@@ -1,0 +1,162 @@
+<div>
+    <waltz-page-header name="{{ ctrl.capability.name }}"
+                       small="Capability"
+                       icon="puzzle-piece">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.capabilities.list">Capabilities</a></li>
+            <li>{{ ctrl.capability.name }}</li>
+        </ol>
+    </waltz-page-header>
+
+
+    <div class="row no-overflow"
+         ng-if="ctrl.capability.parent"
+         style="padding: 1em">
+
+        <div class="col-md-12">
+            <span class="text-muted">
+                <waltz-icon name="level-up"></waltz-icon>
+                Parent:
+            </span>
+            <a ui-sref="main.capabilities.view ({ id: ctrl.capability.parent.id })">
+                {{ ctrl.capability.parent.name }}
+            </a>
+            <span class="text-muted small ">
+                {{ ctrl.capability.parent.description }}
+            </span>
+        </div>
+
+    </div>
+
+    <blockquote style="font-size: medium;">
+        {{ ctrl.capability.description }}
+    </blockquote>
+
+    <!-- CHILDREN -->
+    <div class="row"
+         ng-if="ctrl.capability.children.length > 0">
+        <div class="col-md-offset-1 col-md-10">
+            <table class="table table-condensed small">
+                <colgroup>
+                    <col width="20%">
+                    <col width="80%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th colspan="2">
+                            Sub-Capabilities
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="child in ctrl.capability.children | orderBy:'name'">
+                        <td>
+                            <a ui-sref="main.capabilities.view ({ id: child.id })">
+                                {{ child.name }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="text-muted">
+                                {{ child.description }}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- RATINGS -->
+    <waltz-section name="Application Capability Ratings">
+
+        <waltz-rating-group-header measurables="ctrl.ratings.group.measurables">
+        </waltz-rating-group-header>
+
+        <waltz-rating-group data="ctrl.ratings.group"
+                            tweakers="ctrl.ratings.tweakers"
+                            highestRatingCount="10">
+        </waltz-rating-group>
+
+    </waltz-section>
+
+
+    <!-- FLOWS -->
+    <waltz-section name="Logical Data Flows"
+                   icon="random">
+
+        <waltz-capability-flow-graph flows="ctrl.dataFlows"
+                                     apps-with-capability="ctrl.apps">
+        </waltz-capability-flow-graph>
+
+    </waltz-section>
+
+
+    <!-- APPLICATIONS -->
+    <waltz-section name="Applications"
+                   small="( {{ ctrl.apps.length }} )">
+
+        <div ng-if="ctrl.groupedApps.primaryApps.length > 0">
+            <h4>
+                <waltz-icon name="star"
+                            style="color: goldenrod">
+                </waltz-icon>
+
+                Primary Applications
+            </h4>
+
+            <waltz-app-table applications="ctrl.groupedApps.primaryApps">
+            </waltz-app-table>
+        </div>
+
+        <div ng-if="ctrl.groupedApps.secondaryApps.length > 0">
+            <h4>
+                <waltz-icon name="star-o"
+                            style="color: #999">
+                </waltz-icon>
+                Secondary Applications
+            </h4>
+            <waltz-app-table applications="ctrl.groupedApps.secondaryApps"></waltz-app-table>
+        </div>
+
+        <div ng-if="ctrl.apps.length == 0">
+            <div class="alert alert-warning">
+                <strong>No applications</strong>
+                have been registered against this function.
+            </div>
+        </div>
+    </waltz-section>
+
+    <!-- ASSOCIATED CAPABILITIES -->
+    <waltz-section name="Associated Capabilities">
+        <ul>
+            <li ng-repeat="assoc in ctrl.associatedCapabilities | orderBy:'capabilityReference.name'">
+                <strong>
+                    <a ui-sref="main.capabilities.view ({ id: assoc.capabilityReference.id })">
+                        {{ assoc.capabilityReference.name }}
+                   </a>
+                </strong>
+                <span class="text-muted small">
+                    {{ ctrl.capabilitiesById[assoc.capabilityReference.id].description }}
+                </span>
+                <ul class="list-inline" style="margin-left: 10px">
+                    <li class="text-muted">Applications:</li>
+                    <li ng-repeat="app in assoc.apps | orderBy:'name'">
+                        <a ui-sref="main.app-view ({id: app.id})">
+                            {{ app.name }}
+                        </a>
+                        <span ng-if="! $last"> | </span>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+        <p class="text-muted small">
+            This section shows capabilities performed by applications
+            who <i>also</i> perform this capability.
+        </p>
+
+    </waltz-section>
+
+</div>

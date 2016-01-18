@@ -1,0 +1,9 @@
+<span>
+    <span ng-if="number">
+        {{number}}
+        <a ng-href="sip:{{number}}">
+            <waltz-icon name="phone-square"></waltz-icon>
+        </a>
+    </span>
+    <span ng-if="!number"> - </span>
+</span>

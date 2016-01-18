@@ -1,0 +1,25 @@
+<div>
+    <ui-select ng-model="model.app"
+               theme="bootstrap">
+
+        <ui-select-match placeholder="Search for app...">
+            {{$select.selected.name}}
+        </ui-select-match>
+
+        <ui-select-choices repeat="app in ctrl.apps"
+                           refresh="ctrl.refresh($select.search)"
+                           refresh-delay="300">
+
+            <span ng-bind-html="app.name | highlight: $select.search"></span>
+            <span class="small" ng-if="app.aliases.length > 0">
+                (
+                <span class="small" ng-bind-html="app.aliases.join(', ') | highlight: $select.search"></span>
+                )
+            </span>
+
+            <small style="display: block"
+                   ng-bind-html="app.description | highlight: $select.search"></small>
+
+        </ui-select-choices>
+    </ui-select>
+</div>

@@ -1,0 +1,32 @@
+<div>
+    <style>
+
+    </style>
+
+
+    <div class="waltz-section">
+
+        <div class="waltz-section-header">
+
+            <div class="waltz-visibility-parent waltz-section-header-title">
+
+                <waltz-twistie model="collapsed"></waltz-twistie>
+
+                <waltz-icon name="{{icon}}"></waltz-icon>
+                {{name}}
+
+                <small>
+                    {{ small }}
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="container-fluid waltz-section-body animate-if"
+             ng-if="! collapsed">
+            <ng-transclude></ng-transclude>
+        </div>
+    </div>
+</div>

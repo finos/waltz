@@ -1,0 +1,11 @@
+<div>
+    <div class="measurables-heading">
+        <waltz-rating-group-header measurables="measurables"></waltz-rating-group-header>
+    </div>
+    <div ng-repeat="group in groups">
+        <waltz-rating-group style="border-bottom: 1px solid #ddd"
+                            tweakers="tweakers"
+                            highest-rating-count="highestRatingCount"
+                            data="group"></waltz-rating-group>
+    </div>
+</div>

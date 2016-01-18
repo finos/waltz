@@ -1,0 +1,46 @@
+<div>
+
+    <style>
+        .inherited-server {
+            font-style: italic;
+        }
+    </style>
+
+    <uib-tabset>
+        <uib-tab heading="Overview">
+            <div class="row">
+                <div class="col-md-4">
+                    <waltz-pie-table data="ctrl.pie.os.data"
+                                     config="ctrl.pie.os.config"
+                                     title="By Operating System">
+                    </waltz-pie-table>
+                </div>
+
+                <div class="col-md-4">
+                    <waltz-pie-table data="ctrl.pie.env.data"
+                                     config="ctrl.pie.env.config"
+                                     title="By Environment">
+                    </waltz-pie-table>
+                </div>
+
+                <div class="col-md-4">
+                    <waltz-pie-table data="ctrl.pie.location.data"
+                                     config="ctrl.pie.location.config"
+                                     title="By Location">
+                    </waltz-pie-table>
+                </div>
+            </div>
+        </uib-tab>
+
+        <uib-tab heading="Details" select="showDetail=true">
+            <div ng-if="showDetail">
+                <br>
+                <div style="font-size: smaller; height: 300px"
+                     ui-grid="ctrl.gridOptions">
+                </div>
+            </div>
+    </uib-tab>
+    </uib-tabset>
+
+
+</div>

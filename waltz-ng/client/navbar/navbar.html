@@ -1,0 +1,82 @@
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Waltz</a>
+        </div>
+
+        <ul class="nav navbar-nav nav-bar-left">
+            <li ui-sref-active="active">
+                <a ui-sref="main.home">
+                    <waltz-icon name="home"></waltz-icon>
+                    Home
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="main.org-units.list">
+                    <waltz-icon name="sitemap"></waltz-icon>
+                    Org Units
+                </a>
+            </li>
+            <li ui-sref-active="active" class="dropdown">
+                <a ui-sref="main.capabilities.list">
+                    <waltz-icon name="puzzle-piece"></waltz-icon>
+                    Capabilities
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="main.person">
+                    <waltz-icon name="user"></waltz-icon>
+                    People
+                </a>
+            </li>
+
+        </ul>
+
+
+
+        <form class="navbar-form">
+            <div class="form-group" style="display:inline;">
+                <div class="input-group" style="display:table; padding-left: 24px;">
+                    <span class="input-group-addon"
+                          style="width:1%;">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </span>
+                    <input class="form-control"
+                           ng-model="ctrl.query"
+                           ng-model-options="{ debounce: 250 }"
+                           ng-change="ctrl.doSearch()"
+                           ng-blur="ctrl.dismissResults()"
+                           placeholder="Search...."
+                           autocomplete="off"
+                           autofocus="autofocus"
+                           type="text">
+
+                    <style>
+                        .waltz-nav-search-result-panel {
+                            top: 30px;
+                            position: absolute;
+                            background-color: white;
+                            width:90%;
+                            border: 1px solid #ccc;
+                            box-shadow: 0px 4px 5px gray, -5px 4px 7px gray, 5px 4px 7px gray;
+                        }
+                    </style>
+                    <div class="waltz-nav-search-result-panel" ng-if="ctrl.showSearch()">
+                        <waltz-nav-search-results results="ctrl.searchResults"
+                                                  query="{{ ctrl.query }}"
+                                                  on-dismiss="ctrl.dismissResults"></waltz-nav-search-results>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+
+
+    </div>
+
+
+</nav>

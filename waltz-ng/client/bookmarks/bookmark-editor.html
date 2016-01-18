@@ -1,0 +1,123 @@
+<!--
+  ~  Waltz
+  ~ Copyright (c) David Watkins. All rights reserved.
+  ~ The use and distribution terms for this software are covered by the
+  ~ Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+  ~ which can be found in the file epl-v10.html at the root of this distribution.
+  ~ By using this software in any fashion, you are agreeing to be bound by
+  ~ the terms of this license.
+  ~ You must not remove this notice, or any other, from this software.
+  ~
+  -->
+
+<div>
+
+    <waltz-page-header name="Bookmarks" icon="book">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.app-view ({id: ctrl.parent.id})">{{ ctrl.parent.name }}</a></li>
+            <li>Bookmarks</li>
+            <li>Editor</li>
+        </ol>
+    </waltz-page-header>
+
+    <waltz-section name="Current">
+        <div ng-if="ctrl.bookmarks.length > 0">
+            <table class="table table-condensed" >
+                <colgroup>
+                    <col width="3%">
+                    <col width="15%">
+                    <col width="20%">
+                    <col width="22%">
+                    <col width="25%">
+                    <col width="15%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Kind</th>
+                    <th>Title</th>
+                    <th>URL</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="bookmark in ctrl.bookmarks" class="waltz-visibility-parent">
+                    <td>
+                        <span ng-if="bookmark.isPrimary">
+                            <waltz-icon name="star"></waltz-icon>
+                        </span>
+                        <span ng-if="!bookmark.isPrimary">
+                            <waltz-icon name="star-o"></waltz-icon>
+                        </span>
+
+                    </td>
+                    <td>
+                        <waltz-icon name="{{ bookmark.kind | toIconName:'bookmark' }}"></waltz-icon>
+                        {{ bookmark.kind|toDisplayName:'bookmark' }}
+                    </td>
+
+                    <td>
+                        {{ bookmark.title }}
+                    </td>
+                    <td>
+                        {{ bookmark.url }}
+                    </td>
+                    <td>
+                        {{ bookmark.description }}
+                    </td>
+                    <td>
+                        <span class="waltz-visibility-child-50">
+                            <a href ng-click="ctrl.remove(bookmark)">
+                                Remove
+                            </a>
+                            |
+                            <a href ng-click="ctrl.edit(bookmark)">
+                                Edit
+                            </a>
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div ng-if="ctrl.bookmarks.length == 0" class="alert alert-warning">
+            <strong>No bookmarks</strong> have been registered yet
+        </div>
+
+        <div ng-init="ctrl.createShowing = false">
+            <div ng-show="!ctrl.createShowing">
+                <button ng-click="ctrl.showCreate()" class="btn btn-primary">
+                    Add New
+                </button>
+                &nbsp;
+                <a href ng-click="ctrl.cancel()"> Done</a>
+            </div>
+            <div ng-if="ctrl.createShowing">
+                <hr>
+                <waltz-bookmark-form bookmark="ctrl.newBookmark"
+                                     confirm-label="Create"
+                                     on-cancel="ctrl.createShowing = false"
+                                     on-submit="ctrl.save(bookmark)">
+                </waltz-bookmark-form>
+            </div>
+        </div>
+
+        <div ng-init="ctrl.editShowing = false">
+            <div ng-if="ctrl.editShowing">
+                <hr>
+                <waltz-bookmark-form bookmark="ctrl.selectedBookmark"
+                                     confirm-label="Save"
+                                     on-cancel="ctrl.editShowing = false"
+                                     on-submit="ctrl.save(bookmark)">
+                </waltz-bookmark-form>
+            </div>
+        </div>
+
+
+    </waltz-section>
+
+
+</div>

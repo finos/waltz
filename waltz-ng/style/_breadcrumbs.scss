@@ -1,0 +1,38 @@
+/*
+ *  Waltz
+ * Copyright (c) David Watkins. All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ *
+ */
+
+.waltz-breadcrumbs {
+  @extend .list-inline;
+  font-size: small;
+  margin-bottom: 1px;
+  border-bottom: 1px solid #f8f8f8;
+  opacity: 0.6;
+}
+
+.waltz-breadcrumbs:hover {
+  opacity: 1;
+}
+
+.waltz-breadcrumbs li{
+  padding: 0px;
+}
+.waltz-breadcrumbs li:after {
+  content: ' / '
+}
+.waltz-breadcrumbs li:last-child:after {
+  content: ''
+}
+
+
+.waltz-breadcrumbs a:hover {
+  text-decoration: none;
+}

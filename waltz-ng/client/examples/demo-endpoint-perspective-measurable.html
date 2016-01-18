@@ -1,0 +1,69 @@
+<!--
+  ~  Waltz
+  ~ Copyright (c) David Watkins. All rights reserved.
+  ~ The use and distribution terms for this software are covered by the
+  ~ Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+  ~ which can be found in the file epl-v10.html at the root of this distribution.
+  ~ By using this software in any fashion, you are agreeing to be bound by
+  ~ the terms of this license.
+  ~ You must not remove this notice, or any other, from this software.
+  ~
+  -->
+
+<div>
+    <waltz-page-header name="Perspective Measurable" small="Endpoint & Entity">
+    </waltz-page-header>
+
+
+    <waltz-section name="Perspective Measurable Entity">
+        <h4>perspective <small>Table</small></h4>
+        <table class="table table-condensed table-hover">
+            <thead>
+            <tr>
+                <th>Attribute</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Default</th>
+                <th>Restrictions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td> code </td>
+                <td> Short Code for this measuable, i.e. EQ </td>
+                <td> String </td>
+                <td> - </td>
+                <td> PK </td>
+            </tr>
+            <tr>
+                <td> perspective_code </td>
+                <td> Short Code for the parent perspective, i.e. BUSINESS </td>
+                <td> String </td>
+                <td> - </td>
+                <td> pseudo-FK </td>
+            </tr>
+            <tr>
+                <td> name </td>
+                <td> Display name for the measurable </td>
+                <td> String </td>
+                <td> </td>
+                <td> Required </td>
+            </tr>
+            <tr>
+                <td> description </td>
+                <td> Description for the measurable </td>
+                <td> String </td>
+                <td> </td>
+                <td> Required </td>
+            </tr>
+            </tbody>
+        </table>
+    </waltz-section>
+
+
+    <waltz-section name="Primary Endpoints">
+        <strong>No direct, </strong> see
+        <a ui-sref="main.examples.endpoint-perspective">perspective documentation</a>.
+    </waltz-section>
+
+</div>

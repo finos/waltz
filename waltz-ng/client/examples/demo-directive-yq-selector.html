@@ -1,0 +1,41 @@
+<div>
+
+    <waltz-page-header name="Year / Quarter Selector" small="waltz-yq-select">
+    </waltz-page-header>
+
+    <blockquote>
+        The <q>waltz-yq-select</q> directive provides a simple control to allow a user to select a
+        specific year/quarter.
+    </blockquote>
+
+    <waltz-section name="Demo">
+        <waltz-yq-select style="font-size: small"
+                         start="{year: 2015, quarter: 3}"
+                         end="{year: 2025, quarter: 1}"
+                         selected="ctrl.selected"
+                         on-select="ctrl.onSelect"></waltz-yq-select>
+
+    </waltz-section>
+
+    <waltz-section name="Example Code">
+        <pre>
+&ltwaltz-yq-select start="{year: 2015, quarter: 3}"
+                 end="{year: 2025, quarter: 1}"
+                 selected="ctrl.selectedYQ"
+                 on-select="ctrl.onSelect">&lt;/waltz-yq-select>
+        </pre>
+
+        The control is does not alter the given selected yr/quarter, instead it calls back on the
+        given <code>on-select</code> function.  This should update the <code>selected</code>
+        variable (or reject etc).
+
+        <br>
+
+        <h4>Default Parameters</h4>
+        <ul>
+            <li><strong>start</strong> - <code>{ year: currentYear, quarter: 1 }</code> </li>
+            <li><strong>end</strong> - <code>{ year: start.year + 5, quarter: 4 }</code> </li>
+        </ul>
+    </waltz-section>
+</div>
+

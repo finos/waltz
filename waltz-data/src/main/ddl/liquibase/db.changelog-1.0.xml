@@ -1,0 +1,727 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~  This file is part of Waltz.
+  ~
+  ~     Waltz is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     Waltz is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    
+    <!-- TABLES -->
+    <changeSet author="dwatkins" id="20151129-tbl-1">
+        <createTable tableName="access_log">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="access_log_pkey"/>
+            </column>
+            <column name="user_id" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="params" type="VARCHAR(1024)"/>
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-2">
+        <createTable tableName="app_capability">
+            <column name="application_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="capability_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueBoolean="false" name="is_primary" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-3">
+        <createTable tableName="application">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="application_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="description" type="LONGVARCHAR"/>
+            <column name="asset_code" type="VARCHAR(255)"/>
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="now()" name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="organisational_unit_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="IN_HOUSE" name="kind" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="PRODUCTION" name="lifecycle_phase" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_asset_code" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-4">
+        <createTable tableName="authoritative_source">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="authoritative_source_pkey"/>
+            </column>
+            <column name="parent_kind" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_type" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="application_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-5">
+        <createTable tableName="bookmark">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="bookmark_pkey"/>
+            </column>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="kind" type="VARCHAR(255)"/>
+            <column name="url" type="VARCHAR(255)"/>
+            <column name="parent_kind" type="VARCHAR(255)"/>
+            <column name="parent_id" type="BIGINT"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueBoolean="false" name="is_primary" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-6">
+        <createTable tableName="capability">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="BIGINT"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="LONGVARCHAR">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-7">
+        <createTable tableName="change_log">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="change_log_pkey"/>
+            </column>
+            <column name="parent_kind" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message" type="LONGVARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="severity" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-8">
+        <createTable tableName="data_flow">
+            <column name="source_entity_kind" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_entity_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_entity_kind" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_entity_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_type" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-9">
+        <createTable tableName="data_type">
+            <column name="code" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="LONGVARCHAR">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-10">
+        <createTable tableName="involvement">
+            <column name="entity_kind" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kind" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="employee_id" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-11">
+        <createTable tableName="organisational_unit">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="description" type="LONGVARCHAR"/>
+            <column name="kind" type="VARCHAR(255)"/>
+            <column name="parent_id" type="BIGINT"/>
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="now()" name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-12">
+        <createTable tableName="person">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="person_pkey"/>
+            </column>
+            <column name="employee_id" type="VARCHAR(128)"/>
+            <column name="display_name" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="user_principal_name" type="VARCHAR(255)"/>
+            <column name="department_name" type="VARCHAR(255)"/>
+            <column name="kind" type="VARCHAR(255)"/>
+            <column name="manager_employee_id" type="VARCHAR(128)"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="office_phone" type="VARCHAR(128)"/>
+            <column name="mobile_phone" type="VARCHAR(128)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-13">
+        <createTable tableName="person_hierarchy">
+            <column name="manager_id" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="employee_id" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="99" name="level" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-14">
+        <createTable tableName="perspective">
+            <column defaultValue="BUSINESS" name="code" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="LONGVARCHAR">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-15">
+        <createTable tableName="perspective_measurable">
+            <column defaultValue="" name="code" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="perspective_code" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="LONGVARCHAR">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-16">
+        <createTable tableName="perspective_rating">
+            <column name="measure_code" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Z" name="rating" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="APPLICATION" name="parent_kind" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="capability_id" type="BIGINT"/>
+            <column defaultValue="BUSINESS" name="perspective_code" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-17">
+        <createTable tableName="server_information">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="server_information_pkey"/>
+            </column>
+            <column name="hostname" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="UNKNOWN" name="operating_system" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="DEV" name="environment" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location" type="VARCHAR(128)"/>
+            <column name="asset_code" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-18">
+        <createTable tableName="software_directory">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="software_directory_pkey"/>
+            </column>
+            <column name="vendor" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="HOLD" name="adoption_status" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueBoolean="false" name="notable" type="BOOLEAN"/>
+            <column name="description" type="LONGVARCHAR"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-19">
+        <createTable tableName="user">
+            <column name="user_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-tbl-20">
+        <createTable tableName="user_role">
+            <column name="user_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151130-tbl-1">
+        <createTable tableName="application_alias">
+            <column name="application_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="alias" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151130-tbl-2">
+        <createTable tableName="application_tag">
+            <column name="application_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <!-- PRIMARY KEYS -->
+    <changeSet author="dwatkins" id="20151129-pk-21">
+        <addPrimaryKey columnNames="application_id, capability_id" constraintName="app_capability_pkey" tableName="app_capability"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-pk-22">
+        <addPrimaryKey columnNames="id" constraintName="capability_pkey" tableName="capability"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-pk-23">
+        <addPrimaryKey columnNames="source_entity_kind, source_entity_id, target_entity_id, target_entity_kind, data_type" constraintName="data_flow_pkey" tableName="data_flow"/>
+    </changeSet>
+
+    <changeSet author="dwatkins " id="20151129-pk-24">
+        <addPrimaryKey columnNames="code" constraintName="data_type_pkey" tableName="data_type"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-pk-25">
+        <addPrimaryKey columnNames="id" constraintName="organisational_unit_pkey" tableName="organisational_unit"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-pk-26">
+        <addPrimaryKey columnNames="code" constraintName="perspective_measure_pkey" tableName="perspective_measurable"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-pk-27">
+        <addPrimaryKey columnNames="code" constraintName="perspective_pkey" tableName="perspective"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-pk-28">
+        <addPrimaryKey columnNames="manager_id, employee_id" constraintName="reportee_pkey" tableName="person_hierarchy"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151129-pk-29">
+        <addPrimaryKey columnNames="user_name" constraintName="user_pkey" tableName="user"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151130-pk-1">
+        <addPrimaryKey columnNames="application_id, alias" constraintName="application_alias_pkey" tableName="application_alias"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151130-pk-2">
+        <addPrimaryKey columnNames="application_id, tag" constraintName="application_tag_pkey" tableName="application_tag"/>
+    </changeSet>
+
+
+    <!-- UNIQUE CONSTRAINTS -->
+    <changeSet author="dwatkins" id="20151129-uc-30">
+        <addUniqueConstraint columnNames="employee_id" constraintName="unique_employee_id" tableName="person"/>
+    </changeSet>
+
+    
+    <!-- INDEXES -->
+    <changeSet author="dwatkins" id="20151129-idx-31">
+        <createIndex indexName="fki_authoritative_source_application_id_fkey" tableName="authoritative_source">
+            <column name="application_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="dwatkins" id="20151129-idx-35">
+        <createIndex indexName="unique_name" tableName="application" unique="true">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+
+
+    <!-- FOREIGN KEYS -->
+    <changeSet author="dwatkins" id="20151129-fk-36">
+        <addForeignKeyConstraint baseColumnNames="organisational_unit_id"
+                                 baseTableName="application"
+                                 constraintName="application_organisational_unit_id_fkey"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onUpdate="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="organisational_unit"/>
+    </changeSet>
+    <changeSet author="dwatkins" id="20151129-fk-37">
+        <addForeignKeyConstraint baseColumnNames="application_id"
+                                 baseTableName="authoritative_source"
+                                 constraintName="authoritative_source_application_id_fkey"
+                                 deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION"
+                                 onUpdate="NO ACTION"
+                                 referencedColumnNames="id"
+                                 referencedTableName="application"/>
+    </changeSet>
+
+
+    <!-- REF DATA -->
+    <changeSet id="20151129-rd-1" author="dwatkins">
+        <insert tableName="user">
+            <column name="user_name" value="admin"/>
+            <column name="password" value="$2a$10$jN2VHmBjjKeb8fqDwZbvxecv8xGkVqOghAjUF68Xp0o2hHFhFHxou"/>
+        </insert>
+        <insert tableName="user_role">
+            <column name="user_name" value="admin"/>
+            <column name="role" value="ADMIN"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20151129-rd-2" author="dwatkins">
+        <insert tableName="perspective">
+            <column name="code" value="BUSINESS"></column>
+            <column name="name" value="Business"></column>
+            <column name="description" value="Business Perspective"></column>
+        </insert>
+        <insert tableName="perspective_measurable">
+            <column name="code" value="FIC"></column>
+            <column name="perspective_code" value="BUSINESS"></column>
+            <column name="name" value="FIC"></column>
+            <column name="description" value="Fixed Income"></column>
+        </insert>
+        <insert tableName="perspective_measurable">
+            <column name="code" value="RATES"></column>
+            <column name="perspective_code" value="BUSINESS"></column>
+            <column name="name" value="Rates"></column>
+            <column name="description" value="Rates and Currencies"></column>
+        </insert>
+        <insert tableName="perspective_measurable">
+            <column name="code" value="EQ"></column>
+            <column name="perspective_code" value="BUSINESS"></column>
+            <column name="name" value="Equities"></column>
+            <column name="description" value="Equities"></column>
+        </insert>
+    </changeSet>
+
+
+    <!-- AMMENDMENTS -->
+
+    <changeSet author="dwatkins" id="20151130-mod-1">
+        <dropNotNullConstraint columnDataType="VARCHAR(128)"
+                               columnName="manager_employee_id"
+                               tableName="person"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151130-mod-2">
+        <dropNotNullConstraint columnDataType="VARCHAR(128)"
+                               columnName="mobile_phone"
+                               tableName="person"/>
+        <dropNotNullConstraint columnDataType="VARCHAR(128)"
+                               columnName="office_phone"
+                               tableName="person"/>
+        <dropNotNullConstraint columnDataType="VARCHAR(255)"
+                               columnName="title"
+                               tableName="person"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151130-mod-3" dbms="mysql">
+        <sql> CREATE FULLTEXT INDEX people_content_ft_idx ON person (display_name, user_principal_name, title) </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151130-mod-4" dbms="mysql">
+        <sql> CREATE FULLTEXT INDEX application_content_ft_idx ON application (name, description, asset_code, parent_asset_code) </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151130-mod-5" dbms="mysql">
+        <sql> CREATE FULLTEXT INDEX capability_content_ft_idx ON capability (name, description) </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151130-mod-6" dbms="mysql">
+        <sql> CREATE FULLTEXT INDEX organisational_unit_content_ft_idx ON organisational_unit (name, description) </sql>
+    </changeSet>
+
+    <!-- Additional Server Fields #120 -->
+    <changeSet author="dwatkins" id="20151212-mod-1">
+        <addColumn tableName="server_information">
+            <column name="operating_system_version" type="varchar(128)"/>
+            <column name="country" type="varchar(128)"/>
+            <column name="is_virtual" type="boolean"/>
+        </addColumn>
+    </changeSet>
+
+    <!-- End User Apps #125 -->
+    <changeSet author="dwatkins" id="20151214-tbl-1">
+        <createTable tableName="end_user_application">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="longvarchar">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="MS_EXCEL" name="kind" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="PRODUCTION" name="lifecycle_phase" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="MEDIUM" name="risk_rating" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="organisational_unit_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="organisational_unit_id"
+                                 baseTableName="end_user_application"
+                                 constraintName="end_user_application_organisational_unit_id_fkey"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onUpdate="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="organisational_unit"/>
+
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151217-tbl-1">
+        <createTable tableName="asset_cost">
+            <column name="asset_code" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="year" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kind" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="currency" type="char(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20151226-mod-1">
+        <addColumn tableName="capability">
+            <column name="level" type="int" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet author="dwatkins" id="20151230-mod-1">
+        <createIndex indexName="idx_asset_code"
+                     tableName="application"
+                     unique="false">
+            <column name="asset_code" type="varchar(255)"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160104-tbl-1">
+        <createTable tableName="svg_diagram">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="application_pkey"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kind" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="priority" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="svg" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="key_property" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet author="dwatkins" id="20160105-tbl-1">
+        <modifyDataType tableName="svg_diagram"
+                        columnName="svg"
+                        newDataType="longtext"/>
+    </changeSet>
+
+
+    <changeSet author="dwatkins" id="20160106-idx-1">
+        <createIndex indexName="idx_organisational_unit_id"
+                     tableName="application"
+                     unique="false">
+            <column name="organisational_unit_id" type="BIGINT"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- 146 -->
+    <changeSet author="dwatkins" id="20160106-idx-2">
+        <createIndex indexName="idx_capability_id"
+                     tableName="app_capability"
+                     unique="false">
+            <column name="capability_id" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_application_id"
+                     tableName="app_capability"
+                     unique="false">
+            <column name="application_id" type="BIGINT"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- 146 -->
+    <changeSet author="dwatkins" id="20160106-idx-3">
+        <createIndex indexName="idx_asset_code"
+                     tableName="server_information"
+                     unique="false">
+            <column name="asset_code" type="VARCHAR(128)"/>
+        </createIndex>
+    </changeSet>
+
+
+</databaseChangeLog>

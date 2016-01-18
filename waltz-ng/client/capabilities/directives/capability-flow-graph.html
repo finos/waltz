@@ -1,0 +1,24 @@
+<div>
+
+    Show logical data flows for type:
+    <select ng-model="ctrl.selectedType"
+            ng-change="ctrl.filterByDataType(ctrl.selectedType)">
+        <option value="ALL">
+            All
+        </option>
+        <option ng-repeat="type in ctrl.availableDataTypes | orderBy" value="{{type}}">
+            {{type | toDisplayName:'dataType'}}
+        </option>
+    </select>
+
+    <hr/>
+
+    <waltz-data-flow-diagram data="ctrl.flowData" tweakers="ctrl.tweakers"></waltz-data-flow-diagram>
+
+
+    <p class="text-muted small">
+        Applications coloured green indicate that the application performs this capability, grey applications
+        do not (but either feed or consume from an application that does).  When a node is dragged it will be
+        pinned to it's new position.  To release a pinned node simply double click.
+    </p>
+</div>

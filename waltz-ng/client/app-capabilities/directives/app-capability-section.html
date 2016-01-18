@@ -1,0 +1,24 @@
+<div>
+    <waltz-section name="Capabilities" small="( {{appCapabilities.length}} )" icon="puzzle-piece">
+
+        <waltz-section-actions>
+            <a waltz-has-role="APP_EDITOR"
+               ui-sref='main.app-capability-edit ({id: selfId})'
+               class="btn btn-xs btn-primary">
+                Edit
+            </a>
+        </waltz-section-actions>
+
+
+        <div ng-if="appCapabilities.length > 0">
+            <waltz-app-capability-table app-capabilities="appCapabilities"></waltz-app-capability-table>
+        </div>
+
+        <div ng-if="appCapabilities.length == 0">
+            <div class="alert alert-warning">
+                <strong>No capabilities</strong> have been registered against this application yet.
+            </div>
+        </div>
+
+    </waltz-section>
+</div>

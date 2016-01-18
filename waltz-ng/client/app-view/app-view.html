@@ -1,0 +1,189 @@
+<div>
+    <waltz-page-header icon="desktop"
+                       name="{{ ctrl.app.name }}"
+                       small="{{ ctrl.app.assetCode }}">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>Waltz</li>
+        </ol>
+    </waltz-page-header>
+
+
+    <!-- OVERVIEW -->
+    <waltz-app-overview-section app='ctrl.app'
+                                tags='ctrl.tags'
+                                aliases='ctrl.aliases'
+                                organisational-unit="ctrl.organisationalUnit">
+    </waltz-app-overview-section>
+
+
+    <!-- CAPABILITIES -->
+    <waltz-app-capability-section app-capabilities="ctrl.appCapabilities"
+                                  self-id="{{ctrl.app.id}}">
+    </waltz-app-capability-section>
+
+
+    <!-- CAPABILITY RATINGS -->
+    <waltz-section name="Capability Ratings">
+
+        <div ng-if="ctrl.appCapabilities.length > 0">
+            <waltz-section-actions>
+                <a waltz-has-role="RATING_EDITOR"
+                   ui-sref='main.ratings.editor ({kind : "APPLICATION", entityId: ctrl.app.id, perspectiveCode: "BUSINESS"})'
+                   class="btn btn-xs btn-primary">
+                    Edit
+                </a>
+            </waltz-section-actions>
+
+            <waltz-rating-group-header measurables="ctrl.ratings.group.measurables"></waltz-rating-group-header>
+
+            <waltz-rating-group tweakers="ctrl.ratings.tweakers"
+                                highest-rating-count="ctrl.ratings.highestRatingCount"
+                                data="ctrl.ratings.group"></waltz-rating-group>
+        </div>
+        <div ng-if="ctrl.appCapabilities.length == 0" class="alert alert-warning">
+            <strong>No ratings</strong> - no ratings to show, as the application has not declared it's capabilities
+        </div>
+
+
+    </waltz-section>
+
+
+    <!-- INVOLVED PEOPLE -->
+    <waltz-involved-people-section involvements="ctrl.peopleInvolvements">
+    </waltz-involved-people-section>
+
+
+    <!-- LOGICAL DATA FLOWS -->
+    <waltz-section name="Logical Data Flows" icon="random" small="( {{ctrl.flows.length}} )">
+
+        <waltz-section-actions >
+            <a waltz-has-role="APP_EDITOR"
+               ui-sref='main.data-flow.registration ({id: ctrl.app.id})'
+               class="btn btn-xs btn-primary">
+                Edit
+            </a>
+        </waltz-section-actions>
+
+        <div class="alert alert-warning" ng-if="ctrl.flows.length == 0">
+            <strong>
+                No Data Flows
+            </strong>
+            registered for this application.  Add one
+            <a ui-sref='main.data-flow.registration ({id: ctrl.app.id})'>here</a>.
+        </div>
+
+        <div ng-if="ctrl.flows.length > 0">
+            <waltz-app-data-flow-diagram incoming="ctrl.flow.data.incoming"
+                                         outgoing="ctrl.flow.data.outgoing"
+                                         sources="ctrl.flow.data.sources"
+                                         targets="ctrl.flow.data.targets"
+                                         tweakers="ctrl.flow.tweakers"
+                                         types="ctrl.flow.data.flowTypes"></waltz-app-data-flow-diagram>
+
+            <p class="text-muted small">
+                Diagram detailing the applications data types (Middle)
+                from the sending system (LHS)
+                to the receiving system on the (RHS).
+                <span style="color: darkred">Red lines</span> indicate non-strategic flows,
+                <span style="color: orange">Amber</span> indicates secondary and
+                <span style="color: darkgreen">Green</span> indicates a primary system.
+            </p>
+        </div>
+
+
+    </waltz-section>
+
+
+    <!-- AUTH SOURCES -->
+    <waltz-section name="Authoritative Flow Source"
+                   ng-if="!(ctrl.authSources|isEmpty)">
+
+        <p>
+            This application has an authoritativeness rating for some of the datatypes
+            it deals with.
+        </p>
+
+        <div ng-repeat="(dataType, data) in ctrl.authSources | orderBy">
+            <h4>
+                {{ dataType | toDisplayName:'dataType' }}
+            </h4>
+            <p class="text-muted">{{ dataType | toDescription:'dataType' }}</p>
+
+            <table class="table table-condensed">
+                <colgroup>
+                    <col width="15%"/>
+                    <col width="15%"/>
+                    <col/>
+                </colgroup>
+                <tr ng-repeat="(rating, sources) in data">
+                    <td>
+                        <waltz-rating-indicator value="{{ rating }}">
+                        </waltz-rating-indicator>
+                    </td>
+                    <td>
+                        {{ rating | toDisplayName:'rating' }}
+                    </td>
+                    <td>
+                        Organisational Units:
+                        <ul class="list-inline"
+                            style="display: inline-block">
+                            <li ng-repeat="source in sources">
+                                <a ui-sref="main.org-units.unit({id: source.parentReference.id})">
+                                    {{ ctrl.orgUnitsById[source.parentReference.id].name }}
+                                </a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+        <hr/>
+        <small class="text-muted">
+            Data Types are derived from authoritative sources
+        </small>
+
+    </waltz-section>
+
+
+    <!-- SERVERS -->
+    <waltz-section icon="server" name="Servers" small="( {{ctrl.servers.length}} )">
+
+        <div ng-if="ctrl.servers.length > 0">
+            <waltz-server-list servers="ctrl.servers" primary-asset-code="ctrl.app.assetCode"></waltz-server-list>
+        </div>
+
+        <div ng-if="ctrl.servers.length == 0" class="alert alert-warning">
+            <strong>No Servers</strong> - cannot find any servers associated to this application.
+        </div>
+
+    </waltz-section>
+
+
+    <!-- BOOKMARKS -->
+    <waltz-bookmarks-section bookmarks="ctrl.bookmarks" entity-id="{{ ctrl.app.id }}" kind="APPLICATION">
+    </waltz-bookmarks-section>
+
+
+    <!-- COSTS -->
+    <waltz-section name="Costs">
+        <div ng-if="ctrl.costs.length == 0">
+            <div class="alert alert-warning">
+                <strong>
+                    No costs registered
+                </strong> against this application
+            </div>
+        </div>
+        <div ng-if="ctrl.costs.length > 0">
+            <waltz-asset-cost-table costs="ctrl.costs">
+            </waltz-asset-cost-table>
+        </div>
+    </waltz-section>
+
+
+    <!-- CHANGE LOG -->
+    <waltz-change-log-section entries="ctrl.log">
+    </waltz-change-log-section>
+
+</div>

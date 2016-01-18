@@ -1,0 +1,36 @@
+<div class="waltz-auth-sources-table">
+    <div ng-repeat="(dataType, sources) in ctrl.authSources">
+        <h4>{{ dataType | toDisplayName:'dataType' }}</h4>
+        <table class="table">
+            <colgroup>
+                <col width="15%"/>
+                <col width="30%"/>
+                <col width="55%"/>
+            </colgroup>
+            <tr ng-repeat="source in sources" ng-class="{
+                    'direct' : source.parentReference.id == ctrl.orgUnitId,
+                    'indirect' : source.parentReference.id != ctrl.orgUnitId,
+                }">
+                <td>
+                    <waltz-rating-indicator value="{{source.rating}}"></waltz-rating-indicator>
+                </td>
+                <td>
+                    <div>
+                        {{source.rating|toDisplayName:'rating'}}
+                    </div>
+                    <div ng-if="source.parentReference.id != ctrl.orgUnitId" class="small">
+                        (Declared by: {{ctrl.lookupOrgUnitName(source.parentReference.id)}})
+                    </div>
+                </td>
+                <td>
+                    <a ui-sref="main.app-view ({id: source.applicationReference.id})">
+                        {{source.applicationReference.name}}
+                    </a>
+                    <small>
+                        ( {{source.appOrgUnitReference.name}} )
+                    </small>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

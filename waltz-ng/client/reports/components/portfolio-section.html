@@ -1,0 +1,50 @@
+<div>
+
+    <waltz-section name="{{ ctrl.employee.displayName }}" small="{{ ctrl.employee.title }}">
+
+        <uib-tabset>
+            <uib-tab heading="Summary">
+                <div class="row">
+                    <br>
+                    <div class="col-md-6">
+                        <div>
+                            <waltz-pie-table data="ctrl.chartData.byLifecyclePhase.data"
+                                             config="ctrl.chartData.byLifecyclePhase.config"
+                                             title="Applications By Lifecycle Phase">
+                            </waltz-pie-table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div>
+                            <waltz-pie-table data="ctrl.chartData.byKind.data"
+                                             config="ctrl.chartData.byKind.config"
+                                             title="Applications By Type">
+                            </waltz-pie-table>
+                        </div>
+                    </div>
+                </div>
+            </uib-tab>
+
+
+            <uib-tab select="showAppsTab = true"
+                     heading="Applications"
+                     ng-if="ctrl.portfolio.length > 0">
+
+                <div ng-if="showAppsTab">
+                    <waltz-app-table applications="ctrl.portfolio">
+                    </waltz-app-table>
+                </div>
+
+            </uib-tab>
+        </uib-tabset>
+
+        <a class="btn btn-xs"
+           ui-sref="main.person.view ({empId: ctrl.employee.employeeId })">
+            Go to {{ ctrl.employee.displayName }}'s page&raquo;
+        </a>
+
+    </waltz-section>
+
+
+
+</div>

@@ -1,0 +1,13 @@
+<div>
+    <uib-tabset>
+        <uib-tab heading='{{ diagram.name }}'
+                 ng-repeat="diagram in ctrl.diagrams | orderBy:'priority'">
+            <waltz-svg-diagram diagram="diagram" block-processor="ctrl.blockProcessor">
+            </waltz-svg-diagram>
+            <hr class="waltz-hr-dotted">
+            <div class="text-muted">
+                {{ diagram.description }}
+            </div>
+        </uib-tab>
+    </uib-tabset>
+</div>

@@ -1,0 +1,266 @@
+<!--
+  ~  Waltz
+  ~ Copyright (c) David Watkins. All rights reserved.
+  ~ The use and distribution terms for this software are covered by the
+  ~ Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+  ~ which can be found in the file epl-v10.html at the root of this distribution.
+  ~ By using this software in any fashion, you are agreeing to be bound by
+  ~ the terms of this license.
+  ~ You must not remove this notice, or any other, from this software.
+  ~
+  -->
+
+<div>
+    <waltz-page-header name="{{ ctrl.viewData.orgUnit.name }}"
+                       icon="sitemap"
+                       small="{{ ctrl.viewData.orgUnit.kind | toDisplayName:'orgUnitKind' }}">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.org-units.list">Organisational Units</a></li>
+            <li>{{ctrl.viewData.orgUnit.name}}</li>
+        </ol>
+    </waltz-page-header>
+
+    <!-- OVERVIEW -->
+    <waltz-org-unit-overview parent="ctrl.viewData.immediateHierarchy.parent"
+                             children="ctrl.viewData.immediateHierarchy.children"
+                             unit="ctrl.viewData.orgUnit"
+                             apps="ctrl.viewData.apps"
+                             flows="ctrl.viewData.dataFlows"
+                             ratings="ctrl.viewData.capabilityRatings">
+    </waltz-org-unit-overview>
+
+    <hr/>
+
+    <!-- PEOPLE -->
+    <waltz-involved-people-section involvements="ctrl.viewData.involvements">
+    </waltz-involved-people-section>
+
+
+    <!-- CAPABILITIES -->
+    <waltz-section name="Application Capability Ratings"
+                   icon="puzzle-piece">
+
+        <waltz-section-actions xng-if="ctrl.ratings.groups.length > 0">
+            <button class='btn btn-xs btn-primary' ng-click="ctrl.ratings.actions.expandAll()">
+                <waltz-icon name="plus-square"></waltz-icon> Expand All
+            </button>
+            <button class='btn btn-xs btn-primary' ng-click="ctrl.ratings.actions.collapseAll()">
+                <waltz-icon name="minus-square"></waltz-icon> Collapse All
+            </button>
+        </waltz-section-actions>
+
+        <div ng-if="ctrl.ratings.groups.length > 0">
+            <waltz-rating-groups measurables='ctrl.ratings.measurables'
+                                 groups="ctrl.ratings.groups"
+                                 tweakers="ctrl.ratings.tweakers"></waltz-rating-groups>
+
+            <p class="text-muted small" style="margin-top: 32px">
+                This section shows capabilities performed by applications within this organisational unit.
+            </p>
+        </div>
+
+        <div ng-if="ctrl.ratings.groups.length == 0" class="alert alert-warning">
+            There are no rated capabilities for any member of this group.
+        </div>
+    </waltz-section>
+
+
+    <!-- FLOWS -->
+    <waltz-section name="Logical Data Flows">
+
+        <waltz-section-actions >
+            <a waltz-has-role="ORGUNIT_EDITOR"
+               ng-if="ctrl.showAuthSourceEditBtn"
+               ui-sref="main.auth-sources.edit (ctrl.entityRef)"
+               class="btn btn-xs btn-primary">
+                Edit
+            </a>
+        </waltz-section-actions>
+
+        <uib-tabset>
+
+            <!-- BOINGY GRAPH -->
+            <uib-tab select="shownBoingyGraph = true">
+                <uib-tab-heading>
+                    Logical Data Flows
+                </uib-tab-heading>
+
+                <br>
+
+                <div ng-if="shownBoingyGraph && ctrl.viewData.dataFlows.flows.length > 0 && ctrl.viewData.dataFlows.flows.length < 800">
+                    <waltz-org-unit-flow-viz entities="ctrl.viewData.dataFlows.entities"
+                                             flows="ctrl.viewData.dataFlows.flows"></waltz-org-unit-flow-viz>
+                    <div class="small text-muted">
+                        Dragging nodes will pin them.  Double click to unpin.  If an application is gray
+                        it is not a member of this organisational unit.
+                    </div>
+                </div>
+
+                <div ng-if="ctrl.viewData.dataFlows.flows.length >= 600">
+                    <div class="alert alert-danger"><strong>Too many to flows to draw</strong></div>
+                </div>
+
+
+                <div ng-if="ctrl.viewData.dataFlows.flows.length == 0">
+                    <div class="alert alert-warning">
+                        <strong>No Flows</strong>
+                        have been registered involving applications from {{ ctrl.viewData.orgUnit.name }}.
+                    </div>
+                </div>
+            </uib-tab>
+
+            <!-- RATED FLOWS -->
+            <uib-tab select="shownRatedFlows = true">
+                <uib-tab-heading>
+                    Rated Flows
+                </uib-tab-heading>
+
+                <div class="row" ng-if="shownRatedFlows && ctrl.viewData.ratedFlows.root.flowsByAppThenTypeThenRating.length > 0">
+                    <div class="col-md-8">
+                        <waltz-expanded-rated-flow-chart data="ctrl.viewData.ratedFlows.root"
+                                                         event-dispatcher="ctrl.eventDispatcher">
+
+                        </waltz-expanded-rated-flow-chart>
+                    </div>
+                    <div class="col-md-4">
+                        <waltz-rated-flow-detail style="margin-top: 120px" event-dispatcher="ctrl.eventDispatcher">
+
+                        </waltz-rated-flow-detail>
+                    </div>
+                </div>
+
+                <div ng-if="ctrl.viewData.ratedFlows.root.flowsByAppThenTypeThenRating.length == 0" class="alert alert-warning">
+                    No inbound data flows registered for this organisational unit
+                </div>
+
+                <div class="row" ng-if="shownRatedFlows && ctrl.viewData.ratedFlows.root.children.length > 0">
+                    <div class="col-md-8">
+                        <hr>
+
+                        <div>
+                            <h4 class="text-center">Child Organisational Units</h4>
+                            <waltz-summary-rated-flow-chart data="ctrl.viewData.ratedFlows.root"
+                                                            event-dispatcher="ctrl.eventDispatcher" >
+                            </waltz-summary-rated-flow-chart>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <waltz-rated-flow-summary-detail style="margin-top: 170px" event-dispatcher="ctrl.eventDispatcher">
+
+                        </waltz-rated-flow-summary-detail>
+                    </div>
+                </div>
+
+                <div class="row" style="padding-top: 12px;">
+                    <div class="col-md-12">
+
+                        <div class="small text-muted">
+                            This diagram shows the data types sent to applications in the group.  If a cell is
+                            coloured <span style="color: red">red</span> it indicates that the application is
+                            taking data from a non-approved source.  If a cell is
+                            <span style="color: green">green</span> or <span style="background-color: yellow">yellow</span> it uses
+                            primary or secondary sources.
+                        </div>
+                    </div>
+                </div>
+
+            </uib-tab>
+
+            <!-- AUTH SOURCES -->
+            <uib-tab select="ctrl.showAuthSourceEditBtn = true" deselect="ctrl.showAuthSourceEditBtn = false">
+                <uib-tab-heading>
+                    Authoritative Sources
+                </uib-tab-heading>
+
+                <div ng-show="! ctrl.viewData.authSources | isEmpty">
+                    <waltz-auth-sources-table org-unit-id="ctrl.viewData.orgUnit.id"
+                                              org-units="ctrl.viewData.orgUnits"
+                                              auth-sources="ctrl.viewData.authSources">
+                    </waltz-auth-sources-table>
+                </div>
+
+                <div ng-show="ctrl.viewData.authSources | isEmpty"
+                     class="alert alert-warning">
+                    <strong>No Authoritative Sources</strong>
+                    have been defined for this Organisational Unit.
+                </div>
+
+                <div class="small text-muted">
+                    This section shows the authoritative sources for data types.  A source can be declared locally to this
+                    organisational unit or declared by a <i>parent</i> organisational unit.  An authoritative source
+                    consists of the data type, the source application (it's owning unit is shown in parenthesis) and a rating
+                    of either primary or secondary.
+                </div>
+
+            </uib-tab>
+
+        </uib-tabset>
+
+    </waltz-section>
+
+    <!-- COSTS -->
+    <waltz-section name="Costs">
+        <div class="row">
+            <div class="col-md-12" class="myChart">
+                <waltz-bucket-chart buckets="ctrl.viewData.assetCostBuckets"
+                                    event-dispatcher="ctrl.eventDispatcher">
+                </waltz-bucket-chart>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <br>
+                <div class="small text-muted">
+                    Each circle is sized according to the <i>number</i> of applications whose costs
+                    fall within the stated range.
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 12px">
+            <div class="col-md-12">
+                <waltz-asset-cost-table event-dispatcher='ctrl.eventDispatcher'
+                                        options='{
+                                            showOrgUnit: true,
+                                            showAppName: true,
+                                            showAssetCode: false
+                                        }'
+                                        costs='ctrl.viewData.assetCosts'>
+                </waltz-asset-cost-table>
+            </div>
+        </div>
+    </waltz-section>
+
+
+    <!-- APPS -->
+    <waltz-section name="Applications"
+                   small="({{ ctrl.viewData.apps.length }})"
+                   icon="desktop">
+
+        <div ng-if="ctrl.viewData.apps.length">
+
+            <waltz-app-table filter="appQuery"
+                             applications="ctrl.viewData.apps"></waltz-app-table>
+        </div>
+
+        <div class="alert-warning alert"
+             ng-if="ctrl.viewData.apps.length == 0">
+            <strong>No application </strong>
+            have yet been registered against unit: {{ctrl.unit.name}}.
+        </div>
+    </waltz-section>
+
+
+    <!-- EUC -->
+    <waltz-section name="End User Applications" icon="table" small="({{ctrl.viewData.endUserApps.length}})">
+        <waltz-end-user-app-table end-user-apps="ctrl.viewData.endUserApps"></waltz-end-user-app-table>
+    </waltz-section>
+
+
+    <!-- CHANGE_LOG -->
+    <waltz-change-log-section entries="ctrl.viewData.logEntries">
+
+    </waltz-change-log-section>
+</div>

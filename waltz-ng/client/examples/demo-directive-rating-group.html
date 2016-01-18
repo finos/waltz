@@ -1,0 +1,52 @@
+<!--
+  ~  Waltz
+  ~ Copyright (c) David Watkins. All rights reserved.
+  ~ The use and distribution terms for this software are covered by the
+  ~ Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+  ~ which can be found in the file epl-v10.html at the root of this distribution.
+  ~ By using this software in any fashion, you are agreeing to be bound by
+  ~ the terms of this license.
+  ~ You must not remove this notice, or any other, from this software.
+  ~
+  -->
+
+<div>
+
+    <waltz-page-header name="Rating Group" small="waltz-rating-group">
+    </waltz-page-header>
+
+
+
+    <blockquote>
+        The <code>waltz-change-timeline</code> directive shows a graph representing
+        future changes categorized by year/quarter.  Clicking on a bar will
+        implicitly select all periods before it.
+    </blockquote>
+
+
+    <waltz-section name="Demo">
+
+        <waltz-rating-group highest-rating-count="2"
+                            tweakers="{}"
+                            data="ctrl.group"></waltz-rating-group>
+
+        </waltz-section>
+
+    </waltz-section>
+
+    <waltz-section name="Example Code">
+<pre>
+&lt;waltz-rating-group highest-rating-count="2"
+        tweakers="{}"
+        data="ctrl.group">&lt;/waltz-rating-group>
+</pre>
+    </waltz-section>
+
+    <waltz-section name="Example Data">
+<pre>
+{{ ctrl.group | json }}
+</pre>
+
+    </waltz-section>
+</div>
+

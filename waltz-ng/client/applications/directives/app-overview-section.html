@@ -1,0 +1,18 @@
+<div>
+    <waltz-section name="Overview">
+        <waltz-section-actions>
+            <a waltz-has-role="APP_EDITOR"
+               class="btn btn-xs btn-primary"
+               ui-sref="main.app.edit ({id: ctrl.app.id})">
+                Edit
+            </a>
+        </waltz-section-actions>
+
+        <waltz-app-overview app="ctrl.app"
+                            tags="ctrl.tags"
+                            aliases="ctrl.aliases"
+                            organisational-unit="ctrl.organisationalUnit">
+
+        </waltz-app-overview>
+    </waltz-section>
+</div>

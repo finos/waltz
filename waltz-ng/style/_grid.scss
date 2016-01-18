@@ -1,0 +1,23 @@
+.waltz-grid-currency {
+    text-align: right;
+}
+
+
+.ui-grid-top-panel {
+  @include gradient-vertical($waltz-section-background-color, $waltz-background-color, 0%, 100%);
+}
+
+
+.ui-grid-row:nth-child(even) .ui-grid-cell {
+  background-color: $waltz-background-color;
+}
+
+
+.ui-grid-row:nth-child(odd) .ui-grid-cell {
+  background-color: #fff;
+}
+
+
+.ui-grid-filter-select {
+  background-color: #fff;
+}

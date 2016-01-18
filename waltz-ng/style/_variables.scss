@@ -1,0 +1,29 @@
+$waltz-border-color: #BAA898;
+$waltz-border-color-lighter: #d7c2b0;
+$waltz-background-color: #fffefb;
+$waltz-section-background-color: #FCF7E9;  // section header bars etc
+$waltz-font-color: #332b23;
+
+$waltz-amber: #ff7f0e;
+$waltz-green: #2ca02c;
+$waltz-red: #d62728;
+$waltz-grey: #eee;
+$waltz-blue: #28a1b6;
+
+
+$text-muted: lighten($waltz-font-color, 30%);
+
+$border-radius-small: 1px;
+$border-radius-base: 2px;
+$border-radius-large: 3px;
+$font-size-base: 14px;
+
+$panel-default-heading-bg: $waltz-section-background-color;
+$panel-heading-padding: 6px;
+$panel-default-border: $waltz-border-color;
+$panel-border-radius: 3px;
+
+$blockquote-border-color: $waltz-section-background-color;
+$input-border-focus: $waltz-border-color;
+$popover-title-bg: $waltz-section-background-color;
+$navbar-default-link-active-bg: darken($waltz-section-background-color, 4);

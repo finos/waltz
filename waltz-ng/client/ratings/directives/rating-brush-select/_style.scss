@@ -1,0 +1,47 @@
+.waltz-rbs-options a {
+  display: inline-block;
+  border: 1px solid $waltz-border-color;
+  border-radius: 4px;
+  padding: 6px 12px 6px 12px;
+  opacity: 0.6;
+  text-decoration: none;
+  margin: 4px;
+  font-style: italic;
+}
+
+
+.waltz-rbs-options .selected:hover, .selected:visited, .selected:link, .selected:active {
+  text-decoration: none;
+}
+
+
+.waltz-rbs-options .selected {
+  opacity: 1;
+  border: 3px solid $waltz-border-color;
+  font-style: normal;
+}
+
+
+.waltz-rbs-options a.rating-strategic {
+  background-color: $waltz-green;
+  color: #fff;
+}
+
+
+.waltz-rbs-options a.rating-strategic-with-issues {
+  background-color: $waltz-amber;
+  color: #fff;
+}
+
+
+.waltz-rbs-options a.rating-non-strategic {
+  background-color: $waltz-red;
+  color: #fff;
+}
+
+
+.waltz-rbs-options a.rating-none {
+  background-color: $waltz-grey;
+  color: $waltz-font-color;
+}
+

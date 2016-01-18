@@ -1,0 +1,93 @@
+
+/*
+ *  Waltz
+ * Copyright (c) David Watkins. All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ *
+ */
+
+import d3 from 'd3';
+import _ from 'lodash';
+
+import { aggregatePeopleInvolvements } from '../involvement/involvement-utils';
+
+
+function addDataTypes(extras, vm) {
+    const existing = vm.dataTypes ? vm.dataTypes : [];
+    vm.dataTypes = _.union(existing, extras);
+    return vm.dataTypes;
+}
+
+
+function addOrgUnits(extras, vm) {
+    const existing = vm.orgUnits ? vm.orgUnits : [];
+    vm.orgUnits = _.union(existing, extras);
+    vm.orgUnitsById = _.indexBy(vm.orgUnits, 'id');
+    return vm.orgUnits;
+}
+
+
+export function loadDataFlows(dataFlowStore, id, vm) {
+    const flowsPromise = dataFlowStore.findEnrichedFlowsForApplication(id);
+
+    flowsPromise
+        .then(flows => vm.flows = flows);
+
+    return flowsPromise
+        .then(flows => vm.flowsByType = _.groupBy(flows, 'dataType'))
+        .then(byType => addDataTypes(_.keys(byType), vm));
+
+}
+
+
+export function loadChangeLog(changeLogStore, id, vm) {
+    changeLogStore
+        .findByEntityReference('APPLICATION', id)
+        .then(log => vm.log = log);
+}
+
+
+export function loadServers(serverInfoStore, appId, vm) {
+    serverInfoStore
+        .findByAppId(appId)
+        .then(servers => vm.servers = servers);
+}
+
+
+export function loadInvolvements($q, involvementStore, id, vm) {
+    $q.all([
+        involvementStore.findByEntityReference('APPLICATION', id),
+        involvementStore.findPeopleByEntityReference('APPLICATION', id)
+    ]).then(([involvements, people]) => {
+        vm.peopleInvolvements = aggregatePeopleInvolvements(involvements, people);
+    });
+}
+
+export function loadAuthSources(authSourceStore, orgUnitStore, appId, ouId, vm) {
+    const appAuthSourcePromise = authSourceStore.findByApp(appId);
+    const ouAuthSourcesPromise = authSourceStore.findByReference('ORG_UNIT', ouId);
+
+    ouAuthSourcesPromise.then(ouas => vm.ouAuthSources = ouas);
+    appAuthSourcePromise.then(aas => vm.appAuthSources = aas);
+
+    appAuthSourcePromise.then(authSources => d3.nest()
+        .key(a => a.dataType)
+        .key(a => a.rating)
+        .map(authSources))
+        .then(nested => vm.authSources = nested)
+        .then(nested => addDataTypes(_.keys(nested), vm));
+
+    return appAuthSourcePromise
+        .then(authSources => _.chain(authSources)
+            .filter(a => a.parentReference.kind === 'ORG_UNIT')
+            .map(a => a.parentReference.id)
+            .uniq()
+            .value())
+        .then(orgUnitIds => orgUnitStore.findByIds(orgUnitIds))
+        .then(orgUnits => addOrgUnits(orgUnits, vm));
+}

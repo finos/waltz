@@ -1,0 +1,30 @@
+<div>
+
+    <waltz-page-header name="Bookmark Kind Select" small="waltz-bookmark-kind-select">
+    </waltz-page-header>
+
+    <blockquote>
+        Simple dropdown with bookmark kind choices.
+    </blockquote>
+
+    <waltz-section name="Demo" small="{{ctrl.value}}">
+        <waltz-bookmark-kind-select value="{{ctrl.value}}"
+                                    on-select="ctrl.onSelect">
+        </waltz-bookmark-kind-select>
+    </waltz-section>
+
+    <waltz-section name="Example Code">
+<pre>
+&lt;waltz-bookmark-kind-select value="{ {ctrl.value} }"
+                            on-select="ctrl.onKindSelect">
+&lt;/waltz-bookmark-kind-select>
+</pre>
+
+        The control is does not alter the given value, instead it calls back on the
+        given <code>on-select</code> function.  This should update the <code>value</code>
+        variable (or reject etc).  The callback is provided with two arguments, the first
+        is the code, the second is the full description (in case you want display name/icon etc.)
+
+    </waltz-section>
+</div>
+

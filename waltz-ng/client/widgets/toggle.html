@@ -1,0 +1,15 @@
+<a href ng-click="ctrl.onToggle()">
+    <span ng-if="ctrl.state">
+        <span style="font-size: larger">
+            <waltz-icon name="{{ ctrl.iconOn }}"></waltz-icon>
+        </span>
+        {{ ctrl.labelOn }}
+    </span>
+
+    <span ng-if="! ctrl.state">
+        <span style="font-size: larger">
+            <waltz-icon name="{{ ctrl.iconOff }}"></waltz-icon>
+        </span>
+        {{ ctrl.labelOff }}
+    </span>
+</a>

@@ -1,0 +1,27 @@
+<div>
+    <waltz-section icon="bookmark-o"
+                   name="Bookmarks"
+                   small="( {{ctrl.bookmarks.length}} )">
+        <waltz-section-actions>
+            <a ui-sref="main.bookmarks.edit ({ entityId: ctrl.entityId, kind: ctrl.kind })"
+               class="btn btn-xs btn-primary">
+                Edit
+            </a>
+        </waltz-section-actions>
+        <div class="row" ng-if="ctrl.bookmarks.length > 0">
+            <div class="col-md-6"
+                 ng-repeat="(kind, bookmarks) in ctrl.bookmarksByKind">
+                <waltz-bookmark-card bookmarks="bookmarks" kind="kind">
+                </waltz-bookmark-card>
+            </div>
+        </div>
+
+        <div class="alert alert-warning" ng-if="ctrl.bookmarks.length == 0">
+            <strong>
+                No bookmarks
+            </strong>
+            for this application.
+        </div>
+    </waltz-section>
+</div>
+

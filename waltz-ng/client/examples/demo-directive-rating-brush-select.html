@@ -1,0 +1,39 @@
+<!--
+  ~  Waltz
+  ~ Copyright (c) David Watkins. All rights reserved.
+  ~ The use and distribution terms for this software are covered by the
+  ~ Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+  ~ which can be found in the file epl-v10.html at the root of this distribution.
+  ~ By using this software in any fashion, you are agreeing to be bound by
+  ~ the terms of this license.
+  ~ You must not remove this notice, or any other, from this software.
+  ~
+  -->
+
+<div>
+
+    <waltz-page-header name="Rating Brush Selector" small="waltz-rating-brush-select">
+    </waltz-page-header>
+
+    <blockquote>
+        The <q>waltz-rating-brush-select</q> directive provides the user with a selection mechanism to choose
+        a rating level.
+    </blockquote>
+    <waltz-section name="Demo">
+        <waltz-rating-brush-select selected="ctrl.selected"
+                                   on-select="ctrl.onSelect"></waltz-rating-brush-select>
+    </waltz-section>
+
+    <waltz-section name="Example Code">
+        <pre>
+&lt;waltz-rating-brush-select selected="ctrl.selected"
+                           on-select="ctrl.onSelect">&lt;/waltz-rating-brush-select>
+        </pre>
+
+        The control is does not alter the given selected value, instead it calls back on the
+        given <code>on-select</code> function.  This should update the <code>selected</code>
+        variable (or reject etc).
+
+    </waltz-section>
+</div>
+

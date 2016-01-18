@@ -1,0 +1,45 @@
+<div>
+    <waltz-display-field label="Name">
+        {{ ctrl.app.name }}
+    </waltz-display-field>
+
+
+    <waltz-display-field label="Asset Code">
+        <waltz-asset-code-explorer application="ctrl.app">
+        </waltz-asset-code-explorer>
+    </waltz-display-field>
+
+
+    <waltz-display-field label="Type">
+        {{ ctrl.app.kind | toDisplayName:'applicationKind' }}
+    </waltz-display-field>
+
+
+    <waltz-display-field label="Lifecycle Phase">
+        {{ ctrl.app.lifecyclePhase | toDisplayName:'lifecyclePhase' }}
+    </waltz-display-field>
+
+
+    <waltz-display-field label="Aliases">
+        <waltz-keyword-list keywords="ctrl.aliases">
+        </waltz-keyword-list>
+    </waltz-display-field>
+
+
+    <waltz-display-field label="Owning Unit"
+                         ng-if="ctrl.organisationalUnit">
+        <waltz-org-unit-name-popup unit="ctrl.organisationalUnit">
+        </waltz-org-unit-name-popup>
+    </waltz-display-field>
+
+
+    <waltz-display-field label="Description">
+        {{ ctrl.app.description }}
+    </waltz-display-field>
+
+    <waltz-display-field label="Tags">
+        <waltz-keyword-list keywords="ctrl.tags" on-select="ctrl.tagSelected(keyword)">
+        </waltz-keyword-list>
+    </waltz-display-field>
+
+</div>

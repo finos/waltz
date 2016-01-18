@@ -1,0 +1,110 @@
+<!--
+  ~  Waltz
+  ~ Copyright (c) David Watkins. All rights reserved.
+  ~ The use and distribution terms for this software are covered by the
+  ~ Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+  ~ which can be found in the file epl-v10.html at the root of this distribution.
+  ~ By using this software in any fashion, you are agreeing to be bound by
+  ~ the terms of this license.
+  ~ You must not remove this notice, or any other, from this software.
+  ~
+  -->
+
+<div>
+
+    <style>
+        div.waltz-user-log-scroll {
+            height: 400px;
+            width: 100%;
+            overflow: auto;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 8px;
+        }
+    </style>
+    <waltz-page-header icon="list-ul" name="User Logs"></waltz-page-header>
+
+    <waltz-section name="Select User">
+
+        <form class="form-inline">
+            <div class="form-group">
+                <label>Search</label>
+                <input type="search"
+                       class="form-control"
+                       placeholder="Username"
+                       ng-model="ctrl.userName"
+                       ng-change="ctrl.onChange(ctrl.userName)"
+                       ng-model-options="{debounce: 300}">
+            </div>
+        </form>
+
+    </waltz-section>
+
+    <waltz-section name="Access" small="{{ctrl.userName}}">
+        <div ng-if="ctrl.accesslogs.length > 0" class="waltz-user-log-scroll">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>State</th>
+                    <th>Params</th>
+                    <th>Timestamp</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="log in ctrl.accesslogs">
+                    <td>{{ log.state }}</td>
+                    <td>{{ log.params }}</td>
+                    <td>
+                        <waltz-from-now timestamp="log.createdAt">
+                        </waltz-from-now>
+                    </td>
+                    <td><a href ng-click="ctrl.visit(log)">Visit</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div ng-if="ctrl.accesslogs.length == 0" class="alert alert-warning">
+            No Access logs
+        </div>
+    </waltz-section>
+
+
+    <waltz-section name="Audit" small="{{ctrl.userName}}">
+        <div ng-if="ctrl.changeLogs.length > 0" class="waltz-user-log-scroll">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Message</th>
+                    <th>Entity</th>
+                    <th>Timestamp</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="log in ctrl.changeLogs">
+                    <td>{{ log.message }}</td>
+                    <td>
+                        {{ log.parentReference.kind }} / {{ log.parentReference.id }}
+                        <span ng-if="log.parentReference.name">
+                            / {{ log.parentReference.name }}
+                        </span>
+                    </td>
+                    <td>
+                        <waltz-from-now timestamp="log.createdAt">
+                        </waltz-from-now>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div ng-if="ctrl.changeLogs.length == 0" class="alert alert-warning">
+            No audit logs
+        </div>
+    </waltz-section>
+
+
+</div>
+
+

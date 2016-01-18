@@ -1,0 +1,11 @@
+<div>
+    <ui-select ng-model="ctrl.selected"
+               on-select="ctrl.onChange($item, $model)"
+               theme="bootstrap">
+        <ui-select-match placeholder="Select a kind of bookmark...">{{$select.selected.name}}</ui-select-match>
+        <ui-select-choices repeat="kind in ctrl.kinds | filter:$select.search">
+            <waltz-icon name="{{kind.icon}}" style="display: inline"></waltz-icon>
+            <span ng-bind-html="kind.name | highlight: $select.search"></span>
+        </ui-select-choices>
+    </ui-select>
+</div>

@@ -1,0 +1,11 @@
+<div class="form-group">
+    <label>{{options.templateOptions.label}}</label>
+    <tags-input ng-model="model[options.key]"
+                placeholder="{{options.templateOptions.placeholder}}">
+        <auto-complete ng-if="options.templateOptions.autoCompleteLoader"
+                       source="options.templateOptions.autoCompleteLoader($query)">
+
+        </auto-complete>
+
+    </tags-input>
+</div>

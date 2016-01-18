@@ -1,0 +1,120 @@
+<!--
+  ~  Waltz
+  ~ Copyright (c) David Watkins. All rights reserved.
+  ~ The use and distribution terms for this software are covered by the
+  ~ Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+  ~ which can be found in the file epl-v10.html at the root of this distribution.
+  ~ By using this software in any fashion, you are agreeing to be bound by
+  ~ the terms of this license.
+  ~ You must not remove this notice, or any other, from this software.
+  ~
+  -->
+
+<div>
+    <waltz-page-header name="Application Capability" small="Endpoint & Entity">
+    </waltz-page-header>
+
+    <blockquote>
+        The application capability record is used to indicate that an application
+        performs a given capability.
+    </blockquote>
+
+    <waltz-section name="Application Capability Entity">
+        <h4>app_capability <small>Table</small></h4>
+        <table class="table table-condensed table-hover">
+            <thead>
+
+            <tr>
+                <th>Attribute</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Default</th>
+                <th>Restrictions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td> application_id </td>
+                <td> Id for application </td>
+                <td> Long </td>
+                <td> - </td>
+                <td> Composite PK (1) </td>
+            </tr>
+            <tr>
+                <td> capability_id </td>
+                <td> Id of Capability </td>
+                <td> Long </td>
+                <td> - </td>
+                <td> Composite PK (2) </td>
+            </tr>
+            <tr>
+                <td> is_primary </td>
+                <td> Flag used to indicate that this is a major focus for the application, primarily used for view filtering </td>
+                <td> Boolean </td>
+                <td> false </td>
+                <td> Required </td>
+            </tr>
+            </tbody>
+        </table>
+    </waltz-section>
+
+
+    <waltz-section name="Example JSON Representation">
+        <strong>Note</strong>, this is an enhanced record - decorated with further details about the application and
+        capability.
+        <br>
+        <pre>
+{
+    "capabilityReference": {
+      "kind": "CAPABILITY",
+      "id": 3100,
+      "name": "Settlements"
+    },
+    "applicationReference": {
+      "kind": "APPLICATION",
+      "id": 1,
+      "name": "Waltz"
+    },
+    "description": "Bank settlement system across all business lines. Providing aggregation of settlement instructions for efficiency.",
+    "isPrimary": false
+}
+        </pre>
+    </waltz-section>
+
+
+    <waltz-section name="Primary Endpoints">
+        <table class="table table-condensed">
+            <thead>
+            <tr>
+                <th>URL</th>
+                <th>Return</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><code>api/app-capability/application/(id:long)</code></td>
+                <td>List of app-capability records</td>
+                <td>Returns the all app-capabilities for the given application</td>
+            </tr>
+            <tr>
+                <td><code>api/app-capability/capability/(id:long)</code></td>
+                <td>List of app-capability records</td>
+                <td>Returns the all app-capabilities for the given capability</td>
+            </tr>
+            <tr>
+                <td><code>api/app-capability/org-unit/(id:long)</code></td>
+                <td>List of app-capability records</td>
+                <td>Returns the all app-capabilities for the given organisational unit</td>
+            </tr>
+            <tr>
+                <td><code>api/app-capability/org-unit-tree/(id:long)</code></td>
+                <td>List of app-capability records</td>
+                <td>Returns the all app-capabilities for the given organisational unit and it's descendants</td>
+            </tr>
+
+            </tbody>
+        </table>
+    </waltz-section>
+
+</div>

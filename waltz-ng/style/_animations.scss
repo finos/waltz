@@ -1,0 +1,40 @@
+/*
+ *  Waltz
+ * Copyright (c) David Watkins. All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ *
+ */
+
+
+.animate-if.ng-enter, .animate-if.ng-leave {
+  -webkit-transition: 0.2s linear all;
+  -moz-transition: 0.2s linear all;
+  -ms-transition: 0.2s linear all;
+  -o-transition: 0.2s linear all;
+  transition: 0.2s linear all;
+}
+
+.animate-if.ng-enter {
+  max-height: 0;
+  opacity: 0;
+}
+
+.animate-if.ng-enter.ng-enter-active {
+  max-height: 999px;
+  opacity:0;
+}
+
+.animate-if.ng-leave {
+  max-height: 999px;
+  opacity:0;
+}
+
+.animate-if.ng-leave.ng-leave-active {
+  max-height: 0;
+  opacity:0;
+}

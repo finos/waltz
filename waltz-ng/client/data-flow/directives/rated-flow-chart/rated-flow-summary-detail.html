@@ -1,0 +1,41 @@
+<div>
+    <div ng-if="ctrl.eventData.type == ctrl.eventTypes.ORG_UNIT_SELECTED" class="waltz-detail-callout">
+        <h4 style="border-bottom: 1px solid #ccc; padding-bottom: 4px;">
+            {{ ctrl.eventData.data.orgUnit.name }}
+            <small class="clickable pull-right dismiss" ng-click="ctrl.eventData = null">(X)</small>
+        </h4>
+
+        <span class="text-muted">
+            {{ ctrl.eventData.data.orgUnit.description }}
+        </span>
+
+        <div style="border-top: 1px solid #ddd">
+            <small>
+                Go to
+                <a ui-sref="main.org-units.unit ({id: ctrl.eventData.data.orgUnit.id })">
+                    {{ ctrl.eventData.data.orgUnit.name }}
+                </a>
+            </small>
+        </div>
+    </div>
+
+    <div ng-if="ctrl.eventData.type == ctrl.eventTypes.ORG_UNIT_RATING_SELECTED" class="waltz-detail-callout">
+        <h4 style="padding-bottom: 4px;">
+            {{ ctrl.eventData.data.orgUnit.name }}
+            <small>{{ ctrl.eventData.data.key | toDisplayName:'dataType' }}</small>
+            <small class="clickable pull-right dismiss" ng-click="ctrl.eventData = null">(X)</small>
+        </h4>
+
+        <table class="table table-condensed">
+            <tr ng-repeat="ratingGroup in ctrl.eventData.data.values">
+                <td>
+                    {{ ratingGroup.key | toDisplayName:'rating' }}
+                </td>
+                <td>
+                    {{ ratingGroup.values }}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>

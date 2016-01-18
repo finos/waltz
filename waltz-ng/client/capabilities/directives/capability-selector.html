@@ -1,0 +1,18 @@
+<div>
+    <ui-select ng-model="model.capability"
+               theme="bootstrap">
+
+        <ui-select-match placeholder="Search for capability...">
+            {{$select.selected.name}}
+        </ui-select-match>
+
+        <ui-select-choices repeat="capability in capabilities | filter:$select.search track by $index">
+
+            <span ng-bind-html="capability.name | highlight: $select.search"></span>
+
+            <small style="display: block"
+                   ng-bind-html="capability.description | highlight: $select.search"></small>
+
+        </ui-select-choices>
+    </ui-select>
+</div>

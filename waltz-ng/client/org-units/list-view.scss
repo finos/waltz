@@ -1,0 +1,40 @@
+/*
+ *  Waltz
+ * Copyright (c) David Watkins. All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ *
+ */
+
+@mixin waltz-org-unit-level($level, $fontSize) {
+  .waltz-org-unit-level-#{$level} {
+    font-size: #{$fontSize};
+    margin-left: #{($level - 1) * 32}px;
+    border-radius: 6px;
+  }
+
+  .waltz-org-unit-level-#{$level} .waltz-org-unit-name {
+    font-weight: bolder;
+  }
+}
+
+@include waltz-org-unit-level(1, "large");
+@include waltz-org-unit-level(2, "larger");
+@include waltz-org-unit-level(3, "");
+@include waltz-org-unit-level(4, "");
+@include waltz-org-unit-level(5, "");
+@include waltz-org-unit-level(6, "");
+@include waltz-org-unit-level(7, "");
+
+
+.waltz-org-unit-level {
+  padding: 3px;
+}
+
+.waltz-org-unit-level:hover {
+  background: $waltz-section-background-color;
+}

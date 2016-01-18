@@ -1,0 +1,16 @@
+<table class="table table-condensed table-hover">
+    <tr ng-repeat="direct in ctrl.directs | orderBy:'displayName'">
+        <td>
+            <waltz-person-link person="direct"></waltz-person-link>
+        </td>
+        <td>
+            {{ direct.title }}
+        </td>
+        <td>
+            <waltz-mail-to person="direct"></waltz-mail-to>
+        </td>
+        <td>
+            <waltz-phone-link number="{{ direct.officePhone }}"></waltz-phone-link>
+        </td>
+    </tr>
+</table>

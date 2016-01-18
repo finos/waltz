@@ -1,0 +1,36 @@
+<table class="table table-condensed table-hover">
+    <colgroup>
+        <col width="5%">
+        <col width="25%">
+        <col width="70%">
+    </colgroup>
+    <thead>
+    <tr>
+        <th></th>
+        <th>Name</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="ac in appCapabilities | orderBy:'capabilityReference.name'">
+        <td>
+            <waltz-icon name="star"
+                        style="color: goldenrod"
+                        ng-if="ac.isPrimary"></waltz-icon>
+        </td>
+        <td>
+            <a ui-sref="main.capabilities.view ({id: ac.capabilityReference.id})">
+                <span ng-if="ac.isPrimary" style="font-weight: bolder">
+                    {{ ac.capabilityReference.name }}
+                </span>
+                <span ng-if="! ac.isPrimary">
+                     {{ ac.capabilityReference.name }}
+                </span>
+            </a>
+        </td>
+        <td>
+            {{ ac.description }}
+        </td>
+    </tr>
+    </tbody>
+</table>

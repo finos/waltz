@@ -1,0 +1,32 @@
+<table class="table table-condensed table-hover">
+    <thead>
+    <tr>
+        <th>Source</th>
+        <th></th>
+        <th>Target</th>
+        <th>Data Type</th>
+    </tr>
+    </thead>
+    <tr ng-repeat="flow in flows | orderBy:'sourceEntity.name + targetEntity.name'">
+
+        <td>
+            <waltz-data-flow-app-link app="flow.sourceEntity"
+                                      self-id="{{ selfId }}"></waltz-data-flow-app-link>
+        </td>
+
+        <td>
+            <waltz-icon name="arrow-right"></waltz-icon>
+        </td>
+
+        <td>
+            <waltz-data-flow-app-link app="flow.targetEntity"
+                                      self-id="{{ selfId }}"></waltz-data-flow-app-link>
+        </td>
+
+        <td>
+            <span title="{{ flow.dataType | toDescription:'dataType' }}">
+                {{ flow.dataType | toDisplayName:'dataType' }}
+            </span>
+        </td>
+    </tr>
+</table>

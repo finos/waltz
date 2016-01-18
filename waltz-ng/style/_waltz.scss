@@ -1,0 +1,204 @@
+/*
+ *  Waltz
+ * Copyright (c) David Watkins. All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ *
+ */
+@import "waltz-visibility";
+@import "breadcrumbs";
+@import "grid";
+
+@import "../client/auth-sources/auth-sources";
+@import "../client/common/directives/bucket-chart";
+@import "../client/org-units/list-view";
+@import "../client/bookmarks/bookmarks";
+@import "../client/widgets/styles";
+@import "../client/data-flow/directives/slope-graph/slope-graph";
+@import "../client/data-flow/directives/boingy-graph/boingy-graph";
+@import "../client/ratings/directives/rating-group/rating-group";
+@import "../client/playpen/playpen";
+@import "../client/ratings/directives/rating-brush-select/style";
+
+html {
+  overflow-y: scroll;
+}
+
+
+body {
+  color: $waltz-font-color;
+  padding-top: 70px;
+  background: $waltz-background-color;
+  font-family: 'Noto Sans', sans-serif;
+  margin-right: 12px;
+}
+
+
+textarea {
+  padding: 10px;
+}
+
+
+.navbar {
+  border-bottom: 1px solid $waltz-border-color;
+  background-color: rgba($waltz-section-background-color, 0.95);
+}
+
+
+.clickable:hover {
+  cursor: pointer;
+}
+
+
+.no-text-select {
+  user-select: none;
+}
+
+
+.show-grid {
+  border: 1px solid red;
+}
+
+
+.show-grid div {
+  border: 1px solid green;
+}
+
+
+.no-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-wrap: break-word;
+}
+
+
+.fixed-table {
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+
+
+.vertical-align {
+  display: flex;
+  align-items: center;
+}
+
+
+.waltz-overlay-trigger:hover {
+  cursor: pointer;
+}
+
+
+.waltz-overlay-trigger {
+  border-bottom: 1px dotted #0f0746;
+}
+
+
+.waltz-display-field-table {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+
+.waltz-display-field-label {
+    width: 20%;
+    color: #705f53;
+}
+
+
+.waltz-display-field-value {
+    width: 60%;
+}
+
+
+.waltz-clickable-definition {
+  border-bottom: 1px dotted #ccc;
+}
+
+
+.waltz-clickable-definition:hover {
+  cursor: pointer;
+}
+
+
+.waltz-section-actions {
+  margin-top: -42px;
+  float: right;
+  padding: 0px 2px 2px 0px;
+}
+
+
+.waltz-tally-count {
+  background: #e2ecfb;
+  border-radius: 6px;
+  border: 1px solid #88c1cc;
+  color: #144d66;
+  font-size: x-small;
+  margin: auto;
+  padding: 0 3px 0 3px;
+}
+
+
+.waltz-sidebar {
+  position: fixed;
+  width: 16%;
+  overflow: hidden;
+  white-space: nowrap;
+  word-wrap: break-word;
+  margin-top: 20px;
+  height: 100%;
+}
+
+
+.waltz-content {
+  margin-bottom: 40px;
+}
+
+
+.waltz-page-summary {
+  background: #fff;
+  border: 1px solid $waltz-border-color-lighter;
+  padding: 1em;
+  border-radius: 6px;
+  box-shadow: 4px 4px 4px $waltz-border-color;
+}
+
+
+.waltz-side-nav-help {
+  @extend small;
+  color: $text-muted;
+  white-space: normal !important;
+}
+
+
+.waltz-detail-callout {
+  background-color: lighten($waltz-background-color, 0.5);
+  padding: 0px 6px 4px 6px;
+  border-radius: 3px;
+  border: 1px solid $waltz-border-color-lighter;
+  @include box-shadow(4px, 4px, 4px, $waltz-border-color);
+
+  .dismiss:hover {
+    color: mediumblue;
+  }
+}
+
+
+.waltz-scroll-region {
+  width: 100%;
+  overflow: auto;
+  border: 1px solid $waltz-border-color;
+  border-radius: 3px;
+  padding: 8px;
+}
+
+
+.waltz-hr-dotted {
+    border: 0;
+    border-bottom: 1px dotted $waltz-border-color;
+}

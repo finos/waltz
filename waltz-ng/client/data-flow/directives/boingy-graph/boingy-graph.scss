@@ -1,0 +1,96 @@
+/*
+ *  Waltz
+ * Copyright (c) David Watkins. All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ *
+ */
+
+.waltz-boingy-graph-container {
+  position: relative;
+
+  .info-box {
+    display: inline-block;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    border: 1px solid $waltz-border-color-lighter;
+    padding: 6px;
+    border-radius: 6px;
+    width: 300px;
+    background-color: rgba($waltz-background-color, 0.7);
+    @include box-shadow(2px, 2px, 2px, $waltz-border-color);
+  }
+
+}
+
+
+#arrowhead {
+  fill: #aaa;
+  stroke: #777;
+}
+
+.wdfd-node {
+  circle {
+    fill-opacity: 0.5;
+  }
+  text {
+    fill: #777;
+  }
+}
+
+.wdfd-node:hover {
+  circle {
+    fill-opacity: 0.9;
+  }
+
+  text {
+    stroke-opacity: 0.9;
+    font-weight: 700;
+    fill: #111;
+    font-size: larger;
+  }
+}
+
+.wdfd-link {
+  stroke: #333;
+  stroke-opacity: 0.6;
+}
+
+.wdfd-intra-node circle{
+  fill: green;
+  stroke: #004d00;
+}
+
+.wdfd-extra-node {
+  text {
+    font-style: italic;
+  }
+  circle{
+    fill: #a8a8a8;
+    stroke: #525252;
+  }
+}
+
+.waltz-capability-node-member {
+  circle {
+    fill: green;
+    stroke: #004d00;
+  }
+}
+
+.waltz-capability-node-non-member {
+  text {
+    font-style: italic;
+  }
+
+  circle{
+    fill: #a8a8a8;
+    stroke: #525252;
+  }
+}
+

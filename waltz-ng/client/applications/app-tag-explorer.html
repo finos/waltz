@@ -1,0 +1,59 @@
+<div>
+
+    <waltz-page-header name="Application Tag Explorer" icon="tags">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>Application Tag Explorer</li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="row">
+        <div class="col-md-8">
+            <waltz-section name="{{ tagSet.tag }}"
+                           small="( {{tagSet.apps.length }} )"
+                           icon="tag"
+                           ng-repeat="tagSet in ctrl.tagSets">
+                <waltz-section-actions>
+                    <button class="btn btn-default btn-xs"
+                            ng-click="ctrl.removeTagSet(tagSet)">
+                        Close
+                    </button>
+                </waltz-section-actions>
+                <ul>
+                    <li ng-repeat="app in tagSet.apps | orderBy:'name'" >
+                        <a ui-sref="main.app-view ({ id: app.id })">
+                            <strong>
+                                {{ app.name }}
+                            </strong>
+                    <span class="small">
+                        {{ app.assetCode }}
+                    </span>
+                        </a>
+                        <span class="small text-muted">{{ app.lifecyclePhase | toDisplayName:'lifecyclePhase' }} , {{ app.kind | toDisplayName:'applicationKind' }}</span>
+                        <br>
+                        <span class="small text-muted">{{ app.description }}</span>
+                    </li>
+                </ul>
+            </waltz-section>
+        </div>
+        <div class="col-md-4">
+            <waltz-section name="All Tags">
+                <input class="form-control"
+                       type="search"
+                       placeholder="Search...."
+                       ng-model="tagQuery">
+                <br>
+                <ul class="waltz-keyword-list">
+                    <li ng-repeat="tag in ctrl.tags | filter:tagQuery" class="clickable" ng-click="ctrl.addTagSet(tag)">
+                        {{ tag }}
+                    </li>
+                </ul>
+            </waltz-section>
+
+        </div>
+    </div>
+
+
+
+
+</div>

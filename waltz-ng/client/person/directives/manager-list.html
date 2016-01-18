@@ -1,0 +1,10 @@
+<ul style="display: inline-block"
+    class="list-inline">
+    <li ng-repeat="manager in ctrl.managers">
+        <waltz-person-link person="manager">
+        </waltz-person-link>
+        <span ng-if="! $last">
+            &raquo;
+        </span>
+    </li>
+</ul>

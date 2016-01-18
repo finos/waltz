@@ -1,0 +1,53 @@
+<!--
+  ~  Waltz
+  ~ Copyright (c) David Watkins. All rights reserved.
+  ~ The use and distribution terms for this software are covered by the
+  ~ Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+  ~ which can be found in the file epl-v10.html at the root of this distribution.
+  ~ By using this software in any fashion, you are agreeing to be bound by
+  ~ the terms of this license.
+  ~ You must not remove this notice, or any other, from this software.
+  ~
+  -->
+
+<div>
+    <waltz-page-header name="DataFlows" small="Endpoint">
+    </waltz-page-header>
+
+    <blockquote>
+        The data types endpoint provides a simple list of available data-types for use in flows.
+    </blockquote>
+
+    <waltz-section name="Get All">
+
+        <p>Retrieves information about data flows for the given entity.</p>
+
+        <hr/>
+
+        <strong>Request </strong>
+        <ul>
+            <li><code>GET /api/data-types</code></li>
+        </ul>
+
+        <hr/>
+
+        <strong>Returns</strong>
+        <p>A json array, each element describing a single data type</p>
+        <pre>
+[
+    {
+        "name": "Trade Data",
+        "description": "Information about trades",
+        "code": "TRADE"
+    }, ...
+]</pre>
+
+        <hr/>
+
+        <strong>Client Usage</strong>
+        <p>
+            These types are automatically registered with the <code>toDisplayName</code>
+            and <code>toDescription</code> filters when the client is initialised.
+        </p>
+    </waltz-section>
+</div>

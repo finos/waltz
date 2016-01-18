@@ -1,0 +1,57 @@
+/*
+ *  Waltz
+ * Copyright (c) David Watkins. All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ *
+ */
+
+.waltz-ct .axis text {
+  font: 12px sans-serif;
+  fill: $waltz-font-color;
+  shape-rendering: crispEdges;
+}
+
+.waltz-ct .axis path,
+.waltz-ct .axis line {
+  fill: none;
+  shape-rendering: crispEdges;
+}
+
+
+.waltz-ct .axis.yq line {
+  stroke: $waltz-border-color;
+  shape-rendering: crispEdges;
+}
+
+
+.waltz-ct .axis.year text {
+  fill: lighten($waltz-font-color, 10%);
+  font: 11px sans-serif;
+}
+
+
+.waltz-ct rect.changes.applied {
+  stroke: $waltz-green;
+  fill: lighten($waltz-green, 30%);
+}
+
+.waltz-ct rect.changes.pending {
+  stroke: darken($waltz-amber, 10%);
+  fill: lighten($waltz-amber, 45%);
+}
+
+
+.waltz-ct rect.changes.selected {
+  fill: lighten($waltz-green, 10%);
+  stroke: darken($waltz-green, 10%);
+  stroke-width: 2;
+}
+
+.waltz-ct rect.changes:hover {
+  cursor: pointer;
+}

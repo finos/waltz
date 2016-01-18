@@ -1,0 +1,62 @@
+<div>
+    <div ng-if="mode == Modes.VIEWING">
+
+        {{ value }}
+
+        <button ng-click="edit()"
+                class="btn btn-xs btn-primary">
+            <waltz-icon name="pencil-square-o"></waltz-icon>
+            Edit
+        </button>
+    </div>
+
+
+    <div ng-if="mode == Modes.EDITING">
+        <textarea ng-model="editor.modifiableValue"
+                  rows="10"
+                  style="width: 80%">
+        </textarea>
+
+        <button ng-click="mySave()"
+                class="btn btn-xs btn-success"
+                ng-disabled="editor.modifiableValue == value">
+            <waltz-icon name="cloud-upload"></waltz-icon>
+            Save
+        </button>
+
+        <button ng-click="cancel()"
+                class="btn btn-xs btn-warning">
+            Cancel
+        </button>
+    </div>
+
+
+    <div ng-if="mode == Modes.SAVING">
+       <textarea ng-model="editor.modifiableValue"
+                 rows="10"
+                 style="width: 80%"
+                 disabled>
+        </textarea>
+
+        <waltz-icon spin="true"
+                    name="spinner"></waltz-icon>
+        Saving..
+    </div>
+
+
+    <div ng-if="mode == Modes.ERROR">
+       <textarea ng-model="editor.modifiableValue"
+                 rows="10"
+                 style="width: 80%"
+                 disabled>
+        </textarea>
+
+        <br/>
+
+        <waltz-error-alert error="editor.error"
+                           style="width: 80%"
+                           retry="mySave"></waltz-error-alert>
+
+    </div>
+</div>
+

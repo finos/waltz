@@ -1,0 +1,18 @@
+<div>
+
+
+
+    <waltz-section name="{{unit.name}}" icon="square">
+        <p>{{unit.description}} !!</p>
+        <ul>
+            <li ng-repeat="subUnit in unit.subUnits | orderBy:'name'">
+                <a ui-sref="main.org-units.unit  ({id: {{subUnit.id}} })">
+                    {{subUnit.name}}
+                </a>
+                -
+                <span class="text-muted">{{subUnit.description}}</span>
+            </li>
+        </ul>
+    </waltz-section>
+</div>
+

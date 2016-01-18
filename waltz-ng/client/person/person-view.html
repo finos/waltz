@@ -1,0 +1,139 @@
+<div>
+    <waltz-page-header icon="user" name="{{ ctrl.person.displayName }}">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.person">People</a></li>
+            <li>{{ ctrl.person.displayName }}</li>
+        </ol>
+    </waltz-page-header>
+
+    <ul class="list-unstyled">
+        <li>
+            <div ng-if='ctrl.managers.length > 0' style="padding: 1em">
+                <span class="text-muted">
+                    <waltz-icon name="level-up"></waltz-icon>
+                    Manager/s:
+                    <waltz-manager-list managers="ctrl.managers"></waltz-manager-list>
+                </span>
+            </div>
+
+            <ul class="list-unstyled"
+                style="padding-left: 3em">
+                <li>
+                    <div class="waltz-page-summary">
+                        <h4>
+                            <waltz-icon name="user"></waltz-icon>
+                            {{ctrl.model.person.displayName}}
+                        </h4>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <waltz-display-field label="Title">
+                                    {{ctrl.person.title}}
+                                </waltz-display-field>
+                            </div>
+                            <div class="col-md-6">
+                                <waltz-display-field label="email">
+                                    <waltz-mail-to person="ctrl.person"></waltz-mail-to>
+                                </waltz-display-field>
+                            </div>
+                            <div class="col-md-6">
+                                <waltz-display-field label="Tel (home):">
+                                    <waltz-phone-link number="{{ctrl.person.mobilePhone}}"></waltz-phone-link>
+                                </waltz-display-field>
+
+                                <waltz-display-field label="Tel (office):">
+                                    <waltz-phone-link number="{{ctrl.person.officePhone}}"></waltz-phone-link>
+                                </waltz-display-field>
+                            </div>
+
+                            <div class="col-md-6">
+                                <waltz-display-field label="Roles">
+                                    <ul class="list-unstyled waltz-keyword-list">
+                                        <li ng-repeat="role in ctrl.allRoles | orderBy">
+                                            {{role | toDisplayName:'involvementKind'}}
+                                        </li>
+                                    </ul>
+                                </waltz-display-field>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul ng-if="ctrl.directs.length > 0"
+                        class="list-unstyled"
+                        style="padding-left: 6em">
+                        <li>
+                            <h4>Directs</h4>
+                            <waltz-person-directs-list directs="ctrl.directs"></waltz-person-directs-list>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+
+    <div ng-if="ctrl.hasInvolvements">
+
+        <waltz-section icon="desktop"
+                       name="Application Portfolio">
+
+            <uib-tabset>
+
+                <uib-tab heading="Summary">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div>
+                                <waltz-pie-table data="ctrl.charts.apps.byLifecyclePhase.data"
+                                                 config="ctrl.charts.apps.byLifecyclePhase.config"
+                                                 title="Applications By Lifecycle Phase">
+                                </waltz-pie-table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div>
+                                <waltz-pie-table data="ctrl.charts.apps.byKind.data"
+                                                 config="ctrl.charts.apps.byKind.config"
+                                                 title="Applications By Type">
+                                </waltz-pie-table>
+                            </div>
+                        </div>
+                    </div>
+                </uib-tab>
+
+
+                <uib-tab select="showDirectTab = true"
+                         heading="Direct"
+                         ng-if="ctrl.involvements.direct.length > 0">
+
+                    <div ng-if="showDirectTab"
+                         ng-repeat="group in ctrl.involvements.direct | orderBy:'kind'">
+                        <h4>
+                            Role: {{group.kind | toDisplayName:'involvementKind'}}
+                        </h4>
+
+                        <waltz-app-table applications="group.apps">
+                        </waltz-app-table>
+                    </div>
+
+                </uib-tab>
+
+
+                <uib-tab select="showOversightTab=true"
+                         heading="Oversight"
+                         ng-if="ctrl.involvements.indirect.length > 0">
+
+                    <div ng-if="showOversightTab">
+                        <h4> Oversight Involvements <small>(Inferred via direct reports)</small></h4>
+                        <waltz-app-table applications="ctrl.involvements.indirect">
+                        </waltz-app-table>
+                    </div>
+
+                </uib-tab>
+
+            </uib-tabset>
+
+        </waltz-section>
+    </div>
+
+</div>

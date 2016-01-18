@@ -1,0 +1,44 @@
+
+<div>
+    <waltz-page-header name="Keyword List" small="waltz-keyword-list">
+    </waltz-page-header>
+
+    <blockquote>
+        Displays keywords and optionally can be given an click handler
+    </blockquote>
+
+    <waltz-section name="Demo">
+        <waltz-keyword-list keywords="['z', 'b', 'c']"
+                            on-select="clicked(keyword)">
+
+        </waltz-keyword-list>
+
+        <span>Selected: {{ selected }} </span>
+    </waltz-section>
+
+
+    <waltz-section name="Example Code">
+        <h4>Markup</h4>
+        <pre>
+&lt;waltz-keyword-list keywords="['z', 'b', 'c']"
+                    on-select="clicked(keyword)">
+&lt;/waltz-keyword-list>
+        </pre>
+
+        <h4>Script</h4>
+        <pre>
+ $scope.clicked = function(keyword) {
+        $scope.selected = keyword;
+ };
+        </pre>
+
+        The <code>on-select</code> callback (&) is optional.  If not specified the cursor will not turn into a pointer
+        when hovering over keywords.
+
+        <hr>
+
+        <strong>Important</strong> The parameter in the markup callback must be labelled <code>keyword</code>
+
+    </waltz-section>
+
+</div>

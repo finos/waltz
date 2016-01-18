@@ -1,0 +1,35 @@
+<div>
+    <waltz-section name="Changes">
+        <div ng-if="entries.length > 0">
+            <table class="table table-condensed table-hover">
+                <thead>
+                <tr>
+                    <th>Severity</th>
+                    <th>Message</th>
+                    <th>User</th>
+                    <th>Timestamp</th>
+                </tr>
+                </thead>
+                <tr ng-repeat="entry in entries | orderBy:'-createdAt'">
+                    <td>
+                        {{ entry.severity | toDisplayName:'severity' }}
+                    </td>
+                    <td>
+                        {{ entry.message }}
+                    </td>
+                    <td>
+                        {{ entry.userId }}
+                    </td>
+                    <td>
+                        <waltz-from-now timestamp="entry.createdAt">
+                        </waltz-from-now>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div ng-if="entries.length == 0">
+            <i class="text-muted"> No changes yet </i>
+        </div>
+
+    </waltz-section>
+</div>

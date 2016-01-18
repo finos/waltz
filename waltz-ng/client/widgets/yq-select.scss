@@ -1,0 +1,49 @@
+/*
+ *  Waltz
+ * Copyright (c) David Watkins. All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ *
+ */
+
+
+.waltz-yq-select tr{
+  border: 1px dotted $waltz-border-color;
+}
+
+.waltz-yq-select td{
+  padding: 6px;
+  border: 1px dotted #ddd;
+}
+
+.waltz-yq-select td.enabled:not(:first-child):hover{
+  cursor: pointer;
+  background: lighten($waltz-border-color-lighter, 10%);
+}
+
+.waltz-yq-select td.selected {
+  background: $waltz-border-color-lighter;
+  font-weight: bolder;
+}
+
+.waltz-yq-select td:first-child {
+  color: lighten($waltz-font-color, 25%);
+}
+
+.waltz-yq-select td.selected-year {
+  background: lighten($waltz-border-color-lighter, 15%);
+  font-weight: bolder;
+}
+.waltz-yq-select td.selected:hover {
+  background: $waltz-border-color;
+}
+
+.waltz-yq-select td.disabled {
+  background: $waltz-background-color;
+  color: lighten($waltz-border-color, 10%);
+}
+

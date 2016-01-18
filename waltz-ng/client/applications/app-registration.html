@@ -1,0 +1,91 @@
+<!--
+  ~  Waltz
+  ~ Copyright (c) David Watkins. All rights reserved.
+  ~ The use and distribution terms for this software are covered by the
+  ~ Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+  ~ which can be found in the file epl-v10.html at the root of this distribution.
+  ~ By using this software in any fashion, you are agreeing to be bound by
+  ~ the terms of this license.
+  ~ You must not remove this notice, or any other, from this software.
+  ~
+  -->
+
+<div>
+
+    <waltz-page-header name="Application Registration"></waltz-page-header>
+
+    <waltz-section name="Details">
+        <form ng-submit="ctrl.onSubmit()"
+              name="ctrl.form"
+              novalidate>
+            <formly-form form="ctrl.form"
+                         model="ctrl.model"
+                         fields="ctrl.fields">
+
+                <button type="submit"
+                        class="btn btn-success"
+                        style="margin-left: 12px"
+                        ng-disabled="ctrl.form.$invalid">
+                    Register
+                </button>
+
+            </formly-form>
+
+        </form>
+    </waltz-section>
+
+    <div ng-if="ctrl.registrations.length > 0">
+        <waltz-section name="Recent Registrations">
+
+            <table class="table table-condensed">
+
+                <tr ng-repeat="registration in ctrl.registrations"
+                    ng-class="{ 'bg-success' : registration.success, 'danger' : ! registration.success }"
+                    ng-include="registration.success ? 'applications/app-registration-success.frag' : 'applications/app-registration-failure.frag'">
+                </tr>
+
+            </table>
+
+        </waltz-section>
+    </div>
+
+
+    <script type="text/ng-template"
+            id="applications/app-registration-success.frag">
+        <td>
+            <waltz-icon name="check"></waltz-icon>
+            <a ui-sref="main.app-view ({ id: registration.app.id })">
+                <strong>
+                    {{ registration.app.name }}
+                </strong>
+            </a>
+        </td>
+        <td>
+            {{ registration.app.kind | toDisplayName:'applicationKind' }}
+        </td>
+        <td>
+            {{ registration.app.lifecyclePhase | toDisplayName:'lifecyclePhase' }}
+        </td>
+        <td>
+            <a ui-sref="main.org-units.unit ({ id: registration.app.organisationalUnit.id })">
+                {{ registration.app.organisationalUnit.name }}
+            </a>
+        </td>
+    </script>
+
+    <script type="text/ng-template"
+            id="applications/app-registration-failure.frag">
+        <td>
+            <waltz-icon name="close"></waltz-icon>
+            <strong>
+                {{ registration.app.name }}
+            </strong>
+        </td>
+        <td colspan="3">
+            <span class="text-muted">
+                {{ registration.message }}
+            </span>
+        </td>
+    </script>
+
+</div>

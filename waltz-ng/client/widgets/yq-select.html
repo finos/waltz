@@ -1,0 +1,17 @@
+<table class="waltz-yq-select">
+    <tr ng-repeat="year in ctrl.years">
+        <td ng-class="{ 'selected-year': ctrl.selected.year == year }">{{ year }}</td>
+
+        <td ng-repeat="q in [1,2,3,4]"
+            ng-class="{
+                selected: ctrl.isSelected(year, q),
+                disabled: ctrl.isDisabled(year, q),
+                enabled: !ctrl.isDisabled(year, q)
+            }"
+            ng-click="ctrl.select({ year: year, quarter: q })">
+            Q{{q}}
+        </td>
+
+    </tr>
+</table>
+

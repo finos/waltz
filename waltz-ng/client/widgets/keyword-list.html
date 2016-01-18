@@ -1,0 +1,7 @@
+<ul class="waltz-keyword-list">
+    <li ng-repeat="keyword in keywords | orderBy"
+        ng-click="onSelect({keyword: keyword})"
+        ng-class="{ 'clickable': onSelect }">
+        {{ keyword }}
+    </li>
+</ul>

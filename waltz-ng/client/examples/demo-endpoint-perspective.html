@@ -1,0 +1,120 @@
+<!--
+  ~  Waltz
+  ~ Copyright (c) David Watkins. All rights reserved.
+  ~ The use and distribution terms for this software are covered by the
+  ~ Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+  ~ which can be found in the file epl-v10.html at the root of this distribution.
+  ~ By using this software in any fashion, you are agreeing to be bound by
+  ~ the terms of this license.
+  ~ You must not remove this notice, or any other, from this software.
+  ~
+  -->
+
+<div>
+    <waltz-page-header name="Perspective" small="Endpoint & Entity">
+    </waltz-page-header>
+
+
+    <waltz-section name="Perspective Entity">
+        <h4>perspective <small>Table</small></h4>
+        <table class="table table-condensed table-hover">
+            <thead>
+
+            <tr>
+                <th>Attribute</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Default</th>
+                <th>Restrictions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td> code </td>
+                <td> Short Code for the perspective, i.e. BUSINESS </td>
+                <td> String </td>
+                <td> - </td>
+                <td> PK </td>
+            </tr>
+            <tr>
+                <td> name </td>
+                <td> Display name for the perspective </td>
+                <td> String </td>
+                <td> </td>
+                <td> Required </td>
+            </tr>
+            <tr>
+                <td> description </td>
+                <td> Description for the perspective </td>
+                <td> String </td>
+                <td> </td>
+                <td> Required </td>
+            </tr>
+            </tbody>
+        </table>
+    </waltz-section>
+
+
+    <waltz-section name="Example JSON Representation">
+        <pre>
+{
+  "measurables": [
+    {
+      "code": "CMDTY",
+      "name": "Commodities",
+      "description": "Commodities"
+    },
+    {
+      "code": "EQ",
+      "name": "Equities",
+      "description": "Equities"
+    },
+    {
+      "code": "FIC",
+      "name": "FIC",
+      "description": "Fixed Income"
+    },
+    {
+      "code": "INS",
+      "name": "Insurance",
+      "description": "Insurance"
+    },
+    {
+      "code": "PROP",
+      "name": "Property",
+      "description": "Property"
+    },
+    {
+      "code": "CURR",
+      "name": "Rates",
+      "description": "Rates and Currencies"
+    }
+  ],
+  "code": "BUSINESS",
+  "name": "Business",
+  "description": "Business Support"
+}
+        </pre>
+    </waltz-section>
+
+
+    <waltz-section name="Primary Endpoints">
+        <table class="table table-condensed">
+            <thead>
+            <tr>
+                <th>URL</th>
+                <th>Return</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><code>api/perspective/code/(code:string)</code></td>
+                <td>Single perspective record</td>
+                <td>Returns the perspective and it's child measurables</td>
+            </tr>
+            </tbody>
+        </table>
+    </waltz-section>
+
+</div>
