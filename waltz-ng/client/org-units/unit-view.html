@@ -27,18 +27,23 @@
                              unit="ctrl.viewData.orgUnit"
                              apps="ctrl.viewData.apps"
                              flows="ctrl.viewData.dataFlows"
-                             ratings="ctrl.viewData.capabilityRatings">
+                             ratings="ctrl.viewData.capabilityRatings"
+                             costs="ctrl.viewData.assetCosts"
+                             org-server-stats="ctrl.orgServerStats">
     </waltz-org-unit-overview>
 
     <hr/>
 
     <!-- PEOPLE -->
-    <waltz-involved-people-section involvements="ctrl.viewData.involvements">
+    <waltz-involved-people-section
+        id="ouv-people"
+        involvements="ctrl.viewData.involvements">
     </waltz-involved-people-section>
 
 
     <!-- CAPABILITIES -->
     <waltz-section name="Application Capability Ratings"
+                   id="ouv-ratings"
                    icon="puzzle-piece">
 
         <waltz-section-actions xng-if="ctrl.ratings.groups.length > 0">
@@ -67,7 +72,7 @@
 
 
     <!-- FLOWS -->
-    <waltz-section name="Logical Data Flows">
+    <waltz-section name="Logical Data Flows" id="ouv-flows">
 
         <waltz-section-actions >
             <a waltz-has-role="ORGUNIT_EDITOR"
@@ -200,7 +205,7 @@
     </waltz-section>
 
     <!-- COSTS -->
-    <waltz-section name="Costs">
+    <waltz-section name="Costs" id="ouv-costs">
         <div class="row">
             <div class="col-md-12" class="myChart">
                 <waltz-bucket-chart buckets="ctrl.viewData.assetCostBuckets"
@@ -236,6 +241,7 @@
 
     <!-- APPS -->
     <waltz-section name="Applications"
+                   id="ouv-apps"
                    small="({{ ctrl.viewData.apps.length }})"
                    icon="desktop">
 
@@ -254,7 +260,7 @@
 
 
     <!-- EUC -->
-    <waltz-section name="End User Applications" icon="table" small="({{ctrl.viewData.endUserApps.length}})">
+    <waltz-section id="ouv-euc" name="End User Applications" icon="table" small="({{ctrl.viewData.endUserApps.length}})">
         <waltz-end-user-app-table end-user-apps="ctrl.viewData.endUserApps"></waltz-end-user-app-table>
     </waltz-section>
 

@@ -21,13 +21,20 @@ import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.data.server_info.ServerInfoDao;
 import com.khartec.waltz.model.dataflow.RatedDataFlow;
+import com.khartec.waltz.schema.tables.Application;
+import com.khartec.waltz.schema.tables.ServerInformation;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.data_flow.RatedDataFlowService;
+import org.jooq.DSLContext;
 import org.jooq.Record4;
 import org.jooq.Result;
+import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Collection;
+
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 
 
 public class ServerHarness {
@@ -36,7 +43,17 @@ public class ServerHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         ServerInfoDao serverInfoDao = ctx.getBean(ServerInfoDao.class);
-
+        DSLContext dsl = ctx.getBean(DSLContext.class);
+        dsl.select(APPLICATION.ORGANISATIONAL_UNIT_ID,
+                    DSL.coalesce(SERVER_INFORMATION.IS_VIRTUAL, Boolean.FALSE),
+                    DSL.countDistinct(SERVER_INFORMATION.HOSTNAME))
+                .from(SERVER_INFORMATION)
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ORGANISATIONAL_UNIT_ID.in(150L, 140L))
+                .where(SERVER_INFORMATION.ASSET_CODE.eq(APPLICATION.ASSET_CODE))
+                .groupBy(SERVER_INFORMATION.IS_VIRTUAL, APPLICATION.ORGANISATIONAL_UNIT_ID)
+                .fetch()
+                .forEach(System.out::println);
     }
 
 

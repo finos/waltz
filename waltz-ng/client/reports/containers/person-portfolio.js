@@ -17,7 +17,6 @@ class Controller {
     }
 
     componentWillReceiveStateAndActions(nextState, nextActions) {
-        console.log('cmrsaa', nextState);
     }
 
 
@@ -30,12 +29,6 @@ class Controller {
             reportConfig: state.personPortfolioReportConfig[10]
         };
     }
-}
-
-function controller($ngRedux, $scope, personPortfolioActions) {
-
-    console.log('hmm', typeof personPortfolioActions, personPortfolioActions);
-
 }
 
 Controller.$inject = ['$ngRedux', '$scope', 'PersonPortfolioActions'];

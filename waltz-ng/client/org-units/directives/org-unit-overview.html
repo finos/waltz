@@ -40,20 +40,56 @@
                     <div class="col-md-4">
                         <waltz-pie-table data="ctrl.pies.app.data"
                                          config="ctrl.pies.app.config"
+                                         class="clickable"
+                                         waltz-jump-to="ouv-apps"
                                          title="Applications By Lifecycle Phase">
                         </waltz-pie-table>
                     </div>
                     <div class="col-md-4">
                         <waltz-pie-table data="ctrl.pies.capability.data"
                                          config="ctrl.pies.capability.config"
+                                         class="clickable"
+                                         waltz-jump-to="ouv-ratings"
                                          title="Application Capability Ratings">
                         </waltz-pie-table>
                     </div>
                     <div class="col-md-4">
                         <waltz-pie-table data="ctrl.pies.flows.data"
                                          config="ctrl.pies.flows.config"
+                                         class="clickable"
+                                         waltz-jump-to="ouv-flows"
                                          title="Logical Flows">
                         </waltz-pie-table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <waltz-basic-info-tile name="Portfolio Cost"
+                                               description="Cumulative value of infra and app dev costs"
+                                               waltz-jump-to="ouv-costs"
+                                               icon="euro">
+                            <span style="font-size: xx-large;">
+                                {{ ctrl.portfolioCostStr }}
+                            </span>
+                        </waltz-basic-info-tile>
+                    </div>
+                    <div class="col-md-4">
+                        <waltz-basic-info-tile name="Servers"
+
+                                               description="Number of servers supporting this org unit"
+                                               waltz-jump-to="ouv-servers"
+                                               icon="server">
+                            <div>
+                                <div style="font-size: xx-large;">
+                                    {{ ctrl.serverStats.total }}
+                                </div>
+                                <div class="small text-muted">
+                                    {{ ctrl.serverStats.virtualPercentage }}% virtual
+                                </div>
+                            </div>
+
+
+                        </waltz-basic-info-tile>
                     </div>
                 </div>
             </div>

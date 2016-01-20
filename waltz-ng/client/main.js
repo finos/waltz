@@ -187,6 +187,6 @@ waltzApp.run(['$rootScope', '$document', ($rootScope, $doc) => {
     });
 }]);
 
-waltzApp.config(($ngReduxProvider) => {
+waltzApp.config(['$ngReduxProvider', ($ngReduxProvider) => {
     $ngReduxProvider.createStoreWith(rootReducer, [thunk], []);
-})
+}]);

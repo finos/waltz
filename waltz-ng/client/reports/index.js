@@ -1,10 +1,12 @@
 import personPortfolioActions from './actions/person-portfolio-actions';
 import personActions from './actions/person-actions';
+import orgServerStatsActions from './actions/org-server-stats-actions';
 
 
 export default (module) => {
     module.service('PersonPortfolioActions', personPortfolioActions);
     module.service('PersonActions', personActions);
+    module.service('OrgServerStatsActions', orgServerStatsActions);
 
 
     module.config([
