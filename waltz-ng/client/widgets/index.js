@@ -11,6 +11,7 @@
  */
 
 export default (module) => {
+    module.directive('waltzBasicInfoTile', require('./basic-info-tile'));
     module.directive('waltzChangeTimeline', require('./change-timeline'));
     module.directive('waltzDataExtractLink', require('./data-extract-link'));
     module.directive('waltzDisplayField', require('./display-field'));
@@ -19,6 +20,7 @@ export default (module) => {
     module.directive('waltzExternalLink', require('./external-link'));
     module.directive('waltzFromNow', require('./from-now'));
     module.directive('waltzIcon', require('./icon'));
+    module.directive('waltzJumpTo', require('./jump-to'));
     module.directive('waltzKeywordList', require('./keyword-list'));
     module.directive('waltzMailTo', require('./mail-to'));
     module.directive('waltzNavSearchResults', require('./nav-search-results'));

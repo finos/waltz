@@ -147,10 +147,19 @@ function calculateCapabilityRatings(orgUnitId, apps, appCapabilities, perspectiv
 }
 
 
+function mapStateToThis(state) {
+    return {
+        orgServerStats: state.orgServerStats
+    };
+}
+
+
 function controller($stateParams,
                     $state,
                     $scope,
-                    viewData) {
+                    viewData,
+                    $ngRedux,
+                    orgServerStatsActions) {
 
     const id = $stateParams.id;
     const vm = this;
@@ -173,6 +182,18 @@ function controller($stateParams,
                 $state);
         }
     }, true);
+
+
+    const onUpdate = (selectedState, actions) => {
+        Object.assign(vm, selectedState, actions);
+    };
+
+    const unsubscribe = $ngRedux.connect(mapStateToThis, orgServerStatsActions)(onUpdate);
+    $scope.$on('$destroy', unsubscribe);
+
+    this.fetchOrgServerStats(id);
+
+    global.vm = vm;
 }
 
 
@@ -180,7 +201,9 @@ controller.$inject = [
     '$stateParams',
     '$state',
     '$scope',
-    'viewData'
+    'viewData',
+    '$ngRedux',
+    'OrgServerStatsActions'
 ];
 
 

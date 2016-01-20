@@ -11,9 +11,11 @@
  *
  */
 
+import _ from 'lodash';
+import numeral from 'numeral';
+
 import { lifecyclePhaseColorScale, capabilityColorScale, flowDirectionColorScale } from '../../common/colors';
 
-import _ from 'lodash';
 
 function calcCapabilityStats(capabilityRatings) {
     return _.chain(capabilityRatings)
@@ -31,15 +33,16 @@ function calcAppStats(apps) {
 }
 
 
-function calcFlowStats(flows, apps) {
+function calcAppConnectionStats(flows, apps) {
     const logicalFlows = flows.flows;
 
-    const appIds = _.map(apps, 'id');
+    const orgMemberAppIds = _.map(apps, 'id');
 
     return _.chain(logicalFlows)
+        .uniq(false, f => f.source.id + '.' + f.target.id)
         .map(f => {
-            const sourceIsMember = _.contains(appIds, f.source.id);
-            const targetIsMember = _.contains(appIds, f.target.id);
+            const sourceIsMember = _.contains(orgMemberAppIds, f.source.id);
+            const targetIsMember = _.contains(orgMemberAppIds, f.target.id);
             if (sourceIsMember && targetIsMember) return 'INTRA';
             if (sourceIsMember) return 'INBOUND';
             if (targetIsMember) return 'OUTBOUND';
@@ -60,19 +63,19 @@ function controller($scope, orgUnitStore) {
         app: {
             config: {
                 colorProvider: (d) => lifecyclePhaseColorScale(d.data.key),
-                size: 100
+                size: 80
             }
         },
         capability: {
             config: {
                 colorProvider: (d) => capabilityColorScale(d.data.key),
-                size: 100
+                size: 80
             }
         },
-        flows: {
+        appConnections: {
             config: {
                 colorProvider: (d) => flowDirectionColorScale(d.data.key),
-                size: 100
+                size: 80
             }
         }
     };
@@ -91,9 +94,52 @@ function controller($scope, orgUnitStore) {
 
     $scope.$watch('ctrl.flows', flows => {
         if (!flows) return;
-        vm.pies.flows.data = calcFlowStats(flows, this.apps);
+        vm.pies.appConnections.data = calcAppConnectionStats(flows, this.apps);
     });
 
+    $scope.$watch('ctrl.costs', costs => {
+        if (!costs) return;
+        const amount = _.sum(costs, 'cost.amount');
+
+        vm.portfolioCostStr = '€ ' + nFormatter(amount, 1);
+    });
+
+    $scope.$watch('ctrl.orgServerStats', stats => {
+        if (!stats) return;
+        const serverStats = _.foldl(
+            stats,
+            (acc, stat) => {
+                const total = acc.total + stat.virtualCount + stat.physicalCount;
+                const virtual = acc.virtual + stat.virtualCount;
+                const physical = acc.physical + stat.physicalCount;
+                return { total, virtual, physical };
+            },
+            { total: 0, virtual: 0, physical: 0});
+
+        serverStats.virtualPercentage = serverStats.total > 0
+                ? Number((serverStats.virtual / serverStats.total) * 100).toFixed(1)
+                : "-";
+
+        vm.serverStats = serverStats;
+    })
+
+
+
+}
+
+function nFormatter(num, digits) {
+    var si = [
+        { value: 1E12, symbol: "T" },
+        { value: 1E9,  symbol: "B" },
+        { value: 1E6,  symbol: "M" },
+        { value: 1E3,  symbol: "k" }
+    ], i;
+    for (i = 0; i < si.length; i++) {
+        if (num >= si[i].value) {
+            return (num / si[i].value).toFixed(digits).replace(/\.?0+$/, "") + si[i].symbol;
+        }
+    }
+    return num;
 }
 
 controller.$inject = ['$scope', 'OrgUnitStore'];
@@ -108,7 +154,9 @@ export default () => ({
         children: '=',
         apps: '=',
         flows: '=',
-        ratings: '='
+        ratings: '=',
+        costs: '=',
+        orgServerStats: '='
     },
     bindToController: true,
     controllerAs: 'ctrl',

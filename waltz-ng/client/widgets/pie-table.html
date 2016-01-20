@@ -1,45 +1,36 @@
 <div class="pie-table">
-    <style>
-        .pie-table:hover {
-            border-radius: 4px;
-            background: #f9f9f9;
-        }
-        .pie-table {
-            padding: 3px;
-            height: 100%;
-        }
-    </style>
-    <h4 class="text-center">{{ ctrl.title }}</h4>
-    <div style="display: table; margin: 0 auto;">
+    <waltz-basic-info-tile name="{{ ctrl.title }}"
+                           description=""
+                           icon="">
         <waltz-pie data="ctrl.data"
                    config="ctrl.config">
         </waltz-pie>
-    </div>
-    <div style="padding: 0 15% 0 15%">
-        <table class="table table-condensed small">
-            <tr ng-repeat="r in ctrl.data" >
-                <td>
-                    <div style="width: 20px; border: 1px solid; border-radius: 5px;"
-                         ng-style="{
-                            'background-color': ctrl.config.colorProvider({ data: r }).brighter().toString(),
-                            'border-color' : ctrl.config.colorProvider({ data: r }).toString() }">
-                        &nbsp;
-                    </div>
-                </td>
-                <td>
-                    {{ r.key }}
-                </td>
-                <td>
-                    {{ r.count }}
-                </td>
-            </tr>
-            <tr>
-                <td></td>
-                <th>Total</th>
-                <td>
-                    <strong>{{ ctrl.total }}</strong>
-                </td>
-            </tr>
-        </table>
-    </div>
+
+            <table class="table table-condensed small">
+                <tr ng-repeat="r in ctrl.data" >
+                    <td>
+                        <div style="width: 20px; border: 1px solid; border-radius: 5px;"
+                             ng-style="{
+                        'background-color': ctrl.config.colorProvider({ data: r }).brighter().toString(),
+                        'border-color' : ctrl.config.colorProvider({ data: r }).toString() }">
+                            &nbsp;
+                        </div>
+                    </td>
+                    <td>
+                        {{ r.key }}
+                    </td>
+                    <td>
+                        {{ r.count }}
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <th>Total</th>
+                    <td>
+                        <strong>{{ ctrl.total }}</strong>
+                    </td>
+                </tr>
+            </table>
+    </waltz-basic-info-tile>
+
 </div>

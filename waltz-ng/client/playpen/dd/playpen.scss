@@ -1,0 +1,17 @@
+.sample-data {
+  @extend .waltz-scroll-region;
+  height: 200px;
+}
+
+.sample-line {
+  font-family: monospace;
+  margin-left: 6px;
+  background: $waltz-section-background-color;
+}
+
+.sample-data li:hover .sample-line {
+  font-family: monospace;
+  cursor: default;
+  color: #111;
+  background: $waltz-border-color-lighter
+}

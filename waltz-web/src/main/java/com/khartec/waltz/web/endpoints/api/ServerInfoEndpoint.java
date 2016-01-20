@@ -25,12 +25,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.getId;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.requireRole;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
 
 @Service
 public class ServerInfoEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "server-info");
+    private static final String BASE_URL = mkPath("api", "server-info");
 
     private final ServerInfoService serverInfoService;
 
@@ -46,11 +51,14 @@ public class ServerInfoEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "asset-code", ":assetCode"), (request, response)
+        getForList(mkPath(BASE_URL, "asset-code", ":assetCode"), (request, response)
                 -> serverInfoService.findByAssetCode(request.params("assetCode")));
 
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "app-id", ":id"), (request, response)
-                -> serverInfoService.findByAppId(WebUtilities.getId(request)));
+        getForList(mkPath(BASE_URL, "app-id", ":id"), (request, response)
+                -> serverInfoService.findByAppId(getId(request)));
+
+        getForDatum(mkPath(BASE_URL, "org-unit", ":id", "stats"), ((request, response)
+                -> serverInfoService.findStatsForOrganisationalUnit(getId(request))));
 
     }
 }

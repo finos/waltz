@@ -1,7 +1,6 @@
 import * as types from '../constants/action-types';
 
 function reportConfigs(state = {}, action) {
-    console.log(action)
     switch (action.type) {
         case types.REQUEST_PERSON_PORTFOLIO_REPORT_CONFIG:
             return Object.assign({}, state, { [action.reportId]: []});
