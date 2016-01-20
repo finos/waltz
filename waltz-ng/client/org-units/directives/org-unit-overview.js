@@ -33,15 +33,16 @@ function calcAppStats(apps) {
 }
 
 
-function calcFlowStats(flows, apps) {
+function calcAppConnectionStats(flows, apps) {
     const logicalFlows = flows.flows;
 
-    const appIds = _.map(apps, 'id');
+    const orgMemberAppIds = _.map(apps, 'id');
 
     return _.chain(logicalFlows)
+        .uniq(false, f => f.source.id + '.' + f.target.id)
         .map(f => {
-            const sourceIsMember = _.contains(appIds, f.source.id);
-            const targetIsMember = _.contains(appIds, f.target.id);
+            const sourceIsMember = _.contains(orgMemberAppIds, f.source.id);
+            const targetIsMember = _.contains(orgMemberAppIds, f.target.id);
             if (sourceIsMember && targetIsMember) return 'INTRA';
             if (sourceIsMember) return 'INBOUND';
             if (targetIsMember) return 'OUTBOUND';
@@ -62,19 +63,19 @@ function controller($scope, orgUnitStore) {
         app: {
             config: {
                 colorProvider: (d) => lifecyclePhaseColorScale(d.data.key),
-                size: 100
+                size: 80
             }
         },
         capability: {
             config: {
                 colorProvider: (d) => capabilityColorScale(d.data.key),
-                size: 100
+                size: 80
             }
         },
-        flows: {
+        appConnections: {
             config: {
                 colorProvider: (d) => flowDirectionColorScale(d.data.key),
-                size: 100
+                size: 80
             }
         }
     };
@@ -93,7 +94,7 @@ function controller($scope, orgUnitStore) {
 
     $scope.$watch('ctrl.flows', flows => {
         if (!flows) return;
-        vm.pies.flows.data = calcFlowStats(flows, this.apps);
+        vm.pies.appConnections.data = calcAppConnectionStats(flows, this.apps);
     });
 
     $scope.$watch('ctrl.costs', costs => {
