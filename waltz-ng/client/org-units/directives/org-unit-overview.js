@@ -17,7 +17,7 @@ import numeral from 'numeral';
 import { lifecyclePhaseColorScale, capabilityColorScale, flowDirectionColorScale } from '../../common/colors';
 
 
-function calcCapabilityStats(capabilityRatings) {
+function calcCapabilityPieStats(capabilityRatings) {
     return _.chain(capabilityRatings)
             .countBy('ragRating')
             .map((v, k) => ({ key: k, count: v }))
@@ -25,7 +25,7 @@ function calcCapabilityStats(capabilityRatings) {
 }
 
 
-function calcAppStats(apps) {
+function calcAppPieStats(apps) {
     return _.chain(apps)
             .countBy('lifecyclePhase')
             .map((v, k) => ({ key: k, count: v }))
@@ -33,7 +33,7 @@ function calcAppStats(apps) {
 }
 
 
-function calcAppConnectionStats(flows, apps) {
+function calcAppConnectionPieStats(flows, apps) {
     const logicalFlows = flows.flows;
 
     const orgMemberAppIds = _.map(apps, 'id');
@@ -51,6 +51,27 @@ function calcAppConnectionStats(flows, apps) {
         .countBy()
         .map((v, k) => ({ key: k, count: v }))
         .value();
+}
+
+
+function calcCapabilityStats(ratings) {
+    const caps = _.chain(ratings)
+        .map("capability")
+        .uniq(false, c => c.id)
+        .value();
+
+    const appCount = _.chain(ratings)
+        .map('parent.id')
+        .uniq()
+        .value()
+        .length;
+
+    return {
+        total: caps.length,
+        perApplication: appCount > 0
+            ? Number(caps.length / appCount).toFixed(1)
+            : '-'
+    };
 }
 
 
@@ -84,17 +105,18 @@ function controller($scope, orgUnitStore) {
 
     $scope.$watch('ctrl.apps', apps => {
         if (!apps) return;
-        vm.pies.app.data = calcAppStats(apps);
+        vm.pies.app.data = calcAppPieStats(apps);
     });
 
     $scope.$watch('ctrl.ratings', ratings => {
         if (!ratings) return;
-        vm.pies.capability.data = calcCapabilityStats(ratings);
+        vm.pies.capability.data = calcCapabilityPieStats(ratings);
+        vm.capabilityStats = calcCapabilityStats(ratings);
     });
 
     $scope.$watch('ctrl.flows', flows => {
         if (!flows) return;
-        vm.pies.appConnections.data = calcAppConnectionStats(flows, this.apps);
+        vm.pies.appConnections.data = calcAppConnectionPieStats(flows, this.apps);
     });
 
     $scope.$watch('ctrl.costs', costs => {
