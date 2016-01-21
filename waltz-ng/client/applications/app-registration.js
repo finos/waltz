@@ -18,7 +18,7 @@ import {
     aliasesField,
     assetCodeField,
     descriptionField,
-    owningAreaField,
+    orgUnitField,
     parentAssetCodeField,
     tagsField,
     typeField,
@@ -35,7 +35,7 @@ const controller = function(WaltzDisplayNameService,
 
     OrgUnitStore.findAll().then(units => {
         allOrgUnits = units;
-        owningAreaField.templateOptions.options = _.map(units, (u) => ({ name: u.name, code: u.id}));
+        orgUnitField.templateOptions.options = _.map(units, (u) => ({ name: u.name, code: u.id}));
     });
 
 
@@ -63,7 +63,7 @@ const controller = function(WaltzDisplayNameService,
                 {
                     className: 'col-xs-4',
                     fieldGroup: [
-                        owningAreaField,
+                        orgUnitField,
                         typeField,
                         lifecyclePhaseField
                     ]

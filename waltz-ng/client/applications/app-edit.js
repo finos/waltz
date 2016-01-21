@@ -24,7 +24,7 @@ function setupTagAutoComplete(appStore) {
 
 
 function setupDropDowns(orgUnits, displayNameService) {
-    fields.owningAreaField.templateOptions.options = _.map(orgUnits, (u) => ({ name: u.name, code: u.id}));
+    fields.orgUnitField.templateOptions.options = _.map(orgUnits, (u) => ({ name: u.name, code: u.id}));
     fields.typeField.templateOptions.options = displayNameService.toOptions('applicationKind');
     fields.lifecyclePhaseField.templateOptions.options = displayNameService.toOptions('lifecyclePhase');
 }
@@ -41,7 +41,7 @@ const fieldLayout = [
         className: 'row',
         fieldGroup: [
             { className: 'col-xs-8', fieldGroup: [ fields.descriptionField, fields.tagsField ]},
-            { className: 'col-xs-4', fieldGroup: [ fields.owningAreaField, fields.typeField, fields.lifecyclePhaseField ]}
+            { className: 'col-xs-4', fieldGroup: [ fields.orgUnitField, fields.typeField, fields.lifecyclePhaseField ]}
         ]
     }
 ];
@@ -88,7 +88,7 @@ function controller(appView, orgUnits, displayNameService, appStore, $state) {
     fields.descriptionField.model = formModel.app;
     fields.assetCodeField.model = formModel.app;
     fields.parentAssetCodeField.model = formModel.app;
-    fields.owningAreaField.model = formModel.app;
+    fields.orgUnitField.model = formModel.app;
     fields.typeField.model = formModel.app;
     fields.lifecyclePhaseField.model = formModel.app;
     fields.aliasesField.model = formModel;

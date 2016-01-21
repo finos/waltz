@@ -41,16 +41,18 @@ export const descriptionField = {
 };
 
 
-export const owningAreaField = {
-    type: 'ui-select',
+export const orgUnitField = {
     key: 'organisationalUnitId',
+    type: 'ui-select',
     templateOptions: {
+        optionsAttr: 'bs-options',
+        ngOptions: 'option[to.valueProp] as option in to.options | filter: $select.search',
+        label: 'Owning Organisational Unit',
         valueProp: 'code',
         labelProp: 'name',
-        options: [],
-        label: 'Owning Area',
-        placeholder: 'Select owning Organisational Unit',
-        required: true
+        placeholder: 'Owning Area',
+        //  description: 'Template includes the allow-clear option on the ui-select-match element',
+        options:[]
     }
 };
 
