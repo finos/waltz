@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,7 +57,7 @@ public class AppAliasDao {
 
 
 
-    public int[] updateAliases(long id, List<String> aliases) {
+    public int[] updateAliases(long id, Collection<String> aliases) {
 
         LOG.info("Updating aliases for application " + id + ", aliases: "+ aliases);
 

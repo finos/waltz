@@ -22,7 +22,8 @@ import {
     parentAssetCodeField,
     tagsField,
     typeField,
-    lifecyclePhaseField } from './formly/fields';
+    lifecyclePhaseField,
+    overallRatingField } from './formly/fields';
 
 
 // ----- CONTROLLER -----
@@ -53,21 +54,14 @@ const controller = function(WaltzDisplayNameService,
         {
             className: 'row',
             fieldGroup: [
-                { className: 'col-xs-8', fieldGroup: [nameField, aliasesField] },
-                { className: 'col-xs-4', fieldGroup: [assetCodeField, parentAssetCodeField] }
+                { className: 'col-xs-8', fieldGroup: [nameField, aliasesField, tagsField] },
+                { className: 'col-xs-4', fieldGroup: [assetCodeField, parentAssetCodeField, orgUnitField] }
             ]
         }, {
             className: 'row',
             fieldGroup: [
-                { className: 'col-xs-8', fieldGroup: [descriptionField, tagsField] },
-                {
-                    className: 'col-xs-4',
-                    fieldGroup: [
-                        orgUnitField,
-                        typeField,
-                        lifecyclePhaseField
-                    ]
-                }
+                { className: 'col-xs-8', fieldGroup: [descriptionField] },
+                { className: 'col-xs-4', fieldGroup: [overallRatingField, typeField, lifecyclePhaseField] }
             ]
         }
     ];

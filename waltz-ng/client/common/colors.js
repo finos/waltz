@@ -19,9 +19,16 @@ const red = d3.rgb('#d62728');
 const grey = d3.rgb('#999');
 const blue = d3.rgb('#28a1b6');
 
-export const capabilityColorScale = d3.scale.ordinal()
+
+export const ragColorScale = d3.scale.ordinal()
     .domain(['R', 'A', 'G', 'Z'])
     .range([red, amber, green, grey]);
+
+
+export const capabilityColorScale = ragColorScale;
+
+
+export const investmentRatingColorScale = ragColorScale;
 
 
 export const authoritativeSourceColorScale = d3.scale.ordinal()

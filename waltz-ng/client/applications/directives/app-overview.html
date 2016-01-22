@@ -1,45 +1,79 @@
-<div>
-    <waltz-display-field label="Name">
-        {{ ctrl.app.name }}
-    </waltz-display-field>
+<div class="waltz-display-section">
+    <div class="row">
+        <div class="col-md-2 waltz-display-field-label">
+            Name
+        </div>
+        <div class="col-md-4">
+            {{ ctrl.app.name }}
+        </div>
+
+        <div class="col-md-2 waltz-display-field-label">
+            Asset Code
+        </div>
+        <div class="col-md-4">
+            <waltz-asset-code-explorer application="ctrl.app">
+            </waltz-asset-code-explorer>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2 waltz-display-field-label">
+            Lifecycle Phase
+        </div>
+        <div class="col-md-4">
+            {{ ctrl.app.lifecyclePhase | toDisplayName:'lifecyclePhase' }}
+        </div>
+        <div class="col-md-2 waltz-display-field-label">
+            Type
+        </div>
+        <div class="col-md-4">
+            {{ ctrl.app.kind | toDisplayName:'applicationKind' }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2 waltz-display-field-label">
+            Owning Org Unit
+        </div>
+        <div class="col-md-4">
+            <waltz-org-unit-name-popup unit="ctrl.organisationalUnit">
+            </waltz-org-unit-name-popup>
+        </div>
+        <div class="col-md-2 waltz-display-field-label">
+            Overall Rating
+        </div>
+        <div class="col-md-4">
+            {{ ctrl.app.overallRating | toDisplayName:'investmentRating' }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2 waltz-display-field-label">
+            Aliases
+        </div>
+        <div class="col-md-4">
+            <waltz-keyword-list keywords="ctrl.aliases">
+            </waltz-keyword-list>
+        </div>
+        <div class="col-md-2 waltz-display-field-label">
+            Tags
+        </div>
+        <div class="col-md-4">
+            <waltz-keyword-list keywords="ctrl.tags" on-select="ctrl.tagSelected(keyword)">
+            </waltz-keyword-list>
+        </div>
+    </div>
 
 
-    <waltz-display-field label="Asset Code">
-        <waltz-asset-code-explorer application="ctrl.app">
-        </waltz-asset-code-explorer>
-    </waltz-display-field>
+    <div class="row">
+        <div class="col-md-2 waltz-display-field-label">
+            Description
+        </div>
+        <div class="col-md-6">
+            {{ ctrl.app.description }}
+        </div>
+    </div>
 
-
-    <waltz-display-field label="Type">
-        {{ ctrl.app.kind | toDisplayName:'applicationKind' }}
-    </waltz-display-field>
-
-
-    <waltz-display-field label="Lifecycle Phase">
-        {{ ctrl.app.lifecyclePhase | toDisplayName:'lifecyclePhase' }}
-    </waltz-display-field>
-
-
-    <waltz-display-field label="Aliases">
-        <waltz-keyword-list keywords="ctrl.aliases">
-        </waltz-keyword-list>
-    </waltz-display-field>
-
-
-    <waltz-display-field label="Owning Unit"
-                         ng-if="ctrl.organisationalUnit">
-        <waltz-org-unit-name-popup unit="ctrl.organisationalUnit">
-        </waltz-org-unit-name-popup>
-    </waltz-display-field>
-
-
-    <waltz-display-field label="Description">
-        {{ ctrl.app.description }}
-    </waltz-display-field>
-
-    <waltz-display-field label="Tags">
-        <waltz-keyword-list keywords="ctrl.tags" on-select="ctrl.tagSelected(keyword)">
-        </waltz-keyword-list>
-    </waltz-display-field>
 
 </div>

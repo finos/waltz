@@ -99,20 +99,15 @@ textarea {
 }
 
 
-.waltz-display-field-table {
-  width: 100%;
-  margin-bottom: 12px;
-}
-
-
 .waltz-display-field-label {
-    width: 20%;
     color: #705f53;
 }
 
 
-.waltz-display-field-value {
-    width: 60%;
+.waltz-display-section {
+    .row {
+        padding-top: 4px;
+    }
 }
 
 

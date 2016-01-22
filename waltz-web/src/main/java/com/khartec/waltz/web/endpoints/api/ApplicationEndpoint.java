@@ -47,7 +47,9 @@ import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.getId;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.WebUtilities.readBody;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.lang.Long.parseLong;
 
 
@@ -57,7 +59,7 @@ public class ApplicationEndpoint implements Endpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationEndpoint.class);
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "app");
+    private static final String BASE_URL = mkPath("api", "app");
 
     private final ApplicationService appService;
     private final ChangeLogService changeLogService;
@@ -81,8 +83,9 @@ public class ApplicationEndpoint implements Endpoint {
         registerAppUpdate();
     }
 
+
     private void registerAppUpdate() {
-        Route handleRegistrationRequest = (req, res) -> {
+        Route handleAppUpdateRequest = (req, res) -> {
             res.type(WebUtilities.TYPE_JSON);
             AppChangeAction appChange = readBody(req, AppChangeAction.class);
             LOG.info("Updating application: " + appChange);
@@ -108,11 +111,9 @@ public class ApplicationEndpoint implements Endpoint {
             return true;
         };
 
-        EndpointUtilities.post(WebUtilities.mkPath(BASE_URL, ":id"), handleRegistrationRequest);
+        post(mkPath(BASE_URL, ":id"), handleAppUpdateRequest);
 
     }
-
-
 
 
     private void registerAppRegistration() {
@@ -139,7 +140,7 @@ public class ApplicationEndpoint implements Endpoint {
             return registrationResponse;
         };
 
-        EndpointUtilities.post(BASE_URL, handleRegistrationRequest);
+        post(BASE_URL, handleRegistrationRequest);
     }
 
 
@@ -184,17 +185,17 @@ public class ApplicationEndpoint implements Endpoint {
         ListRoute<Application> findByTag = (request, response) ->
                 appService.findByTag(request.body());
 
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "search", ":query"), search);
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "org-unit", ":ouId"), findByOrgUnit);
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "org-unit-tree", ":ouId"), findByOrgUnitTree);
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "count-by", "org-unit"), tallyByOrgUnit);
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "tags"), findAllTags);
+        getForList(mkPath(BASE_URL, "search", ":query"), search);
+        getForList(mkPath(BASE_URL, "org-unit", ":ouId"), findByOrgUnit);
+        getForList(mkPath(BASE_URL, "org-unit-tree", ":ouId"), findByOrgUnitTree);
+        getForList(mkPath(BASE_URL, "count-by", "org-unit"), tallyByOrgUnit);
+        getForList(mkPath(BASE_URL, "tags"), findAllTags);
 
-        EndpointUtilities.getForDatum(WebUtilities.mkPath(BASE_URL, "id", ":id"), getById);
-        EndpointUtilities.getForDatum(WebUtilities.mkPath(BASE_URL, "id", ":id", "related"), findRelated);
+        getForDatum(mkPath(BASE_URL, "id", ":id"), getById);
+        getForDatum(mkPath(BASE_URL, "id", ":id", "related"), findRelated);
 
-        EndpointUtilities.postForList(WebUtilities.mkPath(BASE_URL, "tags"), findByTag);  // POST as may not be good for qparam
-        EndpointUtilities.postForList(WebUtilities.mkPath(BASE_URL, "by-ids"), findByIds);
+        postForList(mkPath(BASE_URL, "tags"), findByTag);  // POST as may not be good for qparam
+        postForList(mkPath(BASE_URL, "by-ids"), findByIds);
     }
 
 

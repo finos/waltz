@@ -14,7 +14,6 @@ export default (module) => {
     module.directive('waltzBasicInfoTile', require('./basic-info-tile'));
     module.directive('waltzChangeTimeline', require('./change-timeline'));
     module.directive('waltzDataExtractLink', require('./data-extract-link'));
-    module.directive('waltzDisplayField', require('./display-field'));
     module.directive('waltzInlineEditArea', require('./inline-edit-area'));
     module.directive('waltzErrorAlert', require('./error-alert'));
     module.directive('waltzExternalLink', require('./external-link'));
