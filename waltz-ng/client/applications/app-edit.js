@@ -34,14 +34,14 @@ const fieldLayout = [
     {
         className: 'row',
         fieldGroup: [
-            {className: 'col-xs-8', fieldGroup: [ fields.nameField, fields.aliasesField ]},
-            {className: 'col-xs-4', fieldGroup: [ fields.assetCodeField, fields.parentAssetCodeField ]}
+            {className: 'col-xs-8', fieldGroup: [ fields.nameField, fields.aliasesField, fields.tagsField ]},
+            {className: 'col-xs-4', fieldGroup: [ fields.assetCodeField, fields.parentAssetCodeField, fields.orgUnitField ]}
         ]
     }, {
         className: 'row',
         fieldGroup: [
-            { className: 'col-xs-8', fieldGroup: [ fields.descriptionField, fields.tagsField ]},
-            { className: 'col-xs-4', fieldGroup: [ fields.orgUnitField, fields.typeField, fields.lifecyclePhaseField ]}
+            { className: 'col-xs-8', fieldGroup: [ fields.descriptionField ]},
+            { className: 'col-xs-4', fieldGroup: [ fields.overallRatingField, fields.typeField, fields.lifecyclePhaseField ]}
         ]
     }
 ];
@@ -93,6 +93,7 @@ function controller(appView, orgUnits, displayNameService, appStore, $state) {
     fields.lifecyclePhaseField.model = formModel.app;
     fields.aliasesField.model = formModel;
     fields.tagsField.model = formModel;
+    fields.overallRatingField.model = formModel.app;
 
 
     function onSubmit() {

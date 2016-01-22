@@ -46,6 +46,14 @@ export const capabilityRatingNames = {
 };
 
 
+export const investmentRatingNames = {
+    R: 'Disinvest',
+    A: 'Invest',
+    G: 'Hold',
+    Z: 'Unknown'
+};
+
+
 export const involvementKindNames = {
     IT_ARCHITECT: 'IT Architect',
     DATA_ARCHITECT: 'Data Architect',

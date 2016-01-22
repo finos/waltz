@@ -723,5 +723,14 @@
         </createIndex>
     </changeSet>
 
+    <!-- issue: 1 -->
+    <changeSet author="dwatkins" id="20160122-issue-1">
+        <addColumn tableName="application">
+            <column defaultValue="Z" name="overall_rating" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 
 </databaseChangeLog>

@@ -19,6 +19,7 @@ package com.khartec.waltz.model.application;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.capabilityrating.RagRating;
 import org.immutables.value.Value;
 
 import java.util.Optional;
@@ -39,6 +40,7 @@ public abstract class AppRegistrationRequest {
     public abstract Optional<String> parentAssetCode();
     public abstract Set<String> aliases();
     public abstract Set<String> tags();
+    public abstract RagRating overallRating();
 
 
 }

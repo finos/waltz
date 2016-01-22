@@ -23,38 +23,54 @@
                     <div class="waltz-page-summary">
                         <h4>
                             <waltz-icon name="user"></waltz-icon>
-                            {{ctrl.model.person.displayName}}
+                            {{ctrl.person.displayName}}
                         </h4>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <waltz-display-field label="Title">
-                                    {{ctrl.person.title}}
-                                </waltz-display-field>
-                            </div>
-                            <div class="col-md-6">
-                                <waltz-display-field label="email">
+                        <div class="waltz-display-section">
+                            <div class="row">
+                                <div class="col-md-2 waltz-display-field-label">
+                                    Title
+                                </div>
+                                <div class="col-md-4">
+                                    {{ ctrl.person.title }}
+                                </div>
+
+                                <div class="col-md-2 waltz-display-field-label">
+                                    e-mail
+                                </div>
+                                <div class="col-md-4">
                                     <waltz-mail-to person="ctrl.person"></waltz-mail-to>
-                                </waltz-display-field>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <waltz-display-field label="Tel (home):">
-                                    <waltz-phone-link number="{{ctrl.person.mobilePhone}}"></waltz-phone-link>
-                                </waltz-display-field>
 
-                                <waltz-display-field label="Tel (office):">
+                            <div class="row">
+                                <div class="col-md-2 waltz-display-field-label">
+                                    Tel (Office)
+                                </div>
+                                <div class="col-md-4">
                                     <waltz-phone-link number="{{ctrl.person.officePhone}}"></waltz-phone-link>
-                                </waltz-display-field>
+                                </div>
+
+                                <div class="col-md-2 waltz-display-field-label">
+                                    Tel (Mobile)
+                                </div>
+                                <div class="col-md-4">
+                                    <waltz-phone-link number="{{ctrl.person.mobilePhone}}"></waltz-phone-link>
+                                </div>
                             </div>
 
-                            <div class="col-md-6">
-                                <waltz-display-field label="Roles">
+
+                            <div class="row">
+                                <div class="col-md-2 waltz-display-field-label">
+                                    Roles
+                                </div>
+                                <div class="col-md-10">
                                     <ul class="list-unstyled waltz-keyword-list">
                                         <li ng-repeat="role in ctrl.allRoles | orderBy">
                                             {{role | toDisplayName:'involvementKind'}}
                                         </li>
                                     </ul>
-                                </waltz-display-field>
+                                </div>
                             </div>
                         </div>
                     </div>

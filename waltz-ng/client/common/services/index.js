@@ -23,7 +23,8 @@ import {
     orgUnitKindNames,
     severityNames,
     entityNames,
-    assetCostKindNames
+    assetCostKindNames,
+    investmentRatingNames
 } from './display_names';
 
 
@@ -53,6 +54,7 @@ export default (module) => {
     displayNameService.register('capabilityRating', capabilityRatingNames);
     displayNameService.register('entity', entityNames);
     displayNameService.register('assetCost', assetCostKindNames);
+    displayNameService.register('investmentRating', investmentRatingNames);
 
     iconNameService.register('bookmark', bookmarkIconNames);
     iconNameService.register('entity', entityIconNames);

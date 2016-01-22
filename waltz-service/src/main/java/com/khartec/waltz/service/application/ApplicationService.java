@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -107,7 +108,14 @@ public class ApplicationService {
 
     public AppRegistrationResponse registerApp(AppRegistrationRequest request) {
         checkNotEmptyString(request.name(), "Cannot register app with no name");
-        return applicationDao.registerApp(request);
+        AppRegistrationResponse response = applicationDao.registerApp(request);
+
+        if (response.registered()) {
+            appTagDao.updateTags(response.id().get(), request.tags());
+            appAliasDao.updateAliases(response.id().get(), request.aliases());
+        }
+
+        return response;
     }
 
 
@@ -177,11 +185,11 @@ public class ApplicationService {
         return appAliasDao.findAliasesForApplication(appId);
     }
 
-    public int[] updateTags(long id, List<String> tags) {
+    public int[] updateTags(long id, Collection<String> tags) {
         return appTagDao.updateTags(id, tags);
     }
 
-    public int[] updateAliases(long id, List<String> aliases) {
+    public int[] updateAliases(long id, Collection<String> aliases) {
         return appAliasDao.updateAliases(id, aliases);
     }
 }

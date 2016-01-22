@@ -104,3 +104,22 @@ export const tagsField = {
         required: false
     }
 };
+
+
+export const overallRatingField = {
+    type: 'select',
+    key: 'overallRating',
+    templateOptions: {
+        valueProp: 'code',
+        labelProp: 'name',
+        options: [
+            { code: 'A', name: 'Invest'},
+            { code: 'G', name: 'Hold' },
+            { code: 'R', name: 'Disinvest' },
+            { code: 'Z', name: 'Unknown' }
+        ],
+        label: 'Overall Rating',
+        placeholder: '',
+        required: true
+    }
+}

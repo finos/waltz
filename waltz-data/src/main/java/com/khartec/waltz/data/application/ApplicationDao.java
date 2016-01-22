@@ -19,6 +19,7 @@ package com.khartec.waltz.data.application;
 
 
 import com.khartec.waltz.model.application.*;
+import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.tally.ImmutableLongTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ApplicationRecord;
@@ -58,6 +59,7 @@ public class ApplicationDao {
                 .organisationalUnitId(appRecord.getOrganisationalUnitId())
                 .kind(readEnum(appRecord.getKind(), ApplicationKind.class, ApplicationKind.IN_HOUSE))
                 .lifecyclePhase(readEnum(appRecord.getLifecyclePhase(), LifecyclePhase.class, LifecyclePhase.DEVELOPMENT))
+                .overallRating(readEnum(appRecord.getOverallRating(), RagRating.class, RagRating.Z))
                 .build();
     };
 
@@ -202,6 +204,7 @@ public class ApplicationDao {
         record.setOrganisationalUnitId(request.organisationalUnitId());
         record.setKind(request.kind().name());
         record.setLifecyclePhase(request.lifecyclePhase().name());
+        record.setOverallRating(request.overallRating().name());
 
         try {
             int count = record.insert();
@@ -244,10 +247,9 @@ public class ApplicationDao {
         record.setOrganisationalUnitId(application.organisationalUnitId());
         record.setLifecyclePhase(application.lifecyclePhase().name());
         record.setKind(application.kind().name());
+        record.setOverallRating(application.overallRating().name());
 
         return record.update();
     }
-
-
 
 }
