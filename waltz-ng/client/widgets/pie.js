@@ -1,14 +1,18 @@
-
 /*
- *  Waltz
- * Copyright (c) David Watkins. All rights reserved.
- * The use and distribution terms for this software are covered by the
- * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
- * which can be found in the file epl-v10.html at the root of this distribution.
- * By using this software in any fashion, you are agreeing to be bound by
- * the terms of this license.
- * You must not remove this notice, or any other, from this software.
+ *  This file is part of Waltz.
  *
+ *     Waltz is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     Waltz is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 import d3 from 'd3';
 
@@ -63,6 +67,23 @@ function renderArcs(holder, config, data) {
         .duration(400)
         .attrTween('d', tweenPie);
 
+    const emptyPie = holder.selectAll('.empty-pie')
+        .data(data.length ? [] : [1]);
+
+    emptyPie.enter()
+        .append('circle')
+        .attr({
+            cx: 0,
+            cy: 0,
+            r: radius / 2,
+            fill: '#eee',
+            stroke: '#bbb',
+            'stroke-dasharray': [5, 1]
+        })
+        .classed('empty-pie', true);
+
+    emptyPie.exit()
+        .remove();
 }
 
 
