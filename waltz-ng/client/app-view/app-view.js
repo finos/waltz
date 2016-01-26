@@ -11,7 +11,6 @@
  */
 import _ from 'lodash';
 
-
 import { appViewResolver } from './resolvers';
 import {
     loadDataFlows,
@@ -21,6 +20,8 @@ import {
     loadServers } from './data-load';
 import { prepareSlopeGraph } from '../data-flow/directives/slope-graph/slope-graph-utils';
 import { mkAppRatingsGroup, calculateHighestRatingCount } from '../ratings/directives/common';
+
+
 
 function controller(appView,
                     authSourcesStore,
@@ -32,6 +33,7 @@ function controller(appView,
                     perspectiveStore,
                     ratingStore,
                     displayNameService,
+                    complexityStore,
                     $state,
                     $q) {
 
@@ -40,6 +42,8 @@ function controller(appView,
     const vm = this;
 
     const perspectiveCode = 'BUSINESS';
+
+
     $q.all([
         perspectiveStore.findByCode(perspectiveCode),
         ratingStore.findByParentAndPerspective('APPLICATION', id, perspectiveCode)
@@ -76,6 +80,7 @@ function controller(appView,
     ];
 
     $q.all(promises).then(() => {
+
         const graphData = prepareSlopeGraph(
             id,
             vm.flows,
@@ -87,6 +92,9 @@ function controller(appView,
 
         vm.flow = graphData;
     });
+
+
+    complexityStore.findByApplication(id).then(c => vm.complexity = c);
 
 }
 
@@ -102,6 +110,7 @@ controller.$inject = [
     'PerspectiveStore',
     'RatingStore',
     'WaltzDisplayNameService',
+    'ComplexityStore',
     '$state',
     '$q'
 ];

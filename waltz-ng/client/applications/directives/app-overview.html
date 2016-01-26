@@ -65,6 +65,22 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-2 waltz-display-field-label">
+            Complexity Rating:
+        </div>
+        <div class="col-md-10">
+            <span class='waltz-clickable-definition'
+                  popover-trigger="focus"
+                  tabindex="99"
+                  popover-placement="right"
+                  popover-animation="true"
+                  popover-title="Application Complexity Rating"
+                  uib-popover-template="'popup-app-complexity.html'">
+            {{ ctrl.complexity.overallScore | toFixed:2 }}
+            </span>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-2 waltz-display-field-label">
@@ -76,4 +92,32 @@
     </div>
 
 
+
+    <!--  TEMPLATES -->
+
+    <script type='text/ng-template' id='popup-app-complexity.html'>
+        <div>
+            <table class="table small">
+                <tr>
+                    <td>Capability Complexity</td>
+                    <td>{{ ctrl.complexity.capabilityComplexity.score | toFixed:2 }}</td>
+                </tr>
+                <tr>
+                    <td>Connection Complexity</td>
+                    <td>{{ ctrl.complexity.connectionComplexity.score | toFixed:2 }}</td>
+                </tr>
+                <tr>
+                    <td>Server Complexity</td>
+                    <td>{{ ctrl.complexity.serverComplexity.score | toFixed:2 }}</td>
+                </tr>
+            </table>
+
+            <div class="text-muted small">
+                Complexity scores are calculated against a baseline measurement.  The
+                scores should fall between 0 and 1, indicating their proximity to the baseline.
+            </div>
+
+        </div>
+
+    </script>
 </div>

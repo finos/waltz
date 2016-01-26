@@ -38,9 +38,9 @@ public class SetUtilities {
                 .collect(Collectors.toSet());
     }
 
-    public static <T> Set<T> union(Set<T>... xss) {
+    public static <T> Set<T> union(Collection<T>... xss) {
         Set<T> result = new HashSet<>();
-        for (Set xs : xss) {
+        for (Collection xs : xss) {
             result.addAll(xs);
         }
         return result;

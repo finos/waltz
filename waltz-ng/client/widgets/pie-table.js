@@ -25,7 +25,8 @@ export default () => {
         bindToController: {
             data: '=',
             config: '=',
-            title: '@'
+            title: '@',
+            icon: '@'
         },
         controllerAs: 'ctrl',
         controller

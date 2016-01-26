@@ -42,28 +42,12 @@
                                          config="ctrl.pies.app.config"
                                          class="clickable"
                                          waltz-jump-to="ouv-apps"
-                                         title="Applications By Lifecycle Phase">
+                                         title="Apps / Lifecycle Phase"
+                                         icon="desktop">
                         </waltz-pie-table>
                     </div>
                     <div class="col-md-4">
-                        <waltz-pie-table data="ctrl.pies.capability.data"
-                                         config="ctrl.pies.capability.config"
-                                         class="clickable"
-                                         waltz-jump-to="ouv-ratings"
-                                         title="Application Capability Ratings">
-                        </waltz-pie-table>
-                    </div>
-                    <div class="col-md-4">
-                        <waltz-pie-table data="ctrl.pies.appConnections.data"
-                                         config="ctrl.pies.appConnections.config"
-                                         class="clickable"
-                                         waltz-jump-to="ouv-flows"
-                                         title="Application Connections">
-                        </waltz-pie-table>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
+
                         <waltz-basic-info-tile name="Portfolio Cost"
                                                description="Cumulative value of infra and app dev costs"
                                                waltz-jump-to="ouv-costs"
@@ -72,6 +56,31 @@
                                 {{ ctrl.portfolioCostStr }}
                             </span>
                         </waltz-basic-info-tile>
+
+                    </div>
+                    <div class="col-md-4">
+                        <waltz-pie-table data="ctrl.pies.appConnections.data"
+                                         config="ctrl.pies.appConnections.config"
+                                         class="clickable"
+                                         waltz-jump-to="ouv-flows"
+                                         icon="random"
+                                         title="Application Connections">
+                        </waltz-pie-table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <waltz-basic-info-tile name="Complexity"
+                                               description="Derived from capabilities, connections and servers"
+                                               icon="rocket">
+                            <div style="font-size: xx-large;">
+                                {{ ctrl.complexitySummary.cumulativeScore | toFixed:1 }}
+                            </div>
+                            <div class="small text-muted">
+                                {{ ctrl.complexitySummary.averageScore | toFixed:2 }} per app
+                            </div>
+                        </waltz-basic-info-tile>
+
                     </div>
                     <div class="col-md-4">
                         <waltz-basic-info-tile name="Servers"
@@ -87,8 +96,6 @@
                                     {{ ctrl.serverStats.virtualPercentage }}% virtual
                                 </div>
                             </div>
-
-
                         </waltz-basic-info-tile>
 
                     </div>

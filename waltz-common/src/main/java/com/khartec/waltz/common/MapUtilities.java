@@ -17,10 +17,7 @@
 
 package com.khartec.waltz.common;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -88,5 +85,11 @@ public class MapUtilities {
 
     public static <K, V> boolean isEmpty(Map<K, V> map) {
         return map == null || map.isEmpty();
+    }
+
+
+    public static <K, V> Optional<V> maybeGet(Map<K, V> map, K key) {
+        if (map == null) { return Optional.empty(); }
+        return Optional.ofNullable(map.get(key));
     }
 }
