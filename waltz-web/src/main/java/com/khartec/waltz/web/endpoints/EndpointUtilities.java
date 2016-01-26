@@ -32,24 +32,43 @@ public class EndpointUtilities {
     private static final ResponseTransformer transformer = WebUtilities.transformer;
 
 
-    private static <T> Route wrapListHandler(ListRoute<T> handler) {
-        return (request, response) -> {
-            response.type(TYPE_JSON);
-            return handler.apply(request, response);
-        };
-    }
-
+    /**
+     * Helper method to register a route which provides a list of items.
+     * This helps comprehension as the return types of routes becomes explicit.
+     * @param path
+     * @param handler
+     * @param <T>
+     */
     public static <T> void getForList(String path, ListRoute<T> handler) {
         Spark.get(path, wrapListHandler(handler), transformer);
     }
+
+
+    /**
+     * Helper method to register a route which provides a single item (not
+     * a list).  This helps comprehension as the return types of routes
+     * becomes explicit.
+     * @param path
+     * @param handler
+     * @param <T>
+     */
+    public static <T> void getForDatum(String path, DatumRoute<T> handler) {
+        Spark.get(path, (request, response) -> {
+            response.type(TYPE_JSON);
+            return handler.apply(request, response);
+        }, transformer);
+    }
+
 
     public static <T> void post(String path, Route handler) {
         Spark.post(path, handler, transformer);
     }
 
+
     public static <T> void postForList(String path, ListRoute<T> handler) {
         Spark.post(path, wrapListHandler(handler), transformer);
     }
+
 
     public static <T> void postForDatum(String path, DatumRoute<T> handler) {
         Spark.post(path, (request, response) -> {
@@ -60,12 +79,13 @@ public class EndpointUtilities {
 
 
 
-    public static <T> void getForDatum(String path, DatumRoute<T> handler) {
-        Spark.get(path, (request, response) -> {
+    // -- helpers ---
+
+    private static <T> Route wrapListHandler(ListRoute<T> handler) {
+        return (request, response) -> {
             response.type(TYPE_JSON);
             return handler.apply(request, response);
-        }, transformer);
+        };
     }
-
 
 }

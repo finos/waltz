@@ -15,7 +15,8 @@ export default () => ({
         app: '=',
         tags: '=',
         aliases: '=',
-        organisationalUnit: '='
+        organisationalUnit: '=',
+        complexity: '='
     },
     controller,
     controllerAs: 'ctrl',

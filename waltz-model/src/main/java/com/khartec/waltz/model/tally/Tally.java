@@ -26,6 +26,6 @@ package com.khartec.waltz.model.tally;
 public interface Tally<T> {
 
     T id();
-    long count();
+    double count();
 
 }

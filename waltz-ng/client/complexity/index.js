@@ -1,3 +1,4 @@
+
 /*
  *  Waltz
  * Copyright (c) David Watkins. All rights reserved.
@@ -11,9 +12,5 @@
  */
 
 export default (module) => {
-    module.filter('toDisplayName', require('./display-name-filter'));
-    module.filter('toIconName', require('./icon-name-filter'));
-    module.filter('toDescription', require('./description-filter'));
-    module.filter('toFixed', require('./fixed-filter'));
-    module.filter('isEmpty', require('./is-empty'));
+    module.service('ComplexityStore', require('./services/complexity-store'));
 };

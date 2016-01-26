@@ -168,6 +168,7 @@ public class WebUtilities {
                 objClass);
     }
 
+
     public static <T extends Enum<T>> T readEnum(Request request,
                                String paramName,
                                Class<T> enumClass,

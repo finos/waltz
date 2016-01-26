@@ -17,13 +17,6 @@ import numeral from 'numeral';
 import { lifecyclePhaseColorScale, capabilityColorScale, flowDirectionColorScale } from '../../common/colors';
 
 
-function calcCapabilityPieStats(capabilityRatings) {
-    return _.chain(capabilityRatings)
-            .countBy('ragRating')
-            .map((v, k) => ({ key: k, count: v }))
-            .value();
-}
-
 
 function calcAppPieStats(apps) {
     return _.chain(apps)
@@ -87,12 +80,6 @@ function controller($scope, orgUnitStore) {
                 size: 80
             }
         },
-        capability: {
-            config: {
-                colorProvider: (d) => capabilityColorScale(d.data.key),
-                size: 80
-            }
-        },
         appConnections: {
             config: {
                 colorProvider: (d) => flowDirectionColorScale(d.data.key),
@@ -110,7 +97,6 @@ function controller($scope, orgUnitStore) {
 
     $scope.$watch('ctrl.ratings', ratings => {
         if (!ratings) return;
-        vm.pies.capability.data = calcCapabilityPieStats(ratings);
         vm.capabilityStats = calcCapabilityStats(ratings);
     });
 
@@ -143,6 +129,16 @@ function controller($scope, orgUnitStore) {
                 : "-";
 
         vm.serverStats = serverStats;
+    });
+
+    $scope.$watch('ctrl.complexity', complexity => {
+        if (!complexity) return;
+        const cumulativeScore = _.sum(complexity, "overallScore");
+        const averageScore = complexity.length > 0 ? cumulativeScore / complexity.length : 0;
+        vm.complexitySummary =  {
+            cumulativeScore,
+            averageScore
+        };
     })
 
 
@@ -178,7 +174,8 @@ export default () => ({
         flows: '=',
         ratings: '=',
         costs: '=',
-        orgServerStats: '='
+        orgServerStats: '=',
+        complexity: '='
     },
     bindToController: true,
     controllerAs: 'ctrl',

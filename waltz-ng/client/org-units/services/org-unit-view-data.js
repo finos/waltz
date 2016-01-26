@@ -152,6 +152,7 @@ function service(appStore,
                  authSourceCalculator,
                  endUserAppStore,
                  assetCostStore,
+                 complexityStore,
                  $q) {
 
     const data = {};
@@ -171,7 +172,8 @@ function service(appStore,
             ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),
             authSourceCalculator.findByOrgUnit(orgUnitId),
             endUserAppStore.findByOrgUnitTree(orgUnitId),
-            assetCostStore.findAppCostsByOrgUnitTree(orgUnitId)
+            assetCostStore.findAppCostsByOrgUnitTree(orgUnitId),
+            complexityStore.findByOrgUnitTree(orgUnitId)
     ]).then(([
             apps,
             capabilityRatings,
@@ -185,7 +187,8 @@ function service(appStore,
             ratedDataFlows,
             authSources,
             endUserApps,
-            assetCosts
+            assetCosts,
+            complexity
         ]) => {
             data.assetCosts = assetCosts;
             data.immediateHierarchy = orgUnitUtils.getImmediateHierarchy(orgUnits, orgUnitId);
@@ -204,6 +207,7 @@ function service(appStore,
             data.endUserApps = endUserApps;
 
             data.assetCostBuckets = categorizeCostsIntoBuckets(assetCosts);
+            data.complexity = complexity;
 
             data.filter = (config) => {
 
@@ -220,6 +224,11 @@ function service(appStore,
 
                 data.apps = _.filter(apps, a => isAppInScope(a.id));
 
+                data.complexity = _.filter(complexity, c => _.any([
+                    isAppInScope(c.serverComplexity ? c.serverComplexity.id : 0),
+                    isAppInScope(c.capabilityComplexity ? c.capabilityComplexity.id : 0),
+                    isAppInScope(c.connectionComplexity ? c.connectionComplexity.id : 0)
+                ]));
 
                 data.dataFlows = calculateDataFlows(dataFlows, isAppInScope);
 
@@ -275,6 +284,7 @@ service.$inject = [
     'AuthSourcesCalculator',
     'EndUserAppStore',
     'AssetCostStore',
+    'ComplexityStore',
     '$q'
 ];
 

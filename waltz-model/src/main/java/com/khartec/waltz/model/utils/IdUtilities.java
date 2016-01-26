@@ -34,4 +34,8 @@ public class IdUtilities {
     }
 
 
+    public static Long[] toIdArray(List<? extends IdProvider> xs) {
+        return toIds(xs)
+                .toArray(new Long[xs.size()]);
+    }
 }
