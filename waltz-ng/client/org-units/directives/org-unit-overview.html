@@ -74,7 +74,7 @@
                                                description="Derived from capabilities, connections and servers"
                                                icon="rocket">
                             <div style="font-size: xx-large;">
-                                {{ ctrl.complexitySummary.cumulativeScore | toFixed:1 }}
+                                &Sigma; {{ ctrl.complexitySummary.cumulativeScore | toFixed:1 }}
                             </div>
                             <div class="small text-muted">
                                 {{ ctrl.complexitySummary.averageScore | toFixed:2 }} per app
@@ -90,7 +90,7 @@
                                                icon="server">
                             <div>
                                 <div style="font-size: xx-large;">
-                                    {{ ctrl.serverStats.total }}
+                                    # {{ ctrl.serverStats.total }}
                                 </div>
                                 <div class="small text-muted">
                                     {{ ctrl.serverStats.virtualPercentage }}% virtual
@@ -107,7 +107,7 @@
                                                icon="puzzle-piece">
                             <div>
                                 <div style="font-size: xx-large;">
-                                    {{ ctrl.capabilityStats.total }}
+                                    # {{ ctrl.capabilityStats.total }}
                                 </div>
                                 <div class="small text-muted">
                                     {{ ctrl.capabilityStats.perApplication }} per app
