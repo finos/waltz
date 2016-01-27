@@ -1,39 +1,24 @@
 <div>
 
-    <waltz-page-header name="{{ ctrl.tag }}" small="Upload" icon="cloud-upload">
+    <waltz-page-header name="Complexity Demo" small="" icon="cloud-upload">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li>Tag Explorer</li>
+            <li>Complexity</li>
         </ol>
     </waltz-page-header>
 
 
     <waltz-section name="Preview">
         <div class="row">
-            <div class="col-md-3">
-               <waltz-basic-info-tile name="Portfolio Cost"
-                                value="€20,000,000"
-                                description="Cumulative value of infra and app dev costs"
-                                waltz-jump-to="d4"
-                                icon="euro"></waltz-basic-info-tile>
+            <div class="col-md-9">
+                <waltz-complexity-bar-chart complexity="ctrl.complexity">
+
+                </waltz-complexity-bar-chart>
             </div>
-            <div class="col-md-3">
-               <waltz-basic-info-tile waltz-jump-to='d7' name="Bob" value="12" icon="sitemap"></waltz-basic-info-tile>
-            </div>
-            <div class="col-md-3">
-               <waltz-basic-info-tile name="Bob" value="12" icon="sitemap"></waltz-basic-info-tile>
-            </div>
-            <div class="col-md-3">
-               <waltz-basic-info-tile name="Bob" value="12" icon="sitemap"></waltz-basic-info-tile>
-            </div>
+
         </div>
 
     </waltz-section>
-
-
-
-
-
 
     <waltz-section name="Dump1">
         <pre>
