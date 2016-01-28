@@ -11,13 +11,16 @@
  */
 
 import _ from 'lodash';
-import d3 from 'd3';
-import angular from 'angular';
 
 
 function controller($state, $window, $location, complexityStore) {
     const vm = this;
-    complexityStore.findByOrgUnitTree(230).then(c => vm.complexity = c);
+
+    complexityStore
+        .findByOrgUnitTree(10)
+        .then(c => vm.complexity = c);
+
+    vm.onSelect = (d) => console.log("On Select", d)
 }
 
 controller.$inject = [
@@ -46,6 +49,4 @@ export default (module) => {
                 });
         }
     ]);
-
-    module.directive("waltzComplexityBarChart", require('./complexity-bar-chart'));
 };

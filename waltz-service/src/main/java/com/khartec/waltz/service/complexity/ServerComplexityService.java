@@ -45,7 +45,7 @@ public class ServerComplexityService {
 
         return serverComplexityDao.findCountsByAppIds(orgTreePredicate)
                 .stream()
-                .map(tally -> tallyToComplexityScore(tally, baseline))
+                .map(tally -> tallyToComplexityScore(tally, baseline, Math::log))
                 .collect(Collectors.toList());
     }
 
@@ -60,7 +60,7 @@ public class ServerComplexityService {
         List<LongTally> tallies = serverComplexityDao.findCountsByAppIds(appId);
         if (tallies.isEmpty()) { return null; }
 
-        return tallyToComplexityScore(tallies.get(0), baseline);
+        return tallyToComplexityScore(tallies.get(0), baseline, Math::log);
     }
 
 

@@ -58,6 +58,7 @@ public class ComplexityRatingService {
         ComplexityScore capabilityComplexity = capabilityComplexityService.getForApp(appId);
 
         return ImmutableComplexityRating.builder()
+                .id(appId)
                 .connectionComplexity(ofNullable(connectionComplexity))
                 .serverComplexity(ofNullable(serverComplexity))
                 .capabilityComplexity(ofNullable(capabilityComplexity))
@@ -90,6 +91,7 @@ public class ComplexityRatingService {
 
         return appIds.stream()
                 .map(appId -> ImmutableComplexityRating.builder()
+                        .id(appId)
                         .serverComplexity(maybeGet(serverScoresById, appId))
                         .connectionComplexity(maybeGet(connectionScoresById, appId))
                         .capabilityComplexity(maybeGet(capabilityScoresById, appId))

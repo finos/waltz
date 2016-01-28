@@ -10,9 +10,10 @@
 
     <waltz-section name="Preview">
         <div class="row">
-            <div class="col-md-9">
-                <waltz-complexity-bar-chart complexity="ctrl.complexity">
-
+            <div class="col-md-6">
+                <waltz-complexity-bar-chart complexity="ctrl.complexity"
+                                            sizing="{ h: 250 }"
+                                            on-select="ctrl.onSelect">
                 </waltz-complexity-bar-chart>
             </div>
 
