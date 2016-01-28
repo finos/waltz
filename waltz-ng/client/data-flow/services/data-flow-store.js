@@ -11,63 +11,71 @@
  *
  */
 
-export default [
+function service(DataFlowUtilityService, $q, $http, BaseApiUrl, appStore) {
+
+    const BASE = `${BaseApiUrl}/data-flows`;
+
+
+    const findByEntityReference = (kind, id) =>
+        $http.get(`${BASE}/entity/${kind}/${id}`)
+            .then(result => result.data);
+
+
+    const findByOrgUnit = (id) =>
+        $http.get(`${BASE}/org-unit/${id}`)
+            .then(ts => {
+                return ts;
+            })
+            .then(result => result.data);
+
+
+    const findByOrgUnitTree = (id) =>
+        $http.get(`${BASE}/org-unit-tree/${id}`)
+            .then(result => result.data);
+
+
+    const findEnrichedFlowsForApplication = (id) => {
+        const acc = {};
+
+        return findByEntityReference('APPLICATION', id)
+            .then(flows => {
+                acc.flows = flows;
+                return _.chain(flows)
+                    .map(f => [f.source.id, f.target.id])
+                    .flatten()
+                    .uniq()
+                    .value()
+            })
+            .then(appIds => appStore.findByIds(appIds))
+            .then(apps => DataFlowUtilityService.enrich(acc.flows, apps));
+    };
+
+
+    const create = (flow) => $http.post(BASE, flow);
+
+
+    const findByAppIds = (appIds) =>
+        $http.post(`${BASE}/apps`, appIds)
+            .then(r => { console.log('tap', r); return r; })
+            .then(r => r.data);
+
+    return {
+        findByEntityReference,
+        findByOrgUnit,
+        findByOrgUnitTree,
+        findEnrichedFlowsForApplication,
+        findByAppIds,
+        create
+    };
+}
+
+service.$inject = [
     'DataFlowUtilityService',
     '$q',
     '$http',
     'BaseApiUrl',
-    (DataFlowUtilityService, $q, $http, BaseApiUrl) => {
-
-        const BASE = `${BaseApiUrl}/data-flows`;
-
-
-        const findByEntityReference = (kind, id) =>
-            $http.get(`${BASE}/entity/${kind}/${id}`)
-                .then(result => result.data);
-
-
-        const findByOrgUnit = (id) =>
-            $http.get(`${BASE}/org-unit/${id}`)
-                .then(ts => {
-                    return ts;
-                })
-                .then(result => result.data);
-
-
-        const findByOrgUnitTree = (id) =>
-            $http.get(`${BASE}/org-unit-tree/${id}`)
-                .then(result => result.data);
-
-
-        const findApplicationsByEntityReference = (kind, id) =>
-            $http.get(`${BASE}/entity/${kind}/${id}/applications`)
-                .then(result => result.data);
-
-
-        const findEnrichedFlowsForApplication = (id) => $q
-                .all([
-                    findByEntityReference('APPLICATION', id),
-                    findApplicationsByEntityReference('APPLICATION', id)
-                ])
-                .then(([flows, flowApps]) =>
-                    DataFlowUtilityService.enrich(flows, flowApps));
-
-        const create = (flow) => $http.post(BASE, flow);
-
-
-        const findByAppIds = (appIds) =>
-            $http.post(`${BASE}/apps`, appIds)
-                .then(r => { console.log('tap', r); return r; })
-                .then(r => r.data);
-
-        return {
-            findApplicationsByEntityReference,
-            findByEntityReference,
-            findByOrgUnit,
-            findByOrgUnitTree,
-            findEnrichedFlowsForApplication,
-            findByAppIds,
-            create
-        };
-    }
+    'ApplicationStore',
 ];
+
+
+export default service;

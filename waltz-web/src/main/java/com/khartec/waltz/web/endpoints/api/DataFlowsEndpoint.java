@@ -92,11 +92,6 @@ public class DataFlowsEndpoint implements Endpoint {
             return dataFlowService.findByAppIds(appIds);
         };
 
-        ListRoute<Application> findApplicationsByEntityRef = (request, response) -> {
-            EntityReference ref = getEntityReference(request);
-            return dataFlowService.findApplicationsByEntityReference(ref);
-        };
-
         Route create = (request, response) -> {
             response.type(TYPE_JSON);
 
@@ -157,9 +152,7 @@ public class DataFlowsEndpoint implements Endpoint {
             return null;
         };
 
-
         getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), getByEntityRef);
-        getForList(mkPath(BASE_URL, "entity", ":kind", ":id", "applications"), findApplicationsByEntityRef);
         getForList(mkPath(BASE_URL, "org-unit", ":orgUnitId"), getByOrgUnit);
         getForList(mkPath(BASE_URL, "org-unit-tree", ":orgUnitId"), getByOrgUnitTree);
 

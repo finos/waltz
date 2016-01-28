@@ -124,22 +124,6 @@ public class DataFlowDao {
     }
 
 
-    public List<Application> findApplicationsByEntityReference(EntityReference ref) {
-
-        return dsl.selectDistinct(APPLICATION.fields())
-                .from(APPLICATION)
-                .innerJoin(DATA_FLOW)
-                .on(DATA_FLOW.SOURCE_ENTITY_ID.eq(APPLICATION.ID)
-                        .or(DATA_FLOW.TARGET_ENTITY_ID.eq(APPLICATION.ID)))
-                .where(DATA_FLOW.SOURCE_ENTITY_ID.eq(ref.id())
-                        .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .or(DATA_FLOW.TARGET_ENTITY_ID.eq(ref.id())
-                        .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .fetch(ApplicationDao.applicationRecordMapper);
-
-    }
-
-
     public int[] removeFlows(List<DataFlow> flows) {
 
         List<DeleteConditionStep<DataFlowRecord>> deletes = flows.stream()

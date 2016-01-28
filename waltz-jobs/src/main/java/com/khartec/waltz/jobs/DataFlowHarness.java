@@ -33,8 +33,6 @@ public class DataFlowHarness {
 
 
 
-        dataFlowDao.findByCapability(3200L).forEach(System.out::println);
-
     }
 
 }

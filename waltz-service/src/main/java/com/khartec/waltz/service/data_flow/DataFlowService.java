@@ -53,11 +53,6 @@ public class DataFlowService {
     }
 
 
-    public List<Application> findApplicationsByEntityReference(EntityReference ref) {
-        return dataFlowDao.findApplicationsByEntityReference(ref);
-    }
-
-
     public List<DataFlow> findByOrganisationalUnitId(long orgUnitId) {
         return dataFlowDao.findByOrganisationalUnitId(orgUnitId);
     }
