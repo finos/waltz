@@ -57,7 +57,7 @@ public class ConnectionComplexityService {
 
         if (flowCounts.isEmpty()) { return null; }
 
-        return tallyToComplexityScore(flowCounts.get(0), baseline);
+        return tallyToComplexityScore(flowCounts.get(0), baseline, Math::log);
     }
 
 
@@ -85,7 +85,7 @@ public class ConnectionComplexityService {
     public List<ComplexityScore> findWithinOrgUnit(long orgUnitId, int baseline) {
         return connectionComplexityDao.findCounts(byOrgUnitTree(orgUnitId, orgUnitDao))
                 .stream()
-                .map(tally -> tallyToComplexityScore(tally, baseline))
+                .map(tally -> tallyToComplexityScore(tally, baseline, Math::log))
                 .collect(Collectors.toList());
     }
 

@@ -11,31 +11,20 @@
  */
 
 import _ from 'lodash';
-import d3 from 'd3';
-import angular from 'angular';
 
 
-
-
-function controller($state, $window, $location, $anchorScroll) {
+function controller($state, $window, $location, complexityStore) {
     const vm = this;
 
-    vm.jumpToWin = (id) => {
-        console.log($window.document)
-        const target = $window.document.getElementById(id)
-        console.log(target.offsetTop);
-        $window.scrollTo(0, target.offsetTop);
-    }
+    complexityStore
+        .findByOrgUnitTree(10)
+        .then(c => vm.complexity = c);
 
-    vm.jumpTo = (id) => {
-        $anchorScroll.yOffset = 60;
-        $location.hash(id);
-        $anchorScroll();
-    }
+    vm.onSelect = (d) => console.log("On Select", d)
 }
 
 controller.$inject = [
-    '$state', '$window', '$location', '$anchorScroll'
+    '$state', '$window', '$location', 'ComplexityStore'
 ];
 
 
@@ -60,6 +49,4 @@ export default (module) => {
                 });
         }
     ]);
-
-    //require('./basic-info-tile')(module);
 };

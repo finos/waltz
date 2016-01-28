@@ -13,11 +13,11 @@
 
 import d3 from 'd3';
 
-const amber = d3.rgb('#ff7f0e');
-const green = d3.rgb('#2ca02c');
-const red = d3.rgb('#d62728');
-const grey = d3.rgb('#999');
-const blue = d3.rgb('#28a1b6');
+export const amber = d3.rgb('#ff7f0e');
+export const green = d3.rgb('#2ca02c');
+export const red = d3.rgb('#d62728');
+export const grey = d3.rgb('#999');
+export const blue = d3.rgb('#28a1b6');
 
 
 export const ragColorScale = d3.scale.ordinal()

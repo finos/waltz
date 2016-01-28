@@ -191,9 +191,18 @@ function controller($stateParams,
     const unsubscribe = $ngRedux.connect(mapStateToThis, orgServerStatsActions)(onUpdate);
     $scope.$on('$destroy', unsubscribe);
 
-    this.fetchOrgServerStats(id);
+    vm.fetchOrgServerStats(id);
 
-    global.vm = vm;
+    vm.onComplexitySelect = (d) => {
+        vm.complexitySelection = {
+            items: _.map(d.items, (item) => {
+                const app = _.findWhere(vm.viewData.apps, { id: item.id });
+                return {...item, app};
+            }),
+            begin: d.begin,
+            end: d.end
+        };
+    }
 }
 
 

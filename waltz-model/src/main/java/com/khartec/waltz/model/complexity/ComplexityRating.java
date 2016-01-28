@@ -13,6 +13,7 @@ import java.util.Optional;
 @JsonDeserialize(as = ImmutableComplexityRating.class)
 public abstract class ComplexityRating {
 
+    public abstract long id();
     public abstract Optional<ComplexityScore> serverComplexity();
     public abstract Optional<ComplexityScore> connectionComplexity();
     public abstract Optional<ComplexityScore> capabilityComplexity();
