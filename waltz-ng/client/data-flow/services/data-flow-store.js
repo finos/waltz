@@ -52,13 +52,13 @@ export default [
                 .then(([flows, flowApps]) =>
                     DataFlowUtilityService.enrich(flows, flowApps));
 
-        const findByCapability = (capabilityId) =>
-            $http.get(`${BASE}/capability/${capabilityId}`)
-                .then(r => r.data);
-
         const create = (flow) => $http.post(BASE, flow);
 
 
+        const findByAppIds = (appIds) =>
+            $http.post(`${BASE}/apps`, appIds)
+                .then(r => { console.log('tap', r); return r; })
+                .then(r => r.data);
 
         return {
             findApplicationsByEntityReference,
@@ -66,7 +66,7 @@ export default [
             findByOrgUnit,
             findByOrgUnitTree,
             findEnrichedFlowsForApplication,
-            findByCapability,
+            findByAppIds,
             create
         };
     }

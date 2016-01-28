@@ -67,9 +67,8 @@ function controller(capabilities,
     $q.all([
         appCapabilityStore.findApplicationsByCapabilityId(capability.id),
         perspectiveStore.findByCode('BUSINESS'),
-        ratingStore.findByCapability(capability.id),
-        dataFlowStore.findByCapability(capability.id)
-    ]).then(([groupedApps, perspective, ratings, dataFlows]) => {
+        ratingStore.findByCapability(capability.id)
+    ]).then(([groupedApps, perspective, ratings]) => {
 
         const apps = _.union(groupedApps.primaryApps, groupedApps.secondaryApps);
 
@@ -113,8 +112,9 @@ function controller(capabilities,
             }
         };
 
+        dataFlowStore.findByAppIds(_.map(apps, 'id'))
+            .then(fs => vm.dataFlows = fs);
 
-        vm.dataFlows = dataFlows;
     });
 
     vm.capability = capability;

@@ -80,6 +80,15 @@ public class DataFlowDao {
                 .fetch(dataFlowMapper);
     }
 
+
+    public List<DataFlow> findByApplicationIds(List<Long> appIds) {
+        return baseOrgUnitQuery()
+                .and(DATA_FLOW.SOURCE_ENTITY_ID.in(appIds))
+                .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIds))
+                .fetch(dataFlowMapper);
+    }
+
+
     public List<DataFlow> findByOrganisationalUnitId(long orgUnitId) {
         return baseOrgUnitQuery()
                 .and(sourceAppAlias.ORGANISATIONAL_UNIT_ID.eq(orgUnitId)
@@ -94,31 +103,6 @@ public class DataFlowDao {
                 .fetch(dataFlowMapper);
     }
 
-
-    public List<DataFlow> findByCapability(long id) {
-
-
-        Field[] fields = new ArrayBuilder<Field>()
-                .add(DATA_FLOW.fields())
-                .add(sourceAppAlias.NAME)
-                .add(targetAppAlias.NAME)
-                .build(new Field[0]);
-
-        Select<Record1<Long>> appsWithCapabilitySubSelect = dsl.select(APP_CAPABILITY.APPLICATION_ID)
-                .from(APP_CAPABILITY)
-                .where(APP_CAPABILITY.CAPABILITY_ID.eq(id));
-
-        return dsl.selectDistinct(fields)
-                .from(DATA_FLOW)
-                .innerJoin(sourceAppAlias)
-                .on(DATA_FLOW.SOURCE_ENTITY_ID.eq(sourceAppAlias.ID))
-                .innerJoin(targetAppAlias)
-                .on(DATA_FLOW.TARGET_ENTITY_ID.eq(targetAppAlias.ID))
-                .where(DATA_FLOW.SOURCE_ENTITY_ID.in(appsWithCapabilitySubSelect))
-                .or(DATA_FLOW.TARGET_ENTITY_ID.in(appsWithCapabilitySubSelect))
-                .fetch(dataFlowMapper);
-
-    }
 
     private SelectConditionStep<Record> baseOrgUnitQuery() {
 

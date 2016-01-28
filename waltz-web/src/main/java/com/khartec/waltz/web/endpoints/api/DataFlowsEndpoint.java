@@ -41,6 +41,8 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 import static spark.Spark.post;
 
 
@@ -85,20 +87,22 @@ public class DataFlowsEndpoint implements Endpoint {
             return dataFlowService.findByOrganisationalUnitTree(orgUnitId);
         };
 
+        ListRoute<DataFlow> findByAppIds = (request, response) -> {
+            List<Long> appIds = (List<Long>) readBody(request, List.class);
+            return dataFlowService.findByAppIds(appIds);
+        };
+
         ListRoute<Application> findApplicationsByEntityRef = (request, response) -> {
             EntityReference ref = getEntityReference(request);
             return dataFlowService.findApplicationsByEntityReference(ref);
         };
-
-        ListRoute<DataFlow> findByCapability = (request, response) ->
-                dataFlowService.findByCapability(getId(request));
 
         Route create = (request, response) -> {
             response.type(TYPE_JSON);
 
             requireRole(userService, request, Role.APP_EDITOR);
 
-            UpdateDataFlowsAction dataFlowUpdate = WebUtilities.readBody(request, UpdateDataFlowsAction.class);
+            UpdateDataFlowsAction dataFlowUpdate = readBody(request, UpdateDataFlowsAction.class);
             List<DataFlow> addedFlows = dataFlowUpdate
                     .addedTypes()
                     .stream()
@@ -154,12 +158,13 @@ public class DataFlowsEndpoint implements Endpoint {
         };
 
 
-        EndpointUtilities.getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), getByEntityRef);
-        EndpointUtilities.getForList(mkPath(BASE_URL, "entity", ":kind", ":id", "applications"), findApplicationsByEntityRef);
-        EndpointUtilities.getForList(mkPath(BASE_URL, "org-unit", ":orgUnitId"), getByOrgUnit);
-        EndpointUtilities.getForList(mkPath(BASE_URL, "org-unit-tree", ":orgUnitId"), getByOrgUnitTree);
+        getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), getByEntityRef);
+        getForList(mkPath(BASE_URL, "entity", ":kind", ":id", "applications"), findApplicationsByEntityRef);
+        getForList(mkPath(BASE_URL, "org-unit", ":orgUnitId"), getByOrgUnit);
+        getForList(mkPath(BASE_URL, "org-unit-tree", ":orgUnitId"), getByOrgUnitTree);
 
-        EndpointUtilities.getForList(mkPath(BASE_URL, "capability", ":id"), findByCapability);
+        postForList(mkPath(BASE_URL, "apps"), findByAppIds);
+
         post(BASE_URL, create, transformer);
     }
 

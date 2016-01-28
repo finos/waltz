@@ -70,6 +70,10 @@ public class DataFlowService {
 
     }
 
+    public List<DataFlow> findByAppIds(List<Long> appIds) {
+        return dataFlowDao.findByApplicationIds(appIds);
+    }
+
 
     public int[] addFlows(List<DataFlow> flows) {
         return dataFlowDao.addFlows(flows);
@@ -80,8 +84,4 @@ public class DataFlowService {
         return dataFlowDao.removeFlows(flows);
     }
 
-
-    public List<DataFlow> findByCapability(long id) {
-        return dataFlowDao.findByCapability(id);
-    }
 }
