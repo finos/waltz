@@ -35,7 +35,8 @@
 
     <hr/>
 
-    <waltz-section name="Application Complexity">
+    <waltz-section name="Application Complexity"
+                   id="ouv-complexity">
         <div class="row">
             <div class="col-md-8">
                 <waltz-complexity-bar-chart complexity="ctrl.viewData.complexity"
@@ -47,7 +48,6 @@
                     rating.  Select a bar to see the applications that fall within it.
                 </div>
             </div>
-
 
             <div class="col-md-4">
                 <div ng-if="ctrl.complexitySelection.items.length > 0">
@@ -78,12 +78,11 @@
                         </table>
                     </div>
                 </div>
-
             </div>
-
         </div>
-
     </waltz-section>
+
+
     <!-- PEOPLE -->
     <waltz-involved-people-section
         id="ouv-people"
