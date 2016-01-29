@@ -43,6 +43,9 @@ import java.util.Optional;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.*;
 import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.post;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 import static java.lang.String.format;
 import static spark.Spark.delete;
 
@@ -86,22 +89,17 @@ public class AppCapabilityEndpoint implements Endpoint {
         ListRoute<EntityReferenceKeyedGroup> findAssociatedCapabilitiesByApplication =
                 (request, response) -> appCapabilityDao.findAssociatedCapabilitiesByApplication(getId(request));
 
-        ListRoute<ApplicationCapability> findAppCapabilitiesForOrgUnit  = (request, response)
-                -> appCapabilityDao.findApplicationCapabilitiesForOrgUnit(getLong(request, "orgUnitId"));
-
-        ListRoute<ApplicationCapability> findAppCapabilitiesForOrgUnitTree  = (request, response)
-                -> appCapabilityDao.findApplicationCapabilitiesForOrgUnitTree(getLong(request, "orgUnitId"));
+        ListRoute<ApplicationCapability> findAppCapabilitiesForAppIds  = (request, response)
+                -> appCapabilityDao.findApplicationCapabilitiesForAppIds(readBody(request, Long[].class));
 
         EndpointUtilities.getForDatum(mkPath(BASE_URL, "capability", ":capabilityId"), findGroupedAppsForCapability);
-        EndpointUtilities.getForList(mkPath(BASE_URL, "application", ":applicationId"), findCapabilitiesForApp);
-        EndpointUtilities.getForList(mkPath(BASE_URL, "count-by", "capability"), tallyByCapability);
-        EndpointUtilities.getForList(mkPath(BASE_URL, "capability", ":capabilityId", "associated"), findAssociatedAppCapabilities);
-        EndpointUtilities.getForList(mkPath(BASE_URL, "application", ":id", "associated"), findAssociatedCapabilitiesByApplication);
-        EndpointUtilities.getForList(mkPath(BASE_URL, "org-unit", ":orgUnitId"), findAppCapabilitiesForOrgUnit);
-        EndpointUtilities.getForList(mkPath(BASE_URL, "org-unit-tree", ":orgUnitId"), findAppCapabilitiesForOrgUnitTree);
+        getForList(mkPath(BASE_URL, "application", ":applicationId"), findCapabilitiesForApp);
+        getForList(mkPath(BASE_URL, "count-by", "capability"), tallyByCapability);
+        getForList(mkPath(BASE_URL, "capability", ":capabilityId", "associated"), findAssociatedAppCapabilities);
+        getForList(mkPath(BASE_URL, "application", ":id", "associated"), findAssociatedCapabilitiesByApplication);
+        postForList(mkPath(BASE_URL, "apps"), findAppCapabilitiesForAppIds);
 
-
-        EndpointUtilities.post(mkPath(BASE_URL, "application", ":id"), (request, response) -> {
+        post(mkPath(BASE_URL, "application", ":id"), (request, response) -> {
 
             UpdateAppCapabilitiesAction action = readBody(request, UpdateAppCapabilitiesAction.class);
 
@@ -123,23 +121,23 @@ public class AppCapabilityEndpoint implements Endpoint {
         delete(mkPath(BASE_URL, "application", ":id", ":capabilityId"), (req, res) -> {
             long id = getId(req);
 
-            List<Long> capabilityIds = newArrayList(WebUtilities.getLong(req, "capabilityId"));
+            List<Long> capabilityIds = newArrayList(getLong(req, "capabilityId"));
 
             LOG.info("Removing application capabilities: " + capabilityIds + " for application: " + id);
             return appCapabilityDao.removeCapabilitiesFromApp(id, capabilityIds)[0];
         });
 
 
-        EndpointUtilities.post(mkPath(BASE_URL, "application", ":id", ":capabilityId"), (req, res) -> {
+        post(mkPath(BASE_URL, "application", ":id", ":capabilityId"), (req, res) -> {
             long id = getId(req);
-            List<Long> capabilityIds = newArrayList(WebUtilities.getLong(req, "capabilityId"));
+            List<Long> capabilityIds = newArrayList(getLong(req, "capabilityId"));
             LOG.info("Adding application capabilities: " + capabilityIds + " for application: " + id);
             return appCapabilityDao.addCapabilitiesToApp(id, capabilityIds)[0];
         });
 
-        EndpointUtilities.post(mkPath(BASE_URL, "application", ":id", ":capabilityId", "primary"), (req, res) -> {
+        post(mkPath(BASE_URL, "application", ":id", ":capabilityId", "primary"), (req, res) -> {
             long appId = getId(req);
-            long capabilityId = WebUtilities.getLong(req, "capabilityId");
+            long capabilityId = getLong(req, "capabilityId");
             boolean isPrimary = WebUtilities.readBody(req, Boolean.class);
 
             LOG.info("Setting application capability: " + capabilityId + " primary flag to:  " + isPrimary + " for application: " + appId);

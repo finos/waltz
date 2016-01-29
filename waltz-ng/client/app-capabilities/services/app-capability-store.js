@@ -48,13 +48,8 @@ const service = (http, root) => {
             .then(result => result.data);
 
 
-    const findApplicationCapabilitiesForOrgUnitId = id =>
-        http.get(`${BASE}/org-unit/${id}`)
-            .then(result => result.data);
-
-
-    const findApplicationCapabilitiesForOrgUnitTree = id =>
-        http.get(`${BASE}/org-unit-tree/${id}`)
+    const findApplicationCapabilitiesByAppIds = ids =>
+        http.post(`${BASE}/apps`, ids)
             .then(result => result.data);
 
 
@@ -93,8 +88,7 @@ const service = (http, root) => {
         findApplicationsByCapabilityId,
         findAssociatedApplicationCapabilitiesByCapabilityId,
         findAssociatedCapabilitiesByApplicationId,
-        findApplicationCapabilitiesForOrgUnitId,
-        findApplicationCapabilitiesForOrgUnitTree,
+        findApplicationCapabilitiesByAppIds,
         countByCapabilityId,
         removeCapability,
         addCapability,

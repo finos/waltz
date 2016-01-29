@@ -82,20 +82,6 @@ public class AppCapabilityDao {
     }
 
 
-    public List<ApplicationCapability> findApplicationCapabilitiesForOrgUnit(long orgUnitId) {
-        return prepareSelect()
-                .where(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(orgUnitId))
-                .fetch(appCapabilityMapper);
-    }
-
-
-    public List<ApplicationCapability> findApplicationCapabilitiesForOrgUnitIds(List<Long> orgUnitIds) {
-        return prepareSelect()
-                .where(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds))
-                .fetch(appCapabilityMapper);
-    }
-
-
     public List<ApplicationCapability> findAssociatedApplicationCapabilities(long capabilityId) {
         return prepareSelect()
                 .where(APP_CAPABILITY.APPLICATION_ID.in(
@@ -189,6 +175,7 @@ public class AppCapabilityDao {
 
     }
 
+
     public int[] removeCapabilitiesFromApp(long appId, List<Long> capabilityIds) {
         List<DeleteConditionStep<AppCapabilityRecord>> deletes = capabilityIds
                 .stream()
@@ -201,14 +188,20 @@ public class AppCapabilityDao {
         return dsl.batch(deletes).execute();
     }
 
-    public List<ApplicationCapability> findByCapabilityIds(List<Long> capabilityIds) {
 
+    public List<ApplicationCapability> findByCapabilityIds(List<Long> capabilityIds) {
         return prepareSelect()
                 .where(APP_CAPABILITY.APPLICATION_ID.in(
                         select(APP_CAPABILITY.APPLICATION_ID)
                                 .from(APP_CAPABILITY)
                                 .where(APP_CAPABILITY.CAPABILITY_ID.in(capabilityIds))))
                 .fetch(appCapabilityMapper);
+    }
 
+
+    public List<ApplicationCapability> findApplicationCapabilitiesForAppIds(Long[] ids) {
+        return prepareSelect()
+                .where(APPLICATION.ID.in(ids))
+                .fetch(appCapabilityMapper);
     }
 }

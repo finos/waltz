@@ -20,14 +20,11 @@ package com.khartec.waltz.service.app_capability;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.data.app_capability.AppCapabilityDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.EntityReferenceKeyedGroup;
 import com.khartec.waltz.model.ImmutableEntityReferenceKeyedGroup;
 import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
 import com.khartec.waltz.model.applicationcapability.GroupedApplications;
-import com.khartec.waltz.model.applicationcapability.ImmutableGroupedApplications;
-import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.tally.Tally;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,23 +35,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.utils.IdUtilities.toIds;
 
 
 @Service
 public class AppCapabilityService {
 
     private final AppCapabilityDao dao;
-    private final OrganisationalUnitDao orgUnitDao;
 
 
     @Autowired
-    public AppCapabilityService(AppCapabilityDao appCapabilityDao, OrganisationalUnitDao orgUnitDao) {
+    public AppCapabilityService(AppCapabilityDao appCapabilityDao) {
         checkNotNull(appCapabilityDao, "dao must not be null");
-        checkNotNull(orgUnitDao, "orgUnitDao must not be null");
 
         this.dao = appCapabilityDao;
-        this.orgUnitDao = orgUnitDao;
     }
 
 
@@ -96,17 +89,6 @@ public class AppCapabilityService {
     }
 
 
-    public List<ApplicationCapability> findApplicationCapabilitiesForOrgUnit(long orgUnitId) {
-        return dao.findApplicationCapabilitiesForOrgUnit(orgUnitId);
-    }
-
-
-    public List<ApplicationCapability> findApplicationCapabilitiesForOrgUnitTree(long orgUnitId) {
-        List<Long> orgUnitIds = toIds(orgUnitDao.findDescendants(orgUnitId));
-        return dao.findApplicationCapabilitiesForOrgUnitIds(orgUnitIds);
-    }
-
-
     public List<Tally<Long>> tallyByCapabilityId() {
         return dao.tallyByCapabilityId();
     }
@@ -130,5 +112,9 @@ public class AppCapabilityService {
     public List<ApplicationCapability> findByCapabilityIds(List<Long> capIds) {
         return dao.findByCapabilityIds(capIds);
 
+    }
+
+    public List<ApplicationCapability> findApplicationCapabilitiesForAppIds(Long[] ids) {
+        return dao.findApplicationCapabilitiesForAppIds(ids);
     }
 }

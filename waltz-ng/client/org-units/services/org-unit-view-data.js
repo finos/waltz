@@ -54,9 +54,9 @@ function loadDataFlows(dataFlowStore, appStore, groupApps) {
 }
 
 
-function loadAppCapabilities(appCapabilityStore, id) {
+function loadAppCapabilities(appCapabilityStore, appIds) {
     return appCapabilityStore
-        .findApplicationCapabilitiesForOrgUnitTree(id)
+        .findApplicationCapabilitiesByAppIds(appIds)
         .then(rawAppCapabilities => {
             const capabilitiesById = _.chain(rawAppCapabilities)
                 .map('capabilityReference')
@@ -168,7 +168,7 @@ function service(appStore,
         return $q.all([
             ratingStore.findByAppIds(appIds),
             loadDataFlows(dataFlowStore, appStore, apps),
-            loadAppCapabilities(appCapabilityStore, orgUnitId),
+            loadAppCapabilities(appCapabilityStore, appIds),
             orgUnitStore.findAll(),
             changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId),
             involvementStore.findPeopleByEntityReference('ORG_UNIT', orgUnitId),
