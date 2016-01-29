@@ -21,19 +21,6 @@ function service(DataFlowUtilityService, $q, $http, BaseApiUrl, appStore) {
             .then(result => result.data);
 
 
-    const findByOrgUnit = (id) =>
-        $http.get(`${BASE}/org-unit/${id}`)
-            .then(ts => {
-                return ts;
-            })
-            .then(result => result.data);
-
-
-    const findByOrgUnitTree = (id) =>
-        $http.get(`${BASE}/org-unit-tree/${id}`)
-            .then(result => result.data);
-
-
     const findEnrichedFlowsForApplication = (id) => {
         const acc = {};
 
@@ -50,7 +37,6 @@ function service(DataFlowUtilityService, $q, $http, BaseApiUrl, appStore) {
             .then(apps => DataFlowUtilityService.enrich(acc.flows, apps));
     };
 
-
     const create = (flow) => $http.post(BASE, flow);
 
 
@@ -61,8 +47,6 @@ function service(DataFlowUtilityService, $q, $http, BaseApiUrl, appStore) {
 
     return {
         findByEntityReference,
-        findByOrgUnit,
-        findByOrgUnitTree,
         findEnrichedFlowsForApplication,
         findByAppIds,
         create

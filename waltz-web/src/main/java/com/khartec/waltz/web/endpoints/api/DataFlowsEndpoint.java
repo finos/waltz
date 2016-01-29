@@ -19,7 +19,6 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
@@ -27,11 +26,9 @@ import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow.DataFlowService;
 import com.khartec.waltz.service.user.UserService;
-import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.action.UpdateDataFlowsAction;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
+import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Route;
@@ -75,16 +72,6 @@ public class DataFlowsEndpoint implements Endpoint {
         ListRoute<DataFlow> getByEntityRef = (request, response) -> {
             EntityReference ref = getEntityReference(request);
             return dataFlowService.findByEntityReference(ref);
-        };
-
-        ListRoute<DataFlow> getByOrgUnit = (request, response) -> {
-            long orgUnitId = getLong(request, "orgUnitId");
-            return dataFlowService.findByOrganisationalUnitId(orgUnitId);
-        };
-
-        ListRoute<DataFlow> getByOrgUnitTree = (request, response) -> {
-            long orgUnitId = getLong(request, "orgUnitId");
-            return dataFlowService.findByOrganisationalUnitTree(orgUnitId);
         };
 
         ListRoute<DataFlow> findByAppIds = (request, response) -> {
@@ -153,8 +140,6 @@ public class DataFlowsEndpoint implements Endpoint {
         };
 
         getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), getByEntityRef);
-        getForList(mkPath(BASE_URL, "org-unit", ":orgUnitId"), getByOrgUnit);
-        getForList(mkPath(BASE_URL, "org-unit-tree", ":orgUnitId"), getByOrgUnitTree);
 
         postForList(mkPath(BASE_URL, "apps"), findByAppIds);
 

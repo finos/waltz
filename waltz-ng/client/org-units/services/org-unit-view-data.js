@@ -32,25 +32,24 @@ function prepareFlowData(flows, apps) {
 }
 
 
-function loadDataFlows(dataFlowStore, appStore, id) {
-    return dataFlowStore.findByOrgUnitTree(id)
+function loadDataFlows(dataFlowStore, appStore, groupApps) {
+    const groupAppIds = _.map(groupApps, 'id');
+
+    return dataFlowStore.findByAppIds(groupAppIds)
         .then(fs => {
 
-            const appIds = _.chain(fs)
+            const allAppIds = _.chain(fs)
                 .map(f => ([f.source.id, f.target.id]))
                 .flatten()
                 .uniq()
                 .value();
 
-            const enrichAppsWithIsNeighbourFlagFn = apps => _.map(apps, app => ({
-                ...app,
-                isNeighbour: app.organisationalUnitId !== id
-            }));
+            const neighbourIds = _.difference(allAppIds, groupApps);
 
             return appStore
-                .findByIds(appIds)
-                .then(enrichAppsWithIsNeighbourFlagFn)
-                .then(apps => prepareFlowData(fs, apps));
+                .findByIds(neighbourIds)
+                .then(neighbourApps => _.map(neighbourApps, a => ({...a, isNeighbour: true })))
+                .then(neighbourApps => prepareFlowData(fs, _.union(groupApps, neighbourApps)));
         });
 }
 
@@ -158,11 +157,17 @@ function service(appStore,
     const data = {};
 
     function loadAll(orgUnitId) {
+        return appStore.findByOrgUnitTree(orgUnitId)
+            .then(apps => loadAll2(orgUnitId, apps));
+    }
+
+    function loadAll2(orgUnitId, apps) {
+
+        const appIds = _.map(apps, 'id');
 
         return $q.all([
-            appStore.findByOrgUnitTree(orgUnitId),
             ratingStore.findByOrgUnitTree(orgUnitId),
-            loadDataFlows(dataFlowStore, appStore, orgUnitId),
+            loadDataFlows(dataFlowStore, appStore, apps),
             loadAppCapabilities(appCapabilityStore, orgUnitId),
             orgUnitStore.findAll(),
             changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId),
@@ -175,7 +180,6 @@ function service(appStore,
             assetCostStore.findAppCostsByOrgUnitTree(orgUnitId),
             complexityStore.findByOrgUnitTree(orgUnitId)
     ]).then(([
-            apps,
             capabilityRatings,
             dataFlows,
             appCapabilities,

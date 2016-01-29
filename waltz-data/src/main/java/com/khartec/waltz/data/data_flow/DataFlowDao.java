@@ -89,21 +89,6 @@ public class DataFlowDao {
     }
 
 
-    public List<DataFlow> findByOrganisationalUnitId(long orgUnitId) {
-        return baseOrgUnitQuery()
-                .and(sourceAppAlias.ORGANISATIONAL_UNIT_ID.eq(orgUnitId)
-                        .or(targetAppAlias.ORGANISATIONAL_UNIT_ID.eq(orgUnitId)))
-                .fetch(dataFlowMapper);
-    }
-
-    public List<DataFlow> findByOrganisationalUnitIds(List<Long> orgUnitIds) {
-        return baseOrgUnitQuery()
-                .and(sourceAppAlias.ORGANISATIONAL_UNIT_ID.in(orgUnitIds)
-                        .or(targetAppAlias.ORGANISATIONAL_UNIT_ID.in(orgUnitIds)))
-                .fetch(dataFlowMapper);
-    }
-
-
     private SelectConditionStep<Record> baseOrgUnitQuery() {
 
         Field[] fields = new ArrayBuilder<Field>()
