@@ -21,25 +21,6 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     }
 
-    function findByCapability(id) {
-        return $http
-            .get(`${base}/capability/${id}`)
-            .then(result => result.data);
-    }
-
-    function findByOrgUnit(id) {
-        return $http
-            .get(`${base}/org-unit/${id}`)
-            .then(result => result.data);
-    }
-
-    function findByOrgUnitTree(id) {
-        return $http
-            .get(`${base}/org-unit-tree/${id}`)
-            .then(result => result.data);
-    }
-
-
     function findByParentAndPerspective(kind, id, perspectiveCode) {
         return $http
             .get(`${base}/parent/${kind}/${id}/${perspectiveCode}`)
@@ -51,12 +32,18 @@ function store($http, BaseApiUrl) {
             .post(`${base}`, action);
     }
 
+
+    function findByAppIds(ids) {
+        return $http
+            .post(`${base}/apps`, ids)
+            .then(result => result.data);
+    }
+
+
     return {
         findByParent,
         findByParentAndPerspective,
-        findByCapability,
-        findByOrgUnit,
-        findByOrgUnitTree,
+        findByAppIds,
         update
     };
 }

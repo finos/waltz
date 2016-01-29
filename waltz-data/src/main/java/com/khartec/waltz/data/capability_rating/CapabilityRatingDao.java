@@ -17,7 +17,6 @@
 
 package com.khartec.waltz.data.capability_rating;
 
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -27,7 +26,6 @@ import com.khartec.waltz.model.capabilityrating.CapabilityRating;
 import com.khartec.waltz.model.capabilityrating.ImmutableCapabilityRating;
 import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.capabilityrating.RatingChange;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.schema.tables.records.CapabilityRecord;
 import com.khartec.waltz.schema.tables.records.PerspectiveMeasurableRecord;
 import com.khartec.waltz.schema.tables.records.PerspectiveRatingRecord;
@@ -40,9 +38,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.model.utils.IdUtilities.toIds;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
 import static com.khartec.waltz.schema.tables.Perspective.PERSPECTIVE;
 import static com.khartec.waltz.schema.tables.PerspectiveMeasurable.PERSPECTIVE_MEASURABLE;
@@ -126,35 +121,6 @@ public class CapabilityRatingDao {
     }
 
 
-    public List<CapabilityRating> findByCapability(long capabilityId) {
-        return findByCapabilityIds(newArrayList(capabilityId));
-    }
-
-
-    public List<CapabilityRating> findByOrganisationalUnit(long orgUnitId) {
-        return prepareSelectPart()
-                .innerJoin(APPLICATION)
-                .on(PERSPECTIVE_RATING.PARENT_KIND.eq(EntityKind.APPLICATION.name())
-                        .and(PERSPECTIVE_RATING.PARENT_ID.eq(APPLICATION.ID)))
-                .where(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(orgUnitId))
-                .fetch(capabilityRatingMapper);
-    }
-
-
-    public List<CapabilityRating> findByOrganisationalUnitTree(long orgUnitId) {
-
-        List<OrganisationalUnit> orgUnitTree = orgUnitDao.findDescendants(orgUnitId);
-        List<Long> orgUnitIds = toIds(orgUnitTree);
-
-        return prepareSelectPart()
-                .innerJoin(APPLICATION)
-                .on(PERSPECTIVE_RATING.PARENT_KIND.eq(EntityKind.APPLICATION.name())
-                        .and(PERSPECTIVE_RATING.PARENT_ID.eq(APPLICATION.ID)))
-                .where(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds))
-                .fetch(capabilityRatingMapper);
-    }
-
-
     private SelectOnConditionStep<Record>  prepareSelectPart() {
         return dsl.select(fields)
                 .from(PERSPECTIVE_RATING)
@@ -228,6 +194,14 @@ public class CapabilityRatingDao {
     public List<CapabilityRating> findByCapabilityIds(List<Long> capIds) {
         return prepareSelectPart()
                 .where(PERSPECTIVE_RATING.CAPABILITY_ID.in(capIds))
+                .fetch(capabilityRatingMapper);
+    }
+
+
+    public List<CapabilityRating> findByAppIds(Long[] appIds) {
+        return prepareSelectPart()
+                .where(PERSPECTIVE_RATING.PARENT_ID.in(appIds))
+                .and(PERSPECTIVE_RATING.PARENT_KIND.eq(EntityKind.APPLICATION.name()))
                 .fetch(capabilityRatingMapper);
     }
 }

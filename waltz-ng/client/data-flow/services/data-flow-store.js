@@ -1,4 +1,3 @@
-
 /*
  *  Waltz
  * Copyright (c) David Watkins. All rights reserved.
@@ -11,14 +10,14 @@
  *
  */
 
-function service(DataFlowUtilityService, $q, $http, BaseApiUrl, appStore) {
+function service(dataFlowUtils, appStore, $http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/data-flows`;
 
 
-    const findByEntityReference = (kind, id) =>
-        $http.get(`${BASE}/entity/${kind}/${id}`)
-            .then(result => result.data);
+    const findByEntityReference = (kind, id) => $http
+        .get(`${BASE}/entity/${kind}/${id}`)
+        .then(result => result.data);
 
 
     const findEnrichedFlowsForApplication = (id) => {
@@ -34,16 +33,18 @@ function service(DataFlowUtilityService, $q, $http, BaseApiUrl, appStore) {
                     .value()
             })
             .then(appIds => appStore.findByIds(appIds))
-            .then(apps => DataFlowUtilityService.enrich(acc.flows, apps));
+            .then(apps => dataFlowUtils.enrich(acc.flows, apps));
     };
 
-    const create = (flow) => $http.post(BASE, flow);
+
+    const create = (flow) => $http
+        .post(BASE, flow);
 
 
-    const findByAppIds = (appIds) =>
-        $http.post(`${BASE}/apps`, appIds)
-            .then(r => { console.log('tap', r); return r; })
-            .then(r => r.data);
+    const findByAppIds = (appIds) => $http
+        .post(`${BASE}/apps`, appIds)
+        .then(r => r.data);
+
 
     return {
         findByEntityReference,
@@ -55,10 +56,9 @@ function service(DataFlowUtilityService, $q, $http, BaseApiUrl, appStore) {
 
 service.$inject = [
     'DataFlowUtilityService',
-    '$q',
-    '$http',
-    'BaseApiUrl',
     'ApplicationStore',
+    '$http',
+    'BaseApiUrl'
 ];
 
 

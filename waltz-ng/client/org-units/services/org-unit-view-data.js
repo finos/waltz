@@ -166,7 +166,7 @@ function service(appStore,
         const appIds = _.map(apps, 'id');
 
         return $q.all([
-            ratingStore.findByOrgUnitTree(orgUnitId),
+            ratingStore.findByAppIds(appIds),
             loadDataFlows(dataFlowStore, appStore, apps),
             loadAppCapabilities(appCapabilityStore, orgUnitId),
             orgUnitStore.findAll(),
