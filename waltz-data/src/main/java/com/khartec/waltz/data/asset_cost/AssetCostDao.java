@@ -63,8 +63,6 @@ public class AssetCostDao {
 
 
     private RecordMapper<Record, ApplicationCost> appCostMapper = r -> {
-        AssetCostRecord record = r.into(ASSET_COST);
-
         EntityReference appRef = ImmutableEntityReference.builder()
                 .kind(EntityKind.APPLICATION)
                 .id(r.getValue(APPLICATION.ID))
@@ -99,17 +97,16 @@ public class AssetCostDao {
     }
 
 
-    public List<AssetCost> findByOrgUnitIds(List<Long> orgUnitIds) {
+    public List<AssetCost> findByAppId(long appId) {
         return dsl.select(ASSET_COST.fields())
                 .from(ASSET_COST)
                 .innerJoin(APPLICATION)
                 .on(APPLICATION.ASSET_CODE.eq(ASSET_COST.ASSET_CODE))
-                .where(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds))
+                .where(APPLICATION.ID.eq(appId))
                 .fetch(assetCostMapper);
     }
 
-
-    public List<ApplicationCost> findAppCostsByOrgUnits(List<Long> orgUnits) {
+    public List<ApplicationCost> findAppCostsByAppIds(Long[] ids) {
         List<SelectField<?>> fields = ListUtilities.push(
                 Arrays.asList(ASSET_COST.fields()),
                 APPLICATION.NAME,
@@ -123,17 +120,8 @@ public class AssetCostDao {
                 .on(ASSET_COST.ASSET_CODE.eq(APPLICATION.ASSET_CODE))
                 .innerJoin(ORGANISATIONAL_UNIT)
                 .on(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
-                .where(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnits))
+                .where(APPLICATION.ID.in(ids))
                 .fetch(appCostMapper);
-    }
 
-
-    public List<AssetCost> findByAppId(long appId) {
-        return dsl.select(ASSET_COST.fields())
-                .from(ASSET_COST)
-                .innerJoin(APPLICATION)
-                .on(APPLICATION.ASSET_CODE.eq(ASSET_COST.ASSET_CODE))
-                .where(APPLICATION.ID.eq(appId))
-                .fetch(assetCostMapper);
     }
 }

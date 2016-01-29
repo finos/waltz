@@ -177,7 +177,7 @@ function service(appStore,
             ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),
             authSourceCalculator.findByOrgUnit(orgUnitId),
             endUserAppStore.findByOrgUnitTree(orgUnitId),
-            assetCostStore.findAppCostsByOrgUnitTree(orgUnitId),
+            assetCostStore.findAppCostsByAppIds(appIds),
             complexityStore.findByOrgUnitTree(orgUnitId)
     ]).then(([
             capabilityRatings,
