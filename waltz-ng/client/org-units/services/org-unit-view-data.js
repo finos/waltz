@@ -14,7 +14,6 @@ import _ from 'lodash';
 
 import RatedFlowsData from '../../data-flow/RatedFlowsData';
 import { aggregatePeopleInvolvements } from '../../involvement/involvement-utils';
-import { categorizeCostsIntoBuckets } from '../../asset-cost/services/asset-cost-utilities';
 
 
 function prepareFlowData(flows, apps) {
@@ -183,7 +182,6 @@ function service(appStore,
             data.orgUnits = orgUnits;
             data.endUserApps = endUserApps;
 
-            data.assetCostBuckets = categorizeCostsIntoBuckets(assetCosts);
             data.complexity = complexity;
 
             data.filter = (config) => {

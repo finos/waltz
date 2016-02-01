@@ -13,26 +13,6 @@
 import _ from 'lodash';
 
 
-function addDirects(model, directs) {
-    return _.set(model, ['directs'], directs);
-}
-
-
-function addManagers(model, managers) {
-    return _.set(model, ['managers'], managers);
-}
-
-
-function addPerson(model, person) {
-    return _.set(model, ['person'], person);
-}
-
-
-function addInvolvements(model, involvements) {
-    return _.set(model, ['involvements'], involvements);
-}
-
-
 const initModel = {
     managers: [],
     directs: [],
@@ -41,27 +21,28 @@ const initModel = {
         direct: [],
         indirect: [],
         allApps: []
-    }
+    },
+    apps: []
 };
 
 
-function service(personStore, involvementStore, $q) {
+function service(personStore, involvementStore, assetCostStore, $q) {
 
     const state = { model: initModel };
 
     function loadPeople(employeeId) {
         personStore.getByEmployeeId(employeeId)
-            .then(person => state.model = addPerson(state.model, person));
+            .then(person => state.model.person = person);
 
         personStore.findDirects(employeeId)
-            .then(directs => state.model = addDirects(state.model, directs));
+            .then(directs => state.model.directs = directs);
 
         personStore.findManagers(employeeId)
-            .then(managers => state.model = addManagers(state.model, managers));
+            .then(managers => state.model.managers = managers);
     }
 
     function loadApplications(employeeId) {
-        $q.all([
+        return $q.all([
             involvementStore.findByEmployeeId(employeeId),
             involvementStore.findAppsForEmployeeId(employeeId)
         ]).then(([involvements, apps]) => {
@@ -86,16 +67,27 @@ function service(personStore, involvementStore, $q) {
                 allApps: apps
             };
 
-            state.model = addInvolvements(state.model, summary);
+            state.model.apps = apps;
+            state.model.involvements = summary;
 
-            //vm.allRoles = _.map(vm.appInvolvements.direct, 'kind');
+            return state.model;
+
         });
     }
 
+
+    function loadCosts(model) {
+        const appIds = _.map(model.apps, 'id');
+        assetCostStore.findAppCostsByAppIds(appIds).then(assetCosts => model.assetCosts = assetCosts);
+    }
+
+
     function load(employeeId) {
         loadPeople(employeeId);
-        loadApplications(employeeId);
+        loadApplications(employeeId)
+            .then(loadCosts);
     }
+
 
     return {
         load,
@@ -106,6 +98,7 @@ function service(personStore, involvementStore, $q) {
 service.$inject = [
     'PersonDataService',
     'InvolvementDataService',
+    'AssetCostStore',
     '$q'
 ];
 

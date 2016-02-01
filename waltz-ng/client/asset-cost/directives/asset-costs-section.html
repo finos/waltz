@@ -1,0 +1,34 @@
+<div>
+    <waltz-section name="Costs" id="ouv-costs">
+        <div class="row">
+            <div class="col-md-12" class="myChart">
+                <waltz-bucket-chart buckets="ctrl.assetCostBuckets"
+                                    event-dispatcher="ctrl.eventDispatcher">
+                </waltz-bucket-chart>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <br>
+                <div class="small text-muted">
+                    Each circle is sized according to the <i>number</i> of applications whose costs
+                    fall within the stated range.
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 12px">
+            <div class="col-md-12">
+                <waltz-asset-cost-table event-dispatcher='ctrl.eventDispatcher'
+                                        options='{
+                                            showOrgUnit: true,
+                                            showAppName: true,
+                                            showAssetCode: false
+                                        }'
+                                        costs='ctrl.assetCosts'>
+                </waltz-asset-cost-table>
+            </div>
+        </div>
+    </waltz-section>
+</div>

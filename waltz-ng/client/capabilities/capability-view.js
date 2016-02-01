@@ -83,7 +83,9 @@ function controller(capabilities,
                     $stateParams,
                     $state,
                     historyStore,
-                    dataFlowStore) {
+                    dataFlowStore,
+                    complexityStore,
+                    assetCostStore) {
 
     const vm = this;
 
@@ -116,13 +118,17 @@ function controller(capabilities,
             $q.all([
                 perspectiveStore.findByCode('BUSINESS'),
                 ratingStore.findByAppIds(appIds),
-                dataFlowStore.findByAppIds(appIds)
-            ]).then(([perspective, ratings, flows]) => {
+                dataFlowStore.findByAppIds(appIds),
+                complexityStore.findByAppIds(appIds),
+                assetCostStore.findAppCostsByAppIds(appIds)
+            ]).then(([perspective, ratings, flows, complexity, assetCosts]) => {
                 vm.ratings = {
                     group: prepareGroupData(capability, vm.apps, perspective, ratings),
                     tweakers
                 };
                 vm.dataFlows = flows;
+                vm.complexity = complexity;
+                vm.assetCosts = assetCosts;
             });
         });
 
@@ -143,6 +149,7 @@ function controller(capabilities,
 
     logHistory(capability, historyStore);
 
+
     vm.capability = capability;
     vm.capabilitiesById = capabilitiesById;
     vm.associatedCapabilities = associatedCapabilities;
@@ -157,7 +164,9 @@ controller.$inject = [
     '$stateParams',
     '$state',
     'HistoryStore',
-    'DataFlowDataStore'
+    'DataFlowDataStore',
+    'ComplexityStore',
+    'AssetCostStore'
 ];
 
 
