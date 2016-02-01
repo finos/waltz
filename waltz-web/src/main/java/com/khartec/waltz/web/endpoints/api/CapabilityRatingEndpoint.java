@@ -24,19 +24,19 @@ import com.khartec.waltz.service.capability_rating.AppRatingChangesAction;
 import com.khartec.waltz.service.capability_rating.CapabilityRatingService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.user.UserService;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
 public class CapabilityRatingEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "capability-rating");
+    private static final String BASE_URL = mkPath("api", "capability-rating");
 
     private final CapabilityRatingService ratingService;
     private final ChangeLogService changeLogService;
@@ -55,34 +55,26 @@ public class CapabilityRatingEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String byParentPath = WebUtilities.mkPath(BASE_URL, "parent", ":kind", ":id");
-        String byParentAndPerspectivePath = WebUtilities.mkPath(byParentPath, ":perspectiveCode");
-        String byCapabilityPath = WebUtilities.mkPath(BASE_URL, "capability", ":id");
-        String byOrgUnitPath = WebUtilities.mkPath(BASE_URL, "org-unit", ":id");
-        String byOrgUnitTreePath = WebUtilities.mkPath(BASE_URL, "org-unit-tree", ":id");
+        String byParentPath = mkPath(BASE_URL, "parent", ":kind", ":id");
+        String byParentAndPerspectivePath = mkPath(byParentPath, ":perspectiveCode");
+        String byAppIdsPath = mkPath(BASE_URL, "apps");
 
 
-        EndpointUtilities.getForList(byParentPath, (request, response) -> ratingService.findByParent(WebUtilities.getEntityReference(request)));
+        getForList(byParentPath, (request, response) -> ratingService.findByParent(getEntityReference(request)));
 
-        EndpointUtilities.getForList(byParentAndPerspectivePath, (request, response) ->
+        getForList(byParentAndPerspectivePath, (request, response) ->
                 ratingService.findByParentAndPerspective(
-                        WebUtilities.getEntityReference(request),
+                        getEntityReference(request),
                         request.params("perspectiveCode")));
 
-        EndpointUtilities.getForList(byCapabilityPath, (request, response) -> ratingService.findByCapability(WebUtilities.getId(request)));
-
-        EndpointUtilities.getForList(byOrgUnitPath, (request, response) -> ratingService.findByOrganisationalUnit(WebUtilities.getId(request)));
-
-        EndpointUtilities.getForList(byOrgUnitTreePath, (request, response) -> ratingService.findByOrganisationalUnitTree(WebUtilities.getId(request)));
-
-        EndpointUtilities.post(WebUtilities.mkPath(BASE_URL), (request, response) -> {
-            WebUtilities.requireRole(userService, request, Role.RATING_EDITOR);
-            AppRatingChangesAction appRatingChangesAction = WebUtilities.readBody(request, AppRatingChangesAction.class);
+        post(mkPath(BASE_URL), (request, response) -> {
+            requireRole(userService, request, Role.RATING_EDITOR);
+            AppRatingChangesAction appRatingChangesAction = readBody(request, AppRatingChangesAction.class);
 
             int changeCount = ratingService.update(appRatingChangesAction);
 
             changeLogService.write(ImmutableChangeLog.builder()
-                    .userId(WebUtilities.getUser(request).userName())
+                    .userId(getUser(request).userName())
                     .message("Updated capability ratings ( " + changeCount + " )")
                     .parentReference(appRatingChangesAction.application())
                     .severity(Severity.INFORMATION)
@@ -90,5 +82,7 @@ public class CapabilityRatingEndpoint implements Endpoint {
 
             return changeCount;
         });
+
+        postForList(byAppIdsPath, ((request, response) -> ratingService.findByAppIds(readBody(request, Long[].class))));
     }
 }

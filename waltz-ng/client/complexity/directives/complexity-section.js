@@ -1,3 +1,5 @@
+
+
 /*
  *  This file is part of Waltz.
  *
@@ -16,28 +18,32 @@
  *
  */
 
-const service = (http, root) => {
+function controller() {
 
-    const BASE = `${root}/asset-cost`;
+    const vm = this;
 
-
-    const findByCode = code =>
-        http.get(`${BASE}/code/${code}`)
-            .then(result => result.data);
-
-
-    const findAppCostsByAppIds = (ids) =>
-        http.post(`${BASE}/app-cost/apps`, ids)
-            .then(result => result.data);
-
-
-    return {
-        findByCode,
-        findAppCostsByAppIds
+    vm.onComplexitySelect = (d) => {
+        vm.complexitySelection = {
+            items: _.map(d.items, (item) => {
+                const app = _.findWhere(vm.apps, { id: item.id });
+                return {...item, app};
+            }),
+            begin: d.begin,
+            end: d.end
+        };
     };
-};
-
-service.$inject = ['$http', 'BaseApiUrl'];
+}
 
 
-export default service;
+export default () => ({
+    restrict: 'E',
+    replace: true,
+    controller,
+    controllerAs: 'ctrl',
+    scope: {},
+    template: require('./complexity-section.html'),
+    bindToController: {
+        complexity: '=',
+        apps: '=?'
+    }
+});

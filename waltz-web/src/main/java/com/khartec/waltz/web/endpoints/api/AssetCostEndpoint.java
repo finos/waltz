@@ -17,27 +17,22 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.cost.ApplicationCost;
 import com.khartec.waltz.model.cost.AssetCost;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
-import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.web.WebUtilities.getId;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
 public class AssetCostEndpoint implements Endpoint {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BookmarksEndpoint.class);
     private static final String BASE_URL = mkPath("api", "asset-cost");
 
     private final AssetCostService assetCostService;
@@ -53,15 +48,13 @@ public class AssetCostEndpoint implements Endpoint {
     public void register() {
 
         String findByAssetCodePath = mkPath(BASE_URL, "code", ":code");
-        String findByOrgUnitPath = mkPath(BASE_URL, "org-unit-tree", ":id");
-        String findAppCostsByOrgUnitPath = mkPath(BASE_URL, "app-cost", "org-unit-tree", ":id");
+        String findAppCostsByAppIdsPath = mkPath(BASE_URL, "app-cost", "apps");
 
         ListRoute<AssetCost> findByAssetCodeRoute = (request, response) -> assetCostService.findByAssetCode(request.params("code"));
-        ListRoute<AssetCost> findByOrgUnitRoute = (request, response) -> assetCostService.findByOrgUnitTree(getId(request));
-        ListRoute<ApplicationCost> findAppCostsByOrgUnitRoute = (request, response) -> assetCostService.findAppCostsByOrgUnitTree(getId(request));
+        ListRoute<ApplicationCost> findAppCostsByAppIds = (request, response) -> assetCostService.findAppCostsByAppIds(readBody(request, Long[].class));
 
         getForList(findByAssetCodePath, findByAssetCodeRoute);
-        getForList(findByOrgUnitPath, findByOrgUnitRoute);
-        getForList(findAppCostsByOrgUnitPath, findAppCostsByOrgUnitRoute);
+        postForList(findAppCostsByAppIdsPath, findAppCostsByAppIds);
+
     }
 }

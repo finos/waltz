@@ -29,10 +29,14 @@ import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.khartec.waltz.web.WebUtilities.getEntityReference;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+
 @Service
 public class InvolvementEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "involvement");
+    private static final String BASE_URL = mkPath("api", "involvement");
 
     private final InvolvementService service;
 
@@ -62,19 +66,19 @@ public class InvolvementEndpoint implements Endpoint {
         };
 
         ListRoute<Involvement>  findByEntityRef = (request, response) -> {
-            EntityReference entityReference = WebUtilities.getEntityReference(request);
+            EntityReference entityReference = getEntityReference(request);
             return service.findByEntityReference(entityReference);
         };
 
         ListRoute<Person>  findPeopleByEntityRef = (request, response) -> {
-            EntityReference entityReference = WebUtilities.getEntityReference(request);
+            EntityReference entityReference = getEntityReference(request);
             return service.findPeopleByEntityReference(entityReference);
         };
 
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "employee", ":employeeId"), byEmployeeId);
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "employee", ":employeeId", "applications", "direct"), findDirectAppsByEmployeeId);
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "employee", ":employeeId", "applications"), findAllAppsByEmployeeId);
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "entity", ":kind", ":id"), findByEntityRef);
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "entity", ":kind", ":id", "people"), findPeopleByEntityRef);
+        getForList(mkPath(BASE_URL, "employee", ":employeeId"), byEmployeeId);
+        getForList(mkPath(BASE_URL, "employee", ":employeeId", "applications", "direct"), findDirectAppsByEmployeeId);
+        getForList(mkPath(BASE_URL, "employee", ":employeeId", "applications"), findAllAppsByEmployeeId);
+        getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), findByEntityRef);
+        getForList(mkPath(BASE_URL, "entity", ":kind", ":id", "people"), findPeopleByEntityRef);
     }
 }

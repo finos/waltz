@@ -32,32 +32,31 @@ function prepareFlowData(flows, apps) {
 }
 
 
-function loadDataFlows(dataFlowStore, appStore, id) {
-    return dataFlowStore.findByOrgUnitTree(id)
+function loadDataFlows(dataFlowStore, appStore, groupApps) {
+    const groupAppIds = _.map(groupApps, 'id');
+
+    return dataFlowStore.findByAppIds(groupAppIds)
         .then(fs => {
 
-            const appIds = _.chain(fs)
+            const allAppIds = _.chain(fs)
                 .map(f => ([f.source.id, f.target.id]))
                 .flatten()
                 .uniq()
                 .value();
 
-            const enrichAppsWithIsNeighbourFlagFn = apps => _.map(apps, app => ({
-                ...app,
-                isNeighbour: app.organisationalUnitId !== id
-            }));
+            const neighbourIds = _.difference(allAppIds, groupApps);
 
             return appStore
-                .findByIds(appIds)
-                .then(enrichAppsWithIsNeighbourFlagFn)
-                .then(apps => prepareFlowData(fs, apps));
+                .findByIds(neighbourIds)
+                .then(neighbourApps => _.map(neighbourApps, a => ({...a, isNeighbour: true })))
+                .then(neighbourApps => prepareFlowData(fs, _.union(groupApps, neighbourApps)));
         });
 }
 
 
-function loadAppCapabilities(appCapabilityStore, id) {
+function loadAppCapabilities(appCapabilityStore, appIds) {
     return appCapabilityStore
-        .findApplicationCapabilitiesForOrgUnitTree(id)
+        .findApplicationCapabilitiesByAppIds(appIds)
         .then(rawAppCapabilities => {
             const capabilitiesById = _.chain(rawAppCapabilities)
                 .map('capabilityReference')
@@ -105,40 +104,6 @@ function extractPrimaryAppIds(appCapabilities) {
 }
 
 
-function categorizeCostsIntoBuckets(costs) {
-
-    // bucketPredicate:: bucket -> amount -> bool
-    const bucketPredicate = b => a => (a >= b.min) && (a < b.max);
-
-    const buckets = [
-        { min: 0, max: 1000, name: '€0 < 1K', idx: 0, size: 0},
-        { min: 1000, max: 5000, name: '€1K < 5K', idx: 1, size: 0},
-        { min: 5000, max: 10000, name: '€5K < 10K', idx: 2, size: 0},
-        { min: 10000, max: 50000, name: '€10K < 50K', idx: 3, size: 0},
-        { min: 50000, max: 100000, name: '€50K < 100K', idx: 4, size: 0},
-        { min: 100000, max: 500000, name: '€100K < 500K', idx: 5, size: 0},
-        { min: 500000, max: 1000000, name: '€500K < 1M', idx: 6, size: 0},
-        { min: 1000000, max: Number.MAX_VALUE, name: '€1M +', idx: 7, size: 0}
-    ];
-
-    const findBucket = (c) => {
-        return _.find(buckets, b => bucketPredicate(b)(c));
-    };
-
-
-    _.each(costs, c => {
-        const bucket = findBucket(c.cost.amount);
-        if (bucket) {
-            bucket.size++;
-        } else {
-            console.log('failed to find bucket for ', c);
-        }
-    });
-
-    return buckets;
-
-}
-
 function service(appStore,
                  appCapabilityStore,
                  orgUnitUtils,
@@ -159,27 +124,38 @@ function service(appStore,
 
     function loadAll(orgUnitId) {
 
-        return $q.all([
-            appStore.findByOrgUnitTree(orgUnitId),
-            ratingStore.findByOrgUnitTree(orgUnitId),
-            loadDataFlows(dataFlowStore, appStore, orgUnitId),
-            loadAppCapabilities(appCapabilityStore, orgUnitId),
+        const promises = [
             orgUnitStore.findAll(),
+            appStore.findByOrgUnitTree(orgUnitId)
+        ];
+
+        return $q.all(promises)
+            .then(([orgUnits, apps]) => loadAll2(orgUnitId, orgUnits, apps))
+
+
+    }
+
+    function loadAll2(orgUnitId, orgUnits, apps) {
+
+        const appIds = _.map(apps, 'id');
+
+        return $q.all([
+            ratingStore.findByAppIds(appIds),
+            loadDataFlows(dataFlowStore, appStore, apps),
+            loadAppCapabilities(appCapabilityStore, appIds),
             changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId),
             involvementStore.findPeopleByEntityReference('ORG_UNIT', orgUnitId),
             involvementStore.findByEntityReference('ORG_UNIT', orgUnitId),
             perspectiveStore.findByCode('BUSINESS'),
-            ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),
-            authSourceCalculator.findByOrgUnit(orgUnitId),
-            endUserAppStore.findByOrgUnitTree(orgUnitId),
-            assetCostStore.findAppCostsByOrgUnitTree(orgUnitId),
-            complexityStore.findByOrgUnitTree(orgUnitId)
+            ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)
+            authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
+            endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
+            assetCostStore.findAppCostsByAppIds(appIds),
+            complexityStore.findByAppIds(appIds)
     ]).then(([
-            apps,
             capabilityRatings,
             dataFlows,
             appCapabilities,
-            orgUnits,
             changeLogs,
             people,
             involvements,
@@ -206,7 +182,6 @@ function service(appStore,
             data.orgUnits = orgUnits;
             data.endUserApps = endUserApps;
 
-            data.assetCostBuckets = categorizeCostsIntoBuckets(assetCosts);
             data.complexity = complexity;
 
             data.filter = (config) => {
@@ -287,5 +262,6 @@ service.$inject = [
     'ComplexityStore',
     '$q'
 ];
+
 
 export default service;

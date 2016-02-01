@@ -54,21 +54,6 @@ public class CapabilityRatingService {
     }
 
 
-    public List<CapabilityRating> findByCapability(long capabilityId) {
-        return dao.findByCapability(capabilityId);
-    }
-
-
-    public List<CapabilityRating> findByOrganisationalUnit(long orgUnitId) {
-        return dao.findByOrganisationalUnit(orgUnitId);
-    }
-
-
-    public List<CapabilityRating> findByOrganisationalUnitTree(long orgUnitId) {
-        return dao.findByOrganisationalUnitTree(orgUnitId);
-    }
-
-
     public int update(AppRatingChangesAction changesAction) {
         List<RatingChange> changes = changesAction.changes();
 
@@ -95,6 +80,11 @@ public class CapabilityRatingService {
 
     public List<CapabilityRating> findByCapabilityIds(List<Long> capIds) {
         return dao.findByCapabilityIds(capIds);
+
+    }
+
+    public List<CapabilityRating> findByAppIds(Long[] appIds) {
+        return dao.findByAppIds(appIds);
 
     }
 }

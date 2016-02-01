@@ -1,5 +1,3 @@
-
-
 /*
  *  Waltz
  * Copyright (c) David Watkins. All rights reserved.
@@ -28,6 +26,55 @@ function logHistory(capability, historyStore) {
 }
 
 
+function nestBySubjectThenMeasurable(ratings) {
+    return d3.nest()
+        .key(r => r.parent.id)
+        .key(r => r.measurable.code)
+        .map(ratings);
+}
+
+function prepareRawData(apps, measurables, bySubjectThenMeasurable) {
+    return _.chain(apps)
+        .map(s => ({
+            ratings: _.map(
+                measurables,
+                m => {
+                    const ragRating = perhaps(() => bySubjectThenMeasurable[s.id][m.code][0].ragRating, 'Z');
+                    return { original: ragRating, current: ragRating, measurable: m.code || m.id };
+                }),
+            subject: s
+        }))
+        .sortBy('subject.name')
+        .value();
+}
+
+
+function prepareGroupData(capability, apps, perspective, ratings) {
+
+    const measurables = perspective.measurables;
+    const bySubjectThenMeasurable = nestBySubjectThenMeasurable(ratings);
+
+    const raw = prepareRawData(
+        apps,
+        measurables,
+        bySubjectThenMeasurable);
+
+    const groupRef = { id: capability.id, name: capability.name, kind: 'CAPABILITY' };
+
+    const summaries = calculateGroupSummary(raw);
+
+    const group = {
+        groupRef,
+        measurables,
+        raw,
+        summaries,
+        collapsed: false
+    };
+
+    return group;
+}
+
+
 function controller(capabilities,
                     appCapabilityStore,
                     perspectiveStore,
@@ -36,19 +83,54 @@ function controller(capabilities,
                     $stateParams,
                     $state,
                     historyStore,
-                    dataFlowStore) {
+                    dataFlowStore,
+                    complexityStore,
+                    assetCostStore) {
 
     const vm = this;
 
     const capId = Number($stateParams.id);
     const capability = _.findWhere(populateParents(capabilities), { id: capId });
 
-    logHistory(capability, historyStore);
-
     const capabilitiesById = _.indexBy(capabilities, 'id');
 
-    const applications = [];
     const associatedCapabilities = [];
+
+    const tweakers = {
+        subjectLabel: {
+            enter: selection =>
+                selection.on('click.go', d => $state.go('main.app-view', { id: d.subject.id }))
+        }
+    };
+
+
+    const processApps = (groupedApps) => {
+        const apps = _.union(groupedApps.primaryApps, groupedApps.secondaryApps);
+        vm.groupedApps = groupedApps;
+        vm.apps = apps;
+        return _.map(apps, 'id');
+    };
+
+
+    appCapabilityStore.findApplicationsByCapabilityId(capability.id)
+        .then(processApps)
+        .then(appIds => {
+            $q.all([
+                perspectiveStore.findByCode('BUSINESS'),
+                ratingStore.findByAppIds(appIds),
+                dataFlowStore.findByAppIds(appIds),
+                complexityStore.findByAppIds(appIds),
+                assetCostStore.findAppCostsByAppIds(appIds)
+            ]).then(([perspective, ratings, flows, complexity, assetCosts]) => {
+                vm.ratings = {
+                    group: prepareGroupData(capability, vm.apps, perspective, ratings),
+                    tweakers
+                };
+                vm.dataFlows = flows;
+                vm.complexity = complexity;
+                vm.assetCosts = assetCosts;
+            });
+        });
 
 
     appCapabilityStore.findAssociatedApplicationCapabilitiesByCapabilityId(capability.id)
@@ -64,62 +146,12 @@ function controller(capabilities,
             Object.assign(associatedCapabilities, assocCapabilities);
         });
 
-    $q.all([
-        appCapabilityStore.findApplicationsByCapabilityId(capability.id),
-        perspectiveStore.findByCode('BUSINESS'),
-        ratingStore.findByCapability(capability.id),
-        dataFlowStore.findByCapability(capability.id)
-    ]).then(([groupedApps, perspective, ratings, dataFlows]) => {
 
-        const apps = _.union(groupedApps.primaryApps, groupedApps.secondaryApps);
+    logHistory(capability, historyStore);
 
-        vm.groupedApps = groupedApps;
-        vm.apps = apps;
-
-        const measurables = perspective.measurables;
-        const bySubjectThenMeasurable = d3.nest()
-            .key(r => r.parent.id)
-            .key(r => r.measurable.code)
-            .map(ratings);
-
-        const raw = _.chain(apps)
-            .map(s => ({
-                ratings: _.map(
-                    measurables,
-                    m => {
-                        const ragRating = perhaps(() => bySubjectThenMeasurable[s.id][m.code][0].ragRating, 'Z');
-                        return { original: ragRating, current: ragRating, measurable: m.code || m.id };
-                    }),
-                subject: s
-            }))
-            .sortBy('subject.name')
-            .value();
-
-        const group = {
-            groupRef: { id: capability.id, name: capability.name, kind: 'CAPABILITY' },
-            measurables,
-            raw,
-            summaries: calculateGroupSummary(raw),
-            collapsed: false
-        };
-
-        vm.ratings = {
-            group,
-            tweakers: {
-                subjectLabel: {
-                    enter: selection =>
-                        selection.on('click.go', d => $state.go('main.app-view', { id: d.subject.id }))
-                }
-            }
-        };
-
-
-        vm.dataFlows = dataFlows;
-    });
 
     vm.capability = capability;
     vm.capabilitiesById = capabilitiesById;
-    vm.applications = applications;
     vm.associatedCapabilities = associatedCapabilities;
 }
 
@@ -132,7 +164,9 @@ controller.$inject = [
     '$stateParams',
     '$state',
     'HistoryStore',
-    'DataFlowDataStore'
+    'DataFlowDataStore',
+    'ComplexityStore',
+    'AssetCostStore'
 ];
 
 

@@ -15,4 +15,5 @@ export default (module) => {
     module.service('ComplexityStore', require('./services/complexity-store'));
 
     module.directive("waltzComplexityBarChart", require('./directives/complexity-bar-chart'));
+    module.directive("waltzComplexitySection", require('./directives/complexity-section'));
 };

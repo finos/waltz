@@ -18,11 +18,8 @@
 package com.khartec.waltz.service.asset_cost;
 
 import com.khartec.waltz.data.asset_cost.AssetCostDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.cost.ApplicationCost;
 import com.khartec.waltz.model.cost.AssetCost;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.model.utils.IdUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,25 +30,11 @@ import java.util.List;
 public class AssetCostService {
 
     private final AssetCostDao assetCodeDao;
-    private final OrganisationalUnitDao organisationalUnitDao;
 
 
     @Autowired
-    public AssetCostService(AssetCostDao assetCodeDao, OrganisationalUnitDao organisationalUnitDao) {
+    public AssetCostService(AssetCostDao assetCodeDao) {
         this.assetCodeDao = assetCodeDao;
-        this.organisationalUnitDao = organisationalUnitDao;
-    }
-
-
-    public List<AssetCost> findByOrgUnitTree(long orgUnitId) {
-        List<Long> orgUnitIds = getOrgUnitIds(orgUnitId);
-        return assetCodeDao.findByOrgUnitIds(orgUnitIds);
-    }
-
-
-    public List<ApplicationCost> findAppCostsByOrgUnitTree(long orgUnitId) {
-        List<Long> orgUnitIds = getOrgUnitIds(orgUnitId);
-        return assetCodeDao.findAppCostsByOrgUnits(orgUnitIds);
     }
 
 
@@ -60,12 +43,11 @@ public class AssetCostService {
     }
 
 
-    private List<Long> getOrgUnitIds(long orgUnitId) {
-        List<OrganisationalUnit> orgUnits = organisationalUnitDao.findDescendants(orgUnitId);
-        return IdUtilities.toIds(orgUnits);
-    }
-
     public List<AssetCost> findByAppId(long appId) {
         return assetCodeDao.findByAppId(appId);
+    }
+
+    public List<ApplicationCost> findAppCostsByAppIds(Long[] ids) {
+        return assetCodeDao.findAppCostsByAppIds(ids);
     }
 }

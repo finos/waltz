@@ -66,18 +66,19 @@ public class ComplexityRatingService {
     }
 
 
+
     /**
-     * Find connection complexity of applications within a given organisational unit (and it's
-     * sub units).  The complexity are baselined against the application with the most
+     * Find connection complexity of the given applications The complexity
+     * ratings are baselined against the application with the most
      * connections in the system.  If you wish specify a specific baseline use
      * the overloaded method.
-     * @param orgUnitId
+     * @param ids
      * @return
      */
-    public List<ComplexityRating> findWithinOrgUnitTree(long orgUnitId) {
-        List<ComplexityScore> connectionScores = connectionComplexityService.findWithinOrgUnit(orgUnitId);
-        List<ComplexityScore> serverScores = serverComplexityService.findWithinOrgUnit(orgUnitId);
-        List<ComplexityScore> capabilityScores = capabilityComplexityService.findWithinOrgUnit(orgUnitId);
+    public List<ComplexityRating> findByAppIds(Long[] ids) {
+        List<ComplexityScore> connectionScores = connectionComplexityService.findByAppIds(ids);
+        List<ComplexityScore> serverScores = serverComplexityService.findByAppIds(ids);
+        List<ComplexityScore> capabilityScores = capabilityComplexityService.findByAppIds(ids);
 
         Map<Long, ComplexityScore> connectionScoresById = indexBy(s -> s.id(), connectionScores);
         Map<Long, ComplexityScore> serverScoresById = indexBy(s -> s.id(), serverScores);
@@ -97,8 +98,5 @@ public class ComplexityRatingService {
                         .capabilityComplexity(maybeGet(capabilityScoresById, appId))
                         .build())
                 .collect(Collectors.toList());
-
     }
-
-
 }

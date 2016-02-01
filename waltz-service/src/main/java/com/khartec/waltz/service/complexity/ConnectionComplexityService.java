@@ -20,14 +20,12 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 @Service
 public class ConnectionComplexityService {
 
-    private final OrganisationalUnitDao orgUnitDao;
     private final ConnectionComplexityDao connectionComplexityDao;
 
 
     @Autowired
-    public ConnectionComplexityService(ConnectionComplexityDao connectionComplexityDao, OrganisationalUnitDao orgUnitDao) {
+    public ConnectionComplexityService(ConnectionComplexityDao connectionComplexityDao) {
         this.connectionComplexityDao = connectionComplexityDao;
-        this.orgUnitDao = orgUnitDao;
     }
 
 
@@ -62,44 +60,24 @@ public class ConnectionComplexityService {
 
 
     /**
-     * Find connection complexity of applications within a given organisational unit (and it's
-     * sub units).  The complexity are baselined against the application with the most
+     * Find connection complexity of the given applications. The complexity
+     * ratings are baselined against the application with the most
      * connections in the system.  If you wish specify a specific baseline use
      * the overloaded method.
-     * @param orgUnitId
+     * @param ids
      * @return
      */
-    public List<ComplexityScore> findWithinOrgUnit(long orgUnitId) {
+    public List<ComplexityScore> findByAppIds(Long[] ids) {
         int baseline = connectionComplexityDao.findBaseline();
-        return findWithinOrgUnit(orgUnitId, baseline);
+        return findByAppIds(ids, baseline);
     }
 
 
-    /**
-     * Find connection complexity of application within the given org unit (and it's sub
-     * units).  Complexity is baselined against the given value.
-     * @param orgUnitId
-     * @param baseline
-     * @return
-     */
-    public List<ComplexityScore> findWithinOrgUnit(long orgUnitId, int baseline) {
-        return connectionComplexityDao.findCounts(byOrgUnitTree(orgUnitId, orgUnitDao))
+    public List<ComplexityScore> findByAppIds(Long[] ids, int baseline) {
+        return connectionComplexityDao.findCounts(ids)
                 .stream()
                 .map(tally -> tallyToComplexityScore(tally, baseline, Math::log))
                 .collect(Collectors.toList());
     }
 
-
-    // -- HELPERS ----
-
-    private static Select<Record1<Long>> byOrgUnit(Long... orgUnits) {
-        return DSL.select(APPLICATION.ID)
-                .from(APPLICATION)
-                .where(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnits));
-    }
-
-
-    private static Select<Record1<Long>> byOrgUnitTree(Long unitId, OrganisationalUnitDao ouDao) {
-        return byOrgUnit(toIdArray(ouDao.findDescendants(unitId)));
-    }
 }

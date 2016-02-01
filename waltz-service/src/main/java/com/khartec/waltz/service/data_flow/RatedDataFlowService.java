@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.service.data_flow;
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_flow.DataFlowDao;
@@ -98,10 +99,14 @@ public class RatedDataFlowService {
 
         // inclusive
         List<OrganisationalUnit> subUnits = organisationalUnitDao.findDescendants(orgUnitId);
-        List<Long> orgUnitIds = IdUtilities.toIds(subUnits);
+        List<Long> orgUnitIds = toIds(subUnits);
 
         List<Application> apps = applicationDao.findByOrganisationalUnitIds(orgUnitIds);
-        List<DataFlow> relevantFlows = loadRelevantDataFlows(dataFlowDao, orgUnitIds, apps);
+
+        List<DataFlow> relevantFlows = loadRelevantDataFlows(
+                dataFlowDao,
+                apps);
+
         Map<Long, Collection<DataFlow>> flowsByOrgUnitId = groupFlowsByTargetOrgUnitId(apps, relevantFlows);
 
         return flowsByOrgUnitId.entrySet()
@@ -178,12 +183,11 @@ public class RatedDataFlowService {
      * @return a list of data flows where the target is a member of [app].
      */
     private static List<DataFlow> loadRelevantDataFlows(DataFlowDao dataFlowDao,
-                                                        List<Long> orgUnitIds,
-                                                        List<Application> apps) {
+                                                        List<Application> targetApps) {
 
-        List<DataFlow> dataFlows = dataFlowDao.findByOrganisationalUnitIds(orgUnitIds);
+        List<Long> appIds = toIds(targetApps);
+        List<DataFlow> dataFlows = dataFlowDao.findByApplicationIds(appIds);
 
-        List<Long> appIds = toIds(apps);
         return filter(
                 df -> appIds.contains(df.target().id()),
                 dataFlows);

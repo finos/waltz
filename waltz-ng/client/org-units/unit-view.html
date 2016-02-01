@@ -1,12 +1,18 @@
 <!--
-  ~  Waltz
-  ~ Copyright (c) David Watkins. All rights reserved.
-  ~ The use and distribution terms for this software are covered by the
-  ~ Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-  ~ which can be found in the file epl-v10.html at the root of this distribution.
-  ~ By using this software in any fashion, you are agreeing to be bound by
-  ~ the terms of this license.
-  ~ You must not remove this notice, or any other, from this software.
+  ~  This file is part of Waltz.
+  ~
+  ~  Waltz is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  Waltz is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
   ~
   -->
 
@@ -35,52 +41,11 @@
 
     <hr/>
 
-    <waltz-section name="Application Complexity"
-                   id="ouv-complexity">
-        <div class="row">
-            <div class="col-md-8">
-                <waltz-complexity-bar-chart complexity="ctrl.viewData.complexity"
-                                            sizing="{ h: 150 }"
-                                            on-select="ctrl.onComplexitySelect">
-                </waltz-complexity-bar-chart>
-                <div class="small text-muted">
-                    Histogram showing number of applications grouped by their complexity
-                    rating.  Select a bar to see the applications that fall within it.
-                </div>
-            </div>
 
-            <div class="col-md-4">
-                <div ng-if="ctrl.complexitySelection.items.length > 0">
-                    <h4>
-                        {{ ctrl.complexitySelection.begin | toFixed:2 }}
-                        -
-                        {{ ctrl.complexitySelection.end | toFixed: 2 }}
-                        <small>Complexity Band</small>
-                    </h4>
-                    <div class="waltz-scroll-region"
-                         style="height: 140px">
-                        <table class="table table-condensed small">
-                            <thead>
-                            <tr>
-                                <th>App</th>
-                                <th>Score</th>
-                            </tr></thead>
-                            <tr ng-repeat="item in ctrl.complexitySelection.items | orderBy:'app.name'">
-                                <td>
-                                    <a ui-sref="main.app-view ({id: item.app.id })">
-                                        {{ item.app.name }}
-                                    </a>
-                                </td>
-                                <td>
-                                    {{ item.score | toFixed:2 }}
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </waltz-section>
+    <!-- COMPLEXITY -->
+    <waltz-complexity-section complexity="ctrl.viewData.complexity"
+                              apps="ctrl.viewData.apps">
+    </waltz-complexity-section>
 
 
     <!-- PEOPLE -->
@@ -254,38 +219,8 @@
     </waltz-section>
 
     <!-- COSTS -->
-    <waltz-section name="Costs" id="ouv-costs">
-        <div class="row">
-            <div class="col-md-12" class="myChart">
-                <waltz-bucket-chart buckets="ctrl.viewData.assetCostBuckets"
-                                    event-dispatcher="ctrl.eventDispatcher">
-                </waltz-bucket-chart>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <br>
-                <div class="small text-muted">
-                    Each circle is sized according to the <i>number</i> of applications whose costs
-                    fall within the stated range.
-                </div>
-            </div>
-        </div>
-
-        <div class="row" style="margin-top: 12px">
-            <div class="col-md-12">
-                <waltz-asset-cost-table event-dispatcher='ctrl.eventDispatcher'
-                                        options='{
-                                            showOrgUnit: true,
-                                            showAppName: true,
-                                            showAssetCode: false
-                                        }'
-                                        costs='ctrl.viewData.assetCosts'>
-                </waltz-asset-cost-table>
-            </div>
-        </div>
-    </waltz-section>
+    <waltz-asset-costs-section asset-costs="ctrl.viewData.assetCosts">
+    </waltz-asset-costs-section>
 
 
     <!-- APPS -->

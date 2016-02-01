@@ -18,9 +18,7 @@
 package com.khartec.waltz.service.data_flow;
 
 import com.khartec.waltz.data.data_flow.DataFlowDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,23 +26,19 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.utils.IdUtilities.toIds;
 
 
 @Service
 public class DataFlowService {
 
     private final DataFlowDao dataFlowDao;
-    private final OrganisationalUnitDao orgUnitDao;
 
 
     @Autowired
-    public DataFlowService(DataFlowDao dataFlowDao, OrganisationalUnitDao orgUnitDao) {
+    public DataFlowService(DataFlowDao dataFlowDao) {
         checkNotNull(dataFlowDao, "dataFlowDao must not be null");
-        checkNotNull(orgUnitDao, "orgUnitDao must not be null");
         
         this.dataFlowDao = dataFlowDao;
-        this.orgUnitDao = orgUnitDao;
     }
 
 
@@ -53,21 +47,8 @@ public class DataFlowService {
     }
 
 
-    public List<Application> findApplicationsByEntityReference(EntityReference ref) {
-        return dataFlowDao.findApplicationsByEntityReference(ref);
-    }
-
-
-    public List<DataFlow> findByOrganisationalUnitId(long orgUnitId) {
-        return dataFlowDao.findByOrganisationalUnitId(orgUnitId);
-    }
-
-
-    public List<DataFlow> findByOrganisationalUnitTree(long orgUnitId) {
-        List<Long> orgUnitIds = toIds(orgUnitDao.findDescendants(orgUnitId));
-
-        return dataFlowDao.findByOrganisationalUnitIds(orgUnitIds);
-
+    public List<DataFlow> findByAppIds(List<Long> appIds) {
+        return dataFlowDao.findByApplicationIds(appIds);
     }
 
 
@@ -80,8 +61,4 @@ public class DataFlowService {
         return dataFlowDao.removeFlows(flows);
     }
 
-
-    public List<DataFlow> findByCapability(long id) {
-        return dataFlowDao.findByCapability(id);
-    }
 }

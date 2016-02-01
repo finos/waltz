@@ -22,12 +22,13 @@ import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceCalculator;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.WebUtilities;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.getId;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 
 
 /**
@@ -37,7 +38,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 @Service
 public class AuthoritativeSourceCalculatorEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "authoritative-source-calculator");
+    private static final String BASE_URL = mkPath("api", "authoritative-source-calculator");
 
     private final AuthoritativeSourceCalculator calculator;
     private final OrganisationalUnitService organisationalUnitService;
@@ -55,8 +56,8 @@ public class AuthoritativeSourceCalculatorEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        EndpointUtilities.getForDatum(WebUtilities.mkPath(BASE_URL, "org-unit", ":id"), (request, response) -> {
-            long orgUnitId = WebUtilities.getId(request);
+        getForDatum(mkPath(BASE_URL, "org-unit", ":id"), (request, response) -> {
+            long orgUnitId = getId(request);
             Node<OrganisationalUnit, Long> orgUnitNode = organisationalUnitService.loadHierarchy(orgUnitId);
             return calculator.calculateAuthSourcesForOrgUnit(orgUnitNode);
         });

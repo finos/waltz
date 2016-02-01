@@ -61,7 +61,7 @@ public class FlowGenerator {
 
         List<AuthoritativeSource> authSources = authSourceDao.findByEntityKind(EntityKind.ORG_UNIT);
         List<String> dataTypes = dataTypesDao.getAll().stream().map(dt -> dt.code()).collect(toList());
-        List<Application> apps = applicationDao.getAll();
+        List<Application> apps = applicationDao.findAll();
         List<OrganisationalUnit> orgUnits = orgUnitDao.findAll();
 
 

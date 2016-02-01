@@ -56,7 +56,7 @@ public class AssetCostGenerator {
 
 
     private static List<AssetCostRecord> generateRecords(ApplicationService applicationService, CostKind kind, int low, int high) {
-        return applicationService.getAll()
+        return applicationService.findAll()
                     .stream()
                     .filter(a -> a.assetCode().isPresent())
                     .map(a -> ImmutableAssetCost.builder()
