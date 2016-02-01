@@ -8,10 +8,9 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.web.WebUtilities.getId;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -31,9 +30,9 @@ public class ComplexityEndpoint implements Endpoint {
     @Override
     public void register() {
         DatumRoute<ComplexityRating> getForApp = (request, response) -> service.getForApp(getId(request));
-        ListRoute<ComplexityRating> getForOrgTree = (request, response) -> service.findWithinOrgUnitTree(getId(request));
+        ListRoute<ComplexityRating> postForApps = (request, response) -> service.findByAppIds(readBody(request, Long[].class));
 
         getForDatum(mkPath(BASE_URL, "application", ":id"), getForApp);
-        getForList(mkPath(BASE_URL, "org-unit", ":id"), getForOrgTree);
+        postForList(mkPath(BASE_URL, "apps"), postForApps);
     }
 }

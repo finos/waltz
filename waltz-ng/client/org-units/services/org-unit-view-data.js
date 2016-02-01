@@ -124,11 +124,19 @@ function service(appStore,
     const data = {};
 
     function loadAll(orgUnitId) {
-        return appStore.findByOrgUnitTree(orgUnitId)
-            .then(apps => loadAll2(orgUnitId, apps));
+
+        const promises = [
+            orgUnitStore.findAll(),
+            appStore.findByOrgUnitTree(orgUnitId)
+        ];
+
+        return $q.all(promises)
+            .then(([orgUnits, apps]) => loadAll2(orgUnitId, orgUnits, apps))
+
+
     }
 
-    function loadAll2(orgUnitId, apps) {
+    function loadAll2(orgUnitId, orgUnits, apps) {
 
         const appIds = _.map(apps, 'id');
 
@@ -136,21 +144,19 @@ function service(appStore,
             ratingStore.findByAppIds(appIds),
             loadDataFlows(dataFlowStore, appStore, apps),
             loadAppCapabilities(appCapabilityStore, appIds),
-            orgUnitStore.findAll(),
             changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId),
             involvementStore.findPeopleByEntityReference('ORG_UNIT', orgUnitId),
             involvementStore.findByEntityReference('ORG_UNIT', orgUnitId),
             perspectiveStore.findByCode('BUSINESS'),
-            ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),
-            authSourceCalculator.findByOrgUnit(orgUnitId),
-            endUserAppStore.findByOrgUnitTree(orgUnitId),
+            ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)
+            authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
+            endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
             assetCostStore.findAppCostsByAppIds(appIds),
-            complexityStore.findByOrgUnitTree(orgUnitId)
+            complexityStore.findByAppIds(appIds)
     ]).then(([
             capabilityRatings,
             dataFlows,
             appCapabilities,
-            orgUnits,
             changeLogs,
             people,
             involvements,

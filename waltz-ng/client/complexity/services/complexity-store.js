@@ -24,26 +24,14 @@ export default [
                 .then(result => result.data);
 
 
-        const findByOrgUnitTree = (id) =>
-            $http.get(`${BASE}/org-unit/${id}`)
-                .then(ts => {
-                    return ts;
-                })
+        const findByAppIds = ids =>
+            $http.post(`${BASE}/apps`, ids)
                 .then(result => result.data);
 
 
-        const findByOrgUnit = (id) =>
-            $http.get(`${BASE}/org-unit/${id}`)
-                .then(ts => {
-                    return ts;
-                })
-                .then(result => result.data.filter(c => c.id === id));
-
-
         return {
-            findByOrgUnit,
-            findByOrgUnitTree,
-            findByApplication
+            findByApplication,
+            findByAppIds
         };
     }
 ];

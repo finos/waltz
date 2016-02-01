@@ -22,28 +22,24 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 @Service
 public class ServerComplexityService {
 
-    private final OrganisationalUnitDao orgUnitDao;
     private final ServerComplexityDao serverComplexityDao;
 
 
     @Autowired
-    public ServerComplexityService(OrganisationalUnitDao orgUnitDao, ServerComplexityDao serverComplexityDao) {
-        this.orgUnitDao = orgUnitDao;
+    public ServerComplexityService(ServerComplexityDao serverComplexityDao) {
         this.serverComplexityDao = serverComplexityDao;
     }
 
 
-    public List<ComplexityScore> findWithinOrgUnit(long orgUnitId) {
+    public List<ComplexityScore> findByAppIds(Long[] ids) {
         int baseline = serverComplexityDao.findBaseline();
-        return findWithinOrgUnit(orgUnitId, baseline);
+        return findByAppIds(ids, baseline);
+
     }
 
 
-    public List<ComplexityScore> findWithinOrgUnit(long orgUnitId, int baseline) {
-        Long[] orgIds = calcOrgUnitIds(orgUnitId, orgUnitDao);
-        Condition orgTreePredicate = APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgIds);
-
-        return serverComplexityDao.findCountsByAppIds(orgTreePredicate)
+    public List<ComplexityScore> findByAppIds(Long[] ids, int baseline) {
+        return serverComplexityDao.findCountsByAppIds(ids)
                 .stream()
                 .map(tally -> tallyToComplexityScore(tally, baseline, Math::log))
                 .collect(Collectors.toList());
@@ -61,13 +57,6 @@ public class ServerComplexityService {
         if (tallies.isEmpty()) { return null; }
 
         return tallyToComplexityScore(tallies.get(0), baseline, Math::log);
-    }
-
-
-    // -- HELPERS ------
-
-    private static Long[] calcOrgUnitIds(Long unitId, OrganisationalUnitDao ouDao) {
-        return toIdArray(ouDao.findDescendants(unitId));
     }
 
 }
