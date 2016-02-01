@@ -22,11 +22,12 @@ const initModel = {
         indirect: [],
         allApps: []
     },
-    apps: []
+    apps: [],
+    complexity: []
 };
 
 
-function service(personStore, involvementStore, assetCostStore, $q) {
+function service(personStore, involvementStore, assetCostStore, complexityStore, $q) {
 
     const state = { model: initModel };
 
@@ -76,16 +77,24 @@ function service(personStore, involvementStore, assetCostStore, $q) {
     }
 
 
-    function loadCosts(model) {
-        const appIds = _.map(model.apps, 'id');
-        assetCostStore.findAppCostsByAppIds(appIds).then(assetCosts => model.assetCosts = assetCosts);
+    function loadCosts(appIds) {
+        assetCostStore.findAppCostsByAppIds(appIds).then(assetCosts => state.model.assetCosts = assetCosts);
+    }
+
+
+    function loadComplexity(appIds) {
+        complexityStore.findByAppIds(appIds).then(complexity => state.model.complexity = complexity);
     }
 
 
     function load(employeeId) {
         loadPeople(employeeId);
         loadApplications(employeeId)
-            .then(loadCosts);
+            .then(model => {
+                const appIds = _.map(model.apps, 'id');
+                loadCosts(appIds);
+                loadComplexity(appIds);
+            });
     }
 
 
@@ -99,6 +108,7 @@ service.$inject = [
     'PersonDataService',
     'InvolvementDataService',
     'AssetCostStore',
+    'ComplexityStore',
     '$q'
 ];
 
