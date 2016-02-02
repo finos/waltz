@@ -30,7 +30,6 @@ public class ServerComplexityHarness {
         ComplexityRatingService complexityService = ctx.getBean(ComplexityRatingService.class);
 
         System.out.println(serverDao.findCountsByOrgIds(220L).size());
-        System.out.println(serverService.findWithinOrgUnit(220L).size());
 
     }
 

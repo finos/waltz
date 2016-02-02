@@ -28,7 +28,6 @@ public class CapabilityComplexityHarness {
         System.out.println(capabilityComplexityService.getForApp(126L));
 
         System.out.println(complexityRatingService.getForApp(126L));
-        System.out.println(complexityRatingService.findWithinOrgUnitTree(220L).size());
 //        sout(capabilityComplexityDao.findBaseLineForOrgUnitIds(100L, 120L));
 //        sout(capabilityComplexityDao.findScoresForOrgUnitIds(120L));
 //        sout(capabilityComplexityService.findWithinOrgUnit(100L));
