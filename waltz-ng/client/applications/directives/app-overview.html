@@ -1,16 +1,16 @@
 <div class="waltz-display-section">
     <div class="row">
-        <div class="col-md-2 waltz-display-field-label">
+        <div class="col-sm-2 waltz-display-field-label">
             Name
         </div>
-        <div class="col-md-4">
+        <div class="col-sm-4">
             {{ ctrl.app.name }}
         </div>
 
-        <div class="col-md-2 waltz-display-field-label">
+        <div class="col-sm-2 waltz-display-field-label">
             Asset Code
         </div>
-        <div class="col-md-4">
+        <div class="col-sm-4">
             <waltz-asset-code-explorer application="ctrl.app">
             </waltz-asset-code-explorer>
 
@@ -18,58 +18,58 @@
     </div>
 
     <div class="row">
-        <div class="col-md-2 waltz-display-field-label">
+        <div class="col-sm-2 waltz-display-field-label">
             Lifecycle Phase
         </div>
-        <div class="col-md-4">
+        <div class="col-sm-4">
             {{ ctrl.app.lifecyclePhase | toDisplayName:'lifecyclePhase' }}
         </div>
-        <div class="col-md-2 waltz-display-field-label">
+        <div class="col-sm-2 waltz-display-field-label">
             Type
         </div>
-        <div class="col-md-4">
+        <div class="col-sm-4">
             {{ ctrl.app.kind | toDisplayName:'applicationKind' }}
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-2 waltz-display-field-label">
+        <div class="col-sm-2 waltz-display-field-label">
             Owning Org Unit
         </div>
-        <div class="col-md-4">
+        <div class="col-sm-4">
             <waltz-org-unit-name-popup unit="ctrl.organisationalUnit">
             </waltz-org-unit-name-popup>
         </div>
-        <div class="col-md-2 waltz-display-field-label">
+        <div class="col-sm-2 waltz-display-field-label">
             Overall Rating
         </div>
-        <div class="col-md-4">
+        <div class="col-sm-4">
             {{ ctrl.app.overallRating | toDisplayName:'investmentRating' }}
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-2 waltz-display-field-label">
+        <div class="col-sm-2 waltz-display-field-label">
             Aliases
         </div>
-        <div class="col-md-4">
+        <div class="col-sm-4">
             <waltz-keyword-list keywords="ctrl.aliases">
             </waltz-keyword-list>
         </div>
-        <div class="col-md-2 waltz-display-field-label">
+        <div class="col-sm-2 waltz-display-field-label">
             Tags
         </div>
-        <div class="col-md-4">
+        <div class="col-sm-4">
             <waltz-keyword-list keywords="ctrl.tags" on-select="ctrl.tagSelected(keyword)">
             </waltz-keyword-list>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-2 waltz-display-field-label">
+        <div class="col-sm-2 waltz-display-field-label">
             Complexity Rating:
         </div>
-        <div class="col-md-10">
+        <div class="col-sm-10">
             <span class='waltz-clickable-definition'
                   popover-trigger="focus"
                   tabindex="99"
@@ -83,10 +83,10 @@
     </div>
 
     <div class="row">
-        <div class="col-md-2 waltz-display-field-label">
+        <div class="col-sm-2 waltz-display-field-label">
             Description
         </div>
-        <div class="col-md-6">
+        <div class="col-sm-10">
             {{ ctrl.app.description }}
         </div>
     </div>
