@@ -54,27 +54,24 @@ function loadDataFlows(dataFlowStore, appStore, groupApps) {
 }
 
 
-function loadAppCapabilities(appCapabilityStore, appIds) {
-    return appCapabilityStore
-        .findApplicationCapabilitiesByAppIds(appIds)
-        .then(rawAppCapabilities => {
-            const capabilitiesById = _.chain(rawAppCapabilities)
-                .map('capabilityReference')
-                .uniq('id')
-                .indexBy('id')
-                .value();
+function prepareAppCapabilities(apps, capabilities, rawAppCapabilities) {
+    const appsById = _.indexBy(apps, 'id');
+    const capabilitiesById = _.indexBy(capabilities, 'id');
 
-            return _.chain(rawAppCapabilities)
-                .groupBy(ac => ac.capabilityReference.id)
-                .map((apps, cap) => ( {
-                    capability: capabilitiesById[cap],
-                    applications: _.map(apps, ac => {
-                        const { applicationReference, isPrimary } = ac;
-                        return { ...applicationReference, isPrimary };
-                    })
-                } ))
-                .value();
-        });
+    const appCapabilities =  _.chain(rawAppCapabilities)
+        .groupBy(ac => ac.capabilityId)
+        .map((appCapabilities, capId) => ( {
+            capability: capabilitiesById[capId],
+            applications: _.map(appCapabilities, ac => {
+                const { primary, applicationId } = ac;
+                const app = appsById[applicationId];
+
+                return { ...app, primary };
+            })
+        } ))
+        .value();
+
+    return appCapabilities;
 }
 
 
@@ -98,7 +95,7 @@ function extractPrimaryAppIds(appCapabilities) {
     return _.chain(appCapabilities)
         .map('applications')
         .flatten()
-        .where({ isPrimary: true })
+        .where({ primary: true })
         .map('id')
         .value();
 }
@@ -118,6 +115,7 @@ function service(appStore,
                  endUserAppStore,
                  assetCostStore,
                  complexityStore,
+                 capabilityStore,
                  $q) {
 
     const data = {};
@@ -142,7 +140,8 @@ function service(appStore,
         return $q.all([
             ratingStore.findByAppIds(appIds),
             loadDataFlows(dataFlowStore, appStore, apps),
-            loadAppCapabilities(appCapabilityStore, appIds),
+            appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
+            capabilityStore.findByAppIds(appIds),
             changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId),
             involvementStore.findPeopleByEntityReference('ORG_UNIT', orgUnitId),
             involvementStore.findByEntityReference('ORG_UNIT', orgUnitId),
@@ -155,7 +154,8 @@ function service(appStore,
     ]).then(([
             capabilityRatings,
             dataFlows,
-            appCapabilities,
+            rawAppCapabilities,
+            capabilities,
             changeLogs,
             people,
             involvements,
@@ -166,6 +166,8 @@ function service(appStore,
             assetCosts,
             complexity
         ]) => {
+            const appCapabilities = prepareAppCapabilities(apps, capabilities, rawAppCapabilities);
+
             data.assetCosts = assetCosts;
             data.immediateHierarchy = orgUnitUtils.getImmediateHierarchy(orgUnits, orgUnitId);
             data.apps = apps;
@@ -186,12 +188,12 @@ function service(appStore,
 
             data.filter = (config) => {
 
-                const primaryApps = extractPrimaryAppIds(appCapabilities);
+                const primaryAppIds = extractPrimaryAppIds(appCapabilities);
 
                 const inScopeAppIds = _.chain(apps)
                         .filter(a => config.includeSubUnits ? true : a.organisationalUnitId === orgUnitId)
                         .filter(a => config.productionOnly ? a.lifecyclePhase === 'PRODUCTION' : true)
-                        .filter(a => config.primaryOnly ? _.contains(primaryApps, a.id) : true)
+                        .filter(a => config.primaryOnly ? _.contains(primaryAppIds, a.id) : true)
                         .map('id')
                         .value();
 
@@ -219,7 +221,7 @@ function service(appStore,
                                     .filter(ac => ac.capability.id === capId)
                                     .map('applications')
                                     .flatten()
-                                    .filter('isPrimary')
+                                    .filter('primary')
                                     .map('id')
                                     .contains(appId)
                                     .value();
@@ -260,6 +262,7 @@ service.$inject = [
     'EndUserAppStore',
     'AssetCostStore',
     'ComplexityStore',
+    'CapabilityStore',
     '$q'
 ];
 

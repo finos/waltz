@@ -19,16 +19,19 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.service.capability.CapabilityService;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.WebUtilities;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.readBody;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
 public class CapabilityEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "capability");
+    private static final String BASE_URL = mkPath("api", "capability");
 
     private final CapabilityService service;
 
@@ -41,8 +44,10 @@ public class CapabilityEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL), (request, response) ->  service.findAll());
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "search", ":query"), (request, response) ->  service.search(request.params("query")));
+        getForList(mkPath(BASE_URL), (request, response) ->  service.findAll());
+        postForList(mkPath(BASE_URL, "apps"), (request, response) ->  service.findByAppIds(readBody(request, Long[].class)));
+        postForList(mkPath(BASE_URL, "ids"), (request, response) ->  service.findByIds(readBody(request, Long[].class)));
+        getForList(mkPath(BASE_URL, "search", ":query"), (request, response) ->  service.search(request.params("query")));
     }
 
 }

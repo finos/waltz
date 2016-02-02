@@ -23,6 +23,16 @@ export default [
                 .then(result => result.data);
 
 
+        const findByAppIds = (ids) =>
+            $http.post(`${BASE}/apps`, ids)
+                .then(result => result.data);
+
+
+        const findByIds = (ids) =>
+            $http.post(`${BASE}/ids`, ids)
+                .then(result => result.data);
+
+
         const search = (query) => $http
             .get(`${BASE}/search/${query}`)
             .then(x => x.data);
@@ -30,6 +40,8 @@ export default [
 
         return {
             findAll,
+            findByAppIds,
+            findByIds,
             search
         };
     }

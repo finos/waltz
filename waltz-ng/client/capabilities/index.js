@@ -28,5 +28,5 @@ export default (module) => {
     module.directive('waltzCapabilitySelector', require('./directives/capability-selector'));
     module.directive('waltzCapabilityFlowGraph', require('./directives/capability-flow-graph'));
 
-    module.service('CapabilityDataService', require('./services/capability-data-service'));
+    module.service('CapabilityStore', require('./services/capability-store'));
 };

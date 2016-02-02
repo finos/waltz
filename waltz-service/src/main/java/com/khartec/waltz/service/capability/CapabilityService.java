@@ -77,6 +77,15 @@ public class CapabilityService {
         capabilityDao.assignLevels(depths);
 
     }
+
+    public List<Capability> findByIds(Long[] capabilityIds) {
+        return capabilityDao.findByIds(capabilityIds);
+    }
+
+    public List<Capability> findByAppIds(Long[] appIds) {
+            return capabilityDao.findByAppIds(appIds);
+
+    }
 }
 
 

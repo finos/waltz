@@ -19,8 +19,8 @@ import CapabilityView from './capability-view';
 export const baseState = {
     resolve: {
         capabilities: [
-            'CapabilityDataService',
-            (CapabilityDataService) => CapabilityDataService.findAll()
+            'CapabilityStore',
+            (capabilityStore) => capabilityStore.findAll()
         ]
     }
 };

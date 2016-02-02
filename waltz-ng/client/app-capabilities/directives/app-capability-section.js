@@ -17,6 +17,7 @@ export default [
         template: require('./app-capability-section.html'),
         scope: {
             appCapabilities: '=',
+            capabilities: '=',
             selfId: '@'
         }
     })

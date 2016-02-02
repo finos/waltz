@@ -41,6 +41,7 @@ function controller(appStore,
                     appCapabilityStore,
                     perspectiveStore,
                     ratingStore,
+                    capabilityStore,
                     $q,
                     $scope,
                     $stateParams,
@@ -60,7 +61,8 @@ function controller(appStore,
         appStore.getById(entity.id),
         appCapabilityStore.findCapabilitiesByApplicationId(entity.id),
         perspectiveStore.findByCode(perspectiveCode),
-        ratingStore.findByParentAndPerspective(entity.kind, entity.id, perspectiveCode)
+        ratingStore.findByParentAndPerspective(entity.kind, entity.id, perspectiveCode),
+        capabilityStore.findByAppIds([entity.id])
     ];
 
 
@@ -71,10 +73,9 @@ function controller(appStore,
 
 
     $q.all(promises).then(
-        ([app, appCapabilities, perspective, ratings]) => {
+        ([app, appCapabilities, perspective, ratings, capabilities]) => {
             vm.app = app;
             const groupRef = {id: app.id, name: app.name, kind: 'APPLICATION'};
-            const capabilities = _.map(appCapabilities, 'capabilityReference');
             vm.group = mkAppRatingsGroup(groupRef, perspective.measurables, capabilities, ratings);
             recalc();
         });
@@ -176,6 +177,7 @@ controller.$inject = [
     'AppCapabilityStore',
     'PerspectiveStore',
     'RatingStore',
+    'CapabilityStore',
     '$q',
     '$scope',
     '$stateParams',

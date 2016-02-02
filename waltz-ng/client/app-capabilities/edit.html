@@ -29,23 +29,27 @@
                 </thead>
 
                 <tbody>
-                <tr class="waltz-visibility-parent" ng-repeat="capability in ctrl.model.appCapabilities | orderBy:'capabilityReference.name'">
+                <tr class="waltz-visibility-parent"
+                    ng-repeat="ac in ctrl.model.appCapabilities | orderBy:'capability.name'">
                     <td>
-                        <waltz-icon style="color: goldenrod" name="star" ng-if="capability.isPrimary"></waltz-icon>
+                        <waltz-icon style="color: goldenrod"
+                                    name="star"
+                                    ng-if="ac.primary"></waltz-icon>
                     </td>
                     <td>
                         <span class='wce-name'>
-                            {{ capability.capabilityReference.name }}
+                            {{ ac.capability.name }}
                         </span>
                     </td>
                     <td>
                         <span class='small'>
-                            {{ capability.description }}
+                            {{ ac.capability.description }}
                         </span>
                     </td>
                     <td class="waltz-visibility-child-30">
-                        <a href ng-click="ctrl.remove(capability.capabilityReference)">
-                            <waltz-icon fixed-width='true' name="trash"></waltz-icon>
+                        <a href ng-click="ctrl.remove(ac.capability.id)">
+                            <waltz-icon fixed-width='true'
+                                        name="trash"></waltz-icon>
                             Remove
                         </a>
 
@@ -55,8 +59,8 @@
                                       icon-off="star"
                                       label-on="Un-mark as primary"
                                       label-off="Mark as primary"
-                                      on-toggle="ctrl.togglePrimaryCapability(capability)"
-                                      state="capability.isPrimary"></waltz-toggle>
+                                      on-toggle="ctrl.togglePrimaryCapability(ac.capability)"
+                                      state="ac.primary"></waltz-toggle>
                     </td>
                 </tr>
 

@@ -143,14 +143,14 @@
     <!-- ASSOCIATED CAPABILITIES -->
     <waltz-section name="Associated Capabilities">
         <ul>
-            <li ng-repeat="assoc in ctrl.associatedCapabilities | orderBy:'capabilityReference.name'">
+            <li ng-repeat="assoc in ctrl.associatedCapabilities | orderBy:'capability.name'">
                 <strong>
-                    <a ui-sref="main.capabilities.view ({ id: assoc.capabilityReference.id })">
-                        {{ assoc.capabilityReference.name }}
+                    <a ui-sref="main.capabilities.view ({ id: assoc.capability.id })">
+                        {{ assoc.capability.name }}
                    </a>
                 </strong>
                 <span class="text-muted small">
-                    {{ ctrl.capabilitiesById[assoc.capabilityReference.id].description }}
+                    {{ assoc.capability.description }}
                 </span>
                 <ul class="list-inline" style="margin-left: 10px">
                     <li class="text-muted">Applications:</li>

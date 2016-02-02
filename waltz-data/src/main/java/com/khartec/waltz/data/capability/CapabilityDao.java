@@ -30,12 +30,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
-import static org.jooq.impl.DSL.*;
 
 
 @Repository
@@ -123,5 +120,23 @@ public class CapabilityDao {
                 .set(CAPABILITY.LEVEL, level)
                 .where(CAPABILITY.ID.eq(capabilityId))
                 .execute();
+    }
+
+
+    public List<Capability> findByIds(Long[] ids) {
+        return dsl.select()
+                .from(CAPABILITY)
+                .where(CAPABILITY.ID.in(ids))
+                .fetch(capabilityMapper);
+    }
+
+
+    public List<Capability> findByAppIds(Long[] appIds) {
+        return dsl.select(CAPABILITY.fields())
+                .from(CAPABILITY)
+                .innerJoin(APP_CAPABILITY)
+                .on(APP_CAPABILITY.CAPABILITY_ID.eq(CAPABILITY.ID))
+                .where(APP_CAPABILITY.APPLICATION_ID.in(appIds))
+                .fetch(capabilityMapper);
     }
 }

@@ -12,24 +12,24 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="ac in appCapabilities | orderBy:'capabilityReference.name'">
+    <tr ng-repeat="ac in ctrl.items | orderBy:'capability.name'">
         <td>
             <waltz-icon name="star"
                         style="color: goldenrod"
-                        ng-if="ac.isPrimary"></waltz-icon>
+                        ng-if="ac.primary"></waltz-icon>
         </td>
         <td>
-            <a ui-sref="main.capabilities.view ({id: ac.capabilityReference.id})">
-                <span ng-if="ac.isPrimary" style="font-weight: bolder">
-                    {{ ac.capabilityReference.name }}
+            <a ui-sref="main.capabilities.view ({id: ac.capability.id})">
+                <span ng-if="ac.primary" style="font-weight: bolder">
+                    {{ ac.capability.name }}
                 </span>
-                <span ng-if="! ac.isPrimary">
-                     {{ ac.capabilityReference.name }}
+                <span ng-if="! ac.primary">
+                     {{ ac.capability.name }}
                 </span>
             </a>
         </td>
         <td>
-            {{ ac.description }}
+            {{ ac.capability.description }}
         </td>
     </tr>
     </tbody>

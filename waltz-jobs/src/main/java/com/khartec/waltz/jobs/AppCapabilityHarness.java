@@ -18,6 +18,7 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.model.EntityReferenceKeyedGroup;
+import com.khartec.waltz.model.IdGroup;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.app_capability.AppCapabilityService;
 import com.khartec.waltz.service.capability_rating.CapabilityRatingService;
@@ -37,7 +38,7 @@ public class AppCapabilityHarness {
 
         long appId = 636;
 
-        List<EntityReferenceKeyedGroup> associated = appCapabilityService.findAssociatedCapabilitiesByApplication(appId);
+        List<IdGroup> associated = appCapabilityService.findAssociatedCapabilitiesByApplication(appId);
 
         associated.forEach(e -> System.out.println(e.key() + " --- " + e.values().size() + "\n\t"+e.values()));
 

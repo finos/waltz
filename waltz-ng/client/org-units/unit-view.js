@@ -88,7 +88,7 @@ function calculateCapabilityRatings(orgUnitId, apps, appCapabilities, perspectiv
         if (!c) return false;
         const a = _.findWhere(c.applications, { id: app.id });
         if (!a) return false;
-        return a.isPrimary;
+        return a.primary;
     }
 
     const data = {

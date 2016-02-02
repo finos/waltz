@@ -20,9 +20,8 @@ package com.khartec.waltz.service.app_capability;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.data.app_capability.AppCapabilityDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.EntityReferenceKeyedGroup;
-import com.khartec.waltz.model.ImmutableEntityReferenceKeyedGroup;
+import com.khartec.waltz.model.IdGroup;
+import com.khartec.waltz.model.ImmutableIdGroup;
 import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
 import com.khartec.waltz.model.applicationcapability.GroupedApplications;
 import com.khartec.waltz.model.tally.Tally;
@@ -66,26 +65,32 @@ public class AppCapabilityService {
     }
 
 
-    public List<EntityReferenceKeyedGroup> findAssociatedCapabilitiesByApplication(long applicationId) {
+    public List<IdGroup> findAssociatedCapabilitiesByApplication(long applicationId) {
         List<ApplicationCapability> capabilitiesForApp = findCapabilitiesForApp(applicationId);
 
-        List<Long> existingCapabilityIds = ListUtilities.map(capabilitiesForApp, ac -> ac.capabilityReference().id());
+        List<Long> existingCapabilityIds = ListUtilities.map(capabilitiesForApp, ac -> ac.capabilityId());
 
         List<ApplicationCapability> associated = capabilitiesForApp.stream()
-                .map(appCapability -> appCapability.capabilityReference().id())
+                .map(appCapability -> appCapability.capabilityId())
                 .flatMap(capabilityId -> findAssociatedApplicationCapabilities(capabilityId).stream())
-                .filter(associatedAppCap -> associatedAppCap.applicationReference().id() != applicationId)
-                .filter(associatedAppCap -> ! existingCapabilityIds.contains(associatedAppCap.capabilityReference().id()))
+                .filter(associatedAppCap -> associatedAppCap.applicationId() != applicationId)
+                .filter(associatedAppCap -> ! existingCapabilityIds.contains(associatedAppCap.capabilityId()))
                 .collect(Collectors.toList());
 
-        Map<EntityReference, Collection<EntityReference>> associatedCapabilitiesToApps = MapUtilities.groupBy(
-                appCap -> appCap.capabilityReference(),
-                appCap -> appCap.applicationReference(),
+
+        // [ (capId, [appId]) ]
+        Map<Long, Collection<Long>> associatedCapabilitiesToApps = MapUtilities.groupBy(
+                appCap -> appCap.capabilityId(),
+                appCap -> appCap.applicationId(),
                 associated);
 
-        List<EntityReferenceKeyedGroup> result = ListUtilities.newArrayList();
-        associatedCapabilitiesToApps.forEach((k, v) -> result.add(ImmutableEntityReferenceKeyedGroup.builder().key(k).values(v).build()));
-        return result;
+        return associatedCapabilitiesToApps.entrySet()
+                .stream()
+                .map(entry -> ImmutableIdGroup.builder()
+                    .key(entry.getKey())
+                    .values(entry.getValue())
+                    .build())
+                .collect(Collectors.toList());
     }
 
 

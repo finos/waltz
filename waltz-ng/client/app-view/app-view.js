@@ -41,6 +41,7 @@ function controller(appView,
 
     const vm = this;
 
+
     const perspectiveCode = 'BUSINESS';
 
 
@@ -52,9 +53,7 @@ function controller(appView,
         const appRef = { id: id, kind: 'APPLICATION', name: appView.app.name};
 
 
-        const capabilities = _.map(appView.appCapabilities, 'capabilityReference');
-
-        const group = mkAppRatingsGroup(appRef, perspective.measurables, capabilities, ratings);
+        const group = mkAppRatingsGroup(appRef, perspective.measurables, appView.capabilities, ratings);
 
         vm.ratings = {
             highestRatingCount: calculateHighestRatingCount([group]),
