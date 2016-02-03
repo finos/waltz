@@ -12,15 +12,26 @@
  */
 
 import _ from 'lodash';
-import numeral from 'numeral';
 
-import { lifecyclePhaseColorScale, capabilityColorScale, flowDirectionColorScale } from '../../common/colors';
+import {
+    lifecyclePhaseColorScale,
+    capabilityColorScale,
+    flowDirectionColorScale,
+    ragColorScale } from '../../common/colors';
 
 
 
-function calcAppPieStats(apps) {
+function calcAppPhasePieStats(apps) {
     return _.chain(apps)
             .countBy('lifecyclePhase')
+            .map((v, k) => ({ key: k, count: v }))
+            .value();
+}
+
+
+function calcAppInvestmentPieStats(apps) {
+    return _.chain(apps)
+            .countBy('overallRating')
             .map((v, k) => ({ key: k, count: v }))
             .value();
 }
@@ -73,8 +84,14 @@ function controller($scope, orgUnitStore) {
     vm.saveDescriptionFn = (newValue, oldValue) =>
             orgUnitStore.updateDescription(vm.unit.id, newValue, oldValue);
 
+    const investmentLabels = {
+        'R' : 'Disinvest',
+        'A' : 'Maintain',
+        'G' : 'Invest'
+    };
+
     const pies = {
-        app: {
+        appPhase: {
             config: {
                 colorProvider: (d) => lifecyclePhaseColorScale(d.data.key),
                 size: 80
@@ -85,6 +102,13 @@ function controller($scope, orgUnitStore) {
                 colorProvider: (d) => flowDirectionColorScale(d.data.key),
                 size: 80
             }
+        },
+        appInvestment: {
+            config: {
+                colorProvider: (d) => ragColorScale(d.data.key),
+                size: 80,
+                labelProvider: (k) => investmentLabels[k] || 'Unknown'
+            }
         }
     };
 
@@ -92,7 +116,8 @@ function controller($scope, orgUnitStore) {
 
     $scope.$watch('ctrl.apps', apps => {
         if (!apps) return;
-        vm.pies.app.data = calcAppPieStats(apps);
+        vm.pies.appPhase.data = calcAppPhasePieStats(apps);
+        vm.pies.appInvestment.data = calcAppInvestmentPieStats(apps);
     });
 
     $scope.$watch('ctrl.ratings', ratings => {
