@@ -78,11 +78,11 @@ public class CapabilityService {
 
     }
 
-    public List<Capability> findByIds(Long[] capabilityIds) {
+    public List<Capability> findByIds(Long... capabilityIds) {
         return capabilityDao.findByIds(capabilityIds);
     }
 
-    public List<Capability> findByAppIds(Long[] appIds) {
+    public List<Capability> findByAppIds(Long... appIds) {
             return capabilityDao.findByAppIds(appIds);
 
     }

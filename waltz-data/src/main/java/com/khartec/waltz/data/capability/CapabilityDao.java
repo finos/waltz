@@ -132,11 +132,12 @@ public class CapabilityDao {
 
 
     public List<Capability> findByAppIds(Long[] appIds) {
-        return dsl.select(CAPABILITY.fields())
+        return dsl.selectDistinct(CAPABILITY.fields())
                 .from(CAPABILITY)
                 .innerJoin(APP_CAPABILITY)
                 .on(APP_CAPABILITY.CAPABILITY_ID.eq(CAPABILITY.ID))
                 .where(APP_CAPABILITY.APPLICATION_ID.in(appIds))
                 .fetch(capabilityMapper);
     }
+
 }
