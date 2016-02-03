@@ -19,18 +19,24 @@ package com.khartec.waltz.service.app_view;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
 import com.khartec.waltz.model.appview.AppView;
 import com.khartec.waltz.model.appview.ImmutableAppView;
-import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.service.app_capability.AppCapabilityService;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
 import com.khartec.waltz.service.bookmark.BookmarkService;
+import com.khartec.waltz.service.capability.CapabilityService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.map;
 
 
 @Service
@@ -41,6 +47,7 @@ public class AppViewService {
     private final OrganisationalUnitService organisationalUnitService;
     private final AppCapabilityService appCapabilityDao;
     private final AssetCostService assetCostService;
+    private final CapabilityService capabilityService;
 
 
     @Autowired
@@ -48,18 +55,21 @@ public class AppViewService {
                           AppCapabilityService appCapabilityDao,
                           BookmarkService bookmarkService,
                           OrganisationalUnitService organisationalUnitService,
-                          AssetCostService assetCostService) {
+                          AssetCostService assetCostService,
+                          CapabilityService capabilityService) {
         checkNotNull(appService, "ApplicationService must not be null");
         checkNotNull(appCapabilityDao, "appCapabilityDao must not be null");
         checkNotNull(bookmarkService, "BookmarkDao must not be null");
         checkNotNull(organisationalUnitService, "organisationalUnitService must not be null");
         checkNotNull(assetCostService, "assetCostService must not be null");
+        checkNotNull(capabilityService, "capabilityService must not be null");
 
         this.appService = appService;
         this.appCapabilityDao = appCapabilityDao;
         this.bookmarkService = bookmarkService;
         this.organisationalUnitService = organisationalUnitService;
         this.assetCostService = assetCostService;
+        this.capabilityService = capabilityService;
     }
 
 
@@ -71,13 +81,17 @@ public class AppViewService {
 
         Application app = appService.getById(id);
 
+        List<ApplicationCapability> appCapabilities = appCapabilityDao.findCapabilitiesForApp(id);
+        List<Capability> capabilities = capabilityService.findByIds(map(appCapabilities, ac -> ac.capabilityId()).toArray(new Long[0]));
+
         return ImmutableAppView.builder()
                 .app(app)
                 .organisationalUnit(organisationalUnitService.getById(app.organisationalUnitId()))
                 .bookmarks(bookmarkService.findByReference(ref))
                 .tags(appService.findTagsForApplication(id))
                 .aliases(appService.findAliasesForApplication(id))
-                .appCapabilities(appCapabilityDao.findCapabilitiesForApp(id))
+                .appCapabilities(appCapabilities)
+                .capabilities(capabilities)
                 .costs(assetCostService.findByAppId(id))
                 .build();
 

@@ -11,13 +11,41 @@
  *
  */
 
+
+
+function controller($scope) {
+    const vm = this;
+
+    const refresh = ([appCapabilities, capabilities]) => {
+        if (!appCapabilities || !capabilities) return;
+
+        const capabilitiesById = _.indexBy(capabilities, 'id');
+
+        vm.items = _.map(appCapabilities, ac => {
+            return {
+                ...ac,
+                capability: capabilitiesById[ac.capabilityId]
+            }
+        });
+    };
+
+    $scope.$watchGroup(['ctrl.appCapabilities', 'ctrl.capabilities'], refresh)
+}
+
+controller.$inject = ['$scope'];
+
+
 export default () => {
     return {
         restrict: 'E',
         replace: true,
         template: require('./app-capability-table.html'),
-        scope: {
-            appCapabilities: '='
+        scope: {},
+        controller,
+        controllerAs: 'ctrl',
+        bindToController: {
+            appCapabilities: '=',
+            capabilities: '='
         }
     };
 };

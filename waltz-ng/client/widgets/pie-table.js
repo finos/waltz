@@ -11,6 +11,10 @@ function controller($scope) {
     };
 
     $scope.$watch('ctrl.data', dataChanged);
+
+    vm.toDisplayName = (k) => vm.config.labelProvider
+        ? vm.config.labelProvider(k)
+        : k;
 }
 
 controller.$inject = ['$scope'];

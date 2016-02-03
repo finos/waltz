@@ -30,9 +30,8 @@ import java.util.Optional;
 @JsonDeserialize(as = ImmutableApplicationCapability.class)
 public abstract class ApplicationCapability {
 
-    public abstract EntityReference capabilityReference();
-    public abstract EntityReference applicationReference();
-    public abstract Optional<String> description();
+    public abstract long capabilityId();
+    public abstract long applicationId();
     public abstract boolean isPrimary();
 
 }

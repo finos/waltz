@@ -85,7 +85,9 @@ function controller(capabilities,
                     historyStore,
                     dataFlowStore,
                     complexityStore,
-                    assetCostStore) {
+                    assetCostStore,
+                    capabilityStore,
+                    applicationStore) {
 
     const vm = this;
 
@@ -93,8 +95,6 @@ function controller(capabilities,
     const capability = _.findWhere(populateParents(capabilities), { id: capId });
 
     const capabilitiesById = _.indexBy(capabilities, 'id');
-
-    const associatedCapabilities = [];
 
     const tweakers = {
         subjectLabel: {
@@ -135,16 +135,38 @@ function controller(capabilities,
 
     appCapabilityStore.findAssociatedApplicationCapabilitiesByCapabilityId(capability.id)
         .then(assocAppCaps => {
-            const assocCapabilities = _.chain(assocAppCaps)
-                .groupBy('capabilityReference.id')
-                .map(associations => ({
-                    capabilityReference: associations[0].capabilityReference,
-                    apps: _.map(associations, 'applicationReference')
-                }))
-                .value();
+            const associatedAppIds = _.map(assocAppCaps, 'applicationId');
 
-            Object.assign(associatedCapabilities, assocCapabilities);
+
+            applicationStore
+                .findByIds(associatedAppIds)
+                .then((assocApps) => {
+                    const appsById = _.indexBy(assocApps, 'id');
+                    return _.chain(assocAppCaps)
+                        .groupBy('capabilityId')
+                        .map((associations, capabilityId) => {
+                            return {
+                                capability: capabilitiesById[capabilityId],
+                                apps: _.map(associations, assoc => appsById[assoc.applicationId])
+
+                            }
+                        })
+                        .value()
+                })
+                .then(associatedCapabilities => vm.associatedCapabilities = associatedCapabilities);
         });
+
+        //
+        //    const assocCapabilities = _.chain(assocAppCaps)
+        //        .groupBy('capabilityReference.id')
+        //        .map(associations => ({
+        //            capabilityReference: associations[0].capabilityReference,
+        //            apps: _.map(associations, 'applicationReference')
+        //        }))
+        //        .value();
+        //
+        //    Object.assign(associatedCapabilities, assocCapabilities);
+        //});
 
 
     logHistory(capability, historyStore);
@@ -152,7 +174,6 @@ function controller(capabilities,
 
     vm.capability = capability;
     vm.capabilitiesById = capabilitiesById;
-    vm.associatedCapabilities = associatedCapabilities;
 }
 
 controller.$inject = [
@@ -166,7 +187,9 @@ controller.$inject = [
     'HistoryStore',
     'DataFlowDataStore',
     'ComplexityStore',
-    'AssetCostStore'
+    'AssetCostStore',
+    'CapabilityStore',
+    'ApplicationStore'
 ];
 
 

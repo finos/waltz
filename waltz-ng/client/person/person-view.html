@@ -28,43 +28,43 @@
 
                         <div class="waltz-display-section">
                             <div class="row">
-                                <div class="col-md-2 waltz-display-field-label">
+                                <div class="col-sm-2 waltz-display-field-label">
                                     Title
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-sm-4">
                                     {{ ctrl.person.title }}
                                 </div>
 
-                                <div class="col-md-2 waltz-display-field-label">
+                                <div class="col-sm-2 waltz-display-field-label">
                                     e-mail
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-sm-4">
                                     <waltz-mail-to person="ctrl.person"></waltz-mail-to>
                                 </div>
                             </div>
 
                             <div class="row">
-                                <div class="col-md-2 waltz-display-field-label">
+                                <div class="col-sm-2 waltz-display-field-label">
                                     Tel (Office)
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-sm-4">
                                     <waltz-phone-link number="{{ctrl.person.officePhone}}"></waltz-phone-link>
                                 </div>
 
-                                <div class="col-md-2 waltz-display-field-label">
+                                <div class="col-sm-2 waltz-display-field-label">
                                     Tel (Mobile)
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-sm-4">
                                     <waltz-phone-link number="{{ctrl.person.mobilePhone}}"></waltz-phone-link>
                                 </div>
                             </div>
 
 
                             <div class="row">
-                                <div class="col-md-2 waltz-display-field-label">
+                                <div class="col-sm-2 waltz-display-field-label">
                                     Roles
                                 </div>
-                                <div class="col-md-10">
+                                <div class="col-sm-10">
                                     <ul class="list-unstyled waltz-keyword-list">
                                         <li ng-repeat="role in ctrl.allRoles | orderBy">
                                             {{role | toDisplayName:'involvementKind'}}
@@ -98,7 +98,7 @@
 
                 <uib-tab heading="Summary">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-sm-6">
                             <div>
                                 <waltz-pie-table data="ctrl.charts.apps.byLifecyclePhase.data"
                                                  config="ctrl.charts.apps.byLifecyclePhase.config"
@@ -106,7 +106,7 @@
                                 </waltz-pie-table>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-sm-6">
                             <div>
                                 <waltz-pie-table data="ctrl.charts.apps.byKind.data"
                                                  config="ctrl.charts.apps.byKind.config"

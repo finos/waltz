@@ -2,7 +2,7 @@
     <waltz-section name="Application Complexity"
                    id="ouv-complexity">
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-8" style="padding-top: 16px">
                 <waltz-complexity-bar-chart complexity="ctrl.complexity"
                                             sizing="{ h: 150 }"
                                             on-select="ctrl.onComplexitySelect">
@@ -20,6 +20,9 @@
                         -
                         {{ ctrl.complexitySelection.end | toFixed: 2 }}
                         <small>Complexity Band</small>
+                        <small class="pull-right">
+                            <a ng-click="ctrl.complexitySelection = {}" href>&#10006;</a>
+                        </small>
                     </h4>
                     <div class="waltz-scroll-region"
                          style="height: 140px">

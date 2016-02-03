@@ -18,10 +18,13 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.model.applicationcapability.CapabilityUsage;
+import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.capability.CapabilityService;
 import com.khartec.waltz.service.capability_usage.CapabilityUsageService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.List;
 
 
 public class CapabilityHarness {
@@ -37,8 +40,11 @@ public class CapabilityHarness {
         System.out.println(usage);
 
 
-        capabilityService.assignLevels();
+        // capabilityService.assignLevels();
 
+        List<Capability> caps = capabilityService.findByAppIds(33L, 39L, 31L, 130L, 179L);
+        caps.forEach(System.out::println);
+        System.out.println(" :: " + caps.size());
     }
 
 

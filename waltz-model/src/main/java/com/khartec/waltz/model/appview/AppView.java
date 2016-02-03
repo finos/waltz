@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
 import com.khartec.waltz.model.bookmark.Bookmark;
+import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.cost.AssetCost;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import org.immutables.value.Value;
@@ -41,5 +42,6 @@ public abstract class AppView {
     public abstract OrganisationalUnit organisationalUnit();
     public abstract Collection<Bookmark> bookmarks();
     public abstract Collection<ApplicationCapability> appCapabilities();
+    public abstract Collection<Capability> capabilities();
     public abstract List<AssetCost> costs();
 }

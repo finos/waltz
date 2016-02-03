@@ -17,7 +17,7 @@ function controller($state, $window, $location, complexityStore) {
     const vm = this;
 
     complexityStore
-        .findByOrgUnitTree(10)
+        .findByAppIds([10])
         .then(c => vm.complexity = c);
 
     vm.onSelect = (d) => console.log("On Select", d)

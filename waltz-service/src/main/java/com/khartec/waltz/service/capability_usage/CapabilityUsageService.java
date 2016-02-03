@@ -76,7 +76,7 @@ public class CapabilityUsageService {
                 .capability(capNode.getData())
                 .usages(appCapabilities
                         .stream()
-                        .filter(ac -> ac.capabilityReference().id() == capNode.getId())
+                        .filter(ac -> ac.capabilityId() == capNode.getId())
                         .collect(Collectors.toList()))
                 .ratings(ratings.stream()
                         .filter(r -> r.capability().id() == capNode.getId())

@@ -86,7 +86,7 @@ public class AppCapabilityEndpoint implements Endpoint {
         ListRoute<ApplicationCapability> findAssociatedAppCapabilities  = (request, response)
                 -> appCapabilityDao.findAssociatedApplicationCapabilities(getLong(request, "capabilityId"));
 
-        ListRoute<EntityReferenceKeyedGroup> findAssociatedCapabilitiesByApplication =
+        ListRoute<IdGroup> findAssociatedCapabilitiesByApplication =
                 (request, response) -> appCapabilityDao.findAssociatedCapabilitiesByApplication(getId(request));
 
         ListRoute<ApplicationCapability> findAppCapabilitiesForAppIds  = (request, response)

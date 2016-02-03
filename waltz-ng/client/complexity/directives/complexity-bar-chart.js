@@ -16,24 +16,6 @@
  *
  */
 
-/*
- *  This file is part of Waltz.
- *
- *  Waltz is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Waltz is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
-
 import {green, red} from '../../common/colors';
 
 
@@ -118,6 +100,8 @@ function drawBucketBars(buckets, container, scales, sizing, repaint, onSelect) {
         .enter()
         .append('rect')
         .classed('bucket-bar', true)
+
+    bucketBars
         .classed('clickable', onSelect != null)
         .attr({
             fill: (d, i) => scales.color(i),
@@ -125,16 +109,12 @@ function drawBucketBars(buckets, container, scales, sizing, repaint, onSelect) {
             x: (d, i) => scales.x(i),
             width: scales.x.rangeBand(),
             y:  d => (sizing.h - sizing.padding.bottom) - (scales.y(d.items.length)),
-            height: d => scales.y(d.items.length)
+            height: d => scales.y(d.items.length),
+            opacity: d => d.isMouseOver ? 1 : 0.7
         })
         .on('click', d => { if (onSelect) { onSelect(d); } })
         .on('mouseenter', d => { d.isMouseOver = true; repaint(); })
         .on('mouseleave', d => { d.isMouseOver = false; repaint(); });
-
-    bucketBars
-        .attr({
-            opacity: d => d.isMouseOver ? 1 : 0.7
-        });
 }
 
 
@@ -146,7 +126,6 @@ function drawBucketLabels(buckets, container, scales, sizing) {
     bucketCountLabels.enter()
         .append('text')
         .classed('bucket-count-label', true);
-
 
     bucketCountLabels
         .text(d => d.items.length)
@@ -163,9 +142,6 @@ function render(config) {
 
     const repaint = () => render(config);
 
-    global.elem = config.elem;
-
-
     const sizing = _.defaults(
         {},
         config.sizing,
@@ -176,7 +152,9 @@ function render(config) {
     const buckets = config.buckets;
     const scales = prepareScales(buckets, sizing);
 
-    const svg = d3.select(config.elem).selectAll('svg')
+    const svg = d3
+        .select(config.elem)
+        .selectAll('svg')
         .data([1]);
 
     svg.enter()

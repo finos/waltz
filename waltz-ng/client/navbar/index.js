@@ -50,7 +50,7 @@ function controller(applicationStore, personStore, capabilityStore, orgUnitStore
     vm.searchResults = searchResults;
 }
 
-controller.$inject = ['ApplicationStore', 'PersonDataService', 'CapabilityDataService', 'OrgUnitStore', '$timeout'];
+controller.$inject = ['ApplicationStore', 'PersonDataService', 'CapabilityStore', 'OrgUnitStore', '$timeout'];
 
 export default (module) => module.directive('waltzNavbar', () => {
     return {

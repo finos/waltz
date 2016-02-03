@@ -27,9 +27,6 @@ import java.util.Set;
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntityReferenceKeyedGroup.class)
 @JsonDeserialize(as = ImmutableEntityReferenceKeyedGroup.class)
-public abstract class EntityReferenceKeyedGroup {
-
-    public abstract EntityReference key();
-    public abstract Set<EntityReference> values();
+public abstract class EntityReferenceKeyedGroup extends KeyedGroup<EntityReference, EntityReference> {
 
 }

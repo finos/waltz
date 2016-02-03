@@ -60,24 +60,21 @@ function controller(uiGridConstants, $scope) {
             data: [],
             config: {
                 size: 100,
-                colorProvider: (d) => lifecyclePhaseColorScale(d.data.key),
-                labelProvider: (d) => d.data.key
+                colorProvider: (d) => lifecyclePhaseColorScale(d.data.key)
             }
         },
         byKind: {
             data: [],
             config: {
                 size: 100,
-                colorProvider: (d) => kindColorScale(d.data.key),
-                labelProvider: (d) => d.data.key
+                colorProvider: (d) => kindColorScale(d.data.key)
             }
         },
         byRiskRating: {
             data: [],
             config: {
                 size: 100,
-                colorProvider: (d) => riskRatingColorScale(d.data.key),
-                labelProvider: (d) => d.data.key
+                colorProvider: (d) => riskRatingColorScale(d.data.key)
             }
         }
     };

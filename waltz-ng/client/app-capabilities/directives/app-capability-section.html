@@ -11,7 +11,9 @@
 
 
         <div ng-if="appCapabilities.length > 0">
-            <waltz-app-capability-table app-capabilities="appCapabilities"></waltz-app-capability-table>
+            <waltz-app-capability-table app-capabilities="appCapabilities"
+                                        capabilities="capabilities">
+            </waltz-app-capability-table>
         </div>
 
         <div ng-if="appCapabilities.length == 0">
