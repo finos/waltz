@@ -20,37 +20,30 @@ function prepareFlowData(flows, apps) {
     const entitiesById = _.indexBy(apps, 'id');
 
     const enrichedFlows = _.map(flows, f => ({
-        source: entitiesById[f.source.id],
-        target: entitiesById[f.target.id],
+        source: entitiesById[f.source.id] || { ...f.source, isNeighbour: true },
+        target: entitiesById[f.target.id] || { ...f.target, isNeighbour: true },
         dataType: f.dataType
     }));
 
+    const entities = _.chain(enrichedFlows)
+        .map(f => ([f.source, f.target]))
+        .flatten()
+        .uniq(a => a.id)
+        .value();
+
     return {
         flows: enrichedFlows,
-        entities: apps
+        entities
     };
 }
 
 
-function loadDataFlows(dataFlowStore, appStore, groupApps) {
+function loadDataFlows(dataFlowStore, groupApps) {
     const groupAppIds = _.map(groupApps, 'id');
 
     return dataFlowStore.findByAppIds(groupAppIds)
-        .then(fs => {
+        .then(fs => prepareFlowData(fs, groupApps));
 
-            const allAppIds = _.chain(fs)
-                .map(f => ([f.source.id, f.target.id]))
-                .flatten()
-                .uniq()
-                .value();
-
-            const neighbourIds = _.difference(allAppIds, groupApps);
-
-            return appStore
-                .findByIds(neighbourIds)
-                .then(neighbourApps => _.map(neighbourApps, a => ({...a, isNeighbour: true })))
-                .then(neighbourApps => prepareFlowData(fs, _.union(groupApps, neighbourApps)));
-        });
 }
 
 
@@ -113,7 +106,7 @@ function service(appStore,
 
         return $q.all([
             ratingStore.findByAppIds(appIds),
-            loadDataFlows(dataFlowStore, appStore, rawData.apps),
+            loadDataFlows(dataFlowStore, rawData.apps),
             appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
             capabilityStore.findByAppIds(appIds),
             ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)
@@ -153,6 +146,7 @@ function service(appStore,
             rawData.orgUnit = _.find(rawData.orgUnits, { id: orgUnitId });
             rawData.ratedFlows = new RatedFlowsData(rawData.ratedDataFlows, rawData.apps, rawData.orgUnits, orgUnitId);
 
+            console.log('rdf', rawData.ratedDataFlows, 'df', rawData.dataFlows);
             return rawData;
         });
     }
