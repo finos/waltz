@@ -40,6 +40,6 @@ public abstract class Bookmark implements IdProvider {
     public abstract Optional<String> description();
 
     @Value.Default
-    public boolean isPrimary() { return false; }
+    public boolean primary() { return false; }
 
 }

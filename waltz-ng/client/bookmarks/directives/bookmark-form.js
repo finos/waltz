@@ -20,7 +20,7 @@ function controller($scope) {
     };
 
     this.togglePrimary = () => {
-        this.bookmark.isPrimary = !this.bookmark.isPrimary;
+        this.bookmark.primary = !this.bookmark.primary;
     };
 
 
@@ -40,13 +40,13 @@ function controller($scope) {
         this.onCancel();
     };
 
-    const recalcFromStatus = () => {
+    const recalcFormStatus = () => {
         const { url } = this.bookmark;
         this.submitDisabled = url === undefined || url.length === 0;
     };
 
-    $scope.$watch('ctrl.bookmark', recalcFromStatus, true);
-    recalcFromStatus();
+    $scope.$watch('ctrl.bookmark', recalcFormStatus, true);
+    recalcFormStatus();
 }
 
 controller.$inject = ['$scope'];

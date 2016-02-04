@@ -24,7 +24,6 @@ function getParentRef(params) {
 function controller(appStore, bookmarkStore, params, $state) {
     const parentRef = getParentRef(params);
 
-
     this.save = (b) => {
         b.parent = parentRef;
         bookmarkStore

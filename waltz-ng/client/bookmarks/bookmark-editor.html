@@ -45,10 +45,10 @@
                 <tbody>
                 <tr ng-repeat="bookmark in ctrl.bookmarks" class="waltz-visibility-parent">
                     <td>
-                        <span ng-if="bookmark.isPrimary">
+                        <span ng-if="bookmark.primary">
                             <waltz-icon name="star"></waltz-icon>
                         </span>
-                        <span ng-if="!bookmark.isPrimary">
+                        <span ng-if="!bookmark.primary">
                             <waltz-icon name="star-o"></waltz-icon>
                         </span>
 

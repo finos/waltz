@@ -58,7 +58,7 @@ public class BookmarkDao {
                 .title(record.getTitle())
                 .url(record.getUrl())
                 .kind(BookmarkKind.valueOf(record.getKind()))
-                .isPrimary(record.getIsPrimary())
+                .primary(record.getIsPrimary())
                 .build();
     };
 
@@ -109,7 +109,7 @@ public class BookmarkDao {
                 .set(BOOKMARK.KIND, bookmark.kind().name())
                 .set(BOOKMARK.PARENT_ID, bookmark.parent().id())
                 .set(BOOKMARK.PARENT_KIND, bookmark.parent().kind().name())
-                .set(BOOKMARK.IS_PRIMARY, bookmark.isPrimary())
+                .set(BOOKMARK.IS_PRIMARY, bookmark.primary())
                 .set(BOOKMARK.CREATED_AT, DSL.currentTimestamp())
                 .set(BOOKMARK.UPDATED_AT, DSL.currentTimestamp())
                 .returning(BOOKMARK.ID)
@@ -132,7 +132,7 @@ public class BookmarkDao {
                 .set(BOOKMARK.DESCRIPTION, bookmark.description().orElse(""))
                 .set(BOOKMARK.URL, bookmark.url().orElse(""))
                 .set(BOOKMARK.TITLE, bookmark.title().orElse(""))
-                .set(BOOKMARK.IS_PRIMARY, bookmark.isPrimary())
+                .set(BOOKMARK.IS_PRIMARY, bookmark.primary())
                 .set(BOOKMARK.UPDATED_AT, DSL.currentTimestamp())
                 .where(BOOKMARK.ID.eq(bookmark.id().get()))
                 .execute();
