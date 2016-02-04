@@ -35,9 +35,9 @@ export default (module) => {
                     views: { 'content@': editView },
                     resolve: {
                         authSources: authSourcesResolver,
-                        flows: flowResolver,
                         orgUnits: orgUnitsResolver,
-                        id: idResolver
+                        id: idResolver,
+                        flows: flowResolver
                     }
                 });
         }

@@ -146,7 +146,6 @@ function service(appStore,
             rawData.orgUnit = _.find(rawData.orgUnits, { id: orgUnitId });
             rawData.ratedFlows = new RatedFlowsData(rawData.ratedDataFlows, rawData.apps, rawData.orgUnits, orgUnitId);
 
-            console.log('rdf', rawData.ratedDataFlows, 'df', rawData.dataFlows);
             return rawData;
         });
     }
