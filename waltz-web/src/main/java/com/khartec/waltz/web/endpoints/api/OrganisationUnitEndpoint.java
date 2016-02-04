@@ -17,35 +17,34 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-    import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.user.Role;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
-import com.khartec.waltz.service.user.UserService;
-import com.khartec.waltz.web.action.FieldChange;
-import com.khartec.waltz.web.endpoints.Endpoint;
+    import com.khartec.waltz.model.EntityKind;
+    import com.khartec.waltz.model.ImmutableEntityReference;
+    import com.khartec.waltz.model.Severity;
+    import com.khartec.waltz.model.changelog.ChangeLog;
+    import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+    import com.khartec.waltz.model.orgunit.OrganisationalUnit;
+    import com.khartec.waltz.model.user.Role;
+    import com.khartec.waltz.service.changelog.ChangeLogService;
+    import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
+    import com.khartec.waltz.service.user.UserService;
+    import com.khartec.waltz.web.ListRoute;
     import com.khartec.waltz.web.WebUtilities;
-    import com.khartec.waltz.web.endpoints.EndpointUtilities;
+    import com.khartec.waltz.web.action.FieldChange;
+    import com.khartec.waltz.web.endpoints.Endpoint;
     import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+    import org.slf4j.LoggerFactory;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+    import static com.khartec.waltz.common.Checks.checkNotNull;
+    import static com.khartec.waltz.web.WebUtilities.*;
+    import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
 
-
-    @Service
+@Service
 public class OrganisationUnitEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "org-unit");
+    private static final String BASE_URL = mkPath("api", "org-unit");
     private static final Logger LOG = LoggerFactory.getLogger(OrganisationUnitEndpoint.class);
 
     private final OrganisationalUnitService service;
@@ -61,7 +60,6 @@ public class OrganisationUnitEndpoint implements Endpoint {
         checkNotNull(changeLogService, "changeLogService must not be null");
         checkNotNull(userService, "userService must not be null");
 
-
         this.service = service;
         this.changeLogService = changeLogService;
         this.userService = userService;
@@ -70,36 +68,41 @@ public class OrganisationUnitEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        EndpointUtilities.getForList(
-                WebUtilities.mkPath(BASE_URL),
+        getForList(
+                mkPath(BASE_URL),
                 (request, response) -> service.findAll());
 
-        EndpointUtilities.getForList(
-                WebUtilities.mkPath(BASE_URL, "search", ":query"),
+        getForList(
+                mkPath(BASE_URL, "search", ":query"),
                 (request, response) -> service.search(request.params("query")));
 
-        EndpointUtilities.getForDatum(WebUtilities.mkPath(BASE_URL, ":id"),
-                (request, response) -> service.getById(WebUtilities.getId(request)));
+        getForDatum(mkPath(BASE_URL, ":id"),
+                (request, response) -> service.getById(getId(request)));
 
-        EndpointUtilities.post(WebUtilities.mkPath(BASE_URL, ":id", "description"),
+
+        getForDatum(mkPath(BASE_URL, ":id", "hierarchy"),
+                (request, response) -> service.getHierarchyById(getId(request)));
+
+
+        post(mkPath(BASE_URL, ":id", "description"),
                 (request, response) -> {
 
-                    WebUtilities.requireRole(userService, request, Role.ORGUNIT_EDITOR);
+                    requireRole(userService, request, Role.ORGUNIT_EDITOR);
 
                     ChangeLog changeLogEntry = ImmutableChangeLog.builder()
                             .parentReference(ImmutableEntityReference.builder()
-                                    .id(WebUtilities.getId(request))
+                                    .id(getId(request))
                                     .kind(EntityKind.ORG_UNIT)
                                     .build())
                             .message("Description updated")
-                            .userId(WebUtilities.getUser(request).userName())
+                            .userId(getUser(request).userName())
                             .severity(Severity.INFORMATION)
                             .build();
 
                     response.type(WebUtilities.TYPE_JSON);
-                    FieldChange valueChange = WebUtilities.readBody(request, FieldChange.class);
+                    FieldChange valueChange = readBody(request, FieldChange.class);
                     int updateCount = service.updateDescription(
-                            WebUtilities.getId(request),
+                            getId(request),
                             valueChange.current().orElse(null));
 
                     changeLogService.write(changeLogEntry);
@@ -108,22 +111,8 @@ public class OrganisationUnitEndpoint implements Endpoint {
 
                 });
 
-        EndpointUtilities.post(WebUtilities.mkPath(BASE_URL, "by-ids"),
-                (req, res) -> {
-                    List<Long> ids = (List<Long>) WebUtilities.readBody(req, List.class);
-                    if (ListUtilities.isEmpty(ids)) {
-                        return Collections.emptyList();
-                    }
-                    return service.findByIds(ids);
-                });
-
+        ListRoute<OrganisationalUnit> findByIdsRoute = (req, res) -> service.findByIds(readBody(req, Long[].class));
+        postForList(mkPath(BASE_URL, "by-ids"), findByIdsRoute);
     }
 
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("BookmarksEndpoint{");
-        sb.append('}');
-        return sb.toString();
-    }
 }

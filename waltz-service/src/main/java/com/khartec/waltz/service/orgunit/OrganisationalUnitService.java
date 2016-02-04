@@ -24,7 +24,9 @@ import com.khartec.waltz.common.hierarchy.Forest;
 import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
 import com.khartec.waltz.common.hierarchy.Node;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.model.orgunit.ImmutableOrganisationalUnitHierarchy;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
+import com.khartec.waltz.model.orgunit.OrganisationalUnitHierarchy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,7 +70,7 @@ public class OrganisationalUnitService {
     }
 
 
-    public List<OrganisationalUnit> findByIds(List<Long> ids) {
+    public List<OrganisationalUnit> findByIds(Long... ids) {
         return dao.findByIds(ids);
     }
 
@@ -137,4 +139,11 @@ public class OrganisationalUnitService {
         return dao.search(query);
     }
 
+    public OrganisationalUnitHierarchy getHierarchyById(long id) {
+        return ImmutableOrganisationalUnitHierarchy.builder()
+                .children(drop(dao.findDescendants(id), 1))
+                .parents(drop(dao.findAncestors(id), 1))
+                .unit(dao.getById(id))
+                .build();
+    }
 }

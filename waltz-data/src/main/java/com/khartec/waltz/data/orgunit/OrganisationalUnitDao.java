@@ -116,7 +116,7 @@ public class OrganisationalUnitDao {
     }
 
 
-    public List<OrganisationalUnit> findByIds(List<Long> ids) {
+    public List<OrganisationalUnit> findByIds(Long... ids) {
         return dsl.select(ORGANISATIONAL_UNIT.fields())
                 .from(ORGANISATIONAL_UNIT)
                 .where(ORGANISATIONAL_UNIT.ID.in(ids))

@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Value.Immutable
@@ -30,7 +29,7 @@ import java.util.Optional;
 @JsonDeserialize(as = ImmutableOrganisationalUnitHierarchy.class)
 public abstract class OrganisationalUnitHierarchy {
 
-    public abstract Optional<OrganisationalUnit> parent();
+    public abstract List<OrganisationalUnit> parents();
     public abstract List<OrganisationalUnit> children();
     public abstract OrganisationalUnit unit();
 

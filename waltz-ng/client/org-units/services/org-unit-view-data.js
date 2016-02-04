@@ -54,53 +54,6 @@ function loadDataFlows(dataFlowStore, appStore, groupApps) {
 }
 
 
-function prepareAppCapabilities(apps, capabilities, rawAppCapabilities) {
-    const appsById = _.indexBy(apps, 'id');
-    const capabilitiesById = _.indexBy(capabilities, 'id');
-
-    const appCapabilities =  _.chain(rawAppCapabilities)
-        .groupBy(ac => ac.capabilityId)
-        .map((appCapabilities, capId) => ( {
-            capability: capabilitiesById[capId],
-            applications: _.map(appCapabilities, ac => {
-                const { primary, applicationId } = ac;
-                const app = appsById[applicationId];
-
-                return { ...app, primary };
-            })
-        } ))
-        .value();
-
-    return appCapabilities;
-}
-
-
-function calculateDataFlows(dataFlows, appPredicate) {
-    const flows = _.filter(dataFlows.flows,
-            f => appPredicate(f.source.id) || appPredicate(f.target.id));
-
-    const dataFlowAppIds = _.chain(flows)
-        .map(f => ([f.source.id, f.target.id]))
-        .flatten()
-        .uniq()
-        .value();
-
-    const entities = _.filter(dataFlows.entities, e => _.contains(dataFlowAppIds, e.id));
-
-    return { flows, entities };
-}
-
-
-function extractPrimaryAppIds(appCapabilities) {
-    return _.chain(appCapabilities)
-        .map('applications')
-        .flatten()
-        .where({ primary: true })
-        .map('id')
-        .value();
-}
-
-
 function service(appStore,
                  appCapabilityStore,
                  orgUnitUtils,
@@ -118,34 +71,51 @@ function service(appStore,
                  capabilityStore,
                  $q) {
 
-    const data = {};
+    const rawData = {};
+
 
     function loadAll(orgUnitId) {
 
         const promises = [
             orgUnitStore.findAll(),
-            appStore.findByOrgUnitTree(orgUnitId)
-        ];
-
-        return $q.all(promises)
-            .then(([orgUnits, apps]) => loadAll2(orgUnitId, orgUnits, apps))
-
-
-    }
-
-    function loadAll2(orgUnitId, orgUnits, apps) {
-
-        const appIds = _.map(apps, 'id');
-
-        return $q.all([
-            ratingStore.findByAppIds(appIds),
-            loadDataFlows(dataFlowStore, appStore, apps),
-            appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
-            capabilityStore.findByAppIds(appIds),
-            changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId),
+            appStore.findByOrgUnitTree(orgUnitId),
             involvementStore.findPeopleByEntityReference('ORG_UNIT', orgUnitId),
             involvementStore.findByEntityReference('ORG_UNIT', orgUnitId),
             perspectiveStore.findByCode('BUSINESS'),
+            changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId),
+        ];
+
+        return $q.all(promises)
+            .then(([
+                orgUnits,
+                apps,
+                people,
+                involvements,
+                perspective,
+                changeLogs]) => {
+
+                const r = {
+                    orgUnits,
+                    apps,
+                    involvements,
+                    perspective,
+                    changeLogs
+                };
+
+                Object.assign(rawData, r);
+            })
+            .then(() => loadAll2(orgUnitId))
+    }
+
+    function loadAll2(orgUnitId) {
+
+        const appIds = _.map(rawData.apps, 'id');
+
+        return $q.all([
+            ratingStore.findByAppIds(appIds),
+            loadDataFlows(dataFlowStore, appStore, rawData.apps),
+            appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
+            capabilityStore.findByAppIds(appIds),
             ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)
             authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
             endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
@@ -156,87 +126,34 @@ function service(appStore,
             dataFlows,
             rawAppCapabilities,
             capabilities,
-            changeLogs,
-            people,
-            involvements,
-            perspective,
             ratedDataFlows,
             authSources,
             endUserApps,
             assetCosts,
             complexity
         ]) => {
-            const appCapabilities = prepareAppCapabilities(apps, capabilities, rawAppCapabilities);
 
-            data.assetCosts = assetCosts;
-            data.immediateHierarchy = orgUnitUtils.getImmediateHierarchy(orgUnits, orgUnitId);
-            data.apps = apps;
-            data.logEntries = changeLogs;
-            data.people = people;
-            data.involvements = aggregatePeopleInvolvements(involvements, people);
-            data.perspective = perspective;
-            data.capabilityRatings = capabilityRatings;
-            data.dataFlows = dataFlows;
-            data.appCapabilities = appCapabilities;
-            data.orgUnit = _.find(orgUnits, { id: orgUnitId });
-            data.ratedFlows = new RatedFlowsData(ratedDataFlows, apps, orgUnits, orgUnitId);
-            data.authSources = authSources;
-            data.orgUnits = orgUnits;
-            data.endUserApps = endUserApps;
-
-            data.complexity = complexity;
-
-            data.filter = (config) => {
-
-                const primaryAppIds = extractPrimaryAppIds(appCapabilities);
-
-                const inScopeAppIds = _.chain(apps)
-                        .filter(a => config.includeSubUnits ? true : a.organisationalUnitId === orgUnitId)
-                        .filter(a => config.productionOnly ? a.lifecyclePhase === 'PRODUCTION' : true)
-                        .filter(a => config.primaryOnly ? _.contains(primaryAppIds, a.id) : true)
-                        .map('id')
-                        .value();
-
-                const isAppInScope = (id) => _.contains(inScopeAppIds, id);
-
-                data.apps = _.filter(apps, a => isAppInScope(a.id));
-
-                data.complexity = _.filter(complexity, c => _.any([
-                    isAppInScope(c.serverComplexity ? c.serverComplexity.id : 0),
-                    isAppInScope(c.capabilityComplexity ? c.capabilityComplexity.id : 0),
-                    isAppInScope(c.connectionComplexity ? c.connectionComplexity.id : 0)
-                ]));
-
-                data.dataFlows = calculateDataFlows(dataFlows, isAppInScope);
-
-                data.capabilityRatings = _.chain(capabilityRatings)
-                        .filter(r => isAppInScope(r.parent.id))
-                        .filter(r => {
-                            if (!config.primaryOnly) {
-                                return true;
-                            } else {
-                                const appId = r.parent.id;
-                                const capId = r.capability.id;
-                                return _.chain(appCapabilities)
-                                    .filter(ac => ac.capability.id === capId)
-                                    .map('applications')
-                                    .flatten()
-                                    .filter('primary')
-                                    .map('id')
-                                    .contains(appId)
-                                    .value();
-                            }
-                        })
-                        .value();
-
-                data.appCapabilities = _.filter(appCapabilities,
-                        ac => _.any(ac.applications, a => isAppInScope(a.id)));
-
-                data.endUserApps = _.filter(endUserApps, eua => config.includeSubUnits ? true : eua.organisationalUnitId === orgUnitId);
-
+            const r = {
+                orgUnitId,
+                capabilityRatings,
+                dataFlows,
+                rawAppCapabilities,
+                capabilities,
+                ratedDataFlows,
+                authSources,
+                endUserApps,
+                assetCosts,
+                complexity
             };
 
-            return data;
+            Object.assign(rawData, r);
+
+            rawData.immediateHierarchy = orgUnitUtils.getImmediateHierarchy(rawData.orgUnits, orgUnitId);
+            rawData.involvements = aggregatePeopleInvolvements(rawData.involvements, rawData.people);
+            rawData.orgUnit = _.find(rawData.orgUnits, { id: orgUnitId });
+            rawData.ratedFlows = new RatedFlowsData(rawData.ratedDataFlows, rawData.apps, rawData.orgUnits, orgUnitId);
+
+            return rawData;
         });
     }
 
