@@ -17,9 +17,7 @@ import UnitView from './unit-view';
 import UnitNavView from './unit-nav-view';
 
 import {
-    orgUnitResolver,  // TODO: remove
     orgUnitsResolver,
-    orgUnitViewDataResolver,
     talliesResolver } from './resolvers.js';
 
 
@@ -36,24 +34,12 @@ const listState = {
 };
 
 
-function onViewEnter(orgUnit, historyStore) {
-    historyStore.put(orgUnit.name, 'ORG_UNIT', 'main.org-units.unit', { id: orgUnit.id });
-}
-
-onViewEnter.$inject = ['orgUnit', 'HistoryStore'];
-
-
 const viewState = {
     url: 'org-units/{id:int}',
     views: {
         'content@': UnitView,
         'sidenav@main': UnitNavView
-    },
-    resolve: {
-        orgUnit: orgUnitResolver,
-        viewData: orgUnitViewDataResolver
-    },
-    onEnter: onViewEnter
+    }
 };
 
 
@@ -75,4 +61,5 @@ export default (module) => {
     module.service('OrgUnitStore', require('./services/org-unit-store'));
     module.service('OrgUnitUtilityService', require('./services/org-unit-utility'));
     module.service('OrgUnitViewDataService', require('./services/org-unit-view-data'));
+    module.service('OrgUnitViewOptionsService', require('./services/org-unit-view-options'));
 };

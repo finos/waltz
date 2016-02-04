@@ -1,4 +1,3 @@
-
 /*
  *  Waltz
  * Copyright (c) David Watkins. All rights reserved.
@@ -11,32 +10,28 @@
  *
  */
 
-function controller(viewData) {
+function controller(viewOptions) {
     const vm = this;
-    vm.viewData = viewData;
 
-    vm.filter = {
-        includeSubUnits: true,
-        productionOnly: false
-    };
+    vm.options = viewOptions.options;
 
     vm.toggleSubUnits = () => {
-        vm.filter.includeSubUnits = !vm.filter.includeSubUnits;
-        viewData.filter(vm.filter);
+        vm.options.includeSubUnits = !vm.options.includeSubUnits;
     };
 
     vm.toggleProductionOnly = () => {
-        vm.filter.productionOnly = !vm.filter.productionOnly;
-        viewData.filter(vm.filter);
+        vm.options.productionOnly = !vm.options.productionOnly;
     };
 
     vm.togglePrimaryOnly = () => {
-        vm.filter.primaryOnly = !vm.filter.primaryOnly;
-        viewData.filter(vm.filter);
+        vm.options.primaryOnly = !vm.options.primaryOnly;
     };
+
+
 }
 
-controller.$inject = ['viewData'];
+controller.$inject = ['OrgUnitViewOptionsService'];
+
 
 export default {
     template: require('./unit-nav-view.html'),

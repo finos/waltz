@@ -10,8 +10,12 @@
  *
  */
 
-export default [
-    'WaltzDisplayNameService',
-    (WaltzDisplayNameService) => (value, type) => WaltzDisplayNameService.lookup(type, value)
-];
+function filter(displayNameService) {
+    return (value, type) => displayNameService.lookup(type, value);
+}
+
+filter.$inject = ['WaltzDisplayNameService'];
+
+
+export default filter;
 

@@ -157,31 +157,47 @@ function mapStateToThis(state) {
 function controller($stateParams,
                     $state,
                     $scope,
-                    viewData,
                     $ngRedux,
-                    orgServerStatsActions) {
+                    orgServerStatsActions,
+                    viewDataService,
+                    viewOptions,
+                    historyStore) {
 
     const id = $stateParams.id;
     const vm = this;
 
-    vm.viewData = viewData;
+    const refresh = () => {
+        if (!vm.rawViewData) return;
+        const orgUnit = vm.rawViewData.orgUnit;
+
+        historyStore.put(orgUnit.name, 'ORG_UNIT', 'main.org-units.unit', { id: orgUnit.id });
+
+        vm.viewData = viewOptions.filter(vm.rawViewData);
+        vm.ratings = calculateCapabilityRatings(
+            id,
+            vm.viewData.apps,
+            vm.viewData.appCapabilities,
+            vm.viewData.perspective,
+            vm.viewData.capabilityRatings,
+            $state);
+    };
+
+    $scope.$watch(
+        () => viewOptions.options,
+        refresh,
+        true);
+
     vm.entityRef = { kind: 'ORG_UNIT', id };
+
+
 
 
     vm.eventDispatcher = new EventDispatcher();
 
-
-    $scope.$watchGroup(['ctrl.viewData.apps'], () => {
-        if (vm.viewData) {
-            vm.ratings = calculateCapabilityRatings(
-                id,
-                viewData.apps,
-                viewData.appCapabilities,
-                viewData.perspective,
-                viewData.capabilityRatings,
-                $state);
-        }
-    }, true);
+    viewDataService
+        .loadAll(id)
+        .then(data => vm.rawViewData = data)
+        .then(refresh);
 
 
     const onUpdate = (selectedState, actions) => {
@@ -200,9 +216,11 @@ controller.$inject = [
     '$stateParams',
     '$state',
     '$scope',
-    'viewData',
     '$ngRedux',
-    'OrgServerStatsActions'
+    'OrgServerStatsActions',
+    'OrgUnitViewDataService',
+    'OrgUnitViewOptionsService',
+    'HistoryStore'
 ];
 
 

@@ -4,11 +4,7 @@
         <waltz-icon name="{{ icon || 'dot-circle-o' }}"
                     fixed="true"></waltz-icon>
 
-        {{ name }}
-        <small>
-            {{ small }}
-        </small>
+        <span ng-bind="name"></span>
+        <small ng-bind="small"></small>
     </h1>
-
-
 </div>
