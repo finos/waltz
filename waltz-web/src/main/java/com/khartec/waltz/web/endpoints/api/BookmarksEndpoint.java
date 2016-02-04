@@ -33,12 +33,16 @@ import org.springframework.stereotype.Service;
 import spark.Spark;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static spark.Spark.delete;
+import static spark.Spark.get;
+import static spark.Spark.post;
 
     @Service
 public class BookmarksEndpoint implements Endpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(BookmarksEndpoint.class);
-    private static final String BASE_URL = WebUtilities.mkPath("api", "bookmarks");
+    private static final String BASE_URL = mkPath("api", "bookmarks");
 
     private final BookmarkService bookmarkService;
     private final ChangeLogService changeLogService;
@@ -57,26 +61,26 @@ public class BookmarksEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        Spark.get(WebUtilities.mkPath(BASE_URL, ":kind", ":id"),
+        get(mkPath(BASE_URL, ":kind", ":id"),
                 (request, response) -> {
-                    response.type(WebUtilities.TYPE_JSON);
-                    EntityReference ref = WebUtilities.getEntityReference(request);
+                    response.type(TYPE_JSON);
+                    EntityReference ref = getEntityReference(request);
                     return bookmarkService.findByReference(ref);
 
                 },
-                WebUtilities.transformer);
+                transformer);
 
-        Spark.get(WebUtilities.mkPath(BASE_URL, "types"),
+        get(mkPath(BASE_URL, "types"),
                 (request, response) -> {
-                    response.type(WebUtilities.TYPE_JSON);
+                    response.type(TYPE_JSON);
                     return BookmarkKind.values();
                 },
-                WebUtilities.transformer);
+                transformer);
 
-        Spark.post(WebUtilities.mkPath(BASE_URL),
+        post(mkPath(BASE_URL),
                 (request, response) -> {
-                    response.type(WebUtilities.TYPE_JSON);
-                    Bookmark bookmark = WebUtilities.readBody(request, Bookmark.class);
+                    response.type(TYPE_JSON);
+                    Bookmark bookmark = readBody(request, Bookmark.class);
 
                     LOG.info("Saving bookmark: "+bookmark);
                     boolean isUpdate = bookmark.id().isPresent();
@@ -85,13 +89,13 @@ public class BookmarksEndpoint implements Endpoint {
                             ? bookmarkService.update(bookmark)
                             : bookmarkService.create(bookmark);
                 },
-                WebUtilities.transformer);
+                transformer);
 
 
-        Spark.delete(WebUtilities.mkPath(BASE_URL, ":id"), (request, response) -> {
-            response.type(WebUtilities.TYPE_JSON);
+        delete(mkPath(BASE_URL, ":id"), (request, response) -> {
+            response.type(TYPE_JSON);
 
-            long bookmarkId = WebUtilities.getId(request);
+            long bookmarkId = getId(request);
 
             Bookmark bookmark = bookmarkService.getById(bookmarkId);
             if (bookmark == null) {
@@ -110,7 +114,7 @@ public class BookmarksEndpoint implements Endpoint {
 
             return bookmarkService.deleteById(bookmarkId);
 
-        }, WebUtilities.transformer);
+        }, transformer);
 
     }
 
