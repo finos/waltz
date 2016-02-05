@@ -733,4 +733,34 @@
     </changeSet>
 
 
+    <!-- issue: 42 -->
+    <changeSet author="dwatkins" id="20160205-tbl-1">
+        <createTable tableName="static_panel">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="static_panel_pkey"/>
+            </column>
+            <column name="group" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="icon" type="varchar(64)" defaultValue="info">
+                <constraints nullable="false"/>
+            </column>
+            <column name="priority" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="width" type="INTEGER" defaultValueNumeric="12">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kind" type="varchar(64)" defaultValue="HTML">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
