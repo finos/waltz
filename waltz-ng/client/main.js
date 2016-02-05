@@ -78,6 +78,7 @@ const registrationFns = [
     require('./ratings'),
     require('./server-info'),
     require('./sidebar'),
+    require('./static-panel'),
     require('./svg-diagram'),
     require('./user'),
     require('./formly'),
@@ -103,7 +104,7 @@ waltzApp.config([
                 views: {
                     'header': { template: '<waltz-navbar></waltz-navbar>'},
                     'sidebar': { template: '<waltz-sidebar></waltz-sidebar>' },
-                    'content': { template: require('./welcome/welcome.html') },
+                    'content': require('./welcome/welcome.js'),
                     'footer': { template: require('./footer/footer.html') }
                 }
             })
