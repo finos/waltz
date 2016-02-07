@@ -15,7 +15,7 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.service.catalog;
+package com.khartec.waltz.model.catalog;
 
 import org.immutables.value.Value;
 

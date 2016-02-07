@@ -16,21 +16,9 @@
  *
  */
 
-function controller(staticPanelStore, appGroupStore) {
-    const vm = this;
+package com.khartec.waltz.model.app_group;
 
-    staticPanelStore.findByGroup('HOME')
-        .then(panels => vm.panels = panels);
-
-    appGroupStore.findMyGroups()
-        .then(groups => vm.appGroups = groups);
-
-}
-
-controller.$inject = ['StaticPanelStore', 'AppGroupStore'];
-
-export default {
-    controller,
-    controllerAs: 'ctrl',
-    template: require('./welcome.html')
+public enum AppGroupMemberRole {
+    VIEWER,
+    OWNER
 }

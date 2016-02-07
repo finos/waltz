@@ -1,0 +1,75 @@
+<div class="row">
+    <div class="col-sm-offset-1 col-sm-10 waltz-page-summary">
+        <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;">
+            {{ ctrl.appGroup.name }}
+        </h3>
+        <div style="font-size: larger">
+            {{ ctrl.appGroup.description }}
+        </div>
+
+        <br>
+
+        <div class="row">
+            <div class="row">
+                <div class="col-sm-3">
+                    <waltz-basic-info-tile name="Portfolio Cost"
+                                           description="Cumulative value of infra and app dev costs"
+                                           waltz-jump-to="ouv-costs"
+                                           icon="money">
+                            <span style="font-size: xx-large;">
+                                {{ ctrl.portfolioCostStr }}
+                            </span>
+                    </waltz-basic-info-tile>
+                </div>
+                <div class="col-sm-3">
+                    <waltz-basic-info-tile name="Complexity"
+                                           description="Derived from capabilities, connections and servers"
+                                           class="clickable"
+                                           waltz-jump-to="ouv-complexity"
+                                           icon="rocket">
+                        <div style="font-size: xx-large;">
+                            &Sigma; {{ ctrl.complexitySummary.cumulativeScore | toFixed:1 }}
+                        </div>
+                        <div class="small text-muted">
+                            {{ ctrl.complexitySummary.averageScore | toFixed:2 }} per app
+                        </div>
+                    </waltz-basic-info-tile>
+
+                </div>
+                <div class="col-sm-3">
+                    <waltz-basic-info-tile name="Servers"
+
+                                           description="Number of servers supporting this org unit"
+                                           waltz-jump-to="ouv-servers"
+                                           icon="server">
+                        <div>
+                            <div style="font-size: xx-large;">
+                                # {{ ctrl.serverStats.total }}
+                            </div>
+                            <div class="small text-muted">
+                                {{ ctrl.serverStats.virtualPercentage }}% virtual
+                            </div>
+                        </div>
+                    </waltz-basic-info-tile>
+
+                </div>
+
+                <div class="col-sm-3">
+                    <waltz-basic-info-tile name="Capabilities"
+                                           description="Capabilities performed within this OU"
+                                           waltz-jump-to="ouv-ratings"
+                                           icon="puzzle-piece">
+                        <div>
+                            <div style="font-size: xx-large;">
+                                # {{ ctrl.capabilityStats.total }}
+                            </div>
+                            <div class="small text-muted">
+                                {{ ctrl.capabilityStats.perApplication }} per app
+                            </div>
+                        </div>
+                    </waltz-basic-info-tile>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

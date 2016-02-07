@@ -1,0 +1,15 @@
+<div>
+    <ul class="list-group">
+        <li class="list-group-item" ng-repeat="group in ctrl.groups | orderBy:'name'">
+            <div>
+                <strong>
+                    <a ui-sref="main.app-group.view ({ id: group.id })">{{ group.name }}</a>
+                    <small>{{ group.kind }}</small>
+                </strong>
+            </div>
+            <div>
+                <small>{{ group.description }}</small>
+            </div>
+        </li>
+    </ul>
+</div>

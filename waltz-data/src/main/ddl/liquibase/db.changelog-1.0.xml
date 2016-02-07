@@ -763,4 +763,49 @@
         </createTable>
     </changeSet>
 
+
+    <!-- issue: 43 -->
+    <changeSet author="dwatkins" id="20160206-43-1">
+        <createTable tableName="application_group">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="static_panel_pkey"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kind" type="varchar(64)" defaultValue="PUBLIC">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160206-43-2">
+        <createTable tableName="application_group_entry">
+            <column name="group_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="application_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160206-43-3">
+        <createTable tableName="application_group_member">
+            <column name="group_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="varchar(64)" defaultValue="VIEWER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
 </databaseChangeLog>

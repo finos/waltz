@@ -16,21 +16,34 @@
  *
  */
 
-function controller(staticPanelStore, appGroupStore) {
-    const vm = this;
+function service($http, BaseApiUrl) {
 
-    staticPanelStore.findByGroup('HOME')
-        .then(panels => vm.panels = panels);
+    const BASE = `${BaseApiUrl}/app-group`;
 
-    appGroupStore.findMyGroups()
-        .then(groups => vm.appGroups = groups);
+    const getById = (id) => $http
+        .get(`${BASE}/id/${id}`)
+        .then(result => result.data);
+
+    const findMyGroups = (id) => $http
+        .get(`${BASE}/my-groups`)
+        .then(result => result.data);
+
+    const findPublicGroups = (id) => $http
+        .get(`${BASE}/public`)
+        .then(result => result.data);
+
+    return {
+        getById,
+        findMyGroups,
+        findPublicGroups
+    };
 
 }
 
-controller.$inject = ['StaticPanelStore', 'AppGroupStore'];
+service.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
 
-export default {
-    controller,
-    controllerAs: 'ctrl',
-    template: require('./welcome.html')
-}
+
+export default service;

@@ -21,6 +21,7 @@ import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.data.server_info.ServerInfoDao;
 import com.khartec.waltz.model.dataflow.RatedDataFlow;
+import com.khartec.waltz.model.serverinfo.ServerSummaryStatistics;
 import com.khartec.waltz.schema.tables.Application;
 import com.khartec.waltz.schema.tables.ServerInformation;
 import com.khartec.waltz.service.DIConfiguration;
@@ -54,6 +55,12 @@ public class ServerHarness {
                 .groupBy(SERVER_INFORMATION.IS_VIRTUAL, APPLICATION.ORGANISATIONAL_UNIT_ID)
                 .fetch()
                 .forEach(System.out::println);
+
+
+        System.out.println("-------------");
+
+        ServerSummaryStatistics stats = serverInfoDao.findStatsForAppIds(new Long[]{7L});
+        System.out.println(stats);
     }
 
 

@@ -16,21 +16,19 @@
  *
  */
 
-function controller(staticPanelStore, appGroupStore) {
-    const vm = this;
+package com.khartec.waltz.model.app_group;
 
-    staticPanelStore.findByGroup('HOME')
-        .then(panels => vm.panels = panels);
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
-    appGroupStore.findMyGroups()
-        .then(groups => vm.appGroups = groups);
+@Value.Immutable
+@JsonSerialize(as = ImmutableAppGroupMember.class)
+@JsonDeserialize(as = ImmutableAppGroupMember.class)
+public abstract class AppGroupMember {
 
-}
+    public abstract long groupId();
+    public abstract String userId();
+    public abstract AppGroupMemberRole role();
 
-controller.$inject = ['StaticPanelStore', 'AppGroupStore'];
-
-export default {
-    controller,
-    controllerAs: 'ctrl',
-    template: require('./welcome.html')
 }

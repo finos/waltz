@@ -61,4 +61,9 @@ public class ServerInfoService {
         List<Long> ids = IdUtilities.toIds(organisationalUnitDao.findDescendants(orgUnitId));
         return serverInfoDao.findStatsForOrganisationalUnitIds(ids);
     }
+
+    public ServerSummaryStatistics findStatsForAppIds(Long... appIds) {
+        return serverInfoDao.findStatsForAppIds(appIds);
+    }
+
 }

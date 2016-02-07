@@ -27,6 +27,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -145,4 +146,34 @@ public class ServerInfoDao {
         return allStats;
     }
 
+
+    public ServerSummaryStatistics findStatsForAppIds(Long[] appIds) {
+
+        SelectConditionStep<Record1<String>> assetCodesQry = DSL.select(APPLICATION.ASSET_CODE)
+                .from(APPLICATION)
+                .where(APPLICATION.ID.in(appIds));
+
+        Field<BigDecimal> virtualCount = DSL.coalesce(DSL.sum(
+                DSL.choose(SERVER_INFORMATION.IS_VIRTUAL)
+                        .when(Boolean.TRUE, 1)
+                        .otherwise(0)), BigDecimal.ZERO)
+                .as("virtual_count");
+
+        Field<BigDecimal> physicalCount = DSL.coalesce(DSL.sum(
+                DSL.choose(SERVER_INFORMATION.IS_VIRTUAL)
+                        .when(Boolean.TRUE, 0)
+                        .otherwise(1)), BigDecimal.ZERO)
+                .as("physical_count");
+
+        return dsl.select(
+                    virtualCount,
+                    physicalCount
+                )
+                .from(SERVER_INFORMATION)
+                .where(SERVER_INFORMATION.ASSET_CODE.in(assetCodesQry))
+                .fetchOne(r -> ImmutableServerSummaryStatistics.builder()
+                        .virtualCount(r.getValue(virtualCount).intValue())
+                        .physicalCount(r.getValue(physicalCount).intValue())
+                        .build());
+    }
 }

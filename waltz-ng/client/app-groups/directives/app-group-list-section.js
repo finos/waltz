@@ -1,3 +1,4 @@
+
 /*
  *  This file is part of Waltz.
  *
@@ -16,21 +17,26 @@
  *
  */
 
-function controller(staticPanelStore, appGroupStore) {
-    const vm = this;
+const BINDINGS = {
+    groups: '='
+};
 
-    staticPanelStore.findByGroup('HOME')
-        .then(panels => vm.panels = panels);
 
-    appGroupStore.findMyGroups()
-        .then(groups => vm.appGroups = groups);
+function controller() {
 
 }
 
-controller.$inject = ['StaticPanelStore', 'AppGroupStore'];
+controller.$inject = [];
 
-export default {
-    controller,
-    controllerAs: 'ctrl',
-    template: require('./welcome.html')
-}
+
+export default () => {
+    return {
+        restrict: 'E',
+        replace: true,
+        template: require('./app-group-list-section.html'),
+        scope: {},
+        bindToController: BINDINGS,
+        controllerAs: 'ctrl',
+        controller
+    };
+};

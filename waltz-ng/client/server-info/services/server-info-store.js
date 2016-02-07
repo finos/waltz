@@ -22,9 +22,19 @@ function service(http, baseUrl) {
         http.get(`${BASE}/app-id/${appId}`)
             .then(result => result.data);
 
+
+    const findStatsForAppIds = (appIds) =>
+        http.post(`${BASE}/apps/stats`, appIds)
+            .then(t => {
+                console.log('then tap', t);
+                return t;
+            })
+            .then(result => result.data);
+
     return {
         findByAssetCode,
-        findByAppId
+        findByAppId,
+        findStatsForAppIds
     };
 }
 

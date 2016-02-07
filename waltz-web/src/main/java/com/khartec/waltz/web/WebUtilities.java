@@ -169,6 +169,15 @@ public class WebUtilities {
     }
 
 
+    public static <T> T readBody(Request request, Class<T> objClass, T dflt) {
+        try {
+            return readBody(request, objClass);
+        } catch (IOException ioe) {
+            return dflt;
+        }
+    }
+
+
     public static <T extends Enum<T>> T readEnum(Request request,
                                String paramName,
                                Class<T> enumClass,

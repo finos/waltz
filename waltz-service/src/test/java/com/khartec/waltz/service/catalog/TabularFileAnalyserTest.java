@@ -18,6 +18,8 @@
 package com.khartec.waltz.service.catalog;
 
 import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.model.catalog.ImmutableParseAnalysis;
+import com.khartec.waltz.model.catalog.ParseAnalysis;
 import org.junit.Test;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.prefs.CsvPreference;

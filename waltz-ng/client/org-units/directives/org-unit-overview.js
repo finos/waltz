@@ -13,6 +13,8 @@
 
 import _ from 'lodash';
 
+import { numberFormatter } from '../../common';
+
 import {
     lifecyclePhaseColorScale,
     capabilityColorScale,
@@ -134,7 +136,7 @@ function controller($scope, orgUnitStore) {
         if (!costs) return;
         const amount = _.sum(costs, 'cost.amount');
 
-        vm.portfolioCostStr = '€ ' + nFormatter(amount, 1);
+        vm.portfolioCostStr = '€ ' + numberFormatter(amount, 1);
     });
 
     $scope.$watch('ctrl.orgServerStats', stats => {
@@ -170,20 +172,6 @@ function controller($scope, orgUnitStore) {
 
 }
 
-function nFormatter(num, digits) {
-    var si = [
-        { value: 1E12, symbol: "T" },
-        { value: 1E9,  symbol: "B" },
-        { value: 1E6,  symbol: "M" },
-        { value: 1E3,  symbol: "k" }
-    ], i;
-    for (i = 0; i < si.length; i++) {
-        if (num >= si[i].value) {
-            return (num / si[i].value).toFixed(digits).replace(/\.?0+$/, "") + si[i].symbol;
-        }
-    }
-    return num;
-}
 
 controller.$inject = ['$scope', 'OrgUnitStore'];
 
