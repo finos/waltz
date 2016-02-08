@@ -4,13 +4,13 @@
           popover-trigger="focus"
           ng-click="ctrl.loadRelated()"
           tabindex="98"
-          popover-placement="right"
+          popover-placement="left"
           uib-popover-template="'asset-code-explorer-popover.html'">
-
 
         <span ng-if="ctrl.application.assetCode">
             {{ ctrl.application.assetCode }}
         </span>
+
         <span ng-if="ctrl.application.parentAssetCode" class="text-muted">
             ( parent code: {{ ctrl.application.parentAssetCode }} )
         </span>
@@ -36,12 +36,18 @@
             <div ng-show="ctrl.status == 'LOADING'">
                 Loading
             </div>
+
             <div ng-show="ctrl.status == 'LOADED' && (ctrl.related | isEmpty)">
                 Nothing found
             </div>
+
             <div ng-show="ctrl.status == 'LOADED' && ctrl.related != null">
+
                 <div class="form-group" ng-if="ctrl.related['PARENT'].length > 0">
-                    <label>Parent/s <span class="text-muted">({{ctrl.application.parentAssetCode}})</span></label>
+                    <label>
+                        Parent/s
+                        <span class="text-muted">({{ ctrl.application.parentAssetCode }})</span>
+                    </label>
                     <ul class="list-unstyled">
                         <li ng-repeat="parent in ctrl.related['PARENT']">
                             <a ui-sref="main.app-view ({id: parent.id})">{{ parent.name }}</a>
@@ -49,8 +55,12 @@
                         </li>
                     </ul>
                 </div>
+
                 <div class="form-group" ng-if="ctrl.related['SHARING'].length > 0">
-                    <label>Sharing same asset code <span class="text-muted">({{ctrl.application.assetCode}})</span></label>
+                    <label>
+                        Sharing same asset code
+                        <span class="text-muted">({{ ctrl.application.assetCode }})</span>
+                    </label>
                     <ul class="list-unstyled">
                         <li ng-repeat="sharer in ctrl.related['SHARING']">
                             <a ui-sref="main.app-view ({id: sharer.id})">{{ sharer.name }}</a>
@@ -58,6 +68,7 @@
                         </li>
                     </ul>
                 </div>
+
                 <div class="form-group" ng-if="ctrl.related['CHILD'].length > 0">
                     <label>Children</span></label>
                     <ul class="list-unstyled">
@@ -67,10 +78,13 @@
                         </li>
                     </ul>
                 </div>
+
                 <div class="form-group" ng-if="ctrl.related['SIBLING'].length > 0">
                     <label>
                         Siblings, sharing same parent code
-                        <span class="text-muted">({{ctrl.application.parentAssetCode}})</span>
+                        <span class="text-muted">
+                            ({{ ctrl.application.parentAssetCode }})
+                        </span>
                     </label>
                     <ul class="list-unstyled">
                         <li ng-repeat="sibling in ctrl.related['SIBLING']">
@@ -79,6 +93,7 @@
                         </li>
                     </ul>
                 </div>
+
             </div>
         </div>
      </script>
