@@ -16,7 +16,9 @@ export const applicationKindDisplayNames = {
     IN_HOUSE: 'In House',
     INTERNALLY_HOSTED: 'Hosted Internally',
     EXTERNALLY_HOSTED: 'Externally Hosted',
-    EUC: 'End User Computing'
+    EUC: 'End User Computing',
+    THIRD_PARTY: 'Third Party',
+    CUSTOMISED: 'Customised'
 };
 
 
