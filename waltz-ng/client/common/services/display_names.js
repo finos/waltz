@@ -37,7 +37,8 @@ export const bookmarkNames = {
     ISSUE_TRACKER: 'Issue Tracking',
     QUALITY_CONTROL: 'Quality Control',
     DOCUMENTATION: 'Documentation',
-    BUILD_SYSTEM: 'Automated Build / Deployment System'
+    BUILD_SYSTEM: 'Automated Build / Deployment System',
+    MONITORING: 'Monitoring Systems'
 };
 
 
