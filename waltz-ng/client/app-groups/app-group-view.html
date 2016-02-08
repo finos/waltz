@@ -32,6 +32,19 @@
 
     <hr>
 
+
+    <!-- FLOWS -->
+    <waltz-section name="Logical Data Flows"
+                   icon="random">
+        <waltz-org-unit-flow-viz entities="ctrl.dataFlows.entities"
+                                 flows="ctrl.dataFlows.flows"></waltz-org-unit-flow-viz>
+        <div class="small text-muted">
+            Dragging nodes will pin them.  Double click to unpin.  If an application is gray
+            it is not a member of this group.
+        </div>
+    </waltz-section>
+
+
     <!-- COSTS -->
     <waltz-asset-costs-section asset-costs="ctrl.assetCosts">
     </waltz-asset-costs-section>
@@ -56,10 +69,11 @@
         </div>
     </waltz-section>
 
-
+<!--
     <div class="row">
         <div class="col-sm-12">
             <pre>{{ ctrl.groupDetail }}</pre>
         </div>
     </div>
+-->
 </div>

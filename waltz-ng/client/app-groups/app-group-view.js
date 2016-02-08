@@ -16,7 +16,37 @@
  *
  */
 
-function controller(appGroupStore, appStore, assetCostStore, complexityStore, serverInfoStore, $stateParams, $q) {
+function prepareFlowData(flows, apps) {
+    const entitiesById = _.indexBy(apps, 'id');
+
+    const enrichedFlows = _.map(flows, f => ({
+        source: entitiesById[f.source.id] || { ...f.source, isNeighbour: true },
+        target: entitiesById[f.target.id] || { ...f.target, isNeighbour: true },
+        dataType: f.dataType
+    }));
+
+    const entities = _.chain(enrichedFlows)
+        .map(f => ([f.source, f.target]))
+        .flatten()
+        .uniq(a => a.id)
+        .value();
+
+    return {
+        flows: enrichedFlows,
+        entities
+    };
+}
+
+
+function loadDataFlows(dataFlowStore, groupApps) {
+    const groupAppIds = _.map(groupApps, 'id');
+
+    return dataFlowStore.findByAppIds(groupAppIds)
+        .then(fs => prepareFlowData(fs, groupApps));
+}
+
+
+function controller(appGroupStore, appStore, assetCostStore, complexityStore, dataFlowStore, serverInfoStore, $stateParams, $q) {
     const { id }  = $stateParams;
 
     const vm = this;
@@ -41,9 +71,9 @@ function controller(appGroupStore, appStore, assetCostStore, complexityStore, se
             vm.complexity = complexity;
             vm.serverStats = serverStats;
         })
-        .then(() => console.log(vm))
-
-
+        .then(() => loadDataFlows(dataFlowStore, vm.applications))
+        .then(flows => vm.dataFlows = flows)
+        .then(() => console.log(vm));
 
 }
 
@@ -52,6 +82,7 @@ controller.$inject = [
     'ApplicationStore',
     'AssetCostStore',
     'ComplexityStore',
+    'DataFlowDataStore',
     'ServerInfoStore',
     '$stateParams',
     '$q'
