@@ -1,4 +1,3 @@
-
 /*
  *  Waltz
  * Copyright (c) David Watkins. All rights reserved.
@@ -17,7 +16,8 @@ export const bookmarkIconNames = {
     ISSUE_TRACKER: 'tasks',
     QUALITY_CONTROL: 'sliders',
     DOCUMENTATION: 'book',
-    BUILD_SYSTEM: 'simplybuilt'
+    BUILD_SYSTEM: 'simplybuilt',
+    MONITORING: 'bar-chart'
 };
 
 
