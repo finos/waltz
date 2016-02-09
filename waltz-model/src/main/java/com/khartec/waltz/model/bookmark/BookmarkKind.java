@@ -23,5 +23,6 @@ public enum BookmarkKind {
     ISSUE_TRACKER,
     QUALITY_CONTROL,
     DOCUMENTATION,
-    BUILD_SYSTEM;
+    BUILD_SYSTEM,
+    MONITORING
 }

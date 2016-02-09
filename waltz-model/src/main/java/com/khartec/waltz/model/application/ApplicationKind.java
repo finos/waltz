@@ -21,5 +21,7 @@ public enum ApplicationKind {
     IN_HOUSE,
     INTERNALLY_HOSTED,
     EXTERNALLY_HOSTED,
-    EUC
+    EUC,
+    THIRD_PARTY,
+    CUSTOMISED
 }

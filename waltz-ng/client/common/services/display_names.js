@@ -16,7 +16,9 @@ export const applicationKindDisplayNames = {
     IN_HOUSE: 'In House',
     INTERNALLY_HOSTED: 'Hosted Internally',
     EXTERNALLY_HOSTED: 'Externally Hosted',
-    EUC: 'End User Computing'
+    EUC: 'End User Computing',
+    THIRD_PARTY: 'Third Party',
+    CUSTOMISED: 'Customised'
 };
 
 
@@ -35,7 +37,8 @@ export const bookmarkNames = {
     ISSUE_TRACKER: 'Issue Tracking',
     QUALITY_CONTROL: 'Quality Control',
     DOCUMENTATION: 'Documentation',
-    BUILD_SYSTEM: 'Automated Build / Deployment System'
+    BUILD_SYSTEM: 'Automated Build / Deployment System',
+    MONITORING: 'Monitoring Systems'
 };
 
 

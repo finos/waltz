@@ -12,7 +12,7 @@
 
 import _ from 'lodash';
 
-import { lifecyclePhaseDisplayNames, applicationKindDisplayNames }
+import { lifecyclePhaseDisplayNames, applicationKindDisplayNames, investmentRatingNames }
     from '../../common/services/display_names';
 
 
@@ -35,6 +35,14 @@ function controller(uiGridConstants, $scope) {
                 filter: {
                     type: uiGridConstants.filter.SELECT,
                     selectOptions: _.map(applicationKindDisplayNames, (label, value) => ({ label, value }))
+                }
+            },
+            {
+                field: 'overallRating',
+                cellTemplate: '<div class="ui-grid-cell-contents"> {{ COL_FIELD | toDisplayName:"investmentRating" }}</div>',
+                filter: {
+                    type: uiGridConstants.filter.SELECT,
+                    selectOptions: _.map(investmentRatingNames, (label, value) => ({ label, value }))
                 }
             },
             {

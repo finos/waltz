@@ -48,7 +48,10 @@ export default class BaseLookupService {
 
 
     toOptions(type) {
-        return _.map(this.lookupsByType[type], (v, k) => ({ name: v, code: k}));
+        return _.chain(this.lookupsByType[type])
+            .map((v, k) => ({ name: v, code: k}))
+            .sortBy(o => o.name)
+            .value();
     }
 
     toGridOptions(type) {
