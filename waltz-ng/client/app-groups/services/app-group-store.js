@@ -20,22 +20,31 @@ function service($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/app-group`;
 
+
     const getById = (id) => $http
         .get(`${BASE}/id/${id}`)
         .then(result => result.data);
+
 
     const findMyGroups = (id) => $http
         .get(`${BASE}/my-groups`)
         .then(result => result.data);
 
+
     const findPublicGroups = (id) => $http
         .get(`${BASE}/public`)
         .then(result => result.data);
 
+
+    const subscribe = (id) => $http
+        .post(`${BASE}/${id}/subscribe`, {});
+
+
     return {
         getById,
         findMyGroups,
-        findPublicGroups
+        findPublicGroups,
+        subscribe
     };
 
 }

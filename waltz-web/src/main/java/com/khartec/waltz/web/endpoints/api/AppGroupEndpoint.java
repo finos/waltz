@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 
 @Service
@@ -55,6 +56,7 @@ public class AppGroupEndpoint implements Endpoint {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findGroupsForUserPath = mkPath(BASE_URL, "my-groups");
         String findPublicGroupsPath = mkPath(BASE_URL, "public");
+        String subscribePath = mkPath(BASE_URL, "id", ":id", "subscribe");
 
         DatumRoute<AppGroupDetail> getByIdRoute = (request, response) ->
                 service.getGroupDetailById(getId(request));
@@ -65,9 +67,16 @@ public class AppGroupEndpoint implements Endpoint {
         ListRoute<AppGroup> findPublicGroupsRoute = (request, response) ->
                 service.findPublicGroups();
 
+        DatumRoute<Boolean> subscribeRoute = (request, response) -> {
+            long groupId = getId(request);
+            LOG.info("Subscribing to group: " + groupId);
+            return Boolean.TRUE;
+        };
+
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findGroupsForUserPath, findGroupsForUserRoute);
         getForList(findPublicGroupsPath, findPublicGroupsRoute);
+        postForDatum(subscribePath, subscribeRoute);
     }
 }

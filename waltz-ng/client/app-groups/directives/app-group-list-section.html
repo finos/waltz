@@ -3,12 +3,53 @@
                    name="Application Groups">
 
         <waltz-app-group-list groups="ctrl.groups">
-
         </waltz-app-group-list>
 
-        <div class="small text-muted">
+        <div ng-if="!ctrl.showAdd" class="small waltz-paragraph text-muted">
             Application groups are.....
         </div>
 
+        <div ng-if="ctrl.showAdd">
+            <strong>Add another group</strong>
+
+            <div class="waltz-paragraph">
+                To add more groups you may either search for an existing public group
+                or create a new one.
+            </div>
+
+            <input type="text"
+                   ng-model="ctrl.selectedPublicGroup"
+                   placeholder="Search for public group"
+                   uib-typeahead="group as group.name for group in ctrl.availableGroups | filter:{name:$viewValue}"
+                   typeahead-template-url="app-group-list-section/app-group-search-result.html"
+                   class="form-control"
+                   typeahead-show-hint="true"
+                   typeahead-min-length="0">
+
+            <div class="waltz-paragraph">
+                ...or <a href>create a new group</a>
+            </div>
+        </div>
+
+        <span class="pull-right small">
+            <a ng-click="ctrl.toggleShowAdd()" href>
+                <span ng-if="! ctrl.showAdd">
+                    Add <waltz-icon name="plus-circle"></waltz-icon>
+                </span>
+                <span ng-if="ctrl.showAdd">
+                    Cancel &#10006;
+                </span>
+            </a>
+        </span>
     </waltz-section>
+
+
+    <script type="text/ng-template" id="app-group-list-section/app-group-search-result.html">
+        <a style="padding-left: 6px">
+            <span ng-bind-html="match.label | uibTypeaheadHighlight:query"></span>
+            <span class="small no-overflow">
+                - {{ match.model.description | limitTo:100 }}
+            </span>
+        </a>
+    </script>
 </div>

@@ -17,16 +17,60 @@
  *
  */
 
+import _ from 'lodash';
+
+
 const BINDINGS = {
     groups: '='
 };
 
 
-function controller() {
-
+function removeUsedGroups(allGroups, usedGroups) {
+    const usedGroupIds = _.map(usedGroups, 'id');
+    return _.reject(allGroups, g => _.contains(usedGroupIds, g.id));
 }
 
-controller.$inject = [];
+
+function controller(appGroupStore, $scope) {
+
+
+    function loadPublicGroups() {
+        appGroupStore.findPublicGroups()
+            .then(publicGroups => removeUsedGroups(publicGroups, vm.groups))
+            .then(availableGroups => vm.availableGroups = availableGroups);
+    }
+
+
+    function subscribeToGroup(group) {
+        return appGroupStore.subscribe(group.id)
+            .then(() => vm.groups.push(group));
+    }
+
+
+    const vm = this;
+    vm.availableGroups = [];
+
+    vm.showAdd = false;
+
+    vm.toggleShowAdd = () => {
+        vm.showAdd = ! vm.showAdd;
+
+        if (vm.showAdd) {
+            loadPublicGroups();
+        }
+    }
+
+
+    $scope.$watch('ctrl.selectedPublicGroup', selected => {
+        console.log(selected);
+        if (selected && _.isObject(selected)) {
+            subscribeToGroup(selected)
+                .then(() => vm.showAdd = false);
+        }
+    })
+}
+
+controller.$inject = [ 'AppGroupStore', '$scope' ];
 
 
 export default () => {
