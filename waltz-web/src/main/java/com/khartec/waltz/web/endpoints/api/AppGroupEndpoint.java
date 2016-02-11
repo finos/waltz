@@ -20,6 +20,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupDetail;
+import com.khartec.waltz.service.app_group.AppGroupSubscription;
 import com.khartec.waltz.service.app_group.AppGroupService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -30,9 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -54,29 +53,37 @@ public class AppGroupEndpoint implements Endpoint {
     public void register() {
 
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
-        String findGroupsForUserPath = mkPath(BASE_URL, "my-groups");
+        String findGroupSubscriptionsForUserPath = mkPath(BASE_URL, "my-group-subscriptions");
         String findPublicGroupsPath = mkPath(BASE_URL, "public");
         String subscribePath = mkPath(BASE_URL, "id", ":id", "subscribe");
 
         DatumRoute<AppGroupDetail> getByIdRoute = (request, response) ->
                 service.getGroupDetailById(getId(request));
 
-        ListRoute<AppGroup> findGroupsForUserRoute = (request, response) ->
-                service.findGroupsForUser(getUser(request).userName());
+        ListRoute<AppGroupSubscription> findGroupSubscriptionsRoute = (request, response) ->
+                service.findGroupSubscriptionsForUser(getUser(request).userName());
 
         ListRoute<AppGroup> findPublicGroupsRoute = (request, response) ->
                 service.findPublicGroups();
 
-        DatumRoute<Boolean> subscribeRoute = (request, response) -> {
+        ListRoute<AppGroupSubscription> subscribeRoute = (request, response) -> {
             long groupId = getId(request);
+            service.subscribe(getUser(request).userName(), groupId);
             LOG.info("Subscribing to group: " + groupId);
-            return Boolean.TRUE;
+            return findGroupSubscriptionsRoute.apply(request, response);
+        };
+
+        ListRoute<AppGroupSubscription> unsubscribeRoute = (request, response) -> {
+            long groupId = getId(request);
+            service.unsubscribe(getUser(request).userName(), groupId);
+            LOG.info("Unsubscribing from group: " + groupId);
+            return findGroupSubscriptionsRoute.apply(request, response);
         };
 
 
         getForDatum(getByIdPath, getByIdRoute);
-        getForList(findGroupsForUserPath, findGroupsForUserRoute);
+        getForList(findGroupSubscriptionsForUserPath, findGroupSubscriptionsRoute);
         getForList(findPublicGroupsPath, findPublicGroupsRoute);
-        postForDatum(subscribePath, subscribeRoute);
+        postForList(subscribePath, subscribeRoute);
     }
 }

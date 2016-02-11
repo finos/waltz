@@ -2,18 +2,21 @@
     <waltz-section icon='object-group'
                    name="Application Groups">
 
-        <waltz-app-group-list groups="ctrl.groups">
+        <waltz-app-group-list group-subscriptions="ctrl.groupSubscriptions"
+                              editing="ctrl.editing"
+                              unsubscribe="ctrl.unsubscribe">
         </waltz-app-group-list>
 
-        <div ng-if="!ctrl.showAdd" class="small waltz-paragraph text-muted">
-            Application groups are.....
+        <div ng-if="!ctrl.editing" class="small waltz-paragraph text-muted">
+            Application groups can be used to create an ad-hoc view over
+            a specified subset of applications in the organisation.
         </div>
 
-        <div ng-if="ctrl.showAdd">
-            <strong>Add another group</strong>
+        <div ng-if="ctrl.editing">
+            <strong>Modify groups</strong>
 
             <div class="waltz-paragraph">
-                To add more groups you may either search for an existing public group
+                To add more groups you may either subscribe to an existing public group
                 or create a new one.
             </div>
 
@@ -32,11 +35,11 @@
         </div>
 
         <span class="pull-right small">
-            <a ng-click="ctrl.toggleShowAdd()" href>
-                <span ng-if="! ctrl.showAdd">
-                    Add <waltz-icon name="plus-circle"></waltz-icon>
+            <a ng-click="ctrl.toggleEditing()" href>
+                <span ng-if="! ctrl.editing">
+                    Edit <waltz-icon name="plus-circle"></waltz-icon>
                 </span>
-                <span ng-if="ctrl.showAdd">
+                <span ng-if="ctrl.editing">
                     Cancel &#10006;
                 </span>
             </a>

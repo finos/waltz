@@ -22,6 +22,7 @@ import com.khartec.waltz.model.app_group.AppGroupMember;
 import com.khartec.waltz.model.app_group.AppGroupMemberRole;
 import com.khartec.waltz.model.app_group.ImmutableAppGroupMember;
 import com.khartec.waltz.schema.tables.records.ApplicationGroupMemberRecord;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -43,9 +44,25 @@ public class AppGroupMemberDao {
 
 
     public List<AppGroupMember> getMembers(long groupId) {
+        return getWhere(APPLICATION_GROUP_MEMBER.GROUP_ID.eq(groupId));
+    }
+
+
+    public void subscribe(String userId, long groupId) {
+        ApplicationGroupMemberRecord record = new ApplicationGroupMemberRecord(groupId, userId, AppGroupMemberRole.VIEWER.name());
+        dsl.executeInsert(record);
+    }
+
+
+    public List<AppGroupMember> getSubscriptions(String userId) {
+        return getWhere(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId));
+    }
+
+
+    private List<AppGroupMember> getWhere(Condition condition) {
         return dsl.select(APPLICATION_GROUP_MEMBER.fields())
                 .from(APPLICATION_GROUP_MEMBER)
-                .where(APPLICATION_GROUP_MEMBER.GROUP_ID.eq(groupId))
+                .where(condition)
                 .fetch(r -> {
                     ApplicationGroupMemberRecord record = r.into(APPLICATION_GROUP_MEMBER);
                     return ImmutableAppGroupMember.builder()
@@ -55,5 +72,4 @@ public class AppGroupMemberDao {
                             .build();
                 });
     }
-
 }

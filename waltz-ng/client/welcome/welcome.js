@@ -22,8 +22,8 @@ function controller(staticPanelStore, appGroupStore) {
     staticPanelStore.findByGroup('HOME')
         .then(panels => vm.panels = panels);
 
-    appGroupStore.findMyGroups()
-        .then(groups => vm.appGroups = groups);
+    appGroupStore.findMyGroupSubscriptions()
+        .then(groupSubscriptions => vm.appGroupSubscriptions = groupSubscriptions);
 
 }
 

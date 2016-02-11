@@ -21,56 +21,69 @@ import _ from 'lodash';
 
 
 const BINDINGS = {
-    groups: '='
+    groupSubscriptions: '='
 };
 
 
-function removeUsedGroups(allGroups, usedGroups) {
-    const usedGroupIds = _.map(usedGroups, 'id');
-    return _.reject(allGroups, g => _.contains(usedGroupIds, g.id));
+function removeUsedGroups(allGroups, existingSubscriptions) {
+    const subscribedGroupIds = _.map(existingSubscriptions, 'appGroup.id');
+    return _.reject(allGroups, g => _.contains(subscribedGroupIds, g.id));
 }
 
 
 function controller(appGroupStore, $scope) {
 
-
     function loadPublicGroups() {
         appGroupStore.findPublicGroups()
-            .then(publicGroups => removeUsedGroups(publicGroups, vm.groups))
+            .then(publicGroups => removeUsedGroups(publicGroups, vm.groupSubscriptions))
             .then(availableGroups => vm.availableGroups = availableGroups);
     }
 
 
     function subscribeToGroup(group) {
-        return appGroupStore.subscribe(group.id)
-            .then(() => vm.groups.push(group));
+        return appGroupStore.subscribe(group.id);
+    }
+
+
+    function unsubscribeFromGroup(subscription) {
+        return appGroupStore.unsubscribe(subscription.appGroup.id);
     }
 
 
     const vm = this;
     vm.availableGroups = [];
 
-    vm.showAdd = false;
+    vm.editing = false;
 
-    vm.toggleShowAdd = () => {
-        vm.showAdd = ! vm.showAdd;
+    vm.toggleEditing= () => {
+        vm.editing = ! vm.editing;
 
-        if (vm.showAdd) {
+        if (vm.editing) {
             loadPublicGroups();
         }
-    }
+    };
+
+
+    vm.unsubscribe = (subscription) => {
+        unsubscribeFromGroup(subscription)
+            .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions)
+            .then(() =>  vm.editing = false);
+    };
 
 
     $scope.$watch('ctrl.selectedPublicGroup', selected => {
-        console.log(selected);
         if (selected && _.isObject(selected)) {
             subscribeToGroup(selected)
-                .then(() => vm.showAdd = false);
+                .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions)
+                .then(() => {
+                    vm.editing = false;
+                    vm.selectedPublicGroup = null;
+                })
         }
     })
 }
 
-controller.$inject = [ 'AppGroupStore', '$scope' ];
+controller.$inject = [ 'AppGroupStore', '$scope', '$element' ];
 
 
 export default () => {

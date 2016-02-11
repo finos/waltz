@@ -60,14 +60,17 @@ public class MapUtilities {
         return result;
     }
 
+
     public static <K, V> Map<K, V> indexBy(Function<V, K> keyFn, Collection<V> xs) {
-        Map<K, V> result = MapUtilities.newHashMap();
-        for (V v: xs) {
-            K key = keyFn.apply(v);
-            result.put(key, v);
-        }
-        return result;
+        return indexBy(keyFn, Function.identity(), xs);
     }
+
+
+    public static <K, R, V> Map<K, R> indexBy(Function<V, K> keyFn, Function<V, R> valueFn, Collection<V> xs) {
+        return xs.stream()
+                .collect(Collectors.toMap(keyFn, valueFn));
+    }
+
 
     public static <K, V> Map<K, Long> countBy(Function<V, K> keyFn, Collection<V> xs) {
         if (xs == null) {

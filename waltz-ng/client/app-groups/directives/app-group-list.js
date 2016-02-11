@@ -17,7 +17,9 @@
  */
 
 const BINDINGS = {
-    groups: '='
+    groupSubscriptions: '=',
+    editing: '=',
+    unsubscribe: '='
 };
 
 

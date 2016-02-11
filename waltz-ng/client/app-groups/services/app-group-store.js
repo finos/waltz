@@ -26,8 +26,8 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
-    const findMyGroups = (id) => $http
-        .get(`${BASE}/my-groups`)
+    const findMyGroupSubscriptions = (id) => $http
+        .get(`${BASE}/my-group-subscriptions`)
         .then(result => result.data);
 
 
@@ -37,12 +37,14 @@ function service($http, BaseApiUrl) {
 
 
     const subscribe = (id) => $http
-        .post(`${BASE}/${id}/subscribe`, {});
+        .post(`${BASE}/id/${id}/subscribe`, {})
+        .then(result => result.data);
+
 
 
     return {
         getById,
-        findMyGroups,
+        findMyGroupSubscriptions,
         findPublicGroups,
         subscribe
     };
