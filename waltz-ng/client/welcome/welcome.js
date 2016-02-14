@@ -29,6 +29,7 @@ function controller(staticPanelStore, appGroupStore) {
 
 controller.$inject = ['StaticPanelStore', 'AppGroupStore'];
 
+
 export default {
     controller,
     controllerAs: 'ctrl',

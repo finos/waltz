@@ -31,7 +31,7 @@ function removeUsedGroups(allGroups, existingSubscriptions) {
 }
 
 
-function controller(appGroupStore, $scope) {
+function controller(appGroupStore, $scope, $state) {
 
     function loadPublicGroups() {
         appGroupStore.findPublicGroups()
@@ -64,10 +64,26 @@ function controller(appGroupStore, $scope) {
     };
 
 
+    vm.createNewGroup = () => {
+        appGroupStore.createNewGroup()
+            .then(id => {
+                alert('Group created');
+                $state.go('main.app-group.edit', { id })
+            });
+    };
+
+
     vm.unsubscribe = (subscription) => {
         unsubscribeFromGroup(subscription)
-            .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions)
-            .then(() =>  vm.editing = false);
+            .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions);
+    };
+
+
+    vm.deleteGroup = (group) => {
+        if (! confirm("Really delete this group ? \n " + group.appGroup.name)) return;
+
+        appGroupStore.deleteGroup(group.appGroup.id)
+            .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions);
     };
 
 
@@ -76,14 +92,14 @@ function controller(appGroupStore, $scope) {
             subscribeToGroup(selected)
                 .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions)
                 .then(() => {
-                    vm.editing = false;
                     vm.selectedPublicGroup = null;
                 })
         }
-    })
+    });
+
 }
 
-controller.$inject = [ 'AppGroupStore', '$scope', '$element' ];
+controller.$inject = [ 'AppGroupStore', '$scope', '$state' ];
 
 
 export default () => {

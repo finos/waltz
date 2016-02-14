@@ -24,7 +24,8 @@ const BINDINGS = {
     applications: '=',
     assetCosts: '=',
     complexity: '=',
-    serverStats: '='
+    serverStats: '=',
+    editable: '='
 };
 
 

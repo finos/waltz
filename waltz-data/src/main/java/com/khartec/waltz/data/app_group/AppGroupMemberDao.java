@@ -24,6 +24,7 @@ import com.khartec.waltz.model.app_group.ImmutableAppGroupMember;
 import com.khartec.waltz.schema.tables.records.ApplicationGroupMemberRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -48,14 +49,43 @@ public class AppGroupMemberDao {
     }
 
 
-    public void subscribe(String userId, long groupId) {
-        ApplicationGroupMemberRecord record = new ApplicationGroupMemberRecord(groupId, userId, AppGroupMemberRole.VIEWER.name());
-        dsl.executeInsert(record);
+    public int register(long groupId, String userId) {
+        return register(groupId, userId, AppGroupMemberRole.VIEWER);
+    }
+
+
+    public int register(long groupId, String userId, AppGroupMemberRole role) {
+        return dsl.insertInto(APPLICATION_GROUP_MEMBER)
+                .set(APPLICATION_GROUP_MEMBER.USER_ID, userId)
+                .set(APPLICATION_GROUP_MEMBER.GROUP_ID, groupId)
+                .set(APPLICATION_GROUP_MEMBER.ROLE, role.name())
+                .onDuplicateKeyUpdate()
+                .set(APPLICATION_GROUP_MEMBER.ROLE, role.name())
+                .execute();
+
     }
 
 
     public List<AppGroupMember> getSubscriptions(String userId) {
         return getWhere(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId));
+    }
+
+
+    public void unregister(long groupId, String userId) {
+        dsl.deleteFrom(APPLICATION_GROUP_MEMBER)
+                .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId))
+                .and(APPLICATION_GROUP_MEMBER.GROUP_ID.eq(groupId))
+                .execute();
+    }
+
+
+    public boolean canUpdate(long groupId, String userId) {
+        return dsl.select(DSL.value(Boolean.TRUE))
+                .from(APPLICATION_GROUP_MEMBER)
+                .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId))
+                .and(APPLICATION_GROUP_MEMBER.GROUP_ID.eq(groupId))
+                .and(APPLICATION_GROUP_MEMBER.ROLE.eq(AppGroupMemberRole.OWNER.name()))
+                .fetchOne() != null;
     }
 
 

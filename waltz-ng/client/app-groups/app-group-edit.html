@@ -1,0 +1,244 @@
+<!--
+  ~  This file is part of Waltz.
+  ~
+  ~  Waltz is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  Waltz is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  -->
+
+<div>
+    <waltz-page-header name="{{ ctrl.appGroup.name }}"
+                       icon="edit"
+                       small="Edit">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>
+                <a ui-sref="main.app-group.view ({ id:ctrl.appGroup.id })">
+                    {{ ctrl.appGroup.name }}
+                </a>
+            </li>
+            <li>Edit</li>
+        </ol>
+    </waltz-page-header>
+
+
+    <waltz-section name="Overview">
+        <div class="waltz-paragraph"
+             style="padding: 6px; border-bottom: 1px dotted #eee;">
+            <form class="form"
+                  ng-submit="ctrl.updateGroupOverview()">
+
+                <input type="text"
+                       class="form-control"
+                       placeholder="Name of group"
+                       minlength="2"
+                       ng-model="ctrl.appGroup.name">
+
+                <br>
+                <textarea class='form-control'
+                          rows='5'
+                          ng-model="ctrl.appGroup.description">
+                </textarea>
+
+                <br>
+                <button type="submit"
+                        class="btn btn-success">
+                    Update
+                </button>
+
+            </form>
+        </div>
+
+    </waltz-section>
+
+
+
+    <waltz-section icon="desktop" name="Applications In Group">
+
+        <div class="row">
+            <div class="col-md-6">
+                <div ng-if="ctrl.applications.length > 0">
+
+                    <p class="waltz-paragraph">
+                        Current applications within this group, select an application
+                        to focus on it and show related apps which you may want to add.
+                    </p>
+                    <p class="waltz-paragraph">
+                        Alternatively you may use the search field to the right to locate
+                        an application to add to the group.
+                    </p>
+
+                    <div class="waltz-scroll-region" style="height: 300px">
+                        <table class="table table-striped table-condensed">
+                            <thead>
+                            <tr>
+                                <th>Application</th>
+                                <th>Operations</th>
+                            </tr>
+                            </thead>
+                            <tr ng-repeat="app in ctrl.applications | orderBy:'name'"
+                                class="waltz-visibility-parent">
+
+                                <td>
+                                    <a ng-click="ctrl.focusOnApp(app)" href>
+                                        {{ app.name }}
+                                    </a>
+                                </td>
+                                <td>
+                                <span class="waltz-visibility-child-50">
+                                    <a ng-click="ctrl.removeFromGroup(app)" href>
+                                        Remove
+                                    </a>
+                                </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div ng-if="ctrl.applications.length ==0">
+                    <div class="alert alert-warning">
+                        <waltz-icon name="warning"></waltz-icon>
+                        <strong>No applications</strong> have been registered to this
+                        group yet.  Use the search field on the right to start adding
+                        applications.
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+
+                <p class="waltz-paragraph">
+                    Use the search box below to locate an application and add it
+                    to the group.  Once a selection is made related applications
+                    will also be shown.
+                </p>
+
+                <waltz-app-selector model="ctrl.searchedApp"></waltz-app-selector>
+
+                <div ng-if="ctrl.focusApp">
+                    <hr>
+
+                    <h4>Focused on: {{ ctrl.focusApp.app.name }}</h4>
+
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h5>Related By Asset Code</h5>
+                            <waltz-app-group-app-selection-list
+                                applications="ctrl.focusApp.related"
+                                is-member="ctrl.isAppInGroup"
+                                add="ctrl.addToGroup"
+                                refocus="ctrl.focusOnApp">
+                            </waltz-app-group-app-selection-list>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <h5>
+                                <waltz-icon name="sitemap"></waltz-icon>
+                                Apps in same Org Unit
+                            </h5>
+
+                            <waltz-app-group-app-selection-list
+                                applications="ctrl.focusApp.unitMembers"
+                                is-member="ctrl.isAppInGroup"
+                                add="ctrl.addToGroup"
+                                refocus="ctrl.focusOnApp">
+                            </waltz-app-group-app-selection-list>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h5>
+                                <waltz-icon name="arrow-up"></waltz-icon>
+                                Upstream Apps
+                            </h5>
+
+                            <waltz-app-group-app-selection-list
+                                applications="ctrl.focusApp.upstream"
+                                is-member="ctrl.isAppInGroup"
+                                add="ctrl.addToGroup"
+                                refocus="ctrl.focusOnApp">
+                            </waltz-app-group-app-selection-list>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <h5>
+                                <waltz-icon name="arrow-down"></waltz-icon>
+                                Downstream Apps
+                            </h5>
+
+                            <waltz-app-group-app-selection-list
+                                applications="ctrl.focusApp.downstream"
+                                is-member="ctrl.isAppInGroup"
+                                add="ctrl.addToGroup"
+                                refocus="ctrl.focusOnApp">
+                            </waltz-app-group-app-selection-list>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </waltz-section>
+
+    <waltz-section icon="users" name="Group Users">
+        <table class="table table-condensed table-striped">
+            <thead>
+            <tr>
+                <th>Owners</th>
+            </tr>
+            </thead>
+            <tr ng-repeat="owner in ctrl.owners | orderBy:'userId'">
+                <td>{{ owner.userId }}</td>
+            </tr>
+        </table>
+
+        <div class="waltz-paragraph text-muted">
+            <strong>Owners</strong> can add and remove applications from a group.  They may also promote other
+            subscribers to be co-owners.
+        </div>
+
+        <div ng-if='ctrl.viewers.length > 0'>
+            <hr>
+            <br>
+            <table class="table table-condensed table-striped">
+                <thead>
+                <tr>
+                    <th>Subscribers</th>
+                    <th>Operations</th>
+                </tr>
+                </thead>
+                <tr ng-repeat="viewer in ctrl.viewers | orderBy:'userId'" class="waltz-visibility-parent">
+                    <td>
+                        {{ viewer.userId }}
+                    </td>
+                    <td>
+                        <div class="waltz-visibility-child-50">
+                            <a ng-click="ctrl.promoteToOwner(viewer)" href>
+                                Promote to owner
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="waltz-paragraph text-muted">
+                <strong>Subscribers</strong> may only view the group.
+            </div>
+        </div>
+
+
+    </waltz-section>
+
+</div>

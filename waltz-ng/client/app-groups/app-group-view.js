@@ -46,7 +46,7 @@ function loadDataFlows(dataFlowStore, groupApps) {
 }
 
 
-function controller(appGroupStore, appStore, assetCostStore, complexityStore, dataFlowStore, serverInfoStore, $stateParams, $q) {
+function controller(appGroupStore, appStore, assetCostStore, complexityStore, dataFlowStore, serverInfoStore, userService, $stateParams, $q) {
     const { id }  = $stateParams;
 
     const vm = this;
@@ -72,8 +72,14 @@ function controller(appGroupStore, appStore, assetCostStore, complexityStore, da
             vm.serverStats = serverStats;
         })
         .then(() => loadDataFlows(dataFlowStore, vm.applications))
-        .then(flows => vm.dataFlows = flows)
-        .then(() => console.log(vm));
+        .then(flows => vm.dataFlows = flows);
+
+    userService.whoami().then(u => vm.user = u);
+
+    vm.isGroupEditable = () => {
+        if (!vm.groupDetail) return false;
+        return _.any(vm.groupDetail.members, m => m.role === 'OWNER' && m.userId === vm.user.userName );
+    };
 
 }
 
@@ -84,6 +90,7 @@ controller.$inject = [
     'ComplexityStore',
     'DataFlowDataStore',
     'ServerInfoStore',
+    'UserService',
     '$stateParams',
     '$q'
 ];

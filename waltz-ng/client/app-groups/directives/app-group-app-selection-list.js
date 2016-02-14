@@ -16,11 +16,17 @@
  *
  */
 
+/**
+ * This directive renders an application list which exposes simple controls for handling
+ * selections (callback on 'add'), and handling refocuses.  The 'isMember' callback is
+ * used to strikethrough text.
+ */
+
 const BINDINGS = {
-    groupSubscriptions: '=',
-    editing: '=',
-    unsubscribe: '=',
-    deleteGroup: '='
+    applications: '=', // [app]
+    isMember: '=', // function
+    refocus: '=',  // function
+    add: '='  // function
 };
 
 
@@ -35,7 +41,7 @@ export default () => {
     return {
         restrict: 'E',
         replace: true,
-        template: require('./app-group-list.html'),
+        template: require('./app-group-app-selection-list.html'),
         scope: {},
         bindToController: BINDINGS,
         controllerAs: 'ctrl',

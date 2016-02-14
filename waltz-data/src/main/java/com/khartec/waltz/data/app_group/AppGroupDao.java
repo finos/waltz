@@ -3,7 +3,6 @@ package com.khartec.waltz.data.app_group;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupKind;
 import com.khartec.waltz.model.app_group.ImmutableAppGroup;
-import com.khartec.waltz.schema.tables.ApplicationGroupMember;
 import com.khartec.waltz.schema.tables.records.ApplicationGroupRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -31,7 +30,6 @@ public class AppGroupDao {
 
 
     private final DSLContext dsl;
-
 
 
     @Autowired
@@ -65,5 +63,31 @@ public class AppGroupDao {
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name()))
                 .fetch(groupMapper);
+    }
+
+    public int update(AppGroup appGroup) {
+        return dsl.update(APPLICATION_GROUP)
+                .set(APPLICATION_GROUP.DESCRIPTION, appGroup.description())
+                .set(APPLICATION_GROUP.NAME, appGroup.name())
+                .set(APPLICATION_GROUP.KIND, appGroup.kind().name())
+                .where(APPLICATION_GROUP.ID.eq(appGroup.id().get()))
+                .execute();
+    }
+
+    public Long insert(AppGroup appGroup) {
+        return dsl.insertInto(APPLICATION_GROUP)
+                .set(APPLICATION_GROUP.DESCRIPTION, appGroup.description())
+                .set(APPLICATION_GROUP.NAME, appGroup.name())
+                .set(APPLICATION_GROUP.KIND, appGroup.kind().name())
+                .returning(APPLICATION_GROUP.ID)
+                .fetchOne()
+                .getId();
+    }
+
+    public int deleteGroup(long groupId) {
+        return dsl.delete(APPLICATION_GROUP)
+                .where(APPLICATION_GROUP.ID.eq(groupId))
+                .execute();
+
     }
 }

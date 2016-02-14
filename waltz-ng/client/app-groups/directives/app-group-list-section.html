@@ -4,6 +4,7 @@
 
         <waltz-app-group-list group-subscriptions="ctrl.groupSubscriptions"
                               editing="ctrl.editing"
+                              delete-group="ctrl.deleteGroup"
                               unsubscribe="ctrl.unsubscribe">
         </waltz-app-group-list>
 
@@ -30,7 +31,7 @@
                    typeahead-min-length="0">
 
             <div class="waltz-paragraph">
-                ...or <a href>create a new group</a>
+                ...or <a href ng-click="ctrl.createNewGroup()">create a new group</a>
             </div>
         </div>
 

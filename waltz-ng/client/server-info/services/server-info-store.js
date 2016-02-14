@@ -25,10 +25,6 @@ function service(http, baseUrl) {
 
     const findStatsForAppIds = (appIds) =>
         http.post(`${BASE}/apps/stats`, appIds)
-            .then(t => {
-                console.log('then tap', t);
-                return t;
-            })
             .then(result => result.data);
 
     return {

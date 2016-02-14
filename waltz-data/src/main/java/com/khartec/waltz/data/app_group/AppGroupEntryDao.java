@@ -43,4 +43,19 @@ public class AppGroupEntryDao {
                         .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(groupId))))
                 .fetch(appRefMapper);
     }
+
+    public int addApplication(long groupId, long applicationId) {
+        return dsl.insertInto(APPLICATION_GROUP_ENTRY)
+                .set(APPLICATION_GROUP_ENTRY.GROUP_ID, groupId)
+                .set(APPLICATION_GROUP_ENTRY.APPLICATION_ID, applicationId)
+                .onDuplicateKeyIgnore()
+                .execute();
+    }
+
+    public int removeApplication(long groupId, long applicationId) {
+        return dsl.delete(APPLICATION_GROUP_ENTRY)
+                .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(groupId))
+                .and(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(applicationId))
+                .execute();
+    }
 }

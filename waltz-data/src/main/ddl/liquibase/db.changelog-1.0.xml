@@ -808,4 +808,37 @@
     </changeSet>
 
 
+    <changeSet author="dwatkins"
+               id="20160212-43-3">
+        <addPrimaryKey columnNames="group_id, application_id"
+                       constraintName="application_group_entry_pkey"
+                       tableName="application_group_entry"/>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               id="20160213-43-1">
+        <addPrimaryKey columnNames="group_id, user_id"
+                       constraintName="application_group_member_pkey"
+                       tableName="application_group_member"/>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20160214-43-1">
+        <addForeignKeyConstraint baseColumnNames="group_id"
+                                 baseTableName="application_group_member"
+                                 constraintName="application_group_member_group_id_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="application_group"/>
+
+        <addForeignKeyConstraint baseColumnNames="group_id"
+                                 baseTableName="application_group_entry"
+                                 constraintName="application_group_entry_group_id_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="application_group"/>
+
+    </changeSet>
+
 </databaseChangeLog>

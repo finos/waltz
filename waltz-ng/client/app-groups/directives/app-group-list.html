@@ -22,7 +22,7 @@
                 <small style="text-align: right">
                     <ul class="list-unstyled">
                         <li  ng-if="subscription.role == 'OWNER'">
-                            <a href ng-click="ctrl.delete(subscription)">
+                            <a href ng-click="ctrl.deleteGroup(subscription)">
                                 Delete
                                 <waltz-icon name="trash"></waltz-icon>
                             </a>
@@ -33,9 +33,9 @@
                                 <waltz-icon name="minus-circle"></waltz-icon>
                             </a>
                         </li>
-                        <li>
-                            <a href="XXXX">
-                                Edit&nbsp;
+                        <li ng-if="subscription.role == 'OWNER'">
+                            <a ui-sref="main.app-group.edit ({ id:subscription.appGroup.id })">
+                                Edit
                                 <waltz-icon name="edit"></waltz-icon>
                             </a>
                         </li>
