@@ -1,0 +1,57 @@
+<div class="row">
+    <div class="col-sm-offset-1 col-sm-10">
+        <div class="waltz-page-summary">
+            <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;">
+                {{ ctrl.capability.name }}
+            </h3>
+            <div style="border-bottom: 2px dotted #eee; padding: 6px"
+                 class="waltz-paragraph">
+                {{ ctrl.capability.description }}
+            </div>
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <waltz-basic-info-tile name="Portfolio Cost"
+                                           description="Cumulative value of infra and app dev costs"
+                                           waltz-jump-to="costs-section"
+                                           icon="money">
+                        <span style="font-size: xx-large;">
+                            {{ ctrl.portfolioCostStr }}
+                        </span>
+                    </waltz-basic-info-tile>
+                </div>
+                <div class="col-sm-4">
+                    <waltz-basic-info-tile name="Complexity"
+                                           description="Derived from capabilities, connections and servers"
+                                           class="clickable"
+                                           waltz-jump-to="complexity-section"
+                                           icon="rocket">
+                        <div style="font-size: xx-large;">
+                            &Sigma; {{ ctrl.complexitySummary.cumulativeScore | toFixed:1 }}
+                        </div>
+                        <div class="small text-muted">
+                            {{ ctrl.complexitySummary.averageScore | toFixed:2 }} per app
+                        </div>
+                    </waltz-basic-info-tile>
+
+                </div>
+                <div class="col-sm-4">
+                    <waltz-basic-info-tile name="Servers"
+                                           description="Number of servers supporting this group"
+                                           icon="server">
+                        <div>
+                            <div style="font-size: xx-large;">
+                                # {{ ctrl.serverStats.total }}
+                            </div>
+                            <div class="small text-muted">
+                                {{ ctrl.serverStats.virtualPercentage }}% virtual
+                            </div>
+                        </div>
+                    </waltz-basic-info-tile>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

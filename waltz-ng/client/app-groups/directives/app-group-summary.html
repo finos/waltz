@@ -20,7 +20,7 @@
             <div class="col-sm-3">
                 <waltz-basic-info-tile name="Portfolio Cost"
                                        description="Cumulative value of infra and app dev costs"
-                                       waltz-jump-to="ouv-costs"
+                                       waltz-jump-to="costs-section"
                                        icon="money">
                         <span style="font-size: xx-large;">
                             {{ ctrl.portfolioCostStr }}
@@ -31,7 +31,7 @@
                 <waltz-basic-info-tile name="Complexity"
                                        description="Derived from capabilities, connections and servers"
                                        class="clickable"
-                                       waltz-jump-to="ouv-complexity"
+                                       waltz-jump-to="complexity-section"
                                        icon="rocket">
                     <div style="font-size: xx-large;">
                         &Sigma; {{ ctrl.complexitySummary.cumulativeScore | toFixed:1 }}
@@ -45,8 +45,8 @@
             <div class="col-sm-3">
                 <waltz-basic-info-tile name="Servers"
 
-                                       description="Number of servers supporting this org unit"
-                                       waltz-jump-to="ouv-servers"
+                                       description="Number of servers supporting this group"
+                                       waltz-jump-to="servers-section"
                                        icon="server">
                     <div>
                         <div style="font-size: xx-large;">
@@ -63,7 +63,7 @@
             <div class="col-sm-3">
                 <waltz-basic-info-tile name="Capabilities"
                                        description="Capabilities performed within this OU"
-                                       waltz-jump-to="ouv-ratings"
+                                       waltz-jump-to="ratings-section"
                                        icon="puzzle-piece">
                     <div>
                         <div style="font-size: xx-large;">
