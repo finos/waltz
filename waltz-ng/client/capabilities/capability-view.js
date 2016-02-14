@@ -87,7 +87,8 @@ function controller(capabilities,
                     complexityStore,
                     assetCostStore,
                     capabilityStore,
-                    applicationStore) {
+                    applicationStore,
+                    serverInfoStore) {
 
     const vm = this;
 
@@ -120,8 +121,9 @@ function controller(capabilities,
                 ratingStore.findByAppIds(appIds),
                 dataFlowStore.findByAppIds(appIds),
                 complexityStore.findByAppIds(appIds),
-                assetCostStore.findAppCostsByAppIds(appIds)
-            ]).then(([perspective, ratings, flows, complexity, assetCosts]) => {
+                assetCostStore.findAppCostsByAppIds(appIds),
+                serverInfoStore.findStatsForAppIds(appIds)
+            ]).then(([perspective, ratings, flows, complexity, assetCosts, serverStats]) => {
                 vm.ratings = {
                     group: prepareGroupData(capability, vm.apps, perspective, ratings),
                     tweakers
@@ -129,6 +131,7 @@ function controller(capabilities,
                 vm.dataFlows = flows;
                 vm.complexity = complexity;
                 vm.assetCosts = assetCosts;
+                vm.serverStats = serverStats;
             });
         });
 
@@ -156,18 +159,6 @@ function controller(capabilities,
                 .then(associatedCapabilities => vm.associatedCapabilities = associatedCapabilities);
         });
 
-        //
-        //    const assocCapabilities = _.chain(assocAppCaps)
-        //        .groupBy('capabilityReference.id')
-        //        .map(associations => ({
-        //            capabilityReference: associations[0].capabilityReference,
-        //            apps: _.map(associations, 'applicationReference')
-        //        }))
-        //        .value();
-        //
-        //    Object.assign(associatedCapabilities, assocCapabilities);
-        //});
-
 
     logHistory(capability, historyStore);
 
@@ -189,7 +180,8 @@ controller.$inject = [
     'ComplexityStore',
     'AssetCostStore',
     'CapabilityStore',
-    'ApplicationStore'
+    'ApplicationStore',
+    'ServerInfoStore'
 ];
 
 

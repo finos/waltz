@@ -50,14 +50,14 @@
 
     <!-- PEOPLE -->
     <waltz-involved-people-section
-        id="ouv-people"
+        id="people-section"
         involvements="ctrl.viewData.involvements">
     </waltz-involved-people-section>
 
 
     <!-- CAPABILITIES -->
     <waltz-section name="Application Capability Ratings"
-                   id="ouv-ratings"
+                   id="ratings-section"
                    icon="puzzle-piece">
 
         <waltz-section-actions xng-if="ctrl.ratings.groups.length > 0">
@@ -86,7 +86,7 @@
 
 
     <!-- FLOWS -->
-    <waltz-section name="Logical Data Flows" id="ouv-flows">
+    <waltz-section name="Logical Data Flows" id="flows-section">
 
         <waltz-section-actions >
             <a waltz-has-role="ORGUNIT_EDITOR"
@@ -225,7 +225,7 @@
 
     <!-- APPS -->
     <waltz-section name="Applications"
-                   id="ouv-apps"
+                   id="apps-section"
                    small="({{ ctrl.viewData.apps.length }})"
                    icon="desktop">
 
@@ -244,7 +244,7 @@
 
 
     <!-- EUC -->
-    <waltz-section id="ouv-euc" name="End User Applications" icon="table" small="({{ctrl.viewData.endUserApps.length}})">
+    <waltz-section id="euc-section" name="End User Applications" icon="table" small="({{ctrl.viewData.endUserApps.length}})">
         <waltz-end-user-app-table end-user-apps="ctrl.viewData.endUserApps"></waltz-end-user-app-table>
     </waltz-section>
 

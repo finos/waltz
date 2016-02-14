@@ -41,7 +41,7 @@
                         <waltz-pie-table data="ctrl.pies.appPhase.data"
                                          config="ctrl.pies.appPhase.config"
                                          class="clickable"
-                                         waltz-jump-to="ouv-apps"
+                                         waltz-jump-to="apps-section"
                                          title="Apps By Lifecycle Phase"
                                          icon="desktop">
                         </waltz-pie-table>
@@ -50,7 +50,7 @@
                         <waltz-pie-table data="ctrl.pies.appInvestment.data"
                                          config="ctrl.pies.appInvestment.config"
                                          class="clickable"
-                                         waltz-jump-to="ouv-apps"
+                                         waltz-jump-to="apps-section"
                                          icon="money"
                                          title="Apps By Investment Status">
                         </waltz-pie-table>
@@ -59,7 +59,7 @@
                         <waltz-pie-table data="ctrl.pies.appConnections.data"
                                          config="ctrl.pies.appConnections.config"
                                          class="clickable"
-                                         waltz-jump-to="ouv-flows"
+                                         waltz-jump-to="flows-section"
                                          icon="random"
                                          title="Application Connections">
                         </waltz-pie-table>
@@ -69,7 +69,7 @@
                     <div class="col-sm-3">
                         <waltz-basic-info-tile name="Portfolio Cost"
                                                description="Cumulative value of infra and app dev costs"
-                                               waltz-jump-to="ouv-costs"
+                                               waltz-jump-to="costs-section"
                                                icon="money">
                             <span style="font-size: xx-large;">
                                 {{ ctrl.portfolioCostStr }}
@@ -80,7 +80,7 @@
                         <waltz-basic-info-tile name="Complexity"
                                                description="Derived from capabilities, connections and servers"
                                                class="clickable"
-                                               waltz-jump-to="ouv-complexity"
+                                               waltz-jump-to="complexity-section"
                                                icon="rocket">
                             <div style="font-size: xx-large;">
                                 &Sigma; {{ ctrl.complexitySummary.cumulativeScore | toFixed:1 }}
@@ -93,9 +93,7 @@
                     </div>
                     <div class="col-sm-3">
                         <waltz-basic-info-tile name="Servers"
-
                                                description="Number of servers supporting this org unit"
-                                               waltz-jump-to="ouv-servers"
                                                icon="server">
                             <div>
                                 <div style="font-size: xx-large;">
@@ -112,7 +110,7 @@
                     <div class="col-sm-3">
                         <waltz-basic-info-tile name="Capabilities"
                                                description="Capabilities performed within this OU"
-                                               waltz-jump-to="ouv-ratings"
+                                               waltz-jump-to="ratings-section"
                                                icon="puzzle-piece">
                             <div>
                                 <div style="font-size: xx-large;">
@@ -131,7 +129,6 @@
     </div>
 
     <div class="row" ng-if="ctrl.children.length > 0">
-
         <div class="col-sm-offset-2 col-sm-10">
             <h4>Sub Units</h4>
             <table class="table table-hover table-condensed fixed-table">

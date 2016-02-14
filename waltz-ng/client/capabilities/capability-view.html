@@ -29,9 +29,16 @@
 
     </div>
 
-    <blockquote style="font-size: medium;">
-        {{ ctrl.capability.description }}
-    </blockquote>
+    <waltz-capability-summary capability="ctrl.capability"
+                              server-stats="ctrl.serverStats"
+                              complexity="ctrl.complexity"
+                              asset-costs="ctrl.assetCosts">
+
+    </waltz-capability-summary>
+
+
+
+    <br>
 
     <!-- CHILDREN -->
     <div class="row"
