@@ -33,9 +33,16 @@ import java.time.ZoneId;
 public abstract class ChangeLog {
 
     public abstract EntityReference parentReference();
-    public abstract Severity severity();
+
     public abstract String message();
     public abstract String userId();
+
+
+    @Value.Default
+    public Severity severity() {
+        return Severity.INFORMATION;
+    }
+
 
     @Value.Default
     public LocalDateTime createdAt() {

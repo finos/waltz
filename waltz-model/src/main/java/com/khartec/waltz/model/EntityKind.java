@@ -24,5 +24,6 @@ public enum EntityKind {
     APPLICATION,
     CAPABILITY,
     END_USER_APPLICATION,
-    ORG_UNIT
+    ORG_UNIT,
+    APP_GROUP
 }

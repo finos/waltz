@@ -16,24 +16,21 @@
  *
  */
 
-function service($http, BaseApiUrl) {
+package com.khartec.waltz.model.app_group;
 
-    const BASE = `${BaseApiUrl}/app-view`;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.IdProvider;
+import com.khartec.waltz.model.NameProvider;
+import org.immutables.value.Value;
 
-    const getById = (id) => $http
-        .get(`${BASE}/${id}`)
-        .then(result => result.data);
 
-    return {
-        getById
-    };
+@Value.Immutable
+@JsonSerialize(as = ImmutableAppGroup.class)
+@JsonDeserialize(as = ImmutableAppGroup.class)
+public abstract class AppGroup implements IdProvider, NameProvider, DescriptionProvider {
+
+    public abstract AppGroupKind kind();
 
 }
-
-service.$inject = [
-    '$http',
-    'BaseApiUrl',
-];
-
-
-export default service;

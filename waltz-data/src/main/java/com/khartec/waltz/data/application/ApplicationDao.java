@@ -18,6 +18,8 @@
 package com.khartec.waltz.data.application;
 
 
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.tally.ImmutableLongTally;
@@ -46,8 +48,6 @@ public class ApplicationDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationDao.class);
 
-    private final DSLContext dsl;
-
     public static final RecordMapper<Record, Application> applicationRecordMapper = record -> {
         ApplicationRecord appRecord = record.into(APPLICATION);
         return ImmutableApplication.builder()
@@ -62,6 +62,8 @@ public class ApplicationDao {
                 .overallRating(readEnum(appRecord.getOverallRating(), RagRating.class, RagRating.Z))
                 .build();
     };
+
+    private final DSLContext dsl;
 
 
     @Autowired

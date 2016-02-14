@@ -16,24 +16,35 @@
  *
  */
 
-function service($http, BaseApiUrl) {
+/**
+ * This directive renders an application list which exposes simple controls for handling
+ * selections (callback on 'add'), and handling refocuses.  The 'isMember' callback is
+ * used to strikethrough text.
+ */
 
-    const BASE = `${BaseApiUrl}/app-view`;
+const BINDINGS = {
+    applications: '=', // [app]
+    isMember: '=', // function
+    refocus: '=',  // function
+    add: '='  // function
+};
 
-    const getById = (id) => $http
-        .get(`${BASE}/${id}`)
-        .then(result => result.data);
 
-    return {
-        getById
-    };
+function controller() {
 
 }
 
-service.$inject = [
-    '$http',
-    'BaseApiUrl',
-];
+controller.$inject = [];
 
 
-export default service;
+export default () => {
+    return {
+        restrict: 'E',
+        replace: true,
+        template: require('./app-group-app-selection-list.html'),
+        scope: {},
+        bindToController: BINDINGS,
+        controllerAs: 'ctrl',
+        controller
+    };
+};

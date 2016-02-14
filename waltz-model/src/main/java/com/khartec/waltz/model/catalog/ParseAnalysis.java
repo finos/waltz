@@ -15,14 +15,22 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.web;
+package com.khartec.waltz.model.catalog;
 
-import spark.Request;
-import spark.Response;
+import org.immutables.value.Value;
+
+import java.util.List;
 
 
-@FunctionalInterface
-public interface DatumRoute<T> {
+/**
+ * Created by dwatkins on 04/12/2015.
+ */
+@Value.Immutable
+public abstract class ParseAnalysis {
 
-    T apply(Request request, Response response) throws Exception;
+    public abstract char quoteChar();
+    public abstract char delimeterChar();
+
+    public abstract List<Integer> fieldCounts();
+    
 }

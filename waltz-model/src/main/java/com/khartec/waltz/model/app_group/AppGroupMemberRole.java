@@ -16,24 +16,9 @@
  *
  */
 
-function service($http, BaseApiUrl) {
+package com.khartec.waltz.model.app_group;
 
-    const BASE = `${BaseApiUrl}/app-view`;
-
-    const getById = (id) => $http
-        .get(`${BASE}/${id}`)
-        .then(result => result.data);
-
-    return {
-        getById
-    };
-
+public enum AppGroupMemberRole {
+    VIEWER,
+    OWNER
 }
-
-service.$inject = [
-    '$http',
-    'BaseApiUrl',
-];
-
-
-export default service;

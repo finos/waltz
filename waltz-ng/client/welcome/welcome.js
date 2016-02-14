@@ -16,17 +16,19 @@
  *
  */
 
-function controller(staticPanelStore) {
-    console.log('here I am')
-
+function controller(staticPanelStore, appGroupStore) {
     const vm = this;
 
     staticPanelStore.findByGroup('HOME')
         .then(panels => vm.panels = panels);
 
+    appGroupStore.findMyGroupSubscriptions()
+        .then(groupSubscriptions => vm.appGroupSubscriptions = groupSubscriptions);
+
 }
 
-controller.$inject = ['StaticPanelStore'];
+controller.$inject = ['StaticPanelStore', 'AppGroupStore'];
+
 
 export default {
     controller,

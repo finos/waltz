@@ -16,24 +16,29 @@
  *
  */
 
-function service($http, BaseApiUrl) {
+const BINDINGS = {
+    groupSubscriptions: '=',
+    editing: '=',
+    unsubscribe: '=',
+    deleteGroup: '='
+};
 
-    const BASE = `${BaseApiUrl}/app-view`;
 
-    const getById = (id) => $http
-        .get(`${BASE}/${id}`)
-        .then(result => result.data);
-
-    return {
-        getById
-    };
+function controller() {
 
 }
 
-service.$inject = [
-    '$http',
-    'BaseApiUrl',
-];
+controller.$inject = [];
 
 
-export default service;
+export default () => {
+    return {
+        restrict: 'E',
+        replace: true,
+        template: require('./app-group-list.html'),
+        scope: {},
+        bindToController: BINDINGS,
+        controllerAs: 'ctrl',
+        controller
+    };
+};

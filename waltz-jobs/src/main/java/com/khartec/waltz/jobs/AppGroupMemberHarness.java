@@ -15,22 +15,25 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.service.catalog;
+package com.khartec.waltz.jobs;
 
-import org.immutables.value.Value;
+import com.khartec.waltz.data.app_group.AppGroupMemberDao;
+import com.khartec.waltz.model.app_group.AppGroupMemberRole;
+import com.khartec.waltz.service.DIConfiguration;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.List;
+
+public class AppGroupMemberHarness {
+
+    public static void main(String[] args) {
+
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+
+        AppGroupMemberDao dao = ctx.getBean(AppGroupMemberDao.class);
+
+        dao.register(13, "1", AppGroupMemberRole.OWNER);
 
 
-/**
- * Created by dwatkins on 04/12/2015.
- */
-@Value.Immutable
-public abstract class ParseAnalysis {
+    }
 
-    public abstract char quoteChar();
-    public abstract char delimeterChar();
-
-    public abstract List<Integer> fieldCounts();
-    
 }

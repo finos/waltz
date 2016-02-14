@@ -16,24 +16,17 @@
  *
  */
 
-function service($http, BaseApiUrl) {
+package com.khartec.waltz.model.app_group;
 
-    const BASE = `${BaseApiUrl}/app-view`;
-
-    const getById = (id) => $http
-        .get(`${BASE}/${id}`)
-        .then(result => result.data);
-
-    return {
-        getById
-    };
-
+/**
+ *
+ * Represents the type of group.
+ *
+ * Public groups will be discoverable by search.
+ * Private groups will require an invite from the owner.
+ *
+ */
+public enum AppGroupKind {
+    PUBLIC,
+    PRIVATE
 }
-
-service.$inject = [
-    '$http',
-    'BaseApiUrl',
-];
-
-
-export default service;

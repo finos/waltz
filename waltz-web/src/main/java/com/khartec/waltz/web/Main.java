@@ -18,6 +18,7 @@
 package com.khartec.waltz.web;
 
 import com.khartec.waltz.common.exception.DuplicateKeyException;
+import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.api.StaticResourcesEndpoint;
@@ -110,7 +111,7 @@ public class Main {
         exception(DuplicateKeyException.class, (e, req, res) -> {
             String message = "Duplicate detected";
             LOG.error(message, e);
-            WebUtilities.reportException(
+            reportException(
                     500,
                     "DUPLICATE",
                     message,
@@ -118,10 +119,14 @@ public class Main {
                     LOG);
         });
 
+        exception(InsufficientPrivelegeException.class, (e, req, resp) ->
+           reportException(403, "NOT_AUTHORIZED", e.getMessage(), resp, LOG));
+
+
         exception(Exception.class, (e, req, res) -> {
             String message = "Exception: " + e.getMessage() + " / " + e.getClass().getCanonicalName();
             LOG.error(message, e);
-            WebUtilities.reportException(
+            reportException(
                     500,
                     "unknown",
                     message,

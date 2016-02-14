@@ -1,0 +1,26 @@
+<div>
+    <ul>
+        <li ng-repeat="app in ctrl.applications | orderBy:'name'">
+                <span ng-if="ctrl.isMember(app)">
+                    <span class='text-muted' style="text-decoration: line-through">
+                        {{ app.name }}
+                    </span>
+                    <small>
+                        <a href ng-click="ctrl.refocus(app)" title="Re-focus">
+                            (&raquo;)
+                        </a>
+                    </small>
+                </span>
+                <span ng-if="!ctrl.isMember(app)">
+                    <a ng-click="ctrl.add(app)" href>
+                        {{ app.name }}
+                    </a>
+                    <small>
+                        <a href ng-click="ctrl.add(app); ctrl.refocus(app)" title="Add and re-focus">
+                            (&raquo;)
+                        </a>
+                    </small>
+                </span>
+        </li>
+    </ul>
+</div>

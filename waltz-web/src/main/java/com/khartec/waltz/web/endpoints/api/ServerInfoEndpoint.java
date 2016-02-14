@@ -19,17 +19,12 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.service.server_info.ServerInfoService;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.WebUtilities;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getId;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.requireRole;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -59,6 +54,9 @@ public class ServerInfoEndpoint implements Endpoint {
 
         getForDatum(mkPath(BASE_URL, "org-unit", ":id", "stats"), ((request, response)
                 -> serverInfoService.findStatsForOrganisationalUnit(getId(request))));
+
+        postForDatum(mkPath(BASE_URL, "apps", "stats"), ((request, response)
+                -> serverInfoService.findStatsForAppIds(readBody(request, Long[].class, new Long[]{}))));
 
     }
 }
