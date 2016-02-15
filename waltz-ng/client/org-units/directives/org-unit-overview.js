@@ -14,6 +14,10 @@
 import _ from 'lodash';
 
 import { numberFormatter } from '../../common';
+import { enrichServerStats } from  '../../server-info/services/server-utilities';
+import { calcPortfolioCost } from '../../asset-cost/services/asset-cost-utilities';
+import { calcComplexitySummary } from '../../complexity/services/complexity-utilities';
+
 
 import {
     lifecyclePhaseColorScale,
@@ -132,44 +136,26 @@ function controller($scope, orgUnitStore) {
         vm.pies.appConnections.data = calcAppConnectionPieStats(flows, this.apps);
     });
 
-    $scope.$watch('ctrl.costs', costs => {
-        if (!costs) return;
-        const amount = _.sum(costs, 'cost.amount');
 
-        vm.portfolioCostStr = '€ ' + numberFormatter(amount, 1);
-    });
+    $scope.$watch('ctrl.costs', cs => vm.portfolioCostStr = calcPortfolioCost(cs));
 
     $scope.$watch('ctrl.orgServerStats', stats => {
         if (!stats) return;
         const serverStats = _.foldl(
             stats,
             (acc, stat) => {
-                const total = acc.total + stat.virtualCount + stat.physicalCount;
-                const virtual = acc.virtual + stat.virtualCount;
-                const physical = acc.physical + stat.physicalCount;
-                return { total, virtual, physical };
+                const virtualCount = acc.virtualCount + stat.virtualCount;
+                const physicalCount = acc.physicalCount + stat.physicalCount;
+                return { virtualCount, physicalCount };
             },
-            { total: 0, virtual: 0, physical: 0});
+            { virtualCount: 0, physicalCount: 0});
 
-        serverStats.virtualPercentage = serverStats.total > 0
-                ? Number((serverStats.virtual / serverStats.total) * 100).toFixed(1)
-                : "-";
+        enrichServerStats(serverStats);
 
         vm.serverStats = serverStats;
     });
 
-    $scope.$watch('ctrl.complexity', complexity => {
-        if (!complexity) return;
-        const cumulativeScore = _.sum(complexity, "overallScore");
-        const averageScore = complexity.length > 0 ? cumulativeScore / complexity.length : 0;
-        vm.complexitySummary =  {
-            cumulativeScore,
-            averageScore
-        };
-    })
-
-
-
+    $scope.$watch('ctrl.complexity', cs => vm.complexitySummary = calcComplexitySummary(cs));
 }
 
 

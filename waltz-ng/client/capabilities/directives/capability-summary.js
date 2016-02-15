@@ -16,7 +16,9 @@
  *
  */
 
-import { numberFormatter } from '../../common';
+import { enrichServerStats } from  '../../server-info/services/server-utilities';
+import { calcPortfolioCost } from '../../asset-cost/services/asset-cost-utilities';
+import { calcComplexitySummary } from '../../complexity/services/complexity-utilities';
 
 
 const BINDINGS = {
@@ -32,40 +34,9 @@ function controller($scope) {
 
     const vm = this;
 
-    function recalcPortfolioCosts(costs) {
-        if (!costs) return;
-        const amount = _.sum(costs, 'cost.amount');
-
-        vm.portfolioCostStr = '€ ' + numberFormatter(amount, 1);
-    }
-
-
-    function recalcComplexity(complexity) {
-        if (!complexity) return;
-        const cumulativeScore = _.sum(complexity, "overallScore");
-        const averageScore = complexity.length > 0 ? cumulativeScore / complexity.length : 0;
-        vm.complexitySummary =  {
-            cumulativeScore,
-            averageScore
-        };
-    }
-
-
-    function recalcServerStats(serverStats) {
-        if (! serverStats) return;
-        serverStats.total = serverStats.physicalCount + serverStats.virtualCount;
-
-        serverStats.virtualPercentage = serverStats.total > 0
-            ? Number((serverStats.virtualCount / serverStats.total) * 100).toFixed(1)
-            : "-";
-
-        vm.serverStats = serverStats;
-    }
-
-
-    $scope.$watch('ctrl.assetCosts', recalcPortfolioCosts);
-    $scope.$watch('ctrl.complexity', recalcComplexity);
-    $scope.$watch('ctrl.serverStats', recalcServerStats);
+    $scope.$watch('ctrl.assetCosts', cs => vm.portfolioCostStr = calcPortfolioCost(cs));
+    $scope.$watch('ctrl.complexity', cs => vm.complexitySummary = calcComplexitySummary(cs));
+    $scope.$watch('ctrl.serverStats', enrichServerStats);
 
 }
 

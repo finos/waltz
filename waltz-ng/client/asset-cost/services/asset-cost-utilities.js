@@ -17,6 +17,7 @@
  */
 
 import _ from 'lodash';
+import { numberFormatter } from '../../common';
 
 
 export function categorizeCostsIntoBuckets(costs) {
@@ -50,4 +51,17 @@ export function categorizeCostsIntoBuckets(costs) {
     });
 
     return buckets;
+}
+
+
+/**
+ * Given an array of cost data will return
+ * a formatted total cost for the portfolio
+ * @param costs
+ */
+export function calcPortfolioCost(costs) {
+    if (!costs) return;
+    const amount = _.sum(costs, 'cost.amount');
+
+    return '€ ' + numberFormatter(amount, 1);
 }
