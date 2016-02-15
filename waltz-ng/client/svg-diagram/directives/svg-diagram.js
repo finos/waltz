@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import angular from 'angular';
+import d3 from 'd3';
 
 
 function resize(elem) {
@@ -33,7 +34,15 @@ function controller($scope, $window) {
             $window.setTimeout(() => resize(svg), 100);
 
             const custProps = svg.find('v:cp');
+
+            // get rid of auto generated svg titles
+            _.each(svg.find('title'), t => t.remove());
+
             return _.chain(custProps)
+                .filter(cp => cp
+                        && cp.attributes
+                        && cp.attributes['v:lbl']
+                        && cp.attributes['v:lbl'].value == diagram.keyProperty)
                 .map(cp => {
                     const valAttr = cp.attributes['v:val'];
                     const value = valAttr
@@ -47,7 +56,6 @@ function controller($scope, $window) {
                         name: cp.attributes['v:lbl'].value
                     };
                 })
-                .filter(b => b.name === diagram.keyProperty)
                 .value();
         }
     };
