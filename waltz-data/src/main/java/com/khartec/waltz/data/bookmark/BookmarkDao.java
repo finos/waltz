@@ -59,6 +59,7 @@ public class BookmarkDao {
                 .url(record.getUrl())
                 .kind(BookmarkKind.valueOf(record.getKind()))
                 .primary(record.getIsPrimary())
+                .provenance(record.getProvenance())
                 .build();
     };
 
@@ -112,6 +113,7 @@ public class BookmarkDao {
                 .set(BOOKMARK.IS_PRIMARY, bookmark.primary())
                 .set(BOOKMARK.CREATED_AT, DSL.currentTimestamp())
                 .set(BOOKMARK.UPDATED_AT, DSL.currentTimestamp())
+                .set(BOOKMARK.PROVENANCE, bookmark.provenance())
                 .returning(BOOKMARK.ID)
                 .fetchOne();
 
@@ -134,6 +136,7 @@ public class BookmarkDao {
                 .set(BOOKMARK.TITLE, bookmark.title().orElse(""))
                 .set(BOOKMARK.IS_PRIMARY, bookmark.primary())
                 .set(BOOKMARK.UPDATED_AT, DSL.currentTimestamp())
+                .set(BOOKMARK.PROVENANCE, bookmark.provenance())
                 .where(BOOKMARK.ID.eq(bookmark.id().get()))
                 .execute();
 

@@ -26,18 +26,21 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableEndUserApplication.class)
 @JsonDeserialize(as = ImmutableEndUserApplication.class)
-public abstract class EndUserApplication implements IdProvider, DescriptionProvider, NameProvider {
+public abstract class EndUserApplication implements
+        IdProvider,
+        DescriptionProvider,
+        NameProvider,
+        ProvenanceProvider {
 
     public abstract Long organisationalUnitId();
-
-
     public abstract String kind();
-
-
     public abstract LifecyclePhase lifecyclePhase();
-
     public abstract RiskRating riskRating();
 
+    @Value.Default
+    public String provenance() {
+        return "waltz";
+    }
 
     public EntityReference toEntityReference() {
         return ImmutableEntityReference.builder()

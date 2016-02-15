@@ -33,7 +33,8 @@ import java.util.Optional;
 public abstract class Application implements
         IdProvider,
         NameProvider,
-        DescriptionProvider {
+        DescriptionProvider,
+        ProvenanceProvider {
 
     public abstract Optional<String> assetCode();
     public abstract Optional<String> parentAssetCode();
@@ -41,6 +42,12 @@ public abstract class Application implements
     public abstract ApplicationKind kind();
     public abstract LifecyclePhase lifecyclePhase();
     public abstract RagRating overallRating();
+
+
+    @Value.Default
+    public String provenance() {
+        return "waltz";
+    }
 
 
     public EntityReference toEntityReference() {

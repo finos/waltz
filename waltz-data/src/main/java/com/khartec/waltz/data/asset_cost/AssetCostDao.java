@@ -58,6 +58,7 @@ public class AssetCostDao {
         return ImmutableAssetCost.builder()
                 .assetCode(record.getAssetCode())
                 .cost(costMapper.map(r))
+                .provenance(record.getProvenance())
                 .build();
     };
 

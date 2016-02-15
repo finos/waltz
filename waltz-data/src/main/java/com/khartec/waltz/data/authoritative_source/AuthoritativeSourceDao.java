@@ -72,6 +72,7 @@ public class AuthoritativeSourceDao {
                 .applicationReference(appRef)
                 .dataType(record.getDataType())
                 .rating(Rating.valueOf(record.getRating()))
+                .provenance(record.getProvenance())
                 .build();
     };
 

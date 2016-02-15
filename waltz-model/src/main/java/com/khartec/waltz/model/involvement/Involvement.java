@@ -20,16 +20,22 @@ package com.khartec.waltz.model.involvement;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableInvolvement.class)
 @JsonDeserialize(as = ImmutableInvolvement.class)
-public abstract class Involvement {
+public abstract class Involvement implements ProvenanceProvider {
 
     public abstract InvolvementKind kind();
     public abstract EntityReference entityReference();
     public abstract String employeeId();
+
+    @Value.Default
+    public String provenance() {
+        return "waltz";
+    }
 
 }

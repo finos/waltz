@@ -50,6 +50,7 @@ public class EndUserAppDao {
                 .organisationalUnitId(record.getOrganisationalUnitId())
                 .lifecyclePhase(LifecyclePhase.valueOf(record.getLifecyclePhase()))
                 .riskRating(RiskRating.valueOf(record.getRiskRating()))
+                .provenance(record.getProvenance())
                 .build();
     };
 

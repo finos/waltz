@@ -60,6 +60,7 @@ public class ApplicationDao {
                 .kind(readEnum(appRecord.getKind(), ApplicationKind.class, ApplicationKind.IN_HOUSE))
                 .lifecyclePhase(readEnum(appRecord.getLifecyclePhase(), LifecyclePhase.class, LifecyclePhase.DEVELOPMENT))
                 .overallRating(readEnum(appRecord.getOverallRating(), RagRating.class, RagRating.Z))
+                .provenance(appRecord.getProvenance())
                 .build();
     };
 
@@ -250,6 +251,7 @@ public class ApplicationDao {
         record.setLifecyclePhase(application.lifecyclePhase().name());
         record.setKind(application.kind().name());
         record.setOverallRating(application.overallRating().name());
+        record.setProvenance(application.provenance());
 
         return record.update();
     }
