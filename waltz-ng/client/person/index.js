@@ -14,17 +14,6 @@
 import PersonView from './person-view';
 import PersonHome from './person-home';
 
-function onEnter(person, historyStore) {
-    historyStore.put(
-        person.displayName,
-        'PERSON',
-        'main.person.view',
-        { empId: person.employeeId });
-}
-
-
-onEnter.$inject = ['person', 'HistoryStore'];
-
 
 export default (module) => {
 
@@ -40,8 +29,7 @@ export default (module) => {
                 })
                 .state('main.person.view', {
                     url: '/:empId',
-                    views: {'content@': PersonView },
-                    //onEnter
+                    views: {'content@': PersonView }
                 });
         }
     ]);
@@ -50,6 +38,8 @@ export default (module) => {
     module.directive('waltzPersonLink', require('./directives/person-link'));
     module.directive('waltzManagerList', require('./directives/manager-list'));
     module.directive('waltzPersonDirectsList', require('./directives/person-directs-list'));
+    module.directive('waltzPersonSummary', require('./directives/person-summary'));
+
     module.service('PersonViewDataService', require('./person-view-data'));
 
 };

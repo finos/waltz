@@ -1,0 +1,129 @@
+<div>
+    <ul class="list-unstyled">
+        <li>
+            <div ng-if='ctrl.managers.length > 0' style="padding: 1em">
+                    <span class="text-muted">
+                        <waltz-icon name="level-up"></waltz-icon>
+                        Manager/s:
+                        <waltz-manager-list managers="ctrl.managers"></waltz-manager-list>
+                    </span>
+            </div>
+
+            <ul class="list-unstyled"
+                style="padding-left: 3em">
+                <li>
+                    <div class="waltz-page-summary">
+                        <h4>
+                            <waltz-icon name="user"></waltz-icon>
+                            {{ctrl.person.displayName}}
+                        </h4>
+
+                        <div class="waltz-display-section">
+                            <div class="row">
+                                <div class="col-sm-2 waltz-display-field-label">
+                                    Title
+                                </div>
+                                <div class="col-sm-4">
+                                    {{ ctrl.person.title }}
+                                </div>
+
+                                <div class="col-sm-2 waltz-display-field-label">
+                                    e-mail
+                                </div>
+                                <div class="col-sm-4">
+                                    <waltz-mail-to person="ctrl.person"></waltz-mail-to>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-2 waltz-display-field-label">
+                                    Tel (Office)
+                                </div>
+                                <div class="col-sm-4">
+                                    <waltz-phone-link number="{{ctrl.person.officePhone}}"></waltz-phone-link>
+                                </div>
+
+                                <div class="col-sm-2 waltz-display-field-label">
+                                    Tel (Mobile)
+                                </div>
+                                <div class="col-sm-4">
+                                    <waltz-phone-link number="{{ctrl.person.mobilePhone}}"></waltz-phone-link>
+                                </div>
+                            </div>
+
+
+                            <div class="row" style="border-bottom: 2px dotted #eee; padding: 6px">
+                                <div class="col-sm-2 waltz-display-field-label">
+                                    Roles
+                                </div>
+                                <div class="col-sm-10">
+                                    <ul class="list-unstyled waltz-keyword-list">
+                                        <li ng-repeat="role in ctrl.allRoles | orderBy">
+                                            {{role | toDisplayName:'involvementKind'}}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- SCORES -->
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <waltz-basic-info-tile name="Portfolio Cost"
+                                                           description="Cumulative value of infra and app dev costs"
+                                                           waltz-jump-to="costs-section"
+                                                           icon="money">
+                                        <span style="font-size: xx-large;">
+                                            {{ ctrl.portfolioCostStr }}
+                                        </span>
+                                    </waltz-basic-info-tile>
+                                </div>
+                                <div class="col-sm-4">
+                                    <waltz-basic-info-tile name="Complexity"
+                                                           description="Derived from capabilities, connections and servers"
+                                                           class="clickable"
+                                                           waltz-jump-to="complexity-section"
+                                                           icon="rocket">
+                                        <div style="font-size: xx-large;">
+                                            &Sigma; {{ ctrl.complexitySummary.cumulativeScore | toFixed:1 }}
+                                        </div>
+                                        <div class="small text-muted">
+                                            {{ ctrl.complexitySummary.averageScore | toFixed:2 }} per app
+                                        </div>
+                                    </waltz-basic-info-tile>
+
+                                </div>
+                                <div class="col-sm-4">
+                                    <waltz-basic-info-tile name="Servers"
+                                                           description="Number of servers supporting this group"
+                                                           icon="server">
+                                        <div>
+                                            <div style="font-size: xx-large;">
+                                                # {{ ctrl.serverStats.total }}
+                                            </div>
+                                            <div class="small text-muted">
+                                                {{ ctrl.serverStats.virtualPercentage }}% virtual
+                                            </div>
+                                        </div>
+                                    </waltz-basic-info-tile>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <ul ng-if="ctrl.directs.length > 0"
+                        class="list-unstyled"
+                        style="padding-left: 6em">
+                        <li>
+                            <h4>Directs</h4>
+                            <waltz-person-directs-list directs="ctrl.directs"></waltz-person-directs-list>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>

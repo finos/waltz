@@ -23,11 +23,13 @@ const initModel = {
         allApps: []
     },
     apps: [],
-    complexity: []
+    complexity: [],
+    assetCosts: [],
+    serverStats: null
 };
 
 
-function service(personStore, involvementStore, assetCostStore, complexityStore, $q) {
+function service(personStore, involvementStore, assetCostStore, complexityStore, serverInfoStore, $q) {
 
     const state = { model: initModel };
 
@@ -78,12 +80,23 @@ function service(personStore, involvementStore, assetCostStore, complexityStore,
 
 
     function loadCosts(appIds) {
-        assetCostStore.findAppCostsByAppIds(appIds).then(assetCosts => state.model.assetCosts = assetCosts);
+        assetCostStore
+            .findAppCostsByAppIds(appIds)
+            .then(assetCosts => state.model.assetCosts = assetCosts);
     }
 
 
     function loadComplexity(appIds) {
-        complexityStore.findByAppIds(appIds).then(complexity => state.model.complexity = complexity);
+        complexityStore
+            .findByAppIds(appIds)
+            .then(complexity => state.model.complexity = complexity);
+    }
+
+
+    function loadServerStats(appIds) {
+        serverInfoStore
+            .findStatsForAppIds(appIds)
+            .then(stats => state.model.serverStats = stats);
     }
 
 
@@ -94,6 +107,7 @@ function service(personStore, involvementStore, assetCostStore, complexityStore,
                 const appIds = _.map(model.apps, 'id');
                 loadCosts(appIds);
                 loadComplexity(appIds);
+                loadServerStats(appIds);
             });
     }
 
@@ -109,6 +123,7 @@ service.$inject = [
     'InvolvementDataService',
     'AssetCostStore',
     'ComplexityStore',
+    'ServerInfoStore',
     '$q'
 ];
 
