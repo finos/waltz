@@ -841,4 +841,49 @@
 
     </changeSet>
 
+
+    <changeSet author="dwatkins"
+               id="20160215-68-1">
+        <addColumn tableName="application">
+            <column name="provenance" type="varchar(64)" defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="asset_cost">
+            <column name="provenance" type="varchar(64)" defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="authoritative_source">
+            <column name="provenance" type="varchar(64)" defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="bookmark">
+            <column name="provenance" type="varchar(64)" defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="end_user_application">
+            <column name="provenance" type="varchar(64)" defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="data_flow">
+            <column name="provenance" type="varchar(64)" defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="involvement">
+            <column name="provenance" type="varchar(64)" defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="server_information">
+            <column name="provenance" type="varchar(64)" defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

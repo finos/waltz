@@ -61,6 +61,7 @@ public class DataFlowDao {
                         .id(record.getTargetEntityId())
                         .name(r.getValue(targetAppAlias.NAME))
                         .build())
+                .provenance(record.getProvenance())
                 .build();
     };
 
@@ -125,19 +126,21 @@ public class DataFlowDao {
 
 
     public int[] addFlows(List<DataFlow> flows) {
-        List<InsertValuesStep5<DataFlowRecord, String, String, Long, String, Long>> inserts = flows.stream()
+        List<Insert> inserts = flows.stream()
                 .map(f -> dsl
                         .insertInto(DATA_FLOW)
                         .columns(DATA_FLOW.DATA_TYPE,
                                 DATA_FLOW.SOURCE_ENTITY_KIND,
                                 DATA_FLOW.SOURCE_ENTITY_ID,
                                 DATA_FLOW.TARGET_ENTITY_KIND,
-                                DATA_FLOW.TARGET_ENTITY_ID)
+                                DATA_FLOW.TARGET_ENTITY_ID,
+                                DATA_FLOW.PROVENANCE)
                         .values(f.dataType(),
                                 f.source().kind().name(),
                                 f.source().id(),
                                 f.target().kind().name(),
-                                f.target().id()))
+                                f.target().id(),
+                                f.provenance()))
                 .collect(Collectors.toList());
 
         return dsl.batch(inserts).execute();

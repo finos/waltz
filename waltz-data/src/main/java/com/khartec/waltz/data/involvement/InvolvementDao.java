@@ -57,6 +57,7 @@ public class InvolvementDao {
                         .kind(EntityKind.valueOf(involvementRecord.getEntityKind()))
                         .id(involvementRecord.getEntityId())
                         .build())
+                .provenance(involvementRecord.getProvenance())
                 .build();
     };
 

@@ -19,15 +19,21 @@ package com.khartec.waltz.model.cost;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableAssetCost.class)
 @JsonDeserialize(as = ImmutableAssetCost.class)
-public abstract class AssetCost {
+public abstract class AssetCost implements ProvenanceProvider {
 
     public abstract String assetCode();
     public abstract Cost cost();
+
+    @Value.Default
+    public String provenance() {
+        return "waltz";
+    }
 
 }

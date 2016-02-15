@@ -20,6 +20,7 @@ package com.khartec.waltz.model.serverinfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.IdProvider;
+import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
 import java.util.Optional;
@@ -28,7 +29,7 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutableServerInfo.class)
 @JsonDeserialize(as = ImmutableServerInfo.class)
-public abstract class ServerInfo implements IdProvider {
+public abstract class ServerInfo implements IdProvider, ProvenanceProvider {
 
     public abstract String hostname();
     public abstract String operatingSystem();
@@ -37,6 +38,12 @@ public abstract class ServerInfo implements IdProvider {
     public abstract Optional<String> location();
     public abstract Optional<String> country();
     public abstract String assetCode();
+
+
+    @Value.Default
+    public String provenance() {
+        return "waltz";
+    }
 
     @Value.Default
     public boolean virtual() {

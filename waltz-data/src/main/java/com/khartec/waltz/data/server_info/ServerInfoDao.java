@@ -56,6 +56,7 @@ public class ServerInfoDao {
                 .environment(row.getEnvironment())
                 .location(Optional.ofNullable(row.getLocation()))
                 .country(Optional.ofNullable(row.getCountry()))
+                .provenance(row.getProvenance())
                 .build();
     };
 
@@ -98,7 +99,8 @@ public class ServerInfoDao {
                                     SERVER_INFORMATION.IS_VIRTUAL,
                                     SERVER_INFORMATION.ENVIRONMENT,
                                     SERVER_INFORMATION.LOCATION,
-                                    SERVER_INFORMATION.ASSET_CODE)
+                                    SERVER_INFORMATION.ASSET_CODE,
+                                    SERVER_INFORMATION.PROVENANCE)
                             .values(
                                     s.hostname(),
                                     s.operatingSystem(),
@@ -107,10 +109,12 @@ public class ServerInfoDao {
                                     s.virtual(),
                                     s.environment(),
                                     s.location().orElse(""),
-                                    s.assetCode()))
+                                    s.assetCode(),
+                                    s.provenance()))
                     .collect(Collectors.toList()))
                 .execute();
     }
+
 
     public Map<Long, ServerSummaryStatistics> findStatsForOrganisationalUnitIds(List<Long> orgUnitIds) {
         Result<Record3<Long, Boolean, Integer>> records = dsl
