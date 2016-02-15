@@ -19,6 +19,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.svg.SvgDiagram;
 import com.khartec.waltz.service.svg.SvgDiagramService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +36,12 @@ public class SvgDiagramEndpoint implements Endpoint {
 
     private final SvgDiagramService svgDiagramService;
 
+
     @Autowired
     public SvgDiagramEndpoint(SvgDiagramService svgDiagramService) {
         this.svgDiagramService = svgDiagramService;
     }
+
 
     @Override
     public void register() {
