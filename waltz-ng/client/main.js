@@ -144,7 +144,7 @@ waltzApp.config([
 waltzApp.config( [
     '$compileProvider',
     $compileProvider => {
-        $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|sip|chrome-extension):/);
+        $compileProvider.aHrefSanitizationWhitelist(/^\s*(mailto|https?|sip|chrome-extension):/);
     }
 ]);
 
@@ -193,3 +193,5 @@ waltzApp.run(['$rootScope', '$document', ($rootScope, $doc) => {
 waltzApp.config(['$ngReduxProvider', ($ngReduxProvider) => {
     $ngReduxProvider.createStoreWith(rootReducer, [thunk], []);
 }]);
+
+
