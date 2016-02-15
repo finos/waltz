@@ -42,6 +42,7 @@ function controller(appStore,
                     perspectiveStore,
                     ratingStore,
                     capabilityStore,
+                    notification,
                     $q,
                     $scope,
                     $stateParams,
@@ -158,6 +159,7 @@ function controller(appStore,
     vm.revertAll = () => {
         const revertRow = row => _.each(row.ratings, r => r.current = r.original);
         _.each(vm.group.raw, revertRow);
+        notification('Reverted all changes');
         recalc();
     };
 
@@ -167,7 +169,9 @@ function controller(appStore,
 
     vm.submit = () => {
         const action = createChangeAction(vm.group, vm.app, perspectiveCode);
-        ratingStore.update(action).then(() => $state.go('main.app-view', { id: vm.app.id }));
+        ratingStore.update(action)
+            .then(() => $state.go('main.app-view', { id: vm.app.id }))
+            .then(() => notification.success('Updated ratings'));
     };
 
 }
@@ -178,6 +182,7 @@ controller.$inject = [
     'PerspectiveStore',
     'RatingStore',
     'CapabilityStore',
+    'Notification',
     '$q',
     '$scope',
     '$stateParams',

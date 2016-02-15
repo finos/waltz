@@ -15,6 +15,7 @@ import '../style/style.scss';
 import _ from 'lodash';
 import angular from 'angular';
 
+import 'angular-ui-notification';
 import 'angular-ui-grid/ui-grid';
 import 'angular-ui-router';
 import 'angular-ui-bootstrap';
@@ -36,6 +37,7 @@ const dependencies = [
     'ui.router',
     'ui.select',
     'ui.grid',
+    'ui-notification',
     'ngAnimate',
     'ngSanitize',
     'ngTagsInput',
@@ -190,8 +192,7 @@ waltzApp.run(['$rootScope', '$document', ($rootScope, $doc) => {
     });
 }]);
 
+
 waltzApp.config(['$ngReduxProvider', ($ngReduxProvider) => {
     $ngReduxProvider.createStoreWith(rootReducer, [thunk], []);
 }]);
-
-

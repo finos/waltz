@@ -37,7 +37,8 @@
     "ui-select": "^0.13.1",
     "ng-redux": "~3.3.1",
     "redux-thunk": "~1.0.3",
-    "numeral": "~1.5.3"
+    "numeral": "~1.5.3",
+    "angular-ui-notification": "~0.1.0"
   },
   "devDependencies": {
     "babel-core": "~5.2.17",

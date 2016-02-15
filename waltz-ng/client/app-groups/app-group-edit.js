@@ -34,10 +34,10 @@ function handleError(e) {
     alert(e.data.message);
 }
 
-function controller(appGroupStore, appStore, dataFlowStore, $stateParams, $q, $scope) {
+function controller(appGroupStore, appStore, dataFlowStore, notification, $stateParams, $q, $scope) {
     const { id }  = $stateParams;
-
     const vm = this;
+
 
     appGroupStore.getById(id)
         .then(groupDetail => setup(groupDetail))
@@ -46,28 +46,37 @@ function controller(appGroupStore, appStore, dataFlowStore, $stateParams, $q, $s
 
     vm.addToGroup = (app) => {
         appGroupStore.addApplication(id, app.id)
-            .then(apps => vm.applications = apps, e => handleError(e));
+            .then(apps => vm.applications = apps, e => handleError(e))
+            .then(() => notification.success('Added: ' + app.name));
     };
+
 
     vm.removeFromGroup = (app) => {
         appGroupStore.removeApplication(id, app.id)
-            .then(apps => vm.applications = apps, e => handleError(e));
+            .then(apps => vm.applications = apps, e => handleError(e))
+            .then(() => notification.warning('Removed: ' + app.name));
     };
+
 
     vm.isAppInGroup = (app) => {
         return _.any(vm.applications, a => app.id === a.id);
     };
+
 
     vm.promoteToOwner = (member) => {
         appGroupStore.addOwner(member.groupId, member.userId)
             .then(members => {
                 vm.owners = _.filter(members, m => m.role === 'OWNER');
                 vm.viewers = _.filter(members, m => m.role === 'VIEWER');
-            });
+            })
+            .then(() => notification.success('User: ' + member.userId + ' is now an owner of the group'));
+
     };
 
+
     vm.updateGroupOverview = () => {
-        appGroupStore.updateGroupOverview(id, vm.appGroup);
+        appGroupStore.updateGroupOverview(id, vm.appGroup)
+            .then(() => notification.success('Group details updated'));
     };
 
 
@@ -116,6 +125,7 @@ controller.$inject = [
     'AppGroupStore',
     'ApplicationStore',
     'DataFlowDataStore',
+    'Notification',
     '$stateParams',
     '$q',
     '$scope'

@@ -21,6 +21,7 @@ function controller(application,
                     dataTypeStore,
                     authSourceStore,
                     displayNameService,
+                    notification,
                     $state,
                     $scope,
                     $q) {
@@ -155,7 +156,6 @@ function controller(application,
     };
 
     const reload = () => {
-        console.log('RELOAD');
         loadDataFlows(dataFlowStore, appId, vm).then(() => prepareData());
         vm.cancel();
     };
@@ -177,12 +177,10 @@ function controller(application,
             removedTypes: _.map(removed, 'code')
         };
 
-        console.log('command', command);
-
-        dataFlowStore.create(command).then(() => {
-            reload();
-        });
-    }
+        dataFlowStore.create(command)
+            .then(() => reload())
+            .then(() => notification.success('Logical flows updated'));
+    };
 
 
     const addUpstreamFlow = (type, source) => {
@@ -225,6 +223,7 @@ controller.$inject = [
     'DataTypesDataService',
     'AuthSourcesStore',
     'WaltzDisplayNameService',
+    'Notification',
     '$state',
     '$scope',
     '$q'
