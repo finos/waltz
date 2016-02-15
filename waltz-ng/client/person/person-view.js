@@ -50,7 +50,12 @@ function mkAppChartData(apps) {
 }
 
 
-function controller(involvementStore, $q, $scope, $stateParams, viewService, historyStore) {
+function controller(involvementStore,
+                    $q,
+                    $scope,
+                    $stateParams,
+                    viewService,
+                    historyStore) {
 
     const vm = this;
     vm.state = viewService.state;
@@ -68,14 +73,13 @@ function controller(involvementStore, $q, $scope, $stateParams, viewService, his
             historyStore.put(model.person.displayName, 'PERSON', 'main.person.view', { empId: model.person.employeeId });
         }
 
-
-
         vm.hasInvolvements = hasInvolvements(model.involvements);
         vm.charts = {
             apps: mkAppChartData(model.involvements.allApps)
         };
 
     }, true);
+
 }
 
 controller.$inject = [
@@ -87,9 +91,9 @@ controller.$inject = [
     'HistoryStore'
 ];
 
+
 export default {
     template: require('./person-view.html'),
     controller,
     controllerAs: 'ctrl'
-
 };
