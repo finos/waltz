@@ -21,7 +21,7 @@ function getParentRef(params) {
 }
 
 
-function controller(appStore, bookmarkStore, params, $state) {
+function controller(appStore, bookmarkStore, notification, params, $state) {
     const parentRef = getParentRef(params);
 
     this.save = (b) => {
@@ -31,7 +31,8 @@ function controller(appStore, bookmarkStore, params, $state) {
             .then(() => {
                 this.refresh(parentRef);
                 this.resetForm();
-            });
+            })
+            .then(() => notification.success('Updated bookmarks'))
     };
 
     this.cancel = () => {
@@ -55,7 +56,8 @@ function controller(appStore, bookmarkStore, params, $state) {
         if (confirm('Are you sure you want to remove this bookmark ?')) {
             bookmarkStore
                 .remove(b.id)
-                .then(() => this.refresh(parentRef));
+                .then(() => this.refresh(parentRef))
+                .then(() => notification.warning('Removed bookmark'));
         }
     };
 
@@ -71,15 +73,19 @@ function controller(appStore, bookmarkStore, params, $state) {
         this.selectedBookmark = angular.copy(b);
     };
 
-    // ---
-
     appStore.getById(parentRef.id).then(a => this.parent = a);
     this.refresh(parentRef);
 
 }
 
+controller.$inject = [
+    'ApplicationStore',
+    'BookmarkStore',
+    'Notification',
+    '$stateParams',
+    '$state'
+];
 
-controller.$inject = ['ApplicationStore', 'BookmarkStore', '$stateParams', '$state'];
 
 export default {
     template: require('./bookmark-editor.html'),

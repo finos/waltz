@@ -31,7 +31,7 @@ function removeUsedGroups(allGroups, existingSubscriptions) {
 }
 
 
-function controller(appGroupStore, $scope, $state) {
+function controller(appGroupStore, notification, $scope, $state) {
 
     function loadPublicGroups() {
         appGroupStore.findPublicGroups()
@@ -67,7 +67,7 @@ function controller(appGroupStore, $scope, $state) {
     vm.createNewGroup = () => {
         appGroupStore.createNewGroup()
             .then(id => {
-                alert('Group created');
+                notification.success('New group created');
                 $state.go('main.app-group.edit', { id })
             });
     };
@@ -75,7 +75,8 @@ function controller(appGroupStore, $scope, $state) {
 
     vm.unsubscribe = (subscription) => {
         unsubscribeFromGroup(subscription)
-            .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions);
+            .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions)
+            .then(() => notification.warning('Unsubscribed from: ' + subscription.appGroup.name));
     };
 
 
@@ -83,7 +84,9 @@ function controller(appGroupStore, $scope, $state) {
         if (! confirm("Really delete this group ? \n " + group.appGroup.name)) return;
 
         appGroupStore.deleteGroup(group.appGroup.id)
-            .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions);
+            .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions)
+            .then(() => notification.warning('Deleted group: ' + group.appGroup.name));
+
     };
 
 
@@ -91,15 +94,19 @@ function controller(appGroupStore, $scope, $state) {
         if (selected && _.isObject(selected)) {
             subscribeToGroup(selected)
                 .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions)
-                .then(() => {
-                    vm.selectedPublicGroup = null;
-                })
+                .then(() => notification.success('Subscribed to: ' + selected.name))
+                .then(() => vm.selectedPublicGroup = null);
+
         }
     });
-
 }
 
-controller.$inject = [ 'AppGroupStore', '$scope', '$state' ];
+controller.$inject = [
+    'AppGroupStore',
+    'Notification',
+    '$scope',
+    '$state'
+];
 
 
 export default () => {

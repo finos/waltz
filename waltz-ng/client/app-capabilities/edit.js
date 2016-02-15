@@ -23,6 +23,7 @@ const controller = function(appCapabilityStore,
                             appStore,
                             capabilityStore,
                             ratingStore,
+                            notification,
                             $stateParams,
                             $state,
                             $q) {
@@ -65,7 +66,9 @@ const controller = function(appCapabilityStore,
                     });
                     calculateAvailableCapabilities();
                     clearForm();
-                });
+                })
+                .then(() => notification.success('Capability added'));
+
         } else {
             return Promise.resolve();
         }
@@ -74,14 +77,15 @@ const controller = function(appCapabilityStore,
 
     const remove = (capabilityId) => {
         if (model.capabilityUsage[capabilityId]) {
-            alert('Cannot remove capability as it has ratings.');
+            notification.error('Cannot remove capability as it has ratings.');
         } else {
             appCapabilityStore
                 .removeCapability(id, capabilityId)
                 .then(() => {
                     model.appCapabilities = _.reject(model.appCapabilities, ac => ac.capability.id === capabilityId );
                     calculateAvailableCapabilities();
-                });
+                })
+                .then(() => notification.warning('Capability removed'));
         }
     };
 
@@ -131,6 +135,7 @@ const controller = function(appCapabilityStore,
         const appCapability = _.find(model.appCapabilities, ac => ac.capability.id == capability.id);
         appCapability.primary = !appCapability.primary;
         appCapabilityStore.setIsPrimary(id, capability.id, appCapability.primary);
+        notification.success(`${capability.name} ${appCapability.primary ? ' not ' : ''}  marked as primary`);
     };
 
     this.loadSuggestions = () => {
@@ -158,6 +163,7 @@ controller.$inject = [
     'ApplicationStore',
     'CapabilityStore',
     'RatingStore',
+    'Notification',
     '$stateParams',
     '$state',
     '$q'
