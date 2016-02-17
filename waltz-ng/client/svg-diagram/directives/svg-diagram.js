@@ -11,66 +11,28 @@ function resize(elem) {
 
 
 function controller($scope, $window) {
-    const blockParsers = {
-        'draw.io': (diagram, svg) => {
-            const anchors = svg.find('a');
-            return _.chain(anchors)
-                .map(anchor => {
-                    const attr = anchor.attributes['xlink:href'];
-                    if (! attr) return null;
-                    const empId = attr.value;
-                    anchor.removeAttribute('xlink:href');
-                    return {
-                        rawProperty: empId,
-                        parent: anchor,
-                        value: empId,
-                        name: 'xlink:href'
-                    };
-                })
-                .compact()
-                .value();
-        },
-        'visio': (diagram, svg) => {
-            $window.setTimeout(() => resize(svg), 100);
-
-            const custProps = svg.find('v:cp');
-
-            // get rid of auto generated svg titles
-            _.each(svg.find('title'), t => t.remove());
-
-            return _.chain(custProps)
-                .filter(cp => cp
-                        && cp.attributes
-                        && cp.attributes['v:lbl']
-                        && cp.attributes['v:lbl'].value == diagram.keyProperty)
-                .map(cp => {
-                    const valAttr = cp.attributes['v:val'];
-                    const value = valAttr
-                        ? valAttr.value.replace(/.*\((.*)\).*/, '$1')
-                        : '';
-
-                    return {
-                        rawProperty: cp,
-                        parent: cp.parentNode.parentNode,
-                        value,
-                        name: cp.attributes['v:lbl'].value
-                    };
-                })
-                .value();
-        }
-    };
-
     const vm = this;
 
     angular.element($window)
         .on('resize', () => resize($scope.elem));
 
 
-    $scope.$watch('ctrl.diagram', f => {
-        if (!f) return;
+    $scope.$watch('ctrl.diagram', diagram => {
+        if (!diagram) return;
 
-        const svg = $scope.elem.append(vm.diagram.svg);
-        const blocks = blockParsers[vm.diagram.product](vm.diagram, svg);
+        const svg = $scope.elem.append(diagram.svg);
+
+        if (diagram.product === 'visio') {
+            $window.setTimeout(() => resize(svg), 100);
+        }
+
+        const dataProp = 'data-' + diagram.keyProperty;
+        const dataBlocks = svg.querySelectorAll('[' + dataProp + ']');
+
+        const blocks = _.map(dataBlocks, b => ({
+                block: b,
+                value: b.attributes[dataProp].value
+        }));
 
         _.each(blocks, vm.blockProcessor);
     });

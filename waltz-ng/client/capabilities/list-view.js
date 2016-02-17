@@ -29,9 +29,9 @@ function controller(capabilities, appCapabilityStore, svgStore, $state) {
 
     svgStore.findByKind('CAPABILITY').then(xs => vm.diagrams = xs);
 
-    vm.blockProcessor = block => {
-        block.parent.onclick = () => $state.go('main.capabilities.view', { id: block.value });
-        angular.element(block.parent).addClass('clickable');
+    vm.blockProcessor = b => {
+        b.block.onclick = () => $state.go('main.capabilities.view', { id: b.value });
+        angular.element(b.block).addClass('clickable');
     };
 }
 

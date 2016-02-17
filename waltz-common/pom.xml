@@ -23,6 +23,12 @@
             <artifactId>pcollections</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jool</artifactId>
+        </dependency>
+
+
         <!-- LOGGING -->
 
         <dependency>
