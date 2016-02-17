@@ -51,9 +51,9 @@ function controller(orgUnits, tallies, svgStore, $state) {
 
     svgStore.findByKind('ORG_UNIT').then(xs => vm.diagrams = xs);
 
-    vm.blockProcessor = block => {
-        block.parent.onclick = () => $state.go('main.org-units.unit', { id: block.value });
-        angular.element(block.parent).addClass('clickable');
+    vm.blockProcessor = b => {
+        b.block.onclick = () => $state.go('main.org-units.unit', { id: b.value });
+        angular.element(b.block).addClass('clickable');
     };
 }
 
