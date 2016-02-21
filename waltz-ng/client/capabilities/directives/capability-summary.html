@@ -1,57 +1,73 @@
-<div class="row">
-    <div class="col-sm-offset-1 col-sm-10">
-        <div class="waltz-page-summary">
-            <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;">
-                {{ ctrl.capability.name }}
-            </h3>
-            <div style="border-bottom: 2px dotted #eee; padding: 6px"
-                 class="waltz-paragraph">
-                {{ ctrl.capability.description }}
-            </div>
+<div style="margin-bottom: 18px">
 
-            <div class="row">
-                <div class="col-sm-4">
-                    <waltz-basic-info-tile name="Portfolio Cost"
-                                           description="Cumulative value of infra and app dev costs"
-                                           waltz-jump-to="costs-section"
-                                           icon="money">
-                        <span style="font-size: xx-large;">
-                            {{ ctrl.portfolioCostStr }}
+    <!-- PARENT -->
+    <div class="row no-overflow"
+         ng-if="ctrl.capability.parent"
+         style="padding: 1em">
+
+        <div class="col-md-12">
+            <span class="text-muted">
+                <waltz-icon name="level-up"></waltz-icon>
+                Parent:
+            </span>
+            <a ui-sref="main.capabilities.view ({ id: ctrl.capability.parent.id })">
+                {{ ctrl.capability.parent.name }}
+            </a>
+            <span class="text-muted small ">
+                {{ ctrl.capability.parent.description }}
+            </span>
+        </div>
+    </div>
+
+
+    <!-- SCORECARD -->
+    <div class="row">
+        <div class="col-sm-offset-1 col-sm-10">
+            <waltz-capability-scorecard capability="ctrl.capability"
+                                        server-stats="ctrl.serverStats"
+                                        applications="ctrl.applications"
+                                        complexity="ctrl.complexity"
+                                        flows="ctrl.flows"
+                                        asset-costs="ctrl.assetCosts">
+
+            </waltz-capability-scorecard>
+        </div>
+    </div>
+
+
+    <!-- CHILDREN -->
+    <div class="row"
+         style="margin-top: 12px"
+         ng-if="ctrl.capability.children.length > 0">
+        <div class="col-md-offset-2 col-md-9">
+            <table class="table table-condensed small">
+                <colgroup>
+                    <col width="20%">
+                    <col width="80%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th colspan="2">
+                        Sub-Capabilities
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="child in ctrl.capability.children | orderBy:'name'">
+                    <td>
+                        <a ui-sref="main.capabilities.view ({ id: child.id })">
+                            {{ child.name }}
+                        </a>
+                    </td>
+                    <td>
+                        <span class="text-muted">
+                            {{ child.description }}
                         </span>
-                    </waltz-basic-info-tile>
-                </div>
-                <div class="col-sm-4">
-                    <waltz-basic-info-tile name="Complexity"
-                                           description="Derived from capabilities, connections and servers"
-                                           class="clickable"
-                                           waltz-jump-to="complexity-section"
-                                           icon="rocket">
-                        <div style="font-size: xx-large;">
-                            &Sigma; {{ ctrl.complexitySummary.cumulativeScore | toFixed:1 }}
-                        </div>
-                        <div class="small text-muted">
-                            {{ ctrl.complexitySummary.averageScore | toFixed:2 }} per app
-                        </div>
-                    </waltz-basic-info-tile>
-
-                </div>
-                <div class="col-sm-4">
-                    <waltz-basic-info-tile name="Servers"
-                                           description="Number of servers supporting this group"
-                                           icon="server">
-                        <div>
-                            <div style="font-size: xx-large;">
-                                # {{ ctrl.serverStats.total }}
-                            </div>
-                            <div class="small text-muted">
-                                {{ ctrl.serverStats.virtualPercentage }}% virtual
-                            </div>
-                        </div>
-                    </waltz-basic-info-tile>
-
-                </div>
-
-            </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+

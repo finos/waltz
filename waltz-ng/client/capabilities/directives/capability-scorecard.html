@@ -1,20 +1,18 @@
-<div class="row">
-    <div class="col-sm-offset-1 col-sm-10 waltz-page-summary">
-        <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;">
-            {{ ctrl.appGroup.name }}
-            <span class="pull-right"
-                  ng-if="ctrl.editable">
-                <a ui-sref="main.app-group.edit ({ id:ctrl.appGroup.id })"
-                   class="btn btn-xs btn-primary">
-                    <waltz-icon name="edit"></waltz-icon>
-                    Edit Group
-                </a>
-            </span>
-        </h3>
-
-        <div style="font-size: larger; border-bottom: 2px dotted #eee; padding: 6px" class="waltz-paragraph">
-            {{ ctrl.appGroup.description }}
+<div>
+    <div class="waltz-page-summary">
+        <!-- BASICS -->
+        <div class="row">
+            <div class="col-md-12">
+                <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;">
+                    {{ ctrl.capability.name }}
+                </h3>
+                <div style="border-bottom: 2px dotted #eee; padding: 6px"
+                     class="waltz-paragraph">
+                    {{ ctrl.capability.description }}
+                </div>
+            </div>
         </div>
+
 
 
         <div class="row">
@@ -37,8 +35,12 @@
                 </waltz-data-flows-by-direction-pie>
             </div>
         </div>
+
+
         <div class="row">
-            <div class="col-sm-3">
+
+            <!-- PORTFOLIO COST -->
+            <div class="col-sm-4">
                 <waltz-basic-info-tile name="Portfolio Cost"
                                        description="Cumulative value of infra and app dev costs"
                                        waltz-jump-to="costs-section"
@@ -48,7 +50,10 @@
                         </span>
                 </waltz-basic-info-tile>
             </div>
-            <div class="col-sm-3">
+
+
+            <!-- COMPLEXITY -->
+            <div class="col-sm-4">
                 <waltz-basic-info-tile name="Complexity"
                                        description="Derived from capabilities, connections and servers"
                                        class="clickable"
@@ -63,11 +68,11 @@
                 </waltz-basic-info-tile>
 
             </div>
-            <div class="col-sm-3">
-                <waltz-basic-info-tile name="Servers"
 
+            <!-- SERVERS -->
+            <div class="col-sm-4">
+                <waltz-basic-info-tile name="Servers"
                                        description="Number of servers supporting this group"
-                                       waltz-jump-to="servers-section"
                                        icon="server">
                     <div>
                         <div style="font-size: xx-large;">
@@ -78,24 +83,10 @@
                         </div>
                     </div>
                 </waltz-basic-info-tile>
-
             </div>
 
-            <div class="col-sm-3">
-                <waltz-basic-info-tile name="Capabilities"
-                                       description="Capabilities performed within this OU"
-                                       waltz-jump-to="ratings-section"
-                                       icon="puzzle-piece">
-                    <div>
-                        <div style="font-size: xx-large;">
-                            # {{ ctrl.capabilityStats.total }}
-                        </div>
-                        <div class="small text-muted">
-                            {{ ctrl.capabilityStats.perApplication }} per app
-                        </div>
-                    </div>
-                </waltz-basic-info-tile>
-            </div>
         </div>
+
+
     </div>
 </div>
