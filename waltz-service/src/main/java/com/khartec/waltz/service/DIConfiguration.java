@@ -17,7 +17,6 @@
 
 package com.khartec.waltz.service;
 
-import com.khartec.waltz.common.HomeConfigFile;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.jooq.DSLContext;
@@ -25,29 +24,55 @@ import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import javax.sql.DataSource;
 
 
 @Configuration
 @ComponentScan(value={"com.khartec.waltz"})
+@PropertySource(value = "classpath:waltz.properties", ignoreResourceNotFound = true)
+@PropertySource(value = "file:${user.home}/.waltz/waltz.properties", ignoreResourceNotFound = true)
 public class DIConfiguration {
+
+
+    @Value("${database.url}")
+    private String dbUrl;
+
+    @Value("${database.user}")
+    private String dbUser;
+
+    @Value("${database.password}")
+    private String dbPassword;
+
+    @Value("${database.driver}")
+    private String dbDriver;
+
+    @Value("${database.pool.max?:10}")
+    private int dbPoolMax;
+
+    @Value("${database.pool.min?:2}")
+    private int dbPoolMin;
+
 
     @Bean
     public DataSource dataSource() {
-        HomeConfigFile props = new HomeConfigFile(".waltz", "waltz.properties");
+
         HikariConfig dsConfig = new HikariConfig();
-        dsConfig.setJdbcUrl(props.get("database.url"));
-        dsConfig.setUsername(props.get("database.user"));
-        dsConfig.setPassword(props.get("database.password"));
-        dsConfig.setDriverClassName(props.get("database.driver"));
-        dsConfig.setMaximumPoolSize(props.getInt("database.pool.max", 10));
-        dsConfig.setMinimumIdle(props.getInt("database.pool.min", 2));
+        dsConfig.setJdbcUrl(dbUrl);
+        dsConfig.setUsername(dbUser);
+        dsConfig.setPassword(dbPassword);
+        dsConfig.setDriverClassName(dbDriver);
+        dsConfig.setMaximumPoolSize(dbPoolMax);
+        dsConfig.setMinimumIdle(dbPoolMin);
         return new HikariDataSource(dsConfig);
     }
+
 
     @Bean
     @Autowired
@@ -57,5 +82,13 @@ public class DIConfiguration {
                 SQLDialect.MARIADB,
                 new Settings().withRenderFormatted(true));
     }
+
+
+    /* Required for property interpolation to work correctly */
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
 
 }
