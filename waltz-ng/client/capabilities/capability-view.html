@@ -10,69 +10,15 @@
     </waltz-page-header>
 
 
-    <div class="row no-overflow"
-         ng-if="ctrl.capability.parent"
-         style="padding: 1em">
-
-        <div class="col-md-12">
-            <span class="text-muted">
-                <waltz-icon name="level-up"></waltz-icon>
-                Parent:
-            </span>
-            <a ui-sref="main.capabilities.view ({ id: ctrl.capability.parent.id })">
-                {{ ctrl.capability.parent.name }}
-            </a>
-            <span class="text-muted small ">
-                {{ ctrl.capability.parent.description }}
-            </span>
-        </div>
-
-    </div>
 
     <waltz-capability-summary capability="ctrl.capability"
+                              applications="ctrl.apps"
                               server-stats="ctrl.serverStats"
                               complexity="ctrl.complexity"
+                              flows="ctrl.dataFlows"
                               asset-costs="ctrl.assetCosts">
 
     </waltz-capability-summary>
-
-
-
-    <br>
-
-    <!-- CHILDREN -->
-    <div class="row"
-         ng-if="ctrl.capability.children.length > 0">
-        <div class="col-md-offset-1 col-md-10">
-            <table class="table table-condensed small">
-                <colgroup>
-                    <col width="20%">
-                    <col width="80%">
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th colspan="2">
-                            Sub-Capabilities
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="child in ctrl.capability.children | orderBy:'name'">
-                        <td>
-                            <a ui-sref="main.capabilities.view ({ id: child.id })">
-                                {{ child.name }}
-                            </a>
-                        </td>
-                        <td>
-                            <span class="text-muted">
-                                {{ child.description }}
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 
 
     <!-- RATINGS -->

@@ -25,11 +25,12 @@ const initModel = {
     apps: [],
     complexity: [],
     assetCosts: [],
-    serverStats: null
+    serverStats: null,
+    dataFlows: []
 };
 
 
-function service(personStore, involvementStore, assetCostStore, complexityStore, serverInfoStore, $q) {
+function service(personStore, involvementStore, assetCostStore, complexityStore, serverInfoStore, dataFlowStore, $q) {
 
     const state = { model: initModel };
 
@@ -100,6 +101,13 @@ function service(personStore, involvementStore, assetCostStore, complexityStore,
     }
 
 
+    function loadFlows(appIds) {
+        dataFlowStore
+            .findByAppIds(appIds)
+            .then(flows => state.model.dataFlows = flows);
+    }
+
+
     function load(employeeId) {
         loadPeople(employeeId);
         loadApplications(employeeId)
@@ -108,6 +116,7 @@ function service(personStore, involvementStore, assetCostStore, complexityStore,
                 loadCosts(appIds);
                 loadComplexity(appIds);
                 loadServerStats(appIds);
+                loadFlows(appIds);
             });
     }
 
@@ -124,6 +133,7 @@ service.$inject = [
     'AssetCostStore',
     'ComplexityStore',
     'ServerInfoStore',
+    'DataFlowDataStore',
     '$q'
 ];
 

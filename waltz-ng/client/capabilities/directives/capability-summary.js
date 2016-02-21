@@ -26,21 +26,13 @@ const BINDINGS = {
     applications: '=',
     assetCosts: '=',
     complexity: '=',
-    serverStats: '='
+    serverStats: '=',
+    flows: '='
 };
 
 
-function controller($scope) {
-
-    const vm = this;
-
-    $scope.$watch('ctrl.assetCosts', cs => vm.portfolioCostStr = calcPortfolioCost(cs));
-    $scope.$watch('ctrl.complexity', cs => vm.complexitySummary = calcComplexitySummary(cs));
-    $scope.$watch('ctrl.serverStats', enrichServerStats);
-
+function controller() {
 }
-
-controller.$inject = ['$scope'];
 
 
 export default () => {

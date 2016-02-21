@@ -1,3 +1,4 @@
+
 /*
  *  This file is part of Waltz.
  *
@@ -16,29 +17,51 @@
  *
  */
 
-import { enrichServerStats } from  '../../server-info/services/server-utilities';
-import { calcPortfolioCost } from '../../asset-cost/services/asset-cost-utilities';
-import { calcComplexitySummary } from '../../complexity/services/complexity-utilities';
+import {
+    lifecyclePhaseColorScale,
+    ragColorScale } from '../../common/colors';
 
 
 const BINDINGS = {
-    appGroup: '=',
     applications: '=',
-    assetCosts: '=',
-    complexity: '=',
-    serverStats: '=',
-    editable: '=',
-    flows: '='
+    size: '='
 };
 
 
-function controller($scope) {
+const investmentLabels = {
+    'R' : 'Disinvest',
+    'A' : 'Maintain',
+    'G' : 'Invest'
+};
 
+
+const config = {
+    colorProvider: (d) => ragColorScale(d.data.key),
+    size: 80,
+    labelProvider: (k) => investmentLabels[k] || 'Unknown'
+};
+
+
+function calcAppInvestmentPieStats(apps) {
+    return _.chain(apps)
+        .countBy('overallRating')
+        .map((v, k) => ({ key: k, count: v }))
+        .value();
+}
+
+
+function controller($scope) {
     const vm = this;
 
-    $scope.$watch('ctrl.assetCosts', cs => vm.portfolioCostStr = calcPortfolioCost(cs));
-    $scope.$watch('ctrl.complexity', cs => vm.complexitySummary = calcComplexitySummary(cs));
-    $scope.$watch('ctrl.serverStats', enrichServerStats);
+    vm.config = config;
+    vm.data = [];
+
+    $scope.$watch('ctrl.size', sz => vm.config.size = sz ? sz : 80);
+
+    $scope.$watch('ctrl.applications', apps => {
+        if (!apps) return;
+        vm.data = calcAppInvestmentPieStats(apps);
+    });
 
 }
 
@@ -49,7 +72,7 @@ export default () => {
     return {
         restrict: 'E',
         replace: true,
-        template: require('./app-group-summary.html'),
+        template: require('./apps-by-investment-pie.html'),
         scope: {},
         bindToController: BINDINGS,
         controllerAs: 'ctrl',

@@ -20,4 +20,5 @@ export default (module) => {
     module.directive('waltzRatedFlowSummaryDetail', require('./rated-flow-chart/rated-flow-summary-detail'));
     module.directive('waltzAppDataFlowDiagram', require('./slope-graph/slope-graph-directive'));
     module.directive('waltzDataFlowDiagram', require('./boingy-graph/boingy-graph'));
+    module.directive('waltzDataFlowsByDirectionPie', require('./data-flows-by-direction-pie'));
 };

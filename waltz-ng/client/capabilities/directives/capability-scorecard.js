@@ -22,14 +22,14 @@ import { calcComplexitySummary } from '../../complexity/services/complexity-util
 
 
 const BINDINGS = {
-    appGroup: '=',
+    capability: '=',
     applications: '=',
     assetCosts: '=',
     complexity: '=',
     serverStats: '=',
-    editable: '=',
     flows: '='
 };
+
 
 
 function controller($scope) {
@@ -49,7 +49,7 @@ export default () => {
     return {
         restrict: 'E',
         replace: true,
-        template: require('./app-group-summary.html'),
+        template: require('./capability-scorecard.html'),
         scope: {},
         bindToController: BINDINGS,
         controllerAs: 'ctrl',
