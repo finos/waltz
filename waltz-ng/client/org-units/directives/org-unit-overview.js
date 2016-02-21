@@ -19,51 +19,6 @@ import { calcPortfolioCost } from '../../asset-cost/services/asset-cost-utilitie
 import { calcComplexitySummary } from '../../complexity/services/complexity-utilities';
 
 
-import {
-    lifecyclePhaseColorScale,
-    capabilityColorScale,
-    flowDirectionColorScale,
-    ragColorScale } from '../../common/colors';
-
-
-
-function calcAppPhasePieStats(apps) {
-    return _.chain(apps)
-            .countBy('lifecyclePhase')
-            .map((v, k) => ({ key: k, count: v }))
-            .value();
-}
-
-
-function calcAppInvestmentPieStats(apps) {
-    return _.chain(apps)
-            .countBy('overallRating')
-            .map((v, k) => ({ key: k, count: v }))
-            .value();
-}
-
-
-function calcAppConnectionPieStats(flows, apps) {
-    const logicalFlows = flows.flows;
-
-    const orgMemberAppIds = _.map(apps, 'id');
-
-    return _.chain(logicalFlows)
-        .uniq(false, f => f.source.id + '.' + f.target.id)
-        .map(f => {
-            const sourceIsMember = _.contains(orgMemberAppIds, f.source.id);
-            const targetIsMember = _.contains(orgMemberAppIds, f.target.id);
-            if (sourceIsMember && targetIsMember) return 'INTRA';
-            if (sourceIsMember) return 'INBOUND';
-            if (targetIsMember) return 'OUTBOUND';
-            return 'UNKNOWN';
-        })
-        .countBy()
-        .map((v, k) => ({ key: k, count: v }))
-        .value();
-}
-
-
 function calcCapabilityStats(ratings) {
     const caps = _.chain(ratings)
         .map("capability")
@@ -90,52 +45,11 @@ function controller($scope, orgUnitStore) {
     vm.saveDescriptionFn = (newValue, oldValue) =>
             orgUnitStore.updateDescription(vm.unit.id, newValue, oldValue);
 
-    const investmentLabels = {
-        'R' : 'Disinvest',
-        'A' : 'Maintain',
-        'G' : 'Invest'
-    };
-
-    const pies = {
-        appPhase: {
-            config: {
-                colorProvider: (d) => lifecyclePhaseColorScale(d.data.key),
-                size: 80
-            }
-        },
-        appConnections: {
-            config: {
-                colorProvider: (d) => flowDirectionColorScale(d.data.key),
-                size: 80
-            }
-        },
-        appInvestment: {
-            config: {
-                colorProvider: (d) => ragColorScale(d.data.key),
-                size: 80,
-                labelProvider: (k) => investmentLabels[k] || 'Unknown'
-            }
-        }
-    };
-
-    vm.pies = pies;
-
-    $scope.$watch('ctrl.apps', apps => {
-        if (!apps) return;
-        vm.pies.appPhase.data = calcAppPhasePieStats(apps);
-        vm.pies.appInvestment.data = calcAppInvestmentPieStats(apps);
-    });
 
     $scope.$watch('ctrl.ratings', ratings => {
         if (!ratings) return;
         vm.capabilityStats = calcCapabilityStats(ratings);
     });
-
-    $scope.$watch('ctrl.flows', flows => {
-        if (!flows) return;
-        vm.pies.appConnections.data = calcAppConnectionPieStats(flows, this.apps);
-    });
-
 
     $scope.$watch('ctrl.costs', cs => vm.portfolioCostStr = calcPortfolioCost(cs));
 
