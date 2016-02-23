@@ -17,7 +17,9 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.service.capability.CapabilityService;
+import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,10 +46,22 @@ public class CapabilityEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        getForList(mkPath(BASE_URL), (request, response) ->  service.findAll());
-        postForList(mkPath(BASE_URL, "apps"), (request, response) ->  service.findByAppIds(readBody(request, Long[].class)));
-        postForList(mkPath(BASE_URL, "ids"), (request, response) ->  service.findByIds(readBody(request, Long[].class)));
-        getForList(mkPath(BASE_URL, "search", ":query"), (request, response) ->  service.search(request.params("query")));
+        String findAllPath = mkPath(BASE_URL);
+        String findByAppIdsPath = mkPath(BASE_URL, "apps");
+        String findByIdsPath = mkPath(BASE_URL, "ids");
+        String searchPath = mkPath(BASE_URL, "search", ":query");
+
+
+        ListRoute<Capability> findAllRoute = (request, response) -> service.findAll();
+        ListRoute<Capability> findByAppIdsRoute = (request, response) -> service.findByAppIds(readBody(request, Long[].class));
+        ListRoute<Capability> findByIdsRoute = (request, response) -> service.findByIds(readBody(request, Long[].class));
+        ListRoute<Capability> searchRoute = (request, response) -> service.search(request.params("query"));
+
+
+        getForList(findAllPath, findAllRoute);
+        postForList(findByAppIdsPath, findByAppIdsRoute);
+        postForList(findByIdsPath, findByIdsRoute);
+        getForList(searchPath, searchRoute);
     }
 
 }
