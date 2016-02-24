@@ -1,3 +1,16 @@
+function controller() {
+
+    const vm = this;
+
+    vm.show = (diagram) => {
+        diagram.visible = true;
+
+    };
+
+    vm.hide = (diagram) => {
+        diagram.visible = false;
+    };
+}
 
 
 export default () => ({
@@ -10,5 +23,5 @@ export default () => ({
         blockProcessor: '='
     },
     controllerAs: 'ctrl',
-    controller: () => {}
+    controller
 });
