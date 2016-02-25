@@ -140,4 +140,24 @@ public class CapabilityDao {
                 .fetch(capabilityMapper);
     }
 
+
+    public boolean update(Capability capability) {
+        capability
+                .id()
+                .orElseThrow(() -> new UnsupportedOperationException("Cannot update capability record with no ID"));
+
+        return dsl.update(CAPABILITY)
+                .set(CAPABILITY.NAME, capability.name())
+                .set(CAPABILITY.DESCRIPTION, capability.description())
+                .set(CAPABILITY.PARENT_ID, capability.parentId().orElse(null))
+                .set(CAPABILITY.LEVEL, capability.level())
+                .set(CAPABILITY.LEVEL_1, capability.level1().orElse(null))
+                .set(CAPABILITY.LEVEL_2, capability.level2().orElse(null))
+                .set(CAPABILITY.LEVEL_3, capability.level3().orElse(null))
+                .set(CAPABILITY.LEVEL_4, capability.level4().orElse(null))
+                .set(CAPABILITY.LEVEL_5, capability.level5().orElse(null))
+                .where(CAPABILITY.ID.eq(capability.id().get()))
+                .execute() == 1;
+
+    }
 }
