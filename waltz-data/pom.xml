@@ -126,7 +126,7 @@
                             <name>org.jooq.util.mariadb.MariaDBDatabase</name>
                             <includes>.*</includes>
                             <excludes></excludes>
-                            <inputSchema>scratch</inputSchema>
+                            <inputSchema>${database.schema}</inputSchema>
                             <outputSchemaToDefault>true</outputSchemaToDefault>
                         </database>
                         <target>
