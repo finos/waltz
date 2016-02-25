@@ -886,6 +886,26 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="dwatkins"
+               id="20160222-88-1">
+        <addColumn tableName="capability">
+            <column name="level_1" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="level_2" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="level_3" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="level_4" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="level_5" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 
     <changeSet author="dwatkins" id="20160225-99-1">
         <createTable tableName="trait">
@@ -921,6 +941,5 @@
             </column>
         </createTable>
     </changeSet>
-
 
 </databaseChangeLog>

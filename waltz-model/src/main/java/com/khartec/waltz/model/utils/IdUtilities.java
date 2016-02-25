@@ -22,11 +22,20 @@ import com.khartec.waltz.model.IdProvider;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
+
 
 public class IdUtilities {
 
 
+    /**
+     * Convert the given list of idProviders to their id values.
+     * Empty ids are skipped in the resulting list.
+     * @param xs
+     * @return
+     */
     public static List<Long> toIds(List<? extends IdProvider> xs) {
+        checkNotNull(xs, "Cannot convert a null list to a list of ids");
         return xs.stream()
                 .map(x -> x.id().orElse(null))
                 .filter(x -> x != null)
@@ -34,8 +43,32 @@ public class IdUtilities {
     }
 
 
+    /**
+     * Convert the given list of idProviders to their id values.
+     * Empty ids are skipped in the resulting array.
+     * @param xs
+     * @return
+     */
     public static Long[] toIdArray(List<? extends IdProvider> xs) {
+        checkNotNull(xs, "Cannot convert a null list to an array of ids");
         return toIds(xs)
                 .toArray(new Long[xs.size()]);
+    }
+
+
+    /**
+     * If the given id provider has an id of Optional.empty then
+     * throw an IllegarlArgumentException with the given message.
+     * <br>
+     * Returns .
+     * @param idProvider
+     * @param exceptionMessage, message to use if idProvider.id() == empty
+     * @return the id if it is present
+     */
+    public static Long ensureHasId(IdProvider idProvider, String exceptionMessage) {
+        return idProvider
+                .id()
+                .orElseThrow(() -> new IllegalArgumentException(exceptionMessage));
+
     }
 }

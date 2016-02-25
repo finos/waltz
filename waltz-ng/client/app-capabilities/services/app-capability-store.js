@@ -33,7 +33,7 @@ const service = (http, root) => {
             .then(result => result.data);
 
 
-    const findApplicationsByCapabilityId = (id) =>
+    const findApplicationsByCapabilityId = id =>
         http.get(`${BASE}/capability/${id}`)
             .then(result => result.data);
 
