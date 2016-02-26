@@ -16,34 +16,35 @@
  *
  */
 
-import { enrichServerStats } from  '../../server-info/services/server-utilities';
-import { calcPortfolioCost } from '../../asset-cost/services/asset-cost-utilities';
-import { calcComplexitySummary } from '../../complexity/services/complexity-utilities';
+function store($http, BaseApiUrl) {
+    const BASE = `${BaseApiUrl}/trait-usage`;
 
+    const findAll = () => $http
+        .get(BASE)
+        .then(r => r.data);
 
-const BINDINGS = {
-    capability: '=',
-    applications: '=',
-    assetCosts: '=',
-    complexity: '=',
-    serverStats: '=',
-    flows: '=',
-    traits: '='
-};
+    const findByKind = (kind) => $http
+        .get(`${BASE}/entity/${kind}`)
+        .then(r => r.data);
 
+    const findByTraitId = (id) => $http
+        .get(`${BASE}/trait/${id}`)
+        .then(r => r.data);
 
-function controller() {
+    const findByEntityReference = (kind, id) => $http
+        .get(`${BASE}/entity/${kind}/${id}`)
+        .then(r => r.data);
+
+    return {
+        findAll,
+        findByKind,
+        findByTraitId,
+        findByEntityReference
+    };
+
 }
 
+store.$inject = ['$http', 'BaseApiUrl'];
 
-export default () => {
-    return {
-        restrict: 'E',
-        replace: true,
-        template: require('./capability-summary.html'),
-        scope: {},
-        bindToController: BINDINGS,
-        controllerAs: 'ctrl',
-        controller
-    };
-};
+
+export default store;

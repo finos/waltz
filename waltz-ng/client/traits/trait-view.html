@@ -1,0 +1,72 @@
+<!--
+  ~  This file is part of Waltz.
+  ~
+  ~  Waltz is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  Waltz is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  -->
+
+<waltz-page-header name="{{ ctrl.trait.name }}"
+                   small="Trait"
+                   icon="cubes">
+    <ol class="waltz-breadcrumbs">
+        <li><a ui-sref="main">Home</a></li>
+        <li><a ui-sref="main.traits">Traits</a></li>
+        <li>{{ ctrl.trait.name }}</li>
+    </ol>
+</waltz-page-header>
+
+
+<div class="row">
+    <div class="col-sm-10">
+        <waltz-section icon='cubes' name="{{ ctrl.trait.name }}" small="Overview">
+            <blockquote>
+                {{ ctrl.trait.description }}
+            </blockquote>
+        </waltz-section>
+    </div>
+
+    <div class="col-sm-2">
+        <waltz-section name="About">
+            <strong>What is a trait?</strong>
+            A trait is a ....
+        </waltz-section>
+    </div>
+
+    <div class="col-sm-12">
+        <waltz-section icon='puzzle-piece' name="Related Capabilities">
+
+            <table class="table table-condensed table-striped">
+                <thead>
+                <tr>
+                    <th>Capability</th>
+                    <th>Relationship</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="usage in ctrl.usages.CAPABILITY">
+                    <td>
+                        <a ui-sref="main.capabilities.view ({ id: usage.entityReference.id })">
+                            {{ ctrl.lookupCapability(usage.entityReference.id).name }}
+                        </a>
+                    </td>
+                    <td>{{ usage.relationship }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </waltz-section>
+
+        <pre>
+            {{ ctrl.usages }}
+        </pre>
+    </div>

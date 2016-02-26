@@ -16,34 +16,33 @@
  *
  */
 
-import { enrichServerStats } from  '../../server-info/services/server-utilities';
-import { calcPortfolioCost } from '../../asset-cost/services/asset-cost-utilities';
-import { calcComplexitySummary } from '../../complexity/services/complexity-utilities';
+function store($http, BaseApiUrl) {
+
+    const BASE = `${BaseApiUrl}/trait`;
+
+    const getById = (id) => $http
+        .get(`${BASE}/id/${id}`)
+        .then(r => r.data);
 
 
-const BINDINGS = {
-    capability: '=',
-    applications: '=',
-    assetCosts: '=',
-    complexity: '=',
-    serverStats: '=',
-    flows: '=',
-    traits: '='
-};
+    const findAll = () => $http
+        .get(BASE)
+        .then(r => r.data);
 
 
-function controller() {
+    const findByIds = (ids) => $http
+        .post(`${BASE}/id`, ids)
+        .then(r => r.data);
+
+
+    return {
+        findAll,
+        findByIds,
+        getById
+    };
 }
 
+store.$inject = ['$http', 'BaseApiUrl'];
 
-export default () => {
-    return {
-        restrict: 'E',
-        replace: true,
-        template: require('./capability-summary.html'),
-        scope: {},
-        bindToController: BINDINGS,
-        controllerAs: 'ctrl',
-        controller
-    };
-};
+
+export default store;

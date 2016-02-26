@@ -15,35 +15,25 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-import { enrichServerStats } from  '../../server-info/services/server-utilities';
-import { calcPortfolioCost } from '../../asset-cost/services/asset-cost-utilities';
-import { calcComplexitySummary } from '../../complexity/services/complexity-utilities';
-
-
 const BINDINGS = {
-    capability: '=',
-    applications: '=',
-    assetCosts: '=',
-    complexity: '=',
-    serverStats: '=',
-    flows: '=',
     traits: '='
 };
 
 
 function controller() {
+
 }
 
-
-export default () => {
+function directive() {
     return {
         restrict: 'E',
-        replace: true,
-        template: require('./capability-summary.html'),
-        scope: {},
+        replace: 'true',
         bindToController: BINDINGS,
-        controllerAs: 'ctrl',
-        controller
+        scope: {},
+        template: require('./traits-indicator.html'),
+        controller,
+        controllerAs: 'ctrl'
     };
-};
+}
+
+export default directive;
