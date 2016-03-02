@@ -33,14 +33,17 @@ public class TraitEndpoint implements Endpoint {
         String findAllPath = mkPath(BASE_URL);
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findByIdsPath = mkPath(BASE_URL, "id");
+        String findByAppDeclarablePath = mkPath(BASE_URL, "application-declarable");
 
         ListRoute<Trait> findAllRoute = (request, response) -> service.findAll();
         DatumRoute<Trait> getByIdRoute = (request, response) -> service.getById(getId(request));
         ListRoute<Trait> findByIdsRoute = (request, response) -> service.findByIds(readIdsFromBody(request));
+        ListRoute<Trait> findByAppDeclarableRoute = (request, response) -> service.findApplicationDeclarableTraits();
 
         getForList(findAllPath, findAllRoute);
         getForDatum(getByIdPath, getByIdRoute);
         postForList(findByIdsPath, findByIdsRoute);
+        getForList(findByAppDeclarablePath, findByAppDeclarableRoute);
     }
 
 }

@@ -17,10 +17,15 @@
  */
 
 .waltz-trait-indicator {
-    color: #29342c;
+    color: #215a1e;
+    padding: 0 2px 0 2px;
+    border: 1px dashed;
+    border-color: #eee;
 }
 
 
 .waltz-trait-indicator:hover {
-    color: #125c1b;
+    color: #157121;
+    border-color: #ccc;
+
 }

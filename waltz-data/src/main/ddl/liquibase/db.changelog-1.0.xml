@@ -942,4 +942,14 @@
         </createTable>
     </changeSet>
 
+    <changeSet author="dwatkins" id="20160228-99-1">
+        <addColumn tableName="trait">
+            <column name="application_declarable"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

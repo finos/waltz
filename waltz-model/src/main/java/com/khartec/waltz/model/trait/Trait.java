@@ -16,4 +16,10 @@ public abstract class Trait implements
         NameProvider,
         DescriptionProvider,
         IconProvider {
+
+    @Value.Default
+    public boolean applicationDeclarable() {
+        return false;
+    };
+
 }

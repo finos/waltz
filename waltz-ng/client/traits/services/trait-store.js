@@ -35,9 +35,15 @@ function store($http, BaseApiUrl) {
         .then(r => r.data);
 
 
+    const findApplicationDeclarableTraits = () => $http
+        .get(`${BASE}/application-declarable`)
+        .then(r => r.data);
+
+
     return {
         findAll,
         findByIds,
+        findApplicationDeclarableTraits,
         getById
     };
 }

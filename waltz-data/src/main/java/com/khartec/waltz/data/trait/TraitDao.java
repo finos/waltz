@@ -27,6 +27,7 @@ public class TraitDao {
                 .description(record.getDescription())
                 .icon(record.getIcon())
                 .name(record.getName())
+                .applicationDeclarable(record.getApplicationDeclarable())
                 .build();
     };
 
@@ -56,6 +57,11 @@ public class TraitDao {
     }
 
 
+    public List<Trait> findApplicationDeclarableTraits() {
+        return queryForList(TRAIT.APPLICATION_DECLARABLE.eq(true));
+    }
+
+
     // -- HELPERS -----
 
     private List<Trait> queryForList(Condition condition) {
@@ -65,5 +71,7 @@ public class TraitDao {
                 .orderBy(TRAIT.NAME.asc())
                 .fetch(TRAIT_MAPPER);
     }
+
+
 
 }
