@@ -1,24 +1,58 @@
 <div>
-    <waltz-section name="Capabilities" small="( {{appCapabilities.length}} )" icon="puzzle-piece">
+    <waltz-section name="Traits & Capabilities"
+                   icon="puzzle-piece">
 
         <waltz-section-actions>
             <a waltz-has-role="APP_EDITOR"
-               ui-sref='main.app-capability-edit ({id: selfId})'
+               ui-sref='main.app-capability-edit ({id: ctrl.selfId})'
                class="btn btn-xs btn-primary">
                 Edit
             </a>
         </waltz-section-actions>
 
+        <div class="row">
+            <div class="col-sm-6">
 
-        <div ng-if="appCapabilities.length > 0">
-            <waltz-app-capability-table app-capabilities="appCapabilities"
-                                        capabilities="capabilities">
-            </waltz-app-capability-table>
-        </div>
+                <!-- TRAITS -->
 
-        <div ng-if="appCapabilities.length == 0">
-            <div class="alert alert-warning">
-                <strong>No capabilities</strong> have been registered against this application yet.
+                <h4>Traits</h4>
+                <div ng-if="ctrl.traits.length > 0">
+                    <waltz-traits-table traits="ctrl.traits">
+                    </waltz-traits-table>
+                </div>
+
+                <div ng-if="ctrl.traits.length == 0">
+                    <div class="alert alert-warning">
+                        <strong>No Traits</strong>
+                        have been registered against this application yet.
+                    </div>
+                </div>
+
+                <div class="small text-muted">
+                    Traits are used to provide a broad classification to an application
+                </div>
+            </div>
+            <div class="col-sm-6" style="border-left: 1px solid #eee">
+
+                <!-- CAPABILITIES -->
+
+                <h4>Capabilities</h4>
+                <div ng-if="ctrl.appCapabilities.length > 0">
+                    <waltz-app-capability-table app-capabilities="ctrl.appCapabilities"
+                                                capabilities="ctrl.capabilities">
+                    </waltz-app-capability-table>
+                </div>
+
+                <div ng-if="ctrl.appCapabilities.length == 0">
+                    <div class="alert alert-warning">
+                        <strong>No capabilities</strong>
+                        have been registered against this application yet.
+                    </div>
+                </div>
+
+                <div class="small text-muted">
+                    Capabilities are used to describe what an application does.
+                </div>
             </div>
         </div>
 

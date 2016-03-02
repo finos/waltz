@@ -1,12 +1,10 @@
 <table class="table table-condensed table-hover">
     <colgroup>
-        <col width="5%">
-        <col width="25%">
+        <col width="30%">
         <col width="70%">
     </colgroup>
     <thead>
     <tr>
-        <th></th>
         <th>Name</th>
         <th>Description</th>
     </tr>
@@ -17,8 +15,6 @@
             <waltz-icon name="star"
                         style="color: goldenrod"
                         ng-if="ac.primary"></waltz-icon>
-        </td>
-        <td>
             <a ui-sref="main.capabilities.view ({id: ac.capability.id})">
                 <span ng-if="ac.primary" style="font-weight: bolder">
                     {{ ac.capability.name }}

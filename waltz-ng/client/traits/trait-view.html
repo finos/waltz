@@ -33,6 +33,14 @@
             <blockquote>
                 {{ ctrl.trait.description }}
             </blockquote>
+            <div class="alert alert-info" ng-if="ctrl.trait.applicationDeclarable">
+                <waltz-icon name="info-circle"></waltz-icon>
+                <strong>Application Declarable</strong>
+                <br>
+                This trait is intended to be declared by applications and is
+                often used to provide broad grouping information and also to restrict/enable parts of the capability
+                model.
+            </div>
         </waltz-section>
     </div>
 

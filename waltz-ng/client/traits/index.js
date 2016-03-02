@@ -45,5 +45,6 @@ export default (module) => {
         .service('TraitStore', require('./services/trait-store'))
         .service('TraitUsageStore', require('./services/trait-usage-store'))
         .directive('waltzTraitsIndicator', require('./directives/traits-indicator'))
+        .directive('waltzTraitsTable', require('./directives/traits-table'))
         .config(configureStates);
 };

@@ -37,31 +37,8 @@
             <waltz-section name="Traits">
                 <div ng-if="!ctrl.loading">
                     <div ng-if="ctrl.traits.length > 0">
-                        <table class="table table-condensed table-striped">
-                            <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Icon</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="trait in ctrl.traits">
-                                <td>
-                                    <a ui-sref="main.traits.view ({ id: trait.id })">
-                                        {{ trait.name }}
-                                    </a>
-                                </td>
-                                <td>
-                                    {{ trait.description }}
-                                </td>
-                                <td>
-                                    <waltz-icon name="{{trait.icon}}"></waltz-icon>
-                                    {{ trait.icon }}
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <waltz-traits-table traits="ctrl.traits">
+                        </waltz-traits-table>
                     </div>
                     <div ng-if="ctrl.traits.length == 0">
                         <div class="alert alert-warning">

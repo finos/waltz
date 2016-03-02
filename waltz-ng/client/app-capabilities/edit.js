@@ -10,7 +10,6 @@
  *
  */
 
-import angular from 'angular';
 import _ from 'lodash';
 
 
@@ -19,11 +18,14 @@ function filterAvailable(all, used) {
     return _.filter(all, c => !_.contains(killList, c.id));
 }
 
+
 const controller = function(appCapabilityStore,
                             appStore,
                             capabilityStore,
                             ratingStore,
                             notification,
+                            traitStore,
+                            traitUsageStore,
                             $stateParams,
                             $state,
                             $q) {
@@ -41,7 +43,9 @@ const controller = function(appCapabilityStore,
 
 
     const calculateAvailableCapabilities = () => {
-        model.availableCapabilities = filterAvailable(model.allCapabilities, model.appCapabilities);
+        model.availableCapabilities = filterAvailable(
+            model.allCapabilities,
+            model.appCapabilities);
     };
 
 
@@ -90,17 +94,20 @@ const controller = function(appCapabilityStore,
     };
 
 
-    const appPromise = appStore
-        .getById(id);
+    const promises = [
+        appStore.getById(id),
+        appCapabilityStore.findCapabilitiesByApplicationId(id),
+        capabilityStore.findAll(),
+        traitStore.findApplicationDeclarableTraits(),
+        traitUsageStore.findByEntityReference('APPLICATION', id)
+    ];
 
-    const appCapabilityPromise = appCapabilityStore
-        .findCapabilitiesByApplicationId(id);
+    // TODO: load all app declarable traits
+    // TODO: load app trait usages
 
-    const capabilityPromise = capabilityStore
-        .findAll();
-
-    $q.all([capabilityPromise, appCapabilityPromise, appPromise])
-        .then(([capabilities, appCapabilities, app]) => {
+    $q.all(promises)
+        .then(([app, appCapabilities, capabilities, allTraits, traitUsage]) => {
+            console.log(allTraits, traitUsage);
             model.allCapabilities = capabilities;
             const capabilitiesById = _.indexBy(capabilities, 'id');
 
@@ -124,7 +131,6 @@ const controller = function(appCapabilityStore,
         });
 
 
-
     this.model = model;
     this.remove = remove;
     this.add = add;
@@ -138,24 +144,6 @@ const controller = function(appCapabilityStore,
         notification.success(`${capability.name} ${appCapability.primary ? ' not ' : ''}  marked as primary`);
     };
 
-    this.loadSuggestions = () => {
-        appCapabilityStore.findAssociatedCapabilitiesByApplicationId(id)
-            .then(suggestions => this.suggestions = suggestions);
-    };
-
-    this.addSuggestion = suggestion => {
-        const capability = _.findWhere(model.allCapabilities, { id: suggestion.id } );
-        if (!capability) {
-            console.warn('Could not find capability for suggestion: ', suggestion);
-            return;
-        }
-        this.add(capability).then(() => this.loadSuggestions());
-    };
-
-    this.mkPopoverHtml = (suggestion) =>
-        '<ul class="list-unstyled">'
-        + suggestion.values.map(a => `<li>- ${a.name}</li>`).join('')
-        + '</ul>';
 };
 
 controller.$inject = [
@@ -164,6 +152,8 @@ controller.$inject = [
     'CapabilityStore',
     'RatingStore',
     'Notification',
+    'TraitStore',
+    'TraitUsageStore',
     '$stateParams',
     '$state',
     '$q'

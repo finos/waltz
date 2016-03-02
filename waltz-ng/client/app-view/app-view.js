@@ -41,7 +41,6 @@ function controller(appView,
 
     const vm = this;
 
-
     const perspectiveCode = 'BUSINESS';
 
 
@@ -51,7 +50,6 @@ function controller(appView,
     ]).then(([perspective, ratings]) => {
 
         const appRef = { id: id, kind: 'APPLICATION', name: appView.app.name};
-
 
         const group = mkAppRatingsGroup(appRef, perspective.measurables, appView.capabilities, ratings);
 
