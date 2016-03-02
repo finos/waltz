@@ -64,7 +64,7 @@
             <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValueComputed="now()" name="updated_at" type="TIMESTAMP">
+            <column name="updated_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
             <column name="organisational_unit_id" type="BIGINT">
@@ -230,7 +230,7 @@
             <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValueComputed="now()" name="updated_at" type="TIMESTAMP">
+            <column name="updated_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -950,6 +950,19 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               id="20160302-102-1">
+        <dropDefaultValue tableName="application"
+                          columnName="updated_at"/>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20160302-102-2">
+        <dropDefaultValue tableName="organisational_unit"
+                          columnName="updated_at"/>
     </changeSet>
 
 </databaseChangeLog>
