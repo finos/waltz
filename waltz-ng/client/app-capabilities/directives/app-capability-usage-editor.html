@@ -17,24 +17,24 @@
 
         <tbody>
         <tr class="waltz-visibility-parent"
-            ng-repeat="ac in ctrl.usedCapabilities | orderBy:'capability.name'">
+            ng-repeat="usage in ctrl.usedCapabilities | orderBy:'capability.name'">
             <td>
                 <waltz-icon style="color: goldenrod"
                             name="star"
-                            ng-if="ac.primary"></waltz-icon>
+                            ng-if="usage.primary"></waltz-icon>
             </td>
             <td>
                 <span class='wce-name'>
-                    {{ ac.capability.name }}
+                    {{ usage.capability.name }}
                 </span>
             </td>
             <td>
                 <span class='small'>
-                    {{ ac.capability.description }}
+                    {{ usage.capability.description }}
                 </span>
             </td>
             <td class="waltz-visibility-child-30">
-                <a href ng-click="ctrl.remove(ac.capability)">
+                <a href ng-click="ctrl.remove(usage.capability)">
                     <waltz-icon fixed-width='true'
                                 name="trash"></waltz-icon>
                     Remove
@@ -46,8 +46,8 @@
                               icon-off="star"
                               label-on="Un-mark as primary"
                               label-off="Mark as primary"
-                              on-toggle="ctrl.togglePrimary(ac.capability, !ac.primary)"
-                              state="ac.primary"></waltz-toggle>
+                              on-toggle="ctrl.togglePrimary(usage.capability, !usage.primary)"
+                              state="usage.primary"></waltz-toggle>
             </td>
         </tr>
 
@@ -63,6 +63,14 @@
                     <waltz-icon name="plus"></waltz-icon>
                     Add
                 </button>
+            </td>
+        </tr>
+        <tr ng-if="ctrl.hasHiddenCapabilities">
+            <td></td>
+            <td colspan="3">
+                <span class="small text-muted">
+                    Note, some capabilities are not available unless corresponding traits are selected.
+                </span>
             </td>
         </tr>
         </tbody>

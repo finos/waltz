@@ -31,20 +31,23 @@ const controller = function(appCapabilityStore,
         appCapabilityStore.findCapabilitiesByApplicationId(id),
         capabilityStore.findAll(),
         traitStore.findApplicationDeclarableTraits(),
-        traitUsageStore.findByEntityReference('APPLICATION', id)
+        traitUsageStore.findByEntityReference('APPLICATION', id),
+        traitUsageStore.findByEntityKind('CAPABILITY')
     ];
 
 
     $q.all(promises)
-        .then(([app, capabilityUsages, allCapabilities, allTraits, traitUsage]) => {
+        .then(([app, capabilityUsages, allCapabilities, allTraits, traitUsages, capabilityTraits ]) => {
+
             vm.traits = {
                 all: allTraits,
-                usages: traitUsage
+                usages: traitUsages
             };
 
             vm.capabilities = {
                 all: allCapabilities,
-                usages: capabilityUsages
+                usages: capabilityUsages,
+                capabilityTraits
             };
 
             vm.application = app;

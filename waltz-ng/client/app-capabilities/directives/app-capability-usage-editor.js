@@ -19,6 +19,8 @@
 const BINDINGS = {
     usages: '=',
     capabilities: '=',
+    capabilityTraits: '=?',
+    traitUsages: '=?',
     add: '=',
     remove: '=',
     togglePrimary: '='
@@ -31,18 +33,37 @@ function controller($scope) {
 
     vm.addForm = {};
 
-    $scope.$watchGroup(['ctrl.usages', 'ctrl.capabilities'], ([usages, capabilities]) => {
+    const watchExpressions = [
+        'ctrl.usages',
+        'ctrl.capabilities',
+        'ctrl.traitUsages',
+        'ctrl.capabilityTraits'
+    ];
+
+    $scope.$watchGroup(watchExpressions, ([usages, capabilities, traitUsages = [], capabilityTraits = []]) => {
         if (! usages || ! capabilities) { return; }
 
         const capabilitiesById = _.indexBy(capabilities, 'id');
         const usedCapabilityIds = _.map(usages, usage => usage.capabilityId);
 
-        vm.usedCapabilities = _.map(usages, u => ({...u, capability: capabilitiesById[u.capabilityId]}));
+        const exhibitedTraits = _.map(traitUsages, 'traitId');
 
+        const capabilityIdsToRemove = _.chain(capabilityTraits)
+            .where({ relationship: 'REQUIRES' })
+            .reject(ct => _.contains(exhibitedTraits, ct.traitId))
+            .map('entityReference.id')
+            .value();
 
-        vm.availableCapabilities = _.reject(capabilities, t => _.contains(usedCapabilityIds, t.id));
+        vm.usedCapabilities = _.map(usages, u => ({ ...u, capability: capabilitiesById[u.capabilityId] }));
+
+        vm.availableCapabilities = _.chain(capabilities)
+            .reject(t => _.contains(usedCapabilityIds, t.id))
+            .reject(t => _.contains(capabilityIdsToRemove, t.id))
+            .value();
+
+        vm.hasHiddenCapabilities = capabilityIdsToRemove.length > 0;
+
     });
-
 }
 
 

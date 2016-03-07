@@ -11,6 +11,7 @@
         <tr ng-repeat="trait in ctrl.usedTraits | orderBy:'name'"
             class="waltz-visibility-parent">
             <td>
+                <waltz-icon name="{{ trait.icon }}"></waltz-icon>
                 {{ trait.name }}
             </td>
             <td>

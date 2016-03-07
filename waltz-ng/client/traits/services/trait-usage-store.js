@@ -23,7 +23,7 @@ function store($http, BaseApiUrl) {
         .get(BASE)
         .then(r => r.data);
 
-    const findByKind = (kind) => $http
+    const findByEntityKind = (kind) => $http
         .get(`${BASE}/entity/${kind}`)
         .then(r => r.data);
 
@@ -46,7 +46,7 @@ function store($http, BaseApiUrl) {
 
     return {
         findAll,
-        findByKind,
+        findByEntityKind,
         findByTraitId,
         findByEntityReference,
         addUsage,
