@@ -5,9 +5,11 @@ import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.trait.Trait;
 import com.khartec.waltz.model.trait.TraitUsage;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.trait.TraitService;
 import com.khartec.waltz.service.trait.TraitUsageService;
+import com.khartec.waltz.service.user.UserService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
@@ -32,15 +34,18 @@ public class TraitUsageEndpoint implements Endpoint {
     private final TraitUsageService traitUsageService;
     private final TraitService traitService;
     private final ChangeLogService changeLogService;
+    private final UserService userService;
 
 
     @Autowired
     public TraitUsageEndpoint(TraitUsageService traitUsageService,
                               TraitService traitService,
-                              ChangeLogService changeLogService) {
+                              ChangeLogService changeLogService,
+                              UserService userService) {
         this.traitUsageService = traitUsageService;
         this.traitService = traitService;
         this.changeLogService = changeLogService;
+        this.userService = userService;
     }
 
 
@@ -60,6 +65,7 @@ public class TraitUsageEndpoint implements Endpoint {
         ListRoute<TraitUsage> findByTraitIdRoute = (request, response) -> traitUsageService.findByTraitId(getId(request));
 
         ListRoute<TraitUsage> addTraitUsageRoute = (request, response) -> {
+            requireRole(userService, request, Role.APP_EDITOR);
             long traitId = readBody(request, Long.class);
             EntityReference entityReference = getEntityReference(request);
 
@@ -83,6 +89,7 @@ public class TraitUsageEndpoint implements Endpoint {
         };
 
         ListRoute<TraitUsage> removeTraitUsageRoute = (request, response) -> {
+            requireRole(userService, request, Role.APP_EDITOR)
             long traitId = getLong(request, "traitId");
             EntityReference entityReference = getEntityReference(request);
 

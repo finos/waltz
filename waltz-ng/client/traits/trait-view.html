@@ -30,17 +30,25 @@
 <div class="row">
     <div class="col-sm-10">
         <waltz-section icon='cubes' name="{{ ctrl.trait.name }}" small="Overview">
-            <blockquote>
-                {{ ctrl.trait.description }}
-            </blockquote>
-            <div class="alert alert-info" ng-if="ctrl.trait.applicationDeclarable">
-                <waltz-icon name="info-circle"></waltz-icon>
-                <strong>Application Declarable</strong>
-                <br>
-                This trait is intended to be declared by applications and is
-                often used to provide broad grouping information and also to restrict/enable parts of the capability
-                model.
+            <div class="row">
+                <div class="col-sm-8">
+                    <blockquote>
+                        {{ ctrl.trait.description }}
+                    </blockquote>
+                </div>
+                <div class="col-sm-4">
+                    <div class="alert alert-info" ng-if="ctrl.trait.applicationDeclarable">
+                        <waltz-icon name="info-circle"></waltz-icon>
+                        <strong>Application Declarable</strong>
+                        <br>
+                        This trait is intended to be declared by applications and is
+                        often used to provide broad grouping information and also to restrict/enable parts of the capability
+                        model.
+                    </div>
+                </div>
             </div>
+
+
         </waltz-section>
     </div>
 
@@ -54,6 +62,9 @@
     <div class="col-sm-12">
         <waltz-section icon='puzzle-piece' name="Related Capabilities">
 
+            <div class="text-muted">
+                The following capabilities have been associated with this trait.
+            </div>
             <table class="table table-condensed table-striped">
                 <thead>
                 <tr>
@@ -74,7 +85,17 @@
             </table>
         </waltz-section>
 
-        <pre>
-            {{ ctrl.usages }}
-        </pre>
     </div>
+
+    <div class="col-sm-12">
+        <waltz-section name="Applications" icon="desktop">
+            <div class="text-muted">
+                Applications may either exhibit this trait directly or be associated to a capability
+                that is linked to this trait.
+            </div>
+            <div class="alert alert-warning">
+                <strong>TBC</strong>
+            </div>
+        </waltz-section>
+    </div>
+</div>
