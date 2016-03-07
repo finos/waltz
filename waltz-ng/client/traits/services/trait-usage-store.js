@@ -35,11 +35,22 @@ function store($http, BaseApiUrl) {
         .get(`${BASE}/entity/${kind}/${id}`)
         .then(r => r.data);
 
+    const addUsage = (entityRef, traitId) => $http
+        .post(`${BASE}/entity/${entityRef.kind}/${entityRef.id}`, traitId)
+        .then(r => r.data);
+
+    const removeUsage = (entityRef, traitId) => $http
+        .delete(`${BASE}/entity/${entityRef.kind}/${entityRef.id}/${traitId}`)
+        .then(r => r.data);
+
+
     return {
         findAll,
         findByKind,
         findByTraitId,
-        findByEntityReference
+        findByEntityReference,
+        addUsage,
+        removeUsage
     };
 
 }

@@ -10,19 +10,22 @@
 
     <div>
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-md-6">
+
                 <h3>
                     <waltz-icon name="cubes"></waltz-icon>
                     Traits
                 </h3>
+
+                <waltz-trait-usage-editor traits="ctrl.traits.allTraits"
+                                          usages="ctrl.traits.traitUsage"
+                                          add="ctrl.addTrait"
+                                          remove="ctrl.removeTrait">
+                </waltz-trait-usage-editor>
+
             </div>
-        </div>
 
-        <hr>
-
-        <div class="row">
-            <div class="col-md-12">
-
+            <div class="col-md-6">
                 <h3>
                     <waltz-icon name="puzzle-piece"></waltz-icon>
                     Capabilities
@@ -97,13 +100,15 @@
                     </tbody>
                 </table>
 
-                <hr>
-                <a ui-sref="main.app-view ({id: ctrl.application.id})">
-                    &laquo; Go back to {{ctrl.application.name}}
-                </a>
             </div>
 
         </div>
+
+        <hr>
+
+        <a ui-sref="main.app-view ({id: ctrl.application.id})">
+            &laquo; Go back to {{ctrl.application.name}}
+        </a>
 
     </div>
 

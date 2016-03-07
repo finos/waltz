@@ -41,19 +41,23 @@ public class TraitUsageDao {
         this.dsl = dsl;
     }
 
+
     public List<TraitUsage> findAll() {
         return queryForList(DSL.trueCondition());
     }
+
 
     public List<TraitUsage> findByEntityKind(EntityKind kind) {
         return queryForList(
                 TRAIT_USAGE.ENTITY_KIND.eq(kind.name()));
     }
 
+
     public List<TraitUsage> findByTraitId(long id) {
         return queryForList(
                 TRAIT_USAGE.TRAIT_ID.eq(id));
     }
+
 
     public List<TraitUsage> findByEntityReference(EntityReference reference) {
         return queryForList(
@@ -62,6 +66,24 @@ public class TraitUsageDao {
         );
     }
 
+
+    public boolean addTraitUsage(EntityReference entityReference, Long traitId, TraitUsageKind traitUsageKind) {
+        return dsl.insertInto(TRAIT_USAGE)
+                .set(TRAIT_USAGE.ENTITY_KIND, entityReference.kind().name())
+                .set(TRAIT_USAGE.ENTITY_ID, entityReference.id())
+                .set(TRAIT_USAGE.TRAIT_ID, traitId)
+                .set(TRAIT_USAGE.RELATIONSHIP, traitUsageKind.name())
+                .execute() == 1;
+    }
+
+
+    public boolean removeTraitUsage(EntityReference entityReference, long traitId) {
+        return dsl.deleteFrom(TRAIT_USAGE)
+                .where(TRAIT_USAGE.ENTITY_KIND.eq(entityReference.kind().name()))
+                .and(TRAIT_USAGE.ENTITY_ID.eq(entityReference.id()))
+                .and(TRAIT_USAGE.TRAIT_ID.eq(traitId))
+                .execute() == 1;
+    }
 
     // -- HELPERS --
 

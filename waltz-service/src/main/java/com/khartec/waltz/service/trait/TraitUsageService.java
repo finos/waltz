@@ -4,6 +4,7 @@ import com.khartec.waltz.data.trait.TraitUsageDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.trait.TraitUsage;
+import com.khartec.waltz.model.trait.TraitUsageKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,5 +37,15 @@ public class TraitUsageService {
 
     public List<TraitUsage> findByEntityReference(EntityReference reference) {
         return dao.findByEntityReference(reference);
+    }
+
+    public List<TraitUsage> addTraitUsage(EntityReference entityReference, Long traitId) {
+        dao.addTraitUsage(entityReference, traitId, TraitUsageKind.EXHIBITS);
+        return findByEntityReference(entityReference);
+    }
+
+    public List<TraitUsage> removeTraitUsage(EntityReference entityReference, long traitId) {
+        dao.removeTraitUsage(entityReference, traitId);
+        return findByEntityReference(entityReference);
     }
 }

@@ -102,12 +102,14 @@ const controller = function(appCapabilityStore,
         traitUsageStore.findByEntityReference('APPLICATION', id)
     ];
 
-    // TODO: load all app declarable traits
-    // TODO: load app trait usages
 
     $q.all(promises)
         .then(([app, appCapabilities, capabilities, allTraits, traitUsage]) => {
-            console.log(allTraits, traitUsage);
+            vm.traits = {
+                allTraits,
+                traitUsage
+            };
+
             model.allCapabilities = capabilities;
             const capabilitiesById = _.indexBy(capabilities, 'id');
 
@@ -143,6 +145,17 @@ const controller = function(appCapabilityStore,
         appCapabilityStore.setIsPrimary(id, capability.id, appCapability.primary);
         notification.success(`${capability.name} ${appCapability.primary ? ' not ' : ''}  marked as primary`);
     };
+
+
+    this.addTrait = (t) => traitUsageStore
+        .addUsage({ kind: 'APPLICATION', id}, t.id)
+        .then(usage => vm.traits.traitUsage = usage)
+        .then(() => notification.success('Trait registered'));
+
+    this.removeTrait = (t) => traitUsageStore
+        .removeUsage({ kind: 'APPLICATION', id}, t.id)
+        .then(usage => vm.traits.traitUsage = usage)
+        .then(() => notification.warning('Trait registration removed'));
 
 };
 
