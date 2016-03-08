@@ -20,18 +20,21 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.appview.AppView;
 import com.khartec.waltz.service.app_view.AppViewService;
 import com.khartec.waltz.web.DatumRoute;
-import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.WebUtilities;
+import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.getId;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 
 @Service
 public class AppViewEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "app-view");
+    private static final String BASE_URL = mkPath("api", "app-view");
 
     private final AppViewService appViewService;
 
@@ -46,9 +49,11 @@ public class AppViewEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        DatumRoute<AppView> getById = (request, response) -> appViewService.getAppView(WebUtilities.getId(request));
+        String getByIdPath = mkPath(BASE_URL, ":id");
 
-        EndpointUtilities.getForDatum(WebUtilities.mkPath(BASE_URL, ":id"), getById);
+        DatumRoute<AppView> getByIdRoute = (request, response) -> appViewService.getAppView(getId(request));
+
+        getForDatum(getByIdPath, getByIdRoute);
     }
 
 

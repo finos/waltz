@@ -1,0 +1,54 @@
+<div>
+    <table class="table table-condensed">
+        <thead>
+        <tr>
+            <th>Trait</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="trait in ctrl.usedTraits | orderBy:'name'"
+            class="waltz-visibility-parent">
+            <td>
+                <waltz-icon name="{{ trait.icon }}"></waltz-icon>
+                {{ trait.name }}
+            </td>
+            <td>
+                {{ trait.description }}
+            </td>
+            <td>
+                <span class="waltz-visibility-child-30">
+                    <a ng-click="ctrl.remove(trait)" href>
+                        <waltz-icon name='trash'></waltz-icon>
+                        Remove
+                    </a>
+                </span>
+            </td>
+        </tr>
+        <tr style="background-color: #f5f5f5; border-bottom: 1px solid #ccc;" ng-if="ctrl.availableTraits.length > 0">
+            <td>
+                <label>Register new trait:</label>
+            </td>
+            <td>
+                <select ng-options="option.name for option in ctrl.availableTraits track by option.id"
+                        ng-model="ctrl.selectedTrait"></select>
+            </td>
+            <td>
+                <button ng-click="ctrl.add(ctrl.selectedTrait)"
+                        class="btn btn-sm btn-primary"
+                        ng-disabled="!ctrl.selectedTrait">
+                    <waltz-icon name="plus"></waltz-icon>
+                    Add
+                </button>
+            </td>
+        </tr>
+        <tr style="background-color: #f5f5f5; border-bottom: 1px solid #ccc;" ng-if="ctrl.availableTraits.length == 0">
+            <td colspan="3">
+                <waltz-icon name="info-circle"></waltz-icon>
+                No Traits available for registering.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

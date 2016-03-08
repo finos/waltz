@@ -18,8 +18,6 @@ import d3 from 'd3';
 import { environmentColorScale, operatingSystemColorScale, variableScale } from '../../common/colors';
 
 
-global.vs = variableScale;
-
 /**
  * the d3 nest function aggregates using the property name 'values', this
  * function creates a copy of the data with the name 'count'.

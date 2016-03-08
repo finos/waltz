@@ -1,0 +1,29 @@
+<span ng-if="ctrl.traits.length > 0">
+    <span uib-popover-template="'traits-indicator/popup.html'"
+          popover-title="Traits"
+          popover-placement="right"
+          popover-trigger="mouseover"
+          class="clickable waltz-trait-indicator">
+        <waltz-icon name="cubes"></waltz-icon>
+    </span>
+
+    <script type="text/ng-template"
+            id="traits-indicator/popup.html">
+
+        <div class="text-muted small waltz-paragraph">
+            The following traits have been associated to this
+            item.
+        </div>
+
+        <hr>
+
+        <ul class="list-unstyled">
+            <li ng-repeat="trait in ctrl.traits">
+                <waltz-icon name="{{ trait.icon }}"></waltz-icon>
+                <a ui-sref="main.traits.view ({ id: trait.id })">
+                    {{ trait.name }}
+                </a>
+            </li>
+        </ul>
+    </script>
+</span>

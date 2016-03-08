@@ -83,6 +83,7 @@ const registrationFns = [
     require('./sidebar'),
     require('./static-panel'),
     require('./svg-diagram'),
+    require('./traits'),
     require('./user'),
     require('./formly'),
     require('./widgets'),

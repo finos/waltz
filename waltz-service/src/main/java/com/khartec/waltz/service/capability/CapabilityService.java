@@ -86,6 +86,10 @@ public class CapabilityService {
             return capabilityDao.findByAppIds(appIds);
 
     }
+
+    public boolean update(Capability capability) {
+        return capabilityDao.update(capability);
+    }
 }
 
 

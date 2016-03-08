@@ -26,6 +26,8 @@ import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.ParentIdProvider;
 import org.immutables.value.Value;
 
+import java.util.Optional;
+
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableCapability.class)
@@ -37,5 +39,11 @@ public abstract class Capability implements
         ParentIdProvider {
 
     public abstract int level();
+
+    public abstract Optional<Long> level1();
+    public abstract Optional<Long> level2();
+    public abstract Optional<Long> level3();
+    public abstract Optional<Long> level4();
+    public abstract Optional<Long> level5();
 
 }

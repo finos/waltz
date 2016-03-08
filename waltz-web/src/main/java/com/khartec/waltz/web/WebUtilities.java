@@ -38,6 +38,7 @@ import spark.ResponseTransformer;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkAll;
@@ -91,7 +92,9 @@ public class WebUtilities {
      * @param obj  object to render
      * @param logger   logger to use if failure report required
      */
-    public static void attemptRender(Response res, Object obj, Logger logger) {
+    public static void attemptRender(Response res,
+                                     Object obj,
+                                     Logger logger) {
         checkNotNull(res, "res must not be null");
         checkNotNull(obj, "obj must not be null");
         checkNotNull(logger, "logger must not be null");
@@ -105,7 +108,8 @@ public class WebUtilities {
     }
 
 
-    public static long getLong(Request request, String paramName) {
+    public static long getLong(Request request,
+                               String paramName) {
         checkNotNull(request, "request must not be null");
         checkNotNull(paramName, "paramName must not be null");
 
@@ -118,7 +122,9 @@ public class WebUtilities {
     }
 
 
-    public static void requireRole(UserService userService, Request request, Role... requiredRoles) {
+    public static void requireRole(UserService userService,
+                                   Request request,
+                                   Role... requiredRoles) {
         User user = getUser(request);
         if (user == null) {
             LOG.warn("Required role check failed as no user, roles needed: " + requiredRoles);
@@ -162,26 +168,56 @@ public class WebUtilities {
     }
 
 
-    public static <T> T readBody(Request request, Class<T> objClass) throws IOException {
+    /**
+     * Reads the body of the request and attempts to convert it into an instance of
+     * the given class.
+     *
+     * @param request
+     * @param objClass
+     * @param <T>
+     * @return
+     * @throws IOException
+     */
+    public static <T> T readBody(Request request,
+                                 Class<T> objClass) throws IOException {
         return mapper.readValue(
                 request.bodyAsBytes(),
                 objClass);
     }
 
+    public static List<Long> readIdsFromBody(Request req) throws IOException {
+        return (List<Long>) readBody(req, List.class);
+    }
 
-    public static <T> T readBody(Request request, Class<T> objClass, T dflt) {
+
+    /**
+     * Reads the body of the request and attempts to convert it into an instance of
+     * the given class. If the attempt fails then return the given default object
+     * instead of throwing an exception.
+     *
+     * @param request
+     * @param objClass
+     * @param dflt
+     * @param <T>
+     * @return
+     */
+    public static <T> T readBody(Request request,
+                                 Class<T> objClass,
+                                 T dflt) {
         try {
             return readBody(request, objClass);
         } catch (IOException ioe) {
+            String msg = "Failed to ready body of request into an object of type: " + objClass.getName() + ", returning default object";
+            LOG.warn(msg, ioe);
             return dflt;
         }
     }
 
 
     public static <T extends Enum<T>> T readEnum(Request request,
-                               String paramName,
-                               Class<T> enumClass,
-                               T dflt) {
+                                                 String paramName,
+                                                 Class<T> enumClass,
+                                                 T dflt) {
         return EnumUtilities.readEnum(request.params(paramName), enumClass, dflt);
     }
 

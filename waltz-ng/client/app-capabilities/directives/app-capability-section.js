@@ -10,16 +10,27 @@
  *
  */
 
+const BINDINGS = {
+    appCapabilities: '=',
+    capabilities: '=',
+    selfId: '@',
+    traits: '='
+};
+
+
+function controller() {
+}
+
+
 export default [
     () => ({
         restrict: 'E',
         replace: true,
         template: require('./app-capability-section.html'),
-        scope: {
-            appCapabilities: '=',
-            capabilities: '=',
-            selfId: '@'
-        }
+        controller,
+        controllerAs: 'ctrl',
+        scope: {},
+        bindToController: BINDINGS
     })
 ]
 ;

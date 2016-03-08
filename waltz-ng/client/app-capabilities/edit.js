@@ -10,160 +10,87 @@
  *
  */
 
-import angular from 'angular';
 import _ from 'lodash';
 
-
-function filterAvailable(all, used) {
-    const killList = _.map(used, 'capability.id');
-    return _.filter(all, c => !_.contains(killList, c.id));
-}
 
 const controller = function(appCapabilityStore,
                             appStore,
                             capabilityStore,
-                            ratingStore,
                             notification,
+                            traitStore,
+                            traitUsageStore,
                             $stateParams,
                             $state,
                             $q) {
 
     const vm = this;
-    const id = Number($stateParams.id);
+    const id = $stateParams.id;
+
+    const promises = [
+        appStore.getById(id),
+        appCapabilityStore.findCapabilitiesByApplicationId(id),
+        capabilityStore.findAll(),
+        traitStore.findApplicationDeclarableTraits(),
+        traitUsageStore.findByEntityReference('APPLICATION', id),
+        traitUsageStore.findByEntityKind('CAPABILITY')
+    ];
 
 
-    const model = {
-        appCapabilities: [],
-        availableCapabilities: [],
-        allCapabilities: [],
-        capabilityUsage: {}
-    };
+    $q.all(promises)
+        .then(([app, capabilityUsages, allCapabilities, allTraits, traitUsages, capabilityTraits ]) => {
 
+            vm.traits = {
+                all: allTraits,
+                usages: traitUsages
+            };
 
-    const calculateAvailableCapabilities = () => {
-        model.availableCapabilities = filterAvailable(model.allCapabilities, model.appCapabilities);
-    };
+            vm.capabilities = {
+                all: allCapabilities,
+                usages: capabilityUsages,
+                capabilityTraits
+            };
 
-
-    const clearForm = () => {
-        this.addForm.capability = null;
-    };
-
-
-    const add = (newCapability) => {
-        if (!_.any(model.capabilities, c => c.id === newCapability.id)) {
-            return appCapabilityStore
-                .addCapability(id, newCapability.id)
-                .then(() => {
-                    model.appCapabilities.push({
-                        capability: newCapability,
-                        applicationReference: {
-                            id: id,
-                            kind: 'APPLICATION'
-                        },
-                        description: newCapability.description,
-                        primary: false
-                    });
-                    calculateAvailableCapabilities();
-                    clearForm();
-                })
-                .then(() => notification.success('Capability added'));
-
-        } else {
-            return Promise.resolve();
-        }
-    };
-
-
-    const remove = (capabilityId) => {
-        if (model.capabilityUsage[capabilityId]) {
-            notification.error('Cannot remove capability as it has ratings.');
-        } else {
-            appCapabilityStore
-                .removeCapability(id, capabilityId)
-                .then(() => {
-                    model.appCapabilities = _.reject(model.appCapabilities, ac => ac.capability.id === capabilityId );
-                    calculateAvailableCapabilities();
-                })
-                .then(() => notification.warning('Capability removed'));
-        }
-    };
-
-
-    const appPromise = appStore
-        .getById(id);
-
-    const appCapabilityPromise = appCapabilityStore
-        .findCapabilitiesByApplicationId(id);
-
-    const capabilityPromise = capabilityStore
-        .findAll();
-
-    $q.all([capabilityPromise, appCapabilityPromise, appPromise])
-        .then(([capabilities, appCapabilities, app]) => {
-            model.allCapabilities = capabilities;
-            const capabilitiesById = _.indexBy(capabilities, 'id');
-
-            model.appCapabilities = _.map(appCapabilities, ac => {
-                return {
-                    original: true,
-                    capability: capabilitiesById[ac.capabilityId],
-                    application: app,
-                    primary: ac.primary
-                };
-            });
             vm.application = app;
-        })
-        .then( () => calculateAvailableCapabilities())
-        .then( () => ratingStore.findByParent('APPLICATION', id))
-        .then(ratings => {
-            model.capabilityUsage = _.foldl(
-                ratings,
-                (acc, r) => { acc[r.capability.id] = true; return acc; },
-                {});
         });
 
 
+    vm.togglePrimary = (c, primary) => appCapabilityStore
+        .setIsPrimary(id, c.id, primary)
+        .then(() => notification.success(`${c.name} ${primary ? ' not ' : ''}  marked as primary`))
+        .then(() => appCapabilityStore.findCapabilitiesByApplicationId(id))
+        .then(usages => vm.capabilities.usages = usages);
 
-    this.model = model;
-    this.remove = remove;
-    this.add = add;
+    vm.addCapability = (c) => appCapabilityStore
+        .addCapability(id, c.id)
+        .then(() => notification.success(`Added capability: ${c.name}`))
+        .then(() => appCapabilityStore.findCapabilitiesByApplicationId(id))
+        .then(usages => vm.capabilities.usages = usages);
 
-    this.addForm = {};
+    vm.removeCapability = (c) => appCapabilityStore
+        .removeCapability(id, c.id)
+        .then(() => notification.success(`Removed capability: ${c.name}`))
+        .then(() => appCapabilityStore.findCapabilitiesByApplicationId(id))
+        .then(usages => vm.capabilities.usages = usages);
 
-    this.togglePrimaryCapability = (capability) => {
-        const appCapability = _.find(model.appCapabilities, ac => ac.capability.id == capability.id);
-        appCapability.primary = !appCapability.primary;
-        appCapabilityStore.setIsPrimary(id, capability.id, appCapability.primary);
-        notification.success(`${capability.name} ${appCapability.primary ? ' not ' : ''}  marked as primary`);
-    };
+    vm.addTrait = (t) => traitUsageStore
+        .addUsage({ kind: 'APPLICATION', id}, t.id)
+        .then(usages => vm.traits.usages = usages)
+        .then(() => notification.success('Trait registered'));
 
-    this.loadSuggestions = () => {
-        appCapabilityStore.findAssociatedCapabilitiesByApplicationId(id)
-            .then(suggestions => this.suggestions = suggestions);
-    };
+    vm.removeTrait = (t) => traitUsageStore
+        .removeUsage({ kind: 'APPLICATION', id}, t.id)
+        .then(usages => vm.traits.usages = usages)
+        .then(() => notification.warning('Trait registration removed'));
 
-    this.addSuggestion = suggestion => {
-        const capability = _.findWhere(model.allCapabilities, { id: suggestion.id } );
-        if (!capability) {
-            console.warn('Could not find capability for suggestion: ', suggestion);
-            return;
-        }
-        this.add(capability).then(() => this.loadSuggestions());
-    };
-
-    this.mkPopoverHtml = (suggestion) =>
-        '<ul class="list-unstyled">'
-        + suggestion.values.map(a => `<li>- ${a.name}</li>`).join('')
-        + '</ul>';
 };
 
 controller.$inject = [
     'AppCapabilityStore',
     'ApplicationStore',
     'CapabilityStore',
-    'RatingStore',
     'Notification',
+    'TraitStore',
+    'TraitUsageStore',
     '$stateParams',
     '$state',
     '$q'

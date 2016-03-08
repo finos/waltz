@@ -16,6 +16,29 @@ import d3 from 'd3';
 import { perhaps, populateParents } from '../common';
 import { calculateGroupSummary } from '../ratings/directives/common';
 
+function loadTraitInfo(traitStore, traitUsageStore, capabilityId) {
+    const result = {
+        usages: [],
+        traits: []
+    };
+
+    return traitUsageStore
+        .findByEntityReference('CAPABILITY', capabilityId)
+        .then(usages => {
+            if (! usages) { return result; } // shortcut
+
+            result.usages = usages;
+            const traitIds =_.chain(usages)
+                .map('traitId')
+                .uniq()
+                .value();
+
+            return traitStore.findByIds(traitIds)
+                .then(traits => result.traits = traits)
+                .then(() => result);
+        });
+}
+
 
 function logHistory(capability, historyStore) {
     historyStore.put(
@@ -88,7 +111,9 @@ function controller(capabilities,
                     assetCostStore,
                     capabilityStore,
                     applicationStore,
-                    serverInfoStore) {
+                    serverInfoStore,
+                    traitUsageStore,
+                    traitStore) {
 
     const vm = this;
 
@@ -165,6 +190,9 @@ function controller(capabilities,
 
     vm.capability = capability;
     vm.capabilitiesById = capabilitiesById;
+
+    loadTraitInfo(traitStore, traitUsageStore, capability.id)
+        .then(r => vm.traitInfo = r);
 }
 
 controller.$inject = [
@@ -181,7 +209,9 @@ controller.$inject = [
     'AssetCostStore',
     'CapabilityStore',
     'ApplicationStore',
-    'ServerInfoStore'
+    'ServerInfoStore',
+    'TraitUsageStore',
+    'TraitStore'
 ];
 
 
