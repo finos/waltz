@@ -89,7 +89,7 @@ public class TraitUsageEndpoint implements Endpoint {
         };
 
         ListRoute<TraitUsage> removeTraitUsageRoute = (request, response) -> {
-            requireRole(userService, request, Role.APP_EDITOR)
+            requireRole(userService, request, Role.APP_EDITOR);
             long traitId = getLong(request, "traitId");
             EntityReference entityReference = getEntityReference(request);
 
