@@ -16,17 +16,34 @@
  *
  */
 
-function groupUsagesByEntityKind(allUsages) {
+function groupUsagesByEntityKind(allUsages = []) {
     return _.groupBy(allUsages, usage => usage.entityReference.kind)
 }
 
 
-function indexCapabilitiesById(capabilities) {
+function indexCapabilitiesById(capabilities = []) {
     return _.indexBy(capabilities, 'id')
 }
 
 
-function controller(traitStore, traitUsageStore, capabilityStore, $stateParams) {
+function enrichCapabilityUsages(usages = [], capabilitiesById = {}) {
+    console.log(usages, capabilitiesById)
+    return _.map(usages, u => ({
+        usage: u,
+        capability: capabilitiesById[u.entityReference.id]
+    }));
+}
+
+
+function requestCapabilityUsage(triatId, capabilityStore, traitUsageStore) {
+    return [
+        capabilityStore.findAll(),
+        traitUsageStore.findByTraitId(triatId)
+    ];
+}
+
+
+function controller(traitStore, traitUsageStore, capabilityStore, $stateParams, $q) {
 
     const id = $stateParams.id;
     const vm = this;
@@ -35,22 +52,24 @@ function controller(traitStore, traitUsageStore, capabilityStore, $stateParams) 
     vm.trait = null;
     vm.usages = {};
 
-    capabilityStore.findAll()
-        .then(capabilities =>
-            vm.capabilitiesById = indexCapabilitiesById(capabilities));
-
     traitStore
         .getById(id)
         .then(trait =>
             vm.trait = trait);
 
-    traitUsageStore
-        .findByTraitId(id)
-        .then(allUsages =>
-            vm.usages = groupUsagesByEntityKind(allUsages));
+    const promises = requestCapabilityUsage(id, capabilityStore, traitUsageStore);
+
+    $q.all(promises)
+        .then(([capabilities, allUsages]) => {
+            const capabilitiesById = indexCapabilitiesById(capabilities);
+            const usages = groupUsagesByEntityKind(allUsages);
+            vm.capabilityUsages = enrichCapabilityUsages(usages['CAPABILITY'], capabilitiesById);
+        });
 
     vm.lookupCapability = id =>
         vm.capabilitiesById[id];
+
+    global.vm = vm;
 }
 
 
@@ -58,7 +77,8 @@ controller.$inject = [
     'TraitStore',
     'TraitUsageStore',
     'CapabilityStore',
-    '$stateParams'
+    '$stateParams',
+    '$q'
 ];
 
 

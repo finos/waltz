@@ -36,6 +36,8 @@ public class CapabilityHarness {
         CapabilityUsageService capabilityUsageService = ctx.getBean(CapabilityUsageService.class);
         CapabilityService capabilityService = ctx.getBean(CapabilityService.class);
 
+        capabilityService.assignLevels();
+
         Forest<Capability, Long> forest = capabilityService.buildHierarchy();
 
         for (Node<Capability, Long> node : forest.getAllNodes().values()) {

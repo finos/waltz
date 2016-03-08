@@ -73,16 +73,29 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="usage in ctrl.usages.CAPABILITY">
+                <tr ng-repeat="cu in ctrl.capabilityUsages | orderBy:'capability.name'">
                     <td>
-                        <a ui-sref="main.capabilities.view ({ id: usage.entityReference.id })">
-                            {{ ctrl.lookupCapability(usage.entityReference.id).name }}
-                        </a>
+                        <span uib-popover="{{ cu.capability.description }}"
+                              popover-placement="right"
+                              popover-trigger="mouseenter">
+                            <a ui-sref="main.capabilities.view ({ id: cu.capability.id })">
+                                {{ cu.capability.name }}
+                            </a>
+                        </span>
                     </td>
-                    <td>{{ usage.relationship }}</td>
+                    <td>{{ cu.usage.relationship }}</td>
                 </tr>
                 </tbody>
             </table>
+
+            <p class="small text-muted">
+                The relationship describes how the capability is associated with the trait.
+                A relationship of <code>EXHIBITS</code> indicates that the capability
+                has a basic association to the Trait,  <code>REQUIRED</code> indicates that
+                the capability is dependent on the trait - for example the capability would
+                not be available when documenting an application if <i>that</i> application does
+                not exhibit the trait.
+            </p>
         </waltz-section>
 
     </div>
