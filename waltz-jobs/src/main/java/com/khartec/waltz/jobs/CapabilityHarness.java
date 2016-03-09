@@ -54,7 +54,6 @@ public class CapabilityHarness {
             capabilityService.update(capability);
         }
 
-
     }
 
     private static Capability setLevel(Capability capability, int level, Node<Capability, Long> node) {

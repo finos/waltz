@@ -10,15 +10,24 @@
  *
  */
 
+const BINDINGS = {
+    model: '=',
+    capabilities: '='
+};
+
+
+function controller() { }
+
+
 export default () => {
     return {
         restrict: 'E',
         replace: true,
         template: require('./capability-selector.html'),
-        scope: {
-            model: '=',
-            capabilities: '='
-        }
+        scope: {},
+        bindToController: BINDINGS,
+        controllerAs: 'ctrl',
+        controller
     };
 };
 

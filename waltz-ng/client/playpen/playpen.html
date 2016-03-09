@@ -10,30 +10,57 @@
 
     <waltz-section name="Preview">
         <div class="row">
-            <div class="col-md-6">
-                <waltz-complexity-bar-chart complexity="ctrl.complexity"
-                                            sizing="{ h: 250 }"
-                                            on-select="ctrl.onSelect">
-                </waltz-complexity-bar-chart>
+            <div class="col-md-12">
+
+                <table class="tbl tbl-condensed" style="border: 1px solid #FF9696">
+                    <tr>
+                        <td>Hello</td>
+                        <td>
+                            <div class="container">
+                                <!-- widget wrap ? -->
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <waltz-capability-selector capabilities="ctrl.capabilities"></waltz-capability-selector>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button class="btn">
+                                            <waltz-icon name="ellipsis-h"></waltz-icon>
+                                        </button>
+                                        <button class="btn btn-success">
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                        </td>
+                    </tr>
+                </table>
+
+
             </div>
 
         </div>
 
     </waltz-section>
 
+
+    <waltz-section name="Tree">
+        <waltz-capability-tree capabilities="ctrl.capabilities"></waltz-capability-tree>
+    </waltz-section>
+
+
     <waltz-section name="Dump1">
         <pre>
-            {{ }}
+            {{ ctrl.capabilities.length }}
         </pre>
     </waltz-section>
 
 
 
-    <waltz-section name="Dump2">
-        <pre>
-            {{ }}
-        </pre>
-    </waltz-section>
+
 
 
 

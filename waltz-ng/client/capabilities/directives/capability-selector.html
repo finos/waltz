@@ -1,12 +1,12 @@
-<div>
-    <ui-select ng-model="model.capability"
+<span>
+    <ui-select ng-model="ctrl.model.capability"
                theme="bootstrap">
 
         <ui-select-match placeholder="Search for capability...">
             {{$select.selected.name}}
         </ui-select-match>
 
-        <ui-select-choices repeat="capability in capabilities | filter:$select.search track by $index">
+        <ui-select-choices repeat="capability in ctrl.capabilities | filter:$select.search track by $index">
 
             <span ng-bind-html="capability.name | highlight: $select.search"></span>
 
@@ -15,4 +15,4 @@
 
         </ui-select-choices>
     </ui-select>
-</div>
+</span>
