@@ -48,9 +48,31 @@
 
 
     <waltz-section name="Tree">
-        <waltz-capability-tree capabilities="ctrl.capabilities"></waltz-capability-tree>
-    </waltz-section>
+        <div class="row">
+            <div class="col-md-6">
+                <waltz-capability-selector-advanced capabilities="ctrl.capabilities"
+                                                    selected-node="ctrl.selectedNode"
+                                                    options="{ showDescriptions: false }">
+                </waltz-capability-selector-advanced>
+            </div>
+            <div class="col-md-6">
+                <div ng-show="ctrl.selectedNode">
+                    <h4>
+                        {{ ctrl.selectedNode.name }}
+                    </h4>
+                    <p>
+                        {{ ctrl.selectedNode.description }}
+                    </p>
+                    <button class="btn btn-success">
+                        Use this
+                    </button>
+                    <a ng-click="ctrl.selectedNode = undefined" href>Cancel</a>
 
+                </div>
+            </div>
+        </div>
+
+    </waltz-section>
 
     <waltz-section name="Dump1">
         <pre>
@@ -58,19 +80,11 @@
         </pre>
     </waltz-section>
 
-
-
-
-
-
-
     <waltz-section name="Dump3">
         <pre>
             {{ }}
         </pre>
     </waltz-section>
-
-
 
     <waltz-section name="Dump4" id="d4">
         <pre>

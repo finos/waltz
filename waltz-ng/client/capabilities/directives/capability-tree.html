@@ -1,3 +1,36 @@
 <div>
-    <h1>Tree</h1>
+    <div class="waltz-scroll-region"
+         ng-style="{ 'max-height': ctrl.options.maxHeight || '300px' }">
+        <treecontrol class="tree-light"
+                     tree-model="ctrl.treeData"
+                     options="ctrl.treeOptions"
+                     order-by="name"
+                     expanded-nodes="ctrl.expandedNodes"
+                     on-selection="ctrl.showSelected(node)"
+                     filter-expression="ctrl.filterExpression"
+                     selected-node="ctrl.selectedNode">
+
+            <span title="{{ node.description }}"
+                  ng-dblclick="ctrl.toggleExpansion(node)"
+                  class="no-overflow">
+                {{ node.name }}
+
+                <span class="small text-muted" ng-if="ctrl.options.showDescriptions">
+                    {{ node.description }}
+                </span>
+            </span>
+
+        </treecontrol>
+    </div>
+
+    <p class="waltz-paragraph small text-muted">
+        <a href ng-click="ctrl.collapseAll()">
+            Collapse all</a>
+        nodes.
+
+        <a href ng-click="ctrl.expandFiltered()">
+            Expand</a>
+        filter results.
+    </p>
+
 </div>

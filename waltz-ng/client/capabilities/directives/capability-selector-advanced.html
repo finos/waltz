@@ -1,0 +1,17 @@
+<div>
+    <div class="form-group has-feedback has-clear">
+        <input type="search"
+               class="form-control"
+               ng-model="ctrl.treeQuery"
+               placeholder="Filter"/>
+
+        <a class="glyphicon glyphicon-remove-sign form-control-feedback form-control-clear"
+           ng-click="ctrl.clearQuery()"
+           title="Clear filter"
+           style="pointer-events: auto; text-decoration: none;cursor: pointer;"></a>
+    </div>
+    <waltz-capability-tree capabilities="ctrl.capabilities"
+                           options="ctrl.options"
+                           selected-node="ctrl.selectedNode"
+                           filter-expression="{{ctrl.treeQuery}}"></waltz-capability-tree>
+</div>
