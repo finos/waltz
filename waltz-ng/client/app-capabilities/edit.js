@@ -56,7 +56,7 @@ const controller = function(appCapabilityStore,
 
     vm.togglePrimary = (c, primary) => appCapabilityStore
         .setIsPrimary(id, c.id, primary)
-        .then(() => notification.success(`${c.name} ${primary ? ' not ' : ''}  marked as primary`))
+        .then(() => notification.success(`${c.name} ${primary ? '' : ' not '}  marked as primary`))
         .then(() => appCapabilityStore.findCapabilitiesByApplicationId(id))
         .then(usages => vm.capabilities.usages = usages);
 

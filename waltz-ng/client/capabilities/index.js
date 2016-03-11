@@ -27,6 +27,8 @@ export default (module) => {
 
     module.directive('waltzCapabilitySelector', require('./directives/capability-selector'));
     module.directive('waltzCapabilitySelectorAdvanced', require('./directives/capability-selector-advanced'));
+    module.directive('waltzCapabilitySelectorModal', require('./directives/capability-selector-modal'));
+    module.directive('waltzCapabilityPicker', require('./directives/capability-picker'));
     module.directive('waltzCapabilityFlowGraph', require('./directives/capability-flow-graph'));
     module.directive('waltzCapabilityScorecard', require('./directives/capability-scorecard'));
     module.directive('waltzCapabilitySummary', require('./directives/capability-summary'));

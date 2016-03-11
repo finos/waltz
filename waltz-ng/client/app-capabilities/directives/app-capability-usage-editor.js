@@ -31,8 +31,6 @@ function controller($scope) {
 
     const vm = this;
 
-    vm.addForm = {};
-
     const watchExpressions = [
         'ctrl.usages',
         'ctrl.capabilities',
@@ -64,6 +62,11 @@ function controller($scope) {
         vm.hasHiddenCapabilities = capabilityIdsToRemove.length > 0;
 
     });
+
+    vm.addCapability = (c) => {
+        console.log('c', c);
+        vm.add(c).then(vm.selectedNode = null);
+    }
 }
 
 

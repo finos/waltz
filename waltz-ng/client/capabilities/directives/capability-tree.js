@@ -45,15 +45,33 @@ function controller($scope, $filter) {
 
     vm.treeOptions = {
         nodeChildren: "children",
-        dirSelectable: true
+        dirSelectable: true,
+        equality: function(node1, node2) {
+            if (node1 && node2) {
+                return node1.id === node2.id;
+            } else {
+                return false;
+            }
+        }
     };
 
     vm.treeData = [];
     vm.expandedNodes = [];
+    vm.nodesById = {};
 
     $scope.$watch('ctrl.capabilities', (capabilities = []) => {
         const treeData = buildHierarchies(capabilities);
         vm.treeData = switchToParentIds(treeData);
+
+        const nodeIndexer = (nodes = [], acc = {}) => {
+            return _.foldr(nodes, (acc, n) => {
+                acc[n.id] = n;
+                if (n.children) { nodeIndexer(n.children, acc); }
+                return acc;
+            }, acc);
+        };
+
+        vm.nodesById = nodeIndexer(vm.treeData);
     });
 
     vm.toggleExpansion = (node) => {
@@ -74,25 +92,10 @@ function controller($scope, $filter) {
 
     vm.expandFiltered = () => {
 
-        const flatten = (nodes = [], acc = {}) => {
-            return _.foldr(nodes, (acc, n) => {
-                acc[n.id] = n;
-                if (n.children) { flatten(n.children, acc); }
-                return acc;
-            }, acc);
-        };
-
-        const nodesById = flatten(vm.treeData);
-
-        const nodeIdsToExpand = [];
-
-        console.log(nodesById, _.values(nodesById).length);
-
-        const results = $filter('filter')(_.values(nodesById), vm.filterExpression);
+        // apply the same filter as given to the tree control widget
+        const results = $filter('filter')(_.values(vm.nodesById), vm.filterExpression);
 
         vm.expandedNodes.push(...results);
-
-        console.log(_.map(results, 'name'));
     }
 
 }

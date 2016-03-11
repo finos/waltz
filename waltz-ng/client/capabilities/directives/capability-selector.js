@@ -11,7 +11,7 @@
  */
 
 const BINDINGS = {
-    model: '=',
+    selectedNode: '=',
     capabilities: '='
 };
 

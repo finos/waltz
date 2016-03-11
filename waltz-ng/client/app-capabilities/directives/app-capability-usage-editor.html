@@ -1,78 +1,77 @@
-<div>
-    <table class="table table-condensed">
-        <colgroup>
-            <col width="5%"/>
-            <col width="25%"/>
-            <col width="45%"/>
-            <col width="25%"/>
-        </colgroup>
-        <thead>
-        <tr>
-            <th></th>
-            <th>Capability</th>
-            <th>Description</th>
-            <th>Action</th>
-        </tr>
-        </thead>
+<div class="container-fluid">
 
-        <tbody>
-        <tr class="waltz-visibility-parent"
-            ng-repeat="usage in ctrl.usedCapabilities | orderBy:'capability.name'">
-            <td>
-                <waltz-icon style="color: goldenrod"
-                            name="star"
-                            ng-if="usage.primary"></waltz-icon>
-            </td>
-            <td>
+    <div class="row">
+        <div class="col-md-12">
+            <label>Register new capability:</label>
+            <waltz-capability-picker capabilities="ctrl.availableCapabilities"
+                                     selected-node="ctrl.selectedNode"
+                                     on-add="ctrl.addCapability">
+            </waltz-capability-picker>
+            <div class="help-block small" ng-if="ctrl.hasHiddenCapabilities">
+                Note, some capabilities are not available unless corresponding traits are selected.
+            </div>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-condensed table-striped">
+                <colgroup>
+                    <col width="5%"/>
+                    <col width="25%"/>
+                    <col width="45%"/>
+                    <col width="25%"/>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Capability</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr class="waltz-visibility-parent"
+                    ng-repeat="usage in ctrl.usedCapabilities | orderBy:'capability.name'">
+                    <td>
+                        <waltz-icon style="color: goldenrod"
+                                    name="star"
+                                    ng-if="usage.primary"></waltz-icon>
+                    </td>
+                    <td>
                 <span class='wce-name'>
                     {{ usage.capability.name }}
                 </span>
-            </td>
-            <td>
+                    </td>
+                    <td>
                 <span class='small'>
                     {{ usage.capability.description }}
                 </span>
-            </td>
-            <td class="waltz-visibility-child-30">
-                <a href ng-click="ctrl.remove(usage.capability)">
-                    <waltz-icon fixed-width='true'
-                                name="trash"></waltz-icon>
-                    Remove
-                </a>
+                    </td>
+                    <td class="waltz-visibility-child-30">
+                        <a href ng-click="ctrl.remove(usage.capability)">
+                            <waltz-icon fixed-width='true'
+                                        name="trash"></waltz-icon>
+                            Remove
+                        </a>
 
-                <br>
+                        <br>
 
-                <waltz-toggle icon-on="star-o"
-                              icon-off="star"
-                              label-on="Un-mark as primary"
-                              label-off="Mark as primary"
-                              on-toggle="ctrl.togglePrimary(usage.capability, !usage.primary)"
-                              state="usage.primary"></waltz-toggle>
-            </td>
-        </tr>
+                        <waltz-toggle icon-on="star-o"
+                                      icon-off="star"
+                                      label-on="Un-mark as primary"
+                                      label-off="Mark as primary"
+                                      on-toggle="ctrl.togglePrimary(usage.capability, !usage.primary)"
+                                      state="usage.primary"></waltz-toggle>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        <tr style="background-color: #f5f5f5; border-bottom: 1px solid #ccc;">
-            <td></td>
-            <td><label>Register new capability:</label></td>
-            <td><waltz-capability-selector capabilities="ctrl.availableCapabilities"
-                                           model="ctrl.addForm"></waltz-capability-selector></td>
-            <td>
-                <button ng-click="ctrl.add(ctrl.addForm.capability)"
-                        class="btn btn-sm btn-primary"
-                        ng-disabled="!ctrl.addForm.capability">
-                    <waltz-icon name="plus"></waltz-icon>
-                    Add
-                </button>
-            </td>
-        </tr>
-        <tr ng-if="ctrl.hasHiddenCapabilities">
-            <td></td>
-            <td colspan="3">
-                <span class="small text-muted">
-                    Note, some capabilities are not available unless corresponding traits are selected.
-                </span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
 </div>

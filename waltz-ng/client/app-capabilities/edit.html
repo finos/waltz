@@ -8,29 +8,17 @@
         </ol>
     </waltz-page-header>
 
-    <div>
+    <waltz-section name="Traits" icon="cubes">
+        <waltz-trait-usage-editor traits="ctrl.traits.all"
+                                  usages="ctrl.traits.usages"
+                                  add="ctrl.addTrait"
+                                  remove="ctrl.removeTrait">
+        </waltz-trait-usage-editor>
+    </waltz-section>
+
+    <waltz-section name="Capabilities" icon="puzzle-piece">
         <div class="row">
-            <div class="col-md-6">
-
-                <h3>
-                    <waltz-icon name="cubes"></waltz-icon>
-                    Traits
-                </h3>
-
-                <waltz-trait-usage-editor traits="ctrl.traits.all"
-                                          usages="ctrl.traits.usages"
-                                          add="ctrl.addTrait"
-                                          remove="ctrl.removeTrait">
-                </waltz-trait-usage-editor>
-
-            </div>
-
-            <div class="col-md-6">
-                <h3>
-                    <waltz-icon name="puzzle-piece"></waltz-icon>
-                    Capabilities
-                </h3>
-
+            <div class="col-md-12">
                 <waltz-app-capability-usage-editor usages="ctrl.capabilities.usages"
                                                    capabilities="ctrl.capabilities.all"
                                                    capability-traits="ctrl.capabilities.capabilityTraits"
@@ -38,19 +26,10 @@
                                                    add="ctrl.addCapability"
                                                    remove="ctrl.removeCapability"
                                                    toggle-primary="ctrl.togglePrimary">
-
                 </waltz-app-capability-usage-editor>
-
             </div>
-
         </div>
 
-        <hr>
-
-        <a ui-sref="main.app-view ({id: ctrl.application.id})">
-            &laquo; Go back to {{ctrl.application.name}}
-        </a>
-
-    </div>
+    </waltz-section>
 
 </div>
