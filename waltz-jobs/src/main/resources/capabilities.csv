@@ -34,4 +34,9 @@ id	parentId	name	description
 3100	3000	Settlements	Bank settlement system across all business lines. Providing aggregation of settlement instructions for efficiency.
 1100	1000	Trade Manager	Management of the Trade and it's life cycle events
 3700	3000	Trade Reporting	Regulatory Trade Reporting across the different business lines.
-
+6000	0	Data Management	Data Management Functions
+6100	6000	ETL	Extract Transform Load
+6200	6000	Exceptions	Exception Management
+6300	6000	Log Management	Management of log files
+6400	6000	Security	Authentication and authorization
+6500	6000	Reporting	Report Generation

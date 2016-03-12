@@ -7,9 +7,6 @@ import org.immutables.value.Value;
 
 import java.util.List;
 
-/**
- * Created by dwatkins on 06/02/2016.
- */
 @Value.Immutable
 @JsonSerialize(as = ImmutableAppGroupDetail.class)
 @JsonDeserialize(as = ImmutableAppGroupDetail.class)

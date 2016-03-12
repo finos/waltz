@@ -46,9 +46,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getId;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readBody;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.lang.Long.parseLong;
 
@@ -165,7 +163,7 @@ public class ApplicationEndpoint implements Endpoint {
                 = (req, res) -> appService.findRelated(getId(req));
 
         ListRoute<Application> findByIds = (req, res) -> {
-            List<Long> ids = (List<Long>) readBody(req, List.class);
+            List<Long> ids = readIdsFromBody(req);
             if (ListUtilities.isEmpty(ids)) {
                 return Collections.emptyList();
             }

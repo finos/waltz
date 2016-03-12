@@ -19,6 +19,7 @@ import 'angular-ui-notification';
 import 'angular-ui-grid/ui-grid';
 import 'angular-ui-router';
 import 'angular-ui-bootstrap';
+import 'angular-tree-control';
 import 'ui-select';
 import 'satellizer';
 import 'angular-animate';
@@ -45,7 +46,8 @@ const dependencies = [
     'LocalStorageModule',
     'ngRedux',
     require('angular-formly'),
-    require('angular-formly-templates-bootstrap')
+    require('angular-formly-templates-bootstrap'),
+    'treeControl'
 ];
 
 
@@ -83,6 +85,7 @@ const registrationFns = [
     require('./sidebar'),
     require('./static-panel'),
     require('./svg-diagram'),
+    require('./traits'),
     require('./user'),
     require('./formly'),
     require('./widgets'),

@@ -19,6 +19,7 @@ package com.khartec.waltz.data.capability;
 
 import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.capability.ImmutableCapability;
+import com.khartec.waltz.model.utils.IdUtilities;
 import com.khartec.waltz.schema.tables.records.CapabilityRecord;
 import org.jooq.*;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.khartec.waltz.model.utils.IdUtilities.ensureHasId;
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
 
@@ -72,6 +74,11 @@ public class CapabilityDao {
         return ImmutableCapability.builder()
                 .id(record.getId())
                 .level(record.getLevel())
+                .level1(Optional.ofNullable(record.getLevel_1()))
+                .level2(Optional.ofNullable(record.getLevel_2()))
+                .level3(Optional.ofNullable(record.getLevel_3()))
+                .level4(Optional.ofNullable(record.getLevel_4()))
+                .level5(Optional.ofNullable(record.getLevel_5()))
                 .parentId(Optional.ofNullable(record.getParentId()))
                 .description(record.getDescription())
                 .name(record.getName())
@@ -140,4 +147,22 @@ public class CapabilityDao {
                 .fetch(capabilityMapper);
     }
 
+
+    public boolean update(Capability capability) {
+        ensureHasId(capability, "Cannot update capability record with no ID");
+
+        return dsl.update(CAPABILITY)
+                .set(CAPABILITY.NAME, capability.name())
+                .set(CAPABILITY.DESCRIPTION, capability.description())
+                .set(CAPABILITY.PARENT_ID, capability.parentId().orElse(null))
+                .set(CAPABILITY.LEVEL, capability.level())
+                .set(CAPABILITY.LEVEL_1, capability.level1().orElse(null))
+                .set(CAPABILITY.LEVEL_2, capability.level2().orElse(null))
+                .set(CAPABILITY.LEVEL_3, capability.level3().orElse(null))
+                .set(CAPABILITY.LEVEL_4, capability.level4().orElse(null))
+                .set(CAPABILITY.LEVEL_5, capability.level5().orElse(null))
+                .where(CAPABILITY.ID.eq(capability.id().get()))
+                .execute() == 1;
+
+    }
 }

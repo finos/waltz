@@ -13,18 +13,25 @@
 import _ from 'lodash';
 
 
-function controller($state, $window, $location, complexityStore) {
+
+function controller($state, $window, $location, capabilityStore, $uibModal) {
     const vm = this;
 
-    complexityStore
-        .findByAppIds([10])
-        .then(c => vm.complexity = c);
+    vm.onAdd = (d) => console.log("On Add", d);
 
-    vm.onSelect = (d) => console.log("On Select", d)
+    capabilityStore
+        .findAll()
+        .then(cs => vm.capabilities = cs);
+
+
+
+    // ---- modal
+
+
 }
 
 controller.$inject = [
-    '$state', '$window', '$location', 'ComplexityStore'
+    '$state', '$window', '$location', 'CapabilityStore', '$uibModal'
 ];
 
 

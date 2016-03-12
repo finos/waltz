@@ -7,72 +7,72 @@
         </ol>
     </waltz-page-header>
 
+    <pre>
+        {{ ctrl.selectedNode }}
+    </pre>
 
     <waltz-section name="Preview">
         <div class="row">
-            <div class="col-md-6">
-                <waltz-complexity-bar-chart complexity="ctrl.complexity"
-                                            sizing="{ h: 250 }"
-                                            on-select="ctrl.onSelect">
-                </waltz-complexity-bar-chart>
-            </div>
+            <div class="col-md-12">
 
+                <table class="tbl tbl-condensed">
+                    <tr>
+                        <td>Select</td>
+                        <td>
+                            <div class="container">
+                                <waltz-capability-picker capabilities="ctrl.capabilities"
+                                                         selected-node="ctrl.selectedNode"
+                                                         on-add="ctrl.onAdd">
+                                </waltz-capability-picker>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
         </div>
 
     </waltz-section>
 
+
+    <waltz-section name="Tree">
+        <div class="row">
+            <div class="col-md-6">
+                <waltz-capability-selector-advanced capabilities="ctrl.capabilities"
+                                                    selected-node="ctrl.selectedNode"
+                                                    options="{ showDescriptions: false }">
+                </waltz-capability-selector-advanced>
+            </div>
+            <div class="col-md-6">
+                <div ng-show="ctrl.selectedNode">
+                    <h4>
+                        {{ ctrl.selectedNode.name }}
+                    </h4>
+                    <p>
+                        {{ ctrl.selectedNode.description }}
+                    </p>
+                    <button class="btn btn-success">
+                        Use this
+                    </button>
+                    <a ng-click="ctrl.selectedNode = undefined" href>Cancel</a>
+
+                </div>
+            </div>
+        </div>
+
+    </waltz-section>
+
+
+
+
     <waltz-section name="Dump1">
         <pre>
-            {{ }}
+            {{ ctrl.capabilities.length }}
         </pre>
     </waltz-section>
 
 
 
-    <waltz-section name="Dump2">
-        <pre>
-            {{ }}
-        </pre>
-    </waltz-section>
-
-
-
-    <waltz-section name="Dump3">
-        <pre>
-            {{ }}
-        </pre>
-    </waltz-section>
-
-
-
-    <waltz-section name="Dump4" id="d4">
-        <pre>
-            {{ }}
-        </pre>
-    </waltz-section>
-
-
-
-    <waltz-section name="Dump5">
-        <pre>
-            {{ }}
-        </pre>
-    </waltz-section>
-
-
-
-    <waltz-section name="Dump6">
-        <pre>
-            {{ }}
-        </pre>
-    </waltz-section>
-
-
-    <waltz-section name="Dump7" id="d7">
-        <pre>
-            {{ }}
-        </pre>
-    </waltz-section>
 
 
 </div>

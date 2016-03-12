@@ -1,126 +1,35 @@
 <div>
-    <waltz-page-header name="Capability Registration"
+    <waltz-page-header name="Traits and Capability Registration"
                        small="{{ctrl.application.name}}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li><a ui-sref="main.app-view ({id: ctrl.application.id})">{{ctrl.application.name}}</a></li>
-            <li>Capabilities</li>
+            <li>Traits &amp; Capabilities</li>
         </ol>
     </waltz-page-header>
 
+    <waltz-section name="Traits" icon="cubes">
+        <waltz-trait-usage-editor traits="ctrl.traits.all"
+                                  usages="ctrl.traits.usages"
+                                  add="ctrl.addTrait"
+                                  remove="ctrl.removeTrait">
+        </waltz-trait-usage-editor>
+    </waltz-section>
 
-    <div class="row">
-        <div class="col-md-8">
-
-            <table class="table table-condensed">
-                <colgroup>
-                    <col width="5%"/>
-                    <col width="25%"/>
-                    <col width="45%"/>
-                    <col width="25%"/>
-                </colgroup>
-                <thead>
-                <tr>
-                    <th></th>
-                    <th>Capability</th>
-                    <th>Description</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                <tr class="waltz-visibility-parent"
-                    ng-repeat="ac in ctrl.model.appCapabilities | orderBy:'capability.name'">
-                    <td>
-                        <waltz-icon style="color: goldenrod"
-                                    name="star"
-                                    ng-if="ac.primary"></waltz-icon>
-                    </td>
-                    <td>
-                        <span class='wce-name'>
-                            {{ ac.capability.name }}
-                        </span>
-                    </td>
-                    <td>
-                        <span class='small'>
-                            {{ ac.capability.description }}
-                        </span>
-                    </td>
-                    <td class="waltz-visibility-child-30">
-                        <a href ng-click="ctrl.remove(ac.capability.id)">
-                            <waltz-icon fixed-width='true'
-                                        name="trash"></waltz-icon>
-                            Remove
-                        </a>
-
-                        <br>
-
-                        <waltz-toggle icon-on="star-o"
-                                      icon-off="star"
-                                      label-on="Un-mark as primary"
-                                      label-off="Mark as primary"
-                                      on-toggle="ctrl.togglePrimaryCapability(ac.capability)"
-                                      state="ac.primary"></waltz-toggle>
-                    </td>
-                </tr>
-
-                <tr style="background-color: #f5f5f5; border-bottom: 1px solid #ccc;">
-                    <td></td>
-                    <td><label>Register new capability:</label></td>
-                    <td><waltz-capability-selector capabilities="ctrl.model.availableCapabilities"
-                                                   model="ctrl.addForm"></waltz-capability-selector></td>
-                    <td>
-                        <button ng-click="ctrl.add(ctrl.addForm.capability)"
-                                class="btn btn-sm btn-primary"
-                                ng-disabled="!ctrl.addForm.capability">
-                            <waltz-icon name="plus"></waltz-icon>
-                            Add
-                        </button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-
-            <hr>
-            <a ui-sref="main.app-view ({id: ctrl.application.id})">
-                &laquo; Go back to {{ctrl.application.name}}
-            </a>
-
-
-        </div>
-        <div class="col-md-4">
-            <div ng-if="ctrl.model.appCapabilities.length > 0">
-                <div class='alert alert-info' ng-if='! ctrl.suggestions'>
-                    Get <strong><a href ng-click="ctrl.loadSuggestions()">suggestions based on other apps</a></strong> which perform similar functions
-                </div>
-
-                <div ng-if='ctrl.suggestions'>
-                    <h4>Suggestions</h4>
-                    <ul class="list-unstyled">
-                        <li ng-repeat="suggestion in ctrl.suggestions | orderBy:'key.name'">
-                            <a href ng-click="ctrl.addSuggestion(suggestion.key)">{{ suggestion.key.name }}</a>
-                            - (
-                                <span class="waltz-clickable-definition"
-                                      tabindex="{{$index + 99}}"
-                                      popover-placement="top"
-                                      popover-trigger="focus"
-                                      uib-popover-html="ctrl.mkPopoverHtml(suggestion)">
-                                    {{ suggestion.values.length }} apps
-                                </span>
-                            )
-                        </li>
-                    </ul>
-                </div>
+    <waltz-section name="Capabilities" icon="puzzle-piece">
+        <div class="row">
+            <div class="col-md-12">
+                <waltz-app-capability-usage-editor usages="ctrl.capabilities.usages"
+                                                   capabilities="ctrl.capabilities.all"
+                                                   capability-traits="ctrl.capabilities.capabilityTraits"
+                                                   trait-usages="ctrl.traits.usages"
+                                                   add="ctrl.addCapability"
+                                                   remove="ctrl.removeCapability"
+                                                   toggle-primary="ctrl.togglePrimary">
+                </waltz-app-capability-usage-editor>
             </div>
-
         </div>
-    </div>
 
-
-
-
-    <script type="text/ng-template" id="edit-app-capabilities-popover.html">
-        .
-    </script>
+    </waltz-section>
 
 </div>

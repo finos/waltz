@@ -887,6 +887,73 @@
     </changeSet>
 
     <changeSet author="dwatkins"
+               id="20160222-88-1">
+        <addColumn tableName="capability">
+            <column name="level_1" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="level_2" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="level_3" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="level_4" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="level_5" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160225-99-1">
+        <createTable tableName="trait">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="trait_pkey"/>
+            </column>
+            <column name="name" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)" defaultValue="n/a">
+                <constraints nullable="false"/>
+            </column>
+            <column name="icon" type="varchar(64)" defaultValue="circle">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet author="dwatkins" id="20160225-99-2">
+        <createTable tableName="trait_usage">
+            <column name="entity_kind" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="relationship" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trait_id" type="BIGINT">
+                <constraints primaryKeyName="trait_pkey"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160228-99-1">
+        <addColumn tableName="trait">
+            <column name="application_declarable"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
                id="20160302-102-1">
         <dropDefaultValue tableName="application"
                           columnName="updated_at"/>

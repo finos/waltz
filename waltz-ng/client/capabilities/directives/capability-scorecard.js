@@ -27,7 +27,8 @@ const BINDINGS = {
     assetCosts: '=',
     complexity: '=',
     serverStats: '=',
-    flows: '='
+    flows: '=',
+    traits: '='
 };
 
 

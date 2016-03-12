@@ -14,5 +14,5 @@ import editView from './edit';
 
 export const editState = {
     views: {'content@': editView },
-    url: 'app-capability/:id/edit'
+    url: 'app-capability/{id:int}/edit'
 };

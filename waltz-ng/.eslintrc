@@ -1,8 +1,8 @@
 {
-  "extends": "eslint-config-airbnb",
+  "extends": "",
   "env": {
     "browser": true,
-    "node": true,
+    "node": false,
     "mocha": true
   },
   "rules": {
@@ -29,5 +29,11 @@
     "__DISABLE_SSR__": true,
     "__DEVTOOLS__": true,
     "__PORT__" : true
-  }
+  },
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true,
+            "modules": true
+        }
+    }
 }
