@@ -119,7 +119,7 @@ public class AppCapabilityService {
 
     }
 
-    public List<ApplicationCapability> findApplicationCapabilitiesForAppIds(Long[] ids) {
+    public List<ApplicationCapability> findByAppIds(Long... ids) {
         return dao.findApplicationCapabilitiesForAppIds(ids);
     }
 }

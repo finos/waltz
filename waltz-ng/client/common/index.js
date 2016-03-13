@@ -106,3 +106,17 @@ export function numberFormatter(num, digits) {
     }
     return num;
 }
+
+
+/**
+ The wix tree widget does deep comparisons.
+ Having parents as refs therefore blows the callstack.
+ This method will replace refs with id's.
+*/
+export function switchToParentIds(treeData = []) {
+    _.each(treeData, td => {
+        td.parent = td.parent ? td.parent.id : null;
+        switchToParentIds(td.children);
+    });
+    return treeData;
+}
