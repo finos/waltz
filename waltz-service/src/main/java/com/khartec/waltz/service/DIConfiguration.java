@@ -17,6 +17,10 @@
 
 package com.khartec.waltz.service;
 
+import com.khartec.waltz.service.capability.CapabilityService;
+import com.khartec.waltz.service.jmx.CapabilitiesMaintenance;
+import com.khartec.waltz.service.jmx.PersonMaintenance;
+import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.jooq.DSLContext;
@@ -25,16 +29,14 @@ import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import javax.sql.DataSource;
 
 
 @Configuration
+@EnableMBeanExport
 @ComponentScan(value={"com.khartec.waltz"})
 @PropertySource(value = "classpath:waltz.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "file:${user.home}/.waltz/waltz.properties", ignoreResourceNotFound = true)
@@ -90,5 +92,16 @@ public class DIConfiguration {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
+    @Bean
+    @Autowired
+    public CapabilitiesMaintenance capabilitiesMaintenance(CapabilityService capabilityService) {
+        return new CapabilitiesMaintenance(capabilityService);
+    }
+
+    @Bean
+    @Autowired
+    public PersonMaintenance personMaintenance(PersonHierarchyService personHierarchyService) {
+        return new PersonMaintenance(personHierarchyService);
+    }
 
 }

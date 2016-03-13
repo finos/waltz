@@ -17,8 +17,86 @@
 
 package com.khartec.waltz.service.person_hierarchy;
 
-/**
- * Created by dwatkins on 08/01/2016.
- */
+import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.common.hierarchy.FlatNode;
+import com.khartec.waltz.common.hierarchy.Forest;
+import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
+import com.khartec.waltz.common.hierarchy.Node;
+import com.khartec.waltz.data.person.PersonDao;
+import com.khartec.waltz.model.person.Person;
+import com.khartec.waltz.schema.tables.records.PersonHierarchyRecord;
+import org.jooq.DSLContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static java.util.stream.Collectors.toList;
+
+@Service
 public class PersonHierarchyService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PersonHierarchyService.class);
+
+    private final PersonDao personDao;
+    private final DSLContext dsl;
+
+
+    @Autowired
+    public PersonHierarchyService(PersonDao personDao, DSLContext dsl) {
+        this.personDao = personDao;
+        this.dsl = dsl;
+    }
+
+
+    public boolean build() {
+        LOG.warn("Building person hierarchy");
+        List<Person> all = personDao.all();
+
+        Forest<Person, String> forest = toForest(all);
+
+        List<PersonHierarchyRecord> records = toHierarchyRecords(forest);
+
+        dsl.deleteFrom(PERSON_HIERARCHY).execute();
+        dsl.batchStore(records).execute();
+
+        return true;
+    }
+
+
+    private List<PersonHierarchyRecord> toHierarchyRecords(Forest<Person, String> forest) {
+        List<PersonHierarchyRecord> records = new LinkedList<>();
+
+        for (Node<Person, String> node : forest.getAllNodes().values()) {
+            List<Person> ancestors =
+                    ListUtilities.reverse(
+                            HierarchyUtilities.parents(node)
+                                    .stream()
+                                    .map(n -> n.getData())
+                                    .collect(Collectors.toList()));
+
+            for (int i = 0; i < ancestors.size(); i++) {
+                String ancestorId = ancestors.get(i).employeeId();
+                String selfId = node.getData().employeeId();
+                PersonHierarchyRecord record = new PersonHierarchyRecord(ancestorId, selfId, i + 1);
+                records.add(record);
+            }
+        }
+        return records;
+    }
+
+
+    private Forest<Person, String> toForest(List<Person> all) {
+        List<FlatNode<Person, String>> allFlatNodes = all.stream()
+                .map(p -> new FlatNode<>(p.employeeId(), p.managerEmployeeId(), p))
+                .collect(toList());
+
+        return HierarchyUtilities.toForest(allFlatNodes);
+    }
+
 }

@@ -21,8 +21,12 @@ import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.common.hierarchy.FlatNode;
 import com.khartec.waltz.common.hierarchy.Forest;
 import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
+import com.khartec.waltz.common.hierarchy.Node;
 import com.khartec.waltz.data.capability.CapabilityDao;
 import com.khartec.waltz.model.capability.Capability;
+import com.khartec.waltz.model.capability.ImmutableCapability;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +40,8 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 
 @Service
 public class CapabilityService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CapabilityService.class);
 
     private final CapabilityDao capabilityDao;
 
@@ -68,15 +74,6 @@ public class CapabilityService {
     }
 
 
-    public void assignLevels() {
-
-        Forest<Capability, Long> forest = buildHierarchy();
-
-        Map<Long, Integer> depths = HierarchyUtilities.assignDepths(forest);
-
-        capabilityDao.assignLevels(depths);
-
-    }
 
     public List<Capability> findByIds(Long... capabilityIds) {
         return capabilityDao.findByIds(capabilityIds);
@@ -89,6 +86,56 @@ public class CapabilityService {
 
     public boolean update(Capability capability) {
         return capabilityDao.update(capability);
+    }
+
+
+    public boolean rebuildHierarchy() {
+        LOG.warn("Rebuilding capability hierarchy");
+
+        assignLevels();
+        Forest<Capability, Long> forest = buildHierarchy();
+
+        for (Node<Capability, Long> node : forest.getAllNodes().values()) {
+            Capability capability = node.getData();
+            int currLevel = capability.level();
+
+            Node ptr = node;
+            while (ptr != null) {
+                capability = setLevelField(capability, currLevel, ptr);
+                ptr = ptr.getParent();
+                currLevel--;
+            }
+
+            update(capability);
+        }
+
+        return true;
+    }
+
+
+    private void assignLevels() {
+        Forest<Capability, Long> forest = buildHierarchy();
+        Map<Long, Integer> depths = HierarchyUtilities.assignDepths(forest);
+        capabilityDao.assignLevels(depths);
+    }
+
+    private static Capability setLevelField(Capability capability, int level, Node<Capability, Long> node) {
+        if (level == 1) {
+            return ImmutableCapability.copyOf(capability).withLevel1(node.getId());
+        }
+        if (level == 2) {
+            return ImmutableCapability.copyOf(capability).withLevel2(node.getId());
+        }
+        if (level == 3) {
+            return ImmutableCapability.copyOf(capability).withLevel3(node.getId());
+        }
+        if (level == 4) {
+            return ImmutableCapability.copyOf(capability).withLevel4(node.getId());
+        }
+        if (level == 5) {
+            return ImmutableCapability.copyOf(capability).withLevel5(node.getId());
+        }
+        return capability;
     }
 }
 
