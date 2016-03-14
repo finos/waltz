@@ -7,10 +7,14 @@
         </ol>
     </waltz-page-header>
 
-    <pre>
-        {{ ctrl.selectedNode }}
-    </pre>
 
+    <waltz-section>
+        <waltz-capability-multi-selector capabilities="ctrl.capabilitiesForApp"
+                                         explicit-capability-ids="ctrl.explicitCapabilityIds"
+                                         on-selection="ctrl.onSelection">
+
+        </waltz-capability-multi-selector>
+    </waltz-section>
     <waltz-section name="Preview">
         <div class="row">
             <div class="col-md-12">

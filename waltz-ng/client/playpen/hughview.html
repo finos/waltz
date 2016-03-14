@@ -1,0 +1,37 @@
+<div>
+
+
+    <waltz-section name="Something">
+        <div class="row">
+            <div class="col-sm-8">
+                <waltz-app-rating-table applications="ctrl.group.applications"
+                                        capabilities="ctrl.selectedNodes"
+                                        ratings="ctrl.ratings"
+                                        measurable="'EQ'">
+
+                </waltz-app-rating-table>
+            </div>
+            <div class="col-sm-4">
+                <div>
+                    <h4>Info</h4>
+                    <div class="waltz-paragraph">
+                        Use the tree control below to include or exclude
+                        capabilties from the visualisation.
+                    </div>
+                </div>
+
+                <hr>
+
+                <waltz-capability-multi-selector capabilities="ctrl.capabilities"
+                                                 selected-nodes="ctrl.selectedNodes"
+                                                 initially-selected-ids="ctrl.initiallySelectedIds"
+                                                 explicit-capability-ids="ctrl.explicitCapabilityIds">
+                </waltz-capability-multi-selector>
+
+            </div>
+        </div>
+    </waltz-section>
+
+<pre>{{ ctrl.selectedNodes }}</pre>
+
+</div>

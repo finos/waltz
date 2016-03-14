@@ -1,0 +1,27 @@
+<div>
+    <treecontrol class="tree-light"
+                 tree-model="ctrl.treeData"
+                 expanded-nodes="ctrl.expandedNodes"
+                 order-by="name"
+                 on-selection="ctrl.onSelection(node, selected)"
+                 selected-nodes="ctrl.selectedNodes"
+                 options="ctrl.treeOptions">
+            <span>
+                {{ node.name }}
+                <waltz-icon name="star"
+                            fixed-width="true"
+                            ng-if='ctrl.isPrimary(node.id)'>
+                </waltz-icon>
+                <span ng-if="ctrl.showBulkControls(node)">
+                    <a href title="select all"
+                       ng-click="ctrl.selectAll(node, $event)">
+                        <waltz-icon name="check"></waltz-icon>
+                    </a>
+                    <a href title="deselect all"
+                       ng-click="ctrl.deselectAll(node, $event)">
+                        <waltz-icon name="times"></waltz-icon>
+                    </a>
+                </span>
+            </span>
+    </treecontrol>
+</div>
