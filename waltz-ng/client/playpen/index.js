@@ -14,10 +14,14 @@ import _ from 'lodash';
 
 import { buildHierarchies, switchToParentIds, populateParents } from '../common'
 
-function controller($state, $q, capabilityStore, appCapabilityStore) {
+function controller($stateParams, $q, capabilityStore, appCapabilityStore) {
     const vm = this;
 
+    const id = $stateParams.id;
+
     vm.onAdd = (d) => console.log("On Add", d);
+
+    console.log("sid", id);
 
     vm.treeOptions = {
         nodeChildren: "children",
@@ -33,7 +37,7 @@ function controller($state, $q, capabilityStore, appCapabilityStore) {
 
     const promises = [
         capabilityStore.findAll(),
-        appCapabilityStore.findApplicationCapabilitiesByAppIds([98])
+        appCapabilityStore.findApplicationCapabilitiesByAppIds([id])
     ];
 
     $q.all(promises).then(([capabilities, appCapabilities]) => {
@@ -92,7 +96,7 @@ function controller($state, $q, capabilityStore, appCapabilityStore) {
 }
 
 controller.$inject = [
-    '$state', '$q', 'CapabilityStore', 'AppCapabilityStore'
+    '$stateParams', '$q', 'CapabilityStore', 'AppCapabilityStore'
 ];
 
 
@@ -112,7 +116,7 @@ export default (module) => {
         ($stateProvider) => {
             $stateProvider
                 .state('main.playpen', {
-                    url: 'playpen',
+                    url: 'playpen/{id:int}',
                     views: { 'content@': playpenView }
                 });
         }
