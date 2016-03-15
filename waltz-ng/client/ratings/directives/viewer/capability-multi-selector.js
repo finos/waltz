@@ -48,8 +48,6 @@ function controller($scope) {
     $scope.$watchGroup(
         ['ctrl.capabilities', 'ctrl.explicitCapabilityIds', 'ctrl.initiallySelectedIds'],
         ([capabilities, explicitCapabilityIds = [], initiallySelectedIds = []]) => {
-            console.log('watch', initiallySelectedIds);
-
             const nodeData = switchToParentIds(populateParents(capabilities));
             const nodesById = _.indexBy(nodeData, 'id');
 

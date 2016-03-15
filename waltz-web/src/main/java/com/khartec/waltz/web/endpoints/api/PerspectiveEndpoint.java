@@ -27,12 +27,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 
 
 @Service
 public class PerspectiveEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "perspective");
+    private static final String BASE_URL = mkPath("api", "perspective");
     private final PerspectiveDao dao;
 
 
@@ -45,8 +47,10 @@ public class PerspectiveEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String byCodePath = WebUtilities.mkPath(BASE_URL, "code", ":code");
+        String byCodePath = mkPath(BASE_URL, "code", ":code");
+
         DatumRoute<Perspective> byCodeRoute = (request, response) -> dao.getPerspective(request.params("code"));
-        EndpointUtilities.getForDatum(byCodePath, byCodeRoute);
+
+        getForDatum(byCodePath, byCodeRoute);
     }
 }

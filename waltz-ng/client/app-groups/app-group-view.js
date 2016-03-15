@@ -15,6 +15,8 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+import { selectBest } from '../ratings/directives/viewer/coloring-strategies';
+
 
 function prepareFlowData(flows, apps) {
     const entitiesById = _.indexBy(apps, 'id');
@@ -130,6 +132,8 @@ function controller(appGroupStore,
         if (!vm.user) return false;
         return _.any(vm.groupDetail.members, m => m.role === 'OWNER' && m.userId === vm.user.userName );
     };
+
+    vm.ratingColorStrategy = selectBest;
 
 }
 

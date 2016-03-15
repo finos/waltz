@@ -7,11 +7,14 @@
                  selected-nodes="ctrl.selectedNodes"
                  options="ctrl.treeOptions">
             <span>
-                {{ node.name }}
+
+                <span ng-bind="node.name"></span>
+
                 <waltz-icon name="star"
                             fixed-width="true"
                             ng-if='ctrl.isPrimary(node.id)'>
                 </waltz-icon>
+
                 <span ng-if="ctrl.showBulkControls(node)">
                     <a href title="select all"
                        ng-click="ctrl.selectAll(node, $event)">
@@ -22,6 +25,7 @@
                         <waltz-icon name="times"></waltz-icon>
                     </a>
                 </span>
+
             </span>
     </treecontrol>
 </div>

@@ -24,9 +24,9 @@
         </div>
         <div ng-if="ctrl.selectedNodes.length > 0 && ctrl.applications.length > 0" style="overflow-x: visible">
             <waltz-app-rating-table applications="ctrl.applications"
-                                     capabilities="ctrl.selectedNodes"
-                                     ratings="ctrl.ratings"
-                                     measurable="'EQ'">
+                                    capabilities="ctrl.selectedNodes"
+                                    ratings="ctrl.ratings"
+                                    color-strategy="ctrl.colorStrategy">
             </waltz-app-rating-table>
         </div>
         <div ng-show="ctrl.capabilitySelectorVisible == true"
@@ -34,18 +34,41 @@
              style="">
             <div>
                 <h4>
-                    Info
+                    Configuration
                     <a href class="small pull-right" ng-click="ctrl.capabilitySelectorVisible = false">
                         <waltz-icon name="times-circle"></waltz-icon> Close
                     </a>
                 </h4>
                 <div class="waltz-paragraph">
                     Use the tree control below to include or exclude
-                    capabilities from the visualisation.
+                    capabilities from the visualisation and to select
+                    the 'colouring' strategy.
                 </div>
             </div>
 
             <hr>
+
+            <h5>Colouring Strategy</h5>
+
+            <span class="small">Colour by: </span>
+            <waltz-rating-color-strategy-options selected-strategy="ctrl.colorStrategy">
+
+            </waltz-rating-color-strategy-options>
+
+            <div class="waltz-paragraph small text-muted">
+                The colouring strategy determines which rating measures will be used by the visualization.
+                The predefined 'worst' and 'best' values will look at all measures and select accordingly.
+            </div>
+
+            <hr>
+
+            <h5>Filter Capabilities</h5>
+
+            <div class="waltz-paragraph small" style="padding-bottom: 4px;">
+                Use the tree control below to include or exclude
+                capabilities from the visualisation
+            </div>
+
 
             <waltz-capability-multi-selector capabilities="ctrl.capabilities"
                                              selected-nodes="ctrl.selectedNodes"

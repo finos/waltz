@@ -6,7 +6,7 @@ import { perhaps } from '../../../common';
 const BINDINGS = {
     applications: '=',
     ratings: '=',
-    measurable: '=',
+    colorStrategy: '=',
     capabilities: '='
 };
 
@@ -18,16 +18,13 @@ function controller($scope) {
     $scope.$watch('ctrl.ratings', (ratings => {
         if (!ratings) return;
         vm.ratingMap = d3.nest()
-                .key(d => d.measurable.code)
                 .key(d => d.parent.id)
                 .key(d => d.capability.id)
+                .key(d => d.measurable.code)
                 .map(ratings);
     }));
 
-    vm.lookupCell = (appId, capId) => {
-        if (! vm.ratingMap) { return ''; }
-        return perhaps(() => vm.ratingMap['EQ'][appId][capId][0].ragRating, '');
-    };
+    vm.lookupCell = (appId, capId) => vm.colorStrategy.fn(appId, capId, vm.ratingMap);
 
 }
 

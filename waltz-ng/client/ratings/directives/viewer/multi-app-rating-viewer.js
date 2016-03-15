@@ -1,14 +1,15 @@
+
 const BINDINGS = {
     applications: '=',
     ratings: '=',
     capabilities: '=',
     initiallySelectedIds: '=',
     explicitCapabilityIds: '=',
-    capabilitySelectorVisible: '='
+    capabilitySelectorVisible: '=',
+    colorStrategy: '='
 };
 
 function controller() {
-
 }
 
 

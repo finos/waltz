@@ -36,6 +36,7 @@
 
 
     <waltz-section name='Capability Ratings'
+                   small="{{ ctrl.ratingColorStrategy.name }}"
                    ng-init="ctrl.capabilitySelectorVisible = false">
         <waltz-section-actions>
             <a ng-click='ctrl.capabilitySelectorVisible = !ctrl.capabilitySelectorVisible'
@@ -46,6 +47,7 @@
         <waltz-multi-app-rating-viewer applications="ctrl.applications"
                                        capabilities="ctrl.capabilities"
                                        ratings="ctrl.ratings"
+                                       color-strategy="ctrl.ratingColorStrategy"
                                        capability-selector-visible="ctrl.capabilitySelectorVisible"
                                        initially-selected-ids="ctrl.initiallySelectedIds"
                                        explicit-capability-ids="ctrl.explicitCapabilityIds">
