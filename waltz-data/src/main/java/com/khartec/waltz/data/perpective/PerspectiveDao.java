@@ -58,6 +58,7 @@ public class PerspectiveDao {
         return dsl.select(PERSPECTIVE_MEASURABLE.fields())
                 .from(PERSPECTIVE_MEASURABLE)
                 .where(PERSPECTIVE_MEASURABLE.PERSPECTIVE_CODE.eq(code))
+                .orderBy(PERSPECTIVE_MEASURABLE.NAME.asc())
                 .fetch(r -> {
                     PerspectiveMeasurableRecord record = r.into(PERSPECTIVE_MEASURABLE);
                     return ImmutableMeasurable.builder()

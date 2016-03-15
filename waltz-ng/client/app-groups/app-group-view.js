@@ -15,6 +15,8 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+import { selectBest } from '../ratings/directives/viewer/coloring-strategies';
+
 
 function prepareFlowData(flows, apps) {
     const entitiesById = _.indexBy(apps, 'id');
@@ -45,8 +47,46 @@ function loadDataFlows(dataFlowStore, groupApps) {
         .then(fs => prepareFlowData(fs, groupApps));
 }
 
+function calculateRatings(allCapabilities, appCapabilities, ratings) {
+    const capabilitiesById = _.indexBy(allCapabilities, 'id');
 
-function controller(appGroupStore, appStore, assetCostStore, complexityStore, dataFlowStore, serverInfoStore, userService, $stateParams, $q) {
+    const explicitCapabilityIds = _.chain(appCapabilities)
+            .map('capabilityId')
+            .uniq()
+            .value();
+
+    const capabilities = _.chain(explicitCapabilityIds)
+        .map(cId => capabilitiesById[cId])
+        .compact()
+        .map(c => ([c.level1, c.level2, c.level3, c.level4, c.level5]))
+        .flatten()
+        .compact()
+        .uniq()
+        .map(cId => capabilitiesById[cId])
+        .compact()
+        .value();
+
+    return {
+        initiallySelectedIds: explicitCapabilityIds,
+        explicitCapabilityIds,
+        capabilities
+    };
+}
+
+
+function controller(appGroupStore,
+                    appStore,
+                    assetCostStore,
+                    complexityStore,
+                    dataFlowStore,
+                    serverInfoStore,
+                    userService,
+                    capabilityStore,
+                    appCapabilityStore,
+                    ratingStore,
+                    $stateParams,
+                    $q)
+{
     const { id }  = $stateParams;
 
     const vm = this;
@@ -58,28 +98,42 @@ function controller(appGroupStore, appStore, assetCostStore, complexityStore, da
             appStore.findByIds(appIds),
             assetCostStore.findAppCostsByAppIds(appIds),
             complexityStore.findByAppIds(appIds),
-            serverInfoStore.findStatsForAppIds(appIds)
+            serverInfoStore.findStatsForAppIds(appIds),
+            capabilityStore.findAll(),
+            appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
+            ratingStore.findByAppIds(appIds)
         ]))
         .then(([
             apps,
             assetCosts,
             complexity,
-            serverStats
+            serverStats,
+            allCapabilities,
+            appCapabilities,
+            ratings
         ]) => {
             vm.applications = apps;
             vm.assetCosts = assetCosts;
             vm.complexity = complexity;
             vm.serverStats = serverStats;
+            vm.allCapabilities = allCapabilities;
+            vm.appCapabilities = appCapabilities;
+            vm.ratings = ratings;
         })
         .then(() => loadDataFlows(dataFlowStore, vm.applications))
-        .then(flows => vm.dataFlows = flows);
+        .then(flows => vm.dataFlows = flows)
+        .then(() => calculateRatings(vm.allCapabilities, vm.appCapabilities, vm.ratings))
+        .then(r => Object.assign(vm, r));
 
     userService.whoami().then(u => vm.user = u);
 
     vm.isGroupEditable = () => {
         if (!vm.groupDetail) return false;
+        if (!vm.user) return false;
         return _.any(vm.groupDetail.members, m => m.role === 'OWNER' && m.userId === vm.user.userName );
     };
+
+    vm.ratingColorStrategy = selectBest;
 
 }
 
@@ -91,6 +145,9 @@ controller.$inject = [
     'DataFlowDataStore',
     'ServerInfoStore',
     'UserService',
+    'CapabilityStore',
+    'AppCapabilityStore',
+    'RatingStore',
     '$stateParams',
     '$q'
 ];

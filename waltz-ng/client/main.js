@@ -199,3 +199,8 @@ waltzApp.run(['$rootScope', '$document', ($rootScope, $doc) => {
 waltzApp.config(['$ngReduxProvider', ($ngReduxProvider) => {
     $ngReduxProvider.createStoreWith(rootReducer, [thunk], []);
 }]);
+
+// perf improvements
+waltzApp.config(['$httpProvider', ($httpProvider) => {
+    $httpProvider.useApplyAsync(true);
+}]);

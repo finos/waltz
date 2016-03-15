@@ -35,6 +35,26 @@
     <hr>
 
 
+    <waltz-section name='Capability Ratings'
+                   small="{{ ctrl.ratingColorStrategy.name }}"
+                   ng-init="ctrl.capabilitySelectorVisible = false">
+        <waltz-section-actions>
+            <a ng-click='ctrl.capabilitySelectorVisible = !ctrl.capabilitySelectorVisible'
+               class="btn btn-xs btn-primary">
+                <waltz-icon name="cogs"></waltz-icon>
+                Configure
+            </a>
+        </waltz-section-actions>
+        <waltz-multi-app-rating-viewer applications="ctrl.applications"
+                                       capabilities="ctrl.capabilities"
+                                       ratings="ctrl.ratings"
+                                       color-strategy="ctrl.ratingColorStrategy"
+                                       capability-selector-visible="ctrl.capabilitySelectorVisible"
+                                       initially-selected-ids="ctrl.initiallySelectedIds"
+                                       explicit-capability-ids="ctrl.explicitCapabilityIds">
+        </waltz-multi-app-rating-viewer>
+    </waltz-section>
+
     <!-- FLOWS -->
     <waltz-section name="Logical Data Flows"
                    icon="random">

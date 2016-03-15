@@ -24,6 +24,7 @@
 @import "../client/playpen/playpen";
 @import "../client/ratings/directives/rating-brush-select/style";
 @import "../client/traits/directives/trait-indicator";
+@import "../client/ratings/directives/viewer/app-rating-table";
 
 html {
   overflow-y: scroll;
@@ -203,4 +204,14 @@ textarea {
 .waltz-paragraph {
     margin-top: 4px;
     margin-bottom: 4px;
+}
+
+
+a.subtle-link {
+    color: $waltz-font-color;
+    text-decoration: none;
+}
+
+a.subtle-link:hover {
+    color: blue;
 }

@@ -17,7 +17,11 @@
 
 package com.khartec.waltz.common;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class OptionalUtilities {
@@ -31,4 +35,23 @@ public class OptionalUtilities {
         return Optional.ofNullable(value);
     }
 
+
+    /**
+     * Given a list of optional values will return
+     * a list containing only the values that are not
+     * empty (unpacked)
+     * @param optionals
+     * @param <T>
+     * @return
+     */
+    public static <T> List<T> toList(Optional<T>... optionals) {
+        if (optionals == null) { return Collections.emptyList(); }
+
+        return Stream
+                .of(optionals)
+                .filter(opt -> opt.isPresent())
+                .map(opt -> opt.get())
+                .collect(Collectors.toList());
+
+    }
 }

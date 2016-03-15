@@ -10,38 +10,7 @@
  *
  */
 
-import _ from 'lodash';
-
-
-
-function controller($state, $window, $location, capabilityStore, $uibModal) {
-    const vm = this;
-
-    vm.onAdd = (d) => console.log("On Add", d);
-
-    capabilityStore
-        .findAll()
-        .then(cs => vm.capabilities = cs);
-
-
-
-    // ---- modal
-
-
-}
-
-controller.$inject = [
-    '$state', '$window', '$location', 'CapabilityStore', '$uibModal'
-];
-
-
-const playpenView = {
-    template: require('./playpen.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
+import playpenView from './playpen';
 
 
 export default (module) => {
@@ -51,9 +20,10 @@ export default (module) => {
         ($stateProvider) => {
             $stateProvider
                 .state('main.playpen', {
-                    url: 'playpen',
+                    url: 'playpen/{id:int}',
                     views: { 'content@': playpenView }
                 });
         }
     ]);
+
 };
