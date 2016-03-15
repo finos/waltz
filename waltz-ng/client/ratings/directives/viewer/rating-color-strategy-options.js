@@ -31,6 +31,6 @@ export default () => ({
     controllerAs: 'ctrl',
     scope: {},
     bindToController: BINDINGS,
-    template: '<span>\n    <select ng-model="ctrl.selectedStrategy" ng-options="option.name for option in ctrl.strategies"></select>\n</span>'
+    template: '<span>\n    <select ng-model="ctrl.selectedStrategy" ng-options="option.name for option in ctrl.strategies"></select>\n    <span class="small" ng-bind="ctrl.selectedStrategy.description"></span>\n</span>'
 });
 

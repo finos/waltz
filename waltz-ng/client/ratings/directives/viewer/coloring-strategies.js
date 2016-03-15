@@ -73,13 +73,13 @@ export function mkSelectByMeasure(measure) {
 
 export const selectBest = {
     name: 'Best',
-    description: 'Colour by the \'best\' of the ratings across all measures',
+    description: 'Colour by the \'best\' (G -> A -> R) of the ratings across all measures',
     fn: selectBestFn
 };
 
 
 export const selectWorst = {
     name: 'Worst',
-    description: 'Colour by the \'worst\' of the ratings across all measures',
+    description: 'Colour by the \'worst\' (R -> A -> G) of the ratings across all measures',
     fn: selectWorstFn
 };
