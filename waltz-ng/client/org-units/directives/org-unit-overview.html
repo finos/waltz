@@ -90,10 +90,10 @@
                                                icon="server">
                             <div>
                                 <div style="font-size: xx-large;">
-                                    # {{ ctrl.serverStats.total }}
+                                    # <span ng-bind="ctrl.serverStats.total"></span>
                                 </div>
                                 <div class="small text-muted">
-                                    {{ ctrl.serverStats.virtualPercentage }}% virtual
+                                    <span ng-bind="ctrl.serverStats.virtualPercentage"></span>% virtual
                                 </div>
                             </div>
                         </waltz-basic-info-tile>

@@ -124,7 +124,8 @@
                 <div ng-if="ctrl.viewData.dataFlows.flows.length == 0">
                     <div class="alert alert-warning">
                         <strong>No Flows</strong>
-                        have been registered involving applications from {{ ctrl.viewData.orgUnit.name }}.
+                        have been registered involving applications from
+                        <span ng-bind="ctrl.viewData.orgUnit.name"></span>.
                     </div>
                 </div>
             </uib-tab>
