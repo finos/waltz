@@ -36,7 +36,7 @@ import javax.sql.DataSource;
 
 
 @Configuration
-@EnableMBeanExport
+@EnableMBeanExport(defaultDomain = "${database.schema}_${database.user}_${database.schemata:schema}") // TODO: replace
 @ComponentScan(value={"com.khartec.waltz"})
 @PropertySource(value = "classpath:waltz.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "file:${user.home}/.waltz/waltz.properties", ignoreResourceNotFound = true)

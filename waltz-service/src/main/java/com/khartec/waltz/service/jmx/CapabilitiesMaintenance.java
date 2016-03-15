@@ -8,9 +8,7 @@ import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
-@ManagedResource(
-        objectName = "Waltz:type=JMX,name=Capabilities",
-        description = "Maintenance functions for the Waltz Capability model")
+@ManagedResource(description = "Maintenance functions for the Waltz Capability model")
 public class CapabilitiesMaintenance {
 
     private static final Logger LOG = LoggerFactory.getLogger(CapabilitiesMaintenance.class);
