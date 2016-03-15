@@ -11,7 +11,6 @@
  */
 
 import playpenView from './playpen';
-import hughView from './hughview';
 
 
 export default (module) => {
@@ -23,10 +22,6 @@ export default (module) => {
                 .state('main.playpen', {
                     url: 'playpen/{id:int}',
                     views: { 'content@': playpenView }
-                })
-                .state('main.hv', {
-                    url: 'hv/{groupId:int}',
-                    views: { 'content@': hughView }
                 });
         }
     ]);
