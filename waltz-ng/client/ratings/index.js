@@ -19,6 +19,13 @@ export default (module) => {
     module.directive('waltzRatingGroups', require('./directives/rating-groups/directive'));
     module.directive('waltzRatingGroupHeader', require('./directives/rating-group-header/directive'));
     module.directive('waltzRatingBrushSelect', require('./directives/rating-brush-select/directive'));
+
+
+    module.directive('waltzAppRatingTable', require('./directives/viewer/app-rating-table'));
+    module.directive('waltzCapabilityMultiSelector', require('./directives/viewer/capability-multi-selector'));
+    module.directive('waltzMultiAppRatingViewer', require('./directives/viewer/multi-app-rating-viewer'));
+
+
     module.service('RatingStore', require('./services/ratings-store'));
 
     module.config([

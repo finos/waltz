@@ -1,0 +1,48 @@
+.waltz-app-rating-table {
+    /*width: 100%;*/
+}
+
+.waltz-app-rating-table .rating-cell > div {
+    border: 1px solid #f7f7f7;
+    background: #fdfdfd;
+    border-radius: 3px;
+    padding: 3px;
+    margin: 2px;
+    width: 32px;
+    height: 24px;
+}
+
+.waltz-app-rating-table .rating-A > div {
+    background: #ffde99;
+    border-color: #ff7f0e;
+}
+
+.waltz-app-rating-table .rating-G > div {
+    background: #89db81;
+    border-color: #2ca02c;
+}
+
+.waltz-app-rating-table .rating-R > div {
+    background: #ec6b63;
+    border-color: #d62728;
+}
+
+.waltz-app-rating-table .rating-row > th {
+    padding-right: 50px;
+}
+
+th.rotate {
+    /* Something you can count on */
+    height: 140px;
+    white-space: nowrap;
+}
+
+th.rotate > div {
+    transform: translate(22px, 48px) rotate(315deg);
+    width: 30px;
+}
+
+th.rotate > div > span {
+    border-bottom: 1px solid #ccc;
+    padding: 5px 10px;
+}

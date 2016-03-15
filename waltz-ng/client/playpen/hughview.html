@@ -1,5 +1,21 @@
 <div>
 
+    <waltz-section ng-init="ctrl.capabilitySelectorVisible = false">
+        <waltz-section-actions>
+            <a ng-click='ctrl.capabilitySelectorVisible = !ctrl.capabilitySelectorVisible'
+               class="btn btn-xs btn-primary">
+                Filter
+            </a>
+        </waltz-section-actions>
+        <waltz-multi-app-rating-viewer applications="ctrl.group.applications"
+                                       capabilities="ctrl.capabilities"
+                                       ratings="ctrl.ratings"
+                                       capability-selector-visible="ctrl.capabilitySelectorVisible"
+                                       initially-selected-ids="ctrl.initiallySelectedIds"
+                                       explicit-capability-ids="ctrl.explicitCapabilityIds">
+        </waltz-multi-app-rating-viewer>
+    </waltz-section>
+
 
     <waltz-section name="Something">
         <div class="row">
@@ -16,7 +32,7 @@
                     <h4>Info</h4>
                     <div class="waltz-paragraph">
                         Use the tree control below to include or exclude
-                        capabilties from the visualisation.
+                        capabilities from the visualisation.
                     </div>
                 </div>
 
@@ -31,6 +47,9 @@
             </div>
         </div>
     </waltz-section>
+
+
+    <waltz-section></waltz-section>
 
 <pre>{{ ctrl.selectedNodes }}</pre>
 

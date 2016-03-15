@@ -1,4 +1,4 @@
-import { switchToParentIds, populateParents } from '../../common';
+import { switchToParentIds, populateParents } from '../../../common';
 
 
 const BINDINGS = {

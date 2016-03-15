@@ -1,8 +1,7 @@
 import _ from 'lodash';
 import d3 from 'd3';
 
-import { perhaps } from '../../common';
-
+import { perhaps } from '../../../common';
 
 const BINDINGS = {
     applications: '=',

@@ -31,6 +31,4 @@ export default (module) => {
         }
     ]);
 
-    module.directive('waltzAppRatingTable', require('./directives/app-rating-table'));
-    module.directive('waltzCapabilityMultiSelector', require('./directives/capability-multi-selector'));
 };

@@ -1,0 +1,64 @@
+<div class="row">
+    <style>
+        .multi-app-rating-viewer-popup {
+            position: absolute;
+            width: 45%;
+            top:-20px;
+            right: 8px;
+            background: #fafafa;
+            opacity: 0.95;
+            border: 2px solid #eee;
+            padding: 10px;
+            border-radius: 3px;
+            z-index: 100;
+            -webkit-box-shadow: -4px 4px 20px -2px rgba(0,0,0,0.57);
+            -moz-box-shadow: -4px 4px 20px -2px rgba(0,0,0,0.57);
+            box-shadow: -4px 4px 20px -2px rgba(0,0,0,0.57);
+        }
+    </style>
+    <div class="col-sm-12">
+        <div ng-if="ctrl.selectedNodes.length == 0 || ctrl.applications.length == 0">
+            <div class="alert alert-info">
+                Nothing to show
+            </div>
+        </div>
+        <div ng-if="ctrl.selectedNodes.length > 0 && ctrl.applications.length > 0" style="overflow-x: visible">
+            <waltz-app-rating-table applications="ctrl.applications"
+                                     capabilities="ctrl.selectedNodes"
+                                     ratings="ctrl.ratings"
+                                     measurable="'EQ'">
+            </waltz-app-rating-table>
+        </div>
+        <div ng-show="ctrl.capabilitySelectorVisible == true"
+             class="multi-app-rating-viewer-popup"
+             style="">
+            <div>
+                <h4>
+                    Info
+                    <a href class="small pull-right" ng-click="ctrl.capabilitySelectorVisible = false">
+                        <waltz-icon name="times-circle"></waltz-icon> Close
+                    </a>
+                </h4>
+                <div class="waltz-paragraph">
+                    Use the tree control below to include or exclude
+                    capabilities from the visualisation.
+                </div>
+            </div>
+
+            <hr>
+
+            <waltz-capability-multi-selector capabilities="ctrl.capabilities"
+                                             selected-nodes="ctrl.selectedNodes"
+                                             initially-selected-ids="ctrl.initiallySelectedIds"
+                                             explicit-capability-ids="ctrl.explicitCapabilityIds">
+            </waltz-capability-multi-selector>
+
+            <div class="waltz-paragraph small text-muted">
+                The ticks and crosses can be used to select/deselect all items. Grey items indicate capabilities which
+                are not being directly used but are 'parents' of capabilities that have
+                been explicitly used.
+            </div>
+        </div>
+    </div>
+
+</div>
