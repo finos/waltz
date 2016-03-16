@@ -20,7 +20,6 @@
     <waltz-page-header name="{{ ctrl.groupDetail.appGroup.name }}"
                        icon="object-group"
                        small="{{ ctrl.groupDetail.appGroup.kind }}">
-
     </waltz-page-header>
 
     <waltz-app-group-summary applications="ctrl.applications"
@@ -87,15 +86,9 @@
         <div class="alert-warning alert"
              ng-if="ctrl.applications.length == 0">
             <strong>No application </strong>
-            have yet been registered this group, {{ ctrl.groupDetail.appGroup.name }}.
+            have yet been registered this group,
+            <span ng-bind="ctrl.groupDetail.appGroup.name"></span>.
         </div>
     </waltz-section>
 
-<!--
-    <div class="row">
-        <div class="col-sm-12">
-            <pre>{{ ctrl.groupDetail }}</pre>
-        </div>
-    </div>
--->
 </div>
