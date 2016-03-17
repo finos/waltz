@@ -19,7 +19,6 @@ package com.khartec.waltz.data.capability;
 
 import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.capability.ImmutableCapability;
-import com.khartec.waltz.model.utils.IdUtilities;
 import com.khartec.waltz.schema.tables.records.CapabilityRecord;
 import org.jooq.*;
 import org.slf4j.Logger;
@@ -41,6 +40,23 @@ import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
 public class CapabilityDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(CapabilityDao.class);
+
+
+    public static final RecordMapper<Record, Capability> capabilityMapper = r -> {
+        CapabilityRecord record = r.into(CapabilityRecord.class);
+        return ImmutableCapability.builder()
+                .id(record.getId())
+                .level(record.getLevel())
+                .level1(Optional.ofNullable(record.getLevel_1()))
+                .level2(Optional.ofNullable(record.getLevel_2()))
+                .level3(Optional.ofNullable(record.getLevel_3()))
+                .level4(Optional.ofNullable(record.getLevel_4()))
+                .level5(Optional.ofNullable(record.getLevel_5()))
+                .parentId(Optional.ofNullable(record.getParentId()))
+                .description(record.getDescription())
+                .name(record.getName())
+                .build();
+    };
 
 
     private static final String SEARCH_QUERY_POSTGRES = "SELECT\n" +
@@ -67,23 +83,6 @@ public class CapabilityDao {
 
 
     private final DSLContext dsl;
-
-
-    private final RecordMapper<Record, Capability> capabilityMapper = r -> {
-        CapabilityRecord record = r.into(CapabilityRecord.class);
-        return ImmutableCapability.builder()
-                .id(record.getId())
-                .level(record.getLevel())
-                .level1(Optional.ofNullable(record.getLevel_1()))
-                .level2(Optional.ofNullable(record.getLevel_2()))
-                .level3(Optional.ofNullable(record.getLevel_3()))
-                .level4(Optional.ofNullable(record.getLevel_4()))
-                .level5(Optional.ofNullable(record.getLevel_5()))
-                .parentId(Optional.ofNullable(record.getParentId()))
-                .description(record.getDescription())
-                .name(record.getName())
-                .build();
-    };
 
 
     @Autowired
@@ -139,7 +138,7 @@ public class CapabilityDao {
 
 
     public List<Capability> findByAppIds(Long[] appIds) {
-        return dsl.selectDistinct(CAPABILITY.fields())
+        return dsl.select(CAPABILITY.fields())
                 .from(CAPABILITY)
                 .innerJoin(APP_CAPABILITY)
                 .on(APP_CAPABILITY.CAPABILITY_ID.eq(CAPABILITY.ID))

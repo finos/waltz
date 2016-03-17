@@ -17,10 +17,16 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.data.capability.CapabilityDao;
+import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.capability.CapabilityService;
-import com.khartec.waltz.service.capability_usage.CapabilityUsageService;
+import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.List;
+
+import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
+import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
 
 
 public class CapabilityHarness {
@@ -29,9 +35,16 @@ public class CapabilityHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
-        CapabilityService capabilityService = ctx.getBean(CapabilityService.class);
+        DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        capabilityService.rebuildHierarchy();
+        List<Capability> caps = dsl.selectDistinct(CAPABILITY.fields())
+                .from(CAPABILITY)
+                .innerJoin(APP_CAPABILITY)
+                .on(APP_CAPABILITY.CAPABILITY_ID.eq(CAPABILITY.ID))
+                .where(APP_CAPABILITY.APPLICATION_ID.in(680L, 681L))
+                .fetch(CapabilityDao.capabilityMapper);
+
+        caps.forEach(c -> System.out.println(c.name()));
 
     }
 

@@ -17,38 +17,60 @@
 
 package com.khartec.waltz.jobs.sample;
 
+import com.khartec.waltz.common.StringUtilities;
+import com.khartec.waltz.schema.tables.records.CapabilityRecord;
+import com.khartec.waltz.service.DIConfiguration;
+import org.jooq.DSLContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.io.IOException;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+
+import static com.khartec.waltz.common.IOUtilities.readLines;
+import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
 
 
 public class CapabilityGenerator {
 
     private static final Random rnd = new Random();
 
+    public static void main(String[] args) throws IOException {
 
-    public static void main(String[] args) {
-//        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-//        CapabilityService capabilityDao = ctx.getBean(CapabilityService.class);
-//        ApplicationService applicationDao = ctx.getBean(ApplicationService.class);
-//        AppCapabilityService appCapabilityDao = ctx.getBean(AppCapabilityService.class);
-//
-//        DataSource dataSource = ctx.getBean(DataSource.class);
-//        JdbcTemplate template = new JdbcTemplate(dataSource);
-//        template.update("DELETE FROM app_capability");
-//
-//        List<Capability> capabilities = capabilityDao.findAll();
-//
-//        applicationDao.getAll().forEach(app -> {
-//            int count = rnd.nextInt(3);
-//
-//            Set<Long> ids = IntStream
-//                    .range(0, count)
-//                    .mapToObj(i -> randomPick(capabilities))
-//                    .map(c -> c.id().get())
-//                    .collect(Collectors.toSet());
-//
-//            appCapabilityDao.addCapabilitiesToApp(app.id().get(), new ArrayList<>(ids));
-//
-//        });
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        DSLContext dsl = ctx.getBean(DSLContext.class);
 
+        List<String> lines = readLines(CapabilityGenerator.class.getResourceAsStream("/capabilities.csv"));
+
+        System.out.println("Deleting existing Caps's");
+        dsl.deleteFrom(CAPABILITY).execute();
+
+        List<CapabilityRecord> records = lines.stream()
+                .skip(1)
+                .map(line -> line.split("\t"))
+                .filter(cells -> cells.length == 4)
+                .map(cells -> {
+                    CapabilityRecord record = new CapabilityRecord();
+                    record.setId(longVal(cells[0]));
+                    record.setParentId(longVal(cells[1]));
+                    record.setName(cells[2]);
+                    record.setDescription(cells[3]);
+
+                    System.out.println(record);
+                    return record;
+                })
+                .collect(Collectors.toList());
+
+
+        System.out.println("Inserting new Caps's");
+        dsl.batchInsert(records).execute();
+
+        System.out.println("Done");
+
+    }
+
+    private static Long longVal(String value) {
+        return StringUtilities.parseLong(value, null);
     }
 }

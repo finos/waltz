@@ -18,8 +18,6 @@
 package com.khartec.waltz.data.application;
 
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.tally.ImmutableLongTally;
@@ -33,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -208,6 +208,7 @@ public class ApplicationDao {
         record.setKind(request.kind().name());
         record.setLifecyclePhase(request.lifecyclePhase().name());
         record.setOverallRating(request.overallRating().name());
+        record.setUpdatedAt(Timestamp.from(Instant.now()));
 
         try {
             int count = record.insert();

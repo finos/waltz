@@ -28,8 +28,9 @@
         <!-- Database -->
 
         <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
+            <groupId>${jdbc.group}</groupId>
+            <artifactId>${jdbc.artifact}</artifactId>
+            <version>${jdbc.version}</version>
         </dependency>
 
         <dependency>
@@ -61,6 +62,7 @@
 
     <build>
         <plugins>
+            <!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
@@ -79,12 +81,12 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
             <plugin>
 
                 <!-- Specify the maven code generator plugin -->
-                <groupId>org.jooq</groupId>
+                <groupId>${jooq.group}</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
-                <version>3.7.0</version>
 
                 <!-- The plugin should hook into the generate goal -->
                 <executions>

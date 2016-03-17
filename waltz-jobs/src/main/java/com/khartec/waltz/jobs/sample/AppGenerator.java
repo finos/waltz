@@ -22,10 +22,12 @@ import com.khartec.waltz.model.application.AppRegistrationRequest;
 import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.application.ImmutableAppRegistrationRequest;
 import com.khartec.waltz.model.application.LifecyclePhase;
+import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
+import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.IOException;
@@ -34,6 +36,7 @@ import java.util.List;
 import java.util.Random;
 
 import static com.khartec.waltz.common.ArrayUtilities.randomPick;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 
 public class AppGenerator {
@@ -43,6 +46,9 @@ public class AppGenerator {
     public static void main(String[] args) throws IOException {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+
+        DSLContext dsl = ctx.getBean(DSLContext.class);
+        ApplicationService applicationDao = ctx.getBean(ApplicationService.class);
         OrganisationalUnitService ouDao = ctx.getBean(OrganisationalUnitService.class);
 
         List<String> animals = IOUtilities.readLines(AppGenerator.class.getClassLoader().getResourceAsStream("animals.txt"));
@@ -51,7 +57,7 @@ public class AppGenerator {
 
         List<AppRegistrationRequest> registrationRequests = new ArrayList<>();
 
-        for (int i = 0; i < 200; i++) {
+        for (int i = 0; i < 400; i++) {
             String animal = randomPick(animals.toArray(new String[0]));
             animals.remove(animal);
 
@@ -68,13 +74,14 @@ public class AppGenerator {
                     .description("All about " + animal)
                     .kind(randomPick(ApplicationKind.values()))
                     .lifecyclePhase(phase)
+                    .overallRating(randomPick(RagRating.R, RagRating.A, RagRating.A, RagRating.G, RagRating.G))
                     .organisationalUnitId(organisationalUnit.id().get())
                     .build();
 
             registrationRequests.add(app);
         }
 
-        ApplicationService applicationDao = ctx.getBean(ApplicationService.class);
+        dsl.deleteFrom(APPLICATION).execute();
 
         registrationRequests.forEach(applicationDao::registerApp);
 

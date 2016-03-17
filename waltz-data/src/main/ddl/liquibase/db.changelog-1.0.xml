@@ -17,9 +17,8 @@
   -->
 
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
     <property name="clob.type" value="clob" dbms="oracle"></property>
     <property name="clob.type" value="text" dbms="mssql"></property>
@@ -37,7 +36,7 @@
     <property name="int.type" value="int" dbms="mssql"></property>
     <property name="int.type" value="INTEGER" dbms="mysql"></property>
 
-    <property name="longvarchar.type" value="ntext" dbms="mssql"></property>
+    <property name="longvarchar.type" value="nvarchar(4000)" dbms="mssql"></property>
     <property name="longvarchar.type" value="LONGVARCHAR" dbms="mysql"></property>
 
     <!-- TABLES -->
@@ -981,6 +980,66 @@
                id="20160302-102-2">
         <dropDefaultValue tableName="organisational_unit"
                           columnName="updated_at"/>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               dbms="mssql"
+               id="20160317-105-1">
+        <sql>
+            CREATE FULLTEXT CATALOG WaltzFTS
+            WITH ACCENT_SENSITIVITY = OFF;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               dbms="mssql"
+               id="20160317-105-2">
+        <sql>
+            CREATE FULLTEXT INDEX ON application
+            (name, description, asset_code)
+            KEY INDEX application_pkey
+            ON WaltzFTS
+            WITH STOPLIST = SYSTEM;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               dbms="mssql"
+               id="20160317-105-3">
+        <sql>
+            CREATE FULLTEXT INDEX ON capability
+            (name, description)
+            KEY INDEX capability_pkey
+            ON WaltzFTS
+            WITH STOPLIST = SYSTEM;
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               dbms="mssql"
+               id="20160317-105-4">
+        <sql>
+            CREATE FULLTEXT INDEX ON person
+            (display_name, title, email, user_principal_name, department_name)
+            KEY INDEX person_pkey
+            ON WaltzFTS
+            WITH STOPLIST = SYSTEM;
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               dbms="mssql"
+               id="20160317-105-5">
+        <sql>
+            CREATE FULLTEXT INDEX ON organisational_unit
+            (name, description)
+            KEY INDEX organisational_unit_pkey
+            ON WaltzFTS
+            WITH STOPLIST = SYSTEM;
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

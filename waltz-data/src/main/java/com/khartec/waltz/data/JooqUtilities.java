@@ -1,12 +1,12 @@
 package com.khartec.waltz.data;
 
-import org.jooq.Condition;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
-import org.jooq.Table;
+import com.khartec.waltz.common.StringUtilities;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Stream;
 
 public class JooqUtilities {
 
@@ -15,6 +15,18 @@ public class JooqUtilities {
                 .from(table)
                 .where(condition)
                 .fetch(mapper);
+    }
+
+
+    public static class MSSQL {
+
+        public static SQL mkContains(String... terms) {
+            StringJoiner joiner = new StringJoiner(" AND ", "CONTAINS(*, '", "')");
+            Stream.of(terms)
+                    .filter(StringUtilities::notEmpty)
+                    .forEach(joiner::add);
+            return DSL.sql(joiner.toString());
+        }
     }
 
 }

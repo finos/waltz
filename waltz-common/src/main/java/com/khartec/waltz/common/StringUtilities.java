@@ -47,4 +47,12 @@ public class StringUtilities {
         if (! maybeString.isPresent()) return true;
         return isEmpty(maybeString.get());
     }
+
+    public static Long parseLong(String value, Long dflt) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException nfe) {
+            return dflt;
+        }
+    }
 }

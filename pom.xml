@@ -26,21 +26,25 @@
     <profiles>
 
         <profile>
-            <id>waltz-mariadb</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <id>waltz-mariadb</id>
             <properties>
                 <jdbc.group>org.mariadb.jdbc</jdbc.group>
                 <jdbc.artifact>mariadb-java-client</jdbc.artifact>
                 <jdbc.version>1.3.2</jdbc.version>
                 <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
+                <jooq.dialect>MARIADB</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>
                 <jooq.database>org.jooq.util.mariadb.MariaDBDatabase</jooq.database>
             </properties>
         </profile>
 
         <profile>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <id>waltz-mssql</id>
             <properties>
                 <jdbc.group>com.microsoft.sqlserver</jdbc.group>
@@ -49,6 +53,7 @@
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
                 <jooq.group>org.jooq.trial</jooq.group>
                 <jooq.database>org.jooq.util.sqlserver.SQLServerDatabase</jooq.database>
+                <jooq.dialect>SQLSERVER2014</jooq.dialect>
             </properties>
         </profile>
 
@@ -133,12 +138,6 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>1.7.12</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mariadb.jdbc</groupId>
-                <artifactId>mariadb-java-client</artifactId>
-                <version>1.3.2</version>
             </dependency>
 
             <dependency>
