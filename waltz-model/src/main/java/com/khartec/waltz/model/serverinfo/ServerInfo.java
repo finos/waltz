@@ -48,6 +48,6 @@ public abstract class ServerInfo implements IdProvider, ProvenanceProvider {
     @Value.Default
     public boolean virtual() {
         return false;
-    };
+    }
 
 }

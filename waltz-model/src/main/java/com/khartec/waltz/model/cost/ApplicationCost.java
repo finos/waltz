@@ -22,8 +22,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityReference;
 import org.immutables.value.Value;
 
-import java.util.Set;
-
 @Value.Immutable
 @JsonSerialize(as = ImmutableApplicationCost.class)
 @JsonDeserialize(as = ImmutableApplicationCost.class)

@@ -17,9 +17,6 @@
 
 package com.khartec.waltz.model;
 
-/**
- * Created by dwatkins on 23/07/2015.
- */
 public enum EntityKind {
     APPLICATION,
     CAPABILITY,

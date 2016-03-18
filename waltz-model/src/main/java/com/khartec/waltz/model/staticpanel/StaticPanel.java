@@ -38,7 +38,7 @@ public abstract class StaticPanel implements IdProvider {
     @Value.Default
     public int width() {
         return 12;
-    };
+    }
 
     @Value.Default
     public ContentKind kind() {

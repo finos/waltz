@@ -1,9 +1,5 @@
 package com.khartec.waltz.model.trait;
 
-/**
- * Created by dwatkins on 26/02/2016.
- */
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityReference;

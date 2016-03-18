@@ -78,7 +78,7 @@ public class TabularFileAnalyserTest {
                 .forEach(r -> {
                     System.out.println(r.quoteChar()
                             + " "
-                            + r.delimeterChar()
+                            + r.delimiterChar()
                             + " => [ "
                             + r.fieldCounts().size()
                             + " ] "

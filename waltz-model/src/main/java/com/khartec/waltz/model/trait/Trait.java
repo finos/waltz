@@ -20,6 +20,6 @@ public abstract class Trait implements
     @Value.Default
     public boolean applicationDeclarable() {
         return false;
-    };
+    }
 
 }
