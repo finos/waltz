@@ -24,6 +24,7 @@ import com.khartec.waltz.common.hierarchy.Forest;
 import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
 import com.khartec.waltz.common.hierarchy.Node;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.data.orgunit.search.OrganisationalUnitSearchDao;
 import com.khartec.waltz.model.orgunit.ImmutableOrganisationalUnitHierarchy;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.model.orgunit.OrganisationalUnitHierarchy;
@@ -36,9 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkFalse;
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.Checks.*;
 import static com.khartec.waltz.common.ListUtilities.drop;
 
 
@@ -46,12 +45,16 @@ import static com.khartec.waltz.common.ListUtilities.drop;
 public class OrganisationalUnitService {
 
     private final OrganisationalUnitDao dao;
+    private final OrganisationalUnitSearchDao organisationalUnitSearchDao;
 
 
     @Autowired
-    public OrganisationalUnitService(OrganisationalUnitDao dao) {
-        this.dao = dao;
+    public OrganisationalUnitService(OrganisationalUnitDao dao,
+                                     OrganisationalUnitSearchDao organisationalUnitSearchDao) {
         checkNotNull(dao, "dao must not be null");
+        checkNotNull(organisationalUnitSearchDao, "organisationalUnitSearchDao must not be null");
+        this.dao = dao;
+        this.organisationalUnitSearchDao = organisationalUnitSearchDao;
     }
 
 
@@ -136,7 +139,7 @@ public class OrganisationalUnitService {
 
     public List<OrganisationalUnit> search(String query) {
         if (StringUtilities.isEmpty(query)) return Collections.emptyList();
-        return dao.search(query);
+        return organisationalUnitSearchDao.search(query);
     }
 
     public OrganisationalUnitHierarchy getHierarchyById(long id) {

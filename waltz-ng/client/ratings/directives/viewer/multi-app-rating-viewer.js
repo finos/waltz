@@ -13,9 +13,6 @@ function controller() {
 }
 
 
-controller.$inject = ['$scope'];
-
-
 export default () => ({
     replace: true,
     restrict: 'E',

@@ -6,19 +6,9 @@ import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
+import static com.khartec.waltz.schema.tables.Person.PERSON;
 
-/**
- * Created by dwatkins on 17/03/2016.
- */
 public class MsSqlSearchHarness {
-
-    /*
-    select name, description
-    from capability
-    where CONTAINS (*, 'Risk AND Local');
-
-     */
 
     public static void main(String[] args) {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
@@ -27,11 +17,12 @@ public class MsSqlSearchHarness {
 
 
 
-        dsl.select(CAPABILITY.fields())
-                .from(CAPABILITY)
-                .where(JooqUtilities.MSSQL.mkContains())
+        dsl.select(PERSON.fields())
+                .from(PERSON)
+                .where(JooqUtilities.MSSQL.mkContains("fowler"))
+                .limit(5)
                 .fetch()
-                .forEach(System.out::println);
+                .forEach(p -> System.out.println(p.getValue(PERSON.DISPLAY_NAME)));
 
     }
 

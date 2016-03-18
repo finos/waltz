@@ -42,16 +42,17 @@
         </profile>
 
         <profile>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+            <!--
+                Note: this profile requires a professional license for JOOQ,
+                see: http://www.jooq.org/download/
+            -->
             <id>waltz-mssql</id>
             <properties>
                 <jdbc.group>com.microsoft.sqlserver</jdbc.group>
                 <jdbc.artifact>sqljdbc4</jdbc.artifact>
                 <jdbc.version>4.0</jdbc.version>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
-                <jooq.group>org.jooq.trial</jooq.group>
+                <jooq.group>org.jooq.pro</jooq.group>
                 <jooq.database>org.jooq.util.sqlserver.SQLServerDatabase</jooq.database>
                 <jooq.dialect>SQLSERVER2014</jooq.dialect>
             </properties>

@@ -17,12 +17,12 @@
 
 package com.khartec.waltz.service.capability;
 
-import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.common.hierarchy.FlatNode;
 import com.khartec.waltz.common.hierarchy.Forest;
 import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
 import com.khartec.waltz.common.hierarchy.Node;
 import com.khartec.waltz.data.capability.CapabilityDao;
+import com.khartec.waltz.data.capability.search.CapabilitySearchDao;
 import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.capability.ImmutableCapability;
 import org.slf4j.Logger;
@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,11 +43,15 @@ public class CapabilityService {
     private static final Logger LOG = LoggerFactory.getLogger(CapabilityService.class);
 
     private final CapabilityDao capabilityDao;
+    private final CapabilitySearchDao capabilitySearchDao;
 
     @Autowired
-    public CapabilityService(CapabilityDao capabilityDao) {
+    public CapabilityService(CapabilityDao capabilityDao, CapabilitySearchDao capabilitySearchDao) {
         checkNotNull(capabilityDao, "capabilityDao must not be null");
+        checkNotNull(capabilitySearchDao, "capabilitySearchDao must not be null");
+
         this.capabilityDao = capabilityDao;
+        this.capabilitySearchDao = capabilitySearchDao;
     }
 
     public List<Capability> findAll() {
@@ -57,8 +60,7 @@ public class CapabilityService {
 
 
     public List<Capability> search(String query) {
-        if (StringUtilities.isEmpty(query)) return Collections.emptyList();
-        return capabilityDao.search(query);
+        return capabilitySearchDao.search(query);
     }
 
 

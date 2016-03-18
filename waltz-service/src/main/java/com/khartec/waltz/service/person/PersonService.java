@@ -18,6 +18,7 @@
 package com.khartec.waltz.service.person;
 
 import com.khartec.waltz.data.person.PersonDao;
+import com.khartec.waltz.data.person.search.PersonSearchDao;
 import com.khartec.waltz.model.person.ImmutablePerson;
 import com.khartec.waltz.model.person.Person;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +33,16 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class PersonService {
 
     private final PersonDao personDao;
+    private final PersonSearchDao personSearchDao;
 
 
     @Autowired
-    public PersonService(PersonDao personDao) {
+    public PersonService(PersonDao personDao, PersonSearchDao personSearchDao) {
         checkNotNull(personDao, "personDao must not be null");
-        
+        checkNotNull(personSearchDao, "personSearchDao must not be null");
+
         this.personDao = personDao;
+        this.personSearchDao = personSearchDao;
     }
 
 
@@ -69,7 +73,7 @@ public class PersonService {
 
 
     public List<Person> search(String query) {
-        return personDao.search(query);
+        return personSearchDao.search(query);
     }
 
 

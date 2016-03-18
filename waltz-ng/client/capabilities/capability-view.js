@@ -10,11 +10,10 @@
  *
  */
 
-import _ from 'lodash';
-import d3 from 'd3';
-
-import { perhaps, populateParents } from '../common';
-import { calculateGroupSummary } from '../ratings/directives/common';
+import _ from "lodash";
+import d3 from "d3";
+import {perhaps, populateParents} from "../common";
+import {calculateGroupSummary} from "../ratings/directives/common";
 
 function loadTraitInfo(traitStore, traitUsageStore, capabilityId) {
     const result = {
@@ -117,7 +116,7 @@ function controller(capabilities,
 
     const vm = this;
 
-    const capId = Number($stateParams.id);
+    const capId = $stateParams.id;
     const capability = _.findWhere(populateParents(capabilities), { id: capId });
 
     const capabilitiesById = _.indexBy(capabilities, 'id');

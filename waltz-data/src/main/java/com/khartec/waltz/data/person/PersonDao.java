@@ -21,13 +21,14 @@ import com.khartec.waltz.model.person.ImmutablePerson;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.person.PersonKind;
 import com.khartec.waltz.schema.tables.records.PersonRecord;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -120,6 +121,10 @@ public class PersonDao {
 
     public int[] bulkSave(List<ImmutablePerson> people) {
 
+        checkNotNull(people, "Cannot bulk save a null collection of people");
+
+        LOG.info("Bulk saving " + people.size() + "records");
+
         List<PersonRecord> records = people.stream()
                 .map(p -> {
                     PersonRecord r = dsl.newRecord(PERSON);
@@ -140,40 +145,4 @@ public class PersonDao {
         return dsl.batchInsert(records).execute();
     }
 
-
-    public List<Person> search(String query) {
-        if (dsl.dialect() == SQLDialect.POSTGRES) {
-            Result<Record> records = dsl.fetch(SEARCH_POSTGRES, query, query);
-            return records.map(personMapper);
-        }
-        if (dsl.dialect() == SQLDialect.MARIADB) {
-            Result<Record> records = dsl.fetch(SEARCH_MARIADB, query);
-            return records.map(personMapper);
-        }
-        LOG.error("Could not find full text query for database dialect: " + dsl.dialect());
-        return Collections.emptyList();
-    }
-
-
-    private static final String SEARCH_MARIADB
-            = "SELECT * FROM person\n"
-            + " WHERE\n"
-            + " MATCH(display_name, user_principal_name, title)\n"
-            + " AGAINST (?)\n"
-            + " LIMIT 20";
-
-
-    private static final String SEARCH_POSTGRES
-            = "SELECT *,\n"
-            + "  ts_rank_cd(setweight(to_tsvector(coalesce(display_name, '')), 'A')\n"
-            + "             || setweight(to_tsvector(coalesce(title, '')), 'D'),\n"
-            + "             plainto_tsquery(?) )\n"
-            + "    AS rank\n"
-            + "FROM person\n"
-            + "WHERE\n"
-            + "  setweight(to_tsvector(coalesce(display_name, '')), 'A')\n"
-            + "  || setweight(to_tsvector(coalesce(title, '')), 'D')\n"
-            + "  @@ plainto_tsquery(?)\n"
-            + "ORDER BY rank\n"
-            + "DESC LIMIT 20;";
 }
