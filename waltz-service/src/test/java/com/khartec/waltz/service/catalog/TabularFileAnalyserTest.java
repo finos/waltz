@@ -60,7 +60,7 @@ public class TabularFileAnalyserTest {
 
                 ImmutableParseAnalysis.Builder parseAnalysisBuilder = ImmutableParseAnalysis.builder()
                         .quoteChar(quoteChar)
-                        .delimeterChar(delimeter);
+                        .delimiterChar(delimeter);
 
 
                 while (cells != null) {

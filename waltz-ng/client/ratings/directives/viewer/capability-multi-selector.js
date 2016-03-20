@@ -1,4 +1,4 @@
-import { switchToParentIds, populateParents } from '../../../common';
+import {switchToParentIds, populateParents} from "../../../common";
 
 
 const BINDINGS = {
@@ -11,8 +11,9 @@ const BINDINGS = {
 
 
 function hasChildren(node) {
-    return node.children && node.children.length > 0;
+    return ! _.isEmpty(node.children);
 }
+
 
 function calcChildrenIds(node) {
     if (! hasChildren(node)) return [];
@@ -32,22 +33,74 @@ function calcChildrenIds(node) {
     return childIds;
 }
 
-function controller($scope) {
 
-    const vm = this;
-    vm.treeOptions = {
+function deselectAllFn(selectedNodes) {
+    return (node, $event) => {
+        $event.stopPropagation();
+        const childIds = calcChildrenIds(node);
+        _.each(childIds, childId => {
+            const selectedIds = _.map(selectedNodes, 'id');
+            const idx = _.indexOf(selectedIds, childId);
+            if (idx > -1) {
+                selectedNodes.splice(idx, 1);
+            }
+        });
+    };
+}
+
+
+function selectAllFn(selectedNodes, nodesById, allowableNodeIds) {
+    return (node, $event) => {
+        $event.stopPropagation();
+
+        const idsToAdd = _.chain(calcChildrenIds(node))
+            .filter(id => _.contains(allowableNodeIds, id))
+            .value();
+
+        _.each(idsToAdd, id => {
+            const currentlySelectedIds = _.map(selectedNodes, 'id');
+            const idx = _.indexOf(currentlySelectedIds, id);
+            if (idx === -1) {
+                selectedNodes.push(nodesById[id]);
+            }
+        });
+    };
+}
+
+
+function setupTreeOptions() {
+    return {
         nodeChildren: "children",
         multiSelection: true,
         dirSelectable: true,
-        isSelectable: (n) => _.contains(vm.explicitCapabilityIds, n.id),
         equality: (n1, n2) => (n1 && n2 ? n1.id === n2.id : false),
         expanded: [1]
     };
+}
+
+
+const WATCH_EXPRESSIONS = [
+    'ctrl.capabilities',
+    'ctrl.explicitCapabilityIds',
+    'ctrl.initiallySelectedIds'
+];
+
+
+function populateSelectedNodes(ids, selectedNodes, nodesById) {
+    _.each(ids, id => selectedNodes.push(nodesById[id]));
+}
+
+
+function controller($scope) {
+
+    const vm = this;
     vm.treeData = [];
+    vm.treeOptions = setupTreeOptions();
+
 
     $scope.$watchGroup(
-        ['ctrl.capabilities', 'ctrl.explicitCapabilityIds', 'ctrl.initiallySelectedIds'],
-        ([capabilities, explicitCapabilityIds = [], initiallySelectedIds = []]) => {
+        WATCH_EXPRESSIONS,
+        ([capabilities = [], explicitCapabilityIds = [], initiallySelectedIds = []]) => {
             const nodeData = switchToParentIds(populateParents(capabilities));
             const nodesById = _.indexBy(nodeData, 'id');
 
@@ -55,39 +108,14 @@ function controller($scope) {
             vm.expandedNodes = [];
             vm.explicitCapabilityIds = explicitCapabilityIds;
             vm.nodesById = nodesById;
+            vm.selectAll = selectAllFn(vm.selectedNodes, vm.nodesById, vm.explicitCapabilityIds);
+            vm.deselectAll = deselectAllFn(vm.selectedNodes);
+            vm.treeOptions.isSelectable = (n) => _.contains(vm.explicitCapabilityIds, n.id);
 
-            _.each(initiallySelectedIds, id => vm.selectedNodes.push(nodesById[id]));
-    });
-
-    vm.showBulkControls = (node) => {
-        return hasChildren(node);
-    };
-
-    vm.selectAll = (node, $event) => {
-        const childIds = calcChildrenIds(node);
-        $event.stopPropagation();
-        _.each(childIds, childId => {
-            const selectedIds = _.map(vm.selectedNodes, 'id');
-            const idx = _.indexOf(selectedIds, childId);
-            if (idx === -1) {
-                vm.selectedNodes.push(vm.nodesById[childId]);
-            }
-        });
-    };
-
-    vm.deselectAll = (node, $event) => {
-        $event.stopPropagation();
-        const childIds = calcChildrenIds(node);
-        _.each(childIds, childId => {
-            const selectedIds = _.map(vm.selectedNodes, 'id');
-            const idx = _.indexOf(selectedIds, childId);
-            if (idx > -1) {
-                vm.selectedNodes.splice(idx, 1);
-            }
+            populateSelectedNodes(initiallySelectedIds, vm.selectedNodes, nodesById);
         });
 
-    };
-
+    vm.hasChildren = hasChildren;
 }
 
 controller.$inject = [ '$scope' ];

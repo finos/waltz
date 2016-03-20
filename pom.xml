@@ -13,7 +13,7 @@
         <module>waltz-jobs</module>
         <module>waltz-data</module>
     </modules>
-    <packaging>pom</packaging>
+    <packaging>pom</packaging>b
 
     <name>waltz</name>
     <url>http://khartec.com</url>
@@ -27,8 +27,13 @@
 
         <profile>
             <activation>
+                <property>
+                    <name>db.type</name>
+                    <value>maria</value>
+                </property>
                 <activeByDefault>true</activeByDefault>
             </activation>
+
             <id>waltz-mariadb</id>
             <properties>
                 <jdbc.group>org.mariadb.jdbc</jdbc.group>
@@ -46,6 +51,12 @@
                 Note: this profile requires a professional license for JOOQ,
                 see: http://www.jooq.org/download/
             -->
+            <activation>
+                <property>
+                    <name>db.type</name>
+                    <value>mssql</value>
+                </property>
+            </activation>
             <id>waltz-mssql</id>
             <properties>
                 <jdbc.group>com.microsoft.sqlserver</jdbc.group>

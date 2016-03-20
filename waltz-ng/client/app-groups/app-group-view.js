@@ -15,7 +15,7 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-import { selectBest } from '../ratings/directives/viewer/coloring-strategies';
+import {selectBest} from "../ratings/directives/viewer/coloring-strategies";
 
 
 function prepareFlowData(flows, apps) {
@@ -47,24 +47,44 @@ function loadDataFlows(dataFlowStore, groupApps) {
         .then(fs => prepareFlowData(fs, groupApps));
 }
 
-function calculateRatings(allCapabilities, appCapabilities, ratings) {
+
+/**
+ * Calculates the set of capabilities required to
+ * fully describe a given set of app capabilities.
+ * This may include parent capabilities of the
+ * explicit capabilities.
+ *
+ * @param appCapabilities
+ * @param allCapabilities
+ * @returns {*}
+ */
+function includeParentCapabilities(appCapabilities, allCapabilities) {
     const capabilitiesById = _.indexBy(allCapabilities, 'id');
 
+    const toCapabilityId = appCap => appCap.capabilityId;
+    const lookupCapability = id => capabilitiesById[id];
+    const extractParentIds = c => ([c.level1, c.level2, c.level3, c.level4, c.level5]);
+
+    return _.chain(appCapabilities)
+        .map(toCapabilityId)
+        .map(lookupCapability)
+        .map(extractParentIds)
+        .flatten()
+        .compact()
+        .uniq()
+        .map(lookupCapability)
+        .compact()
+        .value();
+}
+
+
+function calculateCapabilities(allCapabilities, appCapabilities) {
     const explicitCapabilityIds = _.chain(appCapabilities)
             .map('capabilityId')
             .uniq()
             .value();
 
-    const capabilities = _.chain(explicitCapabilityIds)
-        .map(cId => capabilitiesById[cId])
-        .compact()
-        .map(c => ([c.level1, c.level2, c.level3, c.level4, c.level5]))
-        .flatten()
-        .compact()
-        .uniq()
-        .map(cId => capabilitiesById[cId])
-        .compact()
-        .value();
+    const capabilities = includeParentCapabilities(appCapabilities, allCapabilities);
 
     return {
         initiallySelectedIds: explicitCapabilityIds,
@@ -122,7 +142,7 @@ function controller(appGroupStore,
         })
         .then(() => loadDataFlows(dataFlowStore, vm.applications))
         .then(flows => vm.dataFlows = flows)
-        .then(() => calculateRatings(vm.allCapabilities, vm.appCapabilities, vm.ratings))
+        .then(() => calculateCapabilities(vm.allCapabilities, vm.appCapabilities))
         .then(r => Object.assign(vm, r));
 
     userService.whoami().then(u => vm.user = u);
@@ -134,7 +154,6 @@ function controller(appGroupStore,
     };
 
     vm.ratingColorStrategy = selectBest;
-
 }
 
 controller.$inject = [
