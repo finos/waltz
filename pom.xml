@@ -13,7 +13,7 @@
         <module>waltz-jobs</module>
         <module>waltz-data</module>
     </modules>
-    <packaging>pom</packaging>b
+    <packaging>pom</packaging>
 
     <name>waltz</name>
     <url>http://khartec.com</url>
@@ -31,7 +31,7 @@
                     <name>db.type</name>
                     <value>maria</value>
                 </property>
-                <activeByDefault>true</activeByDefault>
+
             </activation>
 
             <id>waltz-mariadb</id>
@@ -56,6 +56,7 @@
                     <name>db.type</name>
                     <value>mssql</value>
                 </property>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <id>waltz-mssql</id>
             <properties>

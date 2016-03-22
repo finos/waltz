@@ -31,7 +31,6 @@ function perpareRatingData(ratings) {
 
 
 function controller($scope) {
-
     const vm = this;
 
     $scope.$watch('ctrl.ratings', (ratings => {
@@ -40,7 +39,6 @@ function controller($scope) {
     }));
 
     vm.determineRating = (appId, capId) => vm.colorStrategy.fn(appId, capId, vm.ratingMap);
-
 }
 
 controller.$inject = ['$scope'];
