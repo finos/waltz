@@ -46,7 +46,7 @@ public class ApplicationSearchDao {
             return new MariaAppSearch();
         }
 
-        if (dialect.name().equals("SQLSERVER2014")) {
+        if (dialect.name().startsWith("SQLSERVER")) {
             return new SqlServerAppSearch();
         }
 
