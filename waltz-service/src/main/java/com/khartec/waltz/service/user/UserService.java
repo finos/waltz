@@ -27,9 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.SetUtilities.fromArray;
 
 
 @Service
@@ -77,9 +77,7 @@ public class UserService {
 
     public boolean hasRole(String userName, Role... requiredRoles) {
         List<Role> userRoles = userRoleDao.getUserRoles(userName);
-        return Stream
-                .of(requiredRoles)
-                .allMatch(requiredRole -> userRoles.contains(requiredRole));
+        return userRoles.containsAll(fromArray(requiredRoles));
     }
 
 

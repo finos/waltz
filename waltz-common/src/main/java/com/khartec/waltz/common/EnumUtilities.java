@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 public class EnumUtilities {
 
     public static <T extends Enum<T>> T readEnum(String value, Class<T> enumClass, T dflt) {
+        Checks.checkNotNull(enumClass, "Enum class must be supplied");
         EnumSet<T> set = EnumSet.allOf(enumClass);
         for (T t : set) {
             if (t.name().equals(value)) {

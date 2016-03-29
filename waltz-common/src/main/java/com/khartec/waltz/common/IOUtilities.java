@@ -17,10 +17,7 @@
 
 package com.khartec.waltz.common;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -33,13 +30,27 @@ public class IOUtilities {
         checkNotNull(stream, "stream must not be null");
 
         try {
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            InputStreamReader streamReader = new InputStreamReader(stream);
+            BufferedReader reader = new BufferedReader(streamReader);
             return reader
                     .lines()
                     .collect(toList());
         } finally {
             stream.close();
+        }
+    }
+
+
+    public static void copyStream(InputStream input, OutputStream output)
+            throws IOException
+    {
+        checkNotNull(input, "Input stream cannot be null");
+        checkNotNull(input, "Output stream cannot be null");
+
+        byte[] buff = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = input.read(buff)) != -1) {
+            output.write(buff, 0, bytesRead);
         }
     }
 }

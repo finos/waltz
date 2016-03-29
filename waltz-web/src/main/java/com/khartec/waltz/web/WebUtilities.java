@@ -30,6 +30,7 @@ import com.khartec.waltz.model.ImmutableWebError;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.model.user.User;
 import com.khartec.waltz.service.user.UserService;
+import org.eclipse.jetty.http.MimeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -43,6 +44,7 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkAll;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ObjectUtilities.firstNotNull;
 
 public class WebUtilities {
 
@@ -51,6 +53,7 @@ public class WebUtilities {
 
     public static final String TYPE_JSON = "application/json";
 
+    private static final MimeTypes mimeTypes = new MimeTypes();
     private static final ObjectMapper mapper;
 
     static {
@@ -60,6 +63,8 @@ public class WebUtilities {
 
         // Force timestamps to be sent as ISO-8601 formatted strings
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+        mimeTypes.addMimeMapping("ttf", "application/x-font-ttf");
     }
 
 
@@ -79,7 +84,7 @@ public class WebUtilities {
         checkAll(
                 segs,
                 x -> StringUtilities.notEmpty(x),
-                "Cannot convert segs to path");
+                "Cannot convert empty segments to path");
 
         return String.join("/", segs);
     }
@@ -244,4 +249,22 @@ public class WebUtilities {
                                        Logger log) {
         reportException(statusCode, Optional.ofNullable(errorCode), message, res, log);
     }
+
+
+    /**
+     * Given a path will return the mime type to go with it.
+     * Does this by looking at the extension of the final (non-anchor)
+     * segment of the given path.  <br>
+     *
+     * To add new mimetypes modify the static initialiser of this class.
+     *
+     * @param path
+     * @return
+     */
+    public static String getMimeType(String path) {
+        return firstNotNull(
+                mimeTypes.getMimeByExtension(path),
+                "application/octet-stream");
+    }
+
 }
