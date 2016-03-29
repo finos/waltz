@@ -28,12 +28,9 @@
         <profile>
             <activation>
                 <property>
-                    <name>db.type</name>
-                    <value>maria</value>
+                    <name>!db.type</name>
                 </property>
-
             </activation>
-
             <id>waltz-mariadb</id>
             <properties>
                 <jdbc.group>org.mariadb.jdbc</jdbc.group>
@@ -56,7 +53,7 @@
                     <name>db.type</name>
                     <value>mssql</value>
                 </property>
-                <activeByDefault>true</activeByDefault>
+                <!--<activeByDefault>true</activeByDefault>-->
             </activation>
             <id>waltz-mssql</id>
             <properties>
@@ -76,6 +73,13 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>${jdbc.group}</groupId>
+                <artifactId>${jdbc.artifact}</artifactId>
+                <version>${jdbc.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
