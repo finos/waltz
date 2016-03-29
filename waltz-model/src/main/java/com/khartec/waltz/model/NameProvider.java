@@ -17,10 +17,7 @@
 
 package com.khartec.waltz.model;
 
-/**
- * Created by dwatkins on 01/09/2015.
- */
 public interface NameProvider {
 
-    public String name();
+    String name();
 }

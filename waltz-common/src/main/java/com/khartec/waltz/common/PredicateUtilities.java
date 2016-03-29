@@ -17,7 +17,9 @@
 
 package com.khartec.waltz.common;
 
+import java.util.Collection;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 
 public class PredicateUtilities {
@@ -36,4 +38,39 @@ public class PredicateUtilities {
         return p.negate();
     }
 
+
+    public static <T> boolean all(Collection<T> ts, Predicate<T> p) {
+        return ts.stream()
+                .allMatch(p);
+    }
+
+
+    public static <T> boolean any(Collection<T> ts, Predicate<T> p) {
+        return ts.stream()
+                .anyMatch(p);
+    }
+
+
+    public static <T> boolean none(Collection<T> ts, Predicate<T> p) {
+        return ts.stream()
+                .noneMatch(p);
+    }
+
+
+    public static <T> boolean all(T[] ts, Predicate<T> p) {
+        return Stream.of(ts)
+                .allMatch(p);
+    }
+
+
+    public static <T> boolean any(T[] ts, Predicate<T> p) {
+        return Stream.of(ts)
+                .anyMatch(p);
+    }
+
+
+    public static <T> boolean none(T[] ts, Predicate<T> p) {
+        return Stream.of(ts)
+                .noneMatch(p);
+    }
 }

@@ -12,8 +12,8 @@
  *
  */
 
-import ListView from './list-view';
-import CapabilityView from './capability-view';
+import ListView from "./list-view";
+import CapabilityView from "./capability-view";
 
 
 export const baseState = {
@@ -31,6 +31,6 @@ export const listState = {
 };
 
 export const viewState = {
-    url: 'capabilities/:id',
+    url: 'capabilities/{id:int}',
     views: { 'content@': CapabilityView }
 };

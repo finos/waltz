@@ -17,11 +17,28 @@
   -->
 
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
-    
+    <property name="clob.type" value="clob" dbms="oracle"></property>
+    <property name="clob.type" value="text" dbms="mssql"></property>
+    <property name="clob.type" value="longtext" dbms="mysql"></property>
+
+    <property name="now.value" value="current_timestamp" dbms="oracle"></property>
+    <property name="now.value" value="getutcdate()" dbms="mssql"></property>
+    <property name="now.value" value="now()" dbms="mysql"></property>
+
+    <property name="long.type" value="NUMBER(18)" dbms="oracle"></property>
+    <property name="long.type" value="BIGINT" dbms="mssql"></property>
+    <property name="long.type" value="BIGINT" dbms="mysql"></property>
+
+    <property name="int.type" value="NUMBER(9)" dbms="oracle"></property>
+    <property name="int.type" value="int" dbms="mssql"></property>
+    <property name="int.type" value="INTEGER" dbms="mysql"></property>
+
+    <property name="longvarchar.type" value="nvarchar(4000)" dbms="mssql"></property>
+    <property name="longvarchar.type" value="LONGVARCHAR" dbms="mysql"></property>
+
     <!-- TABLES -->
     <changeSet author="dwatkins" id="20151129-tbl-1">
         <createTable tableName="access_log">
@@ -35,16 +52,16 @@
                 <constraints nullable="false"/>
             </column>
             <column name="params" type="VARCHAR(1024)"/>
-            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP"/>
+            <column defaultValueComputed="${now.value}" name="created_at" type="TIMESTAMP"/>
         </createTable>
     </changeSet>
 
     <changeSet author="dwatkins" id="20151129-tbl-2">
         <createTable tableName="app_capability">
-            <column name="application_id" type="BIGINT">
+            <column name="application_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
-            <column name="capability_id" type="BIGINT">
+            <column name="capability_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
             <column defaultValueBoolean="false" name="is_primary" type="BOOLEAN">
@@ -59,15 +76,15 @@
                 <constraints primaryKey="true" primaryKeyName="application_pkey"/>
             </column>
             <column name="name" type="VARCHAR(255)"/>
-            <column name="description" type="LONGVARCHAR"/>
+            <column name="description" type="${longvarchar.type}"/>
             <column name="asset_code" type="VARCHAR(255)"/>
-            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP">
+            <column defaultValueComputed="${now.value}" name="created_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
             <column name="updated_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="organisational_unit_id" type="BIGINT">
+            <column name="organisational_unit_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
             <column defaultValue="IN_HOUSE" name="kind" type="VARCHAR(128)">
@@ -91,10 +108,10 @@
             <column name="data_type" type="VARCHAR(128)">
                 <constraints nullable="false"/>
             </column>
-            <column name="parent_id" type="BIGINT">
+            <column name="parent_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
-            <column name="application_id" type="BIGINT">
+            <column name="application_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="rating" type="VARCHAR(128)">
@@ -113,7 +130,7 @@
             <column name="kind" type="VARCHAR(255)"/>
             <column name="url" type="VARCHAR(255)"/>
             <column name="parent_kind" type="VARCHAR(255)"/>
-            <column name="parent_id" type="BIGINT"/>
+            <column name="parent_id" type="${long.type}"/>
             <column name="created_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
@@ -128,14 +145,14 @@
 
     <changeSet author="dwatkins" id="20151129-tbl-6">
         <createTable tableName="capability">
-            <column name="id" type="BIGINT">
+            <column name="id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
-            <column name="parent_id" type="BIGINT"/>
+            <column name="parent_id" type="${long.type}"/>
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="LONGVARCHAR">
+            <column name="description" type="${longvarchar.type}">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -149,10 +166,10 @@
             <column name="parent_kind" type="VARCHAR(128)">
                 <constraints nullable="false"/>
             </column>
-            <column name="parent_id" type="BIGINT">
+            <column name="parent_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
-            <column name="message" type="LONGVARCHAR">
+            <column name="message" type="${longvarchar.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="user_id" type="VARCHAR(128)">
@@ -161,7 +178,7 @@
             <column name="severity" type="VARCHAR(32)">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP">
+            <column defaultValueComputed="${now.value}" name="created_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -172,13 +189,13 @@
             <column name="source_entity_kind" type="VARCHAR(128)">
                 <constraints nullable="false"/>
             </column>
-            <column name="source_entity_id" type="BIGINT">
+            <column name="source_entity_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="target_entity_kind" type="VARCHAR(128)">
                 <constraints nullable="false"/>
             </column>
-            <column name="target_entity_id" type="BIGINT">
+            <column name="target_entity_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="data_type" type="VARCHAR(128)">
@@ -195,7 +212,7 @@
             <column name="name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="LONGVARCHAR">
+            <column name="description" type="${longvarchar.type}">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -206,7 +223,7 @@
             <column name="entity_kind" type="VARCHAR(128)">
                 <constraints nullable="false"/>
             </column>
-            <column name="entity_id" type="BIGINT">
+            <column name="entity_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="kind" type="VARCHAR(128)">
@@ -220,14 +237,14 @@
 
     <changeSet author="dwatkins" id="20151129-tbl-11">
         <createTable tableName="organisational_unit">
-            <column name="id" type="BIGINT">
+            <column name="id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="name" type="VARCHAR(255)"/>
-            <column name="description" type="LONGVARCHAR"/>
+            <column name="description" type="${longvarchar.type}"/>
             <column name="kind" type="VARCHAR(255)"/>
-            <column name="parent_id" type="BIGINT"/>
-            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP">
+            <column name="parent_id" type="${long.type}"/>
+            <column defaultValueComputed="${now.value}" name="created_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
             <column name="updated_at" type="TIMESTAMP">
@@ -262,7 +279,7 @@
             <column name="employee_id" type="VARCHAR(128)">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValueNumeric="99" name="level" type="INT">
+            <column defaultValueNumeric="99" name="level" type="${int.type}">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -276,7 +293,7 @@
             <column name="name" type="VARCHAR(128)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="LONGVARCHAR">
+            <column name="description" type="${longvarchar.type}">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -293,7 +310,7 @@
             <column name="name" type="VARCHAR(128)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="LONGVARCHAR">
+            <column name="description" type="${longvarchar.type}">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -310,10 +327,10 @@
             <column defaultValue="APPLICATION" name="parent_kind" type="VARCHAR(128)">
                 <constraints nullable="false"/>
             </column>
-            <column name="parent_id" type="BIGINT">
+            <column name="parent_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
-            <column name="capability_id" type="BIGINT"/>
+            <column name="capability_id" type="${long.type}"/>
             <column defaultValue="BUSINESS" name="perspective_code" type="VARCHAR(32)">
                 <constraints nullable="false"/>
             </column>
@@ -359,7 +376,7 @@
                 <constraints nullable="false"/>
             </column>
             <column defaultValueBoolean="false" name="notable" type="BOOLEAN"/>
-            <column name="description" type="LONGVARCHAR"/>
+            <column name="description" type="${longvarchar.type}"/>
         </createTable>
     </changeSet>
 
@@ -387,7 +404,7 @@
 
     <changeSet author="dwatkins" id="20151130-tbl-1">
         <createTable tableName="application_alias">
-            <column name="application_id" type="BIGINT">
+            <column name="application_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="alias" type="VARCHAR(255)">
@@ -398,7 +415,7 @@
 
     <changeSet author="dwatkins" id="20151130-tbl-2">
         <createTable tableName="application_tag">
-            <column name="application_id" type="BIGINT">
+            <column name="application_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="tag" type="VARCHAR(255)">
@@ -583,13 +600,13 @@
     <!-- End User Apps #125 -->
     <changeSet author="dwatkins" id="20151214-tbl-1">
         <createTable tableName="end_user_application">
-            <column name="id" type="BIGINT">
+            <column name="id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="longvarchar">
+            <column name="description" type="${longvarchar.type}">
                 <constraints nullable="false"/>
             </column>
             <column defaultValue="MS_EXCEL" name="kind" type="varchar(128)">
@@ -601,7 +618,7 @@
             <column defaultValue="MEDIUM" name="risk_rating" type="varchar(128)">
                 <constraints nullable="false"/>
             </column>
-            <column name="organisational_unit_id" type="BIGINT">
+            <column name="organisational_unit_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -640,7 +657,7 @@
 
     <changeSet author="dwatkins" id="20151226-mod-1">
         <addColumn tableName="capability">
-            <column name="level" type="int" defaultValueNumeric="1">
+            <column name="level" type="${int.type}" defaultValueNumeric="1">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
@@ -658,7 +675,7 @@
     <changeSet author="dwatkins" id="20160104-tbl-1">
         <createTable tableName="svg_diagram">
             <column autoIncrement="true" name="id" type="BIGSERIAL">
-                <constraints primaryKey="true" primaryKeyName="application_pkey"/>
+                <constraints primaryKey="true" primaryKeyName="svg_diagram_pkey"/>
             </column>
             <column name="name" type="varchar(255)">
                 <constraints nullable="false"/>
@@ -669,10 +686,10 @@
             <column name="priority" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="TEXT">
+            <column name="description" type="${clob.type}">
                 <constraints nullable="false"/>
             </column>
-            <column name="svg" type="TEXT">
+            <column name="svg" type="${clob.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="key_property" type="varchar(64)">
@@ -688,7 +705,7 @@
     <changeSet author="dwatkins" id="20160105-tbl-1">
         <modifyDataType tableName="svg_diagram"
                         columnName="svg"
-                        newDataType="longtext"/>
+                        newDataType="${clob.type}"/>
     </changeSet>
 
 
@@ -696,7 +713,7 @@
         <createIndex indexName="idx_organisational_unit_id"
                      tableName="application"
                      unique="false">
-            <column name="organisational_unit_id" type="BIGINT"/>
+            <column name="organisational_unit_id" type="${long.type}"/>
         </createIndex>
     </changeSet>
 
@@ -705,12 +722,12 @@
         <createIndex indexName="idx_capability_id"
                      tableName="app_capability"
                      unique="false">
-            <column name="capability_id" type="BIGINT"/>
+            <column name="capability_id" type="${long.type}"/>
         </createIndex>
         <createIndex indexName="idx_application_id"
                      tableName="app_capability"
                      unique="false">
-            <column name="application_id" type="BIGINT"/>
+            <column name="application_id" type="${long.type}"/>
         </createIndex>
     </changeSet>
 
@@ -757,7 +774,7 @@
             <column name="kind" type="varchar(64)" defaultValue="HTML">
                 <constraints nullable="false"/>
             </column>
-            <column name="content" type="TEXT">
+            <column name="content" type="${clob.type}">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -768,7 +785,7 @@
     <changeSet author="dwatkins" id="20160206-43-1">
         <createTable tableName="application_group">
             <column autoIncrement="true" name="id" type="BIGSERIAL">
-                <constraints primaryKey="true" primaryKeyName="static_panel_pkey"/>
+                <constraints primaryKey="true" primaryKeyName="application_group_pkey"/>
             </column>
             <column name="name" type="varchar(255)">
                 <constraints nullable="false"/>
@@ -776,7 +793,7 @@
             <column name="kind" type="varchar(64)" defaultValue="PUBLIC">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="TEXT">
+            <column name="description" type="${clob.type}">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -784,10 +801,10 @@
 
     <changeSet author="dwatkins" id="20160206-43-2">
         <createTable tableName="application_group_entry">
-            <column name="group_id" type="BIGINT">
+            <column name="group_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
-            <column name="application_id" type="BIGINT">
+            <column name="application_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -795,7 +812,7 @@
 
     <changeSet author="dwatkins" id="20160206-43-3">
         <createTable tableName="application_group_member">
-            <column name="group_id" type="BIGINT">
+            <column name="group_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="user_id" type="varchar(128)">
@@ -889,19 +906,19 @@
     <changeSet author="dwatkins"
                id="20160222-88-1">
         <addColumn tableName="capability">
-            <column name="level_1" type="BIGINT">
+            <column name="level_1" type="${long.type}">
                 <constraints nullable="true"/>
             </column>
-            <column name="level_2" type="BIGINT">
+            <column name="level_2" type="${long.type}">
                 <constraints nullable="true"/>
             </column>
-            <column name="level_3" type="BIGINT">
+            <column name="level_3" type="${long.type}">
                 <constraints nullable="true"/>
             </column>
-            <column name="level_4" type="BIGINT">
+            <column name="level_4" type="${long.type}">
                 <constraints nullable="true"/>
             </column>
-            <column name="level_5" type="BIGINT">
+            <column name="level_5" type="${long.type}">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
@@ -930,14 +947,14 @@
             <column name="entity_kind" type="varchar(128)">
                 <constraints nullable="false"/>
             </column>
-            <column name="entity_id" type="BIGINT">
+            <column name="entity_id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="relationship" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="trait_id" type="BIGINT">
-                <constraints primaryKeyName="trait_pkey"/>
+            <column name="trait_id" type="${long.type}">
+                <constraints primaryKeyName="trait_usage_pkey"/>
             </column>
         </createTable>
     </changeSet>
@@ -963,6 +980,66 @@
                id="20160302-102-2">
         <dropDefaultValue tableName="organisational_unit"
                           columnName="updated_at"/>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               dbms="mssql"
+               id="20160317-105-1">
+        <sql>
+            CREATE FULLTEXT CATALOG WaltzFTS
+            WITH ACCENT_SENSITIVITY = OFF;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               dbms="mssql"
+               id="20160317-105-2">
+        <sql>
+            CREATE FULLTEXT INDEX ON application
+            (name, description, asset_code)
+            KEY INDEX application_pkey
+            ON WaltzFTS
+            WITH STOPLIST = SYSTEM;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               dbms="mssql"
+               id="20160317-105-3">
+        <sql>
+            CREATE FULLTEXT INDEX ON capability
+            (name, description)
+            KEY INDEX capability_pkey
+            ON WaltzFTS
+            WITH STOPLIST = SYSTEM;
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               dbms="mssql"
+               id="20160317-105-4">
+        <sql>
+            CREATE FULLTEXT INDEX ON person
+            (display_name, title, email, user_principal_name, department_name)
+            KEY INDEX person_pkey
+            ON WaltzFTS
+            WITH STOPLIST = SYSTEM;
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               dbms="mssql"
+               id="20160317-105-5">
+        <sql>
+            CREATE FULLTEXT INDEX ON organisational_unit
+            (name, description)
+            KEY INDEX organisational_unit_pkey
+            ON WaltzFTS
+            WITH STOPLIST = SYSTEM;
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

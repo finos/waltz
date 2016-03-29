@@ -19,15 +19,15 @@ package com.khartec.waltz.data.capability;
 
 import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.capability.ImmutableCapability;
-import com.khartec.waltz.model.utils.IdUtilities;
 import com.khartec.waltz.schema.tables.records.CapabilityRecord;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,33 +43,7 @@ public class CapabilityDao {
     private static final Logger LOG = LoggerFactory.getLogger(CapabilityDao.class);
 
 
-    private static final String SEARCH_QUERY_POSTGRES = "SELECT\n" +
-            "  *,\n" +
-            "  ts_rank_cd(\n" +
-            "      setweight(to_tsvector(name), 'A')\n" +
-            "      || setweight(to_tsvector(description), 'D'),\n" +
-            "      plainto_tsquery(?)) AS rank\n" +
-            "FROM capability\n" +
-            "WHERE\n" +
-            "  setweight(to_tsvector(name), 'A')\n" +
-            "  || setweight(to_tsvector(description), 'D')\n" +
-            "  @@ plainto_tsquery(?)\n" +
-            "ORDER BY rank DESC\n" +
-            "LIMIT 10;\n";
-
-
-    private static final String SEARCH_QUERY_MARIADB
-            = "SELECT * FROM capability\n"
-            + " WHERE\n"
-            + "  MATCH(name, description)\n"
-            + "  AGAINST (?)\n"
-            + " LIMIT 20";
-
-
-    private final DSLContext dsl;
-
-
-    private final RecordMapper<Record, Capability> capabilityMapper = r -> {
+    public static final RecordMapper<Record, Capability> capabilityMapper = r -> {
         CapabilityRecord record = r.into(CapabilityRecord.class);
         return ImmutableCapability.builder()
                 .id(record.getId())
@@ -86,6 +60,9 @@ public class CapabilityDao {
     };
 
 
+    private final DSLContext dsl;
+
+
     @Autowired
     public CapabilityDao(DSLContext dsl) {
         this.dsl = dsl;
@@ -97,21 +74,6 @@ public class CapabilityDao {
                 .select()
                 .from(CAPABILITY)
                 .fetch(capabilityMapper);
-    }
-
-
-    public List<Capability> search(String query) {
-        if (dsl.dialect() == SQLDialect.POSTGRES) {
-            Result<Record> records = dsl.fetch(SEARCH_QUERY_POSTGRES, query, query);
-            return records.map(capabilityMapper);
-        }
-        if (dsl.dialect() == SQLDialect.MARIADB) {
-            Result<Record> records = dsl.fetch(SEARCH_QUERY_MARIADB, query);
-            return records.map(capabilityMapper);
-        }
-
-        LOG.error("Could not find full text query for database dialect: " + dsl.dialect());
-        return Collections.emptyList();
     }
 
 
@@ -139,7 +101,7 @@ public class CapabilityDao {
 
 
     public List<Capability> findByAppIds(Long[] appIds) {
-        return dsl.selectDistinct(CAPABILITY.fields())
+        return dsl.select(CAPABILITY.fields())
                 .from(CAPABILITY)
                 .innerJoin(APP_CAPABILITY)
                 .on(APP_CAPABILITY.CAPABILITY_ID.eq(CAPABILITY.ID))

@@ -9,11 +9,10 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from 'lodash';
-import angular from 'angular';
-
-import { toRef, loadDataFlows, loadDataTypes, loadAppAuthSources, loadOrgUnitAuthSources } from './registration-utils';
-import { prepareSlopeGraph } from './directives/slope-graph/slope-graph-utils';
+import _ from "lodash";
+import angular from "angular";
+import {toRef, loadDataFlows, loadDataTypes, loadAppAuthSources, loadOrgUnitAuthSources} from "./registration-utils";
+import {prepareSlopeGraph} from "./directives/slope-graph/slope-graph-utils";
 
 
 function controller(application,
@@ -167,7 +166,6 @@ function controller(application,
         const [added, removed] = _.chain(model.selectedTypes)
             .filter(st => st.selected !== st.original)
             .partition('selected')
-            .tap(t => console.log('tap', t))
             .value();
 
         const command = {

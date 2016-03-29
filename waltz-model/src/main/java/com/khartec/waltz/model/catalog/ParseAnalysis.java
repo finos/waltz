@@ -22,14 +22,11 @@ import org.immutables.value.Value;
 import java.util.List;
 
 
-/**
- * Created by dwatkins on 04/12/2015.
- */
 @Value.Immutable
 public abstract class ParseAnalysis {
 
     public abstract char quoteChar();
-    public abstract char delimeterChar();
+    public abstract char delimiterChar();
 
     public abstract List<Integer> fieldCounts();
     

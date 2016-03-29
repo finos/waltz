@@ -95,6 +95,7 @@ public class EndUserAppMaker {
                 record.setLifecyclePhase(randomPick(LifecyclePhase.values()).name());
                 record.setOrganisationalUnitId(ouId);
 
+                record.setId(Long.valueOf(i));
                 record.insert();
             }
         });

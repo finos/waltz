@@ -5,7 +5,7 @@
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li><a ui-sref="main.capabilities.list">Capabilities</a></li>
-            <li>{{ ctrl.capability.name }}</li>
+            <li ng-bind="ctrl.capability.name"></li>
         </ol>
     </waltz-page-header>
 

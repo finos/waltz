@@ -6,26 +6,26 @@
                  on-selection="ctrl.onSelection(node, selected)"
                  selected-nodes="ctrl.selectedNodes"
                  options="ctrl.treeOptions">
-            <span>
+        <span>
 
-                <span ng-bind="node.name"></span>
+            <span ng-bind="node.name"></span>
 
-                <waltz-icon name="star"
-                            fixed-width="true"
-                            ng-if='ctrl.isPrimary(node.id)'>
-                </waltz-icon>
+            <waltz-icon name="star"
+                        fixed-width="true"
+                        ng-if='ctrl.isPrimary(node.id)'>
+            </waltz-icon>
 
-                <span ng-if="ctrl.showBulkControls(node)">
-                    <a href title="select all"
-                       ng-click="ctrl.selectAll(node, $event)">
-                        <waltz-icon name="plus-square-o"></waltz-icon>
-                    </a>
-                    <a href title="deselect all"
-                       ng-click="ctrl.deselectAll(node, $event)">
-                        <waltz-icon name="minus-square-o"></waltz-icon>
-                    </a>
-                </span>
-
+            <span ng-if="ctrl.hasChildren(node)">
+                <a href title="select all"
+                   ng-click="ctrl.selectAll(node, $event)">
+                    <waltz-icon name="plus-square-o"></waltz-icon>
+                </a>
+                <a href title="deselect all"
+                   ng-click="ctrl.deselectAll(node, $event)">
+                    <waltz-icon name="minus-square-o"></waltz-icon>
+                </a>
             </span>
+
+        </span>
     </treecontrol>
 </div>

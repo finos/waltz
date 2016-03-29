@@ -24,4 +24,12 @@ public class ObjectUtilities {
         return x;
     };
 
+
+    public static <T> T  firstNotNull(T... ts) {
+        for (T t : ts) {
+            if (t != null) { return t; }
+        }
+        return null;
+    }
+
 }

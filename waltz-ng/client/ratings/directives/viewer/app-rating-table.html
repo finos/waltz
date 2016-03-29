@@ -22,7 +22,7 @@
                 </a>
             </th>
             <td ng-repeat="app in ctrl.applications"
-                class="rating-cell rating-{{ ctrl.lookupCell(app.id, capability.id) }}">
+                class="rating-cell rating-{{ ctrl.determineRating(app.id, capability.id) }}">
                 <div>
                     <!-- spacer -->
                 </div>

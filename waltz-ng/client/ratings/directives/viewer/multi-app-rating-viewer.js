@@ -1,4 +1,3 @@
-
 const BINDINGS = {
     applications: '=',
     ratings: '=',
@@ -11,9 +10,6 @@ const BINDINGS = {
 
 function controller() {
 }
-
-
-controller.$inject = ['$scope'];
 
 
 export default () => ({

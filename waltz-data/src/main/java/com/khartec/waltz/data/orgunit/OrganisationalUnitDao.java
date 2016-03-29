@@ -22,7 +22,10 @@ import com.khartec.waltz.model.orgunit.ImmutableOrganisationalUnit;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.model.orgunit.OrganisationalUnitKind;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
+import org.jooq.SQLDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,30 +49,6 @@ import static java.util.Collections.emptyList;
 public class OrganisationalUnitDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrganisationalUnitDao.class);
-
-
-    private static final String SEARCH_QUERY_POSTGRES = "SELECT\n" +
-            "  *,\n" +
-            "  ts_rank_cd(\n" +
-            "      setweight(to_tsvector(name), 'A')\n" +
-            "      || setweight(to_tsvector(description), 'D'),\n" +
-            "      plainto_tsquery(?)) AS rank\n" +
-            "FROM organisational_unit\n" +
-            "WHERE\n" +
-            "  setweight(to_tsvector(name), 'A')\n" +
-            "  || setweight(to_tsvector(description), 'D')\n" +
-            "  @@ plainto_tsquery(?)\n" +
-            "ORDER BY rank DESC\n" +
-            "LIMIT 10;\n";
-
-
-    private static final String SEARCH_QUERY_MARIADB
-            = "SELECT * FROM organisational_unit\n"
-            + " WHERE\n"
-            + "  MATCH(name, description)\n"
-            + "  AGAINST (?)\n"
-            + " LIMIT 20";
-
 
 
     public static final RecordMapper<Record, OrganisationalUnit> recordMapper = record -> {
@@ -194,20 +173,6 @@ public class OrganisationalUnitDao {
         }
     }
 
-
-    public List<OrganisationalUnit> search(String query) {
-        if (dsl.dialect() == SQLDialect.POSTGRES) {
-            Result<Record> records = dsl.fetch(SEARCH_QUERY_POSTGRES, query, query);
-            return records.map(recordMapper);
-        }
-        if (dsl.dialect() == SQLDialect.MARIADB) {
-            Result<Record> records = dsl.fetch(SEARCH_QUERY_MARIADB, query);
-            return records.map(recordMapper);
-        }
-
-        LOG.error("Could not find full text query for database dialect: " + dsl.dialect());
-        return emptyList();
-    }
 
     @Override
     public String toString() {

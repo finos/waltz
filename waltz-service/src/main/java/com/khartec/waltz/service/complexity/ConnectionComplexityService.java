@@ -1,12 +1,8 @@
 package com.khartec.waltz.service.complexity;
 
 import com.khartec.waltz.data.complexity.ConnectionComplexityDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.complexity.ComplexityScore;
 import com.khartec.waltz.model.tally.LongTally;
-import org.jooq.Record1;
-import org.jooq.Select;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +10,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.model.complexity.ComplexityUtilities.tallyToComplexityScore;
-import static com.khartec.waltz.model.utils.IdUtilities.toIdArray;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 @Service
 public class ConnectionComplexityService {

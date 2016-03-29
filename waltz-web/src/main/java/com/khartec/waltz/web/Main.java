@@ -79,13 +79,14 @@ public class Main {
     public void start(ServerMode mode) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
-       new StaticResourcesEndpoint(mode).register();
-
         Map<String, Endpoint> endpoints = ctx.getBeansOfType(Endpoint.class);
         endpoints.forEach((name, endpoint) -> {
             LOG.info("Registering Endpoint: {}", name);
             endpoint.register();
         });
+
+
+        new StaticResourcesEndpoint().register();
 
         LOG.info("Completed endpoint registration");
 

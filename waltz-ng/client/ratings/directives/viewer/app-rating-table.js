@@ -1,7 +1,5 @@
-import _ from 'lodash';
-import d3 from 'd3';
+import d3 from "d3";
 
-import { perhaps } from '../../../common';
 
 const BINDINGS = {
     applications: '=',
@@ -11,21 +9,36 @@ const BINDINGS = {
 };
 
 
-function controller($scope) {
+/**
+ * Convert raw ratings into a nested
+ * structure similar to:
+ *
+ * { appId -> cabilityId -> measurable -> [rag] }
+ *
+ * Note that the final rag will always be a single value, however
+ * d3.nest() will always wrap that in an array.
+ *
+ * @param ratings
+ * @returns {*}
+ */
+function perpareRatingData(ratings) {
+    return d3.nest()
+        .key(d => d.parent.id)
+        .key(d => d.capability.id)
+        .key(d => d.measurable.code)
+        .map(ratings);
+}
 
+
+function controller($scope) {
     const vm = this;
 
     $scope.$watch('ctrl.ratings', (ratings => {
         if (!ratings) return;
-        vm.ratingMap = d3.nest()
-                .key(d => d.parent.id)
-                .key(d => d.capability.id)
-                .key(d => d.measurable.code)
-                .map(ratings);
+        vm.ratingMap = perpareRatingData(ratings);
     }));
 
-    vm.lookupCell = (appId, capId) => vm.colorStrategy.fn(appId, capId, vm.ratingMap);
-
+    vm.determineRating = (appId, capId) => vm.colorStrategy.fn(appId, capId, vm.ratingMap);
 }
 
 controller.$inject = ['$scope'];

@@ -61,6 +61,9 @@ public class DIConfiguration {
     @Value("${database.pool.min?:2}")
     private int dbPoolMin;
 
+    @Value("${jooq.dialect}")
+    private String dialect;
+
 
     @Bean
     public DataSource dataSource() {
@@ -79,9 +82,15 @@ public class DIConfiguration {
     @Bean
     @Autowired
     public DSLContext dsl(DataSource dataSource) {
+        try {
+            SQLDialect.valueOf(dialect);
+        } catch (IllegalArgumentException iae) {
+            System.err.println("Cannot parse sql dialect: "+dialect);
+            throw iae;
+        }
         return DSL.using(
                 dataSource,
-                SQLDialect.MARIADB,
+                SQLDialect.valueOf(dialect),
                 new Settings().withRenderFormatted(true));
     }
 

@@ -17,9 +17,6 @@
 
 package com.khartec.waltz.model;
 
-/**
- * Created by dwatkins on 27/08/2015.
- */
 public enum Severity {
 
     INFORMATION,

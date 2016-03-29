@@ -58,7 +58,7 @@ public class IdUtilities {
 
     /**
      * If the given id provider has an id of Optional.empty then
-     * throw an IllegarlArgumentException with the given message.
+     * throw an IllegalArgumentException with the given message.
      * <br>
      * Returns .
      * @param idProvider

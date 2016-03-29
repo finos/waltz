@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.data.orgunit;
 
+import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.*;
 
@@ -24,10 +25,9 @@ import java.util.List;
 
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static org.jooq.impl.DSL.*;
-import static org.jooq.impl.DSL.select;
 
 
-public class OrganisationalUnitDaoPostgresHelper {
+public class OrganisationalUnitDaoPostgresHelper implements DatabaseVendorSpecific {
 
 
     private static final Table<Record> orgTree = table(name("orgTree"));

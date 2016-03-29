@@ -10,16 +10,20 @@
  *
  */
 
+const BINDINGS = {
+    name: '@',
+    icon: '@',
+    small: '@'
+};
 
 export default () => ({
     restrict: 'E',
     replace: true,
     template: require('./page-header.html'),
-    scope: {
-        name: '@',
-        icon: '@',
-        small: '@'
-    },
+    scope: {},
+    bindToController: BINDINGS,
+    controller: () => {},
+    controllerAs: 'ctrl',
     transclude: true
 });
 

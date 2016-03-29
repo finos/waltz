@@ -1,0 +1,13 @@
+.multi-app-rating-viewer-popup {
+    position: absolute;
+    width: 45%;
+    top:-20px;
+    right: 8px;
+    background: #fafafa;
+    opacity: 0.95;
+    border: 2px solid #eee;
+    padding: 10px;
+    border-radius: 3px;
+    z-index: 100;
+    @include box-shadow(4px, 4px, 4px, $waltz-border-color);
+}

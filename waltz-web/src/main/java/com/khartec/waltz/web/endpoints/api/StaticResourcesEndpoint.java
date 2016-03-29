@@ -18,49 +18,83 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.ServerMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.Request;
+import spark.Spark;
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static spark.SparkBase.externalStaticFileLocation;
-import static spark.SparkBase.staticFileLocation;
+import static com.khartec.waltz.common.IOUtilities.copyStream;
+import static com.khartec.waltz.web.WebUtilities.getMimeType;
+import static java.lang.String.format;
 
 public class StaticResourcesEndpoint implements Endpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(StaticResourcesEndpoint.class);
 
-    private final ServerMode mode;
-
-
-    public StaticResourcesEndpoint(ServerMode mode) {
-        checkNotNull(mode, "Mode cannot be null");
-        this.mode = mode;
-    }
+    private final ClassLoader classLoader = StaticResourcesEndpoint.class
+            .getClassLoader();
 
 
     @Override
     public void register() {
-        LOG.debug("Registering static resources for mode {}", mode);
+        LOG.debug("Registering static resources");
 
-        if (mode == ServerMode.DEPLOY) {
-            staticFileLocation("/static");
-        } else if (mode == ServerMode.DEV) {
-            String path = new File("waltz-ng/dist").getAbsolutePath();
-            LOG.debug("Will be looking for static resources in {}", path);
-            System.out.println("Will be looking for static resources in " + path);
-            externalStaticFileLocation(path);
+        Spark.get("/*", (request, response) -> {
+
+            String resolvedPath = resolvePath(request);
+            if (resolvedPath == null) {
+                return null;
+            }
+
+            try (
+                InputStream resourceAsStream = classLoader.getResourceAsStream(resolvedPath);
+            ) {
+                if (resourceAsStream == null) {
+                    return null;
+                } else {
+                    String message = format("Serving %s in response to request for %s", resolvedPath, request.pathInfo());
+                    LOG.info(message);
+
+                    response.type(getMimeType(resolvedPath));
+                    OutputStream out = response
+                            .raw()
+                            .getOutputStream();
+                    copyStream(resourceAsStream, out);
+                    out.flush();
+
+                    return new Object(); // indicate we have handled the request
+                }
+            } catch (Exception e) {
+                LOG.warn("Encountered error when attempting to serve: "+resolvedPath, e);
+                return null;
+            }
+        });
+    }
+
+
+    private String resolvePath(Request request) {
+        String path = request.pathInfo().replaceFirst("\\/", "");
+        String resourcePath = path.length() > 0 ? ("static/" + path) : "static/index.html";
+
+        URL resource = classLoader.getResource(resourcePath);
+
+        if (resource == null) {
+            return null;
         }
+
+        boolean isDirectory = resource
+                .getPath()
+                .endsWith("/");
+
+        String resolvedPath = isDirectory
+                ? resourcePath + "/index.html"
+                : resourcePath;
+
+        return resolvedPath;
     }
 
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("StaticResourcesEndpoint{");
-        sb.append("mode=").append(mode);
-        sb.append('}');
-        return sb.toString();
-    }
 }

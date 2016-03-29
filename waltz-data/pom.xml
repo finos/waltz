@@ -25,11 +25,18 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.hale</groupId>
+            <artifactId>waltz-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- Database -->
 
         <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
+            <groupId>${jdbc.group}</groupId>
+            <artifactId>${jdbc.artifact}</artifactId>
+            <version>${jdbc.version}</version>
         </dependency>
 
         <dependency>
@@ -45,25 +52,23 @@
 
 
         <dependency>
-            <groupId>org.jooq</groupId>
+            <groupId>${jooq.group}</groupId>
             <artifactId>jooq</artifactId>
-            <version>3.7.0</version>
         </dependency>
         <dependency>
-            <groupId>org.jooq</groupId>
+            <groupId>${jooq.group}</groupId>
             <artifactId>jooq-meta</artifactId>
-            <version>3.7.0</version>
         </dependency>
         <dependency>
-            <groupId>org.jooq</groupId>
+            <groupId>${jooq.group}</groupId>
             <artifactId>jooq-codegen</artifactId>
-            <version>3.7.0</version>
         </dependency>
 
     </dependencies>
 
     <build>
         <plugins>
+            <!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
@@ -82,12 +87,12 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
             <plugin>
 
                 <!-- Specify the maven code generator plugin -->
-                <groupId>org.jooq</groupId>
+                <groupId>${jooq.group}</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
-                <version>3.7.0</version>
 
                 <!-- The plugin should hook into the generate goal -->
                 <executions>
@@ -100,9 +105,9 @@
 
                 <dependencies>
                     <dependency>
-                        <groupId>org.mariadb.jdbc</groupId>
-                        <artifactId>mariadb-java-client</artifactId>
-                        <version>1.3.2</version>
+                        <groupId>${jdbc.group}</groupId>
+                        <artifactId>${jdbc.artifact}</artifactId>
+                        <version>${jdbc.version}</version>
                     </dependency>
                 </dependencies>
 
@@ -112,18 +117,17 @@
 
                     <!-- JDBC connection parameters -->
                     <jdbc>
-                        <driver>org.mariadb.jdbc.Driver</driver>
+                        <driver>${jdbc.driver}</driver>
                         <url>${database.url}</url>
                         <user>${database.user}</user>
                         <password>${database.password}</password>
-
                     </jdbc>
 
 
                     <!-- Generator parameters -->
                     <generator>
                         <database>
-                            <name>org.jooq.util.mariadb.MariaDBDatabase</name>
+                            <name>${jooq.database}</name>
                             <includes>.*</includes>
                             <excludes></excludes>
                             <inputSchema>${database.schema}</inputSchema>

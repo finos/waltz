@@ -20,12 +20,13 @@ package com.khartec.waltz.service.application;
 import com.khartec.waltz.data.application.AppAliasDao;
 import com.khartec.waltz.data.application.AppTagDao;
 import com.khartec.waltz.data.application.ApplicationDao;
+import com.khartec.waltz.data.application.search.ApplicationSearchDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.application.AppRegistrationRequest;
 import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
+import com.khartec.waltz.model.tally.Tally;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,22 +52,26 @@ public class ApplicationService {
     private final OrganisationalUnitDao orgUnitDao;
     private final AppTagDao appTagDao;
     private final AppAliasDao appAliasDao;
+    private final ApplicationSearchDao appSearchDao;
 
 
     @Autowired
-    public ApplicationService(ApplicationDao appDao, 
+    public ApplicationService(ApplicationDao appDao,
                               AppTagDao appTagDao,
                               AppAliasDao appAliasDao,
-                              OrganisationalUnitDao orgUnitDao) {
+                              OrganisationalUnitDao orgUnitDao,
+                              ApplicationSearchDao appSearchDao) {
         checkNotNull(appDao, "appDao must not be null");
         checkNotNull(appTagDao, "appTagDao must not be null");
         checkNotNull(appAliasDao, "appAliasDao must not be null");
         checkNotNull(orgUnitDao, "orgUnitDao must not be null");
-        
+        checkNotNull(appSearchDao, "appSearchDao must not be null");
+
         this.applicationDao = appDao;
         this.appTagDao = appTagDao;
         this.appAliasDao = appAliasDao;
         this.orgUnitDao = orgUnitDao;
+        this.appSearchDao = appSearchDao;
     }
 
 
@@ -97,7 +102,7 @@ public class ApplicationService {
 
 
     public List<Application> search(String query) {
-        return applicationDao.search(query);
+        return appSearchDao.search(query);
     }
 
 

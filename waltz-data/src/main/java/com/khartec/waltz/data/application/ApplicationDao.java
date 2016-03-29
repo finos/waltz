@@ -18,14 +18,15 @@
 package com.khartec.waltz.data.application;
 
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.tally.ImmutableLongTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ApplicationRecord;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -33,7 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -151,47 +153,6 @@ public class ApplicationDao {
     }
 
 
-    private static final String SEARCH_POSTGRES
-            = "SELECT *, "
-            + " ts_rank_cd(setweight(to_tsvector(name), 'A') "
-            + "     || setweight(to_tsvector(description), 'D') "
-            + "     || setweight(to_tsvector(coalesce(asset_code, '')), 'A') "
-            + "     || setweight(to_tsvector(coalesce(parent_asset_code, '')), 'A'), "
-            + "     plainto_tsquery(?)"
-            + " ) AS rank"
-            + " FROM application"
-            + " WHERE setweight(to_tsvector(name), 'A') "
-            + "     || setweight(to_tsvector(description), 'D') "
-            + "     || setweight(to_tsvector(coalesce(asset_code, '')), 'A') "
-            + "     || setweight(to_tsvector(coalesce(parent_asset_code, '')), 'A') "
-            + "     @@ plainto_tsquery(?)"
-            + " ORDER BY rank DESC"
-            + " LIMIT 20";
-
-
-    private static final String SEARCH_MARIADB
-            = "SELECT * FROM application\n"
-            + " WHERE\n"
-            + "  MATCH(name, description, asset_code, parent_asset_code)\n"
-            + "  AGAINST (?)\n"
-            + " LIMIT 20";
-
-
-    public List<Application> search(String query) {
-        if (dsl.dialect() == SQLDialect.POSTGRES) {
-            Result<Record> records = dsl.fetch(SEARCH_POSTGRES, query, query);
-            return records.map(applicationRecordMapper);
-        }
-        if (dsl.dialect() == SQLDialect.MARIADB) {
-            Result<Record> records = dsl.fetch(SEARCH_MARIADB, query);
-            return records.map(applicationRecordMapper);
-        }
-
-        LOG.error("Could not find full text query for database dialect: " + dsl.dialect());
-        return Collections.emptyList();
-    }
-
-
     public AppRegistrationResponse registerApp(AppRegistrationRequest request) {
 
         checkNotEmptyString(request.name(), "Cannot register app with no name");
@@ -208,6 +169,7 @@ public class ApplicationDao {
         record.setKind(request.kind().name());
         record.setLifecyclePhase(request.lifecyclePhase().name());
         record.setOverallRating(request.overallRating().name());
+        record.setUpdatedAt(Timestamp.from(Instant.now()));
 
         try {
             int count = record.insert();
@@ -242,7 +204,6 @@ public class ApplicationDao {
 
         ApplicationRecord record = dsl.newRecord(APPLICATION);
 
-        record.setId(application.id().get());
         record.setName(application.name());
         record.setDescription(application.description());
         record.setAssetCode(application.assetCode().orElse(""));
@@ -253,7 +214,9 @@ public class ApplicationDao {
         record.setOverallRating(application.overallRating().name());
         record.setProvenance(application.provenance());
 
-        return record.update();
+        Condition condition = APPLICATION.ID.eq(application.id().get());
+
+        return dsl.executeUpdate(record, condition);
     }
 
 }
