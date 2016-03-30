@@ -53,10 +53,7 @@ public class EndpointUtilities {
      * @param <T>
      */
     public static <T> void getForDatum(String path, DatumRoute<T> handler) {
-        Spark.get(path, (request, response) -> {
-            response.type(TYPE_JSON);
-            return handler.apply(request, response);
-        }, transformer);
+        Spark.get(path, wrapDatumHandler(handler), transformer);
     }
 
 
@@ -73,11 +70,12 @@ public class EndpointUtilities {
         Spark.delete(path, wrapListHandler(handler), transformer);
     }
 
+    public static <T> void deleteForDatum(String path, DatumRoute<T> handler) {
+        Spark.delete(path, wrapDatumHandler(handler), transformer);
+    }
+
     public static <T> void postForDatum(String path, DatumRoute<T> handler) {
-        Spark.post(path, (request, response) -> {
-            response.type(TYPE_JSON);
-            return handler.apply(request, response);
-        }, transformer);
+        Spark.post(path, wrapDatumHandler(handler), transformer);
     }
 
 
@@ -85,6 +83,13 @@ public class EndpointUtilities {
     // -- helpers ---
 
     private static <T> Route wrapListHandler(ListRoute<T> handler) {
+        return (request, response) -> {
+            response.type(TYPE_JSON);
+            return handler.apply(request, response);
+        };
+    }
+
+    private static <T> Route wrapDatumHandler(DatumRoute<T> handler) {
         return (request, response) -> {
             response.type(TYPE_JSON);
             return handler.apply(request, response);

@@ -20,6 +20,7 @@ package com.khartec.waltz.jobs;
 import com.khartec.waltz.model.user.ImmutableLoginRequest;
 import com.khartec.waltz.model.user.ImmutableUserRegistrationRequest;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.service.user.UserService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -29,6 +30,7 @@ public class UserHarness {
     public static void main(String[] args) {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        UserRoleService userRoleService = ctx.getBean(UserRoleService.class);
         UserService userService = ctx.getBean(UserService.class);
 
 //        registerUser(userService);
@@ -41,7 +43,7 @@ public class UserHarness {
         boolean authenticated = userService.authenticate(loginRequest);
         System.out.println(authenticated);
 
-        userService.findAllUsers().forEach(System.out::println);
+        userRoleService.findAllUsers().forEach(System.out::println);
     }
 
 

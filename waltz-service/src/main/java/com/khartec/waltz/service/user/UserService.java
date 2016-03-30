@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.SetUtilities.fromArray;
 
 
 @Service
@@ -38,18 +37,15 @@ public class UserService {
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
     private final UserDao userDao;
-    private final UserRoleDao userRoleDao;
     private final PasswordService passwordService;
 
 
     @Autowired
     public UserService(UserDao userDao, UserRoleDao userRoleDao, PasswordService passwordService) {
         checkNotNull(userDao, "userDao must not be null");
-        checkNotNull(userRoleDao, "userRoleDao must not be null");
         checkNotNull(passwordService, "passwordService must not be null");
 
         this.userDao = userDao;
-        this.userRoleDao = userRoleDao;
         this.passwordService = passwordService;
     }
 
@@ -75,43 +71,16 @@ public class UserService {
     }
 
 
-    public boolean hasRole(String userName, Role... requiredRoles) {
-        List<Role> userRoles = userRoleDao.getUserRoles(userName);
-        return userRoles.containsAll(fromArray(requiredRoles));
-    }
-
-
-    public List<String> findAllUserNames() {
-        return userDao.findAllUserNames();
-    }
-
-    public List<User> findAllUsers() {
-        return userRoleDao.findAllUsers();
-    }
-
-
-    public User findByUserName(String userName) {
-        return ImmutableUser.builder()
-                .userName(userName)
-                .addAllRoles(userRoleDao.getUserRoles(userName))
-                .build();
-    }
-
-
-    public boolean updateRoles(String userName, List<Role> newRoles) {
-        LOG.info("Updating roles for userName: "+userName + ", new roles: " + newRoles);
-        return userRoleDao.updateRoles(userName, newRoles);
-    }
-
-
     public boolean deleteUser(String userName) {
         LOG.info("Deleting user: " + userName);
-        userRoleDao.deleteUser(userName);
         userDao.deleteUser(userName);
         LOG.info("Deleted user: " + userName);
         return true;
     }
 
+    public List<String> findAllUserNames() {
+        return userDao.findAllUserNames();
+    }
 
     public boolean resetPassword(String userName, String password) {
         LOG.info("Resetting password for: " + userName );
@@ -119,8 +88,4 @@ public class UserService {
         return userDao.resetPassword(userName, hashedPassword) == 1;
     }
 
-
-    public List<Role> getUserRoles(String userName) {
-        return userRoleDao.getUserRoles(userName);
-    }
 }

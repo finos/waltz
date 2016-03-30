@@ -26,6 +26,7 @@ import com.khartec.waltz.model.user.ImmutableUser;
 import com.khartec.waltz.model.user.LoginRequest;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.model.user.User;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.service.user.UserService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,11 +55,14 @@ public class AuthEndpoint implements Endpoint {
             .build();
 
     private final UserService userService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public AuthEndpoint(UserService userService) {
+    public AuthEndpoint(UserService userService,
+                        UserRoleService userRoleService) {
         this.userService = userService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -71,7 +75,7 @@ public class AuthEndpoint implements Endpoint {
 
             if (userService.authenticate(login)) {
 
-                List<Role> roles = userService.getUserRoles(login.userName());
+                List<Role> roles = userRoleService.getUserRoles(login.userName());
 
                 Map<String, Object> claims = new MapBuilder()
                         .add("iss", "Waltz")

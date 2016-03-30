@@ -17,28 +17,28 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-    import com.khartec.waltz.model.EntityKind;
-    import com.khartec.waltz.model.ImmutableEntityReference;
-    import com.khartec.waltz.model.Severity;
-    import com.khartec.waltz.model.changelog.ChangeLog;
-    import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-    import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-    import com.khartec.waltz.model.user.Role;
-    import com.khartec.waltz.service.changelog.ChangeLogService;
-    import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
-    import com.khartec.waltz.service.user.UserService;
-    import com.khartec.waltz.web.ListRoute;
-    import com.khartec.waltz.web.WebUtilities;
-    import com.khartec.waltz.web.action.FieldChange;
-    import com.khartec.waltz.web.endpoints.Endpoint;
-    import org.slf4j.Logger;
-    import org.slf4j.LoggerFactory;
-    import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.stereotype.Service;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.changelog.ChangeLog;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.orgunit.OrganisationalUnit;
+import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
+import com.khartec.waltz.service.user.UserRoleService;
+import com.khartec.waltz.web.ListRoute;
+import com.khartec.waltz.web.WebUtilities;
+import com.khartec.waltz.web.action.FieldChange;
+import com.khartec.waltz.web.endpoints.Endpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-    import static com.khartec.waltz.common.Checks.checkNotNull;
-    import static com.khartec.waltz.web.WebUtilities.*;
-    import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -49,20 +49,20 @@ public class OrganisationUnitEndpoint implements Endpoint {
 
     private final OrganisationalUnitService service;
     private final ChangeLogService changeLogService;
-    private final UserService userService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
     public OrganisationUnitEndpoint(OrganisationalUnitService service,
                                     ChangeLogService changeLogService,
-                                    UserService userService) {
+                                    UserRoleService userRoleService) {
         checkNotNull(service, "service must not be null");
         checkNotNull(changeLogService, "changeLogService must not be null");
-        checkNotNull(userService, "userService must not be null");
+        checkNotNull(userRoleService, "userRoleService must not be null");
 
         this.service = service;
         this.changeLogService = changeLogService;
-        this.userService = userService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -87,7 +87,7 @@ public class OrganisationUnitEndpoint implements Endpoint {
         post(mkPath(BASE_URL, ":id", "description"),
                 (request, response) -> {
 
-                    requireRole(userService, request, Role.ORGUNIT_EDITOR);
+                    requireRole(userRoleService, request, Role.ORGUNIT_EDITOR);
 
                     ChangeLog changeLogEntry = ImmutableChangeLog.builder()
                             .parentReference(ImmutableEntityReference.builder()

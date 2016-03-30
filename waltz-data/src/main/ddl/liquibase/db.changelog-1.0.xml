@@ -1042,4 +1042,14 @@
         </sql>
     </changeSet>
 
+    <changeSet author="dwatkins"
+               id="20160330-120-1">
+        <addForeignKeyConstraint baseColumnNames="user_name"
+                                 baseTableName="user_role"
+                                 constraintName="user_role_user_name_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="user_name"
+                                 referencedTableName="user"/>
+    </changeSet>
+
 </databaseChangeLog>
