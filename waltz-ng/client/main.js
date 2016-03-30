@@ -82,6 +82,7 @@ const registrationFns = [
     require('./playpen'),
     require('./ratings'),
     require('./server-info'),
+    require('./settings'),
     require('./sidebar'),
     require('./static-panel'),
     require('./svg-diagram'),

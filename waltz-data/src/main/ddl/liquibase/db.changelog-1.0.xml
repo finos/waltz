@@ -1052,4 +1052,23 @@
                                  referencedTableName="user"/>
     </changeSet>
 
+
+    <changeSet author="dwatkins" id="20160330-120-2">
+        <createTable tableName="settings">
+            <column name="name"
+                    type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value"
+                    type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="kind"
+                    type="varchar(64)"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
