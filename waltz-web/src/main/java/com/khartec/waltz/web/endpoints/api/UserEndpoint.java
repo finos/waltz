@@ -30,6 +30,12 @@ import spark.Spark;
 import java.util.List;
 
 import static com.khartec.waltz.common.ListUtilities.map;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.readBody;
+import static com.khartec.waltz.web.WebUtilities.requireRole;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.post;
 import static spark.Spark.delete;
 import static spark.Spark.get;
 
@@ -38,7 +44,7 @@ import static spark.Spark.get;
 public class UserEndpoint implements Endpoint {
 
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "user");
+    private static final String BASE_URL = mkPath("api", "user");
 
     private final UserService userService;
 
@@ -51,44 +57,39 @@ public class UserEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        Spark.get(WebUtilities.mkPath(BASE_URL, "whoami"), ((request, response) -> request.attribute("user")), WebUtilities.transformer);
+        getForDatum(mkPath(BASE_URL, "whoami"), ((request, response) -> request.attribute("user")));
+        getForList(mkPath(BASE_URL), ((request, response) -> userService.findAllUsers()));
+        getForDatum(mkPath(BASE_URL, ":userName"), (request, response) -> userService.findByUserName(request.params("userName")));
 
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL), ((request, response) -> userService.findAllUsers()));
+        post(mkPath(BASE_URL, "new-user"), (request, response) -> {
+            requireRole(userService, request, Role.ADMIN);
 
-        EndpointUtilities.getForDatum(WebUtilities.mkPath(BASE_URL, ":userName"), (request, response) -> userService.findByUserName(request.params("userName")));
-
-        EndpointUtilities.post(WebUtilities.mkPath(BASE_URL, "new-user"), (request, response) -> {
-            WebUtilities.requireRole(userService, request, Role.ADMIN);
-
-            UserRegistrationRequest userRegRequest = WebUtilities.readBody(request, UserRegistrationRequest.class);
+            UserRegistrationRequest userRegRequest = readBody(request, UserRegistrationRequest.class);
             return userService.registerNewUser(userRegRequest) == 1;
         });
 
-        EndpointUtilities.post(WebUtilities.mkPath(BASE_URL, ":userName", "roles"), (request, response) -> {
-            WebUtilities.requireRole(userService, request, Role.ADMIN);
+        post(mkPath(BASE_URL, ":userName", "roles"), (request, response) -> {
+            requireRole(userService, request, Role.ADMIN);
 
             String userName = request.params("userName");
-            List<String> roles = (List<String>) WebUtilities.readBody(request, List.class);
+            List<String> roles = (List<String>) readBody(request, List.class);
             return userService.updateRoles(userName, map(roles, r -> Role.valueOf(r)));
         });
 
-        EndpointUtilities.post(WebUtilities.mkPath(BASE_URL, ":userName", "reset-password"), (request, response) -> {
-            WebUtilities.requireRole(userService, request, Role.ADMIN);
+        post(mkPath(BASE_URL, ":userName", "reset-password"), (request, response) -> {
+            requireRole(userService, request, Role.ADMIN);
 
             String userName = request.params("userName");
             String password = request.body().trim();
             return userService.resetPassword(userName, password);
         });
 
-        delete(WebUtilities.mkPath(BASE_URL, ":userName"), (request, response) -> {
-            WebUtilities.requireRole(userService, request, Role.ADMIN);
+        delete(mkPath(BASE_URL, ":userName"), (request, response) -> {
+            requireRole(userService, request, Role.ADMIN);
 
             String userName = request.params("userName");
             return userService.deleteUser(userName);
         });
     }
-
-
-
 
 }

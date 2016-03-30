@@ -143,7 +143,7 @@ public class WebUtilities {
 
 
     public static User getUser(Request request) {
-        return (User) request.attribute("user");
+        return (User) request.attribute("waltz-user");
     }
 
 

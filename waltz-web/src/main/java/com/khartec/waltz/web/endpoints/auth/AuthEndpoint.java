@@ -97,7 +97,7 @@ public class AuthEndpoint implements Endpoint {
             String authorizationHeader = request.headers("Authorization");
 
             if (authorizationHeader == null) {
-                request.attribute("user", ANONYMOUS_USER);
+                request.attribute("waltz-user", ANONYMOUS_USER);
             } else {
                 String token = authorizationHeader.replaceFirst("Bearer ", "");
                 Map<String, Object> claims = verifier.verify(token);
