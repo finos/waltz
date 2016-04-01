@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.user.ImmutableUser;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.model.user.User;
 import com.khartec.waltz.model.user.UserRegistrationRequest;
@@ -31,9 +32,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.common.ListUtilities.map;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readBody;
-import static com.khartec.waltz.web.WebUtilities.requireRole;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
@@ -67,7 +66,7 @@ public class UserEndpoint implements Endpoint {
 
         String whoAmIPath = mkPath(BASE_URL, "whoami");
         String findAllPath = mkPath(BASE_URL);
-        String findUserPath = mkPath(BASE_URL, ":userName");
+        String findUserPath = mkPath(BASE_URL, "name", ":userName");
 
 
         // -- routes
@@ -100,9 +99,17 @@ public class UserEndpoint implements Endpoint {
             return userService.deleteUser(userName);
         };
 
-        DatumRoute<Object> whoAmIRoute = (request, response) -> request.attribute("user");
+        DatumRoute<User> whoAmIRoute = (request, response) -> {
+            String username = getUsername(request);
+            return ImmutableUser.builder()
+                    .userName(username)
+                    .roles(userRoleService.getUserRoles(username))
+                    .build();
+        };
+
         ListRoute<User> findAllRoute = (request, response) -> userRoleService.findAllUsers();
         DatumRoute<User> findUserRoute = (request, response) -> userRoleService.findByUserName(request.params("userName"));
+
 
         // --- register
 
@@ -112,8 +119,8 @@ public class UserEndpoint implements Endpoint {
 
         deleteForDatum(deleteUserPath, deleteUserRoute);
 
-        getForDatum(findUserPath, findUserRoute);
         getForDatum(whoAmIPath, whoAmIRoute);
+        getForDatum(findUserPath, findUserRoute);
         getForList(findAllPath, findAllRoute);
     }
 

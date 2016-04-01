@@ -22,10 +22,8 @@ import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.involvement.InvolvementService;
-import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.WebUtilities;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
+import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

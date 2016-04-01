@@ -31,10 +31,9 @@ import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
+import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.action.AppChangeAction;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.WebUtilities;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +93,7 @@ public class ApplicationEndpoint implements Endpoint {
                     ImmutableChangeLog.builder()
                         .message(c.toDescription())
                         .severity(Severity.INFORMATION)
-                        .userId(WebUtilities.getUser(req).userName())
+                        .userId(WebUtilities.getUsername(req))
                         .parentReference(ImmutableEntityReference.builder()
                                 .kind(EntityKind.APPLICATION)
                                 .id(appId)
@@ -128,7 +127,7 @@ public class ApplicationEndpoint implements Endpoint {
             changeLogService.write(ImmutableChangeLog.builder()
                     .message("Registered new application: " + registrationRequest.name())
                     .severity(Severity.INFORMATION)
-                    .userId(WebUtilities.getUser(req).userName())
+                    .userId(WebUtilities.getUsername(req))
                     .parentReference(ImmutableEntityReference.builder()
                             .kind(EntityKind.APPLICATION)
                             .id(registrationResponse.id().get())

@@ -11,20 +11,22 @@
  *
  */
 
+let userPromise = null;
+
 function service(http, baseUrl, $auth, $q) {
+
 
     const BASE = `${baseUrl}/user`;
 
-    const whoami = (force) => {
-        if (force || !this.user) {
-            return http.get(`${BASE}/whoami`)
+
+    const whoami = (force = false) => {
+        if (force || userPromise == null) {
+            userPromise = http.get(`${BASE}/whoami`)
                 .then(result => {
-                    this.user = result.data;
-                    return this.user;
+                    return result.data;
                 });
-        } else {
-            return $q((resolve) => resolve(this.user));
         }
+        return userPromise;
     };
 
 
@@ -41,14 +43,22 @@ function service(http, baseUrl, $auth, $q) {
             .then(() => this.user = null);
 
 
+    const hasRole = ( { roles = [] }, role) => {
+        return _.contains(roles, role);
+    };
+
+
     whoami(true);
 
     return {
         whoami,
         login,
-        logout
+        logout,
+        hasRole
     };
 }
+
+
 
 service.$inject = ['$http', 'BaseApiUrl', '$auth', '$q'];
 

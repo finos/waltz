@@ -1,7 +1,7 @@
 <div>
 
     <!-- DISPLAY LOGGED IN USER -->
-    <div waltz-unless-role="ANONYMOUS">
+    <div waltz-if-anonymous="false">
         <waltz-icon style="color: #5d9757" name="user"></waltz-icon>
         <strong title="{{ ctrl.user.roles }}">
             {{ ctrl.user.userName }}
@@ -13,7 +13,7 @@
     </div>
 
     <!-- DISPLAY ANONYMOUS USER -->
-    <div waltz-has-role="ANONYMOUS"
+    <div waltz-if-anonymous="true"
          ng-init="showLogin=false">
         <waltz-icon style="color: #ff933c"
                     name="user">

@@ -19,12 +19,20 @@ package com.khartec.waltz.common;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
+import static com.khartec.waltz.common.Checks.checkNotNull;
 
 
 public class CollectionUtilities {
 
     public static <T> Optional<T> find(Predicate<T> pred, Collection<T> ts) {
+        checkNotNull(ts, "collection must not be null");
+        checkNotNull(pred, "predicate cannot be null");
+
         return ts.stream()
                 .filter(pred)
                 .findFirst();
@@ -32,9 +40,18 @@ public class CollectionUtilities {
 
 
     public static <T> T first(Collection<T> ts) {
-        Checks.checkNotNull(ts, "list must not be null");
-        Checks.checkFalse(ts.isEmpty(), "list cannot be empty");
+        checkNotEmpty(ts, "Cannot get first item from an empty collection");
 
         return ts.iterator().next();
+    }
+
+
+    public static <X, Y> Collection<Y> map(Collection<X> xs, Function<X, Y> fn) {
+        checkNotNull(xs, "collection must not be null");
+        checkNotNull(fn, "transformation fn cannot be null");
+
+        return xs.stream()
+                .map(x -> fn.apply(x))
+                .collect(Collectors.toList());
     }
 }

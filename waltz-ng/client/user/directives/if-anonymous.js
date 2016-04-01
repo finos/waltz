@@ -11,14 +11,17 @@
  */
 
 const BINDINGS = {
-    role: '@waltzHasRole'
+    shouldBeAnonymous: '=waltzIfAnonymous'
 };
 
 function controller(UserService) {
     const vm = this;
+
     UserService
         .whoami()
-        .then(user => vm.show = UserService.hasRole(user, vm.role));
+        .then(user => vm.show = vm.shouldBeAnonymous
+            ? user.userName === 'anonymous'
+            : user.userName != 'anonymous');
 
     vm.show = false;
 }

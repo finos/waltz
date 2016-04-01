@@ -2,7 +2,6 @@ package com.khartec.waltz.data.settings;
 
 import com.khartec.waltz.model.settings.ImmutableSetting;
 import com.khartec.waltz.model.settings.Setting;
-import com.khartec.waltz.model.settings.SettingKind;
 import com.khartec.waltz.schema.tables.records.SettingsRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -24,7 +23,7 @@ public class SettingsDao {
         return ImmutableSetting.builder()
                 .name(record.getName())
                 .value(record.getValue())
-                .kind(SettingKind.valueOf(record.getKind()))
+                .restricted(record.getRestricted())
                 .build();
     };
 
@@ -35,11 +34,10 @@ public class SettingsDao {
     }
 
 
-    public Collection<Setting> findByKind(SettingKind kind) {
+    public Collection<Setting> findAll() {
         return dsl
                 .select(SETTINGS.fields())
                 .from(SETTINGS)
-                .where(SETTINGS.KIND.eq(kind.name()))
                 .fetch(SETTINGS_MAPPER);
     }
 

@@ -20,9 +20,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.applicationcapability.CapabilityUsage;
 import com.khartec.waltz.service.capability_usage.CapabilityUsageService;
 import com.khartec.waltz.web.DatumRoute;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,21 +28,19 @@ import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 
-/**
- * Created by dwatkins on 27/12/2015.
- */
 @Service
 public class CapabilityUsageEndpoint implements Endpoint {
-
 
     private static final String BASE_URL = mkPath("api", "capability-usage");
 
     private final CapabilityUsageService capabilityUsageService;
 
+
     @Autowired
     public CapabilityUsageEndpoint(CapabilityUsageService capabilityUsageService) {
         this.capabilityUsageService = capabilityUsageService;
     }
+
 
     @Override
     public void register() {

@@ -39,6 +39,7 @@ export default (module) => {
     module
         .directive('waltzHasRole', require('./directives/has-role'))
         .directive('waltzUnlessRole', require('./directives/unless-role'))
+        .directive('waltzIfAnonymous', require('./directives/if-anonymous'))
         .service('UserService', require('./services/user-service'))
         .service('UserStore', require('./services/user-store'))
         .config(configureStates);

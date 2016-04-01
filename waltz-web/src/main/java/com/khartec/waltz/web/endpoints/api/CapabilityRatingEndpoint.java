@@ -74,7 +74,7 @@ public class CapabilityRatingEndpoint implements Endpoint {
             int changeCount = ratingService.update(appRatingChangesAction);
 
             changeLogService.write(ImmutableChangeLog.builder()
-                    .userId(getUser(request).userName())
+                    .userId(getUsername(request))
                     .message("Updated capability ratings ( " + changeCount + " )")
                     .parentReference(appRatingChangesAction.application())
                     .severity(Severity.INFORMATION)

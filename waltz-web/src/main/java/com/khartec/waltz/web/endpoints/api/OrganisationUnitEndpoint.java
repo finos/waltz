@@ -95,7 +95,7 @@ public class OrganisationUnitEndpoint implements Endpoint {
                                     .kind(EntityKind.ORG_UNIT)
                                     .build())
                             .message("Description updated")
-                            .userId(getUser(request).userName())
+                            .userId(getUsername(request))
                             .severity(Severity.INFORMATION)
                             .build();
 

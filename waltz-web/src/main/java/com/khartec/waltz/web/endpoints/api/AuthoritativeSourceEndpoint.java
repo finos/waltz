@@ -26,8 +26,8 @@ import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.WebUtilities;
+import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -91,7 +91,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
             ChangeLog log = ImmutableChangeLog.builder()
                     .message(msg)
                     .severity(Severity.INFORMATION)
-                    .userId(WebUtilities.getUser(request).userName())
+                    .userId(WebUtilities.getUsername(request))
                     .parentReference(authSource.parentReference())
                     .build();
 

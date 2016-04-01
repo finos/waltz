@@ -123,7 +123,7 @@ public class DataFlowsEndpoint implements Endpoint {
                     dataFlowUpdate.removedTypes());
 
             changeLogService.write(ImmutableChangeLog.builder()
-                    .userId(getUser(request).userName())
+                    .userId(getUsername(request))
                     .parentReference(dataFlowUpdate.source())
                     .severity(Severity.INFORMATION)
                     .message(message)
@@ -131,7 +131,7 @@ public class DataFlowsEndpoint implements Endpoint {
 
 
             changeLogService.write(ImmutableChangeLog.builder()
-                    .userId(getUser(request).userName())
+                    .userId(getUsername(request))
                     .parentReference(dataFlowUpdate.target())
                     .severity(Severity.INFORMATION)
                     .message(message)

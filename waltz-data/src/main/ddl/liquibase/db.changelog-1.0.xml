@@ -1063,12 +1063,28 @@
                     type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
-            <column name="kind"
-                    type="varchar(64)"
+            <column name="restricted"
+                    type="BOOLEAN"
                     defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
         </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160401-120-3">
+        <insert tableName="settings">
+            <column name="name" value="web.authentication"/>
+            <column name="value" value="waltz"/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160401-120-4">
+        <insert tableName="settings">
+            <column name="name" value="server.authentication.filter"/>
+            <column name="value" value="com.khartec.waltz.web.endpoints.auth.JWTAuthenticationFilter"/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
     </changeSet>
 
 </databaseChangeLog>

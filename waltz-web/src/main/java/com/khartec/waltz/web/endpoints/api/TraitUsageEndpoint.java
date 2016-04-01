@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.deleteForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
@@ -80,7 +78,7 @@ public class TraitUsageEndpoint implements Endpoint {
             changeLogService.write(ImmutableChangeLog.builder()
                     .severity(Severity.INFORMATION)
                     .parentReference(entityReference)
-                    .userId(getUser(request).userName())
+                    .userId(getUsername(request))
                     .message("Added trait: " + trait.name())
                     .build());
 
@@ -104,7 +102,7 @@ public class TraitUsageEndpoint implements Endpoint {
             changeLogService.write(ImmutableChangeLog.builder()
                     .severity(Severity.INFORMATION)
                     .parentReference(entityReference)
-                    .userId(getUser(request).userName())
+                    .userId(getUsername(request))
                     .message("Removed trait: "+ (trait == null ? traitId : trait.name()))
                     .build());
 

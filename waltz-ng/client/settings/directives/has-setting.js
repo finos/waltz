@@ -10,24 +10,31 @@
  *
  */
 
+import _ from 'lodash';
+
 const BINDINGS = {
-    role: '@waltzHasRole'
+    expr: '@waltzHasSetting'
 };
 
-function controller(UserService) {
+function controller(settingsStore) {
+
     const vm = this;
-    UserService
-        .whoami()
-        .then(user => vm.show = UserService.hasRole(user, vm.role));
+
+    settingsStore
+        .findAll()
+        .then(settings => {
+            const [name, value] = vm.expr.split(/\s*=\s*/);
+            vm.show = _.findWhere(settings, { name }).value == value;
+        });
 
     vm.show = false;
 }
 
-controller.$inject = ['UserService'];
+controller.$inject = ['SettingsStore'];
 
 
 export default () => ({
-    replace: true,
+    replace: false,
     restrict: 'A',
     transclude: true,
     scope: {},
