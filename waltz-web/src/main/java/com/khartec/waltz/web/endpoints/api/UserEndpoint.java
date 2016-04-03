@@ -17,15 +17,13 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.user.ImmutableUser;
-import com.khartec.waltz.model.user.Role;
-import com.khartec.waltz.model.user.User;
-import com.khartec.waltz.model.user.UserRegistrationRequest;
+import com.khartec.waltz.model.user.*;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.service.user.UserService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import com.khartec.waltz.web.endpoints.auth.AuthenticationUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -100,7 +98,14 @@ public class UserEndpoint implements Endpoint {
         };
 
         DatumRoute<User> whoAmIRoute = (request, response) -> {
+            if (AuthenticationUtilities.isAnonymous(request)) {
+                return UserUtilities.ANONYMOUS_USER;
+            }
+
             String username = getUsername(request);
+
+            userService.ensureExists(username);
+
             return ImmutableUser.builder()
                     .userName(username)
                     .roles(userRoleService.getUserRoles(username))

@@ -17,10 +17,11 @@
 
 package com.khartec.waltz.service.user;
 
-import com.khartec.waltz.common.exception.DuplicateKeyException;
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.user.UserDao;
 import com.khartec.waltz.data.user.UserRoleDao;
-import com.khartec.waltz.model.user.*;
+import com.khartec.waltz.model.user.LoginRequest;
+import com.khartec.waltz.model.user.UserRegistrationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,11 +52,6 @@ public class UserService {
 
 
     public int registerNewUser(UserRegistrationRequest request) {
-        String existingPassword = userDao.getPassword(request.userName());
-        if (existingPassword != null) {
-            throw new DuplicateKeyException("Cannot register "+request.userName()+" as already exists");
-        }
-
         LOG.info("Registering new user: "+ request.userName());
         String passwordHash = passwordService.hashPassword(request.password());
         return userDao.create(request.userName(), passwordHash);
@@ -88,4 +84,8 @@ public class UserService {
         return userDao.resetPassword(userName, hashedPassword) == 1;
     }
 
+    public void ensureExists(String username) {
+        Checks.checkNotEmptyString(username, "Cannot ensure an empty username exists");
+        userDao.create(username, passwordService.hashPassword("temp4321"));
+    }
 }

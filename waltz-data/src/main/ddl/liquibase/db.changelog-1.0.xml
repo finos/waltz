@@ -1087,4 +1087,18 @@
         </insert>
     </changeSet>
 
+    <changeSet author="dwatkins" id="20160402-120-5">
+        <addPrimaryKey columnNames="name"
+                       constraintName="settings_pkey"
+                       tableName="settings"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160402-120-6">
+        <insert tableName="settings">
+            <column name="name" value="web.devext.enabled"/>
+            <column name="value" value="false"/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

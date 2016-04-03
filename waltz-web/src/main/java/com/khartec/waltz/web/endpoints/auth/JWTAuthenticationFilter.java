@@ -1,14 +1,23 @@
 package com.khartec.waltz.web.endpoints.auth;
 
 import com.auth0.jwt.JWTVerifier;
-import spark.Filter;
+import com.khartec.waltz.service.settings.SettingsService;
 import spark.Request;
 import spark.Response;
 
 import java.util.Map;
 
 
-public class JWTAuthenticationFilter implements Filter {
+/**
+ * Authentication filter which verifies a jwt token.  We only care
+ * about the bearer name.
+ */
+public class JWTAuthenticationFilter extends WaltzFilter {
+
+    public JWTAuthenticationFilter(SettingsService settingsService) {
+        super(settingsService);
+    }
+
 
     @Override
     public void handle(Request request, Response response) throws Exception {

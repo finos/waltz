@@ -36,6 +36,7 @@ import spark.Filter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.khartec.waltz.common.MapUtilities.newHashMap;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -52,6 +53,7 @@ public class AuthenticationEndpoint implements Endpoint {
 
     private final UserService userService;
     private final UserRoleService userRoleService;
+    private final SettingsService settingsService;
     private final Filter filter;
 
 
@@ -61,23 +63,37 @@ public class AuthenticationEndpoint implements Endpoint {
                                   SettingsService settingsService) {
         this.userService = userService;
         this.userRoleService = userRoleService;
+        this.settingsService = settingsService;
 
         this.filter = settingsService
                 .getValue(NamedSettings.authenticationFilter)
-                .flatMap(className -> {
-                    try {
-                        LOG.info("Setting authentication filter to: " + className);
-                        Filter filter = (Filter) Class.forName(className).newInstance();
-                        return Optional.of(filter);
-                    } catch (Exception e) {
-                        LOG.error("Cannot instantiate authentication filter class: " + className, e);
-                        return Optional.empty();
-                    }
-                })
-                .orElseGet(() -> {
-                    LOG.info("Using default (jwt) authentication filter");
-                    return new JWTAuthenticationFilter();
-                });
+                .flatMap(className -> instantiateFilter(className))
+                .orElseGet(createDefaultFilter());
+    }
+
+
+    private Supplier<Filter> createDefaultFilter() {
+        return () -> {
+            LOG.info("Using default (jwt) authentication filter");
+            return new JWTAuthenticationFilter(settingsService);
+        };
+    }
+
+
+    private Optional<Filter> instantiateFilter(String className) {
+        try {
+            LOG.info("Setting authentication filter to: " + className);
+
+            Filter filter = (Filter) Class
+                    .forName(className)
+                    .getConstructor(SettingsService.class)
+                    .newInstance(settingsService);
+
+            return Optional.of(filter);
+        } catch (Exception e) {
+            LOG.error("Cannot instantiate authentication filter class: " + className, e);
+            return Optional.empty();
+        }
     }
 
 
@@ -87,11 +103,9 @@ public class AuthenticationEndpoint implements Endpoint {
         post(mkPath(BASE_URL, "login"), (request, response) -> {
 
             LoginRequest login = readBody(request, LoginRequest.class);
-
             if (userService.authenticate(login)) {
 
                 List<Role> roles = userRoleService.getUserRoles(login.userName());
-
                 Map<String, Object> claims = new MapBuilder()
                         .add("iss", "Waltz")
                         .add("sub", login.userName())
@@ -99,7 +113,6 @@ public class AuthenticationEndpoint implements Endpoint {
                         .add("displayName", login.userName())
                         .add("employeeId", login.userName())
                         .build();
-
                 JWTSigner signer = new JWTSigner(JWTUtilities.SECRET);
                 String token = signer.sign(claims);
 
