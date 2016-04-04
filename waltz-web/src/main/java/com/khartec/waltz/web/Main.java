@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import spark.Request;
 import spark.Response;
-import spark.SparkBase;
+import spark.Spark;
 
 import java.util.Map;
 
@@ -66,7 +66,7 @@ public class Main {
         System.out.println("----------------------------------------------------");
 
         if (sslEnabled) {
-            SparkBase.secure(home + "/.waltz/keystore.jks", "password", null, null);
+            Spark.secure(home + "/.waltz/keystore.jks", "password", null, null);
         }
 
         int listenPort = Integer.parseInt(listenPortStr);
