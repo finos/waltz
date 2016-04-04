@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from "lodash";
 
 
 const DEFAULT_OPTIONS = {
@@ -11,7 +11,8 @@ const DEFAULT_OPTIONS = {
 const BINDINGS = {
     costs: '=',
     options: '=?',
-    eventDispatcher: '=?'
+    eventDispatcher: '=?',
+    csvName: '@?'
 };
 
 
@@ -94,6 +95,7 @@ function prepareGridOptions(colDefinitions, options, uiGridConstants, $animate) 
     const gridOptions = {
         enableSorting: true,
         enableFiltering: true,
+        exporterMenuPdf: false,
         enableHorizontalScrollbar: uiGridConstants.scrollbars.NEVER,
         columnDefs: columns,
         data: [],
@@ -103,6 +105,12 @@ function prepareGridOptions(colDefinitions, options, uiGridConstants, $animate) 
     return gridOptions;
 }
 
+function setupExportOptions(options, csvName) {
+    Object.assign(options, {
+        enableGridMenu: true,
+        exporterCsvFilename: csvName || "asset_costs.csv"
+    });
+}
 
 function setupYearFilter(costs, uiGridConstants) {
     const yearOptions = _.chain(costs)
@@ -141,6 +149,8 @@ function controller(displayNameService, uiGridConstants, $scope, $animate) {
 
     const colDefinitions = prepareColumns(displayNameService, uiGridConstants);
     const gridOptions = prepareGridOptions(colDefinitions, options, uiGridConstants, $animate);
+
+    setupExportOptions(gridOptions, vm.csvName);
 
     const configureWithCosts = (costs) => {
         vm.gridOptions.data = costs;

@@ -1,4 +1,8 @@
 <div>
+    <pre>
+        csv-name='{{ ctrl.csvName }}'
+    </pre>
+
     <waltz-section name="Costs" id="costs-section">
         <div class="row">
             <div class="col-md-12" class="myChart">
@@ -26,6 +30,7 @@
                                             showAppName: true,
                                             showAssetCode: false
                                         }'
+                                        csv-name='{{ ctrl.csvName }}'
                                         costs='ctrl.assetCosts'>
                 </waltz-asset-cost-table>
             </div>

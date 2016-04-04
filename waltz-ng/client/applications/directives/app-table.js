@@ -10,20 +10,37 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
+import {
+    lifecyclePhaseDisplayNames,
+    applicationKindDisplayNames,
+    investmentRatingNames
+} from "../../common/services/display_names";
 
-import { lifecyclePhaseDisplayNames, applicationKindDisplayNames, investmentRatingNames }
-    from '../../common/services/display_names';
+
+const BINDINGS = {
+    applications: '=',
+    csvName: '@?'
+
+};
 
 
-function controller(uiGridConstants, $scope) {
+function controller(uiGridConstants, $scope, $animate) {
 
     const vm = this;
 
+    const csvName = angular.isDefined(vm.csvName) ? vm.csvName : 'applications.csv';
+
     vm.gridOptions = {
+        enableGridMenu: true,
+        exporterCsvFilename: csvName,
+        exporterMenuPdf: false,
         enableSorting: true,
         enableFiltering: true,
         enableHorizontalScrollbar: uiGridConstants.scrollbars.NEVER,
+        onRegisterApi: (gridApi) => {
+            $animate.enabled(gridApi.grid.element, false);
+        },
         columnDefs: [
             {
                 field: 'name',
@@ -64,7 +81,7 @@ function controller(uiGridConstants, $scope) {
     $scope.$watch('ctrl.applications', (apps) => vm.gridOptions.data = apps);
 }
 
-controller.$inject = ['uiGridConstants', '$scope'];
+controller.$inject = ['uiGridConstants', '$scope', '$animate'];
 
 
 export default () => {
@@ -73,9 +90,7 @@ export default () => {
         replace: true,
         template: require('./app-table.html'),
         scope: {},
-        bindToController: {
-            applications: '='
-        },
+        bindToController: BINDINGS,
         controllerAs: 'ctrl',
         controller
     };

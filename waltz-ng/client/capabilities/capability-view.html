@@ -52,11 +52,13 @@
     </waltz-complexity-section>
 
 
+
     <!-- COSTS -->
-    <waltz-asset-costs-section asset-costs="ctrl.assetCosts">
+    <waltz-asset-costs-section asset-costs="ctrl.assetCosts"
+                               csv-name="{{ ctrl.capability.name }}_asset_costs.csv">
     </waltz-asset-costs-section>
 
-
+    
     <!-- APPLICATIONS -->
     <waltz-section name="Applications"
                    small="( {{ ctrl.apps.length }} )">
@@ -70,7 +72,8 @@
                 Primary Applications
             </h4>
 
-            <waltz-app-table applications="ctrl.groupedApps.primaryApps">
+            <waltz-app-table applications="ctrl.groupedApps.primaryApps"
+                             csv-name="{{ctrl.capability.name}}_primary_apps.csv">
             </waltz-app-table>
         </div>
 
@@ -81,7 +84,8 @@
                 </waltz-icon>
                 Secondary Applications
             </h4>
-            <waltz-app-table applications="ctrl.groupedApps.secondaryApps"></waltz-app-table>
+            <waltz-app-table applications="ctrl.groupedApps.secondaryApps"
+                             csv-name="{{ctrl.capability.name}}_secondary_apps.csv"></waltz-app-table>
         </div>
 
         <div ng-if="ctrl.apps.length == 0">
