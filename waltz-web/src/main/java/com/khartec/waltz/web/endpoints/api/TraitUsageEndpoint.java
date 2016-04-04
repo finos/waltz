@@ -9,20 +9,17 @@ import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.trait.TraitService;
 import com.khartec.waltz.service.trait.TraitUsageService;
-import com.khartec.waltz.service.user.UserService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.deleteForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
@@ -34,18 +31,18 @@ public class TraitUsageEndpoint implements Endpoint {
     private final TraitUsageService traitUsageService;
     private final TraitService traitService;
     private final ChangeLogService changeLogService;
-    private final UserService userService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
     public TraitUsageEndpoint(TraitUsageService traitUsageService,
                               TraitService traitService,
                               ChangeLogService changeLogService,
-                              UserService userService) {
+                              UserRoleService userRoleService) {
         this.traitUsageService = traitUsageService;
         this.traitService = traitService;
         this.changeLogService = changeLogService;
-        this.userService = userService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -65,7 +62,7 @@ public class TraitUsageEndpoint implements Endpoint {
         ListRoute<TraitUsage> findByTraitIdRoute = (request, response) -> traitUsageService.findByTraitId(getId(request));
 
         ListRoute<TraitUsage> addTraitUsageRoute = (request, response) -> {
-            requireRole(userService, request, Role.APP_EDITOR);
+            requireRole(userRoleService, request, Role.APP_EDITOR);
             long traitId = readBody(request, Long.class);
             EntityReference entityReference = getEntityReference(request);
 
@@ -81,7 +78,7 @@ public class TraitUsageEndpoint implements Endpoint {
             changeLogService.write(ImmutableChangeLog.builder()
                     .severity(Severity.INFORMATION)
                     .parentReference(entityReference)
-                    .userId(getUser(request).userName())
+                    .userId(getUsername(request))
                     .message("Added trait: " + trait.name())
                     .build());
 
@@ -89,7 +86,7 @@ public class TraitUsageEndpoint implements Endpoint {
         };
 
         ListRoute<TraitUsage> removeTraitUsageRoute = (request, response) -> {
-            requireRole(userService, request, Role.APP_EDITOR);
+            requireRole(userRoleService, request, Role.APP_EDITOR);
             long traitId = getLong(request, "traitId");
             EntityReference entityReference = getEntityReference(request);
 
@@ -105,7 +102,7 @@ public class TraitUsageEndpoint implements Endpoint {
             changeLogService.write(ImmutableChangeLog.builder()
                     .severity(Severity.INFORMATION)
                     .parentReference(entityReference)
-                    .userId(getUser(request).userName())
+                    .userId(getUsername(request))
                     .message("Removed trait: "+ (trait == null ? traitId : trait.name()))
                     .build());
 

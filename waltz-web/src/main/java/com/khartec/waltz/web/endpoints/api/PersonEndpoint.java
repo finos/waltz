@@ -18,8 +18,8 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.service.person.PersonService;
-import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.WebUtilities;
+import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

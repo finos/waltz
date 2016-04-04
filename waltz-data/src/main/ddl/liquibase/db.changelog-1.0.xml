@@ -1042,4 +1042,63 @@
         </sql>
     </changeSet>
 
+    <changeSet author="dwatkins"
+               id="20160330-120-1">
+        <addForeignKeyConstraint baseColumnNames="user_name"
+                                 baseTableName="user_role"
+                                 constraintName="user_role_user_name_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="user_name"
+                                 referencedTableName="user"/>
+    </changeSet>
+
+
+    <changeSet author="dwatkins" id="20160330-120-2">
+        <createTable tableName="settings">
+            <column name="name"
+                    type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value"
+                    type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="restricted"
+                    type="BOOLEAN"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160401-120-3">
+        <insert tableName="settings">
+            <column name="name" value="web.authentication"/>
+            <column name="value" value="waltz"/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160401-120-4">
+        <insert tableName="settings">
+            <column name="name" value="server.authentication.filter"/>
+            <column name="value" value="com.khartec.waltz.web.endpoints.auth.JWTAuthenticationFilter"/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160402-120-5">
+        <addPrimaryKey columnNames="name"
+                       constraintName="settings_pkey"
+                       tableName="settings"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160402-120-6">
+        <insert tableName="settings">
+            <column name="name" value="web.devext.enabled"/>
+            <column name="value" value="false"/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

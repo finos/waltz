@@ -83,7 +83,7 @@ public class AppGroupEndpoint implements Endpoint {
 
 
         ListRoute<AppGroupSubscription> findGroupSubscriptionsRoute = (request, response) ->
-                appGroupService.findGroupSubscriptionsForUser(getUser(request).userName());
+                appGroupService.findGroupSubscriptionsForUser(getUsername(request));
 
 
         ListRoute<AppGroup> findPublicGroupsRoute = (request, response) ->
@@ -92,7 +92,7 @@ public class AppGroupEndpoint implements Endpoint {
 
         ListRoute<AppGroupSubscription> subscribeRoute = (request, response) -> {
             long groupId = getId(request);
-            String userId = getUser(request).userName();
+            String userId = getUsername(request);
 
             LOG.info("Subscribing {} to group: {}", userId, groupId);
             appGroupService.subscribe(userId, groupId);
@@ -105,13 +105,13 @@ public class AppGroupEndpoint implements Endpoint {
         ListRoute<AppGroupSubscription> unsubscribeRoute = (request, response) -> {
             long groupId = getId(request);
             LOG.info("Unsubscribing from group: {}", groupId);
-            appGroupService.unsubscribe(getUser(request).userName(), groupId);
+            appGroupService.unsubscribe(getUsername(request), groupId);
             return findGroupSubscriptionsRoute.apply(request, response);
         };
 
 
         ListRoute<AppGroupMember> addOwnerRoute = (request, response) -> {
-            String userId = getUser(request).userName();
+            String userId = getUsername(request);
             long groupId = getId(request);
             String ownerId = request.body();
 
@@ -124,7 +124,7 @@ public class AppGroupEndpoint implements Endpoint {
 
 
         ListRoute<AppGroupSubscription> deleteGroupRoute = (request, response) -> {
-            String userId = getUser(request).userName();
+            String userId = getUsername(request);
             long groupId = getId(request);
 
             LOG.warn("Deleting group: {}", groupId);
@@ -139,7 +139,7 @@ public class AppGroupEndpoint implements Endpoint {
             long groupId = getId(request);
             long applicationId = readBody(request, Long.class);
             LOG.info("Adding application: {}, to group: {} ", applicationId,  groupId);
-            return appGroupService.addApplication(getUser(request).userName(), groupId, applicationId);
+            return appGroupService.addApplication(getUsername(request), groupId, applicationId);
         };
 
 
@@ -147,25 +147,20 @@ public class AppGroupEndpoint implements Endpoint {
             long groupId = getId(request);
             long applicationId = getLong(request, "applicationId");
             LOG.info("Removing application: {}, from group: {} ", applicationId,  groupId);
-            return appGroupService.removeApplication(getUser(request).userName(), groupId, applicationId);
+            return appGroupService.removeApplication(getUsername(request), groupId, applicationId);
         };
 
 
         DatumRoute<AppGroupDetail> updateGroupOverviewRoute = (request, response) -> {
-            String userId = getUser(request).userName();
+            String userId = getUsername(request);
             AppGroup appGroup = readBody(request, AppGroup.class);
             return appGroupService.updateOverview(userId, appGroup);
         };
 
         DatumRoute<Long> createNewGroupRoute = (request, response) -> {
-            String userId = getUser(request).userName();
+            String userId = getUsername(request);
             return appGroupService.createNewGroup(userId);
         };
-
-
-
-
-
 
 
         getForList(findGroupSubscriptionsForUserPath, findGroupSubscriptionsRoute);

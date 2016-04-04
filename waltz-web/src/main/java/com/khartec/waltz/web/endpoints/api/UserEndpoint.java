@@ -17,78 +17,116 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.user.Role;
-import com.khartec.waltz.model.user.UserRegistrationRequest;
+import com.khartec.waltz.model.user.*;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.service.user.UserService;
+import com.khartec.waltz.web.DatumRoute;
+import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.WebUtilities;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
+import com.khartec.waltz.web.endpoints.auth.AuthenticationUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import spark.Spark;
 
 import java.util.List;
 
 import static com.khartec.waltz.common.ListUtilities.map;
-import static spark.Spark.delete;
-import static spark.Spark.get;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
 public class UserEndpoint implements Endpoint {
 
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "user");
+    private static final String BASE_URL = mkPath("api", "user");
 
     private final UserService userService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public UserEndpoint(UserService userService) {
+    public UserEndpoint(UserService userService, UserRoleService userRoleService) {
         this.userService = userService;
+        this.userRoleService = userRoleService;
     }
 
 
     @Override
     public void register() {
-        Spark.get(WebUtilities.mkPath(BASE_URL, "whoami"), ((request, response) -> request.attribute("user")), WebUtilities.transformer);
 
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL), ((request, response) -> userService.findAllUsers()));
+        // -- paths
 
-        EndpointUtilities.getForDatum(WebUtilities.mkPath(BASE_URL, ":userName"), (request, response) -> userService.findByUserName(request.params("userName")));
+        String newUserPath = mkPath(BASE_URL, "new-user");
+        String updateRolesPath = mkPath(BASE_URL, ":userName", "roles");
+        String resetPasswordPath = mkPath(BASE_URL, ":userName", "reset-password");
 
-        EndpointUtilities.post(WebUtilities.mkPath(BASE_URL, "new-user"), (request, response) -> {
-            WebUtilities.requireRole(userService, request, Role.ADMIN);
+        String deleteUserPath = mkPath(BASE_URL, ":userName");
 
-            UserRegistrationRequest userRegRequest = WebUtilities.readBody(request, UserRegistrationRequest.class);
+        String whoAmIPath = mkPath(BASE_URL, "whoami");
+        String findAllPath = mkPath(BASE_URL);
+        String findUserPath = mkPath(BASE_URL, "name", ":userName");
+
+
+        // -- routes
+
+        DatumRoute<Boolean> newUserRoute = (request, response) -> {
+            requireRole(userRoleService, request, Role.ADMIN);
+
+            UserRegistrationRequest userRegRequest = readBody(request, UserRegistrationRequest.class);
             return userService.registerNewUser(userRegRequest) == 1;
-        });
-
-        EndpointUtilities.post(WebUtilities.mkPath(BASE_URL, ":userName", "roles"), (request, response) -> {
-            WebUtilities.requireRole(userService, request, Role.ADMIN);
+        };
+        DatumRoute<Boolean> updateRolesRoute = (request, response) -> {
+            requireRole(userRoleService, request, Role.ADMIN);
 
             String userName = request.params("userName");
-            List<String> roles = (List<String>) WebUtilities.readBody(request, List.class);
-            return userService.updateRoles(userName, map(roles, r -> Role.valueOf(r)));
-        });
-
-        EndpointUtilities.post(WebUtilities.mkPath(BASE_URL, ":userName", "reset-password"), (request, response) -> {
-            WebUtilities.requireRole(userService, request, Role.ADMIN);
+            List<String> roles = (List<String>) readBody(request, List.class);
+            return userRoleService.updateRoles(userName, map(roles, r -> Role.valueOf(r)));
+        };
+        DatumRoute<Boolean> resetPasswordRoute = (request, response) -> {
+            requireRole(userRoleService, request, Role.ADMIN);
 
             String userName = request.params("userName");
             String password = request.body().trim();
             return userService.resetPassword(userName, password);
-        });
+        };
 
-        delete(WebUtilities.mkPath(BASE_URL, ":userName"), (request, response) -> {
-            WebUtilities.requireRole(userService, request, Role.ADMIN);
+        DatumRoute<Boolean> deleteUserRoute = (request, response) -> {
+            requireRole(userRoleService, request, Role.ADMIN);
 
             String userName = request.params("userName");
             return userService.deleteUser(userName);
-        });
+        };
+
+        DatumRoute<User> whoAmIRoute = (request, response) -> {
+            if (AuthenticationUtilities.isAnonymous(request)) {
+                return UserUtilities.ANONYMOUS_USER;
+            }
+
+            String username = getUsername(request);
+
+            userService.ensureExists(username);
+
+            return ImmutableUser.builder()
+                    .userName(username)
+                    .roles(userRoleService.getUserRoles(username))
+                    .build();
+        };
+
+        ListRoute<User> findAllRoute = (request, response) -> userRoleService.findAllUsers();
+        DatumRoute<User> findUserRoute = (request, response) -> userRoleService.findByUserName(request.params("userName"));
+
+
+        // --- register
+
+        postForDatum(newUserPath, newUserRoute);
+        postForDatum(updateRolesPath, updateRolesRoute);
+        postForDatum(resetPasswordPath, resetPasswordRoute);
+
+        deleteForDatum(deleteUserPath, deleteUserRoute);
+
+        getForDatum(whoAmIPath, whoAmIRoute);
+        getForDatum(findUserPath, findUserRoute);
+        getForList(findAllPath, findAllRoute);
     }
-
-
-
 
 }

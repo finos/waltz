@@ -44,6 +44,7 @@ public class UserDao {
         return ImmutableUser.builder().userName(record.getUserName()).build();
     };
 
+
     @Autowired
     public UserDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl must not be null");
@@ -57,8 +58,11 @@ public class UserDao {
                 .where(USER.USER_NAME.equalIgnoreCase(userName))
                 .fetchOne();
 
-        if (possiblePassword != null) { return possiblePassword.value1(); }
-        else { return null; }
+        if (possiblePassword != null) {
+            return possiblePassword.value1();
+        } else {
+            return null;
+        }
     }
 
 
@@ -66,8 +70,8 @@ public class UserDao {
         return dsl.insertInto(USER)
                 .set(USER.USER_NAME, userName)
                 .set(USER.PASSWORD, passwordHash)
+                .onDuplicateKeyIgnore()
                 .execute();
-
     }
 
 

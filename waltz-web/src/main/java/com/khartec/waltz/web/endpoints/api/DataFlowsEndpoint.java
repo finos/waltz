@@ -25,7 +25,7 @@ import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow.DataFlowService;
-import com.khartec.waltz.service.user.UserService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.action.UpdateDataFlowsAction;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -50,18 +50,20 @@ public class DataFlowsEndpoint implements Endpoint {
 
     private final DataFlowService dataFlowService;
     private final ChangeLogService changeLogService;
-    private final UserService userService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public DataFlowsEndpoint(DataFlowService dataFlowService, ChangeLogService changeLogService, UserService userService) {
+    public DataFlowsEndpoint(DataFlowService dataFlowService,
+                             ChangeLogService changeLogService,
+                             UserRoleService userRoleService) {
         checkNotNull(dataFlowService, "dataFlowService must not be null");
         checkNotNull(changeLogService, "changeLogService must not be null");
-        checkNotNull(userService, "userService must not be null");
+        checkNotNull(userRoleService, "userRoleService must not be null");
 
         this.dataFlowService = dataFlowService;
         this.changeLogService = changeLogService;
-        this.userService = userService;
+        this.userRoleService = userRoleService;
 
     }
 
@@ -82,7 +84,7 @@ public class DataFlowsEndpoint implements Endpoint {
         Route create = (request, response) -> {
             response.type(TYPE_JSON);
 
-            requireRole(userService, request, Role.APP_EDITOR);
+            requireRole(userRoleService, request, Role.APP_EDITOR);
 
             UpdateDataFlowsAction dataFlowUpdate = readBody(request, UpdateDataFlowsAction.class);
             List<DataFlow> addedFlows = dataFlowUpdate
@@ -121,7 +123,7 @@ public class DataFlowsEndpoint implements Endpoint {
                     dataFlowUpdate.removedTypes());
 
             changeLogService.write(ImmutableChangeLog.builder()
-                    .userId(getUser(request).userName())
+                    .userId(getUsername(request))
                     .parentReference(dataFlowUpdate.source())
                     .severity(Severity.INFORMATION)
                     .message(message)
@@ -129,7 +131,7 @@ public class DataFlowsEndpoint implements Endpoint {
 
 
             changeLogService.write(ImmutableChangeLog.builder()
-                    .userId(getUser(request).userName())
+                    .userId(getUsername(request))
                     .parentReference(dataFlowUpdate.target())
                     .severity(Severity.INFORMATION)
                     .message(message)

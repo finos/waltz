@@ -23,7 +23,6 @@ import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
 import com.khartec.waltz.model.applicationcapability.GroupedApplications;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.model.user.User;
 import com.khartec.waltz.service.app_capability.AppCapabilityService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.web.DatumRoute;
@@ -43,9 +42,7 @@ import java.util.Optional;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.*;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.post;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.lang.String.format;
 import static spark.Spark.delete;
 
@@ -113,7 +110,7 @@ public class AppCapabilityEndpoint implements Endpoint {
             int[] additions = appCapabilityDao.addCapabilitiesToApp(appRef.id(), map(action.additions(), a -> a.id()));
             int[] removals = appCapabilityDao.removeCapabilitiesFromApp(appRef.id(), map(action.removals(), a -> a.id()));
 
-            logChanges(action, appRef, getUser(request));
+            logChanges(action, appRef, getUsername(request));
 
             return additions.length + removals.length;
         });
@@ -147,7 +144,7 @@ public class AppCapabilityEndpoint implements Endpoint {
     }
 
 
-    private void logChanges(UpdateAppCapabilitiesAction action, EntityReference appRef, User user) {
+    private void logChanges(UpdateAppCapabilitiesAction action, EntityReference appRef, String user) {
         List<String> additionMessages = map(
                 action.additions(),
                 ref -> format("Added capability [%s]", ref.name().orElse("[unknown]")));
@@ -163,7 +160,7 @@ public class AppCapabilityEndpoint implements Endpoint {
         messages.forEach(
                 message -> changeLogDao.write(ImmutableChangeLog.builder()
                         .parentReference(appRef)
-                        .userId(user.userName())
+                        .userId(user)
                         .severity(Severity.INFORMATION)
                         .message(message)
                         .build()));

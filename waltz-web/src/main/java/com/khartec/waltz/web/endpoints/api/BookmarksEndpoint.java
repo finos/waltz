@@ -17,26 +17,23 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.bookmark.Bookmark;
-import com.khartec.waltz.model.bookmark.BookmarkKind;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.service.bookmark.BookmarkService;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.WebUtilities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import spark.Spark;
+    import com.khartec.waltz.model.EntityReference;
+    import com.khartec.waltz.model.Severity;
+    import com.khartec.waltz.model.bookmark.Bookmark;
+    import com.khartec.waltz.model.bookmark.BookmarkKind;
+    import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+    import com.khartec.waltz.service.bookmark.BookmarkService;
+    import com.khartec.waltz.service.changelog.ChangeLogService;
+    import com.khartec.waltz.web.WebUtilities;
+    import com.khartec.waltz.web.endpoints.Endpoint;
+    import org.slf4j.Logger;
+    import org.slf4j.LoggerFactory;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.*;
-import static spark.Spark.delete;
-import static spark.Spark.get;
-import static spark.Spark.post;
+    import static com.khartec.waltz.common.Checks.checkNotNull;
+    import static com.khartec.waltz.web.WebUtilities.*;
+    import static spark.Spark.*;
 
     @Service
 public class BookmarksEndpoint implements Endpoint {
@@ -108,7 +105,7 @@ public class BookmarksEndpoint implements Endpoint {
             changeLogService.write(ImmutableChangeLog.builder()
                     .message("Deleted bookmark: " + bookmark.title().orElse("?") + " / " +bookmark.kind())
                     .parentReference(bookmark.parent())
-                    .userId(WebUtilities.getUser(request).userName())
+                    .userId(WebUtilities.getUsername(request))
                     .severity(Severity.INFORMATION)
                     .build());
 

@@ -28,8 +28,8 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.ImmutableWebError;
 import com.khartec.waltz.model.user.Role;
-import com.khartec.waltz.model.user.User;
-import com.khartec.waltz.service.user.UserService;
+import com.khartec.waltz.service.user.UserRoleService;
+import com.khartec.waltz.web.endpoints.auth.AuthenticationUtilities;
 import org.eclipse.jetty.http.MimeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,23 +127,23 @@ public class WebUtilities {
     }
 
 
-    public static void requireRole(UserService userService,
+    public static void requireRole(UserRoleService userRoleService,
                                    Request request,
                                    Role... requiredRoles) {
-        User user = getUser(request);
-        if (user == null) {
+        String user = getUsername(request);
+        if (StringUtilities.isEmpty(user)) {
             LOG.warn("Required role check failed as no user, roles needed: " + requiredRoles);
             throw new IllegalArgumentException("Not logged in");
         }
-        if (! userService.hasRole(user.userName(), requiredRoles)) {
+        if (! userRoleService.hasRole(user, requiredRoles)) {
             LOG.warn("Required role check failed as user: " + user + ", did not have required roles: " + Arrays.toString(requiredRoles));
             throw new NotAuthorizedException();
         }
     }
 
 
-    public static User getUser(Request request) {
-        return (User) request.attribute("user");
+    public static String getUsername(Request request) {
+        return AuthenticationUtilities.getUsername(request);
     }
 
 
@@ -266,5 +266,6 @@ public class WebUtilities {
                 mimeTypes.getMimeByExtension(path),
                 "application/octet-stream");
     }
+
 
 }

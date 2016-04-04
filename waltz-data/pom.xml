@@ -55,14 +55,6 @@
             <groupId>${jooq.group}</groupId>
             <artifactId>jooq</artifactId>
         </dependency>
-        <dependency>
-            <groupId>${jooq.group}</groupId>
-            <artifactId>jooq-meta</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${jooq.group}</groupId>
-            <artifactId>jooq-codegen</artifactId>
-        </dependency>
 
     </dependencies>
 

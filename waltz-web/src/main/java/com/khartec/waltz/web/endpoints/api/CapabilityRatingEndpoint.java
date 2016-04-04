@@ -23,7 +23,7 @@ import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.capability_rating.AppRatingChangesAction;
 import com.khartec.waltz.service.capability_rating.CapabilityRatingService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.user.UserService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,15 +40,15 @@ public class CapabilityRatingEndpoint implements Endpoint {
 
     private final CapabilityRatingService ratingService;
     private final ChangeLogService changeLogService;
-    private final UserService userService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public CapabilityRatingEndpoint(CapabilityRatingService ratingService, ChangeLogService changeLogService, UserService userService) {
+    public CapabilityRatingEndpoint(CapabilityRatingService ratingService, ChangeLogService changeLogService, UserRoleService userRoleService) {
         checkNotNull(ratingService, "ratingService must not be null");
         this.ratingService = ratingService;
         this.changeLogService = changeLogService;
-        this.userService = userService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -68,13 +68,13 @@ public class CapabilityRatingEndpoint implements Endpoint {
                         request.params("perspectiveCode")));
 
         post(mkPath(BASE_URL), (request, response) -> {
-            requireRole(userService, request, Role.RATING_EDITOR);
+            requireRole(userRoleService, request, Role.RATING_EDITOR);
             AppRatingChangesAction appRatingChangesAction = readBody(request, AppRatingChangesAction.class);
 
             int changeCount = ratingService.update(appRatingChangesAction);
 
             changeLogService.write(ImmutableChangeLog.builder()
-                    .userId(getUser(request).userName())
+                    .userId(getUsername(request))
                     .message("Updated capability ratings ( " + changeCount + " )")
                     .parentReference(appRatingChangesAction.application())
                     .severity(Severity.INFORMATION)

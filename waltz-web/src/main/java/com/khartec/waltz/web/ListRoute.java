@@ -20,11 +20,11 @@ package com.khartec.waltz.web;
 import spark.Request;
 import spark.Response;
 
-import java.util.List;
+import java.util.Collection;
 
 
 @FunctionalInterface
 public interface ListRoute<T>  {
 
-    List<T> apply(Request request, Response response) throws Exception;
+    Collection<T> apply(Request request, Response response) throws Exception;
 }

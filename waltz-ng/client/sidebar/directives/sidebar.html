@@ -1,15 +1,11 @@
 <div>
-    <style>
-        .side-active { padding: 3px; font-weight: bold;}
-        .side-inactive { padding: 3px; }
-    </style>
+    <div waltz-has-setting="web.authentication=waltz">
+        <waltz-login-panel></waltz-login-panel>
+        <hr/>
+    </div>
 
-
-    <waltz-login-panel></waltz-login-panel>
-
-    <hr/>
-
-     <span ui-view="sidenav" autoscroll="false">
+     <span ui-view="sidenav"
+           autoscroll="false">
             <!--
             to get content in here use something like:
 
@@ -24,19 +20,26 @@
 
         <uib-accordion-group>
             <uib-accordion-heading>
-                <waltz-icon name="history"></waltz-icon> Recently Viewed
+                <waltz-icon name="history"
+                            fixed-width="true"></waltz-icon>
+                Recently Viewed
             </uib-accordion-heading>
-            <ul class="list-unstyled" ng-if="ctrl.history.length > 0">
+            <ul class="list-unstyled"
+                ng-if="ctrl.history.length > 0">
                 <li class='side-inactive'
                     ui-sref-active="side-active"
                     ng-repeat="item in ctrl.history">
-                    <waltz-icon class='text-muted small' name="{{item.kind | toIconName:'entity'}}"></waltz-icon>
-                    <a ui-sref="{{item.state}} ({{item.stateParams}})">
-                        {{item.name}}
+                    <waltz-icon class='text-muted small'
+                                fixed-width="true"
+                                name="{{item.kind | toIconName:'entity'}}"></waltz-icon>
+                    <a ui-sref="{{::item.state}} ({{::item.stateParams}})">
+                        <span ng-bind="::item.name"></span>
                     </a>
                 </li>
             </ul>
-            <div class="text-muted" ng-if="ctrl.history.length == 0">
+
+            <div class="text-muted"
+                 ng-if="ctrl.history.length == 0">
                 No history
             </div>
 
@@ -48,13 +51,17 @@
 
         <uib-accordion-group>
             <uib-accordion-heading>
-                <waltz-icon name="wrench"></waltz-icon> Admin
+                <waltz-icon name="wrench"
+                            fixed-width="true"></waltz-icon>
+                Admin
             </uib-accordion-heading>
             <ul class="list-unstyled">
                 <li class="side-inactive"
                     waltz-has-role="APP_EDITOR"
                     ui-sref-active="side-active">
-                    <waltz-icon class='text-muted small' name="gift"></waltz-icon>
+                    <waltz-icon class='text-muted small'
+                                fixed-width="true"
+                                name="gift"></waltz-icon>
                     <a ui-sref="main.app.registration">
                         Register App
                     </a>
@@ -62,7 +69,9 @@
                 <li class="side-inactive"
                     waltz-has-role="ADMIN"
                     ui-sref-active="side-active">
-                    <waltz-icon class='text-muted small' name="users"></waltz-icon>
+                    <waltz-icon class='text-muted small'
+                                fixed-width="true"
+                                name="users"></waltz-icon>
                     <a ui-sref="main.user.management">
                         Manage Users
                     </a>
@@ -70,7 +79,9 @@
                 <li class="side-inactive"
                     waltz-has-role="ADMIN"
                     ui-sref-active="side-active">
-                    <waltz-icon class='text-muted small' name="list-ul"></waltz-icon>
+                    <waltz-icon class='text-muted small'
+                                fixed-width="true"
+                                name="list-ul"></waltz-icon>
                     <a ui-sref="main.user.log">
                         User Logs
                     </a>
@@ -78,7 +89,19 @@
                 <li class="side-inactive"
                     waltz-has-role="ADMIN"
                     ui-sref-active="side-active">
-                    <waltz-icon class='text-muted small' name="cubes"></waltz-icon>
+                    <waltz-icon class='text-muted small'
+                                fixed-width="true"
+                                name="cog"></waltz-icon>
+                    <a ui-sref="main.settings">
+                        Settings
+                    </a>
+                </li>
+                <li class="side-inactive"
+                    waltz-has-role="ADMIN"
+                    ui-sref-active="side-active">
+                    <waltz-icon class='text-muted small'
+                                fixed-width="true"
+                                name="cubes"></waltz-icon>
                     <a ui-sref="main.traits">
                         Manage Traits
                     </a>

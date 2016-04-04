@@ -19,22 +19,24 @@ package com.khartec.waltz.web.endpoints.auth;
 
 
 import com.auth0.jwt.JWTSigner;
-import com.auth0.jwt.JWTVerifier;
-import com.khartec.waltz.common.EnumUtilities;
 import com.khartec.waltz.common.MapBuilder;
-import com.khartec.waltz.model.user.ImmutableUser;
+import com.khartec.waltz.model.settings.NamedSettings;
 import com.khartec.waltz.model.user.LoginRequest;
 import com.khartec.waltz.model.user.Role;
-import com.khartec.waltz.model.user.User;
+import com.khartec.waltz.service.settings.SettingsService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.service.user.UserService;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Filter;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.khartec.waltz.common.MapUtilities.newHashMap;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -43,22 +45,55 @@ import static spark.Spark.post;
 
 
 @Service
-public class AuthEndpoint implements Endpoint {
+public class AuthenticationEndpoint implements Endpoint {
 
     private static final String BASE_URL = mkPath("auth");
-    private static final String SECRET = "secret";
 
-    private static final User ANONYMOUS_USER = ImmutableUser.builder()
-            .userName("anonymous")
-            .addRoles(Role.ANONYMOUS)
-            .build();
+    private static final Logger LOG = LoggerFactory.getLogger(AuthenticationEndpoint.class);
 
     private final UserService userService;
+    private final UserRoleService userRoleService;
+    private final SettingsService settingsService;
+    private final Filter filter;
 
 
     @Autowired
-    public AuthEndpoint(UserService userService) {
+    public AuthenticationEndpoint(UserService userService,
+                                  UserRoleService userRoleService,
+                                  SettingsService settingsService) {
         this.userService = userService;
+        this.userRoleService = userRoleService;
+        this.settingsService = settingsService;
+
+        this.filter = settingsService
+                .getValue(NamedSettings.authenticationFilter)
+                .flatMap(className -> instantiateFilter(className))
+                .orElseGet(createDefaultFilter());
+    }
+
+
+    private Supplier<Filter> createDefaultFilter() {
+        return () -> {
+            LOG.info("Using default (jwt) authentication filter");
+            return new JWTAuthenticationFilter(settingsService);
+        };
+    }
+
+
+    private Optional<Filter> instantiateFilter(String className) {
+        try {
+            LOG.info("Setting authentication filter to: " + className);
+
+            Filter filter = (Filter) Class
+                    .forName(className)
+                    .getConstructor(SettingsService.class)
+                    .newInstance(settingsService);
+
+            return Optional.of(filter);
+        } catch (Exception e) {
+            LOG.error("Cannot instantiate authentication filter class: " + className, e);
+            return Optional.empty();
+        }
     }
 
 
@@ -68,11 +103,9 @@ public class AuthEndpoint implements Endpoint {
         post(mkPath(BASE_URL, "login"), (request, response) -> {
 
             LoginRequest login = readBody(request, LoginRequest.class);
-
             if (userService.authenticate(login)) {
 
-                List<Role> roles = userService.getUserRoles(login.userName());
-
+                List<Role> roles = userRoleService.getUserRoles(login.userName());
                 Map<String, Object> claims = new MapBuilder()
                         .add("iss", "Waltz")
                         .add("sub", login.userName())
@@ -80,8 +113,7 @@ public class AuthEndpoint implements Endpoint {
                         .add("displayName", login.userName())
                         .add("employeeId", login.userName())
                         .build();
-
-                JWTSigner signer = new JWTSigner(SECRET);
+                JWTSigner signer = new JWTSigner(JWTUtilities.SECRET);
                 String token = signer.sign(claims);
 
                 return newHashMap("token", token);
@@ -92,28 +124,7 @@ public class AuthEndpoint implements Endpoint {
             }
         }, transformer);
 
-        before(mkPath("api", "*"), ((request, response) -> {
-            JWTVerifier verifier = new JWTVerifier(SECRET);
-            String authorizationHeader = request.headers("Authorization");
-
-            if (authorizationHeader == null) {
-                request.attribute("user", ANONYMOUS_USER);
-            } else {
-                String token = authorizationHeader.replaceFirst("Bearer ", "");
-                Map<String, Object> claims = verifier.verify(token);
-
-                Set<Role> roles = ((List<String>) claims.get("roles"))
-                        .stream()
-                        .map(r -> EnumUtilities.readEnum(r, Role.class, null))
-                        .filter(r -> r != null)
-                        .collect(Collectors.toSet());
-
-                request.attribute("user", ImmutableUser.builder()
-                        .userName((String) claims.get("sub"))
-                        .roles(roles)
-                        .build());
-            }
-        }));
+        before(mkPath("api", "*"), filter);
 
     }
 

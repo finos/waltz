@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.common;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -79,5 +80,10 @@ public class Checks {
     public static <T> T checkOptionalIsPresent(Optional<T> optional, String message) {
         checkTrue(optional.isPresent(), message);
         return optional.get();
+    }
+
+    public static <T> void checkNotEmpty(Collection<T> ts, String message) {
+        checkNotNull(ts, message);
+        checkFalse(ts.isEmpty(), message);
     }
 }

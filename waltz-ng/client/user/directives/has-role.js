@@ -10,27 +10,29 @@
  *
  */
 
-import _ from 'lodash';
+const BINDINGS = {
+    role: '@waltzHasRole'
+};
 
-function controller(scope, UserService) {
+function controller(UserService) {
+    const vm = this;
     UserService
         .whoami()
-        .then(user => scope.show = _.contains(user.roles, scope.role));
+        .then(user => vm.show = UserService.hasRole(user, vm.role));
 
-    scope.show = false;
+    vm.show = false;
 }
 
-controller.$inject = ['$scope', 'UserService'];
+controller.$inject = ['UserService'];
 
 
 export default () => ({
     replace: true,
     restrict: 'A',
     transclude: true,
-    scope: {
-        role: '@waltzHasRole'
-    },
-    template: '<div ng-show="show"><ng-transclude></ng-transclude></div>',
-    //link: (scope, elem, attr) => console.log("link", scope, elem.attr),
+    scope: {},
+    bindToController: BINDINGS,
+    controllerAs: 'ctrl',
+    template: '<div ng-show="ctrl.show"><ng-transclude></ng-transclude></div>',
     controller
 });

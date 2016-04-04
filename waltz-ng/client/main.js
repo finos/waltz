@@ -10,27 +10,25 @@
  *
  */
 
-import '../style/style.scss';
-
-import _ from 'lodash';
-import angular from 'angular';
-
-import 'angular-ui-notification';
-import 'angular-ui-grid/ui-grid';
-import 'angular-ui-router';
-import 'angular-ui-bootstrap';
-import 'angular-tree-control';
-import 'ui-select';
-import 'satellizer';
-import 'angular-animate';
-import 'angular-sanitize';
-import 'ng-tags-input';
-import 'babel-core/polyfill';  // provides Object.assign etc.
-import 'angular-local-storage';
-import 'ng-redux';
-import thunk from 'redux-thunk';
-
-import rootReducer from './reports/reducers';
+import "../style/style.scss";
+import _ from "lodash";
+import angular from "angular";
+import "angular-ui-notification";
+import "angular-ui-grid/ui-grid";
+import "angular-ui-router";
+import "angular-ui-bootstrap";
+import "angular-tree-control";
+import "ui-select";
+import "satellizer";
+import "angular-animate";
+import "angular-sanitize";
+import "ng-tags-input";
+import "babel-core/polyfill";
+import "angular-local-storage";
+import "ng-redux";
+import thunk from "redux-thunk";
+import rootReducer from "./reports/reducers";
+import namedSettings from "./settings/named-settings";  // provides Object.assign etc.
 
 
 const dependencies = [
@@ -82,6 +80,7 @@ const registrationFns = [
     require('./playpen'),
     require('./ratings'),
     require('./server-info'),
+    require('./settings'),
     require('./sidebar'),
     require('./static-panel'),
     require('./svg-diagram'),
@@ -200,7 +199,26 @@ waltzApp.config(['$ngReduxProvider', ($ngReduxProvider) => {
     $ngReduxProvider.createStoreWith(rootReducer, [thunk], []);
 }]);
 
-// perf improvements
+
 waltzApp.config(['$httpProvider', ($httpProvider) => {
+    // using apply async should improve performance
     $httpProvider.useApplyAsync(true);
+}]);
+
+
+waltzApp.run(['$http', 'SettingsStore', ($http, settingsStore) => {
+    settingsStore.findAll()
+        .then(settings => {
+            if (settingsStore.isDevModeEnabled(settings)) {
+                console.log('Dev Extensions enabled');
+                _.chain(settings)
+                    .filter(s => s.name.startsWith(namedSettings.httpHeaderPrefix))
+                    .each(s => {
+                        const headerName = s.name.replace(namedSettings.httpHeaderPrefix, '');
+                        console.log("Adding dev http header", headerName, s.value)
+                        $http.defaults.headers.common[headerName] = s.value;
+                    })
+                    .value()
+            }
+        });
 }]);

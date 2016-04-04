@@ -21,8 +21,6 @@ import com.khartec.waltz.data.perpective.PerspectiveDao;
 import com.khartec.waltz.model.perspective.Perspective;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.WebUtilities;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

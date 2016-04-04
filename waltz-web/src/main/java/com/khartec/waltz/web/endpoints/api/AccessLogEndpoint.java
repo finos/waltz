@@ -56,7 +56,7 @@ public class AccessLogEndpoint implements Endpoint {
 
         EndpointUtilities.post(mkPath(BASE_URL, ":state", ":params"), (request, response) -> {
             AccessLog accessLog = ImmutableAccessLog.builder()
-                    .userId(WebUtilities.getUser(request).userName())
+                    .userId(WebUtilities.getUsername(request))
                     .state(request.params("state"))
                     .params(request.params("params"))
                     .build();
