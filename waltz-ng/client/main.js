@@ -36,6 +36,7 @@ const dependencies = [
     'ui.router',
     'ui.select',
     'ui.grid',
+    'ui.grid.exporter',
     'ui-notification',
     'ngAnimate',
     'ngSanitize',

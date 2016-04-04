@@ -27,6 +27,11 @@
         </ol>
     </waltz-page-header>
 
+
+
+
+
+
     <!-- OVERVIEW -->
     <waltz-org-unit-overview parent="ctrl.viewData.immediateHierarchy.parent"
                              children="ctrl.viewData.immediateHierarchy.children"
@@ -219,8 +224,10 @@
 
     </waltz-section>
 
+
     <!-- COSTS -->
-    <waltz-asset-costs-section asset-costs="ctrl.viewData.assetCosts">
+    <waltz-asset-costs-section asset-costs="ctrl.viewData.assetCosts"
+                               csv-name="asset_costs.csv">
     </waltz-asset-costs-section>
 
 

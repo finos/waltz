@@ -15,8 +15,14 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-import { categorizeCostsIntoBuckets } from '../../asset-cost/services/asset-cost-utilities';
-import EventDispatcher from '../../common/EventDispatcher';
+import {categorizeCostsIntoBuckets} from "../../asset-cost/services/asset-cost-utilities";
+import EventDispatcher from "../../common/EventDispatcher";
+
+
+const BINDINGS = {
+    assetCosts: '=',
+    csvName: '@?'
+};
 
 
 function controller($scope) {
@@ -41,9 +47,7 @@ export default () => {
         replace: true,
         template: require('./asset-costs-section.html'),
         scope: {},
-        bindToController: {
-            assetCosts: '='
-        },
+        bindToController: BINDINGS,
         controllerAs: 'ctrl',
         controller
     };

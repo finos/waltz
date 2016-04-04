@@ -80,6 +80,7 @@
         <div ng-if="ctrl.applications">
 
             <waltz-app-table filter="appQuery"
+                             csv-name="{{ ctrl.groupDetail.appGroup.name }}_applications.csv"
                              applications="ctrl.applications"></waltz-app-table>
         </div>
 
