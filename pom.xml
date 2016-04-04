@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -20,18 +20,18 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jackson.version>2.5.4</jackson.version>
+        <jackson.version>2.7.0</jackson.version>
         <jackson-jsr310.version>2.4.0</jackson-jsr310.version>
         <pcollections.version>2.1.2</pcollections.version>
         <jooq.version>3.7.3</jooq.version>
         <jool.version>0.9.10</jool.version>
-        <immutables.version>2.1.8</immutables.version>
+        <immutables.version>2.1.15</immutables.version>
         <junit.version>4.12</junit.version>
-        <spring.version>4.2.1.RELEASE</spring.version>
-        <spark.version>2.2</spark.version>
-        <slf4j.version>1.7.12</slf4j.version>
-        <logback.version>1.1.3</logback.version>
-        <hikari.version>2.3.9</hikari.version>
+        <spring.version>4.2.5.RELEASE</spring.version>
+        <spark.version>2.3</spark.version>
+        <slf4j.version>1.7.20</slf4j.version>
+        <logback.version>1.1.7</logback.version>
+        <hikari.version>2.4.5</hikari.version>
         <super-csv.version>2.3.1</super-csv.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <jwt.version>2.1.0</jwt.version>
