@@ -17,33 +17,21 @@
 
 package com.khartec.waltz.service.svg;
 
+import com.khartec.waltz.common.SvgUtilities;
 import com.khartec.waltz.data.svg.SvgDiagramDao;
 import com.khartec.waltz.model.svg.ImmutableSvgDiagram;
 import com.khartec.waltz.model.svg.SvgDiagram;
 import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.XmlUtilities.createNonValidatingDocumentBuilderFactory;
-import static com.khartec.waltz.common.XmlUtilities.printDocument;
-import static com.khartec.waltz.common.XmlUtilities.stream;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -59,37 +47,18 @@ public class SvgDiagramService {
 
     private String convertProductSpecificSvg(SvgDiagram diagram) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, TransformerException {
         if (diagram.product().equals("visio")) {
-            return convertVisoSvg(diagram);
+            return convertVisioSvg(diagram);
         } else {
             return diagram.svg();
         }
     }
 
 
-    private String convertVisoSvg(SvgDiagram diagram) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, TransformerException {
-        DocumentBuilder builder = createNonValidatingDocumentBuilderFactory().newDocumentBuilder();
-        InputSource svgSource = new InputSource(new ByteArrayInputStream(diagram.svg().getBytes()));
-        Document svg = builder.parse(svgSource);
-
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        NodeList nodes = (NodeList) xpath.evaluate("//*", svg, XPathConstants.NODESET);
-
+    private String convertVisioSvg(SvgDiagram diagram) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, TransformerException {
         String key = diagram.keyProperty();
+        String svgStr = diagram.svg();
 
-        stream(nodes)
-                .forEach(n -> stream(n.getChildNodes())
-                        .filter(c -> c.getNodeName().contains("custProps"))
-                        .forEach(c -> stream(c.getChildNodes())
-                                .filter(cp -> cp.getNodeName().contains("cp"))
-                                .map(cp -> (Element) cp)
-                                .filter(cp -> key.equals(cp.getAttribute("v:lbl")))
-                                .map(cp -> cp.getAttribute("v:val"))
-                                .map(v -> v.replaceAll("^.*\\((.*)\\)$", "$1"))
-                                .forEach(v -> ((Element) n).setAttribute("data-"+key, v))
-                        )
-                );
-
-        return printDocument(svg);
+        return SvgUtilities.convertVisioSvg(key, svgStr);
     }
 
 

@@ -19,6 +19,7 @@ package com.khartec.waltz.common;
 
 import java.io.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
@@ -52,5 +53,18 @@ public class IOUtilities {
         while ((bytesRead = input.read(buff)) != -1) {
             output.write(buff, 0, bytesRead);
         }
+    }
+
+    public static String readFully(InputStream stream) throws IOException {
+        try {
+            InputStreamReader streamReader = new InputStreamReader(stream);
+            BufferedReader reader = new BufferedReader(streamReader);
+            return reader
+                    .lines()
+                    .collect(Collectors.joining("\n"));
+        } finally {
+            stream.close();
+        }
+
     }
 }
