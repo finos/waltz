@@ -30,21 +30,24 @@ public class XmlUtilities {
     }
 
 
-    public static String printDocument(Document doc) throws IOException, TransformerException {
+    public static String printDocument(Document doc, boolean prettyPrint) throws IOException, TransformerException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        printDocument(doc, baos);
+        printDocument(doc, baos, prettyPrint);
         return new String(baos.toByteArray());
     }
 
 
-    public static void printDocument(Document doc, OutputStream out) throws IOException, TransformerException {
+    public static void printDocument(Document doc, OutputStream out, boolean prettyPrint) throws IOException, TransformerException {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+        if (prettyPrint) {
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+        }
 
         transformer.transform(new DOMSource(doc),
                 new StreamResult(new OutputStreamWriter(out, "UTF-8")));

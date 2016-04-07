@@ -1,4 +1,4 @@
-import angular from 'angular';
+import angular from "angular";
 
 function controller(svgStore, $scope, $state) {
 
@@ -13,13 +13,14 @@ function controller(svgStore, $scope, $state) {
 
 
     svgStore.findByKind('ORG_TREE').then(xs => vm.diagrams = xs);
-    vm.blockProcessor = block => {
-        block.parent.onclick = (e) => {
-            $state.go('main.person.view', { empId: block.value });
-            e.preventDefault();
-        };
-        angular.element(block.parent).addClass('clickable');
+
+
+
+    vm.blockProcessor = b => {
+        b.block.onclick = () => $state.go('main.person.view', { empId: b.value });
+        angular.element(b.block).addClass('clickable');
     };
+
 
     vm.person = null;
 }
