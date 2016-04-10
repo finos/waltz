@@ -1114,4 +1114,14 @@
     </changeSet>
 
 
+    <!-- 124:Adding org unit ref to person record -->
+    <changeSet author="dwatkins" id="20160410-124-1">
+        <addColumn tableName="person">
+            <column name="organisational_unit_id"
+                    type="${long.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
