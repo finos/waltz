@@ -16,8 +16,8 @@
   ~     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
     <property name="clob.type" value="clob" dbms="oracle"></property>
@@ -1042,6 +1042,8 @@
         </sql>
     </changeSet>
 
+
+    <!-- 120:SSO -->
     <changeSet author="dwatkins"
                id="20160330-120-1">
         <addForeignKeyConstraint baseColumnNames="user_name"
@@ -1100,5 +1102,16 @@
             <column name="restricted" valueBoolean="false"/>
         </insert>
     </changeSet>
+
+
+    <!-- 128:Emp View Performance -->
+    <changeSet author="dwatkins" id="20160408-128-1">
+        <createIndex indexName="idx_involvement_entity_emp" tableName="involvement">
+            <column name="entity_kind"/>
+            <column name="entity_id"/>
+            <column name="employee_id"/>
+        </createIndex>
+    </changeSet>
+
 
 </databaseChangeLog>
