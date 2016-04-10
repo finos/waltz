@@ -43,9 +43,6 @@ import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 public class PersonDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(PersonDao.class);
-
-    private final DSLContext dsl;
-
     public static RecordMapper<? super Record, Person> personMapper = r -> {
         PersonRecord record = r.into(PersonRecord.class);
         return ImmutablePerson.builder()
@@ -60,8 +57,10 @@ public class PersonDao {
                 .kind(PersonKind.valueOf(record.getKind()))
                 .mobilePhone(Optional.ofNullable(record.getMobilePhone()))
                 .officePhone(Optional.ofNullable(record.getOfficePhone()))
+                .organisationalUnitId(Optional.ofNullable(record.getOrganisationalUnitId()))
                 .build();
     };
+    private final DSLContext dsl;
 
 
     @Autowired
@@ -143,6 +142,14 @@ public class PersonDao {
                 .collect(Collectors.toList());
 
         return dsl.batchInsert(records).execute();
+    }
+
+
+    public List<Person> findByOrganisationalUnitId(Long... orgUnitIds) {
+        return dsl.select(PERSON.fields())
+                .from(PERSON)
+                .where(PERSON.ORGANISATIONAL_UNIT_ID.in(orgUnitIds))
+                .fetch(personMapper);
     }
 
 }

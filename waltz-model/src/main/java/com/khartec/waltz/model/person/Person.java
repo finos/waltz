@@ -44,4 +44,6 @@ public abstract class Person implements IdProvider {
 
     public abstract Optional<Set<Long>> allManagers();
 
+    public abstract Optional<Long> organisationalUnitId();
+
 }
