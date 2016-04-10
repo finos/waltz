@@ -28,8 +28,9 @@ import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.involvement.InvolvementKind;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.schema.tables.records.InvolvementRecord;
-import com.khartec.waltz.schema.tables.records.PersonRecord;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -40,7 +41,6 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
-import static org.jooq.impl.DSL.select;
 
 
 @Repository
@@ -99,19 +99,15 @@ public class InvolvementDao {
 
 
     public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
-        SelectConditionStep<Record1<String>> allReporteesQuery = select(PERSON_HIERARCHY.EMPLOYEE_ID)
-                .from(PERSON_HIERARCHY)
-                .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId));
-
-        SelectConditionStep<Record1<Long>> appIdsQuery = select(INVOLVEMENT.ENTITY_ID)
-                .from(INVOLVEMENT)
-                .where(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId)
-                        .or(INVOLVEMENT.EMPLOYEE_ID.in(allReporteesQuery))
-                        .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
-
-        return dsl.select()
+        return dsl
+                .selectDistinct(APPLICATION.fields())
                 .from(APPLICATION)
-                .where(APPLICATION.ID.in(appIdsQuery))
+                .innerJoin(INVOLVEMENT)
+                .on(INVOLVEMENT.ENTITY_ID.eq(APPLICATION.ID))
+                .innerJoin(PERSON_HIERARCHY)
+                .on(PERSON_HIERARCHY.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
+                .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                .and(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId)))
                 .fetch(ApplicationDao.applicationRecordMapper);
     }
 
@@ -123,10 +119,7 @@ public class InvolvementDao {
                 .on(INVOLVEMENT.ENTITY_ID.eq(ref.id()))
                 .and(INVOLVEMENT.ENTITY_KIND.eq(ref.kind().name()))
                 .where(PERSON.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
-                .fetch(r -> {
-                    PersonRecord record = r.into(PersonRecord.class);
-                    return PersonDao.personMapper.map(record);
-                });
+                .fetch(PersonDao.personMapper);
     }
 
 }
