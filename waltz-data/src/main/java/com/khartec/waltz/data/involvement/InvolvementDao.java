@@ -107,7 +107,8 @@ public class InvolvementDao {
                 .innerJoin(PERSON_HIERARCHY)
                 .on(PERSON_HIERARCHY.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
                 .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                .and(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId)))
+                .and(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId)
+                        .or(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))))
                 .fetch(ApplicationDao.applicationRecordMapper);
     }
 
