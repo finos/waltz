@@ -1,16 +1,4 @@
-import _ from 'lodash';
-
-/**
- * Generates a random hsl colour value.  The colour should be
- * a light pastel colour.
- *
- * @returns {string}
- */
-export function randPastel() {
-    const hue = Math.floor(Math.random() * 360);
-    const pastel = 'hsl(' + hue + ', 100%, 97.5%)';
-    return pastel;
-}
+import _ from "lodash";
 
 
 /**
@@ -120,3 +108,34 @@ export function switchToParentIds(treeData = []) {
     });
     return treeData;
 }
+
+
+/**
+ *
+ * @param items - items to be searched
+ * @param searchStr - query string to search for
+ * @param searchFields - fields in the items to consider when searching
+ * @returns {Array}
+ */
+
+export function termSearch(items = [], searchStr = '', searchFields = []) {
+
+    const terms = searchStr.toLowerCase().split(/\W/);
+
+    return _.filter(items, item => {
+
+        const fields = _.isEmpty(searchFields)
+            ? _.keys(item)
+            : searchFields;
+
+        const targetStr = _.chain(fields)
+            .reject(field => field.startsWith('$') || _.isFunction(item[field]))
+            .map(field => item[field])
+            .join(' ')
+            .value()
+            .toLowerCase();
+
+        return _.every(terms, term => targetStr.includes(term));
+    });
+}
+

@@ -1,0 +1,28 @@
+<div>
+    <waltz-section name="Technologies">
+        <waltz-section-actions>
+            <input type="search" placeholder="Search"
+                   style="border-radius: 6px; padding-left: 3px"
+                   ng-model="ctrl.qry">
+        </waltz-section-actions>
+
+        <div class="waltz-scroll-region" style="height: 300px">
+            <waltz-simple-software-usage-list packages="ctrl.filteredPackages">
+
+            </waltz-simple-software-usage-list>
+
+        </div>
+
+        <div class="waltz-paragraph text-muted pull-right">
+            <waltz-icon name="info-circle"></waltz-icon>
+            Software associated with the application, sourced from:
+            <ul class="list-inline" style="display: inline-block">
+                <li ng-repeat="(source, usages) in ctrl.usages">
+                    {{ source }}
+                    <span ng-if="!$last">,</span>
+                </li>
+            </ul>
+        </div>
+
+    </waltz-section>
+</div>

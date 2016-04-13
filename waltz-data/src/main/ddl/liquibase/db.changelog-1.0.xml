@@ -1124,4 +1124,75 @@
         </addColumn>
     </changeSet>
 
+
+
+    <!-- 131: Software Catalog / Package -->
+    <changeSet author="dwatkins" id="20160411-131-1">
+        <dropTable tableName="software_directory"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160411-131-2">
+        <createTable tableName="software_package">
+            <column autoIncrement="true"
+                    name="id"
+                    type="BIGSERIAL">
+                <constraints primaryKey="true"
+                             primaryKeyName="software_package_pkey"/>
+            </column>
+            <column name="vendor"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="HOLD"
+                    name="maturity_status"
+                    type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueBoolean="false"
+                    name="notable"
+                    type="BOOLEAN"/>
+            <column name="description"
+                    type="${longvarchar.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="external_id"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="true"/>
+            </column>
+            <column name="provenance"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160411-131-3">
+        <createTable tableName="software_usage">
+            <column name="application_id" type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="software_package_id" type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+
 </databaseChangeLog>

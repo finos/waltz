@@ -83,6 +83,7 @@ const registrationFns = [
     require('./server-info'),
     require('./settings'),
     require('./sidebar'),
+    require('./software-catalog'),
     require('./static-panel'),
     require('./svg-diagram'),
     require('./traits'),
@@ -216,7 +217,6 @@ waltzApp.run(['$http', 'SettingsStore', ($http, settingsStore) => {
                     .filter(s => s.name.startsWith(namedSettings.httpHeaderPrefix))
                     .each(s => {
                         const headerName = s.name.replace(namedSettings.httpHeaderPrefix, '');
-                        console.log("Adding dev http header", headerName, s.value)
                         $http.defaults.headers.common[headerName] = s.value;
                     })
                     .value()

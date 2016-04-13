@@ -10,7 +10,7 @@
  *
  */
 
-import playpenView from './playpen';
+import playpenView from "./playpen";
 
 
 export default (module) => {
@@ -20,7 +20,7 @@ export default (module) => {
         ($stateProvider) => {
             $stateProvider
                 .state('main.playpen', {
-                    url: 'playpen/{id:int}',
+                    url: 'playpen',
                     views: { 'content@': playpenView }
                 });
         }

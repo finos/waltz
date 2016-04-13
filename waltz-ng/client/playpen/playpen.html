@@ -9,40 +9,12 @@
 
 
     <waltz-section>
-        <waltz-capability-multi-selector capabilities="ctrl.capabilitiesForApp"
-                                         explicit-capability-ids="ctrl.explicitCapabilityIds"
-                                         on-selection="ctrl.onSelection">
+        <input class="form-input" type="search" ng-model="ctrl.qry">
 
-        </waltz-capability-multi-selector>
+        <waltz-simple-software-usage-list packages="ctrl.filteredPackages">
+
+        </waltz-simple-software-usage-list>
     </waltz-section>
-    <waltz-section name="Preview">
-        <div class="row">
-            <div class="col-md-12">
-
-                <h1>Tree Here</h1>
-                    <treecontrol class="tree-light"
-                             tree-model="ctrl.treeData"
-                             expanded-nodes="ctrl.expandedNodes"
-                             order-by="name"
-                             on-selection="ctrl.onSelection(node, selected)"
-                             options="ctrl.treeOptions">
-                        <span>
-                            {{ node.name }}
-                            <waltz-icon name="star" fixed-width="true" ng-if='ctrl.isPrimary(node.id)'></waltz-icon>
-                        </span>
-                    </treecontrol>
-                <h3>Post Tree</h3>
-
-            </div>
-
-        </div>
-
-
-    </waltz-section>
-
-
-
-
 
 
     <waltz-section name="Dump1">

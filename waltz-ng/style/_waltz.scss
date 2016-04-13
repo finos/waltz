@@ -27,6 +27,7 @@
 @import "../client/ratings/directives/viewer/app-rating-table";
 @import "../client/ratings/directives/viewer/multi-app-rating-viewer";
 @import "../client/sidebar/directives/sidebar";
+@import "../client/software-catalog/directives/simple-software-usage-list";
 
 html {
   overflow-y: scroll;
@@ -128,7 +129,7 @@ textarea {
 .waltz-section-actions {
   margin-top: -42px;
   float: right;
-  padding: 0px 2px 2px 0px;
+  padding: 0 2px 2px 0;
 }
 
 
@@ -177,7 +178,7 @@ textarea {
 
 .waltz-detail-callout {
   background-color: lighten($waltz-background-color, 0.5);
-  padding: 0px 6px 4px 6px;
+  padding: 0 6px 4px 6px;
   border-radius: 3px;
   border: 1px solid $waltz-border-color-lighter;
   @include box-shadow(4px, 4px, 4px, $waltz-border-color);
@@ -191,7 +192,7 @@ textarea {
 .waltz-scroll-region {
   width: 100%;
   overflow: auto;
-  border: 1px solid $waltz-border-color;
+  border: 1px solid lighten($waltz-border-color, 10);
   border-radius: 3px;
   padding: 8px;
 }

@@ -11,10 +11,9 @@
  *
  */
 
-import d3 from 'd3';
-import _ from 'lodash';
-
-import { aggregatePeopleInvolvements } from '../involvement/involvement-utils';
+import d3 from "d3";
+import _ from "lodash";
+import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
 
 
 function addDataTypes(extras, vm) {
@@ -56,6 +55,12 @@ export function loadServers(serverInfoStore, appId, vm) {
     serverInfoStore
         .findByAppId(appId)
         .then(servers => vm.servers = servers);
+}
+
+
+export function loadSoftwareCatalog(catalogStore, appId, vm) {
+    catalogStore.findByAppIds([appId])
+        .then(resp => vm.softwareCatalog = resp);
 }
 
 

@@ -1,0 +1,30 @@
+<div>
+   <table class="table small">
+       <tbody ng-repeat="package in ctrl.packages | orderBy:'vendor'">
+            <tr>
+                <td>
+                    <span>
+                        {{ package.vendor }}
+                    </span>
+                    /
+                    <span>
+                        <strong>
+                            {{ package.name }}
+                        </strong>
+                    </span>
+                    /
+                    <span>
+                        {{ package.version }}
+                    </span>
+                    <waltz-maturity-status status="package.maturityStatus">
+                    </waltz-maturity-status>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-muted small">
+                    {{ package.description }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
