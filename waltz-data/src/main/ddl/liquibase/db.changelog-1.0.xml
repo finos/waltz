@@ -476,7 +476,7 @@
         <addUniqueConstraint columnNames="employee_id" constraintName="unique_employee_id" tableName="person"/>
     </changeSet>
 
-    
+
     <!-- INDEXES -->
     <changeSet author="dwatkins" id="20151129-idx-31">
         <createIndex indexName="fki_authoritative_source_application_id_fkey" tableName="authoritative_source">
@@ -1191,6 +1191,14 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160414-131-4">
+        <insert tableName="settings">
+            <column name="name" value="feature.software-catalog.enabled"/>
+            <column name="value" value="true"/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
     </changeSet>
 
 

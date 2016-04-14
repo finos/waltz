@@ -197,8 +197,11 @@
 
 
     <!-- TECHNOLOGIES -->
-    <waltz-app-technology-section catalog="ctrl.softwareCatalog">
-    </waltz-app-technology-section>
+    <div waltz-has-setting="feature.software-catalog.enabled=true">
+        <waltz-app-technology-section catalog="ctrl.softwareCatalog">
+        </waltz-app-technology-section>
+    </div>
+
 
 
     <!-- CHANGE LOG -->

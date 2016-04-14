@@ -1,5 +1,5 @@
-
 # Settings
+
 
 ## Security
 
@@ -16,7 +16,16 @@
 
 ## Development (```web.devext``` )
 
+Development options can be used by developers to aid in writing code for Waltz
+
 * ```web.devext.enabled``` - master switch, if enabled other settings in this group will be activated
 * ```web.devext.http.header.*``` - values in this group will be added to the header of
     all $http calls (primarily api calls)
 
+
+## Features (```feature.*```)
+
+Features can be enabled/disabled and configured via settings.  Currently available options are:
+
+* ```feature.software-catalog.enabled```
+  * (```true|false```) display software-catalog (technology sections)
