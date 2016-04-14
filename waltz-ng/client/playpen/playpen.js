@@ -30,7 +30,7 @@ function prepareStats(items, usages) {
 function controller($scope, catalogStore) {
     const vm = this;
 
-    const appIds = [891];
+    const appIds = [891, 843, 813];
 
     catalogStore.findByAppIds(appIds)
         .then(resp => {
