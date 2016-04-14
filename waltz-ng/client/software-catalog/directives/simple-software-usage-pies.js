@@ -1,4 +1,4 @@
-import {variableScale} from "../../common/colors";
+import {maturityColorScale, variableScale} from "../../common/colors";
 
 const BINDINGS = {
     usages: '=',
@@ -27,7 +27,7 @@ function controller($scope) {
 
     vm.pieConfig = {
         maturity: {
-            colorProvider: (d) => variableScale(d.data.key)
+            colorProvider: (d) => maturityColorScale(d.data.key)
         },
         vendor: {
             colorProvider: (d) => variableScale(d.data.key)
