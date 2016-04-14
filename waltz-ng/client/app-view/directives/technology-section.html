@@ -1,27 +1,47 @@
 <div>
     <waltz-section name="Technologies" id="technology">
-        <waltz-section-actions>
-            <input type="search" placeholder="Search"
-                   style="border-radius: 6px; padding-left: 3px"
-                   ng-model="ctrl.qry">
-        </waltz-section-actions>
 
-        <div class="waltz-scroll-region" style="height: 300px">
-            <waltz-simple-software-usage-list packages="ctrl.filteredPackages">
+        <div ng-if="ctrl.catalog.packages.length > 0">
+            <waltz-section-actions>
+                <input type="search" placeholder="Search"
+                       style="border-radius: 6px; padding-left: 3px"
+                       ng-model="ctrl.qry">
+            </waltz-section-actions>
 
-            </waltz-simple-software-usage-list>
+            <uib-tabset>
+                <uib-tab heading="Overview">
+                    <waltz-simple-software-usage-pies packages="ctrl.filteredPackages ">
+                    </waltz-simple-software-usage-pies>
+                </uib-tab>
+                <uib-tab heading="Detail">
+                    <div class="waltz-scroll-region" style="height: 300px">
+                        <waltz-simple-software-usage-list packages="ctrl.filteredPackages">
+                        </waltz-simple-software-usage-list>
+                    </div>
+                </uib-tab>
+
+            </uib-tabset>
+
+
+
+            <div class="waltz-paragraph text-muted pull-right small">
+                <waltz-icon name="info-circle"></waltz-icon>
+                Software associated with the application sourced from:
+                <ul class="list-inline" style="display: inline-block">
+                    <li ng-repeat="(source, usages) in ctrl.usages">
+                        {{ source }}
+                        <span ng-if="!$last">,</span>
+                    </li>
+                </ul>
+            </div>
 
         </div>
 
-        <div class="waltz-paragraph text-muted pull-right">
-            <waltz-icon name="info-circle"></waltz-icon>
-            Software associated with the application, sourced from:
-            <ul class="list-inline" style="display: inline-block">
-                <li ng-repeat="(source, usages) in ctrl.usages">
-                    {{ source }}
-                    <span ng-if="!$last">,</span>
-                </li>
-            </ul>
+        <div ng-if="ctrl.catalog.packages.length == 0">
+            <div class="alert alert-warning">
+                <strong>No software packages</strong>
+                have been associated with this application
+            </div>
         </div>
 
     </waltz-section>

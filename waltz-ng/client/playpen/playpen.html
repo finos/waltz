@@ -7,13 +7,35 @@
         </ol>
     </waltz-page-header>
 
+    <!-- TECHNOLOGIES -->
+    <div waltz-has-setting="feature.software-catalog.enabled=true">
+        <waltz-app-technology-section catalog="ctrl.softwareCatalog">
+        </waltz-app-technology-section>
+    </div>
 
     <waltz-section>
-        <input class="form-input" type="search" ng-model="ctrl.qry">
+        <input class="form-input"
+               type="search"
+               ng-model="ctrl.qry">
 
-        <waltz-simple-software-usage-list packages="ctrl.filteredPackages">
+        <div class="row">
+            <div class="col-sm-6">
+                <waltz-pie-table data="ctrl.pieData.maturity"
+                                 config="ctrl.pieConfig.maturity"
+                                 title="By Maturity">
+                </waltz-pie-table>
+            </div>
+            <div class="col-sm-6">
+                <waltz-pie-table data="ctrl.pieData.vendor"
+                                 config="ctrl.pieConfig.vendor"
+                                 title="By Vendor">
+                </waltz-pie-table>
+            </div>
+        </div>
 
-        </waltz-simple-software-usage-list>
+
+
+
     </waltz-section>
 
 

@@ -9,9 +9,11 @@ const BINDINGS = {
 const FIELDS_TO_SEARCH = ['vendor', 'name', 'version'];
 
 
+
 function controller($scope) {
 
     const vm = this;
+
 
 
     $scope.$watchGroup(
