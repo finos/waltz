@@ -10,10 +10,9 @@
  *
  */
 
-import _ from 'lodash';
-
-import RatedFlowsData from '../../data-flow/RatedFlowsData';
-import { aggregatePeopleInvolvements } from '../../involvement/involvement-utils';
+import _ from "lodash";
+import RatedFlowsData from "../../data-flow/RatedFlowsData";
+import {aggregatePeopleInvolvements} from "../../involvement/involvement-utils";
 
 
 function prepareFlowData(flows, apps) {
@@ -62,6 +61,7 @@ function service(appStore,
                  assetCostStore,
                  complexityStore,
                  capabilityStore,
+                 softwareCatalogStore,
                  $q) {
 
     const rawData = {};
@@ -75,7 +75,7 @@ function service(appStore,
             involvementStore.findPeopleByEntityReference('ORG_UNIT', orgUnitId),
             involvementStore.findByEntityReference('ORG_UNIT', orgUnitId),
             perspectiveStore.findByCode('BUSINESS'),
-            changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId),
+            changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId)
         ];
 
         return $q.all(promises)
@@ -113,7 +113,8 @@ function service(appStore,
             authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
             endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
             assetCostStore.findAppCostsByAppIds(appIds),
-            complexityStore.findByAppIds(appIds)
+            complexityStore.findByAppIds(appIds),
+            softwareCatalogStore.findByAppIds(appIds)
     ]).then(([
             capabilityRatings,
             dataFlows,
@@ -123,7 +124,8 @@ function service(appStore,
             authSources,
             endUserApps,
             assetCosts,
-            complexity
+            complexity,
+            softwareCatalog
         ]) => {
 
             const r = {
@@ -136,7 +138,8 @@ function service(appStore,
                 authSources,
                 endUserApps,
                 assetCosts,
-                complexity
+                complexity,
+                softwareCatalog
             };
 
             Object.assign(rawData, r);
@@ -173,6 +176,7 @@ service.$inject = [
     'AssetCostStore',
     'ComplexityStore',
     'CapabilityStore',
+    'SoftwareCatalogStore',
     '$q'
 ];
 
