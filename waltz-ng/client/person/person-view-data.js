@@ -10,7 +10,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
 const initModel = {
@@ -30,7 +30,14 @@ const initModel = {
 };
 
 
-function service(personStore, involvementStore, assetCostStore, complexityStore, serverInfoStore, dataFlowStore, $q) {
+function service(personStore,
+                 involvementStore,
+                 assetCostStore,
+                 complexityStore,
+                 serverInfoStore,
+                 dataFlowStore,
+                 softwareCatalogStore,
+                 $q) {
 
     const state = { model: initModel };
 
@@ -107,6 +114,12 @@ function service(personStore, involvementStore, assetCostStore, complexityStore,
             .then(flows => state.model.dataFlows = flows);
     }
 
+    function loadSoftwareCatalog(appIds) {
+        softwareCatalogStore
+            .findByAppIds(appIds)
+            .then(catalog => state.model.softwareCatalog = catalog);
+    }
+
 
     function load(employeeId) {
         loadPeople(employeeId);
@@ -117,6 +130,7 @@ function service(personStore, involvementStore, assetCostStore, complexityStore,
                 loadComplexity(appIds);
                 loadServerStats(appIds);
                 loadFlows(appIds);
+                loadSoftwareCatalog(appIds);
             });
     }
 
@@ -134,6 +148,7 @@ service.$inject = [
     'ComplexityStore',
     'ServerInfoStore',
     'DataFlowDataStore',
+    'SoftwareCatalogStore',
     '$q'
 ];
 
