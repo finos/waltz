@@ -112,7 +112,8 @@ function controller(capabilities,
                     applicationStore,
                     serverInfoStore,
                     traitUsageStore,
-                    traitStore) {
+                    traitStore,
+                    softwareCatalogStore) {
 
     const vm = this;
 
@@ -146,8 +147,17 @@ function controller(capabilities,
                 dataFlowStore.findByAppIds(appIds),
                 complexityStore.findByAppIds(appIds),
                 assetCostStore.findAppCostsByAppIds(appIds),
-                serverInfoStore.findStatsForAppIds(appIds)
-            ]).then(([perspective, ratings, flows, complexity, assetCosts, serverStats]) => {
+                serverInfoStore.findStatsForAppIds(appIds),
+                softwareCatalogStore.findByAppIds(appIds)
+            ]).then(([
+                perspective,
+                ratings,
+                flows,
+                complexity,
+                assetCosts,
+                serverStats,
+                softwareCatalog
+            ]) => {
                 vm.ratings = {
                     group: prepareGroupData(capability, vm.apps, perspective, ratings),
                     tweakers
@@ -156,6 +166,7 @@ function controller(capabilities,
                 vm.complexity = complexity;
                 vm.assetCosts = assetCosts;
                 vm.serverStats = serverStats;
+                vm.softwareCatalog = softwareCatalog;
             });
         });
 
@@ -210,7 +221,8 @@ controller.$inject = [
     'ApplicationStore',
     'ServerInfoStore',
     'TraitUsageStore',
-    'TraitStore'
+    'TraitStore',
+    'SoftwareCatalogStore'
 ];
 
 
