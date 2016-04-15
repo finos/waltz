@@ -3,4 +3,5 @@ export default (module) => {
     module.directive('waltzSimpleSoftwareUsageList', require('./directives/simple-software-usage-list'));
     module.directive('waltzSimpleSoftwareUsagePies', require('./directives/simple-software-usage-pies'));
     module.directive('waltzMaturityStatus', require('./directives/maturity-status'));
+    module.directive('waltzSoftwareCatalogSection', require('./directives/software-catalog-section'));
 };

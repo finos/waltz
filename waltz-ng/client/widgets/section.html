@@ -10,13 +10,13 @@
 
             <div class="waltz-visibility-parent waltz-section-header-title">
 
-                <waltz-twistie model="collapsed"></waltz-twistie>
+                <waltz-twistie model="ctrl.collapsed"></waltz-twistie>
 
-                <waltz-icon name="{{icon}}"></waltz-icon>
-                {{name}}
+                <waltz-icon name="{{ ctrl.icon }}"></waltz-icon>
+                {{ ctrl.name }}
 
                 <small>
-                    {{ small }}
+                    {{ ctrl.small }}
                 </small>
 
             </div>
@@ -25,7 +25,7 @@
 
 
         <div class="container-fluid waltz-section-body animate-if"
-             ng-if="! collapsed">
+             ng-if="! ctrl.collapsed">
             <ng-transclude></ng-transclude>
         </div>
     </div>

@@ -1,13 +1,35 @@
+import _ from "lodash";
+
+
 const BINDINGS = {
     usages: '=',
     packages: '='
 };
 
 
-function controller() {
+function controller($scope) {
+
+    const vm = this;
+
+    $scope.$watch(
+        'ctrl.usages',
+        (usages = []) => {
+            const usagesByPkgId = _.countBy(usages, usage => usage.softwarePackageId);
+            vm.countUsages = (pkg) => {
+                const count = usagesByPkgId[pkg.id]
+                return count > 1
+                        ? 'x ' + count
+                        : '';
+            };
+
+        }
+    );
+
+
+
 }
 
-controller.$inject = [ ];
+controller.$inject = [ '$scope' ];
 
 
 export default () => ({

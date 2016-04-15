@@ -33,7 +33,6 @@
 
     <hr>
 
-
     <waltz-section name='Capability Ratings'
                    small="{{ ctrl.ratingColorStrategy.name }}"
                    ng-init="ctrl.capabilitySelectorVisible = false">
@@ -71,6 +70,11 @@
     </waltz-asset-costs-section>
 
 
+    <!-- TECHNOLOGIES -->
+    <waltz-software-catalog-section catalog="ctrl.softwareCatalog">
+    </waltz-software-catalog-section>
+
+
     <!-- APPS -->
     <waltz-section name="Applications"
                    id="apps-section"
@@ -91,5 +95,7 @@
             <span ng-bind="ctrl.groupDetail.appGroup.name"></span>.
         </div>
     </waltz-section>
+
+
 
 </div>

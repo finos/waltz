@@ -94,6 +94,7 @@ function calculateCapabilities(allCapabilities, appCapabilities) {
 }
 
 
+
 function controller(appGroupStore,
                     appStore,
                     assetCostStore,
@@ -104,6 +105,7 @@ function controller(appGroupStore,
                     capabilityStore,
                     appCapabilityStore,
                     ratingStore,
+                    softwareCatalogStore,
                     $stateParams,
                     $q)
 {
@@ -121,7 +123,8 @@ function controller(appGroupStore,
             serverInfoStore.findStatsForAppIds(appIds),
             capabilityStore.findAll(),
             appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
-            ratingStore.findByAppIds(appIds)
+            ratingStore.findByAppIds(appIds),
+            softwareCatalogStore.findByAppIds(appIds)
         ]))
         .then(([
             apps,
@@ -130,7 +133,8 @@ function controller(appGroupStore,
             serverStats,
             allCapabilities,
             appCapabilities,
-            ratings
+            ratings,
+            softwareCatalog
         ]) => {
             vm.applications = apps;
             vm.assetCosts = assetCosts;
@@ -139,6 +143,7 @@ function controller(appGroupStore,
             vm.allCapabilities = allCapabilities;
             vm.appCapabilities = appCapabilities;
             vm.ratings = ratings;
+            vm.softwareCatalog = softwareCatalog;
         })
         .then(() => loadDataFlows(dataFlowStore, vm.applications))
         .then(flows => vm.dataFlows = flows)
@@ -167,6 +172,7 @@ controller.$inject = [
     'CapabilityStore',
     'AppCapabilityStore',
     'RatingStore',
+    'SoftwareCatalogStore',
     '$stateParams',
     '$q'
 ];

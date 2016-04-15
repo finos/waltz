@@ -1,4 +1,6 @@
+import _ from "lodash";
 import {maturityColorScale, variableScale} from "../../common/colors";
+
 
 const BINDINGS = {
     usages: '=',
@@ -8,16 +10,27 @@ const BINDINGS = {
 
 
 function prepareStats(items = [], usages = []) {
+    const usageCounts = _.countBy(usages, 'softwarePackageId');
+
+    const countPieDataBy = (items = [], fn = (x => x)) =>
+        _.chain(items)
+            .groupBy(fn)
+            .map((group, key) => {
+                const calculatedCount = _.foldl(
+                    group,
+                    (acc, groupItem) => acc + usageCounts[groupItem.id] || 1,
+                    0);
+                return {
+                    key,
+                    count: calculatedCount
+                };
+            })
+            .value();
+
 
     return {
-        maturity: _.chain(items)
-            .countBy(item => item.maturityStatus)
-            .map((count, key) => ({key, count}))
-            .value(),
-        vendor: _.chain(items)
-            .countBy(item => item.vendor)
-            .map((count, key) => ({key, count}))
-            .value()
+        maturity: countPieDataBy(items, item => item.maturityStatus),
+        vendor: countPieDataBy(items, item => item.vendor)
     };
 
 }
@@ -40,13 +53,10 @@ function controller($scope) {
     };
 
 
-    $scope.$watch(
-        'ctrl.packages',
+    $scope.$watchGroup(
+        ['ctrl.packages', 'ctrl.usages'],
         () => recalcPieData()
     );
-
-
-
 
 }
 

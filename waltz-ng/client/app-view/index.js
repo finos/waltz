@@ -27,5 +27,5 @@ export default (module) => {
         }
     ]);
 
-    module.directive('waltzAppTechnologySection', require('./directives/technology-section'));
+    
 };

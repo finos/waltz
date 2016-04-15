@@ -10,17 +10,28 @@
  *
  */
 
+const BINDINGS = {
+    name: '@',
+    icon: '@',
+    small: '@',
+    id: '@',
+    collapsible: '='
+};
+
+
+function controller() {
+
+}
+
+
 export default () => ({
     restrict: 'E',
     replace: true,
     template: require('./section.html'),
-    scope: {
-        name: '@',
-        icon: '@',
-        small: '@',
-        id: '@',
-        collapsible: '='
-    },
+    bindToController: BINDINGS,
+    controllerAs:'ctrl',
+    controller,
+    scope: {},
     transclude: true
 });
 

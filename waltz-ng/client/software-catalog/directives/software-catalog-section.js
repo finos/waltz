@@ -6,7 +6,7 @@ const BINDINGS = {
 };
 
 
-const FIELDS_TO_SEARCH = ['vendor', 'name', 'version'];
+const FIELDS_TO_SEARCH = ['vendor', 'name', 'version', 'maturityStatus'];
 
 
 
@@ -46,7 +46,7 @@ export default () => ({
     scope: {
         panel: '='
     },
-    template: require('./technology-section.html'),
+    template: require('./software-catalog-section.html'),
     bindToController: BINDINGS,
     controllerAs: 'ctrl',
     controller
