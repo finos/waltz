@@ -58,7 +58,7 @@
                                csv-name="{{ ctrl.capability.name }}_asset_costs.csv">
     </waltz-asset-costs-section>
 
-    
+
     <!-- APPLICATIONS -->
     <waltz-section name="Applications"
                    small="( {{ ctrl.apps.length }} )">
@@ -95,6 +95,12 @@
             </div>
         </div>
     </waltz-section>
+
+
+    <!-- TECHNOLOGIES -->
+    <waltz-software-catalog-section catalog="ctrl.softwareCatalog">
+    </waltz-software-catalog-section>
+
 
     <!-- ASSOCIATED CAPABILITIES -->
     <waltz-section name="Associated Capabilities">

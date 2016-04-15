@@ -9,18 +9,17 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from 'lodash';
-
-import { appViewResolver } from './resolvers';
+import {appViewResolver} from "./resolvers";
 import {
     loadDataFlows,
     loadChangeLog,
     loadInvolvements,
     loadAuthSources,
-    loadServers } from './data-load';
-import { prepareSlopeGraph } from '../data-flow/directives/slope-graph/slope-graph-utils';
-import { mkAppRatingsGroup, calculateHighestRatingCount } from '../ratings/directives/common';
-
+    loadServers,
+    loadSoftwareCatalog
+} from "./data-load";
+import {prepareSlopeGraph} from "../data-flow/directives/slope-graph/slope-graph-utils";
+import {mkAppRatingsGroup, calculateHighestRatingCount} from "../ratings/directives/common";
 
 
 function controller(appView,
@@ -34,6 +33,7 @@ function controller(appView,
                     ratingStore,
                     displayNameService,
                     complexityStore,
+                    catalogStore,
                     $state,
                     $q) {
 
@@ -73,7 +73,8 @@ function controller(appView,
         loadChangeLog(changeLogStore, id, vm),
         loadInvolvements($q, involvementStore, id, vm),
         loadAuthSources(authSourcesStore, orgUnitStore, id, organisationalUnitId, vm),
-        loadServers(serverInfoStore, id, vm)
+        loadServers(serverInfoStore, id, vm),
+        loadSoftwareCatalog(catalogStore, id, vm)
     ];
 
     $q.all(promises).then(() => {
@@ -108,6 +109,7 @@ controller.$inject = [
     'RatingStore',
     'WaltzDisplayNameService',
     'ComplexityStore',
+    'SoftwareCatalogStore',
     '$state',
     '$q'
 ];

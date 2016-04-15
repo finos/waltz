@@ -8,60 +8,11 @@
     </waltz-page-header>
 
 
-    <waltz-section>
-        <waltz-capability-multi-selector capabilities="ctrl.capabilitiesForApp"
-                                         explicit-capability-ids="ctrl.explicitCapabilityIds"
-                                         on-selection="ctrl.onSelection">
-
-        </waltz-capability-multi-selector>
-    </waltz-section>
-    <waltz-section name="Preview">
-        <div class="row">
-            <div class="col-md-12">
-
-                <h1>Tree Here</h1>
-                    <treecontrol class="tree-light"
-                             tree-model="ctrl.treeData"
-                             expanded-nodes="ctrl.expandedNodes"
-                             order-by="name"
-                             on-selection="ctrl.onSelection(node, selected)"
-                             options="ctrl.treeOptions">
-                        <span>
-                            {{ node.name }}
-                            <waltz-icon name="star" fixed-width="true" ng-if='ctrl.isPrimary(node.id)'></waltz-icon>
-                        </span>
-                    </treecontrol>
-                <h3>Post Tree</h3>
-
-            </div>
-
-        </div>
-
-
-    </waltz-section>
-
-
-
-
-
-
-    <waltz-section name="Dump1">
-        <pre>
-            {{ ctrl.treeOptions }}
-        </pre>
-    </waltz-section>
-
-
-
-    <waltz-section name="Dump1">
-        <pre>
-            {{ ctrl.primaryCapabilityIds }}
-        </pre>
-        <pre>
-            {{ ctrl.expandedNodes }}
-        </pre>
-    </waltz-section>
-
+    <!-- TECHNOLOGIES -->
+    <div waltz-has-setting="feature.software-catalog.enabled=true">
+        <waltz-software-catalog-section catalog="ctrl.softwareCatalog">
+        </waltz-software-catalog-section>
+    </div>
 
 
 

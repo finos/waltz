@@ -28,9 +28,8 @@ import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.involvement.InvolvementKind;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.schema.tables.records.InvolvementRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -99,16 +98,24 @@ public class InvolvementDao {
 
 
     public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
-        return dsl
-                .selectDistinct(APPLICATION.fields())
+        SelectOrderByStep<Record1<String>> employeeIds = dsl.selectDistinct(PERSON_HIERARCHY.EMPLOYEE_ID)
+                .from(PERSON_HIERARCHY)
+                .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId))
+                .union(DSL.select(DSL.value(employeeId)));
+
+        SelectConditionStep<Record1<Long>> applicationIds = dsl.selectDistinct(INVOLVEMENT.ENTITY_ID)
+                .from(INVOLVEMENT)
+                .where(INVOLVEMENT.ENTITY_KIND
+                        .eq(EntityKind.APPLICATION.name())
+                        .and(INVOLVEMENT.EMPLOYEE_ID.in(employeeIds)));
+
+        List<Application> applications = dsl
+                .select(APPLICATION.fields())
                 .from(APPLICATION)
-                .innerJoin(INVOLVEMENT)
-                .on(INVOLVEMENT.ENTITY_ID.eq(APPLICATION.ID))
-                .innerJoin(PERSON_HIERARCHY)
-                .on(PERSON_HIERARCHY.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
-                .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                .and(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId)))
+                .where(APPLICATION.ID.in(applicationIds))
                 .fetch(ApplicationDao.applicationRecordMapper);
+
+        return applications;
     }
 
 

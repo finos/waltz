@@ -17,11 +17,11 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.service.DIConfiguration;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.SelectConditionStep;
+import org.jooq.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import javax.sql.DataSource;
@@ -29,6 +29,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
@@ -46,11 +47,11 @@ public class InvolvementHarness {
             "  from [involvement]\n" +
             "  where (\n" +
             "    (\n" +
-            "      [involvement].[employee_id] = 'UnrbafFjJ'\n" +
+            "      [involvement].[employee_id] = 'Ms6tJhlJn'\n" +
             "      or [involvement].[employee_id] in (\n" +
             "        select [person_hierarchy].[employee_id]\n" +
             "        from [person_hierarchy]\n" +
-            "        where [person_hierarchy].[manager_id] = 'UnrbafFjJ'\n" +
+            "        where [person_hierarchy].[manager_id] = 'Ms6tJhlJn'\n" +
             "      )\n" +
             "    )\n" +
             "    and [involvement].[entity_kind] = 'APPLICATION'\n" +
@@ -62,6 +63,7 @@ public class InvolvementHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
         DataSource dataSource = ctx.getBean(DataSource.class);
+        InvolvementDao dao = ctx.getBean(InvolvementDao.class);
 
         System.out.println("-- Waiting ...");
         Thread.sleep(5000);
@@ -72,7 +74,21 @@ public class InvolvementHarness {
         viaJooqOrig(dsl);
         viaJooqJoins(dsl);
         viaJooqSql(dsl);
+        viaDao(dao);
         viaJdbc(dataSource);
+    }
+
+    private static void viaDao(InvolvementDao dao) {
+        System.out.println("-- dao start");
+        long start = System.currentTimeMillis();
+
+
+        List<Application> apps = dao.findAllApplicationsByEmployeeId("Ms6tJhlJn");
+        System.out.println(apps.size());
+
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("-- dao end "+ duration);
+
     }
 
     private static void viaJdbc(DataSource dataSource) {
@@ -93,6 +109,7 @@ public class InvolvementHarness {
                 c++;
             }
 
+            System.out.println(c);
             long duration = System.currentTimeMillis() - start;
             System.out.println("-- jdbc end "+ duration);
         } catch (SQLException e) {
@@ -113,22 +130,28 @@ public class InvolvementHarness {
 
     private static void viaJooqJoins(DSLContext dsl) {
 
-        String employeeId = "UnrbafFjJ";
+        String employeeId = "Ms6tJhlJn";
+
+        Condition eitherPersonOrReportee = PERSON_HIERARCHY.MANAGER_ID.eq(employeeId)
+                .or(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId));
 
         SelectConditionStep<Record1<Long>> query = dsl
-                .selectDistinct(APPLICATION.ID)
+                .select(APPLICATION.ID)
                 .from(APPLICATION)
                 .innerJoin(INVOLVEMENT)
                     .on(INVOLVEMENT.ENTITY_ID.eq(APPLICATION.ID))
                 .innerJoin(PERSON_HIERARCHY)
                     .on(PERSON_HIERARCHY.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
                 .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                    .and(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId)));
+                    .and(eitherPersonOrReportee));
 
         System.out.println("-- jooq join start");
         long st = System.currentTimeMillis();
 
-        query.fetch();
+        System.out.println(query);
+
+        Result<Record1<Long>> records = query.fetch();
+        System.out.println(records.size());
 
         long dur = System.currentTimeMillis() - st;
         System.out.println("-- jooq join end " + dur);
@@ -136,7 +159,7 @@ public class InvolvementHarness {
 
     private static void viaJooqOrig(DSLContext dsl) {
 
-        String employeeId = "UnrbafFjJ";
+        String employeeId = "Ms6tJhlJn";
 
         SelectConditionStep<Record1<String>> allReporteesQuery = select(PERSON_HIERARCHY.EMPLOYEE_ID)
                 .from(PERSON_HIERARCHY)

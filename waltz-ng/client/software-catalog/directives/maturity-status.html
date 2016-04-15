@@ -1,0 +1,9 @@
+<div class="label"
+     ng-class="{
+        'label-info' : ctrl.status == 'PLANNED',
+        'label-success' : ctrl.status == 'INVEST',
+        'label-warning' : ctrl.status == 'HOLD',
+        'label-danger' : ctrl.status == 'DISINVEST' || ctrl.status == 'UNSUPPORTED' || ctrl.status == 'RESTRICTED'
+     }">
+    {{ ctrl.status }}
+</div>

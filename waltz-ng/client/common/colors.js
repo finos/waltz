@@ -11,7 +11,7 @@
  *
  */
 
-import d3 from 'd3';
+import d3 from "d3";
 
 export const amber = d3.rgb('#ff7f0e');
 export const green = d3.rgb('#2ca02c');
@@ -29,6 +29,20 @@ export const capabilityColorScale = ragColorScale;
 
 
 export const investmentRatingColorScale = ragColorScale;
+
+
+export const maturityColorScale = d3.scale.ordinal()
+    .domain([
+        'PLANNED',
+        'INVEST',
+        'HOLD',
+        'DISINVEST', 'UNSUPPORTED', 'RESTRICTED'
+    ])
+    .range([
+        blue,
+        green,
+        amber,
+        red, red, red]);
 
 
 export const authoritativeSourceColorScale = d3.scale.ordinal()
@@ -66,6 +80,6 @@ export const flowDirectionColorScale = d3.scale.ordinal()
     .range([green, amber, blue, grey]);
 
 
-const underlyingVariableScale = d3.scale.category20();
+const underlyingVariableScale = d3.scale.category20c();
 
 export const variableScale = (x) => d3.rgb(underlyingVariableScale(x));

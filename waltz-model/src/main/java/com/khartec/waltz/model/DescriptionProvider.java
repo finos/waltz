@@ -17,7 +17,10 @@
 
 package com.khartec.waltz.model;
 
+import org.immutables.value.Value;
+
 public interface DescriptionProvider {
 
-    String description();
+    @Value.Default
+    default String description() { return ""; }
 }

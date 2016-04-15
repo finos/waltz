@@ -12,7 +12,7 @@
  */
 
 
-import AppView from './app-view';
+import AppView from "./app-view";
 
 
 export default (module) => {
@@ -26,4 +26,6 @@ export default (module) => {
                 .state('main.app-view', AppView);
         }
     ]);
+
+    
 };

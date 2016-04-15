@@ -1,6 +1,11 @@
 package com.khartec.waltz.model;
 
+import org.immutables.value.Value;
+
 public interface ProvenanceProvider {
 
-    String provenance();
+    @Value.Default
+    default String provenance() {
+        return "waltz";
+    }
 }

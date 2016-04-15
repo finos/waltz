@@ -1,0 +1,49 @@
+<div>
+    <waltz-section name="Technologies" id="technology">
+
+        <div ng-if="ctrl.catalog.packages.length > 0">
+            <waltz-section-actions>
+                <input type="search" placeholder="Search"
+                       style="border-radius: 6px; padding-left: 3px"
+                       ng-model="ctrl.qry">
+            </waltz-section-actions>
+
+            <uib-tabset>
+                <uib-tab heading="Overview">
+                    <waltz-simple-software-usage-pies packages="ctrl.filteredPackages"
+                                                      usages="ctrl.catalog.usages">
+                    </waltz-simple-software-usage-pies>
+                </uib-tab>
+                <uib-tab heading="Detail">
+                    <div class="waltz-scroll-region" style="height: 300px">
+                        <waltz-simple-software-usage-list packages="ctrl.filteredPackages"
+                                                          usages="ctrl.catalog.usages">
+                        </waltz-simple-software-usage-list>
+                    </div>
+                </uib-tab>
+
+            </uib-tabset>
+
+
+
+            <div class="waltz-paragraph text-muted pull-right small">
+                <waltz-icon name="info-circle"></waltz-icon>
+                Associated software packages have been sourced from:
+                <ul class="list-inline" style="display: inline-block">
+                    <li ng-repeat="(source, usages) in ctrl.usages">
+                        {{ source }}
+                        <span ng-if="!$last">,</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div ng-if="ctrl.catalog.packages.length == 0 || ! ctrl.catalog">
+            <div class="alert alert-warning">
+                <strong>No associated software packages</strong>
+            </div>
+        </div>
+
+    </waltz-section>
+</div>

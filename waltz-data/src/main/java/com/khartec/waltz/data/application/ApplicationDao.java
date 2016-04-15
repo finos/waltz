@@ -52,7 +52,7 @@ public class ApplicationDao {
 
     public static final RecordMapper<Record, Application> applicationRecordMapper = record -> {
         ApplicationRecord appRecord = record.into(APPLICATION);
-        return ImmutableApplication.builder()
+        Application app = ImmutableApplication.builder()
                 .name(appRecord.getName())
                 .description(appRecord.getDescription())
                 .assetCode(Optional.ofNullable(appRecord.getAssetCode()))
@@ -64,6 +64,8 @@ public class ApplicationDao {
                 .overallRating(readEnum(appRecord.getOverallRating(), RagRating.class, RagRating.Z))
                 .provenance(appRecord.getProvenance())
                 .build();
+
+        return app;
     };
 
     private final DSLContext dsl;

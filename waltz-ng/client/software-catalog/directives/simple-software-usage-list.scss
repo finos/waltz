@@ -1,0 +1,21 @@
+.waltz-simple-software-usage-list {
+    tbody:hover {
+        background-color: $waltz-background-color;
+    }
+
+    tbody {
+        border-top: 1px solid lighten($waltz-border-color, 30);
+    }
+
+    tbody:before {
+        content: '';
+        display: block;
+        height: 6px;
+    }
+
+    tbody:after {
+        content: '';
+        display: block;
+        height: 6px;
+    }
+}
