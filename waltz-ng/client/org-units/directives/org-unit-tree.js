@@ -1,3 +1,4 @@
+
 /*
  *  Waltz
  * Copyright (c) David Watkins. All rights reserved.
@@ -10,10 +11,32 @@
  *
  */
 
-export default (module) => {
-    module.directive('waltzOrgUnit', require('./org-unit'));
-    module.directive('waltzOrgUnitOverview', require('./org-unit-overview'));
-    module.directive('waltzOrgUnitNamePopup', require('./org-unit-name-popup'));
-    module.directive('waltzOrgUnitFlowViz', require('./org-unit-flow-viz'));
-    module.directive('waltzOrgUnitTree', require('./org-unit-tree'));
+const BINDINGS = {
+    tree: '=',
+    appCounts: '='
 };
+
+
+function controller($scope) {
+    const vm = this;
+
+    vm.treeOptions = {
+        nodeChildren: "children",
+        dirSelectable: false
+    };
+
+}
+
+controller.$inject = [ '$scope' ];
+
+
+export default () => ({
+    restrict: 'E',
+    replace: true,
+    template: require('./org-unit-tree.html'),
+    scope: {},
+    bindToController: BINDINGS,
+    controllerAs: 'ctrl',
+    controller
+});
+

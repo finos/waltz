@@ -1,0 +1,23 @@
+<div>
+    <treecontrol class="tree-classic"
+                 tree-model="ctrl.tree"
+                 options="ctrl.treeOptions">
+            <span class="waltz-visibility-parent">
+                <strong ng-bind="node.name">
+                </strong>
+                <span class="waltz-visibility-child-50">
+                    <strong>
+                        <a ui-sref="main.org-units.unit ({id: node.id })">
+                            Show &raquo;
+                        </a>
+                    </strong>
+                    <span ng-if="ctrl.appCounts[node.id] > 0"
+                          class="small waltz-tally-count"
+                          title="Number of applications">
+                        <span ng-bind="ctrl.appCounts[node.id]"></span>
+                        application/s
+                    </span>
+                </span>
+            </span>
+    </treecontrol>
+</div>

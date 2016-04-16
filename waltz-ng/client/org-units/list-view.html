@@ -26,19 +26,17 @@
 
 
     <!-- TREE -->
-    <waltz-section name="Tree">
+    <waltz-section name="Organisational Units">
+        <div class="row">
+            <div class="col-sm-6">
+                <waltz-org-unit-tree tree="ctrl.trees" app-counts="ctrl.talliesById" on-select="ctrl.onNodeSelect">
+                </waltz-org-unit-tree>
+            </div>
+            <div class="col-sm-6">
 
-        <treecontrol class="tree-classic"
-                     tree-model="ctrl.trees"
-                     options="ctrl.treeOptions">
-            <span class="waltz-visibility-parent">
-                <a ui-sref="main.app-view ({id: node.id })">
-                    <strong ng-bind="node.name">
-                    </strong>
-                </a>
-                <span class="waltz-visibility-child-10 small" ng-bind="node.shortDescription"></span>
-            </span>
-        </treecontrol>
+            </div>
+        </div>
+
     </waltz-section>
 
 
@@ -69,22 +67,23 @@
                     <col width="20%">
                 </colgroup>
                 <tbody>
-                <tr ng-repeat="node in ctrl.flatUnits | orderBy:'unit.name' | filter:qry | limitTo:50">
+                <tr ng-repeat="node in ctrl.orgUnits | orderBy:'name' | filter:qry | limitTo:50">
                     <td>
-                        <a ui-sref="main.org-units.unit ({ id: {{node.unit.id}} })"
+                        <a ui-sref="main.org-units.unit ({ id: {{node.id}} })"
                            class="waltz-org-unit-name"
-                           ng-bind="node.unit.name">
+                           ng-bind="node.name">
                         </a>
                     </td>
                     <td>
-                        <span class="small" bg-bind="node.unit.description">
+                        <span class="small"
+                              ng-bind="node.description">
                         </span>
                     </td>
                     <td>
-                        <span ng-if="ctrl.talliesById[node.unit.id] > 0"
+                        <span ng-if="ctrl.talliesById[node.id] > 0"
                               class="small waltz-tally-count"
                               title="Number of applications">
-                            <span ng-bind="ctrl.talliesById[node.unit.id]"></span>
+                            <span ng-bind="ctrl.talliesById[node.id]"></span>
                             application/s
                         </span>
                     </td>

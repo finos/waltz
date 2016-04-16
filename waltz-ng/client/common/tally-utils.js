@@ -15,6 +15,9 @@ import _ from "lodash";
 export function talliesById(tallies) {
     return _.reduce(
         tallies,
-        (acc, tally) => { acc[tally.id] = tally.count; return acc; },
+        (acc, tally) => {
+            acc[tally.id] = tally.count;
+            return acc;
+        },
         {});
 }
