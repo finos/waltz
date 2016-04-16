@@ -16,6 +16,8 @@
  *
  */
 
+import _ from "lodash";
+
 
 const options = {
     includeSubUnits: true,
@@ -28,20 +30,19 @@ function prepareAppCapabilities(apps, capabilities, rawAppCapabilities) {
     const appsById = _.keyBy(apps, 'id');
     const capabilitiesById = _.keyBy(capabilities, 'id');
 
-    const appCapabilities =  _.chain(rawAppCapabilities)
-        .groupBy(ac => ac.capabilityId)
-        .map((appCapabilities, capId) => ( {
-            capability: capabilitiesById[capId],
-            applications: _.map(appCapabilities, ac => {
-                const { primary, applicationId } = ac;
-                const app = appsById[applicationId];
-
-                return { ...app, primary };
+    return _.chain(rawAppCapabilities)
+        .groupBy('capabilityId')
+        .map((appCapabilities, capabilityId) => ( {
+            capability: capabilitiesById[capabilityId],
+            applications: _.map(appCapabilities, appCapability => {
+                const application = appsById[appCapability.applicationId];
+                return {
+                    ...application,
+                    primary: appCapability.primary
+                };
             })
         } ))
         .value();
-
-    return appCapabilities;
 }
 
 

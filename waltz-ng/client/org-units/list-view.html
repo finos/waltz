@@ -28,16 +28,15 @@
     <!-- TREE -->
     <waltz-section name="Tree">
 
-        <span class="tree-classic"
+        <tree-control class="tree-classic"
                      tree-model="ctrl.trees"
                      options="ctrl.treeOptions">
             <span class="waltz-visibility-parent">
                 <strong ng-bind="node.name">
                 </strong>
-                </span>
                 <span class="waltz-visibility-child-10 small" ng-bind="node.shortDescription"></span>
             </span>
-        </treecontrol>
+        </tree-control>
     </waltz-section>
 
 
