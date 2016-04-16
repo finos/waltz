@@ -39,7 +39,7 @@ function editController(authSources,
             .filter(f => f.dataType === dataType)
             .filter(f => f.source.kind === 'APPLICATION')
             .map('source')
-            .uniq('id')
+            .uniqBy('id')
             .value();
 
         return apps;

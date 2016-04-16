@@ -27,7 +27,7 @@ function prepareFlowData(flows, apps) {
     const entities = _.chain(enrichedFlows)
         .map(f => ([f.source, f.target]))
         .flatten()
-        .uniq(a => a.id)
+        .uniqBy(a => a.id)
         .value();
 
     return {

@@ -37,7 +37,7 @@ function controller($scope) {
         const entities = _.chain(flows)
             .map(df => [df.source, df.target])
             .flatten()
-            .uniq('id')
+            .uniqBy('id')
             .map(app => ({...app, member: _.includes(memberAppIds, app.id)}))
             .value();
 
@@ -62,7 +62,7 @@ function controller($scope) {
         vm.flowData = calculateFlowData(vm.flows, memberAppIds);
         vm.availableDataTypes = _.chain(vm.flows)
             .map('dataType')
-            .uniq(false)
+            .uniq()
             .value();
 
     });

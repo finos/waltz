@@ -98,12 +98,12 @@ function controller(appGroupStore, appStore, dataFlowStore, notification, $state
                 focusApp.unitMembers = _.reject(unitMembers, m => m.id === app.id);
                 focusApp.upstream = _.chain(flows)
                     .map(f => f.source)
-                    .uniq(source => source.id)
+                    .uniqBy(source => source.id)
                     .reject(source => source.id === app.id)
                     .value();
                 focusApp.downstream = _.chain(flows)
                     .map(f => f.target)
-                    .uniq(target => target.id)
+                    .uniqBy(target => target.id)
                     .reject(target => target.id === app.id)
                     .value();
             })

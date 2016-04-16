@@ -20,7 +20,7 @@ import {calcComplexitySummary} from "../../complexity/services/complexity-utilit
 function calcCapabilityStats(ratings) {
     const caps = _.chain(ratings)
         .map("capability")
-        .uniq(false, c => c.id)
+        .uniqBy(c => c.id)
         .value();
 
     const appCount = _.chain(ratings)

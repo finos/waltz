@@ -12,7 +12,6 @@
                 views: {
                     'sidenav@main': { template: '<h1>Hello</h1>' }
                 }
-
             -->
     </span>
 
@@ -31,8 +30,8 @@
                     ng-repeat="item in ctrl.history">
                     <waltz-icon class='text-muted small'
                                 fixed-width="true"
-                                name="{{item.kind | toIconName:'entity'}}"></waltz-icon>
-                    <a ui-sref="{{::item.state}} ({{::item.stateParams}})">
+                                name="{{ item.kind | toIconName:'entity' }}"></waltz-icon>
+                    <a ui-sref="{{ ::item.state }} ({{ ::item.stateParams }})">
                         <span ng-bind="::item.name"></span>
                     </a>
                 </li>
@@ -45,7 +44,8 @@
 
             <a href class="small pull-right"
                ng-click="ctrl.refreshHistory()">
-                Refresh <waltz-icon name="refresh"></waltz-icon>
+                Refresh
+                <waltz-icon name="refresh"></waltz-icon>
             </a>
         </uib-accordion-group>
 

@@ -14,12 +14,18 @@ import _ from "lodash";
 
 
 function getUniqueSourceEntities(xs) {
-    return _.chain(xs).map('sourceEntity').uniq('id').value();
+    return _.chain(xs)
+        .map('sourceEntity')
+        .uniqBy('id')
+        .value();
 }
 
 
 function getUniqueTargetEntities(xs) {
-    return _.chain(xs).map('targetEntity').uniq('id').value();
+    return _.chain(xs)
+        .map('targetEntity')
+        .uniqBy('id')
+        .value();
 }
 
 
@@ -61,7 +67,7 @@ function getOutgoingRating(authSources, flow) {
             .filter({dataType: flow.type, parentReference: {id: ouId, kind: 'ORG_UNIT'}})
             .map('rating')
             .map(getColour)
-            .first()
+            .head()
             .value() || 'red';
 }
 
@@ -71,7 +77,7 @@ function getIncomingRating(authSources, flow) {
             .filter({dataType: flow.type, applicationReference: {id: flow.source}})
             .map('rating')
             .map(getColour)
-            .first()
+            .head()
             .value() || 'red';
 }
 

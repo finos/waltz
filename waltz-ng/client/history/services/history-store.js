@@ -10,7 +10,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 const key = 'history_1';
 
@@ -23,7 +23,7 @@ function store(storage) {
         const item = { name, state, kind, stateParams };
 
         const newHistory = _.chain([item, ...history])
-            .uniq(h => JSON.stringify(h))
+            .uniqBy(h => JSON.stringify(h))
             .take(10)
             .value();
 

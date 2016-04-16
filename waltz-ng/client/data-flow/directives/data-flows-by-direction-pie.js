@@ -33,7 +33,7 @@ function calcAppConnectionPieStats(flows, apps) {
     const orgMemberAppIds = _.map(apps, 'id');
 
     return _.chain(logicalFlows)
-        .uniq(false, f => f.source.id + '.' + f.target.id)
+        .uniqBy(f => f.source.id + '.' + f.target.id)
         .map(f => {
             const sourceIsMember = _.includes(orgMemberAppIds, f.source.id);
             const targetIsMember = _.includes(orgMemberAppIds, f.target.id);
