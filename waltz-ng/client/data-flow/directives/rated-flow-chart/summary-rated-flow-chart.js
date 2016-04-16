@@ -10,11 +10,10 @@
  *
  */
 
-import _ from 'lodash';
-import d3 from 'd3';
-
-import { authoritativeRatingColorScale } from '../../../common/colors.js';
-import { orgUnitSelected, orgUnitRatingSelected } from './events.js';
+import _ from "lodash";
+import d3 from "d3";
+import {authoritativeRatingColorScale} from "../../../common/colors.js";
+import {orgUnitSelected, orgUnitRatingSelected} from "./events.js";
 
 
 function prepareTypeScale(dataTypes, width) {
@@ -102,12 +101,12 @@ class Chart {
             const total = _.chain(d.values).map('values').sum().value();
             const barScale = d3.scale.linear().domain([0, total]).range([0, typeScale.rangeBand()]);
 
-            _.foldr(
+            _.reduce(
                 ['NO_OPINION', 'SECONDARY', 'PRIMARY', 'DISCOURAGED'],
                 (acc, rating) => {
 
                     // note, acc is the starting x value.
-                    const item = (_.findWhere(d.values, {key: rating}));
+                    const item = (_.find(d.values, {key: rating}));
 
                     if (item) {
                         const w = barScale(item.values);

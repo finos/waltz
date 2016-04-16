@@ -41,7 +41,7 @@ function controller($scope, catalogStore) {
             recalcPieData();
         });
 
-    vm.isPrimary = (cId) => _.contains(vm.primaryCapabilityIds, cId);
+    vm.isPrimary = (cId) => _.includes(vm.primaryCapabilityIds, cId);
 
     vm.pieConfig = {
         maturity: {

@@ -1,6 +1,5 @@
-import _ from 'lodash';
-
-import { ensureIsArray, ensureNotNull, ensureIsNumber } from '../../common/checks';
+import _ from "lodash";
+import {ensureIsArray, ensureNotNull, ensureIsNumber} from "../../common/checks";
 
 export default class {
 
@@ -9,11 +8,11 @@ export default class {
         ensureIsArray(allOrgUnits, 'allOrgUnits not an array');
         const id = ensureIsNumber(idThing, 'id is not a number');
 
-        const unit = _.findWhere(allOrgUnits, { id: Number(id) });
+        const unit = _.find(allOrgUnits, { id: Number(id) });
 
         ensureNotNull(unit, `Could not find org-unit for id ${id}`);
-        const parent = _.findWhere(allOrgUnits, { id: Number(unit.parentId) });
-        const children = _.where(allOrgUnits, { parentId: Number(id) });
+        const parent = _.find(allOrgUnits, { id: Number(unit.parentId) });
+        const children = _.filter(allOrgUnits, { parentId: Number(id) });
 
         return {
             parent,

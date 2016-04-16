@@ -12,14 +12,12 @@
  *
  */
 
-import _ from 'lodash';
-import d3 from 'd3';
-
-import { RIGHT_ARROW, DOWN_ARROW } from '../../../common/arrows';
-import { defaultDimensions, setupSummaryBarScales, setupCellScale } from '../common.js';
-import { capabilityColorScale } from '../../../common/colors';
-
-import RatingRows from './rating-rows';
+import _ from "lodash";
+import d3 from "d3";
+import {RIGHT_ARROW, DOWN_ARROW} from "../../../common/arrows";
+import {defaultDimensions, setupSummaryBarScales, setupCellScale} from "../common.js";
+import {capabilityColorScale} from "../../../common/colors";
+import RatingRows from "./rating-rows";
 
 
 const GroupSummaryCellBars = {
@@ -101,7 +99,7 @@ function renderSummaries(container, data, dimensions, scales) {
     rowLabels
         .text((d) => {
             const arrow = data.collapsed ? RIGHT_ARROW : DOWN_ARROW;
-            return arrow + ' ' + _.trunc(d.name, 20);
+            return arrow + ' ' + _.truncate(d.name, 20);
         });
 
     const groupSummaryCells = container

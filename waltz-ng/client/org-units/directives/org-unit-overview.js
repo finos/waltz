@@ -11,12 +11,10 @@
  *
  */
 
-import _ from 'lodash';
-
-import { numberFormatter } from '../../common';
-import { enrichServerStats } from  '../../server-info/services/server-utilities';
-import { calcPortfolioCost } from '../../asset-cost/services/asset-cost-utilities';
-import { calcComplexitySummary } from '../../complexity/services/complexity-utilities';
+import _ from "lodash";
+import {enrichServerStats} from "../../server-info/services/server-utilities";
+import {calcPortfolioCost} from "../../asset-cost/services/asset-cost-utilities";
+import {calcComplexitySummary} from "../../complexity/services/complexity-utilities";
 
 
 function calcCapabilityStats(ratings) {
@@ -55,7 +53,7 @@ function controller($scope, orgUnitStore) {
 
     $scope.$watch('ctrl.orgServerStats', stats => {
         if (!stats) return;
-        const serverStats = _.foldl(
+        const serverStats = _.reduce(
             stats,
             (acc, stat) => {
                 const virtualCount = acc.virtualCount + stat.virtualCount;

@@ -59,7 +59,7 @@ function controller(appGroupStore, appStore, dataFlowStore, notification, $state
 
 
     vm.isAppInGroup = (app) => {
-        return _.any(vm.applications, a => app.id === a.id);
+        return _.some(vm.applications, a => app.id === a.id);
     };
 
 

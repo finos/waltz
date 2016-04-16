@@ -40,7 +40,7 @@ function controller(application,
 
 
     const isDirty = () => {
-        return _.any(model.selectedTypes, st => {
+        return _.some(model.selectedTypes, st => {
             return st.original !== st.selected;
         });
     };
@@ -50,8 +50,8 @@ function controller(application,
         vm.model.selectedTypes = _.map(all, type => {
             return {
                 ...type,
-                selected: _.contains(selectedTypes, type.code),
-                original: _.contains(selectedTypes, type.code)
+                selected: _.includes(selectedTypes, type.code),
+                original: _.includes(selectedTypes, type.code)
             };
         });
     };
@@ -66,7 +66,7 @@ function controller(application,
         model.selectedDirection = 'source';
 
         const selectedTypes = _.chain(vm.flows)
-            .where({ source: { id: app.id }})
+            .filter({ source: { id: app.id }})
             .map('dataType')
             .value();
 
@@ -82,7 +82,7 @@ function controller(application,
         model.selectedDirection = 'target';
 
         const selectedTypes = _.chain(vm.flows)
-            .where({ target: { id: app.id }})
+            .filter({ target: { id: app.id }})
             .map('dataType')
             .value();
 
@@ -141,7 +141,7 @@ function controller(application,
         vm.showAddUpstream = false;
         selectSource(sourceApp);
         if (!sourceApp) return;
-        if (_.any(vm.data.sources, a => a.id === sourceApp.id)) return;
+        if (_.some(vm.data.sources, a => a.id === sourceApp.id)) return;
         vm.data.sources.push(sourceApp);
     };
 
@@ -150,7 +150,7 @@ function controller(application,
         vm.showAddDownstream = false;
         selectTarget(targetApp);
         if (!targetApp) return;
-        if (_.any(vm.data.targets, a => a.id === targetApp.id)) return;
+        if (_.some(vm.data.targets, a => a.id === targetApp.id)) return;
         vm.data.targets.push(targetApp);
     };
 
@@ -182,19 +182,19 @@ function controller(application,
 
 
     const addUpstreamFlow = (type, source) => {
-        if (!_.any(vm.incoming, f => f.source === source.id && f.type === type.code)) {
+        if (!_.some(vm.incoming, f => f.source === source.id && f.type === type.code)) {
             vm.incoming.push({ source: source.id, target: appId, type: type.code});
         }
-        if (!_.any(vm.flowTypes, t => t.code === type.code)) {
+        if (!_.some(vm.flowTypes, t => t.code === type.code)) {
             vm.flowTypes.push(type);
         }
     };
 
     const addDownstreamFlow = (type, target) => {
-        if (!_.any(vm.outgoing, f => f.target === target.id && f.type === type.code)) {
+        if (!_.some(vm.outgoing, f => f.target === target.id && f.type === type.code)) {
             vm.outgoing.push({ target: target.id, source: appId, type: type.code});
         }
-        if (!_.any(vm.flowTypes, t => t.code === type.code)) {
+        if (!_.some(vm.flowTypes, t => t.code === type.code)) {
             vm.flowTypes.push(type);
         }
     };

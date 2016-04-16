@@ -10,7 +10,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
 function getUniqueSourceEntities(xs) {
@@ -50,7 +50,6 @@ function getColour(rating) {
 /**
  * We need flows to find the target entity and therefore the target's OU id.
  * @param authSources
- * @param flows
  * @param flow
  * @returns {*|string}
  */
@@ -59,7 +58,7 @@ function getOutgoingRating(authSources, flow) {
     const ouId = flow.targetOrgUnit;
 
     return _.chain(authSources)
-            .where({dataType: flow.type, parentReference: {id: ouId, kind: 'ORG_UNIT'}})
+            .filter({dataType: flow.type, parentReference: {id: ouId, kind: 'ORG_UNIT'}})
             .map('rating')
             .map(getColour)
             .first()
@@ -69,7 +68,7 @@ function getOutgoingRating(authSources, flow) {
 
 function getIncomingRating(authSources, flow) {
     return _.chain(authSources)
-            .where({dataType: flow.type, applicationReference: {id: flow.source}})
+            .filter({dataType: flow.type, applicationReference: {id: flow.source}})
             .map('rating')
             .map(getColour)
             .first()

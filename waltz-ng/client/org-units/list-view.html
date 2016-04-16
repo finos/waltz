@@ -9,27 +9,55 @@
 
     <blockquote>
         The structure of the organisational hierarchy.
-        An application is assigned to one of the organisational units and the unit inherits the characteristics of the assigned application.
-        The organisational hierarchy allow applications statistics and capabilities to be aggregated up the tree.
+        An application is assigned to one of the organisational units and the unit inherits the characteristics of the
+        assigned application. The organisational hierarchy allow applications statistics and capabilities to be
+        aggregated up the tree.
     </blockquote>
 
 
     <!-- DIAGRAMS -->
-    <waltz-section name="Organisational Unit" small="Overview" ng-if="ctrl.diagrams.length > 0">
-        <waltz-svg-diagrams diagrams="ctrl.diagrams" block-processor="ctrl.blockProcessor">
+    <waltz-section name="Organisational Unit"
+                   small="Overview"
+                   ng-if="ctrl.diagrams.length > 0">
+        <waltz-svg-diagrams diagrams="ctrl.diagrams"
+                            block-processor="ctrl.blockProcessor">
         </waltz-svg-diagrams>
     </waltz-section>
 
+
+    <!-- TREE -->
+    <waltz-section name="Tree">
+
+        <span class="tree-classic"
+                     tree-model="ctrl.trees"
+                     options="ctrl.treeOptions">
+            <span class="waltz-visibility-parent">
+                <strong ng-bind="node.name">
+                </strong>
+                </span>
+                <span class="waltz-visibility-child-10 small" ng-bind="node.shortDescription"></span>
+            </span>
+        </treecontrol>
+    </waltz-section>
+
+
     <!-- SEARCH -->
-    <waltz-section name="Organisational Units" small="Search" ng-init="qry=''">
+    <waltz-section name="Organisational Units"
+                   small="Search"
+                   ng-init="qry=''">
         <div class="row">
             <div class="col-md-5">
-                <input type="search" class="form-control" ng-model="qry" placeholder="Search">
+                <input type="search"
+                       class="form-control"
+                       ng-model="qry"
+                       placeholder="Search">
             </div>
         </div>
         <br>
         <div ng-if="qry.length <= 2">
-            <div class="alert alert-warning">Please enter a search term</div>
+            <div class="alert alert-warning">
+                Please enter a search term
+            </div>
         </div>
 
         <div ng-if="qry.length > 2">
@@ -43,20 +71,20 @@
                 <tr ng-repeat="node in ctrl.flatUnits | orderBy:'unit.name' | filter:qry | limitTo:50">
                     <td>
                         <a ui-sref="main.org-units.unit ({ id: {{node.unit.id}} })"
-                           class="waltz-org-unit-name">
-                            {{node.unit.name}}
+                           class="waltz-org-unit-name"
+                           ng-bind="node.unit.name">
                         </a>
                     </td>
                     <td>
-                        <span class="small">
-                            {{ node.unit.description }}
+                        <span class="small" bg-bind="node.unit.description">
                         </span>
                     </td>
                     <td>
                         <span ng-if="ctrl.talliesById[node.unit.id] > 0"
                               class="small waltz-tally-count"
                               title="Number of applications">
-                            {{ ctrl.talliesById[node.unit.id] }} application/s
+                            <span ng-bind="ctrl.talliesById[node.unit.id]"></span>
+                            application/s
                         </span>
                     </td>
                 </tr>
@@ -65,40 +93,10 @@
         </div>
     </waltz-section>
 
-    <!--&lt;!&ndash; TREE &ndash;&gt;-->
-    <!--<waltz-section name="Organisational Units" small="All">-->
-        <!--<div class="row">-->
-            <!--<div class="col-md-offset-9 col-md-3">-->
-                <!--<input type="search" class="form-control" ng-model="qry" placeholder="Search">-->
-            <!--</div>-->
-        <!--</div>-->
-
-        <!--<ul class="list-unstyled">-->
-            <!--<li ng-repeat="node in ctrl.flatUnits | filter:qry | filter:'depth < 4'">-->
-                <!--<pre>{{node}}</pre>-->
-                <!--<div ng-style="{{node.style}}">-->
-                    <!--<a ui-sref="main.org-units.unit ({ id: {{node.unit.id}} })"-->
-                       <!--class="waltz-org-unit-name">-->
-                        <!--{{node.unit.name}}-->
-                    <!--</a>-->
-                <!--<span ng-if="ctrl.talliesById[node.unit.id] > 0"-->
-                      <!--class="small waltz-tally-count"-->
-                      <!--title="Number of applications">-->
-                    <!--{{ ctrl.talliesById[node.unit.id] }} application/s-->
-                <!--</span>-->
-                    <!--<div class="text-muted no-overflow">-->
-                        <!--{{ node.unit.description }}-->
-                    <!--</div>-->
-                <!--</div>-->
-
-                <!--<hr ng-if="node.depth == 0 && $middle">-->
-            <!--</li>-->
-        <!--</ul>-->
-    <!--</waltz-section>-->
-
     <div class="alert alert-info">
         <waltz-data-extract-link name="Download All"
-                                 extract="org-units"></waltz-data-extract-link>
+                                 extract="org-units">
+        </waltz-data-extract-link>
     </div>
 
 </div>

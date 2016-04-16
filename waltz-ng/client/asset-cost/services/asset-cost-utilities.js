@@ -16,8 +16,8 @@
  *
  */
 
-import _ from 'lodash';
-import { numberFormatter } from '../../common';
+import _ from "lodash";
+import {numberFormatter} from "../../common";
 
 
 export function categorizeCostsIntoBuckets(costs) {
@@ -61,7 +61,7 @@ export function categorizeCostsIntoBuckets(costs) {
  */
 export function calcPortfolioCost(costs) {
     if (!costs) return;
-    const amount = _.sum(costs, 'cost.amount');
+    const amount = _.sumBy(costs, 'cost.amount');
 
     return '€ ' + numberFormatter(amount, 1);
 }

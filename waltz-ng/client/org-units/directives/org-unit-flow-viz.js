@@ -11,7 +11,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
 export default [
@@ -32,7 +32,7 @@ export default [
                 if (scope.entities && scope.flows ) {
                     context.allEntities = scope.entities;
                     context.allFlows = scope.flows;
-                    context.entitiesById = _.indexBy(scope.entities, 'id');
+                    context.entitiesById = _.keyBy(scope.entities, 'id');
                     context.availableTypes = _.chain(context.allFlows)
                         .map('dataType')
                         .uniq()

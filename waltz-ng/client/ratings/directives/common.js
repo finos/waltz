@@ -11,10 +11,9 @@
  *
  */
 
-import d3 from 'd3';
-import _ from 'lodash';
-
-import { noop, perhaps } from '../../common';
+import d3 from "d3";
+import _ from "lodash";
+import {noop, perhaps} from "../../common";
 
 export function calculateHighestRatingCount(groups) {
     return _.chain(groups)
@@ -96,7 +95,7 @@ export function determineChanges(group) {
     const hasChanged = ({ current, original }) => current !== original;
 
     const enrichRating = (r, subject) => {
-        const measurable = _.findWhere(group.measurables, {code: r.measurable});
+        const measurable = _.find(group.measurables, {code: r.measurable});
 
         return {
             original: r.original,

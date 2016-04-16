@@ -30,7 +30,7 @@
     "bootstrap-sass": "~3.3.5",
     "d3": "~3.5.5",
     "font-awesome": "^4.4.0",
-    "lodash": "~3.8.0",
+    "lodash": "~4.11.1",
     "moment": "^2.10.6",
     "ng-tags-input": "^3.0.0",
     "satellizer": "^0.12.5",

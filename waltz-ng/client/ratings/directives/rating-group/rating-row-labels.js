@@ -9,9 +9,8 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from 'lodash';
-
-import { noopTweaker } from '../common';
+import _ from "lodash";
+import {noopTweaker} from "../common";
 
 export default class RatingRowLabels {
 
@@ -30,7 +29,7 @@ export default class RatingRowLabels {
             .classed('no-text-select', true)
             .attr('transform', `translate(${width}, ${height / 1.6})`)
             .attr('text-anchor', 'end')
-            .text(d => _.trunc(d.subject.name, 26))
+            .text(d => _.truncate(d.subject.name, 26))
             .call(this.tweaker.enter.bind(this.tweaker.enter));
     }
 }

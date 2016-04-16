@@ -8,11 +8,11 @@
                 <waltz-icon name="level-up"></waltz-icon>
                 Parent:
             </span>
-            <a ui-sref="main.org-units.unit ({id: ctrl.parent.id })">
-                {{ ctrl.parent.name }}
+            <a ui-sref="main.org-units.unit ({id: ctrl.parent.id })"
+               ng-bind="ctrl.parent.name">
             </a>
-            <span class="text-muted small ">
-                {{ ctrl.parent.description }}
+            <span class="text-muted small "
+                  ng-bind="ctrl.parent.description">
             </span>
         </div>
 
@@ -23,14 +23,10 @@
          style="padding: 1em">
 
         <div class="col-sm-offset-1 col-sm-10 waltz-page-summary">
-            <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;"> {{ ctrl.unit.name }} </h3>
+            <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;"
+                ng-bind="ctrl.unit.name"></h3>
 
-            <div waltz-has-role="ORGUNIT_EDITOR">
-                <waltz-inline-edit-area value="ctrl.unit.description"
-                                        save="ctrl.saveDescriptionFn"></waltz-inline-edit-area>
-            </div>
-            <div waltz-unless-role="ORGUNIT_EDITOR">
-                {{ ctrl.unit.description }}
+            <div ng-bind="ctrl.unit.description">
             </div>
 
             <br>
@@ -64,8 +60,8 @@
                                                description="Cumulative value of infra and app dev costs"
                                                waltz-jump-to="costs-section"
                                                icon="money">
-                            <span style="font-size: xx-large;">
-                                {{ ctrl.portfolioCostStr }}
+                            <span style="font-size: xx-large;"
+                                  ng-bind="ctrl.portfolioCostStr">
                             </span>
                         </waltz-basic-info-tile>
                     </div>
@@ -76,10 +72,14 @@
                                                waltz-jump-to="complexity-section"
                                                icon="rocket">
                             <div style="font-size: xx-large;">
-                                &Sigma; {{ ctrl.complexitySummary.cumulativeScore | toFixed:1 }}
+                                &Sigma;
+                                <span ng-bind="ctrl.complexitySummary.cumulativeScore | toFixed:1">
+                                </span>
                             </div>
                             <div class="small text-muted">
-                                {{ ctrl.complexitySummary.averageScore | toFixed:2 }} per app
+                                <span ng-bind="ctrl.complexitySummary.averageScore | toFixed:2">
+                                </span>
+                                per app
                             </div>
                         </waltz-basic-info-tile>
 
@@ -107,10 +107,11 @@
                                                icon="puzzle-piece">
                             <div>
                                 <div style="font-size: xx-large;">
-                                    # {{ ctrl.capabilityStats.total }}
+                                    #
+                                    <span ng-bind="ctrl.capabilityStats.total"></span>
                                 </div>
                                 <div class="small text-muted">
-                                    {{ ctrl.capabilityStats.perApplication }} per app
+                                    <span ng-bind="ctrl.capabilityStats.perApplication"></span> per app
                                 </div>
                             </div>
                         </waltz-basic-info-tile>
@@ -128,15 +129,14 @@
                 <tr ng-repeat="subUnit in ctrl.children | orderBy:'name'">
                     <td>
                         <a ui-sref="main.org-units.unit ({ id: subUnit.id })">
-                            {{ ::subUnit.name }}
+                            <span ng-bind="::subUnit.name"></span>
                         </a>
                     </td>
                     <td class="text-muted small no-overflow">
-                        {{ ::subUnit.description }}
+                        <span ng-bind="::subUnit.description"></span>
                     </td>
                 </tr>
             </table>
-            </waltz-section>
         </div>
     </div>
 </div>

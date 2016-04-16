@@ -32,11 +32,11 @@ function controller($scope) {
     $scope.$watchGroup(['ctrl.usages', 'ctrl.traits'], ([usages, traits]) => {
         if (! usages || ! traits) { return; }
 
-        const traitsById = _.indexBy(traits, 'id');
+        const traitsById = _.keyBy(traits, 'id');
         const usedTraitIds = _.map(usages, usage => usage.traitId);
 
         vm.usedTraits = _.map(usedTraitIds, id => traitsById[id]);
-        vm.availableTraits = _.reject(traits, t => _.contains(usedTraitIds, t.id));
+        vm.availableTraits = _.reject(traits, t => _.includes(usedTraitIds, t.id));
     });
 
 }

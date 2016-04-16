@@ -108,7 +108,6 @@ function controller(capabilities,
                     dataFlowStore,
                     complexityStore,
                     assetCostStore,
-                    capabilityStore,
                     applicationStore,
                     serverInfoStore,
                     traitUsageStore,
@@ -118,9 +117,9 @@ function controller(capabilities,
     const vm = this;
 
     const capId = $stateParams.id;
-    const capability = _.findWhere(populateParents(capabilities), { id: capId });
+    const capability = _.find(populateParents(capabilities), { id: capId });
 
-    const capabilitiesById = _.indexBy(capabilities, 'id');
+    const capabilitiesById = _.keyBy(capabilities, 'id');
 
     const tweakers = {
         subjectLabel: {
@@ -179,7 +178,7 @@ function controller(capabilities,
             applicationStore
                 .findByIds(associatedAppIds)
                 .then((assocApps) => {
-                    const appsById = _.indexBy(assocApps, 'id');
+                    const appsById = _.keyBy(assocApps, 'id');
                     return _.chain(assocAppCaps)
                         .groupBy('capabilityId')
                         .map((associations, capabilityId) => {
@@ -217,7 +216,6 @@ controller.$inject = [
     'DataFlowDataStore',
     'ComplexityStore',
     'AssetCostStore',
-    'CapabilityStore',
     'ApplicationStore',
     'ServerInfoStore',
     'TraitUsageStore',

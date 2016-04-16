@@ -16,7 +16,7 @@ function prepareStats(items = [], usages = []) {
         _.chain(items)
             .groupBy(fn)
             .map((group, key) => {
-                const calculatedCount = _.foldl(
+                const calculatedCount = _.reduce(
                     group,
                     (acc, groupItem) => acc + usageCounts[groupItem.id] || 1,
                     0);

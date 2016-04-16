@@ -9,7 +9,7 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from 'lodash';
+import _ from "lodash";
 
 
 function editController(authSources,
@@ -23,7 +23,7 @@ function editController(authSources,
     const dataTypes = displayNameService.toOptions('dataType');
 
     const authSourcesByType = _.groupBy(authSources, 'dataType');
-    const orgUnitsById = _.indexBy(orgUnits, 'id');
+    const orgUnitsById = _.keyBy(orgUnits, 'id');
     const orgUnit = orgUnitsById[id];
     const usedTypes = _.chain(flows).map('dataType').uniq().value();
     const unusedTypes = _.chain(dataTypes).map('code').without(...usedTypes).value();

@@ -57,7 +57,7 @@ function service(personStore,
             involvementStore.findByEmployeeId(employeeId),
             involvementStore.findAppsForEmployeeId(employeeId)
         ]).then(([involvements, apps]) => {
-            const appsById = _.indexBy(apps, 'id');
+            const appsById = _.keyBy(apps, 'id');
 
             const appInvolvements = _.filter(involvements, i => i.entityReference.kind === 'APPLICATION');
             const directlyInvolvedAppIds = _.map(appInvolvements, 'entityReference.id');

@@ -19,7 +19,7 @@ import {selectBest} from "../ratings/directives/viewer/coloring-strategies";
 
 
 function prepareFlowData(flows, apps) {
-    const entitiesById = _.indexBy(apps, 'id');
+    const entitiesById = _.keyBy(apps, 'id');
 
     const enrichedFlows = _.map(flows, f => ({
         source: entitiesById[f.source.id] || { ...f.source, isNeighbour: true },
@@ -59,7 +59,7 @@ function loadDataFlows(dataFlowStore, groupApps) {
  * @returns {*}
  */
 function includeParentCapabilities(appCapabilities, allCapabilities) {
-    const capabilitiesById = _.indexBy(allCapabilities, 'id');
+    const capabilitiesById = _.keyBy(allCapabilities, 'id');
 
     const toCapabilityId = appCap => appCap.capabilityId;
     const lookupCapability = id => capabilitiesById[id];
@@ -155,7 +155,7 @@ function controller(appGroupStore,
     vm.isGroupEditable = () => {
         if (!vm.groupDetail) return false;
         if (!vm.user) return false;
-        return _.any(vm.groupDetail.members, m => m.role === 'OWNER' && m.userId === vm.user.userName );
+        return _.some(vm.groupDetail.members, m => m.role === 'OWNER' && m.userId === vm.user.userName );
     };
 
     vm.ratingColorStrategy = selectBest;

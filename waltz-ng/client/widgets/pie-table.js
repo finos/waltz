@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from "lodash";
 
 
 function controller($scope) {
@@ -7,7 +7,7 @@ function controller($scope) {
 
     const dataChanged = (data) => {
         if (!data) return;
-        vm.total = _.sum(data, 'count');
+        vm.total = _.sumBy(data, 'count');
     };
 
     $scope.$watch('ctrl.data', dataChanged);

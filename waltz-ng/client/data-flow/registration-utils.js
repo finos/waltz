@@ -44,7 +44,7 @@ export function calculateDataTypeUsage(sourceApp, targetApp, flows) {
     const usageMap = _.chain(flows)
         .filter(filterFn)
         .map('dataType')
-        .foldl((acc, t) => { acc[t] = true; return acc; }, {})
+        .reduce((acc, t) => { acc[t] = true; return acc; }, {})
         .value();
 
     return usageMap;

@@ -10,8 +10,8 @@
  *
  */
 
-import d3 from 'd3';
-import _ from 'lodash';
+import d3 from "d3";
+import _ from "lodash";
 
 
 const byAppThenTypeThenRatingNester = d3.nest()
@@ -59,7 +59,7 @@ function calculateFlatOrgTree(orgUnitId, orgUnitsByParent) {
 function decorateAndIndexApps(applications, orgUnitsById) {
     return _.chain(applications)
         .map(a => ({...a, orgUnit: orgUnitsById[a.organisationalUnitId]}))
-        .indexBy('id')
+        .keyBy('id')
         .value();
 }
 
@@ -77,7 +77,7 @@ export default class {
      * where sourceApp and targetApp have also been enriched to with organisational units
      */
     prepareData(orgUnitId, orgUnits, applications, ratedDataFlows) {
-        this.orgUnitsById = _.indexBy(orgUnits, 'id');
+        this.orgUnitsById = _.keyBy(orgUnits, 'id');
         this.appsById = decorateAndIndexApps(applications, this.orgUnitsById);
         this.orgUnitsByParent = _.groupBy(orgUnits, ou => ou.parentId);
         this.dataTypes = calculateInvolvedDataTypes(ratedDataFlows);
@@ -92,7 +92,7 @@ export default class {
         const flatOrgTree = calculateFlatOrgTree(orgUnitId, this.orgUnitsByParent);
 
         const childData = _.map(flatOrgTree, child => {
-            const isChildFlowFn = f => _.contains(child.childrenIds, f.targetApp.organisationalUnitId);
+            const isChildFlowFn = f => _.includes(child.childrenIds, f.targetApp.organisationalUnitId);
             const relevantFlows = _.filter(enrichedRatedDataFlows, isChildFlowFn);
             return {
                 id: child.id,

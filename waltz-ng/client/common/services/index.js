@@ -10,9 +10,8 @@
  *
  */
 
-import _ from 'lodash';
-
-import BaseLookupService from './BaseLookupService';
+import _ from "lodash";
+import BaseLookupService from "./BaseLookupService";
 import {
     applicationKindDisplayNames,
     authSourceRatingNames,
@@ -25,14 +24,8 @@ import {
     entityNames,
     assetCostKindNames,
     investmentRatingNames
-} from './display_names';
-
-
-import {
-    bookmarkIconNames,
-    entityIconNames,
-    severityIconNames
-} from './icon_names';
+} from "./display_names";
+import {bookmarkIconNames, entityIconNames, severityIconNames} from "./icon_names";
 
 
 const displayNameService = new BaseLookupService();
@@ -66,7 +59,7 @@ export default (module) => {
             DataTypesDataService
                 .findAll()
                 .then(results => {
-                    const indexed = _.indexBy(results, 'code');
+                    const indexed = _.keyBy(results, 'code');
                     displayNameService.register('dataType', _.mapValues(indexed, 'name'));
                     descriptionService.register('dataType', _.mapValues(indexed, 'description'));
                 })

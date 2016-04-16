@@ -10,17 +10,19 @@
  *
  */
 
-import _ from 'lodash';
-import angular from 'angular';
-
-import { buildHierarchies } from '../common';
-import { talliesById } from '../common/tally-utils';
+import _ from "lodash";
+import angular from "angular";
+import {buildHierarchies} from "../common";
+import {talliesById} from "../common/tally-utils";
 
 
 function controller(orgUnits, tallies, svgStore, $state) {
 
 
     const vm = this;
+
+    console.log(orgUnits);
+    _.each(orgUnits, ou => ou.shortDescription = _.truncate(ou.description, 120));
 
     const rootUnits = buildHierarchies(orgUnits);
 
@@ -48,6 +50,14 @@ function controller(orgUnits, tallies, svgStore, $state) {
 
     vm.flatUnits = toFlatNodes(rootUnits, 0);
     vm.talliesById = talliesById(tallies);
+    vm.trees = rootUnits;
+
+    console.log(vm.trees);
+
+    vm.treeOptions = {
+        nodeChildren: "children",
+        dirSelectable: false
+    };
 
     svgStore.findByKind('ORG_UNIT').then(xs => vm.diagrams = xs);
 

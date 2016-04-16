@@ -10,7 +10,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
 function controller($scope) {
@@ -38,7 +38,7 @@ function controller($scope) {
             .map(df => [df.source, df.target])
             .flatten()
             .uniq('id')
-            .map(app => ({...app, member: _.contains(memberAppIds, app.id)}))
+            .map(app => ({...app, member: _.includes(memberAppIds, app.id)}))
             .value();
 
         return {

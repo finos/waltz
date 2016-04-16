@@ -9,11 +9,11 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from 'lodash';
+import _ from "lodash";
 
 
 export function orgUnitResolver(orgUnits, params) {
-    return _.findWhere(orgUnits, { id: params.id });
+    return _.find(orgUnits, { id: params.id });
 }
 
 orgUnitResolver.$inject = ['orgUnits', '$stateParams'];

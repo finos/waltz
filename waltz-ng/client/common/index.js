@@ -17,7 +17,7 @@ import _ from "lodash";
 export function populateParents(nodes) {
     const byId = _.chain(_.cloneDeep(nodes))
         .map(u => _.merge(u, { children: [], parent: null }))
-        .indexBy('id')
+        .keyBy('id')
         .value();
 
     _.each(_.values(byId), u => {

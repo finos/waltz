@@ -25,7 +25,7 @@ function service(http, baseUrl, $q) {
         if (!_.isArray(settings)) {
             throw "First argument to findOrDefault must be an array of settings";
         }
-        const found = _.findWhere(settings, { name });
+        const found = _.find(settings, { name });
         return found ? found.value : dflt;
     };
 

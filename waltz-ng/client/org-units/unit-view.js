@@ -10,24 +10,23 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from 'lodash';
-import d3 from 'd3';
-
-import EventDispatcher from '../common/EventDispatcher';
-import { perhaps } from '../common/index';
-import { calculateGroupSummary } from '../ratings/directives/common';
+import _ from "lodash";
+import d3 from "d3";
+import EventDispatcher from "../common/EventDispatcher";
+import {perhaps} from "../common/index";
+import {calculateGroupSummary} from "../ratings/directives/common";
 
 
 function indexCapabilities(appCapabilities) {
     return _.chain(appCapabilities)
         .map('capability')
-        .indexBy('id')
+        .keyBy('id')
         .value();
 }
 
 
 function calculateGroupData(apps, appCapabilities, measurables, allRatings) {
-    const appsById = _.indexBy(apps, 'id');
+    const appsById = _.keyBy(apps, 'id');
 
     const capabilitiesById = indexCapabilities(appCapabilities);
 
@@ -86,7 +85,7 @@ function calculateCapabilityRatings(orgUnitId, apps, appCapabilities, perspectiv
     function isPrimary(app, capabilityId) {
         const c = _.find(appCapabilities, ac => ac.capability.id === Number(capabilityId));
         if (!c) return false;
-        const a = _.findWhere(c.applications, { id: app.id });
+        const a = _.find(c.applications, { id: app.id });
         if (!a) return false;
         return a.primary;
     }
@@ -100,8 +99,8 @@ function calculateCapabilityRatings(orgUnitId, apps, appCapabilities, perspectiv
                         .on('click.go', d => $state.go('main.app-view', { id: d.subject.id }))
                         .attr('font-style', d => d.subject.organisationalUnitId === orgUnitId ? 'none' : 'italic')
                         .text(d => isPrimary(d.subject, d.capabilityId)
-                            ? '\u2605 ' + _.trunc(d.subject.name, 24)
-                            : _.trunc(d.subject.name, 26))
+                            ? '\u2605 ' + _.truncate(d.subject.name, 24)
+                            : _.truncate(d.subject.name, 26))
 
             },
             ratingRow: {
@@ -120,7 +119,7 @@ function calculateCapabilityRatings(orgUnitId, apps, appCapabilities, perspectiv
             directApps,
             appCapabilities,
             measurables,
-            _.filter(allRatings, r => _.contains(directAppIds, r.parent.id)));
+            _.filter(allRatings, r => _.includes(directAppIds, r.parent.id)));
     }
 
     function showAll() {

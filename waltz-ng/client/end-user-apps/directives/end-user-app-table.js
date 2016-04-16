@@ -1,11 +1,7 @@
-import d3 from 'd3';
-import _ from 'lodash';
-
-import { lifecyclePhaseDisplayNames }
-    from '../../common/services/display_names';
-
-import { lifecyclePhaseColorScale, riskRatingColorScale }
-    from '../../common/colors';
+import d3 from "d3";
+import _ from "lodash";
+import {lifecyclePhaseDisplayNames} from "../../common/services/display_names";
+import {lifecyclePhaseColorScale, riskRatingColorScale} from "../../common/colors";
 
 function controller(uiGridConstants, $scope) {
     const vm = this;
@@ -53,7 +49,7 @@ function controller(uiGridConstants, $scope) {
 
     $scope.$watch('ctrl.endUserApps', (apps) => recalc(apps));
 
-    const kindColorScale = _.compose(d3.rgb, d3.scale.category20());
+    const kindColorScale = _.flowRight(d3.rgb, d3.scale.category20());
 
     vm.pies = {
         byLifecyclePhase: {

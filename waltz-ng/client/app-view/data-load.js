@@ -26,7 +26,7 @@ function addDataTypes(extras, vm) {
 function addOrgUnits(extras, vm) {
     const existing = vm.orgUnits ? vm.orgUnits : [];
     vm.orgUnits = _.union(existing, extras);
-    vm.orgUnitsById = _.indexBy(vm.orgUnits, 'id');
+    vm.orgUnitsById = _.keyBy(vm.orgUnits, 'id');
     return vm.orgUnits;
 }
 

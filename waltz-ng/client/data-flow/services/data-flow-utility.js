@@ -11,13 +11,13 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 export default [
     () => {
 
         const enrich = (flows, flowEntities) => {
-            const entitiesById = _.indexBy(flowEntities, 'id');
+            const entitiesById = _.keyBy(flowEntities, 'id');
 
             return _.map(flows, f => ({
                 ...f,

@@ -25,8 +25,8 @@ const options = {
 
 
 function prepareAppCapabilities(apps, capabilities, rawAppCapabilities) {
-    const appsById = _.indexBy(apps, 'id');
-    const capabilitiesById = _.indexBy(capabilities, 'id');
+    const appsById = _.keyBy(apps, 'id');
+    const capabilitiesById = _.keyBy(capabilities, 'id');
 
     const appCapabilities =  _.chain(rawAppCapabilities)
         .groupBy(ac => ac.capabilityId)
@@ -60,7 +60,7 @@ function calculateDataFlows(dataFlows, appPredicate) {
 
     const entities = _.filter(
         dataFlows.entities,
-        e => _.contains(dataFlowAppIds, e.id));
+        e => _.includes(dataFlowAppIds, e.id));
 
     return { flows, entities };
 }
@@ -68,7 +68,7 @@ function calculateDataFlows(dataFlows, appPredicate) {
 
 function extractPrimaryAppIds(appCapabilities) {
     return _.chain(appCapabilities)
-        .where({ primary: true })
+        .filter({ primary: true })
         .map('applicationId')
         .uniq()
         .value();
@@ -81,16 +81,16 @@ function mkIsAppInScopeFn(orgUnitId, apps, appCapabilities) {
     const inScopeAppIds = _.chain(apps)
         .filter(a => options.includeSubUnits ? true : a.organisationalUnitId === orgUnitId)
         .filter(a => options.productionOnly ? a.lifecyclePhase === 'PRODUCTION' : true)
-        .filter(a => options.primaryOnly ? _.contains(primaryAppIds, a.id) : true)
+        .filter(a => options.primaryOnly ? _.includes(primaryAppIds, a.id) : true)
         .map('id')
         .value();
 
-    return (id) => _.contains(inScopeAppIds, id);
+    return (id) => _.includes(inScopeAppIds, id);
 }
 
 
 function filterComplexity(complexity, isAppInScope) {
-    return _.filter(complexity, c => _.any([
+    return _.filter(complexity, c => _.some([
         isAppInScope(c.serverComplexity ? c.serverComplexity.id : 0),
         isAppInScope(c.capabilityComplexity ? c.capabilityComplexity.id : 0),
         isAppInScope(c.connectionComplexity ? c.connectionComplexity.id : 0)
@@ -110,7 +110,7 @@ function filterCapabilityRatings(capabilityRatings, appCapabilities, isAppInScop
             } else {
                 const appId = r.parent.id;
                 const capId = r.capability.id;
-                const isPrimary =  _.any(
+                const isPrimary =  _.some(
                     primaryAppCapabilities,
                     ac => ac.capabilityId === capId && ac.applicationId === appId);
                 return isPrimary;
@@ -143,7 +143,7 @@ function filterAssetCosts(assetCosts, orgUnitId, isAppInScope) {
 function filterSoftwareCatalog(softwareCatalog, isAppInScope) {
     const usages = _.filter(softwareCatalog.usages, u => isAppInScope(u.applicationId));
     const packageIds = _.map(usages, 'softwarePackageId');
-    const packages = _.filter(softwareCatalog.packages, p => _.contains(packageIds, p.id));
+    const packages = _.filter(softwareCatalog.packages, p => _.includes(packageIds, p.id));
 
     return {
         usages,

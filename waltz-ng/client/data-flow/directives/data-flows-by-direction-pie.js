@@ -17,7 +17,7 @@
  *
  */
 
-import { flowDirectionColorScale } from '../../common/colors';
+import {flowDirectionColorScale} from "../../common/colors";
 
 
 const BINDINGS = {
@@ -35,8 +35,8 @@ function calcAppConnectionPieStats(flows, apps) {
     return _.chain(logicalFlows)
         .uniq(false, f => f.source.id + '.' + f.target.id)
         .map(f => {
-            const sourceIsMember = _.contains(orgMemberAppIds, f.source.id);
-            const targetIsMember = _.contains(orgMemberAppIds, f.target.id);
+            const sourceIsMember = _.includes(orgMemberAppIds, f.source.id);
+            const targetIsMember = _.includes(orgMemberAppIds, f.target.id);
             if (sourceIsMember && targetIsMember) return 'INTRA';
             if (sourceIsMember) return 'INBOUND';
             if (targetIsMember) return 'OUTBOUND';

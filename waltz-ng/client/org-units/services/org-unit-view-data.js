@@ -16,7 +16,7 @@ import {aggregatePeopleInvolvements} from "../../involvement/involvement-utils";
 
 
 function prepareFlowData(flows, apps) {
-    const entitiesById = _.indexBy(apps, 'id');
+    const entitiesById = _.keyBy(apps, 'id');
 
     const enrichedFlows = _.map(flows, f => ({
         source: entitiesById[f.source.id] || { ...f.source, isNeighbour: true },

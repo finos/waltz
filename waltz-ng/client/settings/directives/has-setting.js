@@ -10,7 +10,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 const BINDINGS = {
     expr: '@waltzHasSetting'
@@ -24,7 +24,7 @@ function controller(settingsStore) {
         .findAll()
         .then(settings => {
             const [name, value] = vm.expr.split(/\s*=\s*/);
-            vm.show = _.findWhere(settings, { name }).value == value;
+            vm.show = _.find(settings, { name }).value == value;
         });
 
     vm.show = false;

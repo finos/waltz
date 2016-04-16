@@ -12,19 +12,19 @@
  */
 
 let userPromise = null;
+let userName = null;
 
-function service(http, baseUrl, $auth, $q) {
+function service(http, baseUrl, $auth) {
 
 
     const BASE = `${baseUrl}/user`;
 
 
     const whoami = (force = false) => {
-        if (force || userPromise == null) {
+        if (force || userPromise == null || userName == null) {
             userPromise = http.get(`${BASE}/whoami`)
-                .then(result => {
-                    return result.data;
-                });
+                .then(result => result.data)
+                .then(u => { userName = u.userName === 'anonymous' ? null : u.userName;  return u; })
         }
         return userPromise;
     };
@@ -44,7 +44,7 @@ function service(http, baseUrl, $auth, $q) {
 
 
     const hasRole = ( { roles = [] }, role) => {
-        return _.contains(roles, role);
+        return _.includes(roles, role);
     };
 
 
@@ -58,9 +58,11 @@ function service(http, baseUrl, $auth, $q) {
     };
 }
 
-
-
-service.$inject = ['$http', 'BaseApiUrl', '$auth', '$q'];
+service.$inject = [
+    '$http',
+    'BaseApiUrl',
+    '$auth'
+];
 
 
 export default service;
