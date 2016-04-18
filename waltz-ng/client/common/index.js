@@ -40,6 +40,35 @@ export function buildHierarchies(nodes) {
 }
 
 
+export function findNode(nodes = [], id) {
+    const found = _.find(nodes, { id });
+    if (found) return found;
+
+    for(let i = 0; i < nodes.length; i++) {
+        const f = findNode(nodes[i].children, id);
+        if (f) return f;
+    }
+
+    return null;
+}
+
+
+export function getParents(node) {
+    if (! node) return [];
+
+    let ptr = node.parent;
+
+    const result = [];
+
+    while (ptr) {
+        result.push(ptr);
+        ptr = ptr.parent;
+    }
+
+    return result;
+}
+
+
 // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions#Using_Special_Characters
 export function escapeRegexCharacters(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

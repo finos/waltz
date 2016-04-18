@@ -10,11 +10,25 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-
 import _ from "lodash";
-import {enrichServerStats} from "../../server-info/services/server-utilities";
-import {calcPortfolioCost} from "../../asset-cost/services/asset-cost-utilities";
-import {calcComplexitySummary} from "../../complexity/services/complexity-utilities";
+
+import { enrichServerStats } from "../../server-info/services/server-utilities";
+import { calcPortfolioCost } from "../../asset-cost/services/asset-cost-utilities";
+import { calcComplexitySummary } from "../../complexity/services/complexity-utilities";
+import { buildHierarchies, findNode, getParents } from "../../common";
+
+
+const BINDINGS = {
+    unitId: '=',
+    allUnits: '=',
+    apps: '=',
+    flows: '=',
+    ratings: '=',
+    costs: '=',
+    orgServerStats: '=',
+    complexity: '='
+};
+
 
 
 function calcCapabilityStats(ratings) {
@@ -43,52 +57,58 @@ function controller($scope, orgUnitStore) {
     vm.saveDescriptionFn = (newValue, oldValue) =>
             orgUnitStore.updateDescription(vm.unit.id, newValue, oldValue);
 
+    $scope.$watch(
+        'ctrl.ratings',
+        ratings => {
+            if (!ratings) return;
+            vm.capabilityStats = calcCapabilityStats(ratings);
+        });
 
-    $scope.$watch('ctrl.ratings', ratings => {
-        if (!ratings) return;
-        vm.capabilityStats = calcCapabilityStats(ratings);
-    });
+    $scope.$watch(
+        'ctrl.allUnits',
+        (units) => {
+            const roots = buildHierarchies(units);
+            const node = findNode(roots, vm.unitId);
+            vm.unit = node;
+            vm.parents = getParents(node);
+        });
 
-    $scope.$watch('ctrl.costs', cs => vm.portfolioCostStr = calcPortfolioCost(cs));
+    $scope.$watch(
+        'ctrl.costs',
+        cs => vm.portfolioCostStr = calcPortfolioCost(cs));
 
-    $scope.$watch('ctrl.orgServerStats', stats => {
-        if (!stats) return;
-        const serverStats = _.reduce(
-            stats,
-            (acc, stat) => {
-                const virtualCount = acc.virtualCount + stat.virtualCount;
-                const physicalCount = acc.physicalCount + stat.physicalCount;
-                return { virtualCount, physicalCount };
-            },
-            { virtualCount: 0, physicalCount: 0});
+    $scope.$watch(
+        'ctrl.orgServerStats',
+        stats => {
+            if (!stats) return;
+            const serverStats = _.reduce(
+                stats,
+                (acc, stat) => {
+                    const virtualCount = acc.virtualCount + stat.virtualCount;
+                    const physicalCount = acc.physicalCount + stat.physicalCount;
+                    return { virtualCount, physicalCount };
+                },
+                { virtualCount: 0, physicalCount: 0});
 
-        enrichServerStats(serverStats);
+            enrichServerStats(serverStats);
 
-        vm.serverStats = serverStats;
-    });
+            vm.serverStats = serverStats;
+        });
 
-    $scope.$watch('ctrl.complexity', cs => vm.complexitySummary = calcComplexitySummary(cs));
+    $scope.$watch(
+        'ctrl.complexity',
+        cs => vm.complexitySummary = calcComplexitySummary(cs));
 }
 
-
 controller.$inject = ['$scope', 'OrgUnitStore'];
+
 
 export default () => ({
     restrict: 'E',
     replace: true,
     template: require('./org-unit-overview.html'),
-    scope: {
-        unit: '=',
-        parent: '=',
-        children: '=',
-        apps: '=',
-        flows: '=',
-        ratings: '=',
-        costs: '=',
-        orgServerStats: '=',
-        complexity: '='
-    },
-    bindToController: true,
+    scope: {},
+    bindToController: BINDINGS,
     controllerAs: 'ctrl',
     controller
 });

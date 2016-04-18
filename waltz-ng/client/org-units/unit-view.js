@@ -13,6 +13,7 @@
 import _ from "lodash";
 import d3 from "d3";
 import EventDispatcher from "../common/EventDispatcher";
+
 import {perhaps} from "../common/index";
 import {calculateGroupSummary} from "../ratings/directives/common";
 
@@ -207,9 +208,7 @@ function controller($stateParams,
     $scope.$on('$destroy', unsubscribe);
 
     vm.fetchOrgServerStats(id);
-
 }
-
 
 controller.$inject = [
     '$stateParams',

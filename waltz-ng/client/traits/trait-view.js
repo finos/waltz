@@ -69,8 +69,6 @@ function controller(traitStore, traitUsageStore, capabilityStore, $stateParams, 
 
     vm.lookupCapability = id =>
         vm.capabilitiesById[id];
-
-    global.vm = vm;
 }
 
 

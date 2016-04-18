@@ -1,0 +1,13 @@
+<div class="btn-group"
+     style="width: 100%">
+    <input type="search"
+
+           class="form-control"
+           ng-model="ctrl.qry"
+           ng-change="ctrl.doSearch(ctrl.qry)"
+           ng-model-options="{ debounce: 200 }"
+           placeholder="Search">
+    <span class="waltz-search-clear glyphicon glyphicon-remove-circle"
+          ng-click="ctrl.clearSearch()">
+    </span>
+</div>

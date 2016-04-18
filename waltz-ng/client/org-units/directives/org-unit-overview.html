@@ -1,23 +1,29 @@
 <div>
     <div class="row no-overflow"
-         ng-if="ctrl.parent"
+         ng-if="ctrl.parents.length > 0"
          style="padding: 1em">
 
         <div class="col-sm-12">
             <span class="text-muted">
                 <waltz-icon name="level-up"></waltz-icon>
-                Parent:
+                Parent/s:
             </span>
-            <a ui-sref="main.org-units.unit ({id: ctrl.parent.id })"
-               ng-bind="ctrl.parent.name">
-            </a>
+            <ul class="list-inline" style="display: inline-block;">
+                <li ng-repeat="parent in ctrl.parents">
+                    <a ui-sref="main.org-units.unit ({id: parent.id })"
+                       ng-bind="parent.name">
+                    </a>
+                    <span ng-if="!$last">&raquo;</span>
+                </li>
+            </ul>
+
             <span class="text-muted small "
                   ng-bind="ctrl.parent.description">
             </span>
         </div>
 
-    </div>
 
+    </div>
 
     <div class="row"
          style="padding: 1em">
@@ -122,21 +128,15 @@
         </div>
     </div>
 
-    <div class="row" ng-if="ctrl.children.length > 0">
+
+    <div class="row" ng-if="ctrl.unit.children.length > 0">
         <div class="col-sm-offset-2 col-sm-10">
+
             <h4>Sub Units</h4>
-            <table class="table table-hover table-condensed fixed-table">
-                <tr ng-repeat="subUnit in ctrl.children | orderBy:'name'">
-                    <td>
-                        <a ui-sref="main.org-units.unit ({ id: subUnit.id })">
-                            <span ng-bind="::subUnit.name"></span>
-                        </a>
-                    </td>
-                    <td class="text-muted small no-overflow">
-                        <span ng-bind="::subUnit.description"></span>
-                    </td>
-                </tr>
-            </table>
+
+            <waltz-org-unit-tree tree="ctrl.unit.children"
+                                 on-selection="ctrl.nodeSelected">
+            </waltz-org-unit-tree>
         </div>
     </div>
 </div>
