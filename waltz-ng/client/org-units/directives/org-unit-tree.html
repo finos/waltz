@@ -16,26 +16,27 @@
                     </i>
                 </strong>
 
-                <span class="waltz-visibility-child-50">
-                    <span ng-if="ctrl.hasAnyApps(node)"
-                          class="small waltz-tally-count"
-                          title="Number of applications">
+                <a ui-sref="main.org-units.unit ({id: node.id })">
 
-                        <span ng-if="ctrl.hasOwnApps(node)">
-                            <span ng-bind="node.appCount"></span>
+                    <span class="waltz-visibility-child-50">
+                        <span ng-if="ctrl.hasAnyApps(node)"
+                              class="small waltz-tally-count"
+                              title="Number of applications">
+
+                            <span ng-if="ctrl.hasOwnApps(node)">
+                                <span ng-bind="node.appCount"></span>
+                            </span>
+
+                            <i ng-if="ctrl.hasInheritedApps(node)">
+                                (<span ng-bind="node.totalAppCount"></span>)
+                            </i>
                         </span>
-
-                        <i ng-if="ctrl.hasInheritedApps(node)">
-                            (<span ng-bind="node.totalAppCount"></span>)
-                        </i>
                     </span>
-                </span>
-                &nbsp;
-                <strong class="waltz-visibility-child-30">
-                    <a ui-sref="main.org-units.unit ({id: node.id })">
-                        Show &raquo;
-                    </a>
-                </strong>
+                    &nbsp;
+                    <strong class="waltz-visibility-child-30">
+                            Show &raquo;
+                    </strong>
+                </a>
             </span>
     </treecontrol>
 </div>
