@@ -6,16 +6,26 @@
                  on-selection="ctrl.onNodeSelect(node)"
                  options="ctrl.treeOptions">
             <span class="waltz-visibility-parent">
-                <strong ng-bind="node.name">
+
+                <strong>
+                    <span ng-if="ctrl.hasOwnApps(node)"
+                          ng-bind="node.name">
+                    </span>
+                    <i ng-bind="node.name"
+                       ng-if="! ctrl.hasOwnApps(node)">
+                    </i>
                 </strong>
+
                 <span class="waltz-visibility-child-50">
-                    <span ng-if="node.totalAppCount > 0"
+                    <span ng-if="ctrl.hasAnyApps(node)"
                           class="small waltz-tally-count"
                           title="Number of applications">
-                        <span ng-if="node.appCount > 0">
+
+                        <span ng-if="ctrl.hasOwnApps(node)">
                             <span ng-bind="node.appCount"></span>
                         </span>
-                        <i ng-if="node.childAppCount > 0">
+
+                        <i ng-if="ctrl.hasInheritedApps(node)">
                             (<span ng-bind="node.totalAppCount"></span>)
                         </i>
                     </span>

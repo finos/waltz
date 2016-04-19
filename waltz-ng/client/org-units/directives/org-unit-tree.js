@@ -40,7 +40,12 @@ function controller() {
             }
         }
         if (_.isFunction(vm.onSelection)) vm.onSelection(node);
-    }
+    };
+
+    vm.hasOwnApps = (node) => node.appCount && node.appCount > 0;
+    vm.hasAnyApps = (node) => node.totalAppCount && node.totalAppCount > 0;
+    vm.hasInheritedApps = (node) => node.childAppCount && node.childAppCount > 0;
+
 
 }
 
