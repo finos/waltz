@@ -20,13 +20,14 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.dataflow.RatedDataFlow;
 import com.khartec.waltz.service.data_flow.RatedDataFlowService;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.getLong;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
 
 
 /**
@@ -36,7 +37,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 @Service
 public class RatedDataFlowsEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "rated-data-flows");
+    private static final String BASE_URL = mkPath("api", "rated-data-flows");
 
     private final RatedDataFlowService ratedDataFlowService;
 
@@ -51,12 +52,14 @@ public class RatedDataFlowsEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        ListRoute<RatedDataFlow> getByOrgUnitTree = (request, response) -> {
-            long orgUnitId = WebUtilities.getLong(request, "orgUnitId");
+        String findByOrgUnitPath = mkPath(BASE_URL, "org-unit-tree", ":orgUnitId");
+
+        ListRoute<RatedDataFlow> findByOrgUnitRoute = (request, response) -> {
+            long orgUnitId = getLong(request, "orgUnitId");
             return ratedDataFlowService.calculateRatedFlowsForOrgUnitTree(orgUnitId);
         };
 
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "org-unit-tree", ":orgUnitId"), getByOrgUnitTree);
+        EndpointUtilities.getForList(findByOrgUnitPath, findByOrgUnitRoute);
     }
 
 }

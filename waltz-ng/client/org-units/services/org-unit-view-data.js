@@ -11,8 +11,9 @@
  */
 
 import _ from "lodash";
+
 import RatedFlowsData from "../../data-flow/RatedFlowsData";
-import {aggregatePeopleInvolvements} from "../../involvement/involvement-utils";
+import { aggregatePeopleInvolvements } from "../../involvement/involvement-utils";
 
 
 function prepareFlowData(flows, apps) {
