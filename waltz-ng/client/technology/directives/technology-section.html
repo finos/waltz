@@ -1,0 +1,96 @@
+<div>
+    <waltz-section name="Technologies" id="technology">
+
+        <div ng-if="ctrl.hasAnyData()">
+            <waltz-section-actions>
+                <input type="search"
+                       placeholder="Search"
+                       style="border-radius: 6px; padding-left: 3px"
+                       ng-model="ctrl.qry">
+            </waltz-section-actions>
+
+            <uib-tabset>
+
+                <uib-tab heading="Overview">
+
+                    <h4 class="text-center">
+                        <waltz-icon name="leaf"></waltz-icon>
+                        Software Packages
+                    </h4>
+                    <waltz-simple-software-usage-pies packages="ctrl.filteredSoftwarePackages"
+                                                      usages="ctrl.catalog.softwareUsages">
+                    </waltz-simple-software-usage-pies>
+
+                    <hr style="border-style: dotted">
+
+                    <h4 class="text-center">
+                        <waltz-icon name="server"></waltz-icon>
+                        Servers
+                    </h4>
+                    <waltz-server-pies servers="ctrl.filteredServers">
+                    </waltz-server-pies>
+
+                    <hr>
+
+                    <h4 class="text-center">
+                        <waltz-icon name="database"></waltz-icon>
+                        Databases
+                    </h4>
+                    <waltz-database-pies databases="ctrl.filteredDatabases">
+                    </waltz-database-pies>
+
+                </uib-tab>
+
+                <uib-tab heading="Software Packages">
+                    <div class="waltz-scroll-region" style="height: 300px">
+                        <waltz-simple-software-usage-list packages="ctrl.filteredSoftwarePackages"
+                                                          usages="ctrl.catalog.softwareUsages">
+                        </waltz-simple-software-usage-list>
+                    </div>
+                </uib-tab>
+
+                <uib-tab heading="Servers"
+                         select="showServerDetail = true">
+                    <div ng-if="showServerDetail">
+                        <br>
+                        <div style="font-size: smaller; height: 300px"
+                             ui-grid="ctrl.serverGridOptions">
+                        </div>
+                    </div>
+                </uib-tab>
+
+                <uib-tab heading="Databases"
+                         select="showDatabaseDetail = true">
+                    <div ng-if="showDatabaseDetail">
+                        <br>
+                        <div style="font-size: smaller; height: 300px"
+                             ui-grid="ctrl.databaseGridOptions">
+                        </div>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+
+
+
+            <div class="waltz-paragraph text-muted pull-right small">
+                <waltz-icon name="info-circle"></waltz-icon>
+                Associated software packages have been sourced from:
+                <ul class="list-inline"
+                    style="display: inline-block">
+                    <li ng-repeat="(source, usages) in ctrl.softwareUsages">
+                        {{ source }}
+                        <span ng-if="!$last">,</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div ng-if="! ctrl.hasAnyData()">
+            <div class="alert alert-warning">
+                <strong>No associated technology found</strong>
+            </div>
+        </div>
+
+    </waltz-section>
+</div>

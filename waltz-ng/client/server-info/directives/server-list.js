@@ -12,65 +12,15 @@
  *
  */
 
-import _ from 'lodash';
-import d3 from 'd3';
-
-import { environmentColorScale, operatingSystemColorScale, variableScale } from '../../common/colors';
-
-
-/**
- * the d3 nest function aggregates using the property name 'values', this
- * function creates a copy of the data with the name 'count'.
- *
- * @param data
- * @returns {Array|*}
- */
-function toPieData(data) {
-    return _.map(data, d => ({ key: d.key, count: d.values }));
-}
+const BINDINGS = {
+    servers: '=',
+    primaryAssetCode: '=?'
+};
 
 function controller($scope, uiGridConstants) {
     const vm = this;
 
 
-    vm.pie = {
-        env: {
-            config: {
-                colorProvider: (d) => environmentColorScale(d.data.key)
-            }
-        },
-        os: {
-            config: {
-                colorProvider: (d) => operatingSystemColorScale(d.data.key)
-            }
-        },
-        location: {
-            config: {
-                colorProvider: (d) => variableScale(d.data.key)
-            }
-        }
-    };
-
-    function update(servers) {
-        if (!servers) return;
-
-        vm.pie.env.data = toPieData(d3.nest()
-            .key(d => d.environment)
-            .rollup(d => d.length)
-            .entries(servers));
-
-        vm.pie.os.data = toPieData(d3.nest()
-            .key(d => d.operatingSystem)
-            .rollup(d => d.length)
-            .entries(servers));
-
-        vm.pie.location.data = toPieData(d3.nest()
-            .key(d => d.location)
-            .rollup(d => d.length)
-            .entries(servers));
-    }
-
-    $scope.$watch('ctrl.servers', (servers) => update(servers), true);
 
     vm.gridOptions = {
         enableSorting: true,
@@ -97,8 +47,8 @@ function controller($scope, uiGridConstants) {
             { field: 'country' }
         ],
         data: vm.servers
-
     };
+
 }
 
 controller.$inject = ['$scope', 'uiGridConstants'];
@@ -107,12 +57,9 @@ controller.$inject = ['$scope', 'uiGridConstants'];
 export default () => ({
     restrict: 'E',
     replace: true,
-    scope: {
-        servers: '=',
-        primaryAssetCode: '=?'
-    },
+    scope: {},
     template: require('./server-list.html'),
-    bindToController: true,
+    bindToController: BINDINGS,
     controllerAs: 'ctrl',
     controller
 });

@@ -1,5 +1,12 @@
 import _ from "lodash";
 
+const BINDINGS = {
+    data: '=',
+    config: '=',
+    title: '@',
+    icon: '@'
+};
+
 
 function controller($scope) {
 
@@ -26,12 +33,7 @@ export default () => {
         replace: true,
         template: require('./pie-table.html'),
         scope: {},
-        bindToController: {
-            data: '=',
-            config: '=',
-            title: '@',
-            icon: '@'
-        },
+        bindToController: BINDINGS,
         controllerAs: 'ctrl',
         controller
     };

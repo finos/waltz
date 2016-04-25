@@ -15,4 +15,5 @@ export default (module) => {
     module.service('ServerInfoStore', require('./services/server-info-store'));
 
     module.directive('waltzServerList', require('./directives/server-list'));
+    module.directive('waltzServerPies', require('./directives/server-pies'));
 };

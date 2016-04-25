@@ -12,11 +12,11 @@
 
 .waltz-info-tile .title {
     width: 100%;
-    font-size: large;
+    font-size: larger;
     margin-top: 0;
     padding-top: 6px;
     padding-bottom: 6px;
-    border-bottom: 1px dotted $waltz-border-color-lighter;
+    border-bottom: 1px dotted lighten($waltz-border-color, 20%);
 }
 
 .waltz-info-tile .content {

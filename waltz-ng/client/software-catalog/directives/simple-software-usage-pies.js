@@ -8,7 +8,6 @@ const BINDINGS = {
 };
 
 
-
 function prepareStats(items = [], usages = []) {
     const usageCounts = _.countBy(usages, 'softwarePackageId');
 
@@ -32,8 +31,9 @@ function prepareStats(items = [], usages = []) {
         maturity: countPieDataBy(items, item => item.maturityStatus),
         vendor: countPieDataBy(items, item => item.vendor)
     };
-
 }
+
+
 function controller($scope) {
 
     const vm = this;

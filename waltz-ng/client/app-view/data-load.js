@@ -64,6 +64,12 @@ export function loadSoftwareCatalog(catalogStore, appId, vm) {
 }
 
 
+export function loadDatabases(databaseStore, appId, vm) {
+    databaseStore.findByAppId(appId)
+        .then(resp => vm.databases = resp);
+}
+
+
 export function loadInvolvements($q, involvementStore, id, vm) {
     $q.all([
         involvementStore.findByEntityReference('APPLICATION', id),

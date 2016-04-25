@@ -168,3 +168,21 @@ export function termSearch(items = [], searchStr = '', searchFields = []) {
     });
 }
 
+/**
+ * the d3 nest function aggregates using the property name 'values', this
+ * function creates a copy of the data with the name 'count'.
+ *
+ * @param data
+ * @returns {Array|*}
+ */
+function toCountData(data) {
+    return _.map(data, d => ({ key: d.key, count: d.values }));
+}
+
+
+export function toKeyCounts(items = [], fn = x => x) {
+    return toCountData(d3.nest()
+        .key(fn)
+        .rollup(d => d.length)
+        .entries(items))
+}
