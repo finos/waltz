@@ -47,6 +47,7 @@
                 <property>
                     <name>!db.type</name>
                 </property>
+                <!--<activeByDefault>true</activeByDefault>-->
             </activation>
             <id>waltz-mariadb</id>
             <properties>

@@ -28,14 +28,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
-import static java.util.stream.Collectors.toMap;
-import static org.jooq.impl.DSL.count;
 
 
 @Repository
@@ -80,7 +81,7 @@ public class ServerInfoDao {
         return dsl.select(SERVER_INFORMATION.fields())
                 .from(SERVER_INFORMATION)
                 .innerJoin(APPLICATION)
-                .on(SERVER_INFORMATION.ASSET_CODE.in(APPLICATION.ASSET_CODE, APPLICATION.PARENT_ASSET_CODE))
+                .on(SERVER_INFORMATION.ASSET_CODE.in(APPLICATION.ASSET_CODE, APPLICATION.ASSET_CODE))
                 .where(APPLICATION.ID.eq(appId))
                 .fetch(recordMapper);
     }

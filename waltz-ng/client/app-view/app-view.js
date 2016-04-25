@@ -42,8 +42,7 @@ function controller(appView,
     const vm = this;
 
     const perspectiveCode = 'BUSINESS';
-
-
+    
     $q.all([
         perspectiveStore.findByCode(perspectiveCode),
         ratingStore.findByParentAndPerspective('APPLICATION', id, perspectiveCode)
