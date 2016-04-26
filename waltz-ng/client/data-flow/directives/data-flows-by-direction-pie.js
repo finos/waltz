@@ -47,9 +47,12 @@ function calcAppConnectionPieStats(flows, apps) {
         .value();
 }
 
+const DEFAULT_SIZE = 80;
+
+
 const config = {
     colorProvider: (d) => flowDirectionColorScale(d.data.key),
-    size: 80
+    size: DEFAULT_SIZE
 };
 
 
@@ -59,7 +62,7 @@ function controller($scope) {
     vm.config = config;
     vm.data = [];
 
-    $scope.$watch('ctrl.size', sz => vm.config.size = sz ? sz : 80);
+    $scope.$watch('ctrl.size', sz => vm.config.size = sz ? sz : DEFAULT_SIZE);
 
     $scope.$watchGroup(['ctrl.applications', 'ctrl.flows'], ([apps, flows]) => {
         if (!apps || !flows) return;

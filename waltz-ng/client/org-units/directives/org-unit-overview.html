@@ -42,20 +42,20 @@
                 <div class="row">
                     <div class="col-sm-4">
                         <waltz-apps-by-investment-pie applications="ctrl.apps"
-                                                      size="80">
+                                                      size="70">
                         </waltz-apps-by-investment-pie>
                     </div>
 
                     <div class="col-sm-4">
                         <waltz-apps-by-lifecycle-phase-pie applications="ctrl.apps"
-                                                           size="80">
+                                                           size="70">
                         </waltz-apps-by-lifecycle-phase-pie>
                     </div>
 
                     <div class="col-sm-4">
                         <waltz-data-flows-by-direction-pie applications='ctrl.apps'
                                                            flows="ctrl.flows.flows"
-                                                           size="80">
+                                                           size="70">
                         </waltz-data-flows-by-direction-pie>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                                                description="Cumulative value of infra and app dev costs"
                                                waltz-jump-to="costs-section"
                                                icon="money">
-                            <span style="font-size: xx-large;"
+                            <span style="font-size: x-large;"
                                   ng-bind="ctrl.portfolioCostStr">
                             </span>
                         </waltz-basic-info-tile>
@@ -77,7 +77,7 @@
                                                class="clickable"
                                                waltz-jump-to="complexity-section"
                                                icon="rocket">
-                            <div style="font-size: xx-large;">
+                            <div style="font-size: x-large;">
                                 &Sigma;
                                 <span ng-bind="ctrl.complexitySummary.cumulativeScore | toFixed:1">
                                 </span>
@@ -95,7 +95,7 @@
                                                description="Number of servers supporting this org unit"
                                                icon="server">
                             <div>
-                                <div style="font-size: xx-large;">
+                                <div style="font-size: x-large;">
                                     # <span ng-bind="ctrl.serverStats.total"></span>
                                 </div>
                                 <div class="small text-muted">

@@ -15,6 +15,7 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+import _ from "lodash";
 import {selectBest} from "../ratings/directives/viewer/coloring-strategies";
 
 

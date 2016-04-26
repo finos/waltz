@@ -55,21 +55,21 @@ function controller(uiGridConstants, $scope) {
         byLifecyclePhase: {
             data: [],
             config: {
-                size: 100,
+                size: 60,
                 colorProvider: (d) => lifecyclePhaseColorScale(d.data.key)
             }
         },
         byKind: {
             data: [],
             config: {
-                size: 100,
+                size: 60,
                 colorProvider: (d) => kindColorScale(d.data.key)
             }
         },
         byRiskRating: {
             data: [],
             config: {
-                size: 100,
+                size: 60,
                 colorProvider: (d) => riskRatingColorScale(d.data.key)
             }
         }

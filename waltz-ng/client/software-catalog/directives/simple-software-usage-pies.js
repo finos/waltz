@@ -8,6 +8,9 @@ const BINDINGS = {
 };
 
 
+const PIE_SIZE = 70;
+
+
 function prepareStats(items = [], usages = []) {
     const usageCounts = _.countBy(usages, 'softwarePackageId');
 
@@ -40,9 +43,11 @@ function controller($scope) {
 
     vm.pieConfig = {
         maturity: {
+            size: PIE_SIZE,
             colorProvider: (d) => maturityColorScale(d.data.key)
         },
         vendor: {
+            size: PIE_SIZE,
             colorProvider: (d) => variableScale(d.data.key)
         }
     };

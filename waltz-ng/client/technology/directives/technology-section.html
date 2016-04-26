@@ -13,35 +13,40 @@
 
                 <uib-tab heading="Overview">
 
-                    <h4 class="text-center">
-                        <waltz-icon name="leaf"></waltz-icon>
-                        Software Packages
-                    </h4>
-                    <waltz-simple-software-usage-pies packages="ctrl.filteredSoftwarePackages"
-                                                      usages="ctrl.catalog.softwareUsages">
-                    </waltz-simple-software-usage-pies>
+                    <div ng-if="ctrl.softwareCatalog.packages.length > 0">
+                        <h4 class="text-center">
+                            <waltz-icon name="leaf"></waltz-icon>
+                            Software Packages
+                        </h4>
+                        <waltz-simple-software-usage-pies packages="ctrl.filteredSoftwarePackages"
+                                                          usages="ctrl.catalog.softwareUsages">
+                        </waltz-simple-software-usage-pies>
+                    </div>
 
-                    <hr style="border-style: dotted">
+                    <div style="border-top: 2px dotted #ddd; margin-top: 4px; margin-bottom: 8px;"
+                         ng-if="ctrl.servers.length > 0">
+                        <h4 class="text-center">
+                            <waltz-icon name="server"></waltz-icon>
+                            Servers
+                        </h4>
+                        <waltz-server-pies servers="ctrl.filteredServers">
+                        </waltz-server-pies>
+                    </div>
 
-                    <h4 class="text-center">
-                        <waltz-icon name="server"></waltz-icon>
-                        Servers
-                    </h4>
-                    <waltz-server-pies servers="ctrl.filteredServers">
-                    </waltz-server-pies>
-
-                    <hr>
-
-                    <h4 class="text-center">
-                        <waltz-icon name="database"></waltz-icon>
-                        Databases
-                    </h4>
-                    <waltz-database-pies databases="ctrl.filteredDatabases">
-                    </waltz-database-pies>
+                    <div style="border-top: 2px dotted #ddd; margin-top: 4px; margin-bottom: 8px;"
+                         ng-if="ctrl.databases.length > 0">
+                        <h4 class="text-center">
+                            <waltz-icon name="database"></waltz-icon>
+                            Databases
+                        </h4>
+                        <waltz-database-pies databases="ctrl.filteredDatabases">
+                        </waltz-database-pies>
+                    </div>
 
                 </uib-tab>
 
-                <uib-tab heading="Software Packages">
+                <uib-tab heading="Software Packages"
+                         disable="ctrl.softwareCatalog.packages.length == 0">
                     <div class="waltz-scroll-region" style="height: 300px">
                         <waltz-simple-software-usage-list packages="ctrl.filteredSoftwarePackages"
                                                           usages="ctrl.catalog.softwareUsages">
@@ -50,7 +55,8 @@
                 </uib-tab>
 
                 <uib-tab heading="Servers"
-                         select="showServerDetail = true">
+                         select="showServerDetail = true"
+                         disable="ctrl.servers.length == 0">
                     <div ng-if="showServerDetail">
                         <br>
                         <div style="font-size: smaller; height: 300px"
@@ -60,7 +66,8 @@
                 </uib-tab>
 
                 <uib-tab heading="Databases"
-                         select="showDatabaseDetail = true">
+                         select="showDatabaseDetail = true"
+                         disable="ctrl.databases.length == 0">
                     <div ng-if="showDatabaseDetail">
                         <br>
                         <div style="font-size: smaller; height: 300px"

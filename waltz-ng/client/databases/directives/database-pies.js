@@ -7,6 +7,9 @@ const BINDINGS = {
 };
 
 
+const PIE_SIZE = 70;
+
+
 function prepareStats(databases) {
 
     const environment = toKeyCounts(databases, d => d.environment);
@@ -25,9 +28,11 @@ function controller($scope) {
 
     vm.pieConfig = {
         environment: {
+            size: PIE_SIZE,
             colorProvider: (d) => environmentColorScale(d.data.key)
         },
         vendor: {
+            size: PIE_SIZE,
             colorProvider: (d) => variableScale(d.data.key)
         }
     };

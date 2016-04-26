@@ -6,24 +6,28 @@ const BINDINGS = {
     servers : '='
 };
 
-
+const PIE_SIZE = 70;
 
 function controller($scope) {
     const vm = this;
 
+
     vm.pie = {
         env: {
             config: {
+                size: PIE_SIZE,
                 colorProvider: (d) => environmentColorScale(d.data.key)
             }
         },
         os: {
             config: {
+                size: PIE_SIZE,
                 colorProvider: (d) => operatingSystemColorScale(d.data.key)
             }
         },
         location: {
             config: {
+                size: PIE_SIZE,
                 colorProvider: (d) => variableScale(d.data.key)
             }
         }

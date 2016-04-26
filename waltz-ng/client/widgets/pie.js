@@ -14,8 +14,10 @@
  *     You should have received a copy of the GNU General Public License
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
-import d3 from 'd3';
+import d3 from "d3";
 
+
+const DEFAULT_SIZE = 70;
 
 function renderArcs(holder, config, data) {
 
@@ -23,8 +25,8 @@ function renderArcs(holder, config, data) {
         colorProvider,
         valueProvider = (d) => d.count,
         idProvider = (d) => d.data.key,
-        size = 100
-        } = config;
+        size = DEFAULT_SIZE
+    } = config;
 
     const radius = size / 2;
 
@@ -88,7 +90,7 @@ function renderArcs(holder, config, data) {
 
 
 function render(svg, config, data) {
-    const { size = 100 } = config;
+    const { size = DEFAULT_SIZE } = config;
     const width = size;
     const height = size;
 
