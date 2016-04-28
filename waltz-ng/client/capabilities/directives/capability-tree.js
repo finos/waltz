@@ -17,7 +17,7 @@
  *
  */
 
-import { buildHierarchies } from '../../common';
+import {buildHierarchies} from "../../common";
 
 const BINDINGS = {
     capabilities: '=',
@@ -64,7 +64,7 @@ function controller($scope, $filter) {
         vm.treeData = switchToParentIds(treeData);
 
         const nodeIndexer = (nodes = [], acc = {}) => {
-            return _.foldr(nodes, (acc, n) => {
+            return _.reduce(nodes, (acc, n) => {
                 acc[n.id] = n;
                 if (n.children) { nodeIndexer(n.children, acc); }
                 return acc;
@@ -91,7 +91,6 @@ function controller($scope, $filter) {
     };
 
     vm.expandFiltered = () => {
-
         // apply the same filter as given to the tree control widget
         const results = $filter('filter')(_.values(vm.nodesById), vm.filterExpression);
 

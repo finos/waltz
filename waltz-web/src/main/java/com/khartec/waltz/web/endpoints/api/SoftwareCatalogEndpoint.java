@@ -1,6 +1,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.software_catalog.SoftwareCatalog;
+import com.khartec.waltz.model.software_catalog.SoftwareSummaryStatistics;
 import com.khartec.waltz.service.software_catalog.SoftwareCatalogService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -26,12 +27,21 @@ public class SoftwareCatalogEndpoint implements Endpoint {
 
     @Override
     public void register() {
+
         String findByAppIdsPath = mkPath(BASE_URL, "apps");
+        String findStatsForAppIdsPath = mkPath(BASE_URL, "apps", "stats");
+
 
         DatumRoute<SoftwareCatalog> findByAppIdsRoute = (request, response) ->
                 service.findForAppIds(readIdsFromBody(request));
 
+        DatumRoute<SoftwareSummaryStatistics> findStatsForAppIdsRoute = (request, response)
+                -> service.findStatisticsForAppIds(readIdsFromBody(request));
+
+
         postForDatum(findByAppIdsPath, findByAppIdsRoute);
+        postForDatum(findStatsForAppIdsPath, findStatsForAppIdsRoute);
+
     }
 
 }

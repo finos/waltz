@@ -25,7 +25,7 @@ function controller() {
     vm.onComplexitySelect = (d) => {
         vm.complexitySelection = {
             items: _.map(d.items, (item) => {
-                const app = _.findWhere(vm.apps, { id: item.id });
+                const app = _.find(vm.apps, { id: item.id });
                 return {...item, app};
             }),
             begin: d.begin,

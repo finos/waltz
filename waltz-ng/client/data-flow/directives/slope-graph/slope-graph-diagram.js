@@ -1,8 +1,7 @@
 
-import _ from 'lodash';
-import d3 from 'd3';
-
-import { noop } from '../../../common';
+import _ from "lodash";
+import d3 from "d3";
+import {noop} from "../../../common";
 
 const transitionSpeed = 150;
 
@@ -69,7 +68,7 @@ function drawTypesColumn(svg, dimensions, types, typeScale, tweaker) {
         .attr('transform', `translate(0, ${dimensions.viz.height / 2})`)
         .append('text')
         .attr('text-anchor', 'middle')
-        .text(type => _.trunc(type.name, 16));
+        .text(type => _.truncate(type.name, 16));
 
     typesSelection.exit().remove();
 
@@ -107,7 +106,7 @@ function drawSourcesColumn(svg, dimensions, sources, scale, tweaker) {
         .classed('wafd-source', true)
         .append('text')
         .attr('text-anchor', 'end')
-        .text(app => _.trunc(app.name, 26));
+        .text(app => _.truncate(app.name, 26));
 
     sourcesSelection.exit().remove();
 
@@ -145,7 +144,7 @@ function drawTargetsColumn(svg, dimensions, targets, scale, tweaker) {
         .call(onHighlight, 'id')
         .append('text')
         .attr('text-anchor', 'start')
-        .text(app => _.trunc(app.name, 26));
+        .text(app => _.truncate(app.name, 26));
 
     targetsSelection.exit().remove();
 

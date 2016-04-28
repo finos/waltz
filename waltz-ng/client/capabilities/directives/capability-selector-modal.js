@@ -17,7 +17,6 @@
  *
  */
 
-import { buildHierarchies } from '../../common';
 
 const BINDINGS = {
     capabilities: '=',
@@ -70,9 +69,8 @@ function controller($uibModal) {
 
         modalInstance.result.then(function (selection) {
             vm.selectedNode = selection;
-            console.log('mc selected', selection);
         }, function () {
-            console.info('mc Modal dismissed at: ' + new Date());
+            //console.info('mc Modal dismissed at: ' + new Date());
         });
     };
 

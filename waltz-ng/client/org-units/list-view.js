@@ -9,55 +9,97 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-
 import _ from 'lodash';
 import angular from 'angular';
 
-import { buildHierarchies } from '../common';
-import { talliesById } from '../common/tally-utils';
+import { buildHierarchies, termSearch } from "../common";
 
 
-function controller(orgUnits, tallies, svgStore, $state) {
+const FIELDS_TO_SEARCH = ['name', 'description'];
 
+function setupBlockProcessor($state) {
+    return b => {
+        b.block.onclick = () =>
+            $state.go('main.org-units.unit', { id: b.value });
 
-    const vm = this;
-
-    const rootUnits = buildHierarchies(orgUnits);
-
-    const toFlatNodes = (units, depth) => {
-        return _.chain(units)
-            .sortBy('name')
-            .map(unit => {
-                const node = {
-                    unit: {
-                        name: unit.name,
-                        description: unit.description,
-                        id: unit.id
-                    },
-                    style: {
-                        'margin-left': (depth * 20) + 'px',
-                        'padding-bottom': Math.max(10 - (depth * 2), 2) + 'px'
-                    },
-                    depth
-                };
-                return _.flatten(_.union([node], toFlatNodes(unit.children, depth + 1)));
-            })
-            .flatten()
-            .value();
-    };
-
-    vm.flatUnits = toFlatNodes(rootUnits, 0);
-    vm.talliesById = talliesById(tallies);
-
-    svgStore.findByKind('ORG_UNIT').then(xs => vm.diagrams = xs);
-
-    vm.blockProcessor = b => {
-        b.block.onclick = () => $state.go('main.org-units.unit', { id: b.value });
-        angular.element(b.block).addClass('clickable');
+        angular
+            .element(b.block)
+            .addClass('clickable');
     };
 }
 
-controller.$inject = ['orgUnits', 'tallies', 'SvgDiagramStore', '$state'];
+
+function loadDiagrams(svgStore, vm, $state) {
+
+    svgStore
+        .findByKind('ORG_UNIT')
+        .then(xs => vm.diagrams = xs);
+
+    vm.blockProcessor = setupBlockProcessor($state);
+}
+
+
+function prepareOrgUnitTree(orgUnits, tallies) {
+    const orgUnitsById = _.keyBy(orgUnits, 'id');
+
+    _.each(tallies, t => {
+        const ou = orgUnitsById[t.id];
+        if (ou) ou.appCount = t.count;
+    });
+
+    const rootUnits = buildHierarchies(orgUnits);
+
+    const summer = (node) => {
+        if (node == null) return 0;
+
+        let temp = Number(node.appCount || 0);
+        let sum = _.sumBy(node.children, summer);
+
+        if (node.children) {
+            node.totalAppCount = sum + temp;
+            node.childAppCount = sum;
+        }
+
+        return temp + sum;
+    };
+
+    _.each(rootUnits, summer);
+
+    return rootUnits;
+}
+
+
+function controller(orgUnits,
+                    tallies,
+                    svgStore,
+                    $state) {
+
+    const vm = this;
+
+    loadDiagrams(svgStore, vm, $state);
+
+    vm.filteredOrgUnits = [];
+    vm.trees = prepareOrgUnitTree(orgUnits, tallies);
+    vm.orgUnits = orgUnits;
+    vm.nodeSelected = (node) => vm.selectedNode = node;
+
+    vm.doSearch = (q) => {
+        if (!q || q.length < 3) {
+            vm.clearSearch();
+        } else {
+            vm.filteredOrgUnits = termSearch(orgUnits, q, FIELDS_TO_SEARCH);
+        }
+    };
+
+    vm.clearSearch = (q) => vm.filteredOrgUnits = [];
+}
+
+controller.$inject = [
+    'orgUnits',
+    'tallies',
+    'SvgDiagramStore',
+    '$state'
+];
 
 
 export default {

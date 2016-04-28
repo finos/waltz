@@ -17,7 +17,7 @@
  *
  */
 
-import { flowDirectionColorScale } from '../../common/colors';
+import {flowDirectionColorScale} from "../../common/colors";
 
 
 const BINDINGS = {
@@ -33,10 +33,10 @@ function calcAppConnectionPieStats(flows, apps) {
     const orgMemberAppIds = _.map(apps, 'id');
 
     return _.chain(logicalFlows)
-        .uniq(false, f => f.source.id + '.' + f.target.id)
+        .uniqBy(f => f.source.id + '.' + f.target.id)
         .map(f => {
-            const sourceIsMember = _.contains(orgMemberAppIds, f.source.id);
-            const targetIsMember = _.contains(orgMemberAppIds, f.target.id);
+            const sourceIsMember = _.includes(orgMemberAppIds, f.source.id);
+            const targetIsMember = _.includes(orgMemberAppIds, f.target.id);
             if (sourceIsMember && targetIsMember) return 'INTRA';
             if (sourceIsMember) return 'INBOUND';
             if (targetIsMember) return 'OUTBOUND';
@@ -47,9 +47,12 @@ function calcAppConnectionPieStats(flows, apps) {
         .value();
 }
 
+const DEFAULT_SIZE = 80;
+
+
 const config = {
     colorProvider: (d) => flowDirectionColorScale(d.data.key),
-    size: 80
+    size: DEFAULT_SIZE
 };
 
 
@@ -59,7 +62,7 @@ function controller($scope) {
     vm.config = config;
     vm.data = [];
 
-    $scope.$watch('ctrl.size', sz => vm.config.size = sz ? sz : 80);
+    $scope.$watch('ctrl.size', sz => vm.config.size = sz ? sz : DEFAULT_SIZE);
 
     $scope.$watchGroup(['ctrl.applications', 'ctrl.flows'], ([apps, flows]) => {
         if (!apps || !flows) return;

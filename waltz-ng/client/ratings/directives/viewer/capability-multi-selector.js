@@ -54,7 +54,7 @@ function selectAllFn(selectedNodes, nodesById, allowableNodeIds) {
         $event.stopPropagation();
 
         const idsToAdd = _.chain(calcChildrenIds(node))
-            .filter(id => _.contains(allowableNodeIds, id))
+            .filter(id => _.includes(allowableNodeIds, id))
             .value();
 
         _.each(idsToAdd, id => {
@@ -102,7 +102,7 @@ function controller($scope) {
         WATCH_EXPRESSIONS,
         ([capabilities = [], explicitCapabilityIds = [], initiallySelectedIds = []]) => {
             const nodeData = switchToParentIds(populateParents(capabilities));
-            const nodesById = _.indexBy(nodeData, 'id');
+            const nodesById = _.keyBy(nodeData, 'id');
 
             vm.treeData = _.filter(nodeData, n => ! n.parentId);
             vm.expandedNodes = [];
@@ -110,7 +110,7 @@ function controller($scope) {
             vm.nodesById = nodesById;
             vm.selectAll = selectAllFn(vm.selectedNodes, vm.nodesById, vm.explicitCapabilityIds);
             vm.deselectAll = deselectAllFn(vm.selectedNodes);
-            vm.treeOptions.isSelectable = (n) => _.contains(vm.explicitCapabilityIds, n.id);
+            vm.treeOptions.isSelectable = (n) => _.includes(vm.explicitCapabilityIds, n.id);
 
             populateSelectedNodes(initiallySelectedIds, vm.selectedNodes, nodesById);
         });

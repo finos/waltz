@@ -20,7 +20,7 @@
 
 export function calcComplexitySummary(complexity) {
     if (!complexity) return;
-    const cumulativeScore = _.sum(complexity, "overallScore");
+    const cumulativeScore = _.sumBy(complexity, "overallScore");
     const averageScore = complexity.length > 0 ? cumulativeScore / complexity.length : 0;
 
     return {

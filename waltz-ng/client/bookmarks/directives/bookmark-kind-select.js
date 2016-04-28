@@ -10,10 +10,9 @@
  *
  */
 
-import _ from 'lodash';
-
-import { bookmarkNames } from '../../common/services/display_names.js';
-import { bookmarkIconNames } from '../../common/services/icon_names.js';
+import _ from "lodash";
+import {bookmarkNames} from "../../common/services/display_names.js";
+import {bookmarkIconNames} from "../../common/services/icon_names.js";
 
 
 function createKinds() {
@@ -34,7 +33,7 @@ function controller($scope) {
 
     $scope.$watch('ctrl.value', (nv) => {
         if (nv) {
-            const selection = _.findWhere(kinds, { code: nv });
+            const selection = _.find(kinds, { code: nv });
             this.selected = selection;
         }
     });

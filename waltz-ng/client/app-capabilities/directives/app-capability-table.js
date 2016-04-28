@@ -19,7 +19,7 @@ function controller($scope) {
     const refresh = ([appCapabilities, capabilities]) => {
         if (!appCapabilities || !capabilities) return;
 
-        const capabilitiesById = _.indexBy(capabilities, 'id');
+        const capabilitiesById = _.keyBy(capabilities, 'id');
 
         vm.items = _.map(appCapabilities, ac => {
             return {

@@ -21,6 +21,7 @@ import com.khartec.waltz.model.serverinfo.ImmutableServerInfo;
 import com.khartec.waltz.model.serverinfo.ImmutableServerSummaryStatistics;
 import com.khartec.waltz.model.serverinfo.ServerInfo;
 import com.khartec.waltz.model.serverinfo.ServerSummaryStatistics;
+import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.schema.tables.records.ServerInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -32,14 +33,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.JooqUtilities.calculateTallies;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
-import static java.util.stream.Collectors.toMap;
-import static org.jooq.impl.DSL.count;
 
 
 @Repository
 public class ServerInfoDao {
+
 
     private final DSLContext dsl;
 
@@ -80,7 +81,7 @@ public class ServerInfoDao {
         return dsl.select(SERVER_INFORMATION.fields())
                 .from(SERVER_INFORMATION)
                 .innerJoin(APPLICATION)
-                .on(SERVER_INFORMATION.ASSET_CODE.in(APPLICATION.ASSET_CODE, APPLICATION.PARENT_ASSET_CODE))
+                .on(SERVER_INFORMATION.ASSET_CODE.in(APPLICATION.ASSET_CODE, APPLICATION.ASSET_CODE))
                 .where(APPLICATION.ID.eq(appId))
                 .fetch(recordMapper);
     }
@@ -151,11 +152,30 @@ public class ServerInfoDao {
     }
 
 
-    public ServerSummaryStatistics findStatsForAppIds(Long[] appIds) {
+    public ServerSummaryStatistics findStatsForAppIds(Collection<Long> appIds) {
 
-        SelectConditionStep<Record1<String>> assetCodesQry = DSL.select(APPLICATION.ASSET_CODE)
-                .from(APPLICATION)
-                .where(APPLICATION.ID.in(appIds));
+        Condition condition = SERVER_INFORMATION.ASSET_CODE
+                .in(dsl.select(APPLICATION.ASSET_CODE)
+                    .from(APPLICATION)
+                    .where(APPLICATION.ID.in(appIds)));
+
+        List<StringTally> environmentTallies = calculateTallies(
+                dsl,
+                SERVER_INFORMATION,
+                SERVER_INFORMATION.ENVIRONMENT,
+                condition);
+
+        List<StringTally> operatingSystemTallies = calculateTallies(
+                dsl,
+                SERVER_INFORMATION,
+                SERVER_INFORMATION.OPERATING_SYSTEM,
+                condition);
+
+        List<StringTally> locationTallies = calculateTallies(
+                dsl,
+                SERVER_INFORMATION,
+                SERVER_INFORMATION.LOCATION,
+                condition);
 
         Field<BigDecimal> virtualCount = DSL.coalesce(DSL.sum(
                 DSL.choose(SERVER_INFORMATION.IS_VIRTUAL)
@@ -174,10 +194,15 @@ public class ServerInfoDao {
                     physicalCount
                 )
                 .from(SERVER_INFORMATION)
-                .where(SERVER_INFORMATION.ASSET_CODE.in(assetCodesQry))
+                .where(condition)
                 .fetchOne(r -> ImmutableServerSummaryStatistics.builder()
                         .virtualCount(r.getValue(virtualCount).intValue())
                         .physicalCount(r.getValue(physicalCount).intValue())
+                        .operatingSystemCounts(operatingSystemTallies)
+                        .environmentCounts(environmentTallies)
+                        .locationCounts(locationTallies)
                         .build());
     }
+
+
 }

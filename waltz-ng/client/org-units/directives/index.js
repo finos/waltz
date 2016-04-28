@@ -15,4 +15,5 @@ export default (module) => {
     module.directive('waltzOrgUnitOverview', require('./org-unit-overview'));
     module.directive('waltzOrgUnitNamePopup', require('./org-unit-name-popup'));
     module.directive('waltzOrgUnitFlowViz', require('./org-unit-flow-viz'));
+    module.directive('waltzOrgUnitTree', require('./org-unit-tree'));
 };

@@ -9,7 +9,7 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from 'lodash';
+import _ from "lodash";
 
 function controller() {
 
@@ -17,7 +17,7 @@ function controller() {
 
     vm.lookupOrgUnitName = (id) => {
         if (this.orgUnits) {
-            const unit = _.indexBy(this.orgUnits, 'id')[id];
+            const unit = _.keyBy(this.orgUnits, 'id')[id];
             return unit ? unit.name : '-';
         } else {
             return '-';

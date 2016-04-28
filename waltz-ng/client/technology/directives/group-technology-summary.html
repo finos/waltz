@@ -1,0 +1,67 @@
+<div>
+    <div class="row">
+        <h4 class="text-center">
+            <waltz-icon name="server"></waltz-icon>
+            Servers
+        </h4>
+        <div class="col-sm-4">
+            <waltz-pie-table data="ctrl.serverStats.operatingSystem"
+                             config="ctrl.pieConfig.operatingSystem"
+                             title="By Operating System">
+            </waltz-pie-table>
+        </div>
+
+        <div class="col-sm-4">
+            <waltz-pie-table data="ctrl.serverStats.environment"
+                             config="ctrl.pieConfig.environment"
+                             title="By Environment">
+            </waltz-pie-table>
+        </div>
+
+        <div class="col-sm-4">
+            <waltz-pie-table data="ctrl.serverStats.location"
+                             config="ctrl.pieConfig.location"
+                             title="By Location">
+            </waltz-pie-table>
+        </div>
+    </div>
+    <div class="row">
+        <h4 class="text-center">
+            <waltz-icon name="database"></waltz-icon>
+            Databases
+        </h4>
+        <div class="col-sm-6">
+            <waltz-pie-table data="ctrl.databaseStats.vendor"
+                             config="ctrl.pieConfig.vendor"
+                             title="By Vendor">
+            </waltz-pie-table>
+        </div>
+
+        <div class="col-sm-6">
+            <waltz-pie-table data="ctrl.databaseStats.environment"
+                             config="ctrl.pieConfig.environment"
+                             title="By Environment">
+            </waltz-pie-table>
+        </div>
+    </div>
+
+    <div class="row">
+        <h4 class="text-center">
+            <waltz-icon name="leaf"></waltz-icon>
+            Software
+        </h4>
+        <div class="col-sm-6">
+            <waltz-pie-table data="ctrl.softwareStats.vendor"
+                             config="ctrl.pieConfig.vendor"
+                             title="By Vendor">
+            </waltz-pie-table>
+        </div>
+
+        <div class="col-sm-6">
+            <waltz-pie-table data="ctrl.softwareStats.maturity"
+                             config="ctrl.pieConfig.maturity"
+                             title="By Maturity">
+            </waltz-pie-table>
+        </div>
+    </div>
+</div>

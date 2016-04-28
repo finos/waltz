@@ -16,7 +16,8 @@ import {
     loadInvolvements,
     loadAuthSources,
     loadServers,
-    loadSoftwareCatalog
+    loadSoftwareCatalog,
+    loadDatabases
 } from "./data-load";
 import {prepareSlopeGraph} from "../data-flow/directives/slope-graph/slope-graph-utils";
 import {mkAppRatingsGroup, calculateHighestRatingCount} from "../ratings/directives/common";
@@ -34,6 +35,7 @@ function controller(appView,
                     displayNameService,
                     complexityStore,
                     catalogStore,
+                    databaseStore,
                     $state,
                     $q) {
 
@@ -42,7 +44,6 @@ function controller(appView,
     const vm = this;
 
     const perspectiveCode = 'BUSINESS';
-
 
     $q.all([
         perspectiveStore.findByCode(perspectiveCode),
@@ -74,7 +75,8 @@ function controller(appView,
         loadInvolvements($q, involvementStore, id, vm),
         loadAuthSources(authSourcesStore, orgUnitStore, id, organisationalUnitId, vm),
         loadServers(serverInfoStore, id, vm),
-        loadSoftwareCatalog(catalogStore, id, vm)
+        loadSoftwareCatalog(catalogStore, id, vm),
+        loadDatabases(databaseStore, id, vm)
     ];
 
     $q.all(promises).then(() => {
@@ -110,6 +112,7 @@ controller.$inject = [
     'WaltzDisplayNameService',
     'ComplexityStore',
     'SoftwareCatalogStore',
+    'DatabaseStore',
     '$state',
     '$q'
 ];

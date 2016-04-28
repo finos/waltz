@@ -41,22 +41,22 @@ function controller($scope) {
     $scope.$watchGroup(watchExpressions, ([usages, capabilities, traitUsages = [], capabilityTraits = []]) => {
         if (! usages || ! capabilities) { return; }
 
-        const capabilitiesById = _.indexBy(capabilities, 'id');
+        const capabilitiesById = _.keyBy(capabilities, 'id');
         const usedCapabilityIds = _.map(usages, usage => usage.capabilityId);
 
         const exhibitedTraits = _.map(traitUsages, 'traitId');
 
         const capabilityIdsToRemove = _.chain(capabilityTraits)
-            .where({ relationship: 'REQUIRES' })
-            .reject(ct => _.contains(exhibitedTraits, ct.traitId))
+            .filter({ relationship: 'REQUIRES' })
+            .reject(ct => _.includes(exhibitedTraits, ct.traitId))
             .map('entityReference.id')
             .value();
 
         vm.usedCapabilities = _.map(usages, u => ({ ...u, capability: capabilitiesById[u.capabilityId] }));
 
         vm.availableCapabilities = _.chain(capabilities)
-            .reject(t => _.contains(usedCapabilityIds, t.id))
-            .reject(t => _.contains(capabilityIdsToRemove, t.id))
+            .reject(t => _.includes(usedCapabilityIds, t.id))
+            .reject(t => _.includes(capabilityIdsToRemove, t.id))
             .value();
 
         vm.hasHiddenCapabilities = capabilityIdsToRemove.length > 0;

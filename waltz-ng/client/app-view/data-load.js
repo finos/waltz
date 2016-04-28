@@ -26,7 +26,7 @@ function addDataTypes(extras, vm) {
 function addOrgUnits(extras, vm) {
     const existing = vm.orgUnits ? vm.orgUnits : [];
     vm.orgUnits = _.union(existing, extras);
-    vm.orgUnitsById = _.indexBy(vm.orgUnits, 'id');
+    vm.orgUnitsById = _.keyBy(vm.orgUnits, 'id');
     return vm.orgUnits;
 }
 
@@ -61,6 +61,12 @@ export function loadServers(serverInfoStore, appId, vm) {
 export function loadSoftwareCatalog(catalogStore, appId, vm) {
     catalogStore.findByAppIds([appId])
         .then(resp => vm.softwareCatalog = resp);
+}
+
+
+export function loadDatabases(databaseStore, appId, vm) {
+    databaseStore.findByAppId(appId)
+        .then(resp => vm.databases = resp);
 }
 
 

@@ -15,11 +15,12 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+import _ from "lodash";
 import {selectBest} from "../ratings/directives/viewer/coloring-strategies";
 
 
 function prepareFlowData(flows, apps) {
-    const entitiesById = _.indexBy(apps, 'id');
+    const entitiesById = _.keyBy(apps, 'id');
 
     const enrichedFlows = _.map(flows, f => ({
         source: entitiesById[f.source.id] || { ...f.source, isNeighbour: true },
@@ -30,7 +31,7 @@ function prepareFlowData(flows, apps) {
     const entities = _.chain(enrichedFlows)
         .map(f => ([f.source, f.target]))
         .flatten()
-        .uniq(a => a.id)
+        .uniqBy(a => a.id)
         .value();
 
     return {
@@ -59,7 +60,7 @@ function loadDataFlows(dataFlowStore, groupApps) {
  * @returns {*}
  */
 function includeParentCapabilities(appCapabilities, allCapabilities) {
-    const capabilitiesById = _.indexBy(allCapabilities, 'id');
+    const capabilitiesById = _.keyBy(allCapabilities, 'id');
 
     const toCapabilityId = appCap => appCap.capabilityId;
     const lookupCapability = id => capabilitiesById[id];
@@ -100,12 +101,11 @@ function controller(appGroupStore,
                     assetCostStore,
                     complexityStore,
                     dataFlowStore,
-                    serverInfoStore,
                     userService,
                     capabilityStore,
                     appCapabilityStore,
                     ratingStore,
-                    softwareCatalogStore,
+                    technologyStatsService,
                     $stateParams,
                     $q)
 {
@@ -120,30 +120,27 @@ function controller(appGroupStore,
             appStore.findByIds(appIds),
             assetCostStore.findAppCostsByAppIds(appIds),
             complexityStore.findByAppIds(appIds),
-            serverInfoStore.findStatsForAppIds(appIds),
             capabilityStore.findAll(),
             appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
             ratingStore.findByAppIds(appIds),
-            softwareCatalogStore.findByAppIds(appIds)
+            technologyStatsService.findByAppIds(appIds)
         ]))
         .then(([
             apps,
             assetCosts,
             complexity,
-            serverStats,
             allCapabilities,
             appCapabilities,
             ratings,
-            softwareCatalog
+            techStats
         ]) => {
             vm.applications = apps;
             vm.assetCosts = assetCosts;
             vm.complexity = complexity;
-            vm.serverStats = serverStats;
             vm.allCapabilities = allCapabilities;
             vm.appCapabilities = appCapabilities;
             vm.ratings = ratings;
-            vm.softwareCatalog = softwareCatalog;
+            vm.techStats = techStats;
         })
         .then(() => loadDataFlows(dataFlowStore, vm.applications))
         .then(flows => vm.dataFlows = flows)
@@ -155,7 +152,7 @@ function controller(appGroupStore,
     vm.isGroupEditable = () => {
         if (!vm.groupDetail) return false;
         if (!vm.user) return false;
-        return _.any(vm.groupDetail.members, m => m.role === 'OWNER' && m.userId === vm.user.userName );
+        return _.some(vm.groupDetail.members, m => m.role === 'OWNER' && m.userId === vm.user.userName );
     };
 
     vm.ratingColorStrategy = selectBest;
@@ -167,12 +164,11 @@ controller.$inject = [
     'AssetCostStore',
     'ComplexityStore',
     'DataFlowDataStore',
-    'ServerInfoStore',
     'UserService',
     'CapabilityStore',
     'AppCapabilityStore',
     'RatingStore',
-    'SoftwareCatalogStore',
+    'TechnologyStatisticsService',
     '$stateParams',
     '$q'
 ];

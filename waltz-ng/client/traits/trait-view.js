@@ -15,6 +15,8 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+import _ from "lodash";
+
 
 function groupUsagesByEntityKind(allUsages = []) {
     return _.groupBy(allUsages, usage => usage.entityReference.kind)
@@ -22,12 +24,11 @@ function groupUsagesByEntityKind(allUsages = []) {
 
 
 function indexCapabilitiesById(capabilities = []) {
-    return _.indexBy(capabilities, 'id')
+    return _.keyBy(capabilities, 'id')
 }
 
 
 function enrichCapabilityUsages(usages = [], capabilitiesById = {}) {
-    console.log(usages, capabilitiesById)
     return _.map(usages, u => ({
         usage: u,
         capability: capabilitiesById[u.entityReference.id]
@@ -68,8 +69,6 @@ function controller(traitStore, traitUsageStore, capabilityStore, $stateParams, 
 
     vm.lookupCapability = id =>
         vm.capabilitiesById[id];
-
-    global.vm = vm;
 }
 
 

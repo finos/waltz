@@ -1,12 +1,12 @@
-import _ from 'lodash';
-import { variableScale } from '../../common/colors';
+import _ from "lodash";
+import {variableScale} from "../../common/colors";
 
 
 function mkChartData(config, portfolios, employees) {
 
     const empIds = config.employeeIds;
 
-    const statsById = _.foldr(empIds, (byId, empId) => {
+    const statsById = _.reduce(empIds, (byId, empId) => {
         byId[empId] = _.countBy(portfolios[empId], app => app.lifecyclePhase);
         return byId;
     }, {});
@@ -70,7 +70,7 @@ function controller($scope) {
 controller.$inject = ['$scope'];
 
 
-export default function portfolioSummarySection() {
+export default function() {
     return {
         restrict: 'E',
         controllerAs: 'ctrl',

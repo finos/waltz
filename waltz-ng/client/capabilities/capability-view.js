@@ -108,19 +108,17 @@ function controller(capabilities,
                     dataFlowStore,
                     complexityStore,
                     assetCostStore,
-                    capabilityStore,
                     applicationStore,
-                    serverInfoStore,
                     traitUsageStore,
                     traitStore,
-                    softwareCatalogStore) {
+                    techStatsService) {
 
     const vm = this;
 
     const capId = $stateParams.id;
-    const capability = _.findWhere(populateParents(capabilities), { id: capId });
+    const capability = _.find(populateParents(capabilities), { id: capId });
 
-    const capabilitiesById = _.indexBy(capabilities, 'id');
+    const capabilitiesById = _.keyBy(capabilities, 'id');
 
     const tweakers = {
         subjectLabel: {
@@ -147,16 +145,14 @@ function controller(capabilities,
                 dataFlowStore.findByAppIds(appIds),
                 complexityStore.findByAppIds(appIds),
                 assetCostStore.findAppCostsByAppIds(appIds),
-                serverInfoStore.findStatsForAppIds(appIds),
-                softwareCatalogStore.findByAppIds(appIds)
+                techStatsService.findByAppIds(appIds)
             ]).then(([
                 perspective,
                 ratings,
                 flows,
                 complexity,
                 assetCosts,
-                serverStats,
-                softwareCatalog
+                techStats
             ]) => {
                 vm.ratings = {
                     group: prepareGroupData(capability, vm.apps, perspective, ratings),
@@ -165,8 +161,7 @@ function controller(capabilities,
                 vm.dataFlows = flows;
                 vm.complexity = complexity;
                 vm.assetCosts = assetCosts;
-                vm.serverStats = serverStats;
-                vm.softwareCatalog = softwareCatalog;
+                vm.techStats = techStats;
             });
         });
 
@@ -179,14 +174,13 @@ function controller(capabilities,
             applicationStore
                 .findByIds(associatedAppIds)
                 .then((assocApps) => {
-                    const appsById = _.indexBy(assocApps, 'id');
+                    const appsById = _.keyBy(assocApps, 'id');
                     return _.chain(assocAppCaps)
                         .groupBy('capabilityId')
                         .map((associations, capabilityId) => {
                             return {
                                 capability: capabilitiesById[capabilityId],
                                 apps: _.map(associations, assoc => appsById[assoc.applicationId])
-
                             }
                         })
                         .value()
@@ -217,12 +211,10 @@ controller.$inject = [
     'DataFlowDataStore',
     'ComplexityStore',
     'AssetCostStore',
-    'CapabilityStore',
     'ApplicationStore',
-    'ServerInfoStore',
     'TraitUsageStore',
     'TraitStore',
-    'SoftwareCatalogStore'
+    'TechnologyStatisticsService'
 ];
 
 

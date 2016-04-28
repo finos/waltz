@@ -17,9 +17,8 @@
  *
  */
 
-import {
-    lifecyclePhaseColorScale,
-    ragColorScale } from '../../common/colors';
+import {lifecyclePhaseColorScale} from "../../common/colors";
+import {toKeyCounts} from "../../common";
 
 
 const BINDINGS = {
@@ -28,18 +27,17 @@ const BINDINGS = {
 };
 
 
+const DEFAULT_SIZE = 80;
+
 const config = {
     colorProvider: (d) => lifecyclePhaseColorScale(d.data.key),
-    size: 80
+    size: DEFAULT_SIZE
 };
 
 
 
 function calcAppPhasePieStats(apps) {
-    return _.chain(apps)
-        .countBy('lifecyclePhase')
-        .map((v, k) => ({ key: k, count: v }))
-        .value();
+    return toKeyCounts(apps, a => a.lifecyclePhase);
 }
 
 
@@ -49,7 +47,7 @@ function controller($scope) {
     vm.config = config;
     vm.data = [];
 
-    $scope.$watch('ctrl.size', sz => vm.config.size = sz ? sz : 80);
+    $scope.$watch('ctrl.size', sz => vm.config.size = sz ? sz : DEFAULT_SIZE);
 
     $scope.$watch('ctrl.applications', apps => {
         if (!apps) return;

@@ -16,7 +16,8 @@
  *
  */
 
-import {green, red} from '../../common/colors';
+import _ from "lodash";
+import {green, red} from "../../common/colors";
 
 
 const sizingDefaults = {
@@ -24,17 +25,19 @@ const sizingDefaults = {
     w: 600,
     padding: {
         bottom: 20,
-        top: 20
+        top: 40
     }
 };
 
 
 function bucket(complexityData) {
-    const scores = _.chain(complexityData)
-        .map(d => ({ score: d.overallScore, id: d.id }))
-        .value();
+    const scores = _.map(
+        complexityData,
+        d => ({ score: d.overallScore, id: d.id }));
 
-    const maxScore = _.max(scores, 'score').score;
+    const maxScore = scores.length > 0
+        ? _.maxBy(scores, 'score').score
+        : 0;
 
     const step = 0.05;
     const buckets = _.range(0, _.max([maxScore + step, 1]), step)
@@ -49,12 +52,13 @@ function bucket(complexityData) {
             bucket.items.push(s);
         }
     });
+
     return buckets;
 }
 
 
 function findBiggestBucket(buckets) {
-    return _.max(buckets, b => b.items.length);
+    return _.maxBy(buckets, b => b.items.length);
 }
 
 
@@ -99,7 +103,7 @@ function drawBucketBars(buckets, container, scales, sizing, repaint, onSelect) {
     bucketBars
         .enter()
         .append('rect')
-        .classed('bucket-bar', true)
+        .classed('bucket-bar', true);
 
     bucketBars
         .classed('clickable', onSelect != null)

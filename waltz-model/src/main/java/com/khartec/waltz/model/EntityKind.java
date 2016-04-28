@@ -18,9 +18,12 @@
 package com.khartec.waltz.model;
 
 public enum EntityKind {
+
     APPLICATION,
     CAPABILITY,
     END_USER_APPLICATION,
     ORG_UNIT,
-    APP_GROUP
+    APP_GROUP,
+    DATABASE
+
 }

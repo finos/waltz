@@ -11,7 +11,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 function controller(userStore) {
 
@@ -29,7 +29,7 @@ function controller(userStore) {
     vm.userSelected = (user) => {
         vm.dismiss();
         vm.selectedUser = user;
-        vm.roleSelections = _.foldl(
+        vm.roleSelections = _.reduce(
             user.roles,
             (acc, role) => { acc[role] = true; return acc; },
             {});
@@ -47,12 +47,12 @@ function controller(userStore) {
     vm.registerUser = (user) => {
         userStore.register(user)
             .then(
-                r => {
+                () => {
                     vm.userSelected(user);
                     vm.users = [...vm.users, user];
                 },
                 err => {
-                    console.error('Error registering user: ', err)
+                    console.error('Error registering user: ', err);
                     vm.lastError = err.data;
                 }
             );
@@ -61,7 +61,7 @@ function controller(userStore) {
     vm.updateUser = (user, roleSelections, password1, password2) => {
 
         if (password1 !== password2) {
-            vm.lastError = { id: 'MISMATCH', message: 'Passwords do not match'}
+            vm.lastError = { id: 'MISMATCH', message: 'Passwords do not match'};
             return;
         }
 

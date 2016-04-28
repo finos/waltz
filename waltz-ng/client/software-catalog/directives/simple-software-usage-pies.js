@@ -8,6 +8,8 @@ const BINDINGS = {
 };
 
 
+const PIE_SIZE = 70;
+
 
 function prepareStats(items = [], usages = []) {
     const usageCounts = _.countBy(usages, 'softwarePackageId');
@@ -16,7 +18,7 @@ function prepareStats(items = [], usages = []) {
         _.chain(items)
             .groupBy(fn)
             .map((group, key) => {
-                const calculatedCount = _.foldl(
+                const calculatedCount = _.reduce(
                     group,
                     (acc, groupItem) => acc + usageCounts[groupItem.id] || 1,
                     0);
@@ -32,17 +34,20 @@ function prepareStats(items = [], usages = []) {
         maturity: countPieDataBy(items, item => item.maturityStatus),
         vendor: countPieDataBy(items, item => item.vendor)
     };
-
 }
+
+
 function controller($scope) {
 
     const vm = this;
 
     vm.pieConfig = {
         maturity: {
+            size: PIE_SIZE,
             colorProvider: (d) => maturityColorScale(d.data.key)
         },
         vendor: {
+            size: PIE_SIZE,
             colorProvider: (d) => variableScale(d.data.key)
         }
     };

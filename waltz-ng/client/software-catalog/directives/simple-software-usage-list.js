@@ -2,19 +2,22 @@ import _ from "lodash";
 
 
 const BINDINGS = {
-    usages: '=',
-    packages: '='
+    catalog: '='
 };
 
+const defaultCatalog = {
+    usages: [],
+    packages: []
+};
 
 function controller($scope) {
 
     const vm = this;
 
     $scope.$watch(
-        'ctrl.usages',
-        (usages = []) => {
-            const usagesByPkgId = _.countBy(usages, usage => usage.softwarePackageId);
+        'ctrl.catalog',
+        (catalog = defaultCatalog) => {
+            const usagesByPkgId = _.countBy(catalog.usages, usage => usage.softwarePackageId);
             vm.countUsages = (pkg) => {
                 const count = usagesByPkgId[pkg.id]
                 return count > 1

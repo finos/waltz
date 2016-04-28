@@ -26,21 +26,19 @@ import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow.DataFlowService;
 import com.khartec.waltz.service.user.UserRoleService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.action.UpdateDataFlowsAction;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import spark.Route;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
-import static spark.Spark.post;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -71,19 +69,12 @@ public class DataFlowsEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        ListRoute<DataFlow> getByEntityRef = (request, response) -> {
-            EntityReference ref = getEntityReference(request);
-            return dataFlowService.findByEntityReference(ref);
-        };
+        String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String findByAppIdsPath = mkPath(BASE_URL, "apps");
+        String createNewFlowPath = BASE_URL;
 
-        ListRoute<DataFlow> findByAppIds = (request, response) -> {
-            List<Long> appIds = (List<Long>) readBody(request, List.class);
-            return dataFlowService.findByAppIds(appIds);
-        };
 
-        Route create = (request, response) -> {
-            response.type(TYPE_JSON);
-
+        DatumRoute<Boolean> createNewFlowRoute = (request, response) -> {
             requireRole(userRoleService, request, Role.APP_EDITOR);
 
             UpdateDataFlowsAction dataFlowUpdate = readBody(request, UpdateDataFlowsAction.class);
@@ -138,14 +129,23 @@ public class DataFlowsEndpoint implements Endpoint {
                     .build());
 
 
-            return null;
+            return true;
         };
 
-        getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), getByEntityRef);
 
-        postForList(mkPath(BASE_URL, "apps"), findByAppIds);
+        ListRoute<DataFlow> getByEntityRef = (request, response) -> {
+            EntityReference ref = getEntityReference(request);
+            return dataFlowService.findByEntityReference(ref);
+        };
 
-        post(BASE_URL, create, transformer);
+        ListRoute<DataFlow> findByAppIdsRoute = (request, response)
+                -> dataFlowService.findByAppIds(readIdsFromBody(request));
+
+
+
+        getForList(findByEntityPath, getByEntityRef);
+        postForList(findByAppIdsPath, findByAppIdsRoute);
+        postForDatum(createNewFlowPath, createNewFlowRoute);
     }
 
 }

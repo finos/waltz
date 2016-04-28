@@ -48,35 +48,43 @@ public class InvolvementEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        ListRoute<Involvement> byEmployeeId = (request, response) -> {
+        String findByEmployeePath = mkPath(BASE_URL, "employee", ":employeeId");
+        String findDirectAppsByEmployeePath = mkPath(findByEmployeePath, "applications", "direct");
+        String findAllAppsByEmployeePath = mkPath(findByEmployeePath, "applications");
+        String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String findPeopleByEntityRefPath = mkPath(findByEntityRefPath, "people");
+
+
+        ListRoute<Involvement> findByEmployeeRoute = (request, response) -> {
             String employeeId = request.params("employeeId");
             return service.findByEmployeeId(employeeId);
         };
 
-        ListRoute<Application>  findDirectAppsByEmployeeId = (request, response) -> {
+        ListRoute<Application>  findDirectAppsByEmployeeRoute = (request, response) -> {
             String employeeId = request.params("employeeId");
             return service.findDirectApplicationsByEmployeeId(employeeId);
         };
 
-        ListRoute<Application>  findAllAppsByEmployeeId = (request, response) -> {
+        ListRoute<Application>  findAllAppsByEmployeeRoute = (request, response) -> {
             String employeeId = request.params("employeeId");
             return service.findAllApplicationsByEmployeeId(employeeId);
         };
 
-        ListRoute<Involvement>  findByEntityRef = (request, response) -> {
+        ListRoute<Involvement>  findByEntityRefRoute = (request, response) -> {
             EntityReference entityReference = getEntityReference(request);
             return service.findByEntityReference(entityReference);
         };
 
-        ListRoute<Person>  findPeopleByEntityRef = (request, response) -> {
+        ListRoute<Person>  findPeopleByEntityRefRoute = (request, response) -> {
             EntityReference entityReference = getEntityReference(request);
             return service.findPeopleByEntityReference(entityReference);
         };
 
-        getForList(mkPath(BASE_URL, "employee", ":employeeId"), byEmployeeId);
-        getForList(mkPath(BASE_URL, "employee", ":employeeId", "applications", "direct"), findDirectAppsByEmployeeId);
-        getForList(mkPath(BASE_URL, "employee", ":employeeId", "applications"), findAllAppsByEmployeeId);
-        getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), findByEntityRef);
-        getForList(mkPath(BASE_URL, "entity", ":kind", ":id", "people"), findPeopleByEntityRef);
+
+        getForList(findByEmployeePath, findByEmployeeRoute);
+        getForList(findDirectAppsByEmployeePath, findDirectAppsByEmployeeRoute);
+        getForList(findAllAppsByEmployeePath, findAllAppsByEmployeeRoute);
+        getForList(findByEntityRefPath, findByEntityRefRoute);
+        getForList(findPeopleByEntityRefPath, findPeopleByEntityRefRoute);
     }
 }

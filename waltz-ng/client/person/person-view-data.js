@@ -34,9 +34,8 @@ function service(personStore,
                  involvementStore,
                  assetCostStore,
                  complexityStore,
-                 serverInfoStore,
                  dataFlowStore,
-                 softwareCatalogStore,
+                 techStatsService,
                  $q) {
 
     const state = { model: initModel };
@@ -57,7 +56,7 @@ function service(personStore,
             involvementStore.findByEmployeeId(employeeId),
             involvementStore.findAppsForEmployeeId(employeeId)
         ]).then(([involvements, apps]) => {
-            const appsById = _.indexBy(apps, 'id');
+            const appsById = _.keyBy(apps, 'id');
 
             const appInvolvements = _.filter(involvements, i => i.entityReference.kind === 'APPLICATION');
             const directlyInvolvedAppIds = _.map(appInvolvements, 'entityReference.id');
@@ -101,23 +100,16 @@ function service(personStore,
     }
 
 
-    function loadServerStats(appIds) {
-        serverInfoStore
-            .findStatsForAppIds(appIds)
-            .then(stats => state.model.serverStats = stats);
-    }
-
-
     function loadFlows(appIds) {
         dataFlowStore
             .findByAppIds(appIds)
             .then(flows => state.model.dataFlows = flows);
     }
 
-    function loadSoftwareCatalog(appIds) {
-        softwareCatalogStore
+    function loadTechStats(appIds) {
+        techStatsService
             .findByAppIds(appIds)
-            .then(catalog => state.model.softwareCatalog = catalog);
+            .then(stats => state.model.techStats = stats);
     }
 
 
@@ -128,9 +120,8 @@ function service(personStore,
                 const appIds = _.map(model.apps, 'id');
                 loadCosts(appIds);
                 loadComplexity(appIds);
-                loadServerStats(appIds);
                 loadFlows(appIds);
-                loadSoftwareCatalog(appIds);
+                loadTechStats(appIds);
             });
     }
 
@@ -146,9 +137,8 @@ service.$inject = [
     'InvolvementDataService',
     'AssetCostStore',
     'ComplexityStore',
-    'ServerInfoStore',
     'DataFlowDataStore',
-    'SoftwareCatalogStore',
+    'TechnologyStatisticsService',
     '$q'
 ];
 

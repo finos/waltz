@@ -153,24 +153,13 @@
     </waltz-section>
 
 
-    <!-- SERVERS -->
-    <waltz-section icon="server"
-                   name="Servers"
-                   small="( {{ctrl.servers.length}} )">
-
-        <div ng-if="ctrl.servers.length > 0">
-            <waltz-server-list servers="ctrl.servers"
-                               primary-asset-code="ctrl.app.assetCode">
-            </waltz-server-list>
-        </div>
-
-        <div ng-if="ctrl.servers.length == 0"
-             class="alert alert-warning">
-            <strong>No Servers</strong>
-            - cannot find any servers associated to this application.
-        </div>
-
-    </waltz-section>
+    <!-- TECHNOLOGIES -->
+    <div waltz-has-setting="feature.software-catalog.enabled=true">
+        <waltz-technology-section software-catalog="ctrl.softwareCatalog"
+                                  databases="ctrl.databases"
+                                  servers="ctrl.servers">
+        </waltz-technology-section>
+    </div>
 
 
     <!-- BOOKMARKS -->
@@ -194,14 +183,6 @@
             </waltz-asset-cost-table>
         </div>
     </waltz-section>
-
-
-    <!-- TECHNOLOGIES -->
-    <div waltz-has-setting="feature.software-catalog.enabled=true">
-        <waltz-software-catalog-section catalog="ctrl.softwareCatalog">
-        </waltz-software-catalog-section>
-    </div>
-
 
 
     <!-- CHANGE LOG -->

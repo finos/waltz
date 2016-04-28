@@ -12,7 +12,7 @@
                           asset-costs="ctrl.assetCosts"
                           managers="ctrl.managers"
                           complexity="ctrl.complexity"
-                          server-stats="ctrl.serverStats"
+                          server-stats="ctrl.techStats.serverStats"
                           directs="ctrl.directs"
                           applications="ctrl.apps"
                           flows="ctrl.dataFlows">
@@ -95,8 +95,12 @@
 
 
         <!-- TECHNOLOGIES -->
-        <waltz-software-catalog-section catalog="ctrl.softwareCatalog">
-        </waltz-software-catalog-section>
+        <waltz-section name="Technologies">
+            <waltz-group-technology-summary stats="ctrl.techStats">
+            </waltz-group-technology-summary>
+        </waltz-section>
+
+
 
 
     </div>

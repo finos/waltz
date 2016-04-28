@@ -17,7 +17,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
 const BINDINGS = {
@@ -27,7 +27,7 @@ const BINDINGS = {
 
 function removeUsedGroups(allGroups, existingSubscriptions) {
     const subscribedGroupIds = _.map(existingSubscriptions, 'appGroup.id');
-    return _.reject(allGroups, g => _.contains(subscribedGroupIds, g.id));
+    return _.reject(allGroups, g => _.includes(subscribedGroupIds, g.id));
 }
 
 

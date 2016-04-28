@@ -1202,5 +1202,103 @@
     </changeSet>
 
 
+    <!-- 134 Database -->
+
+    <changeSet author="dwatkins"
+               id="20160421-134-1">
+
+        <createTable tableName="database">
+            <column autoIncrement="true"
+                    name="id"
+                    type="BIGSERIAL">
+                <constraints primaryKey="true"
+                             primaryKeyName="database_usage_pkey"/>
+            </column>
+
+            <column name="database_name"
+                    type="varchar(128)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+            <column name="instance_name"
+                    type="varchar(128)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="environment"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+
+
+            <column name="dbms_vendor"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dbms_name"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dbms_version"
+                    type="VARCHAR(128)">n
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="external_id"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="provenance"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+
+
+        </createTable>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               id="20160421-134-2">
+
+        <createTable tableName="entity_relationship">
+            <column name="kind_a"
+                    type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_a"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kind_b"
+                    type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_b"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="relationship"
+                    type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="kind_a, id_a, kind_b, id_b, relationship"
+                       constraintName="entity_relationship_pkey"
+                       tableName="entity_relationship"/>
+
+    </changeSet>
+
 
 </databaseChangeLog>

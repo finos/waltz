@@ -27,6 +27,7 @@ export default (module) => {
     module.directive('waltzPhoneLink', require('./phone-link'));
     module.directive('waltzPie', require('./pie'));
     module.directive('waltzPieTable', require('./pie-table'));
+    module.directive('waltzSearch', require('./search'));
     module.directive('waltzSection', require('./section'));
     module.directive('waltzSectionActions', require('./section-actions'));
     module.directive('waltzStepCount', require('./step-count'));

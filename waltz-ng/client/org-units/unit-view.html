@@ -30,17 +30,25 @@
 
     <!-- OVERVIEW -->
     <waltz-org-unit-overview parent="ctrl.viewData.immediateHierarchy.parent"
-                             children="ctrl.viewData.immediateHierarchy.children"
-                             unit="ctrl.viewData.orgUnit"
+                             all-units="ctrl.viewData.orgUnits"
+                             unit-id="ctrl.viewData.orgUnit.id"
                              apps="ctrl.viewData.apps"
                              flows="ctrl.viewData.dataFlows"
                              ratings="ctrl.viewData.capabilityRatings"
                              costs="ctrl.viewData.assetCosts"
-                             org-server-stats="ctrl.orgServerStats"
+                             server-stats="ctrl.viewData.techStats.serverStats"
                              complexity="ctrl.viewData.complexity">
     </waltz-org-unit-overview>
 
     <hr/>
+
+
+
+    <!-- TECHNOLOGIES -->
+    <waltz-section name="Technologies">
+        <waltz-group-technology-summary stats="ctrl.viewData.techStats">
+        </waltz-group-technology-summary>
+    </waltz-section>
 
 
     <!-- COMPLEXITY -->
@@ -226,10 +234,6 @@
                                csv-name="asset_costs.csv">
     </waltz-asset-costs-section>
 
-
-    <!-- TECHNOLOGIES -->
-    <waltz-software-catalog-section catalog="ctrl.viewData.softwareCatalog">
-    </waltz-software-catalog-section>
 
 
     <!-- APPS -->

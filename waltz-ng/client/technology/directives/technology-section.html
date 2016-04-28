@@ -1,0 +1,75 @@
+<div>
+    <waltz-section name="Technologies" id="technology">
+
+        <div ng-if="ctrl.hasAnyData()">
+            <waltz-section-actions>
+                <input type="search"
+                       placeholder="Search"
+                       style="border-radius: 6px; padding-left: 3px"
+                       ng-model="ctrl.qry">
+            </waltz-section-actions>
+
+            <uib-tabset>
+
+                <uib-tab heading="Overview">
+                    <waltz-technology-summary-pies servers="ctrl.filteredServers"
+                                                   databases="ctrl.filteredDatabases"
+                                                   software-catalog="ctrl.filteredSoftwareCatalog">
+                    </waltz-technology-summary-pies>
+                </uib-tab>
+
+                <uib-tab heading="Software Packages"
+                         disable="ctrl.softwareCatalog.packages.length == 0">
+                    <div class="waltz-scroll-region" style="height: 300px">
+                        <waltz-simple-software-usage-list catalog="ctrl.filteredSoftwareCatalog">
+                        </waltz-simple-software-usage-list>
+                    </div>
+                </uib-tab>
+
+                <uib-tab heading="Servers"
+                         select="showServerDetail = true"
+                         disable="ctrl.servers.length == 0">
+                    <div ng-if="showServerDetail">
+                        <br>
+                        <div style="font-size: smaller; height: 300px"
+                             ui-grid="ctrl.serverGridOptions">
+                        </div>
+                    </div>
+                </uib-tab>
+
+                <uib-tab heading="Databases"
+                         select="showDatabaseDetail = true"
+                         disable="ctrl.databases.length == 0">
+                    <div ng-if="showDatabaseDetail">
+                        <br>
+                        <div style="font-size: smaller; height: 300px"
+                             ui-grid="ctrl.databaseGridOptions">
+                        </div>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+
+
+
+            <div class="waltz-paragraph text-muted pull-right small">
+                <waltz-icon name="info-circle"></waltz-icon>
+                Associated software packages have been sourced from:
+                <ul class="list-inline"
+                    style="display: inline-block">
+                    <li ng-repeat="(source, usages) in ctrl.softwareUsages">
+                        {{ source }}
+                        <span ng-if="!$last">,</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div ng-if="! ctrl.hasAnyData()">
+            <div class="alert alert-warning">
+                <strong>No associated technology found</strong>
+            </div>
+        </div>
+
+    </waltz-section>
+</div>

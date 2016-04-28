@@ -11,8 +11,7 @@
  *
  */
 
-import _ from 'lodash';
-
+import _ from "lodash";
 import {
     nameField,
     aliasesField,
@@ -23,7 +22,8 @@ import {
     tagsField,
     typeField,
     lifecyclePhaseField,
-    overallRatingField } from './formly/fields';
+    overallRatingField
+} from "./formly/fields";
 
 
 // ----- CONTROLLER -----
@@ -83,7 +83,7 @@ const controller = function(WaltzDisplayNameService,
                     name,
                     kind,
                     lifecyclePhase,
-                    organisationalUnit: _.findWhere(allOrgUnits, {id: organisationalUnitId})
+                    organisationalUnit: _.find(allOrgUnits, {id: organisationalUnitId})
                 }
             });
         };

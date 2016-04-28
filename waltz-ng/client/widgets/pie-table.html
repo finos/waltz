@@ -6,10 +6,12 @@
                    config="ctrl.config">
         </waltz-pie>
 
-            <table class="table table-condensed small" style="text-align: left">
-                <tr ng-repeat="r in ctrl.data" >
+            <table class="table table-condensed small"
+                   style="text-align: left">
+                <tr ng-repeat="r in ctrl.data"
+                    class="small">
                     <td>
-                        <div style="width: 20px; border: 1px solid; border-radius: 5px;"
+                        <div style="width: 16px; border: 1px solid; border-radius: 5px;"
                              ng-style="{
                         'background-color': ctrl.config.colorProvider({ data: r }).brighter().toString(),
                         'border-color' : ctrl.config.colorProvider({ data: r }).toString() }">
@@ -17,17 +19,19 @@
                         </div>
                     </td>
                     <td>
-                        {{ ctrl.toDisplayName(r.key) }}
+                        <span ng-bind="ctrl.toDisplayName(r.key)"></span>
                     </td>
                     <td>
-                        {{ r.count }}
+                        <span ng-bind="r.count"></span>
                     </td>
                 </tr>
-                <tr>
+                <tr class="small">
                     <td></td>
-                    <th>Total</th>
+                    <th>
+                        Total
+                    </th>
                     <td>
-                        <strong>{{ ctrl.total }}</strong>
+                        <strong ng-bind="ctrl.total"></strong>
                     </td>
                 </tr>
             </table>

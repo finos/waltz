@@ -9,10 +9,10 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from 'lodash';
+import _ from "lodash";
+import {lifecyclePhaseColorScale, variableScale} from "../common/colors";
 
-import { lifecyclePhaseColorScale, variableScale } from '../common/colors';
-
+const PIE_SIZE = 70;
 
 function hasInvolvements(involvements) {
     return involvements.allApps.length > 0;
@@ -24,7 +24,7 @@ function mkAppChartData(apps) {
     const byLifecyclePhase = {
         config: {
             colorProvider: (d) => lifecyclePhaseColorScale(d.data.key),
-            size: 120
+            size: PIE_SIZE
         },
         data: _.chain(apps)
             .countBy('lifecyclePhase')
@@ -35,7 +35,7 @@ function mkAppChartData(apps) {
     const byKind = {
         config: {
             colorProvider: (d) => variableScale(d.data.key),
-            size: 120
+            size: PIE_SIZE
         },
         data: _.chain(apps)
             .countBy('kind')

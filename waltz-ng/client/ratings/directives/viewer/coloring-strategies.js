@@ -1,4 +1,4 @@
-import { perhaps } from  '../../../common';
+import {perhaps} from "../../../common";
 
 
 function drill(appId, capId, ratingMap) {
@@ -26,9 +26,9 @@ function drillForRags(appId, capId, ratingMap) {
 function selectWorstFn(appId, capId, ratingMap) {
     const rags = drillForRags(appId, capId, ratingMap);
 
-    if (_.contains(rags, 'R')) return 'R';
-    if (_.contains(rags, 'A')) return 'A';
-    if (_.contains(rags, 'G')) return 'G';
+    if (_.includes(rags, 'R')) return 'R';
+    if (_.includes(rags, 'A')) return 'A';
+    if (_.includes(rags, 'G')) return 'G';
     return '';
 }
 
@@ -36,9 +36,9 @@ function selectWorstFn(appId, capId, ratingMap) {
 function selectBestFn(appId, capId, ratingMap) {
     const rags = drillForRags(appId, capId, ratingMap);
 
-    if (_.contains(rags, 'G')) return 'G';
-    if (_.contains(rags, 'A')) return 'A';
-    if (_.contains(rags, 'R')) return 'R';
+    if (_.includes(rags, 'G')) return 'G';
+    if (_.includes(rags, 'A')) return 'A';
+    if (_.includes(rags, 'R')) return 'R';
     return '';
 }
 
@@ -48,7 +48,7 @@ function selectBestFn(appId, capId, ratingMap) {
  * (where a rating map is [appId -> capId -> measure -> [rating]])
  * to retrieve a rating (or '' if not found)
  *
- * @param code
+ * @param measureCode
  * @returns {Function}
  */
 function selectByMeasureFn(measureCode) {

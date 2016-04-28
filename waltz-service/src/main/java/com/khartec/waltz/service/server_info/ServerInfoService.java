@@ -25,6 +25,7 @@ import com.khartec.waltz.model.utils.IdUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +63,7 @@ public class ServerInfoService {
         return serverInfoDao.findStatsForOrganisationalUnitIds(ids);
     }
 
-    public ServerSummaryStatistics findStatsForAppIds(Long... appIds) {
+    public ServerSummaryStatistics findStatsForAppIds(Collection<Long> appIds) {
         return serverInfoDao.findStatsForAppIds(appIds);
     }
 

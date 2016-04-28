@@ -1,36 +1,38 @@
 <div>
     <div class="row no-overflow"
-         ng-if="ctrl.parent"
+         ng-if="ctrl.parents.length > 0"
          style="padding: 1em">
 
         <div class="col-sm-12">
             <span class="text-muted">
                 <waltz-icon name="level-up"></waltz-icon>
-                Parent:
+                Parent/s:
             </span>
-            <a ui-sref="main.org-units.unit ({id: ctrl.parent.id })">
-                {{ ctrl.parent.name }}
-            </a>
-            <span class="text-muted small ">
-                {{ ctrl.parent.description }}
+            <ul class="list-inline" style="display: inline-block;">
+                <li ng-repeat="parent in ctrl.parents">
+                    <a ui-sref="main.org-units.unit ({id: parent.id })"
+                       ng-bind="parent.name">
+                    </a>
+                    <span ng-if="!$last">&raquo;</span>
+                </li>
+            </ul>
+
+            <span class="text-muted small "
+                  ng-bind="ctrl.parent.description">
             </span>
         </div>
 
-    </div>
 
+    </div>
 
     <div class="row"
          style="padding: 1em">
 
         <div class="col-sm-offset-1 col-sm-10 waltz-page-summary">
-            <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;"> {{ ctrl.unit.name }} </h3>
+            <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;"
+                ng-bind="ctrl.unit.name"></h3>
 
-            <div waltz-has-role="ORGUNIT_EDITOR">
-                <waltz-inline-edit-area value="ctrl.unit.description"
-                                        save="ctrl.saveDescriptionFn"></waltz-inline-edit-area>
-            </div>
-            <div waltz-unless-role="ORGUNIT_EDITOR">
-                {{ ctrl.unit.description }}
+            <div ng-bind="ctrl.unit.description">
             </div>
 
             <br>
@@ -40,20 +42,20 @@
                 <div class="row">
                     <div class="col-sm-4">
                         <waltz-apps-by-investment-pie applications="ctrl.apps"
-                                                      size="80">
+                                                      size="70">
                         </waltz-apps-by-investment-pie>
                     </div>
 
                     <div class="col-sm-4">
                         <waltz-apps-by-lifecycle-phase-pie applications="ctrl.apps"
-                                                           size="80">
+                                                           size="70">
                         </waltz-apps-by-lifecycle-phase-pie>
                     </div>
 
                     <div class="col-sm-4">
                         <waltz-data-flows-by-direction-pie applications='ctrl.apps'
                                                            flows="ctrl.flows.flows"
-                                                           size="80">
+                                                           size="70">
                         </waltz-data-flows-by-direction-pie>
                     </div>
                 </div>
@@ -64,8 +66,8 @@
                                                description="Cumulative value of infra and app dev costs"
                                                waltz-jump-to="costs-section"
                                                icon="money">
-                            <span style="font-size: xx-large;">
-                                {{ ctrl.portfolioCostStr }}
+                            <span style="font-size: x-large;"
+                                  ng-bind="ctrl.portfolioCostStr">
                             </span>
                         </waltz-basic-info-tile>
                     </div>
@@ -75,11 +77,15 @@
                                                class="clickable"
                                                waltz-jump-to="complexity-section"
                                                icon="rocket">
-                            <div style="font-size: xx-large;">
-                                &Sigma; {{ ctrl.complexitySummary.cumulativeScore | toFixed:1 }}
+                            <div style="font-size: x-large;">
+                                &Sigma;
+                                <span ng-bind="ctrl.complexitySummary.cumulativeScore | toFixed:1">
+                                </span>
                             </div>
                             <div class="small text-muted">
-                                {{ ctrl.complexitySummary.averageScore | toFixed:2 }} per app
+                                <span ng-bind="ctrl.complexitySummary.averageScore | toFixed:2">
+                                </span>
+                                per app
                             </div>
                         </waltz-basic-info-tile>
 
@@ -89,7 +95,7 @@
                                                description="Number of servers supporting this org unit"
                                                icon="server">
                             <div>
-                                <div style="font-size: xx-large;">
+                                <div style="font-size: x-large;">
                                     # <span ng-bind="ctrl.serverStats.total"></span>
                                 </div>
                                 <div class="small text-muted">
@@ -107,10 +113,11 @@
                                                icon="puzzle-piece">
                             <div>
                                 <div style="font-size: xx-large;">
-                                    # {{ ctrl.capabilityStats.total }}
+                                    #
+                                    <span ng-bind="ctrl.capabilityStats.total"></span>
                                 </div>
                                 <div class="small text-muted">
-                                    {{ ctrl.capabilityStats.perApplication }} per app
+                                    <span ng-bind="ctrl.capabilityStats.perApplication"></span> per app
                                 </div>
                             </div>
                         </waltz-basic-info-tile>
@@ -121,22 +128,15 @@
         </div>
     </div>
 
-    <div class="row" ng-if="ctrl.children.length > 0">
+
+    <div class="row" ng-if="ctrl.unit.children.length > 0">
         <div class="col-sm-offset-2 col-sm-10">
+
             <h4>Sub Units</h4>
-            <table class="table table-hover table-condensed fixed-table">
-                <tr ng-repeat="subUnit in ctrl.children | orderBy:'name'">
-                    <td>
-                        <a ui-sref="main.org-units.unit ({ id: subUnit.id })">
-                            {{ ::subUnit.name }}
-                        </a>
-                    </td>
-                    <td class="text-muted small no-overflow">
-                        {{ ::subUnit.description }}
-                    </td>
-                </tr>
-            </table>
-            </waltz-section>
+
+            <waltz-org-unit-tree tree="ctrl.unit.children"
+                                 on-selection="ctrl.nodeSelected">
+            </waltz-org-unit-tree>
         </div>
     </div>
 </div>

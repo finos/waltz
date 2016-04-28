@@ -11,12 +11,12 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 export function pickWorst(ratings) {
 
     const sortedByBadness = [ 'DISCOURAGED', 'SECONDARY', 'PRIMARY', 'NO_OPINION' ];
-    const worst = _.find(sortedByBadness, x => _.contains(ratings, x));
+    const worst = _.find(sortedByBadness, x => _.includes(ratings, x));
 
     return worst || 'DISCOURAGED';
 }

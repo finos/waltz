@@ -22,10 +22,11 @@
                        small="{{ ctrl.groupDetail.appGroup.kind }}">
     </waltz-page-header>
 
+
     <waltz-app-group-summary applications="ctrl.applications"
                              asset-costs="ctrl.assetCosts"
                              complexity="ctrl.complexity"
-                             server-stats="ctrl.serverStats"
+                             server-stats="ctrl.techStats.serverStats"
                              app-group="ctrl.groupDetail.appGroup"
                              flows="ctrl.dataFlows.flows"
                              editable="ctrl.isGroupEditable()">
@@ -71,8 +72,11 @@
 
 
     <!-- TECHNOLOGIES -->
-    <waltz-software-catalog-section catalog="ctrl.softwareCatalog">
-    </waltz-software-catalog-section>
+    <waltz-section name="Technologies">
+        <waltz-group-technology-summary stats="ctrl.techStats">
+        </waltz-group-technology-summary>
+    </waltz-section>
+
 
 
     <!-- APPS -->

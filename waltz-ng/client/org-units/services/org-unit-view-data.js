@@ -16,7 +16,7 @@ import {aggregatePeopleInvolvements} from "../../involvement/involvement-utils";
 
 
 function prepareFlowData(flows, apps) {
-    const entitiesById = _.indexBy(apps, 'id');
+    const entitiesById = _.keyBy(apps, 'id');
 
     const enrichedFlows = _.map(flows, f => ({
         source: entitiesById[f.source.id] || { ...f.source, isNeighbour: true },
@@ -27,7 +27,7 @@ function prepareFlowData(flows, apps) {
     const entities = _.chain(enrichedFlows)
         .map(f => ([f.source, f.target]))
         .flatten()
-        .uniq(a => a.id)
+        .uniqBy(a => a.id)
         .value();
 
     return {
@@ -61,7 +61,7 @@ function service(appStore,
                  assetCostStore,
                  complexityStore,
                  capabilityStore,
-                 softwareCatalogStore,
+                 techStatsService,
                  $q) {
 
     const rawData = {};
@@ -114,7 +114,7 @@ function service(appStore,
             endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
             assetCostStore.findAppCostsByAppIds(appIds),
             complexityStore.findByAppIds(appIds),
-            softwareCatalogStore.findByAppIds(appIds)
+            techStatsService.findByAppIds(appIds)
     ]).then(([
             capabilityRatings,
             dataFlows,
@@ -125,7 +125,7 @@ function service(appStore,
             endUserApps,
             assetCosts,
             complexity,
-            softwareCatalog
+            techStats
         ]) => {
 
             const r = {
@@ -139,7 +139,7 @@ function service(appStore,
                 endUserApps,
                 assetCosts,
                 complexity,
-                softwareCatalog
+                techStats
             };
 
             Object.assign(rawData, r);
@@ -176,7 +176,7 @@ service.$inject = [
     'AssetCostStore',
     'ComplexityStore',
     'CapabilityStore',
-    'SoftwareCatalogStore',
+    'TechnologyStatisticsService',
     '$q'
 ];
 

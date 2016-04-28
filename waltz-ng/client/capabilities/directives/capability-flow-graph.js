@@ -10,7 +10,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
 function controller($scope) {
@@ -37,8 +37,8 @@ function controller($scope) {
         const entities = _.chain(flows)
             .map(df => [df.source, df.target])
             .flatten()
-            .uniq('id')
-            .map(app => ({...app, member: _.contains(memberAppIds, app.id)}))
+            .uniqBy('id')
+            .map(app => ({...app, member: _.includes(memberAppIds, app.id)}))
             .value();
 
         return {
@@ -62,7 +62,7 @@ function controller($scope) {
         vm.flowData = calculateFlowData(vm.flows, memberAppIds);
         vm.availableDataTypes = _.chain(vm.flows)
             .map('dataType')
-            .uniq(false)
+            .uniq()
             .value();
 
     });

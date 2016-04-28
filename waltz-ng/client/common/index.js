@@ -17,7 +17,7 @@ import _ from "lodash";
 export function populateParents(nodes) {
     const byId = _.chain(_.cloneDeep(nodes))
         .map(u => _.merge(u, { children: [], parent: null }))
-        .indexBy('id')
+        .keyBy('id')
         .value();
 
     _.each(_.values(byId), u => {
@@ -37,6 +37,35 @@ export function populateParents(nodes) {
 export function buildHierarchies(nodes) {
     // only give back root element/s
     return _.reject(populateParents(nodes), n => n.parent);
+}
+
+
+export function findNode(nodes = [], id) {
+    const found = _.find(nodes, { id });
+    if (found) return found;
+
+    for(let i = 0; i < nodes.length; i++) {
+        const f = findNode(nodes[i].children, id);
+        if (f) return f;
+    }
+
+    return null;
+}
+
+
+export function getParents(node) {
+    if (! node) return [];
+
+    let ptr = node.parent;
+
+    const result = [];
+
+    while (ptr) {
+        result.push(ptr);
+        ptr = ptr.parent;
+    }
+
+    return result;
 }
 
 
@@ -139,3 +168,21 @@ export function termSearch(items = [], searchStr = '', searchFields = []) {
     });
 }
 
+/**
+ * the d3 nest function aggregates using the property name 'values', this
+ * function creates a copy of the data with the name 'count'.
+ *
+ * @param data
+ * @returns {Array|*}
+ */
+function toCountData(data) {
+    return _.map(data, d => ({ key: d.key, count: d.values }));
+}
+
+
+export function toKeyCounts(items = [], fn = x => x) {
+    return toCountData(d3.nest()
+        .key(fn)
+        .rollup(d => d.length)
+        .entries(items))
+}

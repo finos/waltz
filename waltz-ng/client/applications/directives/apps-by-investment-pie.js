@@ -17,9 +17,8 @@
  *
  */
 
-import {
-    lifecyclePhaseColorScale,
-    ragColorScale } from '../../common/colors';
+import {ragColorScale} from "../../common/colors";
+import {toKeyCounts} from "../../common";
 
 
 const BINDINGS = {
@@ -27,6 +26,8 @@ const BINDINGS = {
     size: '='
 };
 
+
+const DEFAULT_SIZE = 80;
 
 const investmentLabels = {
     'R' : 'Disinvest',
@@ -37,16 +38,13 @@ const investmentLabels = {
 
 const config = {
     colorProvider: (d) => ragColorScale(d.data.key),
-    size: 80,
+    size: DEFAULT_SIZE,
     labelProvider: (k) => investmentLabels[k] || 'Unknown'
 };
 
 
 function calcAppInvestmentPieStats(apps) {
-    return _.chain(apps)
-        .countBy('overallRating')
-        .map((v, k) => ({ key: k, count: v }))
-        .value();
+    return toKeyCounts(apps, a => a.overallRating);
 }
 
 
@@ -56,7 +54,7 @@ function controller($scope) {
     vm.config = config;
     vm.data = [];
 
-    $scope.$watch('ctrl.size', sz => vm.config.size = sz ? sz : 80);
+    $scope.$watch('ctrl.size', sz => vm.config.size = sz ? sz : DEFAULT_SIZE);
 
     $scope.$watch('ctrl.applications', apps => {
         if (!apps) return;

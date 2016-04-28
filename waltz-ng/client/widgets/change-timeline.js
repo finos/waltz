@@ -9,9 +9,9 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import d3 from 'd3';
-import _ from 'lodash';
-import angular from 'angular';
+import d3 from "d3";
+import _ from "lodash";
+import angular from "angular";
 
 
 function yqToVal(yq) {
@@ -95,7 +95,7 @@ function render(svg, data) {
         .rangeBands([0, width], 0.2);
 
     const barScale = d3.scale.linear()
-        .domain([0, _.max(data.changes, 'size').size])
+        .domain([0, _.maxBy(data.changes, 'size').size])
         .range([height - (axisHeight + 10), 4]);
 
     // scrub
