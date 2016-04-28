@@ -5,8 +5,13 @@ function service(http, base) {
         http.post(`${baseUrl}/apps`, ids)
             .then(r => r.data);
 
+    const findStatsForAppIds = (appIds) =>
+        http.post(`${baseUrl}/apps/stats`, appIds)
+            .then(result => result.data);
+
     return {
-        findByAppIds
+        findByAppIds,
+        findStatsForAppIds
     };
 }
 

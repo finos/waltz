@@ -13,7 +13,6 @@
 import _ from "lodash";
 import d3 from "d3";
 import EventDispatcher from "../common/EventDispatcher";
-
 import {perhaps} from "../common/index";
 import {calculateGroupSummary} from "../ratings/directives/common";
 
@@ -147,18 +146,9 @@ function calculateCapabilityRatings(orgUnitId, apps, appCapabilities, perspectiv
 }
 
 
-function mapStateToThis(state) {
-    return {
-        orgServerStats: state.orgServerStats
-    };
-}
-
-
 function controller($stateParams,
                     $state,
                     $scope,
-                    $ngRedux,
-                    orgServerStatsActions,
                     viewDataService,
                     viewOptions,
                     historyStore) {
@@ -189,9 +179,6 @@ function controller($stateParams,
 
     vm.entityRef = { kind: 'ORG_UNIT', id };
 
-
-
-
     vm.eventDispatcher = new EventDispatcher();
 
     viewDataService
@@ -199,23 +186,12 @@ function controller($stateParams,
         .then(data => vm.rawViewData = data)
         .then(refresh);
 
-
-    const onUpdate = (selectedState, actions) => {
-        Object.assign(vm, selectedState, actions);
-    };
-
-    const unsubscribe = $ngRedux.connect(mapStateToThis, orgServerStatsActions)(onUpdate);
-    $scope.$on('$destroy', unsubscribe);
-
-    vm.fetchOrgServerStats(id);
 }
 
 controller.$inject = [
     '$stateParams',
     '$state',
     '$scope',
-    '$ngRedux',
-    'OrgServerStatsActions',
     'OrgUnitViewDataService',
     'OrgUnitViewOptionsService',
     'HistoryStore'

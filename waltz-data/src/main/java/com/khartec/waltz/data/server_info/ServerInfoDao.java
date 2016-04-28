@@ -21,6 +21,7 @@ import com.khartec.waltz.model.serverinfo.ImmutableServerInfo;
 import com.khartec.waltz.model.serverinfo.ImmutableServerSummaryStatistics;
 import com.khartec.waltz.model.serverinfo.ServerInfo;
 import com.khartec.waltz.model.serverinfo.ServerSummaryStatistics;
+import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.schema.tables.records.ServerInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -28,19 +29,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.JooqUtilities.calculateTallies;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 
 
 @Repository
 public class ServerInfoDao {
+
 
     private final DSLContext dsl;
 
@@ -152,11 +152,30 @@ public class ServerInfoDao {
     }
 
 
-    public ServerSummaryStatistics findStatsForAppIds(Long[] appIds) {
+    public ServerSummaryStatistics findStatsForAppIds(Collection<Long> appIds) {
 
-        SelectConditionStep<Record1<String>> assetCodesQry = DSL.select(APPLICATION.ASSET_CODE)
-                .from(APPLICATION)
-                .where(APPLICATION.ID.in(appIds));
+        Condition condition = SERVER_INFORMATION.ASSET_CODE
+                .in(dsl.select(APPLICATION.ASSET_CODE)
+                    .from(APPLICATION)
+                    .where(APPLICATION.ID.in(appIds)));
+
+        List<StringTally> environmentTallies = calculateTallies(
+                dsl,
+                SERVER_INFORMATION,
+                SERVER_INFORMATION.ENVIRONMENT,
+                condition);
+
+        List<StringTally> operatingSystemTallies = calculateTallies(
+                dsl,
+                SERVER_INFORMATION,
+                SERVER_INFORMATION.OPERATING_SYSTEM,
+                condition);
+
+        List<StringTally> locationTallies = calculateTallies(
+                dsl,
+                SERVER_INFORMATION,
+                SERVER_INFORMATION.LOCATION,
+                condition);
 
         Field<BigDecimal> virtualCount = DSL.coalesce(DSL.sum(
                 DSL.choose(SERVER_INFORMATION.IS_VIRTUAL)
@@ -175,10 +194,15 @@ public class ServerInfoDao {
                     physicalCount
                 )
                 .from(SERVER_INFORMATION)
-                .where(SERVER_INFORMATION.ASSET_CODE.in(assetCodesQry))
+                .where(condition)
                 .fetchOne(r -> ImmutableServerSummaryStatistics.builder()
                         .virtualCount(r.getValue(virtualCount).intValue())
                         .physicalCount(r.getValue(physicalCount).intValue())
+                        .operatingSystemCounts(operatingSystemTallies)
+                        .environmentCounts(environmentTallies)
+                        .locationCounts(locationTallies)
                         .build());
     }
+
+
 }

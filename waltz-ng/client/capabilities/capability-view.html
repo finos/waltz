@@ -12,12 +12,11 @@
 
     <waltz-capability-summary capability="ctrl.capability"
                               applications="ctrl.apps"
-                              server-stats="ctrl.serverStats"
+                              server-stats="ctrl.techStats.serverStats"
                               complexity="ctrl.complexity"
                               flows="ctrl.dataFlows"
                               traits="ctrl.traitInfo.traits"
                               asset-costs="ctrl.assetCosts">
-
     </waltz-capability-summary>
 
 
@@ -98,8 +97,10 @@
 
 
     <!-- TECHNOLOGIES -->
-    <waltz-software-catalog-section catalog="ctrl.softwareCatalog">
-    </waltz-software-catalog-section>
+    <waltz-section name="Technologies">
+        <waltz-group-technology-summary stats="ctrl.techStats">
+        </waltz-group-technology-summary>
+    </waltz-section>
 
 
     <!-- ASSOCIATED CAPABILITIES -->

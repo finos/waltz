@@ -109,10 +109,9 @@ function controller(capabilities,
                     complexityStore,
                     assetCostStore,
                     applicationStore,
-                    serverInfoStore,
                     traitUsageStore,
                     traitStore,
-                    softwareCatalogStore) {
+                    techStatsService) {
 
     const vm = this;
 
@@ -146,16 +145,14 @@ function controller(capabilities,
                 dataFlowStore.findByAppIds(appIds),
                 complexityStore.findByAppIds(appIds),
                 assetCostStore.findAppCostsByAppIds(appIds),
-                serverInfoStore.findStatsForAppIds(appIds),
-                softwareCatalogStore.findByAppIds(appIds)
+                techStatsService.findByAppIds(appIds)
             ]).then(([
                 perspective,
                 ratings,
                 flows,
                 complexity,
                 assetCosts,
-                serverStats,
-                softwareCatalog
+                techStats
             ]) => {
                 vm.ratings = {
                     group: prepareGroupData(capability, vm.apps, perspective, ratings),
@@ -164,8 +161,7 @@ function controller(capabilities,
                 vm.dataFlows = flows;
                 vm.complexity = complexity;
                 vm.assetCosts = assetCosts;
-                vm.serverStats = serverStats;
-                vm.softwareCatalog = softwareCatalog;
+                vm.techStats = techStats;
             });
         });
 
@@ -185,7 +181,6 @@ function controller(capabilities,
                             return {
                                 capability: capabilitiesById[capabilityId],
                                 apps: _.map(associations, assoc => appsById[assoc.applicationId])
-
                             }
                         })
                         .value()
@@ -217,10 +212,9 @@ controller.$inject = [
     'ComplexityStore',
     'AssetCostStore',
     'ApplicationStore',
-    'ServerInfoStore',
     'TraitUsageStore',
     'TraitStore',
-    'SoftwareCatalogStore'
+    'TechnologyStatisticsService'
 ];
 
 

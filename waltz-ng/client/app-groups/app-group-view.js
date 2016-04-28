@@ -101,12 +101,11 @@ function controller(appGroupStore,
                     assetCostStore,
                     complexityStore,
                     dataFlowStore,
-                    serverInfoStore,
                     userService,
                     capabilityStore,
                     appCapabilityStore,
                     ratingStore,
-                    softwareCatalogStore,
+                    technologyStatsService,
                     $stateParams,
                     $q)
 {
@@ -121,30 +120,27 @@ function controller(appGroupStore,
             appStore.findByIds(appIds),
             assetCostStore.findAppCostsByAppIds(appIds),
             complexityStore.findByAppIds(appIds),
-            serverInfoStore.findStatsForAppIds(appIds),
             capabilityStore.findAll(),
             appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
             ratingStore.findByAppIds(appIds),
-            softwareCatalogStore.findByAppIds(appIds)
+            technologyStatsService.findByAppIds(appIds)
         ]))
         .then(([
             apps,
             assetCosts,
             complexity,
-            serverStats,
             allCapabilities,
             appCapabilities,
             ratings,
-            softwareCatalog
+            techStats
         ]) => {
             vm.applications = apps;
             vm.assetCosts = assetCosts;
             vm.complexity = complexity;
-            vm.serverStats = serverStats;
             vm.allCapabilities = allCapabilities;
             vm.appCapabilities = appCapabilities;
             vm.ratings = ratings;
-            vm.softwareCatalog = softwareCatalog;
+            vm.techStats = techStats;
         })
         .then(() => loadDataFlows(dataFlowStore, vm.applications))
         .then(flows => vm.dataFlows = flows)
@@ -168,12 +164,11 @@ controller.$inject = [
     'AssetCostStore',
     'ComplexityStore',
     'DataFlowDataStore',
-    'ServerInfoStore',
     'UserService',
     'CapabilityStore',
     'AppCapabilityStore',
     'RatingStore',
-    'SoftwareCatalogStore',
+    'TechnologyStatisticsService',
     '$stateParams',
     '$q'
 ];

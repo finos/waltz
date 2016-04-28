@@ -141,18 +141,6 @@ function filterAssetCosts(assetCosts, orgUnitId, isAppInScope) {
 }
 
 
-function filterSoftwareCatalog(softwareCatalog, isAppInScope) {
-    const usages = _.filter(softwareCatalog.usages, u => isAppInScope(u.applicationId));
-    const packageIds = _.map(usages, 'softwarePackageId');
-    const packages = _.filter(softwareCatalog.packages, p => _.includes(packageIds, p.id));
-
-    return {
-        usages,
-        packages
-    }
-}
-
-
 function filter(rawData) {
 
     if (! rawData) { return null; }
@@ -197,10 +185,6 @@ function filter(rawData) {
         rawData.orgUnitId,
         isAppInScope);
 
-    const softwareCatalog = filterSoftwareCatalog(
-        rawData.softwareCatalog,
-        isAppInScope
-    );
 
     /*
      orgUnits,
@@ -229,8 +213,7 @@ function filter(rawData) {
         capabilityRatings,
         dataFlows,
         complexity,
-        apps,
-        softwareCatalog
+        apps
     };
 }
 

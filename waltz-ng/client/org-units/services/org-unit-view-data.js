@@ -11,9 +11,8 @@
  */
 
 import _ from "lodash";
-
 import RatedFlowsData from "../../data-flow/RatedFlowsData";
-import { aggregatePeopleInvolvements } from "../../involvement/involvement-utils";
+import {aggregatePeopleInvolvements} from "../../involvement/involvement-utils";
 
 
 function prepareFlowData(flows, apps) {
@@ -62,7 +61,7 @@ function service(appStore,
                  assetCostStore,
                  complexityStore,
                  capabilityStore,
-                 softwareCatalogStore,
+                 techStatsService,
                  $q) {
 
     const rawData = {};
@@ -115,7 +114,7 @@ function service(appStore,
             endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
             assetCostStore.findAppCostsByAppIds(appIds),
             complexityStore.findByAppIds(appIds),
-            softwareCatalogStore.findByAppIds(appIds)
+            techStatsService.findByAppIds(appIds)
     ]).then(([
             capabilityRatings,
             dataFlows,
@@ -126,7 +125,7 @@ function service(appStore,
             endUserApps,
             assetCosts,
             complexity,
-            softwareCatalog
+            techStats
         ]) => {
 
             const r = {
@@ -140,7 +139,7 @@ function service(appStore,
                 endUserApps,
                 assetCosts,
                 complexity,
-                softwareCatalog
+                techStats
             };
 
             Object.assign(rawData, r);
@@ -177,7 +176,7 @@ service.$inject = [
     'AssetCostStore',
     'ComplexityStore',
     'CapabilityStore',
-    'SoftwareCatalogStore',
+    'TechnologyStatisticsService',
     '$q'
 ];
 

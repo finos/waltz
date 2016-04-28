@@ -82,17 +82,18 @@ function controller($scope, uiGridConstants) {
     $scope.$watchGroup(
         watchExpressionForQueries,
         ([qry, packages = [], servers = [], databases = []]) => {
-            vm.filteredSoftwarePackages = qry
-                ? termSearch(packages, qry, FIELDS_TO_SEARCH.SOFTWARE)
-                : packages;
-
-            vm.filteredServers = qry
-                ? termSearch(servers, qry)
-                : servers;
-
-            vm.filteredDatabases =  qry
-                ? termSearch(databases, qry)
-                : databases;
+            if (qry) {
+                vm.filteredSoftwareCatalog = {
+                    usages: vm.softwareCatalog.usages,
+                    packages: termSearch(packages, qry, FIELDS_TO_SEARCH.SOFTWARE)
+                };
+                vm.filteredServers = termSearch(servers, qry);
+                vm.filteredDatabases = termSearch(databases, qry);
+            } else {
+                vm.filteredSoftwareCatalog = vm.softwareCatalog;
+                vm.filteredServers = servers;
+                vm.filteredDatabases = databases;
+            }
         }
     );
 
@@ -129,9 +130,6 @@ function controller($scope, uiGridConstants) {
 
         return hasSoftware || hasServers || hasDatabases;
     }
-
-
-
 
 }
 

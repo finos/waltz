@@ -55,8 +55,8 @@ public class ServerInfoEndpoint implements Endpoint {
         getForDatum(mkPath(BASE_URL, "org-unit", ":id", "stats"), ((request, response)
                 -> serverInfoService.findStatsForOrganisationalUnit(getId(request))));
 
-        postForDatum(mkPath(BASE_URL, "apps", "stats"), ((request, response)
-                -> serverInfoService.findStatsForAppIds(readBody(request, Long[].class, new Long[]{}))));
+        postForDatum(mkPath(BASE_URL, "apps", "stats"), (request, response)
+                -> serverInfoService.findStatsForAppIds(readIdsFromBody(request)));
 
     }
 }

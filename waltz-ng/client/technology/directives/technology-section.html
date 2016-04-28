@@ -12,44 +12,16 @@
             <uib-tabset>
 
                 <uib-tab heading="Overview">
-
-                    <div ng-if="ctrl.softwareCatalog.packages.length > 0">
-                        <h4 class="text-center">
-                            <waltz-icon name="leaf"></waltz-icon>
-                            Software Packages
-                        </h4>
-                        <waltz-simple-software-usage-pies packages="ctrl.filteredSoftwarePackages"
-                                                          usages="ctrl.catalog.softwareUsages">
-                        </waltz-simple-software-usage-pies>
-                    </div>
-
-                    <div style="border-top: 2px dotted #ddd; margin-top: 4px; margin-bottom: 8px;"
-                         ng-if="ctrl.servers.length > 0">
-                        <h4 class="text-center">
-                            <waltz-icon name="server"></waltz-icon>
-                            Servers
-                        </h4>
-                        <waltz-server-pies servers="ctrl.filteredServers">
-                        </waltz-server-pies>
-                    </div>
-
-                    <div style="border-top: 2px dotted #ddd; margin-top: 4px; margin-bottom: 8px;"
-                         ng-if="ctrl.databases.length > 0">
-                        <h4 class="text-center">
-                            <waltz-icon name="database"></waltz-icon>
-                            Databases
-                        </h4>
-                        <waltz-database-pies databases="ctrl.filteredDatabases">
-                        </waltz-database-pies>
-                    </div>
-
+                    <waltz-technology-summary-pies servers="ctrl.filteredServers"
+                                                   databases="ctrl.filteredDatabases"
+                                                   software-catalog="ctrl.filteredSoftwareCatalog">
+                    </waltz-technology-summary-pies>
                 </uib-tab>
 
                 <uib-tab heading="Software Packages"
                          disable="ctrl.softwareCatalog.packages.length == 0">
                     <div class="waltz-scroll-region" style="height: 300px">
-                        <waltz-simple-software-usage-list packages="ctrl.filteredSoftwarePackages"
-                                                          usages="ctrl.catalog.softwareUsages">
+                        <waltz-simple-software-usage-list catalog="ctrl.filteredSoftwareCatalog">
                         </waltz-simple-software-usage-list>
                     </div>
                 </uib-tab>

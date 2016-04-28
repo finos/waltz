@@ -11,9 +11,14 @@ function service(http, baseUrl) {
         http.post(`${BASE}/app`, appIds)
             .then(result => result.data);
 
+    const findStatsForAppIds = (appIds) =>
+        http.post(`${BASE}/app/stats`, appIds)
+            .then(result => result.data);
+
     return {
         findByAppId,
-        findByAppIds
+        findByAppIds,
+        findStatsForAppIds
     };
 }
 

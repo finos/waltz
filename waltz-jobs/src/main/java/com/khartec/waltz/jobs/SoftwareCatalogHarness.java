@@ -17,24 +17,21 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.data.server_info.ServerInfoDao;
-import com.khartec.waltz.model.serverinfo.ServerSummaryStatistics;
+import com.khartec.waltz.model.software_catalog.SoftwareSummaryStatistics;
 import com.khartec.waltz.service.DIConfiguration;
-import org.jooq.DSLContext;
+import com.khartec.waltz.service.software_catalog.SoftwareCatalogService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 
 
-public class ServerHarness {
+public class SoftwareCatalogHarness {
 
     public static void main(String[] args) {
-
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        ServerInfoDao serverInfoDao = ctx.getBean(ServerInfoDao.class);
-        DSLContext dsl = ctx.getBean(DSLContext.class);
+        SoftwareCatalogService softwareCatalogService = ctx.getBean(SoftwareCatalogService.class);
 
-        ServerSummaryStatistics stats = serverInfoDao.findStatsForAppIds(newArrayList(801L, 802L));
+        SoftwareSummaryStatistics stats = softwareCatalogService.findStatisticsForAppIds(newArrayList(801L, 802L, 803L));
         System.out.println("stats:"+stats);
     }
 

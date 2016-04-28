@@ -11,11 +11,10 @@
  *
  */
 import _ from "lodash";
-
-import { enrichServerStats } from "../../server-info/services/server-utilities";
-import { calcPortfolioCost } from "../../asset-cost/services/asset-cost-utilities";
-import { calcComplexitySummary } from "../../complexity/services/complexity-utilities";
-import { buildHierarchies, findNode, getParents } from "../../common";
+import {enrichServerStats} from "../../server-info/services/server-utilities";
+import {calcPortfolioCost} from "../../asset-cost/services/asset-cost-utilities";
+import {calcComplexitySummary} from "../../complexity/services/complexity-utilities";
+import {buildHierarchies, findNode, getParents} from "../../common";
 
 
 const BINDINGS = {
@@ -25,7 +24,7 @@ const BINDINGS = {
     flows: '=',
     ratings: '=',
     costs: '=',
-    orgServerStats: '=',
+    serverStats: '=',
     complexity: '='
 };
 
@@ -77,27 +76,12 @@ function controller($scope, orgUnitStore) {
         'ctrl.costs',
         cs => vm.portfolioCostStr = calcPortfolioCost(cs));
 
-    $scope.$watch(
-        'ctrl.orgServerStats',
-        stats => {
-            if (!stats) return;
-            const serverStats = _.reduce(
-                stats,
-                (acc, stat) => {
-                    const virtualCount = acc.virtualCount + stat.virtualCount;
-                    const physicalCount = acc.physicalCount + stat.physicalCount;
-                    return { virtualCount, physicalCount };
-                },
-                { virtualCount: 0, physicalCount: 0});
-
-            enrichServerStats(serverStats);
-
-            vm.serverStats = serverStats;
-        });
 
     $scope.$watch(
         'ctrl.complexity',
         cs => vm.complexitySummary = calcComplexitySummary(cs));
+
+    $scope.$watch('ctrl.serverStats', enrichServerStats);
 }
 
 controller.$inject = ['$scope', 'OrgUnitStore'];
