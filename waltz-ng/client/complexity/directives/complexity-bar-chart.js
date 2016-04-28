@@ -16,6 +16,7 @@
  *
  */
 
+import _ from "lodash";
 import {green, red} from "../../common/colors";
 
 
@@ -30,11 +31,13 @@ const sizingDefaults = {
 
 
 function bucket(complexityData) {
-    const scores = _.chain(complexityData)
-        .map(d => ({ score: d.overallScore, id: d.id }))
-        .value();
+    const scores = _.map(
+        complexityData,
+        d => ({ score: d.overallScore, id: d.id }));
 
-    const maxScore = _.maxBy(scores, 'score').score;
+    const maxScore = scores.length > 0
+        ? _.maxBy(scores, 'score').score
+        : 0;
 
     const step = 0.05;
     const buckets = _.range(0, _.max([maxScore + step, 1]), step)
@@ -49,6 +52,7 @@ function bucket(complexityData) {
             bucket.items.push(s);
         }
     });
+
     return buckets;
 }
 
