@@ -151,7 +151,6 @@ function controller($stateParams,
                     $scope,
                     viewDataService,
                     viewOptions,
-                    assetCostStore,
                     historyStore) {
 
     const id = $stateParams.id;
@@ -188,23 +187,10 @@ function controller($stateParams,
         .then(refresh);
 
     vm.onAssetBucketSelect = (bucket) => {
-        $scope.$applyAsync(() => selectAssetBucket(bucket));
+        $scope.$applyAsync(() => viewDataService.selectAssetBucket(bucket));
     };
 
 
-    function selectAssetBucket(bucket) {
-        const assetCosts = vm.viewData.assetCosts;
-        assetCosts.selectedBucket = bucket;
-        if (assetCosts.costs.length == 0) {
-            assetCosts.loading = true;
-            assetCostStore
-                .findAppCostsByAppIds(_.map(vm.viewData.apps, 'id'))
-                .then(costs => {
-                    assetCosts.costs = costs;
-                    assetCosts.loading = false;
-                });
-        }
-    }
 }
 
 controller.$inject = [
@@ -213,7 +199,6 @@ controller.$inject = [
     '$scope',
     'OrgUnitViewDataService',
     'OrgUnitViewOptionsService',
-    'AssetCostStore',
     'HistoryStore'
 ];
 

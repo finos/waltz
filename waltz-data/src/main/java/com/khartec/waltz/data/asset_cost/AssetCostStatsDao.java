@@ -1,7 +1,5 @@
 package com.khartec.waltz.data.asset_cost;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.cost.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -67,11 +65,6 @@ public class AssetCostStatsDao {
                 year);
     }
 
-    public CostBandDetail calculateCostBandDetail(Collection<Long> appIds, CostBand costBand) {
-        Condition condition = byAppIdsCondition(appIds);
-        return calculateCostBandDetail(condition, 2015, costBand);
-    }
-
     // -----
 
 
@@ -82,56 +75,6 @@ public class AssetCostStatsDao {
                         .where(APPLICATION.ID.in(appIds));
         return ASSET_COST.ASSET_CODE.in(relevantAssetCodes);
     }
-
-
-    private CostBandDetail calculateCostBandDetail(Condition appCondition, int year, CostBand band) {
-
-        SelectHavingConditionStep<Record1<String>> assetCodesInBand =
-                dsl.select(APPLICATION.ASSET_CODE)
-                        .from(ASSET_COST)
-                        .innerJoin(APPLICATION)
-                        .on(APPLICATION.ASSET_CODE.eq(ASSET_COST.ASSET_CODE))
-                        .where(appCondition.and(ASSET_COST.YEAR.eq(year)))
-                        .groupBy(APPLICATION.ASSET_CODE)
-                        .having(subTotalSum.between(band.getLow(), band.getHigh()));
-
-        SelectConditionStep<Record5<BigDecimal, String, String, Long, String>> query =
-                dsl.select(
-                        ASSET_COST.AMOUNT,
-                        ASSET_COST.KIND,
-                        ASSET_COST.CURRENCY,
-                        APPLICATION.ID,
-                        APPLICATION.ASSET_CODE)
-                        .from(ASSET_COST)
-                        .innerJoin(APPLICATION).on(APPLICATION.ASSET_CODE.eq(ASSET_COST.ASSET_CODE))
-                        .where(ASSET_COST.ASSET_CODE.in(assetCodesInBand));
-
-
-        List<ImmutableApplicationCost> amounts = query.stream()
-                .map(r -> {
-                    ImmutableEntityReference appRef = ImmutableEntityReference.builder()
-                            .id(r.getValue(APPLICATION.ID))
-                            .kind(EntityKind.APPLICATION)
-                            .build();
-                    ImmutableCost cost = ImmutableCost.builder()
-                            .amount(r.getValue(ASSET_COST.AMOUNT))
-                            .year(year)
-                            .kind(CostKind.valueOf(r.getValue(ASSET_COST.KIND)))
-                            .currencyCode(r.getValue(ASSET_COST.CURRENCY))
-                            .build();
-                    return ImmutableApplicationCost.builder()
-                            .application(appRef)
-                            .cost(cost)
-                            .build();
-                })
-                .collect(Collectors.toList());
-
-        return ImmutableCostBandDetail.builder()
-                .band(band)
-                .costs(amounts)
-                .build();
-    }
-
 
 
     private List<CostBandTally> calculateCostBandStatistics(Condition condition, int year) {

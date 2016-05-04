@@ -19,12 +19,13 @@ package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.asset_cost.AssetCostDao;
 import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
-import com.khartec.waltz.model.cost.*;
+import com.khartec.waltz.model.cost.AssetCostQueryOptions;
+import com.khartec.waltz.model.cost.CostBandTally;
+import com.khartec.waltz.model.cost.ImmutableAssetCostQueryOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
@@ -55,15 +56,6 @@ public class AssetCostHarness {
         List<CostBandTally> bands = assetCostStatsDao.calculateCostBandStatisticsByAppIds(options);
 
         System.out.println("-- end, dur: " + (System.currentTimeMillis() - st));
-
-
-        CostBand band = new CostBand(
-                BigDecimal.valueOf(5000001),
-                BigDecimal.valueOf(10000000));
-
-        CostBandDetail bandDetail = assetCostStatsDao.calculateCostBandDetail(appIds, band);
-
-        System.out.println(bandDetail);
 
 
         bands.forEach(System.out::println);
