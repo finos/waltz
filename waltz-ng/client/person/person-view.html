@@ -1,4 +1,5 @@
 <div>
+    <!-- HEADER -->
     <waltz-page-header icon="user" name="{{ ctrl.person.displayName }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
@@ -8,8 +9,9 @@
     </waltz-page-header>
 
 
+    <!-- SUMMARY -->
     <waltz-person-summary person="ctrl.person"
-                          asset-costs="ctrl.assetCosts"
+                          asset-costs="ctrl.assetCosts.stats"
                           managers="ctrl.managers"
                           complexity="ctrl.complexity"
                           server-stats="ctrl.techStats.serverStats"
@@ -20,6 +22,7 @@
     </waltz-person-summary>
 
 
+    <!-- APPS -->
     <div ng-if="ctrl.hasInvolvements">
 
         <waltz-section icon="desktop"
@@ -88,20 +91,16 @@
                                   apps="ctrl.apps">
         </waltz-complexity-section>
 
-
-        <!-- COSTS -->
-        <waltz-asset-costs-section asset-costs="ctrl.assetCosts">
-        </waltz-asset-costs-section>
-
-
         <!-- TECHNOLOGIES -->
         <waltz-section name="Technologies">
             <waltz-group-technology-summary stats="ctrl.techStats">
             </waltz-group-technology-summary>
         </waltz-section>
 
-
-
+        <!-- COSTS -->
+        <waltz-asset-costs-section data="ctrl.assetCosts"
+                                   on-bucket-select="ctrl.onAssetBucketSelect">
+        </waltz-asset-costs-section>
 
     </div>
 

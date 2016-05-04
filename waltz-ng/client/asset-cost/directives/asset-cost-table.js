@@ -11,7 +11,7 @@ const DEFAULT_OPTIONS = {
 const BINDINGS = {
     costs: '=',
     options: '=?',
-    eventDispatcher: '=?',
+    selectedBucket: '=?',
     csvName: '@?'
 };
 
@@ -152,6 +152,7 @@ function controller(displayNameService, uiGridConstants, $scope, $animate) {
 
     setupExportOptions(gridOptions, vm.csvName);
 
+    /* setup year and org filters */
     const configureWithCosts = (costs) => {
         vm.gridOptions.data = costs;
         colDefinitions.yearCol = setupYearFilter(costs, uiGridConstants);
@@ -177,25 +178,13 @@ function controller(displayNameService, uiGridConstants, $scope, $animate) {
     };
 
 
-    const applyFilter = (filterCmd) => {
-        if (filterCmd.type !== 'COST.FILTER') { return; }
-
-        const { data } = filterCmd;
-
-        $scope.$apply(() => {
-            if (data.field === 'amount') { filterAmount(data); }
-            if (data.field === 'orgUnit') { filterOrgUnit(data); }
-        });
+    const applyFilter = (filterOptions) => {
+        filterAmount(filterOptions);
     };
 
 
-    $scope.$watch('ctrl.costs', (costs) => configureWithCosts(costs));
-
-    $scope.$watch('ctrl.eventDispatcher', (dispatcher) => {
-        if (dispatcher) {
-            dispatcher.subscribe(applyFilter, 'COST.FILTER');
-        }
-    });
+    $scope.$watch('ctrl.costs', configureWithCosts);
+    $scope.$watch('ctrl.selectedBucket', applyFilter);
 
     vm.gridOptions = gridOptions;
 }

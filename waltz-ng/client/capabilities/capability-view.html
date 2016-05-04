@@ -1,4 +1,5 @@
 <div>
+    <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.capability.name }}"
                        small="Capability"
                        icon="puzzle-piece">
@@ -10,13 +11,14 @@
     </waltz-page-header>
 
 
+    <!-- SUMMARY -->
     <waltz-capability-summary capability="ctrl.capability"
                               applications="ctrl.apps"
                               server-stats="ctrl.techStats.serverStats"
                               complexity="ctrl.complexity"
                               flows="ctrl.dataFlows"
                               traits="ctrl.traitInfo.traits"
-                              asset-costs="ctrl.assetCosts">
+                              asset-costs="ctrl.assetCosts.stats">
     </waltz-capability-summary>
 
 
@@ -30,7 +32,6 @@
                             tweakers="ctrl.ratings.tweakers"
                             highestRatingCount="10">
         </waltz-rating-group>
-
     </waltz-section>
 
 
@@ -49,13 +50,6 @@
     <waltz-complexity-section complexity="ctrl.complexity"
                               apps="ctrl.apps">
     </waltz-complexity-section>
-
-
-
-    <!-- COSTS -->
-    <waltz-asset-costs-section asset-costs="ctrl.assetCosts"
-                               csv-name="{{ ctrl.capability.name }}_asset_costs.csv">
-    </waltz-asset-costs-section>
 
 
     <!-- APPLICATIONS -->
@@ -84,7 +78,8 @@
                 Secondary Applications
             </h4>
             <waltz-app-table applications="ctrl.groupedApps.secondaryApps"
-                             csv-name="{{ctrl.capability.name}}_secondary_apps.csv"></waltz-app-table>
+                             csv-name="{{ctrl.capability.name}}_secondary_apps.csv">
+            </waltz-app-table>
         </div>
 
         <div ng-if="ctrl.apps.length == 0">
@@ -103,23 +98,33 @@
     </waltz-section>
 
 
+
+    <!-- COSTS -->
+    <waltz-asset-costs-section data="ctrl.assetCosts"
+                               on-bucket-select="ctrl.onAssetBucketSelect"
+                               csv-name="{{ ctrl.capability.name }}_asset_costs.csv">
+    </waltz-asset-costs-section>
+
+
     <!-- ASSOCIATED CAPABILITIES -->
     <waltz-section name="Associated Capabilities">
         <ul>
             <li ng-repeat="assoc in ctrl.associatedCapabilities | orderBy:'capability.name'">
                 <strong>
-                    <a ui-sref="main.capabilities.view ({ id: assoc.capability.id })">
-                        {{ assoc.capability.name }}
+                    <a ui-sref="main.capabilities.view ({ id: assoc.capability.id })"
+                       ng-bind="assoc.capability.name">
                    </a>
                 </strong>
-                <span class="text-muted small">
-                    {{ assoc.capability.description }}
+                <span class="text-muted small"
+                      ng-bind="assoc.capability.description">
                 </span>
                 <ul class="list-inline" style="margin-left: 10px">
-                    <li class="text-muted">Applications:</li>
+                    <li class="text-muted">
+                        Applications:
+                    </li>
                     <li ng-repeat="app in assoc.apps | orderBy:'name'">
                         <a ui-sref="main.app-view ({id: app.id})">
-                            {{ app.name }}
+                            <span ng-bind="app.name"></span>
                         </a>
                         <span ng-if="! $last"> | </span>
                     </li>

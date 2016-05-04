@@ -23,8 +23,13 @@ const initModel = {
         allApps: []
     },
     apps: [],
+    appIds: [],
     complexity: [],
-    assetCosts: [],
+    assetCosts: {
+        stats: [],
+        costs: [],
+        loading: false
+    },
     serverStats: null,
     dataFlows: []
 };
@@ -86,10 +91,10 @@ function service(personStore,
     }
 
 
-    function loadCosts(appIds) {
+    function loadCostStats(appIds) {
         assetCostStore
-            .findAppCostsByAppIds(appIds)
-            .then(assetCosts => state.model.assetCosts = assetCosts);
+            .findStatsByAppIds(appIds)
+            .then(assetCosts => state.model.assetCosts.stats = assetCosts);
     }
 
 
@@ -116,9 +121,9 @@ function service(personStore,
     function load(employeeId) {
         loadPeople(employeeId);
         loadApplications(employeeId)
-            .then(model => {
-                const appIds = _.map(model.apps, 'id');
-                loadCosts(appIds);
+            .then(({ apps }) => {
+                const appIds = _.map(apps, 'id');
+                loadCostStats(appIds);
                 loadComplexity(appIds);
                 loadFlows(appIds);
                 loadTechStats(appIds);
@@ -126,9 +131,25 @@ function service(personStore,
     }
 
 
+    function selectAssetBucket(bucket) {
+        const assetCosts = state.model.assetCosts;
+        assetCosts.selectedBucket = bucket;
+        if (assetCosts.costs.length == 0) {
+            assetCosts.loading = true;
+            assetCostStore
+                .findAppCostsByAppIds(_.map(state.model.apps, 'id'))
+                .then(costs => {
+                    assetCosts.costs = costs;
+                    assetCosts.loading = false;
+                });
+        }
+    }
+
+
     return {
         load,
-        state
+        state,
+        selectAssetBucket
     };
 }
 

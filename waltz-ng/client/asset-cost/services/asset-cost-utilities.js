@@ -60,8 +60,7 @@ export function categorizeCostsIntoBuckets(costs) {
  * @param costs
  */
 export function calcPortfolioCost(costs) {
-    if (!costs) return;
-    const amount = _.sumBy(costs, 'cost.amount');
+    if (!costs || !costs.totalCost) return;
 
-    return '€ ' + numberFormatter(amount, 1);
+    return '€ ' + numberFormatter(costs.totalCost.amount, 1);
 }

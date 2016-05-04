@@ -17,14 +17,16 @@
   -->
 
 <div>
+    <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.groupDetail.appGroup.name }}"
                        icon="object-group"
                        small="{{ ctrl.groupDetail.appGroup.kind }}">
     </waltz-page-header>
 
 
+    <!-- SUMMARY -->
     <waltz-app-group-summary applications="ctrl.applications"
-                             asset-costs="ctrl.assetCosts"
+                             asset-costs="ctrl.assetCosts.stats"
                              complexity="ctrl.complexity"
                              server-stats="ctrl.techStats.serverStats"
                              app-group="ctrl.groupDetail.appGroup"
@@ -32,8 +34,11 @@
                              editable="ctrl.isGroupEditable()">
     </waltz-app-group-summary>
 
+
     <hr>
 
+
+    <!-- CAPABILITY RATINGS -->
     <waltz-section name='Capability Ratings'
                    small="{{ ctrl.ratingColorStrategy.name }}"
                    ng-init="ctrl.capabilitySelectorVisible = false">
@@ -54,6 +59,7 @@
         </waltz-multi-app-rating-viewer>
     </waltz-section>
 
+
     <!-- FLOWS -->
     <waltz-section name="Logical Data Flows"
                    icon="random">
@@ -66,17 +72,17 @@
     </waltz-section>
 
 
-    <!-- COSTS -->
-    <waltz-asset-costs-section asset-costs="ctrl.assetCosts">
-    </waltz-asset-costs-section>
-
-
     <!-- TECHNOLOGIES -->
     <waltz-section name="Technologies">
         <waltz-group-technology-summary stats="ctrl.techStats">
         </waltz-group-technology-summary>
     </waltz-section>
 
+
+    <!-- COSTS -->
+    <waltz-asset-costs-section data='ctrl.assetCosts'
+                               on-bucket-select="ctrl.onAssetBucketSelect">
+    </waltz-asset-costs-section>
 
 
     <!-- APPS -->
@@ -86,7 +92,6 @@
                    icon="desktop">
 
         <div ng-if="ctrl.applications">
-
             <waltz-app-table filter="appQuery"
                              csv-name="{{ ctrl.groupDetail.appGroup.name }}_applications.csv"
                              applications="ctrl.applications"></waltz-app-table>
@@ -99,7 +104,5 @@
             <span ng-bind="ctrl.groupDetail.appGroup.name"></span>.
         </div>
     </waltz-section>
-
-
 
 </div>

@@ -11,9 +11,15 @@
  *
  */
 
-import _ from 'lodash';
-import d3 from 'd3';
-import angular from 'angular';
+import _ from "lodash";
+import d3 from "d3";
+import angular from "angular";
+
+
+const BINDINGS = {
+    buckets: '=',
+    onBucketSelect: '=?'
+};
 
 
 function directiveController($scope, $window) {
@@ -59,12 +65,8 @@ function directiveController($scope, $window) {
             .append('circle')
             .classed('bucket', true)
             .on('click', d => {
-                if (vm.eventDispatcher) {
-                    const filterCmd = {
-                        type: 'COST.FILTER',
-                        data: { field: 'amount', min: d.min, max: d.max }
-                    };
-                    vm.eventDispatcher.dispatch(filterCmd);
+                if (vm.onBucketSelect) {
+                    vm.onBucketSelect(d);
                 }
             })
             .append('title');
@@ -80,6 +82,7 @@ function directiveController($scope, $window) {
         svg.selectAll('.bucket title')
             .data(buckets)
             .text(d => `# = ${d.size}`);
+
     };
 
 
@@ -120,10 +123,7 @@ export default function() {
         replace: true,
         template: '<div><div class="viz-elem wbc"><svg></svg></div></div>',
         scope: {},
-        bindToController: {
-            buckets: '=',
-            eventDispatcher: '=?'
-        },
+        bindToController: BINDINGS,
         controllerAs: 'ctrl',
         controller: directiveController,
         link: (scope, elem) => {

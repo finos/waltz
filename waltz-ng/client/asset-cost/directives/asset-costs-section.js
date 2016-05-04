@@ -15,14 +15,33 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-import {categorizeCostsIntoBuckets} from "../../asset-cost/services/asset-cost-utilities";
+
+import numeral from "numeral";
 import EventDispatcher from "../../common/EventDispatcher";
 
 
 const BINDINGS = {
-    assetCosts: '=',
+    data: '=',
+    onBucketSelect: '=?',
     csvName: '@?'
 };
+
+
+const rangeBandToBucket = (band, idx) => {
+    const name = '€ '
+        + numeral(band.id.low).format('0a')
+        + " - € "
+        + numeral(band.id.high).format('0a');
+
+    return {
+        min: band.id.low,
+        max: band.id.high,
+        idx: idx,
+        size: band.count,
+        name: name
+    };
+};
+
 
 
 function controller($scope) {
@@ -31,14 +50,17 @@ function controller($scope) {
 
     vm.eventDispatcher = new EventDispatcher();
 
-    $scope.$watch('ctrl.assetCosts', assetCosts => {
-        if (! assetCosts) return;
-        vm.assetCostBuckets = categorizeCostsIntoBuckets(assetCosts);
-    });
-
+    $scope.$watch(
+        'ctrl.data.stats',
+        assetCostStats => {
+            if (! assetCostStats) return;
+            vm.assetCostBuckets = _.map(assetCostStats.costBandCounts, rangeBandToBucket);
+        });
 }
 
-controller.$inject = ['$scope'];
+controller.$inject = [
+    '$scope'
+];
 
 
 export default () => {

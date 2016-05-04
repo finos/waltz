@@ -80,6 +80,12 @@ function controller(involvementStore,
 
     }, true);
 
+
+    vm.onAssetBucketSelect = bucket => {
+        $scope.$applyAsync(() => {
+            viewService.selectAssetBucket(bucket);
+        });
+    };
 }
 
 controller.$inject = [

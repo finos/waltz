@@ -21,6 +21,7 @@ export default (module) => {
     module.directive('waltzIcon', require('./icon'));
     module.directive('waltzJumpTo', require('./jump-to'));
     module.directive('waltzKeywordList', require('./keyword-list'));
+    module.directive('waltzLoadingNotification', require('./loading-notification'));
     module.directive('waltzMailTo', require('./mail-to'));
     module.directive('waltzNavSearchResults', require('./nav-search-results'));
     module.directive('waltzPageHeader', require('./page-header'));

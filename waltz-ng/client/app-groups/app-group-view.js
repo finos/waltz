@@ -96,7 +96,10 @@ function calculateCapabilities(allCapabilities, appCapabilities) {
 
 
 
-function controller(appGroupStore,
+function controller($scope,
+                    $q,
+                    $stateParams,
+                    appGroupStore,
                     appStore,
                     assetCostStore,
                     complexityStore,
@@ -105,42 +108,50 @@ function controller(appGroupStore,
                     capabilityStore,
                     appCapabilityStore,
                     ratingStore,
-                    technologyStatsService,
-                    $stateParams,
-                    $q)
+                    technologyStatsService)
 {
     const { id }  = $stateParams;
 
+    const assetCosts = {
+        stats: [],
+        costs: [],
+        loading: false
+    };
+
     const vm = this;
+
+    const isUserAnOwner = member =>
+            member.role === 'OWNER'
+            && member.userId === vm.user.userName;
 
     appGroupStore.getById(id)
         .then(groupDetail => vm.groupDetail = groupDetail)
         .then(groupDetail => _.map(groupDetail.applications, 'id'))
         .then(appIds => $q.all([
             appStore.findByIds(appIds),
-            assetCostStore.findAppCostsByAppIds(appIds),
             complexityStore.findByAppIds(appIds),
             capabilityStore.findAll(),
             appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
             ratingStore.findByAppIds(appIds),
-            technologyStatsService.findByAppIds(appIds)
+            technologyStatsService.findByAppIds(appIds),
+            assetCostStore.findStatsByAppIds(appIds)
         ]))
         .then(([
             apps,
-            assetCosts,
             complexity,
             allCapabilities,
             appCapabilities,
             ratings,
-            techStats
+            techStats,
+            assetCostStats
         ]) => {
             vm.applications = apps;
-            vm.assetCosts = assetCosts;
             vm.complexity = complexity;
             vm.allCapabilities = allCapabilities;
             vm.appCapabilities = appCapabilities;
             vm.ratings = ratings;
             vm.techStats = techStats;
+            vm.assetCosts.stats = assetCostStats;
         })
         .then(() => loadDataFlows(dataFlowStore, vm.applications))
         .then(flows => vm.dataFlows = flows)
@@ -152,13 +163,34 @@ function controller(appGroupStore,
     vm.isGroupEditable = () => {
         if (!vm.groupDetail) return false;
         if (!vm.user) return false;
-        return _.some(vm.groupDetail.members, m => m.role === 'OWNER' && m.userId === vm.user.userName );
+        return _.some(vm.groupDetail.members, isUserAnOwner );
     };
 
     vm.ratingColorStrategy = selectBest;
+
+
+    vm.onAssetBucketSelect = (bucket) => {
+        $scope.$applyAsync(() => {
+            assetCosts.selectedBucket = bucket;
+            if (assetCosts.costs.length == 0) {
+                assetCosts.loading = true;
+                assetCostStore
+                    .findAppCostsByAppIds(_.map(vm.applications, "id"))
+                    .then(costs => {
+                        assetCosts.costs = costs;
+                        assetCosts.loading = false;
+                    });
+            }
+        });
+    };
+
+    vm.assetCosts = assetCosts;
 }
 
 controller.$inject = [
+    '$scope',
+    '$q',
+    '$stateParams',
     'AppGroupStore',
     'ApplicationStore',
     'AssetCostStore',
@@ -168,9 +200,7 @@ controller.$inject = [
     'CapabilityStore',
     'AppCapabilityStore',
     'RatingStore',
-    'TechnologyStatisticsService',
-    '$stateParams',
-    '$q'
+    'TechnologyStatisticsService'
 ];
 
 

@@ -29,6 +29,5 @@ public abstract class ApplicationCost {
 
     public abstract Cost cost();
     public abstract EntityReference application();
-    public abstract EntityReference orgUnit();
 
 }

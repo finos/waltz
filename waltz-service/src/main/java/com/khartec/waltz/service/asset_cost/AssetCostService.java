@@ -17,9 +17,10 @@
 
 package com.khartec.waltz.service.asset_cost;
 
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.asset_cost.AssetCostDao;
-import com.khartec.waltz.model.cost.ApplicationCost;
-import com.khartec.waltz.model.cost.AssetCost;
+import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
+import com.khartec.waltz.model.cost.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,25 +30,44 @@ import java.util.List;
 @Service
 public class AssetCostService {
 
-    private final AssetCostDao assetCodeDao;
+    private final AssetCostDao assetCostDao;
+    private final AssetCostStatsDao assetCostStatsDao;
 
 
     @Autowired
-    public AssetCostService(AssetCostDao assetCodeDao) {
-        this.assetCodeDao = assetCodeDao;
+    public AssetCostService(AssetCostDao assetCodeDao, AssetCostStatsDao assetCostStatsDao) {
+        this.assetCostDao = assetCodeDao;
+        this.assetCostStatsDao = assetCostStatsDao;
     }
 
 
     public List<AssetCost> findByAssetCode(String code) {
-        return assetCodeDao.findByAssetCode(code);
+        Checks.checkNotNull(code, "code cannot be null");
+        return assetCostDao.findByAssetCode(code);
     }
 
 
     public List<AssetCost> findByAppId(long appId) {
-        return assetCodeDao.findByAppId(appId);
+        return assetCostDao.findByAppId(appId);
     }
 
-    public List<ApplicationCost> findAppCostsByAppIds(Long[] ids) {
-        return assetCodeDao.findAppCostsByAppIds(ids);
+
+    public List<ApplicationCost> findAppCostsByAppIds(AssetCostQueryOptions options) {
+        Checks.checkNotNull(options, "options cannot be null");
+        return assetCostDao.findAppCostsByAppIds(options);
     }
+
+
+    public AssetCostStatistics calculateStatisticsByAppIds(AssetCostQueryOptions options) {
+        Checks.checkNotNull(options, "options cannot be null");
+        List<CostBandTally> costBandCounts = assetCostStatsDao.calculateCostBandStatisticsByAppIds(options);
+        Cost totalCost = assetCostStatsDao.calculateTotalCostByAppIds(options);
+
+        return ImmutableAssetCostStatistics.builder()
+                .costBandCounts(costBandCounts)
+                .totalCost(totalCost)
+                .build();
+
+    }
+
 }

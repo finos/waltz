@@ -46,7 +46,8 @@ function loadDataFlows(dataFlowStore, groupApps) {
 }
 
 
-function service(appStore,
+function service($q,
+                 appStore,
                  appCapabilityStore,
                  orgUnitUtils,
                  changeLogStore,
@@ -61,11 +62,15 @@ function service(appStore,
                  assetCostStore,
                  complexityStore,
                  capabilityStore,
-                 techStatsService,
-                 $q) {
+                 techStatsService) {
 
-    const rawData = {};
-
+    const rawData = {
+        assetCosts: {
+            costs: [],
+            stats: {},
+            loading: false
+        }
+    };
 
     function loadAll(orgUnitId) {
 
@@ -112,7 +117,7 @@ function service(appStore,
             ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)
             authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
             endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
-            assetCostStore.findAppCostsByAppIds(appIds),
+            assetCostStore.findStatsByAppIds(appIds),
             complexityStore.findByAppIds(appIds),
             techStatsService.findByAppIds(appIds)
     ]).then(([
@@ -123,7 +128,7 @@ function service(appStore,
             ratedDataFlows,
             authSources,
             endUserApps,
-            assetCosts,
+            assetCostStats,
             complexity,
             techStats
         ]) => {
@@ -137,13 +142,13 @@ function service(appStore,
                 ratedDataFlows,
                 authSources,
                 endUserApps,
-                assetCosts,
                 complexity,
                 techStats
             };
 
             Object.assign(rawData, r);
 
+            rawData.assetCosts.stats = assetCostStats;
             rawData.immediateHierarchy = orgUnitUtils.getImmediateHierarchy(rawData.orgUnits, orgUnitId);
             rawData.involvements = aggregatePeopleInvolvements(rawData.involvements, rawData.people);
             rawData.orgUnit = _.find(rawData.orgUnits, { id: orgUnitId });
@@ -161,6 +166,7 @@ function service(appStore,
 }
 
 service.$inject = [
+    '$q',
     'ApplicationStore',
     'AppCapabilityStore',
     'OrgUnitUtilityService',
@@ -177,7 +183,6 @@ service.$inject = [
     'ComplexityStore',
     'CapabilityStore',
     'TechnologyStatisticsService',
-    '$q'
 ];
 
 
