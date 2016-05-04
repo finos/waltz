@@ -101,14 +101,14 @@ function controller($scope,
                     $stateParams,
                     appGroupStore,
                     appStore,
-                    assetCostStore,
                     complexityStore,
                     dataFlowStore,
                     userService,
                     capabilityStore,
                     appCapabilityStore,
                     ratingStore,
-                    technologyStatsService)
+                    technologyStatsService,
+                    assetCostViewService)
 {
     const { id }  = $stateParams;
 
@@ -134,7 +134,7 @@ function controller($scope,
             appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
             ratingStore.findByAppIds(appIds),
             technologyStatsService.findByAppIds(appIds),
-            assetCostStore.findStatsByAppIds(appIds)
+            assetCostViewService.initialise(appIds)
         ]))
         .then(([
             apps,
@@ -143,7 +143,7 @@ function controller($scope,
             appCapabilities,
             ratings,
             techStats,
-            assetCostStats
+            assetCostData
         ]) => {
             vm.applications = apps;
             vm.complexity = complexity;
@@ -151,7 +151,7 @@ function controller($scope,
             vm.appCapabilities = appCapabilities;
             vm.ratings = ratings;
             vm.techStats = techStats;
-            vm.assetCosts.stats = assetCostStats;
+            vm.assetCostData = assetCostData;
         })
         .then(() => loadDataFlows(dataFlowStore, vm.applications))
         .then(flows => vm.dataFlows = flows)
@@ -168,20 +168,12 @@ function controller($scope,
 
     vm.ratingColorStrategy = selectBest;
 
-
-    vm.onAssetBucketSelect = (bucket) => {
+    vm.onAssetBucketSelect = bucket => {
         $scope.$applyAsync(() => {
-            assetCosts.selectedBucket = bucket;
-            if (assetCosts.costs.length == 0) {
-                assetCosts.loading = true;
-                assetCostStore
-                    .findAppCostsByAppIds(_.map(vm.applications, "id"))
-                    .then(costs => {
-                        assetCosts.costs = costs;
-                        assetCosts.loading = false;
-                    });
-            }
-        });
+            assetCostViewService.selectBucket(bucket);
+            assetCostViewService.loadDetail()
+                .then(data => vm.assetCostData = data);
+        })
     };
 
     vm.assetCosts = assetCosts;
@@ -193,14 +185,14 @@ controller.$inject = [
     '$stateParams',
     'AppGroupStore',
     'ApplicationStore',
-    'AssetCostStore',
     'ComplexityStore',
     'DataFlowDataStore',
     'UserService',
     'CapabilityStore',
     'AppCapabilityStore',
     'RatingStore',
-    'TechnologyStatisticsService'
+    'TechnologyStatisticsService',
+    'AssetCostViewService'
 ];
 
 

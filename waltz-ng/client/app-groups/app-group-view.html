@@ -26,7 +26,7 @@
 
     <!-- SUMMARY -->
     <waltz-app-group-summary applications="ctrl.applications"
-                             asset-costs="ctrl.assetCosts.stats"
+                             asset-costs="ctrl.assetCostData.stats"
                              complexity="ctrl.complexity"
                              server-stats="ctrl.techStats.serverStats"
                              app-group="ctrl.groupDetail.appGroup"
@@ -80,7 +80,7 @@
 
 
     <!-- COSTS -->
-    <waltz-asset-costs-section data='ctrl.assetCosts'
+    <waltz-asset-costs-section data='ctrl.assetCostData'
                                on-bucket-select="ctrl.onAssetBucketSelect">
     </waltz-asset-costs-section>
 
