@@ -18,7 +18,7 @@
                               complexity="ctrl.complexity"
                               flows="ctrl.dataFlows"
                               traits="ctrl.traitInfo.traits"
-                              asset-costs="ctrl.assetCosts.stats">
+                              asset-costs="ctrl.assetCostData.stats">
     </waltz-capability-summary>
 
 
@@ -100,7 +100,7 @@
 
 
     <!-- COSTS -->
-    <waltz-asset-costs-section data="ctrl.assetCosts"
+    <waltz-asset-costs-section data="ctrl.assetCostData"
                                on-bucket-select="ctrl.onAssetBucketSelect"
                                csv-name="{{ ctrl.capability.name }}_asset_costs.csv">
     </waltz-asset-costs-section>

@@ -108,7 +108,7 @@ function controller($scope,
                     historyStore,
                     dataFlowStore,
                     complexityStore,
-                    assetCostStore,
+                    assetCostViewService,
                     applicationStore,
                     traitUsageStore,
                     traitStore,
@@ -151,14 +151,14 @@ function controller($scope,
                 ratingStore.findByAppIds(appIds),
                 dataFlowStore.findByAppIds(appIds),
                 complexityStore.findByAppIds(appIds),
-                assetCostStore.findStatsByAppIds(appIds),
+                assetCostViewService.initialise(appIds),
                 techStatsService.findByAppIds(appIds)
             ]).then(([
                 perspective,
                 ratings,
                 flows,
                 complexity,
-                assetCostStats,
+                assetCostData,
                 techStats
             ]) => {
                 vm.ratings = {
@@ -167,7 +167,7 @@ function controller($scope,
                 };
                 vm.dataFlows = flows;
                 vm.complexity = complexity;
-                vm.assetCosts.stats = assetCostStats;
+                vm.assetCostData = assetCostData;
                 vm.techStats = techStats;
             });
         });
@@ -203,19 +203,12 @@ function controller($scope,
     vm.capabilitiesById = capabilitiesById;
     vm.assetCosts = assetCosts;
 
-    vm.onAssetBucketSelect = (bucket) => {
+    vm.onAssetBucketSelect = bucket => {
         $scope.$applyAsync(() => {
-            assetCosts.selectedBucket = bucket;
-            if (assetCosts.costs.length == 0) {
-                assetCosts.loading = true;
-                assetCostStore
-                    .findAppCostsByAppIds(_.map(vm.apps, "id"))
-                    .then(costs => {
-                        assetCosts.costs = costs;
-                        assetCosts.loading = false;
-                    });
-            }
-        });
+            assetCostViewService.selectBucket(bucket);
+            assetCostViewService.loadDetail()
+                .then(data => vm.assetCostData = data);
+        })
     };
 
     loadTraitInfo(traitStore, traitUsageStore, capability.id)
@@ -234,7 +227,7 @@ controller.$inject = [
     'HistoryStore',
     'DataFlowDataStore',
     'ComplexityStore',
-    'AssetCostStore',
+    'AssetCostViewService',
     'ApplicationStore',
     'TraitUsageStore',
     'TraitStore',
