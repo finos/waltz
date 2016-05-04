@@ -23,8 +23,9 @@ const initModel = {
         allApps: []
     },
     apps: [],
+    appIds: [],
     complexity: [],
-    assetCosts: [],
+    assetCostData: {},
     serverStats: null,
     dataFlows: []
 };
@@ -32,7 +33,7 @@ const initModel = {
 
 function service(personStore,
                  involvementStore,
-                 assetCostStore,
+                 assetCostViewService,
                  complexityStore,
                  dataFlowStore,
                  techStatsService,
@@ -86,10 +87,10 @@ function service(personStore,
     }
 
 
-    function loadCosts(appIds) {
-        assetCostStore
-            .findAppCostsByAppIds(appIds)
-            .then(assetCosts => state.model.assetCosts = assetCosts);
+    function loadCostStats(appIds) {
+        assetCostViewService
+            .initialise(appIds)
+            .then(assetCostData => state.model.assetCostData = assetCostData);
     }
 
 
@@ -116,26 +117,34 @@ function service(personStore,
     function load(employeeId) {
         loadPeople(employeeId);
         loadApplications(employeeId)
-            .then(model => {
-                const appIds = _.map(model.apps, 'id');
-                loadCosts(appIds);
+            .then(({ apps }) => {
+                const appIds = _.map(apps, 'id');
+                loadCostStats(appIds);
                 loadComplexity(appIds);
                 loadFlows(appIds);
                 loadTechStats(appIds);
             });
     }
 
+    function selectAssetBucket(bucket) {
+        assetCostViewService.selectBucket(bucket);
+        assetCostViewService.loadDetail()
+            .then(data => state.model.assetCostData = data);
+
+    }
+
 
     return {
         load,
-        state
+        state,
+        selectAssetBucket
     };
 }
 
 service.$inject = [
     'PersonDataService',
     'InvolvementDataService',
-    'AssetCostStore',
+    'AssetCostViewService',
     'ComplexityStore',
     'DataFlowDataStore',
     'TechnologyStatisticsService',

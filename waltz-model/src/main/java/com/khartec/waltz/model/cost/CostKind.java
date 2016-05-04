@@ -22,6 +22,6 @@ public enum CostKind {
     APPLICATION_DEVELOPMENT,
     INFRASTRUCTURE,
     PERSON,
-    OTHER
+    CUMLATIVE, OTHER
 
 }

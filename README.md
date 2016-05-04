@@ -24,3 +24,10 @@
 - Bootstrap 3
 - D3 
 
+
+
+
+## Contact
+
+- email: dwatkins@khartec.com
+- irc: #waltzdev

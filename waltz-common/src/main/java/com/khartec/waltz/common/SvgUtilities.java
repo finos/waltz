@@ -41,7 +41,7 @@ public class SvgUtilities {
                         )
                 );
 
-        return printDocument(svg, false); // do NOT pretty print visio
+        return printDocument(svg, false); // do NOT toPrettyString print visio
     }
 
 }

@@ -17,13 +17,14 @@
   -->
 
 <div>
+    <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.viewData.orgUnit.name }}"
                        icon="sitemap"
                        small="{{ ctrl.viewData.orgUnit.kind | toDisplayName:'orgUnitKind' }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li><a ui-sref="main.org-units.list">Organisational Units</a></li>
-            <li>{{ctrl.viewData.orgUnit.name}}</li>
+            <li><span ng-bind="ctrl.viewData.orgUnit.name"></span></li>
         </ol>
     </waltz-page-header>
 
@@ -35,20 +36,12 @@
                              apps="ctrl.viewData.apps"
                              flows="ctrl.viewData.dataFlows"
                              ratings="ctrl.viewData.capabilityRatings"
-                             costs="ctrl.viewData.assetCosts"
+                             costs="ctrl.viewData.assetCostData.stats"
                              server-stats="ctrl.viewData.techStats.serverStats"
                              complexity="ctrl.viewData.complexity">
     </waltz-org-unit-overview>
 
     <hr/>
-
-
-
-    <!-- TECHNOLOGIES -->
-    <waltz-section name="Technologies">
-        <waltz-group-technology-summary stats="ctrl.viewData.techStats">
-        </waltz-group-technology-summary>
-    </waltz-section>
 
 
     <!-- COMPLEXITY -->
@@ -95,7 +88,8 @@
 
 
     <!-- FLOWS -->
-    <waltz-section name="Logical Data Flows" id="flows-section">
+    <waltz-section name="Logical Data Flows"
+                   id="flows-section">
 
         <waltz-section-actions >
             <a waltz-has-role="ORGUNIT_EDITOR"
@@ -118,15 +112,18 @@
 
                 <div ng-if="shownBoingyGraph && ctrl.viewData.dataFlows.flows.length > 0 && ctrl.viewData.dataFlows.flows.length < 800">
                     <waltz-org-unit-flow-viz entities="ctrl.viewData.dataFlows.entities"
-                                             flows="ctrl.viewData.dataFlows.flows"></waltz-org-unit-flow-viz>
+                                             flows="ctrl.viewData.dataFlows.flows">
+                    </waltz-org-unit-flow-viz>
                     <div class="small text-muted">
                         Dragging nodes will pin them.  Double click to unpin.  If an application is gray
                         it is not a member of this organisational unit.
                     </div>
                 </div>
 
-                <div ng-if="ctrl.viewData.dataFlows.flows.length >= 600">
-                    <div class="alert alert-danger"><strong>Too many to flows to draw</strong></div>
+                <div ng-if="ctrl.viewData.dataFlows.flows.length >= 800">
+                    <div class="alert alert-danger">
+                        <strong>Too many to flows to draw</strong>
+                    </div>
                 </div>
 
 
@@ -153,30 +150,34 @@
                         </waltz-expanded-rated-flow-chart>
                     </div>
                     <div class="col-md-4">
-                        <waltz-rated-flow-detail style="margin-top: 120px" event-dispatcher="ctrl.eventDispatcher">
-
+                        <waltz-rated-flow-detail style="margin-top: 120px"
+                                                 event-dispatcher="ctrl.eventDispatcher">
                         </waltz-rated-flow-detail>
                     </div>
                 </div>
 
-                <div ng-if="ctrl.viewData.ratedFlows.root.flowsByAppThenTypeThenRating.length == 0" class="alert alert-warning">
+                <div ng-if="ctrl.viewData.ratedFlows.root.flowsByAppThenTypeThenRating.length == 0"
+                     class="alert alert-warning">
                     No inbound data flows registered for this organisational unit
                 </div>
 
-                <div class="row" ng-if="shownRatedFlows && ctrl.viewData.ratedFlows.root.children.length > 0">
+                <div class="row"
+                     ng-if="shownRatedFlows && ctrl.viewData.ratedFlows.root.children.length > 0">
                     <div class="col-md-8">
                         <hr>
 
                         <div>
-                            <h4 class="text-center">Child Organisational Units</h4>
+                            <h4 class="text-center">
+                                Child Organisational Units
+                            </h4>
                             <waltz-summary-rated-flow-chart data="ctrl.viewData.ratedFlows.root"
                                                             event-dispatcher="ctrl.eventDispatcher" >
                             </waltz-summary-rated-flow-chart>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <waltz-rated-flow-summary-detail style="margin-top: 170px" event-dispatcher="ctrl.eventDispatcher">
-
+                        <waltz-rated-flow-summary-detail style="margin-top: 170px"
+                                                         event-dispatcher="ctrl.eventDispatcher">
                         </waltz-rated-flow-summary-detail>
                     </div>
                 </div>
@@ -197,7 +198,8 @@
             </uib-tab>
 
             <!-- AUTH SOURCES -->
-            <uib-tab select="ctrl.showAuthSourceEditBtn = true" deselect="ctrl.showAuthSourceEditBtn = false">
+            <uib-tab select="ctrl.showAuthSourceEditBtn = true"
+                     deselect="ctrl.showAuthSourceEditBtn = false">
                 <uib-tab-heading>
                     Authoritative Sources
                 </uib-tab-heading>
@@ -229,11 +231,18 @@
     </waltz-section>
 
 
+    <!-- TECHNOLOGIES -->
+    <waltz-section name="Technologies">
+        <waltz-group-technology-summary stats="ctrl.viewData.techStats">
+        </waltz-group-technology-summary>
+    </waltz-section>
+
+
     <!-- COSTS -->
-    <waltz-asset-costs-section asset-costs="ctrl.viewData.assetCosts"
+    <waltz-asset-costs-section data="ctrl.viewData.assetCostData"
+                               on-bucket-select="ctrl.onAssetBucketSelect"
                                csv-name="asset_costs.csv">
     </waltz-asset-costs-section>
-
 
 
     <!-- APPS -->
@@ -251,19 +260,23 @@
         <div class="alert-warning alert"
              ng-if="ctrl.viewData.apps.length == 0">
             <strong>No application </strong>
-            have yet been registered against unit: {{ctrl.unit.name}}.
+            have yet been registered against unit:
+            <span ng-bind="ctrl.unit.name"></span>.
         </div>
     </waltz-section>
 
 
     <!-- EUC -->
-    <waltz-section id="euc-section" name="End User Applications" icon="table" small="({{ctrl.viewData.endUserApps.length}})">
-        <waltz-end-user-app-table end-user-apps="ctrl.viewData.endUserApps"></waltz-end-user-app-table>
+    <waltz-section id="euc-section"
+                   name="End User Applications"
+                   icon="table"
+                   small="({{ctrl.viewData.endUserApps.length}})">
+        <waltz-end-user-app-table end-user-apps="ctrl.viewData.endUserApps">
+        </waltz-end-user-app-table>
     </waltz-section>
 
 
     <!-- CHANGE_LOG -->
     <waltz-change-log-section entries="ctrl.viewData.logEntries">
-
     </waltz-change-log-section>
 </div>

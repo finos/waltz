@@ -186,6 +186,11 @@ function controller($stateParams,
         .then(data => vm.rawViewData = data)
         .then(refresh);
 
+    vm.onAssetBucketSelect = (bucket) => {
+        $scope.$applyAsync(() => viewDataService.selectAssetBucket(bucket));
+    };
+
+
 }
 
 controller.$inject = [

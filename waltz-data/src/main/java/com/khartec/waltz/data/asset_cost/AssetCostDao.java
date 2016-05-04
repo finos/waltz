@@ -63,6 +63,7 @@ public class AssetCostDao {
     };
 
 
+
     private RecordMapper<Record, ApplicationCost> appCostMapper = r -> {
         EntityReference appRef = ImmutableEntityReference.builder()
                 .kind(EntityKind.APPLICATION)
@@ -70,15 +71,8 @@ public class AssetCostDao {
                 .name(r.getValue(APPLICATION.NAME))
                 .build();
 
-        EntityReference orgUnitRef = ImmutableEntityReference.builder()
-                .kind(EntityKind.ORG_UNIT)
-                .id(r.getValue(ORGANISATIONAL_UNIT.ID))
-                .name(r.getValue(ORGANISATIONAL_UNIT.NAME))
-                .build();
-
         return ImmutableApplicationCost.builder()
                 .application(appRef)
-                .orgUnit(orgUnitRef)
                 .cost(costMapper.map(r))
                 .build();
     };
@@ -107,7 +101,8 @@ public class AssetCostDao {
                 .fetch(assetCostMapper);
     }
 
-    public List<ApplicationCost> findAppCostsByAppIds(Long[] ids) {
+
+    public List<ApplicationCost> findAppCostsByAppIds(AssetCostQueryOptions options) {
         List<SelectField<?>> fields = ListUtilities.push(
                 Arrays.asList(ASSET_COST.fields()),
                 APPLICATION.NAME,
@@ -121,8 +116,9 @@ public class AssetCostDao {
                 .on(ASSET_COST.ASSET_CODE.eq(APPLICATION.ASSET_CODE))
                 .innerJoin(ORGANISATIONAL_UNIT)
                 .on(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
-                .where(APPLICATION.ID.in(ids))
+                .where(APPLICATION.ID.in(options.applicationIds()))
+                .and(ASSET_COST.YEAR.eq(options.year()))
                 .fetch(appCostMapper);
-
     }
+
 }

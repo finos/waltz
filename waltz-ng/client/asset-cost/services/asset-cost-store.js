@@ -27,13 +27,19 @@ const service = (http, root) => {
 
 
     const findAppCostsByAppIds = (ids) =>
-        http.post(`${BASE}/app-cost/apps`, ids)
+        http.post(`${BASE}/app-cost/apps`, { applicationIds: ids, year: 2015 })
+            .then(result => result.data);
+
+
+    const findStatsByAppIds = (ids) =>
+        http.post(`${BASE}/app-cost/apps/stats`, { applicationIds: ids, year: 2015 })
             .then(result => result.data);
 
 
     return {
         findByCode,
-        findAppCostsByAppIds
+        findAppCostsByAppIds,
+        findStatsByAppIds
     };
 };
 

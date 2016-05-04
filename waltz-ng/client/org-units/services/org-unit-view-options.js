@@ -134,10 +134,12 @@ function filterApps(apps, isAppInScope) {
 
 
 function filterAssetCosts(assetCosts, orgUnitId, isAppInScope) {
-    return _.chain(assetCosts)
-        .filter(c => isAppInScope(c.application.id))
-        .filter(c => options.includeSubUnits ? true : c.orgUnit.id === orgUnitId)
-        .value();
+    return assetCosts;
+    //
+    // return _.chain(assetCosts)
+    //     .filter(c => isAppInScope(c.application.id))
+    //     .filter(c => options.includeSubUnits ? true : c.orgUnit.id === orgUnitId)
+    //     .value();
 }
 
 
@@ -207,7 +209,6 @@ function filter(rawData) {
 
     return {
         ...rawData,
-        assetCosts,
         appCapabilities,
         endUserApps,
         capabilityRatings,

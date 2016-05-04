@@ -46,7 +46,8 @@ function loadDataFlows(dataFlowStore, groupApps) {
 }
 
 
-function service(appStore,
+function service($q,
+                 appStore,
                  appCapabilityStore,
                  orgUnitUtils,
                  changeLogStore,
@@ -58,14 +59,12 @@ function service(appStore,
                  ratedDataFlowDataService,
                  authSourceCalculator,
                  endUserAppStore,
-                 assetCostStore,
+                 assetCostViewService,
                  complexityStore,
                  capabilityStore,
-                 techStatsService,
-                 $q) {
+                 techStatsService) {
 
     const rawData = {};
-
 
     function loadAll(orgUnitId) {
 
@@ -112,7 +111,7 @@ function service(appStore,
             ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)
             authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
             endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
-            assetCostStore.findAppCostsByAppIds(appIds),
+            assetCostViewService.initialise(appIds),
             complexityStore.findByAppIds(appIds),
             techStatsService.findByAppIds(appIds)
     ]).then(([
@@ -123,7 +122,7 @@ function service(appStore,
             ratedDataFlows,
             authSources,
             endUserApps,
-            assetCosts,
+            assetCostData,
             complexity,
             techStats
         ]) => {
@@ -137,9 +136,9 @@ function service(appStore,
                 ratedDataFlows,
                 authSources,
                 endUserApps,
-                assetCosts,
                 complexity,
-                techStats
+                techStats,
+                assetCostData
             };
 
             Object.assign(rawData, r);
@@ -154,13 +153,22 @@ function service(appStore,
     }
 
 
+    function selectAssetBucket(bucket) {
+        assetCostViewService.selectBucket(bucket);
+        assetCostViewService.loadDetail()
+            .then(data => rawData.assetCostData = data);
+    }
+
+
     return {
-        loadAll
+        loadAll,
+        selectAssetBucket
     };
 
 }
 
 service.$inject = [
+    '$q',
     'ApplicationStore',
     'AppCapabilityStore',
     'OrgUnitUtilityService',
@@ -173,11 +181,10 @@ service.$inject = [
     'RatedDataFlowDataService',
     'AuthSourcesCalculator',
     'EndUserAppStore',
-    'AssetCostStore',
+    'AssetCostViewService',
     'ComplexityStore',
     'CapabilityStore',
     'TechnologyStatisticsService',
-    '$q'
 ];
 
 

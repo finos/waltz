@@ -97,17 +97,18 @@ function prepareGroupData(capability, apps, perspective, ratings) {
 }
 
 
-function controller(capabilities,
-                    appCapabilityStore,
-                    perspectiveStore,
-                    ratingStore,
+function controller($scope,
                     $q,
                     $stateParams,
                     $state,
+                    capabilities,
+                    appCapabilityStore,
+                    perspectiveStore,
+                    ratingStore,
                     historyStore,
                     dataFlowStore,
                     complexityStore,
-                    assetCostStore,
+                    assetCostViewService,
                     applicationStore,
                     traitUsageStore,
                     traitStore,
@@ -119,6 +120,12 @@ function controller(capabilities,
     const capability = _.find(populateParents(capabilities), { id: capId });
 
     const capabilitiesById = _.keyBy(capabilities, 'id');
+
+    const assetCosts = {
+        stats: {},
+        costs: [],
+        loading: false
+    };
 
     const tweakers = {
         subjectLabel: {
@@ -144,14 +151,14 @@ function controller(capabilities,
                 ratingStore.findByAppIds(appIds),
                 dataFlowStore.findByAppIds(appIds),
                 complexityStore.findByAppIds(appIds),
-                assetCostStore.findAppCostsByAppIds(appIds),
+                assetCostViewService.initialise(appIds),
                 techStatsService.findByAppIds(appIds)
             ]).then(([
                 perspective,
                 ratings,
                 flows,
                 complexity,
-                assetCosts,
+                assetCostData,
                 techStats
             ]) => {
                 vm.ratings = {
@@ -160,7 +167,7 @@ function controller(capabilities,
                 };
                 vm.dataFlows = flows;
                 vm.complexity = complexity;
-                vm.assetCosts = assetCosts;
+                vm.assetCostData = assetCostData;
                 vm.techStats = techStats;
             });
         });
@@ -194,23 +201,33 @@ function controller(capabilities,
 
     vm.capability = capability;
     vm.capabilitiesById = capabilitiesById;
+    vm.assetCosts = assetCosts;
+
+    vm.onAssetBucketSelect = bucket => {
+        $scope.$applyAsync(() => {
+            assetCostViewService.selectBucket(bucket);
+            assetCostViewService.loadDetail()
+                .then(data => vm.assetCostData = data);
+        })
+    };
 
     loadTraitInfo(traitStore, traitUsageStore, capability.id)
         .then(r => vm.traitInfo = r);
 }
 
 controller.$inject = [
+    '$scope',
+    '$q',
+    '$stateParams',
+    '$state',
     'capabilities',
     'AppCapabilityStore',
     'PerspectiveStore',
     'RatingStore',
-    '$q',
-    '$stateParams',
-    '$state',
     'HistoryStore',
     'DataFlowDataStore',
     'ComplexityStore',
-    'AssetCostStore',
+    'AssetCostViewService',
     'ApplicationStore',
     'TraitUsageStore',
     'TraitStore',
