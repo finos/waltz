@@ -11,7 +11,7 @@
 
     <!-- SUMMARY -->
     <waltz-person-summary person="ctrl.person"
-                          asset-costs="ctrl.assetCosts.stats"
+                          asset-costs="ctrl.assetCostData.stats"
                           managers="ctrl.managers"
                           complexity="ctrl.complexity"
                           server-stats="ctrl.techStats.serverStats"
@@ -97,10 +97,12 @@
             </waltz-group-technology-summary>
         </waltz-section>
 
+
         <!-- COSTS -->
-        <waltz-asset-costs-section data="ctrl.assetCosts"
+        <waltz-asset-costs-section data="ctrl.assetCostData"
                                    on-bucket-select="ctrl.onAssetBucketSelect">
         </waltz-asset-costs-section>
+
 
     </div>
 
