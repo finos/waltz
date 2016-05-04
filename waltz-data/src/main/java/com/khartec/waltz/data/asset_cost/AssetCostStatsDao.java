@@ -65,6 +65,24 @@ public class AssetCostStatsDao {
                 year);
     }
 
+
+    public Cost calculateTotalCostByAppIds(AssetCostQueryOptions options) {
+        Condition optionsCondition =
+                APPLICATION.ID.in(options.applicationIds())
+                        .and(ASSET_COST.YEAR.eq(options.year()));
+
+        return dsl.select(DSL.coalesce(DSL.sum(ASSET_COST.AMOUNT), BigDecimal.ZERO))
+                .from(ASSET_COST)
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ASSET_CODE.eq(ASSET_COST.ASSET_CODE))
+                .where(optionsCondition)
+                .fetchOne(r -> ImmutableCost.builder()
+                        .amount(r.value1())
+                        .currencyCode("EUR")
+                        .kind(CostKind.CUMLATIVE)
+                        .year(options.year())
+                        .build());
+    }
     // -----
 
 
@@ -102,25 +120,6 @@ public class AssetCostStatsDao {
                                             .build();
                                 })
                                 .collect(Collectors.toList()));
-
     }
 
-
-    public Cost calculateTotalCostByAppIds(AssetCostQueryOptions options) {
-        Condition optionsCondition =
-                APPLICATION.ID.in(options.applicationIds())
-                .and(ASSET_COST.YEAR.eq(options.year()));
-
-        return dsl.select(DSL.sum(ASSET_COST.AMOUNT))
-                .from(ASSET_COST)
-                .innerJoin(APPLICATION)
-                .on(APPLICATION.ASSET_CODE.eq(ASSET_COST.ASSET_CODE))
-                .where(optionsCondition)
-                .fetchOne(r -> ImmutableCost.builder()
-                        .amount(r.value1())
-                        .currencyCode("EUR")
-                        .kind(CostKind.CUMLATIVE)
-                        .year(options.year())
-                        .build());
-    }
 }
