@@ -15,34 +15,11 @@ import RatedFlowsData from "../../data-flow/RatedFlowsData";
 import {aggregatePeopleInvolvements} from "../../involvement/involvement-utils";
 
 
-function prepareFlowData(flows, apps) {
-    const entitiesById = _.keyBy(apps, 'id');
-
-    const enrichedFlows = _.map(flows, f => ({
-        source: entitiesById[f.source.id] || { ...f.source, isNeighbour: true },
-        target: entitiesById[f.target.id] || { ...f.target, isNeighbour: true },
-        dataType: f.dataType
-    }));
-
-    const entities = _.chain(enrichedFlows)
-        .map(f => ([f.source, f.target]))
-        .flatten()
-        .uniqBy(a => a.id)
-        .value();
-
-    return {
-        flows: enrichedFlows,
-        entities
-    };
-}
-
-
-function loadDataFlows(dataFlowStore, groupApps) {
+function loadDataFlows(dataFlowViewService, groupApps) {
     const groupAppIds = _.map(groupApps, 'id');
 
-    return dataFlowStore.findByAppIds(groupAppIds)
-        .then(fs => prepareFlowData(fs, groupApps));
-
+    return dataFlowViewService
+        .initialise(groupAppIds);
 }
 
 
@@ -51,7 +28,7 @@ function service($q,
                  appCapabilityStore,
                  orgUnitUtils,
                  changeLogStore,
-                 dataFlowStore,
+                 dataFlowViewService,
                  involvementStore,
                  ratingStore,
                  perspectiveStore,
@@ -105,7 +82,7 @@ function service($q,
 
         return $q.all([
             ratingStore.findByAppIds(appIds),
-            loadDataFlows(dataFlowStore, rawData.apps),
+            loadDataFlows(dataFlowViewService, rawData.apps),
             appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
             capabilityStore.findByAppIds(appIds),
             ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)
@@ -160,9 +137,15 @@ function service($q,
     }
 
 
+    function loadFlowDetail() {
+        dataFlowViewService.loadDetail();
+    }
+
+
     return {
         loadAll,
-        selectAssetBucket
+        selectAssetBucket,
+        loadFlowDetail
     };
 
 }
@@ -173,7 +156,7 @@ service.$inject = [
     'AppCapabilityStore',
     'OrgUnitUtilityService',
     'ChangeLogDataService',
-    'DataFlowDataStore',
+    'DataFlowViewService',
     'InvolvementDataService',
     'RatingStore',
     'PerspectiveStore',

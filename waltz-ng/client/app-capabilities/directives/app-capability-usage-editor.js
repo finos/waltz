@@ -64,7 +64,6 @@ function controller($scope) {
     });
 
     vm.addCapability = (c) => {
-        console.log('c', c);
         vm.add(c).then(vm.selectedNode = null);
     }
 }

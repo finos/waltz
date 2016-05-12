@@ -30,10 +30,9 @@
                              complexity="ctrl.complexity"
                              server-stats="ctrl.techStats.serverStats"
                              app-group="ctrl.groupDetail.appGroup"
-                             flows="ctrl.dataFlows.flows"
+                             flows="ctrl.dataFlows.stats"
                              editable="ctrl.isGroupEditable()">
     </waltz-app-group-summary>
-
 
     <hr>
 
@@ -60,22 +59,19 @@
     </waltz-section>
 
 
-    <!-- FLOWS -->
-    <waltz-section name="Logical Data Flows"
-                   icon="random">
-        <waltz-org-unit-flow-viz entities="ctrl.dataFlows.entities"
-                                 flows="ctrl.dataFlows.flows"></waltz-org-unit-flow-viz>
-        <div class="small text-muted">
-            Dragging nodes will pin them.  Double click to unpin.  If an application is gray
-            it is not a member of this group.
-        </div>
-    </waltz-section>
-
-
     <!-- TECHNOLOGIES -->
     <waltz-section name="Technologies">
         <waltz-group-technology-summary stats="ctrl.techStats">
         </waltz-group-technology-summary>
+    </waltz-section>
+
+
+    <!-- FLOWS -->
+    <waltz-section name="Logical Data Flows"
+                   icon="random">
+        <waltz-data-flows-tabgroup flow-data="ctrl.dataFlows"
+                                   on-load-detail="ctrl.loadFlowDetail">
+        </waltz-data-flows-tabgroup>
     </waltz-section>
 
 

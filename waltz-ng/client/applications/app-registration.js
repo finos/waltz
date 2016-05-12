@@ -89,8 +89,6 @@ const controller = function(WaltzDisplayNameService,
         };
 
         const onFailure = (result) => {
-            console.log('result', result);
-
             registrations.push({
                 success: false,
                 message: result.data.message,

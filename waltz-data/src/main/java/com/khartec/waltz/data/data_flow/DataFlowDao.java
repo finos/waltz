@@ -18,12 +18,11 @@
 package com.khartec.waltz.data.data_flow;
 
 import com.khartec.waltz.common.ArrayBuilder;
-import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.dataflow.DataFlow;
+import com.khartec.waltz.model.dataflow.DataFlowQueryOptions;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
 import com.khartec.waltz.schema.tables.records.DataFlowRecord;
 import org.jooq.*;
@@ -34,7 +33,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 
@@ -82,10 +80,10 @@ public class DataFlowDao {
     }
 
 
-    public List<DataFlow> findByApplicationIds(List<Long> appIds) {
+    public List<DataFlow> findByApplicationIds(DataFlowQueryOptions options) {
         return baseOrgUnitQuery()
-                .and(DATA_FLOW.SOURCE_ENTITY_ID.in(appIds))
-                .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIds))
+                .and(DATA_FLOW.SOURCE_ENTITY_ID.in(options.applicationIds()))
+                .or(DATA_FLOW.TARGET_ENTITY_ID.in(options.applicationIds()))
                 .fetch(dataFlowMapper);
     }
 

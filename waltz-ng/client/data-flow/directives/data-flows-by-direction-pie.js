@@ -21,30 +21,17 @@ import {flowDirectionColorScale} from "../../common/colors";
 
 
 const BINDINGS = {
-    applications: '=',
-    flows: '=',
+    stats: '=',
     size: '='
 };
 
 
-function calcAppConnectionPieStats(flows, apps) {
-    const logicalFlows = flows;
-
-    const orgMemberAppIds = _.map(apps, 'id');
-
-    return _.chain(logicalFlows)
-        .uniqBy(f => f.source.id + '.' + f.target.id)
-        .map(f => {
-            const sourceIsMember = _.includes(orgMemberAppIds, f.source.id);
-            const targetIsMember = _.includes(orgMemberAppIds, f.target.id);
-            if (sourceIsMember && targetIsMember) return 'INTRA';
-            if (sourceIsMember) return 'INBOUND';
-            if (targetIsMember) return 'OUTBOUND';
-            return 'UNKNOWN';
-        })
-        .countBy()
-        .map((v, k) => ({ key: k, count: v }))
-        .value();
+function toPieStats(stats) {
+    return [
+        { key: "Inbound", count: stats.upstreamApplicationCount },
+        { key: "Outbound", count: stats.downstreamApplicationCount },
+        { key: "Intra", count: stats.intraApplicationCount }
+    ];
 }
 
 const DEFAULT_SIZE = 80;
@@ -64,9 +51,9 @@ function controller($scope) {
 
     $scope.$watch('ctrl.size', sz => vm.config.size = sz ? sz : DEFAULT_SIZE);
 
-    $scope.$watchGroup(['ctrl.applications', 'ctrl.flows'], ([apps, flows]) => {
-        if (!apps || !flows) return;
-        vm.data = calcAppConnectionPieStats(flows, apps);
+    $scope.$watch('ctrl.stats', (stats) => {
+        if (!stats) return;
+        vm.data = toPieStats(stats);
     });
 
 }

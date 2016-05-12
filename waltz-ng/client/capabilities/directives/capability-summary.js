@@ -16,10 +16,6 @@
  *
  */
 
-import { enrichServerStats } from  '../../server-info/services/server-utilities';
-import { calcPortfolioCost } from '../../asset-cost/services/asset-cost-utilities';
-import { calcComplexitySummary } from '../../complexity/services/complexity-utilities';
-
 
 const BINDINGS = {
     capability: '=',

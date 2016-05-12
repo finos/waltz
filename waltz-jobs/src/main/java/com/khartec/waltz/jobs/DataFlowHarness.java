@@ -17,10 +17,15 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.data.data_flow.DataFlowDao;
+import com.khartec.waltz.model.dataflow.DataFlowQueryOptions;
+import com.khartec.waltz.model.dataflow.DataFlowStatistics;
+import com.khartec.waltz.model.dataflow.ImmutableDataFlowQueryOptions;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.data_flow.DataFlowService;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 
 
 public class DataFlowHarness {
@@ -28,10 +33,15 @@ public class DataFlowHarness {
     public static void main(String[] args) throws ParseException {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        DataFlowService service = ctx.getBean(DataFlowService.class);
 
-        DataFlowDao dataFlowDao = ctx.getBean(DataFlowDao.class);
+        DataFlowQueryOptions options = ImmutableDataFlowQueryOptions.builder()
+                .applicationIds(newArrayList(817L, 1096L, 990L))
+                .build();
 
+        DataFlowStatistics stats = service.calculateStats(options);
 
+        System.out.println(stats);
 
     }
 

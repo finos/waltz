@@ -76,7 +76,7 @@ export const riskRatingColorScale = d3.scale.ordinal()
 
 
 export const flowDirectionColorScale = d3.scale.ordinal()
-    .domain(['INBOUND', 'OUTBOUND', 'INTRA', 'UNKNOWN'])
+    .domain(['Inbound', 'Outbound', 'Intra', 'UNKNOWN'])
     .range([green, amber, blue, grey]);
 
 

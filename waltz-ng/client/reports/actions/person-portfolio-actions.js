@@ -1,5 +1,5 @@
-import * as types from '../constants/action-types';
-import _ from 'lodash';
+import * as types from "../constants/action-types";
+import _ from "lodash";
 
 
 function requestPersonPortfolio(empId) {
@@ -52,7 +52,7 @@ function asyncService(involvementStore, personActions) {
                 id: reportId,
                 name: 'GTO Competition',
                 description: 'Something about this report',
-                employeeIds: ['i5syd2qFs', 'T4kVFERU6', 'CXsyTb11J', 'S0w75IThO', 'HwpKncGGg']
+                employeeIds: ['hb7m0cqg1', 'ZmdOM6ZvB', 'TqWvxU59E']
             };
             return Promise.resolve(dummyReport)
                 .then(c => {

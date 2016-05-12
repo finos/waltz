@@ -46,26 +46,6 @@ function prepareAppCapabilities(apps, capabilities, rawAppCapabilities) {
 }
 
 
-function calculateDataFlows(dataFlows, appPredicate) {
-    const isFlowInScope = (f) => appPredicate(f.source.id) || appPredicate(f.target.id);
-
-    const flows = _.filter(
-        dataFlows.flows,
-        isFlowInScope);
-
-    const dataFlowAppIds = _.chain(flows)
-        .map(f => ([f.source.id, f.target.id]))
-        .flatten()
-        .uniq()
-        .value();
-
-    const entities = _.filter(
-        dataFlows.entities,
-        e => _.includes(dataFlowAppIds, e.id));
-
-    return { flows, entities };
-}
-
 
 function extractPrimaryAppIds(appCapabilities) {
     return _.chain(appCapabilities)
@@ -160,10 +140,6 @@ function filter(rawData) {
         rawData.complexity,
         isAppInScope);
 
-    const dataFlows = calculateDataFlows(
-        rawData.dataFlows,
-        isAppInScope);
-
     const capabilityRatings = filterCapabilityRatings(
         rawData.capabilityRatings,
         rawData.rawAppCapabilities,
@@ -212,7 +188,6 @@ function filter(rawData) {
         appCapabilities,
         endUserApps,
         capabilityRatings,
-        dataFlows,
         complexity,
         apps
     };

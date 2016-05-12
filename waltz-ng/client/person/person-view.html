@@ -17,7 +17,7 @@
                           server-stats="ctrl.techStats.serverStats"
                           directs="ctrl.directs"
                           applications="ctrl.apps"
-                          flows="ctrl.dataFlows">
+                          flows="ctrl.dataFlows.stats">
 
     </waltz-person-summary>
 
@@ -90,6 +90,16 @@
         <waltz-complexity-section complexity="ctrl.complexity"
                                   apps="ctrl.apps">
         </waltz-complexity-section>
+
+
+        <!-- FLOWS -->
+        <waltz-section name="Logical Data Flows"
+                       icon="random">
+            <waltz-data-flows-tabgroup flow-data="ctrl.dataFlows"
+                                       on-load-detail="ctrl.loadFlowDetail">
+            </waltz-data-flows-tabgroup>
+        </waltz-section>
+
 
         <!-- TECHNOLOGIES -->
         <waltz-section name="Technologies">

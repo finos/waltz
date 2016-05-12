@@ -16,7 +16,7 @@
                               applications="ctrl.apps"
                               server-stats="ctrl.techStats.serverStats"
                               complexity="ctrl.complexity"
-                              flows="ctrl.dataFlows"
+                              flows="ctrl.dataFlows.stats"
                               traits="ctrl.traitInfo.traits"
                               asset-costs="ctrl.assetCostData.stats">
     </waltz-capability-summary>
@@ -38,11 +38,9 @@
     <!-- FLOWS -->
     <waltz-section name="Logical Data Flows"
                    icon="random">
-
-        <waltz-capability-flow-graph flows="ctrl.dataFlows"
-                                     apps-with-capability="ctrl.apps">
-        </waltz-capability-flow-graph>
-
+        <waltz-data-flows-tabgroup flow-data="ctrl.dataFlows"
+                                   on-load-detail="ctrl.loadFlowDetail">
+        </waltz-data-flows-tabgroup>
     </waltz-section>
 
 

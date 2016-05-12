@@ -21,4 +21,7 @@ export default (module) => {
     module.directive('waltzAppDataFlowDiagram', require('./slope-graph/slope-graph-directive'));
     module.directive('waltzDataFlowDiagram', require('./boingy-graph/boingy-graph'));
     module.directive('waltzDataFlowsByDirectionPie', require('./data-flows-by-direction-pie'));
+    module.directive('waltzFlowCloudDiagram', require('./flow-cloud-diagram'));
+    module.directive('waltzDataFlowsTabgroup', require('./data-flows-tabgroup'));
+
 };

@@ -35,7 +35,7 @@ function service(personStore,
                  involvementStore,
                  assetCostViewService,
                  complexityStore,
-                 dataFlowStore,
+                 dataFlowViewService,
                  techStatsService,
                  $q) {
 
@@ -102,8 +102,8 @@ function service(personStore,
 
 
     function loadFlows(appIds) {
-        dataFlowStore
-            .findByAppIds(appIds)
+        dataFlowViewService
+            .initialise(appIds)
             .then(flows => state.model.dataFlows = flows);
     }
 
@@ -133,11 +133,15 @@ function service(personStore,
 
     }
 
-
+    function loadFlowDetail() {
+        dataFlowViewService.loadDetail();
+    }
+    
     return {
         load,
         state,
-        selectAssetBucket
+        selectAssetBucket,
+        loadFlowDetail
     };
 }
 
@@ -146,7 +150,7 @@ service.$inject = [
     'InvolvementDataService',
     'AssetCostViewService',
     'ComplexityStore',
-    'DataFlowDataStore',
+    'DataFlowViewService',
     'TechnologyStatisticsService',
     '$q'
 ];
