@@ -20,19 +20,18 @@ const service = (http, root) => {
 
     const BASE = `${root}/asset-cost`;
 
-
     const findByCode = code =>
         http.get(`${BASE}/code/${code}`)
             .then(result => result.data);
 
 
-    const findAppCostsByAppIds = (ids) =>
-        http.post(`${BASE}/app-cost/apps`, { applicationIds: ids, year: 2015 })
+    const findAppCostsByAppIds = (options) =>
+        http.post(`${BASE}/app-cost/apps`, options)
             .then(result => result.data);
 
 
-    const findStatsByAppIds = (ids) =>
-        http.post(`${BASE}/app-cost/apps/stats`, { applicationIds: ids, year: 2015 })
+    const findStatsByAppIds = (options) =>
+        http.post(`${BASE}/app-cost/apps/stats`, options)
             .then(result => result.data);
 
 

@@ -26,7 +26,6 @@ import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.authoritativesource.Rating;
 import com.khartec.waltz.model.dataflow.DataFlow;
-import com.khartec.waltz.model.dataflow.ImmutableDataFlowQueryOptions;
 import com.khartec.waltz.model.dataflow.ImmutableRatedDataFlow;
 import com.khartec.waltz.model.dataflow.RatedDataFlow;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
@@ -186,11 +185,7 @@ public class RatedDataFlowService {
 
         List<Long> appIds = toIds(targetApps);
 
-        ImmutableDataFlowQueryOptions options = ImmutableDataFlowQueryOptions.builder()
-                .applicationIds(appIds)
-                .build();
-
-        List<DataFlow> dataFlows = dataFlowDao.findByApplicationIds(options);
+        List<DataFlow> dataFlows = dataFlowDao.findByApplicationIds(appIds);
 
         return filter(
                 df -> appIds.contains(df.target().id()),

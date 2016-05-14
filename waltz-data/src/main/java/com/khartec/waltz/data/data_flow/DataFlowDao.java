@@ -22,13 +22,13 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.dataflow.DataFlow;
-import com.khartec.waltz.model.dataflow.DataFlowQueryOptions;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
 import com.khartec.waltz.schema.tables.records.DataFlowRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,13 +80,19 @@ public class DataFlowDao {
     }
 
 
-    public List<DataFlow> findByApplicationIds(DataFlowQueryOptions options) {
+    public List<DataFlow> findByApplicationIdSelector(Select<Record1<Long>> appIdSelector) {
         return baseOrgUnitQuery()
-                .and(DATA_FLOW.SOURCE_ENTITY_ID.in(options.applicationIds()))
-                .or(DATA_FLOW.TARGET_ENTITY_ID.in(options.applicationIds()))
+                .and(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector))
+                .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector))
                 .fetch(dataFlowMapper);
     }
 
+    public List<DataFlow> findByApplicationIds(Collection<Long> appIds) {
+        return baseOrgUnitQuery()
+                .and(DATA_FLOW.SOURCE_ENTITY_ID.in(appIds))
+                .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIds))
+                .fetch(dataFlowMapper);
+    }
 
     private SelectConditionStep<Record> baseOrgUnitQuery() {
 

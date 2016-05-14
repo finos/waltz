@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -57,40 +56,39 @@ public class AssetCostStatsDao {
     }
 
 
-    public List<CostBandTally> calculateCostBandStatisticsByAppIds(AssetCostQueryOptions options) {
-        Condition inScopeApps = byAppIdsCondition(options.applicationIds());
-        int year = options.year();
+    public List<CostBandTally> calculateCostBandStatisticsByAppIdSelector(int year, Select<Record1<Long>> appIdSelector) {
+        Condition relevantAssetCodesCondition = relevantAssetCodesCondition(appIdSelector);
         return calculateCostBandStatistics(
-                inScopeApps,
+                relevantAssetCodesCondition,
                 year);
     }
 
 
-    public Cost calculateTotalCostByAppIds(AssetCostQueryOptions options) {
+    public Cost calculateTotalCostByAppIdSelector(int year, Select<Record1<Long>> appIdSelector) {
         Condition optionsCondition =
-                APPLICATION.ID.in(options.applicationIds())
-                        .and(ASSET_COST.YEAR.eq(options.year()));
+                APPLICATION.ID.in(appIdSelector)
+                        .and(ASSET_COST.YEAR.eq(year));
 
         return dsl.select(DSL.coalesce(DSL.sum(ASSET_COST.AMOUNT), BigDecimal.ZERO))
                 .from(ASSET_COST)
                 .innerJoin(APPLICATION)
                 .on(APPLICATION.ASSET_CODE.eq(ASSET_COST.ASSET_CODE))
-                .where(optionsCondition)
+                .where(optionsCondition.toString())
                 .fetchOne(r -> ImmutableCost.builder()
                         .amount(r.value1())
                         .currencyCode("EUR")
                         .kind(CostKind.CUMLATIVE)
-                        .year(options.year())
+                        .year(year)
                         .build());
     }
     // -----
 
 
-    private Condition byAppIdsCondition(Collection<Long> appIds) {
+    private Condition relevantAssetCodesCondition(Select<Record1<Long>> appIdSelector) {
         SelectConditionStep<Record1<String>> relevantAssetCodes =
                 DSL.selectDistinct(APPLICATION.ASSET_CODE)
                         .from(APPLICATION)
-                        .where(APPLICATION.ID.in(appIds));
+                        .where(APPLICATION.ID.in(appIdSelector));
         return ASSET_COST.ASSET_CODE.in(relevantAssetCodes);
     }
 
@@ -100,7 +98,7 @@ public class AssetCostStatsDao {
         SelectHavingStep<Record1<BigDecimal>> subTotals = DSL
                 .select(subTotalSum.as(subTotalAlias))
                 .from(ASSET_COST)
-                .where(condition)
+                .where(condition.toString())
                 .and(ASSET_COST.YEAR.eq(year))
                 .groupBy(ASSET_COST.ASSET_CODE);
 

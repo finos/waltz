@@ -149,9 +149,9 @@ function controller($scope,
             $q.all([
                 perspectiveStore.findByCode('BUSINESS'),
                 ratingStore.findByAppIds(appIds),
-                dataFlowViewService.initialise(appIds),
+                dataFlowViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN'),
                 complexityStore.findByAppIds(appIds),
-                assetCostViewService.initialise(appIds),
+                assetCostViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN', 2015),
                 techStatsService.findByAppIds(appIds)
             ]).then(([
                 perspective,
@@ -212,7 +212,7 @@ function controller($scope,
     };
 
     vm.loadFlowDetail = () => dataFlowViewService.loadDetail();
-    
+
 
     loadTraitInfo(traitStore, traitUsageStore, capability.id)
         .then(r => vm.traitInfo = r);

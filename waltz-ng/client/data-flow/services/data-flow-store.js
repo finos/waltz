@@ -41,20 +41,20 @@ function service(dataFlowUtils, appStore, $http, BaseApiUrl) {
         .post(BASE, flow);
 
 
-    const findByAppIds = (appIds) => $http
-        .post(`${BASE}/apps`, { applicationIds : appIds })
+    const findByAppIdSelector = (options) => $http
+        .post(`${BASE}/apps`, options)
         .then(r => r.data);
 
 
-    const calculateStats = (appIds) => $http
-        .post(`${BASE}/stats`, { applicationIds : appIds })
+    const calculateStats = (options) => $http
+        .post(`${BASE}/stats`, options)
         .then(r => r.data);
 
 
     return {
         findByEntityReference,
         findEnrichedFlowsForApplication,
-        findByAppIds,
+        findByAppIdSelector,
         calculateStats,
         create
     };

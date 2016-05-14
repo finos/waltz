@@ -15,14 +15,6 @@ import RatedFlowsData from "../../data-flow/RatedFlowsData";
 import {aggregatePeopleInvolvements} from "../../involvement/involvement-utils";
 
 
-function loadDataFlows(dataFlowViewService, groupApps) {
-    const groupAppIds = _.map(groupApps, 'id');
-
-    return dataFlowViewService
-        .initialise(groupAppIds);
-}
-
-
 function service($q,
                  appStore,
                  appCapabilityStore,
@@ -51,7 +43,9 @@ function service($q,
             involvementStore.findPeopleByEntityReference('ORG_UNIT', orgUnitId),
             involvementStore.findByEntityReference('ORG_UNIT', orgUnitId),
             perspectiveStore.findByCode('BUSINESS'),
-            changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId)
+            dataFlowViewService.initialise(orgUnitId, "ORG_UNIT", "CHILDREN"),
+            changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId),
+            assetCostViewService.initialise(orgUnitId, 'ORG_UNIT', 'CHILDREN', 2015),
         ];
 
         return $q.all(promises)
@@ -61,14 +55,18 @@ function service($q,
                 people,
                 involvements,
                 perspective,
-                changeLogs]) => {
+                dataFlows,
+                changeLogs,
+                assetCostData]) => {
 
                 const r = {
                     orgUnits,
                     apps,
                     involvements,
                     perspective,
-                    changeLogs
+                    dataFlows,
+                    changeLogs,
+                    assetCostData
                 };
 
                 Object.assign(rawData, r);
@@ -82,24 +80,20 @@ function service($q,
 
         return $q.all([
             ratingStore.findByAppIds(appIds),
-            loadDataFlows(dataFlowViewService, rawData.apps),
             appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
             capabilityStore.findByAppIds(appIds),
             ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)
             authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
             endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
-            assetCostViewService.initialise(appIds),
             complexityStore.findByAppIds(appIds),
             techStatsService.findByAppIds(appIds)
     ]).then(([
             capabilityRatings,
-            dataFlows,
             rawAppCapabilities,
             capabilities,
             ratedDataFlows,
             authSources,
             endUserApps,
-            assetCostData,
             complexity,
             techStats
         ]) => {
@@ -107,7 +101,6 @@ function service($q,
             const r = {
                 orgUnitId,
                 capabilityRatings,
-                dataFlows,
                 rawAppCapabilities,
                 capabilities,
                 ratedDataFlows,
@@ -115,7 +108,6 @@ function service($q,
                 endUserApps,
                 complexity,
                 techStats,
-                assetCostData
             };
 
             Object.assign(rawData, r);

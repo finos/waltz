@@ -2,7 +2,7 @@ const initData = {
     loadingStats: false,
     loadingFlows: false,
     flows: [],
-    appIds: [],
+    options: {},
     stats: {}
 };
 
@@ -10,12 +10,16 @@ const initData = {
 function service($q, dataFlowStore) {
     let data = initData;
 
-    function initialise(appIds) {
-        data = { ...initData };
+    function initialise(id, kind, scope = 'CHILDREN') {
+        reset();
         data.loadingStats = true;
-        data.appIds = appIds;
+        data.options = {
+            entityReference: { id, kind },
+            scope
+        };
+
         return dataFlowStore
-            .calculateStats(appIds)
+            .calculateStats(data.options)
             .then(stats => {
                 data.loadingStats = false;
                 data.stats = stats;
@@ -31,7 +35,7 @@ function service($q, dataFlowStore) {
 
         data.loadingFlows = true;
         return dataFlowStore
-            .findByAppIds(data.appIds)
+            .findByAppIdSelector(data.options)
             .then(flows => {
                 data.loadingFlows = false;
                 data.flows = flows;
@@ -39,9 +43,16 @@ function service($q, dataFlowStore) {
             });
     }
 
+
+    function reset() {
+        data = { ...initData };
+    }
+
+
     return {
         initialise,
-        loadDetail
+        loadDetail,
+        reset
     };
 }
 

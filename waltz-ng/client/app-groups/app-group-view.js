@@ -19,13 +19,6 @@ import _ from "lodash";
 import {selectBest} from "../ratings/directives/viewer/coloring-strategies";
 
 
-function loadDataFlows(dataFlowViewService, groupApps) {
-    const groupAppIds = _.map(groupApps, 'id');
-
-    return dataFlowViewService.initialise(groupAppIds);
-}
-
-
 /**
  * Calculates the set of capabilities required to
  * fully describe a given set of app capabilities.
@@ -101,6 +94,14 @@ function controller($scope,
             member.role === 'OWNER'
             && member.userId === vm.user.userName;
 
+
+    dataFlowViewService.initialise(id, 'APP_GROUP', 'EXACT')
+        .then(flows => vm.dataFlows = flows);
+
+    assetCostViewService.initialise(id, 'APP_GROUP', 'EXACT', 2015)
+        .then(costs => vm.assetCostData = costs);
+
+
     appGroupStore.getById(id)
         .then(groupDetail => vm.groupDetail = groupDetail)
         .then(groupDetail => _.map(groupDetail.applications, 'id'))
@@ -111,7 +112,6 @@ function controller($scope,
             appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
             ratingStore.findByAppIds(appIds),
             technologyStatsService.findByAppIds(appIds),
-            assetCostViewService.initialise(appIds)
         ]))
         .then(([
             apps,
@@ -119,8 +119,7 @@ function controller($scope,
             allCapabilities,
             appCapabilities,
             ratings,
-            techStats,
-            assetCostData
+            techStats
         ]) => {
             vm.applications = apps;
             vm.complexity = complexity;
@@ -128,10 +127,7 @@ function controller($scope,
             vm.appCapabilities = appCapabilities;
             vm.ratings = ratings;
             vm.techStats = techStats;
-            vm.assetCostData = assetCostData;
         })
-        .then(() => loadDataFlows(dataFlowViewService, vm.applications))
-        .then(flows => vm.dataFlows = flows)
         .then(() => calculateCapabilities(vm.allCapabilities, vm.appCapabilities))
         .then(result => Object.assign(vm, result));
 

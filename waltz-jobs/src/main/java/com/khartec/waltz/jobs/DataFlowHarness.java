@@ -17,15 +17,16 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.model.dataflow.DataFlowQueryOptions;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.application.HierarchyQueryScope;
+import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
-import com.khartec.waltz.model.dataflow.ImmutableDataFlowQueryOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.data_flow.DataFlowService;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
 
 
 public class DataFlowHarness {
@@ -35,9 +36,15 @@ public class DataFlowHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DataFlowService service = ctx.getBean(DataFlowService.class);
 
-        DataFlowQueryOptions options = ImmutableDataFlowQueryOptions.builder()
-                .applicationIds(newArrayList(817L, 1096L, 990L))
+        ApplicationIdSelectionOptions options = ImmutableApplicationIdSelectionOptions.builder()
+                .entityReference(ImmutableEntityReference
+                        .builder()
+                        .kind(EntityKind.CAPABILITY)
+                        .id(3220)
+                        .build())
+                .scope(HierarchyQueryScope.CHILDREN)
                 .build();
+
 
         DataFlowStatistics stats = service.calculateStats(options);
 

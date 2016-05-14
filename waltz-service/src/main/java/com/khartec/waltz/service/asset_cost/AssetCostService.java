@@ -18,9 +18,12 @@
 package com.khartec.waltz.service.asset_cost;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.asset_cost.AssetCostDao;
 import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
 import com.khartec.waltz.model.cost.*;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,12 +35,20 @@ public class AssetCostService {
 
     private final AssetCostDao assetCostDao;
     private final AssetCostStatsDao assetCostStatsDao;
+    private final ApplicationIdSelectorFactory idSelectorFactory;
 
 
     @Autowired
-    public AssetCostService(AssetCostDao assetCodeDao, AssetCostStatsDao assetCostStatsDao) {
+    public AssetCostService(AssetCostDao assetCodeDao,
+                            AssetCostStatsDao assetCostStatsDao,
+                            ApplicationIdSelectorFactory idSelectorFactory) {
+        Checks.checkNotNull(assetCodeDao, "assetCodeDao cannot be null");
+        Checks.checkNotNull(assetCostStatsDao, "assetCostStatsDao cannot be null");
+        Checks.checkNotNull(idSelectorFactory, "idSelectorFactory cannot be null");
+
         this.assetCostDao = assetCodeDao;
         this.assetCostStatsDao = assetCostStatsDao;
+        this.idSelectorFactory = idSelectorFactory;
     }
 
 
@@ -54,14 +65,18 @@ public class AssetCostService {
 
     public List<ApplicationCost> findAppCostsByAppIds(AssetCostQueryOptions options) {
         Checks.checkNotNull(options, "options cannot be null");
-        return assetCostDao.findAppCostsByAppIds(options);
+        Select<Record1<Long>> selector = idSelectorFactory.apply(options.idSelectionOptions());
+        return assetCostDao.findAppCostsByAppIdSelector(options.year(), selector);
     }
 
 
     public AssetCostStatistics calculateStatisticsByAppIds(AssetCostQueryOptions options) {
         Checks.checkNotNull(options, "options cannot be null");
-        List<CostBandTally> costBandCounts = assetCostStatsDao.calculateCostBandStatisticsByAppIds(options);
-        Cost totalCost = assetCostStatsDao.calculateTotalCostByAppIds(options);
+
+        Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options.idSelectionOptions());
+
+        List<CostBandTally> costBandCounts = assetCostStatsDao.calculateCostBandStatisticsByAppIdSelector(options.year(), appIdSelector);
+        Cost totalCost = assetCostStatsDao.calculateTotalCostByAppIdSelector(options.year(), appIdSelector);
 
         return ImmutableAssetCostStatistics.builder()
                 .costBandCounts(costBandCounts)

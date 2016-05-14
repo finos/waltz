@@ -20,7 +20,6 @@ package com.khartec.waltz.data.data_flow;
 import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.dataflow.DataFlowMeasures;
-import com.khartec.waltz.model.dataflow.DataFlowQueryOptions;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowMeasures;
 import com.khartec.waltz.model.tally.StringTally;
 import org.jooq.*;
@@ -53,28 +52,30 @@ public class DataFlowStatsDao {
     }
 
 
-    public DataFlowMeasures countDistinctAppInvolvement(DataFlowQueryOptions options) {
-        Checks.checkNotNull(options, "options cannot be null");
+    public DataFlowMeasures countDistinctAppInvolvement(Select<Record1<Long>> appIdSelector) {
 
-        List<Long> appIds = options.applicationIds();
+        Checks.checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
-        SelectConditionStep<Record2<String, Integer>> inAppCounter = countDistinctApps(
-                appIds,
+
+        Select<Record2<String, Integer>> inAppCounter = countDistinctApps(
+                appIdSelector,
                 DATA_FLOW.TARGET_ENTITY_ID,
                 "inAppCount",
                 DATA_FLOW.SOURCE_ENTITY_ID
         );
 
-        SelectConditionStep<Record2<String, Integer>> outAppCounter = countDistinctApps(
-                appIds,
+        Select<Record2<String, Integer>> outAppCounter = countDistinctApps(
+                appIdSelector,
                 DATA_FLOW.SOURCE_ENTITY_ID,
                 "outAppCount",
                 DATA_FLOW.TARGET_ENTITY_ID
         );
 
+
+
         ImmutableDataFlowMeasures.Builder resultBuilder = ImmutableDataFlowMeasures
                 .builder()
-                .intra(appIds.size());
+                .intra(dsl.fetchCount(appIdSelector));
                 // incomplete on purpose, remaining values provided by query result
 
         inAppCounter.union(outAppCounter)
@@ -98,13 +99,11 @@ public class DataFlowStatsDao {
 
 
 
-    public List<StringTally> tallyDataTypes(DataFlowQueryOptions options) {
-        Checks.checkNotNull(options, "options cannot be null");
+    public List<StringTally> tallyDataTypes(Select<Record1<Long>> appIdSelector) {
+        Checks.checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
-        List<Long> appIds = options.applicationIds();
-
-        Condition condition = DATA_FLOW.TARGET_ENTITY_ID.in(appIds)
-                .or(DATA_FLOW.SOURCE_ENTITY_ID.in(appIds))
+        Condition condition = DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector)
+                .or(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector).toString())
                 .and(bothApps);
 
         return calculateTallies(
@@ -115,32 +114,41 @@ public class DataFlowStatsDao {
     }
 
 
-    public DataFlowMeasures countDistinctFlowInvolvement(DataFlowQueryOptions options) {
-        Checks.checkNotNull(options, "options cannot be null");
-
-        List<Long> appIds = options.applicationIds();
-
+    public DataFlowMeasures countDistinctFlowInvolvement(Select<Record1<Long>> appIdSelector) {
+        Checks.checkNotNull(appIdSelector, "appIdSelector cannot be null");
+        
         WithStep flows = dsl.with("flows").as(
                 DSL.selectDistinct(DATA_FLOW.SOURCE_ENTITY_ID, DATA_FLOW.TARGET_ENTITY_ID)
                         .from(DATA_FLOW));
 
         ImmutableDataFlowMeasures.Builder builder = ImmutableDataFlowMeasures.builder();
 
-        flows.select(DSL.value("inConnCount").as("name"),
-                DSL.count())
+
+        Condition inboundCondition = DSL
+                .field("SOURCE_ENTITY_ID").notIn(appIdSelector)
+                .and(DSL.field("TARGET_ENTITY_ID").in(appIdSelector));
+
+        Condition outboundCondition = DSL
+                .field("SOURCE_ENTITY_ID").in(appIdSelector)
+                .and(DSL.field("TARGET_ENTITY_ID").notIn(appIdSelector));
+
+        Condition intraCondition = DSL
+                .field("SOURCE_ENTITY_ID").in(appIdSelector)
+                .and(DSL.field("TARGET_ENTITY_ID").in(appIdSelector));
+
+
+        // TODO:  query goes at least twice as slowly if you don't toString() the condition...
+        flows.select(DSL.value("inConnCount").as("name"), DSL.count())
                 .from("flows")
-                .where(DSL.field("SOURCE_ENTITY_ID").notIn(appIds))
-                .and(DSL.field("TARGET_ENTITY_ID").in(appIds))
-                .union(DSL.select(DSL.value("outConnCount").as("name"),
-                        DSL.count())
+                .where(inboundCondition.toString())
+                .union(DSL
+                        .select(DSL.value("outConnCount").as("name"), DSL.count())
                         .from("flows")
-                        .where(DSL.field("SOURCE_ENTITY_ID").in(appIds))
-                        .and(DSL.field("TARGET_ENTITY_ID").notIn(appIds)))
-                .union(DSL.select(DSL.value("intraConnCount").as("name"),
-                        DSL.count())
+                        .where(outboundCondition.toString()))
+                .union(DSL
+                        .select(DSL.value("intraConnCount").as("name"), DSL.count())
                         .from("flows")
-                        .where(DSL.field("SOURCE_ENTITY_ID").in(appIds))
-                        .and(DSL.field("TARGET_ENTITY_ID").in(appIds)))
+                        .where(intraCondition.toString()))
                 .stream()
                 .forEach(r -> {
                     String name = r.value1();
@@ -166,16 +174,20 @@ public class DataFlowStatsDao {
 
     // -- App Counts
 
-
-    private SelectConditionStep<Record2<String, Integer>> countDistinctApps(List<Long> ids,
+    private SelectConditionStep<Record2<String, Integer>> countDistinctApps(Select<Record1<Long>> appIdSelector,
                                                                             Field<Long> feederField,
                                                                             String name,
                                                                             Field<Long> fieldToCount) {
+        Condition condition = fieldToCount
+                .notIn(appIdSelector)
+                .and(feederField.in(appIdSelector))
+                .and(bothApps);
+
+        // TODO:  query goes at least twice as slowly if you don't toString() the condition...
         return dsl.select(DSL.value(name), DSL.countDistinct(fieldToCount))
                 .from(DATA_FLOW)
-                .where(fieldToCount.notIn(ids))
-                .and(feederField.in(ids))
-                .and(bothApps);
+                .where(condition.toString());
+
     }
 
 

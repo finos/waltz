@@ -19,9 +19,9 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.dataflow.DataFlow;
-import com.khartec.waltz.model.dataflow.DataFlowQueryOptions;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
 import com.khartec.waltz.model.user.Role;
@@ -73,7 +73,7 @@ public class DataFlowsEndpoint implements Endpoint {
     public void register() {
 
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
-        String findByAppIdsPath = mkPath(BASE_URL, "apps");
+        String findByAppIdSelectorPath = mkPath(BASE_URL, "apps");
         String findStatsPath = mkPath(BASE_URL, "stats");
         String createNewFlowPath = BASE_URL;
 
@@ -138,21 +138,21 @@ public class DataFlowsEndpoint implements Endpoint {
             return dataFlowService.findByEntityReference(ref);
         };
 
-        ListRoute<DataFlow> findByAppIdsRoute = (request, response)
-                -> dataFlowService.findByAppIds(readOptions(request));
+        ListRoute<DataFlow> findByAppIdSelectorRoute = (request, response)
+                -> dataFlowService.findByAppIdSelector(readOptions(request));
 
         DatumRoute<DataFlowStatistics> findStatsRoute = (request, response)
                 -> dataFlowService.calculateStats(readOptions(request));
 
 
         getForList(findByEntityPath, getByEntityRef);
-        postForList(findByAppIdsPath, findByAppIdsRoute);
+        postForList(findByAppIdSelectorPath, findByAppIdSelectorRoute);
         postForDatum(createNewFlowPath, createNewFlowRoute);
         postForDatum(findStatsPath, findStatsRoute);
     }
 
-    private DataFlowQueryOptions readOptions(Request request) throws java.io.IOException {
-        return readBody(request, DataFlowQueryOptions.class);
+    private ApplicationIdSelectionOptions readOptions(Request request) throws java.io.IOException {
+        return readBody(request, ApplicationIdSelectionOptions.class);
     }
 
 }

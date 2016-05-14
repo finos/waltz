@@ -11,5 +11,5 @@
  */
 
 export default (module) => {
-    module.service('PersonDataService', require('./person-data'));
+    module.service('PersonStore', require('./person-store'));
 };

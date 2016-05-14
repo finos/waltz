@@ -42,14 +42,16 @@ function service(personStore,
     const state = { model: initModel };
 
     function loadPeople(employeeId) {
-        personStore.getByEmployeeId(employeeId)
+        const personPromise = personStore.getByEmployeeId(employeeId)
             .then(person => state.model.person = person);
 
-        personStore.findDirects(employeeId)
+        const directsPromise = personStore.findDirects(employeeId)
             .then(directs => state.model.directs = directs);
 
-        personStore.findManagers(employeeId)
+        const managersPromise = personStore.findManagers(employeeId)
             .then(managers => state.model.managers = managers);
+
+        return $q.all([personPromise, directsPromise, managersPromise]);
     }
 
     function loadApplications(employeeId) {
@@ -87,9 +89,9 @@ function service(personStore,
     }
 
 
-    function loadCostStats(appIds) {
+    function loadCostStats(personId) {
         assetCostViewService
-            .initialise(appIds)
+            .initialise(personId, 'PERSON', 'CHILDREN', 2015)
             .then(assetCostData => state.model.assetCostData = assetCostData);
     }
 
@@ -101,9 +103,9 @@ function service(personStore,
     }
 
 
-    function loadFlows(appIds) {
+    function loadFlows(personId) {
         dataFlowViewService
-            .initialise(appIds)
+            .initialise(personId, 'PERSON', 'CHILDREN')
             .then(flows => state.model.dataFlows = flows);
     }
 
@@ -114,14 +116,24 @@ function service(personStore,
     }
 
 
+    function reset() {
+        state.model = { ...initModel };
+    }
+
+
     function load(employeeId) {
-        loadPeople(employeeId);
+        reset();
+        loadPeople(employeeId)
+            .then(([person]) => person.id)
+            .then(personId => {
+                loadFlows(personId);
+                loadCostStats(personId);
+            });
+
         loadApplications(employeeId)
             .then(({ apps }) => {
                 const appIds = _.map(apps, 'id');
-                loadCostStats(appIds);
                 loadComplexity(appIds);
-                loadFlows(appIds);
                 loadTechStats(appIds);
             });
     }
@@ -136,7 +148,7 @@ function service(personStore,
     function loadFlowDetail() {
         dataFlowViewService.loadDetail();
     }
-    
+
     return {
         load,
         state,
@@ -146,7 +158,7 @@ function service(personStore,
 }
 
 service.$inject = [
-    'PersonDataService',
+    'PersonStore',
     'InvolvementDataService',
     'AssetCostViewService',
     'ComplexityStore',

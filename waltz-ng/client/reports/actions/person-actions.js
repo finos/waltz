@@ -1,5 +1,4 @@
-import * as types from '../constants/action-types';
-import _ from 'lodash';
+import * as types from "../constants/action-types";
 
 
 function requestPerson(empId) {
@@ -31,7 +30,7 @@ function asyncService(personStore) {
     };
 }
 
-asyncService.$inject = ['PersonDataService'];
+asyncService.$inject = ['PersonStore'];
 
 
 export default asyncService;
