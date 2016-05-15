@@ -109,9 +109,10 @@ function service(personStore,
             .then(flows => state.model.dataFlows = flows);
     }
 
-    function loadTechStats(appIds, personId) {
+
+    function loadTechStats(personId) {
         techStatsService
-            .findByAppIds(appIds, personId, 'PERSON', 'CHILDREN')
+            .findBySelector(personId, 'PERSON', 'CHILDREN')
             .then(stats => state.model.techStats = stats);
     }
 
@@ -128,13 +129,13 @@ function service(personStore,
             .then(personId => {
                 loadFlows(personId);
                 loadCostStats(personId);
+                loadTechStats(personId);
             });
 
         loadApplications(employeeId)
             .then(({ apps }) => {
                 const appIds = _.map(apps, 'id');
                 loadComplexity(appIds);
-                loadTechStats(appIds, state.model.person.id);
             });
     }
 

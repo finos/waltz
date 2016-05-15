@@ -41,7 +41,7 @@ public class DatabaseHarness {
         System.out.println(dbs.size());
 
 
-        Map<Long, List<Database>> moreDbs = databaseDao.findByApplicationIds(newArrayList(801L));
+        Map<Long, List<Database>> moreDbs = databaseDao.findByAppSelector(newArrayList(801L));
         System.out.println(moreDbs.size());
         System.out.println(moreDbs.values().size());
 

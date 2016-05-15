@@ -17,7 +17,6 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.serverinfo.ServerInfo;
 import com.khartec.waltz.model.serverinfo.ServerSummaryStatistics;
 import com.khartec.waltz.service.server_info.ServerInfoService;
@@ -26,7 +25,6 @@ import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import spark.Request;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -64,16 +62,12 @@ public class ServerInfoEndpoint implements Endpoint {
                 -> serverInfoService.findByAppId(getId(request));
 
         DatumRoute<ServerSummaryStatistics> findStatsForAppSelectorRoute = (request, response)
-                -> serverInfoService.findStatsForAppSelector(readOptions(request));
+                -> serverInfoService.findStatsForAppSelector(readOptionsFromBody(request));
 
         getForList(findByAssetCodePath, findByAssetCodeRoute);
         getForList(findByAppIdPath, findByAppIdRoute);
         postForDatum(findStatsForAppSelectorPath, findStatsForAppSelectorRoute);
     }
 
-
-    private ApplicationIdSelectionOptions readOptions(Request request) throws java.io.IOException {
-        return readBody(request, ApplicationIdSelectionOptions.class);
-    }
 
 }

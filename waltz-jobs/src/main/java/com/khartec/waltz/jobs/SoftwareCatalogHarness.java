@@ -31,7 +31,7 @@ public class SoftwareCatalogHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         SoftwareCatalogService softwareCatalogService = ctx.getBean(SoftwareCatalogService.class);
 
-        SoftwareSummaryStatistics stats = softwareCatalogService.findStatisticsForAppIds(newArrayList(801L, 802L, 803L));
+        SoftwareSummaryStatistics stats = softwareCatalogService.findStatisticsForAppIdSelector(newArrayList(801L, 802L, 803L));
         System.out.println("stats:"+stats);
     }
 

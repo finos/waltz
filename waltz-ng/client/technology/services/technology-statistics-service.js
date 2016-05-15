@@ -1,5 +1,3 @@
-import _ from "lodash";
-
 const NOTHING = {
     serverStats: [],
     databaseStats: [],
@@ -12,18 +10,12 @@ function service($q,
                  databaseStore,
                  softwareCatalogStore) {
 
-    const findByAppIds = (appIds = [], id, kind, scope = 'CHILDREN') => {
-        if (appIds.length == 0) { return $q.when(NOTHING); }
-
-        if (_.some(appIds, _.isObject)) {
-            // we've been given a list of objects, lets assume they are applications
-            appIds = _.map(appIds, "id");
-        }
+    const findBySelector = (id, kind, scope = 'CHILDREN') => {
 
         const promises = [
             serverInfoStore.findStatsForSelector(id, kind, scope),
-            databaseStore.findStatsForAppIds(appIds),
-            softwareCatalogStore.findStatsForAppIds(appIds)
+            databaseStore.findStatsForSelector(id, kind, scope),
+            softwareCatalogStore.findStatsForSelector(id, kind, scope)
         ];
 
         return $q
@@ -43,7 +35,7 @@ function service($q,
 
 
     return {
-        findByAppIds
+        findBySelector
     }
 }
 

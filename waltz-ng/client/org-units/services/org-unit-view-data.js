@@ -86,7 +86,7 @@ function service($q,
             authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
             endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
             complexityStore.findByAppIds(appIds),
-            techStatsService.findByAppIds(appIds, orgUnitId, 'ORG_UNIT', 'CHILDREN')
+            techStatsService.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN')
     ]).then(([
             capabilityRatings,
             rawAppCapabilities,
@@ -107,7 +107,7 @@ function service($q,
                 authSources,
                 endUserApps,
                 complexity,
-                techStats,
+                techStats
             };
 
             Object.assign(rawData, r);
