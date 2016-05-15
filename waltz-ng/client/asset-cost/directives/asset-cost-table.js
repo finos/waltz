@@ -190,7 +190,12 @@ function controller(displayNameService, uiGridConstants, $scope, $animate) {
     vm.gridOptions = gridOptions;
 }
 
-controller.$inject = ['WaltzDisplayNameService', 'uiGridConstants', '$scope', '$animate'];
+controller.$inject = [
+    'WaltzDisplayNameService',
+    'uiGridConstants',
+    '$scope',
+    '$animate'
+];
 
 
 export default () => {

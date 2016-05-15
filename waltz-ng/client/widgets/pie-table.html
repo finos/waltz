@@ -2,13 +2,13 @@
     <waltz-basic-info-tile name="{{ ctrl.title }}"
                            description=""
                            icon="{{ ctrl.icon }}">
-        <waltz-pie data="ctrl.data"
+        <waltz-pie data="ctrl.pieData"
                    config="ctrl.config">
         </waltz-pie>
 
             <table class="table table-condensed small"
                    style="text-align: left">
-                <tr ng-repeat="r in ctrl.data"
+                <tr ng-repeat="r in ctrl.pieData"
                     class="small">
                     <td>
                         <div style="width: 16px; border: 1px solid; border-radius: 5px;"
