@@ -17,12 +17,17 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.application.HierarchyQueryScope;
+import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
 import com.khartec.waltz.model.software_catalog.SoftwareSummaryStatistics;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.software_catalog.SoftwareCatalogService;
+import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
 
 
 public class SoftwareCatalogHarness {
@@ -30,8 +35,21 @@ public class SoftwareCatalogHarness {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         SoftwareCatalogService softwareCatalogService = ctx.getBean(SoftwareCatalogService.class);
+        DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        SoftwareSummaryStatistics stats = softwareCatalogService.findStatisticsForAppIds(newArrayList(801L, 802L, 803L));
+
+        EntityReference ref = ImmutableEntityReference.builder()
+                .kind(EntityKind.ORG_UNIT)
+                .id(20L)
+                .build();
+
+
+        ApplicationIdSelectionOptions options = ImmutableApplicationIdSelectionOptions.builder()
+                .entityReference(ref)
+                .scope(HierarchyQueryScope.CHILDREN)
+                .build();
+
+        SoftwareSummaryStatistics stats = softwareCatalogService.findStatisticsForAppIdSelector(options);
         System.out.println("stats:"+stats);
     }
 

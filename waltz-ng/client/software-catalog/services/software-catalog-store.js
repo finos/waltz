@@ -5,13 +5,13 @@ function service(http, base) {
         http.post(`${baseUrl}/apps`, ids)
             .then(r => r.data);
 
-    const findStatsForAppIds = (appIds) =>
-        http.post(`${baseUrl}/apps/stats`, appIds)
+    const findStatsForSelector = (id, kind, scope = 'CHILDREN') =>
+        http.post(`${baseUrl}/stats`, { scope, entityReference : { id, kind } })
             .then(result => result.data);
 
     return {
         findByAppIds,
-        findStatsForAppIds
+        findStatsForSelector
     };
 }
 

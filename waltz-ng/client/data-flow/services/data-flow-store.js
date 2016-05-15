@@ -41,18 +41,25 @@ function service(dataFlowUtils, appStore, $http, BaseApiUrl) {
         .post(BASE, flow);
 
 
-    const findByAppIds = (appIds) => $http
-        .post(`${BASE}/apps`, appIds)
+    const findByAppIdSelector = (options) => $http
+        .post(`${BASE}/apps`, options)
+        .then(r => r.data);
+
+
+    const calculateStats = (options) => $http
+        .post(`${BASE}/stats`, options)
         .then(r => r.data);
 
 
     return {
         findByEntityReference,
         findEnrichedFlowsForApplication,
-        findByAppIds,
+        findByAppIdSelector,
+        calculateStats,
         create
     };
 }
+
 
 service.$inject = [
     'DataFlowUtilityService',

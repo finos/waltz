@@ -17,18 +17,18 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.data.asset_cost.AssetCostDao;
-import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.application.HierarchyQueryScope;
+import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
 import com.khartec.waltz.model.cost.AssetCostQueryOptions;
-import com.khartec.waltz.model.cost.CostBandTally;
+import com.khartec.waltz.model.cost.AssetCostStatistics;
 import com.khartec.waltz.model.cost.ImmutableAssetCostQueryOptions;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.asset_cost.AssetCostService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.List;
-
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
 
 
 public class AssetCostHarness {
@@ -37,28 +37,32 @@ public class AssetCostHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
-        AssetCostDao assetCostDao = ctx.getBean(AssetCostDao.class);
-        AssetCostStatsDao assetCostStatsDao = ctx.getBean(AssetCostStatsDao.class);
 
-        List<Long> appIds = newArrayList(
-                801L,
-                802L,
-                803L);
+        AssetCostService service = ctx.getBean(AssetCostService.class);
+
 
         long st = System.currentTimeMillis();
         System.out.println("-- start");
 
+        ApplicationIdSelectionOptions appIdSelectionOptions = ImmutableApplicationIdSelectionOptions.builder()
+                .scope(HierarchyQueryScope.EXACT)
+                .entityReference(ImmutableEntityReference.builder()
+                        .id(5000)
+                        .kind(EntityKind.CAPABILITY)
+                        .build())
+                .build();
+
         AssetCostQueryOptions options = ImmutableAssetCostQueryOptions.builder()
-                .applicationIds(appIds)
+                .idSelectionOptions(appIdSelectionOptions)
                 .year(2015)
                 .build();
 
-        List<CostBandTally> bands = assetCostStatsDao.calculateCostBandStatisticsByAppIds(options);
+        AssetCostStatistics stats = service.calculateStatisticsByAppIds(options);
 
         System.out.println("-- end, dur: " + (System.currentTimeMillis() - st));
 
 
-        bands.forEach(System.out::println);
+        System.out.println(stats);
     }
 
 

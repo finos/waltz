@@ -19,8 +19,10 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.dataflow.DataFlow;
+import com.khartec.waltz.model.dataflow.DataFlowStatistics;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -32,6 +34,7 @@ import com.khartec.waltz.web.action.UpdateDataFlowsAction;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,7 +73,8 @@ public class DataFlowsEndpoint implements Endpoint {
     public void register() {
 
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
-        String findByAppIdsPath = mkPath(BASE_URL, "apps");
+        String findByAppIdSelectorPath = mkPath(BASE_URL, "apps");
+        String findStatsPath = mkPath(BASE_URL, "stats");
         String createNewFlowPath = BASE_URL;
 
 
@@ -88,7 +92,6 @@ public class DataFlowsEndpoint implements Endpoint {
                             .build())
                     .collect(Collectors.toList());
 
-
             List<DataFlow> removedFlows = dataFlowUpdate
                     .removedTypes()
                     .stream()
@@ -98,7 +101,6 @@ public class DataFlowsEndpoint implements Endpoint {
                             .dataType(a)
                             .build())
                     .collect(Collectors.toList());
-
 
             dataFlowService
                     .addFlows(addedFlows);
@@ -120,14 +122,12 @@ public class DataFlowsEndpoint implements Endpoint {
                     .message(message)
                     .build());
 
-
             changeLogService.write(ImmutableChangeLog.builder()
                     .userId(getUsername(request))
                     .parentReference(dataFlowUpdate.target())
                     .severity(Severity.INFORMATION)
                     .message(message)
                     .build());
-
 
             return true;
         };
@@ -138,14 +138,21 @@ public class DataFlowsEndpoint implements Endpoint {
             return dataFlowService.findByEntityReference(ref);
         };
 
-        ListRoute<DataFlow> findByAppIdsRoute = (request, response)
-                -> dataFlowService.findByAppIds(readIdsFromBody(request));
+        ListRoute<DataFlow> findByAppIdSelectorRoute = (request, response)
+                -> dataFlowService.findByAppIdSelector(readOptions(request));
 
+        DatumRoute<DataFlowStatistics> findStatsRoute = (request, response)
+                -> dataFlowService.calculateStats(readOptions(request));
 
 
         getForList(findByEntityPath, getByEntityRef);
-        postForList(findByAppIdsPath, findByAppIdsRoute);
+        postForList(findByAppIdSelectorPath, findByAppIdSelectorRoute);
         postForDatum(createNewFlowPath, createNewFlowRoute);
+        postForDatum(findStatsPath, findStatsRoute);
+    }
+
+    private ApplicationIdSelectionOptions readOptions(Request request) throws java.io.IOException {
+        return readBody(request, ApplicationIdSelectionOptions.class);
     }
 
 }

@@ -17,8 +17,14 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.data.data_flow.DataFlowDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.application.HierarchyQueryScope;
+import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
+import com.khartec.waltz.model.dataflow.DataFlowStatistics;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.data_flow.DataFlowService;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -28,10 +34,21 @@ public class DataFlowHarness {
     public static void main(String[] args) throws ParseException {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        DataFlowService service = ctx.getBean(DataFlowService.class);
 
-        DataFlowDao dataFlowDao = ctx.getBean(DataFlowDao.class);
+        ApplicationIdSelectionOptions options = ImmutableApplicationIdSelectionOptions.builder()
+                .entityReference(ImmutableEntityReference
+                        .builder()
+                        .kind(EntityKind.CAPABILITY)
+                        .id(3220)
+                        .build())
+                .scope(HierarchyQueryScope.CHILDREN)
+                .build();
 
 
+        DataFlowStatistics stats = service.calculateStats(options);
+
+        System.out.println(stats);
 
     }
 

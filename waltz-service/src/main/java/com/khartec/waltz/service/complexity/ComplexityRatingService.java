@@ -17,9 +17,13 @@
  */
 package com.khartec.waltz.service.complexity;
 
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.complexity.ComplexityRating;
 import com.khartec.waltz.model.complexity.ComplexityScore;
 import com.khartec.waltz.model.complexity.ImmutableComplexityRating;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,16 +43,20 @@ public class ComplexityRatingService {
 
     private final CapabilityComplexityService capabilityComplexityService;
     private final ServerComplexityService serverComplexityService;
+    private final ApplicationIdSelectorFactory appIdSelectorFactory;
     private final ConnectionComplexityService connectionComplexityService;
 
 
     @Autowired
     public ComplexityRatingService(ConnectionComplexityService connectionComplexityService,
                                    CapabilityComplexityService capabilityComplexityService,
-                                   ServerComplexityService serverComplexityService) {
+                                   ServerComplexityService serverComplexityService,
+                                   ApplicationIdSelectorFactory appIdSelectorFactory) {
+
         this.connectionComplexityService = connectionComplexityService;
         this.capabilityComplexityService = capabilityComplexityService;
         this.serverComplexityService = serverComplexityService;
+        this.appIdSelectorFactory = appIdSelectorFactory;
     }
 
 
@@ -75,10 +83,13 @@ public class ComplexityRatingService {
      * @param ids
      * @return
      */
-    public List<ComplexityRating> findByAppIds(Long[] ids) {
-        List<ComplexityScore> connectionScores = connectionComplexityService.findByAppIds(ids);
-        List<ComplexityScore> serverScores = serverComplexityService.findByAppIds(ids);
-        List<ComplexityScore> capabilityScores = capabilityComplexityService.findByAppIds(ids);
+    public List<ComplexityRating> findForAppIdSelector(ApplicationIdSelectionOptions options) {
+
+        Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);
+
+        List<ComplexityScore> connectionScores = connectionComplexityService.findByAppIdSelector(appIdSelector);
+        List<ComplexityScore> serverScores = serverComplexityService.findByAppIdSelector(appIdSelector);
+        List<ComplexityScore> capabilityScores = capabilityComplexityService.findByAppIdSelector(appIdSelector);
 
         Map<Long, ComplexityScore> connectionScoresById = indexBy(s -> s.id(), connectionScores);
         Map<Long, ComplexityScore> serverScoresById = indexBy(s -> s.id(), serverScores);

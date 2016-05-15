@@ -34,7 +34,7 @@
                              all-units="ctrl.viewData.orgUnits"
                              unit-id="ctrl.viewData.orgUnit.id"
                              apps="ctrl.viewData.apps"
-                             flows="ctrl.viewData.dataFlows"
+                             flows="ctrl.viewData.dataFlows.stats"
                              ratings="ctrl.viewData.capabilityRatings"
                              costs="ctrl.viewData.assetCostData.stats"
                              server-stats="ctrl.viewData.techStats.serverStats"
@@ -89,7 +89,7 @@
 
     <!-- FLOWS -->
     <waltz-section name="Logical Data Flows"
-                   id="flows-section">
+                   icon="random">
 
         <waltz-section-actions >
             <a waltz-has-role="ORGUNIT_EDITOR"
@@ -100,40 +100,44 @@
             </a>
         </waltz-section-actions>
 
-        <uib-tabset>
+        <waltz-data-flows-tabgroup flow-data="ctrl.viewData.dataFlows"
+                                   on-load-detail="ctrl.loadFlowDetail">
+        </waltz-data-flows-tabgroup>
 
-            <!-- BOINGY GRAPH -->
-            <uib-tab select="shownBoingyGraph = true">
+    </waltz-section>
+
+
+    <!-- AUTH-FLOWS -->
+    <waltz-section name="Authoritative Sources"
+                   id="flows-section">
+        <uib-tabset>
+            <!-- AUTH SOURCES -->
+            <uib-tab select="ctrl.showAuthSourceEditBtn = true"
+                     deselect="ctrl.showAuthSourceEditBtn = false">
                 <uib-tab-heading>
-                    Logical Data Flows
+                    Authoritative Sources
                 </uib-tab-heading>
 
-                <br>
-
-                <div ng-if="shownBoingyGraph && ctrl.viewData.dataFlows.flows.length > 0 && ctrl.viewData.dataFlows.flows.length < 800">
-                    <waltz-org-unit-flow-viz entities="ctrl.viewData.dataFlows.entities"
-                                             flows="ctrl.viewData.dataFlows.flows">
-                    </waltz-org-unit-flow-viz>
-                    <div class="small text-muted">
-                        Dragging nodes will pin them.  Double click to unpin.  If an application is gray
-                        it is not a member of this organisational unit.
-                    </div>
+                <div ng-show="! ctrl.viewData.authSources | isEmpty">
+                    <waltz-auth-sources-table org-unit-id="ctrl.viewData.orgUnit.id"
+                                              org-units="ctrl.viewData.orgUnits"
+                                              auth-sources="ctrl.viewData.authSources">
+                    </waltz-auth-sources-table>
                 </div>
 
-                <div ng-if="ctrl.viewData.dataFlows.flows.length >= 800">
-                    <div class="alert alert-danger">
-                        <strong>Too many to flows to draw</strong>
-                    </div>
+                <div ng-show="ctrl.viewData.authSources | isEmpty"
+                     class="alert alert-warning">
+                    <strong>No Authoritative Sources</strong>
+                    have been defined for this Organisational Unit.
                 </div>
 
-
-                <div ng-if="ctrl.viewData.dataFlows.flows.length == 0">
-                    <div class="alert alert-warning">
-                        <strong>No Flows</strong>
-                        have been registered involving applications from
-                        <span ng-bind="ctrl.viewData.orgUnit.name"></span>.
-                    </div>
+                <div class="small text-muted">
+                    This section shows the authoritative sources for data types.  A source can be declared locally to this
+                    organisational unit or declared by a <i>parent</i> organisational unit.  An authoritative source
+                    consists of the data type, the source application (it's owning unit is shown in parenthesis) and a rating
+                    of either primary or secondary.
                 </div>
+
             </uib-tab>
 
             <!-- RATED FLOWS -->
@@ -194,40 +198,9 @@
                         </div>
                     </div>
                 </div>
-
-            </uib-tab>
-
-            <!-- AUTH SOURCES -->
-            <uib-tab select="ctrl.showAuthSourceEditBtn = true"
-                     deselect="ctrl.showAuthSourceEditBtn = false">
-                <uib-tab-heading>
-                    Authoritative Sources
-                </uib-tab-heading>
-
-                <div ng-show="! ctrl.viewData.authSources | isEmpty">
-                    <waltz-auth-sources-table org-unit-id="ctrl.viewData.orgUnit.id"
-                                              org-units="ctrl.viewData.orgUnits"
-                                              auth-sources="ctrl.viewData.authSources">
-                    </waltz-auth-sources-table>
-                </div>
-
-                <div ng-show="ctrl.viewData.authSources | isEmpty"
-                     class="alert alert-warning">
-                    <strong>No Authoritative Sources</strong>
-                    have been defined for this Organisational Unit.
-                </div>
-
-                <div class="small text-muted">
-                    This section shows the authoritative sources for data types.  A source can be declared locally to this
-                    organisational unit or declared by a <i>parent</i> organisational unit.  An authoritative source
-                    consists of the data type, the source application (it's owning unit is shown in parenthesis) and a rating
-                    of either primary or secondary.
-                </div>
-
             </uib-tab>
 
         </uib-tabset>
-
     </waltz-section>
 
 

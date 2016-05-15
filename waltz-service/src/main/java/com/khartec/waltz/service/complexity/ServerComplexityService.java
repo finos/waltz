@@ -1,23 +1,18 @@
 package com.khartec.waltz.service.complexity;
 
 import com.khartec.waltz.data.complexity.ServerComplexityDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.complexity.ComplexityScore;
 import com.khartec.waltz.model.tally.LongTally;
-import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.model.complexity.ComplexityUtilities.tallyToComplexityScore;
-import static com.khartec.waltz.model.utils.IdUtilities.toIdArray;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 @Service
 public class ServerComplexityService {
@@ -31,15 +26,15 @@ public class ServerComplexityService {
     }
 
 
-    public List<ComplexityScore> findByAppIds(Long[] ids) {
+    public List<ComplexityScore> findByAppIdSelector(Select<Record1<Long>> idSelector) {
         int baseline = serverComplexityDao.findBaseline();
-        return findByAppIds(ids, baseline);
+        return findByAppIdSelector(idSelector, baseline);
 
     }
 
 
-    public List<ComplexityScore> findByAppIds(Long[] ids, int baseline) {
-        return serverComplexityDao.findCountsByAppIds(ids)
+    public List<ComplexityScore> findByAppIdSelector(Select<Record1<Long>> idSelector, int baseline) {
+        return serverComplexityDao.findCountsByAppIdSelector(idSelector)
                 .stream()
                 .map(tally -> tallyToComplexityScore(tally, baseline, Math::log))
                 .collect(Collectors.toList());
@@ -53,7 +48,7 @@ public class ServerComplexityService {
 
 
     public ComplexityScore getForApp(long appId, int baseline) {
-        List<LongTally> tallies = serverComplexityDao.findCountsByAppIds(appId);
+        List<LongTally> tallies = serverComplexityDao.findCountsByAppIdSelector(DSL.select(DSL.value(appId)));
         if (tallies.isEmpty()) { return null; }
 
         return tallyToComplexityScore(tallies.get(0), baseline, Math::log);

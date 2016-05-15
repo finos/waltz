@@ -27,6 +27,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.ImmutableWebError;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.auth.AuthenticationUtilities;
@@ -193,6 +194,11 @@ public class WebUtilities {
     public static List<Long> readIdsFromBody(Request req) throws IOException {
         return (List<Long>) readBody(req, List.class);
     }
+
+    public static ApplicationIdSelectionOptions readOptionsFromBody(Request request) throws java.io.IOException {
+        return readBody(request, ApplicationIdSelectionOptions.class);
+    }
+
 
 
     /**

@@ -10,13 +10,13 @@
  *
  */
 
-function controller(PersonDataService, $q) {
+function controller(personStore, $q) {
     const vm = this;
 
     vm.people = [];
     vm.refresh = (query) => {
         if (!query) return $q.resolve([]);
-        return PersonDataService
+        return personStore
             .search(query)
             .then((people) => {
                 vm.people = people;
@@ -25,7 +25,7 @@ function controller(PersonDataService, $q) {
 }
 
 controller.$inject = [
-    'PersonDataService',
+    'PersonStore',
     '$q'
 ];
 

@@ -11,8 +11,8 @@
  *
  */
 
-import tmpl from './navbar.html';
-import _ from 'lodash';
+import tmpl from "./navbar.html";
+import _ from "lodash";
 
 function controller(applicationStore, personStore, capabilityStore, orgUnitStore, timeout) {
     const searchResults = {
@@ -50,7 +50,7 @@ function controller(applicationStore, personStore, capabilityStore, orgUnitStore
     vm.searchResults = searchResults;
 }
 
-controller.$inject = ['ApplicationStore', 'PersonDataService', 'CapabilityStore', 'OrgUnitStore', '$timeout'];
+controller.$inject = ['ApplicationStore', 'PersonStore', 'CapabilityStore', 'OrgUnitStore', '$timeout'];
 
 export default (module) => module.directive('waltzNavbar', () => {
     return {

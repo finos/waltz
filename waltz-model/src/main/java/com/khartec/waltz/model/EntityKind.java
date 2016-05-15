@@ -24,6 +24,7 @@ public enum EntityKind {
     END_USER_APPLICATION,
     ORG_UNIT,
     APP_GROUP,
-    DATABASE
+    DATABASE,
+    PERSON
 
 }

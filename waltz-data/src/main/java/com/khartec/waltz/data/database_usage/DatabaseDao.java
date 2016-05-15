@@ -13,7 +13,6 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -71,8 +70,8 @@ public class DatabaseDao {
     }
 
 
-    public Map<Long, List<Database>> findByApplicationIds(List<Long> ids) {
-        Condition joinCondition = byAppIdsJoinCondition(ids);
+    public Map<Long, List<Database>> findByAppSelector(Select<Record1<Long>> appIdSelector) {
+        Condition joinCondition = byAppIdsJoinCondition(appIdSelector);
 
         SelectField[] selectFields = new ArrayBuilder<SelectField>()
                 .add(ENTITY_RELATIONSHIP.ID_A, ENTITY_RELATIONSHIP.KIND_A)
@@ -82,7 +81,7 @@ public class DatabaseDao {
         return dsl.select(selectFields)
                 .from(DATABASE)
                 .innerJoin(ENTITY_RELATIONSHIP)
-                .on(joinCondition)
+                .on(joinCondition.toString())
                 .stream()
                 .map(r -> tuple(
                         r.getValue(ENTITY_RELATIONSHIP.ID_A),
@@ -93,16 +92,18 @@ public class DatabaseDao {
                 ));
     }
 
-    private Condition byAppIdsJoinCondition(Collection<Long> ids) {
+
+    private Condition byAppIdsJoinCondition(Select<Record1<Long>> appIdSelector) {
         return DSL.condition(true)
-                    .and(ENTITY_RELATIONSHIP.KIND_A.eq(APP_KIND))
-                    .and(ENTITY_RELATIONSHIP.ID_A.in(ids))
-                    .and(ENTITY_RELATIONSHIP.KIND_B.eq(DB_KIND))
-                    .and(ENTITY_RELATIONSHIP.ID_B.eq(DATABASE.ID));
+                .and(ENTITY_RELATIONSHIP.KIND_A.eq(APP_KIND))
+                .and(ENTITY_RELATIONSHIP.ID_A.in(appIdSelector))
+                .and(ENTITY_RELATIONSHIP.KIND_B.eq(DB_KIND))
+                .and(ENTITY_RELATIONSHIP.ID_B.eq(DATABASE.ID));
     }
 
-    public DatabaseSummaryStatistics findStatsForAppIds(Collection<Long> appIds) {
-        Condition condition = byAppIdsJoinCondition(appIds);
+
+    public DatabaseSummaryStatistics findStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
+        Condition condition = byAppIdsJoinCondition(appIdSelector);
 
         List<StringTally> vendorCounts = calculateTallies(
                 dsl,

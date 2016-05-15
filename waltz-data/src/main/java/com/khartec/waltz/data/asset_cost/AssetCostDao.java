@@ -23,10 +23,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.cost.*;
 import com.khartec.waltz.schema.tables.records.AssetCostRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
-import org.jooq.SelectField;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -102,7 +99,7 @@ public class AssetCostDao {
     }
 
 
-    public List<ApplicationCost> findAppCostsByAppIds(AssetCostQueryOptions options) {
+    public List<ApplicationCost> findAppCostsByAppIdSelector(int year, Select<Record1<Long>> appIdSelector) {
         List<SelectField<?>> fields = ListUtilities.push(
                 Arrays.asList(ASSET_COST.fields()),
                 APPLICATION.NAME,
@@ -116,8 +113,8 @@ public class AssetCostDao {
                 .on(ASSET_COST.ASSET_CODE.eq(APPLICATION.ASSET_CODE))
                 .innerJoin(ORGANISATIONAL_UNIT)
                 .on(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
-                .where(APPLICATION.ID.in(options.applicationIds()))
-                .and(ASSET_COST.YEAR.eq(options.year()))
+                .where(APPLICATION.ID.in(appIdSelector))
+                .and(ASSET_COST.YEAR.eq(year))
                 .fetch(appCostMapper);
     }
 

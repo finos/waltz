@@ -7,6 +7,7 @@ const BINDINGS = {
     icon: '@'
 };
 
+const MAX_PIE_SEGMENTS = 5;
 
 function controller($scope) {
 
@@ -15,9 +16,27 @@ function controller($scope) {
     const dataChanged = (data) => {
         if (!data) return;
         vm.total = _.sumBy(data, 'count');
+
+        if (data.length > MAX_PIE_SEGMENTS) {
+            const sorted = _.sortBy(data, d => d.count * -1);
+
+            const topData = _.take(sorted, MAX_PIE_SEGMENTS);
+            const otherData = _.drop(sorted, MAX_PIE_SEGMENTS);
+            const otherDatum = {
+                key: 'Other',
+                count : _.sumBy(otherData, "count")
+            };
+
+            vm.pieData = _.concat(topData, otherDatum);
+        } else {
+            vm.pieData = data;
+        }
+
     };
 
-    $scope.$watch('ctrl.data', dataChanged);
+    $scope.$watch(
+        'ctrl.data',
+        dataChanged);
 
     vm.toDisplayName = (k) => vm.config.labelProvider
         ? vm.config.labelProvider(k)

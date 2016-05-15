@@ -106,7 +106,7 @@ function controller($scope,
                     perspectiveStore,
                     ratingStore,
                     historyStore,
-                    dataFlowStore,
+                    dataFlowViewService,
                     complexityStore,
                     assetCostViewService,
                     applicationStore,
@@ -149,14 +149,14 @@ function controller($scope,
             $q.all([
                 perspectiveStore.findByCode('BUSINESS'),
                 ratingStore.findByAppIds(appIds),
-                dataFlowStore.findByAppIds(appIds),
-                complexityStore.findByAppIds(appIds),
-                assetCostViewService.initialise(appIds),
-                techStatsService.findByAppIds(appIds)
+                dataFlowViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN'),
+                complexityStore.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
+                assetCostViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN', 2015),
+                techStatsService.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN')
             ]).then(([
                 perspective,
                 ratings,
-                flows,
+                dataFlows,
                 complexity,
                 assetCostData,
                 techStats
@@ -165,7 +165,7 @@ function controller($scope,
                     group: prepareGroupData(capability, vm.apps, perspective, ratings),
                     tweakers
                 };
-                vm.dataFlows = flows;
+                vm.dataFlows = dataFlows;
                 vm.complexity = complexity;
                 vm.assetCostData = assetCostData;
                 vm.techStats = techStats;
@@ -211,6 +211,9 @@ function controller($scope,
         })
     };
 
+    vm.loadFlowDetail = () => dataFlowViewService.loadDetail();
+
+
     loadTraitInfo(traitStore, traitUsageStore, capability.id)
         .then(r => vm.traitInfo = r);
 }
@@ -225,7 +228,7 @@ controller.$inject = [
     'PerspectiveStore',
     'RatingStore',
     'HistoryStore',
-    'DataFlowDataStore',
+    'DataFlowViewService',
     'ComplexityStore',
     'AssetCostViewService',
     'ApplicationStore',

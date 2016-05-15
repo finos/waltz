@@ -7,18 +7,18 @@ function service(http, baseUrl) {
         http.get(`${BASE}/app/${appId}`)
             .then(result => result.data);
 
-    const findByAppIds = (appIds) =>
-        http.post(`${BASE}/app`, appIds)
+    const findBySelector = (id, kind, scope='CHILDREN') =>
+        http.post(`${BASE}`, { scope, entityReference: { id, kind }})
             .then(result => result.data);
 
-    const findStatsForAppIds = (appIds) =>
-        http.post(`${BASE}/app/stats`, appIds)
+    const findStatsForSelector = (id, kind, scope='CHILDREN') =>
+        http.post(`${BASE}/stats`, { scope, entityReference: { id, kind }})
             .then(result => result.data);
 
     return {
         findByAppId,
-        findByAppIds,
-        findStatsForAppIds
+        findBySelector,
+        findStatsForSelector
     };
 }
 

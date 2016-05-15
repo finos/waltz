@@ -22,7 +22,6 @@ public class DatabaseEndpoint implements Endpoint {
     private final DatabaseService databaseService;
 
     private static final String BASE_URL = mkPath("api", "database");
-    private static final String APP_PATH = mkPath(BASE_URL, "app");
 
     @Autowired
     public DatabaseEndpoint(DatabaseService databaseService) {
@@ -32,16 +31,16 @@ public class DatabaseEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String findForAppPath = mkPath(APP_PATH, ":id");
-        String findForAppsPath = mkPath(APP_PATH);
-        String findStatsForAppsPath = mkPath(APP_PATH, "stats");
+        String findForAppPath = mkPath(BASE_URL, "app", ":id");
+        String findForAppSelectorPath = mkPath(BASE_URL);
+        String findStatsForAppIdSelectorPath = mkPath(BASE_URL, "stats");
 
 
         ListRoute<Database> findForAppRoute = (request, response)
                 -> databaseService.findByApplicationId(getId(request));
 
-        ListRoute<ApplicationDatabases> findForAppsRoute = (request, response)
-                -> databaseService.findByApplicationIds(readIdsFromBody(request))
+        ListRoute<ApplicationDatabases> findForAppSelectorRoute = (request, response)
+                -> databaseService.findByApplicationSelector(readOptionsFromBody(request))
                     .entrySet()
                     .stream()
                     .map(e -> ImmutableApplicationDatabases.builder()
@@ -50,13 +49,13 @@ public class DatabaseEndpoint implements Endpoint {
                             .build())
                     .collect(Collectors.toList());
 
-        DatumRoute<DatabaseSummaryStatistics> findStatsForAppsRoute = (request, response)
-                -> databaseService.findStatsForAppIds(readIdsFromBody(request));
+        DatumRoute<DatabaseSummaryStatistics> findStatsForAppIdSelectorRoute = (request, response)
+                -> databaseService.findStatsForAppIdSelector(readOptionsFromBody(request));
 
 
         getForList(findForAppPath, findForAppRoute);
-        postForList(findForAppsPath, findForAppsRoute);
-        postForDatum(findStatsForAppsPath, findStatsForAppsRoute);
+        postForList(findForAppSelectorPath, findForAppSelectorRoute);
+        postForDatum(findStatsForAppIdSelectorPath, findStatsForAppIdSelectorRoute);
 
     }
 }

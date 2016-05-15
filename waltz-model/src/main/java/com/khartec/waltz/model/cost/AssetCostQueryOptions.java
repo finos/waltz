@@ -2,9 +2,8 @@ package com.khartec.waltz.model.cost;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import org.immutables.value.Value;
-
-import java.util.List;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableAssetCostQueryOptions.class)
@@ -12,6 +11,6 @@ import java.util.List;
 public abstract class AssetCostQueryOptions {
 
     public abstract int year();
-    public abstract List<Long> applicationIds();
+    public abstract ApplicationIdSelectionOptions idSelectionOptions();
 
 }

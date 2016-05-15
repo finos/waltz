@@ -21,9 +21,11 @@ import com.khartec.waltz.data.server_info.ServerInfoDao;
 import com.khartec.waltz.model.serverinfo.ServerSummaryStatistics;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 
 public class ServerHarness {
@@ -34,7 +36,12 @@ public class ServerHarness {
         ServerInfoDao serverInfoDao = ctx.getBean(ServerInfoDao.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        ServerSummaryStatistics stats = serverInfoDao.findStatsForAppIds(newArrayList(801L, 802L));
+        SelectConditionStep<Record1<Long>> idSelector = dsl
+                .select(APPLICATION.ID)
+                .from(APPLICATION)
+                .where(APPLICATION.ID.in(801L, 802L, 803L));
+
+        ServerSummaryStatistics stats = serverInfoDao.findStatsForAppSelector(idSelector);
         System.out.println("stats:"+stats);
     }
 

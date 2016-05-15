@@ -1,12 +1,14 @@
 package com.khartec.waltz.service.database;
 
+import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.database_usage.DatabaseDao;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.database.Database;
 import com.khartec.waltz.model.database.DatabaseSummaryStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -16,10 +18,15 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class DatabaseService {
 
     private final DatabaseDao databaseDao;
+    private final ApplicationIdSelectorFactory factory;
 
     @Autowired
-    public DatabaseService(DatabaseDao databaseDao) {
+    public DatabaseService(DatabaseDao databaseDao, ApplicationIdSelectorFactory factory) {
+        Checks.checkNotNull(databaseDao, "databaseDao cannot be null");
+        Checks.checkNotNull(factory, "factory cannot be null");
+
         this.databaseDao = databaseDao;
+        this.factory = factory;
     }
 
     public List<Database> findByApplicationId(Long id) {
@@ -27,14 +34,14 @@ public class DatabaseService {
         return databaseDao.findByApplicationId(id);
     }
 
-    public Map<Long, List<Database>> findByApplicationIds(List<Long> ids) {
-        checkNotNull(ids, "ids cannot be null");
-        return databaseDao.findByApplicationIds(ids);
+    public Map<Long, List<Database>> findByApplicationSelector(ApplicationIdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        return databaseDao.findByAppSelector(factory.apply(options));
     }
 
-    public DatabaseSummaryStatistics findStatsForAppIds(Collection<Long> appIds) {
-        checkNotNull(appIds, "appIds cannot be null");
-        return databaseDao.findStatsForAppIds(appIds);
+    public DatabaseSummaryStatistics findStatsForAppIdSelector(ApplicationIdSelectionOptions options) {
+        Checks.checkNotNull(options, "options cannot be null");
+        return databaseDao.findStatsForAppSelector(factory.apply(options));
     }
         
 }

@@ -17,14 +17,19 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.serverinfo.ServerInfo;
+import com.khartec.waltz.model.serverinfo.ServerSummaryStatistics;
 import com.khartec.waltz.service.server_info.ServerInfoService;
+import com.khartec.waltz.web.DatumRoute;
+import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 
 @Service
@@ -46,17 +51,23 @@ public class ServerInfoEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        getForList(mkPath(BASE_URL, "asset-code", ":assetCode"), (request, response)
-                -> serverInfoService.findByAssetCode(request.params("assetCode")));
+        String findByAssetCodePath = mkPath(BASE_URL, "asset-code", ":assetCode");
+        String findByAppIdPath = mkPath(BASE_URL, "app-id", ":id");
+        String findStatsForAppSelectorPath = mkPath(BASE_URL, "apps", "stats");
 
-        getForList(mkPath(BASE_URL, "app-id", ":id"), (request, response)
-                -> serverInfoService.findByAppId(getId(request)));
+        ListRoute<ServerInfo> findByAssetCodeRoute = (request, response)
+                -> serverInfoService.findByAssetCode(request.params("assetCode"));
 
-        getForDatum(mkPath(BASE_URL, "org-unit", ":id", "stats"), ((request, response)
-                -> serverInfoService.findStatsForOrganisationalUnit(getId(request))));
+        ListRoute<ServerInfo> findByAppIdRoute = (request, response)
+                -> serverInfoService.findByAppId(getId(request));
 
-        postForDatum(mkPath(BASE_URL, "apps", "stats"), (request, response)
-                -> serverInfoService.findStatsForAppIds(readIdsFromBody(request)));
+        DatumRoute<ServerSummaryStatistics> findStatsForAppSelectorRoute = (request, response)
+                -> serverInfoService.findStatsForAppSelector(readOptionsFromBody(request));
 
+        getForList(findByAssetCodePath, findByAssetCodeRoute);
+        getForList(findByAppIdPath, findByAppIdRoute);
+        postForDatum(findStatsForAppSelectorPath, findStatsForAppSelectorRoute);
     }
+
+
 }

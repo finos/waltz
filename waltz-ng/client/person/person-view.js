@@ -86,6 +86,10 @@ function controller(involvementStore,
             viewService.selectAssetBucket(bucket);
         });
     };
+
+    vm.loadFlowDetail = () => viewService.loadFlowDetail();
+
+
 }
 
 controller.$inject = [

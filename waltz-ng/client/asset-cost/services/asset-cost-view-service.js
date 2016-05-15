@@ -12,12 +12,18 @@ function service($q,
 
     let data = initData;
 
-    function initialise(appIds) {
+    function initialise(id, kind, scope = 'CHILDREN', year = 2015) {
         data = { ...initData };
         data.loadingStats = true;
-        data.appIds = appIds;
+        data.options = {
+            year,
+            idSelectionOptions: {
+                scope,
+                entityReference: { id, kind }
+            }
+        };
         return assetCostStore
-            .findStatsByAppIds(appIds)
+            .findStatsByAppIds(data.options)
             .then(stats => {
                 data.loadingStats = false;
                 data.stats = stats;
@@ -30,10 +36,10 @@ function service($q,
         if (data.costs.length > 0) {
             return $q.when(data);
         }
-        
+
         data.loadingDetail = true;
         return assetCostStore
-            .findAppCostsByAppIds(data.appIds)
+            .findAppCostsByAppIds(data.options)
             .then(costs => {
                 data.loadingDetail = false;
                 data.costs = costs;

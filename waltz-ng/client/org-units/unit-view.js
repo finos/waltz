@@ -190,6 +190,7 @@ function controller($stateParams,
         $scope.$applyAsync(() => viewDataService.selectAssetBucket(bucket));
     };
 
+    vm.loadFlowDetail = () => viewDataService.loadFlowDetail();
 
 }
 

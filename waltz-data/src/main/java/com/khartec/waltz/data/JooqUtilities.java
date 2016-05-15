@@ -33,7 +33,7 @@ public class JooqUtilities {
                 fieldToTally,
                 DSL.count(fieldToTally))
                 .from(table)
-                .where(recordsInScopeCondition)
+                .where(recordsInScopeCondition.toString())
                 .groupBy(fieldToTally)
                 .fetch(TO_STRING_TALLY);
     }

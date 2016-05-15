@@ -17,7 +17,6 @@
 
 package com.khartec.waltz.service.data_flow;
 
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_flow.DataFlowDao;
@@ -30,7 +29,6 @@ import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.ImmutableRatedDataFlow;
 import com.khartec.waltz.model.dataflow.RatedDataFlow;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.model.utils.IdUtilities;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -186,12 +184,14 @@ public class RatedDataFlowService {
                                                         List<Application> targetApps) {
 
         List<Long> appIds = toIds(targetApps);
+
         List<DataFlow> dataFlows = dataFlowDao.findByApplicationIds(appIds);
 
         return filter(
                 df -> appIds.contains(df.target().id()),
                 dataFlows);
     }
+
 
     /** (dao, [ ouId ]) -> { ouId -> [authSource] } */
     private static Map<Long, Collection<AuthoritativeSource>> loadAuthSourcesByOrgUnitIds(

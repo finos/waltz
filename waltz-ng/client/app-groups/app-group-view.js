@@ -19,36 +19,6 @@ import _ from "lodash";
 import {selectBest} from "../ratings/directives/viewer/coloring-strategies";
 
 
-function prepareFlowData(flows, apps) {
-    const entitiesById = _.keyBy(apps, 'id');
-
-    const enrichedFlows = _.map(flows, f => ({
-        source: entitiesById[f.source.id] || { ...f.source, isNeighbour: true },
-        target: entitiesById[f.target.id] || { ...f.target, isNeighbour: true },
-        dataType: f.dataType
-    }));
-
-    const entities = _.chain(enrichedFlows)
-        .map(f => ([f.source, f.target]))
-        .flatten()
-        .uniqBy(a => a.id)
-        .value();
-
-    return {
-        flows: enrichedFlows,
-        entities
-    };
-}
-
-
-function loadDataFlows(dataFlowStore, groupApps) {
-    const groupAppIds = _.map(groupApps, 'id');
-
-    return dataFlowStore.findByAppIds(groupAppIds)
-        .then(fs => prepareFlowData(fs, groupApps));
-}
-
-
 /**
  * Calculates the set of capabilities required to
  * fully describe a given set of app capabilities.
@@ -102,7 +72,7 @@ function controller($scope,
                     appGroupStore,
                     appStore,
                     complexityStore,
-                    dataFlowStore,
+                    dataFlowViewService,
                     userService,
                     capabilityStore,
                     appCapabilityStore,
@@ -124,17 +94,24 @@ function controller($scope,
             member.role === 'OWNER'
             && member.userId === vm.user.userName;
 
+
+    dataFlowViewService.initialise(id, 'APP_GROUP', 'EXACT')
+        .then(flows => vm.dataFlows = flows);
+
+    assetCostViewService.initialise(id, 'APP_GROUP', 'EXACT', 2015)
+        .then(costs => vm.assetCostData = costs);
+
+
     appGroupStore.getById(id)
         .then(groupDetail => vm.groupDetail = groupDetail)
         .then(groupDetail => _.map(groupDetail.applications, 'id'))
         .then(appIds => $q.all([
             appStore.findByIds(appIds),
-            complexityStore.findByAppIds(appIds),
+            complexityStore.findBySelector(id, 'APP_GROUP', 'EXACT'),
             capabilityStore.findAll(),
             appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
             ratingStore.findByAppIds(appIds),
-            technologyStatsService.findByAppIds(appIds),
-            assetCostViewService.initialise(appIds)
+            technologyStatsService.findBySelector(id, 'APP_GROUP', 'EXACT')
         ]))
         .then(([
             apps,
@@ -142,8 +119,7 @@ function controller($scope,
             allCapabilities,
             appCapabilities,
             ratings,
-            techStats,
-            assetCostData
+            techStats
         ]) => {
             vm.applications = apps;
             vm.complexity = complexity;
@@ -151,14 +127,13 @@ function controller($scope,
             vm.appCapabilities = appCapabilities;
             vm.ratings = ratings;
             vm.techStats = techStats;
-            vm.assetCostData = assetCostData;
         })
-        .then(() => loadDataFlows(dataFlowStore, vm.applications))
-        .then(flows => vm.dataFlows = flows)
         .then(() => calculateCapabilities(vm.allCapabilities, vm.appCapabilities))
-        .then(r => Object.assign(vm, r));
+        .then(result => Object.assign(vm, result));
 
-    userService.whoami().then(u => vm.user = u);
+    userService
+        .whoami()
+        .then(u => vm.user = u);
 
     vm.isGroupEditable = () => {
         if (!vm.groupDetail) return false;
@@ -176,6 +151,8 @@ function controller($scope,
         })
     };
 
+    vm.loadFlowDetail = () => dataFlowViewService.loadDetail();
+
     vm.assetCosts = assetCosts;
 }
 
@@ -186,7 +163,7 @@ controller.$inject = [
     'AppGroupStore',
     'ApplicationStore',
     'ComplexityStore',
-    'DataFlowDataStore',
+    'DataFlowViewService',
     'UserService',
     'CapabilityStore',
     'AppCapabilityStore',

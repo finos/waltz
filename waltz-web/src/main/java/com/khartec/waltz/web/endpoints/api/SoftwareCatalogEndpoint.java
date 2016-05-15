@@ -8,8 +8,7 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readIdsFromBody;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 @Service
@@ -29,18 +28,18 @@ public class SoftwareCatalogEndpoint implements Endpoint {
     public void register() {
 
         String findByAppIdsPath = mkPath(BASE_URL, "apps");
-        String findStatsForAppIdsPath = mkPath(BASE_URL, "apps", "stats");
+        String findStatsForAppIdSelectorPath = mkPath(BASE_URL, "stats");
 
 
         DatumRoute<SoftwareCatalog> findByAppIdsRoute = (request, response) ->
                 service.findForAppIds(readIdsFromBody(request));
 
-        DatumRoute<SoftwareSummaryStatistics> findStatsForAppIdsRoute = (request, response)
-                -> service.findStatisticsForAppIds(readIdsFromBody(request));
+        DatumRoute<SoftwareSummaryStatistics> findStatsForAppIdSelectorRoute = (request, response)
+                -> service.findStatisticsForAppIdSelector(readOptionsFromBody(request));
 
 
         postForDatum(findByAppIdsPath, findByAppIdsRoute);
-        postForDatum(findStatsForAppIdsPath, findStatsForAppIdsRoute);
+        postForDatum(findStatsForAppIdSelectorPath, findStatsForAppIdSelectorRoute);
 
     }
 

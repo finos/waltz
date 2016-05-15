@@ -29,10 +29,13 @@ public class ComplexityEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        DatumRoute<ComplexityRating> getForApp = (request, response) -> service.getForApp(getId(request));
-        ListRoute<ComplexityRating> postForApps = (request, response) -> service.findByAppIds(readBody(request, Long[].class));
+        String getForAppPath = mkPath(BASE_URL, "application", ":id");
+        String findForAppIdSelectorPath = BASE_URL;
 
-        getForDatum(mkPath(BASE_URL, "application", ":id"), getForApp);
-        postForList(mkPath(BASE_URL, "apps"), postForApps);
+        DatumRoute<ComplexityRating> getForAppRoute = (request, response) -> service.getForApp(getId(request));
+        ListRoute<ComplexityRating> findForAppIdSelectorRoute = (request, response) -> service.findForAppIdSelector(readOptionsFromBody(request));
+
+        getForDatum(getForAppPath, getForAppRoute);
+        postForList(findForAppIdSelectorPath, findForAppIdSelectorRoute);
     }
 }
