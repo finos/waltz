@@ -29,7 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -117,47 +118,12 @@ public class ServerInfoDao {
     }
 
 
-    public Map<Long, ServerSummaryStatistics> findStatsForOrganisationalUnitIds(List<Long> orgUnitIds) {
-        Result<Record3<Long, Boolean, Integer>> records = dsl
-                .select(APPLICATION.ORGANISATIONAL_UNIT_ID,
-                        DSL.coalesce(SERVER_INFORMATION.IS_VIRTUAL, Boolean.FALSE),
-                        DSL.countDistinct(SERVER_INFORMATION.HOSTNAME))
-                .from(SERVER_INFORMATION)
-                .innerJoin(APPLICATION)
-                .on(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds))
-                .where(SERVER_INFORMATION.ASSET_CODE.eq(APPLICATION.ASSET_CODE))
-                .groupBy(SERVER_INFORMATION.IS_VIRTUAL, APPLICATION.ORGANISATIONAL_UNIT_ID)
-                .fetch();
-
-        Map<Long, ServerSummaryStatistics> allStats = new HashMap<>();
-        ImmutableServerSummaryStatistics emptyStats = ImmutableServerSummaryStatistics.builder()
-                .physicalCount(0)
-                .virtualCount(0)
-                .build();
-
-        records.forEach(r -> {
-            long orgId = r.value1();
-            boolean isVirtual = r.value2();
-
-            ServerSummaryStatistics orgStats = allStats.getOrDefault(orgId, emptyStats);
-
-            ServerSummaryStatistics newStats = isVirtual
-                    ? ImmutableServerSummaryStatistics.copyOf(orgStats).withVirtualCount(r.value3())
-                    : ImmutableServerSummaryStatistics.copyOf(orgStats).withPhysicalCount(r.value3());
-
-            allStats.put(orgId, newStats);
-        });
-
-        return allStats;
-    }
-
-
-    public ServerSummaryStatistics findStatsForAppIds(Collection<Long> appIds) {
+    public ServerSummaryStatistics findStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
 
         Condition condition = SERVER_INFORMATION.ASSET_CODE
                 .in(dsl.select(APPLICATION.ASSET_CODE)
                     .from(APPLICATION)
-                    .where(APPLICATION.ID.in(appIds)));
+                    .where(APPLICATION.ID.in(appIdSelector)));
 
         List<StringTally> environmentTallies = calculateTallies(
                 dsl,

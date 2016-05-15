@@ -23,14 +23,14 @@ function service(http, baseUrl) {
             .then(result => result.data);
 
 
-    const findStatsForAppIds = (appIds) =>
-        http.post(`${BASE}/apps/stats`, appIds)
+    const findStatsForSelector = (id, kind, scope = 'EXACT') =>
+        http.post(`${BASE}/apps/stats`, { scope, entityReference: { id, kind }})
             .then(result => result.data);
 
     return {
         findByAssetCode,
         findByAppId,
-        findStatsForAppIds
+        findStatsForSelector
     };
 }
 

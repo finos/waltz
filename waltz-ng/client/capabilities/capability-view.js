@@ -152,7 +152,7 @@ function controller($scope,
                 dataFlowViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN'),
                 complexityStore.findByAppIds(appIds),
                 assetCostViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN', 2015),
-                techStatsService.findByAppIds(appIds)
+                techStatsService.findByAppIds(appIds, capability.id, 'CAPABILITY', 'CHILDREN')
             ]).then(([
                 perspective,
                 ratings,

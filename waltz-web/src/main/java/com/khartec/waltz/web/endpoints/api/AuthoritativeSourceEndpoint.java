@@ -26,20 +26,21 @@ import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.post;
 import static spark.Spark.delete;
 
 
 @Service
 public class AuthoritativeSourceEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "authoritative-source");
+    private static final String BASE_URL = mkPath("api", "authoritative-source");
 
     private final AuthoritativeSourceService authoritativeSourceService;
     private final ChangeLogService changeLogService;
@@ -59,24 +60,24 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "kind", ":kind"), (request, response)
-                -> authoritativeSourceService.findByEntityKind(WebUtilities.getKind(request)));
+        getForList(mkPath(BASE_URL, "kind", ":kind"), (request, response)
+                -> authoritativeSourceService.findByEntityKind(getKind(request)));
 
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "kind", ":kind", ":id"), (request, response)
-                -> authoritativeSourceService.findByEntityReference(WebUtilities.getEntityReference(request)));
+        getForList(mkPath(BASE_URL, "kind", ":kind", ":id"), (request, response)
+                -> authoritativeSourceService.findByEntityReference(getEntityReference(request)));
 
-        EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "app", ":id"), (request, response)
-                -> authoritativeSourceService.findByApplicationId(WebUtilities.getId(request)));
+        getForList(mkPath(BASE_URL, "app", ":id"), (request, response)
+                -> authoritativeSourceService.findByApplicationId(getId(request)));
 
-        EndpointUtilities.post(WebUtilities.mkPath(BASE_URL, "id", ":id"), (request, response) -> {
+        post(mkPath(BASE_URL, "id", ":id"), (request, response) -> {
             String ratingStr = request.body();
             Rating rating = Rating.valueOf(ratingStr);
-            authoritativeSourceService.update(WebUtilities.getId(request), rating);
+            authoritativeSourceService.update(getId(request), rating);
             return "done";
         });
 
-        delete(WebUtilities.mkPath(BASE_URL, "id", ":id"), (request, response) -> {
-            long id = WebUtilities.getId(request);
+        delete(mkPath(BASE_URL, "id", ":id"), (request, response) -> {
+            long id = getId(request);
             AuthoritativeSource authSource = authoritativeSourceService.getById(id);
             if (authSource == null) {
                 return "done";
@@ -91,7 +92,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
             ChangeLog log = ImmutableChangeLog.builder()
                     .message(msg)
                     .severity(Severity.INFORMATION)
-                    .userId(WebUtilities.getUsername(request))
+                    .userId(getUsername(request))
                     .parentReference(authSource.parentReference())
                     .build();
 
@@ -101,10 +102,10 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
             return "done";
         });
 
-        EndpointUtilities.post(WebUtilities.mkPath(BASE_URL, "kind", ":kind", ":id", ":dataType", ":appId"), (request, response) -> {
-            EntityReference parentRef = WebUtilities.getEntityReference(request);
+        post(mkPath(BASE_URL, "kind", ":kind", ":id", ":dataType", ":appId"), (request, response) -> {
+            EntityReference parentRef = getEntityReference(request);
             String dataType = request.params("dataType");
-            Long appId = WebUtilities.getLong(request, "appId");
+            Long appId = getLong(request, "appId");
 
             String ratingStr = request.body();
             Rating rating = Rating.valueOf(ratingStr);

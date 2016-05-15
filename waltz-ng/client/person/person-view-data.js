@@ -109,9 +109,9 @@ function service(personStore,
             .then(flows => state.model.dataFlows = flows);
     }
 
-    function loadTechStats(appIds) {
+    function loadTechStats(appIds, personId) {
         techStatsService
-            .findByAppIds(appIds)
+            .findByAppIds(appIds, personId, 'PERSON', 'CHILDREN')
             .then(stats => state.model.techStats = stats);
     }
 
@@ -124,7 +124,7 @@ function service(personStore,
     function load(employeeId) {
         reset();
         loadPeople(employeeId)
-            .then(([person]) => person.id)
+            .then(() => state.model.person.id)
             .then(personId => {
                 loadFlows(personId);
                 loadCostStats(personId);
@@ -134,20 +134,22 @@ function service(personStore,
             .then(({ apps }) => {
                 const appIds = _.map(apps, 'id');
                 loadComplexity(appIds);
-                loadTechStats(appIds);
+                loadTechStats(appIds, state.model.person.id);
             });
     }
+
 
     function selectAssetBucket(bucket) {
         assetCostViewService.selectBucket(bucket);
         assetCostViewService.loadDetail()
             .then(data => state.model.assetCostData = data);
-
     }
+
 
     function loadFlowDetail() {
         dataFlowViewService.loadDetail();
     }
+
 
     return {
         load,

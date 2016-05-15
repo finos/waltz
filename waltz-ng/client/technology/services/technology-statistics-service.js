@@ -12,7 +12,7 @@ function service($q,
                  databaseStore,
                  softwareCatalogStore) {
 
-    const findByAppIds = (appIds = []) => {
+    const findByAppIds = (appIds = [], id, kind, scope = 'CHILDREN') => {
         if (appIds.length == 0) { return $q.when(NOTHING); }
 
         if (_.some(appIds, _.isObject)) {
@@ -21,7 +21,7 @@ function service($q,
         }
 
         const promises = [
-            serverInfoStore.findStatsForAppIds(appIds),
+            serverInfoStore.findStatsForSelector(id, kind, scope),
             databaseStore.findStatsForAppIds(appIds),
             softwareCatalogStore.findStatsForAppIds(appIds)
         ];

@@ -111,7 +111,7 @@ function controller($scope,
             capabilityStore.findAll(),
             appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
             ratingStore.findByAppIds(appIds),
-            technologyStatsService.findByAppIds(appIds),
+            technologyStatsService.findByAppIds(appIds, id, 'APP_GROUP', 'EXACT'),
         ]))
         .then(([
             apps,

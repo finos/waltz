@@ -34,7 +34,7 @@ public class ServerHarness {
         ServerInfoDao serverInfoDao = ctx.getBean(ServerInfoDao.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        ServerSummaryStatistics stats = serverInfoDao.findStatsForAppIds(newArrayList(801L, 802L));
+        ServerSummaryStatistics stats = serverInfoDao.findStatsForAppSelector(newArrayList(801L, 802L));
         System.out.println("stats:"+stats);
     }
 

@@ -17,17 +17,17 @@
 
 package com.khartec.waltz.service.server_info;
 
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.server_info.ServerInfoDao;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.serverinfo.ServerInfo;
 import com.khartec.waltz.model.serverinfo.ServerSummaryStatistics;
-import com.khartec.waltz.model.utils.IdUtilities;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -36,16 +36,16 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class ServerInfoService {
 
     private final ServerInfoDao serverInfoDao;
-    private final OrganisationalUnitDao organisationalUnitDao;
+    private final ApplicationIdSelectorFactory selectorFactory;
 
 
     @Autowired
-    public ServerInfoService(ServerInfoDao serverInfoDao, OrganisationalUnitDao organisationalUnitDao) {
+    public ServerInfoService(ServerInfoDao serverInfoDao, ApplicationIdSelectorFactory selectorFactory) {
         checkNotNull(serverInfoDao, "serverInfoDao must not be null");
-        checkNotNull(organisationalUnitDao, "organisationalUnitDao must not be null");
+        checkNotNull(selectorFactory, "selectorFactory cannot be null");
 
         this.serverInfoDao = serverInfoDao;
-        this.organisationalUnitDao = organisationalUnitDao;
+        this.selectorFactory = selectorFactory;
     }
 
     public List<ServerInfo> findByAssetCode(String assetCode) {
@@ -58,13 +58,9 @@ public class ServerInfoService {
     }
 
 
-    public Map<Long, ServerSummaryStatistics> findStatsForOrganisationalUnit(long orgUnitId) {
-        List<Long> ids = IdUtilities.toIds(organisationalUnitDao.findDescendants(orgUnitId));
-        return serverInfoDao.findStatsForOrganisationalUnitIds(ids);
-    }
-
-    public ServerSummaryStatistics findStatsForAppIds(Collection<Long> appIds) {
-        return serverInfoDao.findStatsForAppIds(appIds);
+    public ServerSummaryStatistics findStatsForAppSelector(ApplicationIdSelectionOptions options) {
+        Select<Record1<Long>> selector = selectorFactory.apply(options);
+        return serverInfoDao.findStatsForAppSelector(selector);
     }
 
 }
