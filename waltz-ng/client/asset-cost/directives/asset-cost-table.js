@@ -179,6 +179,7 @@ function controller(displayNameService, uiGridConstants, $scope, $animate) {
 
 
     const applyFilter = (filterOptions) => {
+        if (! filterOptions) return;
         filterAmount(filterOptions);
     };
 

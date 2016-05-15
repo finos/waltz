@@ -3,6 +3,8 @@ package com.khartec.waltz.service.complexity;
 import com.khartec.waltz.data.complexity.ConnectionComplexityDao;
 import com.khartec.waltz.model.complexity.ComplexityScore;
 import com.khartec.waltz.model.tally.LongTally;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,17 +60,17 @@ public class ConnectionComplexityService {
      * ratings are baselined against the application with the most
      * connections in the system.  If you wish specify a specific baseline use
      * the overloaded method.
-     * @param ids
+     * @param idSelector
      * @return
      */
-    public List<ComplexityScore> findByAppIds(Long[] ids) {
+    public List<ComplexityScore> findByAppIdSelector(Select<Record1<Long>> idSelector) {
         int baseline = connectionComplexityDao.findBaseline();
-        return findByAppIds(ids, baseline);
+        return findByAppIdSelector(idSelector, baseline);
     }
 
 
-    public List<ComplexityScore> findByAppIds(Long[] ids, int baseline) {
-        return connectionComplexityDao.findCounts(ids)
+    public List<ComplexityScore> findByAppIdSelector(Select<Record1<Long>> idSelector, int baseline) {
+        return connectionComplexityDao.findCounts(idSelector)
                 .stream()
                 .map(tally -> tallyToComplexityScore(tally, baseline, Math::log))
                 .collect(Collectors.toList());

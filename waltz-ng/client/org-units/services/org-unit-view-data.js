@@ -85,7 +85,7 @@ function service($q,
             ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)
             authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
             endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
-            complexityStore.findByAppIds(appIds),
+            complexityStore.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
             techStatsService.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN')
     ]).then(([
             capabilityRatings,

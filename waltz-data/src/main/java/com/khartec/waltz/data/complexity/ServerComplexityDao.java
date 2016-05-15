@@ -29,15 +29,6 @@ public class ServerComplexityDao {
     }
 
 
-    public List<LongTally> findCountsByOrgIds(Long... orgUnitIds) {
-        return findCountsByAppIds(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds));
-    }
-
-
-    public List<LongTally> findCountsByAppIds(Long... appIds) {
-        return findCountsByAppIds(APPLICATION.ID.in(appIds));
-    }
-
 
     public List<StringTally> findCountsByAssetCodes(String... assetCodes) {
         return findCountsByAssetCodes(SERVER_INFORMATION.ASSET_CODE.in(assetCodes));
@@ -54,12 +45,14 @@ public class ServerComplexityDao {
     }
 
 
-    public List<LongTally> findCountsByAppIds(Condition appCondition) {
+    public List<LongTally> findCountsByAppIdSelector(Select<Record1<Long>> idSelector) {
+        Checks.checkNotNull(idSelector, "idSelector cannot be null");
+
         return dsl.select(APPLICATION.ID, SERVER_COUNT_FIELD)
                 .from(SERVER_INFORMATION)
                 .innerJoin(APPLICATION)
                 .on(SERVER_INFORMATION.ASSET_CODE.eq(APPLICATION.ASSET_CODE))
-                .where(appCondition)
+                .where(APPLICATION.ID.in(idSelector))
                 .groupBy(APPLICATION.ID)
                 .fetch(r -> ImmutableLongTally.builder()
                         .id(r.value1())
@@ -70,6 +63,7 @@ public class ServerComplexityDao {
 
     private List<StringTally> findCountsByAssetCodes(Condition condition) {
         Checks.checkNotNull(condition, "Condition must be given, use DSL.trueCondition() for 'none'");
+
         return dsl.select(SERVER_INFORMATION.ASSET_CODE, SERVER_COUNT_FIELD)
                 .from(SERVER_INFORMATION)
                 .where(condition)

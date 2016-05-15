@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
 
 @Repository
@@ -47,13 +46,7 @@ public class CapabilityComplexityDao {
     }
 
 
-    public List<LongTally> findScoresForOrgUnitIds(Long... orgUnitIds) {
-        return mkSelectQueryIncludingApplicationWhere(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds))
-                .fetch(toScoreMapper);
-    }
-
-
-    public List<LongTally> findScoresForAppIds(Long... appIds) {
+    public List<LongTally> findScoresForAppIdSelector(Select<Record1<Long>> appIds) {
         return mkSelectQueryWhere(APP_CAPABILITY.APPLICATION_ID.in(appIds))
                 .fetch(toScoreMapper);
     }
@@ -75,19 +68,6 @@ public class CapabilityComplexityDao {
     }
 
 
-    public Double findBaseLineForOrgUnitIds(Long... orgUnitIds) {
-        Condition orgUnitMatches = APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds);
-
-        SelectHavingStep<Record2<Long, BigDecimal>> subSelect =
-                mkSelectQueryIncludingApplicationWhere(orgUnitMatches);
-
-        return dsl.select(DSL.max(SCORE_ALIAS))
-                .from(subSelect)
-                .fetchOne()
-                .value1()
-                .doubleValue();
-    }
-
 
     // -- HELPER ---
 
@@ -96,19 +76,8 @@ public class CapabilityComplexityDao {
                 .from(APP_CAPABILITY)
                 .innerJoin(CAPABILITY)
                 .on(CAPABILITY.ID.eq(APP_CAPABILITY.CAPABILITY_ID))
-                .where(conditionStep)
+                .where(conditionStep.toString())
                 .groupBy(APP_CAPABILITY.APPLICATION_ID);
     }
 
-
-    private SelectHavingStep<Record2<Long, BigDecimal>> mkSelectQueryIncludingApplicationWhere(Condition conditionStep) {
-        return dsl.select(APP_CAPABILITY.APPLICATION_ID, SCORE_FIELD.as(SCORE_ALIAS))
-                .from(APP_CAPABILITY)
-                .innerJoin(CAPABILITY)
-                .on(CAPABILITY.ID.eq(APP_CAPABILITY.CAPABILITY_ID))
-                .innerJoin(APPLICATION)
-                .on(APPLICATION.ID.eq(APP_CAPABILITY.APPLICATION_ID))
-                .where(conditionStep)
-                .groupBy(APP_CAPABILITY.APPLICATION_ID);
-    }
 }

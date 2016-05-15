@@ -24,14 +24,14 @@ export default [
                 .then(result => result.data);
 
 
-        const findByAppIds = ids =>
-            $http.post(`${BASE}/apps`, ids)
+        const findBySelector = (id, kind, scope = 'CHILDREN') =>
+            $http.post(BASE, { scope, entityReference: { id, kind }})
                 .then(result => result.data);
 
 
         return {
             findByApplication,
-            findByAppIds
+            findBySelector
         };
     }
 ];

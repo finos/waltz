@@ -3,6 +3,8 @@ package com.khartec.waltz.service.complexity;
 import com.khartec.waltz.data.complexity.CapabilityComplexityDao;
 import com.khartec.waltz.model.complexity.ComplexityScore;
 import com.khartec.waltz.model.tally.LongTally;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +25,14 @@ public class CapabilityComplexityService {
     }
 
 
-    public List<ComplexityScore> findByAppIds(Long[] ids) {
+    public List<ComplexityScore> findByAppIdSelector(Select<Record1<Long>> idSelector) {
         Double baseline = capabilityComplexityDao.findBaseline();
-        return findByAppIds(ids, baseline);
+        return findByAppIdSelector(idSelector, baseline);
     }
 
 
-    public List<ComplexityScore> findByAppIds(Long[] ids, double baseline) {
-        return capabilityComplexityDao.findScoresForAppIds(ids)
+    public List<ComplexityScore> findByAppIdSelector(Select<Record1<Long>> idSelector, double baseline) {
+        return capabilityComplexityDao.findScoresForAppIdSelector(idSelector)
                 .stream()
                 .map(tally -> tallyToComplexityScore(tally, baseline))
                 .collect(Collectors.toList());

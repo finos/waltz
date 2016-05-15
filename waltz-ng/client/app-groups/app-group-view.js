@@ -107,7 +107,7 @@ function controller($scope,
         .then(groupDetail => _.map(groupDetail.applications, 'id'))
         .then(appIds => $q.all([
             appStore.findByIds(appIds),
-            complexityStore.findByAppIds(appIds),
+            complexityStore.findBySelector(id, 'APP_GROUP', 'EXACT'),
             capabilityStore.findAll(),
             appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
             ratingStore.findByAppIds(appIds),

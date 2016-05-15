@@ -96,9 +96,9 @@ function service(personStore,
     }
 
 
-    function loadComplexity(appIds) {
+    function loadComplexity(personId) {
         complexityStore
-            .findByAppIds(appIds)
+            .findBySelector(personId, 'PERSON', 'CHILDREN')
             .then(complexity => state.model.complexity = complexity);
     }
 
@@ -130,13 +130,10 @@ function service(personStore,
                 loadFlows(personId);
                 loadCostStats(personId);
                 loadTechStats(personId);
+                loadComplexity(personId);
             });
 
         loadApplications(employeeId)
-            .then(({ apps }) => {
-                const appIds = _.map(apps, 'id');
-                loadComplexity(appIds);
-            });
     }
 
 
