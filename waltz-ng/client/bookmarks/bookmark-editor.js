@@ -11,75 +11,83 @@
  *
  */
 
-import angular from 'angular';
+import angular from "angular";
+import {kindToViewState} from "../common";
+
 
 function getParentRef(params) {
     return {
         id: params.entityId,
-        kind: params.kind
+        kind: params.kind,
+        name: params.parentName
     };
 }
 
 
-function controller(appStore, bookmarkStore, notification, params, $state) {
+function controller(bookmarkStore, notification, params, $state) {
+    const vm = this;
+
     const parentRef = getParentRef(params);
 
-    this.save = (b) => {
+    vm.save = (b) => {
         b.parent = parentRef;
         bookmarkStore
             .save(b)
             .then(() => {
-                this.refresh(parentRef);
-                this.resetForm();
+                vm.refresh(parentRef);
+                vm.resetForm();
             })
             .then(() => notification.success('Updated bookmarks'))
     };
 
-    this.cancel = () => {
-        $state.go('main.app-view', { id: parentRef.id });
-    };
-
-    this.refresh = (ref) => {
+    vm.refresh = (ref) => {
         bookmarkStore
             .findByParent(ref)
-            .then(bs => this.bookmarks = bs);
+            .then(bs => vm.bookmarks = bs);
     };
 
-    this.resetForm = () => {
-        this.createShowing = false;
-        this.editShowing = false;
-        this.bookmark = {kind: 'DOCUMENTATION'};
+    vm.resetForm = () => {
+        vm.createShowing = false;
+        vm.editShowing = false;
+        vm.bookmark = {kind: 'DOCUMENTATION'};
     };
 
 
-    this.remove = (b) => {
+    vm.remove = (b) => {
         if (confirm('Are you sure you want to remove this bookmark ?')) {
             bookmarkStore
                 .remove(b.id)
-                .then(() => this.refresh(parentRef))
+                .then(() => vm.refresh(parentRef))
                 .then(() => notification.warning('Removed bookmark'));
         }
     };
 
-    this.showCreate = () => {
-        this.createShowing = true;
-        this.editShowing = false;
-        this.newBookmark = { kind: 'DOCUMENTATION' };
+    vm.showCreate = () => {
+        vm.createShowing = true;
+        vm.editShowing = false;
+        vm.newBookmark = { kind: 'DOCUMENTATION' };
     };
 
-    this.edit = (b) => {
-        this.createShowing = false;
-        this.editShowing = true;
-        this.selectedBookmark = angular.copy(b);
+    vm.edit = (b) => {
+        vm.createShowing = false;
+        vm.editShowing = true;
+        vm.selectedBookmark = angular.copy(b);
     };
 
-    appStore.getById(parentRef.id).then(a => this.parent = a);
-    this.refresh(parentRef);
+    vm.refresh(parentRef);
+
+    vm.parentRef = parentRef;
+
+    vm.goToParent = () => {
+        const nextState = kindToViewState(parentRef.kind);
+        $state.go(nextState, parentRef);
+    }
 
 }
 
+
+
 controller.$inject = [
-    'ApplicationStore',
     'BookmarkStore',
     'Notification',
     '$stateParams',

@@ -81,7 +81,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 List<OrganisationalUnit> subUnits = organisationalUnitDao.findDescendants(ref.id());
                 orgUnitIds.addAll(IdUtilities.toIds(subUnits));
                 break;
-            default:
+            case PARENTS:
                 List<OrganisationalUnit> parentUnits = organisationalUnitDao.findAncestors(ref.id());
                 orgUnitIds.addAll(IdUtilities.toIds(parentUnits));
                 break;

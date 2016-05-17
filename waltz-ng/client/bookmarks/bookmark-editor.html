@@ -15,7 +15,11 @@
     <waltz-page-header name="Bookmarks" icon="book">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.app-view ({id: ctrl.parent.id})">{{ ctrl.parent.name }}</a></li>
+            <li>
+                <a href ng-click="ctrl.goToParent()">
+                    <span ng-bind="ctrl.parentRef.name"></span>
+                </a>
+            </li>
             <li>Bookmarks</li>
             <li>Editor</li>
         </ol>
@@ -93,7 +97,7 @@
                     Add New
                 </button>
                 &nbsp;
-                <a href ng-click="ctrl.cancel()"> Done</a>
+                <a href ng-click="ctrl.goToParent()"> Done</a>
             </div>
             <div ng-if="ctrl.createShowing">
                 <hr>

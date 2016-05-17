@@ -95,7 +95,7 @@ public class ApplicationDao {
 
 
     public List<Application> findByOrganisationalUnitIds(List<Long> ids) {
-        return dsl.select()
+        return dsl.select(APPLICATION.fields())
                 .from(APPLICATION)
                 .where(APPLICATION.ORGANISATIONAL_UNIT_ID.in(ids))
                 .fetch(applicationRecordMapper);

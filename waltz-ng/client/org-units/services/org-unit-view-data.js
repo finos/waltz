@@ -31,7 +31,8 @@ function service($q,
                  assetCostViewService,
                  complexityStore,
                  capabilityStore,
-                 techStatsService) {
+                 techStatsService,
+                 bookmarkStore) {
 
     const rawData = {};
 
@@ -86,7 +87,8 @@ function service($q,
             authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
             endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
             complexityStore.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
-            techStatsService.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN')
+            techStatsService.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
+            bookmarkStore.findByParent({id: orgUnitId, kind: 'ORG_UNIT'})
     ]).then(([
             capabilityRatings,
             rawAppCapabilities,
@@ -95,7 +97,8 @@ function service($q,
             authSources,
             endUserApps,
             complexity,
-            techStats
+            techStats,
+            bookmarks
         ]) => {
 
             const r = {
@@ -107,7 +110,8 @@ function service($q,
                 authSources,
                 endUserApps,
                 complexity,
-                techStats
+                techStats,
+                bookmarks
             };
 
             Object.assign(rawData, r);
@@ -160,6 +164,7 @@ service.$inject = [
     'ComplexityStore',
     'CapabilityStore',
     'TechnologyStatisticsService',
+    'BookmarkStore'
 ];
 
 

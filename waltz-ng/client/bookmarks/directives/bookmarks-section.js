@@ -10,23 +10,35 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
-function controller() {
-    this.bookmarksByKind = _.groupBy(this.bookmarks, 'kind');
+const BINDINGS = {
+    bookmarks: '=',
+    entityId: '@',
+    kind: '@',
+    parentName: '@'
+};
+
+function controller($scope) {
+    const vm = this;
+
+    $scope.$watch(
+        'ctrl.bookmarks',
+        (bookmarks => {
+            if (! bookmarks) return;
+            vm.bookmarksByKind = _.groupBy(bookmarks, 'kind');
+        }));
+
 }
 
+controller.$inject = ['$scope'];
 
 export default () => ({
     restrict: 'E',
     replace: true,
-    scope: {
-        bookmarks: '=',
-        entityId: '@',
-        kind: '@'
-    },
+    scope: {},
     template: require('./bookmarks-section.html'),
     controller,
     controllerAs: 'ctrl',
-    bindToController: true
+    bindToController: BINDINGS
 });

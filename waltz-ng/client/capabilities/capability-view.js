@@ -112,7 +112,8 @@ function controller($scope,
                     applicationStore,
                     traitUsageStore,
                     traitStore,
-                    techStatsService) {
+                    techStatsService,
+                    bookmarkStore) {
 
     const vm = this;
 
@@ -195,6 +196,9 @@ function controller($scope,
                 .then(associatedCapabilities => vm.associatedCapabilities = associatedCapabilities);
         });
 
+    bookmarkStore
+        .findByParent({ id: capId, kind: 'CAPABILITY'})
+        .then(bookmarks => vm.bookmarks = bookmarks);
 
     logHistory(capability, historyStore);
 
@@ -234,7 +238,8 @@ controller.$inject = [
     'ApplicationStore',
     'TraitUsageStore',
     'TraitStore',
-    'TechnologyStatisticsService'
+    'TechnologyStatisticsService',
+    'BookmarkStore'
 ];
 
 
