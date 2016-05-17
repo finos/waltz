@@ -91,15 +91,6 @@
     <waltz-section name="Logical Data Flows"
                    icon="random">
 
-        <waltz-section-actions >
-            <a waltz-has-role="ORGUNIT_EDITOR"
-               ng-if="ctrl.showAuthSourceEditBtn"
-               ui-sref="main.auth-sources.edit (ctrl.entityRef)"
-               class="btn btn-xs btn-primary">
-                Edit
-            </a>
-        </waltz-section-actions>
-
         <waltz-data-flows-tabgroup flow-data="ctrl.viewData.dataFlows"
                                    on-load-detail="ctrl.loadFlowDetail">
         </waltz-data-flows-tabgroup>
@@ -110,6 +101,14 @@
     <!-- AUTH-FLOWS -->
     <waltz-section name="Authoritative Sources"
                    id="flows-section">
+        <waltz-section-actions >
+            <a waltz-has-role="ORGUNIT_EDITOR"
+               ng-if="ctrl.showAuthSourceEditBtn"
+               ui-sref="main.auth-sources.edit (ctrl.entityRef)"
+               class="btn btn-xs btn-primary">
+                Edit
+            </a>
+        </waltz-section-actions>
         <uib-tabset>
             <!-- AUTH SOURCES -->
             <uib-tab select="ctrl.showAuthSourceEditBtn = true"
