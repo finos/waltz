@@ -78,7 +78,8 @@ function controller($scope,
                     appCapabilityStore,
                     ratingStore,
                     technologyStatsService,
-                    assetCostViewService)
+                    assetCostViewService,
+                    bookmarkStore)
 {
     const { id }  = $stateParams;
 
@@ -90,6 +91,7 @@ function controller($scope,
 
     const vm = this;
 
+
     const isUserAnOwner = member =>
             member.role === 'OWNER'
             && member.userId === vm.user.userName;
@@ -100,6 +102,10 @@ function controller($scope,
 
     assetCostViewService.initialise(id, 'APP_GROUP', 'EXACT', 2015)
         .then(costs => vm.assetCostData = costs);
+
+    bookmarkStore
+        .findByParent({ id , kind: 'APP_GROUP'})
+        .then(bookmarks => vm.bookmarks = bookmarks);
 
 
     appGroupStore.getById(id)
@@ -169,7 +175,8 @@ controller.$inject = [
     'AppCapabilityStore',
     'RatingStore',
     'TechnologyStatisticsService',
-    'AssetCostViewService'
+    'AssetCostViewService',
+    'BookmarkStore'
 ];
 
 

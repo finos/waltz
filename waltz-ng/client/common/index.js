@@ -186,3 +186,27 @@ export function toKeyCounts(items = [], fn = x => x) {
         .rollup(d => d.length)
         .entries(items))
 }
+
+
+/**
+ * Given an entity kind, this will return the matching
+ * ui-router state name if avaialble.  Otherwise it
+ * will throw an error.
+ * @param kind
+ * @returns String state name
+ */
+export function kindToViewState(kind) {
+    if (kind === 'APPLICATION') {
+        return "main.app-view";
+    }
+    if (kind === 'APP_GROUP') {
+        return "main.app-group.view";
+    }
+    if (kind === 'CAPABILITY') {
+        return "main.capabilities.view";
+    }
+    if (kind === 'ORG_UNIT') {
+        return "main.org-units.unit";
+    }
+    throw "Unable to convert kind: "+kind+ " to a ui-view state";
+}

@@ -3,12 +3,13 @@
                    name="Bookmarks"
                    small="( {{ctrl.bookmarks.length}} )">
         <waltz-section-actions>
-            <a ui-sref="main.bookmarks.edit ({ entityId: ctrl.entityId, kind: ctrl.kind })"
+            <a ui-sref="main.bookmarks.edit ({ entityId: ctrl.entityId, kind: ctrl.kind, parentName:ctrl.parentName })"
                class="btn btn-xs btn-primary">
                 Edit
             </a>
         </waltz-section-actions>
-        <div class="row" ng-if="ctrl.bookmarks.length > 0">
+        <div class="row"
+             ng-if="ctrl.bookmarks.length > 0">
             <div class="col-md-6"
                  ng-repeat="(kind, bookmarks) in ctrl.bookmarksByKind">
                 <waltz-bookmark-card bookmarks="bookmarks" kind="kind">

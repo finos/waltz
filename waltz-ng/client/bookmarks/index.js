@@ -10,7 +10,7 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import editor from './bookmark-editor';
+import editor from "./bookmark-editor";
 
 
 function registerRoute($stateProvider) {
@@ -18,7 +18,7 @@ function registerRoute($stateProvider) {
         .state('main.bookmarks', {
         })
         .state('main.bookmarks.edit', {
-            url: 'bookmarks/{kind}/{entityId:int}/edit',
+            url: 'bookmarks/{kind}/{entityId:int}/edit?parentName',
             views: {'content@': editor }
         });
 }
