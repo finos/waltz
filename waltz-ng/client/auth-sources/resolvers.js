@@ -18,15 +18,19 @@ export function authSourcesResolver(authSourcesStore, params) {
 authSourcesResolver.$inject = ['AuthSourcesStore', '$stateParams'];
 
 
-export function flowResolver(appStore, flowStore, params) {
+export function flowResolver(flowStore, params) {
     const { id } = params;
 
-    return appStore.findByOrgUnit(id)
-        .then(apps => _.map(apps, 'id'))
-        .then(appIds => flowStore.findByAppIds(appIds));
+    const options = {
+        entityReference: {id, kind: "ORG_UNIT"},
+        scope: "CHILDREN"
+    };
+
+    return flowStore.findByAppIdSelector(options);
+
 }
 
-flowResolver.$inject = ['ApplicationStore', 'DataFlowDataStore', '$stateParams'];
+flowResolver.$inject = ['DataFlowDataStore', '$stateParams'];
 
 
 export function idResolver(params) {
