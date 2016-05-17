@@ -34,7 +34,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.data.JooqUtilities.calculateTallies;
+import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 
@@ -125,19 +125,19 @@ public class ServerInfoDao {
                     .from(APPLICATION)
                     .where(APPLICATION.ID.in(appIdSelector)));
 
-        List<StringTally> environmentTallies = calculateTallies(
+        List<StringTally> environmentTallies = calculateStringTallies(
                 dsl,
                 SERVER_INFORMATION,
                 SERVER_INFORMATION.ENVIRONMENT,
                 condition);
 
-        List<StringTally> operatingSystemTallies = calculateTallies(
+        List<StringTally> operatingSystemTallies = calculateStringTallies(
                 dsl,
                 SERVER_INFORMATION,
                 SERVER_INFORMATION.OPERATING_SYSTEM,
                 condition);
 
-        List<StringTally> locationTallies = calculateTallies(
+        List<StringTally> locationTallies = calculateStringTallies(
                 dsl,
                 SERVER_INFORMATION,
                 SERVER_INFORMATION.LOCATION,

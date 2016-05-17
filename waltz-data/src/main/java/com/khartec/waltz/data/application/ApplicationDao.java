@@ -18,10 +18,10 @@
 package com.khartec.waltz.data.application;
 
 
+import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.capabilityrating.RagRating;
-import com.khartec.waltz.model.tally.ImmutableLongTally;
-import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.model.tally.LongTally;
 import com.khartec.waltz.schema.tables.records.ApplicationRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -116,16 +116,13 @@ public class ApplicationDao {
 
     }
 
-    public List<Tally> countByOrganisationalUnit() {
-        return dsl.select(APPLICATION.ORGANISATIONAL_UNIT_ID, DSL.count())
-                .from(APPLICATION)
-                .groupBy(APPLICATION.ORGANISATIONAL_UNIT_ID)
-                .fetch(r -> ImmutableLongTally.builder()
-                        .id(r.value1())
-                        .count(r.value2())
-                        .build());
-    }
 
+    public List<LongTally> countByOrganisationalUnit() {
+        return JooqUtilities.calculateLongTallies(
+                dsl,
+                APPLICATION,
+                APPLICATION.ORGANISATIONAL_UNIT_ID, DSL.trueCondition());
+    }
 
     /**
      * Given an appId will find all app records with:

@@ -19,11 +19,18 @@ export function orgUnitResolver(orgUnits, params) {
 orgUnitResolver.$inject = ['orgUnits', '$stateParams'];
 
 
-export function talliesResolver(appStore) {
+export function appTalliesResolver(appStore) {
     return appStore.countByOrganisationalUnit();
 }
 
-talliesResolver.$inject = ['ApplicationStore'];
+appTalliesResolver.$inject = ['ApplicationStore'];
+
+
+export function endUserAppTalliesResolver(endUserAppStore) {
+    return endUserAppStore.countByOrganisationalUnit();
+}
+
+endUserAppTalliesResolver.$inject = ['EndUserAppStore'];
 
 
 export function orgUnitsResolver(orgUnitStore) {

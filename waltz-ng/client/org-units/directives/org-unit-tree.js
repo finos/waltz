@@ -10,7 +10,7 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from 'lodash';
+import _ from "lodash";
 
 
 const BINDINGS = {
@@ -45,6 +45,10 @@ function controller() {
     vm.hasOwnApps = (node) => node.appCount && node.appCount > 0;
     vm.hasAnyApps = (node) => node.totalAppCount && node.totalAppCount > 0;
     vm.hasInheritedApps = (node) => node.childAppCount && node.childAppCount > 0;
+
+    vm.hasOwnEndUserApps = (node) => node.endUserAppCount && node.endUserAppCount > 0;
+    vm.hasAnyEndUserApps = (node) => node.totalEndUserAppCount && node.totalEndUserAppCount > 0;
+    vm.hasInheritedEndUserApps = (node) => node.childEndUserAppCount && node.childEndUserAppCount > 0;
 
 
 }

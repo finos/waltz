@@ -9,10 +9,9 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from 'lodash';
-import angular from 'angular';
-
-import { buildHierarchies, termSearch } from "../common";
+import _ from "lodash";
+import angular from "angular";
+import {buildHierarchies, termSearch} from "../common";
 
 
 const FIELDS_TO_SEARCH = ['name', 'description'];
@@ -39,38 +38,57 @@ function loadDiagrams(svgStore, vm, $state) {
 }
 
 
-function prepareOrgUnitTree(orgUnits, tallies) {
+function prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies) {
     const orgUnitsById = _.keyBy(orgUnits, 'id');
 
-    _.each(tallies, t => {
-        const ou = orgUnitsById[t.id];
-        if (ou) ou.appCount = t.count;
-    });
+    const enrichWithDirectCounts = (tallies, keyName) => {
+        _.each(tallies, t => {
+            const ou = orgUnitsById[t.id];
+            if (ou) ou[keyName] = t.count;
+        });
+    };
+
+    enrichWithDirectCounts(appTallies, "appCount");
+    enrichWithDirectCounts(endUserAppTallies, "endUserAppCount");
 
     const rootUnits = buildHierarchies(orgUnits);
 
-    const summer = (node) => {
-        if (node == null) return 0;
+    const summerFactory = (countKey, totalKey, childKey) => {
+        const summer = (node) => {
+            if (node == null) {
+                return 0;
+            }
 
-        let temp = Number(node.appCount || 0);
-        let sum = _.sumBy(node.children, summer);
+            let temp = Number(node[countKey] || 0);
+            let sum = _.sumBy(node.children, summer);
 
-        if (node.children) {
-            node.totalAppCount = sum + temp;
-            node.childAppCount = sum;
-        }
+            if (node.children) {
+                node[totalKey] = sum + temp;
+                node[childKey] = sum;
+            }
 
-        return temp + sum;
+            return temp + sum;
+        };
+        return summer;
     };
 
-    _.each(rootUnits, summer);
+    const appCountSummer = summerFactory("appCount",
+        "totalAppCount",
+        "childAppCount");
+    const endUserAppCountSummer = summerFactory("endUserAppCount",
+        "totalEndUserAppCount",
+        "childEndUserAppCount");
+
+    _.each(rootUnits, appCountSummer);
+    _.each(rootUnits, endUserAppCountSummer);
 
     return rootUnits;
 }
 
 
 function controller(orgUnits,
-                    tallies,
+                    appTallies,
+                    endUserAppTallies,
                     svgStore,
                     $state) {
 
@@ -79,7 +97,7 @@ function controller(orgUnits,
     loadDiagrams(svgStore, vm, $state);
 
     vm.filteredOrgUnits = [];
-    vm.trees = prepareOrgUnitTree(orgUnits, tallies);
+    vm.trees = prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies);
     vm.orgUnits = orgUnits;
     vm.nodeSelected = (node) => vm.selectedNode = node;
 
@@ -96,7 +114,8 @@ function controller(orgUnits,
 
 controller.$inject = [
     'orgUnits',
-    'tallies',
+    'appTallies',
+    'endUserAppTallies',
     'SvgDiagramStore',
     '$state'
 ];

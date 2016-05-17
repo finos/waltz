@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.data.JooqUtilities.calculateTallies;
+import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.schema.tables.Database.DATABASE;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static java.util.stream.Collectors.groupingBy;
@@ -105,13 +105,13 @@ public class DatabaseDao {
     public DatabaseSummaryStatistics findStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
         Condition condition = byAppIdsJoinCondition(appIdSelector);
 
-        List<StringTally> vendorCounts = calculateTallies(
+        List<StringTally> vendorCounts = calculateStringTallies(
                 dsl,
                 DATABASE.innerJoin(ENTITY_RELATIONSHIP).on(condition),
                 DATABASE.DBMS_VENDOR,
                 DSL.trueCondition());
 
-        List<StringTally> environmentCounts = calculateTallies(
+        List<StringTally> environmentCounts = calculateStringTallies(
                 dsl,
                 DATABASE.innerJoin(ENTITY_RELATIONSHIP).on(condition),
                 DATABASE.ENVIRONMENT,

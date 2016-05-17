@@ -17,20 +17,21 @@
 
 package com.khartec.waltz.data.end_user_app;
 
+import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.application.LifecyclePhase;
-import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.enduserapp.ImmutableEndUserApplication;
 import com.khartec.waltz.model.enduserapp.RiskRating;
+import com.khartec.waltz.model.tally.LongTally;
 import com.khartec.waltz.schema.tables.records.EndUserApplicationRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.function.Function;
 
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 
@@ -66,6 +67,13 @@ public class EndUserAppDao {
                 .where(END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds))
                 .fetch(endUserAppMapper);
 
+    }
+
+    public List<LongTally> countByOrganisationalUnit() {
+        return JooqUtilities.calculateLongTallies(
+                dsl,
+                END_USER_APPLICATION,
+                END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID, DSL.trueCondition());
     }
 
 }
