@@ -26,7 +26,7 @@ import com.khartec.waltz.model.application.AppRegistrationRequest;
 import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
-import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.model.tally.LongTally;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -96,7 +96,7 @@ public class ApplicationService {
     }
 
 
-    public List<Tally> countByOrganisationalUnit() {
+    public List<LongTally> countByOrganisationalUnit() {
         return applicationDao.countByOrganisationalUnit();
     }
 

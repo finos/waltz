@@ -21,10 +21,12 @@ import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.end_user_app.EndUserAppDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
+import com.khartec.waltz.model.tally.LongTally;
 import com.khartec.waltz.model.utils.IdUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -52,5 +54,10 @@ public class EndUserAppService {
     public List<EndUserApplication> findByOrganisationalUnitTree(long ouId) {
         List<Long> ids = IdUtilities.toIds(orgUnitDao.findDescendants(ouId));
         return findByOrganisationalUnitIds(ids);
+    }
+
+
+    public Collection<LongTally> countByOrgUnitId() {
+        return endUserAppDao.countByOrganisationalUnit();
     }
 }

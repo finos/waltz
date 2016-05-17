@@ -10,20 +10,17 @@
  *
  */
 
-import 'angular-ui-router';
-
-import ListView from './list-view';
-import UnitView from './unit-view';
-import UnitNavView from './unit-nav-view';
-
-import {
-    orgUnitsResolver,
-    talliesResolver } from './resolvers.js';
+import "angular-ui-router";
+import ListView from "./list-view";
+import UnitView from "./unit-view";
+import UnitNavView from "./unit-nav-view";
+import {orgUnitsResolver, appTalliesResolver, endUserAppTalliesResolver} from "./resolvers.js";
 
 
 const baseState = {
     resolve: {
-        tallies: talliesResolver,
+        appTallies: appTalliesResolver,
+        endUserAppTallies: endUserAppTalliesResolver,
         orgUnits: orgUnitsResolver
     }
 };

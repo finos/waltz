@@ -20,7 +20,7 @@
 
                     <span class="waltz-visibility-child-50">
                         <span ng-if="ctrl.hasAnyApps(node)"
-                              class="small waltz-tally-count"
+                              class="small waltz-app-tally-count"
                               title="Number of applications">
 
                             <span ng-if="ctrl.hasOwnApps(node)">
@@ -29,6 +29,21 @@
 
                             <i ng-if="ctrl.hasInheritedApps(node)">
                                 (<span ng-bind="node.totalAppCount"></span>)
+                            </i>
+                        </span>
+                    </span>
+                    &nbsp;
+                    <span class="waltz-visibility-child-50">
+                        <span ng-if="ctrl.hasAnyEndUserApps(node)"
+                              class="small waltz-end-user-app-tally-count"
+                              title="Number of applications">
+
+                            <span ng-if="ctrl.hasOwnEndUserApps(node)">
+                                <span ng-bind="node.endUserAppCount"></span>
+                            </span>
+
+                            <i ng-if="ctrl.hasInheritedEndUserApps(node)">
+                                (<span ng-bind="node.totalEndUserAppCount"></span>)
                             </i>
                         </span>
                     </span>

@@ -26,7 +26,7 @@ import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.model.tally.LongTally;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.web.DatumRoute;
@@ -144,7 +144,7 @@ public class ApplicationEndpoint implements Endpoint {
     private void registerQueries() {
         ListRoute<Application> search = (request, response) -> appService.search(request.params("query"));
 
-        ListRoute<Tally> tallyByOrgUnit = (request, response) -> appService.countByOrganisationalUnit();
+        ListRoute<LongTally> tallyByOrgUnit = (request, response) -> appService.countByOrganisationalUnit();
 
         ListRoute<Application> findByOrgUnit = (req, res) -> {
             String ouId = req.params("ouId");

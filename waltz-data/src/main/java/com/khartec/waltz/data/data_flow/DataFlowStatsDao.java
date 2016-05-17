@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.data.JooqUtilities.calculateTallies;
+import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 
 
@@ -106,7 +106,7 @@ public class DataFlowStatsDao {
                 .or(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector).toString())
                 .and(bothApps);
 
-        return calculateTallies(
+        return calculateStringTallies(
                 dsl,
                 DATA_FLOW,
                 DATA_FLOW.DATA_TYPE,

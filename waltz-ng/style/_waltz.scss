@@ -134,13 +134,25 @@ textarea {
 
 
 .waltz-tally-count {
-  background: #e2ecfb;
   border-radius: 6px;
-  border: 1px solid #88c1cc;
-  color: #144d66;
+  border: 1px solid #ccc;
   font-size: x-small;
   margin: auto;
   padding: 0 3px 0 3px;
+}
+
+.waltz-app-tally-count {
+    @extend .waltz-tally-count;
+    background: #e2ecfb;
+    color: #144d66;
+    border-color: #88c1cc;
+}
+
+.waltz-end-user-app-tally-count {
+    @extend .waltz-tally-count;
+    background: #fbdbeb;
+    color: #ec6b63;
+    border-color: #ec7e6a;
 }
 
 

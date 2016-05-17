@@ -66,6 +66,19 @@
                         Applications (incl. sub-units)
                     </h5>
 
+                    <hr>
+
+                    <h4 ng-if="ctrl.selectedNode.endUserAppCount > 0">
+                        <span ng-bind="ctrl.selectedNode.endUserAppCount"></span>
+                        End User Application/s
+                    </h4>
+
+                    <h5 ng-if="ctrl.selectedNode.childEndUserAppCount > 0">
+                        <span ng-bind="ctrl.selectedNode.totalEndUserAppCount">
+                        </span>
+                        End User Applications (incl. sub-units)
+                    </h5>
+
                     <div class="small waltz-paragraph"
                          ng-bind="ctrl.selectedNode.description">
                     </div>
