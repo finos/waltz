@@ -124,7 +124,7 @@ function service(personStore,
 
     function load(employeeId) {
         reset();
-        loadPeople(employeeId)
+        const peoplePromise = loadPeople(employeeId)
             .then(() => state.model.person.id)
             .then(personId => {
                 loadFlows(personId);
@@ -133,7 +133,9 @@ function service(personStore,
                 loadComplexity(personId);
             });
 
-        loadApplications(employeeId)
+        const appPromise = loadApplications(employeeId);
+
+        return $q.all([peoplePromise, appPromise]);
     }
 
 

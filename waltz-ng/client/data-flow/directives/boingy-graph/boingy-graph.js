@@ -10,10 +10,9 @@
  *
  */
 
-import d3 from 'd3';
-import _ from 'lodash';
-
-import EventDispatcher from '../../../common/EventDispatcher';
+import d3 from "d3";
+import _ from "lodash";
+import EventDispatcher from "../../../common/EventDispatcher";
 
 const dispatcher = new EventDispatcher();
 
@@ -98,9 +97,7 @@ function draw(data, parts, tweakers) {
     link.enter()
         .append('svg:line')
         .attr('marker-end', 'url(#arrowhead)')
-        .classed('wdfd-link', true)
-        .classed('wdfd-intra-link', d => !(d.source.isNeighbour || d.target.isNeighbour))
-        .classed('wdfd-extra-link', d => (d.source.isNeighbour || d.target.isNeighbour));
+        .classed('wdfd-link', true);
 
 
     link.exit()
@@ -158,6 +155,7 @@ function controller($scope) {
 }
 
 controller.$inject = ['$scope'];
+
 
 export default () => ({
     restrict: 'E',

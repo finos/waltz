@@ -34,10 +34,25 @@ export default [
                 .value();
         };
 
+        const buildGraphTweakers = (appIds) => {
+            return {
+                node : {
+                    enter: (selection) => {
+                        selection
+                            .classed('wdfd-intra-node', d => _.includes(appIds, d.id))
+                            .classed('wdfd-extra-node', d => ! _.includes(appIds, d.id))
+                            .on('click', app => app.fixed = true)
+                            .on('dblclick', app => app.fixed = false)
+                    }
+                }
+            };
+        };
+
 
         return {
             enrich,
-            getDataTypes
+            getDataTypes,
+            buildGraphTweakers,
         };
     }
 ];

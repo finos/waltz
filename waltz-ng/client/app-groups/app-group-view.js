@@ -79,8 +79,8 @@ function controller($scope,
                     ratingStore,
                     technologyStatsService,
                     assetCostViewService,
-                    bookmarkStore)
-{
+                    bookmarkStore,
+                    dataFlowUtilityService) {
     const { id }  = $stateParams;
 
     const assetCosts = {
@@ -135,7 +135,10 @@ function controller($scope,
             vm.techStats = techStats;
         })
         .then(() => calculateCapabilities(vm.allCapabilities, vm.appCapabilities))
-        .then(result => Object.assign(vm, result));
+        .then(result => Object.assign(vm, result))
+        .then(() => vm.flowOptions = ({
+            graphTweakers: dataFlowUtilityService.buildGraphTweakers(_.map(vm.applications, "id"))
+        }));
 
     userService
         .whoami()
@@ -162,6 +165,8 @@ function controller($scope,
     vm.assetCosts = assetCosts;
 }
 
+
+
 controller.$inject = [
     '$scope',
     '$q',
@@ -176,7 +181,8 @@ controller.$inject = [
     'RatingStore',
     'TechnologyStatisticsService',
     'AssetCostViewService',
-    'BookmarkStore'
+    'BookmarkStore',
+    'DataFlowUtilityService'
 ];
 
 

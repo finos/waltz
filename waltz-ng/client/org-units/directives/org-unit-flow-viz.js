@@ -13,80 +13,82 @@
 
 import _ from "lodash";
 
+const BINDINGS = {
+    entities: '=',
+    flows: '=',
+    tweakers: '='
+};
+
+function controller($scope) {
+    const rawData = {
+        flows: [],
+        entities: []
+    };
+    const vm = this;
+
+    $scope.$watchGroup(
+        ['ctrl.entities', 'ctrl.flows'],
+        ([entities, flows]) => {
+
+        if (entities && flows ) {
+            rawData.entities = entities;
+            rawData.flows = flows;
+            rawData.entitiesById = _.keyBy(entities, 'id');
+
+            vm.currentData = { ...rawData };
+
+            const availableTypes = _.chain(flows)
+                .map('dataType')
+                .uniq()
+                .value();
+
+            vm.types = {
+                available: availableTypes,
+                selected: 'ALL'
+            };
+
+        }
+
+    });
+
+
+    const filterFlows = (type) => {
+        const flows = _.filter(
+            rawData.flows,
+            f => type === 'ALL' ? true : f.dataType === type);
+
+        const entities = _.chain(flows)
+            .map(f => ([f.source.id, f.target.id]))
+            .flatten()
+            .uniq()
+            .map(id => rawData.entitiesById[id])
+            .value();
+
+        vm.currentData = {
+            flows,
+            entities
+        };
+
+    };
+
+    vm.show = (type) => {
+        vm.types.selected = type;
+        filterFlows(type);
+    };
+ }
+
+
+controller.$inject = ['$scope'];
+
 
 export default [
     () => ({
         restrict: 'E',
         replace: true,
         template: require('./org-unit-flow-viz.html'),
-        scope: {
-            entities: '=',
-            flows: '='
-        },
-        link: (scope) => {
-
-            const context = {};
-
-            scope.$watchGroup(['entities', 'flows'], () => {
-
-                if (scope.entities && scope.flows ) {
-                    context.allEntities = scope.entities;
-                    context.allFlows = scope.flows;
-                    context.entitiesById = _.keyBy(scope.entities, 'id');
-                    context.availableTypes = _.chain(context.allFlows)
-                        .map('dataType')
-                        .uniq()
-                        .value();
-
-                    scope.data = {
-                        entities: context.allEntities,
-                        flows: context.allFlows
-                    };
-
-                    scope.types = {
-                        available: context.availableTypes,
-                        selected: 'ALL'
-                    };
-
-                    scope.tweakers = {
-                        node: {
-                            enter: (selection) =>
-                                selection
-                                    .classed('wdfd-intra-node', d => !d.isNeighbour)
-                                    .classed('wdfd-extra-node', d => d.isNeighbour)
-                                    .on('click', app => app.fixed = true)
-                                    .on('dblclick', app => app.fixed = false)
-                        }
-                    };
-                }
-
-            });
-
-
-            const filterFlows = (type) => {
-                const flows = _.filter(
-                    context.allFlows,
-                        f => type === 'ALL' ? true : f.dataType === type);
-
-                const entities = _.chain(flows)
-                    .map(f => ([f.source.id, f.target.id]))
-                    .flatten()
-                    .uniq()
-                    .map(id => context.entitiesById[id])
-                    .value();
-
-                scope.data = {
-                    flows,
-                    entities
-                };
-
-            };
-
-            scope.show = (type) => {
-                scope.types.selected = type;
-                filterFlows(type);
-            };
-
-        }
+        scope: {},
+        controllerAs: 'ctrl',
+        controller,
+        bindToController: BINDINGS
     })
 ];

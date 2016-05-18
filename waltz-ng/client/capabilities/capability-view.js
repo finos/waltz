@@ -113,7 +113,8 @@ function controller($scope,
                     traitUsageStore,
                     traitStore,
                     techStatsService,
-                    bookmarkStore) {
+                    bookmarkStore,
+                    dataFlowUtilityService) {
 
     const vm = this;
 
@@ -171,6 +172,10 @@ function controller($scope,
                 vm.assetCostData = assetCostData;
                 vm.techStats = techStats;
             });
+
+            vm.flowOptions = {
+                graphTweakers: dataFlowUtilityService.buildGraphTweakers(appIds)
+            };
         });
 
 
@@ -239,7 +244,8 @@ controller.$inject = [
     'TraitUsageStore',
     'TraitStore',
     'TechnologyStatisticsService',
-    'BookmarkStore'
+    'BookmarkStore',
+    'DataFlowUtilityService'
 ];
 
 
