@@ -1,17 +1,20 @@
 <div>
     Show flows for data type:
-    <select ng-model="types.selected"
-            ng-change="show(types.selected)">
+    <select ng-model="ctrl.types.selected"
+            ng-change="ctrl.show(ctrl.types.selected)">
         <option value="ALL">
             All
         </option>
-        <option ng-repeat="type in types.available | orderBy" value="{{type}}">
-            {{type | toDisplayName:'dataType'}}
+        <option ng-repeat="type in ctrl.types.available | orderBy"
+                value="{{ type }}">
+            {{ type | toDisplayName:'dataType' }}
         </option>
     </select>
 
     <hr/>
 
-    <waltz-data-flow-diagram data="data" tweakers="tweakers"></waltz-data-flow-diagram>
+    <waltz-data-flow-diagram data="ctrl.currentData"
+                             tweakers="ctrl.tweakers">
+    </waltz-data-flow-diagram>
 
 </div>

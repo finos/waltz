@@ -151,7 +151,8 @@ function controller($stateParams,
                     $scope,
                     viewDataService,
                     viewOptions,
-                    historyStore) {
+                    historyStore,
+                    dataFlowUtilityService) {
 
     const id = $stateParams.id;
     const vm = this;
@@ -181,17 +182,21 @@ function controller($stateParams,
 
     vm.eventDispatcher = new EventDispatcher();
 
+    const getAppIds = () => _.map(vm.rawViewData.apps, "id");
+
     viewDataService
         .loadAll(id)
         .then(data => vm.rawViewData = data)
-        .then(refresh);
+        .then(refresh)
+        .then(() => vm.flowOptions = ({
+            graphTweakers: dataFlowUtilityService.buildGraphTweakers(getAppIds())
+        }));
 
     vm.onAssetBucketSelect = (bucket) => {
         $scope.$applyAsync(() => viewDataService.selectAssetBucket(bucket));
     };
 
     vm.loadFlowDetail = () => viewDataService.loadFlowDetail();
-
 }
 
 controller.$inject = [
@@ -200,7 +205,8 @@ controller.$inject = [
     '$scope',
     'OrgUnitViewDataService',
     'OrgUnitViewOptionsService',
-    'HistoryStore'
+    'HistoryStore',
+    'DataFlowUtilityService'
 ];
 
 

@@ -3,13 +3,24 @@ import _ from "lodash";
 
 const BINDINGS = {
     flowData: '=',
-    onLoadDetail: '='
+    onLoadDetail: '=',
+    options: '=?'
+};
+
+
+const defaultOptions = {
+    graphTweakers: {
+        node : {
+            enter: (selection) => console.log("default graphTweaker.node.entry, selection: ", selection)
+        }
+    }
 };
 
 
 function controller($scope) {
 
     const vm = this;
+    vm.options = _.defaultsDeep(vm.options, defaultOptions);
 
     $scope.$watch(
         'ctrl.flowData.flows',
@@ -43,6 +54,7 @@ function controller($scope) {
         if (vm.onLoadDetail) vm.onLoadDetail();
         else console.log("No handler for detail provided ('on-load-detail')");
     };
+
 }
 
 controller.$inject = [ '$scope' ];
