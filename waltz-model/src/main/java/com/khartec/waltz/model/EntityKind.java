@@ -32,7 +32,8 @@ public enum EntityKind {
     SERVER,
     SOFTWARE,
     ASSET_COST,
-    BOOKMARK
+    BOOKMARK,
+    AUTHORITATIVE_SOURCE
 
 
 }

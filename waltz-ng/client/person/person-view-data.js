@@ -27,17 +27,24 @@ const initModel = {
     complexity: [],
     assetCostData: {},
     serverStats: null,
-    dataFlows: []
+    dataFlows: [],
+    visibility: {
+        techOverlay: false,
+        flowOverlay: false,
+        costOverlay: false,
+        applicationOverlay: false
+    }
 };
 
 
-function service(personStore,
+function service($q,
+                 personStore,
                  involvementStore,
                  assetCostViewService,
                  complexityStore,
                  dataFlowViewService,
                  techStatsService,
-                 $q) {
+                 sourceDataRatingStore) {
 
     const state = { model: initModel };
 
@@ -116,6 +123,12 @@ function service(personStore,
             .then(stats => state.model.techStats = stats);
     }
 
+    function loadSourceDataRatings()
+    {
+        sourceDataRatingStore
+            .findAll()
+            .then(ratings => state.model.sourceDataRatings = ratings);
+    }
 
     function reset() {
         state.model = { ...initModel };
@@ -131,6 +144,7 @@ function service(personStore,
                 loadCostStats(personId);
                 loadTechStats(personId);
                 loadComplexity(personId);
+                loadSourceDataRatings();
             });
 
         const appPromise = loadApplications(employeeId);
@@ -160,13 +174,14 @@ function service(personStore,
 }
 
 service.$inject = [
+    '$q',
     'PersonStore',
     'InvolvementDataService',
     'AssetCostViewService',
     'ComplexityStore',
     'DataFlowViewService',
     'TechnologyStatisticsService',
-    '$q'
+    'SourceDataRatingStore'
 ];
 
 export default service;

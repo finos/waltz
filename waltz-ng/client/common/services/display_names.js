@@ -107,6 +107,7 @@ export const entityNames = {
     APP_RATING: 'Application Rating',
     APP_CAPABILITY: 'Applicatin Capability',
     LOGICAL_DATA_FLOW: "Logical Data Flow",
+    AUTHORITATIVE_SOURCE: "Authoritative Source"
 };
 
 

@@ -35,7 +35,8 @@ export const entityIconNames = {
     BOOKMARK: 'bookmark-o',
     APP_RATING: 'star-o',
     APP_CAPABILITY: 'puzzle-piece',
-    LOGICAL_DATA_FLOW: "random"
+    LOGICAL_DATA_FLOW: "random",
+    AUTHORITATIVE_SOURCE: "shield"
 };
 
 
