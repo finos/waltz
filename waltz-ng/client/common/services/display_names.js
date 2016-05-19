@@ -100,6 +100,13 @@ export const entityNames = {
     END_USER_APPLICATION: 'End User App',
     APP_GROUP: 'Application Group',
     DATABASE: 'Database',
+    SERVER: 'Server',
+    ASSET_COST: 'Asset Cost',
+    SOFTWARE: 'Software',
+    BOOKMARK: 'Bookmark',
+    APP_RATING: 'Application Rating',
+    APP_CAPABILITY: 'Applicatin Capability',
+    LOGICAL_DATA_FLOW: "Logical Data Flow",
 };
 
 

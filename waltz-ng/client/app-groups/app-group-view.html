@@ -47,7 +47,17 @@
                 <waltz-icon name="cogs"></waltz-icon>
                 Configure
             </a>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.visibility.capabilityRatingOverlay = ! ctrl.visibility.capabilityRatingOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
         </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.visibility.capabilityRatingOverlay"
+                                   ratings="ctrl.sourceDataRatings"
+                                   entities="['APP_RATING', 'APP_CAPABILITY']">
+        </waltz-source-data-overlay>
+
         <waltz-multi-app-rating-viewer applications="ctrl.applications"
                                        capabilities="ctrl.capabilities"
                                        ratings="ctrl.ratings"
@@ -62,6 +72,19 @@
     <!-- FLOWS -->
     <waltz-section name="Logical Data Flows"
                    icon="random">
+
+        <waltz-section-actions>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.visibility.flowOverlay = ! ctrl.visibility.flowOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.visibility.flowOverlay"
+                                   ratings="ctrl.sourceDataRatings"
+                                   entities="['LOGICAL_DATA_FLOW']">
+        </waltz-source-data-overlay>
+
         <waltz-data-flows-tabgroup flow-data="ctrl.dataFlows"
                                    on-load-detail="ctrl.loadFlowDetail"
                                    options="ctrl.flowOptions">
@@ -71,6 +94,19 @@
 
     <!-- TECHNOLOGIES -->
     <waltz-section name="Technologies">
+
+        <waltz-section-actions>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.visibility.techOverlay = ! ctrl.visibility.techOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.visibility.techOverlay"
+                                   ratings="ctrl.sourceDataRatings"
+                                   entities="['SERVER', 'DATABASE', 'SOFTWARE']">
+        </waltz-source-data-overlay>
+
         <waltz-group-technology-summary stats="ctrl.techStats">
         </waltz-group-technology-summary>
     </waltz-section>
@@ -78,6 +114,7 @@
 
     <!-- COSTS -->
     <waltz-asset-costs-section data='ctrl.assetCostData'
+                               source-data-ratings="ctrl.sourceDataRatings"
                                on-bucket-select="ctrl.onAssetBucketSelect">
     </waltz-asset-costs-section>
 
@@ -85,6 +122,7 @@
     <!-- BOOKMARKS -->
     <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
                              kind="APP_GROUP"
+                             source-data-ratings="ctrl.sourceDataRatings"
                              entity-id="{{ ctrl.groupDetail.appGroup.id }}"
                              parent-name="{{ ctrl.groupDetail.appGroup.name }}">
     </waltz-bookmarks-section>
@@ -95,6 +133,18 @@
                    id="apps-section"
                    small="({{ ctrl.applications.length }})"
                    icon="desktop">
+
+        <waltz-section-actions>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.visibility.appOverlay = ! ctrl.visibility.appOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.visibility.appOverlay"
+                                   ratings="ctrl.sourceDataRatings"
+                                   entities="['APPLICATION']">
+        </waltz-source-data-overlay>
 
         <div ng-if="ctrl.applications">
             <waltz-app-table filter="appQuery"

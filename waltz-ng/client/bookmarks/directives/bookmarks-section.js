@@ -16,7 +16,8 @@ const BINDINGS = {
     bookmarks: '=',
     entityId: '@',
     kind: '@',
-    parentName: '@'
+    parentName: '@',
+    sourceDataRatings: '='
 };
 
 function controller($scope) {

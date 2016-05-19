@@ -28,7 +28,14 @@ export const entityIconNames = {
     PERSON: 'user',
     END_USER_APPLICATION: 'table',
     APP_GROUP: 'object-group',
-    DATABASE: 'database'
+    DATABASE: 'database',
+    SERVER: 'server',
+    ASSET_COST: 'money',
+    SOFTWARE: 'gift',
+    BOOKMARK: 'bookmark-o',
+    APP_RATING: 'star-o',
+    APP_CAPABILITY: 'puzzle-piece',
+    LOGICAL_DATA_FLOW: "random"
 };
 
 

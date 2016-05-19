@@ -5,14 +5,20 @@
              style="">
             <div>
                 <h4>
-                    <waltz-icon name="{{ ctrl.icon }}"></waltz-icon>
-                    {{ ctrl.name }}
+                    <waltz-icon name="{{ ctrl.icon }}">
+                    </waltz-icon>
+                    <span ng-bind="ctrl.name"></span>
                     <small>
-                        {{ ctrl.small }}
+                        <span ng-bind="ctrl.small"></span>
                     </small>
 
-                    <a href class="small pull-right" ng-click="ctrl.visible = false">
-                        <waltz-icon name="times-circle"></waltz-icon> Close
+                    <a href
+                       class="small pull-right"
+                       ng-click="ctrl.visible = false">
+                        <waltz-icon size="lg"
+                                    name="times-circle">
+                        </waltz-icon>
+                        Close
                     </a>
                 </h4>
             </div>
