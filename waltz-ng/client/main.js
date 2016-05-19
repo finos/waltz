@@ -85,6 +85,7 @@ const registrationFns = [
     require('./settings'),
     require('./sidebar'),
     require('./software-catalog'),
+    require('./source-data-rating'),
     require('./static-panel'),
     require('./svg-diagram'),
     require('./technology'),

@@ -1,0 +1,24 @@
+<div class="row">
+    <div class="col-md-12">
+        <div ng-show="ctrl.visible == true"
+             class="waltz-overlay-panel"
+             style="">
+            <div>
+                <h4>
+                    <waltz-icon name="{{ ctrl.icon }}"></waltz-icon>
+                    {{ ctrl.name }}
+                    <small>
+                        {{ ctrl.small }}
+                    </small>
+
+                    <a href class="small pull-right" ng-click="ctrl.visible = false">
+                        <waltz-icon name="times-circle"></waltz-icon> Close
+                    </a>
+                </h4>
+            </div>
+            <div ng-transclude>
+                <!-- PROVIDED CONTENT GOES HERE -->
+            </div>
+        </div>
+    </div>
+</div>

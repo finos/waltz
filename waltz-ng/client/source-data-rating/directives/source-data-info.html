@@ -1,0 +1,38 @@
+<div>
+    <table class="table table-condensed table-striped small">
+        <thead>
+        <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Authoritativeness</th>
+            <th>Accuracy</th>
+            <th>Completeness</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="rating in ctrl.ratings">
+            <td>
+                <span ng-bind="rating.entityKind | toDisplayName:'entity'"></span>
+            </td>
+            <td>
+                <span ng-bind="rating.sourceName"></span>
+            </td>
+            <td>
+                <waltz-rag-indicator name="{{ ctrl.authoritativenessRatingToName(rating.authoritativeness) }}"
+                                     rag-rating="rating.authoritativeness">
+                </waltz-rag-indicator>
+            </td>
+            <td>
+                <waltz-rag-indicator name="{{ ctrl.accuracyRatingToName(rating.accuracy) }}"
+                                     rag-rating="rating.accuracy">
+                </waltz-rag-indicator>
+            </td>
+            <td>
+                <waltz-rag-indicator name="{{ ctrl.completenessRatingToName(rating.completeness) }}"
+                                     rag-rating="rating.completeness">
+                </waltz-rag-indicator>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

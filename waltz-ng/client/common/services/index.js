@@ -25,7 +25,7 @@ import {
     assetCostKindNames,
     investmentRatingNames
 } from "./display_names";
-import {bookmarkIconNames, entityIconNames, severityIconNames} from "./icon_names";
+import {bookmarkIconNames, entityIconNames, severityIconNames, ragIconNames} from "./icon_names";
 
 
 const displayNameService = new BaseLookupService();
@@ -52,6 +52,7 @@ export default (module) => {
     iconNameService.register('bookmark', bookmarkIconNames);
     iconNameService.register('entity', entityIconNames);
     iconNameService.register('severity', severityIconNames);
+    iconNameService.register('rag', ragIconNames);
 
     module.run([
         'DataTypesDataService',

@@ -24,10 +24,12 @@ export default (module) => {
     module.directive('waltzLoadingNotification', require('./loading-notification'));
     module.directive('waltzMailTo', require('./mail-to'));
     module.directive('waltzNavSearchResults', require('./nav-search-results'));
+    module.directive('waltzOverlayPanel', require('./overlay-panel'));
     module.directive('waltzPageHeader', require('./page-header'));
     module.directive('waltzPhoneLink', require('./phone-link'));
     module.directive('waltzPie', require('./pie'));
     module.directive('waltzPieTable', require('./pie-table'));
+    module.directive('waltzRagIndicator', require('./rag-indicator'));
     module.directive('waltzSearch', require('./search'));
     module.directive('waltzSection', require('./section'));
     module.directive('waltzSectionActions', require('./section-actions'));

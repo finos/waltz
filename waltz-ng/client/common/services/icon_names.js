@@ -26,7 +26,9 @@ export const entityIconNames = {
     ORG_UNIT: 'sitemap',
     CAPABILITY: 'puzzle-piece',
     PERSON: 'user',
-    END_USER_APPLICATION: 'table'
+    END_USER_APPLICATION: 'table',
+    APP_GROUP: 'object-group',
+    DATABASE: 'database'
 };
 
 
@@ -34,4 +36,11 @@ export const severityIconNames = {
     INFORMATION: 'sitemap',
     ERROR: 'sitemap',
     WARNING: 'sitemap'
+};
+
+export const ragIconNames = {
+    R: 'times-circle',
+    A: 'question-circle',
+    G: 'check-circle',
+    Z: 'circle-o'
 };

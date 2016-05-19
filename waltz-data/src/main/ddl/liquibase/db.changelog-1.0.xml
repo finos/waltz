@@ -1300,5 +1300,37 @@
 
     </changeSet>
 
+    <!-- 152:Creation of Source Data Ratings -->
+    <changeSet author="dwatkins" id="20160518-152-1">
+        <createTable tableName="source_data_rating">
+            <column name="source_name"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_kind"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Z"
+                    name="authoritativeness"
+                    type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Z"
+                    name="accuracy"
+                    type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Z"
+                    name="completeness"
+                    type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="source_name, entity_kind"
+                       constraintName="source_data_rating_pkey"
+                       tableName="source_data_rating"/>
+    </changeSet>
 
 </databaseChangeLog>

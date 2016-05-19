@@ -1,16 +1,18 @@
-
-function controller($scope, dataFlowStore) {
-    const vm = this;
-
-    dataFlowStore
-        .calculateStats([817, 813, 812, 811, 1096, 990])
-        .then(stats => vm.stats = stats);
+const initData = {
+    ratings: []
+};
 
 
+function controller($scope, sourceDataRatingStore) {
+    const vm = Object.assign(this, initData);
+
+    sourceDataRatingStore
+        .findAll()
+        .then(ratings => vm.ratings = ratings);
 }
 
 controller.$inject = [
-    '$scope', 'DataFlowDataStore'
+    '$scope', 'SourceDataRatingStore'
 ];
 
 

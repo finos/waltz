@@ -12,22 +12,17 @@
                                     color-strategy="ctrl.colorStrategy">
             </waltz-app-rating-table>
         </div>
-        <div ng-show="ctrl.capabilitySelectorVisible == true"
-             class="multi-app-rating-viewer-popup"
-             style="">
-            <div>
-                <h4>
-                    <waltz-icon name="cogs"></waltz-icon>
-                    Configuration
-                    <a href class="small pull-right" ng-click="ctrl.capabilitySelectorVisible = false">
-                        <waltz-icon name="times-circle"></waltz-icon> Close
-                    </a>
-                </h4>
-                <div class="waltz-paragraph">
-                    Use the tree control below to include or exclude
-                    capabilities from the visualisation and to select
-                    the 'colouring' strategy.
-                </div>
+
+        <waltz-overlay-panel name="Configuration"
+                             icon="cogs"
+                             visible="ctrl.capabilitySelectorVisible">
+
+
+
+            <div class="waltz-paragraph">
+                Use the tree control below to include or exclude
+                capabilities from the visualisation and to select
+                the 'colouring' strategy.
             </div>
 
             <hr>
@@ -71,7 +66,6 @@
                 are not being directly used but are 'parents' of capabilities that have
                 been explicitly used.
             </div>
-        </div>
+        </waltz-overlay-panel>
     </div>
-
 </div>

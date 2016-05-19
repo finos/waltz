@@ -97,7 +97,9 @@ export const entityNames = {
     ORG_UNIT: 'Org Unit',
     CAPABILITY: 'Capability',
     PERSON: 'Person',
-    END_USER_APPLICATION: 'End User App'
+    END_USER_APPLICATION: 'End User App',
+    APP_GROUP: 'Application Group',
+    DATABASE: 'Database',
 };
 
 
@@ -106,3 +108,4 @@ export const assetCostKindNames = {
     INFRASTRUCTURE: 'Infrastructure',
     PEOPLE: 'People Costs'
 };
+
