@@ -25,6 +25,15 @@ public enum EntityKind {
     ORG_UNIT,
     APP_GROUP,
     DATABASE,
-    PERSON
+    PERSON,
+    APP_RATING,
+    APP_CAPABILITY,
+    LOGICAL_DATA_FLOW,
+    SERVER,
+    SOFTWARE,
+    ASSET_COST,
+    BOOKMARK,
+    AUTHORITATIVE_SOURCE
+
 
 }

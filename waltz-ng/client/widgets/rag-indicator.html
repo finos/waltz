@@ -1,0 +1,9 @@
+<span>
+    <span ng-class="ctrl.ragToTextColor(ctrl.rating)"
+          style="white-space: nowrap">
+        <waltz-icon size="lg"
+                    name="{{ ctrl.rating | toIconName:'rag' }}">
+        </waltz-icon>
+        <span ng-bind="ctrl.name"></span>
+    </span>
+</span>

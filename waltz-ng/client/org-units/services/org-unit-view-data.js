@@ -32,7 +32,8 @@ function service($q,
                  complexityStore,
                  capabilityStore,
                  techStatsService,
-                 bookmarkStore) {
+                 bookmarkStore,
+                 sourceDataRatingStore) {
 
     const rawData = {};
 
@@ -79,7 +80,7 @@ function service($q,
 
         const appIds = _.map(rawData.apps, 'id');
 
-        return $q.all([
+        const bulkPromise = $q.all([
             ratingStore.findByAppIds(appIds),
             appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
             capabilityStore.findByAppIds(appIds),
@@ -88,21 +89,12 @@ function service($q,
             endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
             complexityStore.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
             techStatsService.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
-            bookmarkStore.findByParent({id: orgUnitId, kind: 'ORG_UNIT'})
-    ]).then(([
-            capabilityRatings,
-            rawAppCapabilities,
-            capabilities,
-            ratedDataFlows,
-            authSources,
-            endUserApps,
-            complexity,
-            techStats,
-            bookmarks
-        ]) => {
+            bookmarkStore.findByParent({id: orgUnitId, kind: 'ORG_UNIT'}),
+            sourceDataRatingStore.findAll()
+        ]);
 
-            const r = {
-                orgUnitId,
+        const prepareRawDataPromise = bulkPromise
+            .then(([
                 capabilityRatings,
                 rawAppCapabilities,
                 capabilities,
@@ -111,18 +103,35 @@ function service($q,
                 endUserApps,
                 complexity,
                 techStats,
-                bookmarks
-            };
+                bookmarks,
+                sourceDataRatings
+            ]) => {
 
-            Object.assign(rawData, r);
+                const r = {
+                    orgUnitId,
+                    capabilityRatings,
+                    rawAppCapabilities,
+                    capabilities,
+                    ratedDataFlows,
+                    authSources,
+                    endUserApps,
+                    complexity,
+                    techStats,
+                    bookmarks,
+                    sourceDataRatings
+                };
 
-            rawData.immediateHierarchy = orgUnitUtils.getImmediateHierarchy(rawData.orgUnits, orgUnitId);
-            rawData.involvements = aggregatePeopleInvolvements(rawData.involvements, rawData.people);
-            rawData.orgUnit = _.find(rawData.orgUnits, { id: orgUnitId });
-            rawData.ratedFlows = new RatedFlowsData(rawData.ratedDataFlows, rawData.apps, rawData.orgUnits, orgUnitId);
+                Object.assign(rawData, r);
 
-            return rawData;
-        });
+                rawData.immediateHierarchy = orgUnitUtils.getImmediateHierarchy(rawData.orgUnits, orgUnitId);
+                rawData.involvements = aggregatePeopleInvolvements(rawData.involvements, rawData.people);
+                rawData.orgUnit = _.find(rawData.orgUnits, { id: orgUnitId });
+                rawData.ratedFlows = new RatedFlowsData(rawData.ratedDataFlows, rawData.apps, rawData.orgUnits, orgUnitId);
+
+                return rawData;
+            });
+
+        return prepareRawDataPromise;
     }
 
 
@@ -164,7 +173,8 @@ service.$inject = [
     'ComplexityStore',
     'CapabilityStore',
     'TechnologyStatisticsService',
-    'BookmarkStore'
+    'BookmarkStore',
+    'SourceDataRatingStore'
 ];
 
 

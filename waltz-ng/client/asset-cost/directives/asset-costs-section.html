@@ -1,5 +1,17 @@
 <div>
     <waltz-section name="Costs" id="costs-section">
+        <waltz-section-actions>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.sourceDataOverlay = ! ctrl.sourceDataOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.sourceDataOverlay"
+                                   ratings="ctrl.sourceDataRatings"
+                                   entities="['ASSET_COST']">
+        </waltz-source-data-overlay>
+
         <waltz-loading-notification show="ctrl.assetCostBuckets.length == 0"
                                     name="Loading summary....">
         </waltz-loading-notification>

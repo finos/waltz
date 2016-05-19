@@ -114,7 +114,8 @@ function controller($scope,
                     traitStore,
                     techStatsService,
                     bookmarkStore,
-                    dataFlowUtilityService) {
+                    dataFlowUtilityService,
+                    sourceDataRatingStore) {
 
     const vm = this;
 
@@ -154,14 +155,16 @@ function controller($scope,
                 dataFlowViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN'),
                 complexityStore.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
                 assetCostViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN', 2015),
-                techStatsService.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN')
+                techStatsService.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
+                sourceDataRatingStore.findAll()
             ]).then(([
                 perspective,
                 ratings,
                 dataFlows,
                 complexity,
                 assetCostData,
-                techStats
+                techStats,
+                sourceDataRatings
             ]) => {
                 vm.ratings = {
                     group: prepareGroupData(capability, vm.apps, perspective, ratings),
@@ -171,6 +174,7 @@ function controller($scope,
                 vm.complexity = complexity;
                 vm.assetCostData = assetCostData;
                 vm.techStats = techStats;
+                vm.sourceDataRatings = sourceDataRatings;
             });
 
             vm.flowOptions = {
@@ -245,7 +249,8 @@ controller.$inject = [
     'TraitStore',
     'TechnologyStatisticsService',
     'BookmarkStore',
-    'DataFlowUtilityService'
+    'DataFlowUtilityService',
+    'SourceDataRatingStore'
 ];
 
 

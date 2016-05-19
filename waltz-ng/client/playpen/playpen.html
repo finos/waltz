@@ -8,8 +8,26 @@
     </waltz-page-header>
 
 
+
     <waltz-section name="inout">
-        <waltz-flow-cloud-diagram width="400" height="200" stats="ctrl.stats"></waltz-flow-cloud-diagram>
+        <waltz-section-actions>
+            <button class="btn btn-xs waltz-btn-transparent" ng-click="ctrl.show = true">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+
+        <waltz-source-data-overlay visible="ctrl.show"
+                                   ratings="ctrl.ratings"
+                                   entities="['ORG_UNIT', 'PERSONs']">
+        </waltz-source-data-overlay>
+
+        <div class="row">
+            <div class="col-md-4">
+                <waltz-source-data-info ratings="ctrl.ratings"></waltz-source-data-info>
+            </div>
+        </div>
+
     </waltz-section>
 
 

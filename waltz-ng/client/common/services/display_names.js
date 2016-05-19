@@ -97,7 +97,17 @@ export const entityNames = {
     ORG_UNIT: 'Org Unit',
     CAPABILITY: 'Capability',
     PERSON: 'Person',
-    END_USER_APPLICATION: 'End User App'
+    END_USER_APPLICATION: 'End User App',
+    APP_GROUP: 'Application Group',
+    DATABASE: 'Database',
+    SERVER: 'Server',
+    ASSET_COST: 'Asset Cost',
+    SOFTWARE: 'Software',
+    BOOKMARK: 'Bookmark',
+    APP_RATING: 'Application Rating',
+    APP_CAPABILITY: 'Applicatin Capability',
+    LOGICAL_DATA_FLOW: "Logical Data Flow",
+    AUTHORITATIVE_SOURCE: "Authoritative Source"
 };
 
 
@@ -106,3 +116,4 @@ export const assetCostKindNames = {
     INFRASTRUCTURE: 'Infrastructure',
     PEOPLE: 'People Costs'
 };
+

@@ -23,7 +23,8 @@ import EventDispatcher from "../../common/EventDispatcher";
 const BINDINGS = {
     data: '=',
     onBucketSelect: '=?',
-    csvName: '@?'
+    csvName: '@?',
+    sourceDataRatings: '='
 };
 
 

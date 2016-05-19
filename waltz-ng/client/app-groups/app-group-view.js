@@ -65,6 +65,34 @@ function calculateCapabilities(allCapabilities, appCapabilities) {
 }
 
 
+const initialState = {
+    applications: [],
+    capabilities: [],
+    complexity: [],
+    allCapabilities: [],
+    appCapabilities: [],
+    ratings: [],
+    techStats: null,
+    flowOptions: null,
+    sourceDataRatings: [],
+    assetCostData: null,
+    bookmarks: [],
+    dataFlows : null,
+    groupDetail: null,
+    user: null,
+    ratingColorStrategy: selectBest,
+    initiallySelectedIds: [],
+    visibility: {
+        techOverlay: false,
+        capabilityRatingOverlay: false,
+        flowOverlay: false,
+        bookmarkOverlay: false,
+        costOverlay: false,
+        applicationOverlay: false
+    }
+};
+
+
 
 function controller($scope,
                     $q,
@@ -80,17 +108,12 @@ function controller($scope,
                     technologyStatsService,
                     assetCostViewService,
                     bookmarkStore,
-                    dataFlowUtilityService) {
+                    dataFlowUtilityService,
+                    sourceDataRatingStore) {
     const { id }  = $stateParams;
 
-    const assetCosts = {
-        stats: [],
-        costs: [],
-        loading: false
-    };
 
-    const vm = this;
-
+    const vm = Object.assign(this, initialState);
 
     const isUserAnOwner = member =>
             member.role === 'OWNER'
@@ -138,7 +161,9 @@ function controller($scope,
         .then(result => Object.assign(vm, result))
         .then(() => vm.flowOptions = ({
             graphTweakers: dataFlowUtilityService.buildGraphTweakers(_.map(vm.applications, "id"))
-        }));
+        }))
+        .then(() => sourceDataRatingStore.findAll())
+        .then((ratings) => vm.sourceDataRatings = ratings);
 
     userService
         .whoami()
@@ -150,8 +175,6 @@ function controller($scope,
         return _.some(vm.groupDetail.members, isUserAnOwner );
     };
 
-    vm.ratingColorStrategy = selectBest;
-
     vm.onAssetBucketSelect = bucket => {
         $scope.$applyAsync(() => {
             assetCostViewService.selectBucket(bucket);
@@ -162,7 +185,6 @@ function controller($scope,
 
     vm.loadFlowDetail = () => dataFlowViewService.loadDetail();
 
-    vm.assetCosts = assetCosts;
 }
 
 
@@ -182,7 +204,8 @@ controller.$inject = [
     'TechnologyStatisticsService',
     'AssetCostViewService',
     'BookmarkStore',
-    'DataFlowUtilityService'
+    'DataFlowUtilityService',
+    'SourceDataRatingStore'
 ];
 
 

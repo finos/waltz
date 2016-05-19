@@ -25,6 +25,18 @@
     <!-- RATINGS -->
     <waltz-section name="Application Capability Ratings">
 
+        <waltz-section-actions>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.visibility.capabilityRatingOverlay = ! ctrl.visibility.capabilityRatingOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.visibility.capabilityRatingOverlay"
+                                   ratings="ctrl.sourceDataRatings"
+                                   entities="['APP_RATING', 'APP_CAPABILITY']">
+        </waltz-source-data-overlay>
+
         <waltz-rating-group-header measurables="ctrl.ratings.group.measurables">
         </waltz-rating-group-header>
 
@@ -38,6 +50,20 @@
     <!-- FLOWS -->
     <waltz-section name="Logical Data Flows"
                    icon="random">
+
+        <waltz-section-actions>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.visibility.flowOverlay = ! ctrl.visibility.flowOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.visibility.flowOverlay"
+                                   ratings="ctrl.sourceDataRatings"
+                                   entities="['LOGICAL_DATA_FLOW']">
+        </waltz-source-data-overlay>
+
+
         <waltz-data-flows-tabgroup flow-data="ctrl.dataFlows"
                                    on-load-detail="ctrl.loadFlowDetail"
                                    options="ctrl.flowOptions">
@@ -54,6 +80,19 @@
     <!-- APPLICATIONS -->
     <waltz-section name="Applications"
                    small="( {{ ctrl.apps.length }} )">
+
+        <waltz-section-actions>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.visibility.appOverlay = ! ctrl.visibility.appOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.visibility.appOverlay"
+                                   ratings="ctrl.sourceDataRatings"
+                                   entities="['APPLICATION']">
+        </waltz-source-data-overlay>
+
 
         <div ng-if="ctrl.groupedApps.primaryApps.length > 0">
             <h4>
@@ -92,6 +131,19 @@
 
     <!-- TECHNOLOGIES -->
     <waltz-section name="Technologies">
+
+        <waltz-section-actions>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.visibility.techOverlay = ! ctrl.visibility.techOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.visibility.techOverlay"
+                                   ratings="ctrl.sourceDataRatings"
+                                   entities="['SERVER', 'DATABASE', 'SOFTWARE']">
+        </waltz-source-data-overlay>
+
         <waltz-group-technology-summary stats="ctrl.techStats">
         </waltz-group-technology-summary>
     </waltz-section>
@@ -101,7 +153,8 @@
     <!-- COSTS -->
     <waltz-asset-costs-section data="ctrl.assetCostData"
                                on-bucket-select="ctrl.onAssetBucketSelect"
-                               csv-name="{{ ctrl.capability.name }}_asset_costs.csv">
+                               csv-name="{{ ctrl.capability.name }}_asset_costs.csv"
+                               source-data-ratings="ctrl.sourceDataRatings">
     </waltz-asset-costs-section>
 
 
@@ -109,7 +162,8 @@
     <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
                              entity-id="{{ ctrl.capability.id }}"
                              kind="CAPABILITY"
-                             parent-name="{{ ctrl.capability.name }}">
+                             parent-name="{{ ctrl.capability.name }}"
+                             source-data-ratings="ctrl.sourceDataRatings">
     </waltz-bookmarks-section>
 
 

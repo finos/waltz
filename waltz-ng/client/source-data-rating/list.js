@@ -2,7 +2,6 @@ const initData = {
     ratings: []
 };
 
-
 function controller($scope, sourceDataRatingStore) {
     const vm = Object.assign(this, initData);
 
@@ -17,7 +16,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./playpen.html'),
+    template: require('./list.html'),
     controller,
     controllerAs: 'ctrl',
     bindToController: true,
