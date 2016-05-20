@@ -28,6 +28,10 @@
     <property name="now.value" value="getutcdate()" dbms="mssql"></property>
     <property name="now.value" value="now()" dbms="mysql"></property>
 
+    <property name="today.value" value="current_date" dbms="oracle"></property>
+    <property name="today.value" value="getutcdate()" dbms="mssql"></property>
+    <property name="today.value" value="curdate" dbms="mysql"></property>
+
     <property name="long.type" value="NUMBER(18)" dbms="oracle"></property>
     <property name="long.type" value="BIGINT" dbms="mssql"></property>
     <property name="long.type" value="BIGINT" dbms="mysql"></property>
@@ -1331,6 +1335,66 @@
         <addPrimaryKey columnNames="source_name, entity_kind"
                        constraintName="source_data_rating_pkey"
                        tableName="source_data_rating"/>
+    </changeSet>
+
+
+
+    <!-- 154:ChangeIntiative -->
+    <changeSet author="dwatkins" id="20160520-154-1">
+        <createTable tableName="change_initiative">
+            <column name="id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id"
+                    type="${long.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="external_id"
+                    type="varchar(128)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="name"
+                    type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kind"
+                    type="varchar(64)"
+                    defaultValue="PROGRAMME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lifecycle_phase"
+                    type="varchar(64)"
+                    defaultValue="DEVELOPMENT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${longvarchar.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_update"
+                    type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date"
+                    type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date"
+                    type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="change_initiative_pkey"
+                       tableName="change_initiative"/>
+
     </changeSet>
 
 </databaseChangeLog>
