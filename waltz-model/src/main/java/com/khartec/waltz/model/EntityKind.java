@@ -33,7 +33,8 @@ public enum EntityKind {
     SOFTWARE,
     ASSET_COST,
     BOOKMARK,
-    AUTHORITATIVE_SOURCE
+    AUTHORITATIVE_SOURCE,
+    CHANGE_INITIATIVE;
 
 
 }
