@@ -1397,4 +1397,27 @@
 
     </changeSet>
 
+
+    <changeSet author="dwatkins"
+               id="20160520-154-2"
+               dbms="mysql">
+        <sql>
+            CREATE FULLTEXT INDEX change_initiative_content_ft_idx ON change_initiative (name, description, external_id)
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               dbms="mssql"
+               id="20160520-154-3">
+        <sql>
+            CREATE FULLTEXT INDEX ON change_initiative
+            (name, description, external_id)
+            KEY INDEX change_initiative_pkey
+            ON WaltzFTS
+            WITH STOPLIST = SYSTEM;
+        </sql>
+    </changeSet>
+
+
 </databaseChangeLog>

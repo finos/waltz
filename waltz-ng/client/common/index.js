@@ -208,5 +208,8 @@ export function kindToViewState(kind) {
     if (kind === 'ORG_UNIT') {
         return "main.org-units.unit";
     }
+    if (kind === 'CHANGE_INITIATIVE') {
+        return "main.change-initiative.view";
+    }
     throw "Unable to convert kind: "+kind+ " to a ui-view state";
 }

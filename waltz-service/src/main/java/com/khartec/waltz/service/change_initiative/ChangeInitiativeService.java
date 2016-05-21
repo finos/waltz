@@ -2,6 +2,7 @@ package com.khartec.waltz.service.change_initiative;
 
 import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
+import com.khartec.waltz.data.change_initiative.search.ChangeInitiativeSearchDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +14,18 @@ import java.util.Collection;
 public class ChangeInitiativeService {
 
     private final ChangeInitiativeDao dao;
+    private final ChangeInitiativeSearchDao searchDao;
 
     @Autowired
-    public ChangeInitiativeService(ChangeInitiativeDao dao) {
+    public ChangeInitiativeService(
+            ChangeInitiativeDao dao,
+            ChangeInitiativeSearchDao searchDao) {
+
         Checks.checkNotNull(dao, "dao cannot be null");
+        Checks.checkNotNull(searchDao, "searchDao cannot be null");
+
         this.dao = dao;
+        this.searchDao = searchDao;
     }
 
     public ChangeInitiative getById(Long id) {
@@ -28,4 +36,7 @@ public class ChangeInitiativeService {
         return dao.findForEntityReference(ref);
     }
 
+    public Collection<ChangeInitiative> search(String query) {
+        return searchDao.search(query);
+    }
 }

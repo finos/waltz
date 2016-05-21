@@ -14,16 +14,17 @@ import _ from "lodash";
 import BaseLookupService from "./BaseLookupService";
 import {
     applicationKindDisplayNames,
+    assetCostKindNames,
     authSourceRatingNames,
     bookmarkNames,
     capabilityRatingNames,
+    changeInitiativeNames,
+    entityNames,
+    investmentRatingNames,
     involvementKindNames,
     lifecyclePhaseDisplayNames,
     orgUnitKindNames,
-    severityNames,
-    entityNames,
-    assetCostKindNames,
-    investmentRatingNames
+    severityNames
 } from "./display_names";
 import {bookmarkIconNames, entityIconNames, severityIconNames, ragIconNames} from "./icon_names";
 
@@ -38,16 +39,17 @@ export default (module) => {
     module.service('WaltzDescriptionService', () => descriptionService);
 
     displayNameService.register('applicationKind', applicationKindDisplayNames);
+    displayNameService.register('assetCost', assetCostKindNames);
     displayNameService.register('bookmark', bookmarkNames);
+    displayNameService.register('capabilityRating', capabilityRatingNames);
+    displayNameService.register('changeInitiative', changeInitiativeNames);
+    displayNameService.register('entity', entityNames);
+    displayNameService.register('investmentRating', investmentRatingNames);
     displayNameService.register('involvementKind', involvementKindNames);
     displayNameService.register('lifecyclePhase', lifecyclePhaseDisplayNames);
     displayNameService.register('orgUnitKind', orgUnitKindNames);
     displayNameService.register('rating', authSourceRatingNames);
     displayNameService.register('severity', severityNames);
-    displayNameService.register('capabilityRating', capabilityRatingNames);
-    displayNameService.register('entity', entityNames);
-    displayNameService.register('assetCost', assetCostKindNames);
-    displayNameService.register('investmentRating', investmentRatingNames);
 
     iconNameService.register('bookmark', bookmarkIconNames);
     iconNameService.register('entity', entityIconNames);

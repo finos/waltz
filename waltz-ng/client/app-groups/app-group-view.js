@@ -66,29 +66,31 @@ function calculateCapabilities(allCapabilities, appCapabilities) {
 
 
 const initialState = {
-    applications: [],
-    capabilities: [],
-    complexity: [],
     allCapabilities: [],
     appCapabilities: [],
-    ratings: [],
-    techStats: null,
-    flowOptions: null,
-    sourceDataRatings: [],
+    applications: [],
     assetCostData: null,
     bookmarks: [],
+    capabilities: [],
+    changeInitiatives: [],
+    complexity: [],
     dataFlows : null,
+    flowOptions: null,
     groupDetail: null,
-    user: null,
-    ratingColorStrategy: selectBest,
     initiallySelectedIds: [],
+    ratingColorStrategy: selectBest,
+    ratings: [],
+    sourceDataRatings: [],
+    techStats: null,
+    user: null,
     visibility: {
-        techOverlay: false,
-        capabilityRatingOverlay: false,
-        flowOverlay: false,
+        applicationOverlay: false,
         bookmarkOverlay: false,
+        capabilityRatingOverlay: false,
+        changeInitiativeOverlay: false,
         costOverlay: false,
-        applicationOverlay: false
+        flowOverlay: false,
+        techOverlay: false
     }
 };
 
@@ -99,6 +101,7 @@ function controller($scope,
                     $stateParams,
                     appGroupStore,
                     appStore,
+                    changeInitiativeStore,
                     complexityStore,
                     dataFlowViewService,
                     userService,
@@ -111,7 +114,6 @@ function controller($scope,
                     dataFlowUtilityService,
                     sourceDataRatingStore) {
     const { id }  = $stateParams;
-
 
     const vm = Object.assign(this, initialState);
 
@@ -129,6 +131,10 @@ function controller($scope,
     bookmarkStore
         .findByParent({ id , kind: 'APP_GROUP'})
         .then(bookmarks => vm.bookmarks = bookmarks);
+
+    changeInitiativeStore
+        .findByRef("APP_GROUP", id)
+        .then(list => vm.changeInitiatives = list);
 
 
     appGroupStore.getById(id)
@@ -195,6 +201,7 @@ controller.$inject = [
     '$stateParams',
     'AppGroupStore',
     'ApplicationStore',
+    'ChangeInitiativeStore',
     'ComplexityStore',
     'DataFlowViewService',
     'UserService',

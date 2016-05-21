@@ -111,6 +111,13 @@ export const entityNames = {
 };
 
 
+export const changeInitiativeNames = {
+    PROGRAMME: 'Programme',
+    PROJECT: 'Project',
+    INITIATIVE: 'Initiative'
+};
+
+
 export const assetCostKindNames = {
     APPLICATION_DEVELOPMENT: 'Application Development',
     INFRASTRUCTURE: 'Infrastructure',

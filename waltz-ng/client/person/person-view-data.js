@@ -176,7 +176,7 @@ function service($q,
 service.$inject = [
     '$q',
     'PersonStore',
-    'InvolvementDataService',
+    'InvolvementStore',
     'AssetCostViewService',
     'ComplexityStore',
     'DataFlowViewService',

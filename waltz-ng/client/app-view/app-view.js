@@ -103,7 +103,7 @@ controller.$inject = [
     'appView',
     'AuthSourcesStore',
     'ChangeLogDataService',
-    'InvolvementDataService',
+    'InvolvementStore',
     'DataFlowDataStore',
     'OrgUnitStore',
     'ServerInfoStore',

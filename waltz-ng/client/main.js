@@ -66,6 +66,7 @@ const registrationFns = [
     require('./auth-sources'),
     require('./bookmarks'),
     require('./capabilities'),
+    require('./change-initiative'),
     require('./complexity'),
     require('./change-log'),
     require('./databases'),

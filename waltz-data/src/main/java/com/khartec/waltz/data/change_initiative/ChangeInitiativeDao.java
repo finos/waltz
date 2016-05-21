@@ -22,7 +22,7 @@ import static java.util.Optional.ofNullable;
 @Repository
 public class ChangeInitiativeDao {
 
-    private static final RecordMapper<Record, ChangeInitiative> TO_DOMAIN_MAPPER = r -> {
+    public static final RecordMapper<Record, ChangeInitiative> TO_DOMAIN_MAPPER = r -> {
         ChangeInitiativeRecord record = r.into(CHANGE_INITIATIVE);
         return ImmutableChangeInitiative.builder()
                 .id(record.getId())
