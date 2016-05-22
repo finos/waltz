@@ -10,7 +10,7 @@
             </span>
             <ul class="list-inline" style="display: inline-block;">
                 <li ng-repeat="parent in ctrl.parents">
-                    <a ui-sref="main.org-units.unit ({id: parent.id })"
+                    <a ui-sref="main.org-unit.view ({id: parent.id })"
                        ng-bind="parent.name">
                     </a>
                     <span ng-if="!$last">&raquo;</span>

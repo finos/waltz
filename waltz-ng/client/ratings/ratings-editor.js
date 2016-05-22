@@ -11,10 +11,9 @@
  *
  */
 
-import _ from 'lodash';
-import d3 from 'd3';
-
-import { calculateGroupSummary, determineChanges, mkAppRatingsGroup } from '../ratings/directives/common';
+import _ from "lodash";
+import d3 from "d3";
+import {calculateGroupSummary, determineChanges, mkAppRatingsGroup} from "../ratings/directives/common";
 
 
 function createChangeAction(group, app, perspectiveCode) {
@@ -170,7 +169,7 @@ function controller(appStore,
     vm.submit = () => {
         const action = createChangeAction(vm.group, vm.app, perspectiveCode);
         ratingStore.update(action)
-            .then(() => $state.go('main.app-view', { id: vm.app.id }))
+            .then(() => $state.go('main.app.view', { id: vm.app.id }))
             .then(() => notification.success('Updated ratings'));
     };
 

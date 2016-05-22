@@ -12,7 +12,7 @@
 
 function controller(localStorageService) {
     const vm = this;
-    const refreshHistory = () => vm.history = localStorageService.get('history_1');
+    const refreshHistory = () => vm.history = localStorageService.get('history_2');
 
     vm.refreshHistory = refreshHistory;
     refreshHistory();

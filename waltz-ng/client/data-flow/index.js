@@ -11,8 +11,6 @@
  *
  */
 
-import RegistrationView from "./registration-view";
-
 
 export default (module) => {
 
@@ -24,25 +22,6 @@ export default (module) => {
     module.service('DataFlowUtilityService', require('./services/data-flow-utility'));
 
 
-    module.config([
-        '$stateProvider',
-        ($stateProvider) => {
-            $stateProvider
-                .state('main.data-flow', {
-                    url: 'data-flow'
-                })
-                .state('main.data-flow.registration', {
-                    url: '/registration/:id',
-                    views: {'content@': RegistrationView },
-                    resolve: {
-                        application: [
-                            'ApplicationStore',
-                            '$stateParams',
-                            (ApplicationStore, $stateParams) => ApplicationStore.getById($stateParams.id)
-                        ]
-                    }
-                });
-        }
-    ]);
+    module.config(require('./routes'));
 
 };

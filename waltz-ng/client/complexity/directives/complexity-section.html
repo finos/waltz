@@ -34,7 +34,7 @@
                             </tr></thead>
                             <tr ng-repeat="item in ctrl.complexitySelection.items | orderBy:'app.name'">
                                 <td>
-                                    <a ui-sref="main.app-view ({id: item.app.id })">
+                                    <a ui-sref="main.app.view ({id: item.app.id })">
                                         {{ item.app.name }}
                                     </a>
                                 </td>

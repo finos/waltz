@@ -10,11 +10,9 @@
  *
  */
 
-import _ from 'lodash';
-import angular from 'angular';
-
-import { buildHierarchies } from '../common';
-import { talliesById } from '../common/tally-utils';
+import angular from "angular";
+import {buildHierarchies} from "../common";
+import {talliesById} from "../common/tally-utils";
 
 
 function controller(capabilities, appCapabilityStore, svgStore, $state) {
@@ -30,7 +28,7 @@ function controller(capabilities, appCapabilityStore, svgStore, $state) {
     svgStore.findByKind('CAPABILITY').then(xs => vm.diagrams = xs);
 
     vm.blockProcessor = b => {
-        b.block.onclick = () => $state.go('main.capabilities.view', { id: b.value });
+        b.block.onclick = () => $state.go('main.capability.view', { id: b.value });
         angular.element(b.block).addClass('clickable');
     };
 }

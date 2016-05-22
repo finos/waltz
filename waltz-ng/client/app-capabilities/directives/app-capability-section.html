@@ -1,38 +1,17 @@
 <div>
-    <waltz-section name="Traits & Capabilities"
+    <waltz-section name="Capabilities"
                    icon="puzzle-piece">
 
         <waltz-section-actions>
             <a waltz-has-role="APP_EDITOR"
-               ui-sref='main.app-capability-edit ({id: ctrl.selfId})'
+               ui-sref='main.app-capability.edit ({id: ctrl.selfId})'
                class="btn btn-xs btn-primary">
                 Edit
             </a>
         </waltz-section-actions>
 
         <div class="row">
-            <div class="col-sm-6">
-
-                <!-- TRAITS -->
-
-                <h4>Traits</h4>
-                <div ng-if="ctrl.traits.length > 0">
-                    <waltz-traits-table traits="ctrl.traits">
-                    </waltz-traits-table>
-                </div>
-
-                <div ng-if="ctrl.traits.length == 0">
-                    <div class="alert alert-warning">
-                        <strong>No Traits</strong>
-                        have been registered against this application yet.
-                    </div>
-                </div>
-
-                <div class="small text-muted">
-                    Traits are used to provide a broad classification to an application
-                </div>
-            </div>
-            <div class="col-sm-6" style="border-left: 1px solid #eee">
+            <div class="col-sm-12" style="border-left: 1px solid #eee">
 
                 <!-- CAPABILITIES -->
 

@@ -50,7 +50,7 @@
                     </label>
                     <ul class="list-unstyled">
                         <li ng-repeat="parent in ctrl.related['PARENT']">
-                            <a ui-sref="main.app-view ({id: parent.id})">{{ parent.name }}</a>
+                            <a ui-sref="main.app.view ({id: parent.id})">{{ parent.name }}</a>
                             <small> - {{ parent.description | limitTo: 40 }} </small>
                         </li>
                     </ul>
@@ -63,7 +63,7 @@
                     </label>
                     <ul class="list-unstyled">
                         <li ng-repeat="sharer in ctrl.related['SHARING']">
-                            <a ui-sref="main.app-view ({id: sharer.id})">{{ sharer.name }}</a>
+                            <a ui-sref="main.app.view ({id: sharer.id})">{{ sharer.name }}</a>
                             <small> - {{ sharer.description | limitTo: 40 }} </small>
                         </li>
                     </ul>
@@ -73,7 +73,7 @@
                     <label>Children</span></label>
                     <ul class="list-unstyled">
                         <li ng-repeat="child in ctrl.related['CHILD']">
-                            <a ui-sref="main.app-view ({id: child.id})">{{ child.name }}</a>
+                            <a ui-sref="main.app.view ({id: child.id})">{{ child.name }}</a>
                             <small> - {{ child.description | limitTo: 40 }} </small>
                         </li>
                     </ul>
@@ -88,7 +88,7 @@
                     </label>
                     <ul class="list-unstyled">
                         <li ng-repeat="sibling in ctrl.related['SIBLING']">
-                            <a ui-sref="main.app-view ({id: sibling.id})">{{ sibling.name }}</a>
+                            <a ui-sref="main.app.view ({id: sibling.id})">{{ sibling.name }}</a>
                             <small> - {{ sibling.description | limitTo: 40 }} </small>
                         </li>
                     </ul>

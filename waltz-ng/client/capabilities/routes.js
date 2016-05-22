@@ -40,9 +40,9 @@ const viewState = {
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.capabilities', baseState)
-        .state('main.capabilities.list', listState)
-        .state('main.capabilities.view', viewState);
+        .state('main.capability', baseState)
+        .state('main.capability.list', listState)
+        .state('main.capability.view', viewState);
 }
 
 

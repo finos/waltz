@@ -75,13 +75,13 @@
                     <tbody class="small">
                     <tr ng-repeat="flow in ctrl.condensedFlows">
                         <td>
-                            <a ui-sref="main.app-view ({id: flow.source.id })">
+                            <a ui-sref="main.app.view ({id: flow.source.id })">
                                 <span ng-class="{ italics : flow.groupMembership.source }"
                                       ng-bind="flow.source.name"></span>
                             </a>
                         </td>
                         <td>
-                            <a ui-sref="main.app-view ({id: flow.target.id })">
+                            <a ui-sref="main.app.view ({id: flow.target.id })">
                                 <span ng-class="{ italics : flow.groupMembership.target }"
                                       ng-bind="flow.target.name">
                                 </span>

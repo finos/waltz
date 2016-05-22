@@ -13,7 +13,7 @@
 import AppEdit from "./app-edit";
 import AppRegistration from "./app-registration";
 import appTagExplorerView from "./app-tag-explorer";
-
+import {appViewResolver, orgUnitsResolver} from "./resolvers";
 
 const base = {
     url: 'application'
@@ -26,19 +26,22 @@ const appRegistrationState = {
 };
 
 
+const appViewState = {
+    url: '/:id',
+    resolve: {
+        appView: appViewResolver
+    },
+    views: {
+        'content@': require('./app-view')
+    },
+    onEnter: onAppViewEnter
+};
+
 const appEditState = {
     url: '/:id/edit',
     resolve: {
-        appView: [
-            'ApplicationViewDataService',
-            '$stateParams',
-            (ApplicationViewDataService, $stateParams) =>
-                ApplicationViewDataService.getById($stateParams.id)
-        ],
-        orgUnits: [
-            'OrgUnitStore',
-            (OrgUnitStore) => OrgUnitStore.findAll()
-        ]
+        appView: appViewResolver,
+        orgUnits: orgUnitsResolver
     },
     views: {'content@': AppEdit}
 };
@@ -50,13 +53,28 @@ const appTagExplorerState = {
 };
 
 
+function onAppViewEnter(appView, historyStore) {
+    historyStore.put(
+        appView.app.name,
+        'APPLICATION',
+        'main.app.view',
+        { id: appView.app.id });
+}
+
+onAppViewEnter.$inject = ['appView', 'HistoryStore'];
+
+
+
+
 function setup($stateProvider) {
     $stateProvider
         .state('main.app', base)
+        .state('main.app.view', appViewState)
         .state('main.app.registration', appRegistrationState)
         .state('main.app.edit', appEditState)
         .state('main.app.tag-explorer', appTagExplorerState);
 }
+
 
 setup.$inject = [
     '$stateProvider'

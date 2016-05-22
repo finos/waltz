@@ -54,7 +54,7 @@
             id="applications/app-registration-success.frag">
         <td>
             <waltz-icon name="check"></waltz-icon>
-            <a ui-sref="main.app-view ({ id: registration.app.id })">
+            <a ui-sref="main.app.view ({ id: registration.app.id })">
                 <strong>
                     {{ registration.app.name }}
                 </strong>
@@ -67,7 +67,7 @@
             {{ registration.app.lifecyclePhase | toDisplayName:'lifecyclePhase' }}
         </td>
         <td>
-            <a ui-sref="main.org-units.unit ({ id: registration.app.organisationalUnit.id })">
+            <a ui-sref="main.org-unit.view ({ id: registration.app.organisationalUnit.id })">
                 {{ registration.app.organisationalUnit.name }}
             </a>
         </td>

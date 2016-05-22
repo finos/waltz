@@ -12,7 +12,7 @@
 
 import _ from "lodash";
 
-const key = 'history_1';
+const key = 'history_2';
 
 function store(storage) {
 
@@ -37,7 +37,9 @@ function store(storage) {
     };
 }
 
-store.$inject = ['localStorageService', '$state', '$stateParams'];
+store.$inject = [
+    'localStorageService'
+];
 
 
 export default store;

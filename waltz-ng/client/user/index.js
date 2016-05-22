@@ -10,31 +10,6 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import userManagementView from './user-management';
-import userLogView from './user-log';
-
-const userManagementState = {
-    url: 'user/management',
-    views: {'content@': userManagementView }
-};
-
-
-const userLogState = {
-    url: 'user/log',
-    views: {'content@': userLogView }
-};
-
-
-function configureStates(stateProvider) {
-    stateProvider
-        .state('main.user', {})
-        .state('main.user.management', userManagementState)
-        .state('main.user.log', userLogState);
-}
-
-configureStates.$inject = ['$stateProvider'];
-
-
 export default (module) => {
     module
         .directive('waltzHasRole', require('./directives/has-role'))
@@ -42,5 +17,5 @@ export default (module) => {
         .directive('waltzIfAnonymous', require('./directives/if-anonymous'))
         .service('UserService', require('./services/user-service'))
         .service('UserStore', require('./services/user-store'))
-        .config(configureStates);
+        .config(require('./routes'));
 };

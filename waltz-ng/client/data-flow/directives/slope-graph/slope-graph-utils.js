@@ -85,7 +85,7 @@ function getIncomingRating(authSources, flow) {
 export function prepareSlopeGraph(appId, flows, dataTypes, appAuthSources, ouAuthSources, displayNameService, $state) {
     const isIncoming = f => f.target.id === appId;
     const isOutgoing = f => f.source.id === appId;
-    const addAppClickHandler = selection => selection.on('click', app => $state.go('main.app-view', { id: app.id }));
+    const addAppClickHandler = selection => selection.on('click', app => $state.go('main.app.view', { id: app.id }));
 
     return {
         data: {

@@ -44,7 +44,7 @@ function controller(uiGridConstants, $scope, $animate) {
         columnDefs: [
             {
                 field: 'name',
-                cellTemplate: '<div class="ui-grid-cell-contents"> <a ui-sref="main.app-view ({ id: row.entity[\'id\'] })">{{ COL_FIELD }}</a></div>'
+                cellTemplate: '<div class="ui-grid-cell-contents"> <a ui-sref="main.app.view ({ id: row.entity[\'id\'] })">{{ COL_FIELD }}</a></div>'
             },
             {
                 field: 'kind',

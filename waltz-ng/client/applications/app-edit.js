@@ -10,9 +10,8 @@
  *
  */
 
-import _ from 'lodash';
-
-import * as fields from './formly/fields';
+import _ from "lodash";
+import * as fields from "./formly/fields";
 
 
 function setupTagAutoComplete(appStore) {
@@ -99,7 +98,7 @@ function controller(appView, orgUnits, displayNameService, appStore, notificatio
     function onSubmit() {
         const onSuccess = () => {
             notification.success('Application updated');
-            $state.go('main.app-view', {id: appView.app.id});
+            $state.go('main.app.view', {id: appView.app.id});
         };
 
         const onFailure = (result) => {

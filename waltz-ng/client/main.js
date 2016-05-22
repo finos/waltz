@@ -61,7 +61,6 @@ const registrationFns = [
     require('./applications'),
     require('./app-capabilities'),
     require('./app-groups'),
-    require('./app-view'),
     require('./asset-cost'),
     require('./auth-sources'),
     require('./bookmarks'),

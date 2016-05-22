@@ -21,7 +21,7 @@
                 </waltz-section-actions>
                 <ul>
                     <li ng-repeat="app in tagSet.apps | orderBy:'name'" >
-                        <a ui-sref="main.app-view ({ id: app.id })">
+                        <a ui-sref="main.app.view ({ id: app.id })">
                             <strong>
                                 {{ app.name }}
                             </strong>
