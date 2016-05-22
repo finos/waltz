@@ -18,42 +18,14 @@
  */
 
 
-
-const baseState = {
-    url: 'app-group'
-};
-
-
-const viewState = {
-    url: '/:id',
-    views: { 'content@': require('./app-group-view') }
-};
-
-
-const editState = {
-    url: '/:id/edit',
-    views: { 'content@': require('./app-group-edit') }
-};
-
-
-function setupRoutes($stateProvider) {
-    $stateProvider
-        .state('main.app-group', baseState)
-        .state('main.app-group.view', viewState)
-        .state('main.app-group.edit', editState);
-}
-
-setupRoutes.$inject = ['$stateProvider'];
-
-
 export default (module) => {
 
     module.service('AppGroupStore', require('./services/app-group-store'));
+ 
     module.directive('waltzAppGroupList', require('./directives/app-group-list'));
     module.directive('waltzAppGroupListSection', require('./directives/app-group-list-section'));
     module.directive('waltzAppGroupAppSelectionList', require('./directives/app-group-app-selection-list'));
     module.directive('waltzAppGroupSummary', require('./directives/app-group-summary'));
 
-
-    module.config(setupRoutes);
+    module.config(require('./routes'));
 }

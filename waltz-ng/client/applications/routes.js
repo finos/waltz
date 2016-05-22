@@ -10,20 +10,24 @@
  *
  */
 
-import AppEdit from './app-edit';
-import AppRegistration from './app-registration';
-import appTagExplorerView from './app-tag-explorer';
+import AppEdit from "./app-edit";
+import AppRegistration from "./app-registration";
+import appTagExplorerView from "./app-tag-explorer";
 
 
+const base = {
+    url: 'application'
+};
 
-export const appRegistrationState = {
-    url: 'application/registration',
+
+const appRegistrationState = {
+    url: '/registration',
     views: {'content@': AppRegistration }
 };
 
 
-export const appEditState = {
-    url: 'application/:id/edit',
+const appEditState = {
+    url: '/:id/edit',
     resolve: {
         appView: [
             'ApplicationViewDataService',
@@ -39,7 +43,24 @@ export const appEditState = {
     views: {'content@': AppEdit}
 };
 
-export const appTagExplorerState = {
-    url: 'application-tag-explorer/:tag',
+
+const appTagExplorerState = {
+    url: 'tag-explorer/:tag',
     views: {'content@': appTagExplorerView }
+};
+
+
+function setup($stateProvider) {
+    $stateProvider
+        .state('main.app', base)
+        .state('main.app.registration', appRegistrationState)
+        .state('main.app.edit', appEditState)
+        .state('main.app.tag-explorer', appTagExplorerState);
 }
+
+setup.$inject = [
+    '$stateProvider'
+];
+
+
+export default setup;
