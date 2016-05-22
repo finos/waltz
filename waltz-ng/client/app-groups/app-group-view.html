@@ -146,7 +146,7 @@
                                        list="ctrl.changeInitiatives">
         </waltz-change-initiative-table>
 
-        <div class="alert alert-warning">
+        <div class="alert alert-warning" ng-if="ctrl.changeInitiatives.length == 0">
             <strong>This group has not been associated to any Change Initiatives</strong>
         </div>
 

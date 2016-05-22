@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static com.khartec.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
@@ -18,7 +20,7 @@ import static com.khartec.waltz.schema.tables.ApplicationGroupMember.APPLICATION
 public class AppGroupDao {
 
 
-    private static final RecordMapper<Record, AppGroup> groupMapper = r -> {
+    private static final RecordMapper<? super Record, AppGroup> TO_DOMAIN = r -> {
         ApplicationGroupRecord record = r.into(APPLICATION_GROUP);
         return ImmutableAppGroup.builder()
                 .name(record.getName())
@@ -42,7 +44,7 @@ public class AppGroupDao {
         return dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.eq(groupId))
-                .fetchOne(groupMapper);
+                .fetchOne(TO_DOMAIN);
     }
 
 
@@ -54,7 +56,7 @@ public class AppGroupDao {
         return dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.in(groupIds))
-                .fetch(groupMapper);
+                .fetch(TO_DOMAIN);
     }
 
 
@@ -62,7 +64,7 @@ public class AppGroupDao {
         return dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name()))
-                .fetch(groupMapper);
+                .fetch(TO_DOMAIN);
     }
 
     public int update(AppGroup appGroup) {
@@ -89,5 +91,18 @@ public class AppGroupDao {
                 .where(APPLICATION_GROUP.ID.eq(groupId))
                 .execute();
 
+    }
+
+    public Set<AppGroup> findByIds(String user, List<Long> ids) {
+        return dsl.select(APPLICATION_GROUP.fields())
+                .from(APPLICATION_GROUP)
+                .innerJoin(APPLICATION_GROUP_MEMBER)
+                .on(APPLICATION_GROUP_MEMBER.GROUP_ID.eq(APPLICATION_GROUP.ID))
+                .where(APPLICATION_GROUP.ID.in(ids))
+                .and(APPLICATION_GROUP_MEMBER.USER_ID.eq(user)
+                        .or(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())))
+                .stream()
+                .map(r -> TO_DOMAIN.map(r))
+                .collect(Collectors.toSet());
     }
 }

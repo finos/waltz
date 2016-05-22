@@ -2,6 +2,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.entiy_relationship.EntityRelationship;
 import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -33,11 +34,15 @@ public class ChangeInitiativeEndpoint implements Endpoint {
     public void register() {
 
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String getRelationshipsForIdPath = mkPath(getByIdPath, "related");
         String findForRefPath = mkPath(BASE_URL, "ref", ":kind", ":id");
         String searchPath = mkPath(BASE_URL, "search", ":query");
 
         DatumRoute<ChangeInitiative> getByIdRoute = (request, response) ->
                 service.getById(getId(request));
+
+        ListRoute<EntityRelationship> getRelationshipsForIdRoute = (request, response) ->
+                service.getRelatedEntitiesForId(getId(request));
 
         ListRoute<ChangeInitiative> findForRefRoute = (request, response) ->
                 service.findForEntityReference(getEntityReference(request));
@@ -46,6 +51,7 @@ public class ChangeInitiativeEndpoint implements Endpoint {
                 service.search(request.params("query"));
 
         getForDatum(getByIdPath, getByIdRoute);
+        getForList(getRelationshipsForIdPath, getRelationshipsForIdRoute);
         getForList(findForRefPath, findForRefRoute);
         getForList(searchPath, searchRoute);
 

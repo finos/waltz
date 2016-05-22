@@ -22,7 +22,12 @@ function service($http, BaseApiUrl) {
 
 
     const getById = (id) => $http
-        .get(`${BASE}/id/${id}`)
+        .get(`${BASE}/id/${id}/detail`)
+        .then(result => result.data);
+
+
+    const findByIds = (ids = []) => $http
+        .post(`${BASE}/id`, ids)
         .then(result => result.data);
 
 
@@ -35,29 +40,36 @@ function service($http, BaseApiUrl) {
         .get(`${BASE}/public`)
         .then(result => result.data);
 
+
     const subscribe = (id) => $http
         .post(`${BASE}/id/${id}/subscribe`, {})
         .then(result => result.data);
+
 
     const unsubscribe = (id) => $http
         .post(`${BASE}/id/${id}/unsubscribe`, {})
         .then(result => result.data);
 
+
     const addOwner = (id, ownerId) => $http
         .post(`${BASE}/id/${id}/members/owners`, ownerId)
         .then(result => result.data);
+
 
     const deleteGroup = (id) => $http
         .delete(`${BASE}/id/${id}`)
         .then(result => result.data);
 
+
     const addApplication = (groupId, applicationId) => $http
         .post(`${BASE}/id/${groupId}/applications`, applicationId)
         .then(result => result.data);
 
+
     const removeApplication = (groupId, applicationId) => $http
         .delete(`${BASE}/id/${groupId}/applications/${applicationId}`)
         .then(result => result.data);
+
 
     const updateGroupOverview = (groupId, data) => $http
         .post(`${BASE}/id/${groupId}`, data)
@@ -73,6 +85,7 @@ function service($http, BaseApiUrl) {
         findMyGroupSubscriptions,
 
         getById,
+        findByIds,
         findPublicGroups,
 
         subscribe,

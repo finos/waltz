@@ -12,6 +12,7 @@
 
     </waltz-page-header>
 
+
     <div class="row">
         <div class="col-sm-offset-1 col-sm-10">
             <div class="waltz-page-summary">
@@ -97,5 +98,45 @@
         id="people-section"
         involvements="ctrl.involvements">
     </waltz-involved-people-section>
+
+
+    <waltz-section icon="object-group"
+                   name="Related App Groups">
+        <div class="row">
+            <div class="col-md-12">
+                <div ng-if="ctrl.related.appGroups.length > 0">
+                    <table class="table table-condensed small">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="group in ctrl.related.appGroups">
+                            <td>
+                                <a ui-sref="main.app-group.view ({id: group.id})">
+                                    <span ng-bind="group.name"></span>
+                                </a>
+                            </td>
+                            <td>
+                                <span ng-bind="group.kind"></span>
+                            </td>
+                            <td>
+                                <span ng-bind="group.description | limitTo: 50"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div ng-if="ctrl.related.appGroups.length == 0"
+                     class="alert alert-warning">
+                    <strong>No Groups have been associated with this change initiative</strong>
+                </div>
+
+            </div>
+        </div>
+    </waltz-section>
 
 </div>

@@ -50,7 +50,19 @@
                           ng-model="ctrl.appGroup.description">
                 </textarea>
 
-                <br>
+                <div class="radio">
+                    <label>
+                        <input type="radio" ng-model="ctrl.appGroup.kind" value="PRIVATE">
+                        Private - (recommended) - limited viewers and the group will not be listed in the search results.
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" ng-model="ctrl.appGroup.kind" value="PUBLIC">
+                        Public - anyone can search for and view this group.
+                    </label>
+                </div>
+
                 <button type="submit"
                         class="btn btn-success">
                     Update
