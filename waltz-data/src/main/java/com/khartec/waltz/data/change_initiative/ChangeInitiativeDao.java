@@ -32,9 +32,9 @@ public class ChangeInitiativeDao {
                 .kind(ChangeInitiativeKind.valueOf(record.getKind()))
                 .lifecyclePhase(LifecyclePhase.valueOf(record.getLifecyclePhase()))
                 .provenance(record.getProvenance())
-                .lastUpdate(record.getLastUpdate())
-                .startDate(record.getLastUpdate())
-                .endDate(record.getLastUpdate())
+                .lastUpdate(ofNullable(record.getLastUpdate()))
+                .startDate(record.getStartDate())
+                .endDate(record.getEndDate())
                 .build();
     };
 

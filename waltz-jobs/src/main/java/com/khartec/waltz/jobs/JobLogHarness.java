@@ -15,27 +15,25 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.involvement;
+package com.khartec.waltz.jobs;
 
-public enum InvolvementKind {
+import com.khartec.waltz.data.system.job_log.JobLogDao;
+import com.khartec.waltz.service.DIConfiguration;
+import org.jooq.tools.json.ParseException;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-    IT_ARCHITECT,
-    DATA_ARCHITECT,
 
-    PROJECT_MANAGER,
-    SUPPORT_MANAGER,
+public class JobLogHarness {
 
-    IT_LEAD,
-    DEVELOPER,
-    QA,
-    BUSINESS_ANALYST,
-    SUPPORT,
+    public static void main(String[] args) throws ParseException {
 
-    BUSINESS_SPONSOR,
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
-    SENIOR_MANAGER,
+        JobLogDao jobLogDao = ctx.getBean(JobLogDao.class);
 
-    ADMINISTRATIVE
+        jobLogDao.findLatestSuccessful()
+                .forEach(System.out::println);
 
+    }
 
 }

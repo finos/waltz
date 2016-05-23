@@ -17,6 +17,7 @@ public abstract class EntityRelationship implements ProvenanceProvider {
     public abstract EntityReference a();
     public abstract EntityReference b();
 
+
     @Value.Default
     public RelationshipKind relationship() {
         return HAS;

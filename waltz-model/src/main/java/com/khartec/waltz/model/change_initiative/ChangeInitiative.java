@@ -7,6 +7,7 @@ import com.khartec.waltz.model.application.LifecyclePhase;
 import org.immutables.value.Value;
 
 import java.util.Date;
+import java.util.Optional;
 
 
 @Value.Immutable
@@ -23,7 +24,7 @@ public abstract class ChangeInitiative implements
     public abstract ChangeInitiativeKind kind();
     public abstract LifecyclePhase lifecyclePhase();
 
-    public abstract Date lastUpdate();
+    public abstract Optional<Date> lastUpdate();
 
     public abstract Date startDate();
     public abstract Date endDate();
