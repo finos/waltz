@@ -5,6 +5,7 @@ package com.khartec.waltz.model.entiy_relationship;
  */
 public enum RelationshipKind {
 
-    HAS
+    HAS,
+    RELATES_TO
 
 }

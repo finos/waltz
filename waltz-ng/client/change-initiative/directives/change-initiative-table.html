@@ -1,0 +1,50 @@
+<div>
+    <table class="table table-condensed table-striped small">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Kind</th>
+            <th>Phase</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Last Update</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="record in ctrl.list">
+            <td>
+                <a ui-sref="main.change-initiative.view ({ id: record.id })">
+                    <span ng-bind="record.externalId"></span>
+                </a>
+            </td>
+            <td>
+                <span ng-bind="record.name"></span>
+            </td>
+            <td>
+                <span ng-bind="record.kind | toDisplayName:'changeInitiative' "></span>
+            </td>
+            <td>
+                <span ng-bind="record.lifecyclePhase | toDisplayName:'lifecyclePhase' "></span>
+            </td>
+            <td>
+                <span ng-bind="record.startDate"></span>
+            </td>
+            <td>
+                <span ng-bind="record.endDate"></span>
+            </td>
+            <td>
+                <span>
+                    <waltz-from-now timestamp="record.lastUpdate"
+                                    days-only="true">
+                    </waltz-from-now>
+                </span>
+            </td>
+            <td>
+                <span ng-bind="record.description | limitTo:50"></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

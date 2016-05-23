@@ -9,46 +9,65 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+const BINDINGS = {
+    involvements: '='
+};
+
+
+const initialData = {
+    involvements: []
+};
+
+
+const personComparator = (a, b) => {
+    const aName = a.displayName;
+    const bName = b.displayName;
+    if (aName === bName) return 0;
+    return aName > bName
+        ? 1
+        : -1;
+};
+
+
+const columnDefs = [
+    {
+        field: 'person',
+        displayName: 'Name',
+        sortingAlgorithm: personComparator,
+        filter: {
+            condition: (searchTerm, cellValue) => {
+                const name = cellValue.displayName;
+                return name.match(new RegExp(searchTerm, 'i'));
+            }
+        },
+        cellTemplate: '<div class="ui-grid-cell-contents"> <a ui-sref="main.person.view ({empId: COL_FIELD.employeeId})">{{ COL_FIELD.displayName CUSTOM_FILTERS}}</a> - <a href="mailto:{{COL_FIELD.email}}"><waltz-icon name="envelope-o"></waltz-icon></a></div>'
+    },
+    { field: 'person.title', displayName: 'Title' },
+    { field: 'person.officePhone', displayName: 'Telelphone' },
+    {
+        field: 'involvements',
+        displayName: 'Roles',
+        cellTemplate: '<div class="ui-grid-cell-contents"><span ng-repeat="role in COL_FIELD">{{ role | toDisplayName:"involvementKind" }}</span></div>'
+    }
+];
+
+
 
 function controller($scope, uiGridConstants) {
 
-    const vm = this;
+    const vm = Object.assign(this, initialData);
 
     vm.gridOptions = {
         enableSorting: true,
         enableFiltering: true,
         enableHorizontalScrollbar: uiGridConstants.scrollbars.NEVER,
-        columnDefs: [
-            {
-                field: 'person',
-                displayName: 'Name',
-                sortingAlgorithm: (a, b) => {
-                    const aName = a.displayName;
-                    const bName = b.displayName;
-                    if (aName === bName) return 0;
-                    return aName > bName ? 1 : -1;
-                },
-                filter: {
-                    condition: (searchTerm, cellValue) => {
-                        const name = cellValue.displayName;
-                        return name.match(new RegExp(searchTerm, 'i'));
-                    }
-                },
-                cellTemplate: '<div class="ui-grid-cell-contents"> <a ui-sref="main.person.view ({empId: COL_FIELD.employeeId})">{{ COL_FIELD.displayName CUSTOM_FILTERS}}</a> - <a href="mailto:{{COL_FIELD.email}}"><waltz-icon name="envelope-o"></waltz-icon></a></div>'
-            },
-            { field: 'person.title', displayName: 'Title' },
-            { field: 'person.officePhone', displayName: 'Telelphone' },
-            {
-                field: 'involvements',
-                displayName: 'Roles',
-                cellTemplate: '<div class="ui-grid-cell-contents"><span ng-repeat="role in COL_FIELD">{{ role | toDisplayName:"involvementKind" }}</span></div>'
-            }
-        ],
+        columnDefs,
         data: []
-
     };
 
-    $scope.$watch('ctrl.involvements', (nv) => vm.gridOptions.data = nv);
+    $scope.$watch(
+        'ctrl.involvements',
+        (involvements) => vm.gridOptions.data = involvements);
 }
 
 controller.$inject = ['$scope', 'uiGridConstants'];
@@ -59,9 +78,7 @@ export default () => ({
     replace: true,
     template: require('./involved-people-section.html'),
     scope: {},
-    bindToController: {
-        involvements: '='
-    },
+    bindToController: BINDINGS,
     controller,
     controllerAs: 'ctrl'
 });

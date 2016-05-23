@@ -1,0 +1,142 @@
+
+<div>
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.changeInitiative.name }}"
+                       icon="paper-plane-o"
+                       small="{{ ctrl.changeInitiative.kind | toDisplayName:'changeInitiative' }}">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>Change Initiative</li>
+            <li><span ng-bind="ctrl.changeInitiative.name"></span></li>
+        </ol>
+
+    </waltz-page-header>
+
+
+    <div class="row">
+        <div class="col-sm-offset-1 col-sm-10">
+            <div class="waltz-page-summary">
+                <div class="waltz-display-section">
+                    <!-- NAME, EXTERNAL ID -->
+                    <div class="row">
+                        <div class="col-sm-2 waltz-display-field-label">
+                            Name
+                        </div>
+                        <div class="col-sm-4">
+                            <span ng-bind="ctrl.changeInitiative.name"></span>
+                        </div>
+
+                        <div class="col-sm-2 waltz-display-field-label">
+                            External Id
+                        </div>
+                        <div class="col-sm-4">
+                            <span ng-bind="ctrl.changeInitiative.externalId"></span>
+                        </div>
+                    </div>
+
+                    <!-- KIND, PHASE -->
+                    <div class="row">
+                        <div class="col-sm-2 waltz-display-field-label">
+                            Type
+                        </div>
+                        <div class="col-sm-4">
+                            <span ng-bind="ctrl.changeInitiative.kind | toDisplayName:'changeInitiative'"></span>
+                        </div>
+
+                        <div class="col-sm-2 waltz-display-field-label">
+                            Phase
+                        </div>
+                        <div class="col-sm-4">
+                            <span ng-bind="ctrl.changeInitiative.lifecyclePhase | toDisplayName:'lifecyclePhase'"></span>
+                        </div>
+                    </div>
+
+                    <!-- START, END -->
+                    <div class="row">
+                        <div class="col-sm-2 waltz-display-field-label">
+                            Start
+                        </div>
+                        <div class="col-sm-4">
+                            <span ng-bind="ctrl.changeInitiative.startDate"></span>
+                        </div>
+
+                        <div class="col-sm-2 waltz-display-field-label">
+                            End
+                        </div>
+                        <div class="col-sm-4">
+                            <span ng-bind="ctrl.changeInitiative.endDate"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-2 waltz-display-field-label">
+                            Description
+                        </div>
+                        <div class="col-sm-10">
+                            <span ng-bind="ctrl.changeInitiative.description"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <hr>
+
+    <!-- BOOKMARKS -->
+    <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
+                             kind="CHANGE_INITIATIVE"
+                             source-data-ratings="ctrl.sourceDataRatings"
+                             entity-id="{{ ctrl.changeInitiative.id }}"
+                             parent-name="{{ ctrl.changeInitiative.name }}">
+    </waltz-bookmarks-section>
+
+
+    <!-- PEOPLE -->
+    <waltz-involved-people-section
+        id="people-section"
+        involvements="ctrl.involvements">
+    </waltz-involved-people-section>
+
+
+    <waltz-section icon="object-group"
+                   name="Related App Groups">
+        <div class="row">
+            <div class="col-md-12">
+                <div ng-if="ctrl.related.appGroups.length > 0">
+                    <table class="table table-condensed small">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="group in ctrl.related.appGroups">
+                            <td>
+                                <a ui-sref="main.app-group.view ({id: group.id})">
+                                    <span ng-bind="group.name"></span>
+                                </a>
+                            </td>
+                            <td>
+                                <span ng-bind="group.kind"></span>
+                            </td>
+                            <td>
+                                <span ng-bind="group.description | limitTo: 50"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div ng-if="ctrl.related.appGroups.length == 0"
+                     class="alert alert-warning">
+                    <strong>No Groups have been associated with this change initiative</strong>
+                </div>
+
+            </div>
+        </div>
+    </waltz-section>
+
+</div>

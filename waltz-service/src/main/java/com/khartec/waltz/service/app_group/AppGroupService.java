@@ -1,5 +1,6 @@
 package com.khartec.waltz.service.app_group;
 
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.data.app_group.AppGroupDao;
 import com.khartec.waltz.data.app_group.AppGroupEntryDao;
@@ -9,6 +10,7 @@ import com.khartec.waltz.model.app_group.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -131,6 +133,13 @@ public class AppGroupService {
         appGroupMemberDao.register(groupId, userId, AppGroupMemberRole.OWNER);
 
         return groupId;
+
+    }
+
+    public Collection<AppGroup> findByIds(String user, List<Long> ids) {
+        Checks.checkNotEmptyString(user, "user cannot be empty");
+        Checks.checkNotNull(ids, "ids cannot be null");
+        return appGroupDao.findByIds(user, ids);
 
     }
 }

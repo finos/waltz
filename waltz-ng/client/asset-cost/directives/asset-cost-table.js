@@ -50,7 +50,7 @@ function prepareColumns(displayNameService, uiGridConstants) {
 
     const appCol = {
         field: 'application.name',
-        cellTemplate: '<div class="ui-grid-cell-contents"> <a ui-sref="main.app-view ({ id: row.entity[\'application\'][\'id\'] })">{{ COL_FIELD }}</a></div>',
+        cellTemplate: '<div class="ui-grid-cell-contents"> <a ui-sref="main.app.view ({ id: row.entity[\'application\'][\'id\'] })">{{ COL_FIELD }}</a></div>',
         displayName: 'Application'
     };
 

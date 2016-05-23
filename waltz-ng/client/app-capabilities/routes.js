@@ -10,9 +10,24 @@
  *
  */
 
-import editView from './edit';
+import editView from "./edit";
 
-export const editState = {
-    views: {'content@': editView },
-    url: 'app-capability/{id:int}/edit'
+const baseState = {
+    url: 'app-capability'
 };
+
+const editState = {
+    views: {'content@': editView },
+    url: '/{id:int}/edit'
+};
+
+
+function setup($stateProvider) {
+    $stateProvider
+        .state('main.app-capability', baseState)
+        .state('main.app-capability.edit', editState);
+}
+
+setup.$inject = ['$stateProvider'];
+
+export default setup;

@@ -1,18 +1,18 @@
 const initData = {
-    ratings: []
+    list: []
 };
 
 
-function controller($scope, sourceDataRatingStore) {
+function controller($scope, changeInitiativeStore) {
     const vm = Object.assign(this, initData);
 
-    sourceDataRatingStore
-        .findAll()
-        .then(ratings => vm.ratings = ratings);
+    changeInitiativeStore
+        .findByRef("APP_GROUP", 2)
+        .then(list => vm.list = list);
 }
 
 controller.$inject = [
-    '$scope', 'SourceDataRatingStore'
+    '$scope', 'ChangeInitiativeStore'
 ];
 
 

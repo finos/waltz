@@ -5,7 +5,7 @@
                        icon="puzzle-piece">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.capabilities.list">Capabilities</a></li>
+            <li><a ui-sref="main.capability.list">Capabilities</a></li>
             <li ng-bind="ctrl.capability.name"></li>
         </ol>
     </waltz-page-header>
@@ -172,7 +172,7 @@
         <ul>
             <li ng-repeat="assoc in ctrl.associatedCapabilities | orderBy:'capability.name'">
                 <strong>
-                    <a ui-sref="main.capabilities.view ({ id: assoc.capability.id })"
+                    <a ui-sref="main.capability.view ({ id: assoc.capability.id })"
                        ng-bind="assoc.capability.name">
                    </a>
                 </strong>
@@ -184,7 +184,7 @@
                         Applications:
                     </li>
                     <li ng-repeat="app in assoc.apps | orderBy:'name'">
-                        <a ui-sref="main.app-view ({id: app.id})">
+                        <a ui-sref="main.app.view ({id: app.id})">
                             <span ng-bind="app.name"></span>
                         </a>
                         <span ng-if="! $last"> | </span>

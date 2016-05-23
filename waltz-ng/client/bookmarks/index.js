@@ -10,24 +10,10 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import editor from "./bookmark-editor";
-
-
-function registerRoute($stateProvider) {
-    $stateProvider
-        .state('main.bookmarks', {
-        })
-        .state('main.bookmarks.edit', {
-            url: 'bookmarks/{kind}/{entityId:int}/edit?parentName',
-            views: {'content@': editor }
-        });
-}
-
-registerRoute.$inject = ['$stateProvider'];
 
 export default (module) => {
     require('./directives')(module);
 
-    module.config(registerRoute);
+    module.config(require('./routes'));
     module.service('BookmarkStore', require('./services/bookmark-store'))
 };

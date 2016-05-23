@@ -11,28 +11,11 @@
  */
 
 
-import PersonView from './person-view';
-import PersonHome from './person-home';
-
-
 export default (module) => {
 
     require('./services')(module);
 
-    module.config([
-        '$stateProvider',
-        ($stateProvider) => {
-            $stateProvider
-                .state('main.person', {
-                    url: 'person',
-                    views: {'content@': PersonHome }
-                })
-                .state('main.person.view', {
-                    url: '/:empId',
-                    views: {'content@': PersonView }
-                });
-        }
-    ]);
+    module.config(require('./routes'))
 
     module.directive('waltzPersonSelector', require('./directives/person-selector'));
     module.directive('waltzPersonLink', require('./directives/person-link'));

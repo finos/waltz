@@ -11,19 +11,9 @@
  *
  */
 
-import { baseState, listState, viewState } from './capability-states';
-
 
 export default (module) => {
-    module.config([
-        '$stateProvider',
-        ($stateProvider) => {
-            $stateProvider
-                .state('main.capabilities', baseState)
-                .state('main.capabilities.list', listState)
-                .state('main.capabilities.view', viewState);
-        }
-    ]);
+    module.config(require('./routes'));
 
     module.directive('waltzCapabilitySelector', require('./directives/capability-selector'));
     module.directive('waltzCapabilitySelectorAdvanced', require('./directives/capability-selector-advanced'));

@@ -11,7 +11,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="rating in ctrl.ratings">
+        <tr ng-repeat="rating in ctrl.ratings | orderBy:['entityKind','sourceName']">
             <td>
                 <span ng-bind="rating.entityKind | toDisplayName:'entity'"></span>
             </td>

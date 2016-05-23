@@ -11,8 +11,6 @@
  *
  */
 
-import { editState } from './states';
-
 export default (module) => {
 
     require('./directives')(module);
@@ -20,11 +18,6 @@ export default (module) => {
     module.service('AppCapabilityStore', require('./services/app-capability-store'));
 
 
-    module.config([
-        '$stateProvider',
-        ($stateProvider) => {
-            $stateProvider.state('main.app-capability-edit', editState);
-        }
-    ]);
+    module.config(require('./routes.js'));
 
 };

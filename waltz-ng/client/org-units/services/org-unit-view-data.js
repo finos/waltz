@@ -162,7 +162,7 @@ service.$inject = [
     'OrgUnitUtilityService',
     'ChangeLogDataService',
     'DataFlowViewService',
-    'InvolvementDataService',
+    'InvolvementStore',
     'RatingStore',
     'PerspectiveStore',
     'OrgUnitStore',

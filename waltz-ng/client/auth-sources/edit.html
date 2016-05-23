@@ -2,7 +2,7 @@
     <waltz-page-header name="Authoritative Source Editor" small="{{ ctrl.orgUnit.name }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.org-units.unit ({id: ctrl.orgUnit.id})">{{ ctrl.orgUnit.name }}</a></li>
+            <li><a ui-sref="main.org-unit.view ({id: ctrl.orgUnit.id})">{{ ctrl.orgUnit.name }}</a></li>
             <li>Authoritative Source Editor</li>
         </ol>
     </waltz-page-header>
@@ -176,7 +176,7 @@
                     <hr/>
                     <div>
                         <input class='btn btn-success' type="submit" value="Submit" ng-disabled="ctrl.isDisabled()">
-                        <a ui-sref="main.org-units.unit ({id: ctrl.id})">Cancel</a>
+                        <a ui-sref="main.org-unit.view ({id: ctrl.id})">Cancel</a>
                     </div>
                 </fieldset>
             </form>

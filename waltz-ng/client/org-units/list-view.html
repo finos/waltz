@@ -83,7 +83,7 @@
                          ng-bind="ctrl.selectedNode.description">
                     </div>
 
-                    <a ui-sref="main.org-units.unit ({ id: ctrl.selectedNode.id })">
+                    <a ui-sref="main.org-unit.view ({ id: ctrl.selectedNode.id })">
                         Show &raquo;
                     </a>
 
@@ -115,7 +115,7 @@
                         <tbody>
                         <tr ng-repeat="node in ctrl.filteredOrgUnits">
                             <td>
-                                <a ui-sref="main.org-units.unit ({ id: node.id })"
+                                <a ui-sref="main.org-unit.view ({ id: node.id })"
                                    class="waltz-org-unit-name"
                                    ng-bind="node.name">
                                 </a>

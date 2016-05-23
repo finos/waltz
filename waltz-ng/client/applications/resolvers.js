@@ -1,4 +1,3 @@
-
 /*
  *  Waltz
  * Copyright (c) David Watkins. All rights reserved.
@@ -11,21 +10,15 @@
  *
  */
 
+export function appViewResolver(appViewStore, $stateParams) {
+    return appViewStore.getById($stateParams.id);
+}
 
-import AppView from "./app-view";
+appViewResolver.$inject = ['ApplicationViewDataService', '$stateParams'];
 
 
-export default (module) => {
+export function orgUnitsResolver(orgUnitStore) {
+    return orgUnitStore.findAll();
+}
 
-    require('./services')(module);
-
-    module.config([
-        '$stateProvider',
-        ($stateProvider) => {
-            $stateProvider
-                .state('main.app-view', AppView);
-        }
-    ]);
-
-    
-};
+orgUnitsResolver.$inject = [ 'OrgUnitStore' ];

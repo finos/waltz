@@ -22,21 +22,22 @@ export const bookmarkIconNames = {
 
 
 export const entityIconNames = {
-    APPLICATION: 'desktop',
-    ORG_UNIT: 'sitemap',
-    CAPABILITY: 'puzzle-piece',
-    PERSON: 'user',
-    END_USER_APPLICATION: 'table',
     APP_GROUP: 'object-group',
-    DATABASE: 'database',
-    SERVER: 'server',
-    ASSET_COST: 'money',
-    SOFTWARE: 'gift',
-    BOOKMARK: 'bookmark-o',
-    APP_RATING: 'star-o',
     APP_CAPABILITY: 'puzzle-piece',
+    APP_RATING: 'star-o',
+    APPLICATION: 'desktop',
+    ASSET_COST: 'money',
+    AUTHORITATIVE_SOURCE: "shield",
+    BOOKMARK: 'bookmark-o',
+    CAPABILITY: 'puzzle-piece',
+    CHANGE_INITIATIVE: 'paper-plane-o',
+    DATABASE: 'database',
+    END_USER_APPLICATION: 'table',
     LOGICAL_DATA_FLOW: "random",
-    AUTHORITATIVE_SOURCE: "shield"
+    ORG_UNIT: 'sitemap',
+    PERSON: 'user',
+    SERVER: 'server',
+    SOFTWARE: 'gift',
 };
 
 

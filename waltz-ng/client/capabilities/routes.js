@@ -16,7 +16,7 @@ import ListView from "./list-view";
 import CapabilityView from "./capability-view";
 
 
-export const baseState = {
+const baseState = {
     resolve: {
         capabilities: [
             'CapabilityStore',
@@ -25,12 +25,28 @@ export const baseState = {
     }
 };
 
-export const listState = {
+
+const listState = {
     url: 'capabilities',
     views: {'content@': ListView}
 };
 
-export const viewState = {
+
+const viewState = {
     url: 'capabilities/{id:int}',
     views: { 'content@': CapabilityView }
 };
+
+
+function setup($stateProvider) {
+    $stateProvider
+        .state('main.capability', baseState)
+        .state('main.capability.list', listState)
+        .state('main.capability.view', viewState);
+}
+
+
+setup.$inject = ['$stateProvider'];
+
+
+export default setup;

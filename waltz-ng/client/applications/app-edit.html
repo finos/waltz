@@ -16,7 +16,7 @@
                        small="Editor">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.app-view ({ id: ctrl.application.id })">{{ ctrl.application.name }}</a></li>
+            <li><a ui-sref="main.app.view ({ id: ctrl.application.id })">{{ ctrl.application.name }}</a></li>
             <li>Edit</li>
         </ol>
     </waltz-page-header>
@@ -39,7 +39,7 @@
                style="margin-left: 12px"
                class="btn btn-success">
 
-        <a ui-sref="main.app-view ({ id: ctrl.application.id })">
+        <a ui-sref="main.app.view ({ id: ctrl.application.id })">
             Cancel
         </a>
     </form>

@@ -19,7 +19,7 @@ const FIELDS_TO_SEARCH = ['name', 'description'];
 function setupBlockProcessor($state) {
     return b => {
         b.block.onclick = () =>
-            $state.go('main.org-units.unit', { id: b.value });
+            $state.go('main.org-unit.view', { id: b.value });
 
         angular
             .element(b.block)

@@ -63,7 +63,7 @@
 
         <waltz-section-actions >
             <a waltz-has-role="APP_EDITOR"
-               ui-sref='main.data-flow.registration ({id: ctrl.app.id})'
+               ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'
                class="btn btn-xs btn-primary">
                 Edit
             </a>
@@ -74,7 +74,7 @@
                 No Data Flows
             </strong>
             registered for this application.  Add one
-            <a ui-sref='main.data-flow.registration ({id: ctrl.app.id})'>here</a>.
+            <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>here</a>.
         </div>
 
         <div ng-if="ctrl.flows.length > 0">
@@ -133,7 +133,7 @@
                         <ul class="list-inline"
                             style="display: inline-block">
                             <li ng-repeat="source in sources">
-                                <a ui-sref="main.org-units.unit({id: source.parentReference.id})">
+                                <a ui-sref="main.org-unit.view({id: source.parentReference.id})">
                                     {{ ctrl.orgUnitsById[source.parentReference.id].name }}
                                 </a>
                             </li>

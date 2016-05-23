@@ -9,7 +9,6 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import {appViewResolver} from "./resolvers";
 import {
     loadDataFlows,
     loadChangeLog,
@@ -58,7 +57,7 @@ function controller(appView,
             highestRatingCount: calculateHighestRatingCount([group]),
             tweakers: {
                 subjectLabel: {
-                    enter: (selection) => selection.on('click', (d) => $state.go('main.capabilities.view', { id: d.subject.id }))
+                    enter: (selection) => selection.on('click', (d) => $state.go('main.capability.view', { id: d.subject.id }))
                 }
             },
             group
@@ -103,7 +102,7 @@ controller.$inject = [
     'appView',
     'AuthSourcesStore',
     'ChangeLogDataService',
-    'InvolvementDataService',
+    'InvolvementStore',
     'DataFlowDataStore',
     'OrgUnitStore',
     'ServerInfoStore',
@@ -118,29 +117,9 @@ controller.$inject = [
 ];
 
 
-function onAppViewEnter(appView, historyStore) {
-    historyStore.put(
-        appView.app.name,
-        'APPLICATION',
-        'main.app-view',
-        { id: appView.app.id });
-}
-
-
-onAppViewEnter.$inject = ['appView', 'HistoryStore'];
-
-
-export default {
-    url: 'application/:id',
-    views: {
-        'content@': {
-            template: require('./app-view.html'),
-            controller,
-            controllerAs: 'ctrl'
-        }
-    },
-    resolve: {
-        appView: appViewResolver
-    },
-    onEnter: onAppViewEnter
+export default  {
+    template: require('./app-view.html'),
+    controller,
+    controllerAs: 'ctrl'
 };
+

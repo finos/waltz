@@ -43,7 +43,7 @@ function logHistory(capability, historyStore) {
     historyStore.put(
         capability.name,
         'CAPABILITY',
-        'main.capabilities.view',
+        'main.capability.view',
         { id: capability.id });
 }
 
@@ -133,7 +133,7 @@ function controller($scope,
     const tweakers = {
         subjectLabel: {
             enter: selection =>
-                selection.on('click.go', d => $state.go('main.app-view', { id: d.subject.id }))
+                selection.on('click.go', d => $state.go('main.app.view', { id: d.subject.id }))
         }
     };
 

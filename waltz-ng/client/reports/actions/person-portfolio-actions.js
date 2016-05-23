@@ -72,7 +72,10 @@ function asyncService(involvementStore, personActions) {
     };
 }
 
-asyncService.$inject = ['InvolvementDataService', 'PersonActions'];
+asyncService.$inject = [
+    'InvolvementStore',
+    'PersonActions'
+];
 
 
 export default asyncService;

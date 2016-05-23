@@ -96,7 +96,7 @@ function calculateCapabilityRatings(orgUnitId, apps, appCapabilities, perspectiv
             subjectLabel: {
                 enter: selection =>
                     selection
-                        .on('click.go', d => $state.go('main.app-view', { id: d.subject.id }))
+                        .on('click.go', d => $state.go('main.app.view', { id: d.subject.id }))
                         .attr('font-style', d => d.subject.organisationalUnitId === orgUnitId ? 'none' : 'italic')
                         .text(d => isPrimary(d.subject, d.capabilityId)
                             ? '\u2605 ' + _.truncate(d.subject.name, 24)
@@ -161,7 +161,7 @@ function controller($stateParams,
         if (!vm.rawViewData) return;
         const orgUnit = vm.rawViewData.orgUnit;
 
-        historyStore.put(orgUnit.name, 'ORG_UNIT', 'main.org-units.unit', { id: orgUnit.id });
+        historyStore.put(orgUnit.name, 'ORG_UNIT', 'main.org-unit.view', { id: orgUnit.id });
 
         vm.viewData = viewOptions.filter(vm.rawViewData);
         vm.ratings = calculateCapabilityRatings(

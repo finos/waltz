@@ -105,9 +105,16 @@ export const entityNames = {
     SOFTWARE: 'Software',
     BOOKMARK: 'Bookmark',
     APP_RATING: 'Application Rating',
-    APP_CAPABILITY: 'Applicatin Capability',
+    APP_CAPABILITY: 'Application Capability',
     LOGICAL_DATA_FLOW: "Logical Data Flow",
     AUTHORITATIVE_SOURCE: "Authoritative Source"
+};
+
+
+export const changeInitiativeNames = {
+    PROGRAMME: 'Programme',
+    PROJECT: 'Project',
+    INITIATIVE: 'Initiative'
 };
 
 

@@ -3,7 +3,7 @@
         <p>{{unit.description}}</p>
         <ul>
             <li ng-repeat="subUnit in unit.subUnits | orderBy:'name'">
-                <a ui-sref="main.org-units.unit  ({id: {{subUnit.id}} })">
+                <a ui-sref="main.org-unit.view  ({id: {{subUnit.id}} })">
                     {{subUnit.name}}
                 </a>
                 -

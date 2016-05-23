@@ -197,16 +197,19 @@ export function toKeyCounts(items = [], fn = x => x) {
  */
 export function kindToViewState(kind) {
     if (kind === 'APPLICATION') {
-        return "main.app-view";
+        return "main.app.view";
     }
     if (kind === 'APP_GROUP') {
         return "main.app-group.view";
     }
     if (kind === 'CAPABILITY') {
-        return "main.capabilities.view";
+        return "main.capability.view";
     }
     if (kind === 'ORG_UNIT') {
-        return "main.org-units.unit";
+        return "main.org-unit.view";
+    }
+    if (kind === 'CHANGE_INITIATIVE') {
+        return "main.change-initiative.view";
     }
     throw "Unable to convert kind: "+kind+ " to a ui-view state";
 }

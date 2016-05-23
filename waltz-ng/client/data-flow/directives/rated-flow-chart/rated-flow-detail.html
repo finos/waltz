@@ -9,10 +9,10 @@
         <div ng-repeat="ratingGroup in ctrl.eventData.data.values" style="padding-bottom: 6px">
             <h5> {{ ratingGroup.key | toDisplayName:'rating' }} </h5>
             <div ng-repeat="source in ratingGroup.values" style="border-top: 1px dotted #ddd">
-                <a ui-sref="main.app-view ({id: source.dataFlow.target.id})">{{ source.dataFlow.target.name }}</a>
+                <a ui-sref="main.app.view ({id: source.dataFlow.target.id})">{{ source.dataFlow.target.name }}</a>
                 <span class="text-muted">sources data from</span>
                 <strong>
-                    <a ui-sref="main.app-view ({id: source.dataFlow.source.id})">
+                    <a ui-sref="main.app.view ({id: source.dataFlow.source.id})">
                         {{ source.dataFlow.source.name }}
                     </a>
                 </strong>
@@ -47,7 +47,7 @@
         <div style="border-top: 1px solid #ddd">
             <small>
                 Go to
-                <a ui-sref="main.app-view ({id: ctrl.eventData.data.app.id })">
+                <a ui-sref="main.app.view ({id: ctrl.eventData.data.app.id })">
                     {{ ctrl.eventData.data.app.name }}
                 </a>
             </small>

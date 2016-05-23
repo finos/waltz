@@ -9,16 +9,21 @@ const BINDINGS = {
 
 
 const FIELDS_TO_SEARCH = {
-    SOFTWARE: ['vendor', 'name', 'version', 'maturityStatus']
+    SOFTWARE: [
+        'vendor',
+        'name',
+        'version',
+        'maturityStatus'
+    ]
 };
 
 function createDefaultTableOptions(uiGridConstants) {
     return {
-        enableSorting: true,
+        columnDefs: [],
+        data: [],
         enableFiltering: true,
         enableHorizontalScrollbar: uiGridConstants.scrollbars.NEVER,
-        columnDefs: [],
-        data: []
+        enableSorting: true
     };
 }
 
@@ -107,7 +112,6 @@ function controller($scope, uiGridConstants) {
         }
     );
 
-
     $scope.$watch(
         'ctrl.servers',
         servers => vm.serverGridOptions.data = servers
@@ -133,10 +137,15 @@ function controller($scope, uiGridConstants) {
 
 }
 
-controller.$inject = [ '$scope', 'uiGridConstants' ];
 
 
-export default () => ({
+controller.$inject = [
+    '$scope',
+    'uiGridConstants'
+];
+
+
+const directive = {
     restrict: 'E',
     replace: true,
     scope: {},
@@ -144,4 +153,7 @@ export default () => ({
     bindToController: BINDINGS,
     controllerAs: 'ctrl',
     controller
-});
+};
+
+
+export default () => directive;

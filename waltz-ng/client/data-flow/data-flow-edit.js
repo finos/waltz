@@ -15,15 +15,15 @@ import {toRef, loadDataFlows, loadDataTypes, loadAppAuthSources, loadOrgUnitAuth
 import {prepareSlopeGraph} from "./directives/slope-graph/slope-graph-utils";
 
 
-function controller(application,
+function controller($q,
+                    $scope,
+                    $state,
+                    application,
+                    authSourceStore,
                     dataFlowStore,
                     dataTypeStore,
-                    authSourceStore,
                     displayNameService,
-                    notification,
-                    $state,
-                    $scope,
-                    $q) {
+                    notification) {
 
     const appId = application.id;
     const ouId = application.organisationalUnitId;
@@ -216,20 +216,20 @@ function controller(application,
 }
 
 controller.$inject = [
+    '$q',
+    '$scope',
+    '$state',
     'application',
+    'AuthSourcesStore',
     'DataFlowDataStore',
     'DataTypesDataService',
-    'AuthSourcesStore',
     'WaltzDisplayNameService',
-    'Notification',
-    '$state',
-    '$scope',
-    '$q'
+    'Notification'
 ];
 
 
 export default {
-    template: require('./registration-view.html'),
+    template: require('./data-flow-edit.html'),
     controller,
     controllerAs: 'ctrl'
 };

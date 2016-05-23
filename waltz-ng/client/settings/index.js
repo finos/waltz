@@ -5,14 +5,5 @@ export default (module) => {
     module.service('SettingsStore', settingsStore);
     module.directive('waltzHasSetting', hasSetting);
 
-    module.config([
-        '$stateProvider',
-        ($stateProvider) => {
-            $stateProvider
-                .state('main.settings', {
-                    url: 'settings',
-                    views: { 'content@': require('./settings-view') }
-                });
-        }
-    ]);
+    module.config(require('./routes'));
 };

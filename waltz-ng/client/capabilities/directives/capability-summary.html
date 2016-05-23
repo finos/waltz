@@ -10,7 +10,7 @@
                 <waltz-icon name="level-up"></waltz-icon>
                 Parent:
             </span>
-            <a ui-sref="main.capabilities.view ({ id: ctrl.capability.parent.id })">
+            <a ui-sref="main.capability.view ({ id: ctrl.capability.parent.id })">
                 {{ ctrl.capability.parent.name }}
             </a>
             <span class="text-muted small ">
@@ -56,7 +56,7 @@
                 <tbody>
                 <tr ng-repeat="child in ctrl.capability.children | orderBy:'name'">
                     <td>
-                        <a ui-sref="main.capabilities.view ({ id: child.id })">
+                        <a ui-sref="main.capability.view ({ id: child.id })">
                             {{ child.name }}
                         </a>
                     </td>

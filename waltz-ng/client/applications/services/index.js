@@ -13,4 +13,5 @@
 
 export default (module) => {
     module.service('ApplicationStore', require('./application-store'));
+    module.service('ApplicationViewDataService', require('./application-view-data'));
 };

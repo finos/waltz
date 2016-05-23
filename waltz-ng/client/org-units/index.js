@@ -11,33 +11,6 @@
  */
 
 import "angular-ui-router";
-import ListView from "./list-view";
-import UnitView from "./unit-view";
-import UnitNavView from "./unit-nav-view";
-import {orgUnitsResolver, appTalliesResolver, endUserAppTalliesResolver} from "./resolvers.js";
-
-
-const baseState = {
-    resolve: {
-        appTallies: appTalliesResolver,
-        endUserAppTallies: endUserAppTalliesResolver,
-        orgUnits: orgUnitsResolver
-    }
-};
-
-const listState = {
-    url: 'org-units',
-    views: {'content@': ListView}
-};
-
-
-const viewState = {
-    url: 'org-units/{id:int}',
-    views: {
-        'content@': UnitView,
-        'sidenav@main': UnitNavView
-    }
-};
 
 
 export default (module) => {
@@ -45,15 +18,7 @@ export default (module) => {
     require('./directives')(module);
     require('./templates')(module);
 
-    module.config([
-        '$stateProvider',
-        ($stateProvider) => {
-            $stateProvider
-                .state('main.org-units', baseState)
-                .state('main.org-units.list', listState)
-                .state('main.org-units.unit', viewState);
-        }
-    ]);
+    module.config(require('./routes'));
 
     module.service('OrgUnitStore', require('./services/org-unit-store'));
     module.service('OrgUnitUtilityService', require('./services/org-unit-utility'));

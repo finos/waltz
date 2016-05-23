@@ -11,22 +11,11 @@
  */
 
 
-import { appEditState, appRegistrationState, appTagExplorerState } from './states';
-
 export default (module) => {
 
     require('./services')(module);
 
-    module.config([
-        '$stateProvider',
-        ($stateProvider) => {
-            $stateProvider
-                .state('main.app', {})
-                .state('main.app.registration', appRegistrationState)
-                .state('main.app.edit', appEditState)
-                .state('main.app.tag-explorer', appTagExplorerState);
-        }
-    ]);
+    module.config(require('./routes'));
 
     module.directive('waltzAppOverview', require('./directives/app-overview'));
     module.directive('waltzAppOverviewSection', require('./directives/app-overview-section'));
