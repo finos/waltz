@@ -202,7 +202,7 @@ function drawTitleBar(svg, dimensions) {
 function internetExplorerFix(selection) {
     setTimeout(
         () => selection.each(function() { this.parentNode.insertBefore(this, this); }),
-        100
+        200
     );
 }
 
