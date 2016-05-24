@@ -19,6 +19,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.involvement.InvolvementService;
@@ -50,6 +51,7 @@ public class InvolvementEndpoint implements Endpoint {
 
         String findByEmployeePath = mkPath(BASE_URL, "employee", ":employeeId");
         String findDirectAppsByEmployeePath = mkPath(findByEmployeePath, "applications", "direct");
+        String findDirectChangeInitiativesByEmployeePath = mkPath(findByEmployeePath, "change-initiative", "direct");
         String findAllAppsByEmployeePath = mkPath(findByEmployeePath, "applications");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findPeopleByEntityRefPath = mkPath(findByEntityRefPath, "people");
@@ -63,6 +65,11 @@ public class InvolvementEndpoint implements Endpoint {
         ListRoute<Application>  findDirectAppsByEmployeeRoute = (request, response) -> {
             String employeeId = request.params("employeeId");
             return service.findDirectApplicationsByEmployeeId(employeeId);
+        };
+
+        ListRoute<ChangeInitiative>  findDirectChangeInitiativesByEmployeeRoute = (request, response) -> {
+            String employeeId = request.params("employeeId");
+            return service.findDirectChangeInitiativesByEmployeeId(employeeId);
         };
 
         ListRoute<Application>  findAllAppsByEmployeeRoute = (request, response) -> {
@@ -83,6 +90,7 @@ public class InvolvementEndpoint implements Endpoint {
 
         getForList(findByEmployeePath, findByEmployeeRoute);
         getForList(findDirectAppsByEmployeePath, findDirectAppsByEmployeeRoute);
+        getForList(findDirectChangeInitiativesByEmployeePath, findDirectChangeInitiativesByEmployeeRoute);
         getForList(findAllAppsByEmployeePath, findAllAppsByEmployeeRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findPeopleByEntityRefPath, findPeopleByEntityRefRoute);

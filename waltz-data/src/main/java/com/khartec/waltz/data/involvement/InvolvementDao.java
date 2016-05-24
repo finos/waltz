@@ -18,11 +18,13 @@
 package com.khartec.waltz.data.involvement;
 
 import com.khartec.waltz.data.application.ApplicationDao;
+import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.involvement.ImmutableInvolvement;
 import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.involvement.InvolvementKind;
@@ -33,10 +35,12 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
@@ -129,4 +133,14 @@ public class InvolvementDao {
                 .fetch(PersonDao.personMapper);
     }
 
+
+    public Collection<ChangeInitiative> findDirectChangeInitiativesByEmployeeId(String employeeId) {
+        return dsl.selectDistinct()
+                .from(CHANGE_INITIATIVE)
+                .innerJoin(INVOLVEMENT)
+                .on(INVOLVEMENT.ENTITY_ID.eq(CHANGE_INITIATIVE.ID))
+                .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
+                .and(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
+                .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
+    }
 }

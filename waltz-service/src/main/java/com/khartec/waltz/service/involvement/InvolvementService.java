@@ -17,14 +17,17 @@
 
 package com.khartec.waltz.service.involvement;
 
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.person.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -68,4 +71,8 @@ public class InvolvementService {
         return dao.findPeopleByEntityReference(ref);
     }
 
+    public Collection<ChangeInitiative> findDirectChangeInitiativesByEmployeeId(String employeeId) {
+        Checks.checkNotEmptyString(employeeId, "employeeId cannot be empty");
+        return dao.findDirectChangeInitiativesByEmployeeId(employeeId);
+    }
 }
