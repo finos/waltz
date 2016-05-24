@@ -132,8 +132,9 @@ const baseUrl =
     __ENV__ === 'prod'
     ? './'
     : __ENV__ === 'test'
-        ? 'http://192.168.1.147:8443/'
+        ? 'http://192.168.1.179:8443/'
         : 'http://localhost:8443/';
+        //: 'http://192.168.1.147:8443/'  // TODO (if testing IE on Mac) : use ip lookup
 
 waltzApp.constant('BaseApiUrl', baseUrl + 'api');
 waltzApp.constant('BaseUrl', baseUrl);
