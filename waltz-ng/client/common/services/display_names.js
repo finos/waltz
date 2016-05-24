@@ -95,21 +95,22 @@ export const severityNames = {
 
 
 export const entityNames = {
-    APPLICATION: 'Application',
-    ORG_UNIT: 'Org Unit',
-    CAPABILITY: 'Capability',
-    PERSON: 'Person',
-    END_USER_APPLICATION: 'End User App',
-    APP_GROUP: 'Application Group',
-    DATABASE: 'Database',
-    SERVER: 'Server',
-    ASSET_COST: 'Asset Cost',
-    SOFTWARE: 'Software',
-    BOOKMARK: 'Bookmark',
-    APP_RATING: 'Application Rating',
     APP_CAPABILITY: 'Application Capability',
+    APP_GROUP: 'Application Group',
+    APP_RATING: 'Application Rating',
+    APPLICATION: 'Application',
+    ASSET_COST: 'Asset Cost',
+    AUTHORITATIVE_SOURCE: "Authoritative Source",
+    BOOKMARK: 'Bookmark',
+    CAPABILITY: 'Capability',
+    CHANGE_INITIATIVE: 'Change Initiative',
+    DATABASE: 'Database',
+    END_USER_APPLICATION: 'End User App',
     LOGICAL_DATA_FLOW: "Logical Data Flow",
-    AUTHORITATIVE_SOURCE: "Authoritative Source"
+    ORG_UNIT: 'Org Unit',
+    PERSON: 'Person',
+    SERVER: 'Server',
+    SOFTWARE: 'Software'
 };
 
 

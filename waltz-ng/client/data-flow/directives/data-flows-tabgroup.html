@@ -24,7 +24,7 @@
                         </thead>
                         <tbody>
                         <tr ng-repeat="row in ctrl.flowData.stats.dataTypeCounts">
-                            <td>{{ row.id }}</td>
+                            <td>{{ row.id | toDisplayName:'dataType' }}</td>
                             <td>{{ row.count }}</td>
                         </tr>
                         </tbody>
