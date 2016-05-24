@@ -24,6 +24,7 @@ const initModel = {
     },
     apps: [],
     appIds: [],
+    changeInitiatives: [],
     complexity: [],
     assetCostData: {},
     serverStats: null,
@@ -32,19 +33,20 @@ const initModel = {
         techOverlay: false,
         flowOverlay: false,
         costOverlay: false,
-        applicationOverlay: false
+        applicationOverlay: false,
+        changeInitiativeOverlay: false
     }
 };
 
 
 function service($q,
-                 personStore,
-                 involvementStore,
                  assetCostViewService,
                  complexityStore,
                  dataFlowViewService,
-                 techStatsService,
-                 sourceDataRatingStore) {
+                 involvementStore,
+                 personStore,
+                 sourceDataRatingStore,
+                 techStatsService) {
 
     const state = { model: initModel };
 
@@ -96,6 +98,13 @@ function service($q,
     }
 
 
+    function loadChangeInitiatives(employeeId) {
+        involvementStore
+            .findChangeInitiativesForEmployeeId(employeeId)
+            .then(list => state.model.changeInitiatives = list);
+    }
+
+
     function loadCostStats(personId) {
         assetCostViewService
             .initialise(personId, 'PERSON', 'CHILDREN', 2015)
@@ -137,6 +146,9 @@ function service($q,
 
     function load(employeeId) {
         reset();
+
+        loadChangeInitiatives(employeeId);
+
         const peoplePromise = loadPeople(employeeId)
             .then(() => state.model.person.id)
             .then(personId => {
@@ -175,13 +187,13 @@ function service($q,
 
 service.$inject = [
     '$q',
-    'PersonStore',
-    'InvolvementStore',
     'AssetCostViewService',
     'ComplexityStore',
     'DataFlowViewService',
-    'TechnologyStatisticsService',
-    'SourceDataRatingStore'
+    'InvolvementStore',
+    'PersonStore',
+    'SourceDataRatingStore',
+    'TechnologyStatisticsService'
 ];
 
 export default service;

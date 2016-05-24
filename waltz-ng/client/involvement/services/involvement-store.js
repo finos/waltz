@@ -23,6 +23,11 @@ export default [
                 .then(result => result.data);
 
 
+        const findChangeInitiativesForEmployeeId = (employeeId) =>
+            $http.get(`${BASE}/employee/${employeeId}/change-initiative/direct`)
+                .then(result => result.data);
+
+
         const findByEmployeeId = (employeeId) =>
             $http.get(`${BASE}/employee/${employeeId}`)
                 .then(result => result.data);
@@ -42,6 +47,7 @@ export default [
             findAppsForEmployeeId,
             findByEmployeeId,
             findByEntityReference,
+            findChangeInitiativesForEmployeeId,
             findPeopleByEntityReference
         };
     }
