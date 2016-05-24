@@ -36,5 +36,4 @@ public enum EntityKind {
     AUTHORITATIVE_SOURCE,
     CHANGE_INITIATIVE;
 
-
 }
