@@ -66,7 +66,9 @@ export const involvementKindNames = {
     BUSINESS_SPONSOR: 'Business Sponsor',
     DEVELOPER: 'Developer',
     QA: 'Quality Assurance',
-    BUSINESS_ANALYST: 'Business Analyst'
+    BUSINESS_ANALYST: 'Business Analyst',
+    SENIOR_MANAGER: "Senior Manager",
+    ADMINISTRATIVE: "Administrative"
 };
 
 
