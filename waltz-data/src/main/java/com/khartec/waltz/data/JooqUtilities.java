@@ -10,9 +10,21 @@ import org.jooq.impl.DSL;
 
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 public class JooqUtilities {
+
+    public static final ExecutorService DB_EXECUTOR_POOL =
+            Executors.newFixedThreadPool(
+                10, // TODO: ensure this matches the db conn pool size
+                (runnable) -> {
+                    Thread t = new Thread(runnable, "DB Executor");
+                    t.setDaemon(true);
+                    return t;
+                });
+
 
     /**
      * Expects result set like: { Id, Count }
@@ -41,11 +53,14 @@ public class JooqUtilities {
             Table table,
             Field<String> fieldToTally,
             Condition recordsInScopeCondition) {
-         return makeTallyQuery(
-                    dsl,
-                    table,
-                    fieldToTally,
-                    recordsInScopeCondition)
+
+        Select<Record2<String, Integer>> tallyQuery = makeTallyQuery(
+                dsl,
+                table,
+                fieldToTally,
+                recordsInScopeCondition);
+
+        return tallyQuery
                 .fetch(TO_STRING_TALLY);
 
     }

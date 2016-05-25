@@ -9,15 +9,20 @@ public class HarnessUtilities {
 
         long st = System.currentTimeMillis();
 
-        T r = s.get();
+        try {
+            T r = s.get();
+            long end = System.currentTimeMillis();
 
-        long end = System.currentTimeMillis();
+            System.out.println("-- end [" + name + "]");
+            System.out.println("-- dur [" + name + "]:" + (end - st));
+            System.out.println("-- result [" + name + "]:" + r);
+            System.out.println();
 
-        System.out.println("-- end [" + name + "]");
-        System.out.println("-- dur [" + name + "]:" + (end - st));
-        System.out.println("-- result [" + name + "]:" + r);
-        System.out.println();
+            return r;
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+            return null;
+        }
 
-        return r;
     }
 }
