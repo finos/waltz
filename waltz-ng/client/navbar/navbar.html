@@ -2,16 +2,13 @@
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-            <a class="navbar-brand" href="/">Waltz</a>
+            <a class="navbar-brand" ui-sref="main.home">
+                <waltz-icon name="home"></waltz-icon>
+                Waltz
+            </a>
         </div>
 
         <ul class="nav navbar-nav nav-bar-left">
-            <li ui-sref-active="active">
-                <a ui-sref="main.home">
-                    <waltz-icon name="home"></waltz-icon>
-                    Home
-                </a>
-            </li>
             <li ui-sref-active="active">
                 <a ui-sref="main.org-unit.list">
                     <waltz-icon name="sitemap"></waltz-icon>
@@ -30,6 +27,13 @@
                     People
                 </a>
             </li>
+            <li ui-sref-active="active">
+                <a ui-sref="main.report">
+                    <waltz-icon name="bar-chart"></waltz-icon>
+                    Performance Management
+                </a>
+            </li>
+
 
         </ul>
 
@@ -73,6 +77,7 @@
             </div>
 
         </form>
+
 
 
 
