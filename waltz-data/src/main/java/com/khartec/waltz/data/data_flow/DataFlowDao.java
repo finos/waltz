@@ -82,8 +82,8 @@ public class DataFlowDao {
 
     public List<DataFlow> findByApplicationIdSelector(Select<Record1<Long>> appIdSelector) {
         return baseOrgUnitQuery()
-                .and(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector))
-                .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector))
+                .and(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector).toString())
+                .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector).toString())
                 .fetch(dataFlowMapper);
     }
 
