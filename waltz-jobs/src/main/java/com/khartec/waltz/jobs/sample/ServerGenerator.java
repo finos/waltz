@@ -43,14 +43,14 @@ public class ServerGenerator {
 
         List<ServerInfo> servers = ListUtilities.newArrayList();
 
-        IntStream.range(0, 2000)
+        IntStream.range(0, 100_000)
                 .forEach(i -> servers.add(
                         ImmutableServerInfo.builder()
                                 .hostname(mkHostName(i))
                                 .environment(randomPick(SampleData.environments))
                                 .location(randomPick(SampleData.locations))
                                 .operatingSystem(randomPick(SampleData.operatingSystems))
-                                .assetCode("wltz-0" + rnd.nextInt(300))
+                                .assetCode("wltz-0" + rnd.nextInt(4000))
                                 .build()));
 
        // servers.forEach(System.out::println);

@@ -10,29 +10,37 @@
  *
  */
 
-export default () => {
-    return {
-        restrict: 'E',
-        replace: true,
-        template: require('./app-selector.html'),
-        scope: {
-            model: '='
-        },
-        controller: [
-            'ApplicationStore',
-            function(ApplicationStore) {
-
-                this.apps = [];
-                this.refresh = function(query) {
-                    if (!query) return;
-                    return ApplicationStore.search(query)
-                        .then((apps) => {
-                            this.apps = apps;
-                        });
-                };
-            }
-        ],
-        controllerAs: 'ctrl'
-    };
+const BINDINGS = {
+    model: '='
 };
+
+
+function controller(ApplicationStore) {
+
+    this.apps = [];
+    this.refresh = function(query) {
+        if (!query) return;
+        return ApplicationStore.search(query)
+            .then((apps) => {
+                this.apps = apps;
+            });
+    };
+}
+
+controller.$inject = ['ApplicationStore'];
+
+
+const directive = {
+    restrict: 'E',
+    replace: true,
+    template: require('./app-selector.html'),
+    scope: {},
+    bindToController: BINDINGS,
+    controller,
+    controllerAs: 'ctrl'
+};
+
+
+export default () => directive;
+
 

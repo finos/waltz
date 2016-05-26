@@ -16,6 +16,11 @@
  *
  */
 
+const initialState = {
+    changeInitiatives: [],
+    selectedChangeInitiative: null,
+};
+
 function setup(groupDetail) {
     const { applications, members, appGroup } = groupDetail;
 
@@ -34,9 +39,19 @@ function handleError(e) {
     alert(e.data.message);
 }
 
-function controller(appGroupStore, appStore, dataFlowStore, notification, $stateParams, $q, $scope) {
+
+function controller($q,
+                    $scope,
+                    $stateParams,
+                    appGroupStore,
+                    appStore,
+                    changeInitiativeStore,
+                    dataFlowStore,
+                    notification) {
+
     const { id }  = $stateParams;
-    const vm = this;
+    const vm = Object.assign(this, initialState);
+
 
 
     appGroupStore.getById(id)
@@ -119,16 +134,40 @@ function controller(appGroupStore, appStore, dataFlowStore, notification, $state
         vm.addToGroup(app);
         vm.focusOnApp(app);
     }, true);
+
+
+    $scope.$watch(
+        'ctrl.selectedChangeInitiative',
+        (changeInitiative) => {
+            if (!changeInitiative) return;
+
+            appGroupStore
+                .addChangeInitiative(id, changeInitiative.id)
+                .then(cis => vm.changeInitiatives = cis)
+                .then(() => notification.success('Associated Change Initiative: ' + changeInitiative.name));
+
+        });
+
+    vm.removeChangeInitiative = (changeInitiative) => appGroupStore
+        .removeChangeInitiative(id, changeInitiative.id)
+        .then(cis => vm.changeInitiatives = cis)
+        .then(() => notification.warning('Removed Change Initiative: ' + changeInitiative.name));
+
+    changeInitiativeStore
+        .findByRef('APP_GROUP', id)
+        .then(cis => vm.changeInitiatives = cis);
+
 }
 
 controller.$inject = [
+    '$q',
+    '$scope',
+    '$stateParams',
     'AppGroupStore',
     'ApplicationStore',
+    'ChangeInitiativeStore',
     'DataFlowDataStore',
     'Notification',
-    '$stateParams',
-    '$q',
-    '$scope'
 ];
 
 

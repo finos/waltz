@@ -19,10 +19,16 @@ function service($http, BaseApiUrl) {
             .then(r => r.data);
 
 
+    const search = (query) => $http
+            .get(`${BASE}/search/${query}`)
+            .then(r => r.data);
+
+
     return {
         findByRef,
         findRelatedForId,
-        getById
+        getById,
+        search
     }
 }
 

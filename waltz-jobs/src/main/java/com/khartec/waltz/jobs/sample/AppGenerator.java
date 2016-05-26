@@ -37,6 +37,7 @@ import java.util.Random;
 
 import static com.khartec.waltz.common.ArrayUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
 
 
 public class AppGenerator {
@@ -57,9 +58,8 @@ public class AppGenerator {
 
         List<AppRegistrationRequest> registrationRequests = new ArrayList<>();
 
-        for (int i = 0; i < 400; i++) {
-            String animal = randomPick(animals.toArray(new String[0]));
-            animals.remove(animal);
+        for (int i = 0; i < 5000; i++) {
+            String animal = randomPick(animals.toArray(new String[0])) + " - " + i;
 
 
             OrganisationalUnit organisationalUnit = randomPick(organisationalUnits);
@@ -81,6 +81,7 @@ public class AppGenerator {
             registrationRequests.add(app);
         }
 
+        dsl.deleteFrom(AUTHORITATIVE_SOURCE).execute();
         dsl.deleteFrom(APPLICATION).execute();
 
         registrationRequests.forEach(applicationDao::registerApp);

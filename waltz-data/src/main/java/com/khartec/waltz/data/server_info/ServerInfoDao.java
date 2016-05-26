@@ -25,15 +25,20 @@ import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.schema.tables.records.ServerInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.Unchecked;
+import org.jooq.lambda.tuple.Tuple;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.JooqUtilities.DB_EXECUTOR_POOL;
 import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
@@ -47,6 +52,7 @@ public class ServerInfoDao {
 
 
     private final RecordMapper<Record, ServerInfo> recordMapper = r -> {
+
         ServerInformationRecord row = r.into(ServerInformationRecord.class);
         return ImmutableServerInfo.builder()
                 .id(row.getId())
@@ -125,24 +131,44 @@ public class ServerInfoDao {
                     .from(APPLICATION)
                     .where(APPLICATION.ID.in(appIdSelector)));
 
-        List<StringTally> environmentTallies = calculateStringTallies(
+        Future<Tuple2<Integer, Integer>> typePromise = DB_EXECUTOR_POOL.submit(() ->
+                calculateVirtualAndPhysicalCounts(condition));
+
+        Future<List<StringTally>> envPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
                 SERVER_INFORMATION,
                 SERVER_INFORMATION.ENVIRONMENT,
-                condition);
+                condition));
 
-        List<StringTally> operatingSystemTallies = calculateStringTallies(
+        Future<List<StringTally>> osPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
                 SERVER_INFORMATION,
                 SERVER_INFORMATION.OPERATING_SYSTEM,
-                condition);
+                condition));
 
-        List<StringTally> locationTallies = calculateStringTallies(
+        Future<List<StringTally>> locationPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
                 SERVER_INFORMATION,
                 SERVER_INFORMATION.LOCATION,
-                condition);
+                condition));
 
+
+        return Unchecked.supplier(() -> {
+            Tuple2<Integer, Integer> virtualAndPhysicalCounts = typePromise.get();
+
+            return ImmutableServerSummaryStatistics.builder()
+                    .virtualCount(virtualAndPhysicalCounts.v1)
+                    .physicalCount(virtualAndPhysicalCounts.v2)
+                    .environmentCounts(envPromise.get())
+                    .operatingSystemCounts(osPromise.get())
+                    .locationCounts(locationPromise.get())
+                    .build();
+        }).get();
+
+
+    }
+
+    private Tuple2<Integer, Integer> calculateVirtualAndPhysicalCounts(Condition condition) {
         Field<BigDecimal> virtualCount = DSL.coalesce(DSL.sum(
                 DSL.choose(SERVER_INFORMATION.IS_VIRTUAL)
                         .when(Boolean.TRUE, 1)
@@ -155,19 +181,14 @@ public class ServerInfoDao {
                         .otherwise(1)), BigDecimal.ZERO)
                 .as("physical_count");
 
-        return dsl.select(
-                    virtualCount,
-                    physicalCount
-                )
+        SelectConditionStep<Record2<BigDecimal, BigDecimal>> typeQuery = dsl.select(virtualCount, physicalCount)
                 .from(SERVER_INFORMATION)
-                .where(condition)
-                .fetchOne(r -> ImmutableServerSummaryStatistics.builder()
-                        .virtualCount(r.getValue(virtualCount).intValue())
-                        .physicalCount(r.getValue(physicalCount).intValue())
-                        .operatingSystemCounts(operatingSystemTallies)
-                        .environmentCounts(environmentTallies)
-                        .locationCounts(locationTallies)
-                        .build());
+                .where(condition.toString());
+
+        return typeQuery
+                .fetchOne(r -> Tuple.tuple(
+                        r.value1().intValue(),
+                        r.value2().intValue()));
     }
 
 

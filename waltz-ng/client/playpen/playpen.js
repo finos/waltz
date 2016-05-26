@@ -1,18 +1,43 @@
 const initData = {
-    list: []
+    list: [],
+    model: null
 };
 
 
-function controller($scope, changeInitiativeStore) {
+function controller($scope,
+                    appGroupStore,
+                    changeInitiativeStore) {
     const vm = Object.assign(this, initData);
 
-    changeInitiativeStore
-        .findByRef("APP_GROUP", 2)
-        .then(list => vm.list = list);
+    vm.refresh = (query) => {
+        if (!query) return;
+        return changeInitiativeStore
+            .search(query)
+            .then((results) => this.results = results);
+    };
+
+
+    $scope.$watch(
+        'ctrl.model',
+        (model) => {
+            if (!model) return;
+
+            appGroupStore
+                .addChangeInitiative(2, model.id)
+                .then(cis => vm.list = cis);
+
+        });
+
+    vm.remove = (id) => appGroupStore
+        .removeChangeInitiative(2, id)
+        .then(cis => vm.list = cis);
+
 }
 
 controller.$inject = [
-    '$scope', 'ChangeInitiativeStore'
+    '$scope',
+    'AppGroupStore',
+    'ChangeInitiativeStore'
 ];
 
 

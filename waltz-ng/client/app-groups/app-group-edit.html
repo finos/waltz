@@ -74,6 +74,55 @@
     </waltz-section>
 
 
+    <waltz-section icon="paper-plane-o"
+                   name="Associated Change Initiatives">
+
+        <div class="row">
+            <div class="col-md-6">
+                <div ng-if="ctrl.changeInitiatives.length == 0">
+                    <div class="alert alert-warning">
+                        <strong>No associated Change Initiatives.</strong>
+                    </div>
+                </div>
+                <div ng-if="ctrl.changeInitiatives.length > 0">
+                    <table class="table table-condensed table-striped small">
+                        <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="item in ctrl.changeInitiatives"
+                            class="waltz-visibility-parent">
+                            <td><span ng-bind="item.externalId"></span></td>
+                            <td><span ng-bind="item.name"></span></td>
+                            <td>
+                                <a ng-click="ctrl.removeChangeInitiative(item)"
+                                   href
+                                   class="waltz-visibility-child-50">
+                                    <waltz-icon name="trash"></waltz-icon>
+                                    Remove
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                <span>
+                    Use the search box below to find and associate change initiatives to this group.
+                </span>
+                <waltz-change-initiative-selector model="ctrl.selectedChangeInitiative">
+                </waltz-change-initiative-selector>
+            </div>
+        </div>
+
+
+    </waltz-section>
 
     <waltz-section icon="desktop" name="Applications In Group">
 

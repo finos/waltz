@@ -21,10 +21,15 @@ function service(http, baseUrl, $auth) {
 
 
     const whoami = (force = false) => {
-        if (force || userPromise == null || userName == null) {
+        if (force || (userPromise == null && userName == null)) {
             userPromise = http.get(`${BASE}/whoami`)
                 .then(result => result.data)
-                .then(u => { userName = u.userName === 'anonymous' ? null : u.userName;  return u; })
+                .then(u => {
+                    userName = u.userName === 'anonymous'
+                        ? null
+                        : u.userName;
+                    return u;
+                });
         }
         return userPromise;
     };
@@ -40,7 +45,10 @@ function service(http, baseUrl, $auth) {
     const logout = () =>
         $auth
             .logout()
-            .then(() => this.user = null);
+            .then(() => {
+                this.userPromise = null;
+                this.user = null
+            });
 
 
     const hasRole = ( { roles = [] }, role) => {
@@ -48,7 +56,7 @@ function service(http, baseUrl, $auth) {
     };
 
 
-    whoami(true);
+    whoami();
 
     return {
         whoami,
