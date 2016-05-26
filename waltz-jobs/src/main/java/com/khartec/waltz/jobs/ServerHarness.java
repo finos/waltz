@@ -31,7 +31,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.concurrent.ExecutionException;
 
 
 public class ServerHarness {
@@ -53,16 +52,7 @@ public class ServerHarness {
                 .build();
 
         for (int i = 0; i < 5; i++) {
-            HarnessUtilities.time("stats", () -> {
-                try {
-                    return serverInfoService.findStatsForAppSelector(options);
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            });
+            HarnessUtilities.time("stats", () -> serverInfoService.findStatsForAppSelector(options));
         }
 
 

@@ -35,7 +35,8 @@ public enum InvolvementKind {
 
     SENIOR_MANAGER,
 
-    ADMINISTRATIVE
+    ADMINISTRATIVE,
+    DATA_OWNER
 
 
 }

@@ -68,7 +68,8 @@ export const involvementKindNames = {
     QA: 'Quality Assurance',
     BUSINESS_ANALYST: 'Business Analyst',
     SENIOR_MANAGER: "Senior Manager",
-    ADMINISTRATIVE: "Administrative"
+    ADMINISTRATIVE: "Administrative",
+    DATA_OWNER: 'Data Owner'
 };
 
 
