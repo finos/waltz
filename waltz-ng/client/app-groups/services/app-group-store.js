@@ -71,6 +71,16 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const addChangeInitiative = (groupId, changeInitiativeId) => $http
+        .post(`${BASE}/id/${groupId}/change-initiatives`, changeInitiativeId)
+        .then(result => result.data);
+
+
+    const removeChangeInitiative = (groupId, changeInitiativeId) => $http
+        .delete(`${BASE}/id/${groupId}/change-initiatives/${changeInitiativeId}`)
+        .then(result => result.data);
+
+
     const updateGroupOverview = (groupId, data) => $http
         .post(`${BASE}/id/${groupId}`, data)
         .then(result => result.data);
@@ -97,7 +107,10 @@ function service($http, BaseApiUrl) {
         updateGroupOverview,
 
         addApplication,
-        removeApplication
+        removeApplication,
+
+        addChangeInitiative,
+        removeChangeInitiative
     };
 
 }

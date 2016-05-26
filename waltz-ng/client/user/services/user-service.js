@@ -21,9 +21,7 @@ function service(http, baseUrl, $auth) {
 
 
     const whoami = (force = false) => {
-        console.log('whoami2', force, userPromise == null, userName == null, '=>', force || (userPromise == null && userName == null))
         if (force || (userPromise == null && userName == null)) {
-            console.log("Aarghhhh!")
             userPromise = http.get(`${BASE}/whoami`)
                 .then(result => result.data)
                 .then(u => {

@@ -24,6 +24,7 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupDetail;
 import com.khartec.waltz.model.app_group.AppGroupMember;
+import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.service.app_group.AppGroupService;
 import com.khartec.waltz.service.app_group.AppGroupSubscription;
@@ -77,6 +78,10 @@ public class AppGroupEndpoint implements Endpoint {
         String addApplicationPath = mkPath(idPath, "applications");
         String removeApplicationPath = mkPath(idPath, "applications", ":applicationId");
         String updateGroupOverviewPath = idPath;
+
+        String addChangeInitiativePath = mkPath(idPath, "change-initiatives");
+        String removeChangeInitiativePath = mkPath(idPath, "change-initiatives", ":changeInitiativeId");
+
 
 
         DatumRoute<AppGroupDetail> getDetailByIdRoute = (request, response) ->
@@ -167,6 +172,22 @@ public class AppGroupEndpoint implements Endpoint {
         };
 
 
+        ListRoute<ChangeInitiative> addChangeInitiativeRoute = (request, response) -> {
+            long groupId = getId(request);
+            long changeInitiativeId = readBody(request, Long.class);
+            LOG.info("Adding Change Initiative: {}, to group: {} ", changeInitiativeId,  groupId);
+            return appGroupService.addChangeInitiative(getUsername(request), groupId, changeInitiativeId);
+        };
+
+
+        ListRoute<ChangeInitiative> removeChangeInitiativeRoute = (request, response) -> {
+            long groupId = getId(request);
+            long changeInitiativeId = getLong(request, "changeInitiativeId");
+            LOG.info("Removing Change Initiative: {}, from group: {} ", changeInitiativeId,  groupId);
+            return appGroupService.removeChangeInitiative(getUsername(request), groupId, changeInitiativeId);
+        };
+
+
         getForList(findGroupSubscriptionsForUserPath, findGroupSubscriptionsRoute);
 
         getForDatum(getDetailByIdPath, getDetailByIdRoute);
@@ -179,6 +200,9 @@ public class AppGroupEndpoint implements Endpoint {
 
         postForList(addApplicationPath, addApplicationRoute);
         deleteForList(removeApplicationPath, removeApplicationRoute);
+
+        postForList(addChangeInitiativePath, addChangeInitiativeRoute);
+        deleteForList(removeChangeInitiativePath, removeChangeInitiativeRoute);
 
         deleteForList(deleteGroupPath, deleteGroupRoute);
         postForDatum(updateGroupOverviewPath, updateGroupOverviewRoute);
