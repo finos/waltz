@@ -15,11 +15,6 @@ public abstract class ComplexityScore {
      */
     public abstract long id();
 
-    /**
-     * the raw value this score is based upon
-     * @return
-     */
-    public abstract double rawValue();
 
     /**
      * score, typically between 0 and 1
@@ -28,11 +23,7 @@ public abstract class ComplexityScore {
     public abstract double score();
 
 
-    /**
-     * baseline used to derive this score
-     * @return
-     */
-    public abstract double baseline();
+    public abstract ComplexityKind kind();
 
 
 }

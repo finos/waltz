@@ -10,13 +10,12 @@
  *
  */
 
-import d3 from 'd3';
-import _ from 'lodash';
-import angular from 'angular';
-
-import { authoritativeRatingColorScale } from '../../../common/colors.js';
-import { pickWorst } from '../../../auth-sources/services/auth-sources-utils.js';
-import { appRatingCellSelected, appSelected } from './events.js';
+import d3 from "d3";
+import _ from "lodash";
+import angular from "angular";
+import {authoritativeRatingColorScale} from "../../../common/colors.js";
+import {pickWorst} from "../../../auth-sources/services/auth-sources-utils.js";
+import {appRatingCellSelected, appSelected} from "./events.js";
 
 function prepareAppScale(flowsByAppThenTypeThenRating, height) {
     const appIds = _.chain(flowsByAppThenTypeThenRating)
@@ -47,7 +46,7 @@ class Chart {
     }
 
     resize(width) {
-        console.log('resizing', width);
+        //console.log('resizing', width);
     }
 
     render(data, displayNameService, eventDispatcher) {

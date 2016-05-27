@@ -17,60 +17,68 @@
  */
 package com.khartec.waltz.service.complexity;
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.data.complexity.ComplexityScoreDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ComplexityRating;
 import com.khartec.waltz.model.complexity.ComplexityScore;
-import com.khartec.waltz.model.complexity.ImmutableComplexityRating;
+import com.khartec.waltz.schema.tables.records.ComplexityScoreRecord;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.SelectJoinStep;
+import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.MapUtilities.indexBy;
-import static com.khartec.waltz.common.MapUtilities.maybeGet;
-import static com.khartec.waltz.common.SetUtilities.union;
-import static java.util.Optional.ofNullable;
+import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.map;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 
 @Service
 public class ComplexityRatingService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ComplexityRatingService.class);
+
+    private final ComplexityScoreDao complexityScoreDao;
     private final CapabilityComplexityService capabilityComplexityService;
-    private final ServerComplexityService serverComplexityService;
-    private final ApplicationIdSelectorFactory appIdSelectorFactory;
     private final ConnectionComplexityService connectionComplexityService;
+    private final ServerComplexityService serverComplexityService;
+
+    private final ApplicationIdSelectorFactory appIdSelectorFactory;
 
 
     @Autowired
-    public ComplexityRatingService(ConnectionComplexityService connectionComplexityService,
+    public ComplexityRatingService(ComplexityScoreDao complexityScoreDao,
                                    CapabilityComplexityService capabilityComplexityService,
+                                   ConnectionComplexityService connectionComplexityService,
                                    ServerComplexityService serverComplexityService,
                                    ApplicationIdSelectorFactory appIdSelectorFactory) {
 
-        this.connectionComplexityService = connectionComplexityService;
+        checkNotNull(complexityScoreDao, "complexityScoreDao cannot be null");
+        checkNotNull(capabilityComplexityService, "capabilityComplexityService cannot be null");
+        checkNotNull(connectionComplexityService, "connectionComplexityService cannot be null");
+        checkNotNull(serverComplexityService, "serverComplexityService cannot be null");
+        checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
+
+        this.complexityScoreDao = complexityScoreDao;
         this.capabilityComplexityService = capabilityComplexityService;
+        this.connectionComplexityService = connectionComplexityService;
         this.serverComplexityService = serverComplexityService;
         this.appIdSelectorFactory = appIdSelectorFactory;
     }
 
 
     public ComplexityRating getForApp(long appId) {
-        ComplexityScore serverComplexity = serverComplexityService.getForApp(appId);
-        ComplexityScore connectionComplexity = connectionComplexityService.getForApp(appId);
-        ComplexityScore capabilityComplexity = capabilityComplexityService.getForApp(appId);
-
-        return ImmutableComplexityRating.builder()
-                .id(appId)
-                .connectionComplexity(ofNullable(connectionComplexity))
-                .serverComplexity(ofNullable(serverComplexity))
-                .capabilityComplexity(ofNullable(capabilityComplexity))
-                .build();
+        return complexityScoreDao.getForApp(appId);
     }
 
 
@@ -80,34 +88,50 @@ public class ComplexityRatingService {
      * ratings are baselined against the application with the most
      * connections in the system.  If you wish specify a specific baseline use
      * the overloaded method.
-     * @param ids
+     * @param options
      * @return
      */
     public List<ComplexityRating> findForAppIdSelector(ApplicationIdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);
+        return complexityScoreDao.findForAppIdSelector(appIdSelector);
+
+    }
+
+
+    public int rebuild() {
+
+        LOG.info("Rebuild complexity score table");
+        SelectJoinStep<Record1<Long>> appIdSelector = DSL.select(APPLICATION.ID).from(APPLICATION);
 
         List<ComplexityScore> connectionScores = connectionComplexityService.findByAppIdSelector(appIdSelector);
         List<ComplexityScore> serverScores = serverComplexityService.findByAppIdSelector(appIdSelector);
         List<ComplexityScore> capabilityScores = capabilityComplexityService.findByAppIdSelector(appIdSelector);
 
-        Map<Long, ComplexityScore> connectionScoresById = indexBy(s -> s.id(), connectionScores);
-        Map<Long, ComplexityScore> serverScoresById = indexBy(s -> s.id(), serverScores);
-        Map<Long, ComplexityScore> capabilityScoresById = indexBy(s -> s.id(), capabilityScores);
 
-        Set<Long> appIds = union(
-                serverScoresById.keySet(),
-                connectionScoresById.keySet(),
-                capabilityScoresById.keySet()
-        );
+        List<ComplexityScoreRecord> records = ListUtilities.concat(
+                map(serverScores, r -> buildComplexityScoreRecord(r, ComplexityKind.SERVER)),
+                map(capabilityScores, r -> buildComplexityScoreRecord(r, ComplexityKind.CAPABILITY)),
+                map(connectionScores, r -> buildComplexityScoreRecord(r, ComplexityKind.CONNECTION)));
 
-        return appIds.stream()
-                .map(appId -> ImmutableComplexityRating.builder()
-                        .id(appId)
-                        .serverComplexity(maybeGet(serverScoresById, appId))
-                        .connectionComplexity(maybeGet(connectionScoresById, appId))
-                        .capabilityComplexity(maybeGet(capabilityScoresById, appId))
-                        .build())
-                .collect(Collectors.toList());
+        LOG.info("Scrubbing existing complexity score table");
+        complexityScoreDao.deleteAll();
+
+        LOG.info("Inserting {} new records into complexity score table", records.size());
+        int[] results = complexityScoreDao.bulkInsert(records);
+
+        LOG.info("Completed insertion of new records, results: {}", results.length);
+        return results.length;
+    }
+
+
+
+    private static ComplexityScoreRecord buildComplexityScoreRecord(ComplexityScore r, ComplexityKind kind) {
+        ComplexityScoreRecord record = new ComplexityScoreRecord();
+        record.setEntityKind(EntityKind.APPLICATION.name());
+        record.setEntityId(r.id());
+        record.setComplexityKind(kind.name());
+        record.setScore(BigDecimal.valueOf(r.score()));
+        return record;
     }
 }

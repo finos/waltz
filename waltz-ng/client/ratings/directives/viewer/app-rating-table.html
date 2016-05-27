@@ -21,7 +21,7 @@
                     <span ng-bind="capability.name"></span>
                 </a>
             </th>
-            <td ng-repeat="app in ctrl.applications"
+            <td ng-repeat="app in ctrl.applications | orderBy:'name'"
                 class="rating-cell rating-{{ ctrl.determineRating(app.id, capability.id) }}">
                 <div>
                     <!-- spacer -->

@@ -10,12 +10,17 @@ import static com.khartec.waltz.common.Checks.checkTrue;
 
 public class ComplexityUtilities {
 
-    public static ComplexityScore tallyToComplexityScore(LongTally tally, double baseline) {
-        return tallyToComplexityScore(tally, baseline, Function.identity());
+    public static ComplexityScore tallyToComplexityScore(ComplexityKind kind,
+                                                         LongTally tally,
+                                                         double baseline) {
+        return tallyToComplexityScore(kind, tally, baseline, Function.identity());
     }
 
 
-    public static ComplexityScore tallyToComplexityScore(LongTally tally, double baseline, Function<Double, Double> valueTransformer) {
+    public static ComplexityScore tallyToComplexityScore(ComplexityKind kind,
+                                                         LongTally tally,
+                                                         double baseline,
+                                                         Function<Double, Double> valueTransformer) {
         checkNotNull(tally, "Cannot create a complexity score from a null tally");
         checkTrue(baseline >= 0, "Cannot create a complexity score with a negative baseline value");
         checkNotNull(valueTransformer, "valueTransformer cannot be null");
@@ -29,9 +34,8 @@ public class ComplexityUtilities {
 
         return ImmutableComplexityScore.builder()
                 .id(tally.id())
-                .rawValue(tally.count())
                 .score(score)
-                .baseline(baseline)
+                .kind(kind)
                 .build();
     }
 

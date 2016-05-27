@@ -88,7 +88,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
         }
 
         return dsl
-                .select(APPLICATION.ID)
+                .selectDistinct(APPLICATION.ID)
                 .from(APPLICATION)
                 .where(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds));
     }
@@ -99,7 +99,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 scope == EXACT,
                 "Can only query for 'EXACT' app group matches, not: "+scope);
         return dsl
-                .select(APPLICATION_GROUP_ENTRY.APPLICATION_ID)
+                .selectDistinct(APPLICATION_GROUP_ENTRY.APPLICATION_ID)
                 .from(APPLICATION_GROUP_ENTRY)
                 .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(ref.id()));
     }
@@ -150,7 +150,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 .where(PERSON.ID.eq(ref.id()))
                 .fetchOne(PERSON.EMPLOYEE_ID);
         return dsl
-                .select(INVOLVEMENT.ENTITY_ID)
+                .selectDistinct(INVOLVEMENT.ENTITY_ID)
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId));
@@ -162,7 +162,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
         switch (scope) {
             case CHILDREN:
                 return dsl
-                        .select(APP_CAPABILITY.APPLICATION_ID)
+                        .selectDistinct(APP_CAPABILITY.APPLICATION_ID)
                         .from(APP_CAPABILITY)
                         .where(APP_CAPABILITY.CAPABILITY_ID.in(
                                 dsl.select(CAPABILITY.ID)
@@ -184,12 +184,12 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 ids.remove(null);
 
                 return dsl
-                        .select(APP_CAPABILITY.APPLICATION_ID)
+                        .selectDistinct(APP_CAPABILITY.APPLICATION_ID)
                         .from(APP_CAPABILITY)
                         .where(APP_CAPABILITY.CAPABILITY_ID.in(ids));
             case EXACT:
                 return dsl
-                        .select(APP_CAPABILITY.APPLICATION_ID)
+                        .selectDistinct(APP_CAPABILITY.APPLICATION_ID)
                         .from(APP_CAPABILITY)
                         .where(APP_CAPABILITY.CAPABILITY_ID.eq(ref.id()));
 

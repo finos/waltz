@@ -1456,4 +1456,32 @@
                        tableName="system_job_log"/>
     </changeSet>
 
+
+    <!-- 178: Precalc Complexity -->
+    <changeSet author="dwatkins"
+               id="20160526-178-1">
+        <createTable tableName="complexity_score">
+            <column name="entity_kind"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="complexity_kind"
+                    type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="score"
+                    type="DECIMAL(10,3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="entity_kind, entity_id, complexity_kind"
+                       constraintName="complexity_score_pkey"
+                       tableName="complexity_score"/>
+    </changeSet>
+
 </databaseChangeLog>
