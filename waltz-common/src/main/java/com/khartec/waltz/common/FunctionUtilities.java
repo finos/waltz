@@ -17,6 +17,9 @@
 
 package com.khartec.waltz.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.function.Supplier;
 
 /**
@@ -24,6 +27,7 @@ import java.util.function.Supplier;
  */
 public class FunctionUtilities {
 
+    private static final Logger LOG = LoggerFactory.getLogger(FunctionUtilities.class);
 
     /**
      * This odd looking function can be used as a wrapper
@@ -36,7 +40,7 @@ public class FunctionUtilities {
     }
 
     public static <T> T time(String name, Supplier<T> s) {
-        System.out.println("-- begin [" + name + "]");
+        LOG.info("-- begin [" + name + "]");
 
         long st = System.currentTimeMillis();
 
@@ -44,14 +48,11 @@ public class FunctionUtilities {
             T r = s.get();
             long end = System.currentTimeMillis();
 
-            System.out.println("-- end [" + name + "]");
-            System.out.println("-- dur [" + name + "]:" + (end - st));
-            System.out.println("-- result [" + name + "]:" + r);
-            System.out.println();
-
+            LOG.info("-- end [" + name + "]");
+            LOG.info("-- dur [" + name + "]:" + (end - st));
             return r;
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+            LOG.error("Unexpected error when timing: "+name, e);
             return null;
         }
 

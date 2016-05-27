@@ -91,7 +91,9 @@ public class DIConfiguration {
         return DSL.using(
                 dataSource,
                 SQLDialect.valueOf(dialect),
-                new Settings().withRenderFormatted(true));
+                new Settings()
+                        .withRenderFormatted(false)
+                        .withExecuteLogging(false));
     }
 
 

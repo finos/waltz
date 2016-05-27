@@ -18,6 +18,7 @@
 package com.khartec.waltz.data.data_flow;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.dataflow.DataFlowMeasures;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowMeasures;
@@ -31,6 +32,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 
 
@@ -57,26 +59,30 @@ public class DataFlowStatsDao {
         Checks.checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
 
-        Select<Record2<String, Integer>> inAppCounter = countDistinctApps(
+        Select<Record2<String, Integer>> inAppCounter = FunctionUtilities.time("inAppCounter", () -> countDistinctApps(
                 appIdSelector,
                 DATA_FLOW.TARGET_ENTITY_ID,
                 "inAppCount",
                 DATA_FLOW.SOURCE_ENTITY_ID
-        );
+        ));
 
-        Select<Record2<String, Integer>> outAppCounter = countDistinctApps(
+        Select<Record2<String, Integer>> outAppCounter = FunctionUtilities.time("outAppCounter", () -> countDistinctApps(
                 appIdSelector,
                 DATA_FLOW.SOURCE_ENTITY_ID,
                 "outAppCount",
                 DATA_FLOW.TARGET_ENTITY_ID
-        );
+        ));
 
-
+        // TODO: jooq related.  Yes, this is silly, but everything else seems v. slow
+        Integer intraCount = FunctionUtilities.time("fetchCount2", () -> dsl
+                .select(DSL.count()).from(APPLICATION).where(APPLICATION.ID.in(appIdSelector).toString())
+                .fetchOne().value1());
 
         ImmutableDataFlowMeasures.Builder resultBuilder = ImmutableDataFlowMeasures
                 .builder()
-                .intra(dsl.fetchCount(appIdSelector));
-                // incomplete on purpose, remaining values provided by query result
+                .intra(intraCount);
+
+        // incomplete on purpose, remaining values provided by query result
 
         inAppCounter.union(outAppCounter)
                 .stream()
@@ -138,7 +144,7 @@ public class DataFlowStatsDao {
 
 
         // TODO:  query goes at least twice as slowly if you don't toString() the condition...
-        flows.select(DSL.value("inConnCount").as("name"), DSL.count())
+        SelectOrderByStep<Record2<String, Integer>> query = flows.select(DSL.value("inConnCount").as("name"), DSL.count())
                 .from("flows")
                 .where(inboundCondition.toString())
                 .union(DSL
@@ -148,8 +154,9 @@ public class DataFlowStatsDao {
                 .union(DSL
                         .select(DSL.value("intraConnCount").as("name"), DSL.count())
                         .from("flows")
-                        .where(intraCondition.toString()))
-                .stream()
+                        .where(intraCondition.toString()));
+
+        query.stream()
                 .forEach(r -> {
                     String name = r.value1();
                     int count = r.value2();

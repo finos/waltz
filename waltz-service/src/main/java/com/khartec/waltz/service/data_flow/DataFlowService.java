@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.service.data_flow;
 
+import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow.DataFlowDao;
 import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
@@ -81,9 +82,9 @@ public class DataFlowService {
     public DataFlowStatistics calculateStats(ApplicationIdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);
-        List<StringTally> dataTypeCounts = dataFlowStatsDao.tallyDataTypes(appIdSelector);
-        DataFlowMeasures appCounts = dataFlowStatsDao.countDistinctAppInvolvement(appIdSelector);
-        DataFlowMeasures flowCounts = dataFlowStatsDao.countDistinctFlowInvolvement(appIdSelector);
+        List<StringTally> dataTypeCounts = FunctionUtilities.time("dataTypes", () -> dataFlowStatsDao.tallyDataTypes(appIdSelector));
+        DataFlowMeasures appCounts = FunctionUtilities.time("appCounts", () -> dataFlowStatsDao.countDistinctAppInvolvement(appIdSelector));
+        DataFlowMeasures flowCounts = FunctionUtilities.time("flowCounts", () -> dataFlowStatsDao.countDistinctFlowInvolvement(appIdSelector));
 
         return ImmutableDataFlowStatistics.builder()
                 .dataTypeCounts(dataTypeCounts)
