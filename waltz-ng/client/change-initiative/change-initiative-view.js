@@ -38,7 +38,6 @@ function controller($q,
         return $q
             .all(promises)
             .then(([appGroups]) => {
-                console.log(appGroups)
                 return { appGroups }
             });
 

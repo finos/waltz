@@ -31,11 +31,14 @@ public class ComplexityEndpoint implements Endpoint {
     public void register() {
         String getForAppPath = mkPath(BASE_URL, "application", ":id");
         String findForAppIdSelectorPath = BASE_URL;
+        String rebuildPath = mkPath(BASE_URL, "rebuild");
 
         DatumRoute<ComplexityRating> getForAppRoute = (request, response) -> service.getForApp(getId(request));
         ListRoute<ComplexityRating> findForAppIdSelectorRoute = (request, response) -> service.findForAppIdSelector(readOptionsFromBody(request));
+        DatumRoute<Integer> rebuildRoute = (request, response) -> service.rebuild();
 
         getForDatum(getForAppPath, getForAppRoute);
         postForList(findForAppIdSelectorPath, findForAppIdSelectorRoute);
+        getForDatum(rebuildPath, rebuildRoute);
     }
 }

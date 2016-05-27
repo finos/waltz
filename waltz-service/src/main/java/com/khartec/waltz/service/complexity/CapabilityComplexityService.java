@@ -1,6 +1,7 @@
 package com.khartec.waltz.service.complexity;
 
 import com.khartec.waltz.data.complexity.CapabilityComplexityDao;
+import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ComplexityScore;
 import com.khartec.waltz.model.tally.LongTally;
 import org.jooq.Record1;
@@ -34,7 +35,10 @@ public class CapabilityComplexityService {
     public List<ComplexityScore> findByAppIdSelector(Select<Record1<Long>> idSelector, double baseline) {
         return capabilityComplexityDao.findScoresForAppIdSelector(idSelector)
                 .stream()
-                .map(tally -> tallyToComplexityScore(tally, baseline))
+                .map(tally -> tallyToComplexityScore(
+                        ComplexityKind.CAPABILITY,
+                        tally,
+                        baseline))
                 .collect(Collectors.toList());
     }
 
@@ -49,7 +53,10 @@ public class CapabilityComplexityService {
         LongTally tally = capabilityComplexityDao.findScoresForAppId(appId);
         if (tally == null) return null;
 
-        return tallyToComplexityScore(tally, baseline);
+        return tallyToComplexityScore(
+                ComplexityKind.CAPABILITY,
+                tally,
+                baseline);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.khartec.waltz.service.complexity;
 
 import com.khartec.waltz.data.complexity.ConnectionComplexityDao;
+import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ComplexityScore;
 import com.khartec.waltz.model.tally.LongTally;
 import org.jooq.Record1;
@@ -51,7 +52,11 @@ public class ConnectionComplexityService {
 
         if (flowCounts.isEmpty()) { return null; }
 
-        return tallyToComplexityScore(flowCounts.get(0), baseline, Math::log);
+        return tallyToComplexityScore(
+                ComplexityKind.CONNECTION,
+                flowCounts.get(0),
+                baseline,
+                Math::log);
     }
 
 
@@ -72,7 +77,7 @@ public class ConnectionComplexityService {
     public List<ComplexityScore> findByAppIdSelector(Select<Record1<Long>> idSelector, int baseline) {
         return connectionComplexityDao.findCounts(idSelector)
                 .stream()
-                .map(tally -> tallyToComplexityScore(tally, baseline, Math::log))
+                .map(tally -> tallyToComplexityScore(ComplexityKind.CONNECTION, tally, baseline, Math::log))
                 .collect(Collectors.toList());
     }
 

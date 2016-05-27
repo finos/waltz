@@ -167,7 +167,7 @@ controller.$inject = [
     'ApplicationStore',
     'ChangeInitiativeStore',
     'DataFlowDataStore',
-    'Notification',
+    'Notification'
 ];
 
 
