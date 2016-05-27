@@ -16,5 +16,4 @@ export default (module) => {
     module.filter('toDescription', require('./description-filter'));
     module.filter('toFixed', require('./fixed-filter'));
     module.filter('isEmpty', require('./is-empty'));
-    module.filter('html', require('./html-filter'));
 };
