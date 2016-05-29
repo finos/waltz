@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>waltz</artifactId>
+        <groupId>com.khartec</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>waltz-schema</artifactId>
+
+
+    <properties>
+        <jooq.version>3.7.3</jooq.version>
+    </properties>
+
+    <profiles>
+
+        <profile>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <id>waltz-mariadb</id>
+            <properties>
+                <jdbc.group>org.mariadb.jdbc</jdbc.group>
+                <jdbc.artifact>mariadb-java-client</jdbc.artifact>
+                <jdbc.version>1.3.2</jdbc.version>
+                <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
+                <jooq.dialect>MARIADB</jooq.dialect>
+                <jooq.group>org.jooq</jooq.group>
+                <jooq.database>org.jooq.util.mariadb.MariaDBDatabase</jooq.database>
+            </properties>
+        </profile>
+
+        <profile>
+            <!--
+                Note: this profile requires a professional license for JOOQ,
+                see: http://www.jooq.org/download/
+            -->
+
+            <id>waltz-mssql</id>
+            <properties>
+                <jdbc.group>com.microsoft.sqlserver</jdbc.group>
+                <jdbc.artifact>sqljdbc4</jdbc.artifact>
+                <jdbc.version>4.0</jdbc.version>
+                <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
+                <jooq.group>org.jooq.pro</jooq.group>
+                <jooq.database>org.jooq.util.sqlserver.SQLServerDatabase</jooq.database>
+                <jooq.dialect>SQLSERVER2014</jooq.dialect>
+            </properties>
+        </profile>
+
+
+    </profiles>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>${jdbc.group}</groupId>
+            <artifactId>${jdbc.artifact}</artifactId>
+            <version>${jdbc.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${jooq.group}</groupId>
+            <artifactId>jooq</artifactId>
+            <version>${jooq.version}</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <!-- Specify the maven code generator plugin -->
+                <groupId>${jooq.group}</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>${jooq.version}</version>
+
+                <!-- The plugin should hook into the generate goal -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>${jdbc.group}</groupId>
+                        <artifactId>${jdbc.artifact}</artifactId>
+                        <version>${jdbc.version}</version>
+                    </dependency>
+                </dependencies>
+
+                <!-- Specify the plugin configuration.
+                     The configuration format is the same as for the standalone code generator -->
+                <configuration>
+
+                    <!-- JDBC connection parameters -->
+                    <jdbc>
+                        <driver>${jdbc.driver}</driver>
+                        <url>${database.url}</url>
+                        <user>${database.user}</user>
+                        <password>${database.password}</password>
+                    </jdbc>
+
+
+                    <!-- Generator parameters -->
+                    <generator>
+                        <database>
+                            <name>${jooq.database}</name>
+                            <schemata>
+                                <schema>
+                                    <inputSchema>${database.schema}</inputSchema>
+                                    <outputSchemaToDefault>true</outputSchemaToDefault>
+                                </schema>
+                            </schemata>
+                        </database>
+
+                        <target>
+                            <packageName>com.khartec.waltz.schema</packageName>
+                            <directory>target/generated-sources/jooq</directory>
+                        </target>
+                    </generator>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

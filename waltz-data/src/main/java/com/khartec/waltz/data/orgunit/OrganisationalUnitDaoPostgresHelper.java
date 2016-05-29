@@ -21,6 +21,7 @@ import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.*;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
@@ -39,31 +40,36 @@ public class OrganisationalUnitDaoPostgresHelper implements DatabaseVendorSpecif
 
     public static List<OrganisationalUnit> findDescendants(DSLContext dsl, long orgUnitId) {
 
-        Table<Record> orgTree = table(name("orgTree"));
-        Field<Long> ouIdField = field(name("orgTree", "id"), Long.class);
-        Field<Long> pIdField = field(name("orgTree", "parent_id"), Long.class);
-        Field<String> nameField = field(name("orgTree", "name"), String.class);
-        Field<String> descriptionField = field(name("orgTree", "description"), String.class);
-        Field<String> kindField = field(name("orgTree", "kind"), String.class);
+//        Table<Record> orgTree = table(name("orgTree"));
+//        Field<Long> ouIdField = field(name("orgTree", "id"), Long.class);
+//        Field<Long> pIdField = field(name("orgTree", "parent_id"), Long.class);
+//        Field<String> nameField = field(name("orgTree", "name"), String.class);
+//        Field<String> descriptionField = field(name("orgTree", "description"), String.class);
+//        Field<String> kindField = field(name("orgTree", "kind"), String.class);
+//
+//        Field[] tableFields = new Field[] {
+//                ORGANISATIONAL_UNIT.ID,
+//                ORGANISATIONAL_UNIT.PARENT_ID,
+//                ORGANISATIONAL_UNIT.NAME,
+//                ORGANISATIONAL_UNIT.DESCRIPTION,
+//                ORGANISATIONAL_UNIT.KIND
+//        };
+//
+//        Select<Record> records = select(tableFields)
+//                .from(ORGANISATIONAL_UNIT).where(ORGANISATIONAL_UNIT.ID.eq(orgUnitId))
+//                .unionAll(
+//                        select(tableFields)
+//                                .from(ORGANISATIONAL_UNIT, orgTree)
+//                                .where(ORGANISATIONAL_UNIT.PARENT_ID.eq(ouIdField)));
+//
+//        return dsl.withRecursive("orgTree", "id", "parent_id", "name", "description", "kind")
+//                .as(records)
+//                .select(ouIdField, pIdField, nameField, descriptionField, kindField)
+//                .from(orgTree)
+//                .fetch(OrganisationalUnitDao.recordMapper);
 
-        Field[] tableFields = new Field[] {
-                ORGANISATIONAL_UNIT.ID,
-                ORGANISATIONAL_UNIT.PARENT_ID,
-                ORGANISATIONAL_UNIT.NAME,
-                ORGANISATIONAL_UNIT.DESCRIPTION,
-                ORGANISATIONAL_UNIT.KIND
-        };
 
-        return dsl.withRecursive("orgTree", "id", "parent_id", "name", "description", "kind")
-                .as(select(tableFields)
-                        .from(ORGANISATIONAL_UNIT).where(ORGANISATIONAL_UNIT.ID.eq(orgUnitId))
-                        .unionAll(
-                                select(tableFields)
-                                        .from(ORGANISATIONAL_UNIT, orgTree)
-                                        .where(ORGANISATIONAL_UNIT.PARENT_ID.eq(ouIdField))))
-                .select(ouIdField, pIdField, nameField, descriptionField, kindField)
-                .from(orgTree)
-                .fetch(OrganisationalUnitDao.recordMapper);
+        return Collections.emptyList();
     }
 
 
@@ -78,12 +84,13 @@ public class OrganisationalUnitDaoPostgresHelper implements DatabaseVendorSpecif
 
 
     private static List<OrganisationalUnit> findRecursively(DSLContext dsl, long orgUnitId, Select<? extends Record> recursiveStep) {
-        return dsl.withRecursive("orgTree", "id", "parent_id", "name", "description", "kind")
-                .as(select(ORGANISATIONAL_UNIT.fields())
-                        .from(ORGANISATIONAL_UNIT).where(ORGANISATIONAL_UNIT.ID.eq(orgUnitId))
-                        .unionAll(recursiveStep))
-                .select(ouIdField, pIdField, nameField, descriptionField, kindField)
-                .from(orgTree)
-                .fetch(OrganisationalUnitDao.recordMapper);
+        return Collections.emptyList();
+//        return dsl.withRecursive("orgTree", "id", "parent_id", "name", "description", "kind")
+//                .as(select(ORGANISATIONAL_UNIT.fields())
+//                        .from(ORGANISATIONAL_UNIT).where(ORGANISATIONAL_UNIT.ID.eq(orgUnitId))
+//                        .unionAll(recursiveStep))
+//                .select(ouIdField, pIdField, nameField, descriptionField, kindField)
+//                .from(orgTree)
+//                .fetch(OrganisationalUnitDao.recordMapper);
     }
 }
