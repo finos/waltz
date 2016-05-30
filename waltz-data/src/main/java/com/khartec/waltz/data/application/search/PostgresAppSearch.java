@@ -33,7 +33,7 @@ public class PostgresAppSearch implements FullTextSearch<Application>, DatabaseV
     @Override
     public List<Application> search(DSLContext dsl, String terms) {
         Result<Record> records = dsl.fetch(SEARCH_POSTGRES, terms, terms);
-        return records.map(ApplicationDao.applicationRecordMapper);
+        return records.map(ApplicationDao.TO_DOMAIN_MAPPER);
     }
 
 }

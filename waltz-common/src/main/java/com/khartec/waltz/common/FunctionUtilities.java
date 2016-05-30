@@ -40,7 +40,7 @@ public class FunctionUtilities {
     }
 
     public static <T> T time(String name, Supplier<T> s) {
-        LOG.info("-- begin [" + name + "]");
+        // LOG.info("-- begin [" + name + "]");
 
         long st = System.currentTimeMillis();
 
@@ -48,8 +48,9 @@ public class FunctionUtilities {
             T r = s.get();
             long end = System.currentTimeMillis();
 
-            LOG.info("-- end [" + name + "]");
-            LOG.info("-- dur [" + name + "]:" + (end - st));
+            // LOG.info("-- end [" + name + "]");
+            LOG.info("-- dur [" + name + "]: " + (end - st));
+            //LOG.info("-- result [" + name + "]: " + r);
             return r;
         } catch (Exception e) {
             LOG.error("Unexpected error when timing: "+name, e);

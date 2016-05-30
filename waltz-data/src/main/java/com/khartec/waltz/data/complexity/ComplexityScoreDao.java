@@ -19,12 +19,10 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.ListUtilities.ensureNotNull;
 import static com.khartec.waltz.schema.tables.ComplexityScore.COMPLEXITY_SCORE;
 import static java.util.Optional.ofNullable;
 
-/**
- * Created by dwatkins on 26/05/2016.
- */
 @Repository
 public class ComplexityScoreDao {
 
@@ -38,9 +36,9 @@ public class ComplexityScoreDao {
     };
 
 
-    private static final BiFunction<Long, Collection<ComplexityScore>, ComplexityRating> TO_COMPEXITY_RATING =
+    private static final BiFunction<Long, Collection<ComplexityScore>, ComplexityRating> TO_COMPLEXITY_RATING =
         (id, scores) -> {
-            Map<ComplexityKind, ComplexityScore> scoresByKind = MapUtilities.indexBy(score -> score.kind(), scores);
+            Map<ComplexityKind, ComplexityScore> scoresByKind = MapUtilities.indexBy(score -> score.kind(), ensureNotNull(scores));
             return ImmutableComplexityRating.builder()
                     .id(id)
                     .serverComplexity(ofNullable(scoresByKind.get(ComplexityKind.SERVER)))
@@ -69,15 +67,15 @@ public class ComplexityScoreDao {
                 .map(TO_COMPLEXITY_SCORE_MAPPER)
                 .collect(Collectors.groupingBy(s -> s.id()));
 
-        return TO_COMPEXITY_RATING.apply(appId, scoresForApp.get(appId));
-
+        return TO_COMPLEXITY_RATING.apply(appId, scoresForApp.get(appId));
     }
 
 
     public List<ComplexityRating> findForAppIdSelector(Select<Record1<Long>> appIdSelector) {
-        Map<Long, List<ComplexityScore>> scoresForApp = dsl.select(COMPLEXITY_SCORE.fields())
+        Map<Long, List<ComplexityScore>> scoresForApp = dsl
+                .select(COMPLEXITY_SCORE.fields())
                 .from(COMPLEXITY_SCORE)
-                .where(COMPLEXITY_SCORE.ENTITY_ID.in(appIdSelector).toString())
+                .where(COMPLEXITY_SCORE.ENTITY_ID.in(appIdSelector))
                 .and(COMPLEXITY_SCORE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .stream()
                 .map(TO_COMPLEXITY_SCORE_MAPPER)
@@ -86,7 +84,7 @@ public class ComplexityScoreDao {
         return scoresForApp
                 .entrySet()
                 .stream()
-                .map(entry -> TO_COMPEXITY_RATING.apply(entry.getKey(), entry.getValue()))
+                .map(entry -> TO_COMPLEXITY_RATING.apply(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 

@@ -17,6 +17,8 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
@@ -24,11 +26,16 @@ import com.khartec.waltz.model.application.HierarchyQueryScope;
 import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
 import com.khartec.waltz.model.cost.AssetCostQueryOptions;
 import com.khartec.waltz.model.cost.AssetCostStatistics;
+import com.khartec.waltz.model.cost.CostBandTally;
 import com.khartec.waltz.model.cost.ImmutableAssetCostQueryOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.List;
 
 
 public class AssetCostHarness {
@@ -39,6 +46,8 @@ public class AssetCostHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
         AssetCostService service = ctx.getBean(AssetCostService.class);
+        AssetCostStatsDao dao = ctx.getBean(AssetCostStatsDao.class);
+        ApplicationIdSelectorFactory selectorFactory = ctx.getBean(ApplicationIdSelectorFactory.class);
 
 
         long st = System.currentTimeMillis();
@@ -56,6 +65,10 @@ public class AssetCostHarness {
                 .idSelectionOptions(appIdSelectionOptions)
                 .year(2015)
                 .build();
+
+        Select<Record1<Long>> selector = selectorFactory.apply(appIdSelectionOptions);
+        List<CostBandTally> res = dao.calculateCostBandStatisticsByAppIdSelector(2015, selector);
+
 
         AssetCostStatistics stats = service.calculateStatisticsByAppIds(options);
 

@@ -51,13 +51,16 @@ function service($q,
     const state = { model: initModel };
 
     function loadPeople(employeeId) {
-        const personPromise = personStore.getByEmployeeId(employeeId)
+        const personPromise = personStore
+            .getByEmployeeId(employeeId)
             .then(person => state.model.person = person);
 
-        const directsPromise = personStore.findDirects(employeeId)
+        const directsPromise = personStore
+            .findDirects(employeeId)
             .then(directs => state.model.directs = directs);
 
-        const managersPromise = personStore.findManagers(employeeId)
+        const managersPromise = personStore
+            .findManagers(employeeId)
             .then(managers => state.model.managers = managers);
 
         return $q.all([personPromise, directsPromise, managersPromise]);

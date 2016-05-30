@@ -13,7 +13,7 @@
 
 
     <properties>
-        <jooq.version>3.7.3</jooq.version>
+        <jooq.version>3.7.4</jooq.version>
     </properties>
 
     <profiles>

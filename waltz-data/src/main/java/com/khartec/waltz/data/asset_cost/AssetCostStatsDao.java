@@ -73,7 +73,7 @@ public class AssetCostStatsDao {
                 .from(ASSET_COST)
                 .innerJoin(APPLICATION)
                 .on(APPLICATION.ASSET_CODE.eq(ASSET_COST.ASSET_CODE))
-                .where(optionsCondition.toString())
+                .where(optionsCondition)
                 .fetchOne(r -> ImmutableCost.builder()
                         .amount(r.value1())
                         .currencyCode("EUR")
@@ -98,7 +98,7 @@ public class AssetCostStatsDao {
         SelectHavingStep<Record1<BigDecimal>> subTotals = DSL
                 .select(subTotalSum.as(subTotalAlias))
                 .from(ASSET_COST)
-                .where(condition.toString())
+                .where(condition)
                 .and(ASSET_COST.YEAR.eq(year))
                 .groupBy(ASSET_COST.ASSET_CODE);
 
@@ -106,7 +106,7 @@ public class AssetCostStatsDao {
                 .select(costBandFields)
                 .from(subTotals);
 
-         return query
+        return query
                 .fetchOne(r ->
                         IntStream.range(0, costBandFields.size())
                                 .mapToObj(fieldIdx -> {

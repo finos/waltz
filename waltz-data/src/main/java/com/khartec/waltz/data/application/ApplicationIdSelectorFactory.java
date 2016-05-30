@@ -1,6 +1,5 @@
 package com.khartec.waltz.data.application;
 
-import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.EntityKind;
@@ -9,10 +8,7 @@ import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.application.HierarchyQueryScope;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.model.utils.IdUtilities;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Select;
-import org.jooq.SelectConditionStep;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.model.application.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
@@ -42,8 +39,8 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
 
     @Autowired
     public ApplicationIdSelectorFactory(DSLContext dsl, OrganisationalUnitDao organisationalUnitDao) {
-        Checks.checkNotNull(dsl, "dsl cannot be null");
-        Checks.checkNotNull(organisationalUnitDao, "organisationalUnitDao cannot be null");
+        checkNotNull(dsl, "dsl cannot be null");
+        checkNotNull(organisationalUnitDao, "organisationalUnitDao cannot be null");
 
         this.dsl = dsl;
         this.organisationalUnitDao = organisationalUnitDao;
@@ -52,7 +49,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
 
     @Override
     public Select<Record1<Long>> apply(ApplicationIdSelectionOptions options) {
-        Checks.checkNotNull(options, "options cannot be null");
+        checkNotNull(options, "options cannot be null");
         EntityReference ref = options.entityReference();
         switch (ref.kind()) {
             case APP_GROUP:
@@ -90,14 +87,14 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
         return dsl
                 .selectDistinct(APPLICATION.ID)
                 .from(APPLICATION)
-                .where(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds));
+                .where(dsl.renderInlined(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds)));
     }
 
 
     private SelectConditionStep<Record1<Long>> mkForAppGroup(EntityReference ref, HierarchyQueryScope scope) {
         checkTrue(
                 scope == EXACT,
-                "Can only query for 'EXACT' app group matches, not: "+scope);
+                "Can only query for 'EXACT' app group matches, not: " + scope);
         return dsl
                 .selectDistinct(APPLICATION_GROUP_ENTRY.APPLICATION_ID)
                 .from(APPLICATION_GROUP_ENTRY)
@@ -126,12 +123,14 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 .from(PERSON_HIERARCHY)
                 .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId));
 
-        return DSL
+        Condition condition = INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                .and(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId)
+                .or(INVOLVEMENT.EMPLOYEE_ID.in(employeeIds)));
+
+        return dsl
                 .selectDistinct(INVOLVEMENT.ENTITY_ID)
                 .from(INVOLVEMENT)
-                .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId)
-                    .or(INVOLVEMENT.EMPLOYEE_ID.in(employeeIds)));
+                .where(dsl.renderInlined(condition));
     }
 
 
@@ -164,7 +163,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 return dsl
                         .selectDistinct(APP_CAPABILITY.APPLICATION_ID)
                         .from(APP_CAPABILITY)
-                        .where(APP_CAPABILITY.CAPABILITY_ID.in(
+                        .where(dsl.renderInlined(APP_CAPABILITY.CAPABILITY_ID.in(
                                 dsl.select(CAPABILITY.ID)
                                         .from(CAPABILITY)
                                         .where(CAPABILITY.LEVEL_1.eq(ref.id()))
@@ -172,7 +171,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                                         .or(CAPABILITY.LEVEL_2.eq(ref.id()))
                                         .or(CAPABILITY.LEVEL_3.eq(ref.id()))
                                         .or(CAPABILITY.LEVEL_4.eq(ref.id()))
-                                        .or(CAPABILITY.LEVEL_5.eq(ref.id()))));
+                                        .or(CAPABILITY.LEVEL_5.eq(ref.id())))));
             case PARENTS:
                 Set<Long> ids = dsl.select(CAPABILITY.LEVEL_1, CAPABILITY.LEVEL_2, CAPABILITY.LEVEL_3, CAPABILITY.LEVEL_4, CAPABILITY.LEVEL_4)
                         .from(CAPABILITY)
@@ -186,7 +185,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 return dsl
                         .selectDistinct(APP_CAPABILITY.APPLICATION_ID)
                         .from(APP_CAPABILITY)
-                        .where(APP_CAPABILITY.CAPABILITY_ID.in(ids));
+                        .where(dsl.renderInlined(APP_CAPABILITY.CAPABILITY_ID.in(ids)));
             case EXACT:
                 return dsl
                         .selectDistinct(APP_CAPABILITY.APPLICATION_ID)

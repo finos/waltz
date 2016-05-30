@@ -18,23 +18,24 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.service.person.PersonService;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
 
 @Service
 public class PersonEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "person");
-    private static final String SEARCH_PATH = WebUtilities.mkPath(BASE_URL, "search", ":query");
-    private static final String DIRECTS_PATH = WebUtilities.mkPath(BASE_URL, "employee-id", ":empId", "directs");
-    private static final String MANAGERS_PATH = WebUtilities.mkPath(BASE_URL, "employee-id", ":empId", "managers");
-    private static final String BY_EMPLOYEE_PATH = WebUtilities.mkPath(BASE_URL, "employee-id", ":empId");
+    private static final String BASE_URL = mkPath("api", "person");
+    private static final String SEARCH_PATH = mkPath(BASE_URL, "search", ":query");
+    private static final String DIRECTS_PATH = mkPath(BASE_URL, "employee-id", ":empId", "directs");
+    private static final String MANAGERS_PATH = mkPath(BASE_URL, "employee-id", ":empId", "managers");
+    private static final String BY_EMPLOYEE_PATH = mkPath(BASE_URL, "employee-id", ":empId");
 
     private final PersonService service;
 
@@ -49,20 +50,20 @@ public class PersonEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        EndpointUtilities.getForList(SEARCH_PATH, (request, response) ->
+        getForList(SEARCH_PATH, (request, response) ->
                 service.search(request.params("query")));
 
-        EndpointUtilities.getForList(DIRECTS_PATH, (request, response) -> {
+        getForList(DIRECTS_PATH, (request, response) -> {
             String empId = request.params("empId");
             return service.findDirectsByEmployeeId(empId);
         });
 
-        EndpointUtilities.getForDatum(MANAGERS_PATH, (request, response) -> {
+        getForDatum(MANAGERS_PATH, (request, response) -> {
             String empId = request.params("empId");
             return service.findAllManagersByEmployeeId(empId);
         });
 
-        EndpointUtilities.getForDatum(BY_EMPLOYEE_PATH, (request, response) -> {
+        getForDatum(BY_EMPLOYEE_PATH, (request, response) -> {
             String empId = request.params("empId");
             return service.getByEmployeeId(empId);
         });

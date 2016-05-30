@@ -183,7 +183,7 @@ public class ServerInfoDao {
 
         SelectConditionStep<Record2<BigDecimal, BigDecimal>> typeQuery = dsl.select(virtualCount, physicalCount)
                 .from(SERVER_INFORMATION)
-                .where(condition.toString());
+                .where(dsl.renderInlined(condition));
 
         return typeQuery
                 .fetchOne(r -> Tuple.tuple(

@@ -98,7 +98,7 @@ public class JooqUtilities {
                 fieldToTally,
                 DSL.count(fieldToTally))
                 .from(table)
-                .where(recordsInScopeCondition.toString())
+                .where(dsl.renderInlined(recordsInScopeCondition))
                 .groupBy(fieldToTally);
 
     }

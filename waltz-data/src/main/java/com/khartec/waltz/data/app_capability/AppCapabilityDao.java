@@ -108,7 +108,7 @@ public class AppCapabilityDao {
                 .on(APP_CAPABILITY.APPLICATION_ID.eq(APPLICATION.ID))
                 .where(APP_CAPABILITY.CAPABILITY_ID.eq(capabilityId))
                 .forEach(r -> {
-                    Application app = ApplicationDao.applicationRecordMapper.map(r);
+                    Application app = ApplicationDao.TO_DOMAIN_MAPPER.map(r);
                     if (r.getValue(APP_CAPABILITY.IS_PRIMARY)) {
                         builder.addPrimaryApps(app);
                     } else {

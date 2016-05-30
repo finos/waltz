@@ -75,7 +75,7 @@ public class AppTagDao {
                 .on(APPLICATION_TAG.APPLICATION_ID.eq(APPLICATION.ID))
                 .where(APPLICATION_TAG.TAG.equalIgnoreCase(tag))
                 .orderBy(APPLICATION.NAME)
-                .fetch(ApplicationDao.applicationRecordMapper);
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
     }
 
 

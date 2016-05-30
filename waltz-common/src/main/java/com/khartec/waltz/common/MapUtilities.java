@@ -17,9 +17,18 @@
 
 package com.khartec.waltz.common;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static java.util.Collections.emptyMap;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 
 public class MapUtilities {
@@ -42,18 +51,22 @@ public class MapUtilities {
     }
 
 
-    public static <K, V> Map<K, Collection<V>> groupBy(Function<V, K> keyFn, Collection<V> xs) {
+    public static <K, V> Map<K, Collection<V>> groupBy(Function<V, K> keyFn,
+                                                       Collection<V> xs) {
         return groupBy(keyFn, x -> x, xs);
     }
 
     public static <K, V, V2> Map<K, Collection<V2>> groupBy(Function<V, K> keyFn,
-                                                       Function<V, V2> valueFn,
-                                                       Collection<V> xs) {
-        if (xs == null) return Collections.emptyMap();
+                                                            Function<V, V2> valueFn,
+                                                            Collection<V> xs) {
+        checkNotNull(xs, "xs cannot be null");
+        checkNotNull(keyFn, "keyFn cannot be null");
+        checkNotNull(valueFn, "valueFn cannot be null");
+
         Map<K, Collection<V2>> result = MapUtilities.newHashMap();
         for (V v: xs) {
             K key = keyFn.apply(v);
-            Collection<V2> bucket = result.computeIfAbsent(key, u -> ListUtilities.newArrayList());
+            Collection<V2> bucket = result.computeIfAbsent(key, u -> newArrayList());
             bucket.add(valueFn.apply(v));
             result.put(key, bucket);
         }
@@ -61,20 +74,31 @@ public class MapUtilities {
     }
 
 
-    public static <K, V> Map<K, V> indexBy(Function<V, K> keyFn, Collection<V> xs) {
-        return indexBy(keyFn, Function.identity(), xs);
+    public static <K, V> Map<K, V> indexBy(Function<V, K> keyFn,
+                                           Collection<V> xs) {
+        checkNotNull(xs, "xs cannot be null");
+        checkNotNull(keyFn, "keyFn cannot be null");
+
+        return indexBy(keyFn, identity(), xs);
     }
 
 
-    public static <K, R, V> Map<K, R> indexBy(Function<V, K> keyFn, Function<V, R> valueFn, Collection<V> xs) {
+    public static <K, R, V> Map<K, R> indexBy(Function<V, K> keyFn,
+                                              Function<V, R> valueFn,
+                                              Collection<V> xs) {
+        checkNotNull(xs, "xs cannot be null");
+        checkNotNull(keyFn, "keyFn cannot be null");
+        checkNotNull(valueFn, "valueFn cannot be null");
+
         return xs.stream()
-                .collect(Collectors.toMap(keyFn, valueFn));
+                .collect(toMap(keyFn, valueFn));
     }
 
 
-    public static <K, V> Map<K, Long> countBy(Function<V, K> keyFn, Collection<V> xs) {
+    public static <K, V> Map<K, Long> countBy(Function<V, K> keyFn,
+                                              Collection<V> xs) {
         if (xs == null) {
-            return Collections.emptyMap();
+            return emptyMap();
         }
         return xs.stream()
                 .collect(Collectors.groupingBy(keyFn, Collectors.counting()));
@@ -82,7 +106,9 @@ public class MapUtilities {
 
 
     public static <K, V> Map<K, V> ensureNotNull(Map<K, V> maybeMap) {
-        return maybeMap == null ? newHashMap() : maybeMap;
+        return maybeMap == null
+                ? newHashMap()
+                : maybeMap;
     }
 
 
@@ -91,8 +117,10 @@ public class MapUtilities {
     }
 
 
-    public static <K, V> Optional<V> maybeGet(Map<K, V> map, K key) {
-        if (map == null) { return Optional.empty(); }
-        return Optional.ofNullable(map.get(key));
+    public static <K, V> Optional<V> maybeGet(Map<K, V> map,
+                                              K key) {
+        return map == null
+                ? Optional.empty()
+                : Optional.ofNullable(map.get(key));
     }
 }

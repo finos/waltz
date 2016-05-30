@@ -23,7 +23,7 @@ public class MariaAppSearch implements FullTextSearch<Application>, DatabaseVend
     @Override
     public List<Application> search(DSLContext dsl, String terms) {
         Result<Record> records = dsl.fetch(QUERY, terms);
-        return records.map(ApplicationDao.applicationRecordMapper);
+        return records.map(ApplicationDao.TO_DOMAIN_MAPPER);
     }
 
 }
