@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.*;
+import static com.khartec.waltz.common.FunctionUtilities.time;
 import static com.khartec.waltz.common.ListUtilities.drop;
 
 
@@ -74,7 +75,7 @@ public class OrganisationalUnitService {
 
 
     public List<OrganisationalUnit> findByIds(Long... ids) {
-        return dao.findByIds(ids);
+        return time("OUS.findByIds", () -> dao.findByIds(ids));
     }
 
 
@@ -85,9 +86,11 @@ public class OrganisationalUnitService {
      * @return
      */
     public Node<OrganisationalUnit, Long> loadHierarchy(long orgUnitId) {
-        List<OrganisationalUnit> allInvolvedUnits = getAllRelatedOrgUnits(orgUnitId);
-        Node<OrganisationalUnit, Long> rootNode = buildHierarchyTree(orgUnitId, allInvolvedUnits);
-        return findNode(orgUnitId, rootNode);
+        return time("OUS.loadHierarchy", () -> {
+            List<OrganisationalUnit> allInvolvedUnits = getAllRelatedOrgUnits(orgUnitId);
+            Node<OrganisationalUnit, Long> rootNode = buildHierarchyTree(orgUnitId, allInvolvedUnits);
+            return findNode(orgUnitId, rootNode);
+        });
     }
 
 
@@ -142,11 +145,13 @@ public class OrganisationalUnitService {
         return organisationalUnitSearchDao.search(query);
     }
 
+
     public OrganisationalUnitHierarchy getHierarchyById(long id) {
-        return ImmutableOrganisationalUnitHierarchy.builder()
+        return time("OUS.getHierarchyById", () -> ImmutableOrganisationalUnitHierarchy.builder()
                 .children(drop(dao.findDescendants(id), 1))
                 .parents(drop(dao.findAncestors(id), 1))
                 .unit(dao.getById(id))
-                .build();
+                .build());
     }
+
 }

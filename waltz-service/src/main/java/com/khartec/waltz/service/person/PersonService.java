@@ -28,6 +28,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotEmptyString;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.FunctionUtilities.time;
 
 @Service
 public class PersonService {
@@ -59,7 +60,7 @@ public class PersonService {
 
     public List<Person> findDirectsByEmployeeId(String employeeId) {
         checkNotEmptyString(employeeId, "Cannot find directs without an employeeId");
-        return personDao.findDirectsByEmployeeId(employeeId);
+        return time("PS.findDirectsByEmployeeId", () -> personDao.findDirectsByEmployeeId(employeeId));
     }
 
 
@@ -68,7 +69,7 @@ public class PersonService {
      **/
     public List<Person> findAllManagersByEmployeeId(String employeeId) {
         checkNotEmptyString(employeeId, "Cannot find directs without an employeeId");
-        return personDao.findAllManagersByEmployeeId(employeeId);
+        return time("PS.findAllManagersByEmployeeId", () -> personDao.findAllManagersByEmployeeId(employeeId));
     }
 
 

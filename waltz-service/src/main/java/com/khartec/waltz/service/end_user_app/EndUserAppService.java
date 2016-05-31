@@ -29,6 +29,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
+import static com.khartec.waltz.common.FunctionUtilities.time;
+
 @Service
 public class EndUserAppService {
 
@@ -47,17 +49,20 @@ public class EndUserAppService {
 
 
     public List<EndUserApplication> findByOrganisationalUnitIds(List<Long> ids) {
-        return endUserAppDao.findByOrganisationalUnitIds(ids);
+        Checks.checkNotNull(ids, "ids cannot be null");
+        return time("EUAS.findByOrganisationalUnitIds", () -> endUserAppDao.findByOrganisationalUnitIds(ids));
     }
 
 
     public List<EndUserApplication> findByOrganisationalUnitTree(long ouId) {
-        List<Long> ids = IdUtilities.toIds(orgUnitDao.findDescendants(ouId));
-        return findByOrganisationalUnitIds(ids);
+        return time("EUAS.findByOrganisationalUnitTree", () -> {
+            List<Long> ids = IdUtilities.toIds(orgUnitDao.findDescendants(ouId));
+            return findByOrganisationalUnitIds(ids);
+        });
     }
 
 
     public Collection<LongTally> countByOrgUnitId() {
-        return endUserAppDao.countByOrganisationalUnit();
+        return time("EUAS.countByOrgUnitId", () -> endUserAppDao.countByOrganisationalUnit());
     }
 }
