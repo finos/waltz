@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.hale</groupId>
+    <groupId>com.khartec</groupId>
     <artifactId>waltz</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
@@ -12,6 +12,7 @@
         <module>waltz-web</module>
         <module>waltz-jobs</module>
         <module>waltz-data</module>
+        <module>waltz-schema</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -19,74 +20,25 @@
     <url>http://khartec.com</url>
 
     <properties>
+        <plugin.maven-compiler.version>3.3</plugin.maven-compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <hikari.version>2.4.5</hikari.version>
+        <immutables.version>2.1.15</immutables.version>
         <jackson.version>2.7.0</jackson.version>
         <jackson-jsr310.version>2.4.0</jackson-jsr310.version>
-        <pcollections.version>2.1.2</pcollections.version>
-        <jooq.version>3.7.3</jooq.version>
-        <jool.version>0.9.10</jool.version>
-        <immutables.version>2.1.15</immutables.version>
-        <junit.version>4.12</junit.version>
-        <spring.version>4.2.5.RELEASE</spring.version>
-        <spark.version>2.3</spark.version>
-        <slf4j.version>1.7.20</slf4j.version>
-        <logback.version>1.1.7</logback.version>
-        <hikari.version>2.4.5</hikari.version>
-        <super-csv.version>2.3.1</super-csv.version>
         <jbcrypt.version>0.4</jbcrypt.version>
+        <jool.version>0.9.10</jool.version>
+        <junit.version>4.12</junit.version>
         <jwt.version>2.1.0</jwt.version>
-
-        <plugin.maven-compiler.version>3.3</plugin.maven-compiler.version>
+        <logback.version>1.1.7</logback.version>
+        <pcollections.version>2.1.2</pcollections.version>
+        <slf4j.version>1.7.20</slf4j.version>
+        <spark.version>2.3</spark.version>
+        <spring.version>4.2.5.RELEASE</spring.version>
+        <super-csv.version>2.3.1</super-csv.version>
     </properties>
 
-
-    <profiles>
-
-        <profile>
-            <activation>
-                <property>
-                    <name>!db.type</name>
-                </property>
-                <!--<activeByDefault>true</activeByDefault>-->
-            </activation>
-            <id>waltz-mariadb</id>
-            <properties>
-                <jdbc.group>org.mariadb.jdbc</jdbc.group>
-                <jdbc.artifact>mariadb-java-client</jdbc.artifact>
-                <jdbc.version>1.3.2</jdbc.version>
-                <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
-                <jooq.dialect>MARIADB</jooq.dialect>
-                <jooq.group>org.jooq</jooq.group>
-                <jooq.database>org.jooq.util.mariadb.MariaDBDatabase</jooq.database>
-            </properties>
-        </profile>
-
-        <profile>
-            <!--
-                Note: this profile requires a professional license for JOOQ,
-                see: http://www.jooq.org/download/
-            -->
-            <activation>
-                <property>
-                    <name>db.type</name>
-                    <value>mssql</value>
-                </property>
-                <!--<activeByDefault>true</activeByDefault>-->
-            </activation>
-            <id>waltz-mssql</id>
-            <properties>
-                <jdbc.group>com.microsoft.sqlserver</jdbc.group>
-                <jdbc.artifact>sqljdbc4</jdbc.artifact>
-                <jdbc.version>4.0</jdbc.version>
-                <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
-                <jooq.group>org.jooq.pro</jooq.group>
-                <jooq.database>org.jooq.util.sqlserver.SQLServerDatabase</jooq.database>
-                <jooq.dialect>SQLSERVER2014</jooq.dialect>
-            </properties>
-        </profile>
-
-
-    </profiles>
 
 
     <dependencyManagement>
@@ -181,30 +133,11 @@
 
 
             <!-- db -->
-            <dependency>
-                <groupId>${jdbc.group}</groupId>
-                <artifactId>${jdbc.artifact}</artifactId>
-                <version>${jdbc.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>com.zaxxer</groupId>
                 <artifactId>HikariCP</artifactId>
                 <version>${hikari.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${jooq.group}</groupId>
-                <artifactId>jooq</artifactId>
-                <version>${jooq.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${jooq.group}</groupId>
-                <artifactId>jooq-meta</artifactId>
-                <version>${jooq.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${jooq.group}</groupId>
-                <artifactId>jooq-codegen</artifactId>
-                <version>${jooq.version}</version>
             </dependency>
 
 

@@ -50,7 +50,7 @@ public class ApplicationDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationDao.class);
 
-    public static final RecordMapper<Record, Application> applicationRecordMapper = record -> {
+    public static final RecordMapper<Record, Application> TO_DOMAIN_MAPPER = record -> {
         ApplicationRecord appRecord = record.into(APPLICATION);
         Application app = ImmutableApplication.builder()
                 .name(appRecord.getName())
@@ -81,7 +81,7 @@ public class ApplicationDao {
         return dsl.select()
                 .from(APPLICATION)
                 .where(APPLICATION.ID.eq(id))
-                .fetchOne(applicationRecordMapper);
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
@@ -89,7 +89,7 @@ public class ApplicationDao {
         return dsl.select()
                 .from(APPLICATION)
                 .where(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(id))
-                .fetch(applicationRecordMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -98,21 +98,21 @@ public class ApplicationDao {
         return dsl.select(APPLICATION.fields())
                 .from(APPLICATION)
                 .where(APPLICATION.ORGANISATIONAL_UNIT_ID.in(ids))
-                .fetch(applicationRecordMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public List<Application> getAll() {
         return dsl.select()
                 .from(APPLICATION)
-                .fetch(applicationRecordMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
     public List<Application> findByIds(List<Long> ids) {
         return dsl.select()
                 .from(APPLICATION)
                 .where(APPLICATION.ID.in(ids))
-                .fetch(applicationRecordMapper);
+                .fetch(TO_DOMAIN_MAPPER);
 
     }
 
@@ -148,7 +148,7 @@ public class ApplicationDao {
                 .or(rel.PARENT_ASSET_CODE.eq(self.ASSET_CODE)) //  parent
                 .or(rel.ASSET_CODE.eq(self.PARENT_ASSET_CODE).and(self.PARENT_ASSET_CODE.ne(""))) // child
                 .where(self.ID.eq(appId))
-                .fetch(applicationRecordMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 

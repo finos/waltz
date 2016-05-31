@@ -19,7 +19,7 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
                 .from(APPLICATION)
                 .where(JooqUtilities.MSSQL.mkContains(terms.split(" ")))
                 .limit(20)
-                .fetch(ApplicationDao.applicationRecordMapper);
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
     }
 
 }

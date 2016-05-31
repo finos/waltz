@@ -66,7 +66,7 @@ public class SoftwareCatalogService {
                 .from(SOFTWARE_PACKAGE)
                 .innerJoin(SOFTWARE_USAGE)
                 .on(SOFTWARE_PACKAGE.ID.eq(SOFTWARE_USAGE.SOFTWARE_PACKAGE_ID))
-                .where(condition.toString())
+                .where(dsl.renderInlined(condition))
                 .groupBy(groupingField)
                 .fetch(JooqUtilities.TO_STRING_TALLY);
     }

@@ -97,29 +97,32 @@ public class InvolvementDao {
                 .on(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
                 .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .where(APPLICATION.ID.eq(INVOLVEMENT.ENTITY_ID))
-                .fetch(ApplicationDao.applicationRecordMapper);
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
     }
 
 
     public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
-        SelectOrderByStep<Record1<String>> employeeIds = dsl.selectDistinct(PERSON_HIERARCHY.EMPLOYEE_ID)
+        SelectOrderByStep<Record1<String>> employeeIds = dsl
+                .selectDistinct(PERSON_HIERARCHY.EMPLOYEE_ID)
                 .from(PERSON_HIERARCHY)
                 .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId))
-                .union(DSL.select(DSL.value(employeeId)));
+                .union(DSL.select(DSL.value(employeeId))
+                        .from(PERSON_HIERARCHY));
 
-        SelectConditionStep<Record1<Long>> applicationIds = dsl.selectDistinct(INVOLVEMENT.ENTITY_ID)
+        SelectConditionStep<Record1<Long>> applicationIds = dsl
+                .selectDistinct(INVOLVEMENT.ENTITY_ID)
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND
                         .eq(EntityKind.APPLICATION.name())
                         .and(INVOLVEMENT.EMPLOYEE_ID.in(employeeIds)));
 
-        List<Application> applications = dsl
+        SelectConditionStep<Record> query = dsl
                 .select(APPLICATION.fields())
                 .from(APPLICATION)
-                .where(APPLICATION.ID.in(applicationIds))
-                .fetch(ApplicationDao.applicationRecordMapper);
+                .where(APPLICATION.ID.in(applicationIds));
 
-        return applications;
+        return query
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
     }
 
 
@@ -143,4 +146,5 @@ public class InvolvementDao {
                 .and(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
                 .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
     }
+
 }

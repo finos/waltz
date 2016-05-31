@@ -91,7 +91,7 @@ public class PersonDao {
         checkNotEmptyString(employeeId, "Cannot find directs without an employeeId");
         return dsl.select()
                 .from(PERSON)
-                .where(PERSON.MANAGER_EMPLOYEE_ID.eq(employeeId))
+                .where(dsl.renderInlined(PERSON.MANAGER_EMPLOYEE_ID.eq(employeeId)))
                 .fetch(personMapper);
     }
 
