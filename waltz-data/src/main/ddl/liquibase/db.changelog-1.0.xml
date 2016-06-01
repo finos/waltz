@@ -1488,7 +1488,7 @@
     <!-- 183: Performance Metrics -->
     <changeSet author="dwatkins"
                id="20160601-183-1">
-        <createTable tableName="performance_metric">
+        <createTable tableName="performance_metric_definition">
             <column name="id" type="${long.type}">
                 <constraints nullable="false"/>
             </column>
@@ -1499,8 +1499,8 @@
         </createTable>
 
         <addPrimaryKey columnNames="id"
-                       constraintName="performance_metric_pkey"
-                       tableName="performance_metric"/>
+                       constraintName="performance_metric_defn_pkey"
+                       tableName="performance_metric_definition"/>
     </changeSet>
 
 </databaseChangeLog>
