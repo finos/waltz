@@ -1484,4 +1484,23 @@
                        tableName="complexity_score"/>
     </changeSet>
 
+
+    <!-- 183: Performance Metrics -->
+    <changeSet author="dwatkins"
+               id="20160601-183-1">
+        <createTable tableName="performance_metric">
+            <column name="id" type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="description" type="${longvarchar.type}"/>
+            <column name="category_name" type="VARCHAR(255)"/>
+            <column name="category_description" type="${longvarchar.type}"/>
+        </createTable>
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="performance_metric_pkey"
+                       tableName="performance_metric"/>
+    </changeSet>
+
 </databaseChangeLog>
