@@ -10,45 +10,56 @@
  *
  */
 
+function service($http, BaseApiUrl) {
 
-export default [
+    const BASE = `${BaseApiUrl}/org-unit`;
+
+
+    const getById = (id) => $http
+        .get(`${BASE}/${id}`)
+        .then(result => result.data);
+
+
+    const findAll = () => $http
+        .get(BASE)
+        .then(result => result.data);
+
+
+    const findByIds = (ids) => $http
+        .post(`${BASE}/by-ids`, ids)
+        .then(result => result.data);
+
+
+    const updateDescription = (id, newValue, oldValue) =>
+        $http.post(
+            `${BASE}/${id}/description`, {
+                field: 'description',
+                newValue,
+                oldValue
+            });
+
+
+    const search = (query) => $http
+        .get(`${BASE}/search/${query}`)
+        .then(x => x.data);
+
+
+    return {
+        getById,
+        findByIds,
+        findAll,
+        search,
+        updateDescription
+    };
+
+}
+
+
+service.$inject = [
     '$http',
-    'BaseApiUrl',
-    ($http, BaseApiUrl) => {
-
-        const BASE = `${BaseApiUrl}/org-unit`;
-
-
-        const getById = (id) => $http
-            .get(`${BASE}/${id}`)
-            .then(result => result.data);
-
-
-        const findAll = () => $http
-            .get(BASE)
-            .then(result => result.data);
-
-
-        const findByIds = (ids) => $http
-            .post(`${BASE}/by-ids`, ids)
-            .then(result => result.data);
-
-
-        const updateDescription = (id, newValue, oldValue) =>
-            $http.post(`${BASE}/${id}/description`, {field: 'description', newValue, oldValue});
-
-
-        const search = (query) => $http
-            .get(`${BASE}/search/${query}`)
-            .then(x => x.data);
-
-        return {
-            getById,
-            findByIds,
-            findAll,
-            search,
-            updateDescription
-        };
-    }
+    'BaseApiUrl'
 ];
+
+
+export default service;
 

@@ -77,6 +77,7 @@ const registrationFns = [
     require('./involvement'),
     require('./navbar'),
     require('./org-units'),
+    require('./performance-metrics'),
     require('./perspectives'),
     require('./person'),
     require('./playpen'),

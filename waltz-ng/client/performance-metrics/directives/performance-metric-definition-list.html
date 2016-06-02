@@ -1,0 +1,22 @@
+<div>
+    <div class='waltz-paragraph'
+         ng-repeat="(categoryName, group) in ctrl.groupedDefinitions">
+
+        <strong>
+            <span ng-bind="categoryName"></span>
+        </strong>
+
+        <div class='text-muted'
+             ng-bind="group[0].categoryDescription"></div>
+
+        <div class="small"
+             style="margin-left: 20px; padding-top: 6px;"
+             ng-repeat="item in group">
+            <strong ng-bind="item.name"></strong>
+            <div class='text-muted'
+                 ng-bind="item.description"></div>
+        </div>
+
+        <hr ng-if="!$last">
+    </div>
+</div>
