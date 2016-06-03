@@ -15,7 +15,6 @@ public abstract class Process implements
         NameProvider,
         DescriptionProvider{
 
-
     public abstract int level();
 
     public abstract Optional<Long> level1();
