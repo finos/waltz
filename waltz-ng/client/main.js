@@ -81,6 +81,7 @@ const registrationFns = [
     require('./perspectives'),
     require('./person'),
     require('./playpen'),
+    require('./process'),
     require('./ratings'),
     require('./server-info'),
     require('./settings'),

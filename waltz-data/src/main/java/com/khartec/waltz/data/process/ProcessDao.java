@@ -7,6 +7,7 @@ import com.khartec.waltz.schema.tables.records.ProcessRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class ProcessDao {
     private final DSLContext dsl;
 
 
+    @Autowired
     public ProcessDao(DSLContext dsl) {
         Checks.checkNotNull(dsl, "dsl cannot be null");
         this.dsl = dsl;
