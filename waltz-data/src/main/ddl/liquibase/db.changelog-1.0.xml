@@ -1637,4 +1637,43 @@
         </addColumn>
     </changeSet>
 
+    <!-- 184 PROCESS -->
+
+    <changeSet author="dwatkins" id="20160603-184-1">
+        <createTable tableName="process">
+            <column name="id" type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="${long.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="level_1" type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="level_2" type="${long.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="level_3" type="${long.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="description" type="${longvarchar.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160603-184-2">
+        <addColumn tableName="process">
+            <column name="level" type="${int.type}" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+
 </databaseChangeLog>
