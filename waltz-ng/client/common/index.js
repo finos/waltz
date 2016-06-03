@@ -211,5 +211,8 @@ export function kindToViewState(kind) {
     if (kind === 'CHANGE_INITIATIVE') {
         return "main.change-initiative.view";
     }
+    if (kind === 'PROCESS') {
+        return "main.process.view";
+    }
     throw "Unable to convert kind: "+kind+ " to a ui-view state";
 }

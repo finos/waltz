@@ -20,18 +20,18 @@ package com.khartec.waltz.data.capability;
 import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.capability.ImmutableCapability;
 import com.khartec.waltz.schema.tables.records.CapabilityRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.utils.IdUtilities.ensureHasId;
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
@@ -43,7 +43,7 @@ public class CapabilityDao {
     private static final Logger LOG = LoggerFactory.getLogger(CapabilityDao.class);
 
 
-    public static final RecordMapper<Record, Capability> capabilityMapper = r -> {
+    public static final RecordMapper<Record, Capability> TO_DOMAIN_MAPPER = r -> {
         CapabilityRecord record = r.into(CapabilityRecord.class);
         return ImmutableCapability.builder()
                 .id(record.getId())
@@ -73,7 +73,7 @@ public class CapabilityDao {
         return dsl
                 .select()
                 .from(CAPABILITY)
-                .fetch(capabilityMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -96,7 +96,7 @@ public class CapabilityDao {
         return dsl.select()
                 .from(CAPABILITY)
                 .where(CAPABILITY.ID.in(ids))
-                .fetch(capabilityMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -106,7 +106,7 @@ public class CapabilityDao {
                 .innerJoin(APP_CAPABILITY)
                 .on(APP_CAPABILITY.CAPABILITY_ID.eq(CAPABILITY.ID))
                 .where(APP_CAPABILITY.APPLICATION_ID.in(appIds))
-                .fetch(capabilityMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -126,5 +126,15 @@ public class CapabilityDao {
                 .where(CAPABILITY.ID.eq(capability.id().get()))
                 .execute() == 1;
 
+    }
+
+
+    public Collection<Capability> findByIdSelector(Select<Record1<Long>> selector) {
+        checkNotNull(selector, "selector cannot be null");
+        return dsl.select(CAPABILITY.fields())
+                .from(CAPABILITY)
+                .where(CAPABILITY.ID.in(selector))
+                .orderBy(CAPABILITY.NAME)
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

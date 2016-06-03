@@ -89,12 +89,16 @@ public class AppCapabilityEndpoint implements Endpoint {
         ListRoute<ApplicationCapability> findAppCapabilitiesForAppIds  = (request, response)
                 -> appCapabilityDao.findByAppIds(readBody(request, Long[].class));
 
+        ListRoute<ApplicationCapability> findAppCapabilitiesForAppIdSelector  = (request, response)
+                -> appCapabilityDao.findByAppIdSelector(readOptionsFromBody(request));
+
         EndpointUtilities.getForDatum(mkPath(BASE_URL, "capability", ":capabilityId"), findGroupedAppsForCapability);
         getForList(mkPath(BASE_URL, "application", ":applicationId"), findCapabilitiesForApp);
         getForList(mkPath(BASE_URL, "count-by", "capability"), tallyByCapability);
         getForList(mkPath(BASE_URL, "capability", ":capabilityId", "associated"), findAssociatedAppCapabilities);
         getForList(mkPath(BASE_URL, "application", ":id", "associated"), findAssociatedCapabilitiesByApplication);
         postForList(mkPath(BASE_URL, "apps"), findAppCapabilitiesForAppIds);
+        postForList(mkPath(BASE_URL, "selector"), findAppCapabilitiesForAppIdSelector);
 
         post(mkPath(BASE_URL, "application", ":id"), (request, response) -> {
 

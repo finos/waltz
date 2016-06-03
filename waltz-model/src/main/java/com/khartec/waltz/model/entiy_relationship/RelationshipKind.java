@@ -6,6 +6,8 @@ package com.khartec.waltz.model.entiy_relationship;
 public enum RelationshipKind {
 
     HAS,
-    RELATES_TO
+    PARTICIPATES_IN,
+    RELATES_TO,
+    SUPPORTS
 
 }

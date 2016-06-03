@@ -6,8 +6,10 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.application.HierarchyQueryScope;
+import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.model.utils.IdUtilities;
+import com.khartec.waltz.schema.tables.EntityRelationship;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +62,29 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 return mkForCapability(ref, options.scope());
             case ORG_UNIT:
                 return mkForOrgUnit(ref, options.scope());
+            case PROCESS:
+                return mkForProcess(ref, options.scope());
 
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: "+ref.kind());
+        }
+    }
+
+    private Select<Record1<Long>> mkForProcess(EntityReference ref, HierarchyQueryScope scope) {
+        EntityRelationship rel = EntityRelationship.ENTITY_RELATIONSHIP.as("rel");
+        switch (scope) {
+            case EXACT:
+                return dsl.select(rel.ID_A)
+                        .from(rel)
+                        .where(rel.KIND_A.eq(EntityKind.APPLICATION.name()))
+                        .and(rel.RELATIONSHIP.eq(RelationshipKind.PARTICIPATES_IN.name()))
+                        .and(rel.KIND_B.eq(EntityKind.PROCESS.name()))
+                        .and(rel.ID_B.eq(ref.id()));
+
+            default:
+                throw new UnsupportedOperationException("Querying for appIds related to processes using (scope: '"
+                        + scope
+                        + "') not supported");
         }
     }
 

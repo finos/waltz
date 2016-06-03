@@ -74,6 +74,11 @@ export default [
             .then(x => x.data);
 
 
+        const findBySelector = (options) => $http
+            .post(`${BASE}/selector`, options)
+            .then(x => x.data);
+
+
         return {
             getById,
             findAllTags,
@@ -82,6 +87,7 @@ export default [
             findByOrgUnit,
             findByOrgUnitTree,
             findByIds,
+            findBySelector,
             countByOrganisationalUnit,
             registerNewApp,
             search,

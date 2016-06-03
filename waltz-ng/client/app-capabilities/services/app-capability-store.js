@@ -48,8 +48,15 @@ const service = (http, root) => {
             .then(result => result.data);
 
 
-    const findApplicationCapabilitiesByAppIds = ids =>
-        http.post(`${BASE}/apps`, ids)
+    const findApplicationCapabilitiesByAppIds = ids => {
+        console.log('findApplicationCapabilitiesByAppIds is deprecated, use selector instead');
+        return http.post(`${BASE}/apps`, ids)
+            .then(result => result.data);
+    };
+
+
+    const findApplicationCapabilitiesByAppIdSelector = options =>
+        http.post(`${BASE}/selector`, options)
             .then(result => result.data);
 
 
@@ -66,10 +73,12 @@ const service = (http, root) => {
         return http.post(`${BASE}/application/${id}`, cleanedRequest);
     };
 
+
     const removeCapability = (applicationId, capabilityId) => {
         return http.delete(`${BASE}/application/${applicationId}/${capabilityId}`)
             .then(result => result.data);
     };
+
 
     const addCapability = (applicationId, capabilityId) => {
         return http.post(`${BASE}/application/${applicationId}/${capabilityId}`)
@@ -89,6 +98,7 @@ const service = (http, root) => {
         findAssociatedApplicationCapabilitiesByCapabilityId,
         findAssociatedCapabilitiesByApplicationId,
         findApplicationCapabilitiesByAppIds,
+        findApplicationCapabilitiesByAppIdSelector,
         countByCapabilityId,
         removeCapability,
         addCapability,

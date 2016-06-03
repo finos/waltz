@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,7 +50,7 @@ public class AppCapabilityDao {
     private final DSLContext dsl;
 
 
-    private final RecordMapper<Record, ApplicationCapability> appCapabilityMapper =
+    private final RecordMapper<Record, ApplicationCapability> TO_DOMAIN_MAPPER =
             r -> ImmutableApplicationCapability.builder()
                     .isPrimary(r.getValue(APP_CAPABILITY.IS_PRIMARY))
                     .capabilityId(r.getValue(APP_CAPABILITY.CAPABILITY_ID))
@@ -66,7 +67,7 @@ public class AppCapabilityDao {
     public List<ApplicationCapability> findCapabilitiesForApp(long appId) {
         return prepareSelect()
                 .where(APP_CAPABILITY.APPLICATION_ID.eq(appId))
-                .fetch(appCapabilityMapper);
+                .fetch(TO_DOMAIN_MAPPER);
 
     }
 
@@ -78,7 +79,7 @@ public class AppCapabilityDao {
                         .from(APP_CAPABILITY)
                         .where(APP_CAPABILITY.CAPABILITY_ID.eq(capabilityId))))
                 .and(APP_CAPABILITY.CAPABILITY_ID.ne(capabilityId))
-                .fetch(appCapabilityMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -176,13 +177,21 @@ public class AppCapabilityDao {
                         select(APP_CAPABILITY.APPLICATION_ID)
                                 .from(APP_CAPABILITY)
                                 .where(APP_CAPABILITY.CAPABILITY_ID.in(capabilityIds))))
-                .fetch(appCapabilityMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
+    @Deprecated
     public List<ApplicationCapability> findApplicationCapabilitiesForAppIds(Long[] ids) {
         return prepareSelect()
                 .where(APP_CAPABILITY.APPLICATION_ID.in(ids))
-                .fetch(appCapabilityMapper);
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+    public Collection<ApplicationCapability> findApplicationCapabilitiesForAppIdSelector(Select<Record1<Long>> selector) {
+        return prepareSelect()
+                .where(APP_CAPABILITY.APPLICATION_ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+
     }
 }

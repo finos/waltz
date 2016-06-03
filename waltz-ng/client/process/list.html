@@ -11,8 +11,20 @@
     </waltz-page-header>
 
 
+    <!-- DIAGRAMS -->
+    <waltz-section name="Processes"
+                   small="Overview"
+                   ng-if="ctrl.diagrams.length > 0">
+        <waltz-svg-diagrams diagrams="ctrl.diagrams"
+                            block-processor="ctrl.blockProcessor">
+        </waltz-svg-diagrams>
+    </waltz-section>
+
+
+    <!-- LIST -->
     <waltz-section icon='code-fork'
-                   name="Processes">
+                   name="Processes"
+                   small="All">
         <waltz-process-list processes="ctrl.processes">
         </waltz-process-list>
     </waltz-section>

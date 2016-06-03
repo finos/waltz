@@ -3,10 +3,14 @@
          ng-repeat="process in ctrl.processes">
 
         <strong>
-            <span ng-bind="process.name"></span>
+            <a ui-sref="main.process.view ({id: process.id })">
+                <span ng-bind="process.name"></span>
+            </a>
         </strong>
 
         <div class='text-muted'
-             ng-bind="process.description"></div>
+             ng-bind="process.description">
+        </div>
+
     </div>
 </div>

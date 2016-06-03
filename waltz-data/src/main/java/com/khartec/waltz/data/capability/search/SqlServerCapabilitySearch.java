@@ -19,7 +19,7 @@ public class SqlServerCapabilitySearch implements FullTextSearch<Capability>, Da
                 .from(CAPABILITY)
                 .where(JooqUtilities.MSSQL.mkContains(terms.split(" ")))
                 .limit(20)
-                .fetch(CapabilityDao.capabilityMapper);
+                .fetch(CapabilityDao.TO_DOMAIN_MAPPER);
     }
 
 }

@@ -24,7 +24,7 @@ public class MariaCapabilitySearch implements FullTextSearch<Capability>, Databa
     @Override
     public List<Capability> search(DSLContext dsl, String terms) {
         Result<Record> records = dsl.fetch(QUERY, terms);
-        return records.map(CapabilityDao.capabilityMapper);
+        return records.map(CapabilityDao.TO_DOMAIN_MAPPER);
     }
 
 }

@@ -42,7 +42,7 @@ public class CapabilityHarness {
                 .innerJoin(APP_CAPABILITY)
                 .on(APP_CAPABILITY.CAPABILITY_ID.eq(CAPABILITY.ID))
                 .where(APP_CAPABILITY.APPLICATION_ID.in(680L, 681L))
-                .fetch(CapabilityDao.capabilityMapper);
+                .fetch(CapabilityDao.TO_DOMAIN_MAPPER);
 
         caps.forEach(c -> System.out.println(c.name()));
 

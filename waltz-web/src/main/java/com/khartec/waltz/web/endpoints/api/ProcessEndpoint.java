@@ -1,5 +1,6 @@
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.process.Process;
 import com.khartec.waltz.service.process.ProcessService;
 import com.khartec.waltz.web.DatumRoute;
@@ -33,13 +34,19 @@ public class ProcessEndpoint implements Endpoint {
     public void register() {
         String findAllPath = BASE_URL;
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String findSupportingCapabilitiesPath = mkPath(BASE_URL, "id", ":id", "capabilities");
 
         ListRoute<Process> findAllRoute = (request, response)
                 -> service.findAll();
+
+        ListRoute<Capability> findSupportingCapabilitiesRoute = (request, response)
+                -> service.findSupportingCapabilitiesRoute(getId(request));
+
         DatumRoute<Process> getByIdRoute = (request, response)
                 -> service.getById(getId(request));
 
         getForList(findAllPath, findAllRoute);
+        getForList(findSupportingCapabilitiesPath, findSupportingCapabilitiesRoute);
         getForDatum(getByIdPath, getByIdRoute);
     }
 }

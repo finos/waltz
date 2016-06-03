@@ -1,0 +1,94 @@
+<div>
+
+    <waltz-page-header name="{{ ctrl.process.name }}"
+                       small="Process"
+                       icon="code-fork">
+        <ol class="waltz-breadcrumbs">
+            <li>
+                <a ui-sref="main">Home</a>
+            </li>
+            <li>
+                <a ui-sref="main.process.list">Processes</a>
+            </li>
+            <li>{{ ctrl.process.name }}</li>
+        </ol>
+    </waltz-page-header>
+
+    <!-- SUMMARY -->
+
+    <!-- ROADMAP -->
+
+
+
+    <!-- BOOKMARKS -->
+    <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
+                             entity-id="{{ ctrl.process.id }}"
+                             kind="PROCESS"
+                             parent-name="{{ ctrl.process.name }}"
+                             source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-bookmarks-section>
+
+
+    <!-- RELATED FUNCTIONS -->
+    <waltz-section name="Related Capabilities">
+        <table class="table table-condensed small"
+               ng-if="ctrl.capabilities.length > 0">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="capability in ctrl.capabilities">
+                <td>
+                    <a ui-sref="main.capability.view ({ id: capability.id })">
+                        <span ng-bind="capability.name"></span>
+                    </a>
+                </td>
+                <td>
+                    <span ng-bind="capability.description"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="alert alert-warning"
+             ng-if="ctrl.capabilities.length == 0">
+            <strong>No Related Capabilities</strong>
+        </div>
+
+    </waltz-section>
+
+
+    <!-- APPLICATIONS -->
+    <waltz-section name="Participating Applications"
+                   small="( {{ ctrl.applications.length }} )">
+
+            <waltz-section-actions>
+                <button class="btn btn-xs waltz-btn-transparent"
+                        ng-click="ctrl.visibility.appOverlay = ! ctrl.visibility.appOverlay">
+                    <waltz-icon name="map-signs"></waltz-icon>
+                </button>
+            </waltz-section-actions>
+
+            <waltz-source-data-overlay visible="ctrl.visibility.appOverlay"
+                                       ratings="ctrl.sourceDataRatings"
+                                       entities="['APPLICATION']">
+            </waltz-source-data-overlay>
+
+            <waltz-app-table applications="ctrl.applications"
+                             csv-name="{{ctrl.process.name}}_apps.csv">
+            </waltz-app-table>
+    </waltz-section>
+
+
+    <!-- COSTS -->
+    <waltz-asset-costs-section data="ctrl.assetCostData"
+                               on-bucket-select="ctrl.onAssetBucketSelect"
+                               csv-name="{{ ctrl.process.name }}_asset_costs.csv"
+                               source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-asset-costs-section>
+
+
+</div>

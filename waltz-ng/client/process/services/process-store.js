@@ -13,9 +13,15 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const findSupportingCapabilities = (id) => $http
+        .get(`${BASE}/id/${id}/capabilities`)
+        .then(result => result.data);
+
+
     return {
         getById,
-        findAll
+        findAll,
+        findSupportingCapabilities
     };
 
 }
