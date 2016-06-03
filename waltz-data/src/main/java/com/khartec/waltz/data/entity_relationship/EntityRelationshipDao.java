@@ -103,4 +103,12 @@ public class EntityRelationshipDao {
     }
 
 
+    public Collection<EntityRelationship> findRelationshipsFrom(EntityReference ref,
+                                                                 RelationshipKind relationshipKind) {
+        return dsl.select(ENTITY_RELATIONSHIP.fields())
+                .from(ENTITY_RELATIONSHIP)
+                .where(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()).and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name())))
+                .and(ENTITY_RELATIONSHIP.RELATIONSHIP.eq(relationshipKind.name()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }
