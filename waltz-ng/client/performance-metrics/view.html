@@ -1,0 +1,36 @@
+<div>
+
+    <waltz-page-header name="{{ ctrl.performanceMetric.name }}"
+                       small="{{ ctrl.performanceMetric.categoryName }} - Performance Metric"
+                       icon="bar-chart">
+        <ol class="waltz-breadcrumbs">
+            <li>
+                <a ui-sref="main">Home</a>
+            </li>
+            <li>
+                <a ui-sref="main.performance-metric.list">Performance Metrics</a>
+            </li>
+            <li>{{ ctrl.performanceMetric.name }}</li>
+        </ol>
+    </waltz-page-header>
+
+
+    <div class="row">
+        <div class="col-sm-offset-1 col-sm-10 waltz-page-summary">
+
+            <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;">
+                <span ng-bind="ctrl.performanceMetric.name"></span>
+            </h3>
+
+            <div style="font-size: larger; border-bottom: 2px dotted #eee; padding: 6px"
+                 class="waltz-paragraph"
+                 ng-bind="ctrl.performanceMetric.description">
+            </div>
+
+
+        </div>
+    </div>
+
+
+
+</div>

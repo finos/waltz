@@ -37,7 +37,7 @@ public class CapabilityHarness {
         CapabilityDao dao = ctx.getBean(CapabilityDao.class);
 
 
-        List<Capability> r = dao.findForApps(1202L);
+        List<Capability> r = dao.findByAppIds(1202L);
 
         r.forEach(System.out::println);
 

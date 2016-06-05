@@ -16,8 +16,39 @@
 
     <!-- SUMMARY -->
 
+    <div class="row">
+        <div class="col-sm-offset-1 col-sm-10 waltz-page-summary">
+
+            <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;">
+                <span ng-bind="ctrl.process.name"></span>
+            </h3>
+
+            <div class="waltz-paragraph"
+                 ng-bind="ctrl.process.description">
+            </div>
+
+            <div class="col-md-4">
+                <table class="table table-condensed small">
+                    <tr>
+                        <td>Applications</td>
+                        <td><span ng-bind="ctrl.applications.length"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Capabilities</td>
+                        <td><span ng-bind="ctrl.supportingCapabilities.length"></span></td>
+                    </tr>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- EXPLORER -->
     <style>
-        .waltz-tree-inherited-node {
+        .waltz-inherited-value {
             font-style: italic;
         }
 
@@ -28,6 +59,7 @@
             padding: 0 2px 0 2px;
         }
     </style>
+
 
     <waltz-section name="Capabilities"
                    icon="puzzle-piece">
@@ -43,7 +75,7 @@
                                  order-by="name"
                                  on-selection="ctrl.onCapabilityNodeSelect(node)"
                                  options="ctrl.capabilityTree.options">
-                        <span ng-class="{ 'waltz-tree-inherited-node' : ctrl.isInferredCapability(node.id) }">
+                        <span ng-class="{ 'waltz-inherited-value' : ctrl.isInferredCapability(node.id) }">
                             <span class="waltz-visibility-parent"
                                   ng-bind="node.name">
                             </span>
@@ -118,9 +150,11 @@
                             </strong>
                             <ul style="padding-top: 6px">
                                 <li ng-repeat="capability in ctrl.findCapabilitiesForApp(ctrl.selectedApplication.id)">
-                                    <span ng-bind="capability.name"></span>
-                                    <span ng-if="ctrl.isCapabilityPartOfProcess(capability.id)">
-                                        <a href ng-click='ctrl.onCapabilityNodeSelect(capability)'>(focus)</a>
+                                    <span ng-class="{ 'waltz-inherited-value' : !ctrl.isCapabilityPartOfProcess(capability.id) }">
+                                        <span ng-bind="capability.name"></span>
+                                        <span ng-if="ctrl.isCapabilityPartOfProcess(capability.id)">
+                                            <a href ng-click='ctrl.onCapabilityNodeSelect(capability)'>(focus)</a>
+                                        </span>
                                     </span>
                                 </li>
                             </ul>

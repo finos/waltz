@@ -12,9 +12,12 @@
         <div class="small"
              style="margin-left: 20px; padding-top: 6px;"
              ng-repeat="item in group">
-            <strong ng-bind="item.name"></strong>
+            <a ui-sref="main.performance-metric.view ({ id: item.id })">
+                <strong ng-bind="item.name"></strong>
+            </a>
             <div class='text-muted'
-                 ng-bind="item.description"></div>
+                 ng-bind="item.description">
+            </div>
         </div>
 
         <hr ng-if="!$last">

@@ -9,7 +9,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableCheckpointGoal.class)
 public abstract class CheckpointGoal {
 
-    public abstract Checkpoint checkpoint();
+    public abstract long checkpointId();
     public abstract double value();
     public abstract GoalType goalType();
 
