@@ -30,11 +30,11 @@ import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.action.UpdateAppCapabilitiesAction;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Route;
 
 import java.util.List;
 import java.util.Optional;
@@ -71,36 +71,25 @@ public class AppCapabilityEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        DatumRoute<GroupedApplications> findGroupedAppsForCapability  = (request, response)
+        DatumRoute<GroupedApplications> findGroupedAppsForCapabilityRoute  = (request, response)
                 -> appCapabilityDao.findGroupedApplicationsByCapability(getLong(request, "capabilityId"));
 
-        ListRoute<ApplicationCapability> findCapabilitiesForApp = (request, response)
+        ListRoute<ApplicationCapability> findCapabilitiesForAppRoute = (request, response)
                 -> appCapabilityDao.findCapabilitiesForApp(getLong(request, "applicationId"));
 
-        ListRoute<Tally<Long>> tallyByCapability = (request, response)
+        ListRoute<Tally<Long>> tallyByCapabilityRoute = (request, response)
                 -> appCapabilityDao.tallyByCapabilityId();
 
-        ListRoute<ApplicationCapability> findAssociatedAppCapabilities  = (request, response)
+        ListRoute<ApplicationCapability> findAssociatedAppCapabilitiesRoute  = (request, response)
                 -> appCapabilityDao.findAssociatedApplicationCapabilities(getLong(request, "capabilityId"));
 
-        ListRoute<IdGroup> findAssociatedCapabilitiesByApplication =
+        ListRoute<IdGroup> findAssociatedCapabilitiesByApplicationRoute =
                 (request, response) -> appCapabilityDao.findAssociatedCapabilitiesByApplication(getId(request));
 
-        ListRoute<ApplicationCapability> findAppCapabilitiesForAppIds  = (request, response)
-                -> appCapabilityDao.findByAppIds(readBody(request, Long[].class));
-
-        ListRoute<ApplicationCapability> findAppCapabilitiesForAppIdSelector  = (request, response)
+        ListRoute<ApplicationCapability> findAppCapabilitiesForAppIdSelectorRoute  = (request, response)
                 -> appCapabilityDao.findByAppIdSelector(readOptionsFromBody(request));
 
-        EndpointUtilities.getForDatum(mkPath(BASE_URL, "capability", ":capabilityId"), findGroupedAppsForCapability);
-        getForList(mkPath(BASE_URL, "application", ":applicationId"), findCapabilitiesForApp);
-        getForList(mkPath(BASE_URL, "count-by", "capability"), tallyByCapability);
-        getForList(mkPath(BASE_URL, "capability", ":capabilityId", "associated"), findAssociatedAppCapabilities);
-        getForList(mkPath(BASE_URL, "application", ":id", "associated"), findAssociatedCapabilitiesByApplication);
-        postForList(mkPath(BASE_URL, "apps"), findAppCapabilitiesForAppIds);
-        postForList(mkPath(BASE_URL, "selector"), findAppCapabilitiesForAppIdSelector);
-
-        post(mkPath(BASE_URL, "application", ":id"), (request, response) -> {
+        DatumRoute<Integer> updateRoute = (request, response) -> {
 
             UpdateAppCapabilitiesAction action = readBody(request, UpdateAppCapabilitiesAction.class);
 
@@ -117,26 +106,18 @@ public class AppCapabilityEndpoint implements Endpoint {
             logChanges(action, appRef, getUsername(request));
 
             return additions.length + removals.length;
-        });
+        };
 
-        delete(mkPath(BASE_URL, "application", ":id", ":capabilityId"), (req, res) -> {
+        Route deleteRoute = (req, res) -> {
             long id = getId(req);
 
             List<Long> capabilityIds = newArrayList(getLong(req, "capabilityId"));
 
             LOG.info("Removing application capabilities: " + capabilityIds + " for application: " + id);
             return appCapabilityDao.removeCapabilitiesFromApp(id, capabilityIds)[0];
-        });
+        };
 
-
-        post(mkPath(BASE_URL, "application", ":id", ":capabilityId"), (req, res) -> {
-            long id = getId(req);
-            List<Long> capabilityIds = newArrayList(getLong(req, "capabilityId"));
-            LOG.info("Adding application capabilities: " + capabilityIds + " for application: " + id);
-            return appCapabilityDao.addCapabilitiesToApp(id, capabilityIds)[0];
-        });
-
-        post(mkPath(BASE_URL, "application", ":id", ":capabilityId", "primary"), (req, res) -> {
+        DatumRoute<Integer> mkPrimaryRoute = (req, res) -> {
             long appId = getId(req);
             long capabilityId = getLong(req, "capabilityId");
             boolean isPrimary = WebUtilities.readBody(req, Boolean.class);
@@ -144,7 +125,25 @@ public class AppCapabilityEndpoint implements Endpoint {
             LOG.info("Setting application capability: " + capabilityId + " primary flag to:  " + isPrimary + " for application: " + appId);
 
             return appCapabilityDao.setIsPrimary(appId, capabilityId, isPrimary);
-        });
+        };
+
+        DatumRoute<Integer> additionRoute = (req, res) -> {
+            long id = getId(req);
+            List<Long> capabilityIds = newArrayList(getLong(req, "capabilityId"));
+            LOG.info("Adding application capabilities: " + capabilityIds + " for application: " + id);
+            return appCapabilityDao.addCapabilitiesToApp(id, capabilityIds)[0];
+        };
+
+        getForDatum(mkPath(BASE_URL, "capability", ":capabilityId"), findGroupedAppsForCapabilityRoute);
+        getForList(mkPath(BASE_URL, "application", ":applicationId"), findCapabilitiesForAppRoute);
+        getForList(mkPath(BASE_URL, "count-by", "capability"), tallyByCapabilityRoute);
+        getForList(mkPath(BASE_URL, "capability", ":capabilityId", "associated"), findAssociatedAppCapabilitiesRoute);
+        getForList(mkPath(BASE_URL, "application", ":id", "associated"), findAssociatedCapabilitiesByApplicationRoute);
+        postForList(mkPath(BASE_URL, "selector"), findAppCapabilitiesForAppIdSelectorRoute);
+        postForDatum(mkPath(BASE_URL, "application", ":id"), updateRoute);
+        delete(mkPath(BASE_URL, "application", ":id", ":capabilityId"), deleteRoute);
+        postForDatum(mkPath(BASE_URL, "application", ":id", ":capabilityId"), additionRoute);
+        postForDatum(mkPath(BASE_URL, "application", ":id", ":capabilityId", "primary"), mkPrimaryRoute);
     }
 
 

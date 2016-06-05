@@ -25,9 +25,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
-import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
-
 
 public class CapabilityHarness {
 
@@ -37,14 +34,12 @@ public class CapabilityHarness {
 
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<Capability> caps = dsl.selectDistinct(CAPABILITY.fields())
-                .from(CAPABILITY)
-                .innerJoin(APP_CAPABILITY)
-                .on(APP_CAPABILITY.CAPABILITY_ID.eq(CAPABILITY.ID))
-                .where(APP_CAPABILITY.APPLICATION_ID.in(680L, 681L))
-                .fetch(CapabilityDao.TO_DOMAIN_MAPPER);
+        CapabilityDao dao = ctx.getBean(CapabilityDao.class);
 
-        caps.forEach(c -> System.out.println(c.name()));
+
+        List<Capability> r = dao.findForApps(1202L);
+
+        r.forEach(System.out::println);
 
     }
 

@@ -15,6 +15,27 @@ import d3 from "d3";
 import {perhaps, populateParents} from "../common";
 import {calculateGroupSummary} from "../ratings/directives/common";
 
+
+const initialState = {
+    apps: [],
+    assetCostData: null,
+    assetCosts: null,
+    associatedCapabilities: [],
+    bookmarks: [],
+    capability: null,
+    complexity: [],
+    dataFlows: [],
+    flowOptions: null,
+    groupedApps: null,
+    processes: [],
+    ratings: null,
+    sourceDataRatings: [],
+    techStats: null,
+    traitInfo: null,
+    visibility: {}
+};
+
+
 function loadTraitInfo(traitStore, traitUsageStore, capabilityId) {
     const result = {
         usages: [],
@@ -97,27 +118,28 @@ function prepareGroupData(capability, apps, perspective, ratings) {
 }
 
 
-function controller($scope,
-                    $q,
-                    $stateParams,
+function controller($q,
+                    $scope,
                     $state,
-                    capabilities,
+                    $stateParams,
                     appCapabilityStore,
-                    perspectiveStore,
-                    ratingStore,
-                    historyStore,
-                    dataFlowViewService,
-                    complexityStore,
-                    assetCostViewService,
                     applicationStore,
-                    traitUsageStore,
-                    traitStore,
-                    techStatsService,
+                    assetCostViewService,
                     bookmarkStore,
+                    capabilities,
+                    complexityStore,
                     dataFlowUtilityService,
-                    sourceDataRatingStore) {
+                    dataFlowViewService,
+                    historyStore,
+                    perspectiveStore,
+                    processStore,
+                    ratingStore,
+                    sourceDataRatingStore,
+                    techStatsService,
+                    traitStore,
+                    traitUsageStore) {
 
-    const vm = this;
+    const vm = Object.assign(this, initialState);
 
     const capId = $stateParams.id;
     const capability = _.find(populateParents(capabilities), { id: capId });
@@ -145,6 +167,9 @@ function controller($scope,
         return _.map(apps, 'id');
     };
 
+    processStore
+        .findForCapability(capId)
+        .then(ps => vm.processes = ps);
 
     appCapabilityStore.findApplicationsByCapabilityId(capability.id)
         .then(processApps)
@@ -213,7 +238,6 @@ function controller($scope,
 
 
     vm.capability = capability;
-    vm.capabilitiesById = capabilitiesById;
     vm.assetCosts = assetCosts;
 
     vm.onAssetBucketSelect = bucket => {
@@ -231,26 +255,28 @@ function controller($scope,
         .then(r => vm.traitInfo = r);
 }
 
+
 controller.$inject = [
-    '$scope',
     '$q',
-    '$stateParams',
+    '$scope',
     '$state',
-    'capabilities',
+    '$stateParams',
     'AppCapabilityStore',
-    'PerspectiveStore',
-    'RatingStore',
-    'HistoryStore',
-    'DataFlowViewService',
-    'ComplexityStore',
-    'AssetCostViewService',
     'ApplicationStore',
-    'TraitUsageStore',
-    'TraitStore',
-    'TechnologyStatisticsService',
+    'AssetCostViewService',
     'BookmarkStore',
+    'capabilities',
+    'ComplexityStore',
     'DataFlowUtilityService',
-    'SourceDataRatingStore'
+    'DataFlowViewService',
+    'HistoryStore',
+    'PerspectiveStore',
+    'ProcessStore',
+    'RatingStore',
+    'SourceDataRatingStore',
+    'TechnologyStatisticsService',
+    'TraitStore',
+    'TraitUsageStore'
 ];
 
 

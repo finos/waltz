@@ -11,7 +11,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
 function toEntityRef(capability) {
@@ -46,13 +46,6 @@ const service = (http, root) => {
     const findAssociatedCapabilitiesByApplicationId = id =>
         http.get(`${BASE}/application/${id}/associated`)
             .then(result => result.data);
-
-
-    const findApplicationCapabilitiesByAppIds = ids => {
-        console.log('findApplicationCapabilitiesByAppIds is deprecated, use selector instead');
-        return http.post(`${BASE}/apps`, ids)
-            .then(result => result.data);
-    };
 
 
     const findApplicationCapabilitiesByAppIdSelector = options =>
@@ -97,7 +90,6 @@ const service = (http, root) => {
         findApplicationsByCapabilityId,
         findAssociatedApplicationCapabilitiesByCapabilityId,
         findAssociatedCapabilitiesByApplicationId,
-        findApplicationCapabilitiesByAppIds,
         findApplicationCapabilitiesByAppIdSelector,
         countByCapabilityId,
         removeCapability,
@@ -108,6 +100,8 @@ const service = (http, root) => {
 
 };
 
+
 service.$inject = ['$http', 'BaseApiUrl'];
+
 
 export default service;

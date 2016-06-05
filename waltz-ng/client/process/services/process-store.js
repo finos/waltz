@@ -18,9 +18,21 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const findForApplication = (id) => $http
+        .get(`${BASE}/application/${id}`)
+        .then(result => result.data);
+
+
+    const findForCapability = (id) => $http
+        .get(`${BASE}/capability/${id}`)
+        .then(result => result.data);
+
+
     return {
         getById,
         findAll,
+        findForApplication,
+        findForCapability,
         findSupportingCapabilities
     };
 

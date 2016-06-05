@@ -83,19 +83,6 @@ public class AppCapabilityDao {
     }
 
 
-    private SelectJoinStep<Record> prepareSelect() {
-        final Field[] fields = new Field[] {
-                APP_CAPABILITY.APPLICATION_ID,
-                APP_CAPABILITY.CAPABILITY_ID,
-                APP_CAPABILITY.IS_PRIMARY
-        };
-
-        return dsl
-                .select(fields)
-                .from(APP_CAPABILITY);
-    }
-
-
     public GroupedApplications findGroupedApplicationsByCapability(long capabilityId) {
 
         ImmutableGroupedApplications.Builder builder = ImmutableGroupedApplications.builder();
@@ -181,17 +168,17 @@ public class AppCapabilityDao {
     }
 
 
-    @Deprecated
-    public List<ApplicationCapability> findApplicationCapabilitiesForAppIds(Long[] ids) {
-        return prepareSelect()
-                .where(APP_CAPABILITY.APPLICATION_ID.in(ids))
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
     public Collection<ApplicationCapability> findApplicationCapabilitiesForAppIdSelector(Select<Record1<Long>> selector) {
         return prepareSelect()
                 .where(APP_CAPABILITY.APPLICATION_ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
-
     }
+
+
+    private SelectJoinStep<Record> prepareSelect() {
+        return dsl
+                .select(APP_CAPABILITY.fields())
+                .from(APP_CAPABILITY);
+    }
+
 }

@@ -138,14 +138,11 @@ public class AppCapabilityService {
 
     }
 
-    public List<ApplicationCapability> findByAppIds(Long... ids) {
-        return time(
-                "ACS.findByAppIds",
-                () -> dao.findApplicationCapabilitiesForAppIds(ids));
-    }
 
     public Collection<ApplicationCapability> findByAppIdSelector(ApplicationIdSelectionOptions options) {
         Select<Record1<Long>> selector = appIdSelectorFactory.apply(options);
-        return dao.findApplicationCapabilitiesForAppIdSelector(selector);
+        return time(
+                "ACS.findByAppIdSelector",
+                () -> dao.findApplicationCapabilitiesForAppIdSelector(selector));
     }
 }

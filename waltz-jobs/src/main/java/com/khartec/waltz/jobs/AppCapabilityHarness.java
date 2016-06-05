@@ -17,20 +17,10 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
-import com.khartec.waltz.model.applicationcapability.ImmutableAppCapabilityUsage;
-import com.khartec.waltz.model.capability.Capability;
-import com.khartec.waltz.schema.tables.AppCapability;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.app_capability.AppCapabilityService;
 import com.khartec.waltz.service.capability.CapabilityService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static com.khartec.waltz.common.OptionalUtilities.toList;
 
 
 public class AppCapabilityHarness {
@@ -42,33 +32,6 @@ public class AppCapabilityHarness {
         AppCapabilityService appCapabilityService = ctx.getBean(AppCapabilityService.class);
         CapabilityService capabilityService = ctx.getBean(CapabilityService.class);
 
-        long appId = 98;
-
-        List<ApplicationCapability> appCapabilities = appCapabilityService.findByAppIds(appId);
-
-        List<Long> explicitCapabilityIds = appCapabilities.stream()
-                .map(ac -> ac.capabilityId())
-                .collect(Collectors.toList());
-
-
-        List<Capability> explicitCapabilities = capabilityService.findByIds(explicitCapabilityIds.toArray(new Long[0]));
-
-        Set<Long> allIds = explicitCapabilities.stream()
-                .map(c -> toList(c.level1(), c.level2(), c.level3(), c.level4(), c.level5()))
-                .flatMap(ids -> ids.stream())
-                .collect(Collectors.toSet());
-
-        List<Capability> allCapabilities = capabilityService.findByIds(allIds.toArray(new Long[0]));
-
-
-        ImmutableAppCapabilityUsage.builder()
-                .applicationId(appId)
-                .explicitCapabilityIds(explicitCapabilityIds)
-                .allCapabilities(allCapabilities)
-                .build();
-
-
-        allCapabilities.forEach(System.out::println);
 
 
     }

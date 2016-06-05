@@ -1,9 +1,14 @@
 <div class="container-fluid">
-    <h1>Waltz</h1>
-    <blockquote>Enterprise Architecture delivered to your screen</blockquote>
 
+    <div style="margin-bottom: 24px;">
+        <img height="100px"
+             src="images/branding/waltz_icon+text_positive_bw_300px.png">
+        <span style="font-size: x-large; padding-left: 30px;">
+            Enterprise Architecture on the Wire
+        </span>
+    </div>
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-6" ng-if="ctrl.panels.length > 0">
             <waltz-static-panels panels="ctrl.panels">
 
             </waltz-static-panels>

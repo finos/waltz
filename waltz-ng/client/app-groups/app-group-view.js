@@ -117,6 +117,15 @@ function controller($scope,
 
     const vm = Object.assign(this, initialState);
 
+
+    const appIdSelector = {
+        entityReference: {
+            kind: 'APP_GROUP',
+            id: id
+        },
+        scope: 'EXACT'
+    };
+
     const isUserAnOwner = member =>
             member.role === 'OWNER'
             && member.userId === vm.user.userName;
@@ -144,7 +153,7 @@ function controller($scope,
             appStore.findByIds(appIds),
             complexityStore.findBySelector(id, 'APP_GROUP', 'EXACT'),
             capabilityStore.findAll(),
-            appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
+            appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(appIdSelector),
             ratingStore.findByAppIds(appIds),
             technologyStatsService.findBySelector(id, 'APP_GROUP', 'EXACT')
         ]))

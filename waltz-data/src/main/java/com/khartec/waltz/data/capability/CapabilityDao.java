@@ -17,8 +17,10 @@
 
 package com.khartec.waltz.data.capability;
 
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.capability.ImmutableCapability;
+import com.khartec.waltz.schema.tables.AppCapability;
 import com.khartec.waltz.schema.tables.records.CapabilityRecord;
 import org.jooq.*;
 import org.slf4j.Logger;
@@ -61,18 +63,22 @@ public class CapabilityDao {
 
 
     private final DSLContext dsl;
+    private final com.khartec.waltz.schema.tables.Capability c = CAPABILITY.as("c");
+    private final AppCapability ac = APP_CAPABILITY.as("ac");
+
 
 
     @Autowired
     public CapabilityDao(DSLContext dsl) {
+        Checks.checkNotNull(dsl, "dsl cannot be null");
         this.dsl = dsl;
     }
 
 
     public List<Capability> findAll() {
         return dsl
-                .select()
-                .from(CAPABILITY)
+                .select(c.fields())
+                .from(c)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -85,27 +91,27 @@ public class CapabilityDao {
 
 
     private void assignLevel(long capabilityId, int level) {
-        dsl.update(CAPABILITY)
-                .set(CAPABILITY.LEVEL, level)
-                .where(CAPABILITY.ID.eq(capabilityId))
+        dsl.update(c)
+                .set(c.LEVEL, level)
+                .where(c.ID.eq(capabilityId))
                 .execute();
     }
 
 
     public List<Capability> findByIds(Long[] ids) {
         return dsl.select()
-                .from(CAPABILITY)
-                .where(CAPABILITY.ID.in(ids))
+                .from(c)
+                .where(c.ID.in(ids))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public List<Capability> findByAppIds(Long[] appIds) {
-        return dsl.select(CAPABILITY.fields())
-                .from(CAPABILITY)
-                .innerJoin(APP_CAPABILITY)
-                .on(APP_CAPABILITY.CAPABILITY_ID.eq(CAPABILITY.ID))
-                .where(APP_CAPABILITY.APPLICATION_ID.in(appIds))
+    public List<Capability> findByAppIds(Long... appIds) {
+         return dsl.select(c.fields())
+                .from(c)
+                .innerJoin(ac)
+                .on(ac.CAPABILITY_ID.eq(c.ID))
+                .where(ac.APPLICATION_ID.in(appIds))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -113,17 +119,19 @@ public class CapabilityDao {
     public boolean update(Capability capability) {
         ensureHasId(capability, "Cannot update capability record with no ID");
 
-        return dsl.update(CAPABILITY)
-                .set(CAPABILITY.NAME, capability.name())
-                .set(CAPABILITY.DESCRIPTION, capability.description())
-                .set(CAPABILITY.PARENT_ID, capability.parentId().orElse(null))
-                .set(CAPABILITY.LEVEL, capability.level())
-                .set(CAPABILITY.LEVEL_1, capability.level1().orElse(null))
-                .set(CAPABILITY.LEVEL_2, capability.level2().orElse(null))
-                .set(CAPABILITY.LEVEL_3, capability.level3().orElse(null))
-                .set(CAPABILITY.LEVEL_4, capability.level4().orElse(null))
-                .set(CAPABILITY.LEVEL_5, capability.level5().orElse(null))
-                .where(CAPABILITY.ID.eq(capability.id().get()))
+        LOG.info("Updating capability: "+capability);
+
+        return dsl.update(c)
+                .set(c.NAME, capability.name())
+                .set(c.DESCRIPTION, capability.description())
+                .set(c.PARENT_ID, capability.parentId().orElse(null))
+                .set(c.LEVEL, capability.level())
+                .set(c.LEVEL_1, capability.level1().orElse(null))
+                .set(c.LEVEL_2, capability.level2().orElse(null))
+                .set(c.LEVEL_3, capability.level3().orElse(null))
+                .set(c.LEVEL_4, capability.level4().orElse(null))
+                .set(c.LEVEL_5, capability.level5().orElse(null))
+                .where(c.ID.eq(capability.id().get()))
                 .execute() == 1;
 
     }
@@ -131,10 +139,10 @@ public class CapabilityDao {
 
     public Collection<Capability> findByIdSelector(Select<Record1<Long>> selector) {
         checkNotNull(selector, "selector cannot be null");
-        return dsl.select(CAPABILITY.fields())
-                .from(CAPABILITY)
-                .where(CAPABILITY.ID.in(selector))
-                .orderBy(CAPABILITY.NAME)
+        return dsl.select(c.fields())
+                .from(c)
+                .where(c.ID.in(selector))
+                .orderBy(c.NAME)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

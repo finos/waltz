@@ -62,4 +62,12 @@ public class ProcessService {
 
         return capabilityDao.findByIdSelector(selector);
     }
+
+    public Collection<Process> findForCapability(long id) {
+        return processDao.findForCapability(id);
+    }
+
+    public Collection<Process> findForApplication(long id) {
+        return processDao.findForApplication(id);
+    }
 }

@@ -16,8 +16,120 @@
 
     <!-- SUMMARY -->
 
-    <!-- ROADMAP -->
+    <style>
+        .waltz-tree-inherited-node {
+            font-style: italic;
+        }
 
+        .waltz-tree-node-badge {
+            background: #eee;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            padding: 0 2px 0 2px;
+        }
+    </style>
+
+    <waltz-section name="Capabilities"
+                   icon="puzzle-piece">
+        <div class="row">
+            <!-- TREE PANE -->
+            <div class="col-md-4">
+                <p class="waltz-paragraph">
+                    Explore this process by capability:
+                </p>
+                <div>
+                    <treecontrol class="tree-light"
+                                 tree-model="ctrl.capabilityTree.data"
+                                 order-by="name"
+                                 on-selection="ctrl.onCapabilityNodeSelect(node)"
+                                 options="ctrl.capabilityTree.options">
+                        <span ng-class="{ 'waltz-tree-inherited-node' : ctrl.isInferredCapability(node.id) }">
+                            <span class="waltz-visibility-parent"
+                                  ng-bind="node.name">
+                            </span>
+                            <span class="waltz-tree-node-badge"
+                                  ng-bind="ctrl.countAppsForCapability(node.id)">
+                            </span>
+                        </span>
+                    </treecontrol>
+                </div>
+                <br>
+                <p class="small text-muted">
+                    This process is supported by the above capabilities.
+                    The number following the capability is the number of applications which perform the
+                    capability in the process.  Select a capability for more detail.  Capabilities
+                    shown in <i>italics</i> are not explicitly part of the process.
+                </p>
+            </div>
+
+            <!-- CAPABILITY PANE -->
+            <div class="col-md-4">
+                <div ng-if="ctrl.selectedCapability != null">
+                    <strong ng-bind="ctrl.selectedCapability.name"></strong>
+
+                    <p class="waltz-paragraph small text-muted"
+                       ng-bind="ctrl.selectedCapability.description">
+                    </p>
+
+                     <span class="small small">
+                        <a ui-sref="main.capability.view ({ id: ctrl.selectedCapability.id })">
+                            &raquo; more
+                        </a>
+                    </span>
+                    <hr>
+
+                    <div class="small">
+                        <div ng-if="ctrl.findAppsForCapability(ctrl.selectedCapability.id).length > 0">
+                            <strong>
+                                Associated Applications:
+                            </strong>
+                            <ul style="padding-top: 6px">
+                                <li ng-repeat="app in ctrl.findAppsForCapability(ctrl.selectedCapability.id)">
+                                    <a href ng-click="ctrl.onApplicationSelect(app)">
+                                        <strong ng-bind="app.name"></strong>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- APP PANE -->
+            <div class="col-md-4">
+                <div ng-if="ctrl.selectedApplication != null">
+                    <strong ng-bind="ctrl.selectedApplication.name"></strong>
+
+                    <p class="waltz-paragraph small text-muted"
+                       ng-bind="ctrl.selectedApplication.description">
+                    </p>
+
+                    <span class="small">
+                        <a ui-sref="main.app.view ({ id: ctrl.selectedApplication.id })">
+                            &raquo; More
+                        </a>
+                    </span>
+                    <hr>
+
+                    <div class="small">
+                        <div ng-if="ctrl.findCapabilitiesForApp(ctrl.selectedApplication.id).length > 0">
+                            <strong style="margin-bottom: 3px">
+                                Application Capabilities:
+                            </strong>
+                            <ul style="padding-top: 6px">
+                                <li ng-repeat="capability in ctrl.findCapabilitiesForApp(ctrl.selectedApplication.id)">
+                                    <span ng-bind="capability.name"></span>
+                                    <span ng-if="ctrl.isCapabilityPartOfProcess(capability.id)">
+                                        <a href ng-click='ctrl.onCapabilityNodeSelect(capability)'>(focus)</a>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </waltz-section>
 
 
     <!-- BOOKMARKS -->
@@ -29,40 +141,33 @@
     </waltz-bookmarks-section>
 
 
-    <!-- RELATED FUNCTIONS -->
-    <waltz-section name="Related Capabilities">
-        <table class="table table-condensed small"
-               ng-if="ctrl.capabilities.length > 0">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Description</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="capability in ctrl.capabilities">
-                <td>
-                    <a ui-sref="main.capability.view ({ id: capability.id })">
-                        <span ng-bind="capability.name"></span>
-                    </a>
-                </td>
-                <td>
-                    <span ng-bind="capability.description"></span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
 
-        <div class="alert alert-warning"
-             ng-if="ctrl.capabilities.length == 0">
-            <strong>No Related Capabilities</strong>
-        </div>
+    <!-- FLOWS -->
+    <waltz-section name="Logical Data Flows"
+                   icon="random">
+
+        <waltz-section-actions>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.visibility.flowOverlay = !ctrl.visibility.flowOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.visibility.flowOverlay"
+                                   ratings="ctrl.sourceDataRatings"
+                                   entities="['LOGICAL_DATA_FLOW']">
+        </waltz-source-data-overlay>
+
+        <waltz-data-flows-tabgroup flow-data="ctrl.dataFlows"
+                                   on-load-detail="ctrl.loadFlowDetail"
+                                   options="ctrl.dataFlowOptions">
+        </waltz-data-flows-tabgroup>
 
     </waltz-section>
 
-
     <!-- APPLICATIONS -->
-    <waltz-section name="Participating Applications"
+    <waltz-section name="All Participating Applications"
+                   icon="desktop"
                    small="( {{ ctrl.applications.length }} )">
 
             <waltz-section-actions>

@@ -22,21 +22,22 @@ import {prepareSlopeGraph} from "../data-flow/directives/slope-graph/slope-graph
 import {mkAppRatingsGroup, calculateHighestRatingCount} from "../ratings/directives/common";
 
 
-function controller(appView,
+function controller($q,
+                    $state,
+                    appView,
                     authSourcesStore,
                     changeLogStore,
-                    involvementStore,
-                    dataFlowStore,
-                    orgUnitStore,
-                    serverInfoStore,
-                    perspectiveStore,
-                    ratingStore,
-                    displayNameService,
                     complexityStore,
-                    catalogStore,
                     databaseStore,
-                    $state,
-                    $q) {
+                    dataFlowStore,
+                    involvementStore,
+                    orgUnitStore,
+                    perspectiveStore,
+                    processStore,
+                    ratingStore,
+                    serverInfoStore,
+                    softwareCatalogStore,
+                    displayNameService ) {
 
     const { id, organisationalUnitId } = appView.app;
 
@@ -74,7 +75,7 @@ function controller(appView,
         loadInvolvements($q, involvementStore, id, vm),
         loadAuthSources(authSourcesStore, orgUnitStore, id, organisationalUnitId, vm),
         loadServers(serverInfoStore, id, vm),
-        loadSoftwareCatalog(catalogStore, id, vm),
+        loadSoftwareCatalog(softwareCatalogStore, id, vm),
         loadDatabases(databaseStore, id, vm)
     ];
 
@@ -93,27 +94,34 @@ function controller(appView,
     });
 
 
-    complexityStore.findByApplication(id).then(c => vm.complexity = c);
+    complexityStore
+        .findByApplication(id)
+        .then(c => vm.complexity = c);
+
+    processStore
+        .findForApplication(id)
+        .then(ps => vm.processes = ps);
 
 }
 
 
 controller.$inject = [
+    '$q',
+    '$state',
     'appView',
     'AuthSourcesStore',
     'ChangeLogDataService',
-    'InvolvementStore',
-    'DataFlowDataStore',
-    'OrgUnitStore',
-    'ServerInfoStore',
-    'PerspectiveStore',
-    'RatingStore',
-    'WaltzDisplayNameService',
     'ComplexityStore',
-    'SoftwareCatalogStore',
     'DatabaseStore',
-    '$state',
-    '$q'
+    'DataFlowDataStore',
+    'InvolvementStore',
+    'OrgUnitStore',
+    'PerspectiveStore',
+    'ProcessStore',
+    'RatingStore',
+    'ServerInfoStore',
+    'SoftwareCatalogStore',
+    'WaltzDisplayNameService'
 ];
 
 

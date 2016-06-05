@@ -35,9 +35,17 @@ public class ProcessEndpoint implements Endpoint {
         String findAllPath = BASE_URL;
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findSupportingCapabilitiesPath = mkPath(BASE_URL, "id", ":id", "capabilities");
+        String findForCapabilityPath = mkPath(BASE_URL, "capability", ":id");
+        String findForApplicationPath = mkPath(BASE_URL, "application", ":id");
 
         ListRoute<Process> findAllRoute = (request, response)
                 -> service.findAll();
+
+        ListRoute<Process> findForCapabilityRoute = (request, response)
+                -> service.findForCapability(getId(request));
+
+        ListRoute<Process> findForApplicationRoute = (request, response)
+                -> service.findForApplication(getId(request));
 
         ListRoute<Capability> findSupportingCapabilitiesRoute = (request, response)
                 -> service.findSupportingCapabilitiesRoute(getId(request));
@@ -46,6 +54,8 @@ public class ProcessEndpoint implements Endpoint {
                 -> service.getById(getId(request));
 
         getForList(findAllPath, findAllRoute);
+        getForList(findForCapabilityPath, findForCapabilityRoute);
+        getForList(findForApplicationPath, findForApplicationRoute);
         getForList(findSupportingCapabilitiesPath, findSupportingCapabilitiesRoute);
         getForDatum(getByIdPath, getByIdRoute);
     }
