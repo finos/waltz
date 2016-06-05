@@ -48,7 +48,7 @@ function loadTraitInfo(traitStore, traitUsageStore, capabilityId) {
             if (! usages) { return result; } // shortcut
 
             result.usages = usages;
-            const traitIds =_.chain(usages)
+            const traitIds = _.chain(usages)
                 .map('traitId')
                 .uniq()
                 .value();
