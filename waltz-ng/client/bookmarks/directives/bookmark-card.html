@@ -9,31 +9,38 @@
             </h4>
         </div>
 
-        <div class="col-md-12 bookmark" ng-repeat="bookmark in ctrl.bookmarks">
+        <div class="col-md-12 bookmark"
+             ng-repeat="bookmark in ctrl.bookmarks">
 
-            <waltz-icon ng-if='bookmark.isPrimary'
-                        name="star">
-            </waltz-icon>
-            <waltz-icon ng-if='!bookmark.isPrimary'
-                        class="text-muted"
-                        name="star-o">
-            </waltz-icon>
+            <div>
+                <waltz-icon ng-if='bookmark.isPrimary'
+                            name="star">
+                </waltz-icon>
+                <waltz-icon ng-if='!bookmark.isPrimary'
+                            class="text-muted"
+                            name="star-o">
+                </waltz-icon>
 
-            <waltz-external-link title="{{ bookmark.title }}"
-                                 url="{{ bookmark.url }}"
-                                 show-url="true">
-            </waltz-external-link>
+                <waltz-external-link title="{{ bookmark.title }}"
+                                     url="{{ bookmark.url }}"
+                                     show-url="true">
+                </waltz-external-link>
+            </div>
 
-            <div ng-if="bookmark.description"
-                 class="text-muted small">
+            <div style="border-top: 2px dotted #ddd">
+
+                <div ng-if="bookmark.description"
+                     class="text-muted small">
                 <span ng-bind="bookmark.description">
                 </span>
+                </div>
+
+                <div ng-if="!bookmark.description"
+                     class="text-muted small">
+                    <i>No description provided</i>
+                </div>
             </div>
 
-            <div ng-if="!bookmark.description"
-                 class="text-muted small">
-                <i>No description provided</i>
-            </div>
         </div>
     </div>
 </div>

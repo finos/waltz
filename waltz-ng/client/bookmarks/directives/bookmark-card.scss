@@ -18,10 +18,12 @@
 
 
 .waltz-bookmark-card .kind {
-  background: lighten($waltz-section-background-color, 3%);
+    background: lighten($waltz-section-background-color, 3%);
 }
 
 
 .waltz-bookmark-card .bookmark {
-  border-top: 1px dotted $waltz-border-color;
+    border-top: 1px dotted $waltz-border-color;
+    padding-bottom: 3px;
+    padding-top: 3px;
 }
