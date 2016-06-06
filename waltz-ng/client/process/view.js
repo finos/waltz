@@ -170,7 +170,7 @@ function controller($scope,
         const appIds = vm.appCapabilities.byCapability[capabilityId];
         return _.chain(vm.applications)
             .filter(app => _.includes(appIds, app.id))
-            .orderBy('name')
+            .orderBy(app => app.name.toLowerCase())
             .value();
     };
 
@@ -178,7 +178,7 @@ function controller($scope,
         const capIds = vm.appCapabilities.byApplication[appId];
         return _.chain(vm.allCapabilities)
             .filter(cap => _.includes(capIds, cap.id))
-            .orderBy('name')
+            .orderBy(cap => cap.name.toLowerCase())
             .value();
     };
 

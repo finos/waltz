@@ -60,6 +60,7 @@ public class ProcessDao {
     public List<Process> findAll() {
         return dsl.select(PROCESS.fields())
                 .from(PROCESS)
+                .orderBy(PROCESS.NAME.asc())
                 .fetch(TO_DOMAIN);
     }
 

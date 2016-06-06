@@ -28,10 +28,11 @@ module.exports = {
             { test: /\.jsx?$/, loader: 'babel', exclude: /node_modules/ },
             { test: /\.scss$/, loader: 'style!css!sass' },
             { test: /\.css$/, loader: 'style!css' },
-            { test: /\.(ttf|eot|svg|png)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader' },
-            { test: /\.html?$/, loader: 'raw-loader' },
-            { test: /\.woff(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=10000&minetype=application/font-woff' },
-            { test: /\.woff2(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=10000&minetype=application/font-woff2' }
+            { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=8192' },
+            { test: /\.png$/, loader: 'url-loader?mimetype=image/png&limit=8192' },
+            { test: /\.html?$/, loader: 'html-loader' },
+            { test: /\.woff(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=8192&minetype=application/font-woff' },
+            { test: /\.woff2(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=8192&minetype=application/font-woff2' }
         ],
         noParse: []
     }

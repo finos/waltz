@@ -20,6 +20,11 @@ function processPack(p) {
 }
 
 
+function toPrettyBaseline(item) {
+    return `${item.baseLine}%`;
+}
+
+
 function toPrettyGoal(goal) {
     if (! goal) return '-';
 
@@ -28,10 +33,10 @@ function toPrettyGoal(goal) {
             return `${goal.value}% increase`;
         case 'PERCENT_DECREASE':
             return `${goal.value}% decrease`;
-        case 'BELOW THRESHOLD':
-            return `Below ${goal.value}`;
-        case 'ABOVE THRESHOLD':
-            return `Above ${goal.value}`;
+        case 'BELOW_THRESHOLD':
+            return `Below ${goal.value}%`;
+        case 'ABOVE_THRESHOLD':
+            return `Above ${goal.value}%`;
         default:
             console.log("No pretty print registered for goal type: ", goal.type);
             return `${goal.type} ${goal.value}`;
@@ -68,6 +73,10 @@ function controller(performanceMetricDefinitionStore,
 
 
     vm.toPrettyGoal = toPrettyGoal;
+    vm.toPrettyBaseline = toPrettyBaseline;
+    vm.cellClass = (item, goal) => {
+        return goal ? "success" : "warning";
+    };
 
 }
 

@@ -46,7 +46,7 @@
                     </tr>
                     </thead>
                     <tbody ng-repeat="(sectionName, items) in ctrl.selectedPack.sections">
-                    <tr>
+                    <tr style="background-color: #eee">
                         <td colspan="5">
                             <span ng-bind="sectionName"
                                   class="strong"></span>
@@ -58,11 +58,11 @@
                             </span>
                         </td>
                         <td>
-                            <span ng-bind="item.baseLine"></span>
+                            <span ng-bind="ctrl.toPrettyBaseline(item)"></span>
                         </td>
-                        <td class='warning' ng-repeat="checkpoint in ctrl.selectedPack.checkpoints">
+                        <td ng-repeat="checkpoint in ctrl.selectedPack.checkpoints"
+                            ng-class="ctrl.cellClass(item, item.goalsByCheckpointId[checkpoint.id])">
                             <span ng-bind="ctrl.toPrettyGoal(item.goalsByCheckpointId[checkpoint.id])">
-                            <pre>{{ item.goalsByCheckpointId[checkpoint.id] }}</pre>
                             </span>
                         </td>
                     </tr>

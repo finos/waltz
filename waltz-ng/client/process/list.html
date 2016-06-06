@@ -25,7 +25,11 @@
     <waltz-section icon='code-fork'
                    name="Processes"
                    small="All">
-        <waltz-process-list processes="ctrl.processes">
+        <waltz-section-actions>
+            <input type="search" ng-model="ctrl.processQuery" placeholder="Search...">
+        </waltz-section-actions>
+
+        <waltz-process-list processes="ctrl.filteredProcesses">
         </waltz-process-list>
     </waltz-section>
 </div>
