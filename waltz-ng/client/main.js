@@ -28,7 +28,6 @@ import "angular-local-storage";
 import "ng-redux";
 import thunk from "redux-thunk";
 import rootReducer from "./reports/reducers";
-import namedSettings from "./settings/named-settings";  // provides Object.assign etc.
 
 
 const dependencies = [
@@ -52,11 +51,14 @@ const dependencies = [
 
 const waltzApp = angular.module('waltz-app', dependencies);
 
-
 const registrationFns = [
+    require('./routes'),
+    require('./networking'),
+
     require('./common/directives'),
     require('./common/filters'),
     require('./common/services'),
+    
     require('./access-log'),
     require('./applications'),
     require('./app-capabilities'),
@@ -107,41 +109,6 @@ _.each(registrationFns, (registrationFn, idx) => {
 });
 
 
-waltzApp.config([
-    '$stateProvider',
-    ($stateProvider) => {
-        $stateProvider
-            .state('main', {
-                url: '/',
-                views: {
-                    'header': { template: '<waltz-navbar></waltz-navbar>'},
-                    'sidebar': { template: '<waltz-sidebar></waltz-sidebar>' },
-                    'content': require('./welcome/welcome.js'),
-                    'footer': { template: require('./footer/footer.html') }
-                }
-            })
-            .state('main.home', {
-                url: 'home',
-                views: {
-                    'content': { template: require('./welcome/welcome.html') }
-                }
-            });
-    }
-]);
-
-
-const baseUrl =
-    __ENV__ === 'prod'
-    ? './'
-    : __ENV__ === 'test'
-        ? 'http://192.168.1.179:8443/'
-        : 'http://localhost:8443/';
-        //: 'http://192.168.1.147:8443/'  // TODO (if testing IE on Mac) : use ip lookup
-
-waltzApp.constant('BaseApiUrl', baseUrl + 'api');
-waltzApp.constant('BaseUrl', baseUrl);
-waltzApp.constant('BaseExtractUrl', baseUrl + 'data-extract');
-
 
 waltzApp.config([
     'uiSelectConfig',
@@ -159,6 +126,7 @@ waltzApp.config( [
         $compileProvider.aHrefSanitizationWhitelist(/^\s*(mailto|https?|sip|chrome-extension):/);
     }
 ]);
+
 
 waltzApp.config([
     '$authProvider',
@@ -183,18 +151,6 @@ waltzApp.config([
 ]);
 
 
-waltzApp.config([
-    '$httpProvider',
-    function($httpProvider) {
-        $httpProvider.defaults.cache = false;
-        if (!$httpProvider.defaults.headers.get) {
-            $httpProvider.defaults.headers.get = {};
-        }
-        // disable IE ajax request caching
-        $httpProvider.defaults.headers.get['If-Modified-Since'] = '0';
-    }
-]);
-
 waltzApp.run(['$rootScope', '$document', ($rootScope, $doc) => {
     $rootScope.$on('$stateChangeSuccess', () => {
         $doc[0].body.scrollTop = 0;
@@ -205,27 +161,4 @@ waltzApp.run(['$rootScope', '$document', ($rootScope, $doc) => {
 
 waltzApp.config(['$ngReduxProvider', ($ngReduxProvider) => {
     $ngReduxProvider.createStoreWith(rootReducer, [thunk], []);
-}]);
-
-
-waltzApp.config(['$httpProvider', ($httpProvider) => {
-    // using apply async should improve performance
-    $httpProvider.useApplyAsync(true);
-}]);
-
-
-waltzApp.run(['$http', 'SettingsStore', ($http, settingsStore) => {
-    settingsStore.findAll()
-        .then(settings => {
-            if (settingsStore.isDevModeEnabled(settings)) {
-                console.log('Dev Extensions enabled');
-                _.chain(settings)
-                    .filter(s => s.name.startsWith(namedSettings.httpHeaderPrefix))
-                    .each(s => {
-                        const headerName = s.name.replace(namedSettings.httpHeaderPrefix, '');
-                        $http.defaults.headers.common[headerName] = s.value;
-                    })
-                    .value()
-            }
-        });
 }]);
