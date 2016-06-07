@@ -22,6 +22,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.dataflow.DataFlowMeasures;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowMeasures;
 import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.schema.tables.DataFlow;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +41,11 @@ public class DataFlowStatsDao {
 
     private final DSLContext dsl;
 
+    private final DataFlow df = DATA_FLOW.as("df");
 
     private final Condition bothApps =
-            DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+            df.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                .and(df.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
     @Autowired
     public DataFlowStatsDao(DSLContext dsl) {
@@ -57,16 +59,18 @@ public class DataFlowStatsDao {
 
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
-        Select<Record1<Integer>> inAppCounter = FunctionUtilities.time("DFSD.inAppCounter", () -> countDistinctApps(
-                appIdSelector,
-                DATA_FLOW.TARGET_ENTITY_ID,
-                DATA_FLOW.SOURCE_ENTITY_ID
+        Select<Record1<Integer>> inAppCounter = FunctionUtilities.time("DFSD.inAppCounter", ()
+                -> countDistinctApps(
+                    appIdSelector,
+                    df.TARGET_ENTITY_ID,
+                    df.SOURCE_ENTITY_ID
         ));
 
-        Select<Record1<Integer>> outAppCounter = FunctionUtilities.time("DFSD.outAppCounter", () -> countDistinctApps(
-                appIdSelector,
-                DATA_FLOW.SOURCE_ENTITY_ID,
-                DATA_FLOW.TARGET_ENTITY_ID
+        Select<Record1<Integer>> outAppCounter = FunctionUtilities.time("DFSD.outAppCounter", ()
+                -> countDistinctApps(
+                    appIdSelector,
+                    df.SOURCE_ENTITY_ID,
+                    df.TARGET_ENTITY_ID
         ));
 
         Select<Record1<Integer>> intraAppCounter = dsl
@@ -93,14 +97,14 @@ public class DataFlowStatsDao {
     public List<StringTally> tallyDataTypes(Select<Record1<Long>> appIdSelector) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
-        Condition condition = DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector)
-                .or(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector))
+        Condition condition = df.TARGET_ENTITY_ID.in(appIdSelector)
+                .or(df.SOURCE_ENTITY_ID.in(appIdSelector))
                 .and(bothApps);
 
         return calculateStringTallies(
                 dsl,
-                DATA_FLOW,
-                DATA_FLOW.DATA_TYPE,
+                df,
+                df.DATA_TYPE,
                 condition);
     }
 
@@ -110,8 +114,8 @@ public class DataFlowStatsDao {
 
 
         SelectJoinStep<Record2<Long, Long>> flows = dsl
-                .selectDistinct(DATA_FLOW.SOURCE_ENTITY_ID, DATA_FLOW.TARGET_ENTITY_ID)
-                .from(DATA_FLOW);
+                .selectDistinct(df.SOURCE_ENTITY_ID, df.TARGET_ENTITY_ID)
+                .from(df);
 
         Condition inboundCondition = DSL
                 .field("SOURCE_ENTITY_ID").notIn(appIdSelector)
@@ -126,19 +130,19 @@ public class DataFlowStatsDao {
                 .and(DSL.field("TARGET_ENTITY_ID").in(appIdSelector));
 
         Select<Record1<Integer>> outCounter = dsl
-                .select(DSL.count())
+                .selectCount()
                 .from(flows)
-                .where(outboundCondition);
+                .where(dsl.renderInlined(outboundCondition));
 
         Select<Record1<Integer>> intraCounter = dsl
-                .select(DSL.count())
+                .selectCount()
                 .from(flows)
-                .where(intraCondition);
+                .where(dsl.renderInlined(intraCondition));
 
         Select<Record1<Integer>> inCounter = dsl
-                .select(DSL.count())
+                .selectCount()
                 .from(flows)
-                .where(inboundCondition);
+                .where(dsl.renderInlined(inboundCondition));
 
         Select<Record1<Integer>> query = inCounter
                 .unionAll(outCounter)
@@ -167,8 +171,8 @@ public class DataFlowStatsDao {
                 .and(bothApps);
 
         return dsl.select(DSL.countDistinct(fieldToCount))
-                .from(DATA_FLOW)
-                .where(condition);
+                .from(df)
+                .where(dsl.renderInlined(condition));
 
     }
 
