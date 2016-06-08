@@ -17,14 +17,19 @@
 
 package com.khartec.waltz.service.app_capability;
 
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.data.app_capability.AppCapabilityDao;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.IdGroup;
 import com.khartec.waltz.model.ImmutableIdGroup;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
 import com.khartec.waltz.model.applicationcapability.GroupedApplications;
 import com.khartec.waltz.model.tally.Tally;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,19 +39,23 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.FunctionUtilities.time;
 
 
 @Service
 public class AppCapabilityService {
 
     private final AppCapabilityDao dao;
+    private final ApplicationIdSelectorFactory appIdSelectorFactory;
 
 
     @Autowired
-    public AppCapabilityService(AppCapabilityDao appCapabilityDao) {
+    public AppCapabilityService(AppCapabilityDao appCapabilityDao, ApplicationIdSelectorFactory appIdSelectorFactory) {
         checkNotNull(appCapabilityDao, "dao must not be null");
+        Checks.checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
 
         this.dao = appCapabilityDao;
+        this.appIdSelectorFactory = appIdSelectorFactory;
     }
 
 
@@ -56,12 +65,16 @@ public class AppCapabilityService {
 
 
     public GroupedApplications findGroupedApplicationsByCapability(long capabilityId) {
-        return dao.findGroupedApplicationsByCapability(capabilityId);
+        return time(
+                "ACS.findGroupedApplicationsByCapability",
+                () -> dao.findGroupedApplicationsByCapability(capabilityId));
     }
 
 
     public List<ApplicationCapability> findAssociatedApplicationCapabilities(long capabilityId) {
-        return dao.findAssociatedApplicationCapabilities(capabilityId);
+        return time(
+                "ACS.findAssociatedApplicationCapabilities",
+                () -> dao.findAssociatedApplicationCapabilities(capabilityId));
     }
 
 
@@ -95,7 +108,10 @@ public class AppCapabilityService {
 
 
     public List<Tally<Long>> tallyByCapabilityId() {
-        return dao.tallyByCapabilityId();
+
+        return time(
+                "ACS.tallyByCapabilityId",
+                () -> dao.tallyByCapabilityId());
     }
 
 
@@ -115,11 +131,18 @@ public class AppCapabilityService {
 
 
     public List<ApplicationCapability> findByCapabilityIds(List<Long> capIds) {
-        return dao.findByCapabilityIds(capIds);
+        Checks.checkNotNull(capIds, "capIds cannot be null");
+        return time(
+                "ACS.findByCapabilityIds",
+                () -> dao.findByCapabilityIds(capIds));
 
     }
 
-    public List<ApplicationCapability> findByAppIds(Long... ids) {
-        return dao.findApplicationCapabilitiesForAppIds(ids);
+
+    public Collection<ApplicationCapability> findByAppIdSelector(ApplicationIdSelectionOptions options) {
+        Select<Record1<Long>> selector = appIdSelectorFactory.apply(options);
+        return time(
+                "ACS.findByAppIdSelector",
+                () -> dao.findApplicationCapabilitiesForAppIdSelector(selector));
     }
 }

@@ -10,8 +10,6 @@
  *
  */
 
-import "angular-ui-router";
-
 
 export default (module) => {
 

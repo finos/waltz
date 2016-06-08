@@ -17,7 +17,6 @@
 
 package com.khartec.waltz.service.involvement;
 
-import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
@@ -30,7 +29,9 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
+import static com.khartec.waltz.common.Checks.checkNotEmptyString;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.FunctionUtilities.time;
 
 @Service
 public class InvolvementService {
@@ -42,37 +43,43 @@ public class InvolvementService {
     @Autowired
     public InvolvementService(InvolvementDao dao) {
         checkNotNull(dao, "dao must not be null");
-
         this.dao = dao;
     }
 
 
     public List<Involvement> findByEntityReference(EntityReference ref) {
-        return dao.findByEntityReference(ref);
+        checkNotNull(ref, "ref cannot be null");
+        return time("IS.findByEntityReference", () -> dao.findByEntityReference(ref));
     }
 
 
     public List<Application> findDirectApplicationsByEmployeeId(String employeeId) {
-        return dao.findDirectApplicationsByEmployeeId(employeeId);
+        checkNotEmptyString(employeeId, "employeeId cannot be empty");
+        return time("IS.findDirectApplicationsByEmployeeId", () -> dao.findDirectApplicationsByEmployeeId(employeeId));
     }
 
 
     public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
-        return dao.findAllApplicationsByEmployeeId(employeeId);
+        checkNotEmptyString(employeeId, "employeeId cannot be empty");
+        return time("IS.findAllApplicationsByEmployeeId", () -> dao.findAllApplicationsByEmployeeId(employeeId));
     }
 
 
     public List<Involvement> findByEmployeeId(String employeeId) {
+        checkNotEmptyString(employeeId, "employeeId cannot be empty");
         return dao.findByEmployeeId(employeeId);
     }
 
 
     public List<Person> findPeopleByEntityReference(EntityReference ref) {
-        return dao.findPeopleByEntityReference(ref);
+        checkNotNull(ref, "ref cannot be null");
+        return time("IS.findPeopleByEntityReference", () -> dao.findPeopleByEntityReference(ref));
     }
 
+
     public Collection<ChangeInitiative> findDirectChangeInitiativesByEmployeeId(String employeeId) {
-        Checks.checkNotEmptyString(employeeId, "employeeId cannot be empty");
-        return dao.findDirectChangeInitiativesByEmployeeId(employeeId);
+        checkNotEmptyString(employeeId, "employeeId cannot be empty");
+        return time("IS.findDirectChangeInitiativesByEmployeeId", () -> dao.findDirectChangeInitiativesByEmployeeId(employeeId));
     }
+
 }

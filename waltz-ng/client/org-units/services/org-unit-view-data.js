@@ -39,6 +39,7 @@ function service($q,
 
     function loadAll(orgUnitId) {
 
+
         const promises = [
             orgUnitStore.findAll(),
             appStore.findByOrgUnitTree(orgUnitId),
@@ -78,11 +79,19 @@ function service($q,
 
     function loadAll2(orgUnitId) {
 
+
+        const appIdSelector = {
+            entityReference: {
+                kind: 'ORG_UNIT',
+                id: orgUnitId
+            },
+            scope: 'CHILDREN'
+        };
         const appIds = _.map(rawData.apps, 'id');
 
         const bulkPromise = $q.all([
             ratingStore.findByAppIds(appIds),
-            appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
+            appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(appIdSelector),
             capabilityStore.findByAppIds(appIds),
             ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)
             authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)

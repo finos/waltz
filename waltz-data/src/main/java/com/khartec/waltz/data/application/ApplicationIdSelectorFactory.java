@@ -6,8 +6,10 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.application.HierarchyQueryScope;
+import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.model.utils.IdUtilities;
+import com.khartec.waltz.schema.tables.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,16 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     private final DSLContext dsl;
     private final OrganisationalUnitDao organisationalUnitDao;
 
+    private final Application app = APPLICATION.as("app");
+    private final AppCapability appCapability = APP_CAPABILITY.as("appcap");
+    private final ApplicationGroupEntry appGroup = APPLICATION_GROUP_ENTRY.as("appgrp");
+    private final Capability capability = CAPABILITY.as("cap");
+    private final EntityRelationship relationship = EntityRelationship.ENTITY_RELATIONSHIP.as("relationship");
+    private final Involvement involvement = INVOLVEMENT.as("involvement");
+    private final Person person = PERSON.as("per");
+    private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("phier");
+
+
 
     @Autowired
     public ApplicationIdSelectorFactory(DSLContext dsl, OrganisationalUnitDao organisationalUnitDao) {
@@ -60,9 +72,28 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 return mkForCapability(ref, options.scope());
             case ORG_UNIT:
                 return mkForOrgUnit(ref, options.scope());
+            case PROCESS:
+                return mkForProcess(ref, options.scope());
 
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: "+ref.kind());
+        }
+    }
+
+    private Select<Record1<Long>> mkForProcess(EntityReference ref, HierarchyQueryScope scope) {
+        switch (scope) {
+            case EXACT:
+                return dsl.select(relationship.ID_A)
+                        .from(relationship)
+                        .where(relationship.KIND_A.eq(EntityKind.APPLICATION.name()))
+                        .and(relationship.RELATIONSHIP.eq(RelationshipKind.PARTICIPATES_IN.name()))
+                        .and(relationship.KIND_B.eq(EntityKind.PROCESS.name()))
+                        .and(relationship.ID_B.eq(ref.id()));
+
+            default:
+                throw new UnsupportedOperationException("Querying for appIds related to processes using (scope: '"
+                        + scope
+                        + "') not supported");
         }
     }
 
@@ -85,9 +116,9 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
         }
 
         return dsl
-                .selectDistinct(APPLICATION.ID)
-                .from(APPLICATION)
-                .where(dsl.renderInlined(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds)));
+                .selectDistinct(app.ID)
+                .from(app)
+                .where(dsl.renderInlined(app.ORGANISATIONAL_UNIT_ID.in(orgUnitIds)));
     }
 
 
@@ -96,9 +127,9 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 scope == EXACT,
                 "Can only query for 'EXACT' app group matches, not: " + scope);
         return dsl
-                .selectDistinct(APPLICATION_GROUP_ENTRY.APPLICATION_ID)
-                .from(APPLICATION_GROUP_ENTRY)
-                .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(ref.id()));
+                .selectDistinct(appGroup.APPLICATION_ID)
+                .from(appGroup)
+                .where(appGroup.GROUP_ID.eq(ref.id()));
     }
 
 
@@ -119,40 +150,40 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     private Select<Record1<Long>> mkForPersonReportees(EntityReference ref) {
         String employeeId = findEmployeeId(ref);
 
-        SelectConditionStep<Record1<String>> employeeIds = DSL.selectDistinct(PERSON_HIERARCHY.EMPLOYEE_ID)
-                .from(PERSON_HIERARCHY)
-                .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId));
+        SelectConditionStep<Record1<String>> employeeIds = DSL.selectDistinct(personHierarchy.EMPLOYEE_ID)
+                .from(personHierarchy)
+                .where(personHierarchy.MANAGER_ID.eq(employeeId));
 
-        Condition condition = INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                .and(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId)
-                .or(INVOLVEMENT.EMPLOYEE_ID.in(employeeIds)));
+        Condition condition = involvement.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                .and(involvement.EMPLOYEE_ID.eq(employeeId)
+                .or(involvement.EMPLOYEE_ID.in(employeeIds)));
 
         return dsl
-                .selectDistinct(INVOLVEMENT.ENTITY_ID)
-                .from(INVOLVEMENT)
+                .selectDistinct(involvement.ENTITY_ID)
+                .from(involvement)
                 .where(dsl.renderInlined(condition));
     }
 
 
     private String findEmployeeId(EntityReference ref) {
-        return dsl.select(PERSON.EMPLOYEE_ID)
-                    .from(PERSON)
-                    .where(PERSON.ID.eq(ref.id()))
-                    .fetchOne(PERSON.EMPLOYEE_ID);
+        return dsl.select(person.EMPLOYEE_ID)
+                    .from(person)
+                    .where(person.ID.eq(ref.id()))
+                    .fetchOne(person.EMPLOYEE_ID);
     }
 
 
     private Select<Record1<Long>> mkForSinglePerson(EntityReference ref) {
 
-       String employeeId = dsl.select(PERSON.EMPLOYEE_ID)
-                .from(PERSON)
-                .where(PERSON.ID.eq(ref.id()))
-                .fetchOne(PERSON.EMPLOYEE_ID);
+       String employeeId = dsl.select(person.EMPLOYEE_ID)
+                .from(person)
+                .where(person.ID.eq(ref.id()))
+                .fetchOne(person.EMPLOYEE_ID);
         return dsl
-                .selectDistinct(INVOLVEMENT.ENTITY_ID)
-                .from(INVOLVEMENT)
-                .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId));
+                .selectDistinct(involvement.ENTITY_ID)
+                .from(involvement)
+                .where(involvement.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(involvement.EMPLOYEE_ID.eq(employeeId));
     }
 
 
@@ -161,21 +192,21 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
         switch (scope) {
             case CHILDREN:
                 return dsl
-                        .selectDistinct(APP_CAPABILITY.APPLICATION_ID)
-                        .from(APP_CAPABILITY)
-                        .where(dsl.renderInlined(APP_CAPABILITY.CAPABILITY_ID.in(
-                                dsl.select(CAPABILITY.ID)
-                                        .from(CAPABILITY)
-                                        .where(CAPABILITY.LEVEL_1.eq(ref.id()))
-                                        .or(CAPABILITY.LEVEL_2.eq(ref.id()))
-                                        .or(CAPABILITY.LEVEL_2.eq(ref.id()))
-                                        .or(CAPABILITY.LEVEL_3.eq(ref.id()))
-                                        .or(CAPABILITY.LEVEL_4.eq(ref.id()))
-                                        .or(CAPABILITY.LEVEL_5.eq(ref.id())))));
+                        .selectDistinct(appCapability.APPLICATION_ID)
+                        .from(appCapability)
+                        .where(dsl.renderInlined(appCapability.CAPABILITY_ID.in(
+                                dsl.select(capability.ID)
+                                        .from(capability)
+                                        .where(capability.LEVEL_1.eq(ref.id()))
+                                        .or(capability.LEVEL_2.eq(ref.id()))
+                                        .or(capability.LEVEL_2.eq(ref.id()))
+                                        .or(capability.LEVEL_3.eq(ref.id()))
+                                        .or(capability.LEVEL_4.eq(ref.id()))
+                                        .or(capability.LEVEL_5.eq(ref.id())))));
             case PARENTS:
-                Set<Long> ids = dsl.select(CAPABILITY.LEVEL_1, CAPABILITY.LEVEL_2, CAPABILITY.LEVEL_3, CAPABILITY.LEVEL_4, CAPABILITY.LEVEL_4)
-                        .from(CAPABILITY)
-                        .where(CAPABILITY.ID.eq(ref.id()))
+                Set<Long> ids = dsl.select(capability.LEVEL_1, capability.LEVEL_2, capability.LEVEL_3, capability.LEVEL_4, capability.LEVEL_4)
+                        .from(capability)
+                        .where(capability.ID.eq(ref.id()))
                         .fetchOne(r -> r == null
                                 ? Collections.emptySet()
                                 : SetUtilities.fromArray(r.value1(), r.value2(), r.value3(), r.value4(), r.value5()));
@@ -183,14 +214,14 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 ids.remove(null);
 
                 return dsl
-                        .selectDistinct(APP_CAPABILITY.APPLICATION_ID)
-                        .from(APP_CAPABILITY)
-                        .where(dsl.renderInlined(APP_CAPABILITY.CAPABILITY_ID.in(ids)));
+                        .selectDistinct(appCapability.APPLICATION_ID)
+                        .from(appCapability)
+                        .where(dsl.renderInlined(appCapability.CAPABILITY_ID.in(ids)));
             case EXACT:
                 return dsl
-                        .selectDistinct(APP_CAPABILITY.APPLICATION_ID)
-                        .from(APP_CAPABILITY)
-                        .where(APP_CAPABILITY.CAPABILITY_ID.eq(ref.id()));
+                        .selectDistinct(appCapability.APPLICATION_ID)
+                        .from(appCapability)
+                        .where(appCapability.CAPABILITY_ID.eq(ref.id()));
 
             default:
                 throw new UnsupportedOperationException("Unexpected scope: "+scope);

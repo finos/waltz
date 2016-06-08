@@ -31,7 +31,7 @@ public class PostgresCapabilitySearch implements FullTextSearch<Capability>, Dat
     @Override
     public List<Capability> search(DSLContext dsl, String terms) {
         Result<Record> records = dsl.fetch(QUERY, terms, terms);
-        return records.map(CapabilityDao.capabilityMapper);
+        return records.map(CapabilityDao.TO_DOMAIN_MAPPER);
     }
 
 }

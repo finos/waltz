@@ -23,10 +23,7 @@ import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.tally.LongTally;
 import com.khartec.waltz.schema.tables.records.ApplicationRecord;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -218,4 +215,11 @@ public class ApplicationDao {
         return dsl.executeUpdate(record, condition);
     }
 
+
+    public List<Application> findByAppIdSelector(Select<Record1<Long>> selector) {
+        return dsl.select(APPLICATION.fields())
+                .from(APPLICATION)
+                .where(APPLICATION.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }

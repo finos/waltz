@@ -11,7 +11,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
 function toEntityRef(capability) {
@@ -48,8 +48,8 @@ const service = (http, root) => {
             .then(result => result.data);
 
 
-    const findApplicationCapabilitiesByAppIds = ids =>
-        http.post(`${BASE}/apps`, ids)
+    const findApplicationCapabilitiesByAppIdSelector = options =>
+        http.post(`${BASE}/selector`, options)
             .then(result => result.data);
 
 
@@ -66,10 +66,12 @@ const service = (http, root) => {
         return http.post(`${BASE}/application/${id}`, cleanedRequest);
     };
 
+
     const removeCapability = (applicationId, capabilityId) => {
         return http.delete(`${BASE}/application/${applicationId}/${capabilityId}`)
             .then(result => result.data);
     };
+
 
     const addCapability = (applicationId, capabilityId) => {
         return http.post(`${BASE}/application/${applicationId}/${capabilityId}`)
@@ -88,7 +90,7 @@ const service = (http, root) => {
         findApplicationsByCapabilityId,
         findAssociatedApplicationCapabilitiesByCapabilityId,
         findAssociatedCapabilitiesByApplicationId,
-        findApplicationCapabilitiesByAppIds,
+        findApplicationCapabilitiesByAppIdSelector,
         countByCapabilityId,
         removeCapability,
         addCapability,
@@ -98,6 +100,8 @@ const service = (http, root) => {
 
 };
 
+
 service.$inject = ['$http', 'BaseApiUrl'];
+
 
 export default service;

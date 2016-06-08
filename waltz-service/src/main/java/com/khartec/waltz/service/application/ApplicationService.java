@@ -20,12 +20,10 @@ package com.khartec.waltz.service.application;
 import com.khartec.waltz.data.application.AppAliasDao;
 import com.khartec.waltz.data.application.AppTagDao;
 import com.khartec.waltz.data.application.ApplicationDao;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.application.search.ApplicationSearchDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.model.application.AppRegistrationRequest;
-import com.khartec.waltz.model.application.AppRegistrationResponse;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
+import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.tally.LongTally;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,6 +51,7 @@ public class ApplicationService {
     private final AppTagDao appTagDao;
     private final AppAliasDao appAliasDao;
     private final ApplicationSearchDao appSearchDao;
+    private final ApplicationIdSelectorFactory appIdSelectorFactory;
 
 
     @Autowired
@@ -60,18 +59,21 @@ public class ApplicationService {
                               AppTagDao appTagDao,
                               AppAliasDao appAliasDao,
                               OrganisationalUnitDao orgUnitDao,
-                              ApplicationSearchDao appSearchDao) {
+                              ApplicationSearchDao appSearchDao,
+                              ApplicationIdSelectorFactory appIdSelectorFactory) {
         checkNotNull(appDao, "appDao must not be null");
         checkNotNull(appTagDao, "appTagDao must not be null");
         checkNotNull(appAliasDao, "appAliasDao must not be null");
         checkNotNull(orgUnitDao, "orgUnitDao must not be null");
         checkNotNull(appSearchDao, "appSearchDao must not be null");
+        checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
 
         this.applicationDao = appDao;
         this.appTagDao = appTagDao;
         this.appAliasDao = appAliasDao;
         this.orgUnitDao = orgUnitDao;
         this.appSearchDao = appSearchDao;
+        this.appIdSelectorFactory = appIdSelectorFactory;
     }
 
 
@@ -108,6 +110,11 @@ public class ApplicationService {
 
     public List<Application> findByIds(List<Long> ids) throws SQLException {
         return applicationDao.findByIds(ids);
+    }
+
+
+    public List<Application> findByAppIdSelector(ApplicationIdSelectionOptions options) {
+        return applicationDao.findByAppIdSelector(appIdSelectorFactory.apply(options));
     }
 
 

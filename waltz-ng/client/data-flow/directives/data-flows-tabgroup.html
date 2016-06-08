@@ -1,105 +1,87 @@
-<div>
+<div class="row">
+    <div class="col-md-6 col-md-offset-6">
+        <waltz-flow-filter-options-overlay visible="ctrl.optionsVisible"
+                                           on-change="ctrl.filterChanged"
+                                           types="ctrl.dataTypes">
+        </waltz-flow-filter-options-overlay>
+    </div>
 
-    <uib-tabset active="active">
-        <uib-tab index="0"
-                 heading="Summary">
-            <div class="row">
-                <div class="col-sm-4">
-                    <br>
-                    <waltz-flow-cloud-diagram
-                        width="300"
-                        height="300"
-                        stats="ctrl.flowData.stats">
-                    </waltz-flow-cloud-diagram>
+    <div class="col-md-12">
+        <uib-tabset active="active">
+            <uib-tab index="0"
+                     heading="Summary"
+                     select="ctrl.tabSelected('summary', 0)">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <br>
+                        <waltz-flow-cloud-diagram
+                            width="300"
+                            height="300"
+                            stats="ctrl.flowData.stats">
+                        </waltz-flow-cloud-diagram>
+                    </div>
+                    <div class="col-md-8">
+                        <br>
+                        <h4>Data Categories</h4>
+                        <table class="table table-condensed small table-striped">
+                            <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Count</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="row in ctrl.flowData.stats.dataTypeCounts">
+                                <td>{{ row.id | toDisplayName:'dataType' }}</td>
+                                <td>{{ row.count }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="col-md-8">
-                    <br>
-                    <h4>Data Categories</h4>
-                    <table class="table table-condensed small table-striped">
-                        <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Count</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="row in ctrl.flowData.stats.dataTypeCounts">
-                            <td>{{ row.id | toDisplayName:'dataType' }}</td>
-                            <td>{{ row.count }}</td>
-                        </tr>
-                        </tbody>
-                    </table>
+            </uib-tab>
+
+            <!-- GRAPH -->
+            <uib-tab index="1"
+                     heading="Graph"
+                     select="ctrl.tabSelected('graph', 1)">
+                <br>
+                <waltz-loading-notification show="ctrl.flowData.loadingFlows"
+                                            name="Loading Flow Data">
+                </waltz-loading-notification>
+
+                <div ng-if="ctrl.boingyEverShown && ctrl.flowData.flows.length > 0">
+
+                    <waltz-data-flow-diagram data="ctrl.filteredFlowData"
+                                             tweakers="ctrl.graphTweakers">
+                    </waltz-data-flow-diagram>
+
+                    <div class="small text-muted">
+                        Dragging nodes will pin them.  Double click to unpin.  If an application is gray
+                        it is not a member of this group.
+                    </div>
                 </div>
-            </div>
-        </uib-tab>
 
-        <!-- GRAPH -->
-        <uib-tab index="1"
-                 heading="Graph"
-                 select="ctrl.loadDetail(); ctrl.boingyEverShown = true">
-            <br>
-            <waltz-loading-notification show="ctrl.flowData.loadingFlows"
-                                        name="Loading Flow Data">
-            </waltz-loading-notification>
-            <div ng-if="ctrl.boingyEverShown && ctrl.flowData.flows.length > 0">
-                <waltz-org-unit-flow-viz entities="ctrl.entities"
-                                         flows="ctrl.flowData.flows"
-                                         tweakers="ctrl.options.graphTweakers">
-                </waltz-org-unit-flow-viz>
-                <div class="small text-muted">
-                    Dragging nodes will pin them.  Double click to unpin.  If an application is gray
-                    it is not a member of this group.
+            </uib-tab>
+
+            <!-- TABLE -->
+            <uib-tab index="2"
+                     heading="Table"
+                     select="ctrl.tabSelected('table', 2)">
+                <br>
+                <waltz-loading-notification show="ctrl.flowData.loadingFlows"
+                                            name="Loading Flow Data">
+                </waltz-loading-notification>
+                <div ng-if="ctrl.flowData.flows.length >0"
+                     class="waltz-scroll-region"
+                     style="height: 300px">
+                    <waltz-data-flow-table flows="ctrl.filteredFlowData.flows">
+
+                    </waltz-data-flow-table>
                 </div>
-            </div>
 
-        </uib-tab>
+            </uib-tab>
 
-        <!-- TABLE -->
-        <uib-tab index="2"
-                 heading="Table"
-                 select="ctrl.loadDetail()">
-            <br>
-            <waltz-loading-notification show="ctrl.flowData.loadingFlows"
-                                        name="Loading Flow Data">
-            </waltz-loading-notification>
-            <div ng-if="ctrl.flowData.flows.length >0"
-                 class="waltz-scroll-region"
-                 style="height: 300px">
-                <table class="table table-condensed table-striped small">
-                    <thead>
-                    <tr>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Categories</th>
-                    </tr>
-                    </thead>
-                    <tbody class="small">
-                    <tr ng-repeat="flow in ctrl.condensedFlows">
-                        <td>
-                            <a ui-sref="main.app.view ({id: flow.source.id })">
-                                <span ng-class="{ italics : flow.groupMembership.source }"
-                                      ng-bind="flow.source.name"></span>
-                            </a>
-                        </td>
-                        <td>
-                            <a ui-sref="main.app.view ({id: flow.target.id })">
-                                <span ng-class="{ italics : flow.groupMembership.target }"
-                                      ng-bind="flow.target.name">
-                                </span>
-                            </a>
-                        </td>
-                        <td>
-                            <waltz-keyword-list class="small"
-                                                keywords="flow.categories">
-                            </waltz-keyword-list>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-
-        </uib-tab>
-
-    </uib-tabset>
-
+        </uib-tabset>
+    </div>
 </div>

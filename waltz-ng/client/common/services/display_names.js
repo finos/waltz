@@ -110,6 +110,7 @@ export const entityNames = {
     LOGICAL_DATA_FLOW: "Logical Data Flow",
     ORG_UNIT: 'Org Unit',
     PERSON: 'Person',
+    PROCESS: 'Process',
     SERVER: 'Server',
     SOFTWARE: 'Software'
 };

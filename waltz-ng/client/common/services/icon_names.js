@@ -36,8 +36,9 @@ export const entityIconNames = {
     LOGICAL_DATA_FLOW: "random",
     ORG_UNIT: 'sitemap',
     PERSON: 'user',
+    PROCESS: 'code-fork',
     SERVER: 'server',
-    SOFTWARE: 'gift',
+    SOFTWARE: 'gift'
 };
 
 

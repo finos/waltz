@@ -142,26 +142,26 @@ public class ApplicationEndpoint implements Endpoint {
 
 
     private void registerQueries() {
-        ListRoute<Application> search = (request, response) -> appService.search(request.params("query"));
+        ListRoute<Application> searchRoute = (request, response) -> appService.search(request.params("query"));
 
-        ListRoute<LongTally> tallyByOrgUnit = (request, response) -> appService.countByOrganisationalUnit();
+        ListRoute<LongTally> tallyByOrgUnitRoute = (request, response) -> appService.countByOrganisationalUnit();
 
-        ListRoute<Application> findByOrgUnit = (req, res) -> {
+        ListRoute<Application> findByOrgUnitRoute = (req, res) -> {
             String ouId = req.params("ouId");
             return appService
                     .findByOrganisationalUnitId(parseLong(ouId));
         };
 
-        ListRoute<Application> findByOrgUnitTree = (req, res) -> {
+        ListRoute<Application> findByOrgUnitTreeRoute = (req, res) -> {
             String ouId = req.params("ouId");
             return appService
                     .findByOrganisationalUnitTree(parseLong(ouId));
         };
 
-        DatumRoute<Map<AssetCodeRelationshipKind, List<Application>>> findRelated
+        DatumRoute<Map<AssetCodeRelationshipKind, List<Application>>> findRelatedRoute
                 = (req, res) -> appService.findRelated(getId(req));
 
-        ListRoute<Application> findByIds = (req, res) -> {
+        ListRoute<Application> findByIdsRoute = (req, res) -> {
             List<Long> ids = readIdsFromBody(req);
             if (ListUtilities.isEmpty(ids)) {
                 return Collections.emptyList();
@@ -170,29 +170,33 @@ public class ApplicationEndpoint implements Endpoint {
                     .findByIds(ids);
         };
 
-        DatumRoute<Application> getById = (req, res) -> {
+        DatumRoute<Application> getByIdRoute = (req, res) -> {
             String id = req.params("id");
             return appService
                     .getById(parseLong(id));
         };
 
-        ListRoute<String> findAllTags = (request, response) ->
-                appService.findAllTags();
+        ListRoute<String> findAllTagsRoute = (request, response)
+                -> appService.findAllTags();
 
-        ListRoute<Application> findByTag = (request, response) ->
-                appService.findByTag(request.body());
+        ListRoute<Application> findByTagRoute = (request, response)
+                -> appService.findByTag(request.body());
 
-        getForList(mkPath(BASE_URL, "search", ":query"), search);
-        getForList(mkPath(BASE_URL, "org-unit", ":ouId"), findByOrgUnit);
-        getForList(mkPath(BASE_URL, "org-unit-tree", ":ouId"), findByOrgUnitTree);
-        getForList(mkPath(BASE_URL, "count-by", "org-unit"), tallyByOrgUnit);
-        getForList(mkPath(BASE_URL, "tags"), findAllTags);
+        ListRoute<Application> findBySelectorRoute = ((request, response)
+                -> appService.findByAppIdSelector(readOptionsFromBody(request)));
 
-        getForDatum(mkPath(BASE_URL, "id", ":id"), getById);
-        getForDatum(mkPath(BASE_URL, "id", ":id", "related"), findRelated);
+        getForList(mkPath(BASE_URL, "search", ":query"), searchRoute);
+        getForList(mkPath(BASE_URL, "org-unit", ":ouId"), findByOrgUnitRoute);
+        getForList(mkPath(BASE_URL, "org-unit-tree", ":ouId"), findByOrgUnitTreeRoute);
+        getForList(mkPath(BASE_URL, "count-by", "org-unit"), tallyByOrgUnitRoute);
+        getForList(mkPath(BASE_URL, "tags"), findAllTagsRoute);
 
-        postForList(mkPath(BASE_URL, "tags"), findByTag);  // POST as may not be good for qparam
-        postForList(mkPath(BASE_URL, "by-ids"), findByIds);
+        getForDatum(mkPath(BASE_URL, "id", ":id"), getByIdRoute);
+        getForDatum(mkPath(BASE_URL, "id", ":id", "related"), findRelatedRoute);
+
+        postForList(mkPath(BASE_URL, "tags"), findByTagRoute);  // POST as may not be good for qparam
+        postForList(mkPath(BASE_URL, "by-ids"), findByIdsRoute);
+        postForList(mkPath(BASE_URL, "selector"), findBySelectorRoute);
     }
 
 

@@ -10,19 +10,47 @@
  *
  */
 
+const BINDINGS = {
+    url: '@',
+    title: '@',
+    showUrl: '='
+};
+
+
+function toPrettyUrl(url = "") {
+    return _.truncate(url, { length: 60 });
+}
+
+
+function controller($scope) {
+
+    const vm = this;
+
+    $scope.$watchGroup(
+        ['ctrl.url', 'ctrl.title', 'ctrl.showUrl'],
+        ([url, title, showUrl = false]) => {
+            vm.prettyTitle = title
+                ? title
+                : toPrettyUrl(url);
+            vm.prettyUrl = toPrettyUrl(url);
+            vm.showAside = (showUrl && title && url);
+        });
+
+}
+
+
+controller.$inject = [
+    '$scope'
+];
+
 
 export default () => ({
     replace: true,
     restrict: 'E',
-    scope: {
-        url: '@',
-        title: '@',
-        showUrl: '='
-    },
-    link: (scope) => {
-        scope.linkTitle = scope.title || scope.url;
-        scope.showAside = (scope.showUrl && scope.title && scope.url);
-    },
-    template: '<a target="_blank" href="{{url}}">{{linkTitle}} <span class="text-muted small" ng-if="showAside">({{ url }})</span></a>'
+    scope: {},
+    bindToController: BINDINGS,
+    controllerAs: 'ctrl',
+    controller,
+    template: require('./external-link.html')
 });
 

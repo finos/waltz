@@ -1,0 +1,35 @@
+<div>
+
+    <waltz-page-header name="Processes"
+                       icon="code-fork">
+        <ol class="waltz-breadcrumbs">
+            <li>
+                <a ui-sref="main">Home</a>
+            </li>
+            <li>Processes</li>
+        </ol>
+    </waltz-page-header>
+
+
+    <!-- DIAGRAMS -->
+    <waltz-section name="Processes"
+                   small="Overview"
+                   ng-if="ctrl.diagrams.length > 0">
+        <waltz-svg-diagrams diagrams="ctrl.diagrams"
+                            block-processor="ctrl.blockProcessor">
+        </waltz-svg-diagrams>
+    </waltz-section>
+
+
+    <!-- LIST -->
+    <waltz-section icon='code-fork'
+                   name="Processes"
+                   small="All">
+        <waltz-section-actions>
+            <input type="search" ng-model="ctrl.processQuery" placeholder="Search...">
+        </waltz-section-actions>
+
+        <waltz-process-list processes="ctrl.filteredProcesses">
+        </waltz-process-list>
+    </waltz-section>
+</div>

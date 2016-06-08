@@ -12,7 +12,6 @@
 
 export default (module) => {
     module.directive('waltzDataFlowSection', require('./data-flow-section'));
-    module.directive('waltzDataFlowAppLink', require('./data-flow-app-link'));
     module.directive('waltzDataFlowTable', require('./data-flow-table'));
     module.directive('waltzExpandedRatedFlowChart', require('./rated-flow-chart/expanded-rated-flow-chart'));
     module.directive('waltzSummaryRatedFlowChart', require('./rated-flow-chart/summary-rated-flow-chart'));
@@ -20,8 +19,8 @@ export default (module) => {
     module.directive('waltzRatedFlowSummaryDetail', require('./rated-flow-chart/rated-flow-summary-detail'));
     module.directive('waltzAppDataFlowDiagram', require('./slope-graph/slope-graph-directive'));
     module.directive('waltzDataFlowDiagram', require('./boingy-graph/boingy-graph'));
-    module.directive('waltzDataFlowsByDirectionPie', require('./data-flows-by-direction-pie'));
     module.directive('waltzFlowCloudDiagram', require('./flow-cloud-diagram'));
     module.directive('waltzDataFlowsTabgroup', require('./data-flows-tabgroup'));
-
+    module.directive('waltzDataFlowsTabgroupSection', require('./data-flows-tabgroup-section'));
+    module.directive('waltzFlowFilterOptionsOverlay', require('./flow-filter-options-overlay'));
 };

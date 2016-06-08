@@ -93,7 +93,7 @@ public class DIConfiguration {
                 SQLDialect.valueOf(dialect),
                 new Settings()
                         .withRenderFormatted(true)
-                        .withExecuteLogging(false));
+                        .withExecuteLogging(true));
     }
 
 

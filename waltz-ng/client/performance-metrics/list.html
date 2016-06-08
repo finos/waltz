@@ -1,0 +1,80 @@
+<div>
+
+    <waltz-page-header name="Performance Metrics"
+                       icon="bar-chart">
+        <ol class="waltz-breadcrumbs">
+            <li>
+                <a ui-sref="main">Home</a>
+            </li>
+            <li>Performance Metrics</li>
+        </ol>
+    </waltz-page-header>
+
+    <waltz-section icon="bullseye"
+                   name="Performance Metric Packs">
+
+        <div class="row">
+
+            <div class="col-md-3">
+                <ul>
+                    <li ng-repeat="pack in ctrl.packs">
+                        <a href ng-click="ctrl.packSelected(pack)">
+                            <span ng-bind="pack.name"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-9" ng-if="ctrl.selectedPack != null">
+
+                <h4>
+                    <span ng-bind="ctrl.selectedPack.name"></span>
+                </h4>
+
+                <div class="waltz-paragraph small"
+                     ng-bind="ctrl.selectedPack.description">
+                </div>
+
+                <table class="table table-condensed small">
+                    <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Baseline</th>
+                        <th ng-repeat="checkpoint in ctrl.selectedPack.checkpoints">
+                            <span ng-bind="checkpoint.name"></span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody ng-repeat="(sectionName, items) in ctrl.selectedPack.sections">
+                    <tr style="background-color: #eee">
+                        <td colspan="5">
+                            <span ng-bind="sectionName"
+                                  class="strong"></span>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="item in items">
+                        <td>
+                            <span ng-bind="ctrl.definitionsById[item.definitionId].name">
+                            </span>
+                        </td>
+                        <td>
+                            <span ng-bind="ctrl.toPrettyBaseline(item)"></span>
+                        </td>
+                        <td ng-repeat="checkpoint in ctrl.selectedPack.checkpoints"
+                            ng-class="ctrl.cellClass(item, item.goalsByCheckpointId[checkpoint.id])">
+                            <span ng-bind="ctrl.toPrettyGoal(item.goalsByCheckpointId[checkpoint.id])">
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </waltz-section>
+
+    <waltz-section icon='bar-chart'
+                   name="Performance Metrics">
+        <waltz-performance-metric-definition-list definitions="ctrl.definitions">
+        </waltz-performance-metric-definition-list>
+    </waltz-section>
+</div>

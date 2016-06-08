@@ -111,16 +111,23 @@ function controller($scope,
                     technologyStatsService,
                     assetCostViewService,
                     bookmarkStore,
-                    dataFlowUtilityService,
                     sourceDataRatingStore) {
     const { id }  = $stateParams;
 
     const vm = Object.assign(this, initialState);
 
+
+    const appIdSelector = {
+        entityReference: {
+            kind: 'APP_GROUP',
+            id: id
+        },
+        scope: 'EXACT'
+    };
+
     const isUserAnOwner = member =>
             member.role === 'OWNER'
             && member.userId === vm.user.userName;
-
 
     dataFlowViewService.initialise(id, 'APP_GROUP', 'EXACT')
         .then(flows => vm.dataFlows = flows);
@@ -144,7 +151,7 @@ function controller($scope,
             appStore.findByIds(appIds),
             complexityStore.findBySelector(id, 'APP_GROUP', 'EXACT'),
             capabilityStore.findAll(),
-            appCapabilityStore.findApplicationCapabilitiesByAppIds(appIds),
+            appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(appIdSelector),
             ratingStore.findByAppIds(appIds),
             technologyStatsService.findBySelector(id, 'APP_GROUP', 'EXACT')
         ]))
@@ -165,9 +172,6 @@ function controller($scope,
         })
         .then(() => calculateCapabilities(vm.allCapabilities, vm.appCapabilities))
         .then(result => Object.assign(vm, result))
-        .then(() => vm.flowOptions = ({
-            graphTweakers: dataFlowUtilityService.buildGraphTweakers(_.map(vm.applications, "id"))
-        }))
         .then(() => sourceDataRatingStore.findAll())
         .then((ratings) => vm.sourceDataRatings = ratings);
 
@@ -211,7 +215,6 @@ controller.$inject = [
     'TechnologyStatisticsService',
     'AssetCostViewService',
     'BookmarkStore',
-    'DataFlowUtilityService',
     'SourceDataRatingStore'
 ];
 

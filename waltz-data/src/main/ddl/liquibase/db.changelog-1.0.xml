@@ -1484,4 +1484,196 @@
                        tableName="complexity_score"/>
     </changeSet>
 
+
+    <!-- 183: Performance Metrics -->
+    <changeSet author="dwatkins"
+               id="20160601-183-1">
+        <createTable tableName="performance_metric_definition">
+            <column name="id" type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="description" type="${longvarchar.type}"/>
+            <column name="category_name" type="VARCHAR(255)"/>
+            <column name="category_description" type="${longvarchar.type}"/>
+        </createTable>
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="performance_metric_defn_pkey"
+                       tableName="performance_metric_definition"/>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               id="20160602-183-2">
+        <createTable tableName="perf_metric_pack">
+            <column name="id" type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${longvarchar.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="perf_metric_pack_pkey"
+                       tableName="perf_metric_pack"/>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               id="20160602-183-3">
+        <createTable tableName="perf_metric_pack_checkpoint">
+            <column name="id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pack_id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="year"
+                    type="${int.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quarter"
+                    type="${int.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${longvarchar.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="perf_metric_pack_checkpoint_pk"
+                       tableName="perf_metric_pack_checkpoint"/>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               id="20160602-183-4">
+        <dropPrimaryKey constraintName="performance_metric_defn_pkey"
+                        tableName="performance_metric_definition"/>
+
+        <renameTable newTableName="perf_metric_definition"
+                     oldTableName="performance_metric_definition"/>
+
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="perf_metric_definition_pkey"
+                       tableName="perf_metric_definition"/>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20160602-183-5">
+        <createTable tableName="perf_metric_pack_item">
+            <column name="id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="definition_id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="section_name"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="baseline"
+                    type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="perf_metric_pack_item_pkey"
+                       tableName="perf_metric_pack_item"/>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               id="20160602-183-6">
+        <createTable tableName="perf_metric_pack_item_goal">
+
+            <column name="checkpoint_id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pack_item_id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kind"
+                    type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="checkpoint_id, pack_item_id"
+                       constraintName="perf_metric_pack_item_goal_pk"
+                       tableName="perf_metric_pack_item_goal"/>
+    </changeSet>
+
+    <changeSet id="20160602-183-7"
+               author="dwatkins">
+        <addColumn tableName="perf_metric_pack_item">
+            <column name="pack_id"
+                    type="${long.type}"/>
+        </addColumn>
+    </changeSet>
+
+    <!-- 184 PROCESS -->
+
+    <changeSet author="dwatkins" id="20160603-184-1">
+        <createTable tableName="process">
+            <column name="id" type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="${long.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="level_1" type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="level_2" type="${long.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="level_3" type="${long.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="description" type="${longvarchar.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160603-184-2">
+        <addColumn tableName="process">
+            <column name="level" type="${int.type}" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+
 </databaseChangeLog>

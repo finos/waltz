@@ -33,7 +33,11 @@ function controller(capabilities, appCapabilityStore, svgStore, $state) {
     };
 }
 
-controller.$inject = ['capabilities', 'AppCapabilityStore', 'SvgDiagramStore', '$state'];
+controller.$inject = [
+    'capabilities', 
+    'AppCapabilityStore', 
+    'SvgDiagramStore', 
+    '$state'];
 
 
 export default {
