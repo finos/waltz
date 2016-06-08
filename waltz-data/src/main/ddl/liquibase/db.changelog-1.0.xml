@@ -1743,5 +1743,26 @@
     </changeSet>
 
 
+    <!-- 185 PROVENANCE -->
+    <changeSet author="dwatkins" id="20160608-185-1">
+
+        <addColumn tableName="capability">
+            <column name="provenance"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="app_capability">
+            <column name="provenance"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+    </changeSet>
+
+
 
 </databaseChangeLog>

@@ -20,10 +20,7 @@ package com.khartec.waltz.model.capability;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.DescriptionProvider;
-import com.khartec.waltz.model.IdProvider;
-import com.khartec.waltz.model.NameProvider;
-import com.khartec.waltz.model.ParentIdProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 import java.util.Optional;
@@ -36,7 +33,8 @@ public abstract class Capability implements
         IdProvider,
         NameProvider,
         DescriptionProvider,
-        ParentIdProvider {
+        ParentIdProvider,
+        ProvenanceProvider {
 
     public abstract int level();
 

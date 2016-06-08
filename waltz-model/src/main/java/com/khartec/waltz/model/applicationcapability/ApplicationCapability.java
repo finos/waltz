@@ -19,13 +19,14 @@ package com.khartec.waltz.model.applicationcapability;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableApplicationCapability.class)
 @JsonDeserialize(as = ImmutableApplicationCapability.class)
-public abstract class ApplicationCapability {
+public abstract class ApplicationCapability implements ProvenanceProvider {
 
     public abstract long capabilityId();
     public abstract long applicationId();
