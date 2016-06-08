@@ -20,7 +20,6 @@ const initialState = {
         data: []
     },
     dataFlows: [],
-    dataFlowOptions: {},
     process: null,
     selectedCapability: null,
     selectedApplication: null,
@@ -70,7 +69,6 @@ function controller($scope,
                     assetCostViewService,
                     bookmarkStore,
                     capabilityStore,
-                    dataFlowUtilityService,
                     dataFlowViewService,
                     processStore,
                     sourceDataRatingStore) {
@@ -108,8 +106,7 @@ function controller($scope,
 
     applicationStore
         .findBySelector(selectorOptions)
-        .then(apps => vm.applications = apps)
-        .then(apps => vm.dataFlowOptions.graphTweakers = dataFlowUtilityService.buildGraphTweakers(_.map(apps, 'id')));
+        .then(apps => vm.applications = apps);
 
     bookmarkStore
         .findByParent({ id: processId, kind: 'PROCESS'})
@@ -204,7 +201,6 @@ controller.$inject = [
     'AssetCostViewService',
     'BookmarkStore',
     'CapabilityStore',
-    'DataFlowUtilityService',
     'DataFlowViewService',
     'ProcessStore',
     'SourceDataRatingStore'

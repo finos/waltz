@@ -111,7 +111,6 @@ function controller($scope,
                     technologyStatsService,
                     assetCostViewService,
                     bookmarkStore,
-                    dataFlowUtilityService,
                     sourceDataRatingStore) {
     const { id }  = $stateParams;
 
@@ -129,7 +128,6 @@ function controller($scope,
     const isUserAnOwner = member =>
             member.role === 'OWNER'
             && member.userId === vm.user.userName;
-
 
     dataFlowViewService.initialise(id, 'APP_GROUP', 'EXACT')
         .then(flows => vm.dataFlows = flows);
@@ -174,9 +172,6 @@ function controller($scope,
         })
         .then(() => calculateCapabilities(vm.allCapabilities, vm.appCapabilities))
         .then(result => Object.assign(vm, result))
-        .then(() => vm.flowOptions = ({
-            graphTweakers: dataFlowUtilityService.buildGraphTweakers(_.map(vm.applications, "id"))
-        }))
         .then(() => sourceDataRatingStore.findAll())
         .then((ratings) => vm.sourceDataRatings = ratings);
 
@@ -220,7 +215,6 @@ controller.$inject = [
     'TechnologyStatisticsService',
     'AssetCostViewService',
     'BookmarkStore',
-    'DataFlowUtilityService',
     'SourceDataRatingStore'
 ];
 

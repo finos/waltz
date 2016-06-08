@@ -11,12 +11,18 @@
  *
  */
 
+const BINDINGS = {
+    flows: '=',
+    selfId: '@'
+};
+
+
 export default () => ({
     restrict: 'E',
     replace: true,
     template: require('./data-flow-table.html'),
-    scope: {
-        flows: '=',
-        selfId: '@'
-    }
+    controller: () => {},
+    bindToController: BINDINGS,
+    controllerAs: 'ctrl',
+    scope: {}
 });

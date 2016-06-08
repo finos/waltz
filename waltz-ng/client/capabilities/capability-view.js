@@ -25,7 +25,6 @@ const initialState = {
     capability: null,
     complexity: [],
     dataFlows: [],
-    flowOptions: null,
     groupedApps: null,
     processes: [],
     ratings: null,
@@ -128,7 +127,6 @@ function controller($q,
                     bookmarkStore,
                     capabilities,
                     complexityStore,
-                    dataFlowUtilityService,
                     dataFlowViewService,
                     historyStore,
                     perspectiveStore,
@@ -202,9 +200,7 @@ function controller($q,
                 vm.sourceDataRatings = sourceDataRatings;
             });
 
-            vm.flowOptions = {
-                graphTweakers: dataFlowUtilityService.buildGraphTweakers(appIds)
-            };
+
         });
 
 
@@ -267,7 +263,6 @@ controller.$inject = [
     'BookmarkStore',
     'capabilities',
     'ComplexityStore',
-    'DataFlowUtilityService',
     'DataFlowViewService',
     'HistoryStore',
     'PerspectiveStore',

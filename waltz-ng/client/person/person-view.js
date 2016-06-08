@@ -53,21 +53,15 @@ function mkAppChartData(apps) {
 function controller($scope,
                     $stateParams,
                     viewService,
-                    historyStore,
-                    dataFlowUtilityService) {
+                    historyStore) {
 
     const vm = this;
     vm.state = viewService.state;
 
     const employeeId = $stateParams.empId;
 
-    const getAppIds = () => _.map(vm.state.model.apps, "id");
-
     viewService
-        .load(employeeId)
-        .then(() => vm.flowOptions = {
-                graphTweakers: dataFlowUtilityService.buildGraphTweakers(getAppIds())
-        });
+        .load(employeeId);
 
 
     $scope.$watch(() => viewService.state.model, () => {
@@ -101,8 +95,7 @@ controller.$inject = [
     '$scope',
     '$stateParams',
     'PersonViewDataService',
-    'HistoryStore',
-    'DataFlowUtilityService'
+    'HistoryStore'
 ];
 
 

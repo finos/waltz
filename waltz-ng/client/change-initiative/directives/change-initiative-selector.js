@@ -15,10 +15,11 @@ function controller(changeInitiativeStore) {
         if (!query) return;
         return changeInitiativeStore
             .search(query)
-            .then((results) => this.results = results);
+            .then((results) => vm.results = results);
     };
 
 }
+
 
 controller.$inject = ['ChangeInitiativeStore'];
 

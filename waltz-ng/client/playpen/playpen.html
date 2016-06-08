@@ -1,6 +1,5 @@
-
-
 <div>
+
 
     <waltz-page-header name="Playpen"
                        small=""
@@ -11,43 +10,31 @@
         </ol>
     </waltz-page-header>
 
-    <waltz-section name="Change Initiative Selector">
+    <button ng-click="ctrl.flowOptionsVisible = !ctrl.flowOptionsVisible"
+            class='btn'>
+        Toggle
+    </button>
 
-        <waltz-change-initiative-selector model="ctrl.model"></waltz-change-initiative-selector>
+    <waltz-section name="Data Flows">
 
-        <table class="table table-condensed table-striped small">
-            <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="item in ctrl.list" class="waltz-visibility-parent">
-                <td><span ng-bind="item.externalId"></span></td>
-                <td><span ng-bind="item.name"></span></td>
-                <td>
-                    <a ng-click="ctrl.remove(item.id)" href class="waltz-visibility-child-50">
-                        <waltz-icon name="trash"></waltz-icon>
-                        Remove
-                    </a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="row">
+            <div class="col-md-offset-7 col-md-5">
+                <waltz-flow-filter-options-overlay visible="ctrl.flowOptionsVisible"
+                                                   on-change="ctrl.filterChanged"
+                                                   types="ctrl.dataTypes">
+                </waltz-flow-filter-options-overlay>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <waltz-data-flow-diagram data="ctrl.flowData"
+                                         tweakers="ctrl.graphTweakers">
+                </waltz-data-flow-diagram>
+            </div>
+        </div>
 
     </waltz-section>
-
-
-    <waltz-section name="Change Initiatives"
-                   icon="paper-plane-o">
-
-        <waltz-change-initiative-table list="ctrl.list">
-        </waltz-change-initiative-table>
-
-    </waltz-section>
-
 
 
 </div>

@@ -1,4 +1,4 @@
-<table class="table table-condensed table-hover">
+<table class="table table-condensed table-hover small">
     <thead>
     <tr>
         <th>Source</th>
@@ -7,11 +7,13 @@
         <th>Data Type</th>
     </tr>
     </thead>
-    <tr ng-repeat="flow in flows | orderBy:'sourceEntity.name + targetEntity.name'">
+    <tr ng-repeat="flow in ctrl.flows | orderBy:'sourceEntity.name + targetEntity.name'">
 
         <td>
-            <waltz-data-flow-app-link app="flow.sourceEntity"
-                                      self-id="{{ selfId }}"></waltz-data-flow-app-link>
+            <a ui-sref="main.app.view ({id: ctrl.source.id })">
+                <span ng-bind="flow.source.name">
+                </span>
+            </a>
         </td>
 
         <td>
@@ -19,8 +21,10 @@
         </td>
 
         <td>
-            <waltz-data-flow-app-link app="flow.targetEntity"
-                                      self-id="{{ selfId }}"></waltz-data-flow-app-link>
+            <a ui-sref="main.app.view ({id: ctrl.target.id })">
+                <span ng-bind="flow.target.name">
+                </span>
+            </a>
         </td>
 
         <td>

@@ -26,6 +26,5 @@ export default (module) => {
         }
     ]);
 
-    module.directive("waltzChangeInitiativeSelector", require("./change-initiative-selector"));
-
+   
 };

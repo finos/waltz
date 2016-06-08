@@ -182,29 +182,14 @@
     </waltz-bookmarks-section>
 
 
-
     <!-- FLOWS -->
-    <waltz-section name="Logical Data Flows"
-                   icon="random">
+    <waltz-data-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
+                                       flow-data="ctrl.dataFlows"
+                                       on-load-detail="ctrl.loadFlowDetail"
+                                       applications="ctrl.applications">
 
-        <waltz-section-actions>
-            <button class="btn btn-xs waltz-btn-transparent"
-                    ng-click="ctrl.visibility.flowOverlay = !ctrl.visibility.flowOverlay">
-                <waltz-icon name="map-signs"></waltz-icon>
-            </button>
-        </waltz-section-actions>
+    </waltz-data-flows-tabgroup-section>
 
-        <waltz-source-data-overlay visible="ctrl.visibility.flowOverlay"
-                                   ratings="ctrl.sourceDataRatings"
-                                   entities="['LOGICAL_DATA_FLOW']">
-        </waltz-source-data-overlay>
-
-        <waltz-data-flows-tabgroup flow-data="ctrl.dataFlows"
-                                   on-load-detail="ctrl.loadFlowDetail"
-                                   options="ctrl.dataFlowOptions">
-        </waltz-data-flows-tabgroup>
-
-    </waltz-section>
 
     <!-- APPLICATIONS -->
     <waltz-section name="All Participating Applications"

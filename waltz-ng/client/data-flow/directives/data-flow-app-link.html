@@ -1,11 +1,10 @@
 <span>
-    <a ng-if="app.id != selfId"
-       ui-sref="main.app.view ({id: app.id })">
-        <strong>
-            {{app.name}}
+    <a ng-if="ctrl.app.id != ctrl.selfId"
+       ui-sref="main.app.view ({id: ctrl.app.id })">
+        <strong ng-bind="ctrl.app.name">
         </strong>
     </a>
-    <i ng-if="app.id == selfId">
-        {{ app.name }}
+    <i ng-if="ctrl.app.id == ctrl.selfId"
+       ng-bind="ctrl.app.name">
     </i>
 </span>

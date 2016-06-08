@@ -10,12 +10,26 @@
  *
  */
 
-export default () => ({
+/**
+ * Renders a link to the given app or simply renders
+ * a span if the link is going to 'selfId'
+ */
+
+const BINDINGS = {
+    app: '=',
+    selfId: '@'
+};
+
+
+const directive = {
     restrict: 'E',
     replace: true,
     template: require('./data-flow-app-link.html'),
-    scope: {
-        app: '=',
-        selfId: '@'
-    }
-});
+    scope: {},
+    controller: () => {},
+    bindToController: BINDINGS,
+    controllerAs: 'ctrl'
+};
+
+
+export default () => directive;
