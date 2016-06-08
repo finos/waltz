@@ -12,7 +12,6 @@
 
 export default (module) => {
     module.directive('waltzDataFlowSection', require('./data-flow-section'));
-    module.directive('waltzDataFlowAppLink', require('./data-flow-app-link'));
     module.directive('waltzDataFlowTable', require('./data-flow-table'));
     module.directive('waltzExpandedRatedFlowChart', require('./rated-flow-chart/expanded-rated-flow-chart'));
     module.directive('waltzSummaryRatedFlowChart', require('./rated-flow-chart/summary-rated-flow-chart'));
