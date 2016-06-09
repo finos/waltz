@@ -32,7 +32,7 @@ import java.util.Optional;
 public abstract class ServerInfo implements IdProvider, ProvenanceProvider {
 
     public abstract String hostname();
-    public abstract String operatingSystem();
+    public abstract Optional<String> operatingSystem();
     public abstract Optional<String> operatingSystemVersion();
     public abstract String environment();
     public abstract Optional<String> location();

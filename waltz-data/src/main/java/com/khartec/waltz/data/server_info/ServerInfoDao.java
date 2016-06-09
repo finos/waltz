@@ -59,7 +59,7 @@ public class ServerInfoDao {
                 .assetCode(row.getAssetCode())
                 .hostname(row.getHostname())
                 .virtual(row.getIsVirtual() == null ? false : row.getIsVirtual())
-                .operatingSystem(row.getOperatingSystem())
+                .operatingSystem(Optional.ofNullable(row.getOperatingSystem()))
                 .operatingSystemVersion(Optional.ofNullable(row.getOperatingSystemVersion()))
                 .environment(row.getEnvironment())
                 .location(Optional.ofNullable(row.getLocation()))
@@ -111,7 +111,7 @@ public class ServerInfoDao {
                                     SERVER_INFORMATION.PROVENANCE)
                             .values(
                                     s.hostname(),
-                                    s.operatingSystem(),
+                                    s.operatingSystem().orElse(""),
                                     s.operatingSystemVersion().orElse(""),
                                     s.country().orElse(""),
                                     s.virtual(),
