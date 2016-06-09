@@ -1674,6 +1674,95 @@
         </addColumn>
     </changeSet>
 
+    <!-- 190 NULLABLES -->
+
+    <changeSet author="dwatkins" id="20160608-190-1">
+        <dropNotNullConstraint columnDataType="${clob.type}"
+                               columnName="description"
+                               tableName="application_group"/>
+
+    </changeSet>
+    <changeSet author="dwatkins" id="20160608-190-2">
+        <dropNotNullConstraint columnDataType="${longvarchar.type}"
+                               columnName="description"
+                               tableName="capability"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160608-190-3">
+        <dropNotNullConstraint columnDataType="${longvarchar.type}"
+                               columnName="description"
+                               tableName="data_type"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160608-190-4">
+        <dropNotNullConstraint columnDataType="${longvarchar.type}"
+                               columnName="description"
+                               tableName="end_user_application"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160608-190-5">
+        <dropNotNullConstraint columnDataType="${longvarchar.type}"
+                               columnName="description"
+                               tableName="perf_metric_pack"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160608-190-6">
+        <dropNotNullConstraint columnDataType="${longvarchar.type}"
+                               columnName="description"
+                               tableName="perf_metric_pack_checkpoint"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160608-190-7">
+        <dropNotNullConstraint columnDataType="${longvarchar.type}"
+                               columnName="description"
+                               tableName="perspective"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160608-190-8">
+        <dropNotNullConstraint columnDataType="${longvarchar.type}"
+                               columnName="description"
+                               tableName="perspective_measurable"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160608-190-9">
+        <dropNotNullConstraint columnDataType="${longvarchar.type}"
+                               columnName="description"
+                               tableName="process"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160608-190-10">
+        <dropNotNullConstraint columnDataType="${clob.type}"
+                               columnName="description"
+                               tableName="svg_diagram"/>
+    </changeSet>
+
+    <changeSet author="dwatkins" id="20160608-190-11">
+        <dropNotNullConstraint columnDataType="VARCHAR(255)"
+                               columnName="description"
+                               tableName="trait"/>
+    </changeSet>
+
+
+    <!-- 185 PROVENANCE -->
+    <changeSet author="dwatkins" id="20160608-185-1">
+
+        <addColumn tableName="capability">
+            <column name="provenance"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="app_capability">
+            <column name="provenance"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+    </changeSet>
+
 
 
 </databaseChangeLog>
