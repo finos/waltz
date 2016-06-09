@@ -1764,5 +1764,12 @@
     </changeSet>
 
 
+    <!-- 193 server_information - operating_system NULLABLE -->
+    <changeSet author="dwatkins" id="20160609-193-1">
+        <dropNotNullConstraint columnDataType="VARCHAR(128)"
+                               columnName="operating_system"
+                               tableName="server_information"/>
+
+    </changeSet>
 
 </databaseChangeLog>
