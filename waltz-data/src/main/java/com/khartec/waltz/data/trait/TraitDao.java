@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.Trait.TRAIT;
 
 @Repository
@@ -24,7 +25,7 @@ public class TraitDao {
         TraitRecord record = r.into(TRAIT);
         return ImmutableTrait.builder()
                 .id(record.getId())
-                .description(record.getDescription())
+                .description(mkSafe(record.getDescription()))
                 .icon(record.getIcon())
                 .name(record.getName())
                 .applicationDeclarable(record.getApplicationDeclarable())

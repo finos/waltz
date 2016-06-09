@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static com.khartec.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
 
@@ -24,7 +25,7 @@ public class AppGroupDao {
         ApplicationGroupRecord record = r.into(APPLICATION_GROUP);
         return ImmutableAppGroup.builder()
                 .name(record.getName())
-                .description(record.getDescription())
+                .description(mkSafe(record.getDescription()))
                 .id(record.getId())
                 .kind(AppGroupKind.valueOf(record.getKind()))
                 .build();

@@ -55,4 +55,10 @@ public class StringUtilities {
             return dflt;
         }
     }
+
+    public static String mkSafe(String str) {
+        return str == null
+                ? ""
+                : str;
+    }
 }
