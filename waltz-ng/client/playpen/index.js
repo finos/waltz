@@ -26,8 +26,5 @@ export default (module) => {
         }
     ]);
 
-    module.directive('waltzRagLine', require('./rag-line'));
-    module.directive('waltzRatingExplorerSection', require('./rating-explorer-section'));
-    module.directive('waltzSimpleStackChart', require('./simple-stack-chart'));
 
 };

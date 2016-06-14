@@ -1,6 +1,6 @@
 import _ from "lodash";
 import d3 from "d3";
-import {buildHierarchies} from "../common";
+import {buildHierarchies} from "../../../common";
 
 const BINDINGS = {
     applications: '=',

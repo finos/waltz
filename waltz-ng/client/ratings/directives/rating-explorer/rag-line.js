@@ -1,5 +1,5 @@
 import d3 from "d3";
-import {red, amber, green, grey} from "../common/colors";
+import {red, amber, green, grey} from "../../../common/colors";
 
 
 const BINDINGS = {
