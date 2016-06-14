@@ -1772,4 +1772,26 @@
 
     </changeSet>
 
+
+    <!-- 195 server_information - operating_system should NOT be nullable -->
+    <changeSet author="dwatkins" id="20160613-195-1">
+        <addNotNullConstraint columnDataType="VARCHAR(128)"
+                              columnName="operating_system"
+                              defaultNullValue="UNKNOWN"
+                              tableName="server_information"/>
+        <addNotNullConstraint columnDataType="VARCHAR(128)"
+                              columnName="operating_system_version"
+                              defaultNullValue="UNKNOWN"
+                              tableName="server_information"/>
+        <addNotNullConstraint columnDataType="VARCHAR(128)"
+                              columnName="location"
+                              defaultNullValue="UNKNOWN"
+                              tableName="server_information"/>
+        <addNotNullConstraint columnDataType="VARCHAR(128)"
+                              columnName="country"
+                              defaultNullValue="UNKNOWN"
+                              tableName="server_information"/>
+
+    </changeSet>
+
 </databaseChangeLog>

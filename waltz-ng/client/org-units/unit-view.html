@@ -28,6 +28,7 @@
         </ol>
     </waltz-page-header>
 
+
     <!-- OVERVIEW -->
     <waltz-org-unit-overview parent="ctrl.viewData.immediateHierarchy.parent"
                              all-units="ctrl.viewData.orgUnits"
@@ -57,43 +58,12 @@
 
 
     <!-- CAPABILITIES -->
-    <waltz-section name="Application Capability Ratings"
-                   id="ratings-section"
-                   icon="puzzle-piece">
-
-        <waltz-section-actions xng-if="ctrl.ratings.groups.length > 0">
-            <button class='btn btn-xs btn-primary' ng-click="ctrl.ratings.actions.expandAll()">
-                <waltz-icon name="plus-square"></waltz-icon> Expand All
-            </button>
-            <button class='btn btn-xs btn-primary' ng-click="ctrl.ratings.actions.collapseAll()">
-                <waltz-icon name="minus-square"></waltz-icon> Collapse All
-            </button>
-            <button class="btn btn-xs waltz-btn-transparent"
-                    ng-click="ctrl.visibility.capabilityOverlay = ! ctrl.visibility.capabilityOverlay">
-                <waltz-icon name="map-signs"></waltz-icon>
-            </button>
-        </waltz-section-actions>
-
-        <waltz-source-data-overlay visible="ctrl.visibility.capabilityOverlay"
-                                   ratings="ctrl.viewData.sourceDataRatings"
-                                   entities="['APP_CAPABILITY', 'APP_RATING']">
-        </waltz-source-data-overlay>
-
-
-        <div ng-if="ctrl.ratings.groups.length > 0">
-            <waltz-rating-groups measurables='ctrl.ratings.measurables'
-                                 groups="ctrl.ratings.groups"
-                                 tweakers="ctrl.ratings.tweakers"></waltz-rating-groups>
-
-            <p class="text-muted small" style="margin-top: 32px">
-                This section shows capabilities performed by applications within this organisational unit.
-            </p>
-        </div>
-
-        <div ng-if="ctrl.ratings.groups.length == 0" class="alert alert-warning">
-            There are no rated capabilities for any member of this group.
-        </div>
-    </waltz-section>
+    <waltz-rating-explorer-section applications="ctrl.viewData.apps"
+                                   app-capabilities="ctrl.viewData.rawAppCapabilities"
+                                   capabilities="ctrl.viewData.capabilities"
+                                   ratings="ctrl.viewData.capabilityRatings"
+                                   source-data-ratings="ctrl.viewData.sourceDataRatings">
+    </waltz-rating-explorer-section>
 
 
     <!-- FLOWS -->

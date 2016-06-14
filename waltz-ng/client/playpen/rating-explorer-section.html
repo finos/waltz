@@ -1,0 +1,161 @@
+<div>
+
+    <waltz-section name="Application Capability Ratings Explorer"
+                   id="ratings-section"
+                   icon="puzzle-piece">
+
+
+
+        <waltz-section-actions xng-if="ctrl.ratings.groups.length > 0">
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.visibility.sourceDataRatings = ! ctrl.visibility.sourceDataRatings">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.visibility.sourceDataRatings"
+                                   ratings="ctrl.sourceDataRatings"
+                                   entities="['APP_CAPABILITY', 'APP_RATING']">
+        </waltz-source-data-overlay>
+
+        <style>
+            .info-line {
+                border: 0;
+                margin: 0;
+                padding-left: 24px;
+                display: block;
+            }
+        </style>
+
+        <div class="row">
+            <div class="col-md-4">
+                <treecontrol class="tree-light"
+                             tree-model="ctrl.capabilityTree.data"
+                             order-by="name"
+                             on-selection="ctrl.selectCapability(node)"
+                             options="ctrl.capabilityTree.options">
+                        <span ng-class="{ 'waltz-inherited-value' : node.implied }">
+                            <span class="waltz-visibility-parent">
+
+
+                                <span ng-bind="node.name"></span>
+                                <span class="small waltz-visibility-child-30" title="# Direct / # Cumulative">
+                                    (
+                                    <span class="small"
+                                          ng-bind="node.appCounts.direct"></span>
+                                    <span ng-if="node.children.length > 0">
+                                        /
+                                        <span class="small text-muted"
+                                              ng-bind="node.appCounts.cumulative">
+
+                                        </span>
+                                    </span>
+                                    )
+                                </span>
+
+                                <waltz-rag-line class="info-line"
+                                                scores="node.scores.cumulative"
+                                                range="$parent.ctrl.capabilityTree.appCountRange">
+                                </waltz-rag-line>
+                            </span>
+                        </span>
+                </treecontrol>
+            </div>
+
+            <div class="col-md-3">
+                <table class="waltz-rating-table table small table-condensed table-hover"
+                       ng-if="ctrl.selectedCapabilities.length > 0">
+                    <thead>
+                    <tr>
+                        <th class="rotated"><div><span>Strategic</span></div></th>
+                        <th class="rotated"><div><span>With Issues</span></div></th>
+                        <th class="rotated"><div><span>Non-Strategic</span></div></th>
+                        <th class="rotated"><div><span>Unknown</span></div></th>
+                    </tr>
+                    </thead>
+                    <tbody ng-repeat="cap in ctrl.selectedCapabilities">
+                    <tr ng-class="{ info: cap.id == ctrl.focusedCapability.id }"
+                        class="waltz-visibility-parent">
+                        <td colspan="4" ng-click="ctrl.focusOnCapability(cap)">
+                            <span ng-bind="cap.name"></span>
+                            &nbsp;
+                            <waltz-icon name="times-circle"
+                                        style="color: red;"
+                                        class="waltz-visibility-child-10"
+                                        size="lg"
+                                        ng-click="ctrl.removeCapability(cap)"></waltz-icon>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td ng-class="{ info: cap.id == ctrl.focusedCapability.id && 'G' == ctrl.focusedScore }"
+                            ng-click="ctrl.focusOnCapability(cap, 'G')">
+                            <waltz-simple-stack-chart class='rag-G'
+                                                      max="ctrl.capabilityTree.appCountRange[1]"
+                                                      values="[cap.scores.direct.G, cap.scores.cumulative.G]">
+                            </waltz-simple-stack-chart>
+                        </td>
+                        <td ng-class="{ info: cap.id == ctrl.focusedCapability.id && 'A' == ctrl.focusedScore }"
+                            ng-click="ctrl.focusOnCapability(cap, 'A')">
+                            <waltz-simple-stack-chart class='rag-A'
+                                                      max="ctrl.capabilityTree.appCountRange[1]"
+                                                      values="[cap.scores.direct.A, cap.scores.cumulative.A]">
+                            </waltz-simple-stack-chart>
+                        </td>
+                        <td ng-class="{ info: cap.id == ctrl.focusedCapability.id && 'R' == ctrl.focusedScore }"
+                            ng-click="ctrl.focusOnCapability(cap, 'R')">
+                            <waltz-simple-stack-chart class='rag-R'
+                                                      max="ctrl.capabilityTree.appCountRange[1]"
+                                                      values="[cap.scores.direct.R, cap.scores.cumulative.R]">
+                            </waltz-simple-stack-chart>
+                        </td>
+                        <td ng-class="{ info: cap.id == ctrl.focusedCapability.id && 'Z' == ctrl.focusedScore }"
+                            ng-click="ctrl.focusOnCapability(cap, 'Z')">
+                            <waltz-simple-stack-chart class='rag-Z'
+                                                      max="ctrl.capabilityTree.appCountRange[1]"
+                                                      values="[cap.scores.direct.Z, cap.scores.cumulative.Z]">
+                            </waltz-simple-stack-chart>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-5">
+                <div ng-show="ctrl.visibility.appList">
+                    <strong ng-bind="ctrl.focusedCapability.name"></strong>
+                    <p class="waltz-paragraph small text-muted"
+                       ng-bind="ctrl.focusedCapability.description">
+                    </p>
+                    <div class="waltz-scroll-region"
+                         style="height: 350px">
+                        <table class="table table-condensed small">
+                            <tr ng-repeat="app in ctrl.focusedApps">
+                                <td ng-class="{
+                                    danger : app.score == 'R',
+                                    warning : app.score == 'A',
+                                    success : app.score == 'G' }">
+                                    <a ui-sref="main.app.view ({id: app.id})">
+                                        <span ng-bind="app.name"
+                                              uib-popover="{{ app.description }}"
+                                              popover-placement="left"
+                                              popover-trigger="mouseenter">
+                                        </span>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <p class="waltz-paragraph small">
+            This view allows you to select a capability related to this group and
+            see a breakdown of which apps preform that capability and their rating.
+        </p>
+
+    </waltz-section>
+
+</div>

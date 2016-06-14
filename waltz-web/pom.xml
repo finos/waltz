@@ -12,7 +12,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>waltz-web</artifactId>
-    <packaging>war</packaging>
+    <packaging>war,jar</packaging>
     <name>waltz-web</name>
     <url>http://maven.apache.org</url>
 

@@ -19,10 +19,7 @@ package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.application.ApplicationService;
-import org.jooq.DSLContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import com.khartec.waltz.model.trait.ImmutableTrait;
 
 import java.util.List;
 import java.util.Map;
@@ -34,19 +31,29 @@ public class AppHarness {
 
     public static void main(String[] args) {
 
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        ApplicationService applicationService = ctx.getBean(ApplicationService.class);
-        DSLContext dsl = ctx.getBean(DSLContext.class);
+//        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+//        ApplicationService applicationService = ctx.getBean(ApplicationService.class);
+//        DSLContext dsl = ctx.getBean(DSLContext.class);
+//
+//        List<String> tagList = applicationService.findAllTags();
+//
+//        tagList.forEach(System.out::println);
+//
+//        System.out.println("---------------");
+//
+//        applicationService.findByTag("not-good-at-flying").forEach(a -> System.out.println(a.name()));
+//
+//        System.out.println(applicationService.findTagsForApplication(521L));
+//
 
-        List<String> tagList = applicationService.findAllTags();
+        ImmutableTrait t = ImmutableTrait.builder()
+                .description("HEllo")
+                .icon("Hello")
+                .name("fdjlkfjd;")
+                .applicationDeclarable(true)
+                .build();
 
-        tagList.forEach(System.out::println);
-
-        System.out.println("---------------");
-
-        applicationService.findByTag("not-good-at-flying").forEach(a -> System.out.println(a.name()));
-
-        System.out.println(applicationService.findTagsForApplication(521L));
+        System.out.println(t);
     }
 
 

@@ -20,11 +20,14 @@ export default (module) => {
         ($stateProvider) => {
             $stateProvider
                 .state('main.playpen', {
-                    url: 'playpen',
+                    url: 'playpen/:kind/:id',
                     views: { 'content@': playpenView }
                 });
         }
     ]);
 
-   
+    module.directive('waltzRagLine', require('./rag-line'));
+    module.directive('waltzRatingExplorerSection', require('./rating-explorer-section'));
+    module.directive('waltzSimpleStackChart', require('./simple-stack-chart'));
+
 };
