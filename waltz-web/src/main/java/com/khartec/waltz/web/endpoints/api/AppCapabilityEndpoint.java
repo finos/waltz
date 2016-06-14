@@ -89,6 +89,9 @@ public class AppCapabilityEndpoint implements Endpoint {
         ListRoute<ApplicationCapability> findAppCapabilitiesForAppIdSelectorRoute  = (request, response)
                 -> appCapabilityDao.findByAppIdSelector(readOptionsFromBody(request));
 
+        ListRoute<ApplicationCapability> findByCapabilityIdsRoute  = (request, response)
+                -> appCapabilityDao.findByCapabilityIds(readIdsFromBody(request));
+
         DatumRoute<Integer> updateRoute = (request, response) -> {
 
             UpdateAppCapabilitiesAction action = readBody(request, UpdateAppCapabilitiesAction.class);
@@ -140,6 +143,7 @@ public class AppCapabilityEndpoint implements Endpoint {
         getForList(mkPath(BASE_URL, "capability", ":capabilityId", "associated"), findAssociatedAppCapabilitiesRoute);
         getForList(mkPath(BASE_URL, "application", ":id", "associated"), findAssociatedCapabilitiesByApplicationRoute);
         postForList(mkPath(BASE_URL, "selector"), findAppCapabilitiesForAppIdSelectorRoute);
+        postForList(mkPath(BASE_URL, "capability"), findByCapabilityIdsRoute);
         postForDatum(mkPath(BASE_URL, "application", ":id"), updateRoute);
         delete(mkPath(BASE_URL, "application", ":id", ":capabilityId"), deleteRoute);
         postForDatum(mkPath(BASE_URL, "application", ":id", ":capabilityId"), additionRoute);

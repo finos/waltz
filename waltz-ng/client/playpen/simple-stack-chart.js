@@ -13,7 +13,7 @@ function calculateLayoutData(values = [], xScale) {
     return _.map(values, v => {
         const d = {
             x: last,
-            width: xScale(v)
+            width: xScale(v || 0)
         };
         last += d.width;
         return d;

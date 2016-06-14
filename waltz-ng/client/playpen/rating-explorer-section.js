@@ -259,6 +259,12 @@ function controller($scope) {
 
     vm.removeCapability = (cap) => {
         vm.selectedCapabilities = _.reject(vm.selectedCapabilities, c => c.id === cap.id);
+        if (vm.focusedCapability && cap.id === vm.focusedCapability.id) {
+            vm.focusedCapability = null;
+            vm.focusedApps = null;
+            vm.focusedScore = null;
+            vm.visibility.appList = false;
+        }
     };
 
     vm.focusOnCapability = (cap, desiredScore /* optional */) => {
