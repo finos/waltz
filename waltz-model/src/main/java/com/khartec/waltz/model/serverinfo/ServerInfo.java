@@ -23,8 +23,6 @@ import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
-import java.util.Optional;
-
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableServerInfo.class)
@@ -33,10 +31,10 @@ public abstract class ServerInfo implements IdProvider, ProvenanceProvider {
 
     public abstract String hostname();
     public abstract String operatingSystem();
-    public abstract Optional<String> operatingSystemVersion();
+    public abstract String operatingSystemVersion();
     public abstract String environment();
-    public abstract Optional<String> location();
-    public abstract Optional<String> country();
+    public abstract String location();
+    public abstract String country();
     public abstract String assetCode();
 
 

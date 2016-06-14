@@ -33,7 +33,6 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
@@ -60,10 +59,10 @@ public class ServerInfoDao {
                 .hostname(row.getHostname())
                 .virtual(row.getIsVirtual() == null ? false : row.getIsVirtual())
                 .operatingSystem(row.getOperatingSystem())
-                .operatingSystemVersion(Optional.ofNullable(row.getOperatingSystemVersion()))
+                .operatingSystemVersion(row.getOperatingSystemVersion())
                 .environment(row.getEnvironment())
-                .location(Optional.ofNullable(row.getLocation()))
-                .country(Optional.ofNullable(row.getCountry()))
+                .location(row.getLocation())
+                .country(row.getCountry())
                 .provenance(row.getProvenance())
                 .build();
     };
@@ -112,11 +111,11 @@ public class ServerInfoDao {
                             .values(
                                     s.hostname(),
                                     s.operatingSystem(),
-                                    s.operatingSystemVersion().orElse(""),
-                                    s.country().orElse(""),
+                                    s.operatingSystemVersion(),
+                                    s.country(),
                                     s.virtual(),
                                     s.environment(),
-                                    s.location().orElse(""),
+                                    s.location(),
                                     s.assetCode(),
                                     s.provenance()))
                     .collect(Collectors.toList()))

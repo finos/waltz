@@ -135,7 +135,6 @@ public class AppCapabilityService {
         return time(
                 "ACS.findByCapabilityIds",
                 () -> dao.findByCapabilityIds(capIds));
-
     }
 
 

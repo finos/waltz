@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.PerfMetricPack.PERF_METRIC_PACK;
 import static com.khartec.waltz.schema.tables.PerfMetricPackCheckpoint.PERF_METRIC_PACK_CHECKPOINT;
@@ -114,7 +115,7 @@ public class PerformanceMetricPackDao {
                 cp -> ImmutableCheckpoint.builder()
                         .id(cp.getId())
                         .name(cp.getName())
-                        .description(cp.getDescription())
+                        .description(mkSafe(cp.getDescription()))
                         .year(cp.getYear())
                         .quarter(Quarter.fromInt(cp.getQuarter()))
                         .build());
@@ -147,7 +148,7 @@ public class PerformanceMetricPackDao {
                                 .build())
                         .collect(Collectors.toList()))
                 .name(packRecord.getName())
-                .description(packRecord.getDescription())
+                .description(mkSafe(packRecord.getDescription()))
                 .build();
 
         return pack;

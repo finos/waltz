@@ -73,28 +73,28 @@ public class DataFlowDao {
 
 
     public List<DataFlow> findByEntityReference(EntityReference ref) {
-        return baseOrgUnitQuery()
-                .and(DATA_FLOW.SOURCE_ENTITY_ID.eq(ref.id()).and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name())))
-                .or(DATA_FLOW.TARGET_ENTITY_ID.eq(ref.id()).and(DATA_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name())))
+        return baseQuery()
+                .and(DATA_FLOW.SOURCE_ENTITY_ID.eq(ref.id()))
+                .or(DATA_FLOW.TARGET_ENTITY_ID.eq(ref.id()))
                 .fetch(dataFlowMapper);
     }
 
 
     public List<DataFlow> findByApplicationIdSelector(Select<Record1<Long>> appIdSelector) {
-        return baseOrgUnitQuery()
+        return baseQuery()
                 .and(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector))
                 .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector))
                 .fetch(dataFlowMapper);
     }
 
     public List<DataFlow> findByApplicationIds(Collection<Long> appIds) {
-        return baseOrgUnitQuery()
+        return baseQuery()
                 .and(DATA_FLOW.SOURCE_ENTITY_ID.in(appIds))
                 .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIds))
                 .fetch(dataFlowMapper);
     }
 
-    private SelectConditionStep<Record> baseOrgUnitQuery() {
+    private SelectConditionStep<Record> baseQuery() {
 
         Field[] fields = new ArrayBuilder<Field>()
                 .add(DATA_FLOW.fields())

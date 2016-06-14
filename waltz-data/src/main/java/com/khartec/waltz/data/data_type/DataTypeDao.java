@@ -29,6 +29,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 
 
@@ -40,7 +41,7 @@ public class DataTypeDao {
         DataTypeRecord record = r.into(DataTypeRecord.class);
         return ImmutableDataType.builder()
                 .code(record.getCode())
-                .description(record.getDescription())
+                .description(mkSafe(record.getDescription()))
                 .name(record.getName())
                 .build();
     };

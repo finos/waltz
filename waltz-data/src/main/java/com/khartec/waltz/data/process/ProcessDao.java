@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.Process.PROCESS;
 
 @Repository
@@ -31,7 +32,7 @@ public class ProcessDao {
                 .id(record.getId())
                 .parentId(Optional.ofNullable(record.getParentId()))
                 .name(record.getName())
-                .description(record.getDescription())
+                .description(mkSafe(record.getDescription()))
                 .level(record.getLevel())
                 .level1(record.getLevel_1())
                 .level2(Optional.ofNullable(record.getLevel_2()))

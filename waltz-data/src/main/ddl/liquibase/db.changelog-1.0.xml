@@ -1762,16 +1762,46 @@
         </addColumn>
 
     </changeSet>
-    
+
+
+    <!-- 193 server_information - operating_system NULLABLE -->
+    <changeSet author="dwatkins" id="20160609-193-1">
+        <dropNotNullConstraint columnDataType="VARCHAR(128)"
+                               columnName="operating_system"
+                               tableName="server_information"/>
+
+    </changeSet>
+
+
+    <!-- 195 server_information - operating_system should NOT be nullable -->
+    <changeSet author="dwatkins" id="20160613-195-1">
+        <addNotNullConstraint columnDataType="VARCHAR(128)"
+                              columnName="operating_system"
+                              defaultNullValue="UNKNOWN"
+                              tableName="server_information"/>
+        <addNotNullConstraint columnDataType="VARCHAR(128)"
+                              columnName="operating_system_version"
+                              defaultNullValue="UNKNOWN"
+                              tableName="server_information"/>
+        <addNotNullConstraint columnDataType="VARCHAR(128)"
+                              columnName="location"
+                              defaultNullValue="UNKNOWN"
+                              tableName="server_information"/>
+        <addNotNullConstraint columnDataType="VARCHAR(128)"
+                              columnName="country"
+                              defaultNullValue="UNKNOWN"
+                              tableName="server_information"/>
+    </changeSet>
+
     <!-- last_import for source_data_rating #196 -->
     <changeSet author="dwatkins" id="20160614-196-1">
-    	<addColumn tableName="source_data_rating">
-    		<column name="last_import" 
-    				type="TIMESTAMP"
-    				defaultValueComputed="${now.value}">
-    			<constraints nullable="true"/>
-    		</column>
-    	</addColumn>
+        	<addColumn tableName="source_data_rating">
+            <column name="last_import"
+                type="TIMESTAMP"
+                defaultValueComputed="${now.value}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>

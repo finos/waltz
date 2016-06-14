@@ -27,6 +27,7 @@ import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.Perspective.PERSPECTIVE;
 import static com.khartec.waltz.schema.tables.PerspectiveMeasurable.PERSPECTIVE_MEASURABLE;
 
@@ -64,7 +65,7 @@ public class PerspectiveDao {
                     return ImmutableMeasurable.builder()
                             .name(record.getName())
                             .code(record.getCode())
-                            .description(record.getDescription())
+                            .description(mkSafe(record.getDescription()))
                             .build();
                 });
     }
@@ -79,7 +80,7 @@ public class PerspectiveDao {
                     return ImmutablePerspective.builder()
                             .name(record.getName())
                             .code(record.getCode())
-                            .description(record.getDescription())
+                            .description(mkSafe(record.getDescription()))
                             .build();
                 });
     }

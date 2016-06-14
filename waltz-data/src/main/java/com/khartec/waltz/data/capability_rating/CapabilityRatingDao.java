@@ -204,4 +204,14 @@ public class CapabilityRatingDao {
                 .and(PERSPECTIVE_RATING.PARENT_KIND.eq(EntityKind.APPLICATION.name()))
                 .fetch(capabilityRatingMapper);
     }
+
+    public List<CapabilityRating> findByAppIdSelector(Select<Record1<Long>> appIdSelector) {
+        Condition condition = PERSPECTIVE_RATING.PARENT_ID.in(appIdSelector)
+                .and(PERSPECTIVE_RATING.PARENT_KIND.eq(EntityKind.APPLICATION.name()));
+
+        return prepareSelectPart()
+                .where(dsl.renderInlined(condition))
+                .fetch(capabilityRatingMapper);
+
+    }
 }

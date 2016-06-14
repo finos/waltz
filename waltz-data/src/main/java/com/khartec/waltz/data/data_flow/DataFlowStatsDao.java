@@ -73,16 +73,19 @@ public class DataFlowStatsDao {
                     df.TARGET_ENTITY_ID
         ));
 
-        Select<Record1<Integer>> intraAppCounter = dsl
-                .select(DSL.count())
-                .from(APPLICATION)
-                .where(APPLICATION.ID.in(appIdSelector));
+
+        Select<Record1<Integer>> intraAppCounter = FunctionUtilities.time("DFSD.intraAppCounter", ()
+                -> dsl
+                    .select(DSL.count())
+                    .from(APPLICATION)
+                    .where(dsl.renderInlined(APPLICATION.ID.in(appIdSelector))));
 
         Select<Record1<Integer>> query = inAppCounter
                 .unionAll(outAppCounter)
                 .unionAll(intraAppCounter);
 
-        List<Integer> results = query.fetch(0, Integer.class);
+        List<Integer> results = FunctionUtilities.time("DFSD.executeUnionAppCounters", ()
+                -> query.fetch(0, Integer.class));
 
         return ImmutableDataFlowMeasures
                 .builder()
@@ -91,7 +94,6 @@ public class DataFlowStatsDao {
                 .intra(results.get(2))
                 .build();
     }
-
 
 
     public List<StringTally> tallyDataTypes(Select<Record1<Long>> appIdSelector) {
@@ -175,6 +177,5 @@ public class DataFlowStatsDao {
                 .where(dsl.renderInlined(condition));
 
     }
-
 
 }

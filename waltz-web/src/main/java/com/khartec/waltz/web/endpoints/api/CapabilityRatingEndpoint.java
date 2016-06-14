@@ -58,6 +58,7 @@ public class CapabilityRatingEndpoint implements Endpoint {
         String byParentPath = mkPath(BASE_URL, "parent", ":kind", ":id");
         String byParentAndPerspectivePath = mkPath(byParentPath, ":perspectiveCode");
         String byAppIdsPath = mkPath(BASE_URL, "apps");
+        String byAppIdSelectorPath = mkPath(BASE_URL, "app-selector");
 
 
         getForList(byParentPath, (request, response) -> ratingService.findByParent(getEntityReference(request)));
@@ -84,5 +85,7 @@ public class CapabilityRatingEndpoint implements Endpoint {
         });
 
         postForList(byAppIdsPath, ((request, response) -> ratingService.findByAppIds(readBody(request, Long[].class))));
+
+        postForList(byAppIdSelectorPath, ((request, response) -> ratingService.findByAppIdSelector(readOptionsFromBody(request))));
     }
 }

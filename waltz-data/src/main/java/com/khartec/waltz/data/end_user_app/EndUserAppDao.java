@@ -33,6 +33,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 
 @Repository
@@ -45,7 +46,7 @@ public class EndUserAppDao {
         EndUserApplicationRecord record = r.into(END_USER_APPLICATION);
         return ImmutableEndUserApplication.builder()
                 .name(record.getName())
-                .description(record.getDescription())
+                .description(mkSafe(record.getDescription()))
                 .kind(record.getKind())
                 .id(record.getId())
                 .organisationalUnitId(record.getOrganisationalUnitId())

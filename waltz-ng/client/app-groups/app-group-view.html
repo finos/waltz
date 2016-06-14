@@ -71,36 +71,13 @@
     </waltz-section>
 
 
-    <!-- CAPABILITY RATINGS -->
-    <waltz-section name='Capability Ratings'
-                   small="{{ ctrl.ratingColorStrategy.name }}"
-                   ng-init="ctrl.capabilitySelectorVisible = false">
-        <waltz-section-actions>
-            <a ng-click='ctrl.capabilitySelectorVisible = !ctrl.capabilitySelectorVisible'
-               class="btn btn-xs btn-primary">
-                <waltz-icon name="cogs"></waltz-icon>
-                Configure
-            </a>
-            <button class="btn btn-xs waltz-btn-transparent"
-                    ng-click="ctrl.visibility.capabilityRatingOverlay = ! ctrl.visibility.capabilityRatingOverlay">
-                <waltz-icon name="map-signs"></waltz-icon>
-            </button>
-        </waltz-section-actions>
-
-        <waltz-source-data-overlay visible="ctrl.visibility.capabilityRatingOverlay"
-                                   ratings="ctrl.sourceDataRatings"
-                                   entities="['APP_RATING', 'APP_CAPABILITY']">
-        </waltz-source-data-overlay>
-
-        <waltz-multi-app-rating-viewer applications="ctrl.applications"
-                                       capabilities="ctrl.capabilities"
-                                       ratings="ctrl.ratings"
-                                       color-strategy="ctrl.ratingColorStrategy"
-                                       capability-selector-visible="ctrl.capabilitySelectorVisible"
-                                       initially-selected-ids="ctrl.initiallySelectedIds"
-                                       explicit-capability-ids="ctrl.explicitCapabilityIds">
-        </waltz-multi-app-rating-viewer>
-    </waltz-section>
+    <!-- CAPABILITIES -->
+    <waltz-rating-explorer-section applications="ctrl.applications"
+                                   app-capabilities="ctrl.appCapabilities"
+                                   capabilities="ctrl.capabilities"
+                                   ratings="ctrl.ratings"
+                                   source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-rating-explorer-section>
 
 
     <!-- FLOWS -->
