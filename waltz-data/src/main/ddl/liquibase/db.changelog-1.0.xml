@@ -1769,7 +1769,7 @@
     		<column name="last_import" 
     				type="TIMESTAMP"
     				defaultValueComputed="${now.value}">
-    			<constraints nullable="false"/>
+    			<constraints nullable="true"/>
     		</column>
     	</addColumn>
     </changeSet>
