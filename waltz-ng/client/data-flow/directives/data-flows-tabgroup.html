@@ -50,7 +50,30 @@
                                             name="Loading Flow Data">
                 </waltz-loading-notification>
 
-                <div ng-if="ctrl.boingyEverShown && ctrl.flowData.flows.length > 0">
+                <div ng-if="ctrl.filteredFlowData.entities.length == 0  && ctrl.flowData.flows.length > 0">
+                    <div class="alert alert-warning">
+                        <strong>No data to show</strong> given the current filter options.  Use the
+                        configure button above to adjust these options.
+                    </div>
+                </div>
+
+
+                <div ng-if="ctrl.filteredFlowData.entities.length >= 200 && !ctrl.visibility.ignoreLimits">
+                    <div class="alert alert-warning">
+                        This graph will have <strong>too many nodes</strong> to render smoothly.
+                        Use the configure button too limit the amount of data to show.  Alternatively
+                        the data is available via the 'Table' tab.
+
+                        <br>
+
+                        If you still want to see the graph click
+                        <a href ng-click="ctrl.visibility.ignoreLimits = true">here</a>
+                        - however be aware that your machine may struggle.
+                    </div>
+                </div>
+
+                <div ng-if="ctrl.boingyEverShown && ctrl.filteredFlowData.flows.length > 0">
+
 
                     <div ng-if="ctrl.filteredFlowData.entities.length < 200  || ctrl.visibility.ignoreLimits">
                         <waltz-data-flow-diagram data="ctrl.filteredFlowData"
@@ -63,19 +86,8 @@
                         </div>
                     </div>
 
-                    <div ng-if="ctrl.filteredFlowData.entities.length >= 200 && !ctrl.visibility.ignoreLimits">
-                        <div class="alert alert-warning">
-                            This graph will have <strong>too many nodes</strong> to render smoothly.
-                            Use the configure button too limit the amount of data to show.  Alternatively
-                            the data is available via the 'Table' tab.
 
-                            <br>
 
-                            If you still want to see the graph click
-                            <a href ng-click="ctrl.visibility.ignoreLimits = true">here</a>
-                            - however be aware that your machine may struggle.
-                        </div>
-                    </div>
 
                 </div>
 
