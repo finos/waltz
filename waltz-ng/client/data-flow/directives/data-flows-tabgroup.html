@@ -52,14 +52,31 @@
 
                 <div ng-if="ctrl.boingyEverShown && ctrl.flowData.flows.length > 0">
 
-                    <waltz-data-flow-diagram data="ctrl.filteredFlowData"
-                                             tweakers="ctrl.graphTweakers">
-                    </waltz-data-flow-diagram>
+                    <div ng-if="ctrl.filteredFlowData.entities.length < 200  || ctrl.visibility.ignoreLimits">
+                        <waltz-data-flow-diagram data="ctrl.filteredFlowData"
+                                                 tweakers="ctrl.graphTweakers">
+                        </waltz-data-flow-diagram>
 
-                    <div class="small text-muted">
-                        Dragging nodes will pin them.  Double click to unpin.  If an application is gray
-                        it is not a member of this group.
+                        <div class="small text-muted">
+                            Dragging nodes will pin them.  Double click to unpin.  If an application is gray
+                            it is not a member of this group.
+                        </div>
                     </div>
+
+                    <div ng-if="ctrl.filteredFlowData.entities.length >= 200 && !ctrl.visibility.ignoreLimits">
+                        <div class="alert alert-warning">
+                            This graph will have <strong>too many nodes</strong> to render smoothly.
+                            Use the configure button too limit the amount of data to show.  Alternatively
+                            the data is available via the 'Table' tab.
+
+                            <br>
+
+                            If you still want to see the graph click
+                            <a href ng-click="ctrl.visibility.ignoreLimits = true">here</a>
+                            - however be aware that your machine may struggle.
+                        </div>
+                    </div>
+
                 </div>
 
             </uib-tab>

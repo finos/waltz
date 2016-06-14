@@ -10,9 +10,11 @@
     </waltz-page-header>
 
 
-    <waltz-rating-explorer-section applications="ctrl.applications"
-                                   app-capabilities="ctrl.appCapabilities"
-                                   capabilities="ctrl.allCapabilities"
-                                   ratings="ctrl.ratings">
-    </waltz-rating-explorer-section>
+    <!-- FLOWS -->
+    <waltz-data-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
+                                       flow-data="ctrl.dataFlows"
+                                       on-load-detail="ctrl.loadFlowDetail"
+                                       applications="ctrl.applications">
+    </waltz-data-flows-tabgroup-section>
+
 </div>

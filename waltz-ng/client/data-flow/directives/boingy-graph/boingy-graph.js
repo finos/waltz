@@ -25,10 +25,9 @@ function handleNodeClick(node) {
 
 
 const force = d3.layout.force()
-    .gravity(0.05)
-    .friction(0.6)
     .distance(100)
-    .charge(-100);
+    .linkDistance(60)
+    .charge(-120);
 
 
 function setup(holder) {
