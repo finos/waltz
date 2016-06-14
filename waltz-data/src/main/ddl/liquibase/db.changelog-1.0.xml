@@ -1762,7 +1762,16 @@
         </addColumn>
 
     </changeSet>
-
-
+    
+    <!-- last_import for source_data_rating #196 -->
+    <changeSet author="dwatkins" id="20160614-196-1">
+    	<addColumn tableName="source_data_rating">
+    		<column name="last_import" 
+    				type="TIMESTAMP"
+    				defaultValueComputed="${now.value}">
+    			<constraints nullable="false"/>
+    		</column>
+    	</addColumn>
+    </changeSet>
 
 </databaseChangeLog>
