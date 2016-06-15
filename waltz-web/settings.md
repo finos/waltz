@@ -1,5 +1,9 @@
 # Settings
 
+## Presentation
+
+* ```ui.logo.overlay.text``` - optional text to overlay on the logo, keep it short
+* ```ui.logo.overlay.color``` - colour used to render the optional overlay on the logo
 
 ## Security
 
