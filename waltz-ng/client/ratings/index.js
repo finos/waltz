@@ -11,7 +11,7 @@
  *
  */
 
-import ratingsEditor from './ratings-editor';
+import ratingsEditor from "./ratings-editor";
 
 
 export default (module) => {
@@ -25,6 +25,10 @@ export default (module) => {
     module.directive('waltzCapabilityMultiSelector', require('./directives/viewer/capability-multi-selector'));
     module.directive('waltzMultiAppRatingViewer', require('./directives/viewer/multi-app-rating-viewer'));
     module.directive('waltzRatingColorStrategyOptions', require('./directives/viewer/rating-color-strategy-options'));
+
+    module.directive('waltzRagLine', require('./directives/rating-explorer/rag-line'));
+    module.directive('waltzRatingExplorerSection', require('./directives/rating-explorer/rating-explorer-section'));
+    module.directive('waltzSimpleStackChart', require('./directives/rating-explorer/simple-stack-chart'));
 
 
     module.service('RatingStore', require('./services/ratings-store'));

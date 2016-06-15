@@ -33,8 +33,16 @@
                                      rag-rating="rating.completeness">
                 </waltz-rag-indicator>
             </td>
-            <td>
-                2 days ago
+            <td ng-class="{ 'text-center' : ! rating.lastImportDate }">
+                <span ng-if="rating.lastImportDate">
+                    <waltz-from-now timestamp="rating.lastImportDate">
+                    </waltz-from-now>
+                </span>
+                <span title="N/A"
+                      ng-if="! rating.lastImportDate"
+                      class="text-muted">
+                    -
+                </span>
             </td>
         </tr>
         </tbody>

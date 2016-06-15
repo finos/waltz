@@ -45,32 +45,30 @@ function controller(uiGridConstants, $scope, $animate) {
             {
                 field: 'name',
                 cellTemplate: '<div class="ui-grid-cell-contents"> <a ui-sref="main.app.view ({ id: row.entity[\'id\'] })">{{ COL_FIELD }}</a></div>'
-            },
-            {
+            }, {
                 field: 'kind',
-                cellTemplate: '<div class="ui-grid-cell-contents"> {{ COL_FIELD | toDisplayName:"applicationKind" }}</div>',
+                cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:\'applicationKind\'"></span></div>',
                 filter: {
                     type: uiGridConstants.filter.SELECT,
                     selectOptions: _.map(applicationKindDisplayNames, (label, value) => ({ label, value }))
                 }
-            },
-            {
+            }, {
+                field: 'assetCode'
+            }, {
                 field: 'overallRating',
-                cellTemplate: '<div class="ui-grid-cell-contents"> {{ COL_FIELD | toDisplayName:"investmentRating" }}</div>',
+                cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:\'investmentRating\'"></span></div>',
                 filter: {
                     type: uiGridConstants.filter.SELECT,
                     selectOptions: _.map(investmentRatingNames, (label, value) => ({ label, value }))
                 }
-            },
-            {
+            }, {
                 field: 'lifecyclePhase',
-                cellTemplate: '<div class="ui-grid-cell-contents"> {{ COL_FIELD | toDisplayName:"lifecyclePhase" }}</div>',
+                cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:\'lifecyclePhase\'"></span></span></div>',
                 filter: {
                     type: uiGridConstants.filter.SELECT,
                     selectOptions: _.map(lifecyclePhaseDisplayNames, (label, value) => ({ label, value }))
                 }
-            },
-            {
+            }, {
                 field: 'description',
                 cellTooltip: (row) => row.entity.description
             }
