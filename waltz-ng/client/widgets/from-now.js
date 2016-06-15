@@ -6,12 +6,13 @@ const BINDINGS = {
     daysOnly: '=' // boolean
 };
 
+
 const formats = {
     daysAndMinutes: 'ddd Do MMM YYYY - HH:mm:ss',
     daysOnly: 'ddd Do MMM YYYY',
     parse: 'YYYY-MM-DDThh:mm:ss.SSS'
+};
 
-}
 
 const template = '<span title="{{ ::ctrl.hoverValue }}" ng-bind="::ctrl.fromNow"></span>';
 
@@ -24,7 +25,6 @@ function controller($scope) {
         if (! nv) return;
 
         const m = moment.utc(nv, formats.parse );
-
 
         const hoverFormat = vm.daysOnly
             ? formats.daysOnly
