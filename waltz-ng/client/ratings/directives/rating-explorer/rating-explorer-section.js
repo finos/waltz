@@ -46,7 +46,14 @@ function calculateRequiredCapabilities(directCaps = [],
             cap.level5]))
         .filter(id => id != null)
         .uniq()
-        .map(id => capsById[id])
+        .map(id => {
+            const cap = capsById[id];
+            if (!cap) {
+                console.log("Capability Id referenced but does not exist", id);
+            }
+            return cap;
+        })
+        .filter(cap => cap != null)
         .value()
 }
 
