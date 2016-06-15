@@ -1,8 +1,5 @@
 const initData = {
-    allCapabilities: [],
-    appCapabilities: [],
     applications: [],
-    ratings: [],
     visibility: {}
 };
 
@@ -10,9 +7,7 @@ const initData = {
 function controller($q,
                     $stateParams,
                     appStore,
-                    appCapabilityStore,
-                    capabilityStore,
-                    ratingStore) {
+                    dataFlowViewService) {
 
     const vm = Object.assign(this, initData);
 
@@ -31,18 +26,14 @@ function controller($q,
         .findBySelector(appIdSelector)
         .then(apps => vm.applications = apps);
 
-    appCapabilityStore
-        .findApplicationCapabilitiesByAppIdSelector(appIdSelector)
-        .then(acs => vm.appCapabilities = acs);
+    dataFlowViewService.initialise(appIdSelector.entityReference.id, appIdSelector.entityReference.kind)
+        .then(flows => vm.dataFlows = flows);
 
-    ratingStore
-        .findByAppIdSelector(appIdSelector)
-        .then(rs => vm.ratings = rs);
 
-    capabilityStore
-        .findAll()
-        .then(cs => vm.allCapabilities = cs);
+    vm.loadFlowDetail = () => dataFlowViewService.loadDetail();
 
+
+    global.vm = vm;
 }
 
 
@@ -50,9 +41,7 @@ controller.$inject = [
     '$q',
     '$stateParams',
     'ApplicationStore',
-    'AppCapabilityStore',
-    'CapabilityStore',
-    'RatingStore'
+    'DataFlowViewService'
 ];
 
 
