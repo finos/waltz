@@ -50,6 +50,7 @@ function controller($timeout,
 
 }
 
+
 controller.$inject = [
     '$timeout',
     'ApplicationStore',
@@ -59,11 +60,13 @@ controller.$inject = [
     'SettingsStore'
 ];
 
+
 export default () => {
     return {
         restrict: 'E',
         template: require("./navbar.html"),
         controller,
+        scope: {},
         controllerAs: 'ctrl'
     };
 };

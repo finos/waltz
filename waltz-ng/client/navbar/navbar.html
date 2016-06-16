@@ -9,8 +9,8 @@
                      src="../../images/branding/waltz_badge+text_horizontal_positive_bw_300px.png">
             </a>
             <span ng-bind='ctrl.logoOverlayText'
-                  style='position: relative; left: -35px; top:30px; color: {{ ctrl.logoOverlayColor }}; font-weight: bold; font-style: italic'>
-
+                  style='position: relative; left: -35px; top:30px; font-weight: bold; font-style: italic;'
+                  ng-style=" { 'color': ctrl.logoOverlayColor }">
             </span>
 
             <span ng-bind="ctrl.logoOverlay" ></span>

@@ -14,7 +14,6 @@
         aggregated up the tree.
     </blockquote>
 
-
     <!-- DIAGRAMS -->
     <waltz-section name="Organisational Unit"
                    small="Overview"
@@ -23,6 +22,16 @@
                             block-processor="ctrl.blockProcessor">
         </waltz-svg-diagrams>
     </waltz-section>
+
+
+    <div class="row">
+        <!-- STATIC PANELS -->
+        <div class="col-md-12"
+             ng-if="ctrl.panels.length > 0">
+            <waltz-static-panels panels="ctrl.panels">
+            </waltz-static-panels>
+        </div>
+    </div>
 
 
     <waltz-section name="Organisational Units">
