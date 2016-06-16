@@ -1,6 +1,5 @@
 import ListView from "./list-view";
 import UnitView from "./unit-view";
-import UnitNavView from "./unit-nav-view";
 import {orgUnitsResolver, appTalliesResolver, endUserAppTalliesResolver} from "./resolvers.js";
 
 
@@ -21,8 +20,7 @@ const listState = {
 const viewState = {
     url: 'org-units/{id:int}',
     views: {
-        'content@': UnitView,
-        'sidenav@main': UnitNavView
+        'content@': UnitView
     }
 };
 
