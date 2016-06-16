@@ -31,7 +31,7 @@
             <div class="col-md-4">
                 <treecontrol class="tree-light"
                              tree-model="ctrl.capabilityTree.data"
-                             order-by="name"
+                             order-by="'-name'"
                              on-selection="ctrl.selectCapability(node)"
                              options="ctrl.capabilityTree.options">
                         <span ng-class="{ 'waltz-inherited-value' : node.implied }">

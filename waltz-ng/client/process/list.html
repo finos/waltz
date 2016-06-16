@@ -25,9 +25,19 @@
     <waltz-section icon='code-fork'
                    name="Processes"
                    small="All">
+
         <waltz-section-actions>
             <input type="search" ng-model="ctrl.processQuery" placeholder="Search...">
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.visibility.sourceDataRatings = ! ctrl.visibility.sourceDataRatings">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
         </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.visibility.sourceDataRatings"
+                                   ratings="ctrl.sourceDataRatings"
+                                   entities="['PROCESS']">
+        </waltz-source-data-overlay>
 
         <waltz-process-list processes="ctrl.filteredProcesses">
         </waltz-process-list>

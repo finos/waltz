@@ -2,6 +2,10 @@
     <waltz-section icon='code-fork'
                    name="Related Processes">
 
+        <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
+                                         entities="['PROCESS']">
+        </waltz-source-data-section-addon>
+
         <div ng-if="ctrl.processes.length > 0">
             <table class="table table-condensed small">
                 <thead>
