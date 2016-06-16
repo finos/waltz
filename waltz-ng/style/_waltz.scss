@@ -28,6 +28,7 @@
 @import "../client/sidebar/directives/sidebar";
 @import "../client/software-catalog/directives/simple-software-usage-list";
 @import "../client/data-flow/directives/flow-filter-options-overlay";
+@import "../client/complexity/directives/complexity-bar-chart";
 
 html {
   overflow-y: scroll;
