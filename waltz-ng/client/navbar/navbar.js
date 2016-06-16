@@ -48,8 +48,6 @@ function controller($timeout,
     vm.dismissResults = dismissResults;
     vm.searchResults = searchResults;
 
-    vm.logoOverlayText = "beta";
-    vm.logoOverlayColor = '#a90000';
 }
 
 controller.$inject = [

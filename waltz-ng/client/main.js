@@ -58,7 +58,7 @@ const registrationFns = [
     require('./common/directives'),
     require('./common/filters'),
     require('./common/services'),
-    
+
     require('./access-log'),
     require('./applications'),
     require('./app-capabilities'),
@@ -162,3 +162,12 @@ waltzApp.run(['$rootScope', '$document', ($rootScope, $doc) => {
 waltzApp.config(['$ngReduxProvider', ($ngReduxProvider) => {
     $ngReduxProvider.createStoreWith(rootReducer, [thunk], []);
 }]);
+
+
+if (__ENV__ === 'prod') {
+    waltzApp.config(['$compileProvider', function ($compileProvider) {
+        $compileProvider.debugInfoEnabled(false);
+        console.log("debug disabled, re-enable with:", "angular.reloadWithDebugInfo();");
+    }]);
+}
+
