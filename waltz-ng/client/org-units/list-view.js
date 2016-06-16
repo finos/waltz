@@ -89,12 +89,17 @@ function prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies) {
 function controller(orgUnits,
                     appTallies,
                     endUserAppTallies,
+                    sourceDataRatingStore,
                     svgStore,
                     $state) {
 
     const vm = this;
 
     loadDiagrams(svgStore, vm, $state);
+
+    sourceDataRatingStore
+        .findAll()
+        .then(sdrs => vm.sourceDataRatings = sdrs);
 
     vm.filteredOrgUnits = [];
     vm.trees = prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies);
@@ -116,6 +121,7 @@ controller.$inject = [
     'orgUnits',
     'appTallies',
     'endUserAppTallies',
+    'SourceDataRatingStore',
     'SvgDiagramStore',
     '$state'
 ];

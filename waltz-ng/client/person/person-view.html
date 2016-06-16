@@ -26,18 +26,9 @@
     <waltz-section name="Change Initiatives"
                    icon="paper-plane-o">
 
-        <waltz-section-actions>
-            <button class="btn btn-xs waltz-btn-transparent"
-                    ng-click="ctrl.visibility.changeInitiativeOverlay = ! ctrl.visibility.changeInitiativeOverlay">
-                <waltz-icon name="map-signs"></waltz-icon>
-            </button>
-        </waltz-section-actions>
-
-        <waltz-source-data-overlay visible="ctrl.visibility.changeInitiativeOverlay"
-                                   ratings="ctrl.sourceDataRatings"
-                                   entities="['CHANGE_INITIATIVE']">
-        </waltz-source-data-overlay>
-
+        <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
+                                         entities="['CHANGE_INITIATIVE', 'INVOLVEMENT']">
+        </waltz-source-data-section-addon>
 
         <waltz-change-initiative-table ng-if='ctrl.changeInitiatives.length > 0'
                                        list="ctrl.changeInitiatives">
@@ -56,17 +47,9 @@
         <waltz-section icon="desktop"
                        name="Application Portfolio">
 
-            <waltz-section-actions>
-                <button class="btn btn-xs waltz-btn-transparent"
-                        ng-click="ctrl.visibility.appOverlay = ! ctrl.visibility.appOverlay">
-                    <waltz-icon name="map-signs"></waltz-icon>
-                </button>
-            </waltz-section-actions>
-
-            <waltz-source-data-overlay visible="ctrl.visibility.appOverlay"
-                                       ratings="ctrl.sourceDataRatings"
-                                       entities="['APPLICATION']">
-            </waltz-source-data-overlay>
+            <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
+                                     entities="['APPLICATION', 'INVOLVEMENT']">
+            </waltz-source-data-section-addon>
 
             <uib-tabset>
 
@@ -144,17 +127,9 @@
         <!-- TECHNOLOGIES -->
         <waltz-section name="Technologies">
 
-            <waltz-section-actions>
-                <button class="btn btn-xs waltz-btn-transparent"
-                        ng-click="ctrl.visibility.techOverlay = ! ctrl.visibility.techOverlay">
-                    <waltz-icon name="map-signs"></waltz-icon>
-                </button>
-            </waltz-section-actions>
-
-            <waltz-source-data-overlay visible="ctrl.visibility.techOverlay"
-                                       ratings="ctrl.sourceDataRatings"
-                                       entities="['SERVER', 'DATABASE', 'SOFTWARE']">
-            </waltz-source-data-overlay>
+            <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
+                                             entities="['SERVER', 'DATABASE', 'SOFTWARE']">
+            </waltz-source-data-section-addon>
 
             <waltz-group-technology-summary stats="ctrl.techStats">
             </waltz-group-technology-summary>

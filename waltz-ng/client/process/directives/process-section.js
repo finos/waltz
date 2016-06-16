@@ -1,10 +1,12 @@
 const BINDINGS = {
-    processes: "="
+    processes: "=",
+    sourceDataRatings: '='
 };
 
 
 const initialState = {
-    processes: []
+    processes: [],
+    sourceDataRatings: []
 };
 
 

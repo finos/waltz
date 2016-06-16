@@ -33,6 +33,7 @@ export const entityIconNames = {
     CHANGE_INITIATIVE: 'paper-plane-o',
     DATABASE: 'database',
     END_USER_APPLICATION: 'table',
+    INVOLVEMENT: 'share-alt-square',
     LOGICAL_DATA_FLOW: "random",
     ORG_UNIT: 'sitemap',
     PERSON: 'user',

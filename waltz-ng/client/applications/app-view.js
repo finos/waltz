@@ -10,13 +10,14 @@
  *
  */
 import {
-    loadDataFlows,
-    loadChangeLog,
-    loadInvolvements,
     loadAuthSources,
+    loadChangeLog,
+    loadDatabases,
+    loadDataFlows,
+    loadInvolvements,
     loadServers,
     loadSoftwareCatalog,
-    loadDatabases
+    loadSourceDataRatings
 } from "./data-load";
 import {prepareSlopeGraph} from "../data-flow/directives/slope-graph/slope-graph-utils";
 import {mkAppRatingsGroup, calculateHighestRatingCount} from "../ratings/directives/common";
@@ -37,6 +38,7 @@ function controller($q,
                     ratingStore,
                     serverInfoStore,
                     softwareCatalogStore,
+                    sourceDataRatingStore,
                     displayNameService ) {
 
     const { id, organisationalUnitId } = appView.app;
@@ -71,7 +73,6 @@ function controller($q,
 
     const promises = [
         loadDataFlows(dataFlowStore, id, vm),
-        loadChangeLog(changeLogStore, id, vm),
         loadInvolvements($q, involvementStore, id, vm),
         loadAuthSources(authSourcesStore, orgUnitStore, id, organisationalUnitId, vm),
         loadServers(serverInfoStore, id, vm),
@@ -79,19 +80,22 @@ function controller($q,
         loadDatabases(databaseStore, id, vm)
     ];
 
-    $q.all(promises).then(() => {
+    $q.all(promises)
+        .then(() => {
+            const graphData = prepareSlopeGraph(
+                id,
+                vm.flows,
+                vm.dataTypes,
+                vm.appAuthSources,
+                vm.ouAuthSources,
+                displayNameService,
+                $state);
 
-        const graphData = prepareSlopeGraph(
-            id,
-            vm.flows,
-            vm.dataTypes,
-            vm.appAuthSources,
-            vm.ouAuthSources,
-            displayNameService,
-            $state);
+            vm.flow = graphData;
+        })
+        .then(() => loadChangeLog(changeLogStore, id, vm))
+        .then(() => loadSourceDataRatings(sourceDataRatingStore, vm))
 
-        vm.flow = graphData;
-    });
 
 
     complexityStore
@@ -121,6 +125,7 @@ controller.$inject = [
     'RatingStore',
     'ServerInfoStore',
     'SoftwareCatalogStore',
+    'SourceDataRatingStore',
     'WaltzDisplayNameService'
 ];
 

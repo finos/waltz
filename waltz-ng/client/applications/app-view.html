@@ -22,7 +22,8 @@
     <waltz-app-capability-section app-capabilities="ctrl.appCapabilities"
                                   traits="ctrl.explicitTraits"
                                   capabilities="ctrl.capabilities"
-                                  self-id="{{ctrl.app.id}}">
+                                  self-id="{{ctrl.app.id}}"
+                                  source-data-ratings="ctrl.sourceDataRatings">
     </waltz-app-capability-section>
 
 
@@ -36,7 +37,16 @@
                    class="btn btn-xs btn-primary">
                     Edit
                 </a>
+                <button class="btn btn-xs waltz-btn-transparent"
+                        ng-click="ctrl.visibility.appCapabilitiesOverlay = ! ctrl.visibility.appCapabilitiesOverlay">
+                    <waltz-icon name="map-signs"></waltz-icon>
+                </button>
             </waltz-section-actions>
+
+            <waltz-source-data-overlay visible="ctrl.visibility.appCapabilitiesOverlay"
+                                       ratings="ctrl.sourceDataRatings"
+                                       entities="['APP_CAPABILITY']">
+            </waltz-source-data-overlay>
 
             <waltz-rating-group-header measurables="ctrl.ratings.group.measurables"></waltz-rating-group-header>
 
@@ -54,13 +64,14 @@
 
 
     <!-- PROCESSES -->
-    <waltz-process-section processes="ctrl.processes">
-
+    <waltz-process-section processes="ctrl.processes"
+                           source-data-ratings="ctrl.sourceDataRatings">
     </waltz-process-section>
 
 
     <!-- INVOLVED PEOPLE -->
-    <waltz-involved-people-section involvements="ctrl.peopleInvolvements">
+    <waltz-involved-people-section involvements="ctrl.peopleInvolvements"
+                                   source-data-ratings="ctrl.sourceDataRatings">
     </waltz-involved-people-section>
 
 
@@ -73,7 +84,17 @@
                class="btn btn-xs btn-primary">
                 Edit
             </a>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.visibility.logicalFlows = ! ctrl.visibility.logicalFlows">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
         </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.visibility.logicalFlows"
+                                   ratings="ctrl.sourceDataRatings"
+                                   entities="['LOGICAL_DATA_FLOW']">
+        </waltz-source-data-overlay>
+
 
         <div class="alert alert-warning" ng-if="ctrl.flows.length == 0">
             <strong>
@@ -178,6 +199,10 @@
 
     <!-- COSTS -->
     <waltz-section name="Costs">
+        <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
+                                         entities="['ASSET_COST']">
+        </waltz-source-data-section-addon>
+
         <div ng-if="ctrl.costs.length == 0">
             <div class="alert alert-warning">
                 <strong>

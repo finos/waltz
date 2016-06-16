@@ -9,12 +9,17 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+
+import _ from "lodash";
+
+
 const BINDINGS = {
-    involvements: '='
+    involvements: '=',
+    sourceDataRatings: '='
 };
 
 
-const initialData = {
+const initialState = {
     involvements: []
 };
 
@@ -55,7 +60,7 @@ const columnDefs = [
 
 function controller($scope, uiGridConstants) {
 
-    const vm = Object.assign(this, initialData);
+    const vm = _.defaults(this, initialState);
 
     vm.gridOptions = {
         enableSorting: true,
@@ -73,7 +78,7 @@ function controller($scope, uiGridConstants) {
 controller.$inject = ['$scope', 'uiGridConstants'];
 
 
-export default () => ({
+const directive = {
     restrict: 'E',
     replace: true,
     template: require('./involved-people-section.html'),
@@ -81,4 +86,7 @@ export default () => ({
     bindToController: BINDINGS,
     controller,
     controllerAs: 'ctrl'
-});
+};
+
+
+export default () => directive;

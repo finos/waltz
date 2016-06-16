@@ -51,6 +51,13 @@ export function loadChangeLog(changeLogStore, id, vm) {
 }
 
 
+export function loadSourceDataRatings(sourceDataRatingStore, vm) {
+    sourceDataRatingStore
+        .findAll()
+        .then(sdrs => vm.sourceDataRatings = sdrs);
+}
+
+
 export function loadServers(serverInfoStore, appId, vm) {
     serverInfoStore
         .findByAppId(appId)
