@@ -14,6 +14,8 @@ public class SettingsService {
 
     private final SettingsDao settingsDao;
 
+    public static final String DEFAULT_ROLES_KEY = "server.authentication.roles.default";
+
 
     @Autowired
     public SettingsService(SettingsDao settingsDao) {
