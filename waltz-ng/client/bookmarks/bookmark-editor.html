@@ -16,7 +16,7 @@
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>
-                <a href ng-click="ctrl.goToParent()">
+                <a class="clickable" ng-click="ctrl.goToParent()">
                     <span ng-bind="ctrl.parentRef.name"></span>
                 </a>
             </li>
@@ -73,11 +73,11 @@
                     </td>
                     <td>
                         <span class="waltz-visibility-child-50">
-                            <a href ng-click="ctrl.remove(bookmark)">
+                            <a class="clickable" ng-click="ctrl.remove(bookmark)">
                                 Remove
                             </a>
                             |
-                            <a href ng-click="ctrl.edit(bookmark)">
+                            <a class="clickable" ng-click="ctrl.edit(bookmark)">
                                 Edit
                             </a>
                         </span>
@@ -97,7 +97,7 @@
                     Add New
                 </button>
                 &nbsp;
-                <a href ng-click="ctrl.goToParent()"> Done</a>
+                <a class="clickable" ng-click="ctrl.goToParent()"> Done</a>
             </div>
             <div ng-if="ctrl.createShowing">
                 <hr>
