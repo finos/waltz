@@ -41,10 +41,13 @@
                 <tr>
                     <th>User Name</th>
                     <th>Admin</th>
-                    <th>Application Editor</th>
-                    <th>Rating Editor</th>
-                    <th>Organisational Unit Editor</th>
-                    <th>Capability Editor</th>
+                    <th>Application</th>
+                    <th>Rating</th>
+                    <th>Org Unit</th>
+                    <th>Capability</th>
+                    <th>Bookmark</th>
+                    <th>Flow</th>
+                    <th>Auth Source</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -72,12 +75,27 @@
                         </span>
                     </td>
                     <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "ORGUNIT_EDITOR")'>
+                        <span ng-if='ctrl.hasRole(user, "ORG_UNIT_EDITOR")'>
                             <waltz-icon name='check'></waltz-icon>
                         </span>
                     </td>
                     <td align="left">
                         <span ng-if='ctrl.hasRole(user, "CAPABILITY_EDITOR")'>
+                            <waltz-icon name='check'></waltz-icon>
+                        </span>
+                    </td>
+                    <td align="left">
+                        <span ng-if='ctrl.hasRole(user, "BOOKMARK_EDITOR")'>
+                            <waltz-icon name='check'></waltz-icon>
+                        </span>
+                    </td>
+                    <td align="left">
+                        <span ng-if='ctrl.hasRole(user, "LOGICAL_DATA_FLOW_EDITOR")'>
+                            <waltz-icon name='check'></waltz-icon>
+                        </span>
+                    </td>
+                    <td align="left">
+                        <span ng-if='ctrl.hasRole(user, "AUTHORITATIVE_SOURCE_EDITOR")'>
                             <waltz-icon name='check'></waltz-icon>
                         </span>
                     </td>
@@ -121,9 +139,9 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>ORGUNIT_EDITOR</td>
+                                <td>ORG_UNIT_EDITOR</td>
                                 <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.ORGUNIT_EDITOR">
+                                    <input type="checkbox" ng-model="ctrl.roleSelections.ORG_UNIT_EDITOR">
                                 </td>
                             </tr>
                             <tr>
@@ -132,7 +150,24 @@
                                     <input type="checkbox" ng-model="ctrl.roleSelections.CAPABILITY_EDITOR">
                                 </td>
                             </tr>
-
+                            <tr>
+                                <td>BOOKMARK_EDITOR</td>
+                                <td>
+                                    <input type="checkbox" ng-model="ctrl.roleSelections.BOOKMARK_EDITOR">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>LOGICAL_DATA_FLOW_EDITOR</td>
+                                <td>
+                                    <input type="checkbox" ng-model="ctrl.roleSelections.LOGICAL_DATA_FLOW_EDITOR">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>AUTHORITATIVE_SOURCE_EDITOR</td>
+                                <td>
+                                    <input type="checkbox" ng-model="ctrl.roleSelections.AUTHORITATIVE_SOURCE_EDITOR">
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
