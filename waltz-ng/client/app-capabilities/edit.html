@@ -1,5 +1,5 @@
 <div>
-    <waltz-page-header name="Traits and Capability Registration"
+    <waltz-page-header name="Capability Registration"
                        small="{{ctrl.application.name}}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
@@ -8,7 +8,8 @@
         </ol>
     </waltz-page-header>
 
-    <waltz-section name="Traits" icon="cubes">
+
+    <waltz-section ng-if="false" name="Traits" icon="cubes">
         <waltz-trait-usage-editor traits="ctrl.traits.all"
                                   usages="ctrl.traits.usages"
                                   add="ctrl.addTrait"

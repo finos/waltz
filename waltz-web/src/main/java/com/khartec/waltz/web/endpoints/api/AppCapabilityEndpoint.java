@@ -23,8 +23,10 @@ import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
 import com.khartec.waltz.model.applicationcapability.GroupedApplications;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.app_capability.AppCapabilityService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
@@ -57,15 +59,20 @@ public class AppCapabilityEndpoint implements Endpoint {
 
     private final AppCapabilityService appCapabilityDao;
     private final ChangeLogService changeLogDao;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public AppCapabilityEndpoint(AppCapabilityService appCapabilityService, ChangeLogService changeLogDao) {
+    public AppCapabilityEndpoint(AppCapabilityService appCapabilityService,
+                                 ChangeLogService changeLogDao,
+                                 UserRoleService userRoleService) {
         checkNotNull(appCapabilityService, "appCapabilityService must not be null");
         checkNotNull(changeLogDao, "changeLogDao must not be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.changeLogDao = changeLogDao;
         this.appCapabilityDao = appCapabilityService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -93,6 +100,7 @@ public class AppCapabilityEndpoint implements Endpoint {
                 -> appCapabilityDao.findByCapabilityIds(readIdsFromBody(request));
 
         DatumRoute<Integer> updateRoute = (request, response) -> {
+            requireRole(userRoleService, request, Role.RATING_EDITOR);
 
             UpdateAppCapabilitiesAction action = readBody(request, UpdateAppCapabilitiesAction.class);
 
@@ -112,6 +120,8 @@ public class AppCapabilityEndpoint implements Endpoint {
         };
 
         Route deleteRoute = (req, res) -> {
+            requireRole(userRoleService, req, Role.RATING_EDITOR);
+
             long id = getId(req);
 
             List<Long> capabilityIds = newArrayList(getLong(req, "capabilityId"));
@@ -121,6 +131,8 @@ public class AppCapabilityEndpoint implements Endpoint {
         };
 
         DatumRoute<Integer> mkPrimaryRoute = (req, res) -> {
+            requireRole(userRoleService, req, Role.RATING_EDITOR);
+
             long appId = getId(req);
             long capabilityId = getLong(req, "capabilityId");
             boolean isPrimary = WebUtilities.readBody(req, Boolean.class);
@@ -131,6 +143,8 @@ public class AppCapabilityEndpoint implements Endpoint {
         };
 
         DatumRoute<Integer> additionRoute = (req, res) -> {
+            requireRole(userRoleService, req, Role.RATING_EDITOR);
+
             long id = getId(req);
             List<Long> capabilityIds = newArrayList(getLong(req, "capabilityId"));
             LOG.info("Adding application capabilities: " + capabilityIds + " for application: " + id);
