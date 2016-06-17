@@ -1,5 +1,6 @@
 package com.khartec.waltz.data;
 
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.tally.ImmutableLongTally;
 import com.khartec.waltz.model.tally.ImmutableStringTally;
@@ -8,6 +9,7 @@ import com.khartec.waltz.model.tally.StringTally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.ExecutorService;
@@ -79,6 +81,11 @@ public class JooqUtilities {
     }
 
     public static class MSSQL {
+
+        public static SQL mkContains(Collection<String> terms) {
+            Checks.checkNotNull(terms, "terms cannot be null");
+            return mkContains(terms.toArray(new String[0]));
+        }
 
         public static SQL mkContains(String... terms) {
             StringJoiner joiner = new StringJoiner(" AND ", "CONTAINS(*, '", "')");

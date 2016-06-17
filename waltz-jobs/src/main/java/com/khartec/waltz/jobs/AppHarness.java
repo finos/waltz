@@ -17,9 +17,12 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.data.application.search.SqlServerAppSearch;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
-import com.khartec.waltz.model.trait.ImmutableTrait;
+import com.khartec.waltz.service.DIConfiguration;
+import org.jooq.DSLContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +34,13 @@ public class AppHarness {
 
     public static void main(String[] args) {
 
-//        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        DSLContext dsl = ctx.getBean(DSLContext.class);
+
+        List<Application> jimmy = new SqlServerAppSearch()
+                .search(dsl, "e");
+
+        System.out.println(jimmy);
 //        ApplicationService applicationService = ctx.getBean(ApplicationService.class);
 //        DSLContext dsl = ctx.getBean(DSLContext.class);
 //
@@ -46,14 +55,6 @@ public class AppHarness {
 //        System.out.println(applicationService.findTagsForApplication(521L));
 //
 
-        ImmutableTrait t = ImmutableTrait.builder()
-                .description("HEllo")
-                .icon("Hello")
-                .name("fdjlkfjd;")
-                .applicationDeclarable(true)
-                .build();
-
-        System.out.println(t);
     }
 
 
