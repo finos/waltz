@@ -16,11 +16,11 @@
             </waltz-icon>
 
             <span ng-if="ctrl.hasChildren(node)">
-                <a href title="select all"
+                <a class="clickable" title="select all"
                    ng-click="ctrl.selectAll(node, $event)">
                     <waltz-icon name="plus-square-o"></waltz-icon>
                 </a>
-                <a href title="deselect all"
+                <a class="clickable" title="deselect all"
                    ng-click="ctrl.deselectAll(node, $event)">
                     <waltz-icon name="minus-square-o"></waltz-icon>
                 </a>

@@ -106,7 +106,7 @@
         <div style="margin-top: 6px">
             Select a user from the above list
             <i>or</i>
-            add a <a href ng-click="ctrl.addUserSelected()">new user</a>.
+            add a <a class="clickable" ng-click="ctrl.addUserSelected()">new user</a>.
         </div>
 
         <div ng-if="ctrl.selectedUser">
@@ -208,7 +208,7 @@
                                 ng-click="ctrl.deleteUser(ctrl.selectedUser)">
                             Delete
                         </button>
-                        <a href ng-click="ctrl.dismiss()">
+                        <a class="clickable" ng-click="ctrl.dismiss()">
                             Dismiss
                         </a>
                     </div>
@@ -244,7 +244,7 @@
                                 ng-disabled="! ctrl.isValidNewUser(ctrl.newUser)">
                             Register
                         </button>
-                        <a href ng-click="ctrl.dismiss()">
+                        <a class="clickable" ng-click="ctrl.dismiss()">
                             Cancel
                         </a>
                     </div>
@@ -260,7 +260,7 @@
             </strong>
             {{ ctrl.lastError.message }}
             <br>
-            <a href ng-click="ctrl.lastError = null">
+            <a class="clickable" ng-click="ctrl.lastError = null">
                 Clear
                 <waltz-icon name="times"></waltz-icon>
             </a>

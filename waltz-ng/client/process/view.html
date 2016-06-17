@@ -120,7 +120,7 @@
                                  style="height: 250px">
                                 <ul style="padding-top: 6px" class="list-unstyled">
                                     <li ng-repeat="app in ctrl.findAppsForCapability(ctrl.selectedCapability.id)">
-                                        <a href ng-click="ctrl.onApplicationSelect(app)">
+                                        <a class="clickable" ng-click="ctrl.onApplicationSelect(app)">
                                             <strong ng-bind="app.name"></strong>
                                         </a>
                                     </li>
@@ -159,7 +159,7 @@
                                         <span ng-class="{ 'waltz-inherited-value' : !ctrl.isCapabilityPartOfProcess(capability.id) }">
                                             <span ng-bind="capability.name"></span>
                                             <span ng-if="ctrl.isCapabilityPartOfProcess(capability.id)">
-                                                <a href ng-click='ctrl.onCapabilityNodeSelect(capability)'>(focus)</a>
+                                                <a class="clickable" ng-click='ctrl.onCapabilityNodeSelect(capability)'>(focus)</a>
                                             </span>
                                         </span>
                                     </li>
