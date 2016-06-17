@@ -12,6 +12,7 @@ function controller($scope,
                     $state,
                     processStore,
                     sourceDataRatingStore,
+                    staticPanelStore,
                     svgStore) {
     const vm = Object.assign(this, initialState);
 
@@ -26,6 +27,10 @@ function controller($scope,
     svgStore
         .findByKind('PROCESS')
         .then(xs => vm.diagrams = xs);
+
+    staticPanelStore
+        .findByGroup("HOME.PROCESS")
+        .then(panels => vm.panels = panels);
 
     vm.blockProcessor = b => {
         b.block.onclick = () => $state.go('main.process.view', { id: b.value });
@@ -45,6 +50,7 @@ controller.$inject = [
     '$state',
     'ProcessStore',
     'SourceDataRatingStore',
+    'StaticPanelStore',
     'SvgDiagramStore'
 ];
 

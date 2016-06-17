@@ -48,9 +48,8 @@ function controller($timeout,
     vm.dismissResults = dismissResults;
     vm.searchResults = searchResults;
 
-    vm.logoOverlayText = "beta";
-    vm.logoOverlayColor = '#a90000';
 }
+
 
 controller.$inject = [
     '$timeout',
@@ -61,11 +60,13 @@ controller.$inject = [
     'SettingsStore'
 ];
 
+
 export default () => {
     return {
         restrict: 'E',
         template: require("./navbar.html"),
         controller,
+        scope: {},
         controllerAs: 'ctrl'
     };
 };

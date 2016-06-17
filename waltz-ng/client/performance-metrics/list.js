@@ -45,7 +45,8 @@ function toPrettyGoal(goal) {
 
 
 function controller(performanceMetricDefinitionStore,
-                    performanceMetricPackStore) {
+                    performanceMetricPackStore,
+                    staticPanelStore) {
 
     const vm = Object.assign(this, initialState);
 
@@ -59,6 +60,12 @@ function controller(performanceMetricDefinitionStore,
     performanceMetricPackStore
         .findAllReferences()
         .then(packs => vm.packs = packs);
+
+
+    staticPanelStore
+        .findByGroup("HOME.PERFORMANCE")
+        .then(panels => vm.panels = panels);
+
 
 
     // -- INTERACT
@@ -83,7 +90,8 @@ function controller(performanceMetricDefinitionStore,
 
 controller.$inject = [
     'PerformanceMetricDefinitionStore',
-    'PerformanceMetricPackStore'
+    'PerformanceMetricPackStore',
+    'StaticPanelStore'
 ];
 
 

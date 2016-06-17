@@ -20,14 +20,19 @@ package com.khartec.waltz.service.user;
 import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.user.UserDao;
 import com.khartec.waltz.data.user.UserRoleDao;
+import com.khartec.waltz.model.settings.Setting;
 import com.khartec.waltz.model.user.LoginRequest;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.model.user.UserRegistrationRequest;
+import com.khartec.waltz.service.settings.SettingsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -39,22 +44,33 @@ public class UserService {
 
     private final UserDao userDao;
     private final PasswordService passwordService;
+    private final UserRoleDao userRoleDao;
+    private SettingsService settingsService;
 
 
     @Autowired
-    public UserService(UserDao userDao, UserRoleDao userRoleDao, PasswordService passwordService) {
+    public UserService(UserDao userDao,
+                       UserRoleDao userRoleDao,
+                       PasswordService passwordService,
+                       SettingsService settingsService) {
         checkNotNull(userDao, "userDao must not be null");
+        checkNotNull(userRoleDao, "userRoleDao cannot be null");
         checkNotNull(passwordService, "passwordService must not be null");
+        checkNotNull(settingsService, "settingsService cannot be null");
 
         this.userDao = userDao;
+        this.userRoleDao = userRoleDao;
         this.passwordService = passwordService;
+        this.settingsService = settingsService;
     }
 
 
     public int registerNewUser(UserRegistrationRequest request) {
-        LOG.info("Registering new user: "+ request.userName());
+        LOG.info("Registering new user: " + request.userName());
         String passwordHash = passwordService.hashPassword(request.password());
-        return userDao.create(request.userName(), passwordHash);
+        int rc = userDao.create(request.userName(), passwordHash);
+        assignDefaultRoles(request.userName());
+        return rc;
     }
 
     public boolean authenticate(LoginRequest request) {
@@ -84,8 +100,35 @@ public class UserService {
         return userDao.resetPassword(userName, hashedPassword) == 1;
     }
 
-    public void ensureExists(String username) {
+    /**
+     * Returns true if user is new, false if already existed
+     * @param username
+     * @return
+     */
+    public boolean ensureExists(String username) {
         Checks.checkNotEmptyString(username, "Cannot ensure an empty username exists");
-        userDao.create(username, passwordService.hashPassword("temp4321"));
+        int rc = userDao.create(username, passwordService.hashPassword("temp4321"));
+        boolean isNewUser = (rc == 1);
+
+        if (isNewUser) {
+            assignDefaultRoles(username);
+        }
+
+        return isNewUser;
+    }
+
+    private void assignDefaultRoles(String username) {
+        Checks.checkNotEmptyString(username, "username cannot be empty");
+        Setting setting = settingsService.getByName(SettingsService.DEFAULT_ROLES_KEY);
+        if (setting != null ) {
+            setting.value()
+                    .map(s -> s.split(","))
+                    .map(roleNames -> Stream
+                            .of(roleNames)
+                            .map(name -> Role.valueOf(name.trim()))
+                            .collect(Collectors.toList()))
+                    .ifPresent(roles -> userRoleDao.updateRoles(username, roles));
+
+        }
     }
 }

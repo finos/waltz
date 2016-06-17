@@ -90,12 +90,17 @@ function controller(orgUnits,
                     appTallies,
                     endUserAppTallies,
                     sourceDataRatingStore,
+                    staticPanelStore,
                     svgStore,
                     $state) {
 
     const vm = this;
 
     loadDiagrams(svgStore, vm, $state);
+
+    staticPanelStore
+        .findByGroup("HOME.ORG_UNIT")
+        .then(panels => vm.panels = panels);
 
     sourceDataRatingStore
         .findAll()
@@ -122,6 +127,7 @@ controller.$inject = [
     'appTallies',
     'endUserAppTallies',
     'SourceDataRatingStore',
+    'StaticPanelStore',
     'SvgDiagramStore',
     '$state'
 ];

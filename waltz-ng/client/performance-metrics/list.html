@@ -10,6 +10,17 @@
         </ol>
     </waltz-page-header>
 
+
+    <!-- STATIC PANELS -->
+    <div class="row"
+         ng-if="ctrl.panels.length > 0">
+        <div class="col-sm-12">
+            <waltz-static-panels panels="ctrl.panels">
+            </waltz-static-panels>
+        </div>
+    </div>
+
+
     <waltz-section icon="bullseye"
                    name="Performance Metric Packs">
 

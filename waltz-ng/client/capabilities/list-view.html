@@ -25,11 +25,22 @@
         Capabilities matrices can be useful in identifying hotspots of functionality within an organisation and the potential for application consolidation.
     </blockquote>
 
+
     <!-- DIAGRAMS -->
     <waltz-section name="Capabilities" small="Overview" ng-if="ctrl.diagrams.length > 0">
         <waltz-svg-diagrams diagrams="ctrl.diagrams" block-processor="ctrl.blockProcessor">
         </waltz-svg-diagrams>
     </waltz-section>
+
+
+    <!-- STATIC PANELS -->
+    <div class="row"
+         ng-if="ctrl.panels.length > 0">
+        <div class="col-sm-12">
+            <waltz-static-panels panels="ctrl.panels">
+            </waltz-static-panels>
+        </div>
+    </div>
 
 
     <!-- TREE -->

@@ -15,23 +15,38 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+const initialState = {
+    panels: [],
+    appGroupSubscriptions: []
+};
 
-function controller(staticPanelStore, appGroupStore) {
-    const vm = this;
 
-    staticPanelStore.findByGroup('HOME')
+function controller(appGroupStore,
+                    staticPanelStore) {
+
+    const vm = Object.assign(this, initialState);
+
+    staticPanelStore
+        .findByGroup('HOME')
         .then(panels => vm.panels = panels);
 
-    appGroupStore.findMyGroupSubscriptions()
+    appGroupStore
+        .findMyGroupSubscriptions()
         .then(groupSubscriptions => vm.appGroupSubscriptions = groupSubscriptions);
 
 }
 
-controller.$inject = ['StaticPanelStore', 'AppGroupStore'];
+controller.$inject = [
+    'AppGroupStore',
+    'StaticPanelStore'
+];
 
 
-export default {
+const view = {
     controller,
     controllerAs: 'ctrl',
     template: require('./welcome.html')
-}
+};
+
+
+export default view;

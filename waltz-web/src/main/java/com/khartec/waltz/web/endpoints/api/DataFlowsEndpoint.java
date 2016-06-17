@@ -75,11 +75,11 @@ public class DataFlowsEndpoint implements Endpoint {
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByAppIdSelectorPath = mkPath(BASE_URL, "apps");
         String findStatsPath = mkPath(BASE_URL, "stats");
-        String createNewFlowPath = BASE_URL;
+        String updateFlowsPath = BASE_URL;
 
 
-        DatumRoute<Boolean> createNewFlowRoute = (request, response) -> {
-            requireRole(userRoleService, request, Role.APP_EDITOR);
+        DatumRoute<Boolean> updateFlowsRoute = (request, response) -> {
+            requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
 
             UpdateDataFlowsAction dataFlowUpdate = readBody(request, UpdateDataFlowsAction.class);
             List<DataFlow> addedFlows = dataFlowUpdate
@@ -147,7 +147,7 @@ public class DataFlowsEndpoint implements Endpoint {
 
         getForList(findByEntityPath, getByEntityRef);
         postForList(findByAppIdSelectorPath, findByAppIdSelectorRoute);
-        postForDatum(createNewFlowPath, createNewFlowRoute);
+        postForDatum(updateFlowsPath, updateFlowsRoute);
         postForDatum(findStatsPath, findStatsRoute);
     }
 

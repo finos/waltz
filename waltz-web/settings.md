@@ -17,6 +17,7 @@ Group of settings which control how waltz handles authentication/authorization
     By default this is ```com.khartec.waltz.web.endpoints.auth.JWTAuthenticationFilter```
   * ```com.khartec.waltz.web.endpoints.auth.HeaderBasedAuthenticationFilter```
   * ```com.khartec.waltz.web.endpoints.auth.JWTAuthenticationFilter```
+* ```server.authentication.roles.default``` - Default set of role names (comma sep)
 
 
 ## Development (```web.devext``` )

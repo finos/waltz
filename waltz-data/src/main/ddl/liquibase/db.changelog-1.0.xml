@@ -1804,4 +1804,16 @@
         </addColumn>
     </changeSet>
 
+
+
+    <!-- 214 permissions changes -->
+    <changeSet author="dwatkins" id="20160617-214-1">
+        <sql>
+            UPDATE user_role
+              SET role='ORG_UNIT_EDITOR'
+              WHERE role='ORGUNIT_EDITOR';
+        </sql>
+    </changeSet>
+
+
 </databaseChangeLog>

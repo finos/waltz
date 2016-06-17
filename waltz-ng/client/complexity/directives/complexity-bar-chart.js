@@ -196,7 +196,9 @@ function controller($scope) {
         render(config);
     };
 
-    $scope.$watchGroup(['elem', 'ctrl.complexity'], watcher);
+    $scope.$watchGroup(
+        ['elem', 'ctrl.complexity'],
+        watcher);
 }
 
 controller.$inject = ['$scope'];
@@ -214,7 +216,7 @@ export default () => ({
     controller,
     controllerAs: 'ctrl',
     scope: {},
-    template: '<div class="viz-holder"></div>',
+    template: '<div class="waltz-complexity-viz-holder"></div>',
     bindToController: {
         complexity: '=',
         sizing: '=?',

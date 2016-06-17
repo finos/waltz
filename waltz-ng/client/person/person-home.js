@@ -1,8 +1,17 @@
 import angular from "angular";
 
-function controller(svgStore, $scope, $state) {
 
-    const vm = this;
+const initialState = {
+    person: null
+};
+
+
+function controller($scope,
+                    $state,
+                    staticPanelStore,
+                    svgStore) {
+
+    const vm = Object.assign(this, initialState);
 
     $scope.$watch('ctrl.person', (person) => {
         if (person) {
@@ -11,25 +20,35 @@ function controller(svgStore, $scope, $state) {
         }
     });
 
+    svgStore
+        .findByKind('ORG_TREE')
+        .then(xs => vm.diagrams = xs);
 
-    svgStore.findByKind('ORG_TREE').then(xs => vm.diagrams = xs);
-
-
+    staticPanelStore
+        .findByGroup("HOME.PERSON")
+        .then(panels => vm.panels = panels);
 
     vm.blockProcessor = b => {
         b.block.onclick = () => $state.go('main.person.view', { empId: b.value });
         angular.element(b.block).addClass('clickable');
     };
 
-
-    vm.person = null;
 }
 
 
-controller.$inject = ['SvgDiagramStore', '$scope', '$state'];
+controller.$inject = [
+    '$scope',
+    '$state',
+    'StaticPanelStore',
+    'SvgDiagramStore'
+];
 
-export default {
+
+const view = {
     template: require('./person-home.html'),
     controllerAs: 'ctrl',
     controller
 };
+
+
+export default view;

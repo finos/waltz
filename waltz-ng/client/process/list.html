@@ -21,6 +21,16 @@
     </waltz-section>
 
 
+    <!-- STATIC PANELS -->
+    <div class="row"
+         ng-if="ctrl.panels.length > 0">
+        <div class="col-sm-12">
+            <waltz-static-panels panels="ctrl.panels">
+            </waltz-static-panels>
+        </div>
+    </div>
+
+
     <!-- LIST -->
     <waltz-section icon='code-fork'
                    name="Processes"

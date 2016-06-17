@@ -17,25 +17,27 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-    import com.khartec.waltz.model.EntityReference;
-    import com.khartec.waltz.model.Severity;
-    import com.khartec.waltz.model.bookmark.Bookmark;
-    import com.khartec.waltz.model.bookmark.BookmarkKind;
-    import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-    import com.khartec.waltz.service.bookmark.BookmarkService;
-    import com.khartec.waltz.service.changelog.ChangeLogService;
-    import com.khartec.waltz.web.WebUtilities;
-    import com.khartec.waltz.web.endpoints.Endpoint;
-    import org.slf4j.Logger;
-    import org.slf4j.LoggerFactory;
-    import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.stereotype.Service;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.bookmark.Bookmark;
+import com.khartec.waltz.model.bookmark.BookmarkKind;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.service.bookmark.BookmarkService;
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.user.UserRoleService;
+import com.khartec.waltz.web.WebUtilities;
+import com.khartec.waltz.web.endpoints.Endpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-    import static com.khartec.waltz.common.Checks.checkNotNull;
-    import static com.khartec.waltz.web.WebUtilities.*;
-    import static spark.Spark.*;
+import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static spark.Spark.*;
 
-    @Service
+@Service
 public class BookmarksEndpoint implements Endpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(BookmarksEndpoint.class);
@@ -43,15 +45,20 @@ public class BookmarksEndpoint implements Endpoint {
 
     private final BookmarkService bookmarkService;
     private final ChangeLogService changeLogService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public BookmarksEndpoint(BookmarkService service, ChangeLogService changeLogService) {
+    public BookmarksEndpoint(BookmarkService service,
+                             ChangeLogService changeLogService,
+                             UserRoleService userRoleService) {
         checkNotNull(service, "bookmarkService must not be null");
         checkNotNull(changeLogService, "changeLogService must not be null");
-        
+        checkNotNull(userRoleService, "userRoleService cannot be null");
+
         this.bookmarkService = service;
         this.changeLogService = changeLogService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -76,6 +83,8 @@ public class BookmarksEndpoint implements Endpoint {
 
         post(mkPath(BASE_URL),
                 (request, response) -> {
+                    requireRole(userRoleService, request, Role.BOOKMARK_EDITOR);
+
                     response.type(TYPE_JSON);
                     Bookmark bookmark = readBody(request, Bookmark.class);
 
@@ -90,6 +99,8 @@ public class BookmarksEndpoint implements Endpoint {
 
 
         delete(mkPath(BASE_URL, ":id"), (request, response) -> {
+            requireRole(userRoleService, request, Role.BOOKMARK_EDITOR);
+
             response.type(TYPE_JSON);
 
             long bookmarkId = getId(request);
