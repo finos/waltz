@@ -1,4 +1,4 @@
-function configure($stateProvider, $urlRouterProvider) {
+function configureRoutes($stateProvider, $urlRouterProvider) {
 
     $urlRouterProvider.when('', '/home');
 
@@ -20,16 +20,30 @@ function configure($stateProvider, $urlRouterProvider) {
         });
 }
 
-configure.$inject = [
+configureRoutes.$inject = [
     '$stateProvider',
     '$urlRouterProvider'
 ];
 
 
-function setupRoutes(module) {
-    module.config(configure);
+function configureScrollToTopOnChange($rootScope, $doc) {
+    $rootScope.$on('$stateChangeSuccess', () => {
+        $doc[0].body.scrollTop = 0;
+        $doc[0].documentElement.scrollTop = 0;
+    });
+}
+
+configureScrollToTopOnChange.$inject = [
+    '$rootScope',
+    '$document'
+];
+
+
+function setup(module) {
+    module.config(configureRoutes);
+    module.run(configureScrollToTopOnChange);
 }
 
 
 
-export default setupRoutes;
+export default setup;

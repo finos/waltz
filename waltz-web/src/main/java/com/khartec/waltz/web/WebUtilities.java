@@ -133,7 +133,7 @@ public class WebUtilities {
                                    Role... requiredRoles) {
         String user = getUsername(request);
         if (StringUtilities.isEmpty(user)) {
-            LOG.warn("Required role check failed as no user, roles needed: " + requiredRoles);
+            LOG.warn("Required role check failed as no user, roles needed: " + Arrays.toString(requiredRoles));
             throw new IllegalArgumentException("Not logged in");
         }
         if (! userRoleService.hasRole(user, requiredRoles)) {

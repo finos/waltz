@@ -19,6 +19,7 @@ package com.khartec.waltz.model.user;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.UserNameProvider;
 import org.immutables.value.Value;
 
 import java.util.Set;
@@ -27,9 +28,8 @@ import java.util.Set;
 @Value.Immutable
 @JsonSerialize(as = ImmutableUser.class)
 @JsonDeserialize(as = ImmutableUser.class)
-public abstract class User {
+public abstract class User implements UserNameProvider {
 
-    public abstract String userName();
     public abstract Set<Role> roles();
 
     public boolean hasRole(Role role) {
