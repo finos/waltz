@@ -43,7 +43,7 @@ import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 public class PersonDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(PersonDao.class);
-    public static RecordMapper<? super Record, Person> personMapper = r -> {
+    public static final RecordMapper<? super Record, Person> personMapper = r -> {
         PersonRecord record = r.into(PersonRecord.class);
         return ImmutablePerson.builder()
                 .id(record.getId())

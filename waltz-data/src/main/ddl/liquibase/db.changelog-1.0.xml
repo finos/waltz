@@ -1816,4 +1816,43 @@
     </changeSet>
 
 
+
+    <!-- 222 last logins -->
+    <changeSet author="dwatkins"
+               id="20160620-222-1">
+        <createTable tableName="user_agent_info">
+            <column autoIncrement="true"
+                    name="id"
+                    type="SERIAL">
+                <constraints primaryKey="true"
+                             primaryKeyName="user_agent_info_pkey"/>
+            </column>
+            <column name="user_name"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_agent"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resolution"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operating_system"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ip_address"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="login_timestamp"
+                    type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
 </databaseChangeLog>
