@@ -50,6 +50,8 @@ public class ServerGenerator {
                                 .environment(randomPick(SampleData.environments))
                                 .location(randomPick(SampleData.locations))
                                 .operatingSystem(randomPick(SampleData.operatingSystems))
+                                .operatingSystemVersion(randomPick(SampleData.operatingSystemVersions))
+                                .country("UK")
                                 .assetCode("wltz-0" + rnd.nextInt(4000))
                                 .build()));
 

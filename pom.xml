@@ -38,6 +38,7 @@
         <spark.version>2.3</spark.version>
         <spring.version>4.2.5.RELEASE</spring.version>
         <super-csv.version>2.3.1</super-csv.version>
+        <maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
     </properties>
 
 
