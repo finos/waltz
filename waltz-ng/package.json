@@ -34,12 +34,12 @@
     "moment": "2.13.0",
     "ng-tags-input": "^3.0.0",
     "satellizer": "^0.12.5",
-    "ui-select": "^0.13.1",
+    "ui-select": "0.18.0",
     "ng-redux": "~3.3.1",
     "redux-thunk": "~1.0.3",
     "numeral": "~1.5.3",
-    "angular-ui-notification": "~0.2.0",
-    "angular-tree-control": "~0.2.26"
+    "angular-ui-notification": "0.2.0",
+    "angular-tree-control": "0.2.26"
   },
   "devDependencies": {
     "babel-core": "~5.2.17",

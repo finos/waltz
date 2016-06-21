@@ -1,0 +1,46 @@
+
+.waltz-inherited-value {
+    font-style: italic;
+}
+
+.waltz-rating-table {
+
+    td:hover {
+        cursor: pointer;
+    }
+
+    .rotated {
+
+        height: 60px;
+        white-space: nowrap;
+
+        div {
+            transform: translate(-20px, -5px) rotate(330deg);
+            width: 30px;
+        }
+
+        div > span {
+            padding: 5px 10px;
+        }
+    }
+
+    .rag-R > rect {
+        fill: #d31940;
+    }
+
+    .rag-A > rect {
+        fill: #d0d32a;
+    }
+
+    .rag-G > rect {
+        fill: #38d333;
+    }
+
+    .rag-Z > rect {
+        fill: #777;
+    }
+
+    .stack-1 {
+        opacity: 0.4;
+    }
+}

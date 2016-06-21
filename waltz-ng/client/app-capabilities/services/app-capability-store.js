@@ -53,6 +53,11 @@ const service = (http, root) => {
             .then(result => result.data);
 
 
+    const findByCapabilityIds = ids =>
+        http.post(`${BASE}/capability`, ids)
+            .then(result => result.data);
+
+
     const countByCapabilityId = () =>
         http.get(`${BASE}/count-by/capability`)
             .then(result => result.data);
@@ -91,6 +96,7 @@ const service = (http, root) => {
         findAssociatedApplicationCapabilitiesByCapabilityId,
         findAssociatedCapabilitiesByApplicationId,
         findApplicationCapabilitiesByAppIdSelector,
+        findByCapabilityIds,
         countByCapabilityId,
         removeCapability,
         addCapability,

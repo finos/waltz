@@ -89,12 +89,22 @@ function prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies) {
 function controller(orgUnits,
                     appTallies,
                     endUserAppTallies,
+                    sourceDataRatingStore,
+                    staticPanelStore,
                     svgStore,
                     $state) {
 
     const vm = this;
 
     loadDiagrams(svgStore, vm, $state);
+
+    staticPanelStore
+        .findByGroup("HOME.ORG_UNIT")
+        .then(panels => vm.panels = panels);
+
+    sourceDataRatingStore
+        .findAll()
+        .then(sdrs => vm.sourceDataRatings = sdrs);
 
     vm.filteredOrgUnits = [];
     vm.trees = prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies);
@@ -116,6 +126,8 @@ controller.$inject = [
     'orgUnits',
     'appTallies',
     'endUserAppTallies',
+    'SourceDataRatingStore',
+    'StaticPanelStore',
     'SvgDiagramStore',
     '$state'
 ];

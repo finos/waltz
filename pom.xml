@@ -13,6 +13,7 @@
         <module>waltz-jobs</module>
         <module>waltz-data</module>
         <module>waltz-schema</module>
+        <module>waltz-local-config</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -24,7 +25,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <hikari.version>2.4.5</hikari.version>
-        <immutables.version>2.1.15</immutables.version>
+        <immutables.version>2.2.5</immutables.version>
         <jackson.version>2.7.0</jackson.version>
         <jackson-jsr310.version>2.4.0</jackson-jsr310.version>
         <jbcrypt.version>0.4</jbcrypt.version>

@@ -22,13 +22,13 @@
                 <small style="text-align: right">
                     <ul class="list-unstyled">
                         <li  ng-if="subscription.role == 'OWNER'">
-                            <a href ng-click="ctrl.deleteGroup(subscription)">
+                            <a class="clickable" ng-click="ctrl.deleteGroup(subscription)">
                                 Delete
                                 <waltz-icon name="trash"></waltz-icon>
                             </a>
                         </li>
                         <li ng-if="subscription.role == 'VIEWER'">
-                            <a href ng-click="ctrl.unsubscribe(subscription)">
+                            <a class="clickable" ng-click="ctrl.unsubscribe(subscription)">
                                 Unsubscribe
                                 <waltz-icon name="minus-circle"></waltz-icon>
                             </a>

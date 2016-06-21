@@ -198,7 +198,6 @@ function controller($scope,
 }
 
 
-
 controller.$inject = [
     '$scope',
     '$q',

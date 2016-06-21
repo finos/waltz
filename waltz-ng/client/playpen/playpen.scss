@@ -1,6 +1,88 @@
-.x-axis path {
-    stroke-width: 0.3;
-    stroke: #666;
-    fill: white;
+.waltz-app-capability-card {
+    border: 1px solid #ccc;
+    background-color: #eee;
+    margin: 10px;
+    padding: 10px;
+
+    rect {
+        stroke: #777;
+    }
+
+    .strategic-with-issues {
+        .inherited {
+            fill: #d3ccc0;
+        }
+        .actual {
+            fill: #d0d32a;
+        }
+    }
+
+    .non-strategic {
+        .inherited {
+            fill: #d39ea5;
+        }
+        .actual {
+            fill: #d31940;
+        }
+    }
+
+    .strategic {
+        .inherited {
+            fill: #add3a7;
+        }
+        .actual {
+            fill: #38d333;
+        }
+    }
+
 }
 
+
+.waltz-inherited-value {
+    font-style: italic;
+}
+
+
+
+.waltz-rating-table {
+
+    td:hover {
+        cursor: pointer;
+    }
+
+
+    .rotated {
+
+        height: 60px;
+        white-space: nowrap;
+
+        div {
+            transform: translate(-20px, -5px) rotate(330deg);
+            width: 30px;
+        }
+
+        div > span {
+            padding: 5px 10px;
+        }
+    }
+
+    .rag-R > rect {
+        fill: #d31940;
+    }
+
+    .rag-A > rect {
+        fill: #d0d32a;
+    }
+
+    .rag-G > rect {
+        fill: #38d333;
+    }
+
+    .rag-Z > rect {
+        fill: #777;
+    }
+
+    .stack-1 {
+        opacity: 0.4;
+    }
+}

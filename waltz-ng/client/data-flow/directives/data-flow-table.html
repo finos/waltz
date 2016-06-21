@@ -7,10 +7,11 @@
         <th>Data Type</th>
     </tr>
     </thead>
+    <tbody>
     <tr ng-repeat="flow in ctrl.flows | orderBy:'sourceEntity.name + targetEntity.name'">
 
         <td>
-            <a ui-sref="main.app.view ({id: ctrl.source.id })">
+            <a ui-sref="main.app.view ({id: flow.source.id })">
                 <span ng-bind="flow.source.name">
                 </span>
             </a>
@@ -21,7 +22,7 @@
         </td>
 
         <td>
-            <a ui-sref="main.app.view ({id: ctrl.target.id })">
+            <a ui-sref="main.app.view ({id: flow.target.id })">
                 <span ng-bind="flow.target.name">
                 </span>
             </a>
@@ -33,4 +34,5 @@
             </span>
         </td>
     </tr>
+    </tbody>
 </table>

@@ -150,13 +150,13 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     private Select<Record1<Long>> mkForPersonReportees(EntityReference ref) {
         String employeeId = findEmployeeId(ref);
 
-        SelectConditionStep<Record1<String>> employeeIds = DSL.selectDistinct(personHierarchy.EMPLOYEE_ID)
+        SelectConditionStep<Record1<String>> reporteeIds = DSL.selectDistinct(personHierarchy.EMPLOYEE_ID)
                 .from(personHierarchy)
                 .where(personHierarchy.MANAGER_ID.eq(employeeId));
 
         Condition condition = involvement.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                 .and(involvement.EMPLOYEE_ID.eq(employeeId)
-                .or(involvement.EMPLOYEE_ID.in(employeeIds)));
+                .or(involvement.EMPLOYEE_ID.in(reporteeIds)));
 
         return dsl
                 .selectDistinct(involvement.ENTITY_ID)

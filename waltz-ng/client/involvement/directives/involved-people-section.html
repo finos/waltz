@@ -1,6 +1,9 @@
 <div>
     <waltz-section name="People" icon="users" small="( {{ctrl.involvements.length}} )">
 
+        <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
+                                         entities="['INVOLVEMENT']">
+        </waltz-source-data-section-addon>
 
         <div ng-if="ctrl.involvements.length > 0">
             <div style="font-size: smaller; height: 300px"

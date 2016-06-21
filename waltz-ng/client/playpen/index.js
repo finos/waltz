@@ -20,11 +20,11 @@ export default (module) => {
         ($stateProvider) => {
             $stateProvider
                 .state('main.playpen', {
-                    url: 'playpen',
+                    url: 'playpen/:kind/:id',
                     views: { 'content@': playpenView }
                 });
         }
     ]);
 
-   
+
 };

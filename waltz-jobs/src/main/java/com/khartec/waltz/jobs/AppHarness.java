@@ -17,10 +17,10 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.data.application.search.SqlServerAppSearch;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.application.ApplicationService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -35,18 +35,26 @@ public class AppHarness {
     public static void main(String[] args) {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        ApplicationService applicationService = ctx.getBean(ApplicationService.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<String> tagList = applicationService.findAllTags();
+        List<Application> jimmy = new SqlServerAppSearch()
+                .search(dsl, "e");
 
-        tagList.forEach(System.out::println);
+        System.out.println(jimmy);
+//        ApplicationService applicationService = ctx.getBean(ApplicationService.class);
+//        DSLContext dsl = ctx.getBean(DSLContext.class);
+//
+//        List<String> tagList = applicationService.findAllTags();
+//
+//        tagList.forEach(System.out::println);
+//
+//        System.out.println("---------------");
+//
+//        applicationService.findByTag("not-good-at-flying").forEach(a -> System.out.println(a.name()));
+//
+//        System.out.println(applicationService.findTagsForApplication(521L));
+//
 
-        System.out.println("---------------");
-
-        applicationService.findByTag("not-good-at-flying").forEach(a -> System.out.println(a.name()));
-
-        System.out.println(applicationService.findTagsForApplication(521L));
     }
 
 

@@ -8,7 +8,7 @@
         </strong>
         <p style="padding-left: 8px"
            class="small">
-            <a href ng-click="ctrl.logout()">Logout</a>
+            <a class="clickable" ng-click="ctrl.logout()">Logout</a>
         </p>
     </div>
 
@@ -25,7 +25,7 @@
 
         <p class="small text-muted"
            ng-hide="showLogin">
-            <a href ng-click="showLogin = true">
+            <a class="clickable" ng-click="showLogin = true">
                 Click to login
             </a>
         </p>
@@ -46,7 +46,7 @@
                 <input type="submit"
                        class="btn btn-xs btn-success"
                        value="Login">
-                <a href ng-click="showLogin=false">
+                <a class="clickable" ng-click="showLogin=false">
                     Cancel
                 </a>
             </form>

@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.model.utils.IdUtilities.ensureHasId;
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
@@ -56,7 +57,7 @@ public class CapabilityDao {
                 .level4(Optional.ofNullable(record.getLevel_4()))
                 .level5(Optional.ofNullable(record.getLevel_5()))
                 .parentId(Optional.ofNullable(record.getParentId()))
-                .description(record.getDescription())
+                .description(mkSafe(record.getDescription()))
                 .name(record.getName())
                 .build();
     };

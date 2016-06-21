@@ -163,26 +163,6 @@ function filter(rawData) {
         rawData.orgUnitId,
         isAppInScope);
 
-
-    /*
-     orgUnits,
-     apps,
-     people,
-     involvements,
-     perspective,
-     changeLogs,
-     capabilityRatings,
-     dataFlows,
-     rawAppCapabilities,
-     capabilities,
-     ratedDataFlows,
-     authSources,
-     endUserApps,
-     assetCosts,
-     complexity
-
-     */
-
     return {
         ...rawData,
         appCapabilities,

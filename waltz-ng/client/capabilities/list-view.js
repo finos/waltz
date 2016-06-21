@@ -15,7 +15,11 @@ import {buildHierarchies} from "../common";
 import {talliesById} from "../common/tally-utils";
 
 
-function controller(capabilities, appCapabilityStore, svgStore, $state) {
+function controller(appCapabilityStore,
+                    capabilities,
+                    staticPanelStore,
+                    svgStore,
+                    $state) {
     const vm = this;
 
     vm.capabilityHierarchy = buildHierarchies(capabilities);
@@ -24,8 +28,13 @@ function controller(capabilities, appCapabilityStore, svgStore, $state) {
         .countByCapabilityId()
         .then(tallies => vm.tallies = talliesById(tallies));
 
+    staticPanelStore
+        .findByGroup("HOME.CAPABILITY")
+        .then(panels => vm.panels = panels);
 
-    svgStore.findByKind('CAPABILITY').then(xs => vm.diagrams = xs);
+    svgStore
+        .findByKind('CAPABILITY')
+        .then(xs => vm.diagrams = xs);
 
     vm.blockProcessor = b => {
         b.block.onclick = () => $state.go('main.capability.view', { id: b.value });
@@ -34,9 +43,10 @@ function controller(capabilities, appCapabilityStore, svgStore, $state) {
 }
 
 controller.$inject = [
-    'capabilities', 
-    'AppCapabilityStore', 
-    'SvgDiagramStore', 
+    'AppCapabilityStore',
+    'capabilities',
+    'StaticPanelStore',
+    'SvgDiagramStore',
     '$state'];
 
 

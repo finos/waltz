@@ -107,6 +107,7 @@ export const entityNames = {
     CHANGE_INITIATIVE: 'Change Initiative',
     DATABASE: 'Database',
     END_USER_APPLICATION: 'End User App',
+    INVOLVEMENT: 'Involvement',
     LOGICAL_DATA_FLOW: "Logical Data Flow",
     ORG_UNIT: 'Org Unit',
     PERSON: 'Person',

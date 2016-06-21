@@ -87,7 +87,7 @@ public class OrganisationUnitEndpoint implements Endpoint {
         DatumRoute<OrganisationalUnitHierarchy> getHierarchyRoute = (request, response) -> service.getHierarchyById(getId(request));
 
         DatumRoute<Integer> postDescriptionRoute = (request, response) -> {
-            requireRole(userRoleService, request, Role.ORGUNIT_EDITOR);
+            requireRole(userRoleService, request, Role.ORG_UNIT_EDITOR);
 
             ChangeLog changeLogEntry = ImmutableChangeLog.builder()
                     .parentReference(ImmutableEntityReference.builder()

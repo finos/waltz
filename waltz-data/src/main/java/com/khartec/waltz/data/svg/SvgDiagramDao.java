@@ -28,6 +28,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.SvgDiagram.SVG_DIAGRAM;
 
 @Repository
@@ -40,7 +41,7 @@ public class SvgDiagramDao {
         SvgDiagramRecord record = r.into(SVG_DIAGRAM);
         return ImmutableSvgDiagram.builder()
                 .id(record.getId())
-                .description(record.getDescription())
+                .description(mkSafe(record.getDescription()))
                 .keyProperty(record.getKeyProperty())
                 .name(record.getName())
                 .priority(record.getPriority())

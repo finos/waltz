@@ -1,6 +1,5 @@
 <div>
 
-
     <waltz-page-header name="Playpen"
                        small=""
                        icon="rocket">
@@ -10,31 +9,12 @@
         </ol>
     </waltz-page-header>
 
-    <button ng-click="ctrl.flowOptionsVisible = !ctrl.flowOptionsVisible"
-            class='btn'>
-        Toggle
-    </button>
 
-    <waltz-section name="Data Flows">
-
-        <div class="row">
-            <div class="col-md-offset-7 col-md-5">
-                <waltz-flow-filter-options-overlay visible="ctrl.flowOptionsVisible"
-                                                   on-change="ctrl.filterChanged"
-                                                   types="ctrl.dataTypes">
-                </waltz-flow-filter-options-overlay>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <waltz-data-flow-diagram data="ctrl.flowData"
-                                         tweakers="ctrl.graphTweakers">
-                </waltz-data-flow-diagram>
-            </div>
-        </div>
-
-    </waltz-section>
-
+    <!-- FLOWS -->
+    <waltz-data-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
+                                       flow-data="ctrl.dataFlows"
+                                       on-load-detail="ctrl.loadFlowDetail"
+                                       applications="ctrl.applications">
+    </waltz-data-flows-tabgroup-section>
 
 </div>

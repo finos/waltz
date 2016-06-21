@@ -17,8 +17,10 @@
 
 package com.khartec.waltz.service.capability_rating;
 
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.capability_rating.CapabilityRatingDao;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.capabilityrating.CapabilityRating;
 import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.capabilityrating.RatingChange;
@@ -35,12 +37,16 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class CapabilityRatingService {
 
     private final CapabilityRatingDao dao;
+    private final ApplicationIdSelectorFactory selectorFactory;
 
 
     @Autowired
-    public CapabilityRatingService(CapabilityRatingDao dao) {
+    public CapabilityRatingService(CapabilityRatingDao dao, 
+                                   ApplicationIdSelectorFactory selectorFactory) {
         checkNotNull(dao, "dao must not be null");
+        checkNotNull(selectorFactory, "selectorFactory cannot be null");
         this.dao = dao;
+        this.selectorFactory = selectorFactory;
     }
 
 
@@ -86,5 +92,10 @@ public class CapabilityRatingService {
     public List<CapabilityRating> findByAppIds(Long[] appIds) {
         return dao.findByAppIds(appIds);
 
+    }
+
+    public List<CapabilityRating> findByAppIdSelector(ApplicationIdSelectionOptions options) {
+        return dao.findByAppIdSelector(selectorFactory.apply(options));
+        
     }
 }

@@ -1764,5 +1764,95 @@
     </changeSet>
 
 
+    <!-- 193 server_information - operating_system NULLABLE -->
+    <changeSet author="dwatkins" id="20160609-193-1">
+        <dropNotNullConstraint columnDataType="VARCHAR(128)"
+                               columnName="operating_system"
+                               tableName="server_information"/>
+
+    </changeSet>
+
+
+    <!-- 195 server_information - operating_system should NOT be nullable -->
+    <changeSet author="dwatkins" id="20160613-195-1">
+        <addNotNullConstraint columnDataType="VARCHAR(128)"
+                              columnName="operating_system"
+                              defaultNullValue="UNKNOWN"
+                              tableName="server_information"/>
+        <addNotNullConstraint columnDataType="VARCHAR(128)"
+                              columnName="operating_system_version"
+                              defaultNullValue="UNKNOWN"
+                              tableName="server_information"/>
+        <addNotNullConstraint columnDataType="VARCHAR(128)"
+                              columnName="location"
+                              defaultNullValue="UNKNOWN"
+                              tableName="server_information"/>
+        <addNotNullConstraint columnDataType="VARCHAR(128)"
+                              columnName="country"
+                              defaultNullValue="UNKNOWN"
+                              tableName="server_information"/>
+    </changeSet>
+
+    <!-- last_import for source_data_rating #196 -->
+    <changeSet author="dwatkins" id="20160614-196-1">
+        	<addColumn tableName="source_data_rating">
+            <column name="last_import"
+                type="TIMESTAMP"
+                defaultValueComputed="${now.value}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+
+    <!-- 214 permissions changes -->
+    <changeSet author="dwatkins" id="20160617-214-1">
+        <sql>
+            UPDATE user_role
+              SET role='ORG_UNIT_EDITOR'
+              WHERE role='ORGUNIT_EDITOR';
+        </sql>
+    </changeSet>
+
+
+
+    <!-- 222 last logins -->
+    <changeSet author="dwatkins"
+               id="20160620-222-1">
+        <createTable tableName="user_agent_info">
+            <column autoIncrement="true"
+                    name="id"
+                    type="SERIAL">
+                <constraints primaryKey="true"
+                             primaryKeyName="user_agent_info_pkey"/>
+            </column>
+            <column name="user_name"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_agent"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resolution"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operating_system"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ip_address"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="login_timestamp"
+                    type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 
 </databaseChangeLog>

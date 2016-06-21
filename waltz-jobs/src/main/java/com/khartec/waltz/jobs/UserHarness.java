@@ -21,7 +21,10 @@ import com.khartec.waltz.model.user.ImmutableUserRegistrationRequest;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.service.user.UserService;
+import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import static com.khartec.waltz.schema.tables.User.USER;
 
 
 public class UserHarness {
@@ -30,11 +33,16 @@ public class UserHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         UserRoleService userRoleService = ctx.getBean(UserRoleService.class);
-        UserService userService = ctx.getBean(UserService.class);
+        DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        registerUser(userService);
-        registerUser(userService);
 
+        int rc = dsl.insertInto(USER)
+                .set(USER.USER_NAME, "kamran")
+                .set(USER.PASSWORD, "1234")
+                .onDuplicateKeyIgnore()
+                .execute();
+
+        System.out.println(rc);
 //
 //        ImmutableLoginRequest loginRequest = ImmutableLoginRequest.builder()
 //                .userName("dwatkins")

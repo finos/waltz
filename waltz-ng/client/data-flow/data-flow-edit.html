@@ -46,7 +46,7 @@
                 <!-- ADD UPSTREAM -->
                 <div class="col-md-5" ng-init="ctrl.showAddUpstream = false">
                     <div ng-if="!ctrl.showAddUpstream">
-                        <a href ng-click="ctrl.showAddUpstream = true">
+                        <a class="clickable" ng-click="ctrl.showAddUpstream = true">
                             <waltz-icon name="plus"></waltz-icon>
                             Add Upstream Source
                         </a>
@@ -61,7 +61,7 @@
                                 <waltz-icon name="plus"></waltz-icon>
                                 Add
                             </button>
-                            <a href ng-click="ctrl.showAddUpstream = false">Cancel</a>
+                            <a class="clickable" ng-click="ctrl.showAddUpstream = false">Cancel</a>
                         </div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                 <!-- ADD DOWNSTREAM -->
                 <div class="col-md-5" ng-init="ctrl.showAddDownstream = false">
                     <div ng-if="!ctrl.showAddDownstream" class="pull-right">
-                        <a href ng-click="ctrl.showAddDownstream = true">
+                        <a class="clickable" ng-click="ctrl.showAddDownstream = true">
                             <waltz-icon name="plus"></waltz-icon>
                             Add Downstream Source
                         </a>
@@ -88,7 +88,7 @@
                                 <waltz-icon name="plus"></waltz-icon>
                                 Add
                             </button>
-                            <a href ng-click="ctrl.showAddDownstream = false">Cancel</a>
+                            <a class="clickable" ng-click="ctrl.showAddDownstream = false">Cancel</a>
                         </div>
                     </div>
                 </div>
@@ -104,7 +104,7 @@
                         Data flows to {{ ctrl.model.selectedApp.name }}
                         <small>( from {{ ctrl.app.name }} )</small>
                         <small>
-                            <a class="pull-right" href ng-click="ctrl.cancel()">
+                            <a class="pull-right" class="clickable" ng-click="ctrl.cancel()">
                                 Close
                                 <waltz-icon name="times-circle"></waltz-icon>
                             </a>
@@ -116,7 +116,7 @@
                         Data flows from {{ ctrl.model.selectedApp.name }}
                         <small>( to {{ ctrl.app.name }} )</small>
                         <small>
-                            <a class="pull-right" href ng-click="ctrl.cancel()">
+                            <a class="pull-right" class="clickable" ng-click="ctrl.cancel()">
                                 Close
                                 <waltz-icon name="times-circle"></waltz-icon>
                             </a>

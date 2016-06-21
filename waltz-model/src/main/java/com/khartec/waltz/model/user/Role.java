@@ -24,10 +24,13 @@ import java.util.stream.Stream;
 
 public enum Role {
     ADMIN,
-    ANONYMOUS,
     APP_EDITOR,
-    ORGUNIT_EDITOR,
+    ANONYMOUS,
+    AUTHORITATIVE_SOURCE_EDITOR,
+    BOOKMARK_EDITOR,
     CAPABILITY_EDITOR,
+    LOGICAL_DATA_FLOW_EDITOR,
+    ORG_UNIT_EDITOR,
     RATING_EDITOR;
 
 

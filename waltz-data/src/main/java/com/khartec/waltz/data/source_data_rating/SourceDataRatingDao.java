@@ -12,23 +12,33 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Optional;
 
 import static com.khartec.waltz.schema.tables.SourceDataRating.SOURCE_DATA_RATING;
+
 
 @Repository
 public class SourceDataRatingDao {
 
     private static final RecordMapper<? super Record, SourceDataRating> MAPPER = r -> {
         SourceDataRatingRecord record = r.into(SOURCE_DATA_RATING);
+
+        Optional<LocalDateTime> lastImportDateTime = Optional
+                .ofNullable(record.getLastImport())
+                .map(t -> t.toLocalDateTime());
+
         return ImmutableSourceDataRating.builder()
                 .sourceName(record.getSourceName())
                 .entityKind(EntityKind.valueOf(record.getEntityKind()))
                 .authoritativeness(RagRating.valueOf(record.getAuthoritativeness()))
                 .accuracy(RagRating.valueOf(record.getAccuracy()))
                 .completeness(RagRating.valueOf(record.getCompleteness()))
+                .lastImportDate(lastImportDateTime)
                 .build();
     };
+
 
     private final DSLContext dsl;
 
@@ -44,7 +54,6 @@ public class SourceDataRatingDao {
         return dsl.select(SOURCE_DATA_RATING.fields())
                 .from(SOURCE_DATA_RATING)
                 .fetch(MAPPER);
-
     }
 
 }

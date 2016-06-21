@@ -10,11 +10,14 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+
+
 export default (module) => {
     module
         .directive('waltzHasRole', require('./directives/has-role'))
         .directive('waltzUnlessRole', require('./directives/unless-role'))
         .directive('waltzIfAnonymous', require('./directives/if-anonymous'))
+        .service('UserAgentInfoStore', require('./services/user-agent-info-store'))
         .service('UserService', require('./services/user-service'))
         .service('UserStore', require('./services/user-store'))
         .config(require('./routes'));

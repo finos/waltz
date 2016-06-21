@@ -8,6 +8,12 @@
                      style="position: relative; top: -6px;"
                      src="../../images/branding/waltz_badge+text_horizontal_positive_bw_300px.png">
             </a>
+            <span ng-bind='ctrl.logoOverlayText'
+                  style='position: relative; left: -35px; top:30px; font-weight: bold; font-style: italic;'
+                  ng-style=" { 'color': ctrl.logoOverlayColor }">
+            </span>
+
+            <span ng-bind="ctrl.logoOverlay" ></span>
         </div>
 
         <ul class="nav navbar-nav nav-bar-left">
@@ -33,12 +39,6 @@
                 <a ui-sref="main.person">
                     <waltz-icon name="user"></waltz-icon>
                     People
-                </a>
-            </li>
-            <li ui-sref-active="active">
-                <a ui-sref="main.performance-metric.list">
-                    <waltz-icon name="bar-chart"></waltz-icon>
-                    Performance
                 </a>
             </li>
         </ul>

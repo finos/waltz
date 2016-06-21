@@ -28,6 +28,7 @@ const initialState = {
     groupedApps: null,
     processes: [],
     ratings: null,
+    rawRatings: [],
     sourceDataRatings: [],
     techStats: null,
     traitInfo: null,
@@ -165,16 +166,25 @@ function controller($q,
         return _.map(apps, 'id');
     };
 
+    const appIdSelector = {
+        entityReference: {
+            kind: 'CAPABILITY',
+            id: capId
+        },
+        scope: 'CHILDREN'
+    };
+
+    
     processStore
         .findForCapability(capId)
         .then(ps => vm.processes = ps);
 
     appCapabilityStore.findApplicationsByCapabilityId(capability.id)
         .then(processApps)
-        .then(appIds => {
+        .then(() => {
             $q.all([
                 perspectiveStore.findByCode('BUSINESS'),
-                ratingStore.findByAppIds(appIds),
+                ratingStore.findByAppIdSelector(appIdSelector),
                 dataFlowViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN'),
                 complexityStore.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
                 assetCostViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN', 2015),
@@ -189,6 +199,7 @@ function controller($q,
                 techStats,
                 sourceDataRatings
             ]) => {
+                vm.rawRatings = ratings;
                 vm.ratings = {
                     group: prepareGroupData(capability, vm.apps, perspective, ratings),
                     tweakers
@@ -203,7 +214,7 @@ function controller($q,
 
         });
 
-
+    
     appCapabilityStore.findAssociatedApplicationCapabilitiesByCapabilityId(capability.id)
         .then(assocAppCaps => {
             const associatedAppIds = _.map(assocAppCaps, 'applicationId');

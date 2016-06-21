@@ -92,7 +92,7 @@ function service($q,
         const bulkPromise = $q.all([
             ratingStore.findByAppIds(appIds),
             appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(appIdSelector),
-            capabilityStore.findByAppIds(appIds),
+            capabilityStore.findAll(),
             ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)
             authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
             endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)

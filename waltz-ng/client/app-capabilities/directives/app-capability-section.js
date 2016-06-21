@@ -14,23 +14,20 @@ const BINDINGS = {
     appCapabilities: '=',
     capabilities: '=',
     selfId: '@',
+    sourceDataRatings: '=',
     traits: '='
 };
 
 
-function controller() {
-}
+const directive = {
+    restrict: 'E',
+    replace: true,
+    template: require('./app-capability-section.html'),
+    controller: () => {},
+    controllerAs: 'ctrl',
+    scope: {},
+    bindToController: BINDINGS
+};
 
 
-export default [
-    () => ({
-        restrict: 'E',
-        replace: true,
-        template: require('./app-capability-section.html'),
-        controller,
-        controllerAs: 'ctrl',
-        scope: {},
-        bindToController: BINDINGS
-    })
-]
-;
+export default () => directive;
