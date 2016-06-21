@@ -31,7 +31,8 @@
         </p>
         <div ng-repeat="typeGroup in ctrl.eventData.data.values" style="padding-bottom: 6px">
             <h4>
-                <a ng-click="ctrl.typeGroupSelected(typeGroup)" href>
+                <a ng-click="ctrl.typeGroupSelected(typeGroup)"
+                   class="clickable">
                     {{ typeGroup.key | toDisplayName:'dataType' }}
                 </a>
             </h4>

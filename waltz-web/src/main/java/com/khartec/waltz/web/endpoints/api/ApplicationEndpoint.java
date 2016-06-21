@@ -123,16 +123,18 @@ public class ApplicationEndpoint implements Endpoint {
             AppRegistrationResponse registrationResponse = appService
                     .registerApp(registrationRequest);
 
-
-            changeLogService.write(ImmutableChangeLog.builder()
-                    .message("Registered new application: " + registrationRequest.name())
-                    .severity(Severity.INFORMATION)
-                    .userId(WebUtilities.getUsername(req))
-                    .parentReference(ImmutableEntityReference.builder()
-                            .kind(EntityKind.APPLICATION)
-                            .id(registrationResponse.id().get())
-                            .build())
-                    .build());
+            if (registrationResponse.registered()) {
+                ImmutableChangeLog changeLogEntry = ImmutableChangeLog.builder()
+                        .message("Registered new application: " + registrationRequest.name())
+                        .severity(Severity.INFORMATION)
+                        .userId(WebUtilities.getUsername(req))
+                        .parentReference(ImmutableEntityReference.builder()
+                                .kind(EntityKind.APPLICATION)
+                                .id(registrationResponse.id().get())
+                                .build())
+                        .build();
+                changeLogService.write(changeLogEntry);
+            }
 
             return registrationResponse;
         };

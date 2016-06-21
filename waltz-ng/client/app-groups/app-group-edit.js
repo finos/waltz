@@ -15,11 +15,14 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+import _ from "lodash";
+
 
 const initialState = {
     changeInitiatives: [],
     selectedChangeInitiative: null,
 };
+
 
 function setup(groupDetail) {
     const { applications, members, appGroup } = groupDetail;
@@ -109,7 +112,7 @@ function controller($q,
                 return $q.all(promises);
             })
             .then(([ related, flows, unitMembers]) => {
-                focusApp.related = related;
+                focusApp.related = _.flatten(_.values(related));
                 focusApp.unitMembers = _.reject(unitMembers, m => m.id === app.id);
                 focusApp.upstream = _.chain(flows)
                     .map(f => f.source)
