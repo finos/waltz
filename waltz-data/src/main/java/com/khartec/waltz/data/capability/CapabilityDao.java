@@ -92,9 +92,10 @@ public class CapabilityDao {
 
 
     private void assignLevel(long capabilityId, int level) {
-        dsl.update(c)
-                .set(c.LEVEL, level)
-                .where(c.ID.eq(capabilityId))
+        // NOTE: not using the alias because the generated MSSSQL is incorrect, #225
+        dsl.update(CAPABILITY)
+                .set(CAPABILITY.LEVEL, level)
+                .where(CAPABILITY.ID.eq(capabilityId))
                 .execute();
     }
 
@@ -121,20 +122,19 @@ public class CapabilityDao {
         ensureHasId(capability, "Cannot update capability record with no ID");
 
         LOG.info("Updating capability: "+capability);
-
-        return dsl.update(c)
-                .set(c.NAME, capability.name())
-                .set(c.DESCRIPTION, capability.description())
-                .set(c.PARENT_ID, capability.parentId().orElse(null))
-                .set(c.LEVEL, capability.level())
-                .set(c.LEVEL_1, capability.level1().orElse(null))
-                .set(c.LEVEL_2, capability.level2().orElse(null))
-                .set(c.LEVEL_3, capability.level3().orElse(null))
-                .set(c.LEVEL_4, capability.level4().orElse(null))
-                .set(c.LEVEL_5, capability.level5().orElse(null))
-                .where(c.ID.eq(capability.id().get()))
+        // NOTE: not using the alias because the generated MSSSQL is incorrect, #225
+        return dsl.update(CAPABILITY)
+                .set(CAPABILITY.NAME, capability.name())
+                .set(CAPABILITY.DESCRIPTION, capability.description())
+                .set(CAPABILITY.PARENT_ID, capability.parentId().orElse(null))
+                .set(CAPABILITY.LEVEL, capability.level())
+                .set(CAPABILITY.LEVEL_1, capability.level1().orElse(null))
+                .set(CAPABILITY.LEVEL_2, capability.level2().orElse(null))
+                .set(CAPABILITY.LEVEL_3, capability.level3().orElse(null))
+                .set(CAPABILITY.LEVEL_4, capability.level4().orElse(null))
+                .set(CAPABILITY.LEVEL_5, capability.level5().orElse(null))
+                .where(CAPABILITY.ID.eq(capability.id().get()))
                 .execute() == 1;
-
     }
 
 
