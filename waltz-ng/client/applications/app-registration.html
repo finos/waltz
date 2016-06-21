@@ -14,40 +14,48 @@
 
     <waltz-page-header name="Application Registration"></waltz-page-header>
 
-    <waltz-section name="Details">
-        <form ng-submit="ctrl.onSubmit()"
-              name="ctrl.form"
-              novalidate>
-            <formly-form form="ctrl.form"
-                         model="ctrl.model"
-                         fields="ctrl.fields">
+    <div class="row">
+        <div class="col-md-7">
+            <waltz-section name="Registration Form">
+                <form ng-submit="ctrl.onSubmit()"
+                      name="ctrl.form"
+                      novalidate>
+                    <formly-form form="ctrl.form"
+                                 model="ctrl.model"
+                                 fields="ctrl.fields">
 
-                <button type="submit"
-                        class="btn btn-success"
-                        style="margin-left: 12px"
-                        ng-disabled="ctrl.form.$invalid">
-                    Register
-                </button>
+                        <button type="submit"
+                                class="btn btn-success"
+                                style="margin-left: 12px"
+                                ng-disabled="ctrl.form.$invalid">
+                            Register
+                        </button>
 
-            </formly-form>
+                    </formly-form>
 
-        </form>
-    </waltz-section>
+                </form>
+            </waltz-section>
+        </div>
+        <div class="col-md-5">
+            <div ng-if="ctrl.registrations.length > 0">
+                <waltz-section name="Recent Registrations">
 
-    <div ng-if="ctrl.registrations.length > 0">
-        <waltz-section name="Recent Registrations">
+                    <table class="table table-condensed">
 
-            <table class="table table-condensed">
+                        <tr ng-repeat="registration in ctrl.registrations"
+                            ng-class="{ 'bg-success' : registration.success, 'danger' : ! registration.success }"
+                            ng-include="registration.success ? 'applications/app-registration-success.frag' : 'applications/app-registration-failure.frag'">
+                        </tr>
 
-                <tr ng-repeat="registration in ctrl.registrations"
-                    ng-class="{ 'bg-success' : registration.success, 'danger' : ! registration.success }"
-                    ng-include="registration.success ? 'applications/app-registration-success.frag' : 'applications/app-registration-failure.frag'">
-                </tr>
+                    </table>
 
-            </table>
-
-        </waltz-section>
+                </waltz-section>
+            </div>
+        </div>
     </div>
+
+
+
 
 
     <script type="text/ng-template"

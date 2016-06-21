@@ -28,20 +28,23 @@ import {
 
 // ----- CONTROLLER -----
 
-const controller = function(WaltzDisplayNameService,
-                            OrgUnitStore,
-                            ApplicationStore) {
+const controller = function(applicationStore,
+                            notification,
+                            orgUnitStore,
+                            waltzDisplayNameService ) {
 
     let allOrgUnits = [];
 
-    OrgUnitStore.findAll().then(units => {
-        allOrgUnits = units;
-        orgUnitField.templateOptions.options = _.map(units, (u) => ({ name: u.name, code: u.id}));
-    });
+    orgUnitStore
+        .findAll()
+        .then(units => {
+            allOrgUnits = units;
+            orgUnitField.templateOptions.options = _.map(units, (u) => ({ name: u.name, code: u.id}));
+        });
 
 
-    typeField.templateOptions.options = WaltzDisplayNameService.toOptions('applicationKind');
-    lifecyclePhaseField.templateOptions.options = WaltzDisplayNameService.toOptions('lifecyclePhase');
+    typeField.templateOptions.options = waltzDisplayNameService.toOptions('applicationKind');
+    lifecyclePhaseField.templateOptions.options = waltzDisplayNameService.toOptions('lifecyclePhase');
 
 
     const model = {
@@ -72,6 +75,7 @@ const controller = function(WaltzDisplayNameService,
 
     function onSubmit() {
         const onSuccess = (result) => {
+            notification.success('New Application registered');
             const { registered, message, id, originalRequest } = result;
             const { name, organisationalUnitId, kind, lifecyclePhase } = originalRequest;
 
@@ -89,6 +93,7 @@ const controller = function(WaltzDisplayNameService,
         };
 
         const onFailure = (result) => {
+            notification.success('Failed to register application, see below');
             registrations.push({
                 success: false,
                 message: result.data.message,
@@ -105,7 +110,9 @@ const controller = function(WaltzDisplayNameService,
         };
 
 
-        ApplicationStore.registerNewApp(newApp).then(onSuccess, onFailure);
+        applicationStore
+            .registerNewApp(newApp)
+            .then(onSuccess, onFailure);
     }
 
     // -- exposed
@@ -116,14 +123,15 @@ const controller = function(WaltzDisplayNameService,
     this.registrations = registrations;
 };
 
+controller.$inject = [
+    'ApplicationStore',
+    'Notification',
+    'OrgUnitStore',
+    'WaltzDisplayNameService',
+];
 
 export default {
     template: require('./app-registration.html'),
-    controller: [
-        'WaltzDisplayNameService',
-        'OrgUnitStore',
-        'ApplicationStore',
-        controller
-    ],
+    controller,
     controllerAs: 'ctrl'
 };
