@@ -25,7 +25,11 @@ module.exports = {
     ],
     module: {
         loaders: [
-            { test: /\.jsx?$/, loader: 'babel', exclude: /node_modules/ },
+            {
+                test: /\.jsx?$/,
+                loader: 'babel',
+                exclude: /node_modules/
+            },
             { test: /\.scss$/, loader: 'style!css!sass' },
             { test: /\.css$/, loader: 'style!css' },
             { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=8192' },
