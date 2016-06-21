@@ -37,6 +37,7 @@ const appViewState = {
     onEnter: onAppViewEnter
 };
 
+
 const appEditState = {
     url: '/:id/edit',
     resolve: {
@@ -69,8 +70,8 @@ onAppViewEnter.$inject = ['appView', 'HistoryStore'];
 function setup($stateProvider) {
     $stateProvider
         .state('main.app', base)
-        .state('main.app.view', appViewState)
         .state('main.app.registration', appRegistrationState)
+        .state('main.app.view', appViewState)
         .state('main.app.edit', appEditState)
         .state('main.app.tag-explorer', appTagExplorerState);
 }
