@@ -21,7 +21,10 @@
                         {{ ctrl.complexitySelection.end | toFixed: 2 }}
                         <small>Complexity Band</small>
                         <small class="pull-right">
-                            <a ng-click="ctrl.complexitySelection = {}" href>&#10006;</a>
+                            <a ng-click="ctrl.complexitySelection = {}"
+                               class="clickable">
+                                &#10006;
+                            </a>
                         </small>
                     </h4>
                     <div class="waltz-scroll-region"

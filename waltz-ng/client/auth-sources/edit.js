@@ -12,12 +12,13 @@
 import _ from "lodash";
 
 
-function editController(authSources,
+function editController($state,
+                        authSources,
                         flows,
                         orgUnits,
                         id,
                         authSourceStore,
-                        $state,
+                        notification,
                         displayNameService) {
 
     const dataTypes = displayNameService.toOptions('dataType');
@@ -87,7 +88,8 @@ function editController(authSources,
             };
             authSourceStore
                 .insert(insertRequest)
-                .then(refresh);
+                .then(refresh)
+                .then(() => notification.success('Authoritative Sources updated'));
         }
     }
 
@@ -95,7 +97,8 @@ function editController(authSources,
     function remove(authSource) {
         authSourceStore
             .remove(authSource.id)
-            .then(refresh);
+            .then(refresh)
+            .then(() => notification.warning('Authoritative Source removed'));
     }
 
 
@@ -122,12 +125,13 @@ function editController(authSources,
 
 
 editController.$inject = [
+    '$state',
     'authSources',
     'flows',
     'orgUnits',
     'id',
     'AuthSourcesStore',
-    '$state',
+    'Notification',
     'WaltzDisplayNameService'
 ];
 

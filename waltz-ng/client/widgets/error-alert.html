@@ -11,7 +11,8 @@
         {{ error.data.message }}
     </div>
     <a ng-if="retry() != null"
-       ng-click="retry()()" href>
+       ng-click="retry()()"
+       class="clickable">
         Retry
     </a>
 </div>

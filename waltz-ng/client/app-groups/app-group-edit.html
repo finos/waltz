@@ -151,13 +151,15 @@
                                 class="waltz-visibility-parent">
 
                                 <td>
-                                    <a ng-click="ctrl.focusOnApp(app)" href>
+                                    <a ng-click="ctrl.focusOnApp(app)"
+                                       class="clickable">
                                         {{ app.name }}
                                     </a>
                                 </td>
                                 <td>
                                 <span class="waltz-visibility-child-50">
-                                    <a ng-click="ctrl.removeFromGroup(app)" href>
+                                    <a ng-click="ctrl.removeFromGroup(app)"
+                                       class="clickable">
                                         Remove
                                     </a>
                                 </span>
@@ -299,7 +301,8 @@
                     </td>
                     <td>
                         <div class="waltz-visibility-child-50">
-                            <a ng-click="ctrl.promoteToOwner(viewer)" href>
+                            <a ng-click="ctrl.promoteToOwner(viewer)"
+                               class="clickable">
                                 Promote to owner
                             </a>
                         </div>
