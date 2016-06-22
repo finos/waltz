@@ -1,7 +1,21 @@
-<ul class="waltz-keyword-list">
-    <li ng-repeat="keyword in keywords | orderBy"
-        ng-click="onSelect({keyword: keyword})"
-        ng-class="{ 'clickable': onSelect }">
-        {{ keyword }}
-    </li>
-</ul>
+<span>
+    <span ng-if="keywords.length == 0">
+        <div ng-transclude="empty"></div>
+    </span>
+
+    <ul ng-if="keywords.length > 0"
+        class="waltz-keyword-list">
+        <li ng-repeat="keyword in keywords | orderBy"
+            ng-click="onSelect({keyword: keywordItem})"
+            class="wkl-keyword"
+            ng-class="{ 'clickable': onSelect }">
+            <span ng-bind="keyword"></span>
+        </li>
+
+        <li class="wkl-last waltz-visibility-parent">
+            <div ng-transclude="last"
+                 class="waltz-visibility-child-30">
+            </div>
+        </li>
+    </ul>
+</span>

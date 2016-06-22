@@ -5,18 +5,20 @@ $waltz-keyword-border-color: #c7cfd5;
 // -------
 
 .waltz-keyword-list {
-  list-style: none;
-  padding-left: 0;
-}
+    list-style: none;
+    padding-left: 0;
 
+    li {
+        display: inline-block;
+        padding: 2px 4px 2px 4px;
+        margin: 1px 6px 1px 0;
+        white-space: nowrap;
+    }
 
-.waltz-keyword-list li{
-  color: $waltz-keyword-color;
-  white-space: nowrap;
-  background: $waltz-keyword-background-color;
-  border: 1px solid $waltz-keyword-border-color;
-  display: inline-block;
-  padding: 2px 4px 2px 4px;
-  margin: 1px 6px 1px 0;
-  border-radius: 2px;
+    .wkl-keyword {
+        color: $waltz-keyword-color;
+        background: $waltz-keyword-background-color;
+        border: 1px solid $waltz-keyword-border-color;
+        border-radius: 2px;
+    }
 }

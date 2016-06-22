@@ -46,7 +46,6 @@ public class AppAliasDao {
     }
 
 
-
     public List<String> findAliasesForApplication(long appId) {
         return dsl.select(APPLICATION_ALIAS.ALIAS)
                 .from(APPLICATION_ALIAS)
@@ -54,7 +53,6 @@ public class AppAliasDao {
                 .orderBy(APPLICATION_ALIAS.ALIAS.asc())
                 .fetch(APPLICATION_ALIAS.ALIAS);
     }
-
 
 
     public int[] updateAliases(long id, Collection<String> aliases) {

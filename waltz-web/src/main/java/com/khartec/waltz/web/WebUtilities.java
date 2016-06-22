@@ -195,6 +195,11 @@ public class WebUtilities {
         return (List<Long>) readBody(req, List.class);
     }
 
+
+    public static List<String> readStringsFromBody(Request req) throws IOException {
+        return (List<String>) readBody(req, List.class);
+    }
+
     public static ApplicationIdSelectionOptions readOptionsFromBody(Request request) throws java.io.IOException {
         return readBody(request, ApplicationIdSelectionOptions.class);
     }
