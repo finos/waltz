@@ -1,0 +1,22 @@
+<div>
+    <waltz-section name="{{ctrl.name}}"
+                   icon="pie-chart">
+
+        <div class="row"
+             ng-if="ctrl.entityStatisticsGrouped.length > 0">
+            <div class="col-sm-4"
+                 ng-repeat="(group, stats) in ctrl.entityStatisticsGrouped">
+
+                <waltz-entity-statistic-card values="stats.values"
+                                             category="stats.key">
+                </waltz-entity-statistic-card>
+            </div>
+        </div>
+        <div class="alert alert-warning" ng-if="ctrl.entityStatisticsGrouped.length == 0">
+            <strong>
+                No Indicators
+            </strong>
+            for this application.
+        </div>
+    </waltz-section>
+</div>

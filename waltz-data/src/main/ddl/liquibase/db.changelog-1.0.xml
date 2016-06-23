@@ -1854,5 +1854,122 @@
         </createTable>
     </changeSet>
 
+    <!-- 230 entity statistics -->
+    <changeSet author="kamransaleem"
+               id="20160621-230-1">
+        <createTable tableName="entity_statistic">
+            <column autoIncrement="true"
+                    name="id"
+                    type="BIGSERIAL">
+                <constraints primaryKey="true"
+                             primaryKeyName="entity_statistic_pkey"/>
+            </column>
+            <column name="name"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${longvarchar.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="type"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active"
+                    type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="renderer"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="historic_renderer"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="kamransaleem"
+               id="20160621-230-2">
+        <createTable tableName="entity_statistic_value">
+            <column autoIncrement="true"
+                    name="id"
+                    type="BIGSERIAL">
+                <constraints primaryKey="true"
+                             primaryKeyName="entity_statistic_value_pkey"/>
+            </column>
+            <column name="statistic_id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_kind"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value"
+                    type="VARCHAR(128)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="outcome"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reason"
+                    type="${longvarchar.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current"
+                    type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="kamransaleem"
+               id="20160621-230-3">
+        <createIndex indexName="idx_esv_statistic_id"
+                     tableName="entity_statistic_value"
+                     unique="false">
+            <column name="statistic_id" type="${long.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kamransaleem"
+               id="20160621-230-4">
+        <createIndex indexName="idx_esv_entity_ref"
+                     tableName="entity_statistic_value"
+                     unique="false">
+            <column name="entity_kind" type="VARCHAR(128)"/>
+            <column name="entity_id" type="${long.type}"/>
+        </createIndex>
+    </changeSet>
 
 </databaseChangeLog>

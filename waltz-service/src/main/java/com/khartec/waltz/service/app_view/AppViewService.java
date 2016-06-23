@@ -17,7 +17,6 @@
 
 package com.khartec.waltz.service.app_view;
 
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.Application;
@@ -32,13 +31,13 @@ import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
 import com.khartec.waltz.service.bookmark.BookmarkService;
 import com.khartec.waltz.service.capability.CapabilityService;
+import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import com.khartec.waltz.service.trait.TraitService;
 import com.khartec.waltz.service.trait.TraitUsageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -57,32 +56,36 @@ public class AppViewService {
     private final CapabilityService capabilityService;
     private final TraitUsageService traitUsageService;
     private final TraitService traitService;
+    private final EntityStatisticService entityStatisticService;
 
 
     @Autowired
     public AppViewService(ApplicationService appService,
                           AppCapabilityService appCapabilityService,
-                          BookmarkService bookmarkService,
-                          OrganisationalUnitService organisationalUnitService,
                           AssetCostService assetCostService,
+                          BookmarkService bookmarkService,
                           CapabilityService capabilityService,
+                          EntityStatisticService entityStatisticService,
+                          OrganisationalUnitService organisationalUnitService,
                           TraitService traitService,
                           TraitUsageService traitUsageService) {
         checkNotNull(appService, "ApplicationService must not be null");
         checkNotNull(appCapabilityService, "appCapabilityService must not be null");
-        checkNotNull(bookmarkService, "BookmarkDao must not be null");
-        checkNotNull(organisationalUnitService, "organisationalUnitService must not be null");
         checkNotNull(assetCostService, "assetCostService must not be null");
+        checkNotNull(bookmarkService, "BookmarkDao must not be null");
         checkNotNull(capabilityService, "capabilityService must not be null");
+        checkNotNull(entityStatisticService, "entityStatisticService must not be null");
+        checkNotNull(organisationalUnitService, "organisationalUnitService must not be null");
         checkNotNull(traitService, "traitService must not be null");
         checkNotNull(traitUsageService, "traitUsageService must not be null");
 
         this.appService = appService;
         this.appCapabilityDao = appCapabilityService;
-        this.bookmarkService = bookmarkService;
-        this.organisationalUnitService = organisationalUnitService;
         this.assetCostService = assetCostService;
+        this.bookmarkService = bookmarkService;
         this.capabilityService = capabilityService;
+        this.entityStatisticService = entityStatisticService;
+        this.organisationalUnitService = organisationalUnitService;
         this.traitService = traitService;
         this.traitUsageService = traitUsageService;
     }
@@ -111,6 +114,7 @@ public class AppViewService {
                 .capabilities(capabilities)
                 .costs(assetCostService.findByAppId(id))
                 .explicitTraits(traits)
+                .entityStatisticsWithValues(entityStatisticService.findStatisticsForEntity(ref, true))
                 .build();
     }
 

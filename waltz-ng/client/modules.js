@@ -22,6 +22,7 @@ function setup(module) {
         require('./data-flow'),
         require('./data-types'),
         require('./end-user-apps'),
+        require('./entity-statistics'),
         require('./examples'),
         require('./history'),
         require('./involvement'),
