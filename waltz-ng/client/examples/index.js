@@ -21,8 +21,8 @@ export default (module) => {
                 .state('main.examples', {
                     url: 'examples',
                     views: {
-                        'content@': { template: require('./index.html') },
-                        'sidebar@': { template: require('./toc.html') }
+                        'docs-content@': { template: require('./index.html') },
+                        'docs-sidebar@': { template: require('./toc.html') }
                     }
                 })
                 .state('main.examples.directive-app-selector', {

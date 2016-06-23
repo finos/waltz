@@ -1,15 +1,39 @@
 import _ from "lodash";
 
 
-function controller($timeout,
+const initialState = {
+    history: [],
+    logoOverlayText: '',
+    logoOverlayColor: '#444',
+    query: '',
+    searchResults: {
+        show: false,
+        apps: [],
+        people: [],
+        capabilities: [],
+        orgUnits: []
+    },
+    user: null
+};
+
+
+function controller($scope,
+                    $state,
+                    $timeout,
+                    $uibModal,
                     applicationStore,
                     capabilityStore,
+                    localStorageService,
                     personStore,
                     orgUnitStore,
-                    settingsStore) {
+                    settingsStore,
+                    userService) {
+
     const searchResults = {
         show: false
     };
+
+    const vm = _.defaultsDeep(this, initialState);
 
     settingsStore
         .findAll()
@@ -18,7 +42,11 @@ function controller($timeout,
             vm.logoOverlayColor = settingsStore.findOrDefault(settings, "ui.logo.overlay.color", "");
         });
 
-    function doSearch(query) {
+    userService
+        .whoami(true) // force
+        .then(user => vm.user = user);
+
+    const doSearch = (query) => {
         if (_.isEmpty(query)) {
             searchResults.show = false;
         } else {
@@ -36,28 +64,73 @@ function controller($timeout,
                 .search(query)
                 .then(r => searchResults.orgUnits = r);
         }
-    }
+    };
 
-    function dismissResults() {
-        $timeout(() => { searchResults.show = false; }, 400);
-    }
+    const reloadPage = () => $state.reload();
 
-    const vm = this;
+    const rejected = () => alert('Invalid username/password');
+
+    const logout = () => userService
+        .logout()
+        .then(reloadPage);
+
+    const dismissResults = () => $timeout(() => { searchResults.show = false; }, 400);
+
+    const modalController = ($scope, $uibModalInstance) => {
+        $scope.ok = () => {
+            $uibModalInstance.close({ userName: $scope.username, password: $scope.password });
+        };
+
+        $scope.username = '';
+        $scope.password = '';
+
+        $scope.cancel = () => $uibModalInstance.dismiss('cancel');
+    };
+
+    modalController.$inject = [
+        '$scope',
+        '$uibModalInstance'
+    ];
+
+    vm.searchResults = searchResults;
     vm.doSearch = () => doSearch(vm.query);
     vm.showSearch = () => searchResults.show;
     vm.dismissResults = dismissResults;
-    vm.searchResults = searchResults;
+    vm.refreshHistory = () => vm.history = localStorageService.get('history_2') || [];
+    vm.logout = logout;
+    vm.login = () => {
 
+        var modalInstance = $uibModal.open({
+            animation: true,
+            templateUrl: 'navbar/modal-login.html',
+            controllerAs: 'modal',
+            controller: modalController,
+            size: 'sm'
+        });
+
+        modalInstance.result
+            .then(
+                (credentials) => userService
+                    .login(credentials)
+                    .then(reloadPage, rejected),
+                () => console.log('Login dismissed at: ' + new Date()));
+
+    };
 }
 
 
 controller.$inject = [
+    '$scope',
+    '$state',
     '$timeout',
+    '$uibModal',
     'ApplicationStore',
     'CapabilityStore',
+    'localStorageService',
     'PersonStore',
     'OrgUnitStore',
-    'SettingsStore'
+    'SettingsStore',
+    'UserService'
 ];
 
 
