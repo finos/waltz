@@ -17,6 +17,29 @@ const initialState = {
 };
 
 
+function loginController($scope, $uibModalInstance, logoOverlayText) {
+    $scope.ok = () => {
+        const credentials = {
+            userName: $scope.username,
+            password: $scope.password
+        };
+        $uibModalInstance.close(credentials);
+    };
+
+    $scope.username = '';
+    $scope.password = '';
+    $scope.logoOverlayText = logoOverlayText || '';
+
+    $scope.cancel = () => $uibModalInstance.dismiss('cancel');
+}
+
+loginController.$inject = [
+    '$scope',
+    '$uibModalInstance',
+    'logoOverlayText'
+];
+
+
 function controller($scope,
                     $state,
                     $timeout,
@@ -77,23 +100,6 @@ function controller($scope,
 
     const dismissResults = () => $timeout(() => { searchResults.show = false; }, 400);
 
-    const modalController = ($scope, $uibModalInstance, logoOverlayText) => {
-        $scope.ok = () => {
-            $uibModalInstance.close({ userName: $scope.username, password: $scope.password });
-        };
-
-        $scope.username = '';
-        $scope.password = '';
-        $scope.logoOverlayText = logoOverlayText || '';
-
-        $scope.cancel = () => $uibModalInstance.dismiss('cancel');
-    };
-
-    modalController.$inject = [
-        '$scope',
-        '$uibModalInstance',
-        'logoOverlayText'
-    ];
 
     vm.searchResults = searchResults;
     vm.doSearch = () => doSearch(vm.query);
@@ -103,18 +109,17 @@ function controller($scope,
     vm.logout = logout;
     vm.login = () => {
 
-        var modalInstance = $uibModal.open({
+        var loginModalInstance = $uibModal.open({
             animation: true,
             templateUrl: 'navbar/modal-login.html',
-            controllerAs: 'modal',
-            controller: modalController,
+            controller: loginController,
             resolve: {
                 logoOverlayText: () => vm.logoOverlayText
             },
             size: 'sm'
         });
 
-        modalInstance.result
+        loginModalInstance.result
             .then(
                 (credentials) => userService
                     .login(credentials)
