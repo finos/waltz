@@ -17,8 +17,8 @@
 
 package com.khartec.waltz.service.app_view;
 
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
@@ -32,13 +32,13 @@ import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
 import com.khartec.waltz.service.bookmark.BookmarkService;
 import com.khartec.waltz.service.capability.CapabilityService;
+import com.khartec.waltz.service.entity_alias.EntityAliasService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import com.khartec.waltz.service.trait.TraitService;
 import com.khartec.waltz.service.trait.TraitUsageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -49,47 +49,51 @@ import static java.util.Collections.emptyList;
 @Service
 public class AppViewService {
 
-    private final ApplicationService appService;
-    private final BookmarkService bookmarkService;
-    private final OrganisationalUnitService organisationalUnitService;
     private final AppCapabilityService appCapabilityDao;
+    private final ApplicationService appService;
     private final AssetCostService assetCostService;
+    private final BookmarkService bookmarkService;
     private final CapabilityService capabilityService;
-    private final TraitUsageService traitUsageService;
+    private final EntityAliasService entityAliasService;
+    private final OrganisationalUnitService organisationalUnitService;
     private final TraitService traitService;
+    private final TraitUsageService traitUsageService;
 
 
     @Autowired
     public AppViewService(ApplicationService appService,
                           AppCapabilityService appCapabilityService,
-                          BookmarkService bookmarkService,
-                          OrganisationalUnitService organisationalUnitService,
                           AssetCostService assetCostService,
+                          BookmarkService bookmarkService,
                           CapabilityService capabilityService,
+                          EntityAliasService entityAliasService,
+                          OrganisationalUnitService organisationalUnitService,
                           TraitService traitService,
                           TraitUsageService traitUsageService) {
         checkNotNull(appService, "ApplicationService must not be null");
         checkNotNull(appCapabilityService, "appCapabilityService must not be null");
-        checkNotNull(bookmarkService, "BookmarkDao must not be null");
-        checkNotNull(organisationalUnitService, "organisationalUnitService must not be null");
         checkNotNull(assetCostService, "assetCostService must not be null");
+        checkNotNull(bookmarkService, "BookmarkDao must not be null");
         checkNotNull(capabilityService, "capabilityService must not be null");
-        checkNotNull(traitService, "traitService must not be null");
+        checkNotNull(entityAliasService, "entityAliasService cannot be null");
+        checkNotNull(organisationalUnitService, "organisationalUnitService must not be null");
         checkNotNull(traitUsageService, "traitUsageService must not be null");
+        checkNotNull(traitService, "traitService must not be null");
 
         this.appService = appService;
         this.appCapabilityDao = appCapabilityService;
-        this.bookmarkService = bookmarkService;
-        this.organisationalUnitService = organisationalUnitService;
         this.assetCostService = assetCostService;
+        this.bookmarkService = bookmarkService;
         this.capabilityService = capabilityService;
-        this.traitService = traitService;
+        this.entityAliasService = entityAliasService;
+        this.organisationalUnitService = organisationalUnitService;
         this.traitUsageService = traitUsageService;
+        this.traitService = traitService;
     }
 
 
     public AppView getAppView(long id) {
-        ImmutableEntityReference ref = ImmutableEntityReference.builder()
+        EntityReference ref = ImmutableEntityReference.builder()
                 .kind(EntityKind.APPLICATION)
                 .id(id)
                 .build();
@@ -106,7 +110,7 @@ public class AppViewService {
                 .organisationalUnit(organisationalUnitService.getById(app.organisationalUnitId()))
                 .bookmarks(bookmarkService.findByReference(ref))
                 .tags(appService.findTagsForApplication(id))
-                .aliases(appService.findAliasesForApplication(id))
+                .aliases(entityAliasService.findAliasesForEntityReference(ref))
                 .appCapabilities(appCapabilities)
                 .capabilities(capabilities)
                 .costs(assetCostService.findByAppId(id))
@@ -115,7 +119,7 @@ public class AppViewService {
     }
 
 
-    private List<Trait> findTraitsForApplication(ImmutableEntityReference ref) {
+    private List<Trait> findTraitsForApplication(EntityReference ref) {
         List<TraitUsage> traitUsages = traitUsageService.findByEntityReference(ref);
         return traitUsages.isEmpty()
                 ? emptyList()

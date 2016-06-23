@@ -17,12 +17,15 @@
 
 package com.khartec.waltz.service.application;
 
-import com.khartec.waltz.data.application.AppAliasDao;
 import com.khartec.waltz.data.application.AppTagDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.application.search.ApplicationSearchDao;
+import com.khartec.waltz.data.entity_alias.EntityAliasDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.tally.LongTally;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +52,7 @@ public class ApplicationService {
     private final ApplicationDao applicationDao;
     private final OrganisationalUnitDao orgUnitDao;
     private final AppTagDao appTagDao;
-    private final AppAliasDao appAliasDao;
+    private final EntityAliasDao entityAliasDao;
     private final ApplicationSearchDao appSearchDao;
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
 
@@ -57,20 +60,20 @@ public class ApplicationService {
     @Autowired
     public ApplicationService(ApplicationDao appDao,
                               AppTagDao appTagDao,
-                              AppAliasDao appAliasDao,
+                              EntityAliasDao entityAliasDao,
                               OrganisationalUnitDao orgUnitDao,
                               ApplicationSearchDao appSearchDao,
                               ApplicationIdSelectorFactory appIdSelectorFactory) {
         checkNotNull(appDao, "appDao must not be null");
         checkNotNull(appTagDao, "appTagDao must not be null");
-        checkNotNull(appAliasDao, "appAliasDao must not be null");
+        checkNotNull(entityAliasDao, "entityAliasDao must not be null");
         checkNotNull(orgUnitDao, "orgUnitDao must not be null");
         checkNotNull(appSearchDao, "appSearchDao must not be null");
         checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
 
         this.applicationDao = appDao;
         this.appTagDao = appTagDao;
-        this.appAliasDao = appAliasDao;
+        this.entityAliasDao = entityAliasDao;
         this.orgUnitDao = orgUnitDao;
         this.appSearchDao = appSearchDao;
         this.appIdSelectorFactory = appIdSelectorFactory;
@@ -123,8 +126,15 @@ public class ApplicationService {
         AppRegistrationResponse response = applicationDao.registerApp(request);
 
         if (response.registered()) {
+            EntityReference entityReference = ImmutableEntityReference.builder()
+                    .id(response.id().get())
+                    .kind(EntityKind.APPLICATION)
+                    .build();
+
+            entityAliasDao.updateAliases(entityReference,
+                    request.aliases());
+
             appTagDao.updateTags(response.id().get(), request.tags());
-            appAliasDao.updateAliases(response.id().get(), request.aliases());
         }
 
         return response;
@@ -193,16 +203,9 @@ public class ApplicationService {
         return appTagDao.findTagsForApplication(appId);
     }
 
-    public List<String> findAliasesForApplication(long appId) {
-        return appAliasDao.findAliasesForApplication(appId);
-    }
 
-    public int[] updateTags(long id, Collection<String> tags) {
-        return appTagDao.updateTags(id, tags);
-    }
-
-    public int[] updateAliases(long id, Collection<String> aliases) {
-        return appAliasDao.updateAliases(id, aliases);
+    public int[] updateTags(long appId, Collection<String> tags) {
+        return appTagDao.updateTags(appId, tags);
     }
 }
 

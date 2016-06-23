@@ -1,11 +1,10 @@
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.data.application.AppAliasDao;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.entity_alias.EntityAliasService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
@@ -27,16 +26,16 @@ public class EntityAliasEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "entity", "alias");
 
 
-    private final AppAliasDao appAliasDao;
+    private final EntityAliasService entityAliasService;
     private final ChangeLogService changeLogService;
 
 
     @Autowired
-    public EntityAliasEndpoint(AppAliasDao appAliasDao, ChangeLogService changeLogService) {
-        checkNotNull(appAliasDao, "appAliasDao cannot be null");
+    public EntityAliasEndpoint(EntityAliasService entityAliasService, ChangeLogService changeLogService) {
+        checkNotNull(entityAliasService, "entityAliasService cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
-        this.appAliasDao = appAliasDao;
+        this.entityAliasService = entityAliasService;
         this.changeLogService = changeLogService;
     }
 
@@ -48,11 +47,7 @@ public class EntityAliasEndpoint implements Endpoint {
 
         ListRoute<String> getRoute = (req, resp) -> {
             EntityReference ref = getEntityReference(req);
-            if (ref.kind() != EntityKind.APPLICATION) {
-                // TODO: need generic entity_tag table (#236)
-                throw new UnsupportedOperationException();
-            }
-            return appAliasDao.findAliasesForApplication(ref.id());
+            return entityAliasService.findAliasesForEntityReference(ref);
         };
 
         ListRoute<String> updateRoute = (req, resp) -> {
@@ -61,19 +56,14 @@ public class EntityAliasEndpoint implements Endpoint {
 
             EntityReference ref = getEntityReference(req);
 
-            if (ref.kind() != EntityKind.APPLICATION) {
-                // TODO: need generic entity_tag table (#236)
-                throw new UnsupportedOperationException();
-            }
-
-            List<String> tags = readStringsFromBody(req);
+            List<String> aliases = readStringsFromBody(req);
             String auditMessage = String.format(
-                    "Updated tags, entity: %s, new tags: %s, user: %s",
+                    "Updated alias, entity: %s, new aliases: %s, user: %s",
                     ref,
-                    tags,
+                    aliases,
                     user);
 
-            appAliasDao.updateAliases(ref.id(), tags);
+            entityAliasService.updateAliases(ref, aliases);
 
             LOG.info(auditMessage);
             changeLogService.write(ImmutableChangeLog.builder()
@@ -83,7 +73,7 @@ public class EntityAliasEndpoint implements Endpoint {
                     .severity(Severity.INFORMATION)
                     .build());
 
-            return tags;
+            return aliases;
         };
 
         postForList(updatePath, updateRoute);
