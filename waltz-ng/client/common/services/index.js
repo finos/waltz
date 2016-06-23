@@ -20,13 +20,21 @@ import {
     capabilityRatingNames,
     changeInitiativeNames,
     entityNames,
+    entityStatisticCategoryDisplayNames,
     investmentRatingNames,
     involvementKindNames,
     lifecyclePhaseDisplayNames,
     orgUnitKindNames,
     severityNames
 } from "./display_names";
-import {bookmarkIconNames, entityIconNames, severityIconNames, ragIconNames} from "./icon_names";
+import {
+    bookmarkIconNames,
+    booleanTypeIconNames,
+    entityIconNames,
+    entityStatisticCategoryIconNames,
+    severityIconNames,
+    ragIconNames
+} from "./icon_names";
 
 
 const displayNameService = new BaseLookupService();
@@ -44,6 +52,7 @@ export default (module) => {
     displayNameService.register('capabilityRating', capabilityRatingNames);
     displayNameService.register('changeInitiative', changeInitiativeNames);
     displayNameService.register('entity', entityNames);
+    displayNameService.register('entityStatistic', entityStatisticCategoryDisplayNames);
     displayNameService.register('investmentRating', investmentRatingNames);
     displayNameService.register('involvementKind', involvementKindNames);
     displayNameService.register('lifecyclePhase', lifecyclePhaseDisplayNames);
@@ -52,7 +61,9 @@ export default (module) => {
     displayNameService.register('severity', severityNames);
 
     iconNameService.register('bookmark', bookmarkIconNames);
+    iconNameService.register('BOOLEAN', booleanTypeIconNames);
     iconNameService.register('entity', entityIconNames);
+    iconNameService.register('entityStatistic', entityStatisticCategoryIconNames);
     iconNameService.register('severity', severityIconNames);
     iconNameService.register('rag', ragIconNames);
 

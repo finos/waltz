@@ -24,6 +24,7 @@ import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
 import com.khartec.waltz.model.bookmark.Bookmark;
 import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.cost.AssetCost;
+import com.khartec.waltz.model.entity_statistic.EntityStatisticWithValue;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.model.trait.Trait;
 import org.immutables.value.Value;
@@ -46,4 +47,5 @@ public abstract class AppView {
     public abstract Collection<Capability> capabilities();
     public abstract List<AssetCost> costs();
     public abstract List<Trait> explicitTraits();
+    public abstract List<EntityStatisticWithValue> entityStatisticsWithValues();
 }

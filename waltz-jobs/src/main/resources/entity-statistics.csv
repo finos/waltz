@@ -1,0 +1,7 @@
+name,type,category,renderer,historic_renderer
+Has Wings,BOOLEAN,COMPLIANCE,boolean,boolean
+Is predator,DATE,GOVERNANCE,date,date
+Can swim,ENUM,DATA_QUALITY,enum,enum
+Can climb trees,NUMERIC,SECURITY,numeric,numeric
+Is mammal,PERCENTAGE,COMPLIANCE,percentage,percentage
+Is reptile,BOOLEAN,DATA_QUALITY,boolean_if_false_unknown,boolean_if_false_unknown
