@@ -40,6 +40,7 @@ function controller($scope,
         .then(settings => {
             vm.logoOverlayText = settingsStore.findOrDefault(settings, "ui.logo.overlay.text", "");
             vm.logoOverlayColor = settingsStore.findOrDefault(settings, "ui.logo.overlay.color", "");
+            vm.allowDirectLogin = settingsStore.findOrDefault(settings, 'web.authentication', "") === 'waltz';
         });
 
     userService
@@ -76,20 +77,22 @@ function controller($scope,
 
     const dismissResults = () => $timeout(() => { searchResults.show = false; }, 400);
 
-    const modalController = ($scope, $uibModalInstance) => {
+    const modalController = ($scope, $uibModalInstance, logoOverlayText) => {
         $scope.ok = () => {
             $uibModalInstance.close({ userName: $scope.username, password: $scope.password });
         };
 
         $scope.username = '';
         $scope.password = '';
+        $scope.logoOverlayText = logoOverlayText || '';
 
         $scope.cancel = () => $uibModalInstance.dismiss('cancel');
     };
 
     modalController.$inject = [
         '$scope',
-        '$uibModalInstance'
+        '$uibModalInstance',
+        'logoOverlayText'
     ];
 
     vm.searchResults = searchResults;
@@ -105,6 +108,9 @@ function controller($scope,
             templateUrl: 'navbar/modal-login.html',
             controllerAs: 'modal',
             controller: modalController,
+            resolve: {
+                logoOverlayText: () => vm.logoOverlayText
+            },
             size: 'sm'
         });
 

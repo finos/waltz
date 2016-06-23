@@ -102,6 +102,7 @@
                         </div>
                     </li>
                     <li style="margin: 4px"
+                        ng-if="ctrl.allowDirectLogin"
                         waltz-if-anonymous="true">
                         <a class="clickable"
                            ng-click="ctrl.login()">
@@ -110,6 +111,7 @@
                         </a>
                     </li>
                     <li style="margin: 4px"
+                        ng-if="ctrl.allowDirectLogin"
                         waltz-if-anonymous="false">
                         <a class="clickable"
                            ng-click="ctrl.logout()">
@@ -226,7 +228,10 @@
 
     <script type="text/ng-template" id="navbar/modal-login.html">
         <div class="modal-header">
-            <h3 class="modal-title">Login to Waltz</h3>
+            <h3 class="modal-title">
+                Login to Waltz
+                <small ng-bind="logoOverlayText"></small>
+            </h3>
         </div>
 
         <div class="modal-body">
