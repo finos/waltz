@@ -1,35 +1,33 @@
 <nav class="navbar navbar-default navbar-fixed-top">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <a class="navbar-brand"
-               ui-sref="main.home">
-                <img height="30px"
-                     style="position: relative; top: -6px;"
-                     src="../../images/branding/waltz_badge+text_horizontal_positive_bw_300px.png">
-            </a>
-            <span ng-bind='ctrl.logoOverlayText'
-                  style='position: relative; left: -35px; top:30px; font-weight: bold; font-style: italic;'
-                  ng-style=" { 'color': ctrl.logoOverlayColor }">
-            </span>
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+        <a class="navbar-brand"
+           ui-sref="main.home">
+            <img height="30px"
+                 style="position: relative; top: -6px;"
+                 src="../../images/branding/waltz_badge+text_horizontal_positive_bw_300px.png">
+        </a>
+        <span ng-bind='ctrl.logoOverlayText'
+              style='display: inline; position: absolute; left: 120px; top:30px; font-weight: bold; font-style: italic; white-space: nowrap'
+              ng-style=" { 'color': ctrl.logoOverlayColor }">
+        </span>
+    </div>
 
-            <span ng-bind="ctrl.logoOverlay" ></span>
-        </div>
-
-        <ul class="nav navbar-nav nav-bar-left">
+    <div class="nav-bar-collapse">
+        <ul class="nav navbar-nav navbar-left">
             <li ui-sref-active="active">
                 <a ui-sref="main.org-unit.list">
                     <waltz-icon name="sitemap"></waltz-icon>
                     Org Units
                 </a>
             </li>
-            <li ui-sref-active="active" class="dropdown">
+            <li ui-sref-active="active">
                 <a ui-sref="main.capability.list">
                     <waltz-icon name="puzzle-piece"></waltz-icon>
                     Capabilities
                 </a>
             </li>
-            <li ui-sref-active="active" class="dropdown">
+            <li ui-sref-active="active">
                 <a ui-sref="main.process.list">
                     <waltz-icon name="code-fork"></waltz-icon>
                     Processes
@@ -37,57 +35,227 @@
             </li>
             <li ui-sref-active="active">
                 <a ui-sref="main.person">
-                    <waltz-icon name="user"></waltz-icon>
+                    <waltz-icon name="users"></waltz-icon>
                     People
                 </a>
             </li>
         </ul>
 
+        <ul class="nav navbar-nav navbar-right"
+            style="padding-right: 60px">
 
+            <li class="dropdown" uib-dropdown>
+                <a class="clickable"
+                   ng-click="ctrl.refreshHistory()"
+                   uib-dropdown-toggle>
+                    <waltz-icon name="history"></waltz-icon>
+                    Recently Viewed
+                    <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu"
+                    uib-dropdown-menu
+                    style="width: 250px"
+                    role="menu">
+                    <li ui-sref-active="side-active"
+                        style="margin: 4px"
+                        ng-repeat="item in ctrl.history">
+                        <a ui-sref="{{ ::item.state }} ({{ ::item.stateParams }})">
+                             <waltz-icon class='text-muted small'
+                                         fixed-width="true"
+                                         name="{{ item.kind | toIconName:'entity' }}"></waltz-icon>
+                            <span ng-bind="::item.name"></span>
+                        </a>
+                    </li>
 
-        <form class="navbar-form">
-            <div class="form-group" style="display:inline;">
-                <div class="input-group" style="display:table; padding-left: 24px;">
-                    <span class="input-group-addon"
-                          style="width:1%;">
-                        <span class="glyphicon glyphicon-search"></span>
+                    <li class="text-muted"
+                        ng-if="ctrl.history.length == 0">
+                        <span style="margin: 4px">
+                            Recently viewed items will be added as you navigate through Waltz
+                        </span>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="dropdown" uib-dropdown>
+                <a class="clickable"
+                   uib-dropdown-toggle>
+                    <span waltz-if-anonymous="true">
+                        <waltz-icon name="user"></waltz-icon>
+                        Anonymous
+                        <b class="caret"></b>
                     </span>
-                    <input class="form-control"
+                    <span waltz-if-anonymous="false">
+                        <waltz-icon name="user"></waltz-icon>
+                        Profile
+                        <b class="caret"></b>
+                    </span>
+                </a>
+                <ul class="dropdown-menu"
+                    uib-dropdown-menu
+                    style="width: 250px; margin: 4px"
+                    role="menu">
+                    <li style="margin: 4px">
+                        <div>
+                            <span waltz-if-anonymous="false"
+                                  ng-bind="ctrl.user.userName"></span>
+                            <span waltz-if-anonymous="true">Anonymous</span>
+                        </div>
+                    </li>
+                    <li style="margin: 4px"
+                        waltz-if-anonymous="true">
+                        <a class="clickable"
+                           ng-click="ctrl.login()">
+                            <waltz-icon name="sign-in"></waltz-icon>
+                            Login
+                        </a>
+                    </li>
+                    <li style="margin: 4px"
+                        waltz-if-anonymous="false">
+                        <a class="clickable"
+                           ng-click="ctrl.logout()">
+                            <waltz-icon name="sign-out"></waltz-icon>
+                            Logout
+                        </a>
+                    </li>
+
+                    <li class="divider" waltz-has-role="ADMIN"></li>
+
+                    <li class="side-inactive"
+                        waltz-has-role="ADMIN"
+                        ui-sref-active="side-active">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="cubes"></waltz-icon>
+                        <a ui-sref="main.traits">
+                            Manage Traits
+                        </a>
+                    </li>
+                    <li class="side-inactive"
+                        waltz-has-role="ADMIN"
+                        ui-sref-active="side-active">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="users"></waltz-icon>
+                        <a ui-sref="main.user.management">
+                            Manage Users
+                        </a>
+                    </li>
+                    <li class="side-inactive"
+                        waltz-has-role="APP_EDITOR"
+                        ui-sref-active="side-active">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="gift"></waltz-icon>
+                        <a ui-sref="main.app.registration">
+                            Register App
+                        </a>
+                    </li>
+                    <li class="side-inactive"
+                        waltz-has-role="ADMIN"
+                        ui-sref-active="side-active">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="cog"></waltz-icon>
+                        <a ui-sref="main.settings">
+                            Settings
+                        </a>
+                    </li>
+                    <li class="side-inactive"
+                        waltz-has-role="ADMIN"
+                        ui-sref-active="side-active">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="map-signs"></waltz-icon>
+                        <a ui-sref="main.source-data-ratings">
+                            Source Data Ratings
+                        </a>
+                    </li>
+                    <li class="side-inactive"
+                        waltz-has-role="ADMIN"
+                        ui-sref-active="side-active">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="list-ul"></waltz-icon>
+                        <a ui-sref="main.user.log">
+                            User Logs
+                        </a>
+                    </li>
+                </ul>
+
+            </li>
+
+        </ul>
+
+        <form class="navbar-form navbar-right"
+              role="search">
+            <div class="form-group">
+                <div class="input-group"
+                     style="display: table; padding-left: 24px;">
+                    <input type="text"
+                           class="form-control"
                            ng-model="ctrl.query"
                            ng-model-options="{ debounce: 250 }"
                            ng-change="ctrl.doSearch()"
                            ng-blur="ctrl.dismissResults()"
-                           placeholder="Search...."
                            autocomplete="off"
                            autofocus="autofocus"
-                           type="text">
-
-                    <style>
-                        .waltz-nav-search-result-panel {
-                            top: 30px;
-                            position: absolute;
-                            background-color: white;
-                            width:90%;
-                            border: 1px solid #ccc;
-                            box-shadow: 0px 4px 5px gray, -5px 4px 7px gray, 5px 4px 7px gray;
-                        }
-                    </style>
-                    <div class="waltz-nav-search-result-panel" ng-if="ctrl.showSearch()">
-                        <waltz-nav-search-results results="ctrl.searchResults"
-                                                  query="{{ ctrl.query }}"
-                                                  on-dismiss="ctrl.dismissResults"></waltz-nav-search-results>
-                    </div>
+                           placeholder="Search">
 
                 </div>
-
+                <style>
+                    .waltz-nav-search-result-panel {
+                        top: 42px;
+                        right: 100px;
+                        position: absolute;
+                        background-color: white;
+                        width:50%;
+                        border: 1px solid #ccc;
+                        box-shadow: 0px 4px 5px gray, -5px 4px 7px gray, 5px 4px 7px gray;
+                    }
+                </style>
+                <div class="waltz-nav-search-result-panel" ng-if="ctrl.showSearch()">
+                    <waltz-nav-search-results results="ctrl.searchResults"
+                                              query="{{ ctrl.query }}"
+                                              on-dismiss="ctrl.dismissResults"></waltz-nav-search-results>
+                </div>
             </div>
-
         </form>
-
-
-
 
     </div>
 
 
+    <script type="text/ng-template" id="navbar/modal-login.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Login to Waltz</h3>
+        </div>
+
+        <div class="modal-body">
+            <form>
+                <label>Username</label>
+                <input class='form-control input-sm'
+                       ng-model="username"
+                       autofocus
+                       placeholder="username">
+
+                <label>Password</label>
+                <input class='form-control input-sm'
+                       type="password"
+                       ng-model="password"
+                       placeholder="password">
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-primary"
+                    type="button"
+                    ng-click="ok()">
+                OK
+            </button>
+            <button class="btn btn-warning"
+                    type="button"
+                    ng-click="cancel()">
+                Cancel
+            </button>
+        </div>
+    </script>
 </nav>
