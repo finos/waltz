@@ -49,9 +49,27 @@ export const severityIconNames = {
     WARNING: 'sitemap'
 };
 
+
 export const ragIconNames = {
     R: 'times-circle',
     A: 'question-circle',
     G: 'check-circle',
     Z: 'circle-o'
+};
+
+
+export const entityStatisticCategoryIconNames = {
+    COMPLIANCE: 'exclamation-triangle',
+    GOVERNANCE: 'balance-scale',
+    SECURITY: 'lock',
+    REGULATORY: 'registered',
+    DATA_QUALITY: 'exchange'
+};
+
+
+export const booleanTypeIconNames = {
+    Unknown: 'question',
+    Exempt: 'ban',
+    Yes: 'check',
+    No: 'times'
 };

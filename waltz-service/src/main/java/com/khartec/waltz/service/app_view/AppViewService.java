@@ -33,6 +33,7 @@ import com.khartec.waltz.service.asset_cost.AssetCostService;
 import com.khartec.waltz.service.bookmark.BookmarkService;
 import com.khartec.waltz.service.capability.CapabilityService;
 import com.khartec.waltz.service.entity_alias.EntityAliasService;
+import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import com.khartec.waltz.service.trait.TraitService;
 import com.khartec.waltz.service.trait.TraitUsageService;
@@ -55,6 +56,7 @@ public class AppViewService {
     private final BookmarkService bookmarkService;
     private final CapabilityService capabilityService;
     private final EntityAliasService entityAliasService;
+    private final EntityStatisticService entityStatisticService;
     private final OrganisationalUnitService organisationalUnitService;
     private final TraitService traitService;
     private final TraitUsageService traitUsageService;
@@ -67,6 +69,7 @@ public class AppViewService {
                           BookmarkService bookmarkService,
                           CapabilityService capabilityService,
                           EntityAliasService entityAliasService,
+                          EntityStatisticService entityStatisticService,
                           OrganisationalUnitService organisationalUnitService,
                           TraitService traitService,
                           TraitUsageService traitUsageService) {
@@ -76,9 +79,10 @@ public class AppViewService {
         checkNotNull(bookmarkService, "BookmarkDao must not be null");
         checkNotNull(capabilityService, "capabilityService must not be null");
         checkNotNull(entityAliasService, "entityAliasService cannot be null");
+        checkNotNull(entityStatisticService, "entityStatisticService must not be null");
         checkNotNull(organisationalUnitService, "organisationalUnitService must not be null");
-        checkNotNull(traitUsageService, "traitUsageService must not be null");
         checkNotNull(traitService, "traitService must not be null");
+        checkNotNull(traitUsageService, "traitUsageService must not be null");
 
         this.appService = appService;
         this.appCapabilityDao = appCapabilityService;
@@ -86,6 +90,7 @@ public class AppViewService {
         this.bookmarkService = bookmarkService;
         this.capabilityService = capabilityService;
         this.entityAliasService = entityAliasService;
+        this.entityStatisticService = entityStatisticService;
         this.organisationalUnitService = organisationalUnitService;
         this.traitUsageService = traitUsageService;
         this.traitService = traitService;
@@ -115,6 +120,7 @@ public class AppViewService {
                 .capabilities(capabilities)
                 .costs(assetCostService.findByAppId(id))
                 .explicitTraits(traits)
+                .entityStatisticsWithValues(entityStatisticService.findStatisticsForEntity(ref, true))
                 .build();
     }
 

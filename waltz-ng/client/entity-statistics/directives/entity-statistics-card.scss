@@ -1,0 +1,11 @@
+.waltz-entity-statistic-card {
+    tr td {
+        border-top: none !important;
+    }
+
+    tbody:not(:last-child) tr td {
+        border-bottom: 1px solid #ddd;
+    }
+}
+
+
