@@ -1,4 +1,17 @@
-import _ from 'lodash';
+import _ from "lodash";
+import apiCheck from "api-check";
+
+
+export const checkIsEntityRef = apiCheck
+    .shape({
+        id: apiCheck.number,
+        kind: apiCheck.string
+    });
+
+
+export const checkIsStringList = apiCheck
+    .arrayOf(apiCheck.string);
+
 
 
 export function ensureIsArray(xs, message) {

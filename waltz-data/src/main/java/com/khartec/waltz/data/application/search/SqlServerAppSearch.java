@@ -5,10 +5,10 @@ import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.Application;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.ApplicationAlias.APPLICATION_ALIAS;
+import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 
 public class SqlServerAppSearch implements FullTextSearch<Application>, DatabaseVendorSpecific {
 
@@ -34,15 +34,15 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
         }
 
         Condition aliasCondition = terms.stream()
-                .map(term -> APPLICATION_ALIAS.ALIAS.like("%" + term + "%"))
+                .map(term -> ENTITY_ALIAS.ALIAS.like("%" + term + "%"))
                 .collect(Collectors.reducing(
-                        DSL.trueCondition(),
+                        ENTITY_ALIAS.KIND.eq(EntityKind.APPLICATION.name()),
                         (acc, frag) -> acc.and(frag)));
 
         List<Application> appsViaAlias = dsl.selectDistinct(APPLICATION.fields())
                 .from(APPLICATION)
-                .innerJoin(APPLICATION_ALIAS)
-                .on(APPLICATION_ALIAS.APPLICATION_ID.eq(APPLICATION.ID))
+                .innerJoin(ENTITY_ALIAS)
+                .on(ENTITY_ALIAS.ID.eq(APPLICATION.ID))
                 .where(aliasCondition)
                 .orderBy(APPLICATION.NAME)
                 .limit(20)

@@ -1,34 +1,60 @@
-## CURRENT
+# Waltz Features
+
+## Overview
+
+The primary purpose Waltz is to ..... (grab from confluence)
+
+....deep dives are left to the sources
+
+- Open Source
+    - absolute control if desired
+    - strongly influencing direction of tool
+    - low cost
+    - short time to value
+
+- Target Marker
+    - Wide range of users
+    - Low footprint
+    - ease of use
+    - Low configuration (because it's opinionated)
+
+
+
+## Current
+
 
 ### Application
-  - Basic Info (overall rating, UBR etc)
+  - Basic Info (overall investment status, UBR etc)
   - App Capabilities
   - w/ Ratings per area
-  - Logical Data Flows w/ types
+    - user editable
+  - Logical Data Flows w/ data categories/classes
+    - user editable
   - Cost Summaries
   - Change Initiatives (via groups)
   - Technologies
     - Servers
-    - (Databases / Software coming)
-  - Complexity Scores
-
-### All Main entities (Org Units, Capabilities etc)
-  - Person Involvement
-  - Bookmarks
+    - (Databases / Software awaiting source data)
+  - Complexity Scores (derived)
 
 ### Aggregate views
   - By Capability
   - By Organisational Unit (ubr)
   - By Person (incl. all reportees)
-  - By Buiness Process (GM Critical Processes)
-  - By Custom group (ad hoc)
+  - By Business Process (GM Critical Processes)
+  - By Custom group (user defined)
 
 ### Aggregate views contain
+  - Associated Apps
   - Data flow overview (customisable)
   - Complexity breakdown
   - Asset Cost summary
-  - Associated Apps
   - Technology summary
+
+### All Main entities (Apps, Org Units, Capabilities etc)
+  - Association of people to entities
+  - Bookmarks describing entity
+  - Audited
 
 ### Org Unit Specific
   - End User Application associations (via c7 ownership)
@@ -41,41 +67,56 @@
 ### Navigation Aids
   - can be integrated and 'deep linked' (i.e. Org Charts)
 
+### Source Data Ratings
+  - provide a view on how waltz sees the quality of it's data providers
+  - and the freshness
+  - aim is to give users confidence/oversight on source data
 
 
-## FUTURE
+## Future
 
 
 ### Entity Statistics
-  - e.g. compliance flags, performance metrics etc
+  - e.g. compliance flags, data quality, performance metrics etc
+  - historic views
+  - KPI reporting
+  - *Grouping feature will allow for ad-hoc report packs*
 
 ### Describe portfolio changes over time
   - associated 
     - to change initiatives
-    - transitively to other entities
-  - describing 
+    - to entities
+  - describing
     - application capability rating changes
+    - retirements
     - application data flow changes
+    - *transitively show impact on other entities*
 
 ### App Capability ratings over a set of hierarchical items
-  - e.g. products definitions
-  - lines of business
-  - region
+  - provides a multi dimensional view of an applications role
+    - e.g. products definitions
+    - lines of business
+    - region
+
+### Ad hoc Surveys
+  - Target defined subset of estate
+  - reduce duplication of effort to acquire data
+    - increase exposure of this data
 
 ### Logical Flows tied to physical characteristics
   - Transport mechanisms
   - file formats
-  - schedules
+  - *schedules, SLA/OLA definitions*
 
 ### Diagram Editor
-  - Constrained diagramming tool
+  - Diagramming tool
     - understands domain entities and their relationships
     - indexable, customisable rendering
-    - (replace navaids in long run)
+    - *replace nav-aids*
 
-### Reporting
+### Insights
   - segregation of duty
-    - we understand involvement, apps and what apps do...
+    - through understanding relationships between people, applications and capabilities
   - technology risk exposure
     - outdated/non-strategic tech usage
 
@@ -83,13 +124,13 @@
   - notification of data discrepancies / challenges
 
 ### Capability Model Management
-  - migrate/edit capabilities
+  - *migrate/edit capabilities*
 
 ### Anonymised Industry ratings
-  - requires large waltz user base
+  - *requires large waltz user base*
 
 ### Custom Extensions
-  - plugin module system
+  - *plugin module system*
 
 
 

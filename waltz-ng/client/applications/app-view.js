@@ -9,6 +9,8 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+
+import _ from "lodash";
 import {
     loadAuthSources,
     loadChangeLog,
@@ -23,9 +25,33 @@ import {prepareSlopeGraph} from "../data-flow/directives/slope-graph/slope-graph
 import {mkAppRatingsGroup, calculateHighestRatingCount} from "../ratings/directives/common";
 
 
+const initialState = {
+    aliases: [],
+    appAuthSources: [],
+    appCapabilities: [],
+    capabilities: [],
+    complexity: [],
+    databases: [],
+    dataTypes: [],
+    explicitTraits: [],
+    flows: [],
+    ouAuthSources: [],
+    organisationalUnit: null,
+    peopleInvolvements: [],
+    processes: [],
+    ratings: null,
+    servers: [],
+    softwareCatalog: [],
+    sourceDataRatings: [],
+    tags: [],
+    visibility: {}
+};
+
+
 function controller($q,
                     $state,
                     appView,
+                    aliasStore,
                     authSourcesStore,
                     changeLogStore,
                     complexityStore,
@@ -43,7 +69,9 @@ function controller($q,
 
     const { id, organisationalUnitId } = appView.app;
 
-    const vm = this;
+    const entityRef = { id, kind: 'APPLICATION' };
+
+    const vm = Object.assign(this, initialState);
 
     const perspectiveCode = 'BUSINESS';
 
@@ -97,7 +125,6 @@ function controller($q,
         .then(() => loadSourceDataRatings(sourceDataRatingStore, vm))
 
 
-
     complexityStore
         .findByApplication(id)
         .then(c => vm.complexity = c);
@@ -106,6 +133,13 @@ function controller($q,
         .findForApplication(id)
         .then(ps => vm.processes = ps);
 
+    vm.saveAliases = (aliases) => {
+        const aliasValues = _.map(aliases, 'text');
+        return aliasStore
+            .update(entityRef, aliasValues)
+            .then(() => vm.aliases = aliasValues);
+    };
+
 }
 
 
@@ -113,6 +147,7 @@ controller.$inject = [
     '$q',
     '$state',
     'appView',
+    'AliasStore',
     'AuthSourcesStore',
     'ChangeLogDataService',
     'ComplexityStore',

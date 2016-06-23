@@ -1,9 +1,16 @@
-export default () => ({
+const directive = {
     restrict: 'E',
-    replace: true,
+    replace: false,
     scope: {
         keywords: '=',
         onSelect: '&?'
     },
+    transclude: {
+        empty: '?empty',
+        last: '?last'
+    },
     template: require('./keyword-list.html')
-});
+};
+
+
+export default () => directive;

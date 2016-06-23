@@ -8,6 +8,7 @@ function setup(module) {
         require('./common/services'),
 
         require('./access-log'),
+        require('./alias'),
         require('./applications'),
         require('./app-capabilities'),
         require('./app-groups'),
