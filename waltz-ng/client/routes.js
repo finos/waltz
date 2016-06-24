@@ -7,7 +7,6 @@ function configureRoutes($stateProvider, $urlRouterProvider) {
             url: '/',
             views: {
                 'header': {template: '<waltz-navbar></waltz-navbar>'},
-                'sidebar': {template: '<waltz-sidebar></waltz-sidebar>'},
                 'content': require('./welcome/welcome.js'),
                 'footer': {template: require('./footer/footer.html')}
             }

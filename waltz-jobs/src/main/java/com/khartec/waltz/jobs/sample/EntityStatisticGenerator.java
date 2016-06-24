@@ -2,12 +2,14 @@ package com.khartec.waltz.jobs.sample;
 
 
 import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.entity_statistic.*;
+import com.khartec.waltz.model.entity_statistic.EntityStatistic;
+import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
+import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatistic;
+import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticValue;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple4;
@@ -16,15 +18,12 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.ArrayUtilities.randomPick;
 import static com.khartec.waltz.common.IOUtilities.readLines;
 import static com.khartec.waltz.schema.tables.EntityStatistic.ENTITY_STATISTIC;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 
 public class EntityStatisticGenerator implements SampleDataGenerator {
 
@@ -126,7 +125,7 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
 
         // create a value
         List<EntityStatisticValue> values = new ArrayList<>(5);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 2; i++) {
             List<Tuple4> statisticValues = statisticTypeValueMap.get(es.type());
             Tuple4 esvSample = randomPick(statisticValues.toArray(new Tuple4[statisticValues.size()]));
             ImmutableEntityStatisticValue value = ImmutableEntityStatisticValue.builder()

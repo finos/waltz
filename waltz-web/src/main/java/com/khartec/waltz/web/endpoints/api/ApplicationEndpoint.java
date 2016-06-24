@@ -19,6 +19,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.application.AppRegistrationRequest;
@@ -29,6 +30,7 @@ import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.tally.LongTally;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.entity_alias.EntityAliasService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
@@ -60,16 +62,20 @@ public class ApplicationEndpoint implements Endpoint {
 
     private final ApplicationService appService;
     private final ChangeLogService changeLogService;
+    private final EntityAliasService entityAliasService;
 
 
     @Autowired
     public ApplicationEndpoint(ApplicationService appService,
-                               ChangeLogService changeLogService) {
+                               ChangeLogService changeLogService,
+                               EntityAliasService entityAliasService) {
         checkNotNull(appService, "appService must not be null");
         checkNotNull(changeLogService, "changeLogService must not be null");
+        checkNotNull(entityAliasService, "entityAliasService cannot be null");
 
         this.appService = appService;
         this.changeLogService = changeLogService;
+        this.entityAliasService = entityAliasService;
     }
 
 
@@ -89,21 +95,23 @@ public class ApplicationEndpoint implements Endpoint {
 
             Long appId = appChange.app().id().get();
 
-            appChange.changes().forEach(c -> changeLogService.write(
-                    ImmutableChangeLog.builder()
-                        .message(c.toDescription())
-                        .severity(Severity.INFORMATION)
-                        .userId(WebUtilities.getUsername(req))
-                        .parentReference(ImmutableEntityReference.builder()
-                                .kind(EntityKind.APPLICATION)
-                                .id(appId)
-                                .build())
-                        .build()));
+            EntityReference ref = ImmutableEntityReference.builder()
+                    .kind(EntityKind.APPLICATION)
+                    .id(appId)
+                    .build();
 
+            appChange.changes()
+                    .forEach(c -> changeLogService.write(
+                        ImmutableChangeLog.builder()
+                                .message(c.toDescription())
+                                .severity(Severity.INFORMATION)
+                                .userId(WebUtilities.getUsername(req))
+                                .parentReference(ref)
+                                .build()));
 
             appService.update(appChange.app());
             appService.updateTags(appId, appChange.tags());
-            appService.updateAliases(appId, appChange.aliases());
+            entityAliasService.updateAliases(ref, appChange.aliases());
 
             return true;
         };

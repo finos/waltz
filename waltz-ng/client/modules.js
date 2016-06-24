@@ -8,6 +8,7 @@ function setup(module) {
         require('./common/services'),
 
         require('./access-log'),
+        require('./alias'),
         require('./applications'),
         require('./app-capabilities'),
         require('./app-groups'),
@@ -36,7 +37,6 @@ function setup(module) {
         require('./ratings'),
         require('./server-info'),
         require('./settings'),
-        require('./sidebar'),
         require('./software-catalog'),
         require('./source-data-rating'),
         require('./static-panel'),

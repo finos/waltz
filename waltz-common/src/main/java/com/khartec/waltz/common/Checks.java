@@ -78,8 +78,8 @@ public class Checks {
 
 
     public static <T> T checkOptionalIsPresent(Optional<T> optional, String message) {
-        checkTrue(optional.isPresent(), message);
-        return optional.get();
+        return optional
+                .orElseThrow(() -> new IllegalArgumentException(message));
     }
 
     public static <T> void checkNotEmpty(Collection<T> ts, String message) {

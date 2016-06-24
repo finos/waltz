@@ -33,7 +33,7 @@ import {
     entityIconNames,
     entityStatisticCategoryIconNames,
     severityIconNames,
-    ragIconNames,
+    ragIconNames
 } from "./icon_names";
 
 

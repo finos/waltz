@@ -1,5 +1,5 @@
 function controller() {
-
+    const vm = this;
 }
 
 export default () => ({
@@ -8,10 +8,11 @@ export default () => ({
     scope: {},
     bindToController: {
         app: '=',
+        organisationalUnit: '=',
+        complexity: '=',
         tags: '=',
         aliases: '=',
-        organisationalUnit: '=',
-        complexity: '='
+        updateAliases: '&'
     },
     controller,
     controllerAs: 'ctrl',

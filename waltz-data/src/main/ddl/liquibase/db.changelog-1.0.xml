@@ -1972,4 +1972,33 @@
         </createIndex>
     </changeSet>
 
+    <!-- 237 entity alias -->
+    <changeSet author="dwatkins"
+               id="20160623-237-1">
+        <renameTable newTableName="entity_alias"
+                     oldTableName="application_alias"/>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               id="20160623-237-2">
+        <renameColumn columnDataType="${long.type}"
+                      newColumnName="id"
+                      oldColumnName="application_id"
+                      tableName="entity_alias"/>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               id="20160623-237-3">
+        <addColumn tableName="entity_alias">
+            <column defaultValue="APPLICATION"
+                    name="kind"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
 </databaseChangeLog>
