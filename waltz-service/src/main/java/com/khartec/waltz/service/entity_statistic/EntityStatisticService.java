@@ -2,7 +2,7 @@ package com.khartec.waltz.service.entity_statistic;
 
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticWithValue;
+import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ public class EntityStatisticService {
     }
 
 
-    public List<EntityStatisticWithValue> findStatisticsForEntity(EntityReference ref, boolean active) {
+    public List<EntityStatistic> findStatisticsForEntity(EntityReference ref, boolean active) {
         checkNotNull(ref, "ref cannot be null");
         return entityStatisticDao.findStatisticsForEntity(ref, active);
     }
