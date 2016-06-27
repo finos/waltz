@@ -22,6 +22,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -35,6 +36,7 @@ public class EntityStatisticHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
         EntityStatisticDao dao = ctx.getBean(EntityStatisticDao.class);
+        EntityStatisticService service = ctx.getBean(EntityStatisticService.class);
 
         ImmutableEntityReference ref = ImmutableEntityReference.builder()
                 .kind(EntityKind.APPLICATION)
@@ -44,6 +46,8 @@ public class EntityStatisticHarness {
         List<EntityStatistic> values = dao.findStatisticsForEntity(ref, true);
 
         System.out.println(values.size());
+
+
     }
 
 }

@@ -9,6 +9,6 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableEntityStatistic.class)
 public abstract class EntityStatistic {
 
-    public abstract EntityStatisticDefinition statistic();
+    public abstract EntityStatisticDefinition definition();
     public abstract EntityStatisticValue value();
 }

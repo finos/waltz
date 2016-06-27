@@ -81,7 +81,7 @@ public class EntityStatisticDao {
 
     private static final RecordMapper<? super Record, EntityStatistic> TO_COMPOUND_MAPPER = record -> {
         return ImmutableEntityStatistic.builder()
-                .statistic(TO_DEFINITION_MAPPER.map(record))
+                .definition(TO_DEFINITION_MAPPER.map(record))
                 .value(TO_VALUE_MAPPPER.map(record))
                 .build();
     };
@@ -94,28 +94,6 @@ public class EntityStatisticDao {
     public EntityStatisticDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
         this.dsl = dsl;
-    }
-
-
-    public List<EntityStatistic> findStatisticsForEntity(EntityReference ref, boolean active) {
-        checkNotNull(ref, "ref cannot be null");
-        return dsl.select(es.fields())
-                .select(esv.fields())
-                .from(es)
-                .innerJoin(esv)
-                .on(esv.STATISTIC_ID.eq(es.ID))
-                .where(es.ACTIVE.eq(active)
-                        .and(esv.ENTITY_KIND.eq(ref.kind().name()))
-                        .and(esv.ENTITY_ID.eq(ref.id()))
-                        .and(esv.CURRENT.eq(true)))
-                .fetch(TO_COMPOUND_MAPPER);
-    }
-
-
-    public List<EntityStatisticDefinition> getAllEntityStatistics() {
-        return dsl.select(es.fields())
-                .from(es)
-                .fetch(TO_DEFINITION_MAPPER);
     }
 
 
@@ -155,4 +133,27 @@ public class EntityStatisticDao {
                         .collect(Collectors.toList()))
                 .execute();
     }
+
+
+    public List<EntityStatistic> findStatisticsForEntity(EntityReference ref, boolean active) {
+        checkNotNull(ref, "ref cannot be null");
+        return dsl.select(es.fields())
+                .select(esv.fields())
+                .from(es)
+                .innerJoin(esv)
+                .on(esv.STATISTIC_ID.eq(es.ID))
+                .where(es.ACTIVE.eq(active)
+                        .and(esv.ENTITY_KIND.eq(ref.kind().name()))
+                        .and(esv.ENTITY_ID.eq(ref.id()))
+                        .and(esv.CURRENT.eq(true)))
+                .fetch(TO_COMPOUND_MAPPER);
+    }
+
+
+    public List<EntityStatisticDefinition> getAllEntityStatistics() {
+        return dsl.select(es.fields())
+                .from(es)
+                .fetch(TO_DEFINITION_MAPPER);
+    }
+
 }

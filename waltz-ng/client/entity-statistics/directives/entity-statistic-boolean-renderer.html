@@ -1,8 +1,4 @@
 <div>
-    <waltz-icon name="{{ctrl.value.outcome | toIconName:ctrl.statistic.type}}"
-                size="lg"
-                ng-class="ctrl.value.outcome"
-                fixed-width="true"
-                uib-tooltip="{{ctrl.value.reason}}">
-    </waltz-icon>
+    <kbd ng-bind="ctrl.value.outcome">
+    </kbd>
 </div>
