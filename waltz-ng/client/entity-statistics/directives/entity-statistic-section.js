@@ -31,9 +31,9 @@ function controller($scope) {
         if(!_.isEmpty(entityStats)) {
 
             vm.entityStatisticsGrouped = d3.nest()
-                .key(x => x.statistic.category)
+                .key(x => x.definition.category)
                 .sortKeys(d3.ascending)
-                .sortValues((a, b) => a.statistic.name < b.statistic.name)
+                .sortValues((a, b) => a.definition.name < b.definition.name)
                 .entries(entityStats);
         }
     });

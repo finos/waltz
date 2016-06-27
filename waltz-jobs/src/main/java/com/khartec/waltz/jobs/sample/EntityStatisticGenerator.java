@@ -1,15 +1,11 @@
 package com.khartec.waltz.jobs.sample;
 
-
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.entity_statistic.EntityStatistic;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
-import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatistic;
-import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticValue;
+import com.khartec.waltz.model.entity_statistic.*;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple4;
@@ -21,15 +17,14 @@ import java.util.*;
 
 import static com.khartec.waltz.common.ArrayUtilities.randomPick;
 import static com.khartec.waltz.common.IOUtilities.readLines;
-import static com.khartec.waltz.schema.tables.EntityStatistic.ENTITY_STATISTIC;
+import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 import static java.util.stream.Collectors.*;
 
 public class EntityStatisticGenerator implements SampleDataGenerator {
 
-    private static final Random rnd = new Random();
-    private static final int ES_COUNT = 5000;
     private static final String PROVENANCE = "waltz";
+    private static final int VALUE_COUNT = 4;
 
 
     public static void main(String[] args) throws IOException {
@@ -49,12 +44,12 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
         Application[] applications = applicationDao.getAll().toArray(new Application[0]);
 
 
-        dsl.deleteFrom(ENTITY_STATISTIC).execute();
+        dsl.deleteFrom(ENTITY_STATISTIC_DEFINITION).execute();
         dsl.deleteFrom(ENTITY_STATISTIC_VALUE).execute();
         System.out.println("deleted existing statistics");
 
         // insert new entity stats
-        List<EntityStatistic> allEntityStatistics = null;
+        List<EntityStatisticDefinition> allEntityStatistics = null;
         try {
             allEntityStatistics = insertEntityStatistics(entityStatisticDao);
         } catch (IOException e) {
@@ -66,7 +61,7 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
         List<EntityStatisticValue> values = new ArrayList<>(applications.length * allEntityStatistics.size());
         for (Application app : applications) {
 
-            for (EntityStatistic es : allEntityStatistics) {
+            for (EntityStatisticDefinition es : allEntityStatistics) {
                 try {
                     values.addAll(buildEntityStatisticValues(app, es));
                 } catch (IOException e) {
@@ -86,13 +81,13 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
     }
 
 
-    private static List<EntityStatistic> insertEntityStatistics(EntityStatisticDao entityStatisticDao) throws IOException {
+    private static List<EntityStatisticDefinition> insertEntityStatistics(EntityStatisticDao entityStatisticDao) throws IOException {
         List<String> lines = readLines(OrgUnitGenerator.class.getResourceAsStream("/entity-statistics.csv"));
-        List<EntityStatistic> entityStatistics = lines.stream()
+        List<EntityStatisticDefinition> entityStatistics = lines.stream()
                 .skip(1)
                 .map(line -> line.split(","))
                 .filter(cells -> cells.length == 5)
-                .map(cells -> ImmutableEntityStatistic.builder()
+                .map(cells -> ImmutableEntityStatisticDefinition.builder()
                         .name(cells[0])
                         .description("Described: " + cells[0])
                         .type(StatisticType.valueOf(cells[1]))
@@ -109,7 +104,7 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
     }
 
 
-    private List<EntityStatisticValue> buildEntityStatisticValues(Application app, EntityStatistic es) throws IOException {
+    private List<EntityStatisticValue> buildEntityStatisticValues(Application app, EntityStatisticDefinition es) throws IOException {
         List<String> lines = readLines(OrgUnitGenerator.class.getResourceAsStream("/entity-statistic-values.csv"));
         Map<StatisticType, List<Tuple4>> statisticTypeValueMap = lines.stream()
                 .skip(1)
@@ -124,8 +119,8 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
                 .collect(groupingBy(entry -> entry.getKey(), mapping(entry -> entry.getValue(), toList())));
 
         // create a value
-        List<EntityStatisticValue> values = new ArrayList<>(5);
-        for (int i = 0; i < 2; i++) {
+        List<EntityStatisticValue> values = new ArrayList<>(VALUE_COUNT);
+        for (int i = 0; i < VALUE_COUNT; i++) {
             List<Tuple4> statisticValues = statisticTypeValueMap.get(es.type());
             Tuple4 esvSample = randomPick(statisticValues.toArray(new Tuple4[statisticValues.size()]));
             ImmutableEntityStatisticValue value = ImmutableEntityStatisticValue.builder()

@@ -20,8 +20,9 @@ package com.khartec.waltz.jobs;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticWithValue;
+import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -35,31 +36,18 @@ public class EntityStatisticHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
         EntityStatisticDao dao = ctx.getBean(EntityStatisticDao.class);
+        EntityStatisticService service = ctx.getBean(EntityStatisticService.class);
 
         ImmutableEntityReference ref = ImmutableEntityReference.builder()
                 .kind(EntityKind.APPLICATION)
                 .id(1415)
                 .build();
 
-        List<EntityStatisticWithValue> values = dao.findStatisticsForEntity(ref, true);
+        List<EntityStatistic> values = dao.findStatisticsForEntity(ref, true);
 
         System.out.println(values.size());
-//        ApplicationService applicationService = ctx.getBean(ApplicationService.class);
-//        DSLContext dsl = ctx.getBean(DSLContext.class);
-//
-//        List<String> tagList = applicationService.findAllTags();
-//
-//        tagList.forEach(System.out::println);
-//
-//        System.out.println("---------------");
-//
-//        applicationService.findByTag("not-good-at-flying").forEach(a -> System.out.println(a.name()));
-//
-//        System.out.println(applicationService.findTagsForApplication(521L));
-//
+
 
     }
-
-
 
 }
