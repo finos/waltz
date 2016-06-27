@@ -1,7 +1,4 @@
 <div >
-    <span ng-if="ctrl.value.value !== 'unknown'">{{ctrl.value.value | number:2}}</span>
-    <waltz-icon name="question"
-                ng-if="ctrl.value.value === 'unknown'"
-                size="lg">
-    </waltz-icon>
+    <kbd ng-bind="ctrl.value.outcome | number:2">
+    </kbd>
 </div>

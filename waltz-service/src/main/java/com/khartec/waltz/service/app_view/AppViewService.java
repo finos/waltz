@@ -120,7 +120,7 @@ public class AppViewService {
                 .capabilities(capabilities)
                 .costs(assetCostService.findByAppId(id))
                 .explicitTraits(traits)
-                .entityStatisticsWithValues(entityStatisticService.findStatisticsForEntity(ref, true))
+                .entityStatistics(entityStatisticService.findStatisticsForEntity(ref, true))
                 .build();
     }
 

@@ -13,7 +13,6 @@
 
 
 export default (module) => {
-    module.directive('waltzEntityStatisticCard', require('./directives/entity-statistic-card'));
     module.directive('waltzEntityStatisticSection', require('./directives/entity-statistic-section'));
     module.directive('waltzEntityStatisticBooleanRenderer', require('./directives/entity-statistic-boolean-renderer'));
     module.directive('waltzEntityStatisticPercentageRenderer', require('./directives/entity-statistic-percentage-renderer'));

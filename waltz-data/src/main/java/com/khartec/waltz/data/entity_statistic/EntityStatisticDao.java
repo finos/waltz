@@ -2,7 +2,7 @@ package com.khartec.waltz.data.entity_statistic;
 
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.entity_statistic.*;
-import com.khartec.waltz.schema.tables.records.EntityStatisticRecord;
+import com.khartec.waltz.schema.tables.records.EntityStatisticDefinitionRecord;
 import com.khartec.waltz.schema.tables.records.EntityStatisticValueRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -16,18 +16,19 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.EntityStatistic.ENTITY_STATISTIC;
+import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 
 @Repository
 public class EntityStatisticDao {
 
-    private static final com.khartec.waltz.schema.tables.EntityStatistic es = ENTITY_STATISTIC.as("es");
+    private static final com.khartec.waltz.schema.tables.EntityStatisticDefinition es = ENTITY_STATISTIC_DEFINITION.as("es");
     private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
 
-    private static final RecordMapper<? super Record, EntityStatistic> TO_ENTITY_STATISTIC_MAPPPER = r -> {
-        EntityStatisticRecord record = r.into(ENTITY_STATISTIC);
-        return ImmutableEntityStatistic.builder()
+    private static final RecordMapper<? super Record, EntityStatisticDefinition> TO_DEFINITION_MAPPER = r -> {
+        EntityStatisticDefinitionRecord record = r.into(ENTITY_STATISTIC_DEFINITION);
+
+        return ImmutableEntityStatisticDefinition.builder()
                 .id(record.getId())
                 .name(record.getName())
                 .description((record.getDescription()))
@@ -62,8 +63,8 @@ public class EntityStatisticDao {
 
 
 
-    private static final Function<EntityStatistic, EntityStatisticRecord> TO_RECORD_MAPPER = domainObj -> {
-        EntityStatisticRecord record = new EntityStatisticRecord();
+    private static final Function<EntityStatisticDefinition, EntityStatisticDefinitionRecord> TO_RECORD_MAPPER = domainObj -> {
+        EntityStatisticDefinitionRecord record = new EntityStatisticDefinitionRecord();
 
         record.setName(domainObj.name());
         record.setDescription(domainObj.description());
@@ -78,9 +79,9 @@ public class EntityStatisticDao {
     };
 
 
-    private static final RecordMapper<? super Record, EntityStatisticWithValue> TO_COMPOUND_MAPPER = record -> {
-        return ImmutableEntityStatisticWithValue.builder()
-                .statistic(TO_ENTITY_STATISTIC_MAPPPER.map(record))
+    private static final RecordMapper<? super Record, EntityStatistic> TO_COMPOUND_MAPPER = record -> {
+        return ImmutableEntityStatistic.builder()
+                .definition(TO_DEFINITION_MAPPER.map(record))
                 .value(TO_VALUE_MAPPPER.map(record))
                 .build();
     };
@@ -96,29 +97,7 @@ public class EntityStatisticDao {
     }
 
 
-    public List<EntityStatisticWithValue> findStatisticsForEntity(EntityReference ref, boolean active) {
-        checkNotNull(ref, "ref cannot be null");
-        return dsl.select(es.fields())
-                .select(esv.fields())
-                .from(es)
-                .innerJoin(esv)
-                .on(esv.STATISTIC_ID.eq(es.ID))
-                .where(es.ACTIVE.eq(active)
-                        .and(esv.ENTITY_KIND.eq(ref.kind().name()))
-                        .and(esv.ENTITY_ID.eq(ref.id()))
-                        .and(esv.CURRENT.eq(true)))
-                .fetch(TO_COMPOUND_MAPPER);
-    }
-
-
-    public List<EntityStatistic> getAllEntityStatistics() {
-        return dsl.select(es.fields())
-                .from(es)
-                .fetch(TO_ENTITY_STATISTIC_MAPPPER);
-    }
-
-
-    public boolean addEntityStatistic(EntityStatistic entityStatistic) {
+    public boolean addEntityStatistic(EntityStatisticDefinition entityStatistic) {
         checkNotNull(entityStatistic, "entityStatistic cannot be null");
         return dsl.executeInsert(TO_RECORD_MAPPER.apply(entityStatistic)) == 1;
     }
@@ -154,4 +133,27 @@ public class EntityStatisticDao {
                         .collect(Collectors.toList()))
                 .execute();
     }
+
+
+    public List<EntityStatistic> findStatisticsForEntity(EntityReference ref, boolean active) {
+        checkNotNull(ref, "ref cannot be null");
+        return dsl.select(es.fields())
+                .select(esv.fields())
+                .from(es)
+                .innerJoin(esv)
+                .on(esv.STATISTIC_ID.eq(es.ID))
+                .where(es.ACTIVE.eq(active)
+                        .and(esv.ENTITY_KIND.eq(ref.kind().name()))
+                        .and(esv.ENTITY_ID.eq(ref.id()))
+                        .and(esv.CURRENT.eq(true)))
+                .fetch(TO_COMPOUND_MAPPER);
+    }
+
+
+    public List<EntityStatisticDefinition> getAllEntityStatistics() {
+        return dsl.select(es.fields())
+                .from(es)
+                .fetch(TO_DEFINITION_MAPPER);
+    }
+
 }

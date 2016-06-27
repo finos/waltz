@@ -17,6 +17,16 @@
 
 package com.khartec.waltz.jobs.sample;
 
+import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.model.StatisticType;
+import com.khartec.waltz.model.StatisticValueState;
+import org.jooq.lambda.tuple.Tuple;
+import org.jooq.lambda.tuple.Tuple4;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 public interface SampleData {
 
     String[][] jobTitles = {

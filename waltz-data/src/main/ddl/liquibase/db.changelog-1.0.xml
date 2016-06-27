@@ -2001,4 +2001,18 @@
     </changeSet>
 
 
+    <!-- 244 entity statistics - rename -->
+    <changeSet author="kamransaleem"
+               id="20160624-244-1">
+        <dropPrimaryKey constraintName="entity_statistic_pkey"
+                        tableName="entity_statistic"/>
+
+        <renameTable newTableName="entity_statistic_definition"
+                     oldTableName="entity_statistic"/>
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="entity_statistic_defn_pkey"
+                       tableName="entity_statistic_definition"/>
+    </changeSet>
+
 </databaseChangeLog>
