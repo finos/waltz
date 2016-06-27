@@ -56,13 +56,12 @@
                     uib-dropdown-menu
                     style="width: 250px"
                     role="menu">
-                    <li ui-sref-active="side-active"
-                        style="margin: 4px"
+                    <li style="margin: 4px"
                         ng-repeat="item in ctrl.history">
                         <a ui-sref="{{ ::item.state }} ({{ ::item.stateParams }})">
-                             <waltz-icon class='text-muted small'
-                                         fixed-width="true"
-                                         name="{{ item.kind | toIconName:'entity' }}"></waltz-icon>
+                            <waltz-icon class='text-muted small'
+                                        fixed-width="true"
+                                        name="{{ item.kind | toIconName:'entity' }}"></waltz-icon>
                             <span ng-bind="::item.name"></span>
                         </a>
                     </li>
@@ -95,11 +94,9 @@
                     style="width: 250px; margin: 4px"
                     role="menu">
                     <li style="margin: 4px">
-                        <div>
-                            <span waltz-if-anonymous="false"
-                                  ng-bind="ctrl.user.userName"></span>
-                            <span waltz-if-anonymous="true">Anonymous</span>
-                        </div>
+                        <span waltz-if-anonymous="false"
+                              ng-bind="ctrl.user.userName"></span>
+                        <span waltz-if-anonymous="true">Anonymous</span>
                     </li>
                     <li style="margin: 4px"
                         ng-if="ctrl.allowDirectLogin"
@@ -122,63 +119,64 @@
 
                     <li class="divider" waltz-has-role="ADMIN"></li>
 
-                    <li class="side-inactive"
-                        waltz-has-role="ADMIN"
+                    <li waltz-has-role="ADMIN"
+                        style="margin: 4px"
                         ui-sref-active="side-active">
-                        <waltz-icon class='text-muted small'
-                                    fixed-width="true"
-                                    name="cubes"></waltz-icon>
                         <a ui-sref="main.traits">
+                            <waltz-icon class='text-muted small'
+                                        fixed-width="true"
+                                        name="cubes"></waltz-icon>
                             Manage Traits
                         </a>
                     </li>
-                    <li class="side-inactive"
-                        waltz-has-role="ADMIN"
+                    <li waltz-has-role="ADMIN"
+                        style="margin: 4px"
                         ui-sref-active="side-active">
-                        <waltz-icon class='text-muted small'
-                                    fixed-width="true"
-                                    name="users"></waltz-icon>
                         <a ui-sref="main.user.management">
+                            <waltz-icon class='text-muted small'
+                                        fixed-width="true"
+                                        name="users"></waltz-icon>
                             Manage Users
                         </a>
                     </li>
-                    <li class="side-inactive"
-                        waltz-has-role="APP_EDITOR"
+                    <li waltz-has-role="APP_EDITOR"
+                        style="margin: 4px"
                         ui-sref-active="side-active">
-                        <waltz-icon class='text-muted small'
-                                    fixed-width="true"
-                                    name="gift"></waltz-icon>
                         <a ui-sref="main.app.registration">
+                            <waltz-icon class='text-muted small'
+                                        fixed-width="true"
+                                        name="gift"></waltz-icon>
                             Register App
                         </a>
                     </li>
-                    <li class="side-inactive"
-                        waltz-has-role="ADMIN"
+                    <li waltz-has-role="ADMIN"
+                        style="margin: 4px"
                         ui-sref-active="side-active">
-                        <waltz-icon class='text-muted small'
-                                    fixed-width="true"
-                                    name="cog"></waltz-icon>
                         <a ui-sref="main.settings">
+                            <waltz-icon class='text-muted small'
+                                        fixed-width="true"
+                                        name="cog"></waltz-icon>
                             Settings
                         </a>
                     </li>
-                    <li class="side-inactive"
-                        waltz-has-role="ADMIN"
+                    <li waltz-has-role="ADMIN"
+                        style="margin: 4px"
                         ui-sref-active="side-active">
-                        <waltz-icon class='text-muted small'
-                                    fixed-width="true"
-                                    name="map-signs"></waltz-icon>
+
                         <a ui-sref="main.source-data-ratings">
+                            <waltz-icon class='text-muted small'
+                                        fixed-width="true"
+                                        name="map-signs"></waltz-icon>
                             Source Data Ratings
                         </a>
                     </li>
-                    <li class="side-inactive"
-                        waltz-has-role="ADMIN"
+                    <li waltz-has-role="ADMIN"
+                        style="margin: 4px"
                         ui-sref-active="side-active">
-                        <waltz-icon class='text-muted small'
-                                    fixed-width="true"
-                                    name="list-ul"></waltz-icon>
                         <a ui-sref="main.user.log">
+                            <waltz-icon class='text-muted small'
+                                        fixed-width="true"
+                                        name="list-ul"></waltz-icon>
                             User Logs
                         </a>
                     </li>
