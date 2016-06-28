@@ -1,13 +1,15 @@
 const initialState = {
+    changes: [],
     contribution: {
         score: 0,
         directScores: [],
         leaderBoard: []
     },
+    directs: [],
+    managers: [],
     person: null,
-    user: null,
     roles: [],
-    changes: []
+    user: null
 };
 
 
@@ -30,11 +32,28 @@ function controller($stateParams,
     const vm = Object.assign(this, initialState);
     const userId = $stateParams.userId;
 
+    const loadManagerAndDirects = (p) => {
+        if (p) {
+            const empId = p.employeeId;
+            personStore
+                .findManagers(empId)
+                .then(managers => vm.managers = managers);
+
+            personStore
+                .findDirects(empId)
+                .then(directs => vm.directs = directs);
+        }
+    };
+
     vm.userId = userId;
 
-    personStore
+    const personPromise = personStore
         .findByUserId(userId)
         .then(p => vm.person = p);
+
+    personPromise
+        .then(loadManagerAndDirects);
+
 
     changeLogStore
         .findForUserName(userId)
@@ -55,6 +74,7 @@ function controller($stateParams,
     userContributionStore
         .getLeaderBoard()
         .then(leaderBoard => vm.contribution.leaderBoard = leaderBoard);
+
 
 }
 
