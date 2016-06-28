@@ -87,4 +87,8 @@ public class PersonService {
         return personDao.bulkSave(people);
     }
 
+
+    public Person findPersonByUserId(String userId) {
+        return personDao.findPersonByUserId(userId);
+    }
 }

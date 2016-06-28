@@ -64,7 +64,7 @@ public class UserEndpoint implements Endpoint {
 
         String whoAmIPath = mkPath(BASE_URL, "whoami");
         String findAllPath = mkPath(BASE_URL);
-        String findUserPath = mkPath(BASE_URL, "name", ":userName");
+        String findUserPath = mkPath(BASE_URL, "user-id", ":userId");
 
 
         // -- routes
@@ -113,7 +113,7 @@ public class UserEndpoint implements Endpoint {
         };
 
         ListRoute<User> findAllRoute = (request, response) -> userRoleService.findAllUsers();
-        DatumRoute<User> findUserRoute = (request, response) -> userRoleService.findByUserName(request.params("userName"));
+        DatumRoute<User> findUserRoute = (request, response) -> userRoleService.findForUserId(request.params("userId"));
 
 
         // --- register

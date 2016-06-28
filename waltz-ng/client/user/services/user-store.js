@@ -15,16 +15,18 @@ function store($http, BaseApiUrl) {
 
     const register = (regRequest) => $http.post(`${BASE}/new-user`, regRequest);
     const findAll = () => $http.get(BASE).then(r => r.data);
+    const findForUserId = (userId) => $http.get(`${BASE}/user-id/${userId}`).then(r => r.data);
     const updateRoles = (userName, roles) => $http.post(`${BASE}/${userName}/roles`, roles).then(r => r.data);
     const deleteUser = (userName) => $http.delete(`${BASE}/${userName}`).then(r => r.data);
     const resetPassword = (userName, password) => $http.post(`${BASE}/${userName}/reset-password`, password).then(r => r.data);
 
     return {
-        register,
-        updateRoles,
-        findAll,
         deleteUser,
-        resetPassword
+        findAll,
+        findForUserId,
+        register,
+        resetPassword,
+        updateRoles
     };
 }
 

@@ -35,6 +35,7 @@ const initialState = {
     dataTypes: [],
     explicitTraits: [],
     flows: [],
+    log: [],
     ouAuthSources: [],
     organisationalUnit: null,
     peopleInvolvements: [],

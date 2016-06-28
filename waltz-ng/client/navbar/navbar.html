@@ -94,8 +94,10 @@
                     style="width: 250px; margin: 4px"
                     role="menu">
                     <li style="margin: 4px">
-                        <span waltz-if-anonymous="false"
-                              ng-bind="ctrl.user.userName"></span>
+                        <span waltz-if-anonymous="false">
+                            <a ui-sref="main.profile.view ({userId: ctrl.user.userName})"
+                               ng-bind="ctrl.user.userName"></a>
+                        </span>
                         <span waltz-if-anonymous="true">Anonymous</span>
                     </li>
                     <li style="margin: 4px"

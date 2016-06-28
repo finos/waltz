@@ -46,4 +46,8 @@ public abstract class Person implements IdProvider {
 
     public abstract Optional<Long> organisationalUnitId();
 
+    @Value.Default
+    public String userId() { //TODO change as part of 247
+        return email();
+    }
 }

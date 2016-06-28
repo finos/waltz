@@ -32,6 +32,7 @@ public class StringUtilities {
         return x == null || x.trim().equals("");
     }
 
+
     /**
      * Convenience method for <code> ! isEmpty(x) </code>
      * @param x the String to check
@@ -48,6 +49,7 @@ public class StringUtilities {
         return isEmpty(maybeString.get());
     }
 
+
     public static Long parseLong(String value, Long dflt) {
         try {
             return Long.parseLong(value);
@@ -55,6 +57,16 @@ public class StringUtilities {
             return dflt;
         }
     }
+
+
+    public static Integer parseInteger(String value, Integer dflt) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException nfe) {
+            return dflt;
+        }
+    }
+
 
     public static String mkSafe(String str) {
         return str == null

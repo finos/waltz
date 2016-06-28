@@ -5,7 +5,10 @@ import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.entity_statistic.*;
+import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
+import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
+import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticDefinition;
+import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticValue;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple4;
@@ -13,7 +16,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.khartec.waltz.common.ArrayUtilities.randomPick;
 import static com.khartec.waltz.common.IOUtilities.readLines;
@@ -24,7 +30,7 @@ import static java.util.stream.Collectors.*;
 public class EntityStatisticGenerator implements SampleDataGenerator {
 
     private static final String PROVENANCE = "waltz";
-    private static final int VALUE_COUNT = 4;
+    private static final int VALUE_COUNT = 2;
 
 
     public static void main(String[] args) throws IOException {

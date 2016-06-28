@@ -28,6 +28,8 @@ public class JooqUtilities {
                 });
 
 
+    public static final Field<Integer> TALLY_COUNT_FIELD = DSL.field("count", Integer.class);
+
     /**
      * Expects result set like: { Id, Count }
      */
@@ -96,14 +98,14 @@ public class JooqUtilities {
         }
     }
 
-    private static <T> Select<Record2<T, Integer>> makeTallyQuery(
+    public static <T> SelectHavingStep<Record2<T, Integer>> makeTallyQuery(
             DSLContext dsl,
             Table table,
             Field<T> fieldToTally,
             Condition recordsInScopeCondition) {
         return dsl.select(
                 fieldToTally,
-                DSL.count(fieldToTally))
+                DSL.count(fieldToTally).as(TALLY_COUNT_FIELD))
                 .from(table)
                 .where(dsl.renderInlined(recordsInScopeCondition))
                 .groupBy(fieldToTally);
