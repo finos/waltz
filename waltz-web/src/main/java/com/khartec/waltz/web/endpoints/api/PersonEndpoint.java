@@ -36,6 +36,7 @@ public class PersonEndpoint implements Endpoint {
     private static final String DIRECTS_PATH = mkPath(BASE_URL, "employee-id", ":empId", "directs");
     private static final String MANAGERS_PATH = mkPath(BASE_URL, "employee-id", ":empId", "managers");
     private static final String BY_EMPLOYEE_PATH = mkPath(BASE_URL, "employee-id", ":empId");
+    private static final String FIND_BY_USERID_PATH = mkPath(BASE_URL, "user-id", ":userId");
 
     private final PersonService service;
 
@@ -67,6 +68,9 @@ public class PersonEndpoint implements Endpoint {
             String empId = request.params("empId");
             return service.getByEmployeeId(empId);
         });
+
+        getForDatum(FIND_BY_USERID_PATH, ((request, response) ->
+                service.findPersonByUserId(request.params("userId"))));
 
     }
 }

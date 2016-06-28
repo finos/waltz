@@ -23,10 +23,12 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotEmptyString;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.JooqUtilities.*;
 import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 
 
@@ -89,6 +92,27 @@ public class ChangeLogDao {
                 .from(CHANGE_LOG)
                 .where(CHANGE_LOG.USER_ID.equalIgnoreCase(userName))
                 .fetch(mapper);
+    }
+
+
+    public List<StringTally> getContributionLeaderBoard(int limit) {
+        return makeTallyQuery(
+                    dsl,
+                    CHANGE_LOG,
+                    CHANGE_LOG.USER_ID,
+                    DSL.trueCondition())
+                .orderBy(TALLY_COUNT_FIELD.desc())
+                .limit(limit)
+                .fetch(TO_STRING_TALLY);
+    }
+
+
+    public List<StringTally> getContributionScoresForUsers(List<String> userIds) {
+        return calculateStringTallies(
+                dsl,
+                CHANGE_LOG,
+                CHANGE_LOG.USER_ID,
+                CHANGE_LOG.USER_ID.in(userIds));
     }
 
 

@@ -152,4 +152,11 @@ public class PersonDao {
                 .fetch(personMapper);
     }
 
+
+    public Person findPersonByUserId(String userId) {
+        return dsl.select(PERSON.fields())
+                .from(PERSON)
+                .where(PERSON.EMAIL.eq(userId)) // TODO: change as part of 247
+                .fetchOne(personMapper);
+    }
 }

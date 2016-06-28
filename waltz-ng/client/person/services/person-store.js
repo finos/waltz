@@ -23,6 +23,11 @@ export default [
                 .then(result => result.data);
 
 
+        const findByUserId = (userId) => $http
+                .get(`${BASE}/user-id/${userId}`)
+                .then(result => result.data);
+
+
         const findDirects = (empId) => $http
                 .get(`${BASE}/employee-id/${empId}/directs`)
                 .then(result => result.data);
@@ -40,6 +45,7 @@ export default [
 
         return {
             getByEmployeeId,
+            findByUserId,
             findDirects,
             findManagers,
             search
