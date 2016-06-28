@@ -2003,16 +2003,49 @@
 
     <!-- 244 entity statistics - rename -->
     <changeSet author="kamransaleem"
-               id="20160624-244-1">
-        <dropPrimaryKey constraintName="entity_statistic_pkey"
-                        tableName="entity_statistic"/>
-
+               id="20160624-244-1"
+               dbms="mssql">
         <renameTable newTableName="entity_statistic_definition"
                      oldTableName="entity_statistic"/>
+
+        <dropPrimaryKey constraintName="entity_statistic_pkey"
+                        tableName="entity_statistic_definition"/>
 
         <addPrimaryKey columnNames="id"
                        constraintName="entity_statistic_defn_pkey"
                        tableName="entity_statistic_definition"/>
+
+    </changeSet>
+
+
+    <changeSet author="kamransaleem"
+               id="20160624-244-3"
+               dbms="mysql">
+        <renameTable newTableName="entity_statistic_definition"
+                     oldTableName="entity_statistic"/>
+
+        <sql>
+            ALTER TABLE entity_statistic_definition
+            DROP PRIMARY KEY,
+            CHANGE id id bigint(20);
+        </sql>
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="entity_statistic_defn_pkey"
+                       tableName="entity_statistic_definition"/>
+
+    </changeSet>
+
+
+    <!-- 251 Improve navigation of profile pages and add an index -->
+    <changeSet author="dwatkins"
+               id="20160628-251-1">
+        <createIndex indexName="idx_change_log_user_id"
+                     tableName="change_log"
+                     unique="false">
+            <column name="user_id"
+                    type="VARCHAR(128)"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>

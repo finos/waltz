@@ -52,21 +52,19 @@
                             </div>
 
 
-                            <div class="row" style="border-bottom: 2px dotted #eee; padding: 6px">
+                            <div class="row" >
                                 <div class="col-sm-2 waltz-display-field-label">
-                                    Roles
+                                    Waltz Profile
                                 </div>
-                                <div class="col-sm-10">
-                                    <ul class="list-unstyled waltz-keyword-list">
-                                        <li ng-repeat="role in ctrl.allRoles | orderBy">
-                                            {{ role | toDisplayName:'involvementKind' }}
-                                        </li>
-                                    </ul>
+                                <div class="col-sm-4">
+                                    <a ui-sref="main.profile.view ({userId: ctrl.person.userId})">
+                                        View
+                                    </a>
                                 </div>
                             </div>
 
                             <!-- SCORES -->
-                            <div class="row">
+                            <div class="row" style="border-top: 2px dotted #eee; padding: 6px; margin-top: 16px">
                                 <div class="col-sm-4">
                                     <waltz-apps-by-investment-pie applications="ctrl.applications"
                                                                   size="70">
