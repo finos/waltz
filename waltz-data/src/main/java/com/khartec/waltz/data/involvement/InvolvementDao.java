@@ -19,12 +19,14 @@ package com.khartec.waltz.data.involvement;
 
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
+import com.khartec.waltz.data.end_user_app.EndUserAppDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.involvement.ImmutableInvolvement;
 import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.involvement.InvolvementKind;
@@ -41,6 +43,7 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
+import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
@@ -123,6 +126,14 @@ public class InvolvementDao {
 
         return query
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<EndUserApplication> findAllEndUserApplicationsByEmployeeId(Select<Record1<Long>> endUserAppIdSelector) {
+        return dsl.select(END_USER_APPLICATION.fields())
+                .from(END_USER_APPLICATION)
+                .where(END_USER_APPLICATION.ID.in(endUserAppIdSelector))
+                .fetch(EndUserAppDao.END_USER_APP_MAPPER);
     }
 
 

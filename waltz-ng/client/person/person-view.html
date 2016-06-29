@@ -48,44 +48,26 @@
                        name="Application Portfolio">
 
             <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
-                                     entities="['APPLICATION', 'INVOLVEMENT']">
+                                             entities="['APPLICATION', 'END_USER_APPLICATION', 'INVOLVEMENT']">
             </waltz-source-data-section-addon>
 
             <uib-tabset>
 
                 <uib-tab heading="Summary">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div>
-                                <waltz-pie-table data="ctrl.charts.apps.byLifecyclePhase.data"
-                                                 config="ctrl.charts.apps.byLifecyclePhase.config"
-                                                 title="Applications By Lifecycle Phase">
-                                </waltz-pie-table>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div>
-                                <waltz-pie-table data="ctrl.charts.apps.byKind.data"
-                                                 config="ctrl.charts.apps.byKind.config"
-                                                 title="Applications By Type">
-                                </waltz-pie-table>
-                            </div>
-                        </div>
-                    </div>
+                    <waltz-app-summary has-app-involvements="ctrl.hasAppInvolvements"
+                                       has-end-user-app-involvements="ctrl.hasEndUserAppInvolvements"
+                                       charts="ctrl.charts">
+                    </waltz-app-summary>
                 </uib-tab>
 
 
                 <uib-tab select="showDirectTab = true"
                          heading="Direct"
-                         ng-if="ctrl.involvements.direct.length > 0">
+                         ng-if="ctrl.combinedAppInvolvements.direct.length > 0">
 
-                    <div ng-if="showDirectTab"
-                         ng-repeat="group in ctrl.involvements.direct | orderBy:'kind'">
-                        <h4>
-                            Role: {{group.kind | toDisplayName:'involvementKind'}}
-                        </h4>
-
-                        <waltz-app-table applications="group.apps">
+                    <div ng-if="showDirectTab">
+                        <h4> Direct Involvements </h4>
+                        <waltz-app-table applications="ctrl.combinedAppInvolvements.direct">
                         </waltz-app-table>
                     </div>
 
@@ -94,11 +76,11 @@
 
                 <uib-tab select="showOversightTab=true"
                          heading="Oversight"
-                         ng-if="ctrl.involvements.indirect.length > 0">
+                         ng-if="ctrl.combinedAppInvolvements.indirect.length > 0">
 
                     <div ng-if="showOversightTab">
                         <h4> Oversight Involvements <small>(Inferred via direct reports)</small></h4>
-                        <waltz-app-table applications="ctrl.involvements.indirect">
+                        <waltz-app-table applications="ctrl.combinedAppInvolvements.indirect">
                         </waltz-app-table>
                     </div>
 
@@ -107,42 +89,40 @@
             </uib-tabset>
 
         </waltz-section>
-
-
-        <!-- COMPLEXITY -->
-        <waltz-complexity-section complexity="ctrl.complexity"
-                                  apps="ctrl.apps">
-        </waltz-complexity-section>
-
-
-        <!-- FLOWS -->
-        <waltz-data-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
-                                           flow-data="ctrl.dataFlows"
-                                           on-load-detail="ctrl.loadFlowDetail"
-                                           applications="ctrl.apps">
-
-        </waltz-data-flows-tabgroup-section>
-
-
-        <!-- TECHNOLOGIES -->
-        <waltz-section name="Technologies">
-
-            <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
-                                             entities="['SERVER', 'DATABASE', 'SOFTWARE']">
-            </waltz-source-data-section-addon>
-
-            <waltz-group-technology-summary stats="ctrl.techStats">
-            </waltz-group-technology-summary>
-        </waltz-section>
-
-
-        <!-- COSTS -->
-        <waltz-asset-costs-section data="ctrl.assetCostData"
-                                   on-bucket-select="ctrl.onAssetBucketSelect"
-                                   source-data-ratings="ctrl.sourceDataRatings">
-        </waltz-asset-costs-section>
-
-
     </div>
+
+
+    <!-- COMPLEXITY -->
+    <waltz-complexity-section complexity="ctrl.complexity"
+                              apps="ctrl.apps">
+    </waltz-complexity-section>
+
+
+    <!-- FLOWS -->
+    <waltz-data-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
+                                       flow-data="ctrl.dataFlows"
+                                       on-load-detail="ctrl.loadFlowDetail"
+                                       applications="ctrl.apps">
+
+    </waltz-data-flows-tabgroup-section>
+
+
+    <!-- TECHNOLOGIES -->
+    <waltz-section name="Technologies">
+
+        <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
+                                         entities="['SERVER', 'DATABASE', 'SOFTWARE']">
+        </waltz-source-data-section-addon>
+
+        <waltz-group-technology-summary stats="ctrl.techStats">
+        </waltz-group-technology-summary>
+    </waltz-section>
+
+
+    <!-- COSTS -->
+    <waltz-asset-costs-section data="ctrl.assetCostData"
+                               on-bucket-select="ctrl.onAssetBucketSelect"
+                               source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-asset-costs-section>
 
 </div>

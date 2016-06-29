@@ -18,9 +18,15 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.involvement.InvolvementDao;
+import com.khartec.waltz.model.EntityIdSelectionOptions;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.ImmutableEntityIdSelectionOptions;
+import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.application.HierarchyQueryScope;
+import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.involvement.InvolvementService;
 import org.jooq.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -64,18 +70,32 @@ public class InvolvementHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
         DataSource dataSource = ctx.getBean(DataSource.class);
         InvolvementDao dao = ctx.getBean(InvolvementDao.class);
+        InvolvementService service = ctx.getBean(InvolvementService.class);
 
         System.out.println("-- Waiting ...");
-        Thread.sleep(5000);
+//        Thread.sleep(5000);
 
         System.out.println("-- Starting ...");
-        viaJdbc(dataSource);
-        viaJooqSql(dsl);
-        viaJooqOrig(dsl);
-        viaJooqJoins(dsl);
-        viaJooqSql(dsl);
-        viaDao(dao);
-        viaJdbc(dataSource);
+//        viaJdbc(dataSource);
+//        viaJooqSql(dsl);
+//        viaJooqOrig(dsl);
+//        viaJooqJoins(dsl);
+//        viaJooqSql(dsl);
+//        viaDao(dao);
+//        viaJdbc(dataSource);
+
+        EntityIdSelectionOptions options = ImmutableEntityIdSelectionOptions.builder()
+                .desiredKind(EntityKind.END_USER_APPLICATION)
+                .entityReference(ImmutableEntityReference.builder()
+                        .kind(EntityKind.PERSON)
+                        .id(218)
+                        .build())
+                .scope(HierarchyQueryScope.CHILDREN)
+                .build();
+
+        List<EndUserApplication> endUserApps = service.findAllEndUserApplicationsBySelector(options);
+
+        System.out.println("got end user apps: " + endUserApps.size());
     }
 
     private static void viaDao(InvolvementDao dao) {

@@ -74,7 +74,7 @@ public class EndUserAppMaker {
         };
 
         dsl.delete(END_USER_APPLICATION).execute();
-
+        final Long[] idCounter = {1L};
         ids.forEach(ouId -> {
             for (int i = 0; i < new Random().nextInt(100) + 40; i++) {
                 EndUserApplicationRecord record = dsl.newRecord(END_USER_APPLICATION);
@@ -95,7 +95,7 @@ public class EndUserAppMaker {
                 record.setLifecyclePhase(randomPick(LifecyclePhase.values()).name());
                 record.setOrganisationalUnitId(ouId);
 
-                record.setId(Long.valueOf(i));
+                record.setId(idCounter[0]++);
                 record.insert();
             }
         });
