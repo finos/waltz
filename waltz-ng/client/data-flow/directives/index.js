@@ -23,4 +23,5 @@ export default (module) => {
     module.directive('waltzDataFlowsTabgroup', require('./data-flows-tabgroup'));
     module.directive('waltzDataFlowsTabgroupSection', require('./data-flows-tabgroup-section'));
     module.directive('waltzFlowFilterOptionsOverlay', require('./flow-filter-options-overlay'));
+    module.directive('waltzDataFlowTypeEditor', require('./edit/data-flow-type-editor'));
 };

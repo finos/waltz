@@ -1,5 +1,5 @@
 const initData = {
-    applications: [],
+    usages: [],
     visibility: {}
 };
 
@@ -7,31 +7,52 @@ const initData = {
 function controller($q,
                     $stateParams,
                     appStore,
-                    dataFlowViewService) {
+                    dataFlowStore,
+                    dataTypeStore,
+                    dataTypeUsageStore,
+                    notification) {
 
     const vm = Object.assign(this, initData);
 
-    const appIdSelector = {
-        entityReference : {
-            id: $stateParams.id,
-            kind: $stateParams.kind
-        },
-        scope: "CHILDREN"
+    const entityRef = {
+        id: $stateParams.id,
+        kind: $stateParams.kind
     };
+
+    vm.entityRef = entityRef;
 
 
     // -- LOAD
 
     appStore
-        .findBySelector(appIdSelector)
-        .then(apps => vm.applications = apps);
+        .getById(1896)
+        .then(app => vm.counterpart = app);
 
-    dataFlowViewService.initialise(appIdSelector.entityReference.id, appIdSelector.entityReference.kind)
-        .then(flows => vm.dataFlows = flows);
+    appStore
+        .getById(entityRef.id)
+        .then(app => vm.app = app);
+
+    dataFlowStore
+        .findByEntityReference(entityRef.kind, entityRef.id)
+        .then(fs => vm.currentDataTypes = _.chain(fs)
+            .filter(f => f.source.id === 1896)
+            .map('dataType')
+            .value());
+
+    dataTypeStore
+        .findAll()
+        .then(xs => vm.allDataTypes = xs);
 
 
-    vm.loadFlowDetail = () => dataFlowViewService.loadDetail();
+    dataTypeUsageStore
+        .findForEntity(entityRef.kind, entityRef.id)
+        .then(usages => vm.usages = usages);
 
+    vm.save = (command) =>  dataFlowStore.create(command)
+        .then((r) => console.log(r))
+        .then(() => notification.success('Logical flows updated'));
+
+    vm.cancel = () => console.log('Cancelled');
 
     global.vm = vm;
 }
@@ -41,7 +62,10 @@ controller.$inject = [
     '$q',
     '$stateParams',
     'ApplicationStore',
-    'DataFlowViewService'
+    'DataFlowDataStore',
+    'DataTypesDataService',
+    'DataTypeUsageStore',
+    'Notification'
 ];
 
 

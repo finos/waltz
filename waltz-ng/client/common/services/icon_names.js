@@ -73,3 +73,11 @@ export const booleanTypeIconNames = {
     Yes: 'check',
     No: 'times'
 };
+
+
+export const usageKindIconNames = {
+    ORIGINATOR: 'pencil',
+    DISTRIBUTOR: 'paper-plane-o',
+    CONSUMER: 'eye',
+    MODIFIER: 'pencil-square-o'
+};

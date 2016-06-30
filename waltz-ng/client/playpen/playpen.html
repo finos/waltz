@@ -10,11 +10,20 @@
     </waltz-page-header>
 
 
-    <!-- FLOWS -->
-    <waltz-data-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
-                                       flow-data="ctrl.dataFlows"
-                                       on-load-detail="ctrl.loadFlowDetail"
-                                       applications="ctrl.applications">
-    </waltz-data-flows-tabgroup-section>
+    <waltz-section name="Data Type Editor">
+        <div class="row">
+            <div class="col-sm-12">
+                <waltz-data-flow-type-editor primary-entity="ctrl.app"
+                                             counterpart-entity="ctrl.counterpart"
+                                             current-data-types="ctrl.currentDataTypes"
+                                             direction="'source'"
+                                             all-data-types="ctrl.allDataTypes"
+                                             on-cancel="ctrl.cancel"
+                                             on-save="ctrl.save">
+
+                </waltz-data-flow-type-editor>
+            </div>
+        </div>
+    </waltz-section>
 
 </div>

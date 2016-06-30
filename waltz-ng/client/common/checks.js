@@ -2,16 +2,25 @@ import _ from "lodash";
 import apiCheck from "api-check";
 
 
+const entityRefShape = {
+    id: apiCheck.number,
+    kind: apiCheck.string
+};
+
+
 export const checkIsEntityRef = apiCheck
-    .shape({
-        id: apiCheck.number,
-        kind: apiCheck.string
-    });
+    .shape(entityRefShape);
 
 
 export const checkIsStringList = apiCheck
     .arrayOf(apiCheck.string);
 
+
+export const checkIsApplicationIdSelector = apiCheck
+    .shape({
+        entityReference: apiCheck.shape(entityRefShape),
+        scope: apiCheck.oneOf(['EXACT', 'PARENTS', 'CHILDREN'])
+    });
 
 
 export function ensureIsArray(xs, message) {

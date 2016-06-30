@@ -76,8 +76,8 @@
     </waltz-involved-people-section>
 
 
-    <!-- LOGICAL DATA FLOWS -->
-    <waltz-section name="Logical Data Flows" icon="random" small="( {{ctrl.flows.length}} )">
+    <!-- DATA TYPES & FLOWS -->
+    <waltz-section name="Data" icon="random" small="( types and flows )">
 
         <waltz-section-actions >
             <a waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
@@ -96,34 +96,68 @@
                                    entities="['LOGICAL_DATA_FLOW']">
         </waltz-source-data-overlay>
 
-
-        <div class="alert alert-warning" ng-if="ctrl.flows.length == 0">
-            <strong>
-                No Data Flows
-            </strong>
-            registered for this application.  Add one
-            <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>here</a>.
+        <div ng-if="ctrl.dataTypeUsages.length == 0 && ctrl.flows.length == 0">
+            <div class="alert alert-warning"
+                 ng-if="ctrl.dataTypeUsages.length == 0">
+                <strong>
+                    No flows or types
+                </strong>
+                registered for this application.  Add them
+                <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>
+                    here.
+                </a>
+            </div>
         </div>
 
-        <div ng-if="ctrl.flows.length > 0">
-            <waltz-app-data-flow-diagram incoming="ctrl.flow.data.incoming"
-                                         outgoing="ctrl.flow.data.outgoing"
-                                         sources="ctrl.flow.data.sources"
-                                         targets="ctrl.flow.data.targets"
-                                         tweakers="ctrl.flow.tweakers"
-                                         types="ctrl.flow.data.flowTypes"></waltz-app-data-flow-diagram>
+        <div ng-if="ctrl.dataTypeUsages.length > 0 || ctrl.flows.length > 0">
+            <div>
+                <h4>Data Types</h4>
+                <div class="alert alert-warning"
+                     ng-if="ctrl.dataTypeUsages.length == 0">
+                    <strong>
+                        No Types
+                    </strong>
+                    registered for this application.  Add them
+                    <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>
+                        here.
+                    </a>
+                </div>
 
-            <p class="text-muted small">
-                Diagram detailing the applications data types (Middle)
-                from the sending system (LHS)
-                to the receiving system on the (RHS).
-                <span style="color: darkred">Red lines</span> indicate non-strategic flows,
-                <span style="color: orange">Amber</span> indicates secondary and
-                <span style="color: darkgreen">Green</span> indicates a primary system.
-            </p>
+                <waltz-app-data-type-usage-list usages="ctrl.dataTypeUsages"
+                                                ng-if="ctrl.dataTypeUsages.length > 0">
+                </waltz-app-data-type-usage-list>
+                <hr>
+            </div>
+            <div>
+                <h4>Logical Flows</h4>
+                <div class="alert alert-warning"
+                     ng-if="ctrl.flows.length == 0">
+                    <strong>
+                        No Data Flows
+                    </strong>
+                    registered for this application.  Add one
+                    <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>here</a>.
+                </div>
+
+                <div ng-if="ctrl.flows.length > 0">
+                    <waltz-app-data-flow-diagram incoming="ctrl.flow.data.incoming"
+                                                 outgoing="ctrl.flow.data.outgoing"
+                                                 sources="ctrl.flow.data.sources"
+                                                 targets="ctrl.flow.data.targets"
+                                                 tweakers="ctrl.flow.tweakers"
+                                                 types="ctrl.flow.data.flowTypes"></waltz-app-data-flow-diagram>
+
+                    <p class="text-muted small">
+                        Diagram detailing the applications data types (Middle)
+                        from the sending system (LHS)
+                        to the receiving system on the (RHS).
+                        <span style="color: darkred">Red lines</span> indicate non-strategic flows,
+                        <span style="color: orange">Amber</span> indicates secondary and
+                        <span style="color: darkgreen">Green</span> indicates a primary system.
+                    </p>
+                </div>
+            </div>
         </div>
-
-
     </waltz-section>
 
 

@@ -89,6 +89,10 @@ function controller($q,
         setupSelectedTypes(selectedTypes);
     };
 
+    const selectType = (type) => {
+        console.log('select type', type)
+    };
+
 
     const promises = [
         loadDataFlows(dataFlowStore, appId, vm),
@@ -119,6 +123,12 @@ function controller($q,
 
         graphData.tweakers.source = {
             enter: selection => selection.on('click', app => $scope.$evalAsync(() => selectSource(app)))
+        };
+
+        graphData.tweakers.type = {
+            enter: selection => selection
+                .classed('clickable', true)
+                .on('click', type => $scope.$evalAsync(() => selectType(type)))
         };
 
         Object.assign(vm, graphData);

@@ -2048,4 +2048,72 @@
         </createIndex>
     </changeSet>
 
+
+    <!-- 253 Record usage of data types by applications -->
+    <changeSet author="dwatkins"
+               id="20160629-253-1">
+        <createTable tableName="data_type_usage">
+            <column name="entity_kind"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_type_code"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="usage_kind"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="VARCHAR(2048)"
+                    defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="varchar(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               id="20160629-253-2">
+        <addPrimaryKey columnNames="entity_kind, entity_id, data_type_code, usage_kind"
+                       constraintName="data_type_usage_pkey"
+                       tableName="data_type_usage"/>
+    </changeSet>
+
+
+
+    <changeSet author="dwatkins"
+               id="20160629-253-3">
+        <sql>
+            INSERT INTO data_type_usage (entity_id, entity_kind, data_type_code, usage_kind)
+                SELECT DISTINCT df.source_entity_id as entity_id, df.source_entity_kind as entity_kind, df.data_type as data_type_code, 'DISTRIBUTOR' as usage_kind
+                FROM data_flow df
+                    WHERE data_type != 'UNKNOWN'
+                UNION ALL
+                SELECT DISTINCT df.target_entity_id as entity_id, df.target_entity_kind as entity_kind, df.data_type as data_type_code, 'CONSUMER' as 'usage_kind'
+                FROM data_flow df
+                    WHERE data_type != 'UNKNOWN'
+                UNION ALL
+                SELECT DISTINCT df.source_entity_id as entity_id, df.source_entity_kind as entity_kind, df.data_type as data_type_code, 'ORIGINATOR' as 'usage_kind'
+                FROM data_flow df
+                    WHERE data_type != 'UNKNOWN'
+                        AND NOT EXISTS(
+                            SELECT *
+                            FROM data_flow
+                                WHERE target_entity_kind = df.source_entity_kind
+                                    AND target_entity_id = df.source_entity_id
+                                    AND data_type = df.data_type)
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
