@@ -39,6 +39,7 @@ const initModel = {
     assetCostData: {},
     serverStats: null,
     dataFlows: [],
+    entityStatisticsSummary: [],
     visibility: {
         techOverlay: false,
         flowOverlay: false,
@@ -80,6 +81,7 @@ function service($q,
                  assetCostViewService,
                  complexityStore,
                  dataFlowViewService,
+                 entityStatisticStore,
                  involvementStore,
                  personStore,
                  sourceDataRatingStore,
@@ -186,10 +188,24 @@ function service($q,
             .then(ratings => state.model.sourceDataRatings = ratings);
     }
 
+    function loadEntityStatisticSummary(personId) {
+        const appIdSelector = {
+            entityReference: {
+                kind: 'PERSON',
+                id: personId
+            },
+            scope: 'CHILDREN'
+        };
+        
+        entityStatisticStore.findSummaryStatsByIdSelector(appIdSelector)
+            .then(stats => {
+                state.model.entityStatisticsSummary = stats;
+            });
+    }
+
     function reset() {
         state.model = { ...initModel };
     }
-
 
     function load(employeeId) {
         reset();
@@ -206,6 +222,7 @@ function service($q,
                 loadTechStats(personId);
                 loadComplexity(personId);
                 loadSourceDataRatings();
+                loadEntityStatisticSummary(personId);
             });
 
         const appPromise = peoplePromise
@@ -240,6 +257,7 @@ service.$inject = [
     'AssetCostViewService',
     'ComplexityStore',
     'DataFlowViewService',
+    'EntityStatisticStore',
     'InvolvementStore',
     'PersonStore',
     'SourceDataRatingStore',

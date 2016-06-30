@@ -3,7 +3,11 @@ package com.khartec.waltz.service.entity_statistic;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
+import com.khartec.waltz.model.entity_statistic.EntityStatisticSummary;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +30,13 @@ public class EntityStatisticService {
 
         this.factory = factory;
         this.entityStatisticDao = entityStatisticDao;
+    }
+
+
+    public List<EntityStatisticSummary> findStatisticsForAppIdSelector(ApplicationIdSelectionOptions options) {
+        Select<Record1<Long>> appIdSelector = factory.apply(options);
+
+        return entityStatisticDao.findForAppIdSelector(appIdSelector);
     }
 
 

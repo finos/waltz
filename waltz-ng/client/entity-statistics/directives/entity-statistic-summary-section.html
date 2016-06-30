@@ -1,0 +1,25 @@
+<div>
+    <waltz-section name="{{ctrl.name}}"
+                   icon="pie-chart">
+
+        <div class="row col-sm-12 value"
+             ng-if="ctrl.entityStatistics.length > 0">
+
+            <div class="col-md-3 col-sm-6"
+                 ng-repeat="stat in ctrl.entityStatisticsSorted">
+                    <waltz-pie-table data="stat.chart.data"
+                                     config="stat.chart.config"
+                                     title="{{stat.definition.name}}"
+                                     sub-title="{{stat.definition.category | toDisplayName:'entityStatistic'}}">
+                    </waltz-pie-table>
+            </div>
+        </div>
+        <div class="alert alert-warning" ng-if="ctrl.entityStatistics.length == 0">
+            <strong>
+                No Indicators
+            </strong>
+            available.
+        </div>
+
+    </waltz-section>
+</div>

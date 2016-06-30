@@ -6,8 +6,7 @@ const initData = {
 
 function controller($q,
                     $stateParams,
-                    appStore,
-                    dataFlowViewService) {
+                    entityStatisticStore) {
 
     const vm = Object.assign(this, initData);
 
@@ -16,22 +15,17 @@ function controller($q,
             id: $stateParams.id,
             kind: $stateParams.kind
         },
-        scope: "CHILDREN"
+        scope: $stateParams.kind == 'APP_GROUP' // app-groups always need EXACT as scope
+                                    ? "EXACT"
+                                    : "CHILDREN"
     };
 
 
     // -- LOAD
-
-    appStore
-        .findBySelector(appIdSelector)
-        .then(apps => vm.applications = apps);
-
-    dataFlowViewService.initialise(appIdSelector.entityReference.id, appIdSelector.entityReference.kind)
-        .then(flows => vm.dataFlows = flows);
-
-
-    vm.loadFlowDetail = () => dataFlowViewService.loadDetail();
-
+    entityStatisticStore.findSummaryStatsByIdSelector(appIdSelector)
+        .then(stats => {
+            vm.entityStatistics = stats;
+        });
 
     global.vm = vm;
 }
@@ -40,8 +34,7 @@ function controller($q,
 controller.$inject = [
     '$q',
     '$stateParams',
-    'ApplicationStore',
-    'DataFlowViewService'
+    'EntityStatisticStore'
 ];
 
 

@@ -10,6 +10,7 @@ export default  () => ({
     transclude: true,
     bindToController: {
         name: '@',
+        subName: '@',
         icon: '@',
         description: '@'
     },

@@ -21,6 +21,7 @@ function service($q,
                  orgUnitUtils,
                  changeLogStore,
                  dataFlowViewService,
+                 entityStatisticStore,
                  involvementStore,
                  ratingStore,
                  perspectiveStore,
@@ -99,7 +100,8 @@ function service($q,
             complexityStore.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
             techStatsService.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
             bookmarkStore.findByParent({id: orgUnitId, kind: 'ORG_UNIT'}),
-            sourceDataRatingStore.findAll()
+            sourceDataRatingStore.findAll(),
+            entityStatisticStore.findSummaryStatsByIdSelector(appIdSelector)
         ]);
 
         const prepareRawDataPromise = bulkPromise
@@ -113,7 +115,8 @@ function service($q,
                 complexity,
                 techStats,
                 bookmarks,
-                sourceDataRatings
+                sourceDataRatings,
+                entityStatisticsSummary
             ]) => {
 
                 const r = {
@@ -127,7 +130,8 @@ function service($q,
                     complexity,
                     techStats,
                     bookmarks,
-                    sourceDataRatings
+                    sourceDataRatings,
+                    entityStatisticsSummary
                 };
 
                 Object.assign(rawData, r);
@@ -171,6 +175,7 @@ service.$inject = [
     'OrgUnitUtilityService',
     'ChangeLogDataService',
     'DataFlowViewService',
+    'EntityStatisticStore',
     'InvolvementStore',
     'RatingStore',
     'PerspectiveStore',

@@ -20,7 +20,10 @@ package com.khartec.waltz.jobs;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.entity_statistic.EntityStatistic;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.application.HierarchyQueryScope;
+import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
+import com.khartec.waltz.model.entity_statistic.EntityStatisticSummary;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import org.jooq.DSLContext;
@@ -38,14 +41,27 @@ public class EntityStatisticHarness {
         EntityStatisticDao dao = ctx.getBean(EntityStatisticDao.class);
         EntityStatisticService service = ctx.getBean(EntityStatisticService.class);
 
-        ImmutableEntityReference ref = ImmutableEntityReference.builder()
-                .kind(EntityKind.APPLICATION)
-                .id(1415)
+//        ImmutableEntityReference ref = ImmutableEntityReference.builder()
+//                .kind(EntityKind.APPLICATION)
+//                .id(1415)
+//                .build();
+//
+//        List<EntityStatistic> values = dao.findStatisticsForEntity(ref, true);
+//
+//        System.out.println(values.size());
+
+
+        ApplicationIdSelectionOptions options = ImmutableApplicationIdSelectionOptions.builder()
+                .entityReference(ImmutableEntityReference
+                        .builder()
+                        .kind(EntityKind.ORG_UNIT)
+                        .id(40)
+                        .build())
+                .scope(HierarchyQueryScope.CHILDREN)
                 .build();
 
-        List<EntityStatistic> values = dao.findStatisticsForEntity(ref, true);
 
-        System.out.println(values.size());
+        List<EntityStatisticSummary> statisticsForAppIdSelector = service.findStatisticsForAppIdSelector(options);
 
 
     }
