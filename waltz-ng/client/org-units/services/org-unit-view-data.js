@@ -88,10 +88,9 @@ function service($q,
             },
             scope: 'CHILDREN'
         };
-        const appIds = _.map(rawData.apps, 'id');
-
+        
         const bulkPromise = $q.all([
-            ratingStore.findByAppIds(appIds),
+            ratingStore.findByAppIdSelector(appIdSelector),
             appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(appIdSelector),
             capabilityStore.findAll(),
             ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)

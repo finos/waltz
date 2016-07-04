@@ -74,6 +74,7 @@ public class PersonDataGenerator {
 
 
     private static final Random rnd = new Random();
+    private static int counter = 0;
 
     private static void visit(ImmutablePerson parent, int level) {
 
@@ -99,7 +100,7 @@ public class PersonDataGenerator {
                     .title(jobTitle)
                     .departmentName(randomPick(departmentNames))
                     .displayName(person.fullName())
-                    .email(person.email())
+                    .email((counter++) + person.email())
                     .build();
 
             peeps.add(p);

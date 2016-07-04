@@ -154,7 +154,7 @@ function controller($scope,
             complexityStore.findBySelector(id, 'APP_GROUP', 'EXACT'),
             capabilityStore.findAll(),
             appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(appIdSelector),
-            ratingStore.findByAppIds(appIds),
+            ratingStore.findByAppIdSelector(appIdSelector),
             technologyStatsService.findBySelector(id, 'APP_GROUP', 'EXACT')
         ]))
         .then(([

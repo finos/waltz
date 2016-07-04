@@ -165,4 +165,20 @@ public class ListUtilities {
             return Collections.unmodifiableList(workingList);
         }
     }
+
+
+    /**
+     * Apply mapFn to first element in list if found, otherwise return Optional.empty();
+     * @param xs possible input elements
+     * @param mapFn  function to transform an input element to desired output element
+     * @param <X> type of input list
+     * @param <Y> type of result
+     * @return
+     */
+    public static <X, Y> Optional<Y> applyToFirst(List<X> xs, Function<X, Y> mapFn) {
+        if (isEmpty(xs)) return Optional.empty();
+
+        return Optional.ofNullable(xs.get(0))
+                .map(mapFn);
+    }
 }

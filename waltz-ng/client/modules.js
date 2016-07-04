@@ -34,6 +34,7 @@ function setup(module) {
         require('./person'),
         require('./playpen'),
         require('./process'),
+        require('./profile'),
         require('./ratings'),
         require('./server-info'),
         require('./settings'),
@@ -44,6 +45,7 @@ function setup(module) {
         require('./technology'),
         require('./traits'),
         require('./user'),
+        require('./user-contribution'),
         require('./formly'),
         require('./widgets'),
         require('./reports')
