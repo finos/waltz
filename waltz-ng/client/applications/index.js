@@ -24,5 +24,6 @@ export default (module) => {
     module.directive('waltzAppTable', require('./directives/app-table'));
     module.directive('waltzAppsByInvestmentPie', require('./directives/apps-by-investment-pie'));
     module.directive('waltzAppsByLifecyclePhasePie', require('./directives/apps-by-lifecycle-phase-pie'));
+    module.directive('waltzAppSummary', require('./directives/app-summary'));
 
 };

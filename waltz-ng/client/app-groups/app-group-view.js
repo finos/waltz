@@ -75,6 +75,7 @@ const initialState = {
     changeInitiatives: [],
     complexity: [],
     dataFlows : null,
+    entityStatisticsSummary: [],
     flowOptions: null,
     groupDetail: null,
     initiallySelectedIds: [],
@@ -104,6 +105,7 @@ function controller($scope,
                     changeInitiativeStore,
                     complexityStore,
                     dataFlowViewService,
+                    entityStatisticStore,
                     userService,
                     capabilityStore,
                     appCapabilityStore,
@@ -195,6 +197,11 @@ function controller($scope,
 
     vm.loadFlowDetail = () => dataFlowViewService.loadDetail();
 
+    entityStatisticStore.findSummaryStatsByIdSelector(appIdSelector)
+        .then(stats => {
+            vm.entityStatisticsSummary = stats;
+        });
+
 }
 
 
@@ -207,6 +214,7 @@ controller.$inject = [
     'ChangeInitiativeStore',
     'ComplexityStore',
     'DataFlowViewService',
+    'EntityStatisticStore',
     'UserService',
     'CapabilityStore',
     'AppCapabilityStore',

@@ -20,17 +20,21 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.involvement.InvolvementService;
 import com.khartec.waltz.web.ListRoute;
+import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.readEntityIdOptionsFromBody;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 @Service
 public class InvolvementEndpoint implements Endpoint {
@@ -53,6 +57,7 @@ public class InvolvementEndpoint implements Endpoint {
         String findDirectAppsByEmployeePath = mkPath(findByEmployeePath, "applications", "direct");
         String findDirectChangeInitiativesByEmployeePath = mkPath(findByEmployeePath, "change-initiative", "direct");
         String findAllAppsByEmployeePath = mkPath(findByEmployeePath, "applications");
+        String findAllEndUserAppsBySelectorPath = mkPath(BASE_URL, "end-user-application");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findPeopleByEntityRefPath = mkPath(findByEntityRefPath, "people");
 
@@ -77,6 +82,10 @@ public class InvolvementEndpoint implements Endpoint {
             return service.findAllApplicationsByEmployeeId(employeeId);
         };
 
+        ListRoute<EndUserApplication> findAllEndUserAppsBySelectorRoute = (request, response) -> {
+            return service.findAllEndUserApplicationsBySelector(readEntityIdOptionsFromBody(request));
+        };
+
         ListRoute<Involvement>  findByEntityRefRoute = (request, response) -> {
             EntityReference entityReference = getEntityReference(request);
             return service.findByEntityReference(entityReference);
@@ -92,6 +101,7 @@ public class InvolvementEndpoint implements Endpoint {
         getForList(findDirectAppsByEmployeePath, findDirectAppsByEmployeeRoute);
         getForList(findDirectChangeInitiativesByEmployeePath, findDirectChangeInitiativesByEmployeeRoute);
         getForList(findAllAppsByEmployeePath, findAllAppsByEmployeeRoute);
+        postForList(findAllEndUserAppsBySelectorPath, findAllEndUserAppsBySelectorRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findPeopleByEntityRefPath, findPeopleByEntityRefRoute);
     }

@@ -23,10 +23,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.khartec.waltz.common.EnumUtilities;
 import com.khartec.waltz.common.StringUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.ImmutableWebError;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -202,6 +199,10 @@ public class WebUtilities {
 
     public static ApplicationIdSelectionOptions readOptionsFromBody(Request request) throws java.io.IOException {
         return readBody(request, ApplicationIdSelectionOptions.class);
+    }
+
+    public static EntityIdSelectionOptions readEntityIdOptionsFromBody(Request request) throws java.io.IOException {
+        return readBody(request, EntityIdSelectionOptions.class);
     }
 
 

@@ -25,6 +25,7 @@ const initialState = {
     capability: null,
     complexity: [],
     dataFlows: [],
+    entityStatisticsSummary: [],
     groupedApps: null,
     processes: [],
     ratings: null,
@@ -129,6 +130,7 @@ function controller($q,
                     capabilities,
                     complexityStore,
                     dataFlowViewService,
+                    entityStatisticStore,
                     historyStore,
                     perspectiveStore,
                     processStore,
@@ -174,7 +176,7 @@ function controller($q,
         scope: 'CHILDREN'
     };
 
-    
+
     processStore
         .findForCapability(capId)
         .then(ps => vm.processes = ps);
@@ -214,7 +216,7 @@ function controller($q,
 
         });
 
-    
+
     appCapabilityStore.findAssociatedApplicationCapabilitiesByCapabilityId(capability.id)
         .then(assocAppCaps => {
             const associatedAppIds = _.map(assocAppCaps, 'applicationId');
@@ -260,6 +262,11 @@ function controller($q,
 
     loadTraitInfo(traitStore, traitUsageStore, capability.id)
         .then(r => vm.traitInfo = r);
+
+    entityStatisticStore.findSummaryStatsByIdSelector(appIdSelector)
+        .then(stats => {
+            vm.entityStatisticsSummary = stats;
+        });
 }
 
 
@@ -275,6 +282,7 @@ controller.$inject = [
     'capabilities',
     'ComplexityStore',
     'DataFlowViewService',
+    'EntityStatisticStore',
     'HistoryStore',
     'PerspectiveStore',
     'ProcessStore',

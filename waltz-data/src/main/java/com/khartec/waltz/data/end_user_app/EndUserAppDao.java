@@ -42,7 +42,7 @@ public class EndUserAppDao {
 
     private final DSLContext dsl;
 
-    private static final RecordMapper<Record, EndUserApplication> endUserAppMapper = r -> {
+    public static final RecordMapper<Record, EndUserApplication> END_USER_APP_MAPPER = r -> {
         EndUserApplicationRecord record = r.into(END_USER_APPLICATION);
         return ImmutableEndUserApplication.builder()
                 .name(record.getName())
@@ -66,7 +66,7 @@ public class EndUserAppDao {
         return dsl.select(END_USER_APPLICATION.fields())
                 .from(END_USER_APPLICATION)
                 .where(END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds))
-                .fetch(endUserAppMapper);
+                .fetch(END_USER_APP_MAPPER);
 
     }
 

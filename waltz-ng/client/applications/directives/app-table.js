@@ -30,6 +30,7 @@ function controller(uiGridConstants, $scope, $animate) {
     const vm = this;
 
     const csvName = angular.isDefined(vm.csvName) ? vm.csvName : 'applications.csv';
+    vm.selectedApp = undefined;
 
     vm.gridOptions = {
         enableGridMenu: true,
@@ -44,8 +45,9 @@ function controller(uiGridConstants, $scope, $animate) {
         columnDefs: [
             {
                 field: 'name',
-                cellTemplate: '<div class="ui-grid-cell-contents"> <a ui-sref="main.app.view ({ id: row.entity[\'id\'] })">{{ COL_FIELD }}</a></div>'
-            }, {
+                cellTemplate: '<div class="ui-grid-cell-contents"> <a class="clickable" ng-click="grid.appScope.ctrl.onAppSelect(row.entity)">{{ COL_FIELD }}</a></div>'
+            },
+            {
                 field: 'kind',
                 cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:\'applicationKind\'"></span></div>',
                 filter: {
@@ -53,27 +55,27 @@ function controller(uiGridConstants, $scope, $animate) {
                     selectOptions: _.map(applicationKindDisplayNames, (label, value) => ({ label, value }))
                 }
             }, {
-                field: 'assetCode'
-            }, {
                 field: 'overallRating',
                 cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:\'investmentRating\'"></span></div>',
                 filter: {
                     type: uiGridConstants.filter.SELECT,
                     selectOptions: _.map(investmentRatingNames, (label, value) => ({ label, value }))
                 }
-            }, {
+            },
+            {
                 field: 'lifecyclePhase',
                 cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:\'lifecyclePhase\'"></span></span></div>',
                 filter: {
                     type: uiGridConstants.filter.SELECT,
                     selectOptions: _.map(lifecyclePhaseDisplayNames, (label, value) => ({ label, value }))
                 }
-            }, {
-                field: 'description',
-                cellTooltip: (row) => row.entity.description
             }
         ],
         data: vm.applications
+    };
+
+    vm.onAppSelect = app => {
+        vm.selectedApp = app;
     };
 
     $scope.$watch('ctrl.applications', (apps) => vm.gridOptions.data = apps);

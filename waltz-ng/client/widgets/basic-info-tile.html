@@ -2,6 +2,9 @@
     <div class="title">
         <waltz-icon name="{{ ctrl.icon }}"></waltz-icon>
         {{ ctrl.name }}
+        <div class="sub-title" ng-if="ctrl.subName">
+            <span ng-bind="ctrl.subName"></span>
+        </div>
     </div>
     <div class="content">
         <div class="main-content" ng-transclude>

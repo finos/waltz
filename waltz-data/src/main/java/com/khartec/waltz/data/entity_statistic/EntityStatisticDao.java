@@ -2,22 +2,25 @@ package com.khartec.waltz.data.entity_statistic;
 
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.entity_statistic.*;
+import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.schema.tables.records.EntityStatisticDefinitionRecord;
 import com.khartec.waltz.schema.tables.records.EntityStatisticValueRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.JooqUtilities.TO_STRING_TALLY;
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
+import static org.jooq.impl.DSL.count;
 
 @Repository
 public class EntityStatisticDao {
@@ -87,6 +90,24 @@ public class EntityStatisticDao {
     };
 
 
+    private static Field<Integer> COUNT = DSL.field("count", Integer.class);
+
+
+    private static final Function<? super Map.Entry<Record, Result<Record>>, EntityStatisticSummary> TO_SUMMARY_MAPPER = recordResultEntry -> {
+        EntityStatisticDefinition def = TO_DEFINITION_MAPPER.map(
+                recordResultEntry.getKey().into(ENTITY_STATISTIC_DEFINITION));
+
+       List<StringTally> counts = recordResultEntry.getValue()
+                .into(esv.field(esv.OUTCOME), COUNT)
+                .map(TO_STRING_TALLY);
+
+        return ImmutableEntityStatisticSummary.builder()
+                .definition(def)
+                .counts(counts)
+                .build();
+    };
+
+
     private final DSLContext dsl;
 
 
@@ -132,6 +153,35 @@ public class EntityStatisticDao {
                                         s.provenance()))
                         .collect(Collectors.toList()))
                 .execute();
+    }
+
+
+    public List<EntityStatisticSummary> findForAppIdSelector(Select<Record1<Long>> appIdSelector) {
+        checkNotNull(appIdSelector, "appIdSelector cannot be null");
+
+        // aggregate query
+        SelectHavingStep<Record3<Long, String, Integer>> aggregates = dsl.select(esv.STATISTIC_ID, esv.OUTCOME, count().as("count"))
+                .from(esv)
+                .innerJoin(es)
+                .on(esv.STATISTIC_ID.eq(es.ID))
+                .where(es.ACTIVE.eq(true)
+                        .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                        .and(esv.ENTITY_ID.in(appIdSelector))
+                        .and(esv.CURRENT.eq(true)))
+                .groupBy(esv.STATISTIC_ID, esv.OUTCOME);
+
+        // combine with definitions
+        return dsl.select(es.fields())
+                .select(aggregates.fields())
+                .from(es)
+                .innerJoin(aggregates)
+                .on(es.ID.eq((Field<Long>) aggregates.field("statistic_id")))
+                .fetch()
+                .intoGroups(ENTITY_STATISTIC_DEFINITION.fields())
+                .entrySet()
+                .stream()
+                .map(TO_SUMMARY_MAPPER)
+                .collect(Collectors.toList());
     }
 
 

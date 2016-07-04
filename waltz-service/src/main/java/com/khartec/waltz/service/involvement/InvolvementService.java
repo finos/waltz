@@ -17,10 +17,13 @@
 
 package com.khartec.waltz.service.involvement;
 
+import com.khartec.waltz.data.end_user_app.EndUserAppIdSelectorFactory;
 import com.khartec.waltz.data.involvement.InvolvementDao;
+import com.khartec.waltz.model.EntityIdSelectionOptions;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.person.Person;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +41,15 @@ public class InvolvementService {
 
 
     private final InvolvementDao dao;
+    private EndUserAppIdSelectorFactory endUserAppIdSelectorFactory;
 
 
     @Autowired
-    public InvolvementService(InvolvementDao dao) {
+    public InvolvementService(InvolvementDao dao, EndUserAppIdSelectorFactory endUserAppIdSelectorFactory) {
         checkNotNull(dao, "dao must not be null");
+        checkNotNull(endUserAppIdSelectorFactory, "endUserAppIdSelectorFactory cannot be null");
         this.dao = dao;
+        this.endUserAppIdSelectorFactory = endUserAppIdSelectorFactory;
     }
 
 
@@ -62,6 +68,13 @@ public class InvolvementService {
     public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
         checkNotEmptyString(employeeId, "employeeId cannot be empty");
         return time("IS.findAllApplicationsByEmployeeId", () -> dao.findAllApplicationsByEmployeeId(employeeId));
+    }
+
+
+    public List<EndUserApplication> findAllEndUserApplicationsBySelector(EntityIdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        return time("IS.findAllEndUserApplicationsBySelector",
+                () -> dao.findAllEndUserApplicationsByEmployeeId(endUserAppIdSelectorFactory.apply(options)));
     }
 
 
