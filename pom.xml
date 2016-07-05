@@ -13,7 +13,8 @@
         <module>waltz-jobs</module>
         <module>waltz-data</module>
         <module>waltz-schema</module>
-        <module>waltz-local-config</module>
+        <!--TODO: find a better way of passing a logback configuration file-->
+        <!--<module>waltz-local-config</module>-->
     </modules>
     <packaging>pom</packaging>
 
@@ -158,6 +159,12 @@
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mariadb.jdbc</groupId>
+                <artifactId>mariadb-java-client</artifactId>
+                <version>1.4.6</version>
             </dependency>
 
         </dependencies>
