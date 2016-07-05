@@ -14,6 +14,7 @@
 
     <properties>
         <jooq.version>3.7.4</jooq.version>
+        <liquibase.maven.version>3.5.1</liquibase.maven.version>
     </properties>
 
     <profiles>
@@ -53,6 +54,16 @@
         </profile>
 
 
+        <profile>
+            <id>travis-mariadb</id>
+            <properties>
+                <database.url>jdbc:mysql://127.0.0.1:3306/waltz</database.url>
+                <database.user>root</database.user>
+                <database.password></database.password>
+                <database.schema>waltz</database.schema>
+            </properties>
+        </profile>
+
     </profiles>
 
     <dependencies>
@@ -80,6 +91,30 @@
         </resources>
 
         <plugins>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>${liquibase.maven.version}</version>
+                <configuration>
+                    <changeLogFile>
+                        ${basedir}/../waltz-data/src/main/ddl/liquibase/db.changelog-master.xml
+                    </changeLogFile>
+                    <driver>${jdbc.driver}</driver>
+                    <url>${database.url}</url>
+                    <username>${database.user}</username>
+                    <password>${database.password}</password>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>update</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <!-- Specify the maven code generator plugin -->
                 <groupId>${jooq.group}</groupId>

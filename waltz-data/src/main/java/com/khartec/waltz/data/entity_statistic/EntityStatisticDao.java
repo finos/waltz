@@ -94,10 +94,9 @@ public class EntityStatisticDao {
 
 
     private static final Function<? super Map.Entry<Record, Result<Record>>, EntityStatisticSummary> TO_SUMMARY_MAPPER = recordResultEntry -> {
-        EntityStatisticDefinition def = TO_DEFINITION_MAPPER.map(
-                recordResultEntry.getKey().into(ENTITY_STATISTIC_DEFINITION));
+        EntityStatisticDefinition def = TO_DEFINITION_MAPPER.map(recordResultEntry.getKey());
 
-       List<StringTally> counts = recordResultEntry.getValue()
+        List<StringTally> counts = recordResultEntry.getValue()
                 .into(esv.field(esv.OUTCOME), COUNT)
                 .map(TO_STRING_TALLY);
 
