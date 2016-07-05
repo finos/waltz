@@ -18,3 +18,8 @@ cache:
   directories:
     - $HOME/.m2
     - node_modules
+    
+# safelist
+branches:
+  only:
+    - master
