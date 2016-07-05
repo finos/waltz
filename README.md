@@ -1,5 +1,5 @@
 # Khartec - Waltz
-[![Build Status](https://travis-ci.org/kamransaleem/waltz.svg?branch=master)](https://travis-ci.org/kamransaleem/waltz)
+[![Build Status](https://travis-ci.org/khartec/waltz.svg?branch=master)](https://travis-ci.org/khartec/waltz)
 
 ## Technology Stack
 
