@@ -1,36 +1,39 @@
 <div class="waltz-auth-sources-table">
-    <div ng-repeat="(dataType, sources) in ctrl.authSources">
-        <h4>{{ dataType | toDisplayName:'dataType' }}</h4>
-        <table class="table">
-            <colgroup>
-                <col width="15%"/>
-                <col width="30%"/>
-                <col width="55%"/>
-            </colgroup>
-            <tr ng-repeat="source in sources" ng-class="{
+    <table class="table table-condensed">
+        <thead>
+        <tr>
+            <th>Data Type</th>
+            <th>Authoritativeness</th>
+            <th>Application</th>
+        </tr>
+        </thead>
+        <tbody ng-repeat="(dataType, sources) in ctrl.authSources">
+        <tr ng-repeat="source in sources"
+            ng-class="{
                     'direct' : source.parentReference.id == ctrl.orgUnitId,
                     'indirect' : source.parentReference.id != ctrl.orgUnitId,
                 }">
-                <td>
+            <td><span ng-if='$first' ng-bind="dataType | toDisplayName:'dataType'"></span></td>
+            <td>
+                <span>
                     <waltz-rating-indicator value="{{source.rating}}"></waltz-rating-indicator>
-                </td>
-                <td>
-                    <div>
+                    <span>
                         {{source.rating|toDisplayName:'rating'}}
-                    </div>
-                    <div ng-if="source.parentReference.id != ctrl.orgUnitId" class="small">
+                    </span>
+                    <span ng-if="source.parentReference.id != ctrl.orgUnitId" class="small">
                         (Declared by: {{ctrl.lookupOrgUnitName(source.parentReference.id)}})
-                    </div>
-                </td>
-                <td>
-                    <a ui-sref="main.app.view ({id: source.applicationReference.id})">
-                        {{source.applicationReference.name}}
-                    </a>
-                    <small>
-                        ( {{source.appOrgUnitReference.name}} )
-                    </small>
-                </td>
-            </tr>
-        </table>
-    </div>
+                    </span>
+                </span>
+            </td>
+            <td>
+                <a ui-sref="main.app.view ({id: source.applicationReference.id})">
+                    {{source.applicationReference.name}}
+                </a>
+                <small>
+                    ( {{source.appOrgUnitReference.name}} )
+                </small>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>

@@ -102,7 +102,7 @@
                     Authoritative Sources
                 </uib-tab-heading>
 
-                <div ng-show="! ctrl.viewData.authSources | isEmpty">
+                <div ng-show="! (ctrl.viewData.authSources | isEmpty)">
                     <waltz-auth-sources-table org-unit-id="ctrl.viewData.orgUnit.id"
                                               org-units="ctrl.viewData.orgUnits"
                                               auth-sources="ctrl.viewData.authSources">

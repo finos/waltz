@@ -21,7 +21,10 @@
             <tbody>
             <tr ng-repeat="row in ctrl.usageRows">
                 <td>
-                    <span ng-bind="row.displayName"></span>
+                    <span uib-popover-html="row.nameDescription"
+                          popover-append-to-body="true"
+                          popover-trigger="mouseenter"
+                          ng-bind="row.displayName"></span>
                 </td>
                 <td uib-popover-html="row.readOnlyDescription"
                     popover-append-to-body="true"
