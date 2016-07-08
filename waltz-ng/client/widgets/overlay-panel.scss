@@ -9,5 +9,5 @@
     padding: 10px;
     border-radius: 3px;
     z-index: 100;
-    @include box-shadow(4px, 4px, 4px, $waltz-border-color);
+    @include waltz-box-shadow();
 }

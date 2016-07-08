@@ -138,3 +138,11 @@ export const entityStatisticCategoryDisplayNames = {
     REGULATORY: 'Regulatory',
     DATA_QUALITY: 'Data Quality'
 };
+
+
+export const usageKindDisplayNames = {
+    ORIGINATOR: 'Originator',
+    DISTRIBUTOR: 'Distributor',
+    CONSUMER: 'Consumer',
+    MODIFIER: 'Modifier'
+};

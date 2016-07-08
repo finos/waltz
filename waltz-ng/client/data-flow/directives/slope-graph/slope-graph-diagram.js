@@ -65,7 +65,6 @@ function drawTypesColumn(svg, dimensions, types, typeScale, tweaker) {
         .classed('wafd-type', true)
         .call(tweaker.enter || noop)
         .call(onHighlight, 'code')
-        .attr('transform', `translate(0, ${dimensions.viz.height / 2})`)
         .append('text')
         .attr('text-anchor', 'middle')
         .text(type => _.truncate(type.name, 16));

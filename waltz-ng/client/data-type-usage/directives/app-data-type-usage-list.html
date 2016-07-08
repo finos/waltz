@@ -1,0 +1,50 @@
+<div >
+    <table class="table table-condensed small">
+        <thead>
+        <tr>
+            <th>Type</th>
+            <td ng-repeat="usageKind in ctrl.allUsageKinds" align="center">
+                <waltz-icon name="{{ usageKind.kind | toIconName:'usageKind' }}"></waltz-icon>
+                <span ng-bind="usageKind.kind | toDisplayName:'usageKind'"></span>
+            </td>
+        </tr>
+        </thead>
+        <tbody ng-repeat="(dataTypeCode, usages) in ctrl.consolidatedUsages">
+        <tr>
+            <td>
+                <span uib-popover="{{ dataTypeCode | toDescription: 'dataType' }}"
+                      popover-append-to-body="true"
+                      popover-trigger="mouseenter"
+                      ng-bind="dataTypeCode | toDisplayName:'dataType'"></span>
+            </td>
+            <td ng-repeat="usageKind in ctrl.allUsageKinds"
+                uib-popover="{{ ctrl.lookupDescription(dataTypeCode, usageKind.kind) }}"
+                popover-append-to-body="true"
+                popover-trigger="mouseenter"
+                align="center">
+                <span ng-if="ctrl.isSelected(dataTypeCode, usageKind.kind)"
+                      style="color: green">
+                    <waltz-icon name="check"></waltz-icon>
+                </span>
+
+                <span ng-if="ctrl.hasDescription(dataTypeCode, usageKind.kind) && ! ctrl.isSelected(dataTypeCode, usageKind.kind)"
+                      style="color: darkred">
+                    <waltz-icon name="times"></waltz-icon>
+                </span>
+
+                 <span ng-if="ctrl.hasDescription(dataTypeCode, usageKind.kind)"
+                       style="color: blue">
+                    <waltz-icon name="ellipsis-h"></waltz-icon>
+                </span>
+
+                 <span ng-if="! ctrl.hasDescription(dataTypeCode, usageKind.kind)">
+                    &nbsp;&nbsp;
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+

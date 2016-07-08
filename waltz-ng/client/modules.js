@@ -22,6 +22,7 @@ function setup(module) {
         require('./databases'),
         require('./data-flow'),
         require('./data-types'),
+        require('./data-type-usage'),
         require('./end-user-apps'),
         require('./entity-statistics'),
         require('./examples'),

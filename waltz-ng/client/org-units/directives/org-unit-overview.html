@@ -1,34 +1,9 @@
-<div>
-    <div class="row no-overflow"
-         ng-if="ctrl.parents.length > 0"
-         style="padding: 1em">
-
-        <div class="col-sm-12">
-            <span class="text-muted">
-                <waltz-icon name="level-up"></waltz-icon>
-                Parent/s:
-            </span>
-            <ul class="list-inline" style="display: inline-block;">
-                <li ng-repeat="parent in ctrl.parents">
-                    <a ui-sref="main.org-unit.view ({id: parent.id })"
-                       ng-bind="parent.name">
-                    </a>
-                    <span ng-if="!$last">&raquo;</span>
-                </li>
-            </ul>
-
-            <span class="text-muted small "
-                  ng-bind="ctrl.parent.description">
-            </span>
-        </div>
+<div class="waltz-page-summary" style="margin-bottom: 24px">
 
 
-    </div>
+    <div class="row">
 
-    <div class="row"
-         style="padding: 1em">
-
-        <div class="col-sm-offset-1 col-sm-10 waltz-page-summary">
+        <div class="col-sm-12 ">
             <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;"
                 ng-bind="ctrl.unit.name"></h3>
 
@@ -131,18 +106,41 @@
                 </div>
             </div>
 
+            <hr>
+
+            <div class="row no-overflow"
+                 ng-if="ctrl.parents.length > 0"
+                 style="padding: 1em">
+
+                <div class="col-sm-4">
+
+                    <h4>Parent Units: </h4>
+                    <ul>
+                        <li ng-repeat="parent in ctrl.parents">
+                            <a ui-sref="main.org-unit.view ({id: parent.id })"
+                               ng-bind="parent.name">
+                            </a>
+                            <span ng-if="!$last">&raquo;</span>
+                        </li>
+                    </ul>
+
+                    <span class="text-muted small "
+                          ng-bind="ctrl.parent.description">
+                    </span>
+                </div>
+
+                <div ng-if="ctrl.unit.children.length > 0"
+                     class="col-sm-8">
+
+                    <h4>Sub Units</h4>
+
+                    <waltz-org-unit-tree tree="ctrl.unit.children"
+                                         on-selection="ctrl.nodeSelected">
+                    </waltz-org-unit-tree>
+                </div>
+            </div>
+
         </div>
     </div>
 
-
-    <div class="row" ng-if="ctrl.unit.children.length > 0">
-        <div class="col-sm-offset-2 col-sm-10">
-
-            <h4>Sub Units</h4>
-
-            <waltz-org-unit-tree tree="ctrl.unit.children"
-                                 on-selection="ctrl.nodeSelected">
-            </waltz-org-unit-tree>
-        </div>
-    </div>
 </div>

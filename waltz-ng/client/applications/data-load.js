@@ -109,3 +109,10 @@ export function loadAuthSources(authSourceStore, orgUnitStore, appId, ouId, vm) 
         .then(orgUnitIds => orgUnitStore.findByIds(orgUnitIds))
         .then(orgUnits => addOrgUnits(orgUnits, vm));
 }
+
+
+export function loadDataTypeUsages(dataTypeUsageStore, appId, vm) {
+    dataTypeUsageStore
+        .findForEntity('APPLICATION', appId)
+        .then(usages => vm.dataTypeUsages = usages);
+}
