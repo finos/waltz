@@ -1,10 +1,15 @@
-<div >
+<div>
     <table class="table table-condensed small">
         <thead>
         <tr>
             <th>Type</th>
-            <td ng-repeat="usageKind in ctrl.allUsageKinds" align="center">
-                <waltz-icon name="{{ usageKind.kind | toIconName:'usageKind' }}"></waltz-icon>
+            <td ng-repeat="usageKind in ctrl.allUsageKinds"
+                align="center"
+                uib-popover-html="usageKind.nameDescription"
+                popover-append-to-body="true"
+                popover-trigger="mouseenter">
+                <waltz-icon name="{{ usageKind.kind | toIconName:'usageKind' }}">
+                </waltz-icon>
                 <span ng-bind="usageKind.kind | toDisplayName:'usageKind'"></span>
             </td>
         </tr>
@@ -25,6 +30,7 @@
                 <span ng-if="ctrl.isSelected(dataTypeCode, usageKind.kind)"
                       style="color: green">
                     <waltz-icon name="check"></waltz-icon>
+
                 </span>
 
                 <span ng-if="ctrl.hasDescription(dataTypeCode, usageKind.kind) && ! ctrl.isSelected(dataTypeCode, usageKind.kind)"
