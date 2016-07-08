@@ -1,28 +1,50 @@
 <div >
-    <div style="width: 30%; margin: 1%; border-radius: 6px; padding: 0 1% 0 1%; display: inline-block; vertical-align: top; background-color: #f5f5f5"
-         ng-repeat="dataTypeGroup in ctrl.consolidatedUsages">
-        <h5 style='border-bottom: 1px dotted #ccc; padding-bottom: 3px;' ng-bind="dataTypeGroup.key | toDisplayName:'dataType'"></h5>
-        <div class="small">
-            <i class='text-muted'
-               ng-bind="dataTypeGroup.key | toDescription:'dataType'"></i>
-            <ul style="padding-top: 6px"
-                class="list-unstyled">
-                <li ng-repeat="usage in dataTypeGroup.values"
-                    style="margin-top: 3px">
-                    <div class='text-nowrap'>
-                        <waltz-icon name="{{ usage.usageKind | toIconName:'usageKind' }}"></waltz-icon>
-                        <strong ng-bind="usage.usageKind | toDisplayName:'usageKind'"></strong>
-                    </div>
-                    <div ng-if="usage.description.length > 0"
-                         style="padding-left: 12px; padding-bottom: 3px"
-                         class="small text-muted"
-                         ng-bind="usage.description">
-                    </div>
-                </li>
-            </ul>
-        </div>
+    <table class="table table-condensed small">
+        <thead>
+        <tr>
+            <th>Type</th>
+            <td ng-repeat="usageKind in ctrl.allUsageKinds" align="center">
+                <waltz-icon name="{{ usageKind.kind | toIconName:'usageKind' }}"></waltz-icon>
+                <span ng-bind="usageKind.kind | toDisplayName:'usageKind'"></span>
+            </td>
+        </tr>
+        </thead>
+        <tbody ng-repeat="(dataTypeCode, usages) in ctrl.consolidatedUsages">
+        <tr>
+            <td>
+                <span uib-popover="{{ dataTypeCode | toDescription: 'dataType' }}"
+                      popover-append-to-body="true"
+                      popover-trigger="mouseenter"
+                      ng-bind="dataTypeCode | toDisplayName:'dataType'"></span>
+            </td>
+            <td ng-repeat="usageKind in ctrl.allUsageKinds"
+                uib-popover="{{ ctrl.lookupDescription(dataTypeCode, usageKind.kind) }}"
+                popover-append-to-body="true"
+                popover-trigger="mouseenter"
+                align="center">
+                <span ng-if="ctrl.isSelected(dataTypeCode, usageKind.kind)"
+                      style="color: green">
+                    <waltz-icon name="check"></waltz-icon>
+                </span>
 
-    </div>
+                <span ng-if="ctrl.hasDescription(dataTypeCode, usageKind.kind) && ! ctrl.isSelected(dataTypeCode, usageKind.kind)"
+                      style="color: darkred">
+                    <waltz-icon name="times"></waltz-icon>
+                </span>
+
+                 <span ng-if="ctrl.hasDescription(dataTypeCode, usageKind.kind)"
+                       style="color: blue">
+                    <waltz-icon name="ellipsis-h"></waltz-icon>
+                </span>
+
+                 <span ng-if="! ctrl.hasDescription(dataTypeCode, usageKind.kind)">
+                    &nbsp;&nbsp;
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
 </div>
 
 

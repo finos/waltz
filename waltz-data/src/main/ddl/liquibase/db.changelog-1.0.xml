@@ -2116,4 +2116,20 @@
         </sql>
     </changeSet>
 
+
+    <changeSet author="dwatkins"
+               id="20160629-253-4">
+        <addColumn tableName="data_type_usage">
+            <column name="is_selected" type="boolean"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20160629-253-5">
+        <sql>
+            UPDATE data_type_usage SET is_selected = 1
+        </sql>
+    </changeSet>
+
+
 </databaseChangeLog>

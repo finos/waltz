@@ -15,7 +15,10 @@
   border-radius: 3px;
   margin-bottom: 24px;
   background: #fff;
-  @include box-shadow(2px, 2px, 3px, $waltz-border-color)
+
+
+
+  @include waltz-box-shadow()
 }
 
 

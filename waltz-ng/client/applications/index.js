@@ -20,9 +20,10 @@ export default (module) => {
     module.directive('waltzAppOverview', require('./directives/app-overview'));
     module.directive('waltzAppOverviewSection', require('./directives/app-overview-section'));
     module.directive('waltzAppSelector', require('./directives/app-selector'));
-    module.directive('waltzAssetCodeExplorer', require('./directives/asset-code-explorer'));
     module.directive('waltzAppTable', require('./directives/app-table'));
     module.directive('waltzAppsByInvestmentPie', require('./directives/apps-by-investment-pie'));
     module.directive('waltzAppsByLifecyclePhasePie', require('./directives/apps-by-lifecycle-phase-pie'));
+    module.directive('waltzAssetCodeExplorer', require('./directives/asset-code-explorer'));
+    module.directive('waltzBasicAppSelector', require('./directives/basic-app-selector'));
 
 };

@@ -10,9 +10,63 @@
  *
  */
 import _ from "lodash";
-import angular from "angular";
-import {toRef, loadDataFlows, loadDataTypes, loadAppAuthSources, loadOrgUnitAuthSources} from "./registration-utils";
+import {loadDataFlows, loadDataTypes, loadAppAuthSources, loadOrgUnitAuthSources} from "./registration-utils";
 import {prepareSlopeGraph} from "./directives/slope-graph/slope-graph-utils";
+
+
+function calculateWorkingTypes(flows = [], predicate) {
+    return _.chain(flows)
+        .filter(predicate)
+        .map('dataType')
+        .value();
+}
+
+
+function vetoMove(isDirty) {
+    if (isDirty) {
+        alert('Unsaved changes, either apply them or cancel');
+        return true;
+    }
+    return false;
+}
+
+
+function addApplication(app, appGroup) {
+    if (!app) return;
+    if (_.some(appGroup, a => a.id === app.id)) return;
+    appGroup.push(app);
+}
+
+
+function loadDataTypeUsages(dataTypeUsageStore, appId, vm) {
+    dataTypeUsageStore
+        .findForEntity('APPLICATION', appId)
+        .then(usages => vm.dataTypeUsages = usages);
+}
+
+
+const initialState = {
+    app: null,
+    currentDataTypes: [],
+    dataTypes: [],
+    dataTypeUsages: [],
+    flows: [],
+    graphOptions: {
+        data: {
+            incoming: [],
+            outgoing: [],
+            sources: [],
+            targets: [],
+            types: []
+        },
+        tweakers: {}
+    },
+    isDirty: false,
+    mode: '',
+    selectedApp: null,
+    selectedDirection: null,
+    selectedUsages: []
+};
 
 
 function controller($q,
@@ -22,83 +76,72 @@ function controller($q,
                     authSourceStore,
                     dataFlowStore,
                     dataTypeStore,
+                    dataTypeUsageStore,
                     displayNameService,
                     notification) {
 
-    const appId = application.id;
+    const primaryAppId = application.id;
     const ouId = application.organisationalUnitId;
 
-    const vm = this;
+    const vm = _.defaultsDeep(this, initialState);
+    vm.app = application;
 
-    const model = {
-        newTarget: {},
-        newSource: {},
-        selectedApp: null,
-        selectedDirection: null,
-        selectedTypes: []
+    const reload = () => {
+        loadDataFlows(dataFlowStore, primaryAppId, vm)
+            .then(() => prepareData());
+
+        loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm);
+        vm.cancel();
     };
 
-
-    const isDirty = () => {
-        return _.some(model.selectedTypes, st => {
-            return st.original !== st.selected;
-        });
-    };
-
-    const setupSelectedTypes = (selectedTypes) => {
-        const all = angular.copy(vm.dataTypes);
-        vm.model.selectedTypes = _.map(all, type => {
-            return {
-                ...type,
-                selected: _.includes(selectedTypes, type.code),
-                original: _.includes(selectedTypes, type.code)
-            };
-        });
-    };
 
     const selectSource = (app) => {
         if (!app) return;
-        if (isDirty()) {
-            alert('Unsaved changes, either apply them or cancel');
+        if (vetoMove(vm.isDirty)) {
             return;
         }
-        model.selectedApp = app;
-        model.selectedDirection = 'source';
 
-        const selectedTypes = _.chain(vm.flows)
-            .filter({ source: { id: app.id }})
-            .map('dataType')
-            .value();
+        vm.selectedApp = app;
+        vm.selectedDirection = 'source';
 
-        setupSelectedTypes(selectedTypes);
+        vm.currentDataTypes = calculateWorkingTypes(
+            vm.flows,
+            { source: { id: app.id }});
+
+        vm.setMode('editCounterpart');
+
     };
 
     const selectTarget = (app) => {
-        if (isDirty()) {
-            alert('Unsaved changes, either apply them or cancel');
+        if (vetoMove(vm.isDirty)) {
             return;
         }
-        model.selectedApp = app;
-        model.selectedDirection = 'target';
+        vm.selectedApp = app;
+        vm.selectedDirection = 'target';
 
-        const selectedTypes = _.chain(vm.flows)
-            .filter({ target: { id: app.id }})
-            .map('dataType')
-            .value();
+        vm.currentDataTypes = calculateWorkingTypes(
+            vm.flows,
+            { target: { id: app.id }});
 
-        setupSelectedTypes(selectedTypes);
+        vm.setMode('editCounterpart');
+
     };
 
     const selectType = (type) => {
-        console.log('select type', type)
+        vm.setMode('editDataTypeUsage');
+        vm.selectedDataType = type;
+        vm.selectedUsages = _.chain(vm.dataTypeUsages)
+            .filter({ dataTypeCode: type.code })
+            .map('usage')
+            .value()
     };
 
-
     const promises = [
-        loadDataFlows(dataFlowStore, appId, vm),
-        loadAppAuthSources(authSourceStore, appId, vm),
+        loadDataFlows(dataFlowStore, primaryAppId, vm),
+        loadAppAuthSources(authSourceStore, primaryAppId, vm),
         loadOrgUnitAuthSources(authSourceStore, ouId, vm),
-        loadDataTypes(dataTypeStore, vm)
+        loadDataTypes(dataTypeStore, vm),
+        loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm)
     ];
 
 
@@ -108,8 +151,8 @@ function controller($q,
             .uniq()
             .value();
 
-        const graphData = prepareSlopeGraph(
-            appId,
+        const graphOptions = prepareSlopeGraph(
+            primaryAppId,
             vm.flows,
             dataTypes,
             vm.appAuthSources,
@@ -117,113 +160,67 @@ function controller($q,
             displayNameService,
             $state);
 
-        graphData.tweakers.target = {
+        graphOptions.tweakers.target = {
             enter: selection => selection.on('click', app => $scope.$evalAsync(() => selectTarget(app)))
         };
 
-        graphData.tweakers.source = {
+        graphOptions.tweakers.source = {
             enter: selection => selection.on('click', app => $scope.$evalAsync(() => selectSource(app)))
         };
 
-        graphData.tweakers.type = {
+        graphOptions.tweakers.type = {
             enter: selection => selection
                 .classed('clickable', true)
                 .on('click', type => $scope.$evalAsync(() => selectType(type)))
         };
 
-        Object.assign(vm, graphData);
+        vm.graphOptions = graphOptions;
     };
 
     $q.all(promises)
         .then(() => prepareData());
 
-
     vm.cancel = () => {
-        _.each(vm.model.selectedTypes, st => {
-            st.selected = st.original;
-        });
-        model.selectedApp = null;
-        model.selectedDirection = null;
+        vm.selectedApp = null;
+        vm.selectedDirection = null;
+        vm.isDirty = false;
+        vm.setMode('');
     };
 
-
-    vm.addSource = (sourceApp) => {
-        vm.showAddUpstream = false;
-        selectSource(sourceApp);
-        if (!sourceApp) return;
-        if (_.some(vm.data.sources, a => a.id === sourceApp.id)) return;
-        vm.data.sources.push(sourceApp);
-    };
-
-
-    vm.addTarget = (targetApp) => {
-        vm.showAddDownstream = false;
-        selectTarget(targetApp);
-        if (!targetApp) return;
-        if (_.some(vm.data.targets, a => a.id === targetApp.id)) return;
-        vm.data.targets.push(targetApp);
-    };
-
-    const reload = () => {
-        loadDataFlows(dataFlowStore, appId, vm).then(() => prepareData());
-        vm.cancel();
-    };
-
-    vm.apply = () => {
-        const source = toRef(model.selectedDirection === 'target' ? application : model.selectedApp);
-        const target = toRef(model.selectedDirection === 'source' ? application : model.selectedApp);
-
-        const [added, removed] = _.chain(model.selectedTypes)
-            .filter(st => st.selected !== st.original)
-            .partition('selected')
-            .value();
-
-        const command = {
-            source,
-            target,
-            addedTypes: _.map(added, 'code'),
-            removedTypes: _.map(removed, 'code')
-        };
-
+    vm.saveFlows = (command) => {
         dataFlowStore.create(command)
             .then(() => reload())
             .then(() => notification.success('Logical flows updated'));
     };
 
-
-    const addUpstreamFlow = (type, source) => {
-        if (!_.some(vm.incoming, f => f.source === source.id && f.type === type.code)) {
-            vm.incoming.push({ source: source.id, target: appId, type: type.code});
-        }
-        if (!_.some(vm.flowTypes, t => t.code === type.code)) {
-            vm.flowTypes.push(type);
-        }
+    vm.saveUsages = (usages = []) => {
+        const ref = { id: vm.app.id, kind: 'APPLICATION' };
+        const dataTypeCode = vm.selectedDataType.code;
+        dataTypeUsageStore.save(ref, dataTypeCode, usages)
+            .then(() => reload())
+            .then(() => notification.success('Data usage updated'));
     };
 
-    const addDownstreamFlow = (type, target) => {
-        if (!_.some(vm.outgoing, f => f.target === target.id && f.type === type.code)) {
-            vm.outgoing.push({ target: target.id, source: appId, type: type.code});
-        }
-        if (!_.some(vm.flowTypes, t => t.code === type.code)) {
-            vm.flowTypes.push(type);
-        }
+    vm.addSource = (app) => {
+        selectSource(app);
+        addApplication(app, vm.graphOptions.data.sources);
     };
 
-    vm.typeSelected = (type) => {
-        model.pristine = false;
-        if (type.selected) {
-            if (model.selectedDirection === 'source') {
-                addUpstreamFlow(type, model.selectedApp);
-            } else {
-                addDownstreamFlow(type, model.selectedApp);
-            }
-        }
+    vm.addTarget = (app) => {
+        selectTarget(app);
+        addApplication(app, vm.graphOptions.data.targets);
     };
 
-    vm.model = model;
-    vm.app = application;
-    vm.isDirty = isDirty;
+    vm.setDirtyChange = (dirty) => vm.isDirty = dirty;
+
+    vm.setMode = (mode) => {
+        if (vetoMove(vm.isDirty)) {
+            return;
+        }
+        vm.mode = mode;
+    };
 }
+
 
 controller.$inject = [
     '$q',
@@ -233,6 +230,7 @@ controller.$inject = [
     'AuthSourcesStore',
     'DataFlowDataStore',
     'DataTypesDataService',
+    'DataTypeUsageStore',
     'WaltzDisplayNameService',
     'Notification'
 ];

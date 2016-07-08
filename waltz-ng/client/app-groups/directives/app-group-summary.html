@@ -1,7 +1,8 @@
-<div class="row">
-    <div class="col-sm-offset-1 col-sm-10 waltz-page-summary">
-        <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;">
-            <span ng-bind="ctrl.appGroup.name"></span>
+<div class="waltz-page-summary" style="margin-bottom: 24px">
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;">
+                <span ng-bind="ctrl.appGroup.name"></span>
             <span class="pull-right"
                   ng-if="ctrl.editable">
                 <a ui-sref="main.app-group.edit ({ id:ctrl.appGroup.id })"
@@ -10,105 +11,107 @@
                     Edit Group
                 </a>
             </span>
-        </h3>
+            </h3>
 
-        <div style="font-size: larger; border-bottom: 2px dotted #eee; padding: 6px"
-             class="waltz-paragraph"
-             ng-bind="ctrl.appGroup.description">
-        </div>
-
-
-        <div class="row">
-            <div class="col-sm-4">
-                <waltz-apps-by-investment-pie applications="ctrl.applications"
-                                              size="70">
-                </waltz-apps-by-investment-pie>
+            <div style="font-size: larger; border-bottom: 2px dotted #eee; padding: 6px"
+                 class="waltz-paragraph"
+                 ng-bind="ctrl.appGroup.description">
             </div>
 
-            <div class="col-sm-4">
-                <waltz-apps-by-lifecycle-phase-pie applications="ctrl.applications"
-                                                   size="70">
-                </waltz-apps-by-lifecycle-phase-pie>
-            </div>
 
-            <div class="col-sm-4">
-                <waltz-basic-info-tile waltz-jump-to="dataflows-section"
-                                       icon="random"
-                                       name="Logical Data Flows">
-                    <br>
-                    <waltz-flow-cloud-diagram
-                        width="200"
-                        stats="ctrl.flows">
-                    </waltz-flow-cloud-diagram>
-                </waltz-basic-info-tile>
-            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <waltz-apps-by-investment-pie applications="ctrl.applications"
+                                                  size="70">
+                    </waltz-apps-by-investment-pie>
+                </div>
 
-        </div>
-        <div class="row">
-            <div class="col-sm-3">
-                <waltz-basic-info-tile name="Portfolio Cost"
-                                       description="Cumulative value of infra and app dev costs"
-                                       waltz-jump-to="costs-section"
-                                       icon="money">
+                <div class="col-sm-4">
+                    <waltz-apps-by-lifecycle-phase-pie applications="ctrl.applications"
+                                                       size="70">
+                    </waltz-apps-by-lifecycle-phase-pie>
+                </div>
+
+                <div class="col-sm-4">
+                    <waltz-basic-info-tile waltz-jump-to="dataflows-section"
+                                           icon="random"
+                                           name="Logical Data Flows">
+                        <br>
+                        <waltz-flow-cloud-diagram
+                            width="200"
+                            stats="ctrl.flows">
+                        </waltz-flow-cloud-diagram>
+                    </waltz-basic-info-tile>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-sm-3">
+                    <waltz-basic-info-tile name="Portfolio Cost"
+                                           description="Cumulative value of infra and app dev costs"
+                                           waltz-jump-to="costs-section"
+                                           icon="money">
                         <span style="font-size: x-large;">
                             <span ng-bind="ctrl.portfolioCostStr"></span>
                         </span>
-                </waltz-basic-info-tile>
-            </div>
-            <div class="col-sm-3">
-                <waltz-basic-info-tile name="Complexity"
-                                       description="Derived from capabilities, connections and servers"
-                                       class="clickable"
-                                       waltz-jump-to="complexity-section"
-                                       icon="rocket">
-                    <div style="font-size: x-large;">
-                        &Sigma;
-                        <span ng-nind="ctrl.complexitySummary.cumulativeScore | toFixed:1"></span>
-                    </div>
-                    <div class="small text-muted">
-                        <span ng-bind="ctrl.complexitySummary.averageScore | toFixed:2"></span>
-                        per app
-                    </div>
-                </waltz-basic-info-tile>
-
-            </div>
-            <div class="col-sm-3">
-                <waltz-basic-info-tile name="Servers"
-                                       class="clickable"
-                                       description="Number of servers supporting this group"
-                                       waltz-jump-to="servers-section"
-                                       icon="server">
-                    <div>
+                    </waltz-basic-info-tile>
+                </div>
+                <div class="col-sm-3">
+                    <waltz-basic-info-tile name="Complexity"
+                                           description="Derived from capabilities, connections and servers"
+                                           class="clickable"
+                                           waltz-jump-to="complexity-section"
+                                           icon="rocket">
                         <div style="font-size: x-large;">
-                            #
-                            <span ng-bind="ctrl.serverStats.total"></span>
+                            &Sigma;
+                            <span ng-nind="ctrl.complexitySummary.cumulativeScore | toFixed:1"></span>
                         </div>
                         <div class="small text-muted">
-                            <span ng-bind="ctrl.serverStats.virtualPercentage"></span>
-                            % virtual
-                        </div>
-                    </div>
-                </waltz-basic-info-tile>
-
-            </div>
-
-            <div class="col-sm-3">
-                <waltz-basic-info-tile name="Capabilities"
-                                       description="Capabilities performed within this OU"
-                                       waltz-jump-to="ratings-section"
-                                       icon="puzzle-piece">
-                    <div>
-                        <div style="font-size: x-large;">
-                            #
-                            <span ng-bing="ctrl.capabilityStats.total"></span>
-                        </div>
-                        <div class="small text-muted">
-                            <span ng-bind="ctrl.capabilityStats.perApplication"></span>
+                            <span ng-bind="ctrl.complexitySummary.averageScore | toFixed:2"></span>
                             per app
                         </div>
-                    </div>
-                </waltz-basic-info-tile>
+                    </waltz-basic-info-tile>
+
+                </div>
+                <div class="col-sm-3">
+                    <waltz-basic-info-tile name="Servers"
+                                           class="clickable"
+                                           description="Number of servers supporting this group"
+                                           waltz-jump-to="servers-section"
+                                           icon="server">
+                        <div>
+                            <div style="font-size: x-large;">
+                                #
+                                <span ng-bind="ctrl.serverStats.total"></span>
+                            </div>
+                            <div class="small text-muted">
+                                <span ng-bind="ctrl.serverStats.virtualPercentage"></span>
+                                % virtual
+                            </div>
+                        </div>
+                    </waltz-basic-info-tile>
+
+                </div>
+
+                <div class="col-sm-3">
+                    <waltz-basic-info-tile name="Capabilities"
+                                           description="Capabilities performed within this OU"
+                                           waltz-jump-to="ratings-section"
+                                           icon="puzzle-piece">
+                        <div>
+                            <div style="font-size: x-large;">
+                                #
+                                <span ng-bing="ctrl.capabilityStats.total"></span>
+                            </div>
+                            <div class="small text-muted">
+                                <span ng-bind="ctrl.capabilityStats.perApplication"></span>
+                                per app
+                            </div>
+                        </div>
+                    </waltz-basic-info-tile>
+                </div>
             </div>
         </div>
     </div>
 </div>
+

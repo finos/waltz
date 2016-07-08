@@ -1,9 +1,20 @@
 $waltz-border-color: #9a99ad;
 $waltz-border-color-lighter: lighten($waltz-border-color, 20%);
-$waltz-background-color: #fdffff;
-$waltz-section-background-color: #ecf3fc;  // section header bars etc
+$waltz-background-color: #e4e7f0;
+$waltz-section-background-color: #f0f3fa;  // section header bars etc
 $waltz-font-color: #332b23;
 $waltz-section-font-color: #332b23;
+
+$waltz-navbar-background-color: #2f3544;
+
+
+
+$navbar-default-color:             white;
+$navbar-default-bg:                #2f3544;
+$navbar-default-border:            darken($navbar-default-bg, 6.5%);
+
+$navbar-default-link-color:                #ddd;
+$navbar-default-link-hover-color:          #fff;
 
 //$waltz-border-color: #bfc5d4;
 //$waltz-border-color-lighter: #c2ccde;
@@ -35,7 +46,8 @@ $blockquote-border-color: none;
 $blockquote-font-size: ($font-size-base * 1.1);
 $input-border-focus: $waltz-border-color;
 $popover-title-bg: $waltz-section-background-color;
-$navbar-default-link-active-bg: darken($waltz-section-background-color, 4);
+$navbar-default-link-active-bg: #202636;
+$navbar-default-link-active-color: #fff;
 
 
 $grid-gutter-width: 60px !default;

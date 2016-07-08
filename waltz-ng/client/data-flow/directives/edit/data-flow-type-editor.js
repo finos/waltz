@@ -9,7 +9,14 @@ const BINDINGS = {
     currentDataTypes: '<',
     allDataTypes: '<',
     onSave: '<',
-    onCancel: '<'
+    onCancel: '<',
+    onDirty: '<'
+};
+
+
+const initialState = {
+    title: '-',
+    workingTypes: []
 };
 
 
@@ -23,9 +30,17 @@ function calculateWorkingTypes(all = [], current = []) {
 
 function controller($scope) {
 
-    const vm = this;
+    const vm = _.defaultsDeep(this, initialState);
 
-    vm.isSelected = (option) => true;
+    $scope.$watchGroup(
+        ['ctrl.primaryEntity', 'ctrl.counterpartEntity', 'ctrl.direction'],
+        ([ primary, counterpart, dir]) => {
+            if (! primary || ! counterpart || ! dir) return;
+
+            vm.title = dir === 'source'
+                    ? `From ${counterpart.name} to ${primary.name}`
+                    : `From ${primary.name} to ${counterpart.name}`;
+        });
 
     $scope.$watchGroup(
         ['ctrl.allDataTypes', 'ctrl.currentDataTypes'],
@@ -52,6 +67,11 @@ function controller($scope) {
     };
 
     vm.cancel = () => vm.onCancel();
+
+    vm.onChange = () => {
+        const dirty = _.some(vm.workingTypes, wt => wt.original != wt.selected);
+        vm.onDirty(dirty);
+    };
 }
 
 

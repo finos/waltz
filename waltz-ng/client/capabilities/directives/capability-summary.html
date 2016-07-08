@@ -5,24 +5,13 @@
          ng-if="ctrl.capability.parent"
          style="padding: 1em">
 
-        <div class="col-md-12">
-            <span class="text-muted">
-                <waltz-icon name="level-up"></waltz-icon>
-                Parent:
-            </span>
-            <a ui-sref="main.capability.view ({ id: ctrl.capability.parent.id })">
-                {{ ctrl.capability.parent.name }}
-            </a>
-            <span class="text-muted small ">
-                {{ ctrl.capability.parent.description }}
-            </span>
-        </div>
+
     </div>
 
 
     <!-- SCORECARD -->
     <div class="row">
-        <div class="col-sm-offset-1 col-sm-10">
+        <div class="col-sm-12">
             <waltz-capability-scorecard capability="ctrl.capability"
                                         server-stats="ctrl.serverStats"
                                         applications="ctrl.applications"
@@ -35,40 +24,5 @@
         </div>
     </div>
 
-
-    <!-- CHILDREN -->
-    <div class="row"
-         style="margin-top: 12px"
-         ng-if="ctrl.capability.children.length > 0">
-        <div class="col-md-offset-2 col-md-9">
-            <table class="table table-condensed small">
-                <colgroup>
-                    <col width="20%">
-                    <col width="80%">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th colspan="2">
-                        Sub-Capabilities
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="child in ctrl.capability.children | orderBy:'name'">
-                    <td>
-                        <a ui-sref="main.capability.view ({ id: child.id })">
-                            {{ child.name }}
-                        </a>
-                    </td>
-                    <td>
-                        <span class="text-muted">
-                            {{ child.description }}
-                        </span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
 

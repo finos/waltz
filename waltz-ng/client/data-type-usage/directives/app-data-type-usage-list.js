@@ -1,5 +1,5 @@
 import _ from "lodash";
-import d3 from "d3";
+import allUsageKinds from "../usage-kinds";
 
 const BINDINGS = {
     usages: "<"
@@ -8,17 +8,25 @@ const BINDINGS = {
 
 const initialState = {
     consolidatedUsages:{},
+    allUsageKinds,
     usages: []
 };
 
 
 function consolidateUsages(usages = []) {
-    return d3.nest()
-        .key(u => u.dataTypeCode)
-        .sortKeys(u => u.dataTypeCode)
-        .entries(usages);
+    return _.chain(usages)
+        .groupBy('dataTypeCode')
+        .mapValues(xs => _.chain(xs)
+            .map('usage')
+            .filter(u => u.isSelected || u.description.length > 0)
+            .value())
+        .value();
 }
 
+
+function findUsage(usages = [], dataTypeCode, usageKind) {
+    return _.find(usages, { dataTypeCode , usage : { kind: usageKind }});
+}
 
 function controller($scope) {
     const vm = _.defaultsDeep(this, initialState);
@@ -27,6 +35,24 @@ function controller($scope) {
         'ctrl.usages',
         (usages = []) => vm.consolidatedUsages = consolidateUsages(usages)
     );
+
+    vm.isSelected = (dataTypeCode, usageKind) => {
+        const foundUsage = findUsage(vm.usages, dataTypeCode, usageKind);
+        return foundUsage && foundUsage.usage.isSelected;
+    };
+
+    vm.hasDescription = (dataTypeCode, usageKind) => {
+        const foundUsage = findUsage(vm.usages, dataTypeCode, usageKind);
+        return foundUsage && foundUsage.usage.description;
+    };
+
+    vm.lookupDescription = (dataTypeCode, usageKind) => {
+        const foundUsage = findUsage(vm.usages, dataTypeCode, usageKind);
+        return foundUsage
+            ? foundUsage.usage.description
+            : "";
+    };
+
 }
 
 

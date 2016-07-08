@@ -1,4 +1,4 @@
-import {checkIsApplicationIdSelector} from "../../common/checks";
+import {checkIsApplicationIdSelector, checkIsEntityRef} from "../../common/checks";
 
 
 function service($http,
@@ -21,10 +21,19 @@ function service($http,
             .then(result => result.data);
     };
 
+    const save = (ref, dataTypeCode, usages = []) => {
+        checkIsEntityRef(ref);
+        if (usages.length == 0) return;
+        return $http
+            .post(`${BASE}/entity/${ref.kind}/${ref.id}/${dataTypeCode}`, usages)
+            .then(r => r.data);
+    };
+
     return {
         findForEntity,
         findForDataType,
-        findForSelector
+        findForSelector,
+        save
     };
 }
 

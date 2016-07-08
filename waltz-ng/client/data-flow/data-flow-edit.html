@@ -23,128 +23,127 @@
         </ol>
     </waltz-page-header>
 
-    <h1>{{ctrl.model.data.source}}</h1>
+
     <waltz-section name="Details">
         <form name="dataFlowForm" novalidate ng-submit="ctrl.submit()">
 
             <!-- SLOPE DIAGRAM -->
             <div class="row">
-                <div class="col-md-11">
-                    <waltz-app-data-flow-diagram incoming="ctrl.data.incoming"
-                                                 outgoing="ctrl.data.outgoing"
-                                                 sources="ctrl.data.sources"
-                                                 targets="ctrl.data.targets"
-                                                 tweakers="ctrl.tweakers"
-                                                 types="ctrl.data.flowTypes"></waltz-app-data-flow-diagram>
+                <div class="col-md-12">
+                    <waltz-app-data-flow-diagram incoming="ctrl.graphOptions.data.incoming"
+                                                 outgoing="ctrl.graphOptions.data.outgoing"
+                                                 sources="ctrl.graphOptions.data.sources"
+                                                 targets="ctrl.graphOptions.data.targets"
+                                                 tweakers="ctrl.graphOptions.tweakers"
+                                                 types="ctrl.graphOptions.data.flowTypes"></waltz-app-data-flow-diagram>
                 </div>
             </div>
 
             <hr/>
 
-            <!-- ADD UP/DOWN STREAMS -->
-            <div class="row" ng-hide="ctrl.model.selectedApp != null">
-                <!-- ADD UPSTREAM -->
-                <div class="col-md-5" ng-init="ctrl.showAddUpstream = false">
-                    <div ng-if="!ctrl.showAddUpstream">
-                        <a class="clickable" ng-click="ctrl.showAddUpstream = true">
-                            <waltz-icon name="plus"></waltz-icon>
+
+            <!-- ACTIONS -->
+            <div class="row">
+                <div class="col-sm-5">
+                    <div class="alert"
+                         style="background-color: #f5f5f5; border-radius: 10px;">
+                        <ul class="small">
+                            <li>
+                                Update Sources and Targets
+                                <ul>
+                                    <li>
+                                        Click on an the name of the application above to edit
+                                        the types of data in use
+                                    </li>
+                                    <li>
+                                        To remove an application deselect all of it's
+                                        associated data types
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li>
+                                Add Applications
+                                <ul>
+                                    <li>
+                                        <a class="clickable"
+                                           ng-click="ctrl.setMode('addSource')">
+                                            Add an <strong>upstream</strong> source
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="clickable"
+                                           ng-click="ctrl.setMode('addTarget')">
+                                            Add a <strong>downstream</strong> target
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                        </ul>
+
+                        <hr>
+
+                        <p class="waltz-paragraph small" style="margin-left: 26px" >
+                            Go back to
+                            <a ng-bind='ctrl.app.name' ui-sref="main.app.view ({ id: ctrl.app.id })"></a>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-sm-7">
+                    <div ng-if="ctrl.mode === 'addSource'">
+                        <h4>
+                            <waltz-icon name="arrow-up">
+                            </waltz-icon>
                             Add Upstream Source
-                        </a>
-                    </div>
-                    <div ng-if="ctrl.showAddUpstream " class="row">
-                        <div class="col-md-8">
-                            <waltz-app-selector model="ctrl.model.newSource"></waltz-app-selector>
-                        </div>
-                        <div class="col-md-4">
-                            <button ng-click='ctrl.addSource(ctrl.model.newSource.app)'
-                                    class="btn btn-sm btn-primary">
-                                <waltz-icon name="plus"></waltz-icon>
-                                Add
-                            </button>
-                            <a class="clickable"
-                               ng-click="ctrl.showAddUpstream = false">Cancel</a>
+                        </h4>
+                        <waltz-basic-app-selector on-add="ctrl.addSource"
+                                                  on-cancel="ctrl.cancel">
+
+                        </waltz-basic-app-selector>
+                        <div class="small text-muted waltz-paragraph">
+                            Applications which
+                            <i ng-bind="ctrl.app.name"></i>
+                            either pulls or receives data from are known as upstream sources.
                         </div>
                     </div>
-                </div>
 
-
-                <div class="col-md-1">
-                </div>
-
-                <!-- ADD DOWNSTREAM -->
-                <div class="col-md-5" ng-init="ctrl.showAddDownstream = false">
-                    <div ng-if="!ctrl.showAddDownstream" class="pull-right">
-                        <a class="clickable" ng-click="ctrl.showAddDownstream = true">
-                            <waltz-icon name="plus"></waltz-icon>
-                            Add Downstream Source
-                        </a>
-                    </div>
-                    <div ng-if="ctrl.showAddDownstream" class="row">
-                        <div class="col-md-8">
-                            <waltz-app-selector model="ctrl.model.newTarget"></waltz-app-selector>
-                        </div>
-                        <div class="col-md-4">
-                            <button ng-click='ctrl.addTarget(ctrl.model.newTarget.app)'
-                                    class="btn btn-primary btn-sm">
-                                <waltz-icon name="plus"></waltz-icon>
-                                Add
-                            </button>
-                            <a class="clickable" ng-click="ctrl.showAddDownstream = false">Cancel</a>
+                    <div ng-if="ctrl.mode === 'addTarget'">
+                        <h4>
+                            <waltz-icon name="arrow-down">
+                            </waltz-icon>
+                            Add Downstream Target
+                        </h4>
+                        <waltz-basic-app-selector on-add="ctrl.addTarget"
+                                                  on-cancel="ctrl.cancel">
+                        </waltz-basic-app-selector>
+                        <div class="small text-muted waltz-paragraph">
+                            Applications which either receive or pull data from
+                            <i ng-bind="ctrl.app.name"></i>
+                            are known as downstream targets.
                         </div>
                     </div>
-                </div>
-            </div>
 
+                    <div ng-if="ctrl.mode === 'editCounterpart'">
+                        <waltz-data-flow-type-editor primary-entity="ctrl.app"
+                                                     counterpart-entity="ctrl.selectedApp"
+                                                     direction="ctrl.selectedDirection"
+                                                     current-data-types="ctrl.currentDataTypes"
+                                                     all-data-types="ctrl.dataTypes"
+                                                     on-cancel="ctrl.cancel"
+                                                     on-save="ctrl.saveFlows"
+                                                     on-dirty="ctrl.setDirtyChange">
+                        </waltz-data-flow-type-editor>
+                    </div>
 
-            <!-- DATA TYPES SECTION -->
-            <div class="row" ng-show="ctrl.model.selectedApp != null">
-                <div class="col-md-11">
-
-                    <!-- UPSTREAM / INCOMING -->
-                    <h4 ng-if="ctrl.model.selectedDirection == 'target'">
-                        Data flows to {{ ctrl.model.selectedApp.name }}
-                        <small>( from {{ ctrl.app.name }} )</small>
-                        <small>
-                            <a class="pull-right" class="clickable" ng-click="ctrl.cancel()">
-                                Close
-                                <waltz-icon name="times-circle"></waltz-icon>
-                            </a>
-                        </small>
-                    </h4>
-
-                    <!-- DOWNSTREAM / OUTGOING -->
-                    <h4 ng-if="ctrl.model.selectedDirection=='source'">
-                        Data flows from {{ ctrl.model.selectedApp.name }}
-                        <small>( to {{ ctrl.app.name }} )</small>
-                        <small>
-                            <a class="pull-right" class="clickable" ng-click="ctrl.cancel()">
-                                Close
-                                <waltz-icon name="times-circle"></waltz-icon>
-                            </a>
-                        </small>
-                    </h4>
-
-                    <!-- DATA TYPE OPTIONS -->
-                    <ul class="list-unstyled">
-                        <li ng-repeat="option in ctrl.model.selectedTypes | orderBy:'name'">
-                            <span>
-                                <input type="checkbox" ng-model="option.selected">
-                                <span ng-style="{'font-weight': (option.selected ? 'bold' : 'none') }">{{ option.name }}</span>
-                            </span>
-                            <span class="text-muted small">{{option.description}}</span>
-                        </li>
-                    </ul>
-
-                    <!-- ACTIONS -->
-                    <button class="btn btn-success"
-                            ng-click="ctrl.apply()">
-                        Apply
-                    </button>
-                    <a href
-                       ng-click="ctrl.cancel()">
-                        Cancel
-                    </a>
-
+                    <div ng-if="ctrl.mode === 'editDataTypeUsage'">
+                        <waltz-app-data-type-usage-editor primary-entity="ctrl.app"
+                                                          type="ctrl.selectedDataType"
+                                                          on-save="ctrl.saveUsages"
+                                                          on-cancel="ctrl.cancel"
+                                                          usages="ctrl.selectedUsages">
+                        </waltz-app-data-type-usage-editor>
+                    </div>
                 </div>
             </div>
         </form>

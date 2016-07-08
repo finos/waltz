@@ -10,18 +10,20 @@
     </waltz-page-header>
 
 
-    <waltz-section name="Data Type Editor">
+    <waltz-section name="Our First Page">
         <div class="row">
             <div class="col-sm-12">
-                <waltz-data-flow-type-editor primary-entity="ctrl.app"
-                                             counterpart-entity="ctrl.counterpart"
-                                             current-data-types="ctrl.currentDataTypes"
-                                             direction="'source'"
-                                             all-data-types="ctrl.allDataTypes"
-                                             on-cancel="ctrl.cancel"
-                                             on-save="ctrl.save">
 
-                </waltz-data-flow-type-editor>
+                <h1>
+                    My message is:
+                    <span ng-bind="ctrl.appId"></span>
+                </h1>
+
+
+                <div>
+                    <h3 ng-bind="ctrl.app.name"></h3>
+                </div>
+
             </div>
         </div>
     </waltz-section>

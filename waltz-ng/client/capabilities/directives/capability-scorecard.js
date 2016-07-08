@@ -16,9 +16,9 @@
  *
  */
 
-import { enrichServerStats } from  '../../server-info/services/server-utilities';
-import { calcPortfolioCost } from '../../asset-cost/services/asset-cost-utilities';
-import { calcComplexitySummary } from '../../complexity/services/complexity-utilities';
+import {enrichServerStats} from "../../server-info/services/server-utilities";
+import {calcPortfolioCost} from "../../asset-cost/services/asset-cost-utilities";
+import {calcComplexitySummary} from "../../complexity/services/complexity-utilities";
 
 
 const BINDINGS = {
@@ -33,7 +33,7 @@ const BINDINGS = {
 
 
 
-function controller($scope) {
+function controller($scope, $state) {
 
     const vm = this;
 
@@ -41,9 +41,10 @@ function controller($scope) {
     $scope.$watch('ctrl.complexity', cs => vm.complexitySummary = calcComplexitySummary(cs));
     $scope.$watch('ctrl.serverStats', enrichServerStats);
 
+    vm.subCapabilitySelected = () => $state.go('main.capability.view', { id: vm.selectedSubCapability} );
 }
 
-controller.$inject = ['$scope'];
+controller.$inject = ['$scope', '$state'];
 
 
 export default () => {

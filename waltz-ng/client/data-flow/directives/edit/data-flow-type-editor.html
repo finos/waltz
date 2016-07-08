@@ -3,54 +3,39 @@
     <div class="row">
         <div class="col-md-11">
 
-            <!-- UPSTREAM / INCOMING -->
-            <h4 ng-if="ctrl.direction == 'target'">
-                Data flows to {{ ctrl.model.selectedApp.name }}
-                <small>( from {{ ctrl.app.name }} )</small>
-                <small>
-                    <a class="pull-right" class="clickable" ng-click="ctrl.cancel()">
-                        Close
-                        <waltz-icon name="times-circle"></waltz-icon>
-                    </a>
-                </small>
-            </h4>
-
-            <!-- DOWNSTREAM / OUTGOING -->
-            <h4 ng-if="ctrl.direction=='source'">
-                Data flows from {{ ctrl.counterpartEntity.name }}
-                <small>( to {{ ctrl.primaryEntity.name }} )</small>
-                <small>
-                    <a class="pull-right" class="clickable" ng-click="ctrl.cancel()">
-                        Close
-                        <waltz-icon name="times-circle"></waltz-icon>
-                    </a>
-                </small>
+            <h4>
+                <span ng-bind="ctrl.title"></span>
             </h4>
 
             <!-- DATA TYPE OPTIONS -->
             <ul class="list-unstyled">
                 <li ng-repeat="option in ctrl.workingTypes | orderBy:'name'">
                     <span>
-                        <input type="checkbox" ng-model="option.selected">
-                        <span ng-style="{'font-weight': (option.selected ? 'bold' : 'none') }">
-                            {{ option.name }}
+                        <input type="checkbox"
+                               ng-model="option.selected"
+                               ng-change="ctrl.onChange()">
+                        <span ng-style="{'font-weight': (option.selected ? 'bold' : 'none') }"
+                              ng-bind="option.name">
                         </span>
                     </span>
-                    <span class="text-muted small">
-                        {{option.description}}
+                    <span class="text-muted small"
+                          ng-bind="option.description">
                     </span>
                 </li>
             </ul>
 
-            <!-- ACTIONS -->
-            <button class="btn btn-success"
-                    ng-click="ctrl.save()">
-                Apply
-            </button>
-            <a href
-               ng-click="ctrl.cancel()">
-                Cancel
-            </a>
+            <div class="pull-right">
+                <!-- ACTIONS -->
+                <button class="btn btn-success"
+                        ng-click="ctrl.save()">
+                    Apply
+                </button>
+                <a href
+                   ng-click="ctrl.cancel()">
+                    Cancel
+                </a>
+
+            </div>
 
         </div>
     </div>

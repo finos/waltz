@@ -1,13 +1,17 @@
 
 /** from: https://gist.github.com/garyharan/957284 **/
-@mixin box-shadow($top, $left, $blur, $color, $inset: false) {
-  @if $inset {
-    -webkit-box-shadow:inset $top $left $blur $color;
-    -moz-box-shadow:inset $top $left $blur $color;
-    box-shadow:inset $top $left $blur $color;
-  } @else {
-    -webkit-box-shadow: $top $left $blur $color;
-    -moz-box-shadow: $top $left $blur $color;
-    box-shadow: $top $left $blur $color;
-  }
+@mixin waltz-box-shadow() {
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(47,53,68,1);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(47,53,68,1);
+    box-shadow: 0px 1px 2px 0px rgba(47,53,68,0.25);
+  //
+  //  @if $inset {
+  //  -webkit-box-shadow:inset $top $left $blur $color;
+  //  -moz-box-shadow:inset $top $left $blur $color;
+  //  box-shadow:inset $top $left $blur $color;
+  //} @else {
+  //  -webkit-box-shadow: $top $left $blur $color;
+  //  -moz-box-shadow: $top $left $blur $color;
+  //  box-shadow: $top $left $blur $color;
+  //}
 }

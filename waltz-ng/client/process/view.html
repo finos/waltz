@@ -17,17 +17,17 @@
     <!-- SUMMARY -->
 
     <div class="row">
-        <div class="col-sm-offset-1 col-sm-10 waltz-page-summary">
+        <div class="col-sm-12">
 
-            <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;">
-                <span ng-bind="ctrl.process.name"></span>
-            </h3>
+            <div class="waltz-page-summary">
+                <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;">
+                    <span ng-bind="ctrl.process.name"></span>
+                </h3>
 
-            <div class="waltz-paragraph"
-                 ng-bind="ctrl.process.description">
-            </div>
+                <div class="waltz-paragraph"
+                     ng-bind="ctrl.process.description">
+                </div>
 
-            <div class="col-md-4">
                 <table class="table table-condensed small">
                     <tr>
                         <td>Applications</td>
@@ -38,6 +38,7 @@
                         <td><span ng-bind="ctrl.supportingCapabilities.length"></span></td>
                     </tr>
                 </table>
+
 
             </div>
 

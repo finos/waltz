@@ -51,7 +51,16 @@ public class CollectionUtilities {
         checkNotNull(fn, "transformation fn cannot be null");
 
         return xs.stream()
-                .map(x -> fn.apply(x))
+                .map(fn)
+                .collect(Collectors.toList());
+    }
+
+    public static <X> Collection<X> filter(Collection<X> xs, Predicate<X> pred) {
+        checkNotNull(xs, "collection must not be null");
+        checkNotNull(pred, "predicate fn cannot be null");
+
+        return xs.stream()
+                .filter(pred)
                 .collect(Collectors.toList());
     }
 }

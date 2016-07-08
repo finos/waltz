@@ -1,71 +1,27 @@
-const initData = {
-    usages: [],
-    visibility: {}
-};
+
+function controller($stateParams, appStore) {
+
+    const vm = this;
+
+    vm.message = 'Hello World';
+    vm.appId = $stateParams.id;
+
+    console.log('as', appStore)
 
 
-function controller($q,
-                    $stateParams,
-                    appStore,
-                    dataFlowStore,
-                    dataTypeStore,
-                    dataTypeUsageStore,
-                    notification) {
-
-    const vm = Object.assign(this, initData);
-
-    const entityRef = {
-        id: $stateParams.id,
-        kind: $stateParams.kind
-    };
-
-    vm.entityRef = entityRef;
-
-
-    // -- LOAD
-
-    appStore
-        .getById(1896)
-        .then(app => vm.counterpart = app);
-
-    appStore
-        .getById(entityRef.id)
+    const promise = appStore
+        .getById(vm.appId)
         .then(app => vm.app = app);
 
-    dataFlowStore
-        .findByEntityReference(entityRef.kind, entityRef.id)
-        .then(fs => vm.currentDataTypes = _.chain(fs)
-            .filter(f => f.source.id === 1896)
-            .map('dataType')
-            .value());
 
-    dataTypeStore
-        .findAll()
-        .then(xs => vm.allDataTypes = xs);
-
-
-    dataTypeUsageStore
-        .findForEntity(entityRef.kind, entityRef.id)
-        .then(usages => vm.usages = usages);
-
-    vm.save = (command) =>  dataFlowStore.create(command)
-        .then((r) => console.log(r))
-        .then(() => notification.success('Logical flows updated'));
-
-    vm.cancel = () => console.log('Cancelled');
-
+    console.log(promise)
     global.vm = vm;
 }
 
 
 controller.$inject = [
-    '$q',
     '$stateParams',
-    'ApplicationStore',
-    'DataFlowDataStore',
-    'DataTypesDataService',
-    'DataTypeUsageStore',
-    'Notification'
+    'ApplicationStore'
 ];
 
 

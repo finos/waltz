@@ -1,18 +1,14 @@
 <div>
     <ul class="list-unstyled">
         <li>
-            <div ng-if='ctrl.managers.length > 0' style="padding: 1em">
-                    <span class="text-muted">
-                        <waltz-icon name="level-up"></waltz-icon>
-                        Manager/s:
-                        <waltz-manager-list managers="ctrl.managers"></waltz-manager-list>
-                    </span>
-            </div>
+
 
             <ul class="list-unstyled"
-                style="padding-left: 3em">
+                xstyle="padding-left: 3em">
                 <li>
                     <div class="waltz-page-summary">
+
+
                         <h4>
                             <waltz-icon name="user"></waltz-icon>
                             {{ ctrl.person.displayName }}
@@ -137,14 +133,7 @@
                         </div>
                     </div>
 
-                    <ul ng-if="ctrl.directs.length > 0"
-                        class="list-unstyled"
-                        style="padding-left: 6em">
-                        <li>
-                            <h4>Directs</h4>
-                            <waltz-person-directs-list directs="ctrl.directs"></waltz-person-directs-list>
-                        </li>
-                    </ul>
+
                 </li>
             </ul>
         </li>

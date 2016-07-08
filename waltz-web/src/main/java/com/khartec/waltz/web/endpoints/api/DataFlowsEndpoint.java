@@ -27,6 +27,7 @@ import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow.DataFlowService;
+import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -50,19 +51,23 @@ public class DataFlowsEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "data-flows");
 
     private final DataFlowService dataFlowService;
+    private final DataTypeUsageService dataTypeUsageService;
     private final ChangeLogService changeLogService;
     private final UserRoleService userRoleService;
 
 
     @Autowired
     public DataFlowsEndpoint(DataFlowService dataFlowService,
+                             DataTypeUsageService dataTypeUsageService,
                              ChangeLogService changeLogService,
                              UserRoleService userRoleService) {
         checkNotNull(dataFlowService, "dataFlowService must not be null");
+        checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(changeLogService, "changeLogService must not be null");
         checkNotNull(userRoleService, "userRoleService must not be null");
 
         this.dataFlowService = dataFlowService;
+        this.dataTypeUsageService = dataTypeUsageService;
         this.changeLogService = changeLogService;
         this.userRoleService = userRoleService;
 
@@ -129,6 +134,7 @@ public class DataFlowsEndpoint implements Endpoint {
                     .message(message)
                     .build());
 
+            dataTypeUsageService.recalculateForApplications(dataFlowUpdate.target(), dataFlowUpdate.source());
             return true;
         };
 
