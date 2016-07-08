@@ -14,11 +14,11 @@
   padding: 6px 6px 6px 16px;
   background-color: $waltz-section-background-color;
   border-top-left-radius: 10px;
-  border-bottom-right-radius: 30%;
+  //border-bottom-right-radius: 30%;
   border-top-right-radius: 10px;
   margin-bottom: 12px;
   border: 1px solid $waltz-border-color-lighter;
-  @include box-shadow(2px, 5px, 5px, $waltz-border-color)
+  @include waltz-box-shadow()
 }
 
 .waltz-page-header h2 {

@@ -1,14 +1,48 @@
 <div>
     <div class="waltz-page-summary">
+
+        <div class="row">
+            <div class="col-md-12 pull-right">
+                <div style="padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                    <span class="text-muted"
+                          ng-if="ctrl.capability.parent">
+                        Parent:
+                         <a ui-sref="main.capability.view ({ id: ctrl.capability.parent.id })">
+                            {{ ctrl.capability.parent.name }}
+                        </a>
+                    </span>
+                    <span ng-if="ctrl.capability.parent && ctrl.capability.children.length > 0"
+                          style="padding-right: 16px; margin-right: 16px; border-right: 1px solid #ddd">
+                    </span>
+                    <span class="text-muted"
+                          ng-if="ctrl.capability.children.length > 0">
+                        Sub Capabilities:
+                        &nbsp;
+                        <select style="font-size: larger;"
+                                ng-change="ctrl.subCapabilitySelected()"
+                                ng-model="ctrl.selectedSubCapability">
+                            <option value=""
+                                    disabled
+                                    selected>
+                                Select sub capability
+                            </option>
+                            <option ng-repeat="child in ctrl.capability.children | orderBy:'name'"
+                                    ng-value="child.id">
+                                {{child.name}}
+                            </option>
+                          </select>
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
         <!-- BASICS -->
+
+
         <div class="row">
             <div class="col-md-12">
-                <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;">
-                    {{ ctrl.capability.name }}
-                    <waltz-traits-indicator traits="ctrl.traits">
-                    </waltz-traits-indicator>
-                </h3>
-                <div style="border-bottom: 2px dotted #eee; padding: 6px"
+                <div style="padding-bottom: 12px; padding-top: 12px; border-bottom: 1px solid #eee;"
                      class="waltz-paragraph">
                     {{ ctrl.capability.description }}
                 </div>
@@ -94,6 +128,7 @@
 
         </div>
 
-
     </div>
+
+
 </div>

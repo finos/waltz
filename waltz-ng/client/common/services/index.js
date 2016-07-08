@@ -25,7 +25,8 @@ import {
     involvementKindNames,
     lifecyclePhaseDisplayNames,
     orgUnitKindNames,
-    severityNames
+    severityNames,
+    usageKindDisplayNames
 } from "./display_names";
 import {
     bookmarkIconNames,
@@ -33,7 +34,8 @@ import {
     entityIconNames,
     entityStatisticCategoryIconNames,
     severityIconNames,
-    ragIconNames
+    ragIconNames,
+    usageKindIconNames
 } from "./icon_names";
 
 
@@ -59,6 +61,7 @@ export default (module) => {
     displayNameService.register('orgUnitKind', orgUnitKindNames);
     displayNameService.register('rating', authSourceRatingNames);
     displayNameService.register('severity', severityNames);
+    displayNameService.register('usageKind', usageKindDisplayNames);
 
     iconNameService.register('bookmark', bookmarkIconNames);
     iconNameService.register('BOOLEAN', booleanTypeIconNames);
@@ -66,6 +69,7 @@ export default (module) => {
     iconNameService.register('entityStatistic', entityStatisticCategoryIconNames);
     iconNameService.register('severity', severityIconNames);
     iconNameService.register('rag', ragIconNames);
+    iconNameService.register('usageKind', usageKindIconNames);
 
     module.run([
         'DataTypesDataService',

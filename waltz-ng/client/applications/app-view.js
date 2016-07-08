@@ -16,6 +16,7 @@ import {
     loadChangeLog,
     loadDatabases,
     loadDataFlows,
+    loadDataTypeUsages,
     loadInvolvements,
     loadServers,
     loadSoftwareCatalog,
@@ -33,6 +34,7 @@ const initialState = {
     complexity: [],
     databases: [],
     dataTypes: [],
+    dataTypeUsages: [],
     explicitTraits: [],
     flows: [],
     log: [],
@@ -58,6 +60,7 @@ function controller($q,
                     complexityStore,
                     databaseStore,
                     dataFlowStore,
+                    dataTypeUsageStore,
                     involvementStore,
                     orgUnitStore,
                     perspectiveStore,
@@ -106,7 +109,8 @@ function controller($q,
         loadAuthSources(authSourcesStore, orgUnitStore, id, organisationalUnitId, vm),
         loadServers(serverInfoStore, id, vm),
         loadSoftwareCatalog(softwareCatalogStore, id, vm),
-        loadDatabases(databaseStore, id, vm)
+        loadDatabases(databaseStore, id, vm),
+        loadDataTypeUsages(dataTypeUsageStore, id, vm)
     ];
 
     $q.all(promises)
@@ -154,6 +158,7 @@ controller.$inject = [
     'ComplexityStore',
     'DatabaseStore',
     'DataFlowDataStore',
+    'DataTypeUsageStore',
     'InvolvementStore',
     'OrgUnitStore',
     'PerspectiveStore',

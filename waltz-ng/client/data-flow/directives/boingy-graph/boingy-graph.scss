@@ -23,7 +23,7 @@
     border-radius: 6px;
     width: 300px;
     background-color: rgba($waltz-background-color, 0.7);
-    @include box-shadow(2px, 2px, 2px, $waltz-border-color);
+    @include waltz-box-shadow();
   }
 
 }

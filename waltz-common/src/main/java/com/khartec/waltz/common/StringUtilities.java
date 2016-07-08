@@ -73,4 +73,11 @@ public class StringUtilities {
                 ? ""
                 : str;
     }
+
+
+    public static String limit(String str, int maxLength) {
+        if (str == null) return null;
+        int howMuch = Math.min(maxLength, str.length());
+        return str.substring(0, howMuch);
+    }
 }

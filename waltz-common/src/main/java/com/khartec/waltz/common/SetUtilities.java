@@ -17,10 +17,14 @@
 
 package com.khartec.waltz.common;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
+import static com.khartec.waltz.common.Checks.checkNotNull;
 
 
 public class SetUtilities {
@@ -29,6 +33,12 @@ public class SetUtilities {
         if (ts == null || ts.length == 0) return new HashSet<>();
 
         return new HashSet<>(Arrays.asList(ts));
+    }
+
+    public static <T> Set<T> fromCollection(Collection<T> ts) {
+        if (ts == null || ts.isEmpty()) return new HashSet<>();
+
+        return new HashSet<>(ts);
     }
 
     public static <X, Y> Set<Y> map(Collection<X> xs, Function<X, Y> fn) {
@@ -45,4 +55,23 @@ public class SetUtilities {
         }
         return result;
     }
+
+    public static <T> Set<T> minus(Set<T> xs, Set<T> ys) {
+        checkNotNull(xs, "xs cannot be null");
+        checkNotNull(ys, "ys cannot be null");
+
+        Set<T> working = new HashSet<>(xs);
+        working.removeAll(ys);
+        return working;
+    }
+
+    public static <T> Set<T> intersection(Set<T> xs, Set<T> ys) {
+        checkNotNull(xs, "xs cannot be null");
+        checkNotNull(ys, "ys cannot be null");
+
+        Set<T> working = new HashSet<>(xs);
+        working.retainAll(ys);
+        return working;
+    }
+
 }

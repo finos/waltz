@@ -73,3 +73,6 @@ export function loadDataFlows(dataFlowStore, id, vm) {
 export function loadDataTypes(dataTypeStore, vm) {
     return dataTypeStore.findAll().then(xs => vm.dataTypes = xs);
 }
+
+
+
