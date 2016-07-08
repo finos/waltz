@@ -1,4 +1,6 @@
 <div >
-    <kbd ng-bind="ctrl.value.outcome | number:2">
+    <kbd>
+        <span ng-if="ctrl.isNumber(ctrl.value.outcome)" ng-bind="ctrl.value.outcome | number:2"></span>
+        <span ng-if="!ctrl.isNumber(ctrl.value.outcome)" ng-bind="ctrl.value.outcome"></span>
     </kbd>
 </div>

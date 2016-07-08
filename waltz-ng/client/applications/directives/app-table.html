@@ -1,7 +1,41 @@
 <div>
-    <div style="font-size: smaller; height: 300px"
-         ui-grid-exporter
-         ui-grid="ctrl.gridOptions">
+    <div class="row">
+        <div class="col-md-9">
+            <div style="font-size: smaller; height: 300px"
+                 ui-grid-exporter
+                 ui-grid="ctrl.gridOptions">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div ng-if="ctrl.selectedApp" class="panel panel-warning small">
+                <div class="panel-heading">
+                    <h5 class="panel-title"><strong>Details</strong></h5>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        <span ng-bind="ctrl.selectedApp.description"></span>
+                    </p>
+                    <h6 ng-if="ctrl.selectedApp.role" uib-tooltip="This persons role on the application">
+                        <strong>Role: </strong> {{ctrl.selectedApp.role | toDisplayName:'involvementKind'}}
+                    </h6>
+                    <h6 ng-if="ctrl.selectedApp.assetCode">
+                        <strong>Asset code: </strong> {{ctrl.selectedApp.assetCode}}
+                    </h6>
+                    <h6 ng-if="ctrl.selectedApp.platform">
+                        <strong>Platform: </strong> {{ctrl.selectedApp.platform}}
+                    </h6>
+                    <h6>
+                        <strong>Managed by: </strong> {{ctrl.selectedApp.management}}
+                    </h6>
+                    <div>
+                        <a class="pull-right" ui-sref="main.app.view ({ id: ctrl.selectedApp.id })">more</a>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-warning" ng-if="!ctrl.selectedApp">
+                Select an application to view further details
+            </div>
+        </div>
     </div>
 </div>
 

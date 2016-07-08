@@ -10,24 +10,20 @@
  *
  */
 
-import playpenView from "./playpen";
+
+export default [
+    '$http',
+    'BaseApiUrl',
+    ($http, BaseApiUrl) => {
+        const BASE = `${BaseApiUrl}/entity-statistic`;
 
 
-export default (module) => {
+        const findSummaryStatsByIdSelector = (options) => $http
+            .post(`${BASE}/stats`, options)
+            .then(r => r.data);
 
-    module.config([
-        '$stateProvider',
-        ($stateProvider) => {
-            $stateProvider
-                .state('main.playpen', {
-                    url: 'playpen/:kind/:id',
-                    views: { 'content@': playpenView }
-                });
-        }
-    ]);
-
-
-    
-
-
-};
+        return {
+            findSummaryStatsByIdSelector
+        };
+    }
+];

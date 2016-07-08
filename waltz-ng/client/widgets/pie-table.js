@@ -4,6 +4,7 @@ const BINDINGS = {
     data: '=',
     config: '=',
     title: '@',
+    subTitle: '@',
     icon: '@'
 };
 

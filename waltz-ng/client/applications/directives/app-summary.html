@@ -1,0 +1,46 @@
+<div>
+    <div class="row" ng-if="ctrl.hasAppInvolvements">
+        <h4 class="text-center">
+            <waltz-icon name="university"></waltz-icon>
+            IT Managed
+        </h4>
+        <div class="col-sm-6">
+            <div>
+                <waltz-pie-table data="ctrl.charts.apps.byLifecyclePhase.data"
+                                 config="ctrl.charts.apps.byLifecyclePhase.config"
+                                 title="By Lifecycle Phase">
+                </waltz-pie-table>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div>
+                <waltz-pie-table data="ctrl.charts.apps.byKind.data"
+                                 config="ctrl.charts.apps.byKind.config"
+                                 title="By Type">
+                </waltz-pie-table>
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-if="ctrl.hasEndUserAppInvolvements">
+        <h4 class="text-center">
+            <waltz-icon name="user"></waltz-icon>
+            End User Managed
+        </h4>
+        <div class="col-sm-6">
+            <div>
+                <waltz-pie-table data="ctrl.charts.endUserApps.byLifecyclePhase.data"
+                                 config="ctrl.charts.endUserApps.byLifecyclePhase.config"
+                                 title="By Lifecycle Phase">
+                </waltz-pie-table>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div>
+                <waltz-pie-table data="ctrl.charts.endUserApps.byKind.data"
+                                 config="ctrl.charts.endUserApps.byKind.config"
+                                 title="By Platform">
+                </waltz-pie-table>
+            </div>
+        </div>
+    </div>
+</div>

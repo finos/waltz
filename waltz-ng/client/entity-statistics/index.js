@@ -14,7 +14,10 @@
 
 export default (module) => {
     module.directive('waltzEntityStatisticSection', require('./directives/entity-statistic-section'));
+    module.directive('waltzEntityStatisticSummarySection', require('./directives/entity-statistic-summary-section'));
     module.directive('waltzEntityStatisticBooleanRenderer', require('./directives/entity-statistic-boolean-renderer'));
     module.directive('waltzEntityStatisticPercentageRenderer', require('./directives/entity-statistic-percentage-renderer'));
     module.directive('waltzEntityStatisticNumericRenderer', require('./directives/entity-statistic-numeric-renderer'));
+
+    module.service('EntityStatisticStore', require('./services/entity-statistic-store'));
 };

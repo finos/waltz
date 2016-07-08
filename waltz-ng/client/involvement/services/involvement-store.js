@@ -23,6 +23,11 @@ export default [
                 .then(result => result.data);
 
 
+        const findEndUserAppsBydSelector = (options) => $http
+            .post(`${BASE}/end-user-application`, options)
+            .then(r => r.data);
+
+
         const findChangeInitiativesForEmployeeId = (employeeId) =>
             $http.get(`${BASE}/employee/${employeeId}/change-initiative/direct`)
                 .then(result => result.data);
@@ -45,6 +50,7 @@ export default [
 
         return {
             findAppsForEmployeeId,
+            findEndUserAppsBydSelector,
             findByEmployeeId,
             findByEntityReference,
             findChangeInitiativesForEmployeeId,

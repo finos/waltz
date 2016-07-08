@@ -5,6 +5,9 @@ const BINDINGS = {
 
 
 function controller() {
+    const vm = this;
+
+    vm.isNumber = (v) => !isNaN(parseFloat((v)));
 }
 
 

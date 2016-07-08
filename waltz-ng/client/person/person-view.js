@@ -15,7 +15,7 @@ import {lifecyclePhaseColorScale, variableScale} from "../common/colors";
 const PIE_SIZE = 70;
 
 function hasInvolvements(involvements) {
-    return involvements.allApps.length > 0;
+    return involvements.all.length > 0;
 }
 
 
@@ -72,9 +72,12 @@ function controller($scope,
             historyStore.put(model.person.displayName, 'PERSON', 'main.person.view', { empId: model.person.employeeId });
         }
 
-        vm.hasInvolvements = hasInvolvements(model.involvements);
+        vm.hasAppInvolvements = hasInvolvements(model.appInvolvements);
+        vm.hasEndUserAppInvolvements = hasInvolvements(model.endUserAppInvolvements);
+        vm.hasInvolvements = vm.hasAppInvolvements || vm.hasEndUserAppInvolvements;
         vm.charts = {
-            apps: mkAppChartData(model.involvements.allApps)
+            apps: mkAppChartData(model.appInvolvements.all),
+            endUserApps: mkAppChartData(model.endUserAppInvolvements.all)
         };
 
     }, true);

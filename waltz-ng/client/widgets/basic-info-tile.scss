@@ -17,6 +17,11 @@
     padding-top: 6px;
     padding-bottom: 6px;
     border-bottom: 1px dotted lighten($waltz-border-color, 20%);
+
+    .sub-title {
+        @extend .small;
+        @extend .text-muted;
+    }
 }
 
 .waltz-info-tile .content {
