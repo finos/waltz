@@ -46,6 +46,6 @@ public abstract class Bookmark implements IdProvider, ProvenanceProvider {
     }
 
     @Value.Default
-    public boolean primary() { return false; }
+    public boolean isPrimary() { return false; }
 
 }

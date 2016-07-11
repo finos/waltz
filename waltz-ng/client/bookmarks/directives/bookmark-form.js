@@ -20,7 +20,7 @@ function controller($scope) {
     };
 
     this.togglePrimary = () => {
-        this.bookmark.primary = !this.bookmark.primary;
+        this.bookmark.isPrimary = !this.bookmark.isPrimary;
     };
 
 
