@@ -36,7 +36,7 @@ controller.$inject = ['$scope'];
 
 export default () => ({
     restrict: 'E',
-    replace: true,
+    replace: false,
     scope: {},
     template: require('./bookmarks-section.html'),
     controller,

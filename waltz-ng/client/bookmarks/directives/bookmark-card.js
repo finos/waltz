@@ -10,7 +10,7 @@ function controller() {
 
 const directive = {
     restrict: 'E',
-    replace: true,
+    replace: false,
     scope: {},
     bindToController: BINDINGS,
     controller,
