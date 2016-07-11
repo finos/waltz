@@ -14,12 +14,11 @@
 export default (module) => {
 
     require('./directives')(module);
-    require('./templates')(module);
 
-    module.config(require('./routes'));
-
-    module.service('OrgUnitStore', require('./services/org-unit-store'));
-    module.service('OrgUnitUtilityService', require('./services/org-unit-utility'));
-    module.service('OrgUnitViewDataService', require('./services/org-unit-view-data'));
-    module.service('OrgUnitViewOptionsService', require('./services/org-unit-view-options'));
+    module
+        .config(require('./routes'))
+        .service('OrgUnitStore', require('./services/org-unit-store'))
+        .service('OrgUnitUtilityService', require('./services/org-unit-utility'))
+        .service('OrgUnitViewDataService', require('./services/org-unit-view-data'))
+        .service('OrgUnitViewOptionsService', require('./services/org-unit-view-options'));
 };

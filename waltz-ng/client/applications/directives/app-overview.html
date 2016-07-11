@@ -36,8 +36,9 @@
             Owning Org Unit
         </div>
         <div class="col-sm-4">
-            <waltz-org-unit-name-popup unit="ctrl.organisationalUnit">
-            </waltz-org-unit-name-popup>
+            <a ng-bind='ctrl.organisationalUnit.name'
+               ui-sref="main.org-unit.view ({ id: ctrl.organisationalUnit.id })">
+            </a>
         </div>
         <div class="col-sm-2 waltz-display-field-label">
             Overall Rating
