@@ -1,0 +1,25 @@
+//
+// Dropdowns - used for the dropdown menu on top right.
+// --------------------------------------------------
+.dropdown-menu > li div a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857;
+    color: #333333;
+    white-space: nowrap;
+    text-decoration: none;
+}
+//
+.dropdown-menu > li div:hover,
+.dropdown-menu > li div:focus {
+    @include gradient-vertical($start-color: $dropdown-link-hover-bg, $end-color: darken($dropdown-link-hover-bg, 5%));
+    background-color: darken($dropdown-link-hover-bg, 5%);
+}
+.dropdown-menu > .active div,
+.dropdown-menu > .active div:hover,
+.dropdown-menu > .active div:focus {
+    @include gradient-vertical($start-color: $dropdown-link-active-bg, $end-color: darken($dropdown-link-active-bg, 5%));
+    background-color: darken($dropdown-link-active-bg, 5%);
+}

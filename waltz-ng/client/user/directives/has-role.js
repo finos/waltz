@@ -27,7 +27,7 @@ controller.$inject = ['UserService'];
 
 
 export default () => ({
-    replace: true,
+    replace: false,
     restrict: 'A',
     transclude: true,
     scope: {},

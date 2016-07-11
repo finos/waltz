@@ -54,9 +54,11 @@
                 </a>
                 <ul class="dropdown-menu"
                     uib-dropdown-menu
-                    style="width: 250px"
-                    role="menu">
+                    style="width: 250px; margin-right:8px"
+                    role="menu"
+                    class="no-overflow">
                     <li style="margin: 4px"
+                        class="no-overflow"
                         ng-repeat="item in ctrl.history">
                         <a ui-sref="{{ ::item.state }} ({{ ::item.stateParams }})">
                             <waltz-icon class='text-muted small'
@@ -91,9 +93,12 @@
                 </a>
                 <ul class="dropdown-menu"
                     uib-dropdown-menu
-                    style="width: 250px; margin: 4px"
-                    role="menu">
-                    <li style="margin: 4px">
+                    style="width: 250px; margin-right:8px"
+                    role="menu"
+                    class="no-overflow">
+
+                    <li style="margin: 4px"
+                        class="no-overflow">
                         <span waltz-if-anonymous="false">
                             <a ui-sref="main.profile.view ({userId: ctrl.user.userName})"
                                ng-bind="ctrl.user.userName"></a>
@@ -102,28 +107,30 @@
                     </li>
                     <li style="margin: 4px"
                         ng-if="ctrl.allowDirectLogin"
-                        waltz-if-anonymous="true">
+                        waltz-if-anonymous="true"
+                        class="no-overflow">
                         <a class="clickable"
                            ng-click="ctrl.login()">
                             <waltz-icon name="sign-in"></waltz-icon>
-                            Login
+                            <span>Login</span>
                         </a>
                     </li>
                     <li style="margin: 4px"
                         ng-if="ctrl.allowDirectLogin"
-                        waltz-if-anonymous="false">
+                        waltz-if-anonymous="false"
+                        class="no-overflow">
                         <a class="clickable"
                            ng-click="ctrl.logout()">
                             <waltz-icon name="sign-out"></waltz-icon>
                             Logout
                         </a>
                     </li>
-
                     <li class="divider" waltz-has-role="ADMIN"></li>
 
                     <li waltz-has-role="ADMIN"
                         style="margin: 4px"
-                        ui-sref-active="side-active">
+                        ui-sref-active="side-active"
+                        class="no-overflow">
                         <a ui-sref="main.traits">
                             <waltz-icon class='text-muted small'
                                         fixed-width="true"
@@ -133,7 +140,8 @@
                     </li>
                     <li waltz-has-role="ADMIN"
                         style="margin: 4px"
-                        ui-sref-active="side-active">
+                        ui-sref-active="side-active"
+                        class="no-overflow">
                         <a ui-sref="main.user.management">
                             <waltz-icon class='text-muted small'
                                         fixed-width="true"
@@ -143,7 +151,8 @@
                     </li>
                     <li waltz-has-role="APP_EDITOR"
                         style="margin: 4px"
-                        ui-sref-active="side-active">
+                        ui-sref-active="side-active"
+                        class="no-overflow">
                         <a ui-sref="main.app.registration">
                             <waltz-icon class='text-muted small'
                                         fixed-width="true"
@@ -153,7 +162,8 @@
                     </li>
                     <li waltz-has-role="ADMIN"
                         style="margin: 4px"
-                        ui-sref-active="side-active">
+                        ui-sref-active="side-active"
+                        class="no-overflow">
                         <a ui-sref="main.settings">
                             <waltz-icon class='text-muted small'
                                         fixed-width="true"
@@ -163,7 +173,8 @@
                     </li>
                     <li waltz-has-role="ADMIN"
                         style="margin: 4px"
-                        ui-sref-active="side-active">
+                        ui-sref-active="side-active"
+                        class="no-overflow">
 
                         <a ui-sref="main.source-data-ratings">
                             <waltz-icon class='text-muted small'
@@ -174,7 +185,8 @@
                     </li>
                     <li waltz-has-role="ADMIN"
                         style="margin: 4px"
-                        ui-sref-active="side-active">
+                        ui-sref-active="side-active"
+                        class="no-overflow">
                         <a ui-sref="main.user.log">
                             <waltz-icon class='text-muted small'
                                         fixed-width="true"
@@ -182,6 +194,7 @@
                             User Logs
                         </a>
                     </li>
+
                 </ul>
 
             </li>
