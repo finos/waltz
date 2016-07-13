@@ -21,3 +21,17 @@ export function talliesById(tallies) {
         },
         {});
 }
+
+/**
+ * Given an array of objects and a groupingSelector will return an array of values along with their counts
+ * in the original data.  The grouping selector can be the string name of a field in the data or a function.
+ * @param data
+ * @param groupingSelector
+ * @returns {*}
+ */
+export function tallyBy(data = [], groupingSelector = 'key') {
+    return _.chain(data)
+        .countBy(groupingSelector)
+        .map((v, k) => ({ key: k, count: v }))
+        .value()
+}

@@ -26,7 +26,7 @@
             <waltz-icon name="user"></waltz-icon>
             End User Managed
         </h4>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <div>
                 <waltz-pie-table data="ctrl.charts.endUserApps.byLifecyclePhase.data"
                                  config="ctrl.charts.endUserApps.byLifecyclePhase.config"
@@ -34,11 +34,19 @@
                 </waltz-pie-table>
             </div>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <div>
                 <waltz-pie-table data="ctrl.charts.endUserApps.byKind.data"
                                  config="ctrl.charts.endUserApps.byKind.config"
                                  title="By Platform">
+                </waltz-pie-table>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div>
+                <waltz-pie-table data="ctrl.charts.endUserApps.byRiskRating.data"
+                                 config="ctrl.charts.endUserApps.byRiskRating.config"
+                                 title="By Risk Rating">
                 </waltz-pie-table>
             </div>
         </div>

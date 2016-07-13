@@ -63,9 +63,11 @@ function service($q,
                 changeLogs,
                 assetCostData]) => {
 
+                const appsWithManagement = _.map(apps, a => _.assign(a, {management: 'IT'}));
+
                 const r = {
                     orgUnits,
-                    apps,
+                    apps: appsWithManagement,
                     involvements,
                     perspective,
                     dataFlows,
@@ -88,7 +90,7 @@ function service($q,
             },
             scope: 'CHILDREN'
         };
-        
+
         const bulkPromise = $q.all([
             ratingStore.findByAppIdSelector(appIdSelector),
             appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(appIdSelector),
@@ -118,6 +120,17 @@ function service($q,
                 entityStatisticsSummary
             ]) => {
 
+                const endUserAppsWithManagement = _.map(_.cloneDeep(endUserApps),
+                    a => _.assign(a, {
+                        management: 'End User',
+                        platform: a.kind,
+                        kind: 'EUC',
+                        overallRating: 'Z'
+                    }));
+
+
+                const combinedApps = _.concat(rawData.apps, endUserAppsWithManagement);
+
                 const r = {
                     orgUnitId,
                     capabilityRatings,
@@ -125,12 +138,13 @@ function service($q,
                     capabilities,
                     ratedDataFlows,
                     authSources,
-                    endUserApps,
+                    endUserApps: endUserAppsWithManagement,
                     complexity,
                     techStats,
                     bookmarks,
                     sourceDataRatings,
-                    entityStatisticsSummary
+                    entityStatisticsSummary,
+                    combinedApps
                 };
 
                 Object.assign(rawData, r);

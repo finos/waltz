@@ -146,3 +146,11 @@ export const usageKindDisplayNames = {
     CONSUMER: 'Consumer',
     MODIFIER: 'Modifier'
 };
+
+
+export const riskRatingDisplayNames = {
+    LOW: 'Low',
+    MEDIUM: 'Medium',
+    HIGH: 'High',
+    VERY_HIGH: 'Very high'
+}

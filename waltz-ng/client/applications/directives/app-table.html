@@ -24,6 +24,9 @@
                     <h6 ng-if="ctrl.selectedApp.platform">
                         <strong>Platform: </strong> {{ctrl.selectedApp.platform}}
                     </h6>
+                    <h6 ng-if="ctrl.selectedApp.riskRating">
+                        <strong>Risk Rating: </strong> {{ctrl.selectedApp.riskRating | toDisplayName:'riskRating'}}
+                    </h6>
                     <h6>
                         <strong>Managed by: </strong> {{ctrl.selectedApp.management}}
                     </h6>
