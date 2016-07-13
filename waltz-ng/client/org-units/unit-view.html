@@ -95,56 +95,20 @@
                                    entities="['AUTHORITATIVE_SOURCE']">
         </waltz-source-data-overlay>
         <uib-tabset>
-            <!-- AUTH SOURCES -->
-            <uib-tab select="ctrl.showAuthSourceEditBtn = true"
-                     deselect="ctrl.showAuthSourceEditBtn = false">
-                <uib-tab-heading>
-                    Authoritative Sources
-                </uib-tab-heading>
-
-                <div ng-show="! (ctrl.viewData.authSources | isEmpty)">
-                    <waltz-auth-sources-table org-unit-id="ctrl.viewData.orgUnit.id"
-                                              org-units="ctrl.viewData.orgUnits"
-                                              auth-sources="ctrl.viewData.authSources">
-                    </waltz-auth-sources-table>
-                </div>
-
-                <div ng-show="ctrl.viewData.authSources | isEmpty"
-                     class="alert alert-warning">
-                    <strong>No Authoritative Sources</strong>
-                    have been defined for this Organisational Unit.
-                </div>
-
-                <div class="small text-muted">
-                    This section shows the authoritative sources for data types.  A source can be declared locally to this
-                    organisational unit or declared by a <i>parent</i> organisational unit.  An authoritative source
-                    consists of the data type, the source application (it's owning unit is shown in parenthesis) and a rating
-                    of either primary or secondary.
-                </div>
-
-            </uib-tab>
 
             <!-- RATED FLOWS -->
-            <uib-tab select="shownRatedFlows = true">
+            <uib-tab>
                 <uib-tab-heading>
                     Rated Flows
                 </uib-tab-heading>
 
-                <div class="row" ng-if="shownRatedFlows && ctrl.viewData.ratedFlows.root.flowsByAppThenTypeThenRating.length > 0">
-                    <div class="col-md-8">
-                        <waltz-expanded-rated-flow-chart data="ctrl.viewData.ratedFlows.root"
-                                                         event-dispatcher="ctrl.eventDispatcher">
+                <waltz-rated-flow-summary-panel ng-if="ctrl.viewData.ratedDataFlows.length > 0"
+                                                rated-flows="ctrl.viewData.ratedDataFlows"
+                                                apps="ctrl.viewData.apps"
+                                                org-unit-id="ctrl.viewData.orgUnitId">
+                </waltz-rated-flow-summary-panel>
 
-                        </waltz-expanded-rated-flow-chart>
-                    </div>
-                    <div class="col-md-4">
-                        <waltz-rated-flow-detail style="margin-top: 120px"
-                                                 event-dispatcher="ctrl.eventDispatcher">
-                        </waltz-rated-flow-detail>
-                    </div>
-                </div>
-
-                <div ng-if="ctrl.viewData.ratedFlows.root.flowsByAppThenTypeThenRating.length == 0"
+                <div ng-if="ctrl.viewData.ratedDataFlows.length == 0"
                      class="alert alert-warning">
                     No inbound data flows registered for this organisational unit
                 </div>
@@ -174,15 +138,43 @@
                     <div class="col-md-12">
 
                         <div class="small text-muted">
-                            This diagram shows the data types sent to applications in the group.  If a cell is
-                            coloured <span style="color: red">red</span> it indicates that the application is
-                            taking data from a non-approved source.  If a cell is
-                            <span style="color: green">green</span> or <span style="background-color: yellow">yellow</span> it uses
-                            primary or secondary sources.
+                            This diagram summarises the data types sent to applications in this group.
                         </div>
                     </div>
                 </div>
             </uib-tab>
+
+
+            <!-- AUTH SOURCES -->
+
+            <uib-tab select="ctrl.showAuthSourceEditBtn = true"
+                     deselect="ctrl.showAuthSourceEditBtn = false">
+                <uib-tab-heading>
+                    Authoritative Sources
+                </uib-tab-heading>
+
+                <div ng-show="! (ctrl.viewData.authSources | isEmpty)">
+                    <waltz-auth-sources-table org-unit-id="ctrl.viewData.orgUnit.id"
+                                              org-units="ctrl.viewData.orgUnits"
+                                              auth-sources="ctrl.viewData.authSources">
+                    </waltz-auth-sources-table>
+                </div>
+
+                <div ng-show="ctrl.viewData.authSources | isEmpty"
+                     class="alert alert-warning">
+                    <strong>No Authoritative Sources</strong>
+                    have been defined for this Organisational Unit.
+                </div>
+
+                <div class="small text-muted">
+                    This section shows the authoritative sources for data types.  A source can be declared locally to this
+                    organisational unit or declared by a <i>parent</i> organisational unit.  An authoritative source
+                    consists of the data type, the source application (it's owning unit is shown in parenthesis) and a rating
+                    of either primary or secondary.
+                </div>
+
+            </uib-tab>
+
 
         </uib-tabset>
     </waltz-section>

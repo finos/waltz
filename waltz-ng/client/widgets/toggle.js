@@ -11,26 +11,41 @@
  *
  */
 
+import _ from "lodash";
+
+
+const BINDINGS = {
+    labelOn: '@',
+    labelOff: '@',
+    iconOn: '@',
+    iconOff: '@',
+    onToggle: '&',
+    state: '<'
+};
+
+
+const initialState = {
+    labelOn: '',
+    labelOff: '',
+    iconOn: 'toggle-on',
+    iconOff: 'toggle-off',
+    onToggle: () => console.log('no on-toggle handler supplied to waltz-toggle component'),
+    state: false
+};
+
+
 function controller() {
-
-
+    _.defaultsDeep(this, initialState);
 }
 
 
 export default [
     () => ({
         restrict: 'E',
-        replace: true,
+        replace: false,
         template: require('./toggle.html'),
-        scope: {
-            labelOn: '@',
-            labelOff: '@',
-            iconOn: '@',
-            iconOff: '@',
-            onToggle: '&',
-            state: '='
-        },
-        bindToController: true,
+        scope: {},
+        bindToController: BINDINGS,
         controllerAs: 'ctrl',
         controller
     })

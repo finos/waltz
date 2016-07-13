@@ -1,0 +1,75 @@
+<div>
+    <style>
+        .primary rect {
+            fill: #3cd32f;
+        }
+
+        .secondary rect {
+            fill: #d3c433;
+        }
+
+        .discouraged rect {
+            fill: #d33035;
+        }
+
+        .no-opinion rect {
+            fill: #6d6b70;
+        }
+
+        .stack-1 {
+            opacity: 0.4;
+        }
+
+    </style>
+    <table class="table table-condensed">
+        <thead>
+        <tr>
+            <th>Data Type</th>
+            <th ng-click="ctrl.columnClick($event, 'PRIMARY')">Primary</th>
+            <th ng-click="ctrl.columnClick($event, 'SECONDARY')">Secondary</th>
+            <th ng-click="ctrl.columnClick($event, 'DISCOURAGED')">Discouraged</th>
+            <th ng-click="ctrl.columnClick($event, 'NO_OPINION')">No Opinion</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="(dataType, scores) in ctrl.summary"
+            ng-click="ctrl.rowClick($event, dataType)">
+            <td>
+                <span ng-bind="dataType | toDisplayName:'dataType'"></span>
+            </td>
+            <td>
+                <waltz-rated-flow-summary-cell scores="scores['PRIMARY']"
+                                               type="type"
+                                               largest-bucket="ctrl.largestBucket"
+                                               ng-click="ctrl.cellClick($event, dataType, 'PRIMARY')"
+                                               class="primary clickable">
+                </waltz-rated-flow-summary-cell>
+            </td>
+            <td>
+                <waltz-rated-flow-summary-cell scores="scores['SECONDARY']"
+                                               type="type"
+                                               largest-bucket="ctrl.largestBucket"
+                                               ng-click="ctrl.cellClick($event, dataType, 'SECONDARY')"
+                                               class="secondary clickable">
+                </waltz-rated-flow-summary-cell>
+            </td>
+            <td>
+                <waltz-rated-flow-summary-cell scores="scores['DISCOURAGED']"
+                                               type="type"
+                                               largest-bucket="ctrl.largestBucket"
+                                               ng-click="ctrl.cellClick($event, dataType, 'DISCOURAGED')"
+                                               class="discouraged clickable">
+                </waltz-rated-flow-summary-cell>
+            </td>
+            <td>
+                <waltz-rated-flow-summary-cell scores="scores['NO_OPINION']"
+                                               type="type"
+                                               largest-bucket="ctrl.largestBucket"
+                                               ng-click="ctrl.cellClick($event, dataType, 'NO_OPINION')"
+                                               class="no-opinion clickable">
+                </waltz-rated-flow-summary-cell>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
