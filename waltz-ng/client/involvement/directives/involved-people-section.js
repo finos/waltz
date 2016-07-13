@@ -45,14 +45,14 @@ const columnDefs = [
                 return name.match(new RegExp(searchTerm, 'i'));
             }
         },
-        cellTemplate: '<div class="ui-grid-cell-contents"> <a ui-sref="main.person.view ({empId: COL_FIELD.employeeId})">{{ COL_FIELD.displayName CUSTOM_FILTERS}}</a> - <a href="mailto:{{COL_FIELD.email}}"><waltz-icon name="envelope-o"></waltz-icon></a></div>'
+        cellTemplate: '<div class="ui-grid-cell-contents"> <a ui-sref="main.person.view ({empId: COL_FIELD.employeeId})" ng-bind="COL_FIELD.displayName CUSTOM_FILTERS"></a> - <a href="mailto:{{COL_FIELD.email}}"><waltz-icon name="envelope-o"></waltz-icon></a></div>'
     },
     { field: 'person.title', displayName: 'Title' },
     { field: 'person.officePhone', displayName: 'Telelphone' },
     {
         field: 'involvements',
         displayName: 'Roles',
-        cellTemplate: '<div class="ui-grid-cell-contents"><span ng-repeat="role in COL_FIELD">{{ role | toDisplayName:"involvementKind" }}</span></div>'
+        cellTemplate: '<div class="ui-grid-cell-contents"><span ng-repeat="role in COL_FIELD" ng-bind="role | toDisplayName:\'involvementKind\'"></span></div>'
     }
 ];
 
