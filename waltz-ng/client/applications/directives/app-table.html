@@ -27,8 +27,18 @@
                     <h6>
                         <strong>Managed by: </strong> {{ctrl.selectedApp.management}}
                     </h6>
-                    <div>
-                        <a class="pull-right" ui-sref="main.app.view ({ id: ctrl.selectedApp.id })">more</a>
+                    <div ng-if="ctrl.selectedApp.management == 'IT'">
+                        <strong>
+                            <a class="pull-right" ui-sref="main.app.view ({ id: ctrl.selectedApp.id })">more</a>
+                        </strong>
+                    </div>
+                    <div ng-if="ctrl.selectedApp.management == 'End User'">
+                        <small>
+                            <waltz-icon name="exclamation-triangle"
+                                        size="lg">
+                            </waltz-icon>
+                            This is an end user application and has limited information presently.
+                        </small>
                     </div>
                 </div>
             </div>
