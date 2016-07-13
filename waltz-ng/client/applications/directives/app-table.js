@@ -44,8 +44,17 @@ function controller(uiGridConstants, $scope, $animate) {
         },
         columnDefs: [
             {
+                field: 'info',
+                displayName: '',
+                enableSorting: false,
+                enableColumnMenu: false,
+                enableFiltering: false,
+                width: 40,
+                cellTemplate: '<div class="ui-grid-cell-contents text-center"> <a class="clickable" ng-click="grid.appScope.ctrl.onAppSelect(row.entity)"> <waltz-icon name="info-circle" size="lg"></waltz-icon></a></div>'
+            },
+            {
                 field: 'name',
-                cellTemplate: '<div class="ui-grid-cell-contents"> <a class="clickable" ng-click="grid.appScope.ctrl.onAppSelect(row.entity)">{{ COL_FIELD }}</a></div>'
+                cellTemplate: require('./app-table-name-celltemplate.html')
             },
             {
                 field: 'kind',
