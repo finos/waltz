@@ -85,7 +85,7 @@ export function calculateGroupSummary(rawData) {
     const transposed = d3.transpose(_.map(rawData, 'ratings'));
     return _.map(transposed, measurableColumn => {
         const counts = _.countBy(measurableColumn, c => c.current);
-        return { ...counts, measurable: measurableColumn[0].measurable };
+        return { ...counts };
     });
 }
 

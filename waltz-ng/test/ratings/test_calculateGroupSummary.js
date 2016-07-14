@@ -11,10 +11,8 @@
  *
  */
 
-import assert from 'assert';
-import _ from 'lodash';
-
-import { calculateGroupSummary } from '../../client/ratings/directives/common';
+import assert from "assert";
+import {calculateGroupSummary} from "../../client/ratings/directives/common";
 
 
 describe('calculateGroupSummary', () => {
@@ -25,7 +23,7 @@ describe('calculateGroupSummary', () => {
             { ratings: [ {current: 'A'}, {current: 'A'}, {current: 'A'}] }
         ]);
 
-        assert.deepEqual([{ A: 2 }, { B: 1, A: 1}, { C: 1, A: 1 } ], result);
+        assert.deepEqual(result, [{ A: 2 }, { B: 1, A: 1}, { C: 1, A: 1 } ]);
     });
 
     it('should give empty array for empty input array', () => {

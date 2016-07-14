@@ -11,10 +11,9 @@
  *
  */
 
-import assert from 'assert';
-import _ from 'lodash';
-
-import { shallowDiff } from '../../client/common';
+import assert from "assert";
+import _ from "lodash";
+import {shallowDiff} from "../../client/common";
 
 
 describe('shallowDiff', () => {
@@ -43,7 +42,7 @@ describe('shallowDiff', () => {
         assert.equal(1, diff.length);
         assert.equal('b', diff[0].field);
         assert.equal(2, diff[0].oldValue);
-        assert.equal(undefined, diff[0].newValue);
+        assert.equal(diff[0].newValue, '');
     });
 
     it('should report both removed and added props', () => {
