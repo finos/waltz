@@ -16,13 +16,28 @@ const BINDINGS = {
     small: '@'
 };
 
+
+function controller($document) {
+    const vm = this;
+
+    vm.$onChanges = () => {
+        $document[0].title = `Waltz: ${vm.name}`;
+    }
+}
+
+
+controller.$inject=[
+    '$document'
+];
+
+
 export default () => ({
     restrict: 'E',
-    replace: true,
+    replace: false,
     template: require('./page-header.html'),
     scope: {},
     bindToController: BINDINGS,
-    controller: () => {},
+    controller,
     controllerAs: 'ctrl',
     transclude: true
 });
