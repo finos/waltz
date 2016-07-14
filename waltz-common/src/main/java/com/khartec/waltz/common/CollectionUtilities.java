@@ -19,6 +19,7 @@ package com.khartec.waltz.common;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -62,5 +63,19 @@ public class CollectionUtilities {
         return xs.stream()
                 .filter(pred)
                 .collect(Collectors.toList());
+    }
+
+    public static <X> void maybe(Collection<X> xs, Consumer<Collection<X>> fn) {
+        if (isDefined(xs)) fn.accept(xs);
+    }
+
+    public static <X,Y> Y maybe(Collection<X> xs, Function<Collection<X>, Y> fn, Y dflt) {
+        return isDefined(xs)
+                ? fn.apply(xs)
+                : dflt;
+    }
+
+    private static <X> boolean isDefined(Collection<X> xs) {
+        return !(xs == null || xs.isEmpty());
     }
 }
