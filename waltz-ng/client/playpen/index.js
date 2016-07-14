@@ -10,7 +10,9 @@
  *
  */
 
-import playpenView from "./playpen";
+import playpenView1 from "./1/playpen1";
+import playpenView2 from "./2/playpen2";
+import playpenView3 from "./3/playpen3";
 
 
 export default (module) => {
@@ -20,15 +22,24 @@ export default (module) => {
         ($stateProvider) => {
             $stateProvider
                 .state('main.playpen', {
-                    url: 'playpen/:kind/:id',
-                    views: { 'content@': playpenView }
-                });
+                    url: 'playpen',
+                    views: {
+                        'content@': { template: require('./list.html') }
+                    }
+                })
+                .state('main.playpen.1', {
+                    url: '/1',
+                    views: { 'content@': playpenView1 }
+                })
+                .state('main.playpen.2', {
+                    url: '/2',
+                    views: { 'content@': playpenView2 }
+                })
+                .state('main.playpen.3', {
+                    url: '/3',
+                    views: { 'content@': playpenView3 }
+                })
         }
     ]);
-    
-    
-
-    
-
 
 };
