@@ -17,6 +17,24 @@
  */
 import _ from "lodash";
 import {selectBest} from "../ratings/directives/viewer/coloring-strategies";
+import {lifecyclePhaseColorScale, variableScale} from "../common/colors";
+import {tallyBy} from "../common/tally-utils";
+
+
+const PIE_SIZE = 70;
+
+
+function mkChartData(data, groupingField, size, colorProvider = variableScale, labelProvider = null) {
+    return {
+        config: {
+            colorProvider: (d) => colorProvider(d.data.key),
+            labelProvider,
+            size
+        },
+        data: tallyBy(data, groupingField)
+    };
+}
+
 
 
 /**
@@ -165,12 +183,19 @@ function controller($scope,
             ratings,
             techStats
         ]) => {
-            vm.applications = apps;
+            vm.applications = _.map(apps, a => _.assign(a, {management: 'IT'}));
             vm.complexity = complexity;
             vm.allCapabilities = allCapabilities;
             vm.appCapabilities = appCapabilities;
             vm.ratings = ratings;
             vm.techStats = techStats;
+
+            vm.appSummaryCharts = {
+                apps: {
+                    byLifecyclePhase: mkChartData(apps, 'lifecyclePhase', PIE_SIZE, lifecyclePhaseColorScale),
+                    byKind: mkChartData(apps, 'kind', PIE_SIZE, variableScale)
+                }
+            };
         })
         .then(() => calculateCapabilities(vm.allCapabilities, vm.appCapabilities))
         .then(result => Object.assign(vm, result))

@@ -143,11 +143,28 @@
                                    entities="['APPLICATION']">
         </waltz-source-data-overlay>
 
-        <div ng-if="ctrl.applications">
-            <waltz-app-table filter="appQuery"
-                             csv-name="{{ ctrl.groupDetail.appGroup.name }}_applications.csv"
-                             applications="ctrl.applications"></waltz-app-table>
-        </div>
+        <uib-tabset ng-if="ctrl.applications.length">
+            <uib-tab heading="Summary">
+                <waltz-app-summary has-app-involvements="ctrl.applications.length"
+                                   has-end-user-app-involvements="false"
+                                   charts="ctrl.appSummaryCharts">
+                </waltz-app-summary>
+            </uib-tab>
+
+            <uib-tab select="showTableTab = true"
+                     heading="Applications"
+                     ng-if="ctrl.applications.length">
+
+                <br>
+                <div ng-if="showTableTab">
+                    <waltz-app-table filter="appQuery"
+                                     csv-name="{{ ctrl.groupDetail.appGroup.name }}_applications.csv"
+                                     applications="ctrl.applications">
+                    </waltz-app-table>
+                </div>
+            </uib-tab>
+
+        </uib-tabset>
 
         <div class="alert-warning alert"
              ng-if="ctrl.applications.length == 0">

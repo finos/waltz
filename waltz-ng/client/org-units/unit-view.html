@@ -225,7 +225,7 @@
     </waltz-bookmarks-section>
 
 
-    <!-- COMBINED APPS -->
+    <!-- APPS -->
     <waltz-section name="Applications"
                    id="apps-section"
                    small="({{ ctrl.viewData.combinedApps.length }})"
@@ -254,6 +254,8 @@
             <uib-tab select="showTableTab = true"
                      heading="Applications"
                      ng-if="ctrl.viewData.combinedApps.length">
+
+                <br>
                 <div ng-if="showTableTab">
                     <waltz-app-table filter="appQuery"
                                      applications="ctrl.viewData.combinedApps"></waltz-app-table>

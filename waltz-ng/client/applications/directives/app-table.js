@@ -57,6 +57,13 @@ function controller(uiGridConstants, $scope, $animate) {
                 cellTemplate: require('./app-table-name-celltemplate.html')
             },
             {
+                field: 'assetCode',
+                cellTemplatae: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD"></span></div>',
+                filter: {
+                    type: uiGridConstants.filter.SELECT
+                }
+            },
+            {
                 field: 'kind',
                 cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:\'applicationKind\'"></span></div>',
                 filter: {

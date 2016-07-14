@@ -1,6 +1,22 @@
 import _ from "lodash";
 import {buildHierarchies} from "../common";
+import {lifecyclePhaseColorScale, variableScale} from "../common/colors";
+import {tallyBy} from "../common/tally-utils";
 
+
+const PIE_SIZE = 70;
+
+
+function mkChartData(data, groupingField, size, colorProvider = variableScale, labelProvider = null) {
+    return {
+        config: {
+            colorProvider: (d) => colorProvider(d.data.key),
+            labelProvider,
+            size
+        },
+        data: tallyBy(data, groupingField)
+    };
+}
 
 const initialState = {
     allCapabilities: [],
@@ -106,7 +122,13 @@ function controller($scope,
 
     applicationStore
         .findBySelector(selectorOptions)
-        .then(apps => vm.applications = apps);
+        .then(apps => vm.applications = _.map(apps, a => _.assign(a, {management: 'IT'})))
+        .then(apps => vm.appSummaryCharts = {
+            apps: {
+                byLifecyclePhase: mkChartData(apps, 'lifecyclePhase', PIE_SIZE, lifecyclePhaseColorScale),
+                byKind: mkChartData(apps, 'kind', PIE_SIZE, variableScale)
+            }
+        });
 
     bookmarkStore
         .findByParent({ id: processId, kind: 'PROCESS'})

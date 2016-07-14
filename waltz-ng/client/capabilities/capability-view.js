@@ -14,6 +14,23 @@ import _ from "lodash";
 import d3 from "d3";
 import {perhaps, populateParents} from "../common";
 import {calculateGroupSummary} from "../ratings/directives/common";
+import {lifecyclePhaseColorScale, variableScale} from "../common/colors";
+import {tallyBy} from "../common/tally-utils";
+
+
+const PIE_SIZE = 70;
+
+
+function mkChartData(data, groupingField, size, colorProvider = variableScale, labelProvider = null) {
+    return {
+        config: {
+            colorProvider: (d) => colorProvider(d.data.key),
+            labelProvider,
+            size
+        },
+        data: tallyBy(data, groupingField)
+    };
+}
 
 
 const initialState = {
@@ -162,9 +179,19 @@ function controller($q,
 
 
     const processApps = (groupedApps) => {
+        groupedApps.primaryApps = _.map(groupedApps.primaryApps, a => _.assign(a, {management: 'IT'}));
+        groupedApps.secondaryApps = _.map(groupedApps.secondaryApps, a => _.assign(a, {management: 'IT'}));
+
         const apps = _.union(groupedApps.primaryApps, groupedApps.secondaryApps);
         vm.groupedApps = groupedApps;
         vm.apps = apps;
+        vm.appSummaryCharts = {
+            apps: {
+                byLifecyclePhase: mkChartData(apps, 'lifecyclePhase', PIE_SIZE, lifecyclePhaseColorScale),
+                byKind: mkChartData(apps, 'kind', PIE_SIZE, variableScale)
+            }
+        };
+
         return _.map(apps, 'id');
     };
 
