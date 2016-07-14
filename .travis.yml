@@ -25,3 +25,4 @@ cache:
 branches:
   only:
     - master
+    - /^waltz-.*$/
