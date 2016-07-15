@@ -281,4 +281,10 @@ public class WebUtilities {
     }
 
 
+    public static Optional<Integer> getLimit(Request request) {
+        String limitVal = request.queryParams("limit");
+        return Optional
+                .ofNullable(limitVal)
+                .map(s -> Integer.valueOf(s));
+    }
 }
