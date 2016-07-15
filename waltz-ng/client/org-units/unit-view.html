@@ -220,7 +220,7 @@
     <!-- APPS -->
     <waltz-section name="Applications"
                    id="apps-section"
-                   small="({{ ctrl.viewData.apps.length }})"
+                   small="({{ ctrl.viewData.combinedApps.length }})"
                    icon="desktop">
 
         <waltz-section-actions>
@@ -232,44 +232,36 @@
 
         <waltz-source-data-overlay visible="ctrl.visibility.appOverlay"
                                    ratings="ctrl.viewData.sourceDataRatings"
-                                   entities="['APPLICATION']">
+                                   entities="['APPLICATION', 'END_USER_APPLICATION']">
         </waltz-source-data-overlay>
 
-        <div ng-if="ctrl.viewData.apps.length">
+        <uib-tabset ng-if="ctrl.viewData.combinedApps.length">
+            <uib-tab heading="Summary">
+                <waltz-app-summary has-app-involvements="ctrl.viewData.apps.length"
+                                   has-end-user-app-involvements="ctrl.viewData.endUserApps.length"
+                                   charts="ctrl.appSummaryCharts">
+                </waltz-app-summary>
+            </uib-tab>
 
-            <waltz-app-table filter="appQuery"
-                             applications="ctrl.viewData.apps"></waltz-app-table>
-        </div>
+            <uib-tab select="showTableTab = true"
+                     heading="Applications"
+                     ng-if="ctrl.viewData.combinedApps.length">
+
+                <br>
+                <div ng-if="showTableTab">
+                    <waltz-app-table filter="appQuery"
+                                     applications="ctrl.viewData.combinedApps"></waltz-app-table>
+                </div>
+            </uib-tab>
+
+        </uib-tabset>
 
         <div class="alert-warning alert"
-             ng-if="ctrl.viewData.apps.length == 0">
+             ng-if="ctrl.viewData.combinedApps.length == 0">
             <strong>No application </strong>
             have yet been registered against unit:
             <span ng-bind="ctrl.unit.name"></span>.
         </div>
-    </waltz-section>
-
-
-    <!-- EUC -->
-    <waltz-section id="euc-section"
-                   name="End User Applications"
-                   icon="table"
-                   small="({{ctrl.viewData.endUserApps.length}})">
-
-        <waltz-section-actions>
-            <button class="btn btn-xs waltz-btn-transparent"
-                    ng-click="ctrl.visibility.eucOverlay = ! ctrl.visibility.eucOverlay">
-                <waltz-icon name="map-signs"></waltz-icon>
-            </button>
-        </waltz-section-actions>
-
-        <waltz-source-data-overlay visible="ctrl.visibility.eucOverlay"
-                                   ratings="ctrl.viewData.sourceDataRatings"
-                                   entities="['END_USER_APPLICATION']">
-        </waltz-source-data-overlay>
-
-        <waltz-end-user-app-table end-user-apps="ctrl.viewData.endUserApps">
-        </waltz-end-user-app-table>
     </waltz-section>
 
 

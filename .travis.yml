@@ -1,6 +1,16 @@
-language: java
+language:
+  - java
+  - node_js
+
 jdk: oraclejdk8
-script: mvn clean package -Pwaltz-mariadb,travis-mariadb
+
+node_js:
+  - "4.4.x"
+
+script:
+  - mvn clean package -Pwaltz-mariadb,travis-mariadb
+  - npm run-script test --prefix ./waltz-ng
+
 addons:
   mariadb: '10.1'
   apt:
@@ -12,6 +22,7 @@ install: true
 
 before_install:
   - mysql -u root -e "create database IF NOT EXISTS waltz;"
+  - npm install npm -g
 
 # Enable caching of dependencies
 cache:
@@ -23,3 +34,4 @@ cache:
 branches:
   only:
     - master
+    - /^waltz-.*$/

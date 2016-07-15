@@ -9,8 +9,8 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from "lodash";
 import {lifecyclePhaseColorScale, variableScale} from "../common/colors";
+import {tallyBy} from "../common/tally-utils";
 
 const PIE_SIZE = 70;
 
@@ -19,33 +19,13 @@ function hasInvolvements(involvements) {
 }
 
 
-function mkAppChartData(apps) {
-
-    const byLifecyclePhase = {
-        config: {
-            colorProvider: (d) => lifecyclePhaseColorScale(d.data.key),
-            size: PIE_SIZE
-        },
-        data: _.chain(apps)
-            .countBy('lifecyclePhase')
-            .map((v, k) => ({ key: k, count: v }))
-            .value()
-    };
-
-    const byKind = {
-        config: {
-            colorProvider: (d) => variableScale(d.data.key),
-            size: PIE_SIZE
-        },
-        data: _.chain(apps)
-            .countBy('kind')
-            .map((v, k) => ({ key: k, count: v }))
-            .value()
-    };
-
+function mkChartData(data, groupingField, size, colorProvider) {
     return {
-        byLifecyclePhase,
-        byKind
+        config: {
+            colorProvider: (d) => colorProvider(d.data.key),
+            size
+        },
+        data: tallyBy(data, groupingField)
     };
 }
 
@@ -76,8 +56,15 @@ function controller($scope,
         vm.hasEndUserAppInvolvements = hasInvolvements(model.endUserAppInvolvements);
         vm.hasInvolvements = vm.hasAppInvolvements || vm.hasEndUserAppInvolvements;
         vm.charts = {
-            apps: mkAppChartData(model.appInvolvements.all),
-            endUserApps: mkAppChartData(model.endUserAppInvolvements.all)
+            apps: {
+                byLifecyclePhase: mkChartData(model.appInvolvements.all, 'lifecyclePhase', PIE_SIZE, lifecyclePhaseColorScale),
+                byKind: mkChartData(model.appInvolvements.all, 'kind', PIE_SIZE, variableScale)
+            },
+            endUserApps: {
+                byLifecyclePhase: mkChartData(model.endUserAppInvolvements.all, 'lifecyclePhase', PIE_SIZE, lifecyclePhaseColorScale),
+                byKind: mkChartData(model.endUserAppInvolvements.all, 'kind', PIE_SIZE, variableScale),
+                byRiskRating: mkChartData(model.endUserAppInvolvements.all, 'riskRating', PIE_SIZE, variableScale)
+            }
         };
 
     }, true);

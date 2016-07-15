@@ -10,7 +10,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 export default class BaseLookupService {
 
@@ -38,7 +38,7 @@ export default class BaseLookupService {
             console.error('No lookupMap registered for type', type);
             return '??' + value + '??';
         }
-        return lookupMap[value] || '';
+        return lookupMap[value] || '?'  + value + '?';
     }
 
 
