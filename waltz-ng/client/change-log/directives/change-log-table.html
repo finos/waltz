@@ -1,0 +1,27 @@
+<table class="table table-condensed table-hover small">
+    <thead>
+    <tr>
+        <th>Severity</th>
+        <th>Message</th>
+        <th>User</th>
+        <th>Timestamp</th>
+    </tr>
+    </thead>
+    <tr ng-repeat="entry in ctrl.entries | orderBy:'-createdAt'">
+        <td>
+            <span ng-bind="entry.severity | toDisplayName:'severity'"></span>
+        </td>
+        <td>
+            <span ng-bind="entry.message"></span>
+        </td>
+        <td>
+            <a ui-sref="main.profile.view ({userId: entry.userId})">
+                <span ng-bind="entry.userId"></span>
+            </a>
+        </td>
+        <td>
+            <waltz-from-now timestamp="entry.createdAt">
+            </waltz-from-now>
+        </td>
+    </tr>
+</table>

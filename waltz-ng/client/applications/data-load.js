@@ -16,6 +16,9 @@ import _ from "lodash";
 import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
 
 
+const CHANGE_LOG_LIMIT = 20;
+
+
 function addDataTypes(extras, vm) {
     const existing = vm.dataTypes ? vm.dataTypes : [];
     vm.dataTypes = _.union(existing, extras);
@@ -46,7 +49,7 @@ export function loadDataFlows(dataFlowStore, id, vm) {
 
 export function loadChangeLog(changeLogStore, id, vm) {
     changeLogStore
-        .findByEntityReference('APPLICATION', id)
+        .findByEntityReference('APPLICATION', id, CHANGE_LOG_LIMIT)
         .then(log => vm.log = log);
 }
 

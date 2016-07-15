@@ -1,11 +1,6 @@
 const BINDINGS = {
-    entries: '=',
-    entityReference: '='
+    entries: '='
 };
-
-
-function controller() {
-}
 
 
 const directive = {
@@ -14,8 +9,8 @@ const directive = {
     scope: {},
     bindToController: BINDINGS,
     controllerAs: 'ctrl',
-    controller,
-    template: require('./change-log-section.html')
+    controller: () => {},
+    template: require('./change-log-table.html')
 };
 
 

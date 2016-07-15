@@ -24,8 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
 
@@ -54,7 +53,7 @@ public class ChangeLogEndpoint implements Endpoint {
                 mkPath(BASE_URL, ":kind", ":id"),
                 (request, response) -> {
                     EntityReference ref = getEntityReference(request);
-                    return service.findByParentReference(ref);
+                    return service.findByParentReference(ref, getLimit(request));
                 });
 
 
