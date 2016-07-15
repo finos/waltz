@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotEmptyString;
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -46,10 +47,11 @@ public class ChangeLogService {
     }
 
 
-    public List<ChangeLog> findByParentReference(EntityReference ref) {
+    public List<ChangeLog> findByParentReference(EntityReference ref,
+                                                 Optional<Integer> limit) {
         checkNotNull(ref, "ref must not be null");
 
-        return changeLogDao.findByParentReference(ref);
+        return changeLogDao.findByParentReference(ref, limit);
     }
 
 
