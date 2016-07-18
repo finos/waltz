@@ -38,7 +38,7 @@ export default class BaseLookupService {
             console.error('No lookupMap registered for type', type);
             return '??' + value + '??';
         }
-        return lookupMap[value] || '?'  + value + '?';
+        return lookupMap[value] || '';
     }
 
 

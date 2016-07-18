@@ -103,6 +103,7 @@
                     <url>${database.url}</url>
                     <username>${database.user}</username>
                     <password>${database.password}</password>
+                    <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
                 </configuration>
 
                 <executions>

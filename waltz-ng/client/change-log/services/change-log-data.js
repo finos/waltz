@@ -6,8 +6,8 @@ export default [
 
         const BASE = `${BaseApiUrl}/change-log`;
 
-        const findByEntityReference = (kind, id) =>
-            $http.get(`${BASE}/${kind}/${id}`)
+        const findByEntityReference = (kind, id, limit) =>
+            $http.get(`${BASE}/${kind}/${id}`, { params: { limit }})
                 .then(result => result.data);
 
         const findForUserName = (userName) =>

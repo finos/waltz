@@ -36,6 +36,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotEmptyString;
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -74,13 +75,15 @@ public class ChangeLogDao {
     }
 
 
-    public List<ChangeLog> findByParentReference(EntityReference ref) {
+    public List<ChangeLog> findByParentReference(EntityReference ref,
+                                                 Optional<Integer> limit) {
         checkNotNull(ref, "ref must not be null");
 
         return dsl.select()
                 .from(CHANGE_LOG)
                 .where(CHANGE_LOG.PARENT_ID.eq(ref.id()))
                 .and(CHANGE_LOG.PARENT_KIND.eq(ref.kind().name()))
+                .limit(limit.orElse(Integer.MAX_VALUE))
                 .fetch(mapper);
     }
 

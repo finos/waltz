@@ -1,5 +1,8 @@
 
 export default (module) => {
-    module.directive('waltzChangeLogSection', require('./directives/change-log-section'));
-    module.service('ChangeLogDataService', require('./services/change-log-data'));
+    module
+        .config(require('./routes'))
+        .service('ChangeLogDataService', require('./services/change-log-data'))
+        .directive('waltzChangeLogSection', require('./directives/change-log-section'))
+        .directive('waltzChangeLogTable', require('./directives/change-log-table'));
 };
