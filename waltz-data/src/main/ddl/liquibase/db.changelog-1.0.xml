@@ -2132,5 +2132,24 @@
         </sql>
     </changeSet>
 
+    <!-- 293 User preferences -->
+    <changeSet author="kamransaleem"
+               id="20160715-293-1">
+        <createTable tableName="user_preference">
+            <column name="key"
+                    type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value"
+                    type="VARCHAR(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="user_id, key" constraintName="user_preference_pkey" tableName="user_preference"/>
+    </changeSet>
 
 </databaseChangeLog>
