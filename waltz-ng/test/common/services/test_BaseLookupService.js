@@ -1,5 +1,5 @@
-import assert from 'assert';
-import Service from '../../../client/common/services/BaseLookupService';
+import assert from "assert";
+import Service from "../../../client/common/services/BaseLookupService";
 
 
 describe('base lookup service', () => {
@@ -23,10 +23,10 @@ describe('base lookup service', () => {
     });
 
 
-    it('returns ?\'s around unknown keys', () => {
+    it('returns empty string for unknown keys', () => {
         const service = new Service();
         service.register('t', {});
-        assert.equal('?key?', service.lookup('t', 'key'));
+        assert.equal('', service.lookup('t', 'key'));
     });
 
 
