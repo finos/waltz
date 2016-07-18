@@ -50,7 +50,7 @@ const initModel = {
 };
 
 
-function buildAppInvolvementSummary(apps, involvements) {
+function buildAppInvolvementSummary(apps = [], involvements = []) {
     const appsById = _.keyBy(apps, 'id');
 
     const directlyInvolvedAppIds = _.map(involvements, 'entityReference.id');
@@ -61,7 +61,7 @@ function buildAppInvolvementSummary(apps, involvements) {
     const directAppInvolvements = _.chain(involvements)
         .map(inv => {
             let app = appsById[inv.entityReference.id];
-            app = _.assign(app, {role: inv.kind})
+            app = _.assign(app, {role: inv.kind});
             return app;
         })
         .value();
@@ -121,10 +121,10 @@ function service($q,
             involvementStore.findEndUserAppsBydSelector(endUserAppIdSelector)
         ]).then(([involvements, apps, endUserApps]) => {
 
-            const appsSummary = buildAppInvolvementSummary(apps,
-                _.filter(involvements, i => i.entityReference.kind === 'APPLICATION'));
-            const endUserAppsSummary = buildAppInvolvementSummary(endUserApps,
-                _.filter(involvements, i => i.entityReference.kind === 'END_USER_APPLICATION'));
+            const involvementsByKind = _.groupBy(involvements, 'entityReference.kind');
+
+            const appsSummary = buildAppInvolvementSummary(apps, involvementsByKind['APPLICATION']);
+            const endUserAppsSummary = buildAppInvolvementSummary(endUserApps, involvementsByKind['END_USER_APPLICATION']);
 
             const appsWithManagement = _.map(apps, a => _.assign(a, {management: 'IT'}));
             const endUserAppsWithManagement = _.map(_.cloneDeep(endUserApps),
@@ -135,7 +135,11 @@ function service($q,
                     overallRating: 'Z'
                 }));
             const combinedApps = _.concat(appsWithManagement, endUserAppsWithManagement);
-            const combinedSummary = buildAppInvolvementSummary(combinedApps, involvements);
+
+            const combinedSummary = buildAppInvolvementSummary(combinedApps, _.concat(
+                involvementsByKind['APPLICATION'] || [],
+                involvementsByKind['END_USER_APPLICATION'] || []
+            ));
 
             state.model.apps = apps;
             state.model.appInvolvements = appsSummary;
@@ -196,7 +200,7 @@ function service($q,
             },
             scope: 'CHILDREN'
         };
-        
+
         entityStatisticStore.findSummaryStatsByIdSelector(appIdSelector)
             .then(stats => {
                 state.model.entityStatisticsSummary = stats;
