@@ -54,7 +54,7 @@ function controller(uiGridConstants, $scope, $animate) {
             },
             {
                 field: 'name',
-                cellTemplate: require('./app-table-name-celltemplate.html')
+                cellTemplate: '<div class="ui-grid-cell-contents">\n    <a ng-if="row.entity[\'management\'] == \'IT\'"\n       ui-sref="main.app.view ({ id: row.entity[\'id\'] })" ng-bind="COL_FIELD">\n    </a>\n    <span ng-if="row.entity[\'management\'] == \'End User\'" ng-bind="COL_FIELD"></span>\n</div>'
             },
             {
                 field: 'assetCode',
