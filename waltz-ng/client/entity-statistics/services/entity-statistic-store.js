@@ -17,13 +17,17 @@ export default [
     ($http, BaseApiUrl) => {
         const BASE = `${BaseApiUrl}/entity-statistic`;
 
-
         const findSummaryStatsByIdSelector = (options) => $http
-            .post(`${BASE}/stats`, options)
+            .post(`${BASE}/summary`, options)
+            .then(r => r.data);
+
+        const findStatValuesByIdSelector = (statId, options) => $http
+            .post(`${BASE}/value/${statId}`, options)
             .then(r => r.data);
 
         return {
-            findSummaryStatsByIdSelector
+            findSummaryStatsByIdSelector,
+            findStatValuesByIdSelector
         };
     }
 ];

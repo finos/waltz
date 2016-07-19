@@ -1,6 +1,6 @@
 <div>
 
-    <waltz-page-header name="Playpen"
+    <waltz-page-header name="Hier Nav"
                        small="3"
                        icon="rocket">
         <ol class="waltz-breadcrumbs">
@@ -9,7 +9,28 @@
         </ol>
     </waltz-page-header>
 
-    <waltz-section name="Section">
 
+
+    <waltz-section name="Caps">
+        <div class="row">
+            <div class="col-md-8">
+                <pre>
+                    {{ ctrl.entityStatisticValues | json }}
+                </pre>
+                <waltz-entity-statistic-summary-section name="Indicators"
+                                                        entity-statistics="ctrl.entityStatisticsSummary">
+                </waltz-entity-statistic-summary-section>
+
+            </div>
+            <div class="col-md-4">
+                <waltz-entity-hierarchy-navigator model="ctrl.orgUnits"
+                                                  selected-node="ctrl.selectedOrgUnit"
+                                                  on-select="ctrl.onSelectOrgUnit">
+                </waltz-entity-hierarchy-navigator>
+                <button ng-click="ctrl.jumpOrgUnit()">Jump</button>
+            </div>
+        </div>
     </waltz-section>
+
+
 </div>

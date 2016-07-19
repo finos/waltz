@@ -159,15 +159,19 @@ public class EntityStatisticDao {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
         // aggregate query
+        Condition condition = es.ACTIVE.eq(true)
+                .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(esv.ENTITY_ID.in(appIdSelector))
+                .and(esv.CURRENT.eq(true));
+
+
         SelectHavingStep<Record3<Long, String, Integer>> aggregates = dsl.select(esv.STATISTIC_ID, esv.OUTCOME, count().as("count"))
                 .from(esv)
                 .innerJoin(es)
                 .on(esv.STATISTIC_ID.eq(es.ID))
-                .where(es.ACTIVE.eq(true)
-                        .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                        .and(esv.ENTITY_ID.in(appIdSelector))
-                        .and(esv.CURRENT.eq(true)))
+                .where(dsl.renderInlined(condition))
                 .groupBy(esv.STATISTIC_ID, esv.OUTCOME);
+
 
         // combine with definitions
         return dsl.select(es.fields())
@@ -203,6 +207,23 @@ public class EntityStatisticDao {
         return dsl.select(es.fields())
                 .from(es)
                 .fetch(TO_DEFINITION_MAPPER);
+    }
+
+
+    public List<EntityStatisticValue> getStatisticValuesForAppIdSelector(long statisticId, Select<Record1<Long>> appIdSelector) {
+        checkNotNull(appIdSelector, "appIdSelector cannot be null");
+
+        Condition condition = esv.STATISTIC_ID.eq(statisticId)
+                .and(esv.CURRENT.eq(true))
+                .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(esv.ENTITY_ID.in(appIdSelector));
+
+        List<EntityStatisticValue> fetch = dsl.select(esv.fields())
+                .from(esv)
+                .where(dsl.renderInlined(condition))
+                .fetch(TO_VALUE_MAPPPER);
+
+        return fetch;
     }
 
 }

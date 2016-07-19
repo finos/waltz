@@ -23,7 +23,7 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.application.HierarchyQueryScope;
 import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticSummary;
+import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import org.jooq.DSLContext;
@@ -61,8 +61,9 @@ public class EntityStatisticHarness {
                 .build();
 
 
-        List<EntityStatisticSummary> statisticsForAppIdSelector = service.findStatisticsForAppIdSelector(options);
-
+//        List<EntityStatisticSummary> statisticsForAppIdSelector = service.findStatsSummariesForAppIdSelector(options);
+        List<EntityStatisticValue> statisticValuesForAppIdSelector = service.getStatisticValuesForAppIdSelector(2, options);
+        System.out.println(statisticValuesForAppIdSelector);
 
     }
 

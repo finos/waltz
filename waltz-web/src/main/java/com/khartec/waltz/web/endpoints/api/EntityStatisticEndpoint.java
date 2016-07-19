@@ -18,8 +18,10 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.entity_statistic.EntityStatisticSummary;
+import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import com.khartec.waltz.web.ListRoute;
+import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,12 +50,17 @@ public class EntityStatisticEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String findStatsForAppSelectorPath = mkPath(BASE_URL, "stats");
+        String findStatsSummariesForAppSelectorPath = mkPath(BASE_URL, "summary");
+        String findStatValuesForAppSelectorPath = mkPath(BASE_URL, "value", ":statId");
 
-        ListRoute<EntityStatisticSummary> findStatsForAppSelectorRoute = (request, response)
-                -> entityStatisticService.findStatisticsForAppIdSelector(readOptionsFromBody(request));
+        ListRoute<EntityStatisticSummary> findStatsSummariesForAppSelectorRoute = (request, response)
+                -> entityStatisticService.findStatsSummariesForAppIdSelector(readOptionsFromBody(request));
 
-        postForList(findStatsForAppSelectorPath, findStatsForAppSelectorRoute);
+        ListRoute<EntityStatisticValue> findStatValuesForAppSelectorRoute = (request, response)
+                -> entityStatisticService.getStatisticValuesForAppIdSelector(WebUtilities.getLong(request, "statId"), readOptionsFromBody(request));
+
+        postForList(findStatsSummariesForAppSelectorPath, findStatsSummariesForAppSelectorRoute);
+        postForList(findStatValuesForAppSelectorPath, findStatValuesForAppSelectorRoute);
     }
 
 }
