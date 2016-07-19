@@ -10,7 +10,7 @@ const initData = {
 function controller(orgUnitStore, entityStatisticStore) {
 
     const vm = Object.assign(this, initData);
-    const statId = 33;
+    const statId = 6;
 
     orgUnitStore
         .findAll()
