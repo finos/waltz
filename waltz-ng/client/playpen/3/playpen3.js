@@ -27,7 +27,7 @@ function controller(orgUnitStore, entityStatisticStore) {
         };
         entityStatisticStore
             .findSummaryStatsByIdSelector(selector)
-            .then(stats => vm.entityStatisticsSummary = stats)
+            .then(stats => vm.entityStatisticsSummary = stats);
 
         entityStatisticStore
             .findStatValuesByIdSelector(statId, selector)
