@@ -62,7 +62,7 @@ public class EntityStatisticHarness {
 
 
 //        List<EntityStatisticSummary> statisticsForAppIdSelector = service.findStatsSummariesForAppIdSelector(options);
-        List<EntityStatisticValue> statisticValuesForAppIdSelector = service.getStatisticValuesForAppIdSelector(2, options);
+        List<EntityStatisticValue> statisticValuesForAppIdSelector = service.getStatisticValuesForAppIdSelector(6, options);
         System.out.println(statisticValuesForAppIdSelector);
 
     }

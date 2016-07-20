@@ -10,7 +10,7 @@ const initData = {
 function controller(orgUnitStore, entityStatisticStore) {
 
     const vm = Object.assign(this, initData);
-    const statId = 33;
+    const statId = 6;
 
     orgUnitStore
         .findAll()
@@ -27,7 +27,7 @@ function controller(orgUnitStore, entityStatisticStore) {
         };
         entityStatisticStore
             .findSummaryStatsByIdSelector(selector)
-            .then(stats => vm.entityStatisticsSummary = stats)
+            .then(stats => vm.entityStatisticsSummary = stats);
 
         entityStatisticStore
             .findStatValuesByIdSelector(statId, selector)

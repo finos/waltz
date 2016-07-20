@@ -3,6 +3,7 @@ package com.khartec.waltz.data.entity_statistic;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.entity_statistic.*;
 import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.schema.tables.records.ApplicationRecord;
 import com.khartec.waltz.schema.tables.records.EntityStatisticDefinitionRecord;
 import com.khartec.waltz.schema.tables.records.EntityStatisticValueRecord;
 import org.jooq.*;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.TO_STRING_TALLY;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 import static org.jooq.impl.DSL.count;
@@ -27,6 +29,7 @@ public class EntityStatisticDao {
 
     private static final com.khartec.waltz.schema.tables.EntityStatisticDefinition es = ENTITY_STATISTIC_DEFINITION.as("es");
     private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
+    private static final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
 
     private static final RecordMapper<? super Record, EntityStatisticDefinition> TO_DEFINITION_MAPPER = r -> {
         EntityStatisticDefinitionRecord record = r.into(ENTITY_STATISTIC_DEFINITION);
@@ -47,12 +50,14 @@ public class EntityStatisticDao {
 
     private static final RecordMapper<? super Record, EntityStatisticValue> TO_VALUE_MAPPPER = r -> {
         EntityStatisticValueRecord record = r.into(ENTITY_STATISTIC_VALUE);
+        ApplicationRecord appRecord = r.into(APPLICATION);
         return  ImmutableEntityStatisticValue.builder()
                 .id(record.getId())
                 .statisticId(record.getStatisticId())
                 .entity(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(record.getEntityKind()))
                         .id(record.getEntityId())
+                        .name(appRecord.getName())
                         .build())
                 .value(record.getValue())
                 .outcome(record.getOutcome())
@@ -162,7 +167,7 @@ public class EntityStatisticDao {
         Condition condition = es.ACTIVE.eq(true)
                 .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(esv.ENTITY_ID.in(appIdSelector))
-                .and(esv.CURRENT.eq(true));
+        .and(esv.CURRENT.eq(true));
 
 
         SelectHavingStep<Record3<Long, String, Integer>> aggregates = dsl.select(esv.STATISTIC_ID, esv.OUTCOME, count().as("count"))
@@ -218,8 +223,11 @@ public class EntityStatisticDao {
                 .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(esv.ENTITY_ID.in(appIdSelector));
 
-        List<EntityStatisticValue> fetch = dsl.select(esv.fields())
+        List<EntityStatisticValue> fetch = dsl.select(app.NAME)
+                .select(esv.fields())
                 .from(esv)
+                .join(app)
+                .on(esv.ENTITY_ID.eq(app.ID))
                 .where(dsl.renderInlined(condition))
                 .fetch(TO_VALUE_MAPPPER);
 
