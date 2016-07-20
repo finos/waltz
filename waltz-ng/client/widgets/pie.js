@@ -15,11 +15,33 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 import d3 from "d3";
+import _ from "lodash";
+
+
+/**
+ * data: [....]
+ *
+ * config: {
+ *   colorProvider,
+ *   valueProvider : d => d.count,
+ *   labelProvider : d => ''
+ * }
+ */
+
+const bindings = {
+    data: '<',
+    config: '<',
+    selectedSegmentKey: '<'
+};
+
+
+const defaultOnSelect = (d) => console.log("pie.onSelect default handler: ", d);
 
 
 const DEFAULT_SIZE = 70;
 
-function renderArcs(holder, config, data) {
+
+function renderArcs(holder, config, data, onSelect, selectedSegmentKey) {
 
     const {
         colorProvider,
@@ -55,7 +77,8 @@ function renderArcs(holder, config, data) {
 
     arcs.enter()
         .append('path')
-        .classed('arc', true);
+        .classed('arc clickable', true)
+        .on('click', d => onSelect(d.data));
 
     arcs.attr({
         fill: d => colorProvider(d).brighter(),
@@ -89,7 +112,7 @@ function renderArcs(holder, config, data) {
 }
 
 
-function render(svg, config, data) {
+function render(svg, config, data, onSelect, selectedSegmentKey) {
     const { size = DEFAULT_SIZE } = config;
     const width = size;
     const height = size;
@@ -107,37 +130,47 @@ function render(svg, config, data) {
     mainGroup
         .attr('transform', `translate(${width / 2},${height / 2})`);
 
-    renderArcs(mainGroup, config, data);
+    renderArcs(mainGroup, config, data, onSelect, selectedSegmentKey);
 }
 
 
-function link(scope, elem) {
-    const vizElem = elem[0].querySelector('.viz');
+function controller($element, $scope) {
+    const vizElem = $element[0].querySelector('.waltz-pie');
     const svg = d3.select(vizElem).append('svg');
+    const vm = this;
 
-    scope.$watchGroup(['data', 'config'], ([data, config]) => {
-        if (!data || !config) return;
-        render(svg, config, data);
-    });
+    vm.$onChanges = (changes) => {
+        if (vm.data && vm.config && changes.data) {
+            const onSelectFn = vm.config.onSelect || defaultOnSelect;
+            const onSelect = (d) => $scope.$apply(() => onSelectFn(d));
+
+            render(svg, vm.config, vm.data, onSelect);
+        }
+
+        if (changes.selectedSegmentKey) {
+            svg.selectAll('.arc')
+                .classed('wp-selected', d => {
+                    return d.data.key === vm.selectedSegmentKey;
+                });
+
+        }
+    };
+
 
 }
 
-/**
- * data: [....]
- *
- * config: {
- *   colorProvider,
- *   valueProvider : d => d.count,
- *   labelProvider : d => ''
- * }
- */
-export default () => ({
-    restrict: 'E',
-    replace: true,
-    template: '<span><span class="viz"></span></span>',
-    scope: {
-        data: '=',
-        config: '='
-    },
-    link
-});
+
+controller.$inject = [
+    '$element',
+    '$scope'
+];
+
+
+const component = {
+    bindings,
+    controller,
+    template: '<span><span class="waltz-pie"></span></span>'
+};
+
+
+export default component;

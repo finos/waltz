@@ -1,0 +1,16 @@
+.waltz-pie-segment-table {
+    text-align: left;
+
+    .wpst-indicator-cell {
+        width: 16px;
+        border: 1px solid;
+        border-radius: 5px;
+    }
+
+    .wpst-selected {
+        background: #eee;
+        border-width: 0 1px;
+        border-color: #bbb;
+        border-style: solid;
+    }
+}

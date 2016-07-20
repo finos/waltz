@@ -9,17 +9,29 @@
         </ol>
     </waltz-page-header>
 
-
-
     <waltz-section name="Caps">
+
         <div class="row">
             <div class="col-md-8">
-                <pre>
-                    {{ ctrl.entityStatisticValues | json }}
-                </pre>
-                <waltz-entity-statistic-summary-section name="Indicators"
-                                                        entity-statistics="ctrl.entityStatisticsSummary">
-                </waltz-entity-statistic-summary-section>
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <waltz-pie data="ctrl.pie.data"
+                                   selected-segment-key="ctrl.selectedPieSegment.key"
+                                   config="ctrl.pie.config">
+                        </waltz-pie>
+                    </div>
+                    <div class="col-md-9">
+                        <waltz-pie-segment-table data="ctrl.pie.data"
+                                                 selected-segment-key="ctrl.selectedPieSegment.key"
+                                                 config="ctrl.pie.config">
+                        </waltz-pie-segment-table>
+                    </div>
+                </div>
+
+
+                <waltz-entity-statistics-detail-table statistic-values="ctrl.entityStatisticValues"
+                                                      filter-outcome="ctrl.selectedPieSegment.key">
+                </waltz-entity-statistics-detail-table>
 
             </div>
             <div class="col-md-4">
@@ -31,6 +43,11 @@
             </div>
         </div>
     </waltz-section>
+
+    <waltz-entity-statistic-summary-section name="Indicators"
+                                            entity-statistics="ctrl.entityStatisticsSummary">
+    </waltz-entity-statistic-summary-section>
+
 
 
 </div>

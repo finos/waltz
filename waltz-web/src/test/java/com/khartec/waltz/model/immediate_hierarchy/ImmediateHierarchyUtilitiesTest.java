@@ -1,0 +1,138 @@
+package com.khartec.waltz.model.immediate_hierarchy;
+
+import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.model.IdProvider;
+import com.khartec.waltz.model.ParentIdProvider;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static java.util.Optional.empty;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Created by dwatkins on 20/07/2016.
+ */
+public class ImmediateHierarchyUtilitiesTest {
+
+    private static class Dummy implements IdProvider, ParentIdProvider {
+        private Long id;
+        private Long parentId;
+
+        public Dummy(Long id, Long parentId) {
+            this.id = id;
+            this.parentId = parentId;
+        }
+
+        @Override
+        public Optional<Long> id() {
+            return Optional.ofNullable(id);
+        }
+
+        @Override
+        public Optional<Long> parentId() {
+            return Optional.ofNullable(parentId);
+        }
+
+        @Override
+        public String toString() {
+            return "id: "+id;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Dummy dummy = (Dummy) o;
+
+            if (id != null ? !id.equals(dummy.id) : dummy.id != null) return false;
+            return parentId != null ? parentId.equals(dummy.parentId) : dummy.parentId == null;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = id != null ? id.hashCode() : 0;
+            result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
+            return result;
+        }
+    }
+
+
+    Dummy d1 = new Dummy(1L, null);
+
+    Dummy d11 = new Dummy(11L, d1.id);
+    Dummy d12 = new Dummy(12L, d1.id);
+
+    Dummy d111 = new Dummy(111L, d11.id);
+    Dummy d112 = new Dummy(112L, d11.id);
+
+    ArrayList<Dummy> all = ListUtilities.newArrayList(d1, d11, d12, d111, d112);
+
+
+    @Test
+    public void build() throws Exception {
+
+
+        System.out.println(ImmediateHierarchyUtilities.build(d1.id, all));
+        System.out.println(ImmediateHierarchyUtilities.build(d11.id, all));
+        System.out.println(ImmediateHierarchyUtilities.build(d12.id, all));
+        System.out.println(ImmediateHierarchyUtilities.build(d112.id, all));
+
+        ImmediateHierarchy<Dummy> r1 = ImmediateHierarchyUtilities.build(d1.id, all);
+        ImmediateHierarchy<Dummy> r11 = ImmediateHierarchyUtilities.build(d11.id, all);
+        ImmediateHierarchy<Dummy> r12 = ImmediateHierarchyUtilities.build(d12.id, all);
+        ImmediateHierarchy<Dummy> r112 = ImmediateHierarchyUtilities.build(d112.id, all);
+
+        assertEquals(d1, r1.self());
+        assertEquals(empty(), r1.parent());
+        assertEmpty(r1.siblings());
+        assertSize(2, r1.children());
+        assertContains(r1.children(), d11, d12);
+
+        assertEquals(d11, r11.self());
+        assertEquals(Optional.of(d1), r11.parent());
+        assertSize(1, r11.siblings());
+        assertContains(r11.siblings(), d12);
+        assertSize(2, r11.children());
+        assertContains(r11.children(), d111, d112);
+
+        assertEquals(d12, r12.self());
+        assertEquals(Optional.of(d1), r12.parent());
+        assertSize(1, r12.siblings());
+        assertContains(r12.siblings(), d11);
+        assertEmpty(r12.children());
+
+        assertEquals(d112, r112.self());
+        assertEquals(Optional.of(d11), r112.parent());
+        assertSize(1, r112.siblings());
+        assertContains(r112.siblings(), d111);
+        assertEmpty(r112.children());
+
+
+    }
+
+
+    @Test
+    public void bad() {
+        ImmediateHierarchyUtilities.build(-1, all);
+    }
+    private <X> void assertContains(List<X> xs, X... things) {
+        for (X t : things) {
+            assertTrue(xs.contains(t));
+        }
+    }
+
+    private <X> void assertSize(int i, List<X> xs) {
+        assertEquals(i, xs.size());
+    }
+
+    private <X> void assertEmpty(List<X> xs) {
+        assertTrue(xs.isEmpty());
+    }
+
+}

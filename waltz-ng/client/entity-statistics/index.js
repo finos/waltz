@@ -20,4 +20,6 @@ export default (module) => {
     module.directive('waltzEntityStatisticNumericRenderer', require('./directives/entity-statistic-numeric-renderer'));
 
     module.service('EntityStatisticStore', require('./services/entity-statistic-store'));
+
+    module.component('waltzEntityStatisticsDetailTable', require('./components/entity-statistics-detail-table'));
 };
