@@ -1,10 +1,15 @@
 package com.khartec.waltz.data.entity_statistic;
 
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticSummary;
 import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticSummary;
+import com.khartec.waltz.model.tally.ImmutableStringTally;
+import com.khartec.waltz.model.tally.ImmutableTallyPack;
 import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.TallyPack;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +96,48 @@ public class EntityStatisticSummaryDao {
 
         // aggregate query
         Condition condition = esd.ACTIVE.eq(true)
-                .and(esv.STATISTIC_ID.in(statSelector))
+                .and(esd.ID.in(statSelector))
+                .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(esv.ENTITY_ID.in(appIdSelector))
+                .and(esv.CURRENT.eq(true));
+
+
+        SelectHavingStep<Record3<Long, String, Integer>> aggregates = dsl
+                .select(esd.ID, esv.OUTCOME, count().as("count"))
+                .from(esv)
+                .leftJoin(esd)
+                .on(esv.STATISTIC_ID.eq(esd.ID))
+                .where(dsl.renderInlined(condition))
+                .groupBy(esd.ID, esv.OUTCOME);
+
+        dsl.selectDistinct(esd.ID)
+                .from(esv)
+                .rightOuterJoin(esd).on(esd.ID.eq(esv.STATISTIC_ID))
+                .where(condition)
+                .forEach(r -> System.out.println(r.getValue(esd.ID)));
+
+
+        // combine with definitions
+        return dsl.select(esd.fields())
+                .select(aggregates.fields())
+                .from(esd)
+                .innerJoin(aggregates)
+                .on(esd.ID.eq((Field<Long>) aggregates.field("id")))
+                .fetch()
+                .intoGroups(ENTITY_STATISTIC_DEFINITION.fields())
+                .entrySet()
+                .stream()
+                .map(TO_SUMMARY_MAPPER)
+                .collect(Collectors.toList());
+    }
+
+
+    public List<TallyPack<String>> findStatTallies(List<Long> statisticIds, Select<Record1<Long>> appIdSelector) {
+        Checks.checkNotNull(statisticIds, "statisticIds cannot be null");
+        Checks.checkNotNull(appIdSelector, "appIdSelector cannot be null");
+
+
+        Condition condition = esv.STATISTIC_ID.in(statisticIds)
                 .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(esv.ENTITY_ID.in(appIdSelector))
                 .and(esv.CURRENT.eq(true));
@@ -100,23 +146,23 @@ public class EntityStatisticSummaryDao {
         SelectHavingStep<Record3<Long, String, Integer>> aggregates = dsl
                 .select(esv.STATISTIC_ID, esv.OUTCOME, count().as("count"))
                 .from(esv)
-                .innerJoin(esd)
-                .on(esv.STATISTIC_ID.eq(esd.ID))
                 .where(dsl.renderInlined(condition))
                 .groupBy(esv.STATISTIC_ID, esv.OUTCOME);
 
-
-        // combine with definitions
-        return dsl.select(esd.fields())
-                .select(aggregates.fields())
-                .from(esd)
-                .innerJoin(aggregates)
-                .on(esd.ID.eq((Field<Long>) aggregates.field("statistic_id")))
-                .fetch()
-                .intoGroups(ENTITY_STATISTIC_DEFINITION.fields())
+        return aggregates.fetch()
+                .intoGroups(esv.STATISTIC_ID, r -> ImmutableStringTally.builder()
+                        .count(r.getValue(COUNT))
+                        .id(r.getValue(esv.OUTCOME))
+                        .build())
                 .entrySet()
                 .stream()
-                .map(TO_SUMMARY_MAPPER)
+                .map(entry -> ImmutableTallyPack.<String>builder()
+                        .entityReference(ImmutableEntityReference.builder()
+                                .kind(EntityKind.ENTITY_STATISTIC)
+                                .id(entry.getKey())
+                                .build())
+                        .tallies(entry.getValue())
+                        .build())
                 .collect(Collectors.toList());
     }
 

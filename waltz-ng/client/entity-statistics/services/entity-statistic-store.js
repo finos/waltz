@@ -9,7 +9,7 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-
+import _ from "lodash";
 
 export default [
     '$http',
@@ -25,9 +25,43 @@ export default [
             .post(`${BASE}/value/${statId}`, options)
             .then(r => r.data);
 
+        const findRelatedStatDefinitions = (statId) => $http
+            .get(`${BASE}/definition/${statId}/related`)
+            .then(r => r.data);
+
+        const findRelatedStatSummaries = (statId, options) => $http
+            .post(`${BASE}/summary/${statId}/related`, options)
+            .then(r => r.data);
+
+        const findStatTallies = (definitions, selector) => {
+
+            const statisticIds = _.isArray(definitions)
+                ? definitions
+                : _.chain([
+                        definitions.self,
+                        definitions.parent,
+                        ...definitions.siblings,
+                        ...definitions.children
+                    ])
+                    .filter(s => s != null)
+                    .map('id')
+                    .value();
+
+            const options = {
+                selector,
+                statisticIds
+            };
+            return $http
+                .post(`${BASE}/tally`, options)
+                .then(r => r.data);
+        };
+
         return {
             findSummaryStatsByIdSelector,
-            findStatValuesByIdSelector
+            findStatValuesByIdSelector,
+            findRelatedStatDefinitions,
+            findRelatedStatSummaries,
+            findStatTallies
         };
     }
 ];

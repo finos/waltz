@@ -1,5 +1,6 @@
 package com.khartec.waltz.service.entity_statistic;
 
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
@@ -8,8 +9,12 @@ import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
+import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticSummary;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
+import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchy;
+import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchyUtilities;
+import com.khartec.waltz.model.tally.TallyPack;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,10 +63,18 @@ public class EntityStatisticService {
     }
 
 
-    public List<EntityStatisticSummary> findRelatedStatsSummaries(long id, ApplicationIdSelectionOptions options) {
+    public ImmediateHierarchy<EntityStatisticSummary> findRelatedStatsSummaries(long id, ApplicationIdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = factory.apply(options);
+        List<EntityStatisticSummary> summaries = summaryDao.findRelated(id, appIdSelector);
+        ImmediateHierarchy<EntityStatisticSummary> relations = ImmediateHierarchyUtilities.build(id, summaries, s -> s.definition());
+        return relations;
+    }
 
-        return summaryDao.findRelated(id, appIdSelector);
+
+    public ImmediateHierarchy<EntityStatisticDefinition> findRelatedStatDefinitions(long id) {
+        List<EntityStatisticDefinition> defs = definitionDao.findRelated(id);
+        ImmediateHierarchy<EntityStatisticDefinition> relations = ImmediateHierarchyUtilities.build(id, defs);
+        return relations;
     }
 
 
@@ -77,4 +90,12 @@ public class EntityStatisticService {
         return valueDao.getStatisticValuesForAppIdSelector(statisticId, appIdSelector);
     }
 
+
+    public List<TallyPack<String>> findStatTallies(List<Long> statisticIds, ApplicationIdSelectionOptions options) {
+        Checks.checkNotNull(statisticIds, "statisticIds cannot be null");
+        Checks.checkNotNull(options, "options cannot be null");
+
+        Select<Record1<Long>> appIdSelector = factory.apply(options);
+        return summaryDao.findStatTallies(statisticIds, appIdSelector);
+    }
 }

@@ -1,70 +1,55 @@
 import _ from "lodash";
-import {variableScale} from "../../common/colors";
 
 
 const initData = {
+    statistic: {
+        definition: null,
+        summary: null,
+        values: []
+    },
+    relatedDefinitions: null,
+    summaries: [],
+    navItems: [],
+    selectedNavItem: null
 };
-
-
-const PIE_SIZE = 120;
-
-
-function mkStatChartData(counts, onSelect) {
-    return {
-        config: {
-            colorProvider: (d) => variableScale(d.data.key),
-            labelProvider: d => d.key,
-            onSelect,
-            size: PIE_SIZE
-        },
-        data: _.chain(counts)
-            .map(c => ({ key: c.id, count: c.count }))
-            .value()
-    };
-}
-
-
-function setupPie(stats, statId, onSelect) {
-    const stat = _.find(stats, { definition: {id : statId } });
-    return mkStatChartData(stat.counts, onSelect);
-}
 
 
 function controller(orgUnitStore, entityStatisticStore) {
 
     const vm = Object.assign(this, initData);
+    const statId = 34;
 
 
-    const statId = 31;
-
-    const pieClickHandler = d => {
-        vm.selectedPieSegment = d;
-    };
+    entityStatisticStore
+        .findRelatedStatDefinitions(statId)
+        .then(ds => vm.relatedDefinitions = ds)
+        .then(ds => vm.statistic.definition = ds.self);
 
     orgUnitStore
         .findAll()
-        .then(xs => vm.orgUnits = xs);
+        .then(xs => vm.navItems = xs)
+        .then(() => /* boot */ vm.onSelectNavItem(_.find(vm.navItems, { id: 140 })));
 
-    vm.onSelectOrgUnit = (ou) => {
-        vm.selectedOrgUnit = ou;
+    vm.onSelectNavItem = (navItem) => {
+        vm.selectedNavItem = navItem;
         const selector = {
             scope: 'CHILDREN',
             entityReference: {
-                id: ou.id,
+                id: navItem.id,
                 kind: 'ORG_UNIT'
             }
         };
+
         entityStatisticStore
-            .findSummaryStatsByIdSelector(selector)
-            .then(stats => vm.entityStatisticsSummary = stats)
-            .then(stats => vm.pie = setupPie(stats, statId, pieClickHandler));
+            .findStatTallies(vm.relatedDefinitions, selector)
+            .then(summaries => vm.summaries = summaries)
+            .then(summaries => vm.statistic.summary = _.find(summaries, { entityReference: { id: statId }}))
 
         entityStatisticStore
             .findStatValuesByIdSelector(statId, selector)
-            .then(stats => vm.entityStatisticValues = stats);
+            .then(stats => vm.statistic.values = stats);
     };
 
-    vm.jumpOrgUnit = () => vm.onSelectOrgUnit(_.find(vm.orgUnits, { id: 140 }));
 }
 
 

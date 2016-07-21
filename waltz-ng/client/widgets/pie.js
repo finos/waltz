@@ -41,7 +41,7 @@ const defaultOnSelect = (d) => console.log("pie.onSelect default handler: ", d);
 const DEFAULT_SIZE = 70;
 
 
-function renderArcs(holder, config, data, onSelect, selectedSegmentKey) {
+function renderArcs(holder, config, data, onSelect) {
 
     const {
         colorProvider,
@@ -78,7 +78,9 @@ function renderArcs(holder, config, data, onSelect, selectedSegmentKey) {
     arcs.enter()
         .append('path')
         .classed('arc clickable', true)
-        .on('click', d => onSelect(d.data));
+        .on('click', d => onSelect(d.data))
+        .append('title')
+        .text(d => `${d.data.key} - ${d.data.count}`);
 
     arcs.attr({
         fill: d => colorProvider(d).brighter(),
@@ -112,7 +114,7 @@ function renderArcs(holder, config, data, onSelect, selectedSegmentKey) {
 }
 
 
-function render(svg, config, data, onSelect, selectedSegmentKey) {
+function render(svg, config, data, onSelect) {
     const { size = DEFAULT_SIZE } = config;
     const width = size;
     const height = size;
@@ -130,20 +132,21 @@ function render(svg, config, data, onSelect, selectedSegmentKey) {
     mainGroup
         .attr('transform', `translate(${width / 2},${height / 2})`);
 
-    renderArcs(mainGroup, config, data, onSelect, selectedSegmentKey);
+    renderArcs(mainGroup, config, data, onSelect);
 }
 
 
 function controller($element, $scope) {
     const vizElem = $element[0].querySelector('.waltz-pie');
+
     const svg = d3.select(vizElem).append('svg');
+
     const vm = this;
 
     vm.$onChanges = (changes) => {
         if (vm.data && vm.config && changes.data) {
             const onSelectFn = vm.config.onSelect || defaultOnSelect;
             const onSelect = (d) => $scope.$apply(() => onSelectFn(d));
-
             render(svg, vm.config, vm.data, onSelect);
         }
 
@@ -152,7 +155,6 @@ function controller($element, $scope) {
                 .classed('wp-selected', d => {
                     return d.data.key === vm.selectedSegmentKey;
                 });
-
         }
     };
 
@@ -169,7 +171,7 @@ controller.$inject = [
 const component = {
     bindings,
     controller,
-    template: '<span><span class="waltz-pie"></span></span>'
+    template: require('./pie.html')
 };
 
 

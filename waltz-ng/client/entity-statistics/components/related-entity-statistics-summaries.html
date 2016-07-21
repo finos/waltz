@@ -1,0 +1,57 @@
+<div class="row">
+    <div class="col-md-3" ng-if="$ctrl.chartSummaries.parent">
+        <h4>
+            <span ng-bind="$ctrl.chartSummaries.parent.name"></span>
+            <small>Parent</small>
+            <a class='pull-right clickable'
+               title="Refocus on this statistic"
+               ng-click="$ctrl.goToStatistic($ctrl.chartSummaries.parent)">
+                &raquo;
+            </a>
+        </h4>
+        <waltz-pie-table data="$ctrl.chartSummaries.parent.pie.data"
+                         config="$ctrl.chartSummaries.parent.pie.config"
+                         title="{{$ctrl.chartSummaries.parent.definition.name}}"
+                         sub-title="{{$ctrl.chartSummaries.parent.definition.category | toDisplayName:'entityStatistic'}}">
+        </waltz-pie-table>
+    </div>
+
+    <div class="col-md-3" ng-repeat="sibling in $ctrl.chartSummaries.siblings">
+        <h4>
+            <span ng-bind="sibling.name"></span>
+            <small>Child</small>
+            <a class='pull-right clickable'
+               title="Refocus on this statistic"
+               ng-click="$ctrl.goToStatistic(sibling)">
+                &raquo;
+            </a>
+        </h4>
+        <waltz-pie-table data="sibling.pie.data"
+                         config="sibling.pie.config"
+                         title="{{sibling.definition.name}}"
+                         sub-title="{{sibling.definition.category | toDisplayName:'entityStatistic'}}">
+        </waltz-pie-table>
+
+    </div>
+
+    <div class="col-md-3" ng-repeat="child in $ctrl.chartSummaries.children">
+        <h4>
+            <span ng-bind="child.name"></span>
+            <small>Child</small>
+            <a class='pull-right clickable'
+               title="Refocus on this statistic"
+               ng-click="$ctrl.goToStatistic(child)">
+                &raquo;
+            </a>
+        </h4>
+
+        <waltz-pie-table data="child.pie.data"
+                         config="child.pie.config"
+                         title="{{child.definition.name}}"
+                         sub-title="{{child.definition.category | toDisplayName:'entityStatistic'}}">
+        </waltz-pie-table>
+
+
+    </div>
+
+</div>

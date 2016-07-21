@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
@@ -24,6 +25,8 @@ import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.application.HierarchyQueryScope;
 import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticSummary;
+import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchy;
+import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import org.jooq.DSLContext;
@@ -48,20 +51,20 @@ public class EntityStatisticHarness {
         EntityStatisticService service = ctx.getBean(EntityStatisticService.class);
 
 
+        long CTO = 40;
+        long OPS = 140;
         ApplicationIdSelectionOptions options = ImmutableApplicationIdSelectionOptions.builder()
                 .entityReference(ImmutableEntityReference
                         .builder()
                         .kind(EntityKind.ORG_UNIT)
-                        .id(40)
+                        .id(OPS)
                         .build())
                 .scope(HierarchyQueryScope.CHILDREN)
                 .build();
 
 
-        List<EntityStatisticSummary> statisticsForAppIdSelector = service.findStatsSummariesForAppIdSelector(options);
-        List<EntityStatisticSummary> related = service.findRelatedStatsSummaries(34, options);
-//        List<EntityStatisticValue> statisticValuesForAppIdSelector = service.getStatisticValuesForAppIdSelector(6, options);
-
+        ImmediateHierarchy<EntityStatisticSummary> hier = service.findRelatedStatsSummaries(34L, options);
+        List<TallyPack<String>> statTallies = service.findStatTallies(ListUtilities.newArrayList(31L, 34L), options);
 
         System.out.println("done");
     }

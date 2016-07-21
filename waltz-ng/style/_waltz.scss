@@ -184,6 +184,13 @@ textarea {
     @include waltz-box-shadow();
 }
 
+.waltz-page-summary-attach {
+    margin-top: -14px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+
 
 .waltz-side-nav-help {
   @extend small;

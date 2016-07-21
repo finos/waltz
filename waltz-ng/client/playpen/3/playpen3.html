@@ -9,44 +9,36 @@
         </ol>
     </waltz-page-header>
 
-    <waltz-section name="Caps">
-
+    <waltz-section name="Foo">
         <div class="row">
             <div class="col-md-8">
-                <div class="row">
-                    <div class="col-md-3 text-center">
-                        <waltz-pie data="ctrl.pie.data"
-                                   selected-segment-key="ctrl.selectedPieSegment.key"
-                                   config="ctrl.pie.config">
-                        </waltz-pie>
-                    </div>
-                    <div class="col-md-9">
-                        <waltz-pie-segment-table data="ctrl.pie.data"
-                                                 selected-segment-key="ctrl.selectedPieSegment.key"
-                                                 config="ctrl.pie.config">
-                        </waltz-pie-segment-table>
-                    </div>
-                </div>
-
-
-                <waltz-entity-statistics-detail-table statistic-values="ctrl.entityStatisticValues"
-                                                      filter-outcome="ctrl.selectedPieSegment.key">
-                </waltz-entity-statistics-detail-table>
-
+                <waltz-entity-statistic-detail-panel definition='ctrl.statistic.definition'
+                                                     summary="ctrl.statistic.summary"
+                                                     values="ctrl.statistic.values">
+                </waltz-entity-statistic-detail-panel>
             </div>
             <div class="col-md-4">
-                <waltz-entity-hierarchy-navigator model="ctrl.orgUnits"
-                                                  selected-node="ctrl.selectedOrgUnit"
-                                                  on-select="ctrl.onSelectOrgUnit">
+                <waltz-entity-hierarchy-navigator model="ctrl.navItems"
+                                                  selected-node="ctrl.selectedNavItem"
+                                                  on-select="ctrl.onSelectNavItem">
                 </waltz-entity-hierarchy-navigator>
-                <button ng-click="ctrl.jumpOrgUnit()">Jump</button>
             </div>
+
         </div>
     </waltz-section>
 
-    <waltz-entity-statistic-summary-section name="Indicators"
-                                            entity-statistics="ctrl.entityStatisticsSummary">
-    </waltz-entity-statistic-summary-section>
+
+
+    <waltz-section name="Related">
+        <waltz-related-entity-statistics-summaries definitions='ctrl.relatedDefinitions'
+                                                   summaries="ctrl.summaries">
+
+        </waltz-related-entity-statistics-summaries>
+
+    </waltz-section>
+    <!--<waltz-entity-statistic-summary-section name="Indicators"-->
+                                            <!--entity-statistics="ctrl.entityStatisticsSummary">-->
+    <!--</waltz-entity-statistic-summary-section>-->
 
 
 

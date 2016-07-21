@@ -17,19 +17,27 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticSummary;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
+import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchy;
+import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import com.khartec.waltz.web.json.EntityStatisticQueryOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
+
+import java.io.IOException;
+import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readOptionsFromBody;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -47,20 +55,43 @@ public class EntityStatisticEndpoint implements Endpoint {
     }
 
 
+    public EntityStatisticQueryOptions readQueryOptionsFromBody(Request request) throws java.io.IOException {
+        return readBody(request, EntityStatisticQueryOptions.class);
+    }
+
+
+    private List<TallyPack<String>> findStatTalliesRoute(Request request, Response response) throws IOException {
+        EntityStatisticQueryOptions options = readQueryOptionsFromBody(request);
+        return entityStatisticService.findStatTallies(options.statisticIds(), options.selector());
+    }
+
+
     @Override
     public void register() {
 
-        String findStatsSummariesForAppSelectorPath = mkPath(BASE_URL, "summary");
-        String findStatValuesForAppSelectorPath = mkPath(BASE_URL, "value", ":statId");
+        String findStatsSummariesBySelectorPath = mkPath(BASE_URL, "summary");
+        String findRelatedStatDefinitionsPath = mkPath(BASE_URL, "definition" , ":statId", "related");
+        String findRelatedStatSummariesPath = mkPath(BASE_URL, "summary" , ":statId", "related");
+        String findStatValuesBySelectorPath = mkPath(BASE_URL, "value", ":statId");
+        String findStatTalliesPath = mkPath(BASE_URL, "tally");
 
         ListRoute<EntityStatisticSummary> findStatsSummariesForAppSelectorRoute = (request, response)
                 -> entityStatisticService.findStatsSummariesForAppIdSelector(readOptionsFromBody(request));
 
         ListRoute<EntityStatisticValue> findStatValuesForAppSelectorRoute = (request, response)
-                -> entityStatisticService.getStatisticValuesForAppIdSelector(WebUtilities.getLong(request, "statId"), readOptionsFromBody(request));
+                -> entityStatisticService.getStatisticValuesForAppIdSelector(getLong(request, "statId"), readOptionsFromBody(request));
 
-        postForList(findStatsSummariesForAppSelectorPath, findStatsSummariesForAppSelectorRoute);
-        postForList(findStatValuesForAppSelectorPath, findStatValuesForAppSelectorRoute);
+        DatumRoute<ImmediateHierarchy<EntityStatisticDefinition>> findRelatedStatDefinitionsRoute = (request, response)
+                -> entityStatisticService.findRelatedStatDefinitions(getLong(request, "statId"));
+
+        DatumRoute<ImmediateHierarchy<EntityStatisticSummary>> findRelatedStatSummariesRoute = (request, response)
+                -> entityStatisticService.findRelatedStatsSummaries(getLong(request, "statId"), readOptionsFromBody(request));
+
+        postForList(findStatsSummariesBySelectorPath, findStatsSummariesForAppSelectorRoute);
+        postForList(findStatValuesBySelectorPath, findStatValuesForAppSelectorRoute);
+        postForList(findStatTalliesPath, this::findStatTalliesRoute);
+        postForDatum(findRelatedStatSummariesPath, findRelatedStatSummariesRoute);
+        getForDatum(findRelatedStatDefinitionsPath, findRelatedStatDefinitionsRoute);
     }
 
 }

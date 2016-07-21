@@ -1,0 +1,54 @@
+<div>
+
+    <waltz-page-header name="{{ ctrl.statistic.definition.name }}"
+                       small="Indicator"
+                       icon="pie-chart">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>
+                <a ng-click="ctrl.goToParent()"
+                   class="clickable"
+                   ng-bind="ctrl.selectedNavItem.name">
+                </a>
+            </li>
+            <li>Indicators</li>
+            <li ng-bind="ctrl.statistic.definition.name"></li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-md-8" style="border-right: 1px solid #eee">
+
+                <waltz-entity-statistic-detail-panel definition='ctrl.statistic.definition'
+                                                     summary="ctrl.statistic.summary"
+                                                     values="ctrl.statistic.values">
+                </waltz-entity-statistic-detail-panel>
+
+
+            </div>
+            <div class="col-md-4" >
+                <waltz-entity-hierarchy-navigator model="ctrl.navItems"
+                                                  selected-node="ctrl.selectedNavItem"
+                                                  on-select="ctrl.onSelectNavItem">
+                </waltz-entity-hierarchy-navigator>
+            </div>
+
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Related Indicators</h3>
+                <waltz-related-entity-statistics-summaries definitions='ctrl.relatedDefinitions'
+                                                           parent-ref="ctrl.parentRef"
+                                                           summaries="ctrl.summaries">
+
+                </waltz-related-entity-statistics-summaries>
+            </div>
+        </div>
+
+    </div>
+
+</div>

@@ -5,9 +5,7 @@ import com.khartec.waltz.model.StatisticType;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticDefinition;
 import com.khartec.waltz.schema.tables.records.EntityStatisticDefinitionRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -16,16 +14,12 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
-import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 
 @Repository
 public class EntityStatisticDefinitionDao {
 
-    private static final com.khartec.waltz.schema.tables.EntityStatisticDefinition es = ENTITY_STATISTIC_DEFINITION.as("es");
-    private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
-    private static final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
+    private static final com.khartec.waltz.schema.tables.EntityStatisticDefinition esd = ENTITY_STATISTIC_DEFINITION.as("esd");
 
     public static final RecordMapper<? super Record, EntityStatisticDefinition> TO_DEFINITION_MAPPER = r -> {
         EntityStatisticDefinitionRecord record = r.into(ENTITY_STATISTIC_DEFINITION);
@@ -61,9 +55,6 @@ public class EntityStatisticDefinitionDao {
     };
 
 
-
-
-
     private final DSLContext dsl;
 
 
@@ -73,6 +64,7 @@ public class EntityStatisticDefinitionDao {
         this.dsl = dsl;
     }
 
+
     public boolean insert(EntityStatisticDefinition entityStatistic) {
         checkNotNull(entityStatistic, "entityStatistic cannot be null");
         return dsl.executeInsert(TO_RECORD_MAPPER.apply(entityStatistic)) == 1;
@@ -80,8 +72,31 @@ public class EntityStatisticDefinitionDao {
 
 
     public List<EntityStatisticDefinition> getAllDefinitions() {
-        return dsl.select(es.fields())
-                .from(es)
+        return dsl.select(esd.fields())
+                .from(esd)
+                .fetch(TO_DEFINITION_MAPPER);
+    }
+
+
+    public List<EntityStatisticDefinition> findRelated(long id) {
+        Condition findSelf = esd.ID.eq(id);
+        Condition findChildren = esd.PARENT_ID.eq(id);
+
+        SelectConditionStep<Record1<Long>> parentIdSelector = dsl
+                .select(esd.PARENT_ID)
+                .from(esd)
+                .where(findSelf);
+
+        Condition findParent = esd.ID.eq(parentIdSelector);
+        Condition findSiblings = esd.PARENT_ID.eq(parentIdSelector);
+
+        return dsl.select(esd.fields())
+                .from(esd)
+                .where(findChildren
+                        .or(findSelf)
+                        .or(findParent)
+                        .or(findSiblings)
+                )
                 .fetch(TO_DEFINITION_MAPPER);
     }
 
