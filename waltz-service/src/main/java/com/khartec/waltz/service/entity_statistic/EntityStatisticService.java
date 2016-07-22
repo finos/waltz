@@ -10,7 +10,6 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticSummary;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
 import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchy;
 import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchyUtilities;
@@ -60,14 +59,6 @@ public class EntityStatisticService {
         Select<Record1<Long>> appIdSelector = factory.apply(options);
 
         return definitionDao.findForAppIdSelector(appIdSelector);
-    }
-
-
-    public ImmediateHierarchy<EntityStatisticSummary> findRelatedStatsSummaries(long id, ApplicationIdSelectionOptions options) {
-        Select<Record1<Long>> appIdSelector = factory.apply(options);
-        List<EntityStatisticSummary> summaries = summaryDao.findRelated(id, appIdSelector);
-        ImmediateHierarchy<EntityStatisticSummary> relations = ImmediateHierarchyUtilities.build(id, summaries, s -> s.definition());
-        return relations;
     }
 
 

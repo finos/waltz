@@ -18,7 +18,6 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticSummary;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
 import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchy;
 import com.khartec.waltz.model.tally.TallyPack;
@@ -37,7 +36,8 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -71,7 +71,6 @@ public class EntityStatisticEndpoint implements Endpoint {
 
         String findStatsDefinitionsBySelectorPath = mkPath(BASE_URL, "definition");
         String findRelatedStatDefinitionsPath = mkPath(BASE_URL, "definition" , ":statId", "related");
-        String findRelatedStatSummariesPath = mkPath(BASE_URL, "summary" , ":statId", "related");
         String findStatValuesBySelectorPath = mkPath(BASE_URL, "value", ":statId");
         String findStatTalliesPath = mkPath(BASE_URL, "tally");
 
@@ -84,13 +83,9 @@ public class EntityStatisticEndpoint implements Endpoint {
         DatumRoute<ImmediateHierarchy<EntityStatisticDefinition>> findRelatedStatDefinitionsRoute = (request, response)
                 -> entityStatisticService.findRelatedStatDefinitions(getLong(request, "statId"));
 
-        DatumRoute<ImmediateHierarchy<EntityStatisticSummary>> findRelatedStatSummariesRoute = (request, response)
-                -> entityStatisticService.findRelatedStatsSummaries(getLong(request, "statId"), readOptionsFromBody(request));
-
         postForList(findStatsDefinitionsBySelectorPath, findStatsDefinitionsForAppIdSelector);
         postForList(findStatValuesBySelectorPath, findStatValuesForAppSelectorRoute);
         postForList(findStatTalliesPath, this::findStatTalliesRoute);
-        postForDatum(findRelatedStatSummariesPath, findRelatedStatSummariesRoute);
         getForDatum(findRelatedStatDefinitionsPath, findRelatedStatDefinitionsRoute);
     }
 

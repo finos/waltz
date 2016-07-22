@@ -42,10 +42,6 @@ function store($http, BaseApiUrl) {
         .get(`${BASE}/definition/${statId}/related`)
         .then(r => r.data);
 
-    const findRelatedStatSummaries = (statId, options) => $http
-        .post(`${BASE}/summary/${statId}/related`, options)
-        .then(r => r.data);
-
     const findStatTallies = (definitions, selector) => {
 
         const statisticIds = _.isArray(definitions)
@@ -66,7 +62,6 @@ function store($http, BaseApiUrl) {
         findStatsDefinitionsByIdSelector,
         findStatValuesByIdSelector,
         findRelatedStatDefinitions,
-        findRelatedStatSummaries,
         findStatTallies
     };
 }
