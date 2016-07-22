@@ -38,7 +38,10 @@ function controller($state) {
     const vm = this;
 
     vm.$onChanges = () => {
-        vm.pie = mkStatChartData(vm.summary ? vm.summary.tallies : []);
+        const tallies = vm.summary
+            ? vm.summary.tallies
+            : [];
+        vm.pie = mkStatChartData(tallies);
     };
 
     vm.goToStatistic = (definition) => {
@@ -47,9 +50,12 @@ function controller($state) {
             kind: vm.parentRef.kind,
             statId: definition.id
         };
-        $state.go(
-            "main.entity-statistic.view",
-            (params));
+
+        const stateName = vm.parentRef.kind === 'PERSON'
+            ? "main.entity-statistic.view-person"
+            : "main.entity-statistic.view";
+
+        $state.go(stateName, params);
     };
 }
 

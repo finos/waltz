@@ -3,7 +3,12 @@ const baseState = {
 };
 
 
-const viewState = {
+const personViewState = {
+    url: '/PERSON/{id:string}/{statId:int}',
+    views: { 'content@': require('./person-entity-statistic-view') }
+};
+
+const genericViewState = {
     url: '/{kind:string}/{id:int}/{statId:int}',
     views: { 'content@': require('./entity-statistic-view') }
 };
@@ -12,7 +17,8 @@ const viewState = {
 function setupRoutes($stateProvider) {
     $stateProvider
         .state('main.entity-statistic', baseState)
-        .state('main.entity-statistic.view', viewState)
+        .state('main.entity-statistic.view-person', personViewState)
+        .state('main.entity-statistic.view', genericViewState);
 }
 
 setupRoutes.$inject = ['$stateProvider'];
