@@ -6,7 +6,7 @@
             <li><a ui-sref="main">Home</a></li>
             <li>
                 <a ui-sref="main.person.view ({ empId: ctrl.person.employeeId })"
-                   ng-bind="ctrl.person.name">
+                   ng-bind="ctrl.person.displayName">
                 </a>
             </li>
             <li>Indicators</li>
@@ -32,14 +32,59 @@
                     <span ng-bind="ctrl.parentRef.kind | toDisplayName:'entity'"></span>
                     <small>Selector</small>
                 </h4>
-                <waltz-entity-hierarchy-navigator model="ctrl.navItems"
-                                                  selected-node="ctrl.selectedNavItem"
-                                                  on-select="ctrl.onSelectNavItem">
-                </waltz-entity-hierarchy-navigator>
+
+                <table class="table table-condensed small">
+                    <!-- MANAGERS -->
+                    <tbody ng-if="ctrl.managers.length > 0">
+                    <tr ng-repeat="manager in ctrl.managers">
+                        <td>
+                            <span ng-if="$first">
+                                Managers
+                            </span>
+                        </td>
+                        <td>
+                            <a ng-click="ctrl.onSelectPerson(manager)"
+                               class="clickable">
+                                <span ng-bind="manager.displayName"></span>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <!-- PEERS -->
+                    <tbody ng-if="ctrl.peers.length > 0">
+                    <tr ng-repeat="peer in ctrl.peers">
+                        <td>
+                            <a ng-click="ctrl.onSelectPerson(peer)"
+                               class="clickable">
+                                <span ng-if="$first">
+                                    Peers
+                                </span>
+                            </a>
+                        </td>
+                        <td>
+                            <span ng-bind="peer.displayName"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <!-- DIRECTS -->
+                    <tbody ng-if="ctrl.directs.length > 0">
+                    <tr ng-repeat="direct in ctrl.directs">
+                        <td>
+                            <span ng-if="$first">Directs</span>
+                        </td>
+                        <td>
+                            <a ng-click="ctrl.onSelectPerson(direct)"
+                               class="clickable">
+                                <span ng-bind="direct.displayName"></span>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
 
                 <p class="waltz-paragraph small text-muted"
                    style="padding-top: 12px">
-                    Use the navigational tree above to select a vantage point to view
+                    Select a person listed above to change the vantage point you are viewing
                     this statistic from.
                 </p>
             </div>

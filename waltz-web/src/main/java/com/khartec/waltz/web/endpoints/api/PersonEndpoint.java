@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
@@ -37,6 +38,7 @@ public class PersonEndpoint implements Endpoint {
     private static final String MANAGERS_PATH = mkPath(BASE_URL, "employee-id", ":empId", "managers");
     private static final String BY_EMPLOYEE_PATH = mkPath(BASE_URL, "employee-id", ":empId");
     private static final String FIND_BY_USERID_PATH = mkPath(BASE_URL, "user-id", ":userId");
+    private static final String GET_BY_ID = mkPath(BASE_URL, "id", ":id");
 
     private final PersonService service;
 
@@ -68,6 +70,9 @@ public class PersonEndpoint implements Endpoint {
             String empId = request.params("empId");
             return service.getByEmployeeId(empId);
         });
+
+        getForDatum(GET_BY_ID, (request, response) ->
+                service.getById(getId(request)));
 
         getForDatum(FIND_BY_USERID_PATH, ((request, response) ->
                 service.findPersonByUserId(request.params("userId"))));

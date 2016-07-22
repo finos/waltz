@@ -29,7 +29,6 @@ function controller($scope,
     viewService
         .load(employeeId);
 
-    vm.entityRef = { kind: 'PERSON', employeeId };
 
     $scope.$watch(() => viewService.state.model, () => {
         const model = viewService.state.model;
@@ -37,6 +36,7 @@ function controller($scope,
 
         if (model.person) {
             historyStore.put(model.person.displayName, 'PERSON', 'main.person.view', { empId: model.person.employeeId });
+            vm.entityRef = { kind: 'PERSON', id: model.person.id };
         }
 
         vm.hasAppInvolvements = hasInvolvements(model.appInvolvements);

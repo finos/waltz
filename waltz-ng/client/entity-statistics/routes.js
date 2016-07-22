@@ -4,7 +4,7 @@ const baseState = {
 
 
 const personViewState = {
-    url: '/PERSON/{id:string}/{statId:int}',
+    url: '/PERSON/{id:int}/{statId:int}',
     views: { 'content@': require('./person-entity-statistic-view') }
 };
 
