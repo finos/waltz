@@ -35,9 +35,9 @@ function controller() {
     };
 
     vm.$onChanges = () => {
-        if (vm.definition && vm.summary) {
-            vm.pie = mkStatChartData(vm.summary.tallies, pieClickHandler)
-        }
+        vm.pie = mkStatChartData(
+            vm.summary ? vm.summary.tallies : [],
+            pieClickHandler);
     }
 }
 

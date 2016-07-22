@@ -19,7 +19,8 @@
 
         <div class="row">
             <!-- SUMMARY -->
-            <div class="col-md-8" style="border-right: 1px solid #eee">
+            <div class="col-md-8"
+                 style="border-right: 2px solid #eee">
                 <waltz-entity-statistic-detail-panel definition='ctrl.statistic.definition'
                                                      summary="ctrl.statistic.summary"
                                                      values="ctrl.statistic.values">
@@ -30,7 +31,7 @@
             <div class="col-md-4" >
                 <h4>
                     <span ng-bind="ctrl.parentRef.kind | toDisplayName:'entity'"></span>
-                    <small>Hierarchy</small>
+                    <small>Selector</small>
                 </h4>
                 <waltz-entity-hierarchy-navigator model="ctrl.navItems"
                                                   selected-node="ctrl.selectedNavItem"

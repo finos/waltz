@@ -1,12 +1,15 @@
 
 
-function utils(capabilityStore, orgUnitStore, processStore) {
+function utils(appGroupStore, capabilityStore, orgUnitStore, processStore) {
 
     const findAllForKind = (kind) => {
-        let promise = null;
         switch (kind) {
+            case 'APP_GROUP':
+                return appGroupStore
+                    .findMyGroupSubscriptions()
+                    .then(gs => _.map(gs, 'appGroup'));
             case 'ORG_UNIT':
-                return orgUnitStore.findAll()
+                return orgUnitStore.findAll();
             case 'CAPABILITY':
                 return capabilityStore.findAll();
             case 'PROCESS':
@@ -23,6 +26,7 @@ function utils(capabilityStore, orgUnitStore, processStore) {
 
 
 utils.$inject = [
+    'AppGroupStore',
     'CapabilityStore',
     'OrgUnitStore',
     'ProcessStore'
