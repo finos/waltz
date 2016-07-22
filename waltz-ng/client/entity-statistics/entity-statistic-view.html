@@ -1,7 +1,4 @@
 <div>
-
-
-
     <waltz-page-header name="{{ ctrl.statistic.definition.name }}"
                        small="Indicator"
                        icon="pie-chart">
@@ -19,16 +16,17 @@
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <div class="row">
-            <div class="col-md-8" style="border-right: 1px solid #eee">
 
+        <div class="row">
+            <!-- SUMMARY -->
+            <div class="col-md-8" style="border-right: 1px solid #eee">
                 <waltz-entity-statistic-detail-panel definition='ctrl.statistic.definition'
                                                      summary="ctrl.statistic.summary"
                                                      values="ctrl.statistic.values">
                 </waltz-entity-statistic-detail-panel>
-
-
             </div>
+
+            <!-- NAV -->
             <div class="col-md-4" >
                 <h4>
                     <span ng-bind="ctrl.parentRef.kind | toDisplayName:'entity'"></span>
@@ -38,6 +36,12 @@
                                                   selected-node="ctrl.selectedNavItem"
                                                   on-select="ctrl.onSelectNavItem">
                 </waltz-entity-hierarchy-navigator>
+
+                <p class="waltz-paragraph small text-muted"
+                   style="padding-top: 12px">
+                    Use the navigational tree above to select a vantage point to view
+                    this statistic from.
+                </p>
             </div>
 
         </div>
@@ -45,16 +49,15 @@
         <hr>
 
         <div class="row">
+            <!-- RELATED -->
             <div class="col-md-12">
                 <h3>Related Indicators</h3>
                 <waltz-related-entity-statistics-summaries definitions='ctrl.relatedDefinitions'
                                                            parent-ref="ctrl.parentRef"
                                                            summaries="ctrl.summaries">
-
                 </waltz-related-entity-statistics-summaries>
             </div>
         </div>
-
 
     </div>
 

@@ -9,13 +9,14 @@ const bindings = {
     summary: '<'
 };
 
+
 const template = require('./entity-statistic-summary-card.html');
 
 
 const PIE_SIZE = 100;
 
 
-function mkStatChartData(counts) {
+function mkStatChartData(counts = []) {
     return {
         config: {
             colorProvider: (d) => variableScale(d.data.key),
@@ -23,7 +24,10 @@ function mkStatChartData(counts) {
             size: PIE_SIZE
         },
         data: _.chain(counts)
-            .map(c => ({ key: c.id, count: c.count }))
+            .map(c => ({
+                key: c.id,
+                count: c.count
+            }))
             .value()
     };
 }
@@ -34,9 +38,7 @@ function controller($state) {
     const vm = this;
 
     vm.$onChanges = () => {
-        if (vm.summary) {
-            vm.pie = mkStatChartData(vm.summary.tallies);
-        }
+        vm.pie = mkStatChartData(vm.summary ? vm.summary.tallies : []);
     };
 
     vm.goToStatistic = (definition) => {
@@ -45,7 +47,9 @@ function controller($state) {
             kind: vm.parentRef.kind,
             statId: definition.id
         };
-        $state.go("main.entity-statistic.view", (params))
+        $state.go(
+            "main.entity-statistic.view",
+            (params));
     };
 }
 
