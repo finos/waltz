@@ -17,16 +17,13 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.application.HierarchyQueryScope;
 import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticSummary;
-import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchy;
-import com.khartec.waltz.model.tally.TallyPack;
+import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import org.jooq.DSLContext;
@@ -63,8 +60,10 @@ public class EntityStatisticHarness {
                 .build();
 
 
-        ImmediateHierarchy<EntityStatisticSummary> hier = service.findRelatedStatsSummaries(34L, options);
-        List<TallyPack<String>> statTallies = service.findStatTallies(ListUtilities.newArrayList(31L, 34L), options);
+//        ImmediateHierarchy<EntityStatisticSummary> hier = service.findRelatedStatsSummaries(34L, options);
+//        List<TallyPack<String>> statTallies = service.findStatTallies(ListUtilities.newArrayList(31L, 34L), options);
+
+        List<EntityStatisticDefinition> statsDefinitionsForAppIdSelector = service.findStatsDefinitionsForAppIdSelector(options);
 
         System.out.println("done");
     }

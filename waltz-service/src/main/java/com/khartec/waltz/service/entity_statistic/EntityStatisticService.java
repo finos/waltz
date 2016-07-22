@@ -56,10 +56,10 @@ public class EntityStatisticService {
     }
 
 
-    public List<EntityStatisticSummary> findStatsSummariesForAppIdSelector(ApplicationIdSelectionOptions options) {
+    public List<EntityStatisticDefinition> findStatsDefinitionsForAppIdSelector(ApplicationIdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = factory.apply(options);
 
-        return summaryDao.findForAppIdSelector(appIdSelector);
+        return definitionDao.findForAppIdSelector(appIdSelector);
     }
 
 

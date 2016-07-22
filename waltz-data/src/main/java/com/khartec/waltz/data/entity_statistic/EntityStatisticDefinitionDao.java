@@ -1,5 +1,6 @@
 package com.khartec.waltz.data.entity_statistic;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.StatisticCategory;
 import com.khartec.waltz.model.StatisticType;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
@@ -15,11 +16,13 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
+import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 
 @Repository
 public class EntityStatisticDefinitionDao {
 
     private static final com.khartec.waltz.schema.tables.EntityStatisticDefinition esd = ENTITY_STATISTIC_DEFINITION.as("esd");
+    private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
 
     public static final RecordMapper<? super Record, EntityStatisticDefinition> TO_DEFINITION_MAPPER = r -> {
         EntityStatisticDefinitionRecord record = r.into(ENTITY_STATISTIC_DEFINITION);
@@ -78,6 +81,13 @@ public class EntityStatisticDefinitionDao {
     }
 
 
+    public List<EntityStatisticDefinition> findForAppIdSelector(Select<Record1<Long>> appIdSelector) {
+        return find(
+                dsl.select(esd.ID).where(esd.PARENT_ID.isNull()),
+                appIdSelector);
+    }
+
+
     public List<EntityStatisticDefinition> findRelated(long id) {
         Condition findSelf = esd.ID.eq(id);
         Condition findChildren = esd.PARENT_ID.eq(id);
@@ -97,6 +107,28 @@ public class EntityStatisticDefinitionDao {
                         .or(findParent)
                         .or(findSiblings)
                 )
+                .fetch(TO_DEFINITION_MAPPER);
+    }
+
+
+    private List<EntityStatisticDefinition> find(SelectConditionStep<Record1<Long>> statSelector,
+                                              Select<Record1<Long>> appIdSelector) {
+        checkNotNull(appIdSelector, "appIdSelector cannot be null");
+
+        // aggregate query
+        Condition condition = esd.ACTIVE.eq(true)
+                .and(esd.ID.in(statSelector))
+                .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(esv.ENTITY_ID.in(appIdSelector))
+                .and(esv.CURRENT.eq(true));
+
+
+        // combine with definitions
+        return dsl.selectDistinct(esd.fields())
+                .from(esd)
+                .join(esv)
+                .on(esd.ID.eq(esv.STATISTIC_ID))
+                .where(dsl.renderInlined(condition))
                 .fetch(TO_DEFINITION_MAPPER);
     }
 
