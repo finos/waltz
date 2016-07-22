@@ -59,13 +59,6 @@ public class EntityStatisticSummaryDao {
     }
 
 
-    public List<EntityStatisticSummary> findForAppIdSelector(Select<Record1<Long>> appIdSelector) {
-        return find(
-                dsl.select(esd.ID).where(esd.PARENT_ID.isNull()),
-                appIdSelector);
-    }
-
-
     public List<EntityStatisticSummary> findRelated(long id, Select<Record1<Long>> appIdSelector) {
         Condition findSelf = esd.ID.eq(id);
         Condition findChildren = esd.PARENT_ID.eq(id);

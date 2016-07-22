@@ -69,14 +69,14 @@ public class EntityStatisticEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String findStatsSummariesBySelectorPath = mkPath(BASE_URL, "summary");
+        String findStatsDefinitionsBySelectorPath = mkPath(BASE_URL, "definition");
         String findRelatedStatDefinitionsPath = mkPath(BASE_URL, "definition" , ":statId", "related");
         String findRelatedStatSummariesPath = mkPath(BASE_URL, "summary" , ":statId", "related");
         String findStatValuesBySelectorPath = mkPath(BASE_URL, "value", ":statId");
         String findStatTalliesPath = mkPath(BASE_URL, "tally");
 
-        ListRoute<EntityStatisticSummary> findStatsSummariesForAppSelectorRoute = (request, response)
-                -> entityStatisticService.findStatsSummariesForAppIdSelector(readOptionsFromBody(request));
+        ListRoute<EntityStatisticDefinition> findStatsDefinitionsForAppIdSelector = (request, response)
+                -> entityStatisticService.findStatsDefinitionsForAppIdSelector(readOptionsFromBody(request));
 
         ListRoute<EntityStatisticValue> findStatValuesForAppSelectorRoute = (request, response)
                 -> entityStatisticService.getStatisticValuesForAppIdSelector(getLong(request, "statId"), readOptionsFromBody(request));
@@ -87,7 +87,7 @@ public class EntityStatisticEndpoint implements Endpoint {
         DatumRoute<ImmediateHierarchy<EntityStatisticSummary>> findRelatedStatSummariesRoute = (request, response)
                 -> entityStatisticService.findRelatedStatsSummaries(getLong(request, "statId"), readOptionsFromBody(request));
 
-        postForList(findStatsSummariesBySelectorPath, findStatsSummariesForAppSelectorRoute);
+        postForList(findStatsDefinitionsBySelectorPath, findStatsDefinitionsForAppIdSelector);
         postForList(findStatValuesBySelectorPath, findStatValuesForAppSelectorRoute);
         postForList(findStatTalliesPath, this::findStatTalliesRoute);
         postForDatum(findRelatedStatSummariesPath, findRelatedStatSummariesRoute);

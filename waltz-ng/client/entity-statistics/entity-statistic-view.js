@@ -39,10 +39,6 @@ function controller($q,
 
     const navItemPromise = entityStatisticUtilities
         .findAllForKind(entityKind)
-        .then(x => {
-            console.log(x);
-            return x;
-        })
         .then(xs => vm.navItems = xs);
 
     $q.all([navItemPromise, definitionPromise])

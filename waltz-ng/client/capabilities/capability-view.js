@@ -14,23 +14,6 @@ import _ from "lodash";
 import d3 from "d3";
 import {perhaps, populateParents} from "../common";
 import {calculateGroupSummary} from "../ratings/directives/common";
-import {lifecyclePhaseColorScale, variableScale} from "../common/colors";
-import {tallyBy} from "../common/tally-utils";
-
-
-const PIE_SIZE = 70;
-
-
-function mkChartData(data, groupingField, size, colorProvider = variableScale, labelProvider = null) {
-    return {
-        config: {
-            colorProvider: (d) => colorProvider(d.data.key),
-            labelProvider,
-            size
-        },
-        data: tallyBy(data, groupingField)
-    };
-}
 
 
 const initialState = {
@@ -42,7 +25,7 @@ const initialState = {
     capability: null,
     complexity: [],
     dataFlows: [],
-    entityStatisticsSummary: [],
+    entityStatistics: [],
     groupedApps: null,
     processes: [],
     ratings: null,
@@ -136,6 +119,22 @@ function prepareGroupData(capability, apps, perspective, ratings) {
 }
 
 
+function loadEntityStatistics(entityStatisticStore, appIdSelector) {
+    const entityStatistics = {};
+
+    return entityStatisticStore.findStatsDefinitionsByIdSelector(appIdSelector)
+        .then(definitions => {
+            entityStatistics.definitions = definitions;
+            const definitionIds = _.map(definitions, 'id');
+            return entityStatisticStore.findStatTallies(definitionIds, appIdSelector);
+        })
+        .then(tallies => {
+            entityStatistics.summaries = tallies;
+            return entityStatistics;
+        });
+}
+
+
 function controller($q,
                     $scope,
                     $state,
@@ -185,13 +184,6 @@ function controller($q,
         const apps = _.union(groupedApps.primaryApps, groupedApps.secondaryApps);
         vm.groupedApps = groupedApps;
         vm.apps = apps;
-        vm.appSummaryCharts = {
-            apps: {
-                byLifecyclePhase: mkChartData(apps, 'lifecyclePhase', PIE_SIZE, lifecyclePhaseColorScale),
-                byKind: mkChartData(apps, 'kind', PIE_SIZE, variableScale)
-            }
-        };
-
         return _.map(apps, 'id');
     };
 
@@ -203,6 +195,7 @@ function controller($q,
         scope: 'CHILDREN'
     };
 
+    vm.entityRef = appIdSelector.entityReference;
 
     processStore
         .findForCapability(capId)
@@ -290,9 +283,9 @@ function controller($q,
     loadTraitInfo(traitStore, traitUsageStore, capability.id)
         .then(r => vm.traitInfo = r);
 
-    entityStatisticStore.findSummaryStatsByIdSelector(appIdSelector)
+   loadEntityStatistics(entityStatisticStore, appIdSelector)
         .then(stats => {
-            vm.entityStatisticsSummary = stats;
+            vm.entityStatistics = stats;
         });
 }
 

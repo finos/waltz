@@ -192,7 +192,7 @@ function service($q,
             .then(ratings => state.model.sourceDataRatings = ratings);
     }
 
-    function loadEntityStatisticSummary(personId) {
+    function loadEntityStatistics(personId) {
         const appIdSelector = {
             entityReference: {
                 kind: 'PERSON',
@@ -201,9 +201,17 @@ function service($q,
             scope: 'CHILDREN'
         };
 
-        entityStatisticStore.findSummaryStatsByIdSelector(appIdSelector)
-            .then(stats => {
-                state.model.entityStatisticsSummary = stats;
+        const entityStatistics = {};
+
+        return entityStatisticStore.findStatsDefinitionsByIdSelector(appIdSelector)
+            .then(definitions => {
+                entityStatistics.definitions = definitions;
+                const definitionIds = _.map(definitions, 'id');
+                return entityStatisticStore.findStatTallies(definitionIds, appIdSelector);
+            })
+            .then(tallies => {
+                entityStatistics.summaries = tallies;
+                return state.model.entityStatistics = entityStatistics;
             });
     }
 
@@ -226,7 +234,7 @@ function service($q,
                 loadTechStats(personId);
                 loadComplexity(personId);
                 loadSourceDataRatings();
-                loadEntityStatisticSummary(personId);
+                loadEntityStatistics(personId);
             });
 
         const appPromise = peoplePromise

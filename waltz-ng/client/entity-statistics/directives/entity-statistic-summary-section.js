@@ -10,49 +10,28 @@
  *
  */
 import _ from "lodash";
-import {variableScale} from "../../common/colors";
-
-
-const PIE_SIZE = 70;
 
 
 const BINDINGS = {
     name: '@',
-    entityStatistics: '<'
+    definitions: '<',
+    summaries: '<',
+    parentRef: '<'
 };
 
 
 const initData = {
-    entityStatistics: [],
-    entityStatisticsSorted: [],
+    definitions: [],
+    summaries: []
 };
-
-function mkStatChartData(counts) {
-    const byOutcome = {
-        config: {
-            colorProvider: (d) => variableScale(d.data.key),
-            size: PIE_SIZE
-        },
-        data: _.chain(counts)
-            .map(c => ({ key: c.id, count: c.count }))
-            .value()
-    };
-
-    return byOutcome;
-}
 
 
 function controller($scope) {
     const vm = _.defaultsDeep(this, initData);
 
-    $scope.$watch('ctrl.entityStatistics', (entityStats = []) => {
-        if(!_.isEmpty(entityStats)) {
-
-            _.forEach(entityStats, stat => {
-                stat.chart = mkStatChartData(stat.counts);
-            });
-
-            vm.entityStatisticsSorted = _.orderBy(entityStats, ['definition.category', 'definition.name']);
+    $scope.$watch('ctrl.summaries', (summaries = []) => {
+        if(!_.isEmpty(summaries)) {
+            vm.summariesByDefinitionId = _.keyBy(vm.summaries, 'entityReference.id');
         }
     });
 

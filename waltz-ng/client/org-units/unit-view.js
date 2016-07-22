@@ -11,24 +11,6 @@
  *
  */
 import EventDispatcher from "../common/EventDispatcher";
-import {lifecyclePhaseColorScale, variableScale} from "../common/colors";
-import {tallyBy} from "../common/tally-utils";
-import {riskRatingDisplayNames} from "../common/services/display_names";
-
-
-const PIE_SIZE = 70;
-
-
-function mkChartData(data, groupingField, size, colorProvider = variableScale, labelProvider = null) {
-    return {
-        config: {
-            colorProvider: (d) => colorProvider(d.data.key),
-            labelProvider,
-            size
-        },
-        data: tallyBy(data, groupingField)
-    };
-}
 
 
 function controller($stateParams,
@@ -47,18 +29,6 @@ function controller($stateParams,
         historyStore.put(orgUnit.name, 'ORG_UNIT', 'main.org-unit.view', { id: orgUnit.id });
 
         vm.viewData = viewOptions.filter(vm.rawViewData);
-        vm.appSummaryCharts = {
-            apps: {
-                byLifecyclePhase: mkChartData(vm.viewData.apps, 'lifecyclePhase', PIE_SIZE, lifecyclePhaseColorScale),
-                byKind: mkChartData(vm.viewData.apps, 'kind', PIE_SIZE, variableScale)
-            },
-            endUserApps: {
-                byLifecyclePhase: mkChartData(vm.viewData.endUserApps, 'lifecyclePhase', PIE_SIZE, lifecyclePhaseColorScale),
-                byKind: mkChartData(vm.viewData.endUserApps, 'platform', PIE_SIZE, variableScale),
-                byRiskRating: mkChartData(vm.viewData.endUserApps, 'riskRating', PIE_SIZE, variableScale, k => riskRatingDisplayNames[k])
-            }
-        };
-
     };
 
     $scope.$watch(
