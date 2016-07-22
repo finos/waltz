@@ -29,8 +29,8 @@
             <!-- NAV -->
             <div class="col-md-4" >
                 <h4>
-                    <span ng-bind="ctrl.parentRef.kind | toDisplayName:'entity'"></span>
-                    <small>Selector</small>
+                    <span ng-bind="ctrl.person.displayName"></span>
+                    <small>Tree</small>
                 </h4>
 
                 <table class="table table-condensed small">
@@ -54,15 +54,15 @@
                     <tbody ng-if="ctrl.peers.length > 0">
                     <tr ng-repeat="peer in ctrl.peers">
                         <td>
-                            <a ng-click="ctrl.onSelectPerson(peer)"
-                               class="clickable">
-                                <span ng-if="$first">
-                                    Peers
-                                </span>
-                            </a>
+                            <span ng-if="$first">
+                                Peers
+                            </span>
                         </td>
                         <td>
-                            <span ng-bind="peer.displayName"></span>
+                            <a ng-click="ctrl.onSelectPerson(peer)"
+                               class="clickable">
+                                <span ng-bind="peer.displayName"></span>
+                            </a>
                         </td>
                     </tr>
                     </tbody>

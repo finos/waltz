@@ -78,9 +78,10 @@ function controller($q,
             .findManagers(person.employeeId)
             .then(managers => vm.managers = managers);
 
-        // personStore
-        //     .findPeers(person.employeeId)
-        //     .then(peers => vm.peers = peers);
+        personStore
+            .findDirects(person.managerEmployeeId)
+            .then(peers => _.reject(peers, p => p.id === person.id))
+            .then(peers => vm.peers = peers);
 
         updateUrlWithoutReload($state, person);
     };
