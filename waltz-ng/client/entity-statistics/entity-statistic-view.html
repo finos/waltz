@@ -1,5 +1,7 @@
 <div>
 
+
+
     <waltz-page-header name="{{ ctrl.statistic.definition.name }}"
                        small="Indicator"
                        icon="pie-chart">
@@ -28,6 +30,10 @@
 
             </div>
             <div class="col-md-4" >
+                <h4>
+                    <span ng-bind="ctrl.parentRef.kind | toDisplayName:'entity'"></span>
+                    <small>Hierarchy</small>
+                </h4>
                 <waltz-entity-hierarchy-navigator model="ctrl.navItems"
                                                   selected-node="ctrl.selectedNavItem"
                                                   on-select="ctrl.onSelectNavItem">
@@ -48,6 +54,7 @@
                 </waltz-related-entity-statistics-summaries>
             </div>
         </div>
+
 
     </div>
 

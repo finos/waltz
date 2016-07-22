@@ -18,7 +18,8 @@ export default (module) => {
         .config(require('./routes'));
 
     module
-        .service('EntityStatisticStore', require('./services/entity-statistic-store'));
+        .service('EntityStatisticStore', require('./services/entity-statistic-store'))
+        .service('EntityStatisticUtilities', require('./services/entity-statistics-utilities'));
 
     module
         .directive('waltzEntityStatisticSection', require('./directives/entity-statistic-section'))
@@ -30,5 +31,6 @@ export default (module) => {
     module
         .component('waltzEntityStatisticDetailTable', require('./components/entity-statistic-detail-table'))
         .component('waltzEntityStatisticDetailPanel', require('./components/entity-statistic-detail-panel'))
+        .component('waltzEntityStatisticSummaryCard', require('./components/entity-statistic-summary-card'))
         .component('waltzRelatedEntityStatisticsSummaries', require('./components/related-entity-statistics-summaries'));
 };

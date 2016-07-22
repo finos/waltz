@@ -6,6 +6,7 @@ import com.khartec.waltz.model.ParentIdProvider;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,9 +14,6 @@ import static java.util.Optional.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by dwatkins on 20/07/2016.
- */
 public class ImmediateHierarchyUtilitiesTest {
 
     private static class Dummy implements IdProvider, ParentIdProvider {
@@ -117,10 +115,17 @@ public class ImmediateHierarchyUtilitiesTest {
     }
 
 
-    @Test
-    public void bad() {
+    @Test(expected = IllegalArgumentException.class)
+    public void selfMustBePresent() {
         ImmediateHierarchyUtilities.build(-1, all);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void mustHaveSomeUnits() {
+        ImmediateHierarchyUtilities.build(1, Collections.emptyList());
+    }
+
+
     private <X> void assertContains(List<X> xs, X... things) {
         for (X t : things) {
             assertTrue(xs.contains(t));

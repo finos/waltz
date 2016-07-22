@@ -23,7 +23,7 @@ function updateUrlWithoutReload($state, navItem) {
 function controller($q,
                     $state,
                     $stateParams,
-                    orgUnitStore,
+                    entityStatisticUtilities,
                     entityStatisticStore) {
 
     const vm = Object.assign(this, initData);
@@ -37,9 +37,9 @@ function controller($q,
         .then(ds => vm.relatedDefinitions = ds)
         .then(ds => vm.statistic.definition = ds.self);
 
-    const navItemPromise = orgUnitStore
-        .findAll()
-        .then(xs => vm.navItems = xs)
+    const navItemPromise = entityStatisticUtilities
+        .findAllForKind(entityKind)
+        .then(xs => vm.navItems = xs);
 
     $q.all([navItemPromise, definitionPromise])
         .then(() => /* boot */ vm.onSelectNavItem(_.find(vm.navItems, { id: entityId })));
@@ -84,7 +84,7 @@ controller.$inject = [
     '$q',
     '$state',
     '$stateParams',
-    'OrgUnitStore',
+    'EntityStatisticUtilities',
     'EntityStatisticStore'
 ];
 

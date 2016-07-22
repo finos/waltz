@@ -1,0 +1,13 @@
+<div class="waltz-entity-statistic-summary-card">
+    <a class='clickable wessc-link small' style="position: relative; left: 80%; top: 25px;"
+       title="Refocus on this statistic"
+       ng-click="$ctrl.goToStatistic($ctrl.definition)">
+        More &raquo;
+    </a>
+    <waltz-pie-table data="$ctrl.pie.data"
+                     config="$ctrl.pie.config"
+                     title="{{$ctrl.definition.name}}"
+                     sub-title="{{ $ctrl.subTitle }}">
+    </waltz-pie-table>
+
+</div>

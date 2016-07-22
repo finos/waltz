@@ -11,57 +11,71 @@
  */
 import _ from "lodash";
 
-export default [
+
+function extractDefinitionIdsFromImmediateHierarchy(hierarchy) {
+    const definitions = [
+        hierarchy.self,
+        hierarchy.parent,
+        ...hierarchy.siblings,
+        ...hierarchy.children
+    ];
+
+    return _.chain(definitions)
+        .filter(s => s != null)
+        .map('id')
+        .value();
+}
+
+
+function store($http, BaseApiUrl) {
+    const BASE = `${BaseApiUrl}/entity-statistic`;
+
+    const findSummaryStatsByIdSelector = (options) => $http
+        .post(`${BASE}/summary`, options)
+        .then(r => r.data);
+
+    const findStatValuesByIdSelector = (statId, options) => $http
+        .post(`${BASE}/value/${statId}`, options)
+        .then(r => r.data);
+
+    const findRelatedStatDefinitions = (statId) => $http
+        .get(`${BASE}/definition/${statId}/related`)
+        .then(r => r.data);
+
+    const findRelatedStatSummaries = (statId, options) => $http
+        .post(`${BASE}/summary/${statId}/related`, options)
+        .then(r => r.data);
+
+    const findStatTallies = (definitions, selector) => {
+
+        const statisticIds = _.isArray(definitions)
+            ? definitions
+            : extractDefinitionIdsFromImmediateHierarchy(definitions);
+
+        const options = {
+            selector,
+            statisticIds
+        };
+
+        return $http
+            .post(`${BASE}/tally`, options)
+            .then(r => r.data);
+    };
+
+    return {
+        findSummaryStatsByIdSelector,
+        findStatValuesByIdSelector,
+        findRelatedStatDefinitions,
+        findRelatedStatSummaries,
+        findStatTallies
+    };
+}
+
+
+store.$inject = [
     '$http',
-    'BaseApiUrl',
-    ($http, BaseApiUrl) => {
-        const BASE = `${BaseApiUrl}/entity-statistic`;
-
-        const findSummaryStatsByIdSelector = (options) => $http
-            .post(`${BASE}/summary`, options)
-            .then(r => r.data);
-
-        const findStatValuesByIdSelector = (statId, options) => $http
-            .post(`${BASE}/value/${statId}`, options)
-            .then(r => r.data);
-
-        const findRelatedStatDefinitions = (statId) => $http
-            .get(`${BASE}/definition/${statId}/related`)
-            .then(r => r.data);
-
-        const findRelatedStatSummaries = (statId, options) => $http
-            .post(`${BASE}/summary/${statId}/related`, options)
-            .then(r => r.data);
-
-        const findStatTallies = (definitions, selector) => {
-
-            const statisticIds = _.isArray(definitions)
-                ? definitions
-                : _.chain([
-                        definitions.self,
-                        definitions.parent,
-                        ...definitions.siblings,
-                        ...definitions.children
-                    ])
-                    .filter(s => s != null)
-                    .map('id')
-                    .value();
-
-            const options = {
-                selector,
-                statisticIds
-            };
-            return $http
-                .post(`${BASE}/tally`, options)
-                .then(r => r.data);
-        };
-
-        return {
-            findSummaryStatsByIdSelector,
-            findStatValuesByIdSelector,
-            findRelatedStatDefinitions,
-            findRelatedStatSummaries,
-            findStatTallies
-        };
-    }
+    'BaseApiUrl'
 ];
+
+
+export default store;
