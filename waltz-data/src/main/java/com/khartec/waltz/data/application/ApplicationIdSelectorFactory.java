@@ -12,6 +12,8 @@ import com.khartec.waltz.model.utils.IdUtilities;
 import com.khartec.waltz.schema.tables.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,6 @@ import java.util.Set;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.model.application.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -31,9 +32,12 @@ import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static com.khartec.waltz.schema.tables.Process.PROCESS;
 
 @Service
 public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelectionOptions, Select<Record1<Long>>> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationIdSelectorFactory.class);
 
     private final DSLContext dsl;
     private final OrganisationalUnitDao organisationalUnitDao;
@@ -83,12 +87,15 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     private Select<Record1<Long>> mkForProcess(EntityReference ref, HierarchyQueryScope scope) {
         switch (scope) {
             case EXACT:
-                return dsl.select(relationship.ID_A)
-                        .from(relationship)
-                        .where(relationship.KIND_A.eq(EntityKind.APPLICATION.name()))
-                        .and(relationship.RELATIONSHIP.eq(RelationshipKind.PARTICIPATES_IN.name()))
-                        .and(relationship.KIND_B.eq(EntityKind.PROCESS.name()))
-                        .and(relationship.ID_B.eq(ref.id()));
+                SelectSelectStep<Record1<Long>> exactProcessIdSelector = dsl.select(DSL.val(ref.id()));
+                return mkForProcess(exactProcessIdSelector);
+            case CHILDREN:
+                SelectConditionStep<Record1<Long>> childProcessIdSelector = dsl.select(PROCESS.ID)
+                        .from(PROCESS)
+                        .where(PROCESS.LEVEL_1.eq(ref.id())
+                                .or(PROCESS.LEVEL_2.eq(ref.id()))
+                                .or(PROCESS.LEVEL_3.eq(ref.id())));
+                return mkForProcess(childProcessIdSelector);
 
             default:
                 throw new UnsupportedOperationException("Querying for appIds related to processes using (scope: '"
@@ -97,6 +104,15 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
         }
     }
 
+
+    private Select<Record1<Long>> mkForProcess(Select<Record1<Long>> processIdSelector) {
+        return dsl.select(relationship.ID_A)
+                .from(relationship)
+                .where(relationship.KIND_A.eq(EntityKind.APPLICATION.name()))
+                .and(relationship.RELATIONSHIP.eq(RelationshipKind.PARTICIPATES_IN.name()))
+                .and(relationship.KIND_B.eq(EntityKind.PROCESS.name()))
+                .and(relationship.ID_B.in(processIdSelector));
+    }
 
     private SelectConditionStep<Record1<Long>> mkForOrgUnit(EntityReference ref, HierarchyQueryScope scope) {
         Set<Long> orgUnitIds = new HashSet<>();
@@ -123,9 +139,9 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
 
 
     private SelectConditionStep<Record1<Long>> mkForAppGroup(EntityReference ref, HierarchyQueryScope scope) {
-        checkTrue(
-                scope == EXACT,
-                "Can only query for 'EXACT' app group matches, not: " + scope);
+        if (scope != EXACT) {
+            LOG.info("App Groups are not hierarchical therefore ignoring requested scope of: "+scope);
+        }
         return dsl
                 .selectDistinct(appGroup.APPLICATION_ID)
                 .from(appGroup)

@@ -36,7 +36,6 @@ function mkChartData(data, groupingField, size, colorProvider = variableScale, l
 }
 
 
-
 /**
  * Calculates the set of capabilities required to
  * fully describe a given set of app capabilities.
@@ -93,7 +92,7 @@ const initialState = {
     changeInitiatives: [],
     complexity: [],
     dataFlows : null,
-    entityStatisticsSummary: [],
+    entityStatistics: [],
     flowOptions: null,
     groupDetail: null,
     initiallySelectedIds: [],
@@ -114,6 +113,20 @@ const initialState = {
 };
 
 
+function loadEntityStatistics(entityStatisticStore, appIdSelector) {
+    const entityStatistics = {};
+
+    return entityStatisticStore.findStatsDefinitionsByIdSelector(appIdSelector)
+        .then(definitions => {
+            entityStatistics.definitions = definitions;
+            const definitionIds = _.map(definitions, 'id');
+            return entityStatisticStore.findStatTallies(definitionIds, appIdSelector);
+        })
+        .then(tallies => {
+            entityStatistics.summaries = tallies;
+            return entityStatistics;
+        });
+}
 
 function controller($scope,
                     $q,
@@ -144,6 +157,8 @@ function controller($scope,
         },
         scope: 'EXACT'
     };
+
+    vm.entityRef = appIdSelector.entityReference;
 
     const isUserAnOwner = member =>
             member.role === 'OWNER'
@@ -222,9 +237,9 @@ function controller($scope,
 
     vm.loadFlowDetail = () => dataFlowViewService.loadDetail();
 
-    entityStatisticStore.findSummaryStatsByIdSelector(appIdSelector)
+    loadEntityStatistics(entityStatisticStore, appIdSelector)
         .then(stats => {
-            vm.entityStatisticsSummary = stats;
+            vm.entityStatistics = stats;
         });
 
 }

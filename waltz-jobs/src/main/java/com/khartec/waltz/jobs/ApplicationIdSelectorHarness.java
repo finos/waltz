@@ -16,8 +16,6 @@ import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.common.FunctionUtilities.time;
-
 /**
  * Created by dwatkins on 13/05/2016.
  */
@@ -36,8 +34,8 @@ public class ApplicationIdSelectorHarness {
         ApplicationIdSelectionOptions options = ImmutableApplicationIdSelectionOptions.builder()
                 .entityReference(ImmutableEntityReference
                         .builder()
-                        .kind(EntityKind.PERSON)
-                        .id(3455)
+                        .kind(EntityKind.ORG_UNIT)
+                        .id(30)
                         .build())
                 .scope(HierarchyQueryScope.CHILDREN)
                 .build();
@@ -45,23 +43,7 @@ public class ApplicationIdSelectorHarness {
 
         Select<Record1<Long>> selector = factory.apply(options);
 
-
-        time("selector", () -> dsl
-                .fetch(selector)
-                .size());
-
-        time("tally", () -> dao
-                .tallyDataTypes(selector)
-                .size());
-
-        time("appCount", () -> dao
-                .countDistinctAppInvolvement(selector));
-
-        time("flowCount", () -> dao
-                .countDistinctFlowInvolvement(selector));
-
-        time("service", () -> service
-                .calculateStats(options));
+        System.out.println(selector);
     }
 
 

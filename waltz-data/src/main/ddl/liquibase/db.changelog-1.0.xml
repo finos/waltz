@@ -2133,4 +2133,16 @@
     </changeSet>
 
 
+    <!-- 302 - Entity Statistic Hierarchy -->
+    <changeSet author="dwatkins"
+               id="20160720-302-1">
+        <addColumn tableName="entity_statistic_definition">
+            <column name="parent_id"
+                    type="${long.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+
+    </changeSet>
+
 </databaseChangeLog>

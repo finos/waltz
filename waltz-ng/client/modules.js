@@ -24,6 +24,7 @@ function setup(module) {
         require('./data-types'),
         require('./data-type-usage'),
         require('./end-user-apps'),
+        require('./entity'),
         require('./entity-statistics'),
         require('./examples'),
         require('./history'),

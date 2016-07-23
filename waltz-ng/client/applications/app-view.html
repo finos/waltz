@@ -145,7 +145,8 @@
                                                  sources="ctrl.flow.data.sources"
                                                  targets="ctrl.flow.data.targets"
                                                  tweakers="ctrl.flow.tweakers"
-                                                 types="ctrl.flow.data.flowTypes"></waltz-app-data-flow-diagram>
+                                                 types="ctrl.flow.data.flowTypes">
+                    </waltz-app-data-flow-diagram>
 
                     <p class="text-muted small">
                         Diagram detailing the applications data types (Middle)
@@ -170,11 +171,12 @@
             it deals with.
         </p>
 
-        <div ng-repeat="(dataType, data) in ctrl.authSources | orderBy">
-            <h4>
-                {{ dataType | toDisplayName:'dataType' }}
+        <div ng-repeat="(dataType, data) in ctrl.authSources">
+            <h4 ng-span="dataType | toDisplayName:'dataType'">
             </h4>
-            <p class="text-muted">{{ dataType | toDescription:'dataType' }}</p>
+            <p class="text-muted"
+               ng-span="dataType | toDescription:'dataType'">
+            </p>
 
             <table class="table table-condensed">
                 <colgroup>
@@ -188,22 +190,21 @@
                         </waltz-rating-indicator>
                     </td>
                     <td>
-                        {{ rating | toDisplayName:'rating' }}
+                        <span ng-bind="rating | toDisplayName:'rating'"></span>
                     </td>
                     <td>
                         Organisational Units:
                         <ul class="list-inline"
                             style="display: inline-block">
                             <li ng-repeat="source in sources">
-                                <a ui-sref="main.org-unit.view({id: source.parentReference.id})">
-                                    {{ ctrl.orgUnitsById[source.parentReference.id].name }}
+                                <a ui-sref="main.org-unit.view({id: source.parentReference.id})"
+                                   ng-bind="ctrl.orgUnitsById[source.parentReference.id].name">
                                 </a>
                             </li>
                         </ul>
                     </td>
                 </tr>
             </table>
-
         </div>
         <hr/>
         <small class="text-muted">

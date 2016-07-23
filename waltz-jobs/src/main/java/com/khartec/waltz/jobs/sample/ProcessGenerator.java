@@ -41,7 +41,7 @@ public class ProcessGenerator {
 
         Set<TableRecord<?>> records = new HashSet<>();
 
-        for (long g = 0; g < 4; g++ ) {
+        for (long g = 1; g < 5; g++ ) {
             ProcessRecord record = new ProcessRecord();
             record.setDescription("Process Group: " + g);
             record.setName("Process Group " + g);
@@ -58,6 +58,7 @@ public class ProcessGenerator {
                 record2.setDescription("Process: " + name);
                 record2.setName(name);
                 record2.setId(id);
+                record2.setParentId(g);
                 record2.setLevel(2);
                 record2.setLevel_1(g);
                 record2.setLevel_2(id);

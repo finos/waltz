@@ -9,21 +9,68 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import _ from "lodash";
 
 
-export default [
-    '$http',
-    'BaseApiUrl',
-    ($http, BaseApiUrl) => {
-        const BASE = `${BaseApiUrl}/entity-statistic`;
+function extractDefinitionIdsFromImmediateHierarchy(hierarchy) {
+    const definitions = [
+        hierarchy.self,
+        hierarchy.parent,
+        ...hierarchy.siblings,
+        ...hierarchy.children
+    ];
+
+    return _.chain(definitions)
+        .filter(s => s != null)
+        .map('id')
+        .value();
+}
 
 
-        const findSummaryStatsByIdSelector = (options) => $http
-            .post(`${BASE}/stats`, options)
-            .then(r => r.data);
+function store($http, BaseApiUrl) {
+    const BASE = `${BaseApiUrl}/entity-statistic`;
 
-        return {
-            findSummaryStatsByIdSelector
+    const findStatsDefinitionsByIdSelector = (options) => $http
+        .post(`${BASE}/definition`, options)
+        .then(r => r.data);
+
+    const findStatValuesByIdSelector = (statId, options) => $http
+        .post(`${BASE}/value/${statId}`, options)
+        .then(r => r.data);
+
+    const findRelatedStatDefinitions = (statId) => $http
+        .get(`${BASE}/definition/${statId}/related`)
+        .then(r => r.data);
+
+    const findStatTallies = (definitions, selector) => {
+
+        const statisticIds = _.isArray(definitions)
+            ? definitions
+            : extractDefinitionIdsFromImmediateHierarchy(definitions);
+
+        const options = {
+            selector,
+            statisticIds
         };
-    }
+
+        return $http
+            .post(`${BASE}/tally`, options)
+            .then(r => r.data);
+    };
+
+    return {
+        findStatsDefinitionsByIdSelector,
+        findStatValuesByIdSelector,
+        findRelatedStatDefinitions,
+        findStatTallies
+    };
+}
+
+
+store.$inject = [
+    '$http',
+    'BaseApiUrl'
 ];
+
+
+export default store;

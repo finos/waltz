@@ -1,6 +1,6 @@
 <div>
 
-    <waltz-page-header name="Playpen"
+    <waltz-page-header name="Hier Nav"
                        small="3"
                        icon="rocket">
         <ol class="waltz-breadcrumbs">
@@ -9,7 +9,37 @@
         </ol>
     </waltz-page-header>
 
-    <waltz-section name="Section">
+    <waltz-section name="Foo">
+        <div class="row">
+            <div class="col-md-8">
+                <waltz-entity-statistic-detail-panel definition='ctrl.statistic.definition'
+                                                     summary="ctrl.statistic.summary"
+                                                     values="ctrl.statistic.values">
+                </waltz-entity-statistic-detail-panel>
+            </div>
+            <div class="col-md-4">
+                <waltz-entity-hierarchy-navigator model="ctrl.navItems"
+                                                  selected-node="ctrl.selectedNavItem"
+                                                  on-select="ctrl.onSelectNavItem">
+                </waltz-entity-hierarchy-navigator>
+            </div>
+
+        </div>
+    </waltz-section>
+
+
+
+    <waltz-section name="Related">
+        <waltz-related-entity-statistics-summaries definitions='ctrl.relatedDefinitions'
+                                                   summaries="ctrl.summaries">
+
+        </waltz-related-entity-statistics-summaries>
 
     </waltz-section>
+    <!--<waltz-entity-statistic-summary-section name="Indicators"-->
+                                            <!--entity-statistics="ctrl.entityStatisticsSummary">-->
+    <!--</waltz-entity-statistic-summary-section>-->
+
+
+
 </div>

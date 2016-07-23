@@ -18,7 +18,6 @@ export default (module) => {
     module.directive('waltzErrorAlert', require('./error-alert'));
     module.directive('waltzExternalLink', require('./external-link'));
     module.directive('waltzFromNow', require('./from-now'));
-    module.directive('waltzIcon', require('./icon'));
     module.directive('waltzJumpTo', require('./jump-to'));
     module.directive('waltzKeywordList', require('./keyword-list'));
     module.directive('waltzLoadingNotification', require('./loading-notification'));
@@ -27,7 +26,6 @@ export default (module) => {
     module.directive('waltzOverlayPanel', require('./overlay-panel'));
     module.directive('waltzPageHeader', require('./page-header'));
     module.directive('waltzPhoneLink', require('./phone-link'));
-    module.directive('waltzPie', require('./pie'));
     module.directive('waltzPieTable', require('./pie-table'));
     module.directive('waltzRagIndicator', require('./rag-indicator'));
     module.directive('waltzSearch', require('./search'));
@@ -37,4 +35,10 @@ export default (module) => {
     module.directive('waltzToggle', require('./toggle'));
     module.directive('waltzTwistie', require('./twistie'));
     module.directive('waltzYqSelect', require('./yq-select'));
+    
+    module
+        .component('waltzIcon', require('./icon'))
+        .component('waltzPie', require('./pie'))
+        .component('waltzPieSegmentTable', require('./pie-segment-table'));
+
 };

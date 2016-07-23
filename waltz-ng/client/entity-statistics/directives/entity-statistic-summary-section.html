@@ -3,18 +3,18 @@
                    icon="pie-chart">
 
         <div class="row col-sm-12 value"
-             ng-if="ctrl.entityStatistics.length > 0">
+             ng-if="ctrl.definitions.length > 0">
 
             <div class="col-md-3 col-sm-6"
-                 ng-repeat="stat in ctrl.entityStatisticsSorted">
-                    <waltz-pie-table data="stat.chart.data"
-                                     config="stat.chart.config"
-                                     title="{{stat.definition.name}}"
-                                     sub-title="{{stat.definition.category | toDisplayName:'entityStatistic'}}">
-                    </waltz-pie-table>
+                 ng-repeat="definition in ctrl.definitions">
+                <waltz-entity-statistic-summary-card summary="ctrl.summariesByDefinitionId[definition.id]"
+                                                     definition="definition"
+                                                     parent-ref="ctrl.parentRef"
+                                                     sub-title="{{definition.category | toDisplayName:'entityStatistic'}}">
+                </waltz-entity-statistic-summary-card>
             </div>
         </div>
-        <div class="alert alert-warning" ng-if="ctrl.entityStatistics.length == 0">
+        <div class="alert alert-warning" ng-if="ctrl.definitions.length == 0">
             <strong>
                 No Indicators
             </strong>

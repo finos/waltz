@@ -1,0 +1,48 @@
+<table class="table table-condensed small waltz-pie-segment-table">
+    <tr ng-repeat="r in $ctrl.data"
+        class="small"
+        ng-click="$ctrl.rowSelected(r, $event)"
+        ng-class="{
+            'wpst-selected': $ctrl.selectedSegmentKey === r.key,
+            'clickable' : $ctrl.config.onSelect
+        }">
+        <td>
+            <div class='wpst-indicator-cell'
+                 ng-style="{
+                    'background-color': $ctrl.config.colorProvider({ data: r }).brighter().toString(),
+                    'border-color' : $ctrl.config.colorProvider({ data: r }).toString()
+                 }">
+                &nbsp;
+            </div>
+        </td>
+        <td>
+            <span ng-bind="$ctrl.config.labelProvider(r)"></span>
+        </td>
+        <td>
+            <span ng-bind="r.count"></span>
+        </td>
+        <td>
+            <a class='clickable'
+               ng-if="$ctrl.selectedSegmentKey === r.key"
+               ng-click="$ctrl.rowSelected(null, $event)">
+                <waltz-icon size="lg"
+                            name="ban"
+                            title="Cancel selection"></waltz-icon>
+            </a>
+            <span ng-if="$ctrl.selectedSegmentKey !== r.key">
+                <waltz-icon name="fw"></waltz-icon>
+            </span>
+        </td>
+    </tr>
+    <tr class="small clickable"
+        ng-click="$ctrl.rowSelected(null, $event)">
+        <td></td>
+        <th>
+            Total
+        </th>
+        <td>
+            <strong ng-bind="$ctrl.total"></strong>
+        </td>
+        <td></td>
+    </tr>
+</table>

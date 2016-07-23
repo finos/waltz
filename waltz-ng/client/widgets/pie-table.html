@@ -7,35 +7,10 @@
                    config="ctrl.config">
         </waltz-pie>
 
-            <table class="table table-condensed small"
-                   style="text-align: left">
-                <tr ng-repeat="r in ctrl.pieData"
-                    class="small">
-                    <td>
-                        <div style="width: 16px; border: 1px solid; border-radius: 5px;"
-                             ng-style="{
-                        'background-color': ctrl.config.colorProvider({ data: r }).brighter().toString(),
-                        'border-color' : ctrl.config.colorProvider({ data: r }).toString() }">
-                            &nbsp;
-                        </div>
-                    </td>
-                    <td>
-                        <span ng-bind="ctrl.toDisplayName(r.key)"></span>
-                    </td>
-                    <td>
-                        <span ng-bind="r.count"></span>
-                    </td>
-                </tr>
-                <tr class="small">
-                    <td></td>
-                    <th>
-                        Total
-                    </th>
-                    <td>
-                        <strong ng-bind="ctrl.total"></strong>
-                    </td>
-                </tr>
-            </table>
+        <waltz-pie-segment-table data="ctrl.pieData"
+                                 config="ctrl.config">
+        </waltz-pie-segment-table>
+
     </waltz-basic-info-tile>
 
 </div>

@@ -9,24 +9,10 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import {lifecyclePhaseColorScale, variableScale} from "../common/colors";
-import {tallyBy} from "../common/tally-utils";
 
-const PIE_SIZE = 70;
 
 function hasInvolvements(involvements) {
     return involvements.all.length > 0;
-}
-
-
-function mkChartData(data, groupingField, size, colorProvider) {
-    return {
-        config: {
-            colorProvider: (d) => colorProvider(d.data.key),
-            size
-        },
-        data: tallyBy(data, groupingField)
-    };
 }
 
 
@@ -50,23 +36,12 @@ function controller($scope,
 
         if (model.person) {
             historyStore.put(model.person.displayName, 'PERSON', 'main.person.view', { empId: model.person.employeeId });
+            vm.entityRef = { kind: 'PERSON', id: model.person.id };
         }
 
         vm.hasAppInvolvements = hasInvolvements(model.appInvolvements);
         vm.hasEndUserAppInvolvements = hasInvolvements(model.endUserAppInvolvements);
         vm.hasInvolvements = vm.hasAppInvolvements || vm.hasEndUserAppInvolvements;
-        vm.charts = {
-            apps: {
-                byLifecyclePhase: mkChartData(model.appInvolvements.all, 'lifecyclePhase', PIE_SIZE, lifecyclePhaseColorScale),
-                byKind: mkChartData(model.appInvolvements.all, 'kind', PIE_SIZE, variableScale)
-            },
-            endUserApps: {
-                byLifecyclePhase: mkChartData(model.endUserAppInvolvements.all, 'lifecyclePhase', PIE_SIZE, lifecyclePhaseColorScale),
-                byKind: mkChartData(model.endUserAppInvolvements.all, 'kind', PIE_SIZE, variableScale),
-                byRiskRating: mkChartData(model.endUserAppInvolvements.all, 'riskRating', PIE_SIZE, variableScale)
-            }
-        };
-
     }, true);
 
 

@@ -17,13 +17,13 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
+import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.application.HierarchyQueryScope;
 import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticSummary;
+import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import org.jooq.DSLContext;
@@ -31,39 +31,41 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.List;
 
+import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
+import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
+
 
 public class EntityStatisticHarness {
+
+    private static final com.khartec.waltz.schema.tables.EntityStatisticDefinition esd = ENTITY_STATISTIC_DEFINITION.as("esd");
+    private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
 
     public static void main(String[] args) {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
-        EntityStatisticDao dao = ctx.getBean(EntityStatisticDao.class);
+        EntityStatisticValueDao dao = ctx.getBean(EntityStatisticValueDao.class);
         EntityStatisticService service = ctx.getBean(EntityStatisticService.class);
 
-//        ImmutableEntityReference ref = ImmutableEntityReference.builder()
-//                .kind(EntityKind.APPLICATION)
-//                .id(1415)
-//                .build();
-//
-//        List<EntityStatistic> values = dao.findStatisticsForEntity(ref, true);
-//
-//        System.out.println(values.size());
 
-
+        long CTO = 40;
+        long OPS = 140;
         ApplicationIdSelectionOptions options = ImmutableApplicationIdSelectionOptions.builder()
                 .entityReference(ImmutableEntityReference
                         .builder()
                         .kind(EntityKind.ORG_UNIT)
-                        .id(40)
+                        .id(OPS)
                         .build())
                 .scope(HierarchyQueryScope.CHILDREN)
                 .build();
 
 
-        List<EntityStatisticSummary> statisticsForAppIdSelector = service.findStatisticsForAppIdSelector(options);
+//        ImmediateHierarchy<EntityStatisticSummary> hier = service.findRelatedStatsSummaries(34L, options);
+//        List<TallyPack<String>> statTallies = service.findStatTallies(ListUtilities.newArrayList(31L, 34L), options);
 
+        List<EntityStatisticDefinition> statsDefinitionsForAppIdSelector = service.findStatsDefinitionsForAppIdSelector(options);
 
+        System.out.println("done");
     }
 
 }

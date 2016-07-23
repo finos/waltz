@@ -1,0 +1,17 @@
+.waltz-entity-statistic-summary-card {
+
+    &:hover {
+        .wessc-link {
+            color: blue;
+            opacity: 1;
+        }
+    }
+
+    .wessc-link {
+        position: relative;
+        left: 80%;
+        top: 25px;
+        opacity: 0.6;
+        color: grey;
+    }
+}

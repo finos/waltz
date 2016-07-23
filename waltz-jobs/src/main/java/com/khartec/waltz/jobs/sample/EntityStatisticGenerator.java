@@ -2,7 +2,8 @@ package com.khartec.waltz.jobs.sample;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
+import com.khartec.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
+import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
@@ -45,7 +46,8 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
 
         DSLContext dsl = context.getBean(DSLContext.class);
         ApplicationDao applicationDao = context.getBean(ApplicationDao.class);
-        EntityStatisticDao entityStatisticDao = context.getBean(EntityStatisticDao.class);
+        EntityStatisticValueDao statisticsValueDao = context.getBean(EntityStatisticValueDao.class);
+        EntityStatisticDefinitionDao statisticsDefinitionDao = context.getBean(EntityStatisticDefinitionDao.class);
 
         Application[] applications = applicationDao.getAll().toArray(new Application[0]);
 
@@ -57,7 +59,7 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
         // insert new entity stats
         List<EntityStatisticDefinition> allEntityStatistics = null;
         try {
-            allEntityStatistics = insertEntityStatistics(entityStatisticDao);
+            allEntityStatistics = insertEntityStatistics(statisticsDefinitionDao);
         } catch (IOException e) {
             System.out.println("Failed to insert entity statistics: " + e.getMessage());
             e.printStackTrace();
@@ -77,7 +79,7 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
             }
         }
 
-        int[] results = entityStatisticDao.bulkSaveValues(values);
+        int[] results = statisticsValueDao.bulkSaveValues(values);
         System.out.println("inserted entity statistic values: " + results.length);
 
         Map<String, Integer> result = new HashMap<>(2);
@@ -87,9 +89,9 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
     }
 
 
-    private static List<EntityStatisticDefinition> insertEntityStatistics(EntityStatisticDao entityStatisticDao) throws IOException {
+    private static List<EntityStatisticDefinition> insertEntityStatistics(EntityStatisticDefinitionDao definitionDao) throws IOException {
         List<String> lines = readLines(OrgUnitGenerator.class.getResourceAsStream("/entity-statistics.csv"));
-        List<EntityStatisticDefinition> entityStatistics = lines.stream()
+        List<EntityStatisticDefinition> definitions = lines.stream()
                 .skip(1)
                 .map(line -> line.split(","))
                 .filter(cells -> cells.length == 5)
@@ -105,8 +107,8 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
                         .build())
                 .collect(toList());
 
-        entityStatistics.forEach(entityStatistic -> entityStatisticDao.addEntityStatistic(entityStatistic));
-        return entityStatisticDao.getAllEntityStatistics();
+        definitions.forEach(entityStatistic -> definitionDao.insert(entityStatistic));
+        return definitionDao.getAllDefinitions();
     }
 
 
