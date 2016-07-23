@@ -35,10 +35,12 @@ export default (module) => {
     module.directive('waltzToggle', require('./toggle'));
     module.directive('waltzTwistie', require('./twistie'));
     module.directive('waltzYqSelect', require('./yq-select'));
-    
+
     module
         .component('waltzIcon', require('./icon'))
         .component('waltzPie', require('./pie'))
-        .component('waltzPieSegmentTable', require('./pie-segment-table'));
+        .component('waltzPieSegmentTable', require('./pie-segment-table'))
+        .component('waltzSimpleStackChart', require('./simple-stack-chart'));
+
 
 };

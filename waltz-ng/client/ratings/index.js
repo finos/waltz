@@ -28,8 +28,7 @@ export default (module) => {
 
     module.directive('waltzRagLine', require('./directives/rating-explorer/rag-line'));
     module.directive('waltzRatingExplorerSection', require('./directives/rating-explorer/rating-explorer-section'));
-    module.directive('waltzSimpleStackChart', require('./directives/rating-explorer/simple-stack-chart'));
-
+    
 
     module.service('RatingStore', require('./services/ratings-store'));
 

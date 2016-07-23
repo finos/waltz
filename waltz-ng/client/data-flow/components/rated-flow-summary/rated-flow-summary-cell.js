@@ -10,6 +10,7 @@ const BINDINGS = {
 
 
 const initialState = {
+    popoverText: '...',
     onClick: () => console.log("No on-click handler passed to rating-flow-summary-cell")
 };
 
@@ -22,18 +23,20 @@ function controller() {
         vm.onClick();
         $event.stopPropagation();
     };
+
+    vm.$onChanges = () => {
+        if (vm.scores && vm.type) {
+            vm.popoverText = `${vm.type}:: direct: ${vm.scores.direct}, indirect: ${vm.scores.indirect}`;
+        }
+    };
 }
 
 
-const directive = {
-    restrict: 'E',
-    replace: false,
-    bindToController: BINDINGS,
+const component = {
+    bindings: BINDINGS,
     controller,
-    controllerAs: 'ctrl',
-    scope: {},
     template: require('./rated-flow-summary-cell.html')
 };
 
 
-export default () => directive;
+export default component;
