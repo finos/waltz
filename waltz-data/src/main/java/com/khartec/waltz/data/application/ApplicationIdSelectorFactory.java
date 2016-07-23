@@ -32,6 +32,7 @@ import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static com.khartec.waltz.schema.tables.Process.PROCESS;
 
 @Service
 public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelectionOptions, Select<Record1<Long>>> {
@@ -86,12 +87,15 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     private Select<Record1<Long>> mkForProcess(EntityReference ref, HierarchyQueryScope scope) {
         switch (scope) {
             case EXACT:
-                return dsl.select(relationship.ID_A)
-                        .from(relationship)
-                        .where(relationship.KIND_A.eq(EntityKind.APPLICATION.name()))
-                        .and(relationship.RELATIONSHIP.eq(RelationshipKind.PARTICIPATES_IN.name()))
-                        .and(relationship.KIND_B.eq(EntityKind.PROCESS.name()))
-                        .and(relationship.ID_B.eq(ref.id()));
+                SelectSelectStep<Record1<Long>> exactProcessIdSelector = dsl.select(DSL.val(ref.id()));
+                return mkForProcess(exactProcessIdSelector);
+            case CHILDREN:
+                SelectConditionStep<Record1<Long>> childProcessIdSelector = dsl.select(PROCESS.ID)
+                        .from(PROCESS)
+                        .where(PROCESS.LEVEL_1.eq(ref.id())
+                                .or(PROCESS.LEVEL_2.eq(ref.id()))
+                                .or(PROCESS.LEVEL_3.eq(ref.id())));
+                return mkForProcess(childProcessIdSelector);
 
             default:
                 throw new UnsupportedOperationException("Querying for appIds related to processes using (scope: '"
@@ -100,6 +104,15 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
         }
     }
 
+
+    private Select<Record1<Long>> mkForProcess(Select<Record1<Long>> processIdSelector) {
+        return dsl.select(relationship.ID_A)
+                .from(relationship)
+                .where(relationship.KIND_A.eq(EntityKind.APPLICATION.name()))
+                .and(relationship.RELATIONSHIP.eq(RelationshipKind.PARTICIPATES_IN.name()))
+                .and(relationship.KIND_B.eq(EntityKind.PROCESS.name()))
+                .and(relationship.ID_B.in(processIdSelector));
+    }
 
     private SelectConditionStep<Record1<Long>> mkForOrgUnit(EntityReference ref, HierarchyQueryScope scope) {
         Set<Long> orgUnitIds = new HashSet<>();

@@ -17,14 +17,18 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.person.PersonService;
+import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getId;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
@@ -39,14 +43,21 @@ public class PersonEndpoint implements Endpoint {
     private static final String BY_EMPLOYEE_PATH = mkPath(BASE_URL, "employee-id", ":empId");
     private static final String FIND_BY_USERID_PATH = mkPath(BASE_URL, "user-id", ":userId");
     private static final String GET_BY_ID = mkPath(BASE_URL, "id", ":id");
+    private static final String REBUILD_HIERARCHY_PATH = mkPath(BASE_URL, "rebuild-hierarchy");
 
-    private final PersonService service;
+    private final PersonService personService;
+    private final PersonHierarchyService personHierarchyService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public PersonEndpoint(PersonService service) {
-        checkNotNull(service, "service must not be null");
-        this.service = service;
+    public PersonEndpoint(PersonService service,
+                          PersonHierarchyService personHierarchyService,
+                          UserRoleService userRoleService) {
+        checkNotNull(service, "personService must not be null");
+        this.personService = service;
+        this.personHierarchyService = personHierarchyService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -54,28 +65,37 @@ public class PersonEndpoint implements Endpoint {
     public void register() {
 
         getForList(SEARCH_PATH, (request, response) ->
-                service.search(request.params("query")));
+                personService.search(request.params("query")));
 
         getForList(DIRECTS_PATH, (request, response) -> {
             String empId = request.params("empId");
-            return service.findDirectsByEmployeeId(empId);
+            return personService.findDirectsByEmployeeId(empId);
         });
 
         getForDatum(MANAGERS_PATH, (request, response) -> {
             String empId = request.params("empId");
-            return service.findAllManagersByEmployeeId(empId);
+            return personService.findAllManagersByEmployeeId(empId);
         });
 
         getForDatum(BY_EMPLOYEE_PATH, (request, response) -> {
             String empId = request.params("empId");
-            return service.getByEmployeeId(empId);
+            return personService.getByEmployeeId(empId);
         });
 
         getForDatum(GET_BY_ID, (request, response) ->
-                service.getById(getId(request)));
+                personService.getById(getId(request)));
 
         getForDatum(FIND_BY_USERID_PATH, ((request, response) ->
-                service.findPersonByUserId(request.params("userId"))));
+                personService.findPersonByUserId(request.params("userId"))));
+        
+        
+        getForDatum(REBUILD_HIERARCHY_PATH, this::rebuildHierarchyRoute);
 
+    }
+
+    private boolean rebuildHierarchyRoute(Request request, Response response) {
+        requireRole(userRoleService, request, Role.ADMIN);
+        personHierarchyService.build();
+        return true;
     }
 }
