@@ -2,12 +2,14 @@ import _ from "lodash";
 import d3 from "d3";
 
 
-const BINDINGS = {
+const bindings = {
     ratedFlows: '<',
     apps: '<',
     orgUnitId: '<'
 };
 
+
+const template = require('./rated-flow-summary-panel.html');
 
 const initialState = {
     apps: [],
@@ -46,7 +48,7 @@ function groupByTypeThenRating(flows = []) {
 function prepareData(flows = [], apps = [], orgUnitId) {
 
     const directlyInvolvedFlows = findDirectlyInvolvedFlows(flows, apps, orgUnitId);
-    const direct =  groupByTypeThenRating(directlyInvolvedFlows);
+    const direct = groupByTypeThenRating(directlyInvolvedFlows);
     const all = groupByTypeThenRating(flows);
 
     return {
@@ -90,15 +92,11 @@ function controller() {
 }
 
 
-const directive = {
-    restrict: 'E',
-    replace: false,
-    template: require('./rated-flow-summary-panel.html'),
+const component = {
+    template,
     controller,
-    controllerAs: 'ctrl',
-    bindToController: BINDINGS,
-    scope: {}
+    bindings
 };
 
 
-export default () => directive;
+export default component;

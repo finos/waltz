@@ -10,7 +10,7 @@
             <strong>Data Type</strong>
         </td>
         <td>
-            <span ng-bind="ctrl.dataType | toDisplayName:'dataType'">
+            <span ng-bind="$ctrl.dataType | toDisplayName:'dataType'">
             </span>
         </td>
     </tr>
@@ -19,7 +19,7 @@
             <strong>Rating</strong>
         </td>
         <td>
-            <span ng-bind="ctrl.rating | toDisplayName:'rating'">
+            <span ng-bind="$ctrl.rating | toDisplayName:'rating'">
             </span>
         </td>
     </tr>
@@ -28,9 +28,9 @@
             <strong>Include Sub-Units ?</strong>
         </td>
         <td>
-            <waltz-toggle on-toggle='ctrl.toggleIndirectApps()'
+            <waltz-toggle on-toggle='$ctrl.toggleIndirectApps()'
                           label-on="Now including sub-units"
-                          state="ctrl.shouldShowIndirectApps"></waltz-toggle>
+                          state="$ctrl.shouldShowIndirectApps"></waltz-toggle>
         </td>
     </tr>
     <tr>
@@ -40,7 +40,7 @@
         <td>
             <div class="waltz-scroll-region" style="height: 200px">
                 <ul class="list-unstyled">
-                    <li ng-repeat="app in ctrl.sourceApps | orderBy:'name'">
+                    <li ng-repeat="app in $ctrl.sourceApps | orderBy:'name'">
                         <a ui-sref="main.app.view ({ id: app.id })"
                            ng-bind="app.name">
                         </a>

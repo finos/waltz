@@ -24,8 +24,6 @@ export default (module) => {
         .directive('waltzDataFlowsTabgroupSection', require('./data-flows-tabgroup-section'))
         .directive('waltzFlowFilterOptionsOverlay', require('./flow-filter-options-overlay'))
         .directive('waltzDataFlowTypeEditor', require('./edit/data-flow-type-editor'))
-        .directive('waltzRatedFlowSummaryCell', require('./rated-flow-summary/rated-flow-summary-cell'))
-        .directive('waltzRatedFlowSummaryInfoCell', require('./rated-flow-summary/rated-flow-summary-info-cell'))
-        .directive('waltzRatedFlowSummaryPanel', require('./rated-flow-summary/rated-flow-summary-panel'))
-        .directive('waltzRatedFlowSummaryTable', require('./rated-flow-summary/rated-flow-summary-table'));
+
+
 };
