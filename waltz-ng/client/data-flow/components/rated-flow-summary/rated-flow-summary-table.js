@@ -56,24 +56,7 @@ function summariseByTypeThenRating(flows = [], apps = [], orgUnitId) {
 
 
 function calculateMaxBucketSizes(flows = []) {
-    const sizes = d3.nest()
-        .key(f => f.dataFlow.dataType)
-        .key(f => f.rating)
-        .rollup(bs => bs.length)
-        .entries(flows);
-
-
-    return _.chain(sizes)
-        .map(s => ({
-            dataType: s.key,
-            maxSize: _.maxBy(s.values, v => v.values).values
-        }))
-        .reduce((acc, v) => {
-            acc[v.dataType] = v.maxSize;
-            return acc;
-        }, {})
-        .value();
-
+    return _.countBy(flows, f => f.dataFlow.dataType);
 }
 
 

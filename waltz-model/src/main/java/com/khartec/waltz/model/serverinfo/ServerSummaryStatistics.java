@@ -19,6 +19,7 @@ public abstract class ServerSummaryStatistics implements SummaryStatistics {
     public abstract List<StringTally> operatingSystemCounts();
     public abstract List<StringTally> locationCounts();
 
+    @Value.Default
     public long totalCount() {
         return virtualCount() + physicalCount();
     }

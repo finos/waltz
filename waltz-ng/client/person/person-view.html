@@ -68,9 +68,8 @@
             <uib-tabset>
 
                 <uib-tab heading="Summary">
-                    <waltz-app-summary has-app-involvements="ctrl.hasAppInvolvements"
-                                       has-end-user-app-involvements="ctrl.hasEndUserAppInvolvements"
-                                       charts="ctrl.charts">
+                    <waltz-app-summary apps="ctrl.apps"
+                                       end-user-apps="ctrl.endUserApps">
                     </waltz-app-summary>
                 </uib-tab>
 
@@ -117,7 +116,6 @@
                                        flow-data="ctrl.dataFlows"
                                        on-load-detail="ctrl.loadFlowDetail"
                                        applications="ctrl.apps">
-
     </waltz-data-flows-tabgroup-section>
 
 

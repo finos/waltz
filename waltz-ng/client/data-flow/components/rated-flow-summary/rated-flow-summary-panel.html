@@ -9,11 +9,10 @@
     <div class="col-md-5">
         <waltz-rated-flow-summary-info-cell ng-if="$ctrl.selectedBucket.type == 'CELL'"
                                             applications="$ctrl.selectedBucket.applications"
-                                            data-data-type="$ctrl.selectedBucket.dataType"
+                                            type="$ctrl.selectedBucket.dataType"
                                             flows="$ctrl.selectedBucket.flows"
                                             org-unit-id="$ctrl.orgUnitId"
                                             rating="$ctrl.selectedBucket.rating">
-            <!-- note: data-data-type gets round angular's eager capture of attrs with a data-prefix -->
         </waltz-rated-flow-summary-info-cell>
     </div>
 </div>

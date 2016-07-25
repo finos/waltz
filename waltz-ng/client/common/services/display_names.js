@@ -153,4 +153,4 @@ export const riskRatingDisplayNames = {
     MEDIUM: 'Medium',
     HIGH: 'High',
     VERY_HIGH: 'Very high'
-}
+};
