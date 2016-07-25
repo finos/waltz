@@ -15,16 +15,19 @@ export default (module) => {
 
     require('./services')(module);
 
-    module.config(require('./routes'));
+    module
+        .config(require('./routes'));
 
-    module.directive('waltzAppOverview', require('./directives/app-overview'));
-    module.directive('waltzAppOverviewSection', require('./directives/app-overview-section'));
-    module.directive('waltzAppSelector', require('./directives/app-selector'));
-    module.directive('waltzAppTable', require('./directives/app-table'));
-    module.directive('waltzAppsByInvestmentPie', require('./directives/apps-by-investment-pie'));
-    module.directive('waltzAppsByLifecyclePhasePie', require('./directives/apps-by-lifecycle-phase-pie'));
-    module.directive('waltzAppSummary', require('./directives/app-summary'));
-    module.directive('waltzAssetCodeExplorer', require('./directives/asset-code-explorer'));
-    module.directive('waltzBasicAppSelector', require('./directives/basic-app-selector'));
+    module
+        .directive('waltzAppOverview', require('./directives/app-overview'))
+        .directive('waltzAppOverviewSection', require('./directives/app-overview-section'))
+        .directive('waltzAppSelector', require('./directives/app-selector'))
+        .directive('waltzAppTable', require('./directives/app-table'))
+        .directive('waltzAppsByInvestmentPie', require('./directives/apps-by-investment-pie'))
+        .directive('waltzAppsByLifecyclePhasePie', require('./directives/apps-by-lifecycle-phase-pie'))
+        .directive('waltzAssetCodeExplorer', require('./directives/asset-code-explorer'))
+        .directive('waltzBasicAppSelector', require('./directives/basic-app-selector'));
 
+    module
+        .component('waltzAppSummary', require('./components/app-summary'));
 };

@@ -11,6 +11,11 @@ const BINDINGS = {
 
 
 const initialState = {
+    directApps: [],
+    indirectApps: [],
+    sourceApps: [],
+    offLabel: '',
+    enableSubUnitToggle: false,
     shouldShowIndirectApps: false
 };
 
@@ -40,6 +45,15 @@ function controller() {
         vm.sourceApps = vm.shouldShowIndirectApps
             ? targetApps
             : directApps
+
+        vm.directApps = directApps;
+        vm.indirectApps = indirectApps;
+
+        vm.enableSubUnitToggle = indirectApps.length > 0;
+
+        vm.offLabel = indirectApps.length > 0
+            ? `(not showing ${ indirectApps.length } apps from sub-units)`
+            : '';
 
     };
 

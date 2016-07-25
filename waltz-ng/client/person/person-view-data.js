@@ -141,7 +141,8 @@ function service($q,
                 involvementsByKind['END_USER_APPLICATION'] || []
             ));
 
-            state.model.apps = apps;
+            state.model.apps = appsWithManagement;
+            state.model.endUserApps = endUserAppsWithManagement
             state.model.appInvolvements = appsSummary;
             state.model.endUserAppInvolvements = endUserAppsSummary;
             state.model.combinedAppInvolvements = combinedSummary;

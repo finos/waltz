@@ -211,9 +211,7 @@
 
             <uib-tabset ng-if="ctrl.applications.length">
                 <uib-tab heading="Summary">
-                    <waltz-app-summary has-app-involvements="ctrl.applications.length"
-                                       has-end-user-app-involvements="false"
-                                       charts="ctrl.appSummaryCharts">
+                    <waltz-app-summary apps="ctrl.applications">
                     </waltz-app-summary>
                 </uib-tab>
 

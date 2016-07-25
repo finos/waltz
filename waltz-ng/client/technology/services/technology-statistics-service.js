@@ -26,7 +26,7 @@ function service($q,
                 softwareStats
             ]) => ({
                     serverStats,
-                    databaseStats : {},
+                    databaseStats : { count: 0 },
                     softwareStats
                 })
             );

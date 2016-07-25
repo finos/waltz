@@ -17,6 +17,7 @@
   -->
 
 <div>
+
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.viewData.orgUnit.name }}"
                        icon="sitemap"
@@ -174,8 +175,6 @@
                 </div>
 
             </uib-tab>
-
-
         </uib-tabset>
     </waltz-section>
 
@@ -237,9 +236,8 @@
 
         <uib-tabset ng-if="ctrl.viewData.combinedApps.length">
             <uib-tab heading="Summary">
-                <waltz-app-summary has-app-involvements="ctrl.viewData.apps.length"
-                                   has-end-user-app-involvements="ctrl.viewData.endUserApps.length"
-                                   charts="ctrl.appSummaryCharts">
+                <waltz-app-summary apps="ctrl.viewData.apps"
+                                   end-user-apps="ctrl.viewData.endUserApps">
                 </waltz-app-summary>
             </uib-tab>
 
