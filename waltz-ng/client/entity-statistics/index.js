@@ -13,11 +13,24 @@
 
 
 export default (module) => {
-    module.directive('waltzEntityStatisticSection', require('./directives/entity-statistic-section'));
-    module.directive('waltzEntityStatisticSummarySection', require('./directives/entity-statistic-summary-section'));
-    module.directive('waltzEntityStatisticBooleanRenderer', require('./directives/entity-statistic-boolean-renderer'));
-    module.directive('waltzEntityStatisticPercentageRenderer', require('./directives/entity-statistic-percentage-renderer'));
-    module.directive('waltzEntityStatisticNumericRenderer', require('./directives/entity-statistic-numeric-renderer'));
 
-    module.service('EntityStatisticStore', require('./services/entity-statistic-store'));
+    module
+        .config(require('./routes'));
+
+    module
+        .service('EntityStatisticStore', require('./services/entity-statistic-store'))
+        .service('EntityStatisticUtilities', require('./services/entity-statistics-utilities'));
+
+    module
+        .directive('waltzEntityStatisticSection', require('./directives/entity-statistic-section'))
+        .directive('waltzEntityStatisticSummarySection', require('./directives/entity-statistic-summary-section'))
+        .directive('waltzEntityStatisticBooleanRenderer', require('./directives/entity-statistic-boolean-renderer'))
+        .directive('waltzEntityStatisticPercentageRenderer', require('./directives/entity-statistic-percentage-renderer'))
+        .directive('waltzEntityStatisticNumericRenderer', require('./directives/entity-statistic-numeric-renderer'));
+
+    module
+        .component('waltzEntityStatisticDetailTable', require('./components/entity-statistic-detail-table'))
+        .component('waltzEntityStatisticDetailPanel', require('./components/entity-statistic-detail-panel'))
+        .component('waltzEntityStatisticSummaryCard', require('./components/entity-statistic-summary-card'))
+        .component('waltzRelatedEntityStatisticsSummaries', require('./components/related-entity-statistics-summaries'));
 };

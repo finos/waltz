@@ -3,7 +3,7 @@ import _ from "lodash";
 
 const BINDINGS = {
     applications: '<',
-    dataType: '<',
+    type: '<',
     flows: '<',
     orgUnitId: '<',
     rating: '<'
@@ -11,6 +11,11 @@ const BINDINGS = {
 
 
 const initialState = {
+    directApps: [],
+    indirectApps: [],
+    sourceApps: [],
+    offLabel: '',
+    enableSubUnitToggle: false,
     shouldShowIndirectApps: false
 };
 
@@ -41,6 +46,15 @@ function controller() {
             ? targetApps
             : directApps
 
+        vm.directApps = directApps;
+        vm.indirectApps = indirectApps;
+
+        vm.enableSubUnitToggle = indirectApps.length > 0;
+
+        vm.offLabel = indirectApps.length > 0
+            ? `(not showing ${ indirectApps.length } apps from sub-units)`
+            : '';
+
     };
 
     vm.$onChanges = refresh;
@@ -53,15 +67,11 @@ function controller() {
 }
 
 
-const directive = {
-    restrict: 'E',
-    replace: false,
+const component = {
     template: require('./rated-flow-summary-info-cell.html'),
     controller,
-    controllerAs: 'ctrl',
-    bindToController: BINDINGS,
-    scope: {}
+    bindings: BINDINGS
 };
 
 
-export default () => directive;
+export default component;

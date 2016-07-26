@@ -2152,4 +2152,86 @@
         <addPrimaryKey columnNames="user_id, key" constraintName="user_preference_pkey" tableName="user_preference"/>
     </changeSet>
 
+    <!-- 302 - Entity Statistic Hierarchy -->
+    <changeSet author="dwatkins"
+               id="20160720-302-1">
+        <addColumn tableName="entity_statistic_definition">
+            <column name="parent_id"
+                    type="${long.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+
+    </changeSet>
+
+
+    <!-- 312 - Entit Stat Defn - Remove Auto Inc -->
+    <changeSet author="dwatkins"
+               id="2016072-312-1">
+        <addColumn tableName="entity_statistic_definition">
+            <column name="orig_id"
+                    type="${long.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="2016072-312-2">
+        <sql>
+            UPDATE entity_statistic_definition SET orig_id = id
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               id="2016072-312-3">
+        <dropPrimaryKey constraintName="entity_statistic_defn_pkey"
+                        tableName="entity_statistic_definition"/>
+    </changeSet>
+
+
+    <changeSet author="dwatkins"
+               id="2016072-312-4">
+        <dropColumn tableName="entity_statistic_definition" columnName="id">
+        </dropColumn>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="2016072-312-5">
+        <addColumn tableName="entity_statistic_definition">
+            <column name="id" type="${long.type}">
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="2016072-312-6">
+        <sql>
+            UPDATE entity_statistic_definition SET id = orig_id
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="2016072-312-7">
+        <addNotNullConstraint tableName="entity_statistic_definition"
+                              columnName="id"
+                              columnDataType="${long.type}"/>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="2016072-312-8">
+        <addPrimaryKey columnNames="id"
+                       constraintName="entity_statistic_defn_pkey"
+                       tableName="entity_statistic_definition"/>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="2016072-312-9">
+        <dropColumn tableName="entity_statistic_definition"
+                    columnName="orig_id">
+        </dropColumn>
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -49,7 +49,7 @@ function service($q,
             perspectiveStore.findByCode('BUSINESS'),
             dataFlowViewService.initialise(orgUnitId, "ORG_UNIT", "CHILDREN"),
             changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId),
-            assetCostViewService.initialise(orgUnitId, 'ORG_UNIT', 'CHILDREN', 2015),
+            assetCostViewService.initialise(orgUnitId, 'ORG_UNIT', 'CHILDREN', 2015)
         ];
 
         return $q.all(promises)
@@ -80,6 +80,22 @@ function service($q,
             .then(() => loadAll2(orgUnitId))
     }
 
+    function loadEntityStatistics(appIdSelector) {
+        const entityStatistics = {};
+
+        return entityStatisticStore
+            .findTopLevelDefinitions()
+            .then(definitions => {
+                entityStatistics.definitions = definitions;
+                const definitionIds = _.map(definitions, 'id');
+                return entityStatisticStore.findStatTallies(definitionIds, appIdSelector);
+            })
+            .then(tallies => {
+                entityStatistics.summaries = tallies;
+                return entityStatistics;
+            });
+    }
+
     function loadAll2(orgUnitId) {
 
 
@@ -102,7 +118,7 @@ function service($q,
             techStatsService.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
             bookmarkStore.findByParent({id: orgUnitId, kind: 'ORG_UNIT'}),
             sourceDataRatingStore.findAll(),
-            entityStatisticStore.findSummaryStatsByIdSelector(appIdSelector)
+            loadEntityStatistics(appIdSelector)
         ]);
 
         const prepareRawDataPromise = bulkPromise
@@ -117,7 +133,7 @@ function service($q,
                 techStats,
                 bookmarks,
                 sourceDataRatings,
-                entityStatisticsSummary
+                entityStatistics
             ]) => {
 
                 const endUserAppsWithManagement = _.map(_.cloneDeep(endUserApps),
@@ -131,6 +147,7 @@ function service($q,
 
                 const combinedApps = _.concat(rawData.apps, endUserAppsWithManagement);
 
+
                 const r = {
                     orgUnitId,
                     capabilityRatings,
@@ -143,7 +160,7 @@ function service($q,
                     techStats,
                     bookmarks,
                     sourceDataRatings,
-                    entityStatisticsSummary,
+                    entityStatistics,
                     combinedApps
                 };
 

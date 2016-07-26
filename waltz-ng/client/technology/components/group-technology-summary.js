@@ -2,11 +2,20 @@ import _ from "lodash";
 import {environmentColorScale, operatingSystemColorScale, maturityColorScale, variableScale} from "../../common/colors";
 
 
-const BINDINGS = {
-    stats: '='
+const bindings = {
+    stats: '<'
+};
+
+const initialState = {
+    visibility: {
+        servers: false,
+        software: false,
+        databases: false
+    }
 };
 
 const PIE_SIZE = 70;
+
 
 const PIE_CONFIG = {
     environment: {
@@ -34,6 +43,7 @@ const PIE_CONFIG = {
 
 const tallyToPieDatum = t => ({ key: t.id, count: t.count });
 const prepareForPieChart = (tallies) => _.map(tallies, tallyToPieDatum);
+
 
 function processServerStats(stats) {
     return {
@@ -67,33 +77,36 @@ function processSoftwareCatalogStats(stats) {
 }
 
 
-function controller($scope) {
-
-    const vm = this;
-
-    $scope.$watch(
-        'ctrl.stats',
-        stats => {
-            if (! stats) return;
-            Object.assign(vm, processServerStats(stats.serverStats));
-            Object.assign(vm, processDatabaseStats(stats.databaseStats));
-            Object.assign(vm, processSoftwareCatalogStats(stats.softwareStats));
-        });
-
-
-    vm.pieConfig = PIE_CONFIG;
-
+function calculateVisibility(stats) {
+    return {
+        servers: stats.serverStats.count > 0,
+        databases: stats.databaseStats.count > 0,
+        software: stats.softwareStats && _.keys(stats.softwareStats.vendorCounts).length > 0
+    };
 }
 
-controller.$inject = [ '$scope' ];
+function controller() {
+
+    const vm = _.defaultsDeep(this, initialState);
+
+    vm.$onChanges = () => {
+        if (! vm.stats) return;
+        Object.assign(vm, processServerStats(vm.stats.serverStats));
+        Object.assign(vm, processDatabaseStats(vm.stats.databaseStats));
+        Object.assign(vm, processSoftwareCatalogStats(vm.stats.softwareStats));
+
+        vm.visibility = calculateVisibility(vm.stats);
+    };
+
+    vm.pieConfig = PIE_CONFIG;
+}
 
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
-    scope: {},
+const component = {
     template: require('./group-technology-summary.html'),
-    bindToController: BINDINGS,
-    controllerAs: 'ctrl',
+    bindings,
     controller
-});
+};
+
+
+export default component;

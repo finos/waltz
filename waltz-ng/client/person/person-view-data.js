@@ -141,7 +141,8 @@ function service($q,
                 involvementsByKind['END_USER_APPLICATION'] || []
             ));
 
-            state.model.apps = apps;
+            state.model.apps = appsWithManagement;
+            state.model.endUserApps = endUserAppsWithManagement
             state.model.appInvolvements = appsSummary;
             state.model.endUserAppInvolvements = endUserAppsSummary;
             state.model.combinedAppInvolvements = combinedSummary;
@@ -192,7 +193,7 @@ function service($q,
             .then(ratings => state.model.sourceDataRatings = ratings);
     }
 
-    function loadEntityStatisticSummary(personId) {
+    function loadEntityStatistics(personId) {
         const appIdSelector = {
             entityReference: {
                 kind: 'PERSON',
@@ -201,9 +202,18 @@ function service($q,
             scope: 'CHILDREN'
         };
 
-        entityStatisticStore.findSummaryStatsByIdSelector(appIdSelector)
-            .then(stats => {
-                state.model.entityStatisticsSummary = stats;
+        const entityStatistics = {};
+
+        return entityStatisticStore
+            .findTopLevelDefinitions()
+            .then(definitions => {
+                entityStatistics.definitions = definitions;
+                const definitionIds = _.map(definitions, 'id');
+                return entityStatisticStore.findStatTallies(definitionIds, appIdSelector);
+            })
+            .then(tallies => {
+                entityStatistics.summaries = tallies;
+                return state.model.entityStatistics = entityStatistics;
             });
     }
 
@@ -226,7 +236,7 @@ function service($q,
                 loadTechStats(personId);
                 loadComplexity(personId);
                 loadSourceDataRatings();
-                loadEntityStatisticSummary(personId);
+                loadEntityStatistics(personId);
             });
 
         const appPromise = peoplePromise

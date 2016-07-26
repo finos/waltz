@@ -2,7 +2,7 @@ import d3 from "d3";
 import _ from "lodash";
 
 
-const BINDINGS = {
+const bindings = {
     ratedFlows: '<',
     apps: '<',
     orgUnitId: '<',
@@ -10,10 +10,13 @@ const BINDINGS = {
 };
 
 
+const template = require('./rated-flow-summary-table.html');
+
+
 const initialState = {
     apps: [],
     ratedFlows: [],
-    largestBucket: 0,
+    maxBucketSizes: {},
     onClick: (data) => console.log('no on-click handler supplied to rated-flow-summary-table', data)
 };
 
@@ -52,23 +55,25 @@ function summariseByTypeThenRating(flows = [], apps = [], orgUnitId) {
 }
 
 
-function findLargestBucket(summary) {
-    return _.chain(summary)
-        .flatMap(x => _.map(x))    // get all the 'leaf' values of the nested obj structure
-        .map('all')                // focus on 'all' attribute
-        .max()                     // find the biggest
-        .value();
+function calculateMaxBucketSizes(flows = []) {
+    return _.countBy(flows, f => f.dataFlow.dataType);
 }
 
 
 function prepareData(flows = [], apps = [], orgUnitId) {
 
     const summary = summariseByTypeThenRating(flows, apps, orgUnitId);
-    const largestBucket = findLargestBucket(summary);
+    const maxBucketSizes = calculateMaxBucketSizes(flows);
+    const totals = d3
+        .nest()
+        .key(f => f.dataFlow.dataType)
+        .rollup(fs => fs.length)
+        .map(flows);
 
     return {
-        largestBucket,
-        summary
+        summary,
+        maxBucketSizes,
+        totals
     };
 }
 
@@ -93,15 +98,11 @@ function controller() {
 }
 
 
-const directive = {
-    restrict: 'E',
-    replace: false,
-    template: require('./rated-flow-summary-table.html'),
+const component = {
+    template,
     controller,
-    controllerAs: 'ctrl',
-    bindToController: BINDINGS,
-    scope: {}
+    bindings
 };
 
 
-export default () => directive;
+export default component;

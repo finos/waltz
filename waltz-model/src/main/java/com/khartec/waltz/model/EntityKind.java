@@ -37,6 +37,7 @@ public enum EntityKind {
     CHANGE_INITIATIVE,
     PERFORMANCE_METRIC_PACK,
     PROCESS,
+    ENTITY_STATISTIC,
     INVOLVEMENT
 
 }

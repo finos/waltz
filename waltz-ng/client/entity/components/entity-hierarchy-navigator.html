@@ -1,0 +1,14 @@
+<div>
+    <treecontrol class="tree-light"
+                 tree-model="$ctrl.forest"
+                 selected-node="$ctrl.currentNode"
+                 expanded-nodes="$ctrl.expandedNodes"
+                 on-selection="$ctrl.handleSelection(node)">
+        <span class="clickable"
+           title="{{ node.description }}">
+            <span ng-transclude="nodeTemplate">
+                <span ng-bind="node.name"></span>
+            </span>
+        </span>
+    </treecontrol>
+</div>

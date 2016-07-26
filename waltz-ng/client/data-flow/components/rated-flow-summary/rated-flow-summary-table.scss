@@ -1,21 +1,18 @@
 .waltz-rated-flow-summary-table {
-    .primary rect {
+    .primary {
         fill: #3cd32f;
     }
 
-    .secondary rect {
+    .secondary {
         fill: #d3c433;
     }
 
-    .discouraged rect {
+    .discouraged {
         fill: #d33035;
     }
 
-    .no-opinion rect {
+    .no-opinion {
         fill: #6d6b70;
     }
 
-    .stack-1 {
-        opacity: 0.4;
-    }
 }

@@ -71,6 +71,7 @@ public class SoftwareCatalogService {
                 .fetch(JooqUtilities.TO_STRING_TALLY);
     }
 
+
     public SoftwareSummaryStatistics findStatisticsForAppIdSelector(ApplicationIdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = factory.apply(options);

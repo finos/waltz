@@ -17,24 +17,6 @@
  */
 import _ from "lodash";
 import {selectBest} from "../ratings/directives/viewer/coloring-strategies";
-import {lifecyclePhaseColorScale, variableScale} from "../common/colors";
-import {tallyBy} from "../common/tally-utils";
-
-
-const PIE_SIZE = 70;
-
-
-function mkChartData(data, groupingField, size, colorProvider = variableScale, labelProvider = null) {
-    return {
-        config: {
-            colorProvider: (d) => colorProvider(d.data.key),
-            labelProvider,
-            size
-        },
-        data: tallyBy(data, groupingField)
-    };
-}
-
 
 
 /**
@@ -93,7 +75,7 @@ const initialState = {
     changeInitiatives: [],
     complexity: [],
     dataFlows : null,
-    entityStatisticsSummary: [],
+    entityStatistics: [],
     flowOptions: null,
     groupDetail: null,
     initiallySelectedIds: [],
@@ -114,6 +96,21 @@ const initialState = {
 };
 
 
+function loadEntityStatistics(entityStatisticStore, appIdSelector) {
+    const entityStatistics = {};
+
+    return entityStatisticStore
+        .findTopLevelDefinitions()
+        .then(definitions => {
+            entityStatistics.definitions = definitions;
+            const definitionIds = _.map(definitions, 'id');
+            return entityStatisticStore.findStatTallies(definitionIds, appIdSelector);
+        })
+        .then(tallies => {
+            entityStatistics.summaries = tallies;
+            return entityStatistics;
+        });
+}
 
 function controller($scope,
                     $q,
@@ -144,6 +141,8 @@ function controller($scope,
         },
         scope: 'EXACT'
     };
+
+    vm.entityRef = appIdSelector.entityReference;
 
     const isUserAnOwner = member =>
             member.role === 'OWNER'
@@ -189,13 +188,6 @@ function controller($scope,
             vm.appCapabilities = appCapabilities;
             vm.ratings = ratings;
             vm.techStats = techStats;
-
-            vm.appSummaryCharts = {
-                apps: {
-                    byLifecyclePhase: mkChartData(apps, 'lifecyclePhase', PIE_SIZE, lifecyclePhaseColorScale),
-                    byKind: mkChartData(apps, 'kind', PIE_SIZE, variableScale)
-                }
-            };
         })
         .then(() => calculateCapabilities(vm.allCapabilities, vm.appCapabilities))
         .then(result => Object.assign(vm, result))
@@ -222,9 +214,9 @@ function controller($scope,
 
     vm.loadFlowDetail = () => dataFlowViewService.loadDetail();
 
-    entityStatisticStore.findSummaryStatsByIdSelector(appIdSelector)
+    loadEntityStatistics(entityStatisticStore, appIdSelector)
         .then(stats => {
-            vm.entityStatisticsSummary = stats;
+            vm.entityStatistics = stats;
         });
 
 }

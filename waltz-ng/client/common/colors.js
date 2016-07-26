@@ -83,5 +83,5 @@ export const flowDirectionColorScale = d3.scale.ordinal()
 const underlyingVariableScale = d3.scale.category20c();
 
 export const variableScale = (x) => x != "Other"
-        ? d3.rgb(underlyingVariableScale(x))
+        ? d3.rgb(underlyingVariableScale(JSON.stringify(x)))
         : grey;

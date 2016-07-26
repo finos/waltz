@@ -8,7 +8,13 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntityStatisticDefinition.class)
 @JsonDeserialize(as = ImmutableEntityStatisticDefinition.class)
-public abstract class EntityStatisticDefinition implements IdProvider, NameProvider, DescriptionProvider, ProvenanceProvider {
+public abstract class EntityStatisticDefinition implements
+        IdProvider,
+        NameProvider,
+        DescriptionProvider,
+        ProvenanceProvider,
+        ParentIdProvider
+{
 
     public abstract StatisticType type();
     public abstract StatisticCategory category();
