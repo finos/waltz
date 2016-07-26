@@ -15,13 +15,15 @@
 
 - Postgresql 
 - MariaDB
+- Microsoft SQL Server (2012+)  
+  - requires JOOQ Pro license to build from source
 
 
 ### Client
 
 - Browser based
     - IE 9+, Chrome, Safari, Firefox)
-- AngularJS 1.4
+- AngularJS 1.5
 - Bootstrap 3
 - D3 
 
