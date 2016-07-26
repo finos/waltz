@@ -17,10 +17,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.ArrayUtilities.randomPick;
 import static com.khartec.waltz.common.IOUtilities.readLines;
@@ -30,12 +33,59 @@ import static java.util.stream.Collectors.*;
 
 public class EntityStatisticGenerator implements SampleDataGenerator {
 
-    private static final String PROVENANCE = "waltz";
+    private static final String PROVENANCE = "DEMO";
     private static final int VALUE_COUNT = 2;
 
 
-    public static void main(String[] args) throws IOException {
+    private static final EntityStatisticDefinition BASE_DEFN = ImmutableEntityStatisticDefinition.builder()
+            .active(true)
+            .category(StatisticCategory.COMPLIANCE)
+            .description("description")
+            .type(StatisticType.ENUM)
+            .renderer("enum")
+            .historicRenderer("enum")
+            .name("dummy stat")
+            .provenance(PROVENANCE)
+            .build();
 
+
+    private static final EntityStatisticDefinition SDLC = ImmutableEntityStatisticDefinition
+            .copyOf(BASE_DEFN)
+            .withId(10000L)
+            .withName("SDLC Compliance");
+
+    private static final EntityStatisticDefinition SDLC_TECH = ImmutableEntityStatisticDefinition
+            .copyOf(SDLC)
+            .withId(10100L)
+            .withParentId(10000L)
+            .withName("SDLC Technology");
+
+    private static final EntityStatisticDefinition SDLC_PROCESS = ImmutableEntityStatisticDefinition
+            .copyOf(SDLC)
+            .withId(10200L)
+            .withParentId(10000L)
+            .withName("SDLC Process");
+
+    private static final EntityStatisticDefinition SDLC_JIRA = ImmutableEntityStatisticDefinition
+            .copyOf(SDLC)
+            .withId(10101L)
+            .withParentId(10100L)
+            .withName("SDLC Tech Jira");
+
+    private static final EntityStatisticDefinition SDLC_SVN = ImmutableEntityStatisticDefinition
+            .copyOf(SDLC)
+            .withId(10102L)
+            .withParentId(10100L)
+            .withName("SDLC Tech SVN");
+
+    private static final EntityStatisticDefinition SDLC_WIKI = ImmutableEntityStatisticDefinition
+            .copyOf(SDLC)
+            .withId(10103L)
+            .withParentId(10100L)
+            .withName("SDLC Tech Wiki");
+
+
+    public static void main(String[] args) throws IOException {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         new EntityStatisticGenerator().apply(ctx);
     }
@@ -46,50 +96,99 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
 
         DSLContext dsl = context.getBean(DSLContext.class);
         ApplicationDao applicationDao = context.getBean(ApplicationDao.class);
-        EntityStatisticValueDao statisticsValueDao = context.getBean(EntityStatisticValueDao.class);
-        EntityStatisticDefinitionDao statisticsDefinitionDao = context.getBean(EntityStatisticDefinitionDao.class);
+        EntityStatisticValueDao valueDao = context.getBean(EntityStatisticValueDao.class);
+        EntityStatisticDefinitionDao definitionDao = context.getBean(EntityStatisticDefinitionDao.class);
 
         Application[] applications = applicationDao.getAll().toArray(new Application[0]);
 
+        dsl.deleteFrom(ENTITY_STATISTIC_DEFINITION)
+                .where(ENTITY_STATISTIC_DEFINITION.PROVENANCE.eq("DEMO"))
+                .execute();
 
-        dsl.deleteFrom(ENTITY_STATISTIC_DEFINITION).execute();
-        dsl.deleteFrom(ENTITY_STATISTIC_VALUE).execute();
-        System.out.println("deleted existing statistics");
+        dsl.deleteFrom(ENTITY_STATISTIC_VALUE)
+                .where(ENTITY_STATISTIC_VALUE.PROVENANCE.eq("DEMO"))
+                .execute();
 
-        // insert new entity stats
-        List<EntityStatisticDefinition> allEntityStatistics = null;
-        try {
-            allEntityStatistics = insertEntityStatistics(statisticsDefinitionDao);
-        } catch (IOException e) {
-            System.out.println("Failed to insert entity statistics: " + e.getMessage());
-            e.printStackTrace();
-        }
-        System.out.println("Inserted entity statistics: " + allEntityStatistics.size());
+        System.out.println("deleted existing statistics (provenance: '" + PROVENANCE + "')");
 
-        List<EntityStatisticValue> values = new ArrayList<>(applications.length * allEntityStatistics.size());
-        for (Application app : applications) {
+        definitionDao.insert(SDLC);
+        definitionDao.insert(SDLC_TECH);
+        definitionDao.insert(SDLC_PROCESS);
+        definitionDao.insert(SDLC_JIRA);
+        definitionDao.insert(SDLC_SVN);
+        definitionDao.insert(SDLC_WIKI);
 
-            for (EntityStatisticDefinition es : allEntityStatistics) {
-                try {
-                    values.addAll(buildEntityStatisticValues(app, es));
-                } catch (IOException e) {
-                    System.out.println("Failed to insert entity statistics: " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        }
+        createAdoptionStatsFor(SDLC_TECH, applications, valueDao);
+        createAdoptionStatsFor(SDLC_PROCESS, applications, valueDao);
+        createAdoptionStatsFor(SDLC_JIRA, applications, valueDao);
+        createAdoptionStatsFor(SDLC_SVN, applications, valueDao);
+        createAdoptionStatsFor(SDLC_WIKI, applications, valueDao);
 
-        int[] results = statisticsValueDao.bulkSaveValues(values);
-        System.out.println("inserted entity statistic values: " + results.length);
+        return null;//
+//
+//
+//        // insert new entity stats
+//        List<EntityStatisticDefinition> allEntityStatistics = null;
+//        try {
+//            allEntityStatistics = insertDefinitions(statisticsDefinitionDao);
+//        } catch (IOException e) {
+//            System.out.println("Failed to insert entity statistics: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//        System.out.println("Inserted entity statistics: " + allEntityStatistics.size());
+//
+//        List<EntityStatisticValue> values = new ArrayList<>(applications.length * allEntityStatistics.size());
+//        for (Application app : applications) {
+//
+//            for (EntityStatisticDefinition es : allEntityStatistics) {
+//                try {
+//                    values.addAll(buildValue(app, es));
+//                } catch (IOException e) {
+//                    System.out.println("Failed to insert entity statistics: " + e.getMessage());
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//
+//        int[] results = statisticsValueDao.bulkSaveValues(values);
+//        System.out.println("inserted entity statistic values: " + results.length);
+//
+//        Map<String, Integer> result = new HashMap<>(2);
+//        result.put("EntityStatistic", allEntityStatistics.size());
+//        result.put("EntityStatisticValue", results.length);
+//        return result;
+    }
 
-        Map<String, Integer> result = new HashMap<>(2);
-        result.put("EntityStatistic", allEntityStatistics.size());
-        result.put("EntityStatisticValue", results.length);
-        return result;
+    private void createAdoptionStatsFor(EntityStatisticDefinition defn,
+                                        Application[] applications,
+                                        EntityStatisticValueDao valueDao) {
+
+        List<EntityStatisticValue> values = Stream.of(applications)
+                .map(app -> app.id().get())
+                .map(appId -> {
+                    String result = randomPick("COMPLIANT", "PARTIALLY_COMPLIANT", "NON_COMPLIANT");
+                    return ImmutableEntityStatisticValue
+                            .builder()
+                            .entity(ImmutableEntityReference
+                                    .builder()
+                                    .id(appId)
+                                    .kind(EntityKind.APPLICATION)
+                                    .build())
+                            .current(true)
+                            .state(StatisticValueState.PROVIDED)
+                            .outcome(result)
+                            .value(result)
+                            .statisticId(defn.id().get())
+                            .createdAt(LocalDateTime.now())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        valueDao.bulkSaveValues(values);
     }
 
 
-    private static List<EntityStatisticDefinition> insertEntityStatistics(EntityStatisticDefinitionDao definitionDao) throws IOException {
+    private static List<EntityStatisticDefinition> insertDefinitions(EntityStatisticDefinitionDao definitionDao) throws IOException {
         List<String> lines = readLines(OrgUnitGenerator.class.getResourceAsStream("/entity-statistics.csv"));
         List<EntityStatisticDefinition> definitions = lines.stream()
                 .skip(1)
@@ -112,7 +211,7 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
     }
 
 
-    private List<EntityStatisticValue> buildEntityStatisticValues(Application app, EntityStatisticDefinition es) throws IOException {
+    private List<EntityStatisticValue> buildValue(Application app, EntityStatisticDefinition es) throws IOException {
         List<String> lines = readLines(OrgUnitGenerator.class.getResourceAsStream("/entity-statistic-values.csv"));
         Map<StatisticType, List<Tuple4>> statisticTypeValueMap = lines.stream()
                 .skip(1)

@@ -23,13 +23,10 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.application.HierarchyQueryScope;
 import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.List;
 
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
@@ -63,7 +60,6 @@ public class EntityStatisticHarness {
 //        ImmediateHierarchy<EntityStatisticSummary> hier = service.findRelatedStatsSummaries(34L, options);
 //        List<TallyPack<String>> statTallies = service.findStatTallies(ListUtilities.newArrayList(31L, 34L), options);
 
-        List<EntityStatisticDefinition> statsDefinitionsForAppIdSelector = service.findStatsDefinitionsForAppIdSelector(options);
 
         System.out.println("done");
     }
