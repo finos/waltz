@@ -204,7 +204,8 @@ function service($q,
 
         const entityStatistics = {};
 
-        return entityStatisticStore.findStatsDefinitionsByIdSelector(appIdSelector)
+        return entityStatisticStore
+            .findTopLevelDefinitions()
             .then(definitions => {
                 entityStatistics.definitions = definitions;
                 const definitionIds = _.map(definitions, 'id');

@@ -45,6 +45,8 @@ public class EntityStatisticDefinitionDao {
     private static final Function<EntityStatisticDefinition, EntityStatisticDefinitionRecord> TO_RECORD_MAPPER = domainObj -> {
         EntityStatisticDefinitionRecord record = new EntityStatisticDefinitionRecord();
 
+        record.setId(domainObj.id().get());
+        record.setParentId(domainObj.parentId().orElse(null));
         record.setName(domainObj.name());
         record.setDescription(domainObj.description());
         record.setType(domainObj.type().name());
@@ -81,10 +83,12 @@ public class EntityStatisticDefinitionDao {
     }
 
 
-    public List<EntityStatisticDefinition> findForAppIdSelector(Select<Record1<Long>> appIdSelector) {
-        return find(
-                dsl.select(esd.ID).where(esd.PARENT_ID.isNull()),
-                appIdSelector);
+    public List<EntityStatisticDefinition> findTopLevelDefinitions() {
+        return dsl.select(esd.fields())
+                .from(esd)
+                .where(esd.PARENT_ID.isNull())
+                .and(esd.ACTIVE.eq(Boolean.TRUE))
+                .fetch(TO_DEFINITION_MAPPER);
     }
 
 
@@ -107,6 +111,7 @@ public class EntityStatisticDefinitionDao {
                         .or(findParent)
                         .or(findSiblings)
                 )
+                .and(esd.ACTIVE.eq(Boolean.TRUE))
                 .fetch(TO_DEFINITION_MAPPER);
     }
 

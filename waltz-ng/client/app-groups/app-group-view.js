@@ -99,7 +99,8 @@ const initialState = {
 function loadEntityStatistics(entityStatisticStore, appIdSelector) {
     const entityStatistics = {};
 
-    return entityStatisticStore.findStatsDefinitionsByIdSelector(appIdSelector)
+    return entityStatisticStore
+        .findTopLevelDefinitions()
         .then(definitions => {
             entityStatistics.definitions = definitions;
             const definitionIds = _.map(definitions, 'id');
