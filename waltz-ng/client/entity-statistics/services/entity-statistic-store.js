@@ -31,7 +31,11 @@ function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/entity-statistic`;
 
     const findTopLevelDefinitions = (options) => $http
-        .get(`${BASE}/definition`, options)
+        .get(`${BASE}/definition`)
+        .then(r => r.data);
+
+    const findStatDefinition = (id) => $http
+        .get(`${BASE}/definition/${id}`)
         .then(r => r.data);
 
     const findStatValuesByIdSelector = (statId, options) => $http
@@ -60,6 +64,7 @@ function store($http, BaseApiUrl) {
 
     return {
         findTopLevelDefinitions,
+        findStatDefinition,
         findStatValuesByIdSelector,
         findRelatedStatDefinitions,
         findStatTallies

@@ -61,7 +61,7 @@ export const ragIconNames = {
 export const entityStatisticCategoryIconNames = {
     COMPLIANCE: 'exclamation-triangle',
     GOVERNANCE: 'balance-scale',
-    SECURITY: 'lock',
+    SECURITY: 'unlock-alt',
     REGULATORY: 'registered',
     DATA_QUALITY: 'exchange'
 };

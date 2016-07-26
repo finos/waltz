@@ -1,13 +1,38 @@
 <div class="waltz-entity-statistic-summary-card">
-    <a class='clickable wessc-link small'
-       title="Refocus on this statistic"
-       ng-click="$ctrl.goToStatistic($ctrl.definition)">
-        More &raquo;
-    </a>
-    <waltz-pie-table data="$ctrl.pie.data"
-                     config="$ctrl.pie.config"
-                     title="{{$ctrl.definition.name}}"
-                     sub-title="{{ $ctrl.subTitle }}">
-    </waltz-pie-table>
+
+    <div class="row">
+        <div class="col-sm-offset-1 col-sm-5">
+            <h5>
+                </waltz-icon>
+                <span ng-bind="$ctrl.definition.name">
+                </span>
+            </h5>
+            <div class='small'>
+                <span ng-bind="$ctrl.definition.category | toDisplayName:'entityStatistic'">
+                </span>
+                <waltz-icon name="{{ $ctrl.definition.category | toIconName:'entityStatistic' }}">
+                </waltz-icon>
+            </div>
+            <a class='clickable small'
+               title="Refocus on this statistic"
+               ng-click="$ctrl.goToStatistic($ctrl.definition)">
+                Explore &raquo;
+            </a>
+        </div>
+        <div class="col-sm-5 text-center">
+            <waltz-pie data="$ctrl.pie.data"
+                       config="$ctrl.pie.config">
+            </waltz-pie>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <waltz-pie-segment-table data="$ctrl.pie.data"
+                                     config="$ctrl.pie.config">
+            </waltz-pie-segment-table>
+        </div>
+    </div>
+
 
 </div>
