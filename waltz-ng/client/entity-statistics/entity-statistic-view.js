@@ -24,9 +24,10 @@ function updateUrlWithoutReload($state, navItem) {
 
 
 function hasRelatedDefinitions(defs) {
-    console.log(defs);
     const relatedCount = defs.children.length
-        + (defs.parent ? 1 : 0)
+        + (defs.parent
+            ? 1
+            : 0)
         + defs.siblings.length;
 
     return relatedCount > 0;
@@ -84,7 +85,6 @@ function controller($q,
 
         updateUrlWithoutReload($state, navItem);
     };
-
 
     vm.goToParent = () => {
         const stateName = kindToViewState(entityKind);
