@@ -30,8 +30,8 @@ function extractDefinitionIdsFromImmediateHierarchy(hierarchy) {
 function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/entity-statistic`;
 
-    const findStatsDefinitionsByIdSelector = (options) => $http
-        .post(`${BASE}/definition`, options)
+    const findTopLevelDefinitions = (options) => $http
+        .get(`${BASE}/definition`, options)
         .then(r => r.data);
 
     const findStatValuesByIdSelector = (statId, options) => $http
@@ -59,7 +59,7 @@ function store($http, BaseApiUrl) {
     };
 
     return {
-        findStatsDefinitionsByIdSelector,
+        findTopLevelDefinitions,
         findStatValuesByIdSelector,
         findRelatedStatDefinitions,
         findStatTallies

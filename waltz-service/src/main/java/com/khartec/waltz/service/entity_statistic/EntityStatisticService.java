@@ -55,10 +55,8 @@ public class EntityStatisticService {
     }
 
 
-    public List<EntityStatisticDefinition> findStatsDefinitionsForAppIdSelector(ApplicationIdSelectionOptions options) {
-        Select<Record1<Long>> appIdSelector = factory.apply(options);
-
-        return definitionDao.findForAppIdSelector(appIdSelector);
+    public List<EntityStatisticDefinition> findTopLevelDefinitions() {
+        return definitionDao.findTopLevelDefinitions();
     }
 
 

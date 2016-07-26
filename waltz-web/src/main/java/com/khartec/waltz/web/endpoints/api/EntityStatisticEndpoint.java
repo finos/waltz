@@ -36,8 +36,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -69,13 +68,13 @@ public class EntityStatisticEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String findStatsDefinitionsBySelectorPath = mkPath(BASE_URL, "definition");
+        String findTopLevelDefinitionsPath = mkPath(BASE_URL, "definition");
         String findRelatedStatDefinitionsPath = mkPath(BASE_URL, "definition" , ":statId", "related");
         String findStatValuesBySelectorPath = mkPath(BASE_URL, "value", ":statId");
         String findStatTalliesPath = mkPath(BASE_URL, "tally");
 
-        ListRoute<EntityStatisticDefinition> findStatsDefinitionsForAppIdSelector = (request, response)
-                -> entityStatisticService.findStatsDefinitionsForAppIdSelector(readOptionsFromBody(request));
+        ListRoute<EntityStatisticDefinition> findTopLevelDefinitionsRoute = (request, response)
+                -> entityStatisticService.findTopLevelDefinitions();
 
         ListRoute<EntityStatisticValue> findStatValuesForAppSelectorRoute = (request, response)
                 -> entityStatisticService.getStatisticValuesForAppIdSelector(getLong(request, "statId"), readOptionsFromBody(request));
@@ -83,7 +82,7 @@ public class EntityStatisticEndpoint implements Endpoint {
         DatumRoute<ImmediateHierarchy<EntityStatisticDefinition>> findRelatedStatDefinitionsRoute = (request, response)
                 -> entityStatisticService.findRelatedStatDefinitions(getLong(request, "statId"));
 
-        postForList(findStatsDefinitionsBySelectorPath, findStatsDefinitionsForAppIdSelector);
+        getForList(findTopLevelDefinitionsPath, findTopLevelDefinitionsRoute);
         postForList(findStatValuesBySelectorPath, findStatValuesForAppSelectorRoute);
         postForList(findStatTalliesPath, this::findStatTalliesRoute);
         getForDatum(findRelatedStatDefinitionsPath, findRelatedStatDefinitionsRoute);
