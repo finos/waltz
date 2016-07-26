@@ -11,12 +11,26 @@ const initData = {
     summaries: [],
     navItems: [],
     selectedNavItem: null,
-    parentStateRef: '.'
+    parentStateRef: '.',
+    visibility: {
+        related: false
+    }
 };
 
 
 function updateUrlWithoutReload($state, navItem) {
     $state.go('.', {id: navItem.id}, {notify: false});
+}
+
+
+function hasRelatedDefinitions(defs) {
+    const relatedCount = defs.children.length
+        + (defs.parent
+            ? 1
+            : 0)
+        + defs.siblings.length;
+
+    return relatedCount > 0;
 }
 
 
@@ -35,7 +49,8 @@ function controller($q,
     const definitionPromise = entityStatisticStore
         .findRelatedStatDefinitions(statId)
         .then(ds => vm.relatedDefinitions = ds)
-        .then(ds => vm.statistic.definition = ds.self);
+        .then(ds => vm.statistic.definition = ds.self)
+        .then(() => vm.visibility.related = hasRelatedDefinitions(vm.relatedDefinitions));
 
     const navItemPromise = entityStatisticUtilities
         .findAllForKind(entityKind)
@@ -70,7 +85,6 @@ function controller($q,
 
         updateUrlWithoutReload($state, navItem);
     };
-
 
     vm.goToParent = () => {
         const stateName = kindToViewState(entityKind);

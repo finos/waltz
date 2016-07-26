@@ -8,16 +8,18 @@
  **/
 
 const bindings = {
+    filterOutcome: '<',
     statisticValues: '<',
-    filterOutcome: '<'
+    statisticDefinition: '<'
 };
 
 
 function controller($animate, uiGridConstants) {
     const vm = this;
-    vm.gridOptions = setupGrid($animate, uiGridConstants);
 
     vm.$onChanges = (change) => {
+        vm.gridOptions = setupGrid($animate, uiGridConstants, vm.statisticDefinition);
+
         if (change.statisticValues) {
             vm.gridOptions.data = vm.statisticValues || [];
         }
@@ -66,6 +68,20 @@ const outcomeCell = (uiGridConstants) => {
 };
 
 
+const valueCell = (uiGridConstants, statisticDefinition) => {
+    return {
+        field: 'value',
+        type: (statisticDefinition && statisticDefinition.type === 'NUMERIC')
+            ? 'number'
+            : 'string',
+        filter: {
+            term: null,
+            condition: uiGridConstants.filter.EXACT
+        }
+    }
+};
+
+
 const reasonCell = {
     field: 'reason'
 };
@@ -79,7 +95,7 @@ const dateCell = {
 };
 
 
-function setupGrid($animate, uiGridConstants) {
+function setupGrid($animate, uiGridConstants, statisticDefinition) {
     return {
         enableGridMenu: true,
         exporterCsvFilename: "stats",
@@ -93,6 +109,7 @@ function setupGrid($animate, uiGridConstants) {
         columnDefs: [
             appNameCell,
             outcomeCell(uiGridConstants),
+            valueCell(uiGridConstants, statisticDefinition),
             reasonCell,
             dateCell
         ]
