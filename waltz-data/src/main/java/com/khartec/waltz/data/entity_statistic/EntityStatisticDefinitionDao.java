@@ -137,4 +137,10 @@ public class EntityStatisticDefinitionDao {
                 .fetch(TO_DEFINITION_MAPPER);
     }
 
+    public EntityStatisticDefinition getDefinition(long id) {
+        return dsl.select(esd.fields())
+                .from(esd)
+                .where(esd.ID.eq(id))
+                .fetchOne(TO_DEFINITION_MAPPER);
+    }
 }

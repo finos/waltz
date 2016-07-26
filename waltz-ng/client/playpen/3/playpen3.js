@@ -28,13 +28,20 @@ function controller(entityStatisticStore) {
         }
     };
 
+    entityStatisticStore
+        .findStatDefinition(statId)
+        .then(d => vm.statistic.definition = d);
 
+    entityStatisticStore
+        .findStatTallies([statId], selector)
+        .then(s => vm.statistic.summary = s[0]);
 
     entityStatisticStore
         .findStatValuesByIdSelector(statId, selector)
         .then(stats => vm.statistic.values = stats)
         .then(stats => perpareBars(stats));
 
+    
 }
 
 
