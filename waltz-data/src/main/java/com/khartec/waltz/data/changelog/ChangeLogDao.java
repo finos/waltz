@@ -83,6 +83,7 @@ public class ChangeLogDao {
                 .from(CHANGE_LOG)
                 .where(CHANGE_LOG.PARENT_ID.eq(ref.id()))
                 .and(CHANGE_LOG.PARENT_KIND.eq(ref.kind().name()))
+                .orderBy(CHANGE_LOG.CREATED_AT.desc())
                 .limit(limit.orElse(Integer.MAX_VALUE))
                 .fetch(mapper);
     }
@@ -94,6 +95,7 @@ public class ChangeLogDao {
         return dsl.select()
                 .from(CHANGE_LOG)
                 .where(CHANGE_LOG.USER_ID.equalIgnoreCase(userName))
+                .orderBy(CHANGE_LOG.CREATED_AT.desc())
                 .fetch(mapper);
     }
 
