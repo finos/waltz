@@ -1,0 +1,26 @@
+<ul class="nav navbar-nav navbar-form navbar-right">
+    <li>
+        <form role="search">
+            <div class="form-group">
+                <div class="input-group"
+                     style="display: table;">
+                    <input type="text"
+                           class="form-control"
+                           ng-model="$ctrl.query"
+                           ng-model-options="{ debounce: 250 }"
+                           ng-change="$ctrl.doSearch()"
+                           ng-blur="$ctrl.dismissResults()"
+                           autocomplete="off"
+                           autofocus="autofocus"
+                           placeholder="Search">
+
+                </div>
+            </div>
+        </form>
+    </li>
+    <div class="waltz-nav-search-results-panel" ng-if="$ctrl.showSearch()">
+        <waltz-nav-search-results results="$ctrl.searchResults"
+                                  query="{{ $ctrl.query }}"
+                                  on-dismiss="$ctrl.dismissResults"></waltz-nav-search-results>
+    </div>
+</ul>

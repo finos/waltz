@@ -5,7 +5,7 @@
            ui-sref="main.home">
             <img height="30px"
                  style="position: relative; top: -6px;"
-                 src="../../images/branding/waltz_badge+text_horizontal_negative_bw_145px.png">
+                 src="../../../images/branding/waltz_badge+text_horizontal_negative_bw_145px.png">
         </a>
         <span ng-bind='ctrl.logoOverlayText'
               style='display: inline; position: absolute; left: 120px; top:30px; font-weight: bold; font-style: italic; white-space: nowrap'
@@ -44,38 +44,7 @@
         <ul class="nav navbar-nav navbar-right"
             style="padding-right: 60px">
 
-            <li class="dropdown" uib-dropdown>
-                <a class="clickable"
-                   ng-click="ctrl.refreshHistory()"
-                   uib-dropdown-toggle>
-                    <waltz-icon name="history"></waltz-icon>
-                    Recently Viewed
-                    <b class="caret"></b>
-                </a>
-                <ul class="dropdown-menu"
-                    uib-dropdown-menu
-                    style="width: 250px; margin-right:8px"
-                    role="menu"
-                    class="no-overflow">
-                    <li style="margin: 4px"
-                        class="no-overflow"
-                        ng-repeat="item in ctrl.history">
-                        <a ui-sref="{{ ::item.state }} ({{ ::item.stateParams }})">
-                            <waltz-icon class='text-muted small'
-                                        fixed-width="true"
-                                        name="{{ item.kind | toIconName:'entity' }}"></waltz-icon>
-                            <span ng-bind="::item.name"></span>
-                        </a>
-                    </li>
-
-                    <li class="text-muted"
-                        ng-if="ctrl.history.length == 0">
-                        <span style="margin: 4px">
-                            Recently viewed items will be added as you navigate through Waltz
-                        </span>
-                    </li>
-                </ul>
-            </li>
+            <waltz-navbar-recently-viewed></waltz-navbar-recently-viewed>
 
             <li class="dropdown" uib-dropdown>
                 <a class="clickable"
@@ -206,41 +175,8 @@
 
         </ul>
 
-        <form class="navbar-form navbar-right"
-              role="search">
-            <div class="form-group">
-                <div class="input-group"
-                     style="display: table; padding-left: 24px;">
-                    <input type="text"
-                           class="form-control"
-                           ng-model="ctrl.query"
-                           ng-model-options="{ debounce: 250 }"
-                           ng-change="ctrl.doSearch()"
-                           ng-blur="ctrl.dismissResults()"
-                           autocomplete="off"
-                           autofocus="autofocus"
-                           placeholder="Search">
-
-                </div>
-                <style>
-                    .waltz-nav-search-result-panel {
-                        top: 42px;
-                        right: 100px;
-                        position: absolute;
-                        background-color: white;
-                        width:50%;
-                        border: 1px solid #ccc;
-                        box-shadow: 0px 4px 5px gray, -5px 4px 7px gray, 5px 4px 7px gray;
-                    }
-                </style>
-                <div class="waltz-nav-search-result-panel" ng-if="ctrl.showSearch()">
-                    <waltz-nav-search-results results="ctrl.searchResults"
-                                              query="{{ ctrl.query }}"
-                                              on-dismiss="ctrl.dismissResults"></waltz-nav-search-results>
-                </div>
-            </div>
-        </form>
-
+        <waltz-navbar-search-form>
+        </waltz-navbar-search-form>
     </div>
 
 

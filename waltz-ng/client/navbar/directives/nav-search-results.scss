@@ -1,0 +1,17 @@
+.waltz-nav-search-results-panel {
+    top: 42px;
+    right: 100px;
+    position: absolute;
+    background-color: white;
+    width:50%;
+    border: 1px solid #ccc;
+    box-shadow: 0px 4px 5px gray, -5px 4px 7px gray, 5px 4px 7px gray;
+
+    .waltz-nav-search-results {
+        margin: 10px;
+        padding-right: 10px;
+        overflow-y: auto;
+        height: 70vh
+    }
+}
+

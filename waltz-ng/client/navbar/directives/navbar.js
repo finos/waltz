@@ -2,17 +2,8 @@ import _ from "lodash";
 
 
 const initialState = {
-    history: [],
     logoOverlayText: '',
     logoOverlayColor: '#444',
-    query: '',
-    searchResults: {
-        show: false,
-        apps: [],
-        people: [],
-        capabilities: [],
-        orgUnits: []
-    },
     user: null
 };
 
@@ -42,19 +33,10 @@ loginController.$inject = [
 
 function controller($scope,
                     $state,
-                    $timeout,
                     $uibModal,
-                    applicationStore,
-                    capabilityStore,
-                    localStorageService,
-                    personStore,
-                    orgUnitStore,
+
                     settingsStore,
                     userService) {
-
-    const searchResults = {
-        show: false
-    };
 
     const vm = _.defaultsDeep(this, initialState);
 
@@ -70,25 +52,7 @@ function controller($scope,
         .whoami(true) // force
         .then(user => vm.user = user);
 
-    const doSearch = (query) => {
-        if (_.isEmpty(query)) {
-            searchResults.show = false;
-        } else {
-            searchResults.show = true;
-            applicationStore
-                .search(query)
-                .then(r => searchResults.apps = r);
-            personStore
-                .search(query)
-                .then(r => searchResults.people = r);
-            capabilityStore
-                .search(query)
-                .then(r => searchResults.capabilities = r);
-            orgUnitStore
-                .search(query)
-                .then(r => searchResults.orgUnits = r);
-        }
-    };
+
 
     const reloadPage = () => $state.reload();
 
@@ -98,14 +62,7 @@ function controller($scope,
         .logout()
         .then(reloadPage);
 
-    const dismissResults = () => $timeout(() => { searchResults.show = false; }, 400);
 
-
-    vm.searchResults = searchResults;
-    vm.doSearch = () => doSearch(vm.query);
-    vm.showSearch = () => searchResults.show;
-    vm.dismissResults = dismissResults;
-    vm.refreshHistory = () => vm.history = localStorageService.get('history_2') || [];
     vm.logout = logout;
     vm.login = () => {
 
@@ -133,13 +90,7 @@ function controller($scope,
 controller.$inject = [
     '$scope',
     '$state',
-    '$timeout',
     '$uibModal',
-    'ApplicationStore',
-    'CapabilityStore',
-    'localStorageService',
-    'PersonStore',
-    'OrgUnitStore',
     'SettingsStore',
     'UserService'
 ];
