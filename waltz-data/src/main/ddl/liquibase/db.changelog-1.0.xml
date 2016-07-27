@@ -2214,5 +2214,22 @@
         </dropColumn>
     </changeSet>
 
+    <!-- 324 - Entit Stat Defn - Visibility Modifiers -->
+    <changeSet author="kamransaleem"
+               id="20160727-324-1">
+        <addColumn tableName="entity_statistic_definition">
+            <column name="entity_visibility"
+                    type="boolean"
+                    defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="rollup_visibility"
+                    type="boolean"
+                    defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>
