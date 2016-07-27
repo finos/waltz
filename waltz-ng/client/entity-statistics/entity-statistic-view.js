@@ -37,6 +37,7 @@ function hasRelatedDefinitions(defs) {
 function controller($q,
                     $state,
                     $stateParams,
+                    bookmarkStore,
                     entityStatisticUtilities,
                     entityStatisticStore) {
 
@@ -45,6 +46,14 @@ function controller($q,
     const entityKind = $stateParams.kind;
     const entityId = $stateParams.id;
 
+    const statRef = {
+        id: statId,
+        kind: 'ENTITY_STATISTIC'
+    };
+
+    bookmarkStore
+        .findByParent(statRef)
+        .then(bs => vm.bookmarks = bs);
 
     const definitionPromise = entityStatisticStore
         .findRelatedStatDefinitions(statId)
@@ -90,7 +99,7 @@ function controller($q,
         const stateName = kindToViewState(entityKind);
         const navId = vm.selectedNavItem.id;
         $state.go(stateName, { id: navId });
-    }
+    };
 }
 
 
@@ -98,6 +107,7 @@ controller.$inject = [
     '$q',
     '$state',
     '$stateParams',
+    'BookmarkStore',
     'EntityStatisticUtilities',
     'EntityStatisticStore'
 ];

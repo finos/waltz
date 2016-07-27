@@ -15,19 +15,14 @@ import angular from "angular";
 import {kindToViewState} from "../common";
 
 
-function getParentRef(params) {
-    return {
-        id: params.entityId,
-        kind: params.kind,
-        name: params.parentName
-    };
-}
-
-
-function controller(bookmarkStore, notification, params, $state) {
+function controller($state,
+                    $stateParams,
+                    $window,
+                    bookmarkStore,
+                    notification) {
     const vm = this;
 
-    const parentRef = getParentRef(params);
+    const parentRef = getParentRef($stateParams);
 
     vm.save = (b) => {
         b.parent = parentRef;
@@ -79,19 +74,31 @@ function controller(bookmarkStore, notification, params, $state) {
     vm.parentRef = parentRef;
 
     vm.goToParent = () => {
-        const nextState = kindToViewState(parentRef.kind);
-        $state.go(nextState, parentRef);
-    }
-
+        try {
+            const nextState = kindToViewState(parentRef.kind);
+            $state.go(nextState, parentRef);
+        } catch (e) {
+            $window.history.back();
+        }
+    };
 }
 
 
+function getParentRef(params) {
+    return {
+        id: params.entityId,
+        kind: params.kind,
+        name: params.parentName
+    };
+}
+
 
 controller.$inject = [
-    'BookmarkStore',
-    'Notification',
+    '$state',
     '$stateParams',
-    '$state'
+    '$window',
+    'BookmarkStore',
+    'Notification'
 ];
 
 
