@@ -21,4 +21,6 @@ public abstract class EntityStatisticDefinition implements
     public abstract boolean active();
     public abstract String renderer();
     public abstract String historicRenderer();
+    public abstract Boolean entityVisibility();
+    public abstract Boolean rollupVisibility();
 }

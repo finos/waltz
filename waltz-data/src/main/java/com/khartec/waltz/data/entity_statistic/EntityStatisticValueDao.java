@@ -2,9 +2,9 @@ package com.khartec.waltz.data.entity_statistic;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.StatisticValueState;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
 import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticValue;
+import com.khartec.waltz.model.entity_statistic.StatisticValueState;
 import com.khartec.waltz.schema.tables.records.EntityStatisticValueRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
