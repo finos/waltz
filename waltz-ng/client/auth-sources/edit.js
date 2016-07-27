@@ -90,11 +90,7 @@ function editController($state,
                 .insert(insertRequest)
                 .then(
                     () => notification.success('Authoritative Sources updated'),
-                    (e) => {
-                        console.log('err', e);
-                        notification.error('Update failed, ' + e.data.message || e.statusText);
-                    }
-                )
+                    (e) => notification.error('Update failed, ' + e.data.message || e.statusText))
                 .then(refresh);
         }
     }
