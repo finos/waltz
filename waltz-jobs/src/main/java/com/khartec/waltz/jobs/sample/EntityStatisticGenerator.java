@@ -3,12 +3,11 @@ package com.khartec.waltz.jobs.sample;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
-import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticDefinition;
-import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticValue;
+import com.khartec.waltz.model.entity_statistic.*;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
@@ -49,6 +48,8 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
             .renderer("enum")
             .historicRenderer("enum")
             .name("dummy stat")
+            .entityVisibility(StatisticVisibility.SHOW_ALL)
+            .rollupVisibility(StatisticVisibility.SHOW_ALL)
             .provenance(PROVENANCE)
             .build();
 

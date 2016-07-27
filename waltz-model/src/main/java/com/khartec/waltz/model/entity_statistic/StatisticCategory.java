@@ -15,7 +15,7 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model;
+package com.khartec.waltz.model.entity_statistic;
 
 public enum StatisticCategory {
     COMPLIANCE,
