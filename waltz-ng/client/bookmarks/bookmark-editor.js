@@ -93,7 +93,6 @@ function getParentRef(params) {
 }
 
 
-
 controller.$inject = [
     '$state',
     '$stateParams',
