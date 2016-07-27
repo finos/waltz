@@ -107,92 +107,97 @@
                     </li>
                     <li style="margin: 4px"
                         ng-if="ctrl.allowDirectLogin"
-                        waltz-if-anonymous="true"
                         class="no-overflow">
-                        <a class="clickable"
-                           ng-click="ctrl.login()">
-                            <waltz-icon name="sign-in"></waltz-icon>
-                            <span>Login</span>
-                        </a>
-                    </li>
-                    <li style="margin: 4px"
-                        ng-if="ctrl.allowDirectLogin"
-                        waltz-if-anonymous="false"
-                        class="no-overflow">
-                        <a class="clickable"
-                           ng-click="ctrl.logout()">
+                        <span waltz-if-anonymous="true">
+                            <a class="clickable"
+                               ng-click="ctrl.login()">
+                                <waltz-icon name="sign-in"></waltz-icon>
+                                <span>Login</span>
+                            </a>
+                        </span>
+                        <span waltz-if-anonymous="false">
+                            <a class="clickable"
+                               ng-click="ctrl.logout()">
                             <waltz-icon name="sign-out"></waltz-icon>
                             Logout
                         </a>
+                        </span>
+
                     </li>
+
                     <li class="divider" waltz-has-role="ADMIN"></li>
 
-                    <li waltz-has-role="ADMIN"
-                        style="margin: 4px"
+                    <li style="margin: 4px"
                         ui-sref-active="side-active"
                         class="no-overflow">
-                        <a ui-sref="main.traits">
-                            <waltz-icon class='text-muted small'
-                                        fixed-width="true"
-                                        name="cubes"></waltz-icon>
-                            Manage Traits
-                        </a>
+                        <span waltz-has-role="ADMIN">
+                            <a ui-sref="main.traits">
+                                <waltz-icon class='text-muted small'
+                                            fixed-width="true"
+                                            name="cubes"></waltz-icon>
+                                Manage Traits
+                            </a>
+                        </span>
                     </li>
-                    <li waltz-has-role="ADMIN"
-                        style="margin: 4px"
+                    <li style="margin: 4px"
                         ui-sref-active="side-active"
                         class="no-overflow">
-                        <a ui-sref="main.user.management">
-                            <waltz-icon class='text-muted small'
-                                        fixed-width="true"
-                                        name="users"></waltz-icon>
-                            Manage Users
-                        </a>
+                        <span waltz-has-role="ADMIN">
+                            <a ui-sref="main.user.management">
+                                <waltz-icon class='text-muted small'
+                                            fixed-width="true"
+                                            name="users"></waltz-icon>
+                                Manage Users
+                            </a>
+                        </span>
                     </li>
-                    <li waltz-has-role="APP_EDITOR"
-                        style="margin: 4px"
+                    <li style="margin: 4px"
                         ui-sref-active="side-active"
                         class="no-overflow">
-                        <a ui-sref="main.app.registration">
-                            <waltz-icon class='text-muted small'
-                                        fixed-width="true"
-                                        name="gift"></waltz-icon>
-                            Register App
-                        </a>
+                        <span waltz-has-role="APP_EDITOR">
+                            <a ui-sref="main.app.registration">
+                                <waltz-icon class='text-muted small'
+                                            fixed-width="true"
+                                            name="gift"></waltz-icon>
+                                Register App
+                            </a>
+                        </span>
                     </li>
-                    <li waltz-has-role="ADMIN"
-                        style="margin: 4px"
+                    <li style="margin: 4px"
                         ui-sref-active="side-active"
                         class="no-overflow">
-                        <a ui-sref="main.settings">
-                            <waltz-icon class='text-muted small'
-                                        fixed-width="true"
-                                        name="cog"></waltz-icon>
-                            Settings
-                        </a>
+                        <span waltz-has-role="ADMIN">
+                            <a ui-sref="main.settings">
+                                <waltz-icon class='text-muted small'
+                                            fixed-width="true"
+                                            name="cog"></waltz-icon>
+                                Settings
+                            </a>
+                        </span>
                     </li>
-                    <li waltz-has-role="ADMIN"
-                        style="margin: 4px"
+                    <li style="margin: 4px"
                         ui-sref-active="side-active"
                         class="no-overflow">
-
-                        <a ui-sref="main.source-data-ratings">
-                            <waltz-icon class='text-muted small'
-                                        fixed-width="true"
-                                        name="map-signs"></waltz-icon>
-                            Source Data Ratings
-                        </a>
+                        <span waltz-has-role="ADMIN">
+                            <a ui-sref="main.source-data-ratings">
+                                <waltz-icon class='text-muted small'
+                                            fixed-width="true"
+                                            name="map-signs"></waltz-icon>
+                                Source Data Ratings
+                            </a>
+                        </span>
                     </li>
-                    <li waltz-has-role="ADMIN"
-                        style="margin: 4px"
+                    <li style="margin: 4px"
                         ui-sref-active="side-active"
                         class="no-overflow">
-                        <a ui-sref="main.user.log">
-                            <waltz-icon class='text-muted small'
-                                        fixed-width="true"
-                                        name="list-ul"></waltz-icon>
-                            User Logs
-                        </a>
+                        <span waltz-has-role="ADMIN">
+                            <a ui-sref="main.user.log">
+                                <waltz-icon class='text-muted small'
+                                            fixed-width="true"
+                                            name="list-ul"></waltz-icon>
+                                User Logs
+                            </a>
+                        </span>
                     </li>
 
                 </ul>
