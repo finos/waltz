@@ -17,17 +17,20 @@
 
 package com.khartec.waltz.service.asset_cost;
 
-import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.asset_cost.AssetCostDao;
 import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.cost.*;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+
+import static com.khartec.waltz.common.Checks.checkNotNull;
 
 
 @Service
@@ -42,9 +45,9 @@ public class AssetCostService {
     public AssetCostService(AssetCostDao assetCodeDao,
                             AssetCostStatsDao assetCostStatsDao,
                             ApplicationIdSelectorFactory idSelectorFactory) {
-        Checks.checkNotNull(assetCodeDao, "assetCodeDao cannot be null");
-        Checks.checkNotNull(assetCostStatsDao, "assetCostStatsDao cannot be null");
-        Checks.checkNotNull(idSelectorFactory, "idSelectorFactory cannot be null");
+        checkNotNull(assetCodeDao, "assetCodeDao cannot be null");
+        checkNotNull(assetCostStatsDao, "assetCostStatsDao cannot be null");
+        checkNotNull(idSelectorFactory, "idSelectorFactory cannot be null");
 
         this.assetCostDao = assetCodeDao;
         this.assetCostStatsDao = assetCostStatsDao;
@@ -53,7 +56,7 @@ public class AssetCostService {
 
 
     public List<AssetCost> findByAssetCode(String code) {
-        Checks.checkNotNull(code, "code cannot be null");
+        checkNotNull(code, "code cannot be null");
         return assetCostDao.findByAssetCode(code);
     }
 
@@ -63,25 +66,37 @@ public class AssetCostService {
     }
 
 
-    public List<ApplicationCost> findAppCostsByAppIds(AssetCostQueryOptions options) {
-        Checks.checkNotNull(options, "options cannot be null");
-        Select<Record1<Long>> selector = idSelectorFactory.apply(options.idSelectionOptions());
-        return assetCostDao.findAppCostsByAppIdSelector(options.year(), selector);
+    public List<ApplicationCost> findAppCostsByAppIds(ApplicationIdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        Select<Record1<Long>> selector = idSelectorFactory.apply(options);
+
+        return assetCostDao
+                .findLatestYear()
+                .map(year -> assetCostDao.findAppCostsByAppIdSelector(year, selector))
+                .orElse(Collections.emptyList());
     }
 
 
-    public AssetCostStatistics calculateStatisticsByAppIds(AssetCostQueryOptions options) {
-        Checks.checkNotNull(options, "options cannot be null");
+    public AssetCostStatistics calculateStatisticsByAppIds(ApplicationIdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
 
-        Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options.idSelectionOptions());
+        Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);
 
-        List<CostBandTally> costBandCounts = assetCostStatsDao.calculateCostBandStatisticsByAppIdSelector(options.year(), appIdSelector);
-        Cost totalCost = assetCostStatsDao.calculateTotalCostByAppIdSelector(options.year(), appIdSelector);
+        return assetCostDao
+                .findLatestYear()
+                .map(year -> {
+                    List<CostBandTally> costBandCounts = assetCostStatsDao
+                            .calculateCostBandStatisticsByAppIdSelector(year, appIdSelector);
 
-        return ImmutableAssetCostStatistics.builder()
-                .costBandCounts(costBandCounts)
-                .totalCost(totalCost)
-                .build();
+                    Cost totalCost = assetCostStatsDao
+                            .calculateTotalCostByAppIdSelector(year, appIdSelector);
+
+                    return ImmutableAssetCostStatistics.builder()
+                            .costBandCounts(costBandCounts)
+                            .totalCost(totalCost)
+                            .build();
+                })
+                .orElse(null);
 
     }
 

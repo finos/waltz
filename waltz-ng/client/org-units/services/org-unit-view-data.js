@@ -38,8 +38,17 @@ function service($q,
 
     const rawData = {};
 
+
+
     function loadAll(orgUnitId) {
 
+        const appIdSelector = {
+            entityReference: {
+                id: orgUnitId,
+                kind: 'ORG_UNIT'
+            },
+            scope: 'CHILDREN'
+        };
 
         const promises = [
             orgUnitStore.findAll(),
@@ -49,7 +58,7 @@ function service($q,
             perspectiveStore.findByCode('BUSINESS'),
             dataFlowViewService.initialise(orgUnitId, "ORG_UNIT", "CHILDREN"),
             changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId),
-            assetCostViewService.initialise(orgUnitId, 'ORG_UNIT', 'CHILDREN', 2015)
+            assetCostViewService.initialise(appIdSelector, 2016)
         ];
 
         return $q.all(promises)

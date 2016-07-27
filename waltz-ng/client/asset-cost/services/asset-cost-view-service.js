@@ -1,3 +1,5 @@
+import { checkIsApplicationIdSelector } from '../../common/checks';
+
 const initData = {
     loadingStats: false,
     loadingCosts: false,
@@ -12,18 +14,14 @@ function service($q,
 
     let data = initData;
 
-    function initialise(id, kind, scope = 'CHILDREN', year = 2015) {
+    function initialise(selector, year) {
+        checkIsApplicationIdSelector(selector);
+
         data = { ...initData };
         data.loadingStats = true;
-        data.options = {
-            year,
-            idSelectionOptions: {
-                scope,
-                entityReference: { id, kind }
-            }
-        };
+        data.options = selector;
         return assetCostStore
-            .findStatsByAppIds(data.options)
+            .findStatsByAppIds(data.options, year)
             .then(stats => {
                 data.loadingStats = false;
                 data.stats = stats;

@@ -24,11 +24,13 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.cost.*;
 import com.khartec.waltz.schema.tables.records.AssetCostRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AssetCost.ASSET_COST;
@@ -118,4 +120,12 @@ public class AssetCostDao {
                 .fetch(appCostMapper);
     }
 
+
+    public Optional<Integer> findLatestYear() {
+        Integer year = dsl
+                .select(DSL.max(ASSET_COST.YEAR).as("latest"))
+                .from(ASSET_COST)
+                .fetchOne("latest", Integer.class);
+        return Optional.ofNullable(year);
+    }
 }

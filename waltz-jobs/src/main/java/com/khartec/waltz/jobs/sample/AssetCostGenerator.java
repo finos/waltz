@@ -38,6 +38,9 @@ public class AssetCostGenerator {
 
     private static final Random rnd = new Random();
 
+    private static final int year = 2015;
+    private static final String provenance = "waltz";
+
 
     public static void main(String[] args) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
@@ -48,7 +51,10 @@ public class AssetCostGenerator {
         List<AssetCostRecord> appDevCosts = generateRecords(applicationService, CostKind.APPLICATION_DEVELOPMENT, 10_000, 10_000_000);
         List<AssetCostRecord> infraCosts = generateRecords(applicationService, CostKind.INFRASTRUCTURE, 1_000, 50_000);
 
-        dsl.deleteFrom(ASSET_COST).execute();
+        dsl.deleteFrom(ASSET_COST)
+                .where(ASSET_COST.YEAR.eq(year))
+                .and(ASSET_COST.PROVENANCE.eq(provenance))
+                .execute();
 
         dsl.batchInsert(appDevCosts).execute();
         dsl.batchInsert(infraCosts).execute();
@@ -64,7 +70,7 @@ public class AssetCostGenerator {
                             .cost(ImmutableCost.builder()
                                     .currencyCode("EUR")
                                     .amount(generateAmount(low, high))
-                                    .year(2015)
+                                    .year(year)
                                     .kind(kind)
                                     .build())
                             .build())

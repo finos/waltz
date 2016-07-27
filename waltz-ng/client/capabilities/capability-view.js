@@ -210,7 +210,7 @@ function controller($q,
                 ratingStore.findByAppIdSelector(appIdSelector),
                 dataFlowViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN'),
                 complexityStore.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
-                assetCostViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN', 2015),
+                assetCostViewService.initialise(appIdSelector, 2016),
                 techStatsService.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
                 sourceDataRatingStore.findAll()
             ]).then(([
