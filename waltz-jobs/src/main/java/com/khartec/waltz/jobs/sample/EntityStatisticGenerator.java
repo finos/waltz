@@ -48,6 +48,8 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
             .renderer("enum")
             .historicRenderer("enum")
             .name("dummy stat")
+            .entityVisibility(StatisticVisibility.SHOW_ALL)
+            .rollupVisibility(StatisticVisibility.SHOW_ALL)
             .provenance(PROVENANCE)
             .build();
 
