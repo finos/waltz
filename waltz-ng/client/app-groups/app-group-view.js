@@ -151,7 +151,7 @@ function controller($scope,
     dataFlowViewService.initialise(id, 'APP_GROUP', 'EXACT')
         .then(flows => vm.dataFlows = flows);
 
-    assetCostViewService.initialise(id, 'APP_GROUP', 'EXACT', 2015)
+    assetCostViewService.initialise(appIdSelector, 2016)
         .then(costs => vm.assetCostData = costs);
 
     bookmarkStore
