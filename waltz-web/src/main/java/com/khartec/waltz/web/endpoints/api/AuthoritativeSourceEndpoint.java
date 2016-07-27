@@ -24,8 +24,10 @@ import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.authoritativesource.Rating;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,16 +46,20 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
 
     private final AuthoritativeSourceService authoritativeSourceService;
     private final ChangeLogService changeLogService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
     public AuthoritativeSourceEndpoint(
             AuthoritativeSourceService authoritativeSourceService,
+            UserRoleService userRoleService,
             ChangeLogService changeLogService) {
         checkNotNull(authoritativeSourceService, "authoritativeSourceService must not be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
         checkNotNull(changeLogService, "changeLogService must not be null");
 
         this.authoritativeSourceService = authoritativeSourceService;
+        this.userRoleService = userRoleService;
         this.changeLogService = changeLogService;
     }
 
@@ -70,6 +76,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
                 -> authoritativeSourceService.findByApplicationId(getId(request)));
 
         post(mkPath(BASE_URL, "id", ":id"), (request, response) -> {
+            requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
             String ratingStr = request.body();
             Rating rating = Rating.valueOf(ratingStr);
             authoritativeSourceService.update(getId(request), rating);
@@ -77,6 +84,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         });
 
         delete(mkPath(BASE_URL, "id", ":id"), (request, response) -> {
+            requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
             long id = getId(request);
             AuthoritativeSource authSource = authoritativeSourceService.getById(id);
             if (authSource == null) {
@@ -103,6 +111,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         });
 
         post(mkPath(BASE_URL, "kind", ":kind", ":id", ":dataType", ":appId"), (request, response) -> {
+            requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
             EntityReference parentRef = getEntityReference(request);
             String dataType = request.params("dataType");
             Long appId = getLong(request, "appId");
