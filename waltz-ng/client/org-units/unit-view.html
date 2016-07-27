@@ -78,13 +78,14 @@
     <!-- AUTH-FLOWS -->
     <waltz-section name="Authoritative Sources"
                    id="flows-section">
-        <waltz-section-actions >
-            <a waltz-has-role="AUTHORITATIVE_SOURCE_EDITOR"
-               ng-if="ctrl.showAuthSourceEditBtn"
-               ui-sref="main.auth-sources.edit (ctrl.entityRef)"
-               class="btn btn-xs btn-primary">
-                Edit
-            </a>
+        <waltz-section-actions>
+            <span waltz-has-role="AUTHORITATIVE_SOURCE_EDITOR">
+                <a ng-if="ctrl.showAuthSourceEditBtn"
+                   ui-sref="main.auth-sources.edit (ctrl.entityRef)"
+                   class="btn btn-xs btn-primary">
+                    Edit
+                </a>
+            </span>
             <button class="btn btn-xs waltz-btn-transparent"
                     ng-click="ctrl.visibility.authOverlay = ! ctrl.visibility.authOverlay">
                 <waltz-icon name="map-signs"></waltz-icon>

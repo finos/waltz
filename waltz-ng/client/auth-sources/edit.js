@@ -88,8 +88,14 @@ function editController($state,
             };
             authSourceStore
                 .insert(insertRequest)
-                .then(refresh)
-                .then(() => notification.success('Authoritative Sources updated'));
+                .then(
+                    () => notification.success('Authoritative Sources updated'),
+                    (e) => {
+                        console.log('err', e);
+                        notification.error('Update failed, ' + e.data.message || e.statusText);
+                    }
+                )
+                .then(refresh);
         }
     }
 
