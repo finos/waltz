@@ -70,7 +70,7 @@ function controller($q,
 
 
     function resetValueData() {
-        const clearData = _.cloneDeep(initData);
+        const clearData = initialiseData({}, initData);
         vm.statistic.summary = clearData.statistic.summary;
         vm.statistic.values = clearData.statistic.values;
         vm.summaries = clearData.summaries;
