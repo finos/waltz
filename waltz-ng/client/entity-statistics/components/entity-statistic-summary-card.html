@@ -3,15 +3,12 @@
     <div class="row">
         <div class="col-sm-offset-1 col-sm-5">
             <h5>
-                </waltz-icon>
                 <span ng-bind="$ctrl.definition.name">
                 </span>
             </h5>
             <div class='small'>
                 <span ng-bind="$ctrl.definition.category | toDisplayName:'entityStatistic'">
                 </span>
-                <waltz-icon name="{{ $ctrl.definition.category | toIconName:'entityStatistic' }}">
-                </waltz-icon>
             </div>
             <a class='clickable small'
                title="Refocus on this statistic"
@@ -19,7 +16,7 @@
                 Explore &raquo;
             </a>
         </div>
-        <div class="col-sm-5 text-center">
+        <div class="col-sm-6 text-center">
             <waltz-pie data="$ctrl.pie.data"
                        config="$ctrl.pie.config">
             </waltz-pie>
