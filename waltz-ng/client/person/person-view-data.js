@@ -161,7 +161,7 @@ function service($q,
 
     function loadCostStats(personId) {
         assetCostViewService
-            .initialise(personId, 'PERSON', 'CHILDREN', 2015)
+            .initialise({ entityReference: { kind: 'PERSON', id: personId }, scope: 'CHILDREN' }, 2016)
             .then(assetCostData => state.model.assetCostData = assetCostData);
     }
 
