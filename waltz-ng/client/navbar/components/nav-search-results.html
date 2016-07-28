@@ -1,8 +1,8 @@
-<div class="waltz-nav-search-results">
+<div class="wns-results">
     <h3 style="border-bottom: 1px solid #ccc">
-        Search Results: {{query}}
+        Search Results: {{$ctrl.query}}
         <small class="pull-right">
-            <a class="clickable" ng-click="dismiss()">
+            <a class="clickable" ng-click="$ctrl.dismiss()">
                 <waltz-icon name="close"></waltz-icon>
             </a>
         </small>
@@ -10,7 +10,7 @@
 
     <h4><waltz-icon name="desktop"></waltz-icon> Applications</h4>
     <ul class="list-unstyled">
-        <li ng-repeat="app in results.apps">
+        <li ng-repeat="app in $ctrl.results.apps">
             <a ui-sref="main.app.view ({id: app.id})">
                 {{app.name}}
                 <small>
@@ -18,7 +18,7 @@
                 </small>
             </a>
         </li>
-        <li ng-show="results.apps.length == 0" class="text-muted">No results...</li>
+        <li ng-show="$ctrl.results.apps.length == 0" class="text-muted">No results...</li>
 
     </ul>
 
@@ -26,20 +26,20 @@
 
     <h4><waltz-icon name="users"></waltz-icon> People</h4>
     <ul class="list-unstyled">
-        <li ng-repeat="person in results.people">
+        <li ng-repeat="person in $ctrl.results.people">
             <a ui-sref="main.person.view ({empId: person.employeeId})">
                 {{ person.displayName }}
             </a>
             <small>{{ person.title }}</small>
         </li>
-        <li ng-show="results.people.length == 0" class="text-muted">No results...</li>
+        <li ng-show="$ctrl.results.people.length == 0" class="text-muted">No results...</li>
     </ul>
 
     <hr/>
 
     <h4><waltz-icon name="puzzle-piece"></waltz-icon> Capabilities</h4>
     <ul class="list-unstyled">
-        <li ng-repeat="capability in results.capabilities">
+        <li ng-repeat="capability in $ctrl.results.capabilities">
             <a ui-sref="main.capability.view ({id: capability.id})">
                 {{ capability.name }}
             </a>
@@ -48,13 +48,13 @@
                 <span ng-if="capability.description.length > 60">...</span>
             </small>
         </li>
-        <li ng-show="results.capabilities.length == 0" class="text-muted">No results...</li>
+        <li ng-show="$ctrl.results.capabilities.length == 0" class="text-muted">No results...</li>
     </ul>
     <hr/>
 
     <h4><waltz-icon name="sitemap"></waltz-icon> Organisational Units</h4>
     <ul class="list-unstyled">
-        <li ng-repeat="orgUnit in results.orgUnits">
+        <li ng-repeat="orgUnit in $ctrl.results.orgUnits">
             <a ui-sref="main.org-unit.view ({id: orgUnit.id})">
                 {{ orgUnit.name }}
             </a>
@@ -63,7 +63,7 @@
                 <span ng-if="orgUnit.description.length > 60">...</span>
             </small>
         </li>
-        <li ng-show="results.orgUnit.length == 0" class="text-muted">No results...</li>
+        <li ng-show="$ctrl.results.orgUnit.length == 0" class="text-muted">No results...</li>
     </ul>
 
 

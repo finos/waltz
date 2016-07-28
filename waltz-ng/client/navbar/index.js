@@ -15,8 +15,9 @@ export default (module) => {
     module
         .directive('waltzNavbar', require('./directives/navbar'))
         .directive('waltzNavbarRecentlyViewed', require('./directives/navbar-recently-viewed'))
-        .directive('waltzNavbarProfile', require('./directives/navbar-profile'))
-        .directive('waltzNavSearchResults', require('./directives/nav-search-results'));
+        .directive('waltzNavbarProfile', require('./directives/navbar-profile'));
 
-    module.component('waltzNavbarSearchForm', require('./components/navbar-search-form'));
+    module
+        .component('waltzNavbarSearchForm', require('./components/navbar-search-form'))
+        .component('waltzNavSearchResults', require('./components/nav-search-results'));
 };

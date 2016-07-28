@@ -1,4 +1,4 @@
-.waltz-nav-search-results-panel {
+.waltz-nav-search-panel {
     top: 42px;
     right: 100px;
     position: absolute;
@@ -7,7 +7,7 @@
     border: 1px solid #ccc;
     box-shadow: 0px 4px 5px gray, -5px 4px 7px gray, 5px 4px 7px gray;
 
-    .waltz-nav-search-results {
+    .wns-results {
         margin: 10px;
         padding-right: 10px;
         overflow-y: auto;

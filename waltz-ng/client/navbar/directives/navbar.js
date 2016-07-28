@@ -1,14 +1,5 @@
-import _ from "lodash";
-
-
-const initialState = {
-
-};
-
-
 
 function controller() {
-    const vm = _.defaultsDeep(this, initialState);
 }
 
 

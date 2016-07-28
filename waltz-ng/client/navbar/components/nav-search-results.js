@@ -10,24 +10,33 @@
  *
  */
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
-    template: require('./nav-search-results.html'),
-    scope: {
-        query: '@',
-        results: '=',
-        onDismiss: '='
-    },
-    link: function(scope, elem) {
-        scope.dismiss = () => {
-            if (scope.onDismiss) {
-                scope.onDismiss();
-            } else {
-                console.log('No dismiss handler registered');
-            }
-        };
+const bindings = {
+    query: '@',
+    results: '<',
+    onDismiss: '<'
+};
+
+const template = require('./nav-search-results.html');
+
+
+function controller() {
+    const vm = this;
+
+    vm.dismiss = () => {
+        if (vm.onDismiss) {
+            vm.onDismiss();
+        } else {
+            console.log('No dismiss handler registered');
+        }
     }
 
+}
 
-});
+
+const component = {
+    template,
+    bindings,
+    controller,
+};
+
+export default component;

@@ -4,16 +4,16 @@
     <li class="dropdown" uib-dropdown>
         <a class="clickable"
            uib-dropdown-toggle>
-                        <span waltz-if-anonymous="true">
-                            <waltz-icon name="user"></waltz-icon>
-                            Anonymous
-                            <b class="caret"></b>
-                        </span>
+            <span waltz-if-anonymous="true">
+                <waltz-icon name="user"></waltz-icon>
+                Anonymous
+                <b class="caret"></b>
+            </span>
             <span waltz-if-anonymous="false">
-                            <waltz-icon name="user"></waltz-icon>
-                            Profile
-                            <b class="caret"></b>
-                        </span>
+                <waltz-icon name="user"></waltz-icon>
+                Profile
+                <b class="caret"></b>
+            </span>
         </a>
         <ul class="dropdown-menu"
             uib-dropdown-menu
@@ -23,28 +23,28 @@
 
             <li style="margin: 4px"
                 class="no-overflow">
-                            <span waltz-if-anonymous="false">
-                                <a ui-sref="main.profile.view ({userId: ctrl.user.userName})"
-                                   ng-bind="ctrl.user.userName"></a>
-                            </span>
+                <span waltz-if-anonymous="false">
+                    <a ui-sref="main.profile.view ({userId: ctrl.user.userName})"
+                       ng-bind="ctrl.user.userName"></a>
+                </span>
                 <span waltz-if-anonymous="true">Anonymous</span>
             </li>
             <li style="margin: 4px"
                 ng-if="ctrl.allowDirectLogin"
                 class="no-overflow">
-                            <span waltz-if-anonymous="true">
-                                <a class="clickable"
-                                   ng-click="ctrl.login()">
-                                    <waltz-icon name="sign-in"></waltz-icon>
-                                    <span>Login</span>
-                                </a>
-                            </span>
+                <span waltz-if-anonymous="true">
+                    <a class="clickable"
+                       ng-click="ctrl.login()">
+                        <waltz-icon name="sign-in"></waltz-icon>
+                        <span>Login</span>
+                    </a>
+                </span>
                 <span waltz-if-anonymous="false">
-                                <a class="clickable"
-                                   ng-click="ctrl.logout()">
-                                <waltz-icon name="sign-out"></waltz-icon>
-                                Logout
-                            </a>
+                    <a class="clickable"
+                       ng-click="ctrl.logout()">
+                        <waltz-icon name="sign-out"></waltz-icon>
+                        Logout
+                    </a>
                 </span>
 
             </li>
@@ -54,74 +54,74 @@
             <li style="margin: 4px"
                 ui-sref-active="side-active"
                 class="no-overflow">
-                            <span waltz-has-role="ADMIN">
-                                <a ui-sref="main.traits">
-                                    <waltz-icon class='text-muted small'
-                                                fixed-width="true"
-                                                name="cubes"></waltz-icon>
-                                    Manage Traits
-                                </a>
-                            </span>
+                <span waltz-has-role="ADMIN">
+                    <a ui-sref="main.traits">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="cubes"></waltz-icon>
+                        Manage Traits
+                    </a>
+                </span>
             </li>
             <li style="margin: 4px"
                 ui-sref-active="side-active"
                 class="no-overflow">
-                            <span waltz-has-role="ADMIN">
-                                <a ui-sref="main.user.management">
-                                    <waltz-icon class='text-muted small'
-                                                fixed-width="true"
-                                                name="users"></waltz-icon>
-                                    Manage Users
-                                </a>
-                            </span>
+                <span waltz-has-role="ADMIN">
+                    <a ui-sref="main.user.management">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="users"></waltz-icon>
+                        Manage Users
+                    </a>
+                </span>
             </li>
             <li style="margin: 4px"
                 ui-sref-active="side-active"
                 class="no-overflow">
-                            <span waltz-has-role="APP_EDITOR">
-                                <a ui-sref="main.app.registration">
-                                    <waltz-icon class='text-muted small'
-                                                fixed-width="true"
-                                                name="gift"></waltz-icon>
-                                    Register App
-                                </a>
-                            </span>
+                <span waltz-has-role="APP_EDITOR">
+                    <a ui-sref="main.app.registration">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="gift"></waltz-icon>
+                        Register App
+                    </a>
+                </span>
             </li>
             <li style="margin: 4px"
                 ui-sref-active="side-active"
                 class="no-overflow">
-                            <span waltz-has-role="ADMIN">
-                                <a ui-sref="main.settings">
-                                    <waltz-icon class='text-muted small'
-                                                fixed-width="true"
-                                                name="cog"></waltz-icon>
-                                    Settings
-                                </a>
-                            </span>
+                <span waltz-has-role="ADMIN">
+                    <a ui-sref="main.settings">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="cog"></waltz-icon>
+                        Settings
+                    </a>
+                </span>
             </li>
             <li style="margin: 4px"
                 ui-sref-active="side-active"
                 class="no-overflow">
-                            <span waltz-has-role="ADMIN">
-                                <a ui-sref="main.source-data-ratings">
-                                    <waltz-icon class='text-muted small'
-                                                fixed-width="true"
-                                                name="map-signs"></waltz-icon>
-                                    Source Data Ratings
-                                </a>
-                            </span>
+                <span waltz-has-role="ADMIN">
+                    <a ui-sref="main.source-data-ratings">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="map-signs"></waltz-icon>
+                        Source Data Ratings
+                    </a>
+                </span>
             </li>
             <li style="margin: 4px"
                 ui-sref-active="side-active"
                 class="no-overflow">
-                            <span waltz-has-role="ADMIN">
-                                <a ui-sref="main.user.log">
-                                    <waltz-icon class='text-muted small'
-                                                fixed-width="true"
-                                                name="list-ul"></waltz-icon>
-                                    User Logs
-                                </a>
-                            </span>
+                <span waltz-has-role="ADMIN">
+                    <a ui-sref="main.user.log">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="list-ul"></waltz-icon>
+                        User Logs
+                    </a>
+                </span>
             </li>
 
         </ul>
