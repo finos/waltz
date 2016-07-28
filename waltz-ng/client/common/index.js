@@ -216,3 +216,8 @@ export function kindToViewState(kind) {
     }
     throw "Unable to convert kind: "+kind+ " to a ui-view state";
 }
+
+
+export function initialiseData(vm, initData) {
+    return Object.assign(vm, _.cloneDeep(initData));
+}
