@@ -8,12 +8,7 @@ const initialState = {
 
 
 function controller() {
-
     const vm = _.defaultsDeep(this, initialState);
-
-
-
-
 }
 
 
