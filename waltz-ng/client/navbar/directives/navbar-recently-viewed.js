@@ -7,7 +7,7 @@ const template = require('./navbar-recently-viewed.html');
 
 
 const initialState = {
-    history: [],
+    history: []
 };
 
 
