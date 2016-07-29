@@ -64,6 +64,8 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
             .renderer("bar")
             .historicRenderer("bar")
             .name("Open Audit Issues")
+            .entityVisibility(true)
+            .rollupVisibility(true)
             .provenance(PROVENANCE)
             .build();
 
@@ -144,6 +146,7 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
         createAdoptionStatsFor(SDLC_SVN, applications, valueDao);
         createAdoptionStatsFor(SDLC_WIKI, applications, valueDao);
         createIntStatsFor(AUDIT, applications, valueDao, 20, failIfPositiveFn);
+        createIntStatsFor(SDLC, applications, valueDao, 20, failIfPositiveFn);
 
         return null;
     }

@@ -95,9 +95,17 @@ function controller($q,
         };
 
         entityStatisticStore
-            .findStatTallies(vm.relatedDefinitions, selector)
-            .then(summaries => vm.summaries = summaries)
-            .then(summaries => vm.statistic.summary = _.find(summaries, { entityReference: { id: statId }}));
+            .findStatTallies([statId], selector)
+            .then(summaries => vm.statistic.summary = summaries[0])
+            .then(() => {
+                const related = [
+                    vm.relatedDefinitions.parent,
+                    ...vm.relatedDefinitions.siblings,
+                    ...vm.relatedDefinitions.children ];
+
+                return entityStatisticStore.findStatTallies(_.map(related, 'id'), selector);
+            })
+            .then(summaries => vm.summaries = summaries);
 
         entityStatisticStore
             .findStatValuesByIdSelector(statId, selector)
