@@ -1,6 +1,6 @@
 import _ from "lodash";
 import {tallyBy} from "../../common/tally-utils";
-import {lifecyclePhaseColorScale, variableScale} from "../../common/colors";
+import {lifecyclePhaseColorScale, riskRatingColorScale, variableScale} from "../../common/colors";
 import {
     riskRatingDisplayNames,
     lifecyclePhaseDisplayNames,
@@ -32,6 +32,7 @@ const applicationKindLabelProvider = d => applicationKindDisplayNames[d.key] || 
 
 const randomColorProvider = d => variableScale(d.data.key);
 const lifecycleColorProvider = d => lifecyclePhaseColorScale(d.data.key);
+const riskRatingColorProvider = d => riskRatingColorScale(d.data.key);
 
 
 function mkChartData(data,
@@ -81,7 +82,7 @@ function mkCharts(apps = [], endUserApps = []) {
                 endUserApps,
                 'riskRating',
                 PIE_SIZE,
-                randomColorProvider,
+                riskRatingColorProvider,
                 riskRatingLabelProvider)
         }
     };
