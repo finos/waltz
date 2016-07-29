@@ -21,13 +21,17 @@ import {ragColorScale} from "../../common/colors";
 import {toKeyCounts} from "../../common";
 
 
-const BINDINGS = {
-    applications: '=',
-    size: '='
+const bindings = {
+    applications: '<',
+    size: '<'
 };
 
 
+const template = require('./apps-by-investment-pie.html');
+
+
 const DEFAULT_SIZE = 80;
+
 
 const investmentLabels = {
     'R' : 'Disinvest',
@@ -39,7 +43,7 @@ const investmentLabels = {
 const config = {
     colorProvider: (d) => ragColorScale(d.data.key),
     size: DEFAULT_SIZE,
-    labelProvider: (k) => investmentLabels[k] || 'Unknown'
+    labelProvider: (d) => investmentLabels[d.key] || 'Unknown'
 };
 
 
@@ -48,32 +52,25 @@ function calcAppInvestmentPieStats(apps) {
 }
 
 
-function controller($scope) {
+function controller() {
     const vm = this;
 
     vm.config = config;
     vm.data = [];
 
-    $scope.$watch('ctrl.size', sz => vm.config.size = sz ? sz : DEFAULT_SIZE);
-
-    $scope.$watch('ctrl.applications', apps => {
-        if (!apps) return;
-        vm.data = calcAppInvestmentPieStats(apps);
-    });
-
+    vm.$onChanges = () => {
+        vm.config.size = vm.size
+            ? vm.size
+            : DEFAULT_SIZE;
+        vm.data = calcAppInvestmentPieStats(vm.applications);
+    };
 }
 
-controller.$inject = ['$scope'];
 
-
-export default () => {
-    return {
-        restrict: 'E',
-        replace: true,
-        template: require('./apps-by-investment-pie.html'),
-        scope: {},
-        bindToController: BINDINGS,
-        controllerAs: 'ctrl',
-        controller
-    };
+const component = {
+    template,
+    bindings,
+    controller
 };
+
+export default component;
