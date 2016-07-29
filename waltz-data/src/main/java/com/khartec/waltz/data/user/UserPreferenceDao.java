@@ -1,7 +1,7 @@
-package com.khartec.waltz.data.user_preference;
+package com.khartec.waltz.data.user;
 
-import com.khartec.waltz.model.user_preference.ImmutableUserPreference;
-import com.khartec.waltz.model.user_preference.UserPreference;
+import com.khartec.waltz.model.user.ImmutableUserPreference;
+import com.khartec.waltz.model.user.UserPreference;
 import com.khartec.waltz.schema.tables.records.UserPreferenceRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -58,24 +58,24 @@ public class UserPreferenceDao {
     }
 
 
-    public int savePreferences(String userId, List<UserPreference> preferences) {
+    public int savePreferencesForUser(String userId, List<UserPreference> preferences) {
 
         List<String> existingKeys = dsl.select(USER_PREFERENCE.KEY)
                 .from(USER_PREFERENCE)
                 .where(USER_PREFERENCE.USER_ID.eq(userId))
                 .fetch()
                 .stream()
-                .map(up -> up.field1().toString())
+                .map(up -> up.getValue(USER_PREFERENCE.KEY))
                 .collect(Collectors.toList());
 
         List<UserPreferenceRecord> inserts = preferences.stream()
-                .filter(p -> !existingKeys.contains(p.key()))
+                .filter(p -> p.user_id().equals(userId) && !existingKeys.contains(p.key()))
                 .map(TO_RECORD_MAPPER)
                 .collect(Collectors.toList());
 
 
         List<UserPreferenceRecord> updates = preferences.stream()
-                .filter(p -> existingKeys.contains(p.key()))
+                .filter(p -> p.user_id().equals(userId) && existingKeys.contains(p.key()))
                 .map(TO_RECORD_MAPPER)
                 .collect(Collectors.toList());
 
@@ -86,13 +86,11 @@ public class UserPreferenceDao {
     }
 
 
-    public Boolean clearUserPreferences(String userId) {
+    public void clearPreferencesForUser(String userId) {
 
-        int execute = dsl.deleteFrom(USER_PREFERENCE)
+        dsl.deleteFrom(USER_PREFERENCE)
                 .where(USER_PREFERENCE.USER_ID.eq(userId))
                 .execute();
-
-        return execute == 0;
     }
 
 

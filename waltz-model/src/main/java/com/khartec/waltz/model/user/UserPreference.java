@@ -1,4 +1,4 @@
-package com.khartec.waltz.model.user_preference;
+package com.khartec.waltz.model.user;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
