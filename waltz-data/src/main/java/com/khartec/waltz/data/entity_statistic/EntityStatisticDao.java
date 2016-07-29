@@ -4,6 +4,7 @@ import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatistic;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -43,15 +44,16 @@ public class EntityStatisticDao {
 
     public List<EntityStatistic> findStatisticsForEntity(EntityReference ref, boolean active) {
         checkNotNull(ref, "ref cannot be null");
+        Condition condition = es.ACTIVE.eq(active)
+                .and(esv.ENTITY_KIND.eq(ref.kind().name()))
+                .and(esv.ENTITY_ID.eq(ref.id()))
+                .and(esv.CURRENT.eq(true));
         return dsl.select(es.fields())
                 .select(esv.fields())
                 .from(es)
                 .innerJoin(esv)
                 .on(esv.STATISTIC_ID.eq(es.ID))
-                .where(es.ACTIVE.eq(active)
-                        .and(esv.ENTITY_KIND.eq(ref.kind().name()))
-                        .and(esv.ENTITY_ID.eq(ref.id()))
-                        .and(esv.CURRENT.eq(true)))
+                .where(dsl.renderInlined(condition))
                 .fetch(TO_COMPOUND_MAPPER);
     }
 
