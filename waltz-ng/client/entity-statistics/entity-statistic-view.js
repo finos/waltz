@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {kindToViewState} from "../common";
+import {kindToViewState, initialiseData} from "../common";
 
 const initData = {
     statistic: {
@@ -40,8 +40,8 @@ function controller($q,
                     bookmarkStore,
                     entityStatisticUtilities,
                     entityStatisticStore) {
+    const vm = initialiseData(this, initData);
 
-    const vm = Object.assign(this, initData);
     const statId = $stateParams.statId;
     const entityKind = $stateParams.kind;
     const entityId = $stateParams.id;
@@ -68,7 +68,18 @@ function controller($q,
     $q.all([navItemPromise, definitionPromise])
         .then(() => /* boot */ vm.onSelectNavItem(_.find(vm.navItems, { id: entityId })));
 
+
+    function resetValueData() {
+        const clearData = initialiseData({}, initData);
+        vm.statistic.summary = clearData.statistic.summary;
+        vm.statistic.values = clearData.statistic.values;
+        vm.summaries = clearData.summaries;
+    }
+
+
     vm.onSelectNavItem = (navItem) => {
+        resetValueData();
+
         vm.selectedNavItem = navItem;
 
         const entityReference = {
