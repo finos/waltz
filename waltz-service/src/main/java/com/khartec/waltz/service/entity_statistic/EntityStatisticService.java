@@ -87,4 +87,14 @@ public class EntityStatisticService {
         Select<Record1<Long>> appIdSelector = factory.apply(options);
         return summaryDao.findStatTallies(statisticIds, appIdSelector);
     }
+
+
+    public EntityStatisticDefinition findDefinition(long id) {
+        return definitionDao.getDefinition(id);
+    }
+
+
+    public List<EntityStatisticDefinition> findAllActiveDefinitions() {
+        return definitionDao.findAllActiveDefinitions();
+    }
 }

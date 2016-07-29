@@ -1,4 +1,3 @@
-
 /*
  *  Waltz
  * Copyright (c) David Watkins. All rights reserved.
@@ -11,5 +10,14 @@
  *
  */
 
+export default (module) => {
 
-export default (module) => module.directive('waltzNavbar', require('./navbar'));
+    module
+        .directive('waltzNavbar', require('./directives/navbar'))
+        .directive('waltzNavbarRecentlyViewed', require('./directives/navbar-recently-viewed'))
+        .directive('waltzNavbarProfile', require('./directives/navbar-profile'));
+
+    module
+        .component('waltzNavbarSearchForm', require('./components/navbar-search-form'))
+        .component('waltzNavSearchResults', require('./components/nav-search-results'));
+};

@@ -1,0 +1,53 @@
+<nav class="navbar navbar-default navbar-fixed-top">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+        <a class="navbar-brand"
+           ui-sref="main.home">
+            <img height="30px"
+                 style="position: relative; top: -6px;"
+                 src="../../../images/branding/waltz_badge+text_horizontal_negative_bw_145px.png">
+        </a>
+        <span ng-bind='ctrl.logoOverlayText'
+              style='display: inline; position: absolute; left: 120px; top:30px; font-weight: bold; font-style: italic; white-space: nowrap'
+              ng-style=" { 'color': ctrl.logoOverlayColor }">
+        </span>
+    </div>
+
+    <div class="nav-bar-collapse">
+        <ul class="nav navbar-nav navbar-left">
+            <li ui-sref-active="active">
+                <a ui-sref="main.org-unit.list">
+                    <waltz-icon name="sitemap"></waltz-icon>
+                    Org Units
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="main.capability.list">
+                    <waltz-icon name="puzzle-piece"></waltz-icon>
+                    Capabilities
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="main.process.list">
+                    <waltz-icon name="code-fork"></waltz-icon>
+                    Processes
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="main.person">
+                    <waltz-icon name="users"></waltz-icon>
+                    People
+                </a>
+            </li>
+        </ul>
+
+        <waltz-navbar-profile>
+        </waltz-navbar-profile>
+
+        <waltz-navbar-recently-viewed>
+        </waltz-navbar-recently-viewed>
+
+        <waltz-navbar-search-form>
+        </waltz-navbar-search-form>
+    </div>
+</nav>

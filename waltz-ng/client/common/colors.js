@@ -12,12 +12,14 @@
  */
 
 import d3 from "d3";
+import _ from 'lodash';
 
-export const amber = d3.rgb('#ff7f0e');
-export const green = d3.rgb('#2ca02c');
-export const red = d3.rgb('#d62728');
-export const grey = d3.rgb('#999');
-export const blue = d3.rgb('#28a1b6');
+
+export const amber = d3.rgb('#D9923F');
+export const green = d3.rgb('#5BB65D');
+export const red = d3.rgb('#DA524B');
+export const grey = d3.rgb('#939393');
+export const blue = d3.rgb('#5271CC');
 
 
 export const ragColorScale = d3.scale.ordinal()
@@ -72,7 +74,7 @@ export const lifecyclePhaseColorScale = d3.scale.ordinal()
 
 export const riskRatingColorScale = d3.scale.ordinal()
     .domain(['LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH'])
-    .range([blue, green, amber, red]);
+    .range([green, amber, red, red.darker()]);
 
 
 export const flowDirectionColorScale = d3.scale.ordinal()
@@ -80,8 +82,97 @@ export const flowDirectionColorScale = d3.scale.ordinal()
     .range([green, amber, blue, grey]);
 
 
-const underlyingVariableScale = d3.scale.category20c();
 
-export const variableScale = (x) => x != "Other"
-        ? d3.rgb(underlyingVariableScale(JSON.stringify(x)))
-        : grey;
+
+const variableColorList = [
+    {
+        color: red,
+        keys: [
+            'NO',
+            'FAIL',
+            'DISINVEST',
+            'UNSUPPORTED',
+            'RESTRICTED',
+            'DISCOURAGED',
+            'NON_STRATEGIC',
+            'NON_COMPLIANT',
+            'R',
+            'RED',
+            'OVERDUE',
+            'LATE',
+            'BAD'
+        ]
+    }, {
+        color: green,
+        keys: [
+            'YES',
+            'PASS',
+            'COMPLETED',
+            'SUCCESS',
+            'INVEST',
+            'SUPPORTED',
+            'PRIMARY',
+            'COMPLIANT',
+            'ENCOURAGED',
+            'STRATEGIC',
+            'G',
+            'GREEN',
+            'GOOD'
+        ]
+    }, {
+        color: amber,
+        keys: [
+            'MAYBE',
+            'PARTIAL',
+            'HOLD',
+            'IN_PROGRESS',
+            'SECONDARY',
+            'STRATEGIC_WITH_ISSUES',
+            'PART_COMPLIANT',
+            'PARTIALLY_COMPLIANT',
+            'A',
+            'AMBER',
+            'YELLOW',
+            'OKAY'
+        ]
+    }, {
+        color: blue,
+        keys: [
+            'PLANNED',
+            'OTHER',
+            'CONCEPTUAL',
+            'B',
+            'NOT_STARTED',
+            'BLUE'
+      ]
+    }, {
+        color: grey,
+        keys: [
+            'UNKNOWN',
+            'EXEMPT',
+            'RETIRED',
+            'GREY',
+            'GRAY',
+            'POSTPONED',
+            'N/A',
+            'NA',
+            'NOT_APPLICABLE',
+            'MEH'
+        ]
+    }
+];
+
+const variableScaleMap = _.reduce(
+    variableColorList,
+    (acc, colorSet) => {
+        _.each(colorSet.keys, k => acc[k] = colorSet.color);
+        return acc;
+    },
+    {});
+
+const randomColorScale = d3.scale.category20();
+
+
+export const variableScale = (x) => variableScaleMap[x.toUpperCase()] || d3.rgb(randomColorScale(x));
+
+

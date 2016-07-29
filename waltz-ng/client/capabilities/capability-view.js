@@ -25,7 +25,7 @@ const initialState = {
     capability: null,
     complexity: [],
     dataFlows: [],
-    entityStatistics: [],
+    entityStatisticDefinitions: [],
     groupedApps: null,
     processes: [],
     ratings: null,
@@ -119,23 +119,6 @@ function prepareGroupData(capability, apps, perspective, ratings) {
 }
 
 
-function loadEntityStatistics(entityStatisticStore, appIdSelector) {
-    const entityStatistics = {};
-
-    return entityStatisticStore
-        .findTopLevelDefinitions()
-        .then(definitions => {
-            entityStatistics.definitions = definitions;
-            const definitionIds = _.map(definitions, 'id');
-            return entityStatisticStore.findStatTallies(definitionIds, appIdSelector);
-        })
-        .then(tallies => {
-            entityStatistics.summaries = tallies;
-            return entityStatistics;
-        });
-}
-
-
 function controller($q,
                     $scope,
                     $state,
@@ -210,7 +193,7 @@ function controller($q,
                 ratingStore.findByAppIdSelector(appIdSelector),
                 dataFlowViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN'),
                 complexityStore.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
-                assetCostViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN', 2015),
+                assetCostViewService.initialise(appIdSelector, 2016),
                 techStatsService.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
                 sourceDataRatingStore.findAll()
             ]).then(([
@@ -284,10 +267,9 @@ function controller($q,
     loadTraitInfo(traitStore, traitUsageStore, capability.id)
         .then(r => vm.traitInfo = r);
 
-   loadEntityStatistics(entityStatisticStore, appIdSelector)
-        .then(stats => {
-            vm.entityStatistics = stats;
-        });
+    entityStatisticStore
+        .findAllActiveDefinitions()
+        .then(defns => vm.entityStatisticDefinitions = defns);
 }
 
 

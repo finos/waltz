@@ -16,24 +16,30 @@
  *
  */
 
-const service = (http, root) => {
+const service = ($http, root) => {
 
     const BASE = `${root}/asset-cost`;
 
     const findByCode = code =>
-        http.get(`${BASE}/code/${code}`)
+        $http.get(`${BASE}/code/${code}`)
             .then(result => result.data);
 
 
     const findAppCostsByAppIds = (options) =>
-        http.post(`${BASE}/app-cost/apps`, options)
+        $http.post(`${BASE}/app-cost/apps`, options)
             .then(result => result.data);
 
 
-    const findStatsByAppIds = (options) =>
-        http.post(`${BASE}/app-cost/apps/stats`, options)
-            .then(result => result.data);
+    const findStatsByAppIds = (options, year) => {
+        var path = `${BASE}/app-cost/apps/stats`;
+        const params = year
+            ? { params: { year } }
+            : {};
 
+        return $http
+            .post(path, options, params)
+            .then(result => result.data);
+    };
 
     return {
         findByCode,

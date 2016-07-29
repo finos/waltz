@@ -24,10 +24,8 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.application.HierarchyQueryScope;
 import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
-import com.khartec.waltz.model.cost.AssetCostQueryOptions;
 import com.khartec.waltz.model.cost.AssetCostStatistics;
 import com.khartec.waltz.model.cost.CostBandTally;
-import com.khartec.waltz.model.cost.ImmutableAssetCostQueryOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
 import org.jooq.DSLContext;
@@ -61,16 +59,12 @@ public class AssetCostHarness {
                         .build())
                 .build();
 
-        AssetCostQueryOptions options = ImmutableAssetCostQueryOptions.builder()
-                .idSelectionOptions(appIdSelectionOptions)
-                .year(2015)
-                .build();
 
         Select<Record1<Long>> selector = selectorFactory.apply(appIdSelectionOptions);
         List<CostBandTally> res = dao.calculateCostBandStatisticsByAppIdSelector(2015, selector);
 
 
-        AssetCostStatistics stats = service.calculateStatisticsByAppIds(options);
+        AssetCostStatistics stats = service.calculateStatisticsByAppIds(appIdSelectionOptions);
 
         System.out.println("-- end, dur: " + (System.currentTimeMillis() - st));
 

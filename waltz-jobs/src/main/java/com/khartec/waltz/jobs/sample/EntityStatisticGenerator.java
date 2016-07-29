@@ -3,12 +3,11 @@ package com.khartec.waltz.jobs.sample;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
-import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticDefinition;
-import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticValue;
+import com.khartec.waltz.model.entity_statistic.*;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
@@ -49,6 +48,8 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
             .renderer("enum")
             .historicRenderer("enum")
             .name("dummy stat")
+            .entityVisibility(true)
+            .rollupVisibility(true)
             .provenance(PROVENANCE)
             .build();
 
@@ -63,6 +64,8 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
             .renderer("bar")
             .historicRenderer("bar")
             .name("Open Audit Issues")
+            .entityVisibility(true)
+            .rollupVisibility(true)
             .provenance(PROVENANCE)
             .build();
 
@@ -143,6 +146,7 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
         createAdoptionStatsFor(SDLC_SVN, applications, valueDao);
         createAdoptionStatsFor(SDLC_WIKI, applications, valueDao);
         createIntStatsFor(AUDIT, applications, valueDao, 20, failIfPositiveFn);
+        createIntStatsFor(SDLC, applications, valueDao, 20, failIfPositiveFn);
 
         return null;
     }

@@ -17,22 +17,23 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.cost.ApplicationCost;
 import com.khartec.waltz.model.cost.AssetCost;
-import com.khartec.waltz.model.cost.AssetCostQueryOptions;
 import com.khartec.waltz.model.cost.AssetCostStatistics;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
-import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
+import spark.Response;
 
 import java.io.IOException;
+import java.util.List;
 
 import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readBody;
+import static com.khartec.waltz.web.WebUtilities.readOptionsFromBody;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
@@ -59,18 +60,22 @@ public class AssetCostEndpoint implements Endpoint {
 
         ListRoute<AssetCost> findByAssetCodeRoute = (request, response) -> assetCostService.findByAssetCode(request.params("code"));
 
-        ListRoute<ApplicationCost> findAppCostsByAppIds = (request, response) -> assetCostService.findAppCostsByAppIds(readQueryOptions(request));
-
-        DatumRoute<AssetCostStatistics> calcStatisticsByAppIdsRoute = (request, response) ->
-                assetCostService.calculateStatisticsByAppIds(readQueryOptions(request));
-
         getForList(findByAssetCodePath, findByAssetCodeRoute);
-        postForList(findAppCostsByAppIdsPath, findAppCostsByAppIds);
-        postForDatum(calcStatisticsByAppIdsPath, calcStatisticsByAppIdsRoute);
+        postForList(findAppCostsByAppIdsPath, this::findAppCostsByAppIds);
+        postForDatum(calcStatisticsByAppIdsPath, this::calcStatisticsByAppIdsRoute);
 
     }
 
-    private AssetCostQueryOptions readQueryOptions(Request request) throws IOException {
-        return readBody(request, AssetCostQueryOptions.class);
+    private AssetCostStatistics calcStatisticsByAppIdsRoute(Request request, Response response) throws IOException {
+        ApplicationIdSelectionOptions selectorOptions = readOptionsFromBody(request);
+        return assetCostService.calculateStatisticsByAppIds(selectorOptions);
     }
+
+
+    private List<ApplicationCost> findAppCostsByAppIds(Request request, Response response) throws IOException {
+        ApplicationIdSelectionOptions selectorOptions = readOptionsFromBody(request);
+        return assetCostService.findAppCostsByAppIds(selectorOptions);
+    }
+
+
 }

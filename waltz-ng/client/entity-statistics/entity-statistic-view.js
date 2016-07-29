@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {kindToViewState} from "../common";
+import {kindToViewState, initialiseData} from "../common";
 
 const initData = {
     statistic: {
@@ -37,14 +37,23 @@ function hasRelatedDefinitions(defs) {
 function controller($q,
                     $state,
                     $stateParams,
+                    bookmarkStore,
                     entityStatisticUtilities,
                     entityStatisticStore) {
+    const vm = initialiseData(this, initData);
 
-    const vm = Object.assign(this, initData);
     const statId = $stateParams.statId;
     const entityKind = $stateParams.kind;
     const entityId = $stateParams.id;
 
+    const statRef = {
+        id: statId,
+        kind: 'ENTITY_STATISTIC'
+    };
+
+    bookmarkStore
+        .findByParent(statRef)
+        .then(bs => vm.bookmarks = bs);
 
     const definitionPromise = entityStatisticStore
         .findRelatedStatDefinitions(statId)
@@ -59,7 +68,18 @@ function controller($q,
     $q.all([navItemPromise, definitionPromise])
         .then(() => /* boot */ vm.onSelectNavItem(_.find(vm.navItems, { id: entityId })));
 
+
+    function resetValueData() {
+        const clearData = initialiseData({}, initData);
+        vm.statistic.summary = clearData.statistic.summary;
+        vm.statistic.values = clearData.statistic.values;
+        vm.summaries = clearData.summaries;
+    }
+
+
     vm.onSelectNavItem = (navItem) => {
+        resetValueData();
+
         vm.selectedNavItem = navItem;
 
         const entityReference = {
@@ -75,9 +95,22 @@ function controller($q,
         };
 
         entityStatisticStore
-            .findStatTallies(vm.relatedDefinitions, selector)
-            .then(summaries => vm.summaries = summaries)
-            .then(summaries => vm.statistic.summary = _.find(summaries, { entityReference: { id: statId }}));
+            .findStatTallies([statId], selector)
+            .then(summaries => vm.statistic.summary = summaries[0])
+            .then(() => {
+                const related = [
+                    vm.relatedDefinitions.parent,
+                    ...vm.relatedDefinitions.siblings,
+                    ...vm.relatedDefinitions.children ];
+
+                const relatedIds = _.chain(related)
+                    .filter(s => s != null)
+                    .map('id')
+                    .value();
+
+                return entityStatisticStore.findStatTallies(relatedIds, selector);
+            })
+            .then(summaries => vm.summaries = summaries);
 
         entityStatisticStore
             .findStatValuesByIdSelector(statId, selector)
@@ -90,7 +123,7 @@ function controller($q,
         const stateName = kindToViewState(entityKind);
         const navId = vm.selectedNavItem.id;
         $state.go(stateName, { id: navId });
-    }
+    };
 }
 
 
@@ -98,6 +131,7 @@ controller.$inject = [
     '$q',
     '$state',
     '$stateParams',
+    'BookmarkStore',
     'EntityStatisticUtilities',
     'EntityStatisticStore'
 ];

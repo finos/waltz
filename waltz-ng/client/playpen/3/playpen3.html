@@ -10,14 +10,13 @@
     </waltz-page-header>
 
     <waltz-section name="Foo">
-        <div class="row">
-            <div class="col-md-12">
-                <waltz-entity-statistic-detail-panel definition='ctrl.statistic.definition'
-                                                     summary="ctrl.statistic.summary"
-                                                     values="ctrl.statistic.values">
-                </waltz-entity-statistic-detail-panel>
-            </div>
-        </div>
+
+        <!-- INDICATORS -->
+        <waltz-entity-statistic-summary-section name="Indicators"
+                                                definitions="ctrl.definitions"
+                                                parent-ref="ctrl.entityRef">
+        </waltz-entity-statistic-summary-section>
+
     </waltz-section>
 
 

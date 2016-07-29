@@ -75,7 +75,7 @@ const initialState = {
     changeInitiatives: [],
     complexity: [],
     dataFlows : null,
-    entityStatistics: [],
+    entityStatisticDefinitions: [],
     flowOptions: null,
     groupDetail: null,
     initiallySelectedIds: [],
@@ -95,22 +95,6 @@ const initialState = {
     }
 };
 
-
-function loadEntityStatistics(entityStatisticStore, appIdSelector) {
-    const entityStatistics = {};
-
-    return entityStatisticStore
-        .findTopLevelDefinitions()
-        .then(definitions => {
-            entityStatistics.definitions = definitions;
-            const definitionIds = _.map(definitions, 'id');
-            return entityStatisticStore.findStatTallies(definitionIds, appIdSelector);
-        })
-        .then(tallies => {
-            entityStatistics.summaries = tallies;
-            return entityStatistics;
-        });
-}
 
 function controller($scope,
                     $q,
@@ -151,7 +135,7 @@ function controller($scope,
     dataFlowViewService.initialise(id, 'APP_GROUP', 'EXACT')
         .then(flows => vm.dataFlows = flows);
 
-    assetCostViewService.initialise(id, 'APP_GROUP', 'EXACT', 2015)
+    assetCostViewService.initialise(appIdSelector, 2016)
         .then(costs => vm.assetCostData = costs);
 
     bookmarkStore
@@ -214,10 +198,9 @@ function controller($scope,
 
     vm.loadFlowDetail = () => dataFlowViewService.loadDetail();
 
-    loadEntityStatistics(entityStatisticStore, appIdSelector)
-        .then(stats => {
-            vm.entityStatistics = stats;
-        });
+    entityStatisticStore
+        .findAllActiveDefinitions()
+        .then(definitions => vm.entityStatisticDefinitions = definitions);
 
 }
 

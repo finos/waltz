@@ -38,8 +38,17 @@ function service($q,
 
     const rawData = {};
 
+
+
     function loadAll(orgUnitId) {
 
+        const appIdSelector = {
+            entityReference: {
+                id: orgUnitId,
+                kind: 'ORG_UNIT'
+            },
+            scope: 'CHILDREN'
+        };
 
         const promises = [
             orgUnitStore.findAll(),
@@ -49,7 +58,7 @@ function service($q,
             perspectiveStore.findByCode('BUSINESS'),
             dataFlowViewService.initialise(orgUnitId, "ORG_UNIT", "CHILDREN"),
             changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId),
-            assetCostViewService.initialise(orgUnitId, 'ORG_UNIT', 'CHILDREN', 2015)
+            assetCostViewService.initialise(appIdSelector, 2016)
         ];
 
         return $q.all(promises)
@@ -80,21 +89,6 @@ function service($q,
             .then(() => loadAll2(orgUnitId))
     }
 
-    function loadEntityStatistics(appIdSelector) {
-        const entityStatistics = {};
-
-        return entityStatisticStore
-            .findTopLevelDefinitions()
-            .then(definitions => {
-                entityStatistics.definitions = definitions;
-                const definitionIds = _.map(definitions, 'id');
-                return entityStatisticStore.findStatTallies(definitionIds, appIdSelector);
-            })
-            .then(tallies => {
-                entityStatistics.summaries = tallies;
-                return entityStatistics;
-            });
-    }
 
     function loadAll2(orgUnitId) {
 
@@ -118,7 +112,7 @@ function service($q,
             techStatsService.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
             bookmarkStore.findByParent({id: orgUnitId, kind: 'ORG_UNIT'}),
             sourceDataRatingStore.findAll(),
-            loadEntityStatistics(appIdSelector)
+            entityStatisticStore.findAllActiveDefinitions(appIdSelector)
         ]);
 
         const prepareRawDataPromise = bulkPromise
@@ -133,7 +127,7 @@ function service($q,
                 techStats,
                 bookmarks,
                 sourceDataRatings,
-                entityStatistics
+                entityStatisticDefinitions
             ]) => {
 
                 const endUserAppsWithManagement = _.map(_.cloneDeep(endUserApps),
@@ -160,7 +154,7 @@ function service($q,
                     techStats,
                     bookmarks,
                     sourceDataRatings,
-                    entityStatistics,
+                    entityStatisticDefinitions,
                     combinedApps
                 };
 

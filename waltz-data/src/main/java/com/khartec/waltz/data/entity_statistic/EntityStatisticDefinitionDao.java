@@ -1,10 +1,10 @@
 package com.khartec.waltz.data.entity_statistic;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.StatisticCategory;
-import com.khartec.waltz.model.StatisticType;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticDefinition;
+import com.khartec.waltz.model.entity_statistic.StatisticCategory;
+import com.khartec.waltz.model.entity_statistic.StatisticType;
 import com.khartec.waltz.schema.tables.records.EntityStatisticDefinitionRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +38,8 @@ public class EntityStatisticDefinitionDao {
                 .historicRenderer(record.getHistoricRenderer())
                 .provenance(record.getProvenance())
                 .parentId(Optional.ofNullable(record.getParentId()))
+                .entityVisibility(record.getEntityVisibility())
+                .rollupVisibility(record.getRollupVisibility())
                 .build();
     };
 
@@ -55,6 +57,8 @@ public class EntityStatisticDefinitionDao {
         record.setRenderer(domainObj.renderer());
         record.setHistoricRenderer(domainObj.historicRenderer());
         record.setProvenance(domainObj.provenance());
+        record.setEntityVisibility(domainObj.entityVisibility());
+        record.setRollupVisibility(domainObj.rollupVisibility());
 
         return record;
     };
@@ -79,6 +83,13 @@ public class EntityStatisticDefinitionDao {
     public List<EntityStatisticDefinition> getAllDefinitions() {
         return dsl.select(esd.fields())
                 .from(esd)
+                .fetch(TO_DEFINITION_MAPPER);
+    }
+
+    public List<EntityStatisticDefinition> findAllActiveDefinitions() {
+        return dsl.select(esd.fields())
+                .from(esd)
+                .where(esd.ACTIVE.eq(true))
                 .fetch(TO_DEFINITION_MAPPER);
     }
 
@@ -137,4 +148,10 @@ public class EntityStatisticDefinitionDao {
                 .fetch(TO_DEFINITION_MAPPER);
     }
 
+    public EntityStatisticDefinition getDefinition(long id) {
+        return dsl.select(esd.fields())
+                .from(esd)
+                .where(esd.ID.eq(id))
+                .fetchOne(TO_DEFINITION_MAPPER);
+    }
 }

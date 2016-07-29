@@ -79,8 +79,8 @@ function processSoftwareCatalogStats(stats) {
 
 function calculateVisibility(stats) {
     return {
-        servers: stats.serverStats.count > 0,
-        databases: stats.databaseStats.count > 0,
+        servers: stats.serverStats.totalCount > 0,
+        databases: stats.databaseStats.totalCount > 0,
         software: stats.softwareStats && _.keys(stats.softwareStats.vendorCounts).length > 0
     };
 }

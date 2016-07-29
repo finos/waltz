@@ -39,7 +39,7 @@ const initModel = {
     assetCostData: {},
     serverStats: null,
     dataFlows: [],
-    entityStatisticsSummary: [],
+    entityStatisticDefinitions: [],
     visibility: {
         techOverlay: false,
         flowOverlay: false,
@@ -161,7 +161,7 @@ function service($q,
 
     function loadCostStats(personId) {
         assetCostViewService
-            .initialise(personId, 'PERSON', 'CHILDREN', 2015)
+            .initialise({ entityReference: { kind: 'PERSON', id: personId }, scope: 'CHILDREN' }, 2016)
             .then(assetCostData => state.model.assetCostData = assetCostData);
     }
 
@@ -193,28 +193,10 @@ function service($q,
             .then(ratings => state.model.sourceDataRatings = ratings);
     }
 
-    function loadEntityStatistics(personId) {
-        const appIdSelector = {
-            entityReference: {
-                kind: 'PERSON',
-                id: personId
-            },
-            scope: 'CHILDREN'
-        };
-
-        const entityStatistics = {};
-
+    function loadEntityStatistics() {
         return entityStatisticStore
-            .findTopLevelDefinitions()
-            .then(definitions => {
-                entityStatistics.definitions = definitions;
-                const definitionIds = _.map(definitions, 'id');
-                return entityStatisticStore.findStatTallies(definitionIds, appIdSelector);
-            })
-            .then(tallies => {
-                entityStatistics.summaries = tallies;
-                return state.model.entityStatistics = entityStatistics;
-            });
+            .findAllActiveDefinitions()
+            .then(defns => state.model.entityStatisticDefinitions = defns);
     }
 
     function reset() {
@@ -236,7 +218,7 @@ function service($q,
                 loadTechStats(personId);
                 loadComplexity(personId);
                 loadSourceDataRatings();
-                loadEntityStatistics(personId);
+                loadEntityStatistics();
             });
 
         const appPromise = peoplePromise
