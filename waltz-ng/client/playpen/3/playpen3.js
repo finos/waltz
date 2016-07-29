@@ -16,32 +16,18 @@ function perpareBars(stats = []) {
 
 function controller(entityStatisticStore) {
 
-    const vm = Object.assign(this, initData);
-    const statId = 20000;
+    const vm = this;
 
-
-    const selector = {
-        scope: 'CHILDREN',
-        entityReference: {
+    vm.entityRef =  {
             id: 30,
             kind: 'ORG_UNIT'
-        }
     };
 
     entityStatisticStore
-        .findStatDefinition(statId)
-        .then(d => vm.statistic.definition = d);
+        .findAllActiveDefinitions()
+        .then(d => vm.definitions = d);
 
-    entityStatisticStore
-        .findStatTallies([statId], selector)
-        .then(s => vm.statistic.summary = s[0]);
 
-    entityStatisticStore
-        .findStatValuesByIdSelector(statId, selector)
-        .then(stats => vm.statistic.values = stats)
-        .then(stats => perpareBars(stats));
-
-    
 }
 
 

@@ -180,43 +180,6 @@
     </waltz-section>
 
 
-    <!-- TECHNOLOGIES -->
-    <waltz-section name="Technologies">
-
-        <waltz-section-actions>
-            <button class="btn btn-xs waltz-btn-transparent"
-                    ng-click="ctrl.visibility.techOverlay = ! ctrl.visibility.techOverlay">
-                <waltz-icon name="map-signs"></waltz-icon>
-            </button>
-        </waltz-section-actions>
-
-        <waltz-source-data-overlay visible="ctrl.visibility.techOverlay"
-                                   ratings="ctrl.viewData.sourceDataRatings"
-                                   entities="['SERVER', 'DATABASE', 'SOFTWARE']">
-        </waltz-source-data-overlay>
-
-        <waltz-group-technology-summary stats="ctrl.viewData.techStats">
-        </waltz-group-technology-summary>
-    </waltz-section>
-
-
-    <!-- COSTS -->
-    <waltz-asset-costs-section data="ctrl.viewData.assetCostData"
-                               source-data-ratings="ctrl.viewData.sourceDataRatings"
-                               on-bucket-select="ctrl.onAssetBucketSelect"
-                               csv-name="asset_costs.csv">
-    </waltz-asset-costs-section>
-
-
-    <!-- BOOKMARKS -->
-    <waltz-bookmarks-section bookmarks="ctrl.viewData.bookmarks"
-                             entity-id="{{ ctrl.viewData.orgUnit.id }}"
-                             kind="ORG_UNIT"
-                             parent-name="{{ ctrl.viewData.orgUnit.name }}"
-                             source-data-ratings="ctrl.viewData.sourceDataRatings">
-    </waltz-bookmarks-section>
-
-
     <!-- APPS -->
     <waltz-section name="Applications"
                    id="apps-section"
@@ -266,10 +229,47 @@
 
     <!-- INDICATORS -->
     <waltz-entity-statistic-summary-section name="Indicators"
-                                            definitions="ctrl.viewData.entityStatistics.definitions"
-                                            summaries="ctrl.viewData.entityStatistics.summaries"
+                                            definitions="ctrl.viewData.entityStatisticDefinitions"
                                             parent-ref="ctrl.entityRef">
     </waltz-entity-statistic-summary-section>
+
+
+
+    <!-- TECHNOLOGIES -->
+    <waltz-section name="Technologies">
+
+        <waltz-section-actions>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="ctrl.visibility.techOverlay = ! ctrl.visibility.techOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="ctrl.visibility.techOverlay"
+                                   ratings="ctrl.viewData.sourceDataRatings"
+                                   entities="['SERVER', 'DATABASE', 'SOFTWARE']">
+        </waltz-source-data-overlay>
+
+        <waltz-group-technology-summary stats="ctrl.viewData.techStats">
+        </waltz-group-technology-summary>
+    </waltz-section>
+
+
+    <!-- COSTS -->
+    <waltz-asset-costs-section data="ctrl.viewData.assetCostData"
+                               source-data-ratings="ctrl.viewData.sourceDataRatings"
+                               on-bucket-select="ctrl.onAssetBucketSelect"
+                               csv-name="asset_costs.csv">
+    </waltz-asset-costs-section>
+
+
+    <!-- BOOKMARKS -->
+    <waltz-bookmarks-section bookmarks="ctrl.viewData.bookmarks"
+                             entity-id="{{ ctrl.viewData.orgUnit.id }}"
+                             kind="ORG_UNIT"
+                             parent-name="{{ ctrl.viewData.orgUnit.name }}"
+                             source-data-ratings="ctrl.viewData.sourceDataRatings">
+    </waltz-bookmarks-section>
 
 
     <!-- CHANGE_LOG -->
