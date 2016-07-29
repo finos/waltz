@@ -103,7 +103,12 @@ function controller($q,
                     ...vm.relatedDefinitions.siblings,
                     ...vm.relatedDefinitions.children ];
 
-                return entityStatisticStore.findStatTallies(_.map(related, 'id'), selector);
+                const relatedIds = _.chain(related)
+                    .filter(s => s != null)
+                    .map('id')
+                    .value();
+
+                return entityStatisticStore.findStatTallies(relatedIds, selector);
             })
             .then(summaries => vm.summaries = summaries);
 
