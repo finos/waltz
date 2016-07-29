@@ -18,55 +18,54 @@
  */
 
 import {lifecyclePhaseColorScale} from "../../common/colors";
+import {lifecyclePhaseDisplayNames} from '../../common/services/display_names';
 import {toKeyCounts} from "../../common";
 
 
-const BINDINGS = {
-    applications: '=',
-    size: '='
+const bindings = {
+    applications: '<',
+    size: '<'
 };
+
+
+const template = require('./apps-by-lifecycle-phase-pie.html');
 
 
 const DEFAULT_SIZE = 80;
 
+
 const config = {
     colorProvider: (d) => lifecyclePhaseColorScale(d.data.key),
-    size: DEFAULT_SIZE
+    size: DEFAULT_SIZE,
+    labelProvider: d => lifecyclePhaseDisplayNames[d.key] || 'Unknown'
 };
 
 
-
-function calcAppPhasePieStats(apps) {
+function calcAppPhasePieStats(apps = []) {
     return toKeyCounts(apps, a => a.lifecyclePhase);
 }
 
 
-function controller($scope) {
+function controller() {
     const vm = this;
 
     vm.config = config;
     vm.data = [];
 
-    $scope.$watch('ctrl.size', sz => vm.config.size = sz ? sz : DEFAULT_SIZE);
-
-    $scope.$watch('ctrl.applications', apps => {
-        if (!apps) return;
-        vm.data = calcAppPhasePieStats(apps);
-    });
-
+    vm.$onChanges = () => {
+        vm.config.size = vm.size
+            ? vm.size
+            : DEFAULT_SIZE;
+        vm.data = calcAppPhasePieStats(vm.applications);
+    };
 }
 
-controller.$inject = ['$scope'];
 
-
-export default () => {
-    return {
-        restrict: 'E',
-        replace: true,
-        template: require('./apps-by-lifecycle-phase-pie.html'),
-        scope: {},
-        bindToController: BINDINGS,
-        controllerAs: 'ctrl',
-        controller
-    };
+const component = {
+    template,
+    bindings,
+    controller
 };
+
+
+export default component;

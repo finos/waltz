@@ -23,11 +23,11 @@ export default (module) => {
         .directive('waltzAppOverviewSection', require('./directives/app-overview-section'))
         .directive('waltzAppSelector', require('./directives/app-selector'))
         .directive('waltzAppTable', require('./directives/app-table'))
-        .directive('waltzAppsByInvestmentPie', require('./directives/apps-by-investment-pie'))
-        .directive('waltzAppsByLifecyclePhasePie', require('./directives/apps-by-lifecycle-phase-pie'))
         .directive('waltzAssetCodeExplorer', require('./directives/asset-code-explorer'))
         .directive('waltzBasicAppSelector', require('./directives/basic-app-selector'));
 
     module
+        .component('waltzAppsByInvestmentPie', require('./components/apps-by-investment-pie'))
+        .component('waltzAppsByLifecyclePhasePie', require('./components/apps-by-lifecycle-phase-pie'))
         .component('waltzAppSummary', require('./components/app-summary'));
 };
