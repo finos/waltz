@@ -115,6 +115,13 @@
     </waltz-section>
 
 
+    <!-- INDICATORS -->
+    <waltz-entity-statistic-summary-section name="Indicators"
+                                            definitions="ctrl.entityStatisticDefinitions"
+                                            parent-ref="ctrl.entityRef">
+    </waltz-entity-statistic-summary-section>
+
+
     <!-- TECHNOLOGIES -->
     <waltz-section name="Technologies">
 
@@ -151,14 +158,6 @@
                              parent-name="{{ ctrl.capability.name }}"
                              source-data-ratings="ctrl.sourceDataRatings">
     </waltz-bookmarks-section>
-
-
-    <!-- INDICATORS -->
-    <waltz-entity-statistic-summary-section name="Indicators"
-                                            definitions="ctrl.entityStatistics.definitions"
-                                            summaries="ctrl.entityStatistics.summaries"
-                                            parent-ref="ctrl.entityRef">
-    </waltz-entity-statistic-summary-section>
 
 
     <!-- ASSOCIATED CAPABILITIES -->

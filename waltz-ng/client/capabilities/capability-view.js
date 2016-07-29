@@ -25,7 +25,7 @@ const initialState = {
     capability: null,
     complexity: [],
     dataFlows: [],
-    entityStatistics: [],
+    entityStatisticDefinitions: [],
     groupedApps: null,
     processes: [],
     ratings: null,
@@ -116,23 +116,6 @@ function prepareGroupData(capability, apps, perspective, ratings) {
     };
 
     return group;
-}
-
-
-function loadEntityStatistics(entityStatisticStore, appIdSelector) {
-    const entityStatistics = {};
-
-    return entityStatisticStore
-        .findTopLevelDefinitions()
-        .then(definitions => {
-            entityStatistics.definitions = definitions;
-            const definitionIds = _.map(definitions, 'id');
-            return entityStatisticStore.findStatTallies(definitionIds, appIdSelector);
-        })
-        .then(tallies => {
-            entityStatistics.summaries = tallies;
-            return entityStatistics;
-        });
 }
 
 
@@ -284,10 +267,9 @@ function controller($q,
     loadTraitInfo(traitStore, traitUsageStore, capability.id)
         .then(r => vm.traitInfo = r);
 
-   loadEntityStatistics(entityStatisticStore, appIdSelector)
-        .then(stats => {
-            vm.entityStatistics = stats;
-        });
+    entityStatisticStore
+        .findAllActiveDefinitions()
+        .then(defns => vm.entityStatisticDefinitions = defns);
 }
 
 

@@ -86,6 +86,13 @@ public class EntityStatisticDefinitionDao {
                 .fetch(TO_DEFINITION_MAPPER);
     }
 
+    public List<EntityStatisticDefinition> findAllActiveDefinitions() {
+        return dsl.select(esd.fields())
+                .from(esd)
+                .where(esd.ACTIVE.eq(true))
+                .fetch(TO_DEFINITION_MAPPER);
+    }
+
 
     public List<EntityStatisticDefinition> findTopLevelDefinitions() {
         return dsl.select(esd.fields())

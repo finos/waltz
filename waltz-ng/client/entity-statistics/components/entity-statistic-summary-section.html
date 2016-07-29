@@ -1,0 +1,43 @@
+<div>
+    <waltz-section name="{{ $ctrl.name }}"
+                   icon="pie-chart">
+
+        <div class="row"
+             ng-if="$ctrl.definitions.length > 0">
+            <div class="col-md-4">
+                <treecontrol class="tree-light"
+                             tree-model="$ctrl.definitionTree"
+                             on-selection="$ctrl.onDefinitionSelection(node)">
+                    <span ng-bind="node.name"></span>
+                </treecontrol>
+
+            </div>
+            <div class="col-md-8">
+                <div ng-if="$ctrl.activeSummary == null && ! $ctrl.loading">
+                    Select an indicator to see more...
+                </div>
+                <div ng-if="$ctrl.activeSummary != null && $ctrl.loading"
+                     style="height: 230px">
+                </div>
+                <div ng-if="$ctrl.activeSummary != null && ! $ctrl.loading">
+                    <waltz-entity-statistic-summary-card summary="$ctrl.activeSummary"
+                                                         definition="$ctrl.activeDefinition"
+                                                         parent-ref="$ctrl.parentRef"
+                                                         sub-title="{{$ctrl.activeDefinition.category | toDisplayName:'entityStatistic'}}">
+                    </waltz-entity-statistic-summary-card>
+                </div>
+            </div>
+        </div>
+
+        <div class="row"
+             ng-if="$ctrl.definitions.length == 0">
+            <div class="col-md-12">
+                <div class="alert alert-warning">
+                    <strong>
+                        No Indicators
+                    </strong>
+                </div>
+            </div>
+        </div>
+    </waltz-section>
+</div>

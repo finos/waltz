@@ -68,14 +68,14 @@ public class EntityStatisticEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String findTopLevelDefinitionsPath = mkPath(BASE_URL, "definition");
+        String findAllActiveDefinitionsPath = mkPath(BASE_URL, "definition");
         String findDefinitionPath = mkPath(BASE_URL, "definition", ":id");
         String findRelatedStatDefinitionsPath = mkPath(BASE_URL, "definition" , ":statId", "related");
         String findStatValuesBySelectorPath = mkPath(BASE_URL, "value", ":statId");
         String findStatTalliesPath = mkPath(BASE_URL, "tally");
 
-        ListRoute<EntityStatisticDefinition> findTopLevelDefinitionsRoute = (request, response)
-                -> entityStatisticService.findTopLevelDefinitions();
+        ListRoute<EntityStatisticDefinition> findAllActiveDefinitionsRoute = (request, response)
+                -> entityStatisticService.findAllActiveDefinitions();
 
         DatumRoute<EntityStatisticDefinition> findDefinitionRoute = (request, response)
                 -> entityStatisticService.findDefinition(getId(request));
@@ -86,7 +86,7 @@ public class EntityStatisticEndpoint implements Endpoint {
         DatumRoute<ImmediateHierarchy<EntityStatisticDefinition>> findRelatedStatDefinitionsRoute = (request, response)
                 -> entityStatisticService.findRelatedStatDefinitions(getLong(request, "statId"));
 
-        getForList(findTopLevelDefinitionsPath, findTopLevelDefinitionsRoute);
+        getForList(findAllActiveDefinitionsPath, findAllActiveDefinitionsRoute);
         postForList(findStatValuesBySelectorPath, findStatValuesForAppSelectorRoute);
         postForList(findStatTalliesPath, this::findStatTalliesRoute);
         getForDatum(findRelatedStatDefinitionsPath, findRelatedStatDefinitionsRoute);
