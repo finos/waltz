@@ -114,7 +114,7 @@ function controller($scope,
         .then(bookmarks => vm.bookmarks = bookmarks);
 
     assetCostViewService
-        .initialise(processId, 'PROCESS', 'EXACT', 2015)
+        .initialise({ entityReference: { id: processId, kind: 'PROCESS'}, scope: 'EXACT'}, 2015)
         .then(d => vm.assetCostData = d);
 
     capabilityStore
