@@ -17,12 +17,13 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.cost.ApplicationCost;
 import com.khartec.waltz.model.cost.AssetCost;
 import com.khartec.waltz.model.cost.AssetCostStatistics;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
 import com.khartec.waltz.web.ListRoute;
+import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readOptionsFromBody;
+import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
@@ -67,13 +68,13 @@ public class AssetCostEndpoint implements Endpoint {
     }
 
     private AssetCostStatistics calcStatisticsByAppIdsRoute(Request request, Response response) throws IOException {
-        ApplicationIdSelectionOptions selectorOptions = readOptionsFromBody(request);
+        IdSelectionOptions selectorOptions = WebUtilities.readIdSelectionOptionsFromBody(request);
         return assetCostService.calculateStatisticsByAppIds(selectorOptions);
     }
 
 
     private List<ApplicationCost> findAppCostsByAppIds(Request request, Response response) throws IOException {
-        ApplicationIdSelectionOptions selectorOptions = readOptionsFromBody(request);
+        IdSelectionOptions selectorOptions = readIdSelectionOptionsFromBody(request);
         return assetCostService.findAppCostsByAppIds(selectorOptions);
     }
 

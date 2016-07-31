@@ -23,7 +23,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityIdSelectionOptions;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.application.HierarchyQueryScope;
+import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.involvement.InvolvementService;

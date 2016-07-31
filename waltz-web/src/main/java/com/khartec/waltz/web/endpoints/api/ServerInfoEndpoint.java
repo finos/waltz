@@ -62,7 +62,7 @@ public class ServerInfoEndpoint implements Endpoint {
                 -> serverInfoService.findByAppId(getId(request));
 
         DatumRoute<ServerSummaryStatistics> findStatsForAppSelectorRoute = (request, response)
-                -> serverInfoService.findStatsForAppSelector(readOptionsFromBody(request));
+                -> serverInfoService.findStatsForAppSelector(readIdSelectionOptionsFromBody(request));
 
         getForList(findByAssetCodePath, findByAssetCodeRoute);
         getForList(findByAppIdPath, findByAppIdRoute);

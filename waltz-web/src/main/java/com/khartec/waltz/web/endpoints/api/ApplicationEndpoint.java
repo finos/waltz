@@ -156,17 +156,6 @@ public class ApplicationEndpoint implements Endpoint {
 
         ListRoute<LongTally> tallyByOrgUnitRoute = (request, response) -> appService.countByOrganisationalUnit();
 
-        ListRoute<Application> findByOrgUnitRoute = (req, res) -> {
-            String ouId = req.params("ouId");
-            return appService
-                    .findByOrganisationalUnitId(parseLong(ouId));
-        };
-
-        ListRoute<Application> findByOrgUnitTreeRoute = (req, res) -> {
-            String ouId = req.params("ouId");
-            return appService
-                    .findByOrganisationalUnitTree(parseLong(ouId));
-        };
 
         DatumRoute<Map<AssetCodeRelationshipKind, List<Application>>> findRelatedRoute
                 = (req, res) -> appService.findRelated(getId(req));
@@ -193,11 +182,9 @@ public class ApplicationEndpoint implements Endpoint {
                 -> appService.findByTag(request.body());
 
         ListRoute<Application> findBySelectorRoute = ((request, response)
-                -> appService.findByAppIdSelector(readOptionsFromBody(request)));
+                -> appService.findByAppIdSelector(readIdSelectionOptionsFromBody(request)));
 
         getForList(mkPath(BASE_URL, "search", ":query"), searchRoute);
-        getForList(mkPath(BASE_URL, "org-unit", ":ouId"), findByOrgUnitRoute);
-        getForList(mkPath(BASE_URL, "org-unit-tree", ":ouId"), findByOrgUnitTreeRoute);
         getForList(mkPath(BASE_URL, "count-by", "org-unit"), tallyByOrgUnitRoute);
         getForList(mkPath(BASE_URL, "tags"), findAllTagsRoute);
 

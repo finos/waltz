@@ -17,19 +17,20 @@
 
 package com.khartec.waltz.service.data_flow;
 
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow.DataFlowDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.authoritativesource.Rating;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.ImmutableRatedDataFlow;
 import com.khartec.waltz.model.dataflow.RatedDataFlow;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceCalculator;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,9 +51,9 @@ import static com.khartec.waltz.model.utils.IdUtilities.toIds;
 public class RatedDataFlowService {
 
     private final AuthoritativeSourceCalculator authoritativeSourceCalculator;
-    private final OrganisationalUnitDao organisationalUnitDao;
     private final ApplicationDao applicationDao;
     private final DataFlowDao dataFlowDao;
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
 
     /** (dataflow, (type -> [authSource])) -> Rating */
     private static final BiFunction<DataFlow, Map<String, Map<Long, AuthoritativeSource>>, Rating> lookupRatingFn =
@@ -75,18 +76,17 @@ public class RatedDataFlowService {
 
     @Autowired
     public RatedDataFlowService(AuthoritativeSourceCalculator authoritativeSourceCalculator,
-                                OrganisationalUnitDao organisationalUnitDao,
                                 ApplicationDao applicationDao,
-                                DataFlowDao dataFlowDao) {
+                                DataFlowDao dataFlowDao, ApplicationIdSelectorFactory applicationIdSelectorFactory) {
         checkNotNull(applicationDao, "applicationDao must not be null");
-        checkNotNull(organisationalUnitDao, "organisationalUnitDao must not be null");
         checkNotNull(authoritativeSourceCalculator, "authoritativeSourceCalculator must not be null");
         checkNotNull(dataFlowDao, "dataFlowDao must not be null");
+        Checks.checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
 
         this.authoritativeSourceCalculator = authoritativeSourceCalculator;
-        this.organisationalUnitDao = organisationalUnitDao;
         this.applicationDao = applicationDao;
         this.dataFlowDao = dataFlowDao;
+        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
     }
 
 
@@ -95,11 +95,9 @@ public class RatedDataFlowService {
         Map<Long, Map<String, Map<Long, AuthoritativeSource>>> authSourcesByOrgThenTypeThenApp =
                 authoritativeSourceCalculator.calculateAuthSourcesForOrgUnitTree(orgUnitId);
 
-        // inclusive
-        List<OrganisationalUnit> subUnits = organisationalUnitDao.findDescendants(orgUnitId);
-        List<Long> orgUnitIds = toIds(subUnits);
+        Select<Record1<Long>> appIdSelector = createAppIdSelectorBasedOnOrgUnitId(orgUnitId);
 
-        List<Application> apps = applicationDao.findByOrganisationalUnitIds(orgUnitIds);
+        List<Application> apps = applicationDao.findByAppIdSelector(appIdSelector);
 
         List<DataFlow> relevantFlows = loadRelevantDataFlows(
                 dataFlowDao,
@@ -121,6 +119,18 @@ public class RatedDataFlowService {
                 .collect(Collectors.toList());
     }
 
+    private Select<Record1<Long>> createAppIdSelectorBasedOnOrgUnitId(long orgUnitId) {
+        IdSelectionOptions selectionOptions = ImmutableIdSelectionOptions.builder()
+                .entityReference(ImmutableEntityReference.builder()
+                        .kind(EntityKind.ORG_UNIT)
+                        .id(orgUnitId)
+                        .build())
+                .scope(HierarchyQueryScope.CHILDREN)
+                .build();
+
+        return applicationIdSelectorFactory.apply(selectionOptions);
+    }
+
 
     private static List<RatedDataFlow> prepareResult(
             Collection<DataFlow> flows,
@@ -136,14 +146,6 @@ public class RatedDataFlowService {
                 })
                 .collect(Collectors.toList());
     }
-
-    private static Map<String, Collection<AuthoritativeSource>> groupRelevantAuthSourcesByType(
-            Map<Long, Collection<AuthoritativeSource>> authSourcesByOrgUnitId,
-            Long orgUnitId) {
-        Collection<AuthoritativeSource> authSourcesForOrgUnit = authSourcesByOrgUnitId.get(orgUnitId);
-        return groupBy(as -> as.dataType(), authSourcesForOrgUnit);
-    }
-
 
     private static Map<Long, Collection<DataFlow>> groupFlowsByTargetOrgUnitId(List<Application> apps,
                                                                                List<DataFlow> relevantFlows) {
@@ -193,28 +195,5 @@ public class RatedDataFlowService {
     }
 
 
-    /** (dao, [ ouId ]) -> { ouId -> [authSource] } */
-    private static Map<Long, Collection<AuthoritativeSource>> loadAuthSourcesByOrgUnitIds(
-            AuthoritativeSourceDao authoritativeSourceDao,
-            List<Long> orgUnitIds) {
 
-        List<AuthoritativeSource> allAuthSources = authoritativeSourceDao
-                .findByEntityReferences(EntityKind.ORG_UNIT, orgUnitIds);
-
-        return groupBy(
-                as -> as.parentReference().id(),
-                allAuthSources);
-    }
-
-
-    /** (dao, ouId) -> [ ouId ] */
-    private static List<Long> loadOrganisationalUnitIds(OrganisationalUnitDao organisationalUnitDao,
-                                                        long orgUnitId) {
-        List<OrganisationalUnit> descendants = organisationalUnitDao
-                .findDescendants(orgUnitId);
-
-        List<OrganisationalUnit> ancestors = organisationalUnitDao.findAncestors(orgUnitId);
-
-        return toIds(descendants);
-    }
 }

@@ -19,11 +19,7 @@ package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.server_info.ServerInfoDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
-import com.khartec.waltz.model.application.HierarchyQueryScope;
-import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.server_info.ServerInfoService;
 import org.jooq.DSLContext;
@@ -43,7 +39,7 @@ public class ServerHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
 
-        ApplicationIdSelectionOptions options = ImmutableApplicationIdSelectionOptions.builder()
+        IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
                 .entityReference(ImmutableEntityReference.builder()
                         .kind(EntityKind.ORG_UNIT)
                         .id(10)

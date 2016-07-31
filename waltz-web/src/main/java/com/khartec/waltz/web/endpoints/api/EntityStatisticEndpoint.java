@@ -81,7 +81,7 @@ public class EntityStatisticEndpoint implements Endpoint {
                 -> entityStatisticService.findDefinition(getId(request));
 
         ListRoute<EntityStatisticValue> findStatValuesForAppSelectorRoute = (request, response)
-                -> entityStatisticService.getStatisticValuesForAppIdSelector(getLong(request, "statId"), readOptionsFromBody(request));
+                -> entityStatisticService.getStatisticValuesForAppIdSelector(getLong(request, "statId"), readIdSelectionOptionsFromBody(request));
 
         DatumRoute<ImmediateHierarchy<EntityStatisticDefinition>> findRelatedStatDefinitionsRoute = (request, response)
                 -> entityStatisticService.findRelatedStatDefinitions(getLong(request, "statId"));

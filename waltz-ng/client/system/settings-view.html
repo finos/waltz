@@ -2,11 +2,12 @@
     <waltz-page-header icon="cog" name="Settings">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
+            <li>System</li>
             <li>Settings</li>
         </ol>
     </waltz-page-header>
 
-    <waltz-section name="Settings">
+    <div class="waltz-page-summary waltz-page-summary-attach">
         <p class="waltz-paragraph">
             Settings are used to configure and tune waltz.  The table below shows the currently configured
             settings.
@@ -20,8 +21,8 @@
             </thead>
             <tbody>
             <tr ng-repeat="setting in ctrl.settings | orderBy:'name'">
-                <td>{{ setting.name }}</td>
-                <td>{{ setting.value }}</td>
+                <td><span ng-bind="setting.name"></span></td>
+                <td><span ng-bind="setting.value"></span></td>
             </tr>
             <tr ng-if="ctrl.settings.length == 0">
                 <td colspan="2">
@@ -39,5 +40,5 @@
                 <waltz-icon name="refresh"></waltz-icon>
             </a>
         </div>
-    </waltz-section>
+    </div>
 </div>

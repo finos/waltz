@@ -3,11 +3,7 @@ package com.khartec.waltz.jobs;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
 import com.khartec.waltz.data.involvement.InvolvementDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
-import com.khartec.waltz.model.application.HierarchyQueryScope;
-import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.data_flow.DataFlowService;
 import com.khartec.waltz.service.involvement.InvolvementService;
@@ -31,7 +27,7 @@ public class ApplicationIdSelectorHarness {
         InvolvementService involvementService = ctx.getBean(InvolvementService.class);
         InvolvementDao involvementDao = ctx.getBean(InvolvementDao.class);
 
-        ApplicationIdSelectionOptions options = ImmutableApplicationIdSelectionOptions.builder()
+        IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
                 .entityReference(ImmutableEntityReference
                         .builder()
                         .kind(EntityKind.ORG_UNIT)

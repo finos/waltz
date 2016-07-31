@@ -3,7 +3,7 @@ package com.khartec.waltz.service.database;
 import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.database_usage.DatabaseDao;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.database.Database;
 import com.khartec.waltz.model.database.DatabaseSummaryStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +34,12 @@ public class DatabaseService {
         return databaseDao.findByApplicationId(id);
     }
 
-    public Map<Long, List<Database>> findByApplicationSelector(ApplicationIdSelectionOptions options) {
+    public Map<Long, List<Database>> findByApplicationSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         return databaseDao.findByAppSelector(factory.apply(options));
     }
 
-    public DatabaseSummaryStatistics findStatsForAppIdSelector(ApplicationIdSelectionOptions options) {
+    public DatabaseSummaryStatistics findStatsForAppIdSelector(IdSelectionOptions options) {
         Checks.checkNotNull(options, "options cannot be null");
         return databaseDao.findStatsForAppSelector(factory.apply(options));
     }

@@ -19,7 +19,6 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
@@ -35,7 +34,6 @@ import com.khartec.waltz.web.action.UpdateDataFlowsAction;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import spark.Request;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -145,10 +143,10 @@ public class DataFlowsEndpoint implements Endpoint {
         };
 
         ListRoute<DataFlow> findByAppIdSelectorRoute = (request, response)
-                -> dataFlowService.findByAppIdSelector(readOptions(request));
+                -> dataFlowService.findByAppIdSelector(readIdSelectionOptionsFromBody(request));
 
         DatumRoute<DataFlowStatistics> findStatsRoute = (request, response)
-                -> dataFlowService.calculateStats(readOptions(request));
+                -> dataFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
 
 
         getForList(findByEntityPath, getByEntityRef);
@@ -157,8 +155,5 @@ public class DataFlowsEndpoint implements Endpoint {
         postForDatum(findStatsPath, findStatsRoute);
     }
 
-    private ApplicationIdSelectionOptions readOptions(Request request) throws java.io.IOException {
-        return readBody(request, ApplicationIdSelectionOptions.class);
-    }
 
 }

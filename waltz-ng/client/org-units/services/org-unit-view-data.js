@@ -52,7 +52,7 @@ function service($q,
 
         const promises = [
             orgUnitStore.findAll(),
-            appStore.findByOrgUnitTree(orgUnitId),
+            appStore.findBySelector(appIdSelector),
             involvementStore.findPeopleByEntityReference('ORG_UNIT', orgUnitId),
             involvementStore.findByEntityReference('ORG_UNIT', orgUnitId),
             perspectiveStore.findByCode('BUSINESS'),
@@ -92,8 +92,7 @@ function service($q,
 
     function loadAll2(orgUnitId) {
 
-
-        const appIdSelector = {
+        const selector = {
             entityReference: {
                 kind: 'ORG_UNIT',
                 id: orgUnitId
@@ -102,17 +101,17 @@ function service($q,
         };
 
         const bulkPromise = $q.all([
-            ratingStore.findByAppIdSelector(appIdSelector),
-            appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(appIdSelector),
+            ratingStore.findByAppIdSelector(selector),
+            appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(selector),
             capabilityStore.findAll(),
             ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)
             authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
-            endUserAppStore.findByOrgUnitTree(orgUnitId),   // use orgIds(DESC)
+            endUserAppStore.findBySelector(selector),   // use orgIds(DESC)
             complexityStore.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
             techStatsService.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
             bookmarkStore.findByParent({id: orgUnitId, kind: 'ORG_UNIT'}),
             sourceDataRatingStore.findAll(),
-            entityStatisticStore.findAllActiveDefinitions(appIdSelector)
+            entityStatisticStore.findAllActiveDefinitions(selector)
         ]);
 
         const prepareRawDataPromise = bulkPromise

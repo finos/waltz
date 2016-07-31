@@ -1,5 +1,5 @@
 import _ from "lodash";
-import namedSettings from "./settings/named-settings";
+import namedSettings from "./system/named-settings";
 
 function run($http, settingsStore) {
 

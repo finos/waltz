@@ -86,6 +86,6 @@ public class CapabilityRatingEndpoint implements Endpoint {
 
         postForList(byAppIdsPath, ((request, response) -> ratingService.findByAppIds(readBody(request, Long[].class))));
 
-        postForList(byAppIdSelectorPath, ((request, response) -> ratingService.findByAppIdSelector(readOptionsFromBody(request))));
+        postForList(byAppIdSelectorPath, ((request, response) -> ratingService.findByAppIdSelector(readIdSelectionOptionsFromBody(request))));
     }
 }

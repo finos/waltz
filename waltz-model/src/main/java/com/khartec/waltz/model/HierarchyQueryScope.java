@@ -1,4 +1,4 @@
-package com.khartec.waltz.model.application;
+package com.khartec.waltz.model;
 
 public enum HierarchyQueryScope {
     EXACT,

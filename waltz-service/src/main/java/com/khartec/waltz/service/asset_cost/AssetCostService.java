@@ -20,7 +20,7 @@ package com.khartec.waltz.service.asset_cost;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.asset_cost.AssetCostDao;
 import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.cost.*;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -66,7 +66,7 @@ public class AssetCostService {
     }
 
 
-    public List<ApplicationCost> findAppCostsByAppIds(ApplicationIdSelectionOptions options) {
+    public List<ApplicationCost> findAppCostsByAppIds(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = idSelectorFactory.apply(options);
 
@@ -77,7 +77,7 @@ public class AssetCostService {
     }
 
 
-    public AssetCostStatistics calculateStatisticsByAppIds(ApplicationIdSelectionOptions options) {
+    public AssetCostStatistics calculateStatisticsByAppIds(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
 
         Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);

@@ -19,11 +19,7 @@ package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
-import com.khartec.waltz.model.application.HierarchyQueryScope;
-import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.cost.AssetCostStatistics;
 import com.khartec.waltz.model.cost.CostBandTally;
 import com.khartec.waltz.service.DIConfiguration;
@@ -51,7 +47,7 @@ public class AssetCostHarness {
         long st = System.currentTimeMillis();
         System.out.println("-- start");
 
-        ApplicationIdSelectionOptions appIdSelectionOptions = ImmutableApplicationIdSelectionOptions.builder()
+        IdSelectionOptions appIdSelectionOptions = ImmutableIdSelectionOptions.builder()
                 .scope(HierarchyQueryScope.EXACT)
                 .entityReference(ImmutableEntityReference.builder()
                         .id(5000)

@@ -40,7 +40,7 @@ public class DatabaseEndpoint implements Endpoint {
                 -> databaseService.findByApplicationId(getId(request));
 
         ListRoute<ApplicationDatabases> findForAppSelectorRoute = (request, response)
-                -> databaseService.findByApplicationSelector(readOptionsFromBody(request))
+                -> databaseService.findByApplicationSelector(readIdSelectionOptionsFromBody(request))
                     .entrySet()
                     .stream()
                     .map(e -> ImmutableApplicationDatabases.builder()
@@ -50,7 +50,7 @@ public class DatabaseEndpoint implements Endpoint {
                     .collect(Collectors.toList());
 
         DatumRoute<DatabaseSummaryStatistics> findStatsForAppIdSelectorRoute = (request, response)
-                -> databaseService.findStatsForAppIdSelector(readOptionsFromBody(request));
+                -> databaseService.findStatsForAppIdSelector(readIdSelectionOptionsFromBody(request));
 
 
         getForList(findForAppPath, findForAppRoute);

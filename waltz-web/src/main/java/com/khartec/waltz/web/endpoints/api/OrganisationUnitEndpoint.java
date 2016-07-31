@@ -23,7 +23,6 @@ import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.model.orgunit.OrganisationalUnitHierarchy;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
@@ -75,7 +74,6 @@ public class OrganisationUnitEndpoint implements Endpoint {
         String searchPath = mkPath(BASE_URL, "search", ":query");
         String findByIdsPath = mkPath(BASE_URL, "by-ids");
         String getByIdPath = mkPath(BASE_URL, ":id");
-        String getHierarchyPath = mkPath(BASE_URL, ":id", "hierarchy");
         String postDescriptionPath = mkPath(BASE_URL, ":id", "description");
 
 
@@ -84,7 +82,6 @@ public class OrganisationUnitEndpoint implements Endpoint {
         ListRoute<OrganisationalUnit> findByIdsRoute = (req, res) -> service.findByIds(readBody(req, Long[].class));
 
         DatumRoute<OrganisationalUnit> getByIdRoute = (request, response) -> service.getById(getId(request));
-        DatumRoute<OrganisationalUnitHierarchy> getHierarchyRoute = (request, response) -> service.getHierarchyById(getId(request));
 
         DatumRoute<Integer> postDescriptionRoute = (request, response) -> {
             requireRole(userRoleService, request, Role.ORG_UNIT_EDITOR);
@@ -116,7 +113,6 @@ public class OrganisationUnitEndpoint implements Endpoint {
         postForList(findByIdsPath, findByIdsRoute);
 
         getForDatum(getByIdPath, getByIdRoute);
-        getForDatum(getHierarchyPath, getHierarchyRoute);
         postForDatum(postDescriptionPath, postDescriptionRoute);
 
     }

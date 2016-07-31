@@ -94,7 +94,7 @@ public class AppCapabilityEndpoint implements Endpoint {
                 (request, response) -> appCapabilityDao.findAssociatedCapabilitiesByApplication(getId(request));
 
         ListRoute<ApplicationCapability> findAppCapabilitiesForAppIdSelectorRoute  = (request, response)
-                -> appCapabilityDao.findByAppIdSelector(readOptionsFromBody(request));
+                -> appCapabilityDao.findByAppIdSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<ApplicationCapability> findByCapabilityIdsRoute  = (request, response)
                 -> appCapabilityDao.findByCapabilityIds(readIdsFromBody(request));

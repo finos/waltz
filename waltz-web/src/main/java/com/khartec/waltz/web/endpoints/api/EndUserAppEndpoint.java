@@ -22,17 +22,17 @@ import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.tally.LongTally;
 import com.khartec.waltz.service.end_user_app.EndUserAppService;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 @Service
 public class EndUserAppEndpoint implements Endpoint {
-
 
 
     private static final String BASE_URL = mkPath("api", "end-user-application");
@@ -47,20 +47,17 @@ public class EndUserAppEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findForOrgUnitPath = mkPath(BASE_URL, "org-unit-tree", ":id");
+        String findBySelectorPath = mkPath(BASE_URL, "selector");
         String countByOrgUnitPath = mkPath(BASE_URL, "count-by", "org-unit");
 
-        ListRoute<EndUserApplication> findForOrgUnitRoute = (request, response) -> {
-            long ouId = WebUtilities.getId(request);
-            return endUserAppService
-                    .findByOrganisationalUnitTree(ouId);
-        };
+        ListRoute<EndUserApplication> findBySelectorRoute = (request, response)
+                -> endUserAppService.findByOrganisationalUnitSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<LongTally> countByOrgUnitRoute = (request, response) -> endUserAppService.countByOrgUnitId();
 
-        getForList(findForOrgUnitPath, findForOrgUnitRoute);
-
         getForList(countByOrgUnitPath, countByOrgUnitRoute);
+
+        postForList(findBySelectorPath, findBySelectorRoute);
     }
 
 }

@@ -17,32 +17,22 @@
 
 package com.khartec.waltz.data.orgunit;
 
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.orgunit.ImmutableOrganisationalUnit;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.model.orgunit.OrganisationalUnitKind;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
-import org.jooq.SQLDialect;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
-import static com.khartec.waltz.common.ListUtilities.filter;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
-import static java.util.Collections.emptyList;
 
 
 @Repository
@@ -95,82 +85,23 @@ public class OrganisationalUnitDao {
     }
 
 
+    public List<OrganisationalUnit> findBySelector(Select<Record1<Long>> selector) {
+        Condition condition = ORGANISATIONAL_UNIT.ID.in(selector);
+        return findByCondition(condition);
+    }
+
+
     public List<OrganisationalUnit> findByIds(Long... ids) {
+        Condition condition = ORGANISATIONAL_UNIT.ID.in(ids);
+        return findByCondition(condition);
+    }
+
+
+    private List<OrganisationalUnit> findByCondition(Condition condition) {
         return dsl.select(ORGANISATIONAL_UNIT.fields())
                 .from(ORGANISATIONAL_UNIT)
-                .where(ORGANISATIONAL_UNIT.ID.in(ids))
+                .where(condition)
                 .fetch(recordMapper);
-    }
-
-
-    public List<OrganisationalUnit> findDescendants(long orgUnitId) {
-        if (dsl.dialect() == SQLDialect.POSTGRES) {
-            return OrganisationalUnitDaoPostgresHelper.findDescendants(dsl, orgUnitId);
-        } else {
-            List<OrganisationalUnit> orgUnits = findAll();
-            Optional<OrganisationalUnit> root = orgUnits
-                    .stream()
-                    .filter(ou -> ou.id().equals(Optional.of(orgUnitId)))
-                    .findFirst();
-
-            if (! root.isPresent()) {
-                return emptyList();
-            }
-
-            Map<Optional<Long>, Collection<OrganisationalUnit>> byParentId = groupBy(
-                    ou -> ou.parentId(),
-                    filter(
-                            ou -> ou.parentId().isPresent(),
-                            orgUnits));
-
-            List<OrganisationalUnit> acc = ListUtilities.newArrayList();
-            descend(root.get(), acc, byParentId);
-            return acc;
-        }
-    }
-
-
-    private void descend(OrganisationalUnit ou,
-                         List<OrganisationalUnit> acc,
-                         Map<Optional<Long>, Collection<OrganisationalUnit>> byParentId) {
-        acc.add(ou);
-        Collection<OrganisationalUnit> children = byParentId.get(ou.id());
-        if (children != null) {
-            children.forEach(child -> descend(child, acc, byParentId));
-        }
-    }
-
-
-
-
-    public List<OrganisationalUnit> findAncestors(long orgUnitId) {
-
-        if (dsl.dialect() == SQLDialect.POSTGRES) {
-            return OrganisationalUnitDaoPostgresHelper.findAncestors(dsl, orgUnitId);
-        } else {
-            List<OrganisationalUnit> orgUnits = findAll();
-
-            Map<Optional<Long>, OrganisationalUnit> byId = indexBy(ou -> ou.id(), orgUnits);
-            OrganisationalUnit orgUnit = byId.get(Optional.of(orgUnitId));
-
-            if (orgUnit == null) {
-                LOG.warn("Could not find orgUnit: " + orgUnitId + " so cannot calculate ancestors");
-                return emptyList();
-            }
-
-            List<OrganisationalUnit> acc = ListUtilities.newArrayList();
-            ascend(orgUnit, acc, byId);
-            return acc;
-        }
-    }
-
-
-    private void ascend(OrganisationalUnit orgUnit, List<OrganisationalUnit> acc, Map<Optional<Long>, OrganisationalUnit> byId) {
-        acc.add(orgUnit);
-        OrganisationalUnit parent = byId.get(orgUnit.parentId());
-        if (parent != null) {
-            ascend(parent, acc, byId);
-        }
     }
 
 
@@ -180,5 +111,4 @@ public class OrganisationalUnitDao {
                 "dsl=" + dsl +
                 '}';
     }
-
 }

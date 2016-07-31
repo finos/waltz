@@ -107,7 +107,7 @@ function controller($q,
                 const promises = [
                     appStore.findRelatedById(fullApp.id),
                     dataFlowStore.findByEntityReference('APPLICATION', fullApp.id),
-                    appStore.findByOrgUnit(fullApp.organisationalUnitId)
+                    appStore.findBySelector({ entityReference: { id: fullApp.organisationalUnitId, kind: 'ORG_UNIT'}, scope: 'EXACT'})
                 ];
                 return $q.all(promises);
             })
