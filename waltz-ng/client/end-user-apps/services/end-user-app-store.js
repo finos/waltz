@@ -3,8 +3,9 @@ function service($http, baseUrl) {
 
     const BASE = `${baseUrl}/end-user-application`;
 
-    const findByOrgUnitTree = (ouId) =>
-        $http.get(`${BASE}/org-unit-tree/${ouId}`)
+    const findBySelector = (selector) =>
+        $http
+            .post(`${BASE}/selector`, selector)
             .then(result => result.data);
 
     const countByOrganisationalUnit = () => $http
@@ -12,7 +13,7 @@ function service($http, baseUrl) {
         .then(result => result.data);
 
     return {
-        findByOrgUnitTree,
+        findBySelector,
         countByOrganisationalUnit
     };
 }

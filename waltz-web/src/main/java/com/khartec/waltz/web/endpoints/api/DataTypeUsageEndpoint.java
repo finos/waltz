@@ -66,7 +66,7 @@ public class DataTypeUsageEndpoint implements Endpoint {
                 -> dataTypeUsageService.findForDataType(request.params("type"));
 
         ListRoute<DataTypeUsage> findForSelectorRoute = (request, response)
-                -> dataTypeUsageService.findForIdSelector(EntityKind.APPLICATION, readOptionsFromBody(request));
+                -> dataTypeUsageService.findForIdSelector(EntityKind.APPLICATION, readIdSelectionOptionsFromBody(request));
 
         ListRoute<DataTypeUsage> saveRoute = (request, response)
                 -> {

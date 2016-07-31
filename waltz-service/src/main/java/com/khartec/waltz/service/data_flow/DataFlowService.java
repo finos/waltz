@@ -22,7 +22,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow.DataFlowDao;
 import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.DataFlowMeasures;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
@@ -63,7 +63,7 @@ public class DataFlowService {
     }
 
 
-    public List<DataFlow> findByAppIdSelector(ApplicationIdSelectionOptions options) {
+    public List<DataFlow> findByAppIdSelector(IdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);
         return dataFlowDao.findByApplicationIdSelector(appIdSelector);
     }
@@ -79,7 +79,7 @@ public class DataFlowService {
     }
 
 
-    public DataFlowStatistics calculateStats(ApplicationIdSelectionOptions options) {
+    public DataFlowStatistics calculateStats(IdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);
         List<StringTally> dataTypeCounts = FunctionUtilities.time("DFS.dataTypes", () -> dataFlowStatsDao.tallyDataTypes(appIdSelector));

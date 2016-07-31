@@ -6,7 +6,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type_usage.DataTypeUsageDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.system.SystemChangeSet;
@@ -50,7 +50,7 @@ public class DataTypeUsageService {
     }
 
 
-    public List<DataTypeUsage> findForIdSelector(EntityKind kind, ApplicationIdSelectionOptions options) {
+    public List<DataTypeUsage> findForIdSelector(EntityKind kind, IdSelectionOptions options) {
         return dataTypeUsageDao.findForIdSelector(kind, selectorFactory.apply(options));
     }
 

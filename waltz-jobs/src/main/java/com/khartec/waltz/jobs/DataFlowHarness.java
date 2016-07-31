@@ -19,11 +19,7 @@ package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
-import com.khartec.waltz.model.application.HierarchyQueryScope;
-import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowMeasures;
 import com.khartec.waltz.service.DIConfiguration;
@@ -62,7 +58,7 @@ public class DataFlowHarness {
         DataFlowStatsDao dataFlowStatsDao = ctx.getBean(DataFlowStatsDao.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        ApplicationIdSelectionOptions options = ImmutableApplicationIdSelectionOptions.builder()
+        IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
                 .entityReference(ImmutableEntityReference
                         .builder()
                         .kind(EntityKind.PERSON)

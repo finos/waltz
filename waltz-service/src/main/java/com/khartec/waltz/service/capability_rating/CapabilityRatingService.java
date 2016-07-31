@@ -20,7 +20,7 @@ package com.khartec.waltz.service.capability_rating;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.capability_rating.CapabilityRatingDao;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.capabilityrating.CapabilityRating;
 import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.capabilityrating.RatingChange;
@@ -94,7 +94,7 @@ public class CapabilityRatingService {
 
     }
 
-    public List<CapabilityRating> findByAppIdSelector(ApplicationIdSelectionOptions options) {
+    public List<CapabilityRating> findByAppIdSelector(IdSelectionOptions options) {
         return dao.findByAppIdSelector(selectorFactory.apply(options));
         
     }

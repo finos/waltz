@@ -3,7 +3,7 @@ package com.khartec.waltz.data;
 import com.khartec.waltz.model.EntityIdSelectionOptions;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.HierarchyQueryScope;
+import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
 import com.khartec.waltz.schema.tables.EntityRelationship;
 import com.khartec.waltz.schema.tables.Involvement;

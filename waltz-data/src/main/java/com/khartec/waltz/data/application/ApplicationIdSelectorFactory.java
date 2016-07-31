@@ -1,14 +1,10 @@
 package com.khartec.waltz.data.application;
 
 import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
-import com.khartec.waltz.model.application.HierarchyQueryScope;
+import com.khartec.waltz.data.IdSelectorFactory;
+import com.khartec.waltz.data.orgunit.OrgUnitIdSelectorFactory;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.model.utils.IdUtilities;
 import com.khartec.waltz.schema.tables.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -18,13 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.application.HierarchyQueryScope.EXACT;
+import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
@@ -35,12 +28,12 @@ import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 import static com.khartec.waltz.schema.tables.Process.PROCESS;
 
 @Service
-public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelectionOptions, Select<Record1<Long>>> {
+public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationIdSelectorFactory.class);
 
     private final DSLContext dsl;
-    private final OrganisationalUnitDao organisationalUnitDao;
+    private final OrgUnitIdSelectorFactory orgUnitIdSelectorFactory;
 
     private final Application app = APPLICATION.as("app");
     private final AppCapability appCapability = APP_CAPABILITY.as("appcap");
@@ -52,19 +45,18 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("phier");
 
 
-
     @Autowired
-    public ApplicationIdSelectorFactory(DSLContext dsl, OrganisationalUnitDao organisationalUnitDao) {
+    public ApplicationIdSelectorFactory(DSLContext dsl, OrgUnitIdSelectorFactory orgUnitIdSelectorFactory) {
         checkNotNull(dsl, "dsl cannot be null");
-        checkNotNull(organisationalUnitDao, "organisationalUnitDao cannot be null");
+        checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
 
         this.dsl = dsl;
-        this.organisationalUnitDao = organisationalUnitDao;
+        this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
     }
 
 
     @Override
-    public Select<Record1<Long>> apply(ApplicationIdSelectionOptions options) {
+    public Select<Record1<Long>> apply(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         EntityReference ref = options.entityReference();
         switch (ref.kind()) {
@@ -83,6 +75,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 throw new IllegalArgumentException("Cannot create selector for entity kind: "+ref.kind());
         }
     }
+
 
     private Select<Record1<Long>> mkForProcess(EntityReference ref, HierarchyQueryScope scope) {
         switch (scope) {
@@ -114,27 +107,20 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 .and(relationship.ID_B.in(processIdSelector));
     }
 
-    private SelectConditionStep<Record1<Long>> mkForOrgUnit(EntityReference ref, HierarchyQueryScope scope) {
-        Set<Long> orgUnitIds = new HashSet<>();
-        orgUnitIds.add(ref.id());
 
-        switch (scope) {
-            case EXACT:
-                break;
-            case CHILDREN:
-                List<OrganisationalUnit> subUnits = organisationalUnitDao.findDescendants(ref.id());
-                orgUnitIds.addAll(IdUtilities.toIds(subUnits));
-                break;
-            case PARENTS:
-                List<OrganisationalUnit> parentUnits = organisationalUnitDao.findAncestors(ref.id());
-                orgUnitIds.addAll(IdUtilities.toIds(parentUnits));
-                break;
-        }
+    private SelectConditionStep<Record1<Long>> mkForOrgUnit(EntityReference ref, HierarchyQueryScope scope) {
+
+        ImmutableIdSelectionOptions ouSelectorOptions = ImmutableIdSelectionOptions.builder()
+                .entityReference(ref)
+                .scope(scope)
+                .build();
+
+        Select<Record1<Long>> ouSelector = orgUnitIdSelectorFactory.apply(ouSelectorOptions);
 
         return dsl
                 .selectDistinct(app.ID)
                 .from(app)
-                .where(dsl.renderInlined(app.ORGANISATIONAL_UNIT_ID.in(orgUnitIds)));
+                .where(dsl.renderInlined(app.ORGANISATIONAL_UNIT_ID.in(ouSelector)));
     }
 
 
@@ -162,6 +148,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                                 + "') not supported");
         }
     }
+
 
     private Select<Record1<Long>> mkForPersonReportees(EntityReference ref) {
         String employeeId = findEmployeeId(ref);
@@ -242,8 +229,6 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
             default:
                 throw new UnsupportedOperationException("Unexpected scope: "+scope);
         }
-
-
     }
 
 }

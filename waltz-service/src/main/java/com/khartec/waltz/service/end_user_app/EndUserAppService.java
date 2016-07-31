@@ -17,48 +17,44 @@
 
 package com.khartec.waltz.service.end_user_app;
 
-import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.end_user_app.EndUserAppDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.data.orgunit.OrgUnitIdSelectorFactory;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.tally.LongTally;
-import com.khartec.waltz.model.utils.IdUtilities;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
 
 @Service
 public class EndUserAppService {
 
     private final EndUserAppDao endUserAppDao;
-    private final OrganisationalUnitDao orgUnitDao;
+    private final OrgUnitIdSelectorFactory orgUnitIdSelectorFactory;
 
 
     @Autowired
-    public EndUserAppService(EndUserAppDao endUserAppDao, OrganisationalUnitDao orgUnitDao) {
-        Checks.checkNotNull(endUserAppDao, "EndUserAppDao is required");
-        Checks.checkNotNull(orgUnitDao, "OrgUnitDao is required");
+    public EndUserAppService(EndUserAppDao endUserAppDao,
+                             OrgUnitIdSelectorFactory orgUnitIdSelectorFactory) {
+        checkNotNull(endUserAppDao, "EndUserAppDao is required");
+        checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
 
-        this.orgUnitDao = orgUnitDao;
         this.endUserAppDao = endUserAppDao;
+        this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
     }
 
 
-    public List<EndUserApplication> findByOrganisationalUnitIds(List<Long> ids) {
-        Checks.checkNotNull(ids, "ids cannot be null");
-        return time("EUAS.findByOrganisationalUnitIds", () -> endUserAppDao.findByOrganisationalUnitIds(ids));
-    }
-
-
-    public List<EndUserApplication> findByOrganisationalUnitTree(long ouId) {
-        return time("EUAS.findByOrganisationalUnitTree", () -> {
-            List<Long> ids = IdUtilities.toIds(orgUnitDao.findDescendants(ouId));
-            return findByOrganisationalUnitIds(ids);
-        });
+    public List<EndUserApplication> findByOrganisationalUnitSelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        Select<Record1<Long>> selector = orgUnitIdSelectorFactory.apply(options);
+        return time("EUAS.findByOrganisationalUnitSelector", () -> endUserAppDao.findByOrganisationalUnitSelector(selector));
     }
 
 

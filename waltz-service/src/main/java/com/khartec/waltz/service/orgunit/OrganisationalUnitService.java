@@ -17,29 +17,28 @@
 
 package com.khartec.waltz.service.orgunit;
 
-import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.common.hierarchy.FlatNode;
 import com.khartec.waltz.common.hierarchy.Forest;
 import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
 import com.khartec.waltz.common.hierarchy.Node;
+import com.khartec.waltz.data.orgunit.OrgUnitIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.data.orgunit.search.OrganisationalUnitSearchDao;
-import com.khartec.waltz.model.orgunit.ImmutableOrganisationalUnitHierarchy;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.model.orgunit.OrganisationalUnitHierarchy;
+import org.jooq.Record1;
+import org.jooq.Select;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.*;
 import static com.khartec.waltz.common.FunctionUtilities.time;
-import static com.khartec.waltz.common.ListUtilities.drop;
 
 
 @Service
@@ -47,15 +46,20 @@ public class OrganisationalUnitService {
 
     private final OrganisationalUnitDao dao;
     private final OrganisationalUnitSearchDao organisationalUnitSearchDao;
+    private final OrgUnitIdSelectorFactory selectorFactory;
 
 
     @Autowired
     public OrganisationalUnitService(OrganisationalUnitDao dao,
-                                     OrganisationalUnitSearchDao organisationalUnitSearchDao) {
+                                     OrganisationalUnitSearchDao organisationalUnitSearchDao,
+                                     OrgUnitIdSelectorFactory orgUnitIdSelectorFactory) {
         checkNotNull(dao, "dao must not be null");
         checkNotNull(organisationalUnitSearchDao, "organisationalUnitSearchDao must not be null");
+        checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
+
         this.dao = dao;
         this.organisationalUnitSearchDao = organisationalUnitSearchDao;
+        this.selectorFactory = orgUnitIdSelectorFactory;
     }
 
 
@@ -87,21 +91,37 @@ public class OrganisationalUnitService {
      */
     public Node<OrganisationalUnit, Long> loadHierarchy(long orgUnitId) {
         return time("OUS.loadHierarchy", () -> {
-            List<OrganisationalUnit> allInvolvedUnits = getAllRelatedOrgUnits(orgUnitId);
+            Collection<OrganisationalUnit> allInvolvedUnits = getAllRelatedOrgUnits(orgUnitId);
             Node<OrganisationalUnit, Long> rootNode = buildHierarchyTree(orgUnitId, allInvolvedUnits);
             return findNode(orgUnitId, rootNode);
         });
     }
 
 
-    private List<OrganisationalUnit> getAllRelatedOrgUnits(long orgUnitId) {
-        List<OrganisationalUnit> parents = dao.findAncestors(orgUnitId);
-        List<OrganisationalUnit> children = dao.findDescendants(orgUnitId);
-        return ListUtilities.concat(drop(parents, 1), children);
+    private Collection<OrganisationalUnit> getAllRelatedOrgUnits(long orgUnitId) {
+        IdSelectionOptions parentSelectorOptions = ImmutableIdSelectionOptions
+                .builder()
+                .entityReference(ImmutableEntityReference.builder()
+                        .id(orgUnitId)
+                        .kind(EntityKind.ORG_UNIT)
+                        .build())
+                .scope(HierarchyQueryScope.PARENTS)
+                .build();
+
+        IdSelectionOptions childSelectorOptions = ImmutableIdSelectionOptions
+                .copyOf(parentSelectorOptions)
+                .withScope(HierarchyQueryScope.CHILDREN);
+
+        Select<Record1<Long>> parentSelector = selectorFactory.apply(parentSelectorOptions);
+        Select<Record1<Long>> childSelector = selectorFactory.apply(childSelectorOptions);
+        Select<Record1<Long>> relatedSelector = DSL.selectFrom(parentSelector.asTable()).union(childSelector);
+
+        List<OrganisationalUnit> related = dao.findBySelector(relatedSelector);
+        return SetUtilities.fromCollection(related);
     }
 
 
-    private Node<OrganisationalUnit, Long> buildHierarchyTree(long orgUnitId, List<OrganisationalUnit> allInvolvedUnits) {
+    private Node<OrganisationalUnit, Long> buildHierarchyTree(long orgUnitId, Collection<OrganisationalUnit> allInvolvedUnits) {
         List<FlatNode<OrganisationalUnit, Long>> allInvolvedAsFlatNodes = toFlatNodes(allInvolvedUnits);
 
         Forest<OrganisationalUnit, Long> unitForest = HierarchyUtilities.toForest(allInvolvedAsFlatNodes);
@@ -113,7 +133,7 @@ public class OrganisationalUnitService {
     }
 
 
-    private List<FlatNode<OrganisationalUnit, Long>> toFlatNodes(List<OrganisationalUnit> allInvolvedUnits) {
+    private List<FlatNode<OrganisationalUnit, Long>> toFlatNodes(Collection<OrganisationalUnit> allInvolvedUnits) {
         return allInvolvedUnits.stream()
                 .map(ou -> {
                     Long ouId = ou.id().get();
@@ -145,13 +165,5 @@ public class OrganisationalUnitService {
         return organisationalUnitSearchDao.search(query);
     }
 
-
-    public OrganisationalUnitHierarchy getHierarchyById(long id) {
-        return time("OUS.getHierarchyById", () -> ImmutableOrganisationalUnitHierarchy.builder()
-                .children(drop(dao.findDescendants(id), 1))
-                .parents(drop(dao.findAncestors(id), 1))
-                .unit(dao.getById(id))
-                .build());
-    }
 
 }

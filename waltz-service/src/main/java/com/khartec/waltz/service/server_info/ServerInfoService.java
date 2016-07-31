@@ -19,7 +19,7 @@ package com.khartec.waltz.service.server_info;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.server_info.ServerInfoDao;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.serverinfo.ServerInfo;
 import com.khartec.waltz.model.serverinfo.ServerSummaryStatistics;
 import org.jooq.Record1;
@@ -58,7 +58,7 @@ public class ServerInfoService {
     }
 
 
-    public ServerSummaryStatistics findStatsForAppSelector(ApplicationIdSelectionOptions options) {
+    public ServerSummaryStatistics findStatsForAppSelector(IdSelectionOptions options) {
         Select<Record1<Long>> selector = selectorFactory.apply(options);
         return serverInfoDao.findStatsForAppSelector(selector);
     }

@@ -82,15 +82,6 @@ public class ApplicationDao {
     }
 
 
-    public List<Application> findByOrganisationalUnitId(long id) {
-        return dsl.select()
-                .from(APPLICATION)
-                .where(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(id))
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
-
-
     public List<Application> findByOrganisationalUnitIds(List<Long> ids) {
         return dsl.select(APPLICATION.fields())
                 .from(APPLICATION)
@@ -118,7 +109,8 @@ public class ApplicationDao {
         return JooqUtilities.calculateLongTallies(
                 dsl,
                 APPLICATION,
-                APPLICATION.ORGANISATIONAL_UNIT_ID, DSL.trueCondition());
+                APPLICATION.ORGANISATIONAL_UNIT_ID,
+                DSL.trueCondition());
     }
 
     /**

@@ -91,7 +91,7 @@
                 ui-sref-active="side-active"
                 class="no-overflow">
                 <span waltz-has-role="ADMIN">
-                    <a ui-sref="main.settings">
+                    <a ui-sref="main.system.settings">
                         <waltz-icon class='text-muted small'
                                     fixed-width="true"
                                     name="cog"></waltz-icon>
@@ -120,6 +120,18 @@
                                     fixed-width="true"
                                     name="list-ul"></waltz-icon>
                         User Logs
+                    </a>
+                </span>
+            </li>
+            <li style="margin: 4px"
+                ui-sref-active="side-active"
+                class="no-overflow">
+                <span waltz-has-role="ADMIN">
+                    <a ui-sref="main.system.hierarchies">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="sitemap"></waltz-icon>
+                        Hierarchy Maintenance
                     </a>
                 </span>
             </li>

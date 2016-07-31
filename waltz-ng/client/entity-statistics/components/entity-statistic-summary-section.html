@@ -11,7 +11,15 @@
                     <span ng-bind="node.name"></span>
                 </treecontrol>
 
+                <hr>
+
+                <div class="small text-muted waltz-paragraph">
+                    Various indicators are collected for applications.
+                    Use the tree control above to select one.  Click on it's
+                    'explore' link to see more about that indicator.
+                </div>
             </div>
+
             <div class="col-md-8">
                 <div ng-if="$ctrl.activeSummary == null && ! $ctrl.loading">
                     Select an indicator to see more...

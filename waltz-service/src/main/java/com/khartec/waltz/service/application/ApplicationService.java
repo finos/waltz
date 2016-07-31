@@ -25,8 +25,12 @@ import com.khartec.waltz.data.entity_alias.EntityAliasDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.*;
+import com.khartec.waltz.model.application.AppRegistrationRequest;
+import com.khartec.waltz.model.application.AppRegistrationResponse;
+import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
 import com.khartec.waltz.model.tally.LongTally;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +45,6 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotEmptyString;
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.utils.IdUtilities.toIds;
 import static java.util.Collections.emptyMap;
 
 
@@ -85,17 +88,6 @@ public class ApplicationService {
     }
 
 
-    public List<Application> findByOrganisationalUnitId(long id) {
-        return applicationDao.findByOrganisationalUnitId(id);
-    }
-
-
-    public List<Application> findByOrganisationalUnitTree(long id) {
-        List<Long> orgUnitIds = toIds(orgUnitDao.findDescendants(id));
-        return applicationDao.findByOrganisationalUnitIds(orgUnitIds);
-    }
-
-
     public List<Application> findAll() {
         return applicationDao.getAll();
     }
@@ -116,7 +108,7 @@ public class ApplicationService {
     }
 
 
-    public List<Application> findByAppIdSelector(ApplicationIdSelectionOptions options) {
+    public List<Application> findByAppIdSelector(IdSelectionOptions options) {
         return applicationDao.findByAppIdSelector(appIdSelectorFactory.apply(options));
     }
 

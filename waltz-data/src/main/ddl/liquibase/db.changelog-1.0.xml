@@ -2164,13 +2164,11 @@
         </sql>
     </changeSet>
 
-
     <changeSet author="dwatkins"
                id="2016072-312-3">
         <dropPrimaryKey constraintName="entity_statistic_defn_pkey"
                         tableName="entity_statistic_definition"/>
     </changeSet>
-
 
     <changeSet author="dwatkins"
                id="2016072-312-4">
@@ -2214,7 +2212,9 @@
         </dropColumn>
     </changeSet>
 
-    <!-- 324 - Entit Stat Defn - Visibility Modifiers -->
+
+    <!-- 324 - Entity Stat Defn - Visibility Modifiers -->
+
     <changeSet author="kamransaleem"
                id="20160727-324-1">
         <addColumn tableName="entity_statistic_definition">
@@ -2231,5 +2231,33 @@
             </column>
         </addColumn>
     </changeSet>
+
+
+    <!-- 353 - Entity Hierarchy Table -->
+
+    <changeSet author="dwatkins"
+               id="20160730-353-1">
+        <createTable tableName="entity_hierarchy"
+                     remarks="Generic Hierarchy table">
+            <column name="kind"
+                    remarks="Entity kind"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ancestor_id"
+                    type="${long.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="level"
+                    type="${int.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 
 </databaseChangeLog>

@@ -35,7 +35,7 @@ public class SoftwareCatalogEndpoint implements Endpoint {
                 service.findForAppIds(readIdsFromBody(request));
 
         DatumRoute<SoftwareSummaryStatistics> findStatsForAppIdSelectorRoute = (request, response)
-                -> service.findStatisticsForAppIdSelector(readOptionsFromBody(request));
+                -> service.findStatisticsForAppIdSelector(readIdSelectionOptionsFromBody(request));
 
 
         postForDatum(findByAppIdsPath, findByAppIdsRoute);

@@ -7,7 +7,7 @@ import com.khartec.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticSummaryDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
@@ -73,14 +73,14 @@ public class EntityStatisticService {
     }
 
 
-    public List<EntityStatisticValue> getStatisticValuesForAppIdSelector(long statisticId, ApplicationIdSelectionOptions options) {
+    public List<EntityStatisticValue> getStatisticValuesForAppIdSelector(long statisticId, IdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = factory.apply(options);
 
         return valueDao.getStatisticValuesForAppIdSelector(statisticId, appIdSelector);
     }
 
 
-    public List<TallyPack<String>> findStatTallies(List<Long> statisticIds, ApplicationIdSelectionOptions options) {
+    public List<TallyPack<String>> findStatTallies(List<Long> statisticIds, IdSelectionOptions options) {
         Checks.checkNotNull(statisticIds, "statisticIds cannot be null");
         Checks.checkNotNull(options, "options cannot be null");
 

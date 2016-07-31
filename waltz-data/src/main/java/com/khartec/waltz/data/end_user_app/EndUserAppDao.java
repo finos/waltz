@@ -24,9 +24,7 @@ import com.khartec.waltz.model.enduserapp.ImmutableEndUserApplication;
 import com.khartec.waltz.model.enduserapp.RiskRating;
 import com.khartec.waltz.model.tally.LongTally;
 import com.khartec.waltz.schema.tables.records.EndUserApplicationRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -62,6 +60,7 @@ public class EndUserAppDao {
     }
 
 
+    @Deprecated
     public List<EndUserApplication> findByOrganisationalUnitIds(List<Long> orgUnitIds) {
         return dsl.select(END_USER_APPLICATION.fields())
                 .from(END_USER_APPLICATION)
@@ -77,4 +76,11 @@ public class EndUserAppDao {
                 END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID, DSL.trueCondition());
     }
 
+
+    public List<EndUserApplication> findByOrganisationalUnitSelector(Select<Record1<Long>> selector) {
+        return dsl.select(END_USER_APPLICATION.fields())
+                .from(END_USER_APPLICATION)
+                .where(END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID.in(selector))
+                .fetch(END_USER_APP_MAPPER);
+    }
 }

@@ -2,7 +2,7 @@ package com.khartec.waltz.model.cost;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -11,6 +11,6 @@ import org.immutables.value.Value;
 public abstract class AssetCostQueryOptions {
 
     public abstract int year();
-    public abstract ApplicationIdSelectionOptions idSelectionOptions();
+    public abstract IdSelectionOptions idSelectionOptions();
 
 }

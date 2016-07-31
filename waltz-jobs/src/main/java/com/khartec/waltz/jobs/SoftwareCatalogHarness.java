@@ -17,12 +17,7 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
-import com.khartec.waltz.model.application.HierarchyQueryScope;
-import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.software_catalog.SoftwareSummaryStatistics;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.software_catalog.SoftwareCatalogService;
@@ -44,7 +39,7 @@ public class SoftwareCatalogHarness {
                 .build();
 
 
-        ApplicationIdSelectionOptions options = ImmutableApplicationIdSelectionOptions.builder()
+        IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
                 .entityReference(ref)
                 .scope(HierarchyQueryScope.CHILDREN)
                 .build();

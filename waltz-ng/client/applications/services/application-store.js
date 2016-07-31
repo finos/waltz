@@ -14,20 +14,9 @@
 function service($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/app`;
 
-
     
     const getById = (id) => $http
         .get(`${BASE}/id/${id}`)
-        .then(result => result.data);
-
-
-    const findByOrgUnit = (ouId) => $http
-        .get(`${BASE}/org-unit/${ouId}`)
-        .then(result => result.data);
-
-
-    const findByOrgUnitTree = (ouId) => $http
-        .get(`${BASE}/org-unit-tree/${ouId}`)
         .then(result => result.data);
 
 
@@ -81,8 +70,6 @@ function service($http, BaseApiUrl) {
         findAllTags,
         findByTag,
         findRelatedById,
-        findByOrgUnit,
-        findByOrgUnitTree,
         findByIds,
         findBySelector,
         countByOrganisationalUnit,

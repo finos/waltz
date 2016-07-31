@@ -1,0 +1,53 @@
+<div>
+
+    <waltz-page-header icon="cog" name="Settings">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>System</li>
+            <li>Settings</li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+
+            <div class="col-md-6">
+                <h4>Record Counts</h4>
+                <table class="table table-condensed table-striped">
+                    <thead>
+                    <tr>
+                        <th>Entity</th>
+                        <th>Hierarchy Count</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="tally in ctrl.tallies">
+                        <td>
+                            <span ng-bind="tally.id | toDisplayName:'entity'"></span>
+                        </td>
+                        <td>
+                            <span ng-bind="tally.count"></span>
+                        </td>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-6">
+                <h4>Actions</h4>
+                <ul class="list-unstyled">
+                    <li ng-repeat="kind in ctrl.kinds">
+                            <a ng-click="ctrl.build(kind)"
+                               class="clickable">
+                                <waltz-icon name="recycle"></waltz-icon>
+                                Rebuild for
+                                <span ng-bind="kind | toDisplayName:'entity'"></span>
+                            </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </waltz-section>
+</div>

@@ -18,11 +18,7 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
-import com.khartec.waltz.model.application.HierarchyQueryScope;
-import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import org.jooq.DSLContext;
@@ -47,7 +43,7 @@ public class EntityStatisticHarness {
 
         long CTO = 40;
         long OPS = 140;
-        ApplicationIdSelectionOptions options = ImmutableApplicationIdSelectionOptions.builder()
+        IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
                 .entityReference(ImmutableEntityReference
                         .builder()
                         .kind(EntityKind.ORG_UNIT)

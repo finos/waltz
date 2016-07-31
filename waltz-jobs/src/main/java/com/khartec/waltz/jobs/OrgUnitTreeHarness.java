@@ -77,6 +77,8 @@ public class OrgUnitTreeHarness {
     }
 
 
+
+
     public CommonTableExpression<Record2<Long, Long>> findDescendents(long id) {
 
         SelectConditionStep<Record2<Long, Long>> recursiveStep = select(idField, parentIdField)

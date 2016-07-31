@@ -23,8 +23,8 @@ import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.data.app_capability.AppCapabilityDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.IdGroup;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableIdGroup;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
 import com.khartec.waltz.model.applicationcapability.GroupedApplications;
 import com.khartec.waltz.model.tally.Tally;
@@ -138,7 +138,7 @@ public class AppCapabilityService {
     }
 
 
-    public Collection<ApplicationCapability> findByAppIdSelector(ApplicationIdSelectionOptions options) {
+    public Collection<ApplicationCapability> findByAppIdSelector(IdSelectionOptions options) {
         Select<Record1<Long>> selector = appIdSelectorFactory.apply(options);
         return time(
                 "ACS.findByAppIdSelector",

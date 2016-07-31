@@ -31,10 +31,6 @@ public class OrgUnitHarness {
         OrganisationalUnitDao dao = ctx.getBean(OrganisationalUnitDao.class);
 
 
-        System.out.println("--Results---");
-        dao.findDescendants(20L)
-                .forEach(ou -> System.out.println(ou.name()));
-        System.out.println("------------");
 
 
     }
