@@ -18,8 +18,15 @@
         <td>
             <span ng-bind="$ctrl.config.labelProvider(r)"></span>
         </td>
+
         <td>
             <span ng-bind="r.count"></span>
+        </td>
+        <td>
+            <span class="small"
+                  ng-bind="$ctrl.asPercentage(r)">
+            </span>
+            %
         </td>
         <td>
             <a class='clickable'
@@ -40,9 +47,11 @@
         <th>
             Total
         </th>
+
         <td>
             <strong ng-bind="$ctrl.total"></strong>
         </td>
+        <td></td>
         <td></td>
     </tr>
 </table>

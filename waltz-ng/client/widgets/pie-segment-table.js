@@ -1,6 +1,7 @@
 import _ from "lodash";
 import {variableScale} from "../common/colors";
 
+
 const bindings = {
     config: '<',
     data: '<',
@@ -17,6 +18,7 @@ const defaultConfig = {
     labelProvider: (d) => d.key,
     colorProvider: (d) => variableScale(d)
 };
+
 
 const defaultOnSelect = (d) => console.log('no pie-segment-table::on-select handler provided:', d);
 
@@ -36,10 +38,16 @@ function controller() {
                 (vm.config.onSelect || defaultOnSelect)(d);
             };
         }
-
     };
 
+    vm.asPercentage = (d) => {
+        const numerator = d.count || 0;
+        const denominator = vm.total || 0;
 
+        return denominator === 0
+            ? '-'
+            : Number((numerator / denominator) * 100).toFixed(1);
+    };
 }
 
 
