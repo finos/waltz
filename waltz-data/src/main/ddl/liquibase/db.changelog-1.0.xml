@@ -2260,4 +2260,16 @@
     </changeSet>
 
 
+    <!-- 358 : Adding index to hierarchy table -->
+
+    <changeSet author="dwatkins"
+               id="20160801-358-1">
+        <createIndex indexName="idx_entity_hier_kind_ancestor"
+                     tableName="entity_hierarchy">
+            <column name="kind"/>
+            <column name="ancestor_id"/>
+        </createIndex>
+    </changeSet>
+
+
 </databaseChangeLog>
