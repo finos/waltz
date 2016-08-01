@@ -1,10 +1,12 @@
 import _ from "lodash";
 import {variableScale} from "../../common/colors";
 
+
 const bindings = {
+    applications: '<',
+    definition: '<',
     summary: '<',
-    values: '<',
-    definition: '<'
+    values: '<'
 };
 
 

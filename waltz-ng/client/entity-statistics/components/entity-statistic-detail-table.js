@@ -1,3 +1,6 @@
+import _ from 'lodash';
+
+
 /**
  * Intended to show a table similar to:
  *
@@ -8,9 +11,10 @@
  **/
 
 const bindings = {
+    applications: '<',
     filterOutcome: '<',
-    statisticValues: '<',
-    statisticDefinition: '<'
+    statisticDefinition: '<',
+    statisticValues: '<'
 };
 
 
@@ -25,11 +29,18 @@ function controller($animate, uiGridConstants) {
         }
 
         if(change.filterOutcome) {
-            const tableOutcomeCell = vm.gridOptions.columnDefs[1];
+            const tableOutcomeCell = vm.gridOptions.columnDefs[2];
             tableOutcomeCell.filter.term = vm.filterOutcome;
         }
-    };
 
+        if(change.applications) {
+            vm.appsById = _.keyBy(vm.applications, 'id');
+        }
+
+        if (vm.appsById && vm.statisticValues) {
+            _.each(vm.statisticValues, sv => sv.application = vm.appsById[sv.entity.id]);
+        }
+    };
 }
 
 
@@ -39,7 +50,7 @@ controller.$inject = [
 ];
 
 
-const template = "<div style=\"font-size: smaller; height: 300px\"\n     ui-grid-exporter\n     ui-grid=\"$ctrl.gridOptions\">\n</div>";
+const template = "<div style=\"font-size: smaller; height: 300px\"\n     ui-grid-exporter\n     ui-grid-resize-columns\n     ui-grid=\"$ctrl.gridOptions\">\n</div>";
 
 
 const component = {
@@ -65,6 +76,12 @@ const outcomeCell = (uiGridConstants) => {
             condition: uiGridConstants.filter.EXACT
         }
     }
+};
+
+
+const assetCodeCell = {
+    field: 'application.assetCode',
+    displayName: 'Asset Code'
 };
 
 
@@ -108,6 +125,7 @@ function setupGrid($animate, uiGridConstants, statisticDefinition) {
         },
         columnDefs: [
             appNameCell,
+            assetCodeCell,
             outcomeCell(uiGridConstants),
             valueCell(uiGridConstants, statisticDefinition),
             reasonCell,
