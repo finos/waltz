@@ -27,7 +27,6 @@ const initData = {
         data: []
     },
     appCapabilities: [],
-    selectedCapabilities: [],
     ratings: [],
     visibility: {}
 };
@@ -252,27 +251,6 @@ function build(allCapabilities = [],
 function controller($scope) {
 
     const vm = _.defaultsDeep(this, initData);
-
-    vm.selectCapability = (cap) => {
-        const currentIds = _.map(vm.selectedCapabilities, 'id');
-        if (_.includes(currentIds, cap.id)) {
-            // do nothing
-        } else {
-            vm.selectedCapabilities.unshift(cap);
-        }
-        vm.focusOnCapability(cap);
-    };
-
-
-    vm.removeCapability = (cap) => {
-        vm.selectedCapabilities = _.reject(vm.selectedCapabilities, c => c.id === cap.id);
-        if (vm.focusedCapability && cap.id === vm.focusedCapability.id) {
-            vm.focusedCapability = null;
-            vm.focusedApps = null;
-            vm.focusedScore = null;
-            vm.visibility.appList = false;
-        }
-    };
 
     vm.focusOnCapability = (cap, desiredScore /* optional */) => {
         const scores = desiredScore
