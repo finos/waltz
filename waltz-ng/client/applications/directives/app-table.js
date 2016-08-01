@@ -58,10 +58,7 @@ function controller(uiGridConstants, $scope, $animate) {
             },
             {
                 field: 'assetCode',
-                cellTemplatae: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD"></span></div>',
-                filter: {
-                    type: uiGridConstants.filter.SELECT
-                }
+                cellTemplatae: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD"></span></div>'
             },
             {
                 field: 'kind',
