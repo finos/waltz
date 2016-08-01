@@ -33,6 +33,7 @@ const dependencies = [
     'ui.select',
     'ui.grid',
     'ui.grid.exporter',
+    'ui.grid.resizeColumns',
     'ui-notification',
     'ngAnimate',
     'ngSanitize',

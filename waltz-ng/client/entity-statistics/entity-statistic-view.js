@@ -2,6 +2,7 @@ import _ from "lodash";
 import {kindToViewState, initialiseData} from "../common";
 
 const initData = {
+    applications: [],
     statistic: {
         definition: null,
         summary: null,
@@ -37,6 +38,7 @@ function hasRelatedDefinitions(defs) {
 function controller($q,
                     $state,
                     $stateParams,
+                    applicationStore,
                     bookmarkStore,
                     entityStatisticUtilities,
                     entityStatisticStore) {
@@ -116,6 +118,11 @@ function controller($q,
             .findStatValuesByIdSelector(statId, selector)
             .then(stats => vm.statistic.values = stats);
 
+
+        applicationStore
+            .findBySelector(selector)
+            .then(apps => vm.applications = apps);
+
         updateUrlWithoutReload($state, navItem);
     };
 
@@ -131,6 +138,7 @@ controller.$inject = [
     '$q',
     '$state',
     '$stateParams',
+    'ApplicationStore',
     'BookmarkStore',
     'EntityStatisticUtilities',
     'EntityStatisticStore'
