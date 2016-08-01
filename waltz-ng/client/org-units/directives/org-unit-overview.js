@@ -32,8 +32,7 @@ const BINDINGS = {
 
 function calcCapabilityStats(ratings) {
     const caps = _.chain(ratings)
-        .map("capability")
-        .uniqBy(c => c.id)
+        .uniqBy(c => c.capabilityId)
         .value();
 
     const appCount = _.chain(ratings)

@@ -61,7 +61,7 @@ function controller(appStore,
         appStore.getById(entity.id),
         appCapabilityStore.findCapabilitiesByApplicationId(entity.id),
         perspectiveStore.findByCode(perspectiveCode),
-        ratingStore.findByParentAndPerspective(entity.kind, entity.id, perspectiveCode),
+        ratingStore.findByParent(entity.kind, entity.id),
         capabilityStore.findByAppIds([entity.id])
     ];
 

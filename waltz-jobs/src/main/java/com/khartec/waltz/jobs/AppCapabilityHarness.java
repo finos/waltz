@@ -17,23 +17,36 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.capabilityrating.CapabilityRating;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.app_capability.AppCapabilityService;
-import com.khartec.waltz.service.capability.CapabilityService;
+import com.khartec.waltz.service.capability_rating.CapabilityRatingService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.List;
 
 
 public class AppCapabilityHarness {
+
+    private static final IdSelectionOptions selector = ImmutableIdSelectionOptions
+            .builder()
+            .entityReference(ImmutableEntityReference
+                    .builder()
+                    .id(10)
+                    .kind(EntityKind.ORG_UNIT)
+                    .build())
+            .scope(HierarchyQueryScope.CHILDREN)
+            .build();
 
     public static void main(String[] args) {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
-        AppCapabilityService appCapabilityService = ctx.getBean(AppCapabilityService.class);
-        CapabilityService capabilityService = ctx.getBean(CapabilityService.class);
+        CapabilityRatingService ratingSvc = ctx.getBean(CapabilityRatingService.class);
 
+        System.out.println(ratingSvc);
 
-
+        List<CapabilityRating> result = ratingSvc.findByAppIdSelector(selector);
     }
 
 }

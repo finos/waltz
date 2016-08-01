@@ -19,7 +19,6 @@ package com.khartec.waltz.model.capabilityrating;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.CodedReference;
 import com.khartec.waltz.model.EntityReference;
 import org.immutables.value.Value;
 
@@ -29,9 +28,8 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableCapabilityRating.class)
 public abstract class CapabilityRating {
 
-    public abstract CodedReference perspective();
-    public abstract CodedReference measurable();
-    public abstract EntityReference capability();
+    public abstract String measurableCode();
+    public abstract long capabilityId();
     public abstract EntityReference parent();
 
     public abstract RagRating ragRating();

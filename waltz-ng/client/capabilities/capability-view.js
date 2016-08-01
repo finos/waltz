@@ -73,7 +73,7 @@ function logHistory(capability, historyStore) {
 function nestBySubjectThenMeasurable(ratings) {
     return d3.nest()
         .key(r => r.parent.id)
-        .key(r => r.measurable.code)
+        .key(r => r.measurableCode)
         .map(ratings);
 }
 

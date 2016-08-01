@@ -17,19 +17,14 @@
 
 package com.khartec.waltz.data.capability_rating;
 
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableCodedReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.capabilityrating.CapabilityRating;
 import com.khartec.waltz.model.capabilityrating.ImmutableCapabilityRating;
 import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.capabilityrating.RatingChange;
-import com.khartec.waltz.schema.tables.records.CapabilityRecord;
-import com.khartec.waltz.schema.tables.records.PerspectiveMeasurableRecord;
 import com.khartec.waltz.schema.tables.records.PerspectiveRatingRecord;
-import com.khartec.waltz.schema.tables.records.PerspectiveRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -38,9 +33,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
-import static com.khartec.waltz.schema.tables.Perspective.PERSPECTIVE;
-import static com.khartec.waltz.schema.tables.PerspectiveMeasurable.PERSPECTIVE_MEASURABLE;
 import static com.khartec.waltz.schema.tables.PerspectiveRating.PERSPECTIVE_RATING;
 
 
@@ -49,27 +41,19 @@ public class CapabilityRatingDao {
 
 
     private final DSLContext dsl;
-    private final OrganisationalUnitDao orgUnitDao;
 
 
     private final Field[] fields = new Field[] {
             PERSPECTIVE_RATING.PARENT_ID,
             PERSPECTIVE_RATING.PARENT_KIND,
             PERSPECTIVE_RATING.RATING,
-            PERSPECTIVE.CODE,
-            PERSPECTIVE.NAME,
-            PERSPECTIVE_MEASURABLE.CODE,
-            PERSPECTIVE_MEASURABLE.NAME,
-            CAPABILITY.NAME,
-            CAPABILITY.ID,
+            PERSPECTIVE_RATING.MEASURE_CODE,
+            PERSPECTIVE_RATING.CAPABILITY_ID
     };
 
     private final RecordMapper<Record, CapabilityRating> capabilityRatingMapper =
             r -> {
                 PerspectiveRatingRecord ratingRecord = r.into(PerspectiveRatingRecord.class);
-                PerspectiveRecord perspectiveRecord = r.into(PerspectiveRecord.class);
-                PerspectiveMeasurableRecord measurableRecord = r.into(PerspectiveMeasurableRecord.class);
-                CapabilityRecord capabilityRecord =r.into(CapabilityRecord.class);
 
                 return ImmutableCapabilityRating.builder()
                         .ragRating(RagRating.valueOf(ratingRecord.getRating()))
@@ -77,30 +61,17 @@ public class CapabilityRatingDao {
                                 .id(ratingRecord.getParentId())
                                 .kind(EntityKind.valueOf(ratingRecord.getParentKind()))
                                 .build())
-                        .capability(ImmutableEntityReference.builder()
-                                .id(capabilityRecord.getId())
-                                .name(capabilityRecord.getName())
-                                .kind(EntityKind.CAPABILITY)
-                                .build())
-                        .perspective(ImmutableCodedReference.builder()
-                                .name(perspectiveRecord.getName())
-                                .code(perspectiveRecord.getCode())
-                                .build())
-                        .measurable(ImmutableCodedReference.builder()
-                                .name(measurableRecord.getName())
-                                .code(measurableRecord.getCode())
-                                .build())
+                        .capabilityId(ratingRecord.getCapabilityId())
+                        .measurableCode(ratingRecord.getMeasureCode())
                         .build();
             };
 
 
     @Autowired
-    public CapabilityRatingDao(DSLContext dsl, OrganisationalUnitDao orgUnitDao) {
+    public CapabilityRatingDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl must not be null");
-        checkNotNull(orgUnitDao, "orgUnitDao must not be null");
-        
+
         this.dsl = dsl;
-        this.orgUnitDao = orgUnitDao;
     }
 
 
@@ -112,24 +83,9 @@ public class CapabilityRatingDao {
     }
 
 
-    public List<CapabilityRating> findByParentAndPerspective(EntityReference parentRef, String perspectiveCode) {
-        return prepareSelectPart()
-                .where(PERSPECTIVE_RATING.PARENT_ID.eq(parentRef.id()))
-                .and(PERSPECTIVE_RATING.PARENT_KIND.eq(parentRef.kind().name()))
-                .and(PERSPECTIVE.CODE.eq(perspectiveCode))
-                .fetch(capabilityRatingMapper);
-    }
-
-
-    private SelectOnConditionStep<Record>  prepareSelectPart() {
+    private SelectJoinStep<Record> prepareSelectPart() {
         return dsl.select(fields)
-                .from(PERSPECTIVE_RATING)
-                .innerJoin(PERSPECTIVE_MEASURABLE)
-                .on(PERSPECTIVE_RATING.MEASURE_CODE.eq(PERSPECTIVE_MEASURABLE.CODE))
-                .innerJoin(PERSPECTIVE)
-                .on(PERSPECTIVE_MEASURABLE.PERSPECTIVE_CODE.eq(PERSPECTIVE.CODE))
-                .innerJoin(CAPABILITY)
-                .on(CAPABILITY.ID.eq(PERSPECTIVE_RATING.CAPABILITY_ID));
+                .from(PERSPECTIVE_RATING);
     }
 
 

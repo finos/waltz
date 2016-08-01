@@ -55,11 +55,6 @@ public class CapabilityRatingService {
     }
 
 
-    public List<CapabilityRating> findByParentAndPerspective(EntityReference parentRef, String perspectiveCode) {
-        return dao.findByParentAndPerspective(parentRef, perspectiveCode);
-    }
-
-
     public int update(AppRatingChangesAction changesAction) {
         List<RatingChange> changes = changesAction.changes();
 
