@@ -103,7 +103,7 @@ public class JooqHarness {
 
 
     private static void pretty(CapabilityRating cr) {
-        String msg = "app: " + cr.parent().id() + ", capability: " + cr.capability().name() + ", rating: "+cr.ragRating();
+        String msg = "app: " + cr.parent().id() + ", capability: " + cr.capabilityId() + ", rating: "+cr.ragRating();
         System.out.println(msg);
     }
 

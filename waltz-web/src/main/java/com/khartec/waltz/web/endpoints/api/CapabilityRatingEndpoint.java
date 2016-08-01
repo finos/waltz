@@ -56,17 +56,12 @@ public class CapabilityRatingEndpoint implements Endpoint {
     public void register() {
 
         String byParentPath = mkPath(BASE_URL, "parent", ":kind", ":id");
-        String byParentAndPerspectivePath = mkPath(byParentPath, ":perspectiveCode");
         String byAppIdsPath = mkPath(BASE_URL, "apps");
         String byAppIdSelectorPath = mkPath(BASE_URL, "app-selector");
 
 
         getForList(byParentPath, (request, response) -> ratingService.findByParent(getEntityReference(request)));
 
-        getForList(byParentAndPerspectivePath, (request, response) ->
-                ratingService.findByParentAndPerspective(
-                        getEntityReference(request),
-                        request.params("perspectiveCode")));
 
         post(mkPath(BASE_URL), (request, response) -> {
             requireRole(userRoleService, request, Role.RATING_EDITOR);

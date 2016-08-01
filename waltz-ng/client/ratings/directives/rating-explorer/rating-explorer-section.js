@@ -195,7 +195,7 @@ function calculateScores(appCapabilities = [], ratings = [], calcScoreFn) {
 
     const viaRatings = d3
         .nest()
-        .key(r => r.capability.id)
+        .key(r => r.capabilityId)
         .key(r => r.parent.id)
         .rollup(calcScoreFn)
         .map(ratings);  // cId -> appId -> { values: [ratings] }

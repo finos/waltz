@@ -21,11 +21,6 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     }
 
-    function findByParentAndPerspective(kind, id, perspectiveCode) {
-        return $http
-            .get(`${base}/parent/${kind}/${id}/${perspectiveCode}`)
-            .then(result => result.data);
-    }
 
     function update(action) {
         return $http
@@ -50,7 +45,6 @@ function store($http, BaseApiUrl) {
 
     return {
         findByParent,
-        findByParentAndPerspective,
         findByAppIds,
         findByAppIdSelector,
         update

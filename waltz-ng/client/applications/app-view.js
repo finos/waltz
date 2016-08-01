@@ -81,7 +81,7 @@ function controller($q,
 
     $q.all([
         perspectiveStore.findByCode(perspectiveCode),
-        ratingStore.findByParentAndPerspective('APPLICATION', id, perspectiveCode)
+        ratingStore.findByParent('APPLICATION', id)
     ]).then(([perspective, ratings]) => {
 
         const appRef = { id: id, kind: 'APPLICATION', name: appView.app.name};
