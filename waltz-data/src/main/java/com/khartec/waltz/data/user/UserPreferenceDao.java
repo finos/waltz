@@ -17,6 +17,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.UserPreference.USER_PREFERENCE;
 
 @Repository
@@ -47,6 +48,7 @@ public class UserPreferenceDao {
 
     @Autowired
     public UserPreferenceDao(DSLContext dsl) {
+        checkNotNull(dsl, "dsl cannot be null");
         this.dsl = dsl;
     }
 
