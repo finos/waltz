@@ -53,36 +53,43 @@ public class UserPreferenceEndpoint implements Endpoint {
     @Override
     public void register() {
 
-
         // -- paths
-        String findAllForUserPath = mkPath(BASE_URL, ":userId");
-        String saveForUserPath = mkPath(BASE_URL, "save", ":userId");
-        String deleteForUserPath = mkPath(BASE_URL, "clear", ":userId");
+        String findAllForUserPath = mkPath(BASE_URL, ":userName");
+        String saveAllForUserPath = mkPath(BASE_URL, ":userName", "save-all");
+        String saveForUserPath = mkPath(BASE_URL, ":userName", "save");
+        String deleteForUserPath = mkPath(BASE_URL, ":userName", "clear");
 
 
         // -- routes
         ListRoute<UserPreference> findAllForUserRoute = (request, response) -> {
-            String userId = request.params("userId");
-            return userPreferenceService.getPreferences(userId);
+            String userName = request.params("userName");
+            return userPreferenceService.getPreferences(userName);
         };
 
 
-        DatumRoute<Boolean> saveForUserRoute = (request, response) -> {
-            String userId = request.params("userId");
+        ListRoute<UserPreference> saveAllForUserRoute = (request, response) -> {
+            String userName = request.params("userName");
             List<UserPreference> preferences = readBody(request, List.class);
-            return userPreferenceService.savePreferences(userId, preferences);
+            return userPreferenceService.savePreferences(userName, preferences);
+        };
+
+
+        ListRoute<UserPreference> saveForUserRoute = (request, response) -> {
+            UserPreference preference = readBody(request, UserPreference.class);
+            return userPreferenceService.savePreference(preference);
         };
 
 
         DatumRoute<Boolean> deleteForUserRoute = (request, response) -> {
-            String userId = request.params("userId");
-            return userPreferenceService.clearPreferences(userId);
+            String userName = request.params("userName");
+            return userPreferenceService.clearPreferences(userName);
         };
 
 
         // --- register
         getForList(findAllForUserPath, findAllForUserRoute);
-        postForDatum(saveForUserPath, saveForUserRoute);
-        getForDatum(deleteForUserPath, deleteForUserRoute);
+        postForList(saveAllForUserPath, saveAllForUserRoute);
+        postForList(saveForUserPath, saveForUserRoute);
+        deleteForDatum(deleteForUserPath, deleteForUserRoute);
     }
 }

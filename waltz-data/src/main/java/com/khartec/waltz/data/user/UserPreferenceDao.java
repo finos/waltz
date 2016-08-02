@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -27,7 +28,7 @@ public class UserPreferenceDao {
 
         UserPreferenceRecord record = r.into(USER_PREFERENCE);
         return ImmutableUserPreference.builder()
-                .user_id(record.getUserId())
+                .userName(record.getUserName())
                 .key(record.getKey())
                 .value(record.getValue())
                 .build();
@@ -35,7 +36,7 @@ public class UserPreferenceDao {
 
     private static final Function<UserPreference, UserPreferenceRecord> TO_RECORD_MAPPER = p -> {
         UserPreferenceRecord record = new UserPreferenceRecord();
-        record.setUserId(p.user_id());
+        record.setUserName(p.userName());
         record.setKey(p.key());
         record.setValue(p.value());
         return record;
@@ -50,32 +51,32 @@ public class UserPreferenceDao {
     }
 
 
-    public List<UserPreference> getPreferencesForUser(String userId) {
+    public List<UserPreference> getPreferencesForUser(String userName) {
         return dsl.select(USER_PREFERENCE.fields())
             .from(USER_PREFERENCE)
-            .where(USER_PREFERENCE.USER_ID.eq(userId))
+            .where(USER_PREFERENCE.USER_NAME.eq(userName))
             .fetch(TO_USER_PREFERENCE_MAPPER);
     }
 
 
-    public int savePreferencesForUser(String userId, List<UserPreference> preferences) {
+    public int savePreferencesForUser(String userName, List<UserPreference> preferences) {
 
         List<String> existingKeys = dsl.select(USER_PREFERENCE.KEY)
                 .from(USER_PREFERENCE)
-                .where(USER_PREFERENCE.USER_ID.eq(userId))
+                .where(USER_PREFERENCE.USER_NAME.eq(userName))
                 .fetch()
                 .stream()
                 .map(up -> up.getValue(USER_PREFERENCE.KEY))
                 .collect(Collectors.toList());
 
         List<UserPreferenceRecord> inserts = preferences.stream()
-                .filter(p -> p.user_id().equals(userId) && !existingKeys.contains(p.key()))
+                .filter(p -> p.userName().equals(userName) && !existingKeys.contains(p.key()))
                 .map(TO_RECORD_MAPPER)
                 .collect(Collectors.toList());
 
 
         List<UserPreferenceRecord> updates = preferences.stream()
-                .filter(p -> p.user_id().equals(userId) && existingKeys.contains(p.key()))
+                .filter(p -> p.userName().equals(userName) && existingKeys.contains(p.key()))
                 .map(TO_RECORD_MAPPER)
                 .collect(Collectors.toList());
 
@@ -86,10 +87,16 @@ public class UserPreferenceDao {
     }
 
 
-    public void clearPreferencesForUser(String userId) {
+    public int savePreference(UserPreference preference) {
+        return savePreferencesForUser(preference.userName(),
+                new ArrayList<UserPreference>() {{ add(preference);}});
+    }
+
+
+    public void clearPreferencesForUser(String userName) {
 
         dsl.deleteFrom(USER_PREFERENCE)
-                .where(USER_PREFERENCE.USER_ID.eq(userId))
+                .where(USER_PREFERENCE.USER_NAME.eq(userName))
                 .execute();
     }
 

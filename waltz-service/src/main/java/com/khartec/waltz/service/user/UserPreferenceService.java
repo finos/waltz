@@ -27,19 +27,25 @@ public class UserPreferenceService {
     }
 
 
-    public List<UserPreference> getPreferences(String userId) {
-        return userPreferenceDao.getPreferencesForUser(userId);
+    public List<UserPreference> getPreferences(String userName) {
+        return userPreferenceDao.getPreferencesForUser(userName);
     }
 
 
-    public boolean savePreferences(String userId, List<UserPreference> preferences) {
-        userPreferenceDao.savePreferencesForUser(userId, preferences);
-        return true;
+    public List<UserPreference> savePreferences(String userName, List<UserPreference> preferences) {
+        userPreferenceDao.savePreferencesForUser(userName, preferences);
+        return getPreferences(userName);
     }
 
 
-    public boolean clearPreferences(String userId) {
-        userPreferenceDao.clearPreferencesForUser(userId);
+    public List<UserPreference> savePreference(UserPreference preference) {
+        userPreferenceDao.savePreference(preference);
+        return getPreferences(preference.userName());
+    }
+
+
+    public boolean clearPreferences(String userName) {
+        userPreferenceDao.clearPreferencesForUser(userName);
         return true;
     }
 

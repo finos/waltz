@@ -39,19 +39,19 @@ public class UserPreferenceHarness {
 
         List<UserPreference> preferences = new ArrayList<UserPreference>() {{
             add(ImmutableUserPreference.builder()
-                    .user_id("admin")
+                    .userName("admin")
                     .key("org-unit.section.technologies.collapsed")
                     .value("false")
                     .build());
 
             add(ImmutableUserPreference.builder()
-                    .user_id("admin")
+                    .userName("admin")
                     .key("org-unit.section.indicators.collapsed")
                     .value("true")
                     .build());
 
             add(ImmutableUserPreference.builder()
-                    .user_id("admin")
+                    .userName("admin")
                     .key("org-unit.section.logicalflows.collapsed")
                     .value("true")
                     .build());
@@ -61,9 +61,17 @@ public class UserPreferenceHarness {
 //        int result = userPreferenceDao.savePreferencesForUser("admin", preferences);
 //        System.out.println("result: " + result);
 
+        int result = userPreferenceDao.savePreference(ImmutableUserPreference.builder()
+                .userName("admin")
+                .key("org-unit.section.logicalflows.hidden")
+                .value("true")
+                .build());
+        System.out.println("result: " + result);
 
-        List<UserPreference> prefs = userPreferenceDao.getPreferencesForUser("admin");
-        prefs.forEach(u -> System.out.printf("user: %s, key: %s, value: %s\r\n", u.user_id(), u.key(), u.value()));
+
+
+//        List<UserPreference> prefs = userPreferenceDao.getPreferencesForUser("admin");
+//        prefs.forEach(u -> System.out.printf("user: %s, key: %s, value: %s\r\n", u.userName(), u.key(), u.value()));
 
 //        userPreferenceDao.clearPreferencesForUser("kamran");
 

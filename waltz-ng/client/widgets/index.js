@@ -28,7 +28,6 @@ export default (module) => {
     module.directive('waltzPieTable', require('./pie-table'));
     module.directive('waltzRagIndicator', require('./rag-indicator'));
     module.directive('waltzSearch', require('./search'));
-    module.directive('waltzSection', require('./section'));
     module.directive('waltzSectionActions', require('./section-actions'));
     module.directive('waltzStepCount', require('./step-count'));
     module.directive('waltzToggle', require('./toggle'));
@@ -39,7 +38,8 @@ export default (module) => {
         .component('waltzIcon', require('./icon'))
         .component('waltzPie', require('./pie'))
         .component('waltzPieSegmentTable', require('./pie-segment-table'))
-        .component('waltzSimpleStackChart', require('./simple-stack-chart'));
+        .component('waltzSimpleStackChart', require('./simple-stack-chart'))
+        .component('waltzSection', require('./section'));
 
 
 };

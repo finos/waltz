@@ -99,21 +99,22 @@ const initialState = {
 function controller($scope,
                     $q,
                     $stateParams,
+                    appCapabilityStore,
                     appGroupStore,
                     appStore,
+                    assetCostViewService,
+                    bookmarkStore,
+                    capabilityStore,
                     changeInitiativeStore,
                     complexityStore,
                     dataFlowViewService,
                     entityStatisticStore,
-                    userService,
-                    capabilityStore,
-                    appCapabilityStore,
                     ratingStore,
+                    sourceDataRatingStore,
                     technologyStatsService,
-                    assetCostViewService,
-                    bookmarkStore,
-                    sourceDataRatingStore) {
+                    userService) {
     const { id }  = $stateParams;
+
 
     const vm = Object.assign(this, initialState);
 
@@ -209,20 +210,20 @@ controller.$inject = [
     '$scope',
     '$q',
     '$stateParams',
+    'AppCapabilityStore',
     'AppGroupStore',
     'ApplicationStore',
+    'AssetCostViewService',
+    'BookmarkStore',
+    'CapabilityStore',
     'ChangeInitiativeStore',
     'ComplexityStore',
     'DataFlowViewService',
     'EntityStatisticStore',
-    'UserService',
-    'CapabilityStore',
-    'AppCapabilityStore',
     'RatingStore',
+    'SourceDataRatingStore',
     'TechnologyStatisticsService',
-    'AssetCostViewService',
-    'BookmarkStore',
-    'SourceDataRatingStore'
+    'UserService'
 ];
 
 

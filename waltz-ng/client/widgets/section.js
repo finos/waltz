@@ -9,29 +9,66 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import {stringToBoolean} from "../common";
 
-const BINDINGS = {
+
+const bindings = {
     name: '@',
     icon: '@',
     small: '@',
     id: '@',
-    collapsible: '='
+    collapsible: '<'
 };
 
 
-function controller() {
+const template = require('./section.html');
 
+
+function buildPreferenceKey(state, widgetId, keyName) {
+    return `${state.name}.section.${widgetId}.${keyName}`;
 }
 
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
-    template: require('./section.html'),
-    bindToController: BINDINGS,
-    controllerAs:'ctrl',
-    controller,
-    scope: {},
-    transclude: true
-});
+function controller($scope,
+                    $state,
+                    userPreferenceService) {
+    const vm = this;
 
+    if(vm.id) {
+        userPreferenceService.loadPreferences()
+            .then(preferences => {
+                const preferenceKey = buildPreferenceKey($state.current, vm.id, 'collapsed');
+                if(preferences[preferenceKey]) {
+                    const keyValue = stringToBoolean(preferences[preferenceKey].value)
+                    vm.collapsed = keyValue;
+                }
+
+            });
+    }
+
+
+    $scope.$watch('ctrl.collapsed', (collapsed) => {
+        if(vm.id) {
+            userPreferenceService.savePreference(buildPreferenceKey($state.current, vm.id, 'collapsed'), collapsed);
+        }
+    });
+}
+
+
+controller.$inject = [
+    '$scope',
+    '$state',
+    'UserPreferenceService'
+];
+
+
+const component = {
+    template,
+    bindings,
+    controller,
+    controllerAs:'ctrl',
+    transclude: true
+};
+
+
+export default component;
