@@ -10,6 +10,7 @@ import com.khartec.waltz.model.entity_hierarchy.EntityHierarchyItem;
 import com.khartec.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
 import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.schema.Tables;
+import com.khartec.waltz.service.capability.CapabilityService;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Table;
@@ -31,14 +32,17 @@ public class EntityHierarchyService {
 
     private final DSLContext dsl;
     private final EntityHierarchyDao entityHierarchyDao;
+    private final CapabilityService capabilityService;
 
     @Autowired
-    public EntityHierarchyService(DSLContext dsl, EntityHierarchyDao entityHierarchyDao) {
+    public EntityHierarchyService(DSLContext dsl, EntityHierarchyDao entityHierarchyDao, CapabilityService capabilityService ) {
         checkNotNull(dsl, "dsl cannot be null");
         checkNotNull(entityHierarchyDao, "entityHierarchyDao cannot be null");
+        checkNotNull(capabilityService, "capabilityService cannot be null");
 
         this.dsl = dsl;
         this.entityHierarchyDao = entityHierarchyDao;
+        this.capabilityService = capabilityService;
     }
 
 
@@ -56,6 +60,11 @@ public class EntityHierarchyService {
     private int buildFor(Table table, EntityKind kind) {
         Collection<FlatNode<Long, Long>> flatNodes = fetchFlatNodes(table);
         List<EntityHierarchyItem> hierarchyItems = convertFlatNodesToHierarchyItems(kind, flatNodes);
+
+        //TODO: remove this once all code using the entity_hierarchy service and related fixes
+        if (kind == EntityKind.CAPABILITY) {
+            capabilityService.rebuildHierarchy();
+        }
 
         return entityHierarchyDao.replaceHierarchy(kind, hierarchyItems);
     }

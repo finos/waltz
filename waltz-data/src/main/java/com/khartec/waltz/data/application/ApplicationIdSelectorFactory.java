@@ -1,8 +1,8 @@
 package com.khartec.waltz.data.application;
 
-import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.IdSelectorFactory;
-import com.khartec.waltz.data.orgunit.OrgUnitIdSelectorFactory;
+import com.khartec.waltz.data.capability.CapabilityIdSelectorFactory;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
 import com.khartec.waltz.schema.tables.*;
@@ -13,15 +13,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Set;
-
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
-import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
@@ -33,12 +29,12 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationIdSelectorFactory.class);
 
     private final DSLContext dsl;
-    private final OrgUnitIdSelectorFactory orgUnitIdSelectorFactory;
+    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
+    private final CapabilityIdSelectorFactory capabilityIdSelectorFactory;
 
     private final Application app = APPLICATION.as("app");
     private final AppCapability appCapability = APP_CAPABILITY.as("appcap");
     private final ApplicationGroupEntry appGroup = APPLICATION_GROUP_ENTRY.as("appgrp");
-    private final Capability capability = CAPABILITY.as("cap");
     private final EntityRelationship relationship = EntityRelationship.ENTITY_RELATIONSHIP.as("relationship");
     private final Involvement involvement = INVOLVEMENT.as("involvement");
     private final Person person = PERSON.as("per");
@@ -46,11 +42,15 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
 
     @Autowired
-    public ApplicationIdSelectorFactory(DSLContext dsl, OrgUnitIdSelectorFactory orgUnitIdSelectorFactory) {
+    public ApplicationIdSelectorFactory(DSLContext dsl,
+                                        CapabilityIdSelectorFactory capabilityIdSelectorFactory,
+                                        OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
         checkNotNull(dsl, "dsl cannot be null");
+        checkNotNull(capabilityIdSelectorFactory, "capabilityIdSelectorFactory cannot be null");
         checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
 
         this.dsl = dsl;
+        this.capabilityIdSelectorFactory = capabilityIdSelectorFactory;
         this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
     }
 
@@ -192,43 +192,17 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
     private Select<Record1<Long>> mkForCapability(EntityReference ref, HierarchyQueryScope scope) {
 
-        switch (scope) {
-            case CHILDREN:
-                return dsl
-                        .selectDistinct(appCapability.APPLICATION_ID)
-                        .from(appCapability)
-                        .where(dsl.renderInlined(appCapability.CAPABILITY_ID.in(
-                                dsl.select(capability.ID)
-                                        .from(capability)
-                                        .where(capability.LEVEL_1.eq(ref.id()))
-                                        .or(capability.LEVEL_2.eq(ref.id()))
-                                        .or(capability.LEVEL_2.eq(ref.id()))
-                                        .or(capability.LEVEL_3.eq(ref.id()))
-                                        .or(capability.LEVEL_4.eq(ref.id()))
-                                        .or(capability.LEVEL_5.eq(ref.id())))));
-            case PARENTS:
-                Set<Long> ids = dsl.select(capability.LEVEL_1, capability.LEVEL_2, capability.LEVEL_3, capability.LEVEL_4, capability.LEVEL_4)
-                        .from(capability)
-                        .where(capability.ID.eq(ref.id()))
-                        .fetchOne(r -> r == null
-                                ? Collections.emptySet()
-                                : SetUtilities.fromArray(r.value1(), r.value2(), r.value3(), r.value4(), r.value5()));
+        ImmutableIdSelectionOptions capabilitySelectorOptions = ImmutableIdSelectionOptions.builder()
+                .entityReference(ref)
+                .scope(scope)
+                .build();
 
-                ids.remove(null);
+        Select<Record1<Long>> capabilitySelector = capabilityIdSelectorFactory.apply(capabilitySelectorOptions);
 
-                return dsl
-                        .selectDistinct(appCapability.APPLICATION_ID)
-                        .from(appCapability)
-                        .where(dsl.renderInlined(appCapability.CAPABILITY_ID.in(ids)));
-            case EXACT:
-                return dsl
-                        .selectDistinct(appCapability.APPLICATION_ID)
-                        .from(appCapability)
-                        .where(appCapability.CAPABILITY_ID.eq(ref.id()));
-
-            default:
-                throw new UnsupportedOperationException("Unexpected scope: "+scope);
-        }
+        return dsl
+                .selectDistinct(appCapability.APPLICATION_ID)
+                .from(appCapability)
+                .where(dsl.renderInlined(appCapability.CAPABILITY_ID.in(capabilitySelector)));
     }
 
 }

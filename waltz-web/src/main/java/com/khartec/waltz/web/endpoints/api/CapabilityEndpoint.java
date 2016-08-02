@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.WebUtilities.readBody;
+import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
@@ -49,18 +50,21 @@ public class CapabilityEndpoint implements Endpoint {
         String findAllPath = mkPath(BASE_URL);
         String findByAppIdsPath = mkPath(BASE_URL, "apps");
         String findByIdsPath = mkPath(BASE_URL, "ids");
+        String findByIdSelectorPath = mkPath(BASE_URL, "selector");
         String searchPath = mkPath(BASE_URL, "search", ":query");
 
 
         ListRoute<Capability> findAllRoute = (request, response) -> service.findAll();
         ListRoute<Capability> findByAppIdsRoute = (request, response) -> service.findByAppIds(readBody(request, Long[].class));
         ListRoute<Capability> findByIdsRoute = (request, response) -> service.findByIds(readBody(request, Long[].class));
+        ListRoute<Capability> findByIdSelectorRoute = (request, response) -> service.findByIdSelector(readIdSelectionOptionsFromBody(request));
         ListRoute<Capability> searchRoute = (request, response) -> service.search(request.params("query"));
 
 
         getForList(findAllPath, findAllRoute);
         postForList(findByAppIdsPath, findByAppIdsRoute);
         postForList(findByIdsPath, findByIdsRoute);
+        postForList(findByIdSelectorPath, findByIdSelectorRoute);
         getForList(searchPath, searchRoute);
     }
 

@@ -2,7 +2,7 @@ package com.khartec.waltz.data.end_user_app;
 
 import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.EntityIdSelectorFactory;
-import com.khartec.waltz.data.orgunit.OrgUnitIdSelectorFactory;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -21,11 +21,12 @@ public class EndUserAppIdSelectorFactory extends EntityIdSelectorFactory  {
 
 
     private final EndUserApplication eua = END_USER_APPLICATION.as("eua");
-    private final OrgUnitIdSelectorFactory orgUnitIdSelectorFactory;
+    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
 
 
     @Autowired
-    public EndUserAppIdSelectorFactory(DSLContext dsl, OrgUnitIdSelectorFactory orgUnitIdSelectorFactory) {
+    public EndUserAppIdSelectorFactory(DSLContext dsl,
+                                       OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
         super(dsl);
         Checks.checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
         this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
