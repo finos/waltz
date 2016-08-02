@@ -18,12 +18,19 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.capability.CapabilityDao;
+import com.khartec.waltz.data.capability.CapabilityIdSelectorFactory;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.ImmutableIdSelectionOptions;
 import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.List;
+import java.util.Collection;
 
 
 public class CapabilityHarness {
@@ -37,9 +44,18 @@ public class CapabilityHarness {
         CapabilityDao dao = ctx.getBean(CapabilityDao.class);
 
 
-        List<Capability> r = dao.findByAppIds(1202L);
+        CapabilityIdSelectorFactory selectorFactory = ctx.getBean(CapabilityIdSelectorFactory.class);
 
-        r.forEach(System.out::println);
+        Select<Record1<Long>> selector = selectorFactory.apply(ImmutableIdSelectionOptions.builder()
+                .entityReference(ImmutableEntityReference.builder()
+                        .kind(EntityKind.APP_GROUP)
+                        .id(5L)
+                        .build())
+                .scope(HierarchyQueryScope.PARENTS)
+                .build());
+
+        Collection<Capability> caps = dao.findByIdSelector(selector);
+        caps.forEach(c -> System.out.println(c.name()));
 
     }
 

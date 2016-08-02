@@ -23,8 +23,8 @@ import com.khartec.waltz.common.hierarchy.FlatNode;
 import com.khartec.waltz.common.hierarchy.Forest;
 import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
 import com.khartec.waltz.common.hierarchy.Node;
-import com.khartec.waltz.data.orgunit.OrgUnitIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.search.OrganisationalUnitSearchDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
@@ -46,13 +46,13 @@ public class OrganisationalUnitService {
 
     private final OrganisationalUnitDao dao;
     private final OrganisationalUnitSearchDao organisationalUnitSearchDao;
-    private final OrgUnitIdSelectorFactory selectorFactory;
+    private final OrganisationalUnitIdSelectorFactory selectorFactory;
 
 
     @Autowired
     public OrganisationalUnitService(OrganisationalUnitDao dao,
                                      OrganisationalUnitSearchDao organisationalUnitSearchDao,
-                                     OrgUnitIdSelectorFactory orgUnitIdSelectorFactory) {
+                                     OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
         checkNotNull(dao, "dao must not be null");
         checkNotNull(organisationalUnitSearchDao, "organisationalUnitSearchDao must not be null");
         checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");

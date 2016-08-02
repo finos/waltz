@@ -18,7 +18,7 @@
 package com.khartec.waltz.service.end_user_app;
 
 import com.khartec.waltz.data.end_user_app.EndUserAppDao;
-import com.khartec.waltz.data.orgunit.OrgUnitIdSelectorFactory;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.tally.LongTally;
@@ -37,12 +37,12 @@ import static com.khartec.waltz.common.FunctionUtilities.time;
 public class EndUserAppService {
 
     private final EndUserAppDao endUserAppDao;
-    private final OrgUnitIdSelectorFactory orgUnitIdSelectorFactory;
+    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
 
 
     @Autowired
     public EndUserAppService(EndUserAppDao endUserAppDao,
-                             OrgUnitIdSelectorFactory orgUnitIdSelectorFactory) {
+                             OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
         checkNotNull(endUserAppDao, "EndUserAppDao is required");
         checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
 

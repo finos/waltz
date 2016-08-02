@@ -118,6 +118,7 @@ public class CapabilityDao {
     }
 
 
+    @Deprecated
     public boolean update(Capability capability) {
         ensureHasId(capability, "Cannot update capability record with no ID");
 

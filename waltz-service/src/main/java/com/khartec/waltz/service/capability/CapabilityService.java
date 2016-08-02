@@ -22,14 +22,19 @@ import com.khartec.waltz.common.hierarchy.Forest;
 import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
 import com.khartec.waltz.common.hierarchy.Node;
 import com.khartec.waltz.data.capability.CapabilityDao;
+import com.khartec.waltz.data.capability.CapabilityIdSelectorFactory;
 import com.khartec.waltz.data.capability.search.CapabilitySearchDao;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.capability.ImmutableCapability;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,14 +49,19 @@ public class CapabilityService {
 
     private final CapabilityDao capabilityDao;
     private final CapabilitySearchDao capabilitySearchDao;
+    private final CapabilityIdSelectorFactory capabilityIdSelectorFactory;
 
     @Autowired
-    public CapabilityService(CapabilityDao capabilityDao, CapabilitySearchDao capabilitySearchDao) {
+    public CapabilityService(CapabilityDao capabilityDao,
+                             CapabilitySearchDao capabilitySearchDao,
+                             CapabilityIdSelectorFactory capabilityIdSelectorFactory) {
         checkNotNull(capabilityDao, "capabilityDao must not be null");
         checkNotNull(capabilitySearchDao, "capabilitySearchDao must not be null");
+        checkNotNull(capabilityIdSelectorFactory, "capabilityIdSelectorFactory cannot be null");
 
         this.capabilityDao = capabilityDao;
         this.capabilitySearchDao = capabilitySearchDao;
+        this.capabilityIdSelectorFactory = capabilityIdSelectorFactory;
     }
 
     public List<Capability> findAll() {
@@ -86,11 +96,13 @@ public class CapabilityService {
 
     }
 
+    @Deprecated
     public boolean update(Capability capability) {
         return capabilityDao.update(capability);
     }
 
 
+    @Deprecated
     public boolean rebuildHierarchy() {
         LOG.warn("Rebuilding capability hierarchy");
 
@@ -138,6 +150,14 @@ public class CapabilityService {
             return ImmutableCapability.copyOf(capability).withLevel5(node.getId());
         }
         return capability;
+    }
+
+
+    public Collection<Capability> findByIdSelector(IdSelectionOptions idSelectionOptions) {
+        checkNotNull(idSelectionOptions, "idSelectionOptions cannot be null");
+
+        Select<Record1<Long>> selector = capabilityIdSelectorFactory.apply(idSelectionOptions);
+        return capabilityDao.findByIdSelector(selector);
     }
 }
 
