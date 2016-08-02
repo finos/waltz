@@ -39,19 +39,16 @@ public class UserPreferenceHarness {
 
         List<UserPreference> preferences = new ArrayList<UserPreference>() {{
             add(ImmutableUserPreference.builder()
-                    .userName("admin")
                     .key("org-unit.section.technologies.collapsed")
                     .value("false")
                     .build());
 
             add(ImmutableUserPreference.builder()
-                    .userName("admin")
                     .key("org-unit.section.indicators.collapsed")
                     .value("true")
                     .build());
 
             add(ImmutableUserPreference.builder()
-                    .userName("admin")
                     .key("org-unit.section.logicalflows.collapsed")
                     .value("true")
                     .build());
@@ -61,8 +58,7 @@ public class UserPreferenceHarness {
 //        int result = userPreferenceDao.savePreferencesForUser("admin", preferences);
 //        System.out.println("result: " + result);
 
-        int result = userPreferenceDao.savePreference(ImmutableUserPreference.builder()
-                .userName("admin")
+        int result = userPreferenceDao.savePreference("admin", ImmutableUserPreference.builder()
                 .key("org-unit.section.logicalflows.hidden")
                 .value("true")
                 .build());
