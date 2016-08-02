@@ -218,8 +218,13 @@ export function kindToViewState(kind) {
 }
 
 
-export function initialiseData(vm, initData) {
+export function resetData(vm, initData) {
     return Object.assign(vm, _.cloneDeep(initData));
+}
+
+
+export function initialiseData(vm, initData) {
+    return _.defaultsDeep(vm, _.cloneDeep(initData));
 }
 
 

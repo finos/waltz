@@ -1,22 +1,22 @@
 <div>
-    <style>
-
-    </style>
-
-
     <div class="waltz-section">
 
         <div class="waltz-section-header">
 
             <div class="waltz-visibility-parent waltz-section-header-title">
 
-                <waltz-twistie model="ctrl.collapsed"></waltz-twistie>
+                <waltz-twistie
+                    collapsed="$ctrl.collapsed"
+                    toggle-expansion="$ctrl.expand">
+                </waltz-twistie>
 
-                <waltz-icon name="{{ ctrl.icon }}"></waltz-icon>
-                {{ ctrl.name }}
+
+
+                <waltz-icon name="{{ $ctrl.icon }}"></waltz-icon>
+                <span ng-bind="$ctrl.name"></span>
 
                 <small>
-                    {{ ctrl.small }}
+                    <span ng-bind="$ctrl.small"></span>
                 </small>
 
             </div>
@@ -25,7 +25,7 @@
 
 
         <div class="container-fluid waltz-section-body animate-if"
-             ng-if="! ctrl.collapsed">
+             ng-if="! $ctrl.collapsed">
             <ng-transclude></ng-transclude>
         </div>
     </div>

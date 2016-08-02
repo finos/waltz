@@ -13,21 +13,21 @@
 function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/user-preference`;
 
-    const findAll = (userName) => $http.get(`${BASE}/${userName}`).then(r => r.data);
+    const findAllForUser = () => $http.get(`${BASE}`).then(r => r.data);
 
-    const save = (preference) => $http.post(`${BASE}/${preference.userName}/save`, preference)
+    const saveForUser = (preference) => $http.post(`${BASE}/save`, preference)
         .then(r => r.data);
 
-    const saveAllForUserName = (userName, preferences) => $http.post(`${BASE}/${userName}/save-all`, preferences)
+    const saveAllForUser = (preferences) => $http.post(`${BASE}/save-all`, preferences)
         .then(r => r.data);
 
-    const deleteForUserName = (userName) => $http.delete(`${BASE}/${userName}/clear`).then(r => r.data);
+    const deleteForUser = () => $http.delete(`${BASE}/clear`).then(r => r.data);
 
     return {
-        findAll,
-        save,
-        saveAllForUserName,
-        deleteForUserName
+        findAllForUser,
+        saveForUser,
+        saveAllForUser,
+        deleteForUser
     };
 }
 

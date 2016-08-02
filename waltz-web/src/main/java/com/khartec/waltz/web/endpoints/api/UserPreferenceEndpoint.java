@@ -28,8 +28,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readBody;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
@@ -54,21 +53,21 @@ public class UserPreferenceEndpoint implements Endpoint {
     public void register() {
 
         // -- paths
-        String findAllForUserPath = mkPath(BASE_URL, ":userName");
-        String saveAllForUserPath = mkPath(BASE_URL, ":userName", "save-all");
-        String saveForUserPath = mkPath(BASE_URL, ":userName", "save");
-        String deleteForUserPath = mkPath(BASE_URL, ":userName", "clear");
+        String findAllForUserPath = mkPath(BASE_URL);
+        String saveAllForUserPath = mkPath(BASE_URL, "save-all");
+        String saveForUserPath = mkPath(BASE_URL, "save");
+        String deleteForUserPath = mkPath(BASE_URL, "clear");
 
 
         // -- routes
         ListRoute<UserPreference> findAllForUserRoute = (request, response) -> {
-            String userName = request.params("userName");
+            String userName = getUsername(request);
             return userPreferenceService.getPreferences(userName);
         };
 
 
         ListRoute<UserPreference> saveAllForUserRoute = (request, response) -> {
-            String userName = request.params("userName");
+            String userName = getUsername(request);
             List<UserPreference> preferences = readBody(request, List.class);
             return userPreferenceService.savePreferences(userName, preferences);
         };
@@ -76,12 +75,12 @@ public class UserPreferenceEndpoint implements Endpoint {
 
         ListRoute<UserPreference> saveForUserRoute = (request, response) -> {
             UserPreference preference = readBody(request, UserPreference.class);
-            return userPreferenceService.savePreference(preference);
+            return userPreferenceService.savePreference(getUsername(request), preference);
         };
 
 
         DatumRoute<Boolean> deleteForUserRoute = (request, response) -> {
-            String userName = request.params("userName");
+            String userName = getUsername(request);
             return userPreferenceService.clearPreferences(userName);
         };
 

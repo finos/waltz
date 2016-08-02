@@ -9,12 +9,44 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import {initialiseData} from "../common";
+
+
+const bindings = {
+    collapsed: '<',
+    toggleExpansion: '<'
+};
+
+
+const template = require('./twistie.html');
+
+
+const initialState = {
+    collapsed: false,
+    toggleExpansion: (collapsed) => console.log("Default handler defined for toggleExpansion - collapsed: ", collapsed)
+};
+
+
+function controller() {
+    const vm = initialiseData(this, initialState);
+
+    vm.onClick = () => {
+        vm.collapsed = ! vm.collapsed;
+        if(vm.toggleExpansion) {
+            vm.toggleExpansion(vm.collapsed);
+        }
+    };
+}
+
 
 export default () => ({
     restrict: 'E',
     replace: true,
-    scope: {
-        expanded: '=model'
-    },
-    template: require('./twistie.html')
+    scope: {},
+    bindToController: bindings,
+    controllerAs: 'ctrl',
+    controller,
+    template
 });
+
+

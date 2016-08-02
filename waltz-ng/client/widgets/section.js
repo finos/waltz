@@ -9,7 +9,7 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import {stringToBoolean} from "../common";
+import {stringToBoolean, initialiseData} from "../common";
 
 
 const bindings = {
@@ -24,15 +24,19 @@ const bindings = {
 const template = require('./section.html');
 
 
+const initialState = {
+  collapsed: false
+};
+
+
 function buildPreferenceKey(state, widgetId, keyName) {
     return `${state.name}.section.${widgetId}.${keyName}`;
 }
 
 
-function controller($scope,
-                    $state,
+function controller($state,
                     userPreferenceService) {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     if(vm.id) {
         userPreferenceService.loadPreferences()
@@ -47,16 +51,16 @@ function controller($scope,
     }
 
 
-    $scope.$watch('ctrl.collapsed', (collapsed) => {
+    vm.expand = (collapsed) => {
+        vm.collapsed = collapsed;
         if(vm.id) {
             userPreferenceService.savePreference(buildPreferenceKey($state.current, vm.id, 'collapsed'), collapsed);
         }
-    });
+    }
 }
 
 
 controller.$inject = [
-    '$scope',
     '$state',
     'UserPreferenceService'
 ];
@@ -66,7 +70,6 @@ const component = {
     template,
     bindings,
     controller,
-    controllerAs:'ctrl',
     transclude: true
 };
 

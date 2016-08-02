@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {kindToViewState, initialiseData} from "../common";
+import {kindToViewState, resetData} from "../common";
 
 const initData = {
     statistic: {
@@ -40,7 +40,7 @@ function controller($q,
                     bookmarkStore,
                     entityStatisticUtilities,
                     entityStatisticStore) {
-    const vm = initialiseData(this, initData);
+    const vm = resetData(this, initData);
 
     const statId = $stateParams.statId;
     const entityKind = $stateParams.kind;
@@ -70,7 +70,7 @@ function controller($q,
 
 
     function resetValueData() {
-        const clearData = initialiseData({}, initData);
+        const clearData = resetData({}, initData);
         vm.statistic.summary = clearData.statistic.summary;
         vm.statistic.values = clearData.statistic.values;
         vm.summaries = clearData.summaries;

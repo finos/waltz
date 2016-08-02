@@ -23,7 +23,7 @@ function service($q, userPreferenceStore, userService) {
         if (force || (preferencePromise == null)) {
             preferencePromise = userService
                 .whoami()
-                .then(user => userPreferenceStore.findAll(user.userName))
+                .then(user => userPreferenceStore.findAllForUser())
                 .then(preferences => _.keyBy(preferences, 'key'))
                 .then(p => preferences = p);
         }
@@ -41,12 +41,11 @@ function service($q, userPreferenceStore, userService) {
                 .whoami()
                 .then(user => {
                     const preference = {
-                        userName: user.userName,
                         key,
                         value
                     };
 
-                    return userPreferenceStore.save(preference)
+                    return userPreferenceStore.saveForUser(preference)
                         .then(preferences => _.keyBy(preferences, 'key'))
                         .then(p => preferences = p);
 

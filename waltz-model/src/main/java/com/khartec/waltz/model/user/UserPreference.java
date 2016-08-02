@@ -8,7 +8,6 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableUserPreference.class)
 @JsonDeserialize(as = ImmutableUserPreference.class)
 public abstract class UserPreference {
-    public abstract String userName();
     public abstract String key();
     public abstract String value();
 }
