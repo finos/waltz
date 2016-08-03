@@ -20,5 +20,7 @@ export default (module) => {
         .service('UserAgentInfoStore', require('./services/user-agent-info-store'))
         .service('UserService', require('./services/user-service'))
         .service('UserStore', require('./services/user-store'))
+        .service('UserPreferenceStore', require('./services/user-preference-store'))
+        .service('UserPreferenceService', require('./services/user-preference-service'))
         .config(require('./routes'));
 };

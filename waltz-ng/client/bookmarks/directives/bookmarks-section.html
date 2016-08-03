@@ -1,7 +1,8 @@
 <div>
     <waltz-section icon="bookmark-o"
                    name="Bookmarks"
-                   small="( {{ctrl.bookmarks.length}} )">
+                   small="( {{ctrl.bookmarks.length}} )"
+                   id="bookmarks-section">
         <waltz-section-actions>
             <a waltz-has-role="BOOKMARK_EDITOR"
                ui-sref="main.bookmarks.edit ({ entityId: ctrl.entityId, kind: ctrl.kind, parentName:ctrl.parentName })"
