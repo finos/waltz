@@ -2272,4 +2272,12 @@
     </changeSet>
 
 
+    <!-- 372 remove self linking data flows -->
+    <changeSet author="kamransaleem" id="20160803-372-1">
+        <sql>
+            DELETE FROM data_flow
+            WHERE source_entity_id = target_entity_id;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
