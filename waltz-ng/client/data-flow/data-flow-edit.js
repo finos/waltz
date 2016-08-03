@@ -202,11 +202,20 @@ function controller($q,
     };
 
     vm.addSource = (app) => {
+        if(vm.app.id == app.id) {
+            notification.warning("An application may not link to itself.");
+            return;
+        }
+
         selectSource(app);
         addApplication(app, vm.graphOptions.data.sources);
     };
 
     vm.addTarget = (app) => {
+        if(vm.app.id == app.id) {
+            notification.warning("An application may not link to itself.")
+            return;
+        }
         selectTarget(app);
         addApplication(app, vm.graphOptions.data.targets);
     };
