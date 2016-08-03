@@ -1,9 +1,27 @@
+import {initialiseData} from "../../common";
 
-function controller() {
+
+const initialState = {
+    logoOverlayText: '',
+    logoOverlayColor: '#444',
+};
+
+
+function controller(settingsStore) {
+    const vm = initialiseData(this, initialState);
+
+    settingsStore
+        .findAll()
+        .then(settings => {
+            vm.logoOverlayText = settingsStore.findOrDefault(settings, "ui.logo.overlay.text", "");
+            vm.logoOverlayColor = settingsStore.findOrDefault(settings, "ui.logo.overlay.color", "");
+        });
+
+
 }
 
 
-controller.$inject = [];
+controller.$inject = ['SettingsStore',];
 
 
 export default () => {

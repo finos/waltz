@@ -1,7 +1,7 @@
 import _ from "lodash";
 
 const bindings = {
-
+    logoOverlayText: '<'
 };
 
 
@@ -10,7 +10,6 @@ const template = require('./navbar-profile.html');
 
 const initialState = {
     logoOverlayText: '',
-    logoOverlayColor: '#444',
     user: null
 };
 
@@ -48,8 +47,6 @@ function controller($state,
     settingsStore
         .findAll()
         .then(settings => {
-            vm.logoOverlayText = settingsStore.findOrDefault(settings, "ui.logo.overlay.text", "");
-            vm.logoOverlayColor = settingsStore.findOrDefault(settings, "ui.logo.overlay.color", "");
             vm.allowDirectLogin = settingsStore.findOrDefault(settings, 'web.authentication', "") === 'waltz';
         });
 
