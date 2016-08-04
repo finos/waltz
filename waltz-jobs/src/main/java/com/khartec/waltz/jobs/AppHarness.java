@@ -37,8 +37,13 @@ public class AppHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
+
+        // Water & Vole
+        // P&S Blotter
+        // P & S Gorilla
+
         List<Application> jimmy = new SqlServerAppSearch()
-                .search(dsl, "e");
+                .search(dsl, "Water & Vole");
 
         System.out.println(jimmy);
 //        ApplicationService applicationService = ctx.getBean(ApplicationService.class);

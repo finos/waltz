@@ -89,12 +89,19 @@ public class JooqUtilities {
             return mkContains(terms.toArray(new String[0]));
         }
 
+
         public static SQL mkContains(String... terms) {
             StringJoiner joiner = new StringJoiner(" AND ", "CONTAINS(*, '", "')");
             Stream.of(terms)
                     .filter(StringUtilities::notEmpty)
+                    .map(t -> wrapSpecialInQuotes(t))
                     .forEach(joiner::add);
             return DSL.sql(joiner.toString());
+        }
+
+
+        private static String wrapSpecialInQuotes(String t) {
+            return t.contains("&") ? "\"" + t + "\"" : t;
         }
     }
 
