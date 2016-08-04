@@ -84,17 +84,24 @@ public class JooqUtilities {
 
     public static class MSSQL {
 
-        public static SQL mkContains(Collection<String> terms) {
+        public static SQL  mkContains(Collection<String> terms) {
             Checks.checkNotNull(terms, "terms cannot be null");
             return mkContains(terms.toArray(new String[0]));
         }
+
 
         public static SQL mkContains(String... terms) {
             StringJoiner joiner = new StringJoiner(" AND ", "CONTAINS(*, '", "')");
             Stream.of(terms)
                     .filter(StringUtilities::notEmpty)
+                    .map(t -> WrapSpecialInQuotes(t))
                     .forEach(joiner::add);
             return DSL.sql(joiner.toString());
+        }
+
+
+        private static String WrapSpecialInQuotes(String t) {
+            return t.contains("&") ? "\"" + t + "\"" : t;
         }
     }
 
