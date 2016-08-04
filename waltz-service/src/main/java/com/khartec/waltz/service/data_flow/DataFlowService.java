@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -70,7 +71,11 @@ public class DataFlowService {
 
 
     public int[] addFlows(List<DataFlow> flows) {
-        return dataFlowDao.addFlows(flows);
+        List<DataFlow> flowsExceptSameSourceAndTarget = flows.stream()
+                .filter(f -> !f.source().equals(f.target()))
+                .collect(Collectors.toList());
+
+        return dataFlowDao.addFlows(flowsExceptSameSourceAndTarget);
     }
 
 
