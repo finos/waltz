@@ -45,6 +45,15 @@ function loadDataTypeUsages(dataTypeUsageStore, appId, vm) {
 }
 
 
+function notifyIllegalFlow(notification, targetApp, flowApp) {
+    if(targetApp.id == flowApp.id) {
+        notification.warning("An application may not link to itself.");
+        return true;
+    }
+    return false;
+}
+
+
 const initialState = {
     app: null,
     currentDataTypes: [],
@@ -202,20 +211,13 @@ function controller($q,
     };
 
     vm.addSource = (app) => {
-        if(vm.app.id == app.id) {
-            notification.warning("An application may not link to itself.");
-            return;
-        }
-
+        if(notifyIllegalFlow(notification, vm.app, app)) return;
         selectSource(app);
         addApplication(app, vm.graphOptions.data.sources);
     };
 
     vm.addTarget = (app) => {
-        if(vm.app.id == app.id) {
-            notification.warning("An application may not link to itself.")
-            return;
-        }
+        if(notifyIllegalFlow(notification, vm.app, app)) return;
         selectTarget(app);
         addApplication(app, vm.graphOptions.data.targets);
     };
