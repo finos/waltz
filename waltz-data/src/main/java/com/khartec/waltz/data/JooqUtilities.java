@@ -94,13 +94,13 @@ public class JooqUtilities {
             StringJoiner joiner = new StringJoiner(" AND ", "CONTAINS(*, '", "')");
             Stream.of(terms)
                     .filter(StringUtilities::notEmpty)
-                    .map(t -> WrapSpecialInQuotes(t))
+                    .map(t -> wrapSpecialInQuotes(t))
                     .forEach(joiner::add);
             return DSL.sql(joiner.toString());
         }
 
 
-        private static String WrapSpecialInQuotes(String t) {
+        private static String wrapSpecialInQuotes(String t) {
             return t.contains("&") ? "\"" + t + "\"" : t;
         }
     }
