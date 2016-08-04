@@ -84,7 +84,7 @@ public class JooqUtilities {
 
     public static class MSSQL {
 
-        public static SQL  mkContains(Collection<String> terms) {
+        public static SQL mkContains(Collection<String> terms) {
             Checks.checkNotNull(terms, "terms cannot be null");
             return mkContains(terms.toArray(new String[0]));
         }
