@@ -16,7 +16,8 @@
  *
  */
 const bindings = {
-    panel: '<'
+    panel: '<',
+    renderMode: '<'
 };
 
 

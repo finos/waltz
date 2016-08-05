@@ -2301,16 +2301,4 @@
         </sql>
     </changeSet>
 
-
-    <!-- 212 control rendering of static panels -->
-    <changeSet author="kamransaleem" id="20160805-212-1">
-        <addColumn tableName="static_panel">
-            <column name="renderer"
-                    type="VARCHAR(128)"
-                    defaultValue="section">
-                <constraints nullable="false"/>
-            </column>
-        </addColumn>
-    </changeSet>
-
 </databaseChangeLog>

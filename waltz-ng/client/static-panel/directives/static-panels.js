@@ -16,22 +16,35 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+import {initialiseData} from "../../common";
+
+const bindings = {
+    panels: '<',
+    renderMode: '@'
+};
+
+
+const template = require('./static-panels.html');
+
+
+const initialData = {
+    renderMode: 'section'
+}
+
 
 function controller() {
-
+   const vm = initialiseData(this, initialData);
 }
+
 
 controller.$inject = [];
 
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
-    scope: {
-        panels: '='
-    },
-    template: require('./static-panels.html'),
-    bindToController: true,
-    controllerAs: 'ctrl',
+const component = {
+    bindings,
+    template,
     controller
-});
+};
+
+
+export default component;

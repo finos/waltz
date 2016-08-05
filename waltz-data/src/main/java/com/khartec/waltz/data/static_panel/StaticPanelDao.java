@@ -29,7 +29,6 @@ public class StaticPanelDao {
                 .title(record.getTitle())
                 .priority(record.getPriority())
                 .width(record.getWidth())
-                .renderer(record.getRenderer())
                 .build();
     };
 

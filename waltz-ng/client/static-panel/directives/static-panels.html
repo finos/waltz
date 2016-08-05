@@ -1,6 +1,8 @@
 <div class="row">
-    <div class='col-sm-{{panel.width}}' ng-repeat="panel in ctrl.panels | orderBy:'priority'">
-        <waltz-static-panel panel="panel">
+    <div class='col-sm-{{panel.width}}'
+         ng-repeat="panel in $ctrl.panels | orderBy:'priority'">
+        <waltz-static-panel panel="panel"
+                            render-mode="$ctrl.renderMode">
 
         </waltz-static-panel>
     </div>
