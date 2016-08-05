@@ -9,23 +9,6 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from "lodash";
-
-
-function extractDefinitionIdsFromImmediateHierarchy(hierarchy) {
-    const definitions = [
-        hierarchy.self,
-        hierarchy.parent,
-        ...hierarchy.siblings,
-        ...hierarchy.children
-    ];
-
-    return _.chain(definitions)
-        .filter(s => s != null)
-        .map('id')
-        .value();
-}
-
 
 function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/entity-statistic`;
@@ -46,12 +29,7 @@ function store($http, BaseApiUrl) {
         .get(`${BASE}/definition/${statId}/related`)
         .then(r => r.data);
 
-    const findStatTallies = (definitions, selector) => {
-
-        const statisticIds = _.isArray(definitions)
-            ? definitions
-            : extractDefinitionIdsFromImmediateHierarchy(definitions);
-
+    const findStatTallies = (statisticIds = [], selector) => {
         const options = {
             selector,
             statisticIds
@@ -62,12 +40,19 @@ function store($http, BaseApiUrl) {
             .then(r => r.data);
     };
 
+    const calculateStatTally = (definition, selector) => {
+        return $http
+            .post(`${BASE}/tally/${definition.id}/${definition.rollupKind}`, selector)
+            .then(r => r.data);
+    };
+
     return {
         findAllActiveDefinitions,
         findStatDefinition,
         findStatValuesByIdSelector,
         findRelatedStatDefinitions,
-        findStatTallies
+        findStatTallies,
+        calculateStatTally
     };
 }
 

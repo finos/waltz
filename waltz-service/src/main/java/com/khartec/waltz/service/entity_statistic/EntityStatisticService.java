@@ -11,17 +11,24 @@ import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
+import com.khartec.waltz.model.entity_statistic.RollupKind;
 import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchy;
 import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchyUtilities;
+import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.model.tally.TallyPack;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.concat;
+import static com.khartec.waltz.common.MapUtilities.groupBy;
+import static java.util.Collections.emptyList;
 
 @Service
 public class EntityStatisticService {
@@ -85,12 +92,45 @@ public class EntityStatisticService {
         Checks.checkNotNull(options, "options cannot be null");
 
         Select<Record1<Long>> appIdSelector = factory.apply(options);
-        return summaryDao.findStatTallies(statisticIds, appIdSelector);
+
+        Map<RollupKind, Collection<Long>> definitionIdsByRollupKind = groupBy(
+                d -> d.rollupKind(),
+                d -> d.id().orElse(null),
+                definitionDao.findByIds(statisticIds));
+
+
+        return concat(
+                summaryDao.generateWithCountByEntity(
+                        definitionIdsByRollupKind.getOrDefault(RollupKind.COUNT_BY_ENTITY, emptyList()),
+                        appIdSelector),
+                summaryDao.generateWithSumByValue(
+                        definitionIdsByRollupKind.getOrDefault(RollupKind.SUM_BY_VALUE, emptyList()),
+                        appIdSelector)
+        );
+
     }
 
 
-    public EntityStatisticDefinition findDefinition(long id) {
-        return definitionDao.getDefinition(id);
+    public List<StringTally> calculateStatTally(Long statisticId, RollupKind rollupKind, IdSelectionOptions options) {
+        Checks.checkNotNull(statisticId, "statisticId cannot be null");
+        Checks.checkNotNull(options, "options cannot be null");
+        Checks.checkNotNull(rollupKind, "rollupKind cannot be null");
+
+        Select<Record1<Long>> appIdSelector = factory.apply(options);
+
+        switch(rollupKind) {
+            case COUNT_BY_ENTITY:
+                return summaryDao.generateWithCountByEntity(statisticId, appIdSelector);
+            case SUM_BY_VALUE:
+                return summaryDao.generateWithSumByValue(statisticId, appIdSelector);
+            default:
+                throw new UnsupportedOperationException(String.format("Rollup kind [%s] not supported.", rollupKind));
+        }
+    }
+
+
+    public EntityStatisticDefinition getDefinitionById(long id) {
+        return definitionDao.getById(id);
     }
 
 

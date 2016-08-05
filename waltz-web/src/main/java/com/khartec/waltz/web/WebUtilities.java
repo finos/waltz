@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkAll;
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -234,8 +235,8 @@ public class WebUtilities {
     public static <T extends Enum<T>> T readEnum(Request request,
                                                  String paramName,
                                                  Class<T> enumClass,
-                                                 T dflt) {
-        return EnumUtilities.readEnum(request.params(paramName), enumClass, dflt);
+                                                 Function<String, T> failedParseSupplier) {
+        return EnumUtilities.readEnum(request.params(paramName), enumClass, failedParseSupplier);
     }
 
 

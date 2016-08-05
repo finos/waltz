@@ -70,7 +70,6 @@ function controller($q,
     $q.all([navItemPromise, definitionPromise])
         .then(() => /* boot */ vm.onSelectNavItem(_.find(vm.navItems, { id: entityId })));
 
-
     function resetValueData() {
         const clearData = resetData({}, initData);
         vm.statistic.summary = clearData.statistic.summary;
@@ -97,8 +96,8 @@ function controller($q,
         };
 
         entityStatisticStore
-            .findStatTallies([statId], selector)
-            .then(summaries => vm.statistic.summary = summaries[0])
+            .calculateStatTally(vm.statistic.definition, selector)
+            .then(summary => vm.statistic.summary = summary)
             .then(() => {
                 const related = [
                     vm.relatedDefinitions.parent,
@@ -117,7 +116,6 @@ function controller($q,
         entityStatisticStore
             .findStatValuesByIdSelector(statId, selector)
             .then(stats => vm.statistic.values = stats);
-
 
         applicationStore
             .findBySelector(selector)

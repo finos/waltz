@@ -17,15 +17,20 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
+import com.khartec.waltz.model.entity_statistic.RollupKind;
 import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchy;
+import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.json.EntityStatisticQueryOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -46,6 +51,8 @@ public class EntityStatisticEndpoint implements Endpoint {
 
     private final EntityStatisticService entityStatisticService;
 
+    private static final Logger LOG = LoggerFactory.getLogger(EntityStatisticEndpoint.class);
+
 
     @Autowired
     public EntityStatisticEndpoint(EntityStatisticService entityStatisticService) {
@@ -65,6 +72,22 @@ public class EntityStatisticEndpoint implements Endpoint {
     }
 
 
+    private List<StringTally> calculateStatTallyRoute(Request request, Response response) throws IOException {
+        IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
+        RollupKind rollupKind = readEnum(
+                request,
+                "rollupKind",
+                RollupKind.class,
+                (s) -> {
+                    String msg = String.format("rollupKind cannot be [%s]", s);
+                    throw new UnsupportedOperationException(msg);
+                });
+
+        Long statisticId = getId(request);
+        return entityStatisticService.calculateStatTally(statisticId, rollupKind, idSelectionOptions);
+    }
+
+
     @Override
     public void register() {
 
@@ -73,12 +96,13 @@ public class EntityStatisticEndpoint implements Endpoint {
         String findRelatedStatDefinitionsPath = mkPath(BASE_URL, "definition" , ":statId", "related");
         String findStatValuesBySelectorPath = mkPath(BASE_URL, "value", ":statId");
         String findStatTalliesPath = mkPath(BASE_URL, "tally");
+        String calculateStatTallyPath = mkPath(BASE_URL, "tally", ":id", ":rollupKind");
 
         ListRoute<EntityStatisticDefinition> findAllActiveDefinitionsRoute = (request, response)
                 -> entityStatisticService.findAllActiveDefinitions();
 
         DatumRoute<EntityStatisticDefinition> findDefinitionRoute = (request, response)
-                -> entityStatisticService.findDefinition(getId(request));
+                -> entityStatisticService.getDefinitionById(getId(request));
 
         ListRoute<EntityStatisticValue> findStatValuesForAppSelectorRoute = (request, response)
                 -> entityStatisticService.getStatisticValuesForAppIdSelector(getLong(request, "statId"), readIdSelectionOptionsFromBody(request));
@@ -89,6 +113,7 @@ public class EntityStatisticEndpoint implements Endpoint {
         getForList(findAllActiveDefinitionsPath, findAllActiveDefinitionsRoute);
         postForList(findStatValuesBySelectorPath, findStatValuesForAppSelectorRoute);
         postForList(findStatTalliesPath, this::findStatTalliesRoute);
+        postForList(calculateStatTallyPath, this::calculateStatTallyRoute);
         getForDatum(findRelatedStatDefinitionsPath, findRelatedStatDefinitionsRoute);
         getForDatum(findDefinitionPath, findDefinitionRoute);
     }

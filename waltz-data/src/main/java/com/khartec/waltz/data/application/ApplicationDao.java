@@ -56,9 +56,9 @@ public class ApplicationDao {
                 .parentAssetCode(Optional.ofNullable(appRecord.getParentAssetCode()))
                 .id(appRecord.getId())
                 .organisationalUnitId(appRecord.getOrganisationalUnitId())
-                .kind(readEnum(appRecord.getKind(), ApplicationKind.class, ApplicationKind.IN_HOUSE))
-                .lifecyclePhase(readEnum(appRecord.getLifecyclePhase(), LifecyclePhase.class, LifecyclePhase.DEVELOPMENT))
-                .overallRating(readEnum(appRecord.getOverallRating(), RagRating.class, RagRating.Z))
+                .kind(readEnum(appRecord.getKind(), ApplicationKind.class, (s) -> ApplicationKind.IN_HOUSE))
+                .lifecyclePhase(readEnum(appRecord.getLifecyclePhase(), LifecyclePhase.class, (s) -> LifecyclePhase.DEVELOPMENT))
+                .overallRating(readEnum(appRecord.getOverallRating(), RagRating.class, (s) -> RagRating.Z))
                 .provenance(appRecord.getProvenance())
                 .build();
 

@@ -48,7 +48,7 @@ public class OrganisationalUnitDao {
                 .description(orgUnitRecord.getDescription())
                 .id(orgUnitRecord.getId())
                 .parentId(Optional.ofNullable(orgUnitRecord.getParentId()))
-                .kind(readEnum(orgUnitRecord.getKind(), OrganisationalUnitKind.class, OrganisationalUnitKind.IT))
+                .kind(readEnum(orgUnitRecord.getKind(), OrganisationalUnitKind.class, (s) -> OrganisationalUnitKind.IT))
                 .build();
     };
 
