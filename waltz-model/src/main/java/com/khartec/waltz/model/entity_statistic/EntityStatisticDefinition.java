@@ -19,6 +19,12 @@ public abstract class EntityStatisticDefinition implements
     public abstract StatisticType type();
     public abstract StatisticCategory category();
     public abstract boolean active();
+
+    @Value.Default
+    public RollupKind rollupKind() {
+        return RollupKind.COUNT_BY_ENTITY;
+    }
+
     public abstract String renderer();
     public abstract String historicRenderer();
     public abstract Boolean entityVisibility();

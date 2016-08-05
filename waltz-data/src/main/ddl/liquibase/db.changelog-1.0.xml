@@ -2294,11 +2294,25 @@
 
 
     <!-- 372 remove self linking data flows -->
+
     <changeSet author="kamransaleem" id="20160803-372-1">
         <sql>
             DELETE FROM data_flow
             WHERE source_entity_id = target_entity_id;
         </sql>
+    </changeSet>
+
+
+    <!-- 394 : Indicators should allow sum-by-value as well as count-by-entity -->
+
+    <changeSet author="dwatkins" id="20160805-394-1">
+        <addColumn tableName="entity_statistic_definition">
+            <column name="rollup_kind"
+                    type="VARCHAR(64)"
+                    defaultValue="COUNT_BY_ENTITY">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>

@@ -38,7 +38,7 @@ function controller() {
 
     vm.$onChanges = () => {
         vm.pie = mkStatChartData(
-            vm.summary ? vm.summary.tallies : [],
+            vm.summary,
             pieClickHandler);
     }
 }

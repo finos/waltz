@@ -63,7 +63,22 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
             .type(StatisticType.NUMERIC)
             .renderer("bar")
             .historicRenderer("bar")
-            .name("Open Audit Issues")
+            .entityVisibility(true)
+            .rollupVisibility(true)
+            .provenance(PROVENANCE)
+            .build();
+
+
+    private static final EntityStatisticDefinition SERVER_COUNT = ImmutableEntityStatisticDefinition.builder()
+            .active(true)
+            .id(20010L)
+            .category(StatisticCategory.SECURITY)
+            .name("Server Type Count")
+            .description("Server Types")
+            .type(StatisticType.NUMERIC)
+            .rollupKind(RollupKind.SUM_BY_VALUE)
+            .renderer("bar")
+            .historicRenderer("bar")
             .entityVisibility(true)
             .rollupVisibility(true)
             .provenance(PROVENANCE)
@@ -139,6 +154,7 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
         definitionDao.insert(SDLC_SVN);
         definitionDao.insert(SDLC_WIKI);
         definitionDao.insert(AUDIT);
+        definitionDao.insert(SERVER_COUNT);
 
         createAdoptionStatsFor(SDLC_TECH, applications, valueDao);
         createAdoptionStatsFor(SDLC_PROCESS, applications, valueDao);
@@ -147,6 +163,9 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
         createAdoptionStatsFor(SDLC_WIKI, applications, valueDao);
         createIntStatsFor(AUDIT, applications, valueDao, 20, failIfPositiveFn);
         createIntStatsFor(SDLC, applications, valueDao, 20, failIfPositiveFn);
+
+        createIntStatsFor(SERVER_COUNT, applications, valueDao, 20, (x, y) -> "VIRTUAL");
+        createIntStatsFor(SERVER_COUNT, applications, valueDao, 20, (x, y) -> "BARE_METAL");
 
         return null;
     }
@@ -167,6 +186,9 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
                     int v = state == StatisticValueState.PROVIDED
                             ? rnd.nextInt(bound)
                             : 0;
+
+                    // naughty
+                    v = rnd.nextInt(bound);
 
                     return ImmutableEntityStatisticValue.builder()
                             .entity(appRef)

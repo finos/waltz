@@ -19,21 +19,26 @@ package com.khartec.waltz.common;
 
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.khartec.waltz.common.Checks.checkNotNull;
 
 
 public class EnumUtilities {
 
-    public static <T extends Enum<T>> T readEnum(String value, Class<T> enumClass, T dflt) {
-        Checks.checkNotNull(enumClass, "Enum class must be supplied");
+    public static <T extends Enum<T>> T readEnum(String value, Class<T> enumClass, Function<String, T> failedParseSupplier) {
+        checkNotNull(enumClass, "Enum class must be supplied");
+        checkNotNull(failedParseSupplier, "failedParseSupplier cannot be null");
+
         EnumSet<T> set = EnumSet.allOf(enumClass);
         for (T t : set) {
             if (t.name().equals(value)) {
                 return t;
             }
         }
-        return dflt;
+        return failedParseSupplier.apply(value);
     }
 
 

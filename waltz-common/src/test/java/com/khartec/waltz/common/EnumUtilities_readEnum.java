@@ -18,21 +18,21 @@ public class EnumUtilities_readEnum {
 
     @Test
     public void canReadEnum() {
-        assertEquals(MyEnum.A, readEnum("A", MyEnum.class, null));
-        assertEquals(MyEnum.B, readEnum("B", MyEnum.class, null));
+        assertEquals(MyEnum.A, readEnum("A", MyEnum.class, (s) -> null));
+        assertEquals(MyEnum.B, readEnum("B", MyEnum.class, (s) -> null));
     }
 
 
     @Test
     public void defaultValueUsedIfNoMatch() {
-        assertEquals(MyEnum.A, readEnum("Z", MyEnum.class, MyEnum.A));
-        assertEquals(null, readEnum("Z", MyEnum.class, null));
+        assertEquals(MyEnum.A, readEnum("Z", MyEnum.class, (s) -> MyEnum.A));
+        assertEquals(null, readEnum("Z", MyEnum.class, (s) -> null));
     }
 
 
     @Test(expected = IllegalArgumentException.class)
     public void badIfNoEnumClass() {
-        readEnum("A", null, MyEnum.A);
+        readEnum("A", null, (s) -> MyEnum.A);
     }
 
 }

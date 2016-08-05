@@ -18,11 +18,14 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
-import com.khartec.waltz.model.*;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
+import org.jooq.AggregateFunction;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.math.BigDecimal;
 
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
@@ -40,21 +43,23 @@ public class EntityStatisticHarness {
         EntityStatisticValueDao dao = ctx.getBean(EntityStatisticValueDao.class);
         EntityStatisticService service = ctx.getBean(EntityStatisticService.class);
 
+        /*
+        select
+  outcome,
+  sum(CASE ISNUMERIC(value) when 1 then cast(value as BIGINT) else 0 end)
+from entity_statistic_value
+where statistic_id = 20010
+GROUP BY outcome;
+         */
 
-        long CTO = 40;
-        long OPS = 140;
-        IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
-                .entityReference(ImmutableEntityReference
-                        .builder()
-                        .kind(EntityKind.ORG_UNIT)
-                        .id(OPS)
-                        .build())
-                .scope(HierarchyQueryScope.CHILDREN)
-                .build();
+        AggregateFunction<BigDecimal> summer = DSL.sum(DSL.cast(esv.VALUE, Long.class));
 
-
-//        ImmediateHierarchy<EntityStatisticSummary> hier = service.findRelatedStatsSummaries(34L, options);
-//        List<TallyPack<String>> statTallies = service.findStatTallies(ListUtilities.newArrayList(31L, 34L), options);
+        dsl.select(esv.OUTCOME, summer)
+                .from(esv)
+                .where(esv.STATISTIC_ID.eq(20010L))
+                .groupBy(esv.OUTCOME)
+                .fetch()
+                .forEach(System.out::println);
 
 
         System.out.println("done");

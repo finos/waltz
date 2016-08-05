@@ -1,10 +1,7 @@
 package com.khartec.waltz.data.entity_statistic;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
-import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticDefinition;
-import com.khartec.waltz.model.entity_statistic.StatisticCategory;
-import com.khartec.waltz.model.entity_statistic.StatisticType;
+import com.khartec.waltz.model.entity_statistic.*;
 import com.khartec.waltz.schema.tables.records.EntityStatisticDefinitionRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +31,7 @@ public class EntityStatisticDefinitionDao {
                 .type(StatisticType.valueOf(record.getType()))
                 .category(StatisticCategory.valueOf(record.getCategory()))
                 .active(record.getActive())
+                .rollupKind(RollupKind.valueOf(record.getRollupKind()))
                 .renderer(record.getRenderer())
                 .historicRenderer(record.getHistoricRenderer())
                 .provenance(record.getProvenance())
@@ -54,6 +52,7 @@ public class EntityStatisticDefinitionDao {
         record.setType(domainObj.type().name());
         record.setCategory(domainObj.category().name());
         record.setActive(domainObj.active());
+        record.setRollupKind(domainObj.rollupKind().name());
         record.setRenderer(domainObj.renderer());
         record.setHistoricRenderer(domainObj.historicRenderer());
         record.setProvenance(domainObj.provenance());
@@ -148,10 +147,17 @@ public class EntityStatisticDefinitionDao {
                 .fetch(TO_DEFINITION_MAPPER);
     }
 
-    public EntityStatisticDefinition getDefinition(long id) {
+    public EntityStatisticDefinition getById(long id) {
         return dsl.select(esd.fields())
                 .from(esd)
                 .where(esd.ID.eq(id))
                 .fetchOne(TO_DEFINITION_MAPPER);
+    }
+
+    public List<EntityStatisticDefinition> findByIds(List<Long> ids) {
+        return dsl.select(esd.fields())
+                .from(esd)
+                .where(esd.ID.in(ids))
+                .fetch(TO_DEFINITION_MAPPER);
     }
 }
