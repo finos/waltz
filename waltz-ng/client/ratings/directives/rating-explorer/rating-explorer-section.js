@@ -252,10 +252,8 @@ function controller($scope) {
 
     const vm = _.defaultsDeep(this, initData);
 
-    vm.focusOnCapability = (cap, desiredScore /* optional */) => {
-        const scores = desiredScore
-            ? _.filter(cap.details.cumulative, ({ appId, score }) => score === desiredScore)
-            : cap.details.cumulative;
+    vm.focusOnCapability = (cap) => {
+        const scores = cap.details.cumulative;
 
         vm.focusedApps = _.chain(scores)
             .uniqBy("appId")
@@ -264,7 +262,6 @@ function controller($scope) {
             .value();
 
         vm.focusedCapability = cap;
-        vm.focusedScore = desiredScore;
         vm.visibility.appList = true;
     };
 

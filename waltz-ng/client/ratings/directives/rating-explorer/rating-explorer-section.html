@@ -32,7 +32,7 @@
                 <treecontrol class="tree-light"
                              tree-model="ctrl.capabilityTree.data"
                              order-by="'-name'"
-                             on-selection="ctrl.focusOnCapability(node)"
+                             on-selection="ctrl.focusOnCapability(node, selected)"
                              options="ctrl.capabilityTree.options">
                         <span ng-class="{ 'waltz-inherited-value' : node.implied }">
                             <span class="waltz-visibility-parent">
