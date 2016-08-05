@@ -1,6 +1,5 @@
 package com.khartec.waltz.data.static_panel;
 
-import com.khartec.waltz.model.serverinfo.ServerInfo;
 import com.khartec.waltz.model.staticpanel.ContentKind;
 import com.khartec.waltz.model.staticpanel.ImmutableStaticPanel;
 import com.khartec.waltz.model.staticpanel.StaticPanel;
