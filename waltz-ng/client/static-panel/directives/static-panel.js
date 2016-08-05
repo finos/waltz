@@ -15,22 +15,26 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+const bindings = {
+    panel: '<'
+};
+
+
+const template = require('./static-panel.html');
+
 
 function controller() {
-
 }
+
 
 controller.$inject = [];
 
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
-    scope: {
-        panel: '='
-    },
-    template: require('./static-panel.html'),
-    bindToController: true,
-    controllerAs: 'ctrl',
+const component = {
+    template,
+    bindings,
     controller
-});
+};
+
+
+export default component;

@@ -20,6 +20,7 @@
 export default (module) => {
     module.service('StaticPanelStore', require('./services/static-panel-store'));
 
-    module.directive('waltzStaticPanel', require('./directives/static-panel'));
     module.directive('waltzStaticPanels', require('./directives/static-panels'));
+
+    module.component('waltzStaticPanel', require('./directives/static-panel'));
 };

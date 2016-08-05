@@ -1,8 +1,33 @@
-<div>
-    <waltz-section icon="{{ ctrl.panel.icon }}"
-                   name="{{ ctrl.panel.title }}">
-        <div ng-bind-html="ctrl.panel.content">
-
+<div class="waltz-static-panel">
+    <waltz-section icon="{{ $ctrl.panel.icon }}"
+                   name="{{ $ctrl.panel.title }}"
+                   ng-if="$ctrl.panel.renderer === 'section'">
+        <div ng-bind-html="$ctrl.panel.content">
         </div>
     </waltz-section>
+
+    <div class="wsp-chromeless"
+         ng-if="$ctrl.panel.renderer === 'chromeless'">
+        <h3>
+            <waltz-icon name="{{ $ctrl.panel.icon }}">
+            </waltz-icon>
+            <span ng-bind="$ctrl.panel.title">
+            </span>
+        </h3>
+        <div ng-bind-html="$ctrl.panel.content">
+        </div>
+    </div>
+
+
+    <div class="wsp-minimal-border"
+         ng-if="$ctrl.panel.renderer === 'minimal-border'">
+        <h3>
+            <waltz-icon name="{{ $ctrl.panel.icon }}">
+            </waltz-icon>
+            <span ng-bind="$ctrl.panel.title">
+            </span>
+        </h3>
+        <div ng-bind-html="$ctrl.panel.content">
+        </div>
+    </div>
 </div>

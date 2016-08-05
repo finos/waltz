@@ -32,6 +32,7 @@ public abstract class StaticPanel implements IdProvider {
     public abstract String icon();
     public abstract String group();
     public abstract String content();
+    public abstract String renderer();
 
     public abstract int priority();
 
