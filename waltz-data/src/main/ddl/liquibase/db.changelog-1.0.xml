@@ -2134,7 +2134,8 @@
 
     <!-- 293 User preferences -->
     <changeSet author="kamransaleem"
-               id="20160715-293-1">
+               id="20160715-293-1"
+               failOnError="false">
         <createTable tableName="user_preference">
             <column name="key"
                     type="VARCHAR(512)">
@@ -2314,5 +2315,40 @@
             </column>
         </addColumn>
     </changeSet>
+
+
+    <!-- 405 User preference 767 primary key limit on mariadb when UTF8 -->
+    <changeSet author="kamransaleem"
+               id="20160808-405-1">
+        <dropTable tableName="user_preference"/>
+    </changeSet>
+
+
+    <changeSet author="kamransaleem"
+               id="20160808-405-2">
+        <createTable tableName="user_preference">
+            <column name="key"
+                    type="VARCHAR(120)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value"
+                    type="VARCHAR(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet author="kamransaleem"
+               id="20160808-405-3">
+        <addPrimaryKey columnNames="user_name, key"
+                       constraintName="user_preference_pkey"
+                       tableName="user_preference"/>
+    </changeSet>
+
+
 
 </databaseChangeLog>
