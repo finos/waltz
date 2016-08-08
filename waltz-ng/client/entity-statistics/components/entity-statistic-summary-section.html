@@ -23,7 +23,19 @@
 
             <div class="col-md-8">
                 <div ng-if="$ctrl.activeSummary == null && ! $ctrl.loading">
-                    Select an indicator to see more...
+                    <div class="alert alert-info">
+                        <waltz-icon size="lg"
+                                    name="info">
+                        </waltz-icon>
+
+                        <span style="padding-left: 24px">
+                            Select an <strong>indicator</strong>
+                            from the tree on the left to see
+                            details.
+                        </span>
+                    </div>
+
+
                 </div>
                 <div ng-if="$ctrl.activeSummary != null && $ctrl.loading"
                      style="height: 230px">
