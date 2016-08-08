@@ -1,27 +1,63 @@
-/*
- *  Waltz
- * Copyright (c) David Watkins. All rights reserved.
- * The use and distribution terms for this software are covered by the
- * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
- * which can be found in the file epl-v10.html at the root of this distribution.
- * By using this software in any fashion, you are agreeing to be bound by
- * the terms of this license.
- * You must not remove this notice, or any other, from this software.
- *
- */
+@import "../../style/variables";
+@import "../../style/util";
+
 
 .waltz-page-header {
-  padding: 6px 6px 6px 16px;
-  background-color: $waltz-section-background-color;
-  border-top-left-radius: 10px;
-  //border-bottom-right-radius: 30%;
-  border-top-right-radius: 10px;
-  margin-bottom: 12px;
-  border: 1px solid $waltz-border-color-lighter;
-  @include waltz-box-shadow()
+
+    background-color: $waltz-section-background-color;
+
+
+    @include waltz-box-shadow();
+
 }
 
-.waltz-page-header h2 {
-  margin-top: 6px;
-  margin-bottom: 4px;
+
+.waltz-page-header.wph-free {
+    padding: 6px 6px 6px 16px;
+    border-top-left-radius: 10px;
+    height: 80px;
+    border-top-right-radius: 10px;
+    margin-bottom: 12px;
+    border: 1px solid $waltz-border-color-lighter;
+
+    h2 {
+        margin-top: 6px;
+        margin-bottom: 4px;
+        @include transition(font-size 0.4s);
+    }
+
+    @include transition(height 0.2s);
 }
+
+
+
+.waltz-page-header.wph-sticky {
+    width: 100%;
+    height: 30px;
+    overflow: hidden;
+    position: fixed;
+    top: 50px;
+    left: 0px;
+    z-index: 999;
+    border-bottom: 2px solid $waltz-border-color-lighter;
+
+    h2 {
+        margin: 4px;
+        padding-top: 2px;
+        padding-left: 36px;
+        font-size: medium;
+        display: inline-block;
+
+        @include transition(font-size 0.4s);
+    }
+
+    ul {
+        float: right;
+        display: inline-block;
+    }
+
+    @include transition(height 0.4s);
+
+
+}
+

@@ -1,5 +1,9 @@
-<div class="waltz-page-header">
-    <div ng-transclude></div>
+<div class="waltz-page-header"
+     ng-class="{
+        'wph-sticky' : ctrl.sticky,
+        'wph-free': !ctrl.sticky
+     }">
+    <div ng-if="! ctrl.sticky" ng-transclude></div>
     <h2>
         <waltz-icon name="{{ ctrl.icon || 'dot-circle-o' }}"
                     fixed="true"></waltz-icon>
