@@ -2328,7 +2328,7 @@
                id="20160808-405-2">
         <createTable tableName="user_preference">
             <column name="key"
-                    type="VARCHAR(120)">
+                    type="VARCHAR(512)">
                 <constraints nullable="false"/>
             </column>
             <column name="value"

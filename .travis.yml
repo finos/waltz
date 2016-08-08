@@ -21,7 +21,7 @@ addons:
 install: true
 
 before_install:
-  - mysql -u root -e "create database IF NOT EXISTS waltz;"
+  - mysql -u root -e "create database IF NOT EXISTS waltz CHARACTER SET='utf8';"
   - npm install npm -g
 
 # Enable caching of dependencies
