@@ -27,6 +27,7 @@ function updateUrlWithoutReload($state, person) {
 function controller($q,
                     $state,
                     $stateParams,
+                    applicationStore,
                     entityStatisticStore,
                     personStore) {
 
@@ -36,7 +37,6 @@ function controller($q,
 
     const personPromise = personStore
         .getById(personId);
-
 
     const definitionPromise = entityStatisticStore
         .findRelatedStatDefinitions(statId)
@@ -70,9 +70,10 @@ function controller($q,
             entityReference
         };
 
+
         entityStatisticStore
-            .findStatTallies([statId], selector)
-            .then(summaries => vm.statistic.summary = summaries[0])
+            .calculateStatTally(vm.statistic.definition, selector)
+            .then(summary => vm.statistic.summary = summary)
             .then(() => {
                 const related = [
                     vm.relatedDefinitions.parent,
@@ -106,6 +107,10 @@ function controller($q,
             .then(peers => _.reject(peers, p => p.id === person.id))
             .then(peers => vm.peers = peers);
 
+        applicationStore
+            .findBySelector(selector)
+            .then(apps => vm.applications = apps);
+
         updateUrlWithoutReload($state, person);
     };
 
@@ -116,6 +121,7 @@ controller.$inject = [
     '$q',
     '$state',
     '$stateParams',
+    'ApplicationStore',
     'EntityStatisticStore',
     'PersonStore'
 ];

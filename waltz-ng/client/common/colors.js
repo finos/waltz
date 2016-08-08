@@ -144,7 +144,7 @@ const variableColorList = [
             'B',
             'NOT_STARTED',
             'BLUE'
-      ]
+        ]
     }, {
         color: grey,
         keys: [
@@ -173,6 +173,10 @@ const variableScaleMap = _.reduce(
 const randomColorScale = d3.scale.category20();
 
 
-export const variableScale = (x) => variableScaleMap[x.toUpperCase()] || d3.rgb(randomColorScale(x));
+export const variableScale = (x) => {
+    var key = x.toUpperCase();
+    var foundColor = variableScaleMap[key];
+    return foundColor || d3.rgb(randomColorScale(x));
+};
 
 
