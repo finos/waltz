@@ -10,6 +10,8 @@
  *
  */
 
+import angular from 'angular';
+
 const BINDINGS = {
     name: '@',
     icon: '@',
@@ -17,17 +19,40 @@ const BINDINGS = {
 };
 
 
-function controller($document) {
+function controller($anchorScroll,
+                    $document,
+                    $location,
+                    $scope,
+                    $window) {
     const vm = this;
+
+    vm.sticky = false;
 
     vm.$onChanges = () => {
         $document[0].title = `Waltz: ${vm.name}`;
-    }
+    };
+
+    angular
+        .element($window)
+        .bind("scroll", () => {
+            vm.sticky = $window.pageYOffset > 60;
+            $scope.$apply();
+        });
+
+
+    vm.goTo = (sectionId) => {
+        $location.hash(sectionId);
+        $anchorScroll();
+    };
 }
 
 
 controller.$inject=[
-    '$document'
+    '$anchorScroll',
+    '$document',
+    '$location',
+    '$scope',
+    '$window'
 ];
 
 

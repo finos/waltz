@@ -15,12 +15,12 @@
     "padded-blocks": 0,
     "no-console": 0,
     "new-cap": 1,
-    "indent": [2, 4],
+    "indent": [2, 4, { "SwitchCase": 1 }],
     "no-else-return" : 0,
     "comma-dangle": 0
   },
   "plugins": [
-//    "react"
+//        "airbnb"
   ],
   "globals": {
     "__DEVELOPMENT__": true,
@@ -31,8 +31,10 @@
     "__PORT__" : true
   },
     "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module",
         "ecmaFeatures": {
-            "jsx": true,
+            "jsx": false,
             "modules": true
         }
     }

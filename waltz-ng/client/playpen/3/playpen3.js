@@ -1,38 +1,39 @@
-import _ from "lodash";
-
+import angular from 'angular';
 
 const initData = {
-    statistic: {
-        definition: null,
-        summary: null,
-        values: []
-    },
+    stick: false
 };
 
-function perpareBars(stats = []) {
-    const extent = d3.extent(stats, s => Number(s.value));
-    console.log(extent, _.map(stats, s=> Number(s.value)));
-}
 
-function controller(entityStatisticStore) {
+function controller($anchorScroll,
+                    $location,
+                    $scope,
+                    $window) {
 
-    const vm = this;
+    const vm = Object.assign(this, initData);
 
-    vm.entityRef =  {
-            id: 30,
-            kind: 'ORG_UNIT'
+    angular
+        .element($window)
+        .bind("scroll", () => {
+            vm.stick = $window.pageYOffset > 80;
+            $scope.$apply()
+        });
+
+
+    vm.goTo = (sectionId) => {
+        $location.hash(sectionId);
+        $anchorScroll();
     };
-
-    entityStatisticStore
-        .findAllActiveDefinitions()
-        .then(d => vm.definitions = d);
 
 
 }
 
 
 controller.$inject = [
-    'EntityStatisticStore'
+    '$anchorScroll',
+    '$location',
+    '$scope',
+    '$window'
 ];
 
 
