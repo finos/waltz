@@ -19,15 +19,18 @@ package com.khartec.waltz.model.datatype;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.CodeProvider;
-import com.khartec.waltz.model.DescriptionProvider;
-import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableDataType.class)
 @JsonDeserialize(as = ImmutableDataType.class)
-public abstract class DataType implements NameProvider, DescriptionProvider, CodeProvider {
+public abstract class DataType implements
+        NameProvider,
+        DescriptionProvider,
+        CodeProvider,
+        IdProvider,
+        ParentIdProvider {
 
 }

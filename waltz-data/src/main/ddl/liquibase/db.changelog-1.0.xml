@@ -2350,5 +2350,76 @@
     </changeSet>
 
 
+    <!-- 383 : DataType Id and ParentId -->
+    <changeSet author="kamransaleem"
+               id="20160808-383-1">
+        <addColumn tableName="data_type">
+            <column name="id"
+                    type="${long.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="parent_id"
+                    type="${long.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet author="kamransaleem"
+               id="20160808-383-2"
+               dbms="mssql">
+        <sql>
+            UPDATE data_type
+            SET id = t.id
+            FROM (
+                (SELECT dt.code,
+                        (SELECT (count(*) + 1) * 1000 FROM data_type WHERE code &lt; dt.code) AS id
+                 FROM data_type dt) t
+            JOIN data_type dt ON t.code = dt.code)
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="kamransaleem"
+               id="20160808-383-2"
+               dbms="mysql">
+        <sql>
+            UPDATE data_type dt1
+            INNER JOIN
+                (SELECT dt.code,
+                        (SELECT (count(*) + 1) * 1000 FROM data_type WHERE code &lt; dt.code) AS id
+                FROM data_type dt) t
+                ON t.code = dt1.code
+            SET dt1.id = t.id
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="kamransaleem"
+               id="20160808-383-4">
+        <dropPrimaryKey constraintName="data_type_pkey"
+                        tableName="data_type"/>
+
+        <addNotNullConstraint tableName="data_type"
+                              columnName="id"
+                              columnDataType="${long.type}" />
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="data_type_pkey"
+                       tableName="data_type"/>
+
+    </changeSet>
+
+
+    <changeSet author="kamransaleem"
+               id="20160808-383-5">
+        <createIndex indexName="idx_code"
+                     tableName="data_type"
+                     unique="true">
+            <column name="code" type="varchar(128)"/>
+        </createIndex>
+    </changeSet>
+
 
 </databaseChangeLog>
