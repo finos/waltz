@@ -38,6 +38,7 @@ public enum EntityKind {
     PERFORMANCE_METRIC_PACK,
     PROCESS,
     ENTITY_STATISTIC,
-    INVOLVEMENT
+    INVOLVEMENT,
+    DATA_TYPE
 
 }
