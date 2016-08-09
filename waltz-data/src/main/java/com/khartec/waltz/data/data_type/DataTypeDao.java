@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
@@ -43,6 +44,8 @@ public class DataTypeDao {
                 .code(record.getCode())
                 .description(mkSafe(record.getDescription()))
                 .name(record.getName())
+                .id(Optional.ofNullable(record.getId()))
+                .parentId(Optional.ofNullable(record.getParentId()))
                 .build();
     };
 
