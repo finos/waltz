@@ -92,6 +92,7 @@ export const entityNames = {
     CAPABILITY: 'Capability',
     CHANGE_INITIATIVE: 'Change Initiative',
     DATABASE: 'Database',
+    DATA_TYPE: 'Data Type',
     END_USER_APPLICATION: 'End User App',
     ENTITY_STATISTIC: 'Statistic',
     INVOLVEMENT: 'Involvement',
