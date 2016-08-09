@@ -131,14 +131,16 @@ public class EntityHierarchyService {
         switch (kind) {
             case CAPABILITY:
                 return Tables.CAPABILITY;
+            case CHANGE_INITIATIVE:
+                return Tables.CHANGE_INITIATIVE;
+            case DATA_TYPE:
+                return Tables.DATA_TYPE;
+            case ENTITY_STATISTIC:
+                return Tables.ENTITY_STATISTIC_DEFINITION;
             case ORG_UNIT:
                 return Tables.ORGANISATIONAL_UNIT;
             case PROCESS:
                 return Tables.PROCESS;
-            case ENTITY_STATISTIC:
-                return Tables.ENTITY_STATISTIC_DEFINITION;
-            case CHANGE_INITIATIVE:
-                return Tables.CHANGE_INITIATIVE;
             default:
                 throw new IllegalArgumentException("Cannot deteremine hierarchy table for kind: "+kind);
         }

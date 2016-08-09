@@ -1,13 +1,14 @@
-import {initialiseData} from '../common';
+import {initialiseData} from "../common";
 
 const initialState = {
     tallies: [],
     kinds: [
-        'ORG_UNIT',
         'CAPABILITY',
-        'PROCESS',
+        'CHANGE_INITIATIVE',
+        'DATA_TYPE',
         'ENTITY_STATISTIC',
-        'CHANGE_INITIATIVE'
+        'ORG_UNIT',
+        'PROCESS'
     ]
 };
 
