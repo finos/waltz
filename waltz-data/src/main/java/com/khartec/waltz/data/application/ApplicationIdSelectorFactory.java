@@ -226,12 +226,14 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
         Select<Record1<Long>> dtSelector = dataTypeIdSelectorFactory.apply(dtSelectorOptions);
 
+        Condition condition = dataTypeUsage.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                .and(dataType.ID.in(dtSelector));
+
         return dsl
                 .selectDistinct(dataTypeUsage.ENTITY_ID)
                 .from(dataTypeUsage)
                 .join(dataType).on(dataType.CODE.eq(dataTypeUsage.DATA_TYPE_CODE))
-                .where(dsl.renderInlined(dataTypeUsage.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                        .and(dataType.ID.in(dtSelector))));
+                .where(dsl.renderInlined(condition));
     }
 
 }
