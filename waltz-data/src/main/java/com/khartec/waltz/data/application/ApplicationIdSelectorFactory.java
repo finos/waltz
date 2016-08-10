@@ -2,10 +2,12 @@ package com.khartec.waltz.data.application;
 
 import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.capability.CapabilityIdSelectorFactory;
+import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
 import com.khartec.waltz.schema.tables.*;
+import com.khartec.waltz.schema.tables.DataType;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -18,6 +20,8 @@ import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
+import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
+import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
@@ -29,12 +33,15 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationIdSelectorFactory.class);
 
     private final DSLContext dsl;
-    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
     private final CapabilityIdSelectorFactory capabilityIdSelectorFactory;
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
+    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
 
     private final Application app = APPLICATION.as("app");
     private final AppCapability appCapability = APP_CAPABILITY.as("appcap");
     private final ApplicationGroupEntry appGroup = APPLICATION_GROUP_ENTRY.as("appgrp");
+    private final DataTypeUsage dataTypeUsage = DATA_TYPE_USAGE.as("dtu");
+    private final DataType dataType = DATA_TYPE.as("dt");
     private final EntityRelationship relationship = EntityRelationship.ENTITY_RELATIONSHIP.as("relationship");
     private final Involvement involvement = INVOLVEMENT.as("involvement");
     private final Person person = PERSON.as("per");
@@ -44,13 +51,16 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     @Autowired
     public ApplicationIdSelectorFactory(DSLContext dsl,
                                         CapabilityIdSelectorFactory capabilityIdSelectorFactory,
+                                        DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
                                         OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
         checkNotNull(dsl, "dsl cannot be null");
         checkNotNull(capabilityIdSelectorFactory, "capabilityIdSelectorFactory cannot be null");
+        checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
         checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
 
         this.dsl = dsl;
         this.capabilityIdSelectorFactory = capabilityIdSelectorFactory;
+        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
         this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
     }
 
@@ -70,6 +80,8 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 return mkForOrgUnit(ref, options.scope());
             case PROCESS:
                 return mkForProcess(ref, options.scope());
+            case DATA_TYPE:
+                return mkForDataType(ref, options.scope());
 
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: "+ref.kind());
@@ -203,6 +215,25 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 .selectDistinct(appCapability.APPLICATION_ID)
                 .from(appCapability)
                 .where(dsl.renderInlined(appCapability.CAPABILITY_ID.in(capabilitySelector)));
+    }
+
+
+    private Select<Record1<Long>> mkForDataType(EntityReference ref, HierarchyQueryScope scope) {
+        ImmutableIdSelectionOptions dtSelectorOptions = ImmutableIdSelectionOptions.builder()
+                .entityReference(ref)
+                .scope(scope)
+                .build();
+
+        Select<Record1<Long>> dtSelector = dataTypeIdSelectorFactory.apply(dtSelectorOptions);
+
+        Condition condition = dataTypeUsage.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                .and(dataType.ID.in(dtSelector));
+
+        return dsl
+                .selectDistinct(dataTypeUsage.ENTITY_ID)
+                .from(dataTypeUsage)
+                .join(dataType).on(dataType.CODE.eq(dataTypeUsage.DATA_TYPE_CODE))
+                .where(dsl.renderInlined(condition));
     }
 
 }
