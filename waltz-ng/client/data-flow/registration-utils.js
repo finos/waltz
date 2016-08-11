@@ -70,8 +70,8 @@ export function loadDataFlows(dataFlowStore, id, vm) {
         .then(flows => vm.flows = flows);
 }
 
-export function loadDataTypes(dataTypeStore, vm) {
-    return dataTypeStore.findAll().then(xs => vm.dataTypes = xs);
+export function loadDataTypes(dataTypesService, vm) {
+    return dataTypesService.loadDataTypes().then(xs => vm.dataTypes = xs);
 }
 
 

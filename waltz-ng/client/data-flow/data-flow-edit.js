@@ -84,7 +84,7 @@ function controller($q,
                     application,
                     authSourceStore,
                     dataFlowStore,
-                    dataTypeStore,
+                    dataTypesService,
                     dataTypeUsageStore,
                     displayNameService,
                     notification) {
@@ -149,7 +149,7 @@ function controller($q,
         loadDataFlows(dataFlowStore, primaryAppId, vm),
         loadAppAuthSources(authSourceStore, primaryAppId, vm),
         loadOrgUnitAuthSources(authSourceStore, ouId, vm),
-        loadDataTypes(dataTypeStore, vm),
+        loadDataTypes(dataTypesService, vm),
         loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm)
     ];
 
@@ -240,7 +240,7 @@ controller.$inject = [
     'application',
     'AuthSourcesStore',
     'DataFlowDataStore',
-    'DataTypesDataService',
+    'DataTypesService',
     'DataTypeUsageStore',
     'WaltzDisplayNameService',
     'Notification'

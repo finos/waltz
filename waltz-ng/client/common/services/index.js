@@ -74,10 +74,10 @@ export default (module) => {
     iconNameService.register('usageKind', usageKindIconNames);
 
     module.run([
-        'DataTypesDataService',
-        (DataTypesDataService) =>
-            DataTypesDataService
-                .findAll()
+        'DataTypesService',
+        (DataTypesService) =>
+            DataTypesService
+                .loadDataTypes()
                 .then(results => {
                     const indexed = _.keyBy(results, 'code');
                     displayNameService.register('dataType', _.mapValues(indexed, 'name'));

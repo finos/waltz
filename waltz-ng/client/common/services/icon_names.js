@@ -32,7 +32,7 @@ export const entityIconNames = {
     CAPABILITY: 'puzzle-piece',
     CHANGE_INITIATIVE: 'paper-plane-o',
     DATABASE: 'database',
-    DATA_TYPE: 'wpforms',
+    DATA_TYPE: 'qrcode',
     END_USER_APPLICATION: 'table',
     INVOLVEMENT: 'share-alt-square',
     LOGICAL_DATA_FLOW: "random",
