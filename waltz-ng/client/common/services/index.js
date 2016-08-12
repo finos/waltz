@@ -48,7 +48,6 @@ export default (module) => {
     module.service('WaltzDisplayNameService', () => displayNameService);
     module.service('WaltzIconNameService', () => iconNameService);
     module.service('WaltzDescriptionService', () => descriptionService);
-    module.service('ParameterResolverService', require('./param-resolver-service'));
 
     displayNameService.register('applicationKind', applicationKindDisplayNames);
     displayNameService.register('assetCost', assetCostKindNames);
@@ -88,26 +87,5 @@ export default (module) => {
     runner.$inject = ['DataTypeService'];
 
     module.run(runner);
-
-    function redirectTo($rootScope, $state, paramResolver) {
-        $rootScope.$on('$stateChangeStart', function(evt, to, params) {
-            if (to.redirectTo) {
-                evt.preventDefault();
-
-                let resolvedParams = params;
-                if(to.redirectToParamResolver) {
-                    paramResolver.resolve(params, to.redirectToParamResolver)
-                        .then(resolvedParams => {
-                            $state.go(to.redirectTo, resolvedParams);
-                        });
-                }
-            }
-        });
-    }
-
-    redirectTo.$inject = ['$rootScope', '$state', 'ParameterResolverService'];
-
-    module.run(redirectTo);
-
 
 };
