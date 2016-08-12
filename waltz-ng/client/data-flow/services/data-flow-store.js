@@ -51,12 +51,18 @@ function service(dataFlowUtils, appStore, $http, BaseApiUrl) {
         .then(r => r.data);
 
 
+    const countByDataType = () =>
+        $http.get(`${BASE}/count-by/data-type`)
+            .then(result => result.data);
+
+
     return {
         findByEntityReference,
         findEnrichedFlowsForApplication,
         findByAppIdSelector,
         calculateStats,
-        create
+        create,
+        countByDataType
     };
 }
 

@@ -25,4 +25,6 @@ export default (module) => {
     module.service('DataTypesStore', require('./services/data-types-store'));
     module.service('DataTypesService', require('./services/data-types-service'));
 
+    module.component('waltzDataTypeTree', require('./components/data-type-tree'));
+
 };
