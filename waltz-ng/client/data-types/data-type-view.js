@@ -20,13 +20,10 @@ const initialState = {
 };
 
 
-function controller($stateParams,
-                    dataTypes) {
+function controller(dataTypes,
+                    dataTypeId) {
 
     const vm = initialiseData(this, initialState);
-
-    const dataTypeId = $stateParams.id;
-
     const dataType = _.find(populateParents(dataTypes), { id: dataTypeId });
 
     const appIdSelector = {
@@ -44,8 +41,8 @@ function controller($stateParams,
 
 
 controller.$inject = [
-    '$stateParams',
     'dataTypes',
+    'dataTypeId'
 ];
 
 
