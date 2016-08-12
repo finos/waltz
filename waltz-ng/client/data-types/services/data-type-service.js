@@ -14,11 +14,11 @@
 let dataTypesPromise = null;
 let dataTypes = [];
 
-function service(dataTypesStore) {
+function service(dataTypeStore) {
 
     const loadDataTypes = (force = false) => {
         if (force || (dataTypesPromise == null)) {
-            dataTypesPromise = dataTypesStore.findAll()
+            dataTypesPromise = dataTypeStore.findAll()
                 .then(d => dataTypes = d);
         }
         return dataTypesPromise;
@@ -34,7 +34,7 @@ function service(dataTypesStore) {
 
 
 service.$inject = [
-    'DataTypesStore'
+    'DataTypeStore'
 ];
 
 

@@ -1,9 +1,8 @@
+import {loadDataTypes} from "./resolvers";
+
 const baseState = {
     resolve: {
-        dataTypes: [
-            'DataTypesService',
-            (dataTypesService) => dataTypesService.loadDataTypes()
-        ]
+        dataTypes: loadDataTypes
     }
 };
 
@@ -18,12 +17,14 @@ const viewByCodeState = {
     url: 'data-types/code/{code}',
     views: {'content@': require('./data-type-view') },
     redirectTo: 'main.data-type.view',
+    redirectToParamResolver: 'DataTypeCodeIdResolverService'
+
 };
 
 
 const viewState = {
     url: 'data-types/{id:int}',
-    views: {'content@': require('./data-type-view') }
+    views: {'content@': require('./data-type-view') },
 };
 
 

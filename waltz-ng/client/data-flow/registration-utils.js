@@ -66,12 +66,15 @@ export function loadOrgUnitAuthSources(authSourceStore, ouId, vm) {
 
 
 export function loadDataFlows(dataFlowStore, id, vm) {
-    return dataFlowStore.findEnrichedFlowsForApplication(id)
+    return dataFlowStore
+        .findEnrichedFlowsForApplication(id)
         .then(flows => vm.flows = flows);
 }
 
-export function loadDataTypes(dataTypesService, vm) {
-    return dataTypesService.loadDataTypes().then(xs => vm.dataTypes = xs);
+export function loadDataTypes(dataTypeService, vm) {
+    return dataTypeService
+        .loadDataTypes()
+        .then(xs => vm.dataTypes = xs);
 }
 
 
