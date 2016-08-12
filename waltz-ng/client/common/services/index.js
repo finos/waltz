@@ -48,6 +48,7 @@ export default (module) => {
     module.service('WaltzDisplayNameService', () => displayNameService);
     module.service('WaltzIconNameService', () => iconNameService);
     module.service('WaltzDescriptionService', () => descriptionService);
+    module.service('ParameterResolverService', require('./param-resolver-service'));
 
     displayNameService.register('applicationKind', applicationKindDisplayNames);
     displayNameService.register('assetCost', assetCostKindNames);
@@ -73,16 +74,40 @@ export default (module) => {
     iconNameService.register('rag', ragIconNames);
     iconNameService.register('usageKind', usageKindIconNames);
 
-    module.run([
-        'DataTypesDataService',
-        (DataTypesDataService) =>
-            DataTypesDataService
-                .findAll()
-                .then(results => {
-                    const indexed = _.keyBy(results, 'code');
-                    displayNameService.register('dataType', _.mapValues(indexed, 'name'));
-                    descriptionService.register('dataType', _.mapValues(indexed, 'description'));
-                })
-    ]);
+
+    function runner(dataTypeService) {
+        dataTypeService
+            .loadDataTypes()
+            .then(results => {
+                const indexed = _.keyBy(results, 'code');
+                displayNameService.register('dataType', _.mapValues(indexed, 'name'));
+                descriptionService.register('dataType', _.mapValues(indexed, 'description'));
+            })
+    }
+
+    runner.$inject = ['DataTypeService'];
+
+    module.run(runner);
+
+    function redirectTo($rootScope, $state, paramResolver) {
+        $rootScope.$on('$stateChangeStart', function(evt, to, params) {
+            if (to.redirectTo) {
+                evt.preventDefault();
+
+                let resolvedParams = params;
+                if(to.redirectToParamResolver) {
+                    paramResolver.resolve(params, to.redirectToParamResolver)
+                        .then(resolvedParams => {
+                            $state.go(to.redirectTo, resolvedParams);
+                        });
+                }
+            }
+        });
+    }
+
+    redirectTo.$inject = ['$rootScope', '$state', 'ParameterResolverService'];
+
+    module.run(redirectTo);
+
 
 };

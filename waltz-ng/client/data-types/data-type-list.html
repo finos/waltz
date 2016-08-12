@@ -1,0 +1,84 @@
+<div>
+
+    <waltz-page-header name="Data Types"
+                       small="search"
+                       icon="qrcode">
+
+        <ol class="waltz-breadcrumbs">
+            <li>
+                <a ui-sref="main">
+                    Home
+                </a>
+            </li>
+            <li>Data Types</li>
+        </ol>
+
+    </waltz-page-header>
+
+
+    <!-- OVERVIEW -->
+    <waltz-section name="Overview"
+                   ng-if="ctrl.diagrams.length > 0">
+        <waltz-svg-diagrams diagrams="ctrl.diagrams"
+                            block-processor="ctrl.blockProcessor">
+        </waltz-svg-diagrams>
+    </waltz-section>
+
+
+    <!-- STATIC PANELS -->
+    <div class="row"
+         ng-if="ctrl.panels.length > 0">
+        <div class="col-sm-12">
+            <waltz-static-panels panels="ctrl.panels">
+            </waltz-static-panels>
+        </div>
+    </div>
+
+
+    <!-- TREE -->
+    <waltz-section name="Data Types" small="All">
+
+        <ul class="list-unstyled"
+            ng-show="ctrl.dataTypeHierarchy.length > 0">
+            <li ng-repeat="dataType in ctrl.dataTypeHierarchy | orderBy:'name'">
+                <div ng-include="'node.html'"
+                     ng-init="node=dataType; level=1">
+                </div>
+            </li>
+        </ul>
+
+        <div class="alert alert-warning"
+             ng-show="ctrl.dataTypeHierarchy.length == 0">
+            <strong>No Data Types</strong> have been defined within this system.
+        </div>
+
+    </waltz-section>
+
+
+    <script type="text/ng-template"
+            id="node.html">
+        <div class="waltz-org-unit-level waltz-org-unit-level-{{ level }}">
+            <a ui-sref="main.data-type.code ({ code: node.code})"
+               class="waltz-org-unit-name clickable"
+               ng-bind="node.name">
+            </a>
+            <span ng-if="ctrl.tallies[node.id] > 0"
+                  class="small waltz-tally-count"
+                  title="Number of applications">
+                <span ng-bind="ctrl.tallies[node.id]"></span>
+                <span>application/s</span>
+            </span>
+
+            <div class="text-muted no-overflow"
+                 ng-bind="node.description">
+            </div>
+        </div>
+
+        <ul class="list-unstyled">
+            <li ng-repeat="node in node.children | orderBy:'name'"
+                ng-init="level=level+1"
+                ng-include="'node.html'"></li>
+        </ul>
+    </script>
+
+</div>
