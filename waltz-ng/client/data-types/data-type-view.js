@@ -10,8 +10,9 @@
  *
  */
 
-import _ from "lodash";
-import {initialiseData, populateParents} from "../common";
+import {initialiseData} from "../common";
+
+const template = require('./data-type-view.html');
 
 
 const initialState = {
@@ -20,16 +21,14 @@ const initialState = {
 };
 
 
-function controller(dataTypes,
-                    dataTypeId) {
+function controller(dataType) {
 
     const vm = initialiseData(this, initialState);
-    const dataType = _.find(populateParents(dataTypes), { id: dataTypeId });
 
     const appIdSelector = {
         entityReference: {
             kind: 'DATA_TYPE',
-            id: dataTypeId
+            id: dataType.id
         },
         scope: 'CHILDREN'
     };
@@ -41,13 +40,12 @@ function controller(dataTypes,
 
 
 controller.$inject = [
-    'dataTypes',
-    'dataTypeId'
+    'dataType'
 ];
 
 
 export default {
-    template: require('./data-type-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

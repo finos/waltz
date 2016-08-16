@@ -1,4 +1,4 @@
-import {loadDataTypes, dataTypeIdResolver} from "./resolvers";
+import {loadDataTypes, dataTypeByCodeResolver, dataTypeByIdResolver} from "./resolvers";
 
 const baseState = {
     resolve: {
@@ -16,14 +16,14 @@ const listState = {
 const viewByCodeState = {
     url: 'data-types/code/{code}',
     views: {'content@': require('./data-type-view') },
-    resolve: {dataTypeId: dataTypeIdResolver }
+    resolve: {dataType: dataTypeByCodeResolver }
 };
 
 
 const viewState = {
     url: 'data-types/{id:int}',
     views: {'content@': require('./data-type-view') },
-    resolve: {dataTypeId: dataTypeIdResolver }
+    resolve: {dataType: dataTypeByIdResolver }
 };
 
 
