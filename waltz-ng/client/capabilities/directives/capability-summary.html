@@ -1,28 +1,14 @@
-<div style="margin-bottom: 18px">
+<div class="row">
+    <div class="col-sm-12">
+        <waltz-capability-scorecard capability="ctrl.capability"
+                                    server-stats="ctrl.serverStats"
+                                    applications="ctrl.applications"
+                                    complexity="ctrl.complexity"
+                                    flows="ctrl.flows"
+                                    traits="ctrl.traits"
+                                    asset-costs="ctrl.assetCosts">
 
-    <!-- PARENT -->
-    <div class="row no-overflow"
-         ng-if="ctrl.capability.parent"
-         style="padding: 1em">
-
-
+        </waltz-capability-scorecard>
     </div>
-
-
-    <!-- SCORECARD -->
-    <div class="row">
-        <div class="col-sm-12">
-            <waltz-capability-scorecard capability="ctrl.capability"
-                                        server-stats="ctrl.serverStats"
-                                        applications="ctrl.applications"
-                                        complexity="ctrl.complexity"
-                                        flows="ctrl.flows"
-                                        traits="ctrl.traits"
-                                        asset-costs="ctrl.assetCosts">
-
-            </waltz-capability-scorecard>
-        </div>
-    </div>
-
 </div>
 
