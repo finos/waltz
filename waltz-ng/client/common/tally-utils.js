@@ -44,7 +44,7 @@ export function tallyBy(data = [], groupingSelector = 'key') {
  * @param childKey
  * @returns {function(*)}
  */
-export function summerFactory (countKey, totalKey, childKey) {
+export function buildPropertySummer (countKey, totalKey, childKey) {
     const summer = (node) => {
         if (node == null) {
             return 0;

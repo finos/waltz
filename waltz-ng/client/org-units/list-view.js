@@ -12,7 +12,7 @@
 import _ from "lodash";
 import angular from "angular";
 import {buildHierarchies, termSearch} from "../common";
-import {summerFactory} from "../common/tally-utils";
+import {buildPropertySummer} from "../common/tally-utils";
 
 
 const FIELDS_TO_SEARCH = ['name', 'description'];
@@ -54,10 +54,10 @@ function prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies) {
 
     const rootUnits = buildHierarchies(orgUnits);
 
-    const appCountSummer = summerFactory("appCount",
+    const appCountSummer = buildPropertySummer("appCount",
         "totalAppCount",
         "childAppCount");
-    const endUserAppCountSummer = summerFactory("endUserAppCount",
+    const endUserAppCountSummer = buildPropertySummer("endUserAppCount",
         "totalEndUserAppCount",
         "childEndUserAppCount");
 

@@ -1,5 +1,5 @@
 import {initialiseData, buildHierarchies} from "../../common";
-import {summerFactory} from "../../common/tally-utils";
+import {buildPropertySummer} from "../../common/tally-utils";
 
 
 const bindings = {
@@ -31,7 +31,7 @@ function prepareDataTypeTree(dataTypes, tallies) {
 
     const rootDataTypes = buildHierarchies(dataTypes);
 
-    const dataFlowCountSummer = summerFactory("dataFlowCount", "totalDataFlowCount", "childDataFlowCount");
+    const dataFlowCountSummer = buildPropertySummer("dataFlowCount", "totalDataFlowCount", "childDataFlowCount");
 
     _.each(rootDataTypes, dataFlowCountSummer);
 
