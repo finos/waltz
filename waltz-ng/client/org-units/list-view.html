@@ -7,21 +7,26 @@
         </ol>
     </waltz-page-header>
 
-    <blockquote>
-        The structure of the organisational hierarchy.
-        An application is assigned to one of the organisational units and the unit inherits the characteristics of the
-        assigned application. The organisational hierarchy allow applications statistics and capabilities to be
-        aggregated up the tree.
-    </blockquote>
 
-    <!-- DIAGRAMS -->
-    <waltz-section name="Organisational Unit"
-                   small="Overview"
-                   ng-if="ctrl.diagrams.length > 0">
-        <waltz-svg-diagrams diagrams="ctrl.diagrams"
-                            block-processor="ctrl.blockProcessor">
-        </waltz-svg-diagrams>
-    </waltz-section>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="waltz-page-summary waltz-page-summary-attach">
+                <blockquote>
+                    The structure of the organisational hierarchy.
+                    An application is assigned to one of the organisational units and the unit inherits the characteristics of the
+                    assigned application. The organisational hierarchy allow applications statistics and capabilities to be
+                    aggregated up the tree.
+                </blockquote>
+
+                <waltz-svg-diagrams diagrams="ctrl.diagrams"
+                                    block-processor="ctrl.blockProcessor">
+                </waltz-svg-diagrams>
+            </div>
+        </div>
+    </div>
+
+
+    <br>
 
 
     <div class="row">

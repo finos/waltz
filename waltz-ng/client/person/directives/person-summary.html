@@ -1,141 +1,130 @@
-<div>
-    <ul class="list-unstyled">
-        <li>
+<div class="waltz-page-summary-attach waltz-page-summary">
+
+    <div class="waltz-display-section">
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Title
+            </div>
+            <div class="col-sm-4"
+                 ng-bind="ctrl.person.title">
+            </div>
+
+            <div class="col-sm-2 waltz-display-field-label">
+                e-mail
+            </div>
+            <div class="col-sm-4">
+                <waltz-mail-to person="ctrl.person"></waltz-mail-to>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Tel (Office)
+            </div>
+            <div class="col-sm-4">
+                <waltz-phone-link number="{{ ctrl.person.officePhone }}"></waltz-phone-link>
+            </div>
+
+            <div class="col-sm-2 waltz-display-field-label">
+                Tel (Mobile)
+            </div>
+            <div class="col-sm-4">
+                <waltz-phone-link number="{{ ctrl.person.mobilePhone }}"></waltz-phone-link>
+            </div>
+        </div>
 
 
-            <ul class="list-unstyled"
-                xstyle="padding-left: 3em">
-                <li>
-                    <div class="waltz-page-summary">
+        <div class="row" >
+            <div class="col-sm-2 waltz-display-field-label">
+                Waltz Profile
+            </div>
+            <div class="col-sm-4">
+                <a ui-sref="main.profile.view ({userId: ctrl.person.userId})">
+                    View
+                </a>
+            </div>
+        </div>
 
+        <!-- SCORES -->
+        <div class="row" style="border-top: 2px dotted #eee; padding: 6px; margin-top: 16px">
+            <div class="col-sm-4">
+                <waltz-apps-by-investment-pie applications="ctrl.applications"
+                                              size="70">
+                </waltz-apps-by-investment-pie>
+            </div>
 
-                        <h4>
-                            <waltz-icon name="user"></waltz-icon>
-                            {{ ctrl.person.displayName }}
-                        </h4>
+            <div class="col-sm-4">
+                <waltz-apps-by-lifecycle-phase-pie applications="ctrl.applications"
+                                                   size="70">
+                </waltz-apps-by-lifecycle-phase-pie>
+            </div>
 
-                        <div class="waltz-display-section">
-                            <div class="row">
-                                <div class="col-sm-2 waltz-display-field-label">
-                                    Title
-                                </div>
-                                <div class="col-sm-4">
-                                    {{ ctrl.person.title }}
-                                </div>
+            <div class="col-sm-4">
+                <waltz-basic-info-tile waltz-jump-to="dataflows-section"
+                                       icon="random"
+                                       name="Logical Data Flows">
+                    <br>
+                    <waltz-flow-cloud-diagram
+                        width="200"
+                        stats="ctrl.flows">
+                    </waltz-flow-cloud-diagram>
+                </waltz-basic-info-tile>
+            </div>
+        </div>
 
-                                <div class="col-sm-2 waltz-display-field-label">
-                                    e-mail
-                                </div>
-                                <div class="col-sm-4">
-                                    <waltz-mail-to person="ctrl.person"></waltz-mail-to>
-                                </div>
-                            </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <waltz-basic-info-tile name="Portfolio Cost"
+                                       description="Cumulative value of infra and app dev costs"
+                                       waltz-jump-to="costs-section"
+                                       icon="money">
+                    <span style="font-size: x-large;"
+                          ng-bind="ctrl.portfolioCostStr">
+                    </span>
+                </waltz-basic-info-tile>
+            </div>
+            <div class="col-sm-4">
+                <waltz-basic-info-tile name="Complexity"
+                                       description="Derived from capabilities, connections and servers"
+                                       class="clickable"
+                                       waltz-jump-to="complexity-section"
+                                       icon="rocket">
+                    <div style="font-size: x-large;">
+                        &Sigma;
+                        <span ng-bind="ctrl.complexitySummary.cumulativeScore | toFixed:1">
+                        </span>
+                    </div>
+                    <div class="small text-muted">
+                        <span ng-bind="ctrl.complexitySummary.averageScore | toFixed:2">
+                        </span>
+                        per app
+                    </div>
+                </waltz-basic-info-tile>
 
-                            <div class="row">
-                                <div class="col-sm-2 waltz-display-field-label">
-                                    Tel (Office)
-                                </div>
-                                <div class="col-sm-4">
-                                    <waltz-phone-link number="{{ ctrl.person.officePhone }}"></waltz-phone-link>
-                                </div>
-
-                                <div class="col-sm-2 waltz-display-field-label">
-                                    Tel (Mobile)
-                                </div>
-                                <div class="col-sm-4">
-                                    <waltz-phone-link number="{{ ctrl.person.mobilePhone }}"></waltz-phone-link>
-                                </div>
-                            </div>
-
-
-                            <div class="row" >
-                                <div class="col-sm-2 waltz-display-field-label">
-                                    Waltz Profile
-                                </div>
-                                <div class="col-sm-4">
-                                    <a ui-sref="main.profile.view ({userId: ctrl.person.userId})">
-                                        View
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- SCORES -->
-                            <div class="row" style="border-top: 2px dotted #eee; padding: 6px; margin-top: 16px">
-                                <div class="col-sm-4">
-                                    <waltz-apps-by-investment-pie applications="ctrl.applications"
-                                                                  size="70">
-                                    </waltz-apps-by-investment-pie>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <waltz-apps-by-lifecycle-phase-pie applications="ctrl.applications"
-                                                                       size="70">
-                                    </waltz-apps-by-lifecycle-phase-pie>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <waltz-basic-info-tile waltz-jump-to="dataflows-section"
-                                                           icon="random"
-                                                           name="Logical Data Flows">
-                                        <br>
-                                        <waltz-flow-cloud-diagram
-                                            width="200"
-                                            stats="ctrl.flows">
-                                        </waltz-flow-cloud-diagram>
-                                    </waltz-basic-info-tile>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <waltz-basic-info-tile name="Portfolio Cost"
-                                                           description="Cumulative value of infra and app dev costs"
-                                                           waltz-jump-to="costs-section"
-                                                           icon="money">
-                                        <span style="font-size: x-large;">
-                                            {{ ctrl.portfolioCostStr }}
-                                        </span>
-                                    </waltz-basic-info-tile>
-                                </div>
-                                <div class="col-sm-4">
-                                    <waltz-basic-info-tile name="Complexity"
-                                                           description="Derived from capabilities, connections and servers"
-                                                           class="clickable"
-                                                           waltz-jump-to="complexity-section"
-                                                           icon="rocket">
-                                        <div style="font-size: x-large;">
-                                            &Sigma; {{ ctrl.complexitySummary.cumulativeScore | toFixed:1 }}
-                                        </div>
-                                        <div class="small text-muted">
-                                            {{ ctrl.complexitySummary.averageScore | toFixed:2 }} per app
-                                        </div>
-                                    </waltz-basic-info-tile>
-
-                                </div>
-                                <div class="col-sm-4">
-                                    <waltz-basic-info-tile name="Servers"
-                                                           description="Number of servers supporting this group"
-                                                           icon="server">
-                                        <div>
-                                            <div style="font-size: x-large;">
-                                                # {{ ctrl.serverStats.total }}
-                                            </div>
-                                            <div class="small text-muted">
-                                                {{ ctrl.serverStats.virtualPercentage }}% virtual
-                                            </div>
-                                        </div>
-                                    </waltz-basic-info-tile>
-
-                                </div>
-
-                            </div>
-
+            </div>
+            <div class="col-sm-4">
+                <waltz-basic-info-tile name="Servers"
+                                       description="Number of servers supporting this group"
+                                       icon="server">
+                    <div>
+                        <div style="font-size: x-large;">
+                            #
+                            <span ng-bind="ctrl.serverStats.total">
+                            </span>
+                        </div>
+                        <div class="small text-muted">
+                            <span ng-bind="ctrl.serverStats.virtualPercentage">
+                            </span>
+                            % virtual
                         </div>
                     </div>
+                </waltz-basic-info-tile>
 
+            </div>
 
-                </li>
-            </ul>
-        </li>
-    </ul>
+        </div>
+
+    </div>
 </div>
+
+
