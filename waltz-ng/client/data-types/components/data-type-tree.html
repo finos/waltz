@@ -3,7 +3,7 @@
     <ul class="list-unstyled"
         ng-show="$ctrl.dataTypeHierarchy.length > 0">
         <li ng-repeat="dataType in $ctrl.dataTypeHierarchy | orderBy:'name'">
-            <div ng-include="'node.html'"
+            <div ng-include="'inline/data-types/tree/node.html'"
                  ng-init="node=dataType; level=1">
             </div>
         </li>
@@ -48,6 +48,6 @@
     <ul class="list-unstyled">
         <li ng-repeat="node in node.children | orderBy:'name'"
             ng-init="level=level+1"
-            ng-include="'node.html'"></li>
+            ng-include="'inline/data-types/tree/node.html'"></li>
     </ul>
 </script>
