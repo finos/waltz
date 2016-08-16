@@ -1,4 +1,10 @@
 /**
+ * Additional scroll amount to compensate for navbar etc.
+*/
+const OFFSET = 90;
+
+
+/**
  * An attribute directive which allows
  * for create in page scroll to anchors.
  * Usage:  &lt;div waltz-jump-to='some-id'>&lt;/div>
@@ -6,7 +12,8 @@
  * @param $anchorScroll
  * @returns directive
  */
-const directive = function($location, $anchorScroll) {
+const directive = function($anchorScroll,
+                           $location) {
     return {
         restrict: 'A',
         link: (scope, elem, attrs) => {
@@ -14,7 +21,7 @@ const directive = function($location, $anchorScroll) {
             // then the attr name will also change
             const target = attrs.waltzJumpTo;
             elem.on('click', () => {
-                $anchorScroll.yOffset = 60;
+                $anchorScroll.yOffset = OFFSET;
                 $location.hash(target);
                 $anchorScroll();
                 scope.$apply();
@@ -23,6 +30,11 @@ const directive = function($location, $anchorScroll) {
     }
 };
 
-directive.$inject=['$location', '$anchorScroll'];
+
+directive.$inject=[
+    '$anchorScroll',
+    '$location'
+];
+
 
 export default directive;
