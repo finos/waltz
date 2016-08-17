@@ -1,8 +1,6 @@
 <div class="waltz-page-summary" style="margin-bottom: 24px">
     <div class="row">
         <div class="col-sm-12">
-            <h3 style="margin-top: 10px; padding-bottom: 4px; border-bottom: 1px solid #eee;">
-                <span ng-bind="ctrl.appGroup.name"></span>
             <span class="pull-right"
                   ng-if="ctrl.editable">
                 <a ui-sref="main.app-group.edit ({ id:ctrl.appGroup.id })"
@@ -11,7 +9,6 @@
                     Edit Group
                 </a>
             </span>
-            </h3>
 
             <div style="font-size: larger; border-bottom: 2px dotted #eee; padding: 6px"
                  class="waltz-paragraph"
