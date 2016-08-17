@@ -73,16 +73,19 @@ export default (module) => {
     iconNameService.register('rag', ragIconNames);
     iconNameService.register('usageKind', usageKindIconNames);
 
-    module.run([
-        'DataTypesDataService',
-        (DataTypesDataService) =>
-            DataTypesDataService
-                .findAll()
-                .then(results => {
-                    const indexed = _.keyBy(results, 'code');
-                    displayNameService.register('dataType', _.mapValues(indexed, 'name'));
-                    descriptionService.register('dataType', _.mapValues(indexed, 'description'));
-                })
-    ]);
+
+    function runner(dataTypeService) {
+        dataTypeService
+            .loadDataTypes()
+            .then(results => {
+                const indexed = _.keyBy(results, 'code');
+                displayNameService.register('dataType', _.mapValues(indexed, 'name'));
+                descriptionService.register('dataType', _.mapValues(indexed, 'description'));
+            })
+    }
+
+    runner.$inject = ['DataTypeService'];
+
+    module.run(runner);
 
 };

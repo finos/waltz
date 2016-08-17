@@ -1,5 +1,11 @@
+
+
+
 export default (module) => {
 
-    module.service('DataTypesDataService', require('./services/data-types-data'));
+    module.config(require('./routes'));
+
+    module.service('DataTypeStore', require('./services/data-type-store'));
+    module.service('DataTypeService', require('./services/data-type-service'));
 
 };
