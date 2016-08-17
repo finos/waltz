@@ -36,10 +36,52 @@
 
 
     <!-- TREE -->
-    <waltz-data-type-tree data-data-types="ctrl.dataTypes"
-                          tallies="ctrl.tallies">
+    <waltz-section name="Data Types" small="All">
+        <div class="row">
+            <div class="col-sm-8">
+                <waltz-data-type-tree trees="ctrl.trees"
+                                      on-selection="ctrl.nodeSelected">
+                </waltz-data-type-tree>
+            </div>
+            <div class="col-sm-4">
+                <div ng-if="ctrl.selectedNode"
+                     class="waltz-detail-callout">
+                    <h3>
+                        <span ng-bind="ctrl.selectedNode.name"></span>
+                        <small class="pull-right clickable">
+                            <waltz-icon name="times"
+                                        ng-click="ctrl.selectedNode = null">
+                            </waltz-icon>
+                        </small>
+                    </h3>
 
-    </waltz-data-type-tree>
+                    <h4 ng-if="ctrl.selectedNode.dataFlowCount > 0">
+                        <span ng-bind="ctrl.selectedNode.dataFlowCount"></span>
+                        Data Flows/s
+                    </h4>
+
+                    <h5 ng-if="ctrl.selectedNode.totalDataFlowCount > 0">
+                        <span ng-bind="ctrl.selectedNode.totalDataFlowCount">
+                        </span>
+                        Data Flows (incl. sub-types)
+                    </h5>
+
+                    <hr>
+
+                    <div class="small waltz-paragraph"
+                         ng-bind="ctrl.selectedNode.description">
+                    </div>
+
+                    <a ui-sref="main.data-type.view ({ id: ctrl.selectedNode.id })">
+                        Show &raquo;
+                    </a>
+
+                    <br>
+                </div>
+            </div>
+        </div>
+    </waltz-section>
+
 
 
 </div>
