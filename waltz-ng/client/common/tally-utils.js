@@ -35,3 +35,30 @@ export function tallyBy(data = [], groupingSelector = 'key') {
         .map((v, k) => ({ key: k, count: v }))
         .value()
 }
+
+
+/**
+ * Given a node with a @countKey, adds total and child counts for the node
+ * @param countKey
+ * @param totalKey
+ * @param childKey
+ * @returns {function(*)}
+ */
+export function buildPropertySummer (countKey, totalKey, childKey) {
+    const summer = (node) => {
+        if (node == null) {
+            return 0;
+        }
+
+        const count = Number(node[countKey] || 0);
+        const sum = _.sumBy(node.children, summer);
+
+        if (node.children) {
+            node[totalKey] = sum + count;
+            node[childKey] = sum;
+        }
+
+        return count + sum;
+    };
+    return summer;
+};

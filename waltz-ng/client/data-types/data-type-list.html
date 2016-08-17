@@ -36,49 +36,10 @@
 
 
     <!-- TREE -->
-    <waltz-section name="Data Types" small="All">
+    <waltz-data-type-tree data-data-types="ctrl.dataTypes"
+                          tallies="ctrl.tallies">
 
-        <ul class="list-unstyled"
-            ng-show="ctrl.dataTypeHierarchy.length > 0">
-            <li ng-repeat="dataType in ctrl.dataTypeHierarchy | orderBy:'name'">
-                <div ng-include="'node.html'"
-                     ng-init="node=dataType; level=1">
-                </div>
-            </li>
-        </ul>
+    </waltz-data-type-tree>
 
-        <div class="alert alert-warning"
-             ng-show="ctrl.dataTypeHierarchy.length == 0">
-            <strong>No Data Types</strong> have been defined within this system.
-        </div>
-
-    </waltz-section>
-
-
-    <script type="text/ng-template"
-            id="node.html">
-        <div class="waltz-org-unit-level waltz-org-unit-level-{{ level }}">
-            <a ui-sref="main.data-type.code ({ code: node.code})"
-               class="waltz-org-unit-name clickable"
-               ng-bind="node.name">
-            </a>
-            <span ng-if="ctrl.tallies[node.id] > 0"
-                  class="small waltz-tally-count"
-                  title="Number of applications">
-                <span ng-bind="ctrl.tallies[node.id]"></span>
-                <span>application/s</span>
-            </span>
-
-            <div class="text-muted no-overflow"
-                 ng-bind="node.description">
-            </div>
-        </div>
-
-        <ul class="list-unstyled">
-            <li ng-repeat="node in node.children | orderBy:'name'"
-                ng-init="level=level+1"
-                ng-include="'node.html'"></li>
-        </ul>
-    </script>
 
 </div>

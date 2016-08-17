@@ -28,6 +28,7 @@ import com.khartec.waltz.model.dataflow.DataFlowMeasures;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowStatistics;
 import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,5 +98,10 @@ public class DataFlowService {
                 .flowCounts(flowCounts)
                 .build();
     }
+
+    public List<Tally<String>> tallyByDataType() {
+        return dataFlowDao.tallyByDataType();
+    }
+
 
 }

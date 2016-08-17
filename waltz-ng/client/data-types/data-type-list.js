@@ -1,13 +1,15 @@
 import angular from "angular";
-import {initialiseData, buildHierarchies} from "../common";
+import {initialiseData} from "../common";
+
 
 const initialState = {
     dataTypes: [],
-    dataTypeHierarchy: []
+    tallies: [],
 };
 
 
 function controller($state,
+                    dataFlowStore,
                     dataTypes,
                     staticPanelStore,
                     svgStore) {
@@ -15,7 +17,6 @@ function controller($state,
     const vm = initialiseData(this, initialState);
 
     vm.dataTypes = dataTypes;
-    vm.dataTypeHierarchy = buildHierarchies(dataTypes);
 
     svgStore
         .findByKind('DATA_TYPE')
@@ -29,11 +30,16 @@ function controller($state,
         b.block.onclick = () => $state.go('main.data-type.view', { dataTypeId: b.value });
         angular.element(b.block).addClass('clickable');
     };
+
+    dataFlowStore.countByDataType()
+        .then(tallies => vm.tallies = tallies );
+
 }
 
 
 controller.$inject = [
     '$state',
+    'DataFlowDataStore',
     'dataTypes',
     'StaticPanelStore',
     'SvgDiagramStore'

@@ -23,6 +23,8 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
+import com.khartec.waltz.model.tally.ImmutableStringTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.DataFlowRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,7 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
-
+import static org.jooq.impl.DSL.count;
 
 
 @Repository
@@ -151,4 +153,13 @@ public class DataFlowDao {
     }
 
 
+    public List<Tally<String>> tallyByDataType() {
+        return dsl.select(DATA_FLOW.DATA_TYPE, count(DATA_FLOW.DATA_TYPE))
+                .from(DATA_FLOW)
+                .groupBy(DATA_FLOW.DATA_TYPE)
+                .fetch(r -> ImmutableStringTally.builder()
+                        .id(r.value1())
+                        .count(r.value2())
+                        .build());
+    }
 }

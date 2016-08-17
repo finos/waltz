@@ -50,7 +50,7 @@
         <ul class="list-unstyled"
             ng-show="ctrl.capabilityHierarchy.length > 0">
             <li ng-repeat="capability in ctrl.capabilityHierarchy | orderBy:'name'">
-                <div ng-include="'node.html'"
+                <div ng-include="'inline/capabilities/tree/node.html'"
                      ng-init="node=capability; level=1"></div>
             </li>
         </ul>
@@ -70,7 +70,7 @@
 
 
     <script type="text/ng-template"
-            id="node.html">
+            id="inline/capabilities/tree/node.html">
         <div class="waltz-org-unit-level waltz-org-unit-level-{{ level }}">
             <a ui-sref="main.capability.view ({ id: node.id })"
                class="waltz-org-unit-name">
@@ -89,7 +89,7 @@
         <ul class="list-unstyled">
             <li ng-repeat="node in node.children | orderBy:'name'"
                 ng-init="level=level+1"
-                ng-include="'node.html'"></li>
+                ng-include="'inline/capabilities/tree/node.html'"></li>
         </ul>
     </script>
 </div>

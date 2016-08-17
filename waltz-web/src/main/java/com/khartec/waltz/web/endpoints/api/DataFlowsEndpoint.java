@@ -23,6 +23,7 @@ import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow.DataFlowService;
@@ -79,6 +80,7 @@ public class DataFlowsEndpoint implements Endpoint {
         String findByAppIdSelectorPath = mkPath(BASE_URL, "apps");
         String findStatsPath = mkPath(BASE_URL, "stats");
         String updateFlowsPath = BASE_URL;
+        String tallyByDataTypePath = mkPath(BASE_URL, "count-by", "data-type");
 
 
         DatumRoute<Boolean> updateFlowsRoute = (request, response) -> {
@@ -149,10 +151,15 @@ public class DataFlowsEndpoint implements Endpoint {
                 -> dataFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
 
 
+        ListRoute<Tally<String>> tallyByDataTypeRoute = (request, response)
+                -> dataFlowService.tallyByDataType();
+
+
         getForList(findByEntityPath, getByEntityRef);
         postForList(findByAppIdSelectorPath, findByAppIdSelectorRoute);
         postForDatum(updateFlowsPath, updateFlowsRoute);
         postForDatum(findStatsPath, findStatsRoute);
+        getForList(tallyByDataTypePath, tallyByDataTypeRoute);
     }
 
 
