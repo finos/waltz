@@ -16,12 +16,50 @@
                               all-data-types="ctrl.viewData.dataTypes"
                               data-data-type-id="ctrl.viewData.dataType.id"
                               apps="ctrl.viewData.apps"
-                              flows="ctrl.viewData.dataFlows.stats"
+                              flows="ctrl.viewData.dataFlowTallies"
                               costs="ctrl.viewData.assetCostData.stats"
                               server-stats="ctrl.viewData.techStats.serverStats"
                               complexity="ctrl.viewData.complexity"
-                              data-data-flow-tallies="ctrl.viewData.dataFlowTallies">
+                              data-data-flow-tallies="ctrl.viewData.dataFlowTallies.dataTypeCounts">
     </waltz-data-type-overview>
+
+
+    <!-- FLOWS -->
+    <waltz-data-type-flows-tabgroup-section ratings="ctrl.viewData.sourceDataRatings"
+                                       flow-data="ctrl.viewData.dataFlows"
+                                       on-load-detail="ctrl.loadFlowDetail"
+                                       applications="ctrl.viewData.apps">
+
+    </waltz-data-type-flows-tabgroup-section>
+
+
+    <!-- INDICATORS -->
+    <waltz-entity-statistic-summary-section name="Indicators"
+                                            definitions="ctrl.viewData.entityStatisticDefinitions"
+                                            parent-ref="ctrl.entityRef">
+    </waltz-entity-statistic-summary-section>
+
+
+    <!-- COSTS -->
+    <waltz-asset-costs-section data="ctrl.viewData.assetCostData"
+                               source-data-ratings="ctrl.viewData.sourceDataRatings"
+                               on-bucket-select="ctrl.onAssetBucketSelect"
+                               csv-name="asset_costs.csv">
+    </waltz-asset-costs-section>
+
+
+    <!-- BOOKMARKS -->
+    <waltz-bookmarks-section bookmarks="ctrl.viewData.bookmarks"
+                             entity-id="{{ ctrl.viewData.dataType.id }}"
+                             kind="DATA_TYPE"
+                             parent-name="{{ ctrl.viewData.orgUnit.name }}"
+                             source-data-ratings="ctrl.viewData.sourceDataRatings">
+    </waltz-bookmarks-section>
+
+
+    <!-- CHANGE_LOG -->
+    <waltz-change-log-section entries="ctrl.viewData.logEntries">
+    </waltz-change-log-section>
 
 
 </div>

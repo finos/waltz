@@ -78,7 +78,9 @@ public class DataFlowsEndpoint implements Endpoint {
 
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByAppIdSelectorPath = mkPath(BASE_URL, "apps");
+        String findByDataTypeIdSelectorPath = mkPath(BASE_URL, "data-type");
         String findStatsPath = mkPath(BASE_URL, "stats");
+        String findStatsForDataTypePath = mkPath(BASE_URL, "stats", "data-type");
         String updateFlowsPath = BASE_URL;
         String tallyByDataTypePath = mkPath(BASE_URL, "count-by", "data-type");
 
@@ -147,8 +149,14 @@ public class DataFlowsEndpoint implements Endpoint {
         ListRoute<DataFlow> findByAppIdSelectorRoute = (request, response)
                 -> dataFlowService.findByAppIdSelector(readIdSelectionOptionsFromBody(request));
 
+        ListRoute<DataFlow> findByDataTypeIdSelectorRoute = (request, response)
+                -> dataFlowService.findByDataTypeIdSelector(readIdSelectionOptionsFromBody(request));
+
         DatumRoute<DataFlowStatistics> findStatsRoute = (request, response)
                 -> dataFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
+
+        DatumRoute<DataFlowStatistics> findStatsForDataTypeRoute = (request, response)
+                -> dataFlowService.calculateStatsForDataType(readIdSelectionOptionsFromBody(request));
 
 
         ListRoute<Tally<String>> tallyByDataTypeRoute = (request, response)
@@ -157,8 +165,10 @@ public class DataFlowsEndpoint implements Endpoint {
 
         getForList(findByEntityPath, getByEntityRef);
         postForList(findByAppIdSelectorPath, findByAppIdSelectorRoute);
+        postForList(findByDataTypeIdSelectorPath, findByDataTypeIdSelectorRoute);
         postForDatum(updateFlowsPath, updateFlowsRoute);
         postForDatum(findStatsPath, findStatsRoute);
+        postForDatum(findStatsForDataTypePath, findStatsForDataTypeRoute);
         getForList(tallyByDataTypePath, tallyByDataTypeRoute);
     }
 

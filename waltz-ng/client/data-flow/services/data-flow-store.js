@@ -46,8 +46,18 @@ function service(dataFlowUtils, appStore, $http, BaseApiUrl) {
         .then(r => r.data);
 
 
+    const findByDataTypeIdSelector = (options) => $http
+        .post(`${BASE}/data-type`, options)
+        .then(r => r.data);
+
+
     const calculateStats = (options) => $http
         .post(`${BASE}/stats`, options)
+        .then(r => r.data);
+
+
+    const calculateStatsForDataType = (options) => $http
+        .post(`${BASE}/stats/data-type`, options)
         .then(r => r.data);
 
 
@@ -60,7 +70,9 @@ function service(dataFlowUtils, appStore, $http, BaseApiUrl) {
         findByEntityReference,
         findEnrichedFlowsForApplication,
         findByAppIdSelector,
+        findByDataTypeIdSelector,
         calculateStats,
+        calculateStatsForDataType,
         create,
         countByDataType
     };

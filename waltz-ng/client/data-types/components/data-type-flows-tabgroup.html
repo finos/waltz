@@ -1,0 +1,76 @@
+<div class="row">
+    <div class="col-md-6 col-md-offset-6">
+        <waltz-flow-filter-options-overlay visible="$ctrl.optionsVisible"
+                                           on-change="$ctrl.filterChanged"
+                                           types="$ctrl.dataTypes">
+        </waltz-flow-filter-options-overlay>
+    </div>
+
+    <div class="col-md-12">
+        <uib-tabset active="active">
+
+            <!-- TABLE -->
+            <uib-tab index="0"
+                     heading="Table"
+                     select="$ctrl.tabSelected('table', 0)">
+                <br>
+                <waltz-loading-notification show="$ctrl.flowData.loadingFlows"
+                                            name="Loading Flow Data">
+                </waltz-loading-notification>
+                <div ng-if="$ctrl.flowData.length >0"
+                     class="waltz-scroll-region"
+                     style="height: 300px">
+                    <waltz-data-flow-table flows="$ctrl.flowData">
+
+                    </waltz-data-flow-table>
+                </div>
+
+            </uib-tab>
+
+            <!-- GRAPH -->
+            <uib-tab index="1"
+                     heading="Graph"
+                     select="$ctrl.tabSelected('graph', 1)">
+                <br>
+
+                <div ng-if="$ctrl.filteredFlowData.entities.length == 0  && $ctrl.flowData.length > 0">
+                    <div class="alert alert-warning">
+                        <strong>No data to show</strong> given the current filter options.  Use the
+                        configure button above to adjust these options.
+                    </div>
+                </div>
+
+
+                <div ng-if="$ctrl.filteredFlowData.entities.length >= 200 && !$ctrl.visibility.ignoreLimits">
+                    <div class="alert alert-warning">
+                        This graph will have <strong>too many nodes</strong> to render smoothly.
+                        Use the configure button too limit the amount of data to show.  Alternatively
+                        the data is available via the 'Table' tab.
+
+                        <br>
+
+                        If you still want to see the graph click
+                        <a class="clickable" ng-click="$ctrl.visibility.ignoreLimits = true">here</a>
+                         - however be aware that your machine may struggle.
+                    </div>
+                </div>
+
+
+                <div ng-if="$ctrl.boingyEverShown && $ctrl.filteredFlowData.flows.length > 0">
+                    <div ng-if="$ctrl.filteredFlowData.entities.length < 200  || $ctrl.visibility.ignoreLimits">
+                        <waltz-data-flow-diagram data="$ctrl.filteredFlowData"
+                                                 tweakers="$ctrl.graphTweakers">
+                        </waltz-data-flow-diagram>
+
+                        <div class="small text-muted">
+                            Dragging nodes will pin them.  Double click to unpin.  If an application is gray
+                            it is not a member of this group.
+                        </div>
+                    </div>
+                </div>
+
+            </uib-tab>
+
+        </uib-tabset>
+    </div>
+</div>

@@ -27,6 +27,7 @@ import com.khartec.waltz.model.tally.ImmutableStringTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.DataFlowRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static org.jooq.impl.DSL.count;
 
 
@@ -46,6 +48,7 @@ public class DataFlowDao {
     private final DSLContext dsl;
     private final com.khartec.waltz.schema.tables.Application sourceAppAlias = APPLICATION.as("sourceAppAlias");
     private final com.khartec.waltz.schema.tables.Application targetAppAlias = APPLICATION.as("targetAppAlias");
+    private final com.khartec.waltz.schema.tables.DataType dt = DATA_TYPE.as("dt");
 
     private RecordMapper<Record, DataFlow> dataFlowMapper = r -> {
         DataFlowRecord record = r.into(DataFlowRecord.class);
@@ -161,5 +164,13 @@ public class DataFlowDao {
                         .id(r.value1())
                         .count(r.value2())
                         .build());
+    }
+
+
+    public Collection<DataFlow> findByDataTypeIdSelector(Select<Record1<Long>> dataTypeIdSelector) {
+        return baseQuery()
+                .and(DATA_FLOW.DATA_TYPE
+                        .in(DSL.select(dt.CODE).from(dt).where(dt.ID.in(dataTypeIdSelector))))
+                .fetch(dataFlowMapper);
     }
 }

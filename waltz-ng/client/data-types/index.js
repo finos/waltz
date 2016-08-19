@@ -9,6 +9,8 @@ export default (module) => {
 
     module
         .component('waltzDataTypeOverview', require('./components/data-type-overview'))
+        .component('waltzDataTypeFlowsTabgroup', require('./components/data-type-flows-tabgroup'))
+        .component('waltzDataTypeFlowsTabgroupSection', require('./components/data-type-flows-tabgroup-section'))
         .component('waltzDataTypeTree', require('./components/data-type-tree'));
 
 };

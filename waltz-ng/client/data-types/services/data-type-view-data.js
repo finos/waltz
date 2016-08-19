@@ -18,7 +18,6 @@ function service($q,
                  appStore,
                  appCapabilityStore,
                  changeLogStore,
-                 dataFlowViewService,
                  dataFlowStore,
                  entityStatisticStore,
                  ratingStore,
@@ -47,8 +46,8 @@ function service($q,
         const promises = [
             dataTypeService.loadDataTypes(),
             appStore.findBySelector(appIdSelector),
-            dataFlowViewService.initialise(dataTypeId, "DATA_TYPE", "CHILDREN"),
-            dataFlowStore.countByDataType(),
+            dataFlowStore.findByDataTypeIdSelector(appIdSelector),
+            dataFlowStore.calculateStatsForDataType(appIdSelector),
             changeLogStore.findByEntityReference('DATA_TYPE', dataTypeId),
             assetCostViewService.initialise(appIdSelector, 2016)
         ];
@@ -143,15 +142,9 @@ function service($q,
     }
 
 
-    function loadFlowDetail() {
-        dataFlowViewService.loadDetail();
-    }
-
-
     return {
         loadAll,
         selectAssetBucket,
-        loadFlowDetail
     };
 
 }
@@ -161,7 +154,6 @@ service.$inject = [
     'ApplicationStore',
     'AppCapabilityStore',
     'ChangeLogDataService',
-    'DataFlowViewService',
     'DataFlowDataStore',
     'EntityStatisticStore',
     'RatingStore',
