@@ -2441,4 +2441,69 @@
     </changeSet>
 
 
+
+    <!-- 422 : Database Information - OS and HW end of life -->
+    <changeSet author="dwatkins"
+               id="20160823-422-1">
+        <renameTable oldTableName="database"
+                     newTableName="database_information"/>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20160823-422-2">
+        <addColumn tableName="database_information">
+            <column name="end_of_life_date"
+                    type="DATE">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="database_information">
+            <column name="asset_code"
+                    defaultValue="UNKNOWN"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20160823-422-3"
+               author="dwatkins"
+               dbms="mssql">
+        <sql>
+            update db
+            set db.asset_code = rel.asset_code
+            from database_information db
+            inner join
+               (
+                 select er.id_b, app.asset_code from entity_relationship er
+                 inner JOIN application app ON app.id = er.id_a
+                 where kind_b = 'DATABASE'
+               ) rel
+            on rel.id_b = db.id;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20160823-422-4"
+               author="dwatkins"
+               dbms="mysql">
+        <sql>
+            update database_information db
+            inner join
+                (
+                    select er.id_b, app.asset_code from entity_relationship er
+                    inner JOIN application app ON app.id = er.id_a
+                    where kind_b = 'DATABASE'
+                ) rel
+            on rel.id_b = db.id
+            set db.asset_code = rel.asset_code;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20160823-422-5"
+               author="dwatkins">
+        <delete tableName="entity_relationship">
+            <where>kind_b = 'DATABASE'</where>
+        </delete>
+    </changeSet>
+
 </databaseChangeLog>

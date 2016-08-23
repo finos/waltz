@@ -17,8 +17,8 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.data.database_usage.DatabaseDao;
-import com.khartec.waltz.model.database.Database;
+import com.khartec.waltz.data.database_information.DatabaseInformationDao;
+import com.khartec.waltz.model.database_information.DatabaseInformation;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -38,10 +38,10 @@ public class DatabaseHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
-        DatabaseDao databaseDao = ctx.getBean(DatabaseDao.class);
+        DatabaseInformationDao databaseDao = ctx.getBean(DatabaseInformationDao.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<Database> dbs = databaseDao.findByApplicationId(801L);
+        List<DatabaseInformation> dbs = databaseDao.findByApplicationId(801L);
         System.out.println(dbs.size());
 
         SelectConditionStep<Record1<Long>> idSelector = dsl
@@ -49,7 +49,7 @@ public class DatabaseHarness {
                 .from(APPLICATION)
                 .where(APPLICATION.ID.in(801L, 802L, 803L));
 
-        Map<Long, List<Database>> moreDbs = databaseDao.findByAppSelector(idSelector);
+        Map<Long, List<DatabaseInformation>> moreDbs = databaseDao.findByAppSelector(idSelector);
         System.out.println(moreDbs.size());
         System.out.println(moreDbs.values().size());
 

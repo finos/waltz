@@ -1,13 +1,12 @@
-package com.khartec.waltz.data.database_usage;
+package com.khartec.waltz.data.database_information;
 
 import com.khartec.waltz.common.ArrayBuilder;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.database.Database;
-import com.khartec.waltz.model.database.DatabaseSummaryStatistics;
-import com.khartec.waltz.model.database.ImmutableDatabase;
-import com.khartec.waltz.model.database.ImmutableDatabaseSummaryStatistics;
+import com.khartec.waltz.model.database_information.DatabaseInformation;
+import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
+import com.khartec.waltz.model.database_information.ImmutableDatabaseInformation;
+import com.khartec.waltz.model.database_information.ImmutableDatabaseSummaryStatistics;
 import com.khartec.waltz.model.tally.StringTally;
-import com.khartec.waltz.schema.tables.records.DatabaseRecord;
+import com.khartec.waltz.schema.tables.records.DatabaseInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,23 +18,22 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
-import static com.khartec.waltz.schema.tables.Database.DATABASE;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
-public class DatabaseDao {
-
-    private final static String APP_KIND = EntityKind.APPLICATION.name();
-    private final static String DB_KIND = EntityKind.DATABASE.name();
+public class DatabaseInformationDao {
 
     private final DSLContext dsl;
 
-    private final static RecordMapper<? super Record, Database> DATABASE_RECORD_MAPPER = r -> {
-        DatabaseRecord record = r.into(DATABASE);
-        return ImmutableDatabase.builder()
+
+    private final static RecordMapper<? super Record, DatabaseInformation> DATABASE_RECORD_MAPPER = r -> {
+        DatabaseInformationRecord record = r.into(DATABASE_INFORMATION);
+        return ImmutableDatabaseInformation.builder()
                 .databaseName(record.getDatabaseName())
                 .instanceName(record.getInstanceName())
                 .environment(record.getEnvironment())
@@ -44,44 +42,40 @@ public class DatabaseDao {
                 .dbmsVersion(record.getDbmsVersion())
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .provenance(record.getProvenance())
+                .assetCode(record.getAssetCode())
+                .endOfLifeDate(record.getEndOfLifeDate())
                 .build();
     };
 
 
     @Autowired
-    public DatabaseDao(DSLContext dsl) {
+    public DatabaseInformationDao(DSLContext dsl) {
         this.dsl = dsl;
     }
 
 
-    public List<Database> findByApplicationId(long id) {
-
-        Condition joinCondition = DSL.condition(true)
-                .and(ENTITY_RELATIONSHIP.KIND_A.eq(APP_KIND))
-                .and(ENTITY_RELATIONSHIP.ID_A.eq(id))
-                .and(ENTITY_RELATIONSHIP.KIND_B.eq(DB_KIND))
-                .and(ENTITY_RELATIONSHIP.ID_B.eq(DATABASE.ID));
-
-        return dsl.select(DATABASE.fields())
-                .from(DATABASE)
-                .innerJoin(ENTITY_RELATIONSHIP)
-                .on(joinCondition)
+    public List<DatabaseInformation> findByApplicationId(long id) {
+        return dsl.select(DATABASE_INFORMATION.fields())
+                .from(DATABASE_INFORMATION)
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ASSET_CODE.eq(DATABASE_INFORMATION.ASSET_CODE))
+                .where(APPLICATION.ID.eq(id))
                 .fetch(DATABASE_RECORD_MAPPER);
     }
 
 
-    public Map<Long, List<Database>> findByAppSelector(Select<Record1<Long>> appIdSelector) {
-        Condition joinCondition = byAppIdsJoinCondition(appIdSelector);
-
+    public Map<Long, List<DatabaseInformation>> findByAppSelector(Select<Record1<Long>> appIdSelector) {
         SelectField[] selectFields = new ArrayBuilder<SelectField>()
                 .add(ENTITY_RELATIONSHIP.ID_A, ENTITY_RELATIONSHIP.KIND_A)
-                .add(DATABASE.fields())
+                .add(DATABASE_INFORMATION.fields())
                 .build(new SelectField[]{});
 
         return dsl.select(selectFields)
-                .from(DATABASE)
-                .innerJoin(ENTITY_RELATIONSHIP)
-                .on(joinCondition.toString())
+                .from(DATABASE_INFORMATION)
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ASSET_CODE.eq(DATABASE_INFORMATION.ASSET_CODE))
+                .where(APPLICATION.ID.in(appIdSelector))
+                .fetch()
                 .stream()
                 .map(r -> tuple(
                         r.getValue(ENTITY_RELATIONSHIP.ID_A),
@@ -93,28 +87,23 @@ public class DatabaseDao {
     }
 
 
-    private Condition byAppIdsJoinCondition(Select<Record1<Long>> appIdSelector) {
-        return DSL.condition(true)
-                .and(ENTITY_RELATIONSHIP.KIND_A.eq(APP_KIND))
-                .and(ENTITY_RELATIONSHIP.ID_A.in(appIdSelector))
-                .and(ENTITY_RELATIONSHIP.KIND_B.eq(DB_KIND))
-                .and(ENTITY_RELATIONSHIP.ID_B.eq(DATABASE.ID));
-    }
-
-
     public DatabaseSummaryStatistics findStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
-        Condition condition = byAppIdsJoinCondition(appIdSelector);
+        Table databaseInfo = DATABASE_INFORMATION
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ASSET_CODE.eq(DATABASE_INFORMATION.ASSET_CODE))
+                .and(APPLICATION.ID.in(appIdSelector))
+                .asTable();
 
         List<StringTally> vendorCounts = calculateStringTallies(
                 dsl,
-                DATABASE.innerJoin(ENTITY_RELATIONSHIP).on(condition),
-                DATABASE.DBMS_VENDOR,
+                databaseInfo,
+                DATABASE_INFORMATION.DBMS_VENDOR,
                 DSL.trueCondition());
 
         List<StringTally> environmentCounts = calculateStringTallies(
                 dsl,
-                DATABASE.innerJoin(ENTITY_RELATIONSHIP).on(condition),
-                DATABASE.ENVIRONMENT,
+                databaseInfo,
+                DATABASE_INFORMATION.ENVIRONMENT,
                 DSL.trueCondition());
 
         return ImmutableDatabaseSummaryStatistics.builder()
@@ -122,6 +111,5 @@ public class DatabaseDao {
                 .environmentCounts(environmentCounts)
                 .build();
     }
-
 
 }

@@ -1,8 +1,8 @@
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.database.Database;
-import com.khartec.waltz.model.database.DatabaseSummaryStatistics;
-import com.khartec.waltz.service.database.DatabaseService;
+import com.khartec.waltz.model.database_information.DatabaseInformation;
+import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
+import com.khartec.waltz.service.database_information.DatabaseInformationService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -17,15 +17,15 @@ import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
-public class DatabaseEndpoint implements Endpoint {
+public class DatabaseInformationEndpoint implements Endpoint {
 
-    private final DatabaseService databaseService;
+    private final DatabaseInformationService databaseInformationService;
 
     private static final String BASE_URL = mkPath("api", "database");
 
     @Autowired
-    public DatabaseEndpoint(DatabaseService databaseService) {
-        this.databaseService = databaseService;
+    public DatabaseInformationEndpoint(DatabaseInformationService databaseInformationService) {
+        this.databaseInformationService = databaseInformationService;
     }
 
     @Override
@@ -36,11 +36,11 @@ public class DatabaseEndpoint implements Endpoint {
         String findStatsForAppIdSelectorPath = mkPath(BASE_URL, "stats");
 
 
-        ListRoute<Database> findForAppRoute = (request, response)
-                -> databaseService.findByApplicationId(getId(request));
+        ListRoute<DatabaseInformation> findForAppRoute = (request, response)
+                -> databaseInformationService.findByApplicationId(getId(request));
 
         ListRoute<ApplicationDatabases> findForAppSelectorRoute = (request, response)
-                -> databaseService.findByApplicationSelector(readIdSelectionOptionsFromBody(request))
+                -> databaseInformationService.findByApplicationSelector(readIdSelectionOptionsFromBody(request))
                     .entrySet()
                     .stream()
                     .map(e -> ImmutableApplicationDatabases.builder()
@@ -50,7 +50,7 @@ public class DatabaseEndpoint implements Endpoint {
                     .collect(Collectors.toList());
 
         DatumRoute<DatabaseSummaryStatistics> findStatsForAppIdSelectorRoute = (request, response)
-                -> databaseService.findStatsForAppIdSelector(readIdSelectionOptionsFromBody(request));
+                -> databaseInformationService.findStatsForAppIdSelector(readIdSelectionOptionsFromBody(request));
 
 
         getForList(findForAppPath, findForAppRoute);

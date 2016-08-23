@@ -15,13 +15,13 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.service.server_info;
+package com.khartec.waltz.service.server_information;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.server_info.ServerInfoDao;
+import com.khartec.waltz.data.server_information.ServerInformationDao;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.serverinfo.ServerInfo;
-import com.khartec.waltz.model.serverinfo.ServerSummaryStatistics;
+import com.khartec.waltz.model.server_information.ServerInformation;
+import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,34 +33,34 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 
 
 @Service
-public class ServerInfoService {
+public class ServerInformationService {
 
-    private final ServerInfoDao serverInfoDao;
+    private final ServerInformationDao serverInformationDao;
     private final ApplicationIdSelectorFactory selectorFactory;
 
 
     @Autowired
-    public ServerInfoService(ServerInfoDao serverInfoDao, ApplicationIdSelectorFactory selectorFactory) {
-        checkNotNull(serverInfoDao, "serverInfoDao must not be null");
+    public ServerInformationService(ServerInformationDao serverInfoDao, ApplicationIdSelectorFactory selectorFactory) {
+        checkNotNull(serverInfoDao, "serverInformationDao must not be null");
         checkNotNull(selectorFactory, "selectorFactory cannot be null");
 
-        this.serverInfoDao = serverInfoDao;
+        this.serverInformationDao = serverInfoDao;
         this.selectorFactory = selectorFactory;
     }
 
-    public List<ServerInfo> findByAssetCode(String assetCode) {
-        return serverInfoDao.findByAssetCode(assetCode);
+    public List<ServerInformation> findByAssetCode(String assetCode) {
+        return serverInformationDao.findByAssetCode(assetCode);
     }
 
 
-    public List<ServerInfo> findByAppId(long appId) {
-        return serverInfoDao.findByAppId(appId);
+    public List<ServerInformation> findByAppId(long appId) {
+        return serverInformationDao.findByAppId(appId);
     }
 
 
     public ServerSummaryStatistics findStatsForAppSelector(IdSelectionOptions options) {
         Select<Record1<Long>> selector = selectorFactory.apply(options);
-        return serverInfoDao.findStatsForAppSelector(selector);
+        return serverInformationDao.findStatsForAppSelector(selector);
     }
 
 }

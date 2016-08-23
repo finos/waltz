@@ -15,10 +15,11 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.serverinfo;
+package com.khartec.waltz.model.server_information;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.AssetCodeProvider;
 import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.Nullable;
 import com.khartec.waltz.model.ProvenanceProvider;
@@ -28,9 +29,12 @@ import java.util.Date;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableServerInfo.class)
-@JsonDeserialize(as = ImmutableServerInfo.class)
-public abstract class ServerInfo implements IdProvider, ProvenanceProvider {
+@JsonSerialize(as = ImmutableServerInformation.class)
+@JsonDeserialize(as = ImmutableServerInformation.class)
+public abstract class ServerInformation implements
+        IdProvider,
+        ProvenanceProvider,
+        AssetCodeProvider {
 
     public abstract String hostname();
     public abstract String operatingSystem();
@@ -38,7 +42,6 @@ public abstract class ServerInfo implements IdProvider, ProvenanceProvider {
     public abstract String environment();
     public abstract String location();
     public abstract String country();
-    public abstract String assetCode();
 
     @Nullable
     public abstract Date hardwareEndOfLifeDate();

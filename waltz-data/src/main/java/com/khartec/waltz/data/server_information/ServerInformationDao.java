@@ -15,12 +15,12 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.data.server_info;
+package com.khartec.waltz.data.server_information;
 
-import com.khartec.waltz.model.serverinfo.ImmutableServerInfo;
-import com.khartec.waltz.model.serverinfo.ImmutableServerSummaryStatistics;
-import com.khartec.waltz.model.serverinfo.ServerInfo;
-import com.khartec.waltz.model.serverinfo.ServerSummaryStatistics;
+import com.khartec.waltz.model.server_information.ImmutableServerInformation;
+import com.khartec.waltz.model.server_information.ImmutableServerSummaryStatistics;
+import com.khartec.waltz.model.server_information.ServerInformation;
+import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
 import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.schema.tables.records.ServerInformationRecord;
 import org.jooq.*;
@@ -37,6 +37,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.data.JooqUtilities.DB_EXECUTOR_POOL;
 import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -44,16 +45,16 @@ import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATI
 
 
 @Repository
-public class ServerInfoDao {
+public class ServerInformationDao {
 
 
     private final DSLContext dsl;
 
 
-    private final RecordMapper<Record, ServerInfo> recordMapper = r -> {
+    private final RecordMapper<Record, ServerInformation> recordMapper = r -> {
 
         ServerInformationRecord row = r.into(ServerInformationRecord.class);
-        return ImmutableServerInfo.builder()
+        return ImmutableServerInformation.builder()
                 .id(row.getId())
                 .assetCode(row.getAssetCode())
                 .hostname(row.getHostname())
@@ -71,13 +72,13 @@ public class ServerInfoDao {
 
 
     @Autowired
-    public ServerInfoDao(DSLContext dsl) {
+    public ServerInformationDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl must not be null");
         this.dsl = dsl;
     }
 
 
-    public List<ServerInfo> findByAssetCode(String assetCode) {
+    public List<ServerInformation> findByAssetCode(String assetCode) {
         return dsl.select()
                 .from(SERVER_INFORMATION)
                 .where(SERVER_INFORMATION.ASSET_CODE.eq(assetCode))
@@ -85,7 +86,7 @@ public class ServerInfoDao {
     }
 
 
-    public List<ServerInfo> findByAppId(long appId) {
+    public List<ServerInformation> findByAppId(long appId) {
         return dsl.select(SERVER_INFORMATION.fields())
                 .from(SERVER_INFORMATION)
                 .innerJoin(APPLICATION)
@@ -95,7 +96,7 @@ public class ServerInfoDao {
     }
 
 
-    public int[] bulkSave(List<ServerInfo> servers) {
+    public int[] bulkSave(List<ServerInformation> servers) {
         return dsl
                 .batch(servers.stream()
                     .map(s -> dsl
@@ -109,6 +110,8 @@ public class ServerInfoDao {
                                     SERVER_INFORMATION.ENVIRONMENT,
                                     SERVER_INFORMATION.LOCATION,
                                     SERVER_INFORMATION.ASSET_CODE,
+                                    SERVER_INFORMATION.HW_END_OF_LIFE_DATE,
+                                    SERVER_INFORMATION.OS_END_OF_LIFE_DATE,
                                     SERVER_INFORMATION.PROVENANCE)
                             .values(
                                     s.hostname(),
@@ -119,6 +122,8 @@ public class ServerInfoDao {
                                     s.environment(),
                                     s.location(),
                                     s.assetCode(),
+                                    toSqlDate(s.hardwareEndOfLifeDate()),
+                                    toSqlDate(s.operationSystemEndOfLifeDate()),
                                     s.provenance()))
                     .collect(Collectors.toList()))
                 .execute();
