@@ -11,5 +11,7 @@
  */
 
 export default (module) => {
-    module.directive('waltzBucketChart', require('./bucket-chart'));
+    module
+        .component('waltzBucketChart', require('./bucket-chart'))
+        .component('waltzBucketChart2', require('./bucket-chart2'));
 };

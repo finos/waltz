@@ -25,13 +25,17 @@ import com.khartec.waltz.model.cost.*;
 import com.khartec.waltz.schema.tables.records.AssetCostRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AssetCost.ASSET_COST;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
@@ -118,6 +122,24 @@ public class AssetCostDao {
                 .where(APPLICATION.ID.in(appIdSelector))
                 .and(ASSET_COST.YEAR.eq(year))
                 .fetch(appCostMapper);
+    }
+
+
+    public List<Tuple2<Long, BigDecimal>> calculateCombinedAmountsForSelector(int year, Select<Record1<Long>> appIdSelector) {
+        checkNotNull(appIdSelector, "appIdSelector cannot be null");
+
+        Field<BigDecimal> totalAmount = DSL.sum(ASSET_COST.AMOUNT).as("total_amount");
+
+        Condition condition = ASSET_COST.YEAR.eq(year)
+                .and(APPLICATION.ID.in(appIdSelector));
+
+        return dsl.select(APPLICATION.ID, totalAmount)
+                .from(ASSET_COST)
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ASSET_CODE.eq(ASSET_COST.ASSET_CODE))
+                .where(dsl.renderInlined(condition))
+                .groupBy(APPLICATION.ID)
+                .fetch(r -> Tuple.tuple(r.value1(), r.value2()));
     }
 
 

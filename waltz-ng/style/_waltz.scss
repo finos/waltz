@@ -17,7 +17,7 @@
 @import "../client/data-flow/components/rated-flow-summary/rated-flow-summary-table";
 
 @import "../client/auth-sources/auth-sources";
-@import "../client/common/directives/bucket-chart";
+@import "../client/common/componets/bucket-chart";
 @import "../client/org-units/list-view";
 @import "../client/bookmarks/bookmarks";
 @import "../client/widgets/styles";
@@ -36,6 +36,7 @@
 @import "../client/software-catalog/directives/simple-software-usage-list";
 @import "../client/data-flow/directives/flow-filter-options-overlay";
 @import "../client/complexity/directives/complexity-bar-chart";
+@import "../client/playpen/3/asset-cost-graph";
 
 html {
   overflow-y: scroll;

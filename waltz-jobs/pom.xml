@@ -30,7 +30,6 @@
             <version>0.5.0</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.khartec</groupId>
             <artifactId>waltz-service</artifactId>

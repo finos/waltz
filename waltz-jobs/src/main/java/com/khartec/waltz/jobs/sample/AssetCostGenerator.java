@@ -27,6 +27,7 @@ import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ public class AssetCostGenerator {
 
     private static final Random rnd = new Random();
 
-    private static final int year = 2015;
+    private static final int year = 2016;
     private static final String provenance = "waltz";
 
 
@@ -48,8 +49,8 @@ public class AssetCostGenerator {
 
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<AssetCostRecord> appDevCosts = generateRecords(applicationService, CostKind.APPLICATION_DEVELOPMENT, 10_000, 10_000_000);
-        List<AssetCostRecord> infraCosts = generateRecords(applicationService, CostKind.INFRASTRUCTURE, 1_000, 50_000);
+        List<AssetCostRecord> appDevCosts = generateRecords(applicationService, CostKind.APPLICATION_DEVELOPMENT, 100_0000);
+        List<AssetCostRecord> infraCosts = generateRecords(applicationService, CostKind.INFRASTRUCTURE, 5_000);
 
         dsl.deleteFrom(ASSET_COST)
                 .where(ASSET_COST.YEAR.eq(year))
@@ -61,7 +62,7 @@ public class AssetCostGenerator {
     }
 
 
-    private static List<AssetCostRecord> generateRecords(ApplicationService applicationService, CostKind kind, int low, int high) {
+    private static List<AssetCostRecord> generateRecords(ApplicationService applicationService, CostKind kind, int mean) {
         return applicationService.findAll()
                     .stream()
                     .filter(a -> a.assetCode().isPresent())
@@ -69,7 +70,7 @@ public class AssetCostGenerator {
                             .assetCode(a.assetCode().get())
                             .cost(ImmutableCost.builder()
                                     .currencyCode("EUR")
-                                    .amount(generateAmount(low, high))
+                                    .amount(generateAmount(mean))
                                     .year(year)
                                     .kind(kind)
                                     .build())
@@ -87,8 +88,12 @@ public class AssetCostGenerator {
     }
 
 
-    private static BigDecimal generateAmount(int low, int high) {
-        int amount = rnd.nextInt(high - low) + low;
-        return BigDecimal.valueOf(amount);
+    private static BigDecimal generateAmount(long mean) {
+        double z = mean / 3.4;
+        double val = rnd.nextGaussian() * z + mean;
+
+        return BigDecimal
+                .valueOf(val)
+                .setScale(2, RoundingMode.CEILING);
     }
 }
