@@ -1,0 +1,60 @@
+<div id="source-sink-section">
+    <waltz-section name="Sources and Sinks"
+                   icon="rss"
+                   id="source-sink-section">
+        <waltz-section-actions>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="$ctrl.visibility.sourcesOverlay = ! $ctrl.visibility.sourcesOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="$ctrl.visibility.sourcesOverlay"
+                                   ratings="$ctrl.ratings"
+                                   entities="['LOGICAL_DATA_FLOW', 'APPLICATION']">
+        </waltz-source-data-overlay>
+
+        <table class="table table-condensed">
+            <thead>
+            <tr>
+                <th>Application</th>
+                <th>Authoritativeness</th>
+                <th>Data Type</th>
+                <th>Org Unit</th>
+                <th>Sinks</th>
+            </tr>
+            </thead>
+            <tbody >
+            <tr ng-repeat="sourceSink in $ctrl.sourceSinks">
+                <td>
+                    <a ui-sref="main.app.view ({id: sourceSink.source.id})">
+                        {{sourceSink.source.name}}
+                    </a>
+                </td>
+                <td>
+                    <span>
+                        <waltz-rating-indicator value="{{sourceSink.rating}}"></waltz-rating-indicator>
+                        <span>
+                            {{sourceSink.rating|toDisplayName:'rating'}}
+                        </span>
+                    </span>
+                </td>
+                <td>
+                    <span ng-if='$first' ng-bind="sourceSink.dataType.name | toDisplayName:'dataType'"></span>
+                </td>
+                <td>
+                    <a ui-sref="main.org-unit.view ({id: sourceSink.organisationalUnit.id})">
+                        {{sourceSink.organisationalUnit.name}}
+                    </a>
+                </td>
+                <td>
+                    <span>
+                        {{sourceSink.sinkCount}}
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+    </waltz-section>
+</div>

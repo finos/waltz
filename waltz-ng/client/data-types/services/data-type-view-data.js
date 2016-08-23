@@ -27,7 +27,8 @@ function service($q,
                  capabilityStore,
                  techStatsService,
                  bookmarkStore,
-                 sourceDataRatingStore) {
+                 sourceDataRatingStore,
+                 sourceSinkStore) {
 
     const rawData = {};
 
@@ -35,7 +36,7 @@ function service($q,
 
     function loadAll(dataTypeId) {
 
-        const appIdSelector = {
+        const dataTypeIdSelector = {
             entityReference: {
                 id: dataTypeId,
                 kind: 'DATA_TYPE'
@@ -45,11 +46,12 @@ function service($q,
 
         const promises = [
             dataTypeService.loadDataTypes(),
-            appStore.findBySelector(appIdSelector),
-            dataFlowStore.findByDataTypeIdSelector(appIdSelector),
-            dataFlowStore.calculateStatsForDataType(appIdSelector),
+            appStore.findBySelector(dataTypeIdSelector),
+            dataFlowStore.findByDataTypeIdSelector(dataTypeIdSelector),
+            dataFlowStore.calculateStatsForDataType(dataTypeIdSelector),
             changeLogStore.findByEntityReference('DATA_TYPE', dataTypeId),
-            assetCostViewService.initialise(appIdSelector, 2016)
+            assetCostViewService.initialise(dataTypeIdSelector, 2016),
+            sourceSinkStore.findByDataTypeSelector(dataTypeIdSelector)
         ];
 
         return $q.all(promises)
@@ -59,7 +61,8 @@ function service($q,
                 dataFlows,
                 dataFlowTallies,
                 changeLogs,
-                assetCostData]) => {
+                assetCostData,
+                sourceSinks]) => {
 
                 const appsWithManagement = _.map(apps, a => _.assign(a, {management: 'IT'}));
 
@@ -69,7 +72,8 @@ function service($q,
                     dataFlows,
                     dataFlowTallies,
                     changeLogs,
-                    assetCostData
+                    assetCostData,
+                    sourceSinks
                 };
 
                 Object.assign(rawData, r);
@@ -163,7 +167,8 @@ service.$inject = [
     'CapabilityStore',
     'TechnologyStatisticsService',
     'BookmarkStore',
-    'SourceDataRatingStore'
+    'SourceDataRatingStore',
+    'SourceSinkStore'
 ];
 
 
