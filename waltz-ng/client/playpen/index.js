@@ -17,6 +17,9 @@ import playpenView3 from "./3/playpen3";
 
 export default (module) => {
 
+    module
+        .component('waltzAssetCostGraph', require('./3/asset-cost-graph.js'));
+
     module.config([
         '$stateProvider',
         ($stateProvider) => {

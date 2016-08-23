@@ -18,17 +18,16 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.data.asset_cost.AssetCostDao;
 import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.cost.AssetCostStatistics;
-import com.khartec.waltz.model.cost.CostBandTally;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Select;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -40,7 +39,8 @@ public class AssetCostHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
         AssetCostService service = ctx.getBean(AssetCostService.class);
-        AssetCostStatsDao dao = ctx.getBean(AssetCostStatsDao.class);
+        AssetCostStatsDao statsDao = ctx.getBean(AssetCostStatsDao.class);
+        AssetCostDao costDao = ctx.getBean(AssetCostDao.class);
         ApplicationIdSelectorFactory selectorFactory = ctx.getBean(ApplicationIdSelectorFactory.class);
 
 
@@ -48,24 +48,20 @@ public class AssetCostHarness {
         System.out.println("-- start");
 
         IdSelectionOptions appIdSelectionOptions = ImmutableIdSelectionOptions.builder()
-                .scope(HierarchyQueryScope.EXACT)
+                .scope(HierarchyQueryScope.CHILDREN)
                 .entityReference(ImmutableEntityReference.builder()
-                        .id(5000)
+                        .id(5600)
                         .kind(EntityKind.CAPABILITY)
                         .build())
                 .build();
 
 
-        Select<Record1<Long>> selector = selectorFactory.apply(appIdSelectionOptions);
-        List<CostBandTally> res = dao.calculateCostBandStatisticsByAppIdSelector(2015, selector);
-
-
-        AssetCostStatistics stats = service.calculateStatisticsByAppIds(appIdSelectionOptions);
-
+        List<Tuple2<Long, BigDecimal>> costs = service.calculateCombinedAmountsForSelector(appIdSelectionOptions);
         System.out.println("-- end, dur: " + (System.currentTimeMillis() - st));
 
 
-        System.out.println(stats);
+        System.out.println(costs);
+        System.out.println(costs.size());
     }
 
 

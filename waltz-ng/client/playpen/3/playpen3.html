@@ -1,12 +1,48 @@
 <div>
 
 
-    <waltz-section name="Treemap" id="section-1">
+    <waltz-section name="Asset Costs" id="section-1">
 
-        <h2>Hello</h2>
-        <hr>
-        <div></div>
+        <div class="row">
+            <div class="col-md-9">
+                <waltz-asset-cost-graph amounts="ctrl.amounts"
+                                        apps="ctrl.apps"
+                                        on-hover="ctrl.onHover"
+                                        on-select="ctrl.onSelect"
+                                        selected="ctrl.selectedApp.id">
+                </waltz-asset-cost-graph>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted small">
+                     <div ng-bind="ctrl.hoveredApp.name"></div>
+                     <div ng-bind="ctrl.hoveredAmount"></div>
+                </div>
+                <hr>
+                <h4 ng-bind="ctrl.selectedApp.name">
+                </h4>
+                <div ng-bind="ctrl.selectedAmount"></div>
+                <div ng-bind="ctrl.selectedApp.description"></div>
+            </div>
+        </div>
 
+
+        <button ng-click="ctrl.all()">All</button>
+        <button ng-click="ctrl.more()">Almost All</button>
+        <button ng-click="ctrl.less()">Less</button>
+        <button ng-click="ctrl.low()">Low</button>
+        <button ng-click="ctrl.high()">High</button>
+
+        <pre>{{ ctrl.selectedApp }} </pre>
+        <div class="waltz-scroll-region" style="height: 200px">
+            <ul>
+                <li ng-repeat="app in ctrl.apps">
+                    <span ng-bind='app.name'
+                          class="clickable"
+                          ng-click="ctrl.selectedApp = app">
+                    </span>
+                </li>
+            </ul>
+        </div>
     </waltz-section>
 
 

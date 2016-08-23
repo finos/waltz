@@ -1,20 +1,3 @@
-/*
- *  This file is part of Waltz.
- *
- *     Waltz is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     Waltz is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -22,15 +5,15 @@ import com.khartec.waltz.model.cost.ApplicationCost;
 import com.khartec.waltz.model.cost.AssetCost;
 import com.khartec.waltz.model.cost.AssetCostStatistics;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
-import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.khartec.waltz.web.WebUtilities.mkPath;
@@ -58,17 +41,29 @@ public class AssetCostEndpoint implements Endpoint {
         String findByAssetCodePath = mkPath(BASE_URL, "code", ":code");
         String findAppCostsByAppIdsPath = mkPath(BASE_URL, "app-cost", "apps");
         String calcStatisticsByAppIdsPath = mkPath(BASE_URL, "app-cost", "apps", "stats");
+        String calcCombinedAmountsForSelectorPath = mkPath(BASE_URL, "amount", "app-selector");
 
-        ListRoute<AssetCost> findByAssetCodeRoute = (request, response) -> assetCostService.findByAssetCode(request.params("code"));
-
-        getForList(findByAssetCodePath, findByAssetCodeRoute);
+        getForList(findByAssetCodePath, this::findByAssetCodeRoute);
         postForList(findAppCostsByAppIdsPath, this::findAppCostsByAppIds);
         postForDatum(calcStatisticsByAppIdsPath, this::calcStatisticsByAppIdsRoute);
+        postForList(calcCombinedAmountsForSelectorPath, this::calcCombinedAmountsForSelectorRoute);
 
     }
 
+
+    private List<AssetCost> findByAssetCodeRoute(Request request, Response response) {
+        return assetCostService.findByAssetCode(request.params("code"));
+    }
+
+
+    private List<Tuple2<Long, BigDecimal>> calcCombinedAmountsForSelectorRoute(Request request, Response response) throws IOException {
+        IdSelectionOptions selectorOptions = readIdSelectionOptionsFromBody(request);
+        return assetCostService.calculateCombinedAmountsForSelector(selectorOptions);
+    }
+
+
     private AssetCostStatistics calcStatisticsByAppIdsRoute(Request request, Response response) throws IOException {
-        IdSelectionOptions selectorOptions = WebUtilities.readIdSelectionOptionsFromBody(request);
+        IdSelectionOptions selectorOptions = readIdSelectionOptionsFromBody(request);
         return assetCostService.calculateStatisticsByAppIds(selectorOptions);
     }
 
@@ -77,6 +72,5 @@ public class AssetCostEndpoint implements Endpoint {
         IdSelectionOptions selectorOptions = readIdSelectionOptionsFromBody(request);
         return assetCostService.findAppCostsByAppIds(selectorOptions);
     }
-
 
 }

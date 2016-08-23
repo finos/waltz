@@ -24,9 +24,11 @@ import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.cost.*;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -73,6 +75,18 @@ public class AssetCostService {
         return assetCostDao
                 .findLatestYear()
                 .map(year -> assetCostDao.findAppCostsByAppIdSelector(year, selector))
+                .orElse(Collections.emptyList());
+    }
+
+
+    public List<Tuple2<Long, BigDecimal>> calculateCombinedAmountsForSelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+
+        Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);
+
+        return assetCostDao
+                .findLatestYear()
+                .map(y -> assetCostDao.calculateCombinedAmountsForSelector(y, appIdSelector))
                 .orElse(Collections.emptyList());
     }
 

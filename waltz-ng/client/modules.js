@@ -3,7 +3,7 @@ function setup(module) {
         require('./routes'),
         require('./networking'),
 
-        require('./common/directives'),
+        require('./common/componets'),
         require('./common/filters'),
         require('./common/services'),
 

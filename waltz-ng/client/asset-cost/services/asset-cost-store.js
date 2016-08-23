@@ -21,12 +21,14 @@ const service = ($http, root) => {
     const BASE = `${root}/asset-cost`;
 
     const findByCode = code =>
-        $http.get(`${BASE}/code/${code}`)
+        $http
+            .get(`${BASE}/code/${code}`)
             .then(result => result.data);
 
 
     const findAppCostsByAppIds = (options) =>
-        $http.post(`${BASE}/app-cost/apps`, options)
+        $http
+            .post(`${BASE}/app-cost/apps`, options)
             .then(result => result.data);
 
 
@@ -41,10 +43,18 @@ const service = ($http, root) => {
             .then(result => result.data);
     };
 
+
+    const calculateCombinedAmountsForSelector = (options) =>
+        $http
+            .post(`${BASE}/amount/app-selector`, options)
+            .then(r => r.data);
+
+
     return {
         findByCode,
         findAppCostsByAppIds,
-        findStatsByAppIds
+        findStatsByAppIds,
+        calculateCombinedAmountsForSelector
     };
 };
 
