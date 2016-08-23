@@ -64,6 +64,8 @@ public class ServerInfoDao {
                 .location(row.getLocation())
                 .country(row.getCountry())
                 .provenance(row.getProvenance())
+                .hardwareEndOfLifeDate(row.getHwEndOfLifeDate())
+                .operationSystemEndOfLifeDate(row.getOsEndOfLifeDate())
                 .build();
     };
 

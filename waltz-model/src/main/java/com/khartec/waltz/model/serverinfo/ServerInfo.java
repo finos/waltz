@@ -20,8 +20,11 @@ package com.khartec.waltz.model.serverinfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.IdProvider;
+import com.khartec.waltz.model.Nullable;
 import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
+
+import java.util.Date;
 
 
 @Value.Immutable
@@ -36,6 +39,11 @@ public abstract class ServerInfo implements IdProvider, ProvenanceProvider {
     public abstract String location();
     public abstract String country();
     public abstract String assetCode();
+
+    @Nullable
+    public abstract Date hardwareEndOfLifeDate();
+    @Nullable
+    public abstract Date operationSystemEndOfLifeDate();
 
 
     @Value.Default
