@@ -2350,6 +2350,25 @@
     </changeSet>
 
 
+    <!-- 421 : Server Information - OS and HW end of life -->
+    <changeSet author="kamransaleem" id="20160817-421-1">
+        <addColumn tableName="server_information">
+            <column name="os_end_of_life_date"
+                    type="DATE">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="kamransaleem" id="20160817-421-2">
+        <addColumn tableName="server_information">
+            <column name="hw_end_of_life_date"
+                    type="DATE">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
     <!-- 383 : DataType Id and ParentId -->
     <changeSet author="kamransaleem"
                id="20160808-383-1">
