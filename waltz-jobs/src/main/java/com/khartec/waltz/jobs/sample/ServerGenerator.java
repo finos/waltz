@@ -18,17 +18,21 @@
 package com.khartec.waltz.jobs.sample;
 
 import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.data.server_info.ServerInfoDao;
-import com.khartec.waltz.model.serverinfo.ImmutableServerInfo;
-import com.khartec.waltz.model.serverinfo.ServerInfo;
+import com.khartec.waltz.data.server_information.ServerInformationDao;
+import com.khartec.waltz.model.server_information.ImmutableServerInformation;
+import com.khartec.waltz.model.server_information.ServerInformation;
 import com.khartec.waltz.service.DIConfiguration;
+import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.ArrayUtilities.randomPick;
+import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 
 
 public class ServerGenerator {
@@ -39,13 +43,18 @@ public class ServerGenerator {
     public static void main(String[] args) {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        ServerInfoDao serverDao = ctx.getBean(ServerInfoDao.class);
+        ServerInformationDao serverDao = ctx.getBean(ServerInformationDao.class);
+        DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<ServerInfo> servers = ListUtilities.newArrayList();
+        dsl.delete(SERVER_INFORMATION)
+                .where(SERVER_INFORMATION.PROVENANCE.eq("RANDOM_GENERATOR"))
+                .execute();
 
-        IntStream.range(0, 100_000)
+        List<ServerInformation> servers = ListUtilities.newArrayList();
+
+        IntStream.range(0, 10_000)
                 .forEach(i -> servers.add(
-                        ImmutableServerInfo.builder()
+                        ImmutableServerInformation.builder()
                                 .hostname(mkHostName(i))
                                 .environment(randomPick(SampleData.environments))
                                 .location(randomPick(SampleData.locations))
@@ -53,6 +62,16 @@ public class ServerGenerator {
                                 .operatingSystemVersion(randomPick(SampleData.operatingSystemVersions))
                                 .country("UK")
                                 .assetCode("wltz-0" + rnd.nextInt(4000))
+                                .hardwareEndOfLifeDate(
+                                        rnd.nextInt(10) > 5
+                                                ? Date.valueOf(LocalDate.now().plusMonths(rnd.nextInt(12 * 6) - (12 * 3)))
+                                                : null)
+                                .operationSystemEndOfLifeDate(
+                                        rnd.nextInt(10) > 5
+                                                ? Date.valueOf(LocalDate.now().plusMonths(rnd.nextInt(12 * 6) - (12 * 3)))
+                                                : null)
+                                .virtual(rnd.nextInt(10) > 7)
+                                .provenance("RANDOM_GENERATOR")
                                 .build()));
 
        // servers.forEach(System.out::println);

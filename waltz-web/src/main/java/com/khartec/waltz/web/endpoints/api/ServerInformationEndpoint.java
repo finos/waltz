@@ -17,9 +17,9 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.serverinfo.ServerInfo;
-import com.khartec.waltz.model.serverinfo.ServerSummaryStatistics;
-import com.khartec.waltz.service.server_info.ServerInfoService;
+import com.khartec.waltz.model.server_information.ServerInformation;
+import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
+import com.khartec.waltz.service.server_information.ServerInformationService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -33,18 +33,18 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 
 @Service
-public class ServerInfoEndpoint implements Endpoint {
+public class ServerInformationEndpoint implements Endpoint {
 
     private static final String BASE_URL = mkPath("api", "server-info");
 
-    private final ServerInfoService serverInfoService;
+    private final ServerInformationService serverInformationService;
 
 
     @Autowired
-    public ServerInfoEndpoint(ServerInfoService serverInfoService) {
-        checkNotNull(serverInfoService, "serverInfoService must not be null");
+    public ServerInformationEndpoint(ServerInformationService serverInfoService) {
+        checkNotNull(serverInfoService, "serverInformationService must not be null");
 
-        this.serverInfoService = serverInfoService;
+        this.serverInformationService = serverInfoService;
     }
 
 
@@ -55,14 +55,14 @@ public class ServerInfoEndpoint implements Endpoint {
         String findByAppIdPath = mkPath(BASE_URL, "app-id", ":id");
         String findStatsForAppSelectorPath = mkPath(BASE_URL, "apps", "stats");
 
-        ListRoute<ServerInfo> findByAssetCodeRoute = (request, response)
-                -> serverInfoService.findByAssetCode(request.params("assetCode"));
+        ListRoute<ServerInformation> findByAssetCodeRoute = (request, response)
+                -> serverInformationService.findByAssetCode(request.params("assetCode"));
 
-        ListRoute<ServerInfo> findByAppIdRoute = (request, response)
-                -> serverInfoService.findByAppId(getId(request));
+        ListRoute<ServerInformation> findByAppIdRoute = (request, response)
+                -> serverInformationService.findByAppId(getId(request));
 
         DatumRoute<ServerSummaryStatistics> findStatsForAppSelectorRoute = (request, response)
-                -> serverInfoService.findStatsForAppSelector(readIdSelectionOptionsFromBody(request));
+                -> serverInformationService.findStatsForAppSelector(readIdSelectionOptionsFromBody(request));
 
         getForList(findByAssetCodePath, findByAssetCodeRoute);
         getForList(findByAppIdPath, findByAppIdRoute);

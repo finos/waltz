@@ -18,10 +18,10 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.common.FunctionUtilities;
-import com.khartec.waltz.data.server_info.ServerInfoDao;
+import com.khartec.waltz.data.server_information.ServerInformationDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.server_info.ServerInfoService;
+import com.khartec.waltz.service.server_information.ServerInformationService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -34,8 +34,8 @@ public class ServerHarness {
     public static void main(String[] args) {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        ServerInfoService serverInfoService = ctx.getBean(ServerInfoService.class);
-        ServerInfoDao serverInfoDao = ctx.getBean(ServerInfoDao.class);
+        ServerInformationService serverInfoService = ctx.getBean(ServerInformationService.class);
+        ServerInformationDao serverInfoDao = ctx.getBean(ServerInformationDao.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
 

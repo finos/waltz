@@ -1,4 +1,4 @@
-package com.khartec.waltz.model.serverinfo;
+package com.khartec.waltz.model.server_information;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

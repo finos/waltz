@@ -17,25 +17,32 @@ const FIELDS_TO_SEARCH = {
     ]
 };
 
-function createDefaultTableOptions(uiGridConstants) {
+function createDefaultTableOptions($animate, uiGridConstants, exportFileName = "export.csv") {
     return {
         columnDefs: [],
         data: [],
+        enableGridMenu: true,
         enableFiltering: true,
         enableHorizontalScrollbar: uiGridConstants.scrollbars.NEVER,
-        enableSorting: true
+        enableSorting: true,
+        exporterCsvFilename: exportFileName,
+        exporterMenuPdf: false,
+        onRegisterApi: (gridApi) => {
+            $animate.enabled(gridApi.grid.element, false);
+        }
     };
 }
 
 
-function prepareServerGridOptions(uiGridConstants) {
+function prepareServerGridOptions($animate, uiGridConstants) {
 
     const columnDefs = [
-        {field: 'hostname', displayName: 'Host'},
-        {field: 'environment'},
+        { field: 'hostname', displayName: 'Host' },
+        { field: 'environment' },
         {
             field: 'virtual',
             displayName: 'Virtual',
+            width: "5%",
             filter: {
                 type: uiGridConstants.filter.SELECT,
                 selectOptions: [
@@ -45,18 +52,20 @@ function prepareServerGridOptions(uiGridConstants) {
             },
             cellTemplate: '<div class="ui-grid-cell-contents"> <waltz-icon ng-if="COL_FIELD" name="check"></waltz-icon></div>'
         },
-        {field: 'operatingSystem'},
-        {field: 'operatingSystemVersion', displayName: 'Version'},
-        {field: 'location'},
-        {field: 'country'}
+        { field: 'operatingSystem' },
+        { field: 'operatingSystemVersion', displayName: 'Version' },
+        { field: 'location' },
+        { field: 'country' },
+        { field: 'hardwareEndOfLifeDate', displayName: 'h/w End of Life' },
+        { field: 'operatingSystemEndOfLifeDate', displayName: 'OS End of Life' }
     ];
 
-    const baseTable = createDefaultTableOptions(uiGridConstants);
+    const baseTable = createDefaultTableOptions($animate, uiGridConstants, "server.csv");
     return _.extend(baseTable, { columnDefs });
 }
 
 
-function prepareDatabaseGridOptions(uiGridConstants) {
+function prepareDatabaseGridOptions($animate, uiGridConstants) {
 
     const columnDefs = [
         { field: 'instanceName', displayName: 'Instance' },
@@ -64,16 +73,17 @@ function prepareDatabaseGridOptions(uiGridConstants) {
         { field: 'environment' },
         { field: 'dbmsVendor', displayName: 'Vendor' },
         { field: 'dbmsName', displayName: 'Product Name' },
-        { field: 'dbmsVersion', displayName: 'Version' }
+        { field: 'dbmsVersion', displayName: 'Version' },
+        { field: 'endOfLifeDate', displayName: 'End of Life' }
     ];
 
-    const baseTable = createDefaultTableOptions(uiGridConstants);
+    const baseTable = createDefaultTableOptions($animate, uiGridConstants, "database.csv");
     return _.extend(baseTable, { columnDefs });
 }
 
 
 
-function controller($scope, uiGridConstants) {
+function controller($animate, $scope, uiGridConstants) {
 
     const vm = this;
 
@@ -123,8 +133,8 @@ function controller($scope, uiGridConstants) {
     );
 
 
-    vm.serverGridOptions = prepareServerGridOptions(uiGridConstants);
-    vm.databaseGridOptions = prepareDatabaseGridOptions(uiGridConstants);
+    vm.serverGridOptions = prepareServerGridOptions($animate, uiGridConstants);
+    vm.databaseGridOptions = prepareDatabaseGridOptions($animate, uiGridConstants);
 
 
     vm.hasAnyData = () => {
@@ -138,8 +148,8 @@ function controller($scope, uiGridConstants) {
 }
 
 
-
 controller.$inject = [
+    '$animate',
     '$scope',
     'uiGridConstants'
 ];

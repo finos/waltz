@@ -1,4 +1,4 @@
-package com.khartec.waltz.model.database;
+package com.khartec.waltz.model.database_information;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
