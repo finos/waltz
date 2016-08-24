@@ -2422,4 +2422,122 @@
     </changeSet>
 
 
+    <!-- 390 : Rating on dataflow - datatype sinks and sources -->
+    <changeSet author="kamransaleem"
+               id="20160824-390-1">
+        <addColumn tableName="data_flow">
+            <column name="rating"
+                    type="VARCHAR(128)"
+                    defaultValue="NO_OPINION">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="kamransaleem"
+               id="20160824-390-2"
+               dbms="mssql">
+        <sql>
+            with allRatings
+            AS (
+                SELECT
+                df.source_entity_id,
+                df.target_entity_id,
+                df.data_type,
+                au.rating,
+                eh.level
+                FROM authoritative_source au
+                INNER JOIN data_flow df
+                ON au.data_type = df.data_type
+                AND au.application_id = df.source_entity_id
+                INNER JOIN entity_hierarchy eh
+                ON eh.ancestor_id = au.parent_id
+                AND eh.kind = au.parent_kind
+                INNER JOIN application a
+                ON a.id = df.target_entity_id
+                AND a.organisational_unit_id = eh.id
+                WHERE df.source_entity_kind = 'APPLICATION'
+                AND df.target_entity_kind = 'APPLICATION'
+            )
+            UPDATE data_flow
+            SET rating = t.rating
+            FROM
+                (select ar.*
+                FROM allRatings ar
+                INNER JOIN
+                (select source_entity_id, target_entity_id, data_type, MAX(level) as max_level
+                from allRatings
+                group by source_entity_id, target_entity_id, data_type) arm
+            on
+                ar.source_entity_id = arm.source_entity_id
+                and ar.target_entity_id = arm.target_entity_id
+                and ar.data_type = arm.data_type
+                and ar.level = arm.max_level) t
+            where t.source_entity_id = data_flow.source_entity_id
+                and t.target_entity_id = data_flow.target_entity_id
+                and t.data_type = data_flow.data_type
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="kamransaleem"
+               id="20160824-390-2"
+               dbms="mysql">
+        <sql>
+            CREATE TEMPORARY TABLE allRatings
+            (
+                SELECT
+                    df.source_entity_id,
+                    df.target_entity_id,
+                    df.data_type,
+                    au.rating,
+                    eh.level
+                FROM authoritative_source au
+                INNER JOIN data_flow df
+                    ON au.data_type = df.data_type
+                    AND au.application_id = df.source_entity_id
+                INNER JOIN entity_hierarchy eh
+                    ON eh.ancestor_id = au.parent_id
+                    AND eh.kind = au.parent_kind
+                INNER JOIN application a
+                    ON a.id = df.target_entity_id
+                    AND a.organisational_unit_id = eh.id
+                WHERE df.source_entity_kind = 'APPLICATION'
+                    AND df.target_entity_kind = 'APPLICATION'
+                ORDER BY df.source_entity_id, df.target_entity_id
+            );
+
+
+            CREATE TEMPORARY TABLE allRatingsMax
+            (
+                select source_entity_id, target_entity_id, data_type, MAX(level) as max_level
+                from allRatings
+                group by source_entity_id, target_entity_id, data_type
+            );
+
+
+            UPDATE data_flow df
+            inner join
+                (select ar.*
+                FROM allRatings ar
+                INNER JOIN allRatingsMax arm
+                on
+                    ar.source_entity_id = arm.source_entity_id
+                    and ar.target_entity_id = arm.target_entity_id
+                    and ar.data_type = arm.data_type
+                    and ar.level = arm.max_level) t
+            on t.source_entity_id = df.source_entity_id
+            and t.target_entity_id = df.target_entity_id
+            and t.data_type = df.data_type
+            SET df.rating = t.rating;
+
+
+            DROP TEMPORARY table allRatingsMax;
+            DROP TEMPORARY table allRatings;
+
+        </sql>
+    </changeSet>
+
+
+
 </databaseChangeLog>
