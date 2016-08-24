@@ -18,6 +18,7 @@
 package com.khartec.waltz.jobs.sample;
 
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.authoritativesource.Rating;
 import com.khartec.waltz.schema.tables.records.DataFlowRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;
@@ -53,7 +54,8 @@ public class UnknownFlowGenerator {
                         "APPLICATION",
                         t.v2(),
                         "UNKNOWN",
-                        "UNK_TEST"))
+                        "UNK_TEST",
+                        Rating.NO_OPINION.name()))
                 .collect(Collectors.toSet());
 
         dsl.deleteFrom(DATA_FLOW)
