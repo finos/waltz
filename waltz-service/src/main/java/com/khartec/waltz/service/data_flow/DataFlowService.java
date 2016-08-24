@@ -30,6 +30,8 @@ import com.khartec.waltz.model.dataflow.DataFlowStatistics;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowStatistics;
 import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.service.application.ApplicationService;
+import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceCalculator;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,19 +51,27 @@ public class DataFlowService {
     private final DataFlowStatsDao dataFlowStatsDao;
     private final ApplicationIdSelectorFactory idSelectorFactory;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
+    private final AuthoritativeSourceCalculator authoritativeSourceCalculator;
+    private ApplicationService applicationService;
 
 
     @Autowired
-    public DataFlowService(DataFlowDao dataFlowDao,
+    public DataFlowService(ApplicationIdSelectorFactory idSelectorFactory,
+                           ApplicationService applicationService,
+                           AuthoritativeSourceCalculator authoritativeSourceCalculator,
+                           DataFlowDao dataFlowDao,
                            DataFlowStatsDao dataFlowStatsDao,
-                           ApplicationIdSelectorFactory idSelectorFactory,
                            DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
+        checkNotNull(idSelectorFactory, "idSelectorFactory cannot be null");
+        checkNotNull(applicationService, "applicationService cannot be null");
+        checkNotNull(authoritativeSourceCalculator, "authoritativeSourceCalculator cannot be null");
         checkNotNull(dataFlowDao, "dataFlowDao must not be null");
         checkNotNull(dataFlowStatsDao, "dataFlowStatsDao cannot be null");
-        checkNotNull(idSelectorFactory, "idSelectorFactory cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
 
         this.idSelectorFactory = idSelectorFactory;
+        this.applicationService = applicationService;
+        this.authoritativeSourceCalculator = authoritativeSourceCalculator;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
         this.dataFlowStatsDao = dataFlowStatsDao;
         this.dataFlowDao = dataFlowDao;
@@ -82,6 +92,13 @@ public class DataFlowService {
     public int[] addFlows(List<DataFlow> flows) {
         List<DataFlow> flowsExceptSameSourceAndTarget = flows.stream()
                 .filter(f -> !f.source().equals(f.target()))
+                .collect(Collectors.toList());
+
+        // need to retrieve the rating for each sourceApp, targetApp, datatype combination
+        // first turn targetApps into owning orgUnits
+        List<Long> targetApplicationIds = flowsExceptSameSourceAndTarget
+                .stream()
+                .map(df -> df.target().id())
                 .collect(Collectors.toList());
 
         return dataFlowDao.addFlows(flowsExceptSameSourceAndTarget);

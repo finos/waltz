@@ -14,19 +14,13 @@
 function service($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/rated-data-flows`;
 
-    const findByOrgUnit = (id) =>
-        $http.get(`${BASE}/org-unit/${id}`)
-            .then(ts => {
-                return ts;
-            })
+    const findByOrgUnitTree = (id) => {
+        console.log('rdfs - findByOrgUnitTree: ', id);
+        return $http.get(`${BASE}/org-unit-tree/${id}`)
             .then(result => result.data);
-
-    const findByOrgUnitTree = (id) =>
-        $http.get(`${BASE}/org-unit-tree/${id}`)
-            .then(result => result.data);
+    }
 
     return {
-        findByOrgUnit,
         findByOrgUnitTree
     };
 }

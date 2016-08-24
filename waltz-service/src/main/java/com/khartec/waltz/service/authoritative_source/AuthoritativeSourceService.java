@@ -20,6 +20,7 @@ package com.khartec.waltz.service.authoritative_source;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.authoritativesource.Rating;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +82,15 @@ public class AuthoritativeSourceService {
 
     public int remove(long id) {
         return authoritativeSourceDao.remove(id);
+    }
+
+
+    public AuthoritativeSourceResolver createResolver(List<Long> orgIds) {
+        List<AuthoritativeRatingVantagePoint> authoritativeRatingVantagePoints =
+                authoritativeSourceDao.findAuthoritativeRatingVantagePoints(orgIds);
+
+        AuthoritativeSourceResolver resolver = new AuthoritativeSourceResolver(authoritativeRatingVantagePoints);
+        return resolver;
     }
 
 }

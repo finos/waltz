@@ -34,6 +34,7 @@ import static com.khartec.waltz.web.WebUtilities.mkPath;
  * A RatedDataFlow is a combination of a data flow and a rating derived
  * from the receivers org-unit authoritative sources
  */
+@Deprecated
 @Service
 public class RatedDataFlowsEndpoint implements Endpoint {
 

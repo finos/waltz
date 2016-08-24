@@ -21,6 +21,7 @@ import com.khartec.waltz.common.ArrayBuilder;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.authoritativesource.Rating;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
 import com.khartec.waltz.model.tally.ImmutableStringTally;
@@ -64,6 +65,7 @@ public class DataFlowDao {
                         .id(record.getTargetEntityId())
                         .name(r.getValue(targetAppAlias.NAME))
                         .build())
+                .rating(Rating.valueOf(record.getRating()))
                 .provenance(record.getProvenance())
                 .build();
     };
@@ -143,13 +145,15 @@ public class DataFlowDao {
                                 DATA_FLOW.SOURCE_ENTITY_ID,
                                 DATA_FLOW.TARGET_ENTITY_KIND,
                                 DATA_FLOW.TARGET_ENTITY_ID,
-                                DATA_FLOW.PROVENANCE)
+                                DATA_FLOW.PROVENANCE,
+                                DATA_FLOW.RATING)
                         .values(f.dataType(),
                                 f.source().kind().name(),
                                 f.source().id(),
                                 f.target().kind().name(),
                                 f.target().id(),
-                                f.provenance()))
+                                f.provenance(),
+                                f.rating().name()))
                 .collect(Collectors.toList());
 
         return dsl.batch(inserts).execute();

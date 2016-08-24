@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ProvenanceProvider;
+import com.khartec.waltz.model.authoritativesource.Rating;
 import org.immutables.value.Value;
 
 
@@ -32,6 +33,7 @@ public abstract class DataFlow implements ProvenanceProvider {
     public abstract EntityReference source();
     public abstract EntityReference target();
     public abstract String dataType();
+    public abstract Rating rating();
 
     @Value.Default
     public String provenance() {
