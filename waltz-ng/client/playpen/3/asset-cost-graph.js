@@ -1,6 +1,6 @@
-import {initialiseData} from '../../common'
+import {initialiseData} from '../../common';
+import _ from 'lodash';
 import d3 from 'd3';
-import {variableScale} from '../../common/colors';
 
 
 const template = "<div class='waltz-asset-cost-graph'><svg></svg></div>";
@@ -42,9 +42,28 @@ const dimensions = {
 };
 
 
+const numberFormat = d3.format(",d");
+
+
+function currencyLogFormat(d) {
+    var x = Math.log(d) / Math.log(10) + 1e-6;
+    return Math.abs(x - Math.floor(x)) < .5
+        ? '€ ' + numberFormat(d)
+        : "";
+}
+
+
+function calculateOpacity(size = 1) {
+    return _.max([
+        10 / Math.sqrt(size * 40),
+        0.1
+    ]);
+}
+
 function getAppId(a) {
     return a.v1;
 }
+
 
 function getAmount(a) {
     return a.v2;
@@ -90,24 +109,21 @@ function update(graph, axis, amounts = [], selected = null, handlers) {
             .domain([0, amounts.length])
             .range([0, dimensions.graph.width]),
         y: d3.scale
-            .linear()
+            .log()
             .domain([minAmount / 1.5, maxAmount * 1.2])
             .range([dimensions.graph.height, 0])
     };
 
-
-    const format = d3.format(',d');
-
     const yAxis = d3.svg.axis()
         .scale(scales.y)
-        .ticks(5)
+        .ticks(4)
         .orient("left")
-        .tickFormat(d => '€ ' + format(d));
+        .tickFormat(currencyLogFormat);
 
     axis.call(yAxis);
 
     // hand-wavy opacity algorithm goes here
-    const opacity = 10 / Math.sqrt(amountsToDisplay.length * 40)
+    const opacity = calculateOpacity(amountsToDisplay.length);
 
     const circles = graph
         .selectAll('.wacg-amount')
@@ -151,7 +167,7 @@ function update(graph, axis, amounts = [], selected = null, handlers) {
     circles
         .classed('wacg-selected', (d) => getAppId(d) === selected)
         .transition()
-        .duration(animationDuration)
+        .duration(animationDuration / 2)
         .attr({
             opacity,
             r: d => getAppId(d) === selected ? radius * 1.5 : radius,
