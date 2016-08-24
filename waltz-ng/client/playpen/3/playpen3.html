@@ -26,23 +26,49 @@
         </div>
 
 
-        <button ng-click="ctrl.all()">All</button>
-        <button ng-click="ctrl.more()">Almost All</button>
-        <button ng-click="ctrl.less()">Less</button>
-        <button ng-click="ctrl.low()">Low</button>
-        <button ng-click="ctrl.high()">High</button>
+        <div class="row">
+            <div class="col-md-12">
+                <button ng-click="ctrl.all()">All</button>
+                <button ng-click="ctrl.more()">Almost All</button>
+                <button ng-click="ctrl.less()">Less</button>
+                <button ng-click="ctrl.low()">Low</button>
+                <button ng-click="ctrl.high()">High</button>
+                <hr>
+            </div>
+        </div>
 
-        <pre>{{ ctrl.selectedApp }} </pre>
-        <div class="waltz-scroll-region" style="height: 200px">
-            <ul>
-                <li ng-repeat="app in ctrl.apps">
+        <div class="row">
+            <div class="col-md-4">
+                <form>
+                    <label>Kind</label>
+                    <input type="text"
+                           ng-model='ctrl.ref.kind'
+                           class="form-control">
+                    <label>Id</label>
+                    <input type="number"
+                           ng-model='ctrl.ref.id'
+                           class="form-control">
+                    <br>
+                    <button class="btn" ng-click="ctrl.refresh()">
+                        Refresh
+                    </button>
+                </form>
+            </div>
+            <div class="col-md-8">
+                <div class="waltz-scroll-region" style="height: 200px">
+                    <ul>
+                        <li ng-repeat="app in ctrl.apps">
                     <span ng-bind='app.name'
                           class="clickable"
                           ng-click="ctrl.selectedApp = app">
                     </span>
-                </li>
-            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
         </div>
+
     </waltz-section>
 
 
