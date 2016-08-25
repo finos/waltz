@@ -47,6 +47,7 @@ import static com.khartec.waltz.common.MapUtilities.*;
 import static com.khartec.waltz.model.utils.IdUtilities.toIds;
 
 
+@Deprecated
 @Service
 public class RatedDataFlowService {
 

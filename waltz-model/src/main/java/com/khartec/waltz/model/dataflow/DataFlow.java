@@ -33,7 +33,9 @@ public abstract class DataFlow implements ProvenanceProvider {
     public abstract EntityReference source();
     public abstract EntityReference target();
     public abstract String dataType();
-    public abstract Rating rating();
+
+    @Value.Default
+    public Rating rating() { return Rating.NO_OPINION; };
 
     @Value.Default
     public String provenance() {

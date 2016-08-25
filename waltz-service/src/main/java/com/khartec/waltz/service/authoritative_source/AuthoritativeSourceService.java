@@ -20,12 +20,13 @@ package com.khartec.waltz.service.authoritative_source;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.authoritativesource.Rating;
+import com.khartec.waltz.service.data_flow.DataFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -36,12 +37,17 @@ public class AuthoritativeSourceService {
 
 
     private final AuthoritativeSourceDao authoritativeSourceDao;
+    private DataFlowService dataFlowService;
 
 
     @Autowired
-    public AuthoritativeSourceService(AuthoritativeSourceDao authoritativeSourceDao) {
+    public AuthoritativeSourceService(AuthoritativeSourceDao authoritativeSourceDao,
+                                      DataFlowService dataFlowService) {
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao must not be null");
+        checkNotNull(dataFlowService, "dataFlowService cannot be null");
+
         this.authoritativeSourceDao = authoritativeSourceDao;
+        this.dataFlowService = dataFlowService;
     }
 
 
@@ -70,27 +76,35 @@ public class AuthoritativeSourceService {
     }
 
 
-    public int update(long id, Rating rating) {
-        return authoritativeSourceDao.update(id, rating);
+    public int update(long id, Rating rating) throws SQLException {
+        int updateCount = authoritativeSourceDao.update(id, rating);
+        AuthoritativeSource updatedAuthSource = getById(id);
+        updateRatingsForAuthSource(updatedAuthSource);
+        return updateCount;
     }
 
 
-    public int insert(EntityReference parentRef, String dataType, Long appId, Rating rating) {
-        return authoritativeSourceDao.insert(parentRef, dataType, appId, rating);
+    public int insert(EntityReference parentRef, String dataType, Long appId, Rating rating) throws SQLException {
+        int insertedCount = authoritativeSourceDao.insert(parentRef, dataType, appId, rating);
+        dataFlowService.updateRatingsForConsumers(parentRef, dataType, appId);
+        return insertedCount;
     }
 
 
-    public int remove(long id) {
-        return authoritativeSourceDao.remove(id);
+    public int remove(long id) throws SQLException {
+
+        AuthoritativeSource authSourceToDelete = getById(id);
+        int deletedCount = authoritativeSourceDao.remove(id);
+        updateRatingsForAuthSource(authSourceToDelete);
+        return deletedCount;
     }
 
 
-    public AuthoritativeSourceResolver createResolver(List<Long> orgIds) {
-        List<AuthoritativeRatingVantagePoint> authoritativeRatingVantagePoints =
-                authoritativeSourceDao.findAuthoritativeRatingVantagePoints(orgIds);
-
-        AuthoritativeSourceResolver resolver = new AuthoritativeSourceResolver(authoritativeRatingVantagePoints);
-        return resolver;
+    private void updateRatingsForAuthSource(AuthoritativeSource authSource) throws SQLException {
+        dataFlowService.updateRatingsForConsumers(
+                authSource.parentReference(),
+                authSource.dataType(),
+                authSource.applicationReference().id());
     }
 
 }

@@ -110,7 +110,7 @@ public class DataFlowsEndpoint implements Endpoint {
                     .collect(Collectors.toList());
 
             dataFlowService
-                    .addFlows(addedFlows);
+                    .storeFlows(addedFlows);
 
             dataFlowService
                     .removeFlows(removedFlows);

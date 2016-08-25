@@ -17,8 +17,7 @@
 
 package com.khartec.waltz.common;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -44,6 +43,13 @@ public class CollectionUtilities {
         checkNotEmpty(ts, "Cannot get first item from an empty collection");
 
         return ts.iterator().next();
+    }
+
+
+    public static <T> Optional<T> head(Collection<T> ts) {
+        return Optional.ofNullable(ts)
+                .filter(x -> !x.isEmpty())
+                .map(x -> first(x));
     }
 
 
@@ -75,7 +81,20 @@ public class CollectionUtilities {
                 : dflt;
     }
 
+
+    public static <X> Collection<X> sort(Collection<X> xs, Comparator<? super X> comparator) {
+        checkNotNull(xs, "xs cannot be null");
+        checkNotNull(comparator, "comparator cannot be null");
+
+        List<X> sorted = new ArrayList<X>(xs);
+        sorted.sort(comparator);
+        return sorted;
+    }
+
+
     private static <X> boolean isDefined(Collection<X> xs) {
         return !(xs == null || xs.isEmpty());
     }
+
+
 }

@@ -94,6 +94,19 @@ public class DataFlowDao {
                 .fetch(dataFlowMapper);
     }
 
+
+    public List<DataFlow> findConsumersBySelector(Select<Record1<Long>> appIdSelector,
+                                                  EntityReference source,
+                                                  String dataType) {
+
+        return baseQuery()
+                .and(DATA_FLOW.SOURCE_ENTITY_ID.eq(source.id()))
+                .and(DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector))
+                .and(DATA_FLOW.DATA_TYPE.eq(dataType))
+                .fetch(dataFlowMapper);
+    }
+
+
     public List<DataFlow> findByApplicationIds(Collection<Long> appIds) {
         return baseQuery()
                 .and(DATA_FLOW.SOURCE_ENTITY_ID.in(appIds))
@@ -122,41 +135,16 @@ public class DataFlowDao {
 
 
     public int[] removeFlows(List<DataFlow> flows) {
-
-        List<DeleteConditionStep<DataFlowRecord>> deletes = flows.stream()
-                .map(f -> dsl.deleteFrom(DATA_FLOW)
-                        .where(DATA_FLOW.SOURCE_ENTITY_ID.eq(f.source().id()))
-                        .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(f.source().kind().name()))
-                        .and(DATA_FLOW.TARGET_ENTITY_ID.eq(f.target().id()))
-                        .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(f.target().kind().name()))
-                        .and(DATA_FLOW.DATA_TYPE.eq(f.dataType())))
-                .collect(Collectors.toList());
-
-        return dsl.batch(deletes).execute();
+        return removeFlows(dsl, flows);
     }
 
 
-    public int[] addFlows(List<DataFlow> flows) {
-        List<Insert> inserts = flows.stream()
-                .map(f -> dsl
-                        .insertInto(DATA_FLOW)
-                        .columns(DATA_FLOW.DATA_TYPE,
-                                DATA_FLOW.SOURCE_ENTITY_KIND,
-                                DATA_FLOW.SOURCE_ENTITY_ID,
-                                DATA_FLOW.TARGET_ENTITY_KIND,
-                                DATA_FLOW.TARGET_ENTITY_ID,
-                                DATA_FLOW.PROVENANCE,
-                                DATA_FLOW.RATING)
-                        .values(f.dataType(),
-                                f.source().kind().name(),
-                                f.source().id(),
-                                f.target().kind().name(),
-                                f.target().id(),
-                                f.provenance(),
-                                f.rating().name()))
-                .collect(Collectors.toList());
-
-        return dsl.batch(inserts).execute();
+    public int[] storeFlows(List<DataFlow> flows) {
+        return dsl.transactionResult(configuration -> {
+            DSLContext tx = DSL.using(configuration);
+            removeFlows(tx, flows);
+            return addFlows(tx, flows);
+        });
     }
 
 
@@ -177,4 +165,45 @@ public class DataFlowDao {
                         .in(DSL.select(dt.CODE).from(dt).where(dt.ID.in(dataTypeIdSelector))))
                 .fetch(dataFlowMapper);
     }
+
+
+    private int[] removeFlows(DSLContext ctx, List<DataFlow> flows) {
+
+        List<DeleteConditionStep<DataFlowRecord>> deletes = flows.stream()
+                .map(f -> ctx.deleteFrom(DATA_FLOW)
+                        .where(DATA_FLOW.SOURCE_ENTITY_ID.eq(f.source().id()))
+                        .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(f.source().kind().name()))
+                        .and(DATA_FLOW.TARGET_ENTITY_ID.eq(f.target().id()))
+                        .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(f.target().kind().name()))
+                        .and(DATA_FLOW.DATA_TYPE.eq(f.dataType())))
+                .collect(Collectors.toList());
+
+        return ctx.batch(deletes).execute();
+    }
+
+
+    private int[] addFlows(DSLContext ctx, List<DataFlow> flows) {
+
+        List<Insert> inserts = flows.stream()
+                .map(f -> ctx
+                        .insertInto(DATA_FLOW)
+                        .columns(DATA_FLOW.DATA_TYPE,
+                                DATA_FLOW.SOURCE_ENTITY_KIND,
+                                DATA_FLOW.SOURCE_ENTITY_ID,
+                                DATA_FLOW.TARGET_ENTITY_KIND,
+                                DATA_FLOW.TARGET_ENTITY_ID,
+                                DATA_FLOW.PROVENANCE,
+                                DATA_FLOW.RATING)
+                        .values(f.dataType(),
+                                f.source().kind().name(),
+                                f.source().id(),
+                                f.target().kind().name(),
+                                f.target().id(),
+                                f.provenance(),
+                                f.rating().name()))
+                .collect(Collectors.toList());
+
+        return ctx.batch(inserts).execute();
+    }
+
 }

@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -189,7 +190,7 @@ public class AuthoritativeSourceDao {
     }
 
 
-    public List<AuthoritativeRatingVantagePoint> findAuthoritativeRatingVantagePoints(List<Long> orgIds) {
+    public List<AuthoritativeRatingVantagePoint> findAuthoritativeRatingVantagePoints(Set<Long> orgIds) {
         return dsl.select(
                 ENTITY_HIERARCHY.ID,
                 ENTITY_HIERARCHY.LEVEL,

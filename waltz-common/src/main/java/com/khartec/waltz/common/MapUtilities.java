@@ -74,6 +74,27 @@ public class MapUtilities {
     }
 
 
+    public static <K, V, V2> Map<K, V2> groupAndThen(Function<V, K> keyFn,
+                                                            Function<Collection<V>, V2> valueFn,
+                                                            Collection<V> xs) {
+
+        checkNotNull(xs, "xs cannot be null");
+        checkNotNull(keyFn, "keyFn cannot be null");
+        checkNotNull(valueFn, "valueFn cannot be null");
+
+        Map<K, V2> result = MapUtilities.newHashMap();
+        Map<K, Collection<V>> step1 = groupBy(keyFn, xs);
+
+        for (Map.Entry<K, Collection<V>> entry : step1.entrySet()) {
+
+            K key = entry.getKey();
+            Collection<V> group = entry.getValue();
+            V2 transformedGroup = valueFn.apply(group);
+            result.put(key, transformedGroup);
+        }
+        return result;
+    }
+
     public static <K, V> Map<K, V> indexBy(Function<V, K> keyFn,
                                            Collection<V> xs) {
         checkNotNull(xs, "xs cannot be null");

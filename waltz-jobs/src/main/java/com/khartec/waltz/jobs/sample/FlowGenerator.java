@@ -34,6 +34,7 @@ import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -48,7 +49,7 @@ public class FlowGenerator {
     private static final Random rnd = new Random();
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         AuthoritativeSourceDao authSourceDao = ctx.getBean(AuthoritativeSourceDao.class);
@@ -105,7 +106,7 @@ public class FlowGenerator {
         all.addAll(expectedFlows);
         all.addAll(probableFlows);
 
-        dataFlowDao.addFlows(new ArrayList<>(all));
+        dataFlowDao.storeFlows(new ArrayList<>(all));
 
         System.out.println("Done");
 

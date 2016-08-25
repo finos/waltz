@@ -22,21 +22,19 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow.DataFlowDao;
 import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.DataFlowMeasures;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowStatistics;
 import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.service.application.ApplicationService;
-import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceCalculator;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,34 +45,30 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 @Service
 public class DataFlowService {
 
+    private final ApplicationIdSelectorFactory idSelectorFactory;
     private final DataFlowDao dataFlowDao;
     private final DataFlowStatsDao dataFlowStatsDao;
-    private final ApplicationIdSelectorFactory idSelectorFactory;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
-    private final AuthoritativeSourceCalculator authoritativeSourceCalculator;
-    private ApplicationService applicationService;
+    private DataFlowRatingsService dataFlowRatingsService;
 
 
     @Autowired
     public DataFlowService(ApplicationIdSelectorFactory idSelectorFactory,
-                           ApplicationService applicationService,
-                           AuthoritativeSourceCalculator authoritativeSourceCalculator,
                            DataFlowDao dataFlowDao,
                            DataFlowStatsDao dataFlowStatsDao,
-                           DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
+                           DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
+                           DataFlowRatingsService dataFlowRatingsService) {
         checkNotNull(idSelectorFactory, "idSelectorFactory cannot be null");
-        checkNotNull(applicationService, "applicationService cannot be null");
-        checkNotNull(authoritativeSourceCalculator, "authoritativeSourceCalculator cannot be null");
         checkNotNull(dataFlowDao, "dataFlowDao must not be null");
         checkNotNull(dataFlowStatsDao, "dataFlowStatsDao cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
+        checkNotNull(dataFlowRatingsService, "dataFlowRatingsService cannot be null");
 
         this.idSelectorFactory = idSelectorFactory;
-        this.applicationService = applicationService;
-        this.authoritativeSourceCalculator = authoritativeSourceCalculator;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
         this.dataFlowStatsDao = dataFlowStatsDao;
         this.dataFlowDao = dataFlowDao;
+        this.dataFlowRatingsService = dataFlowRatingsService;
     }
 
 
@@ -89,19 +83,22 @@ public class DataFlowService {
     }
 
 
-    public int[] addFlows(List<DataFlow> flows) {
+    public List<DataFlow> findConsumersBySelector(IdSelectionOptions options,
+                                                  EntityReference source,
+                                                  String dataType) {
+        Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);
+        return dataFlowDao.findConsumersBySelector(appIdSelector, source, dataType);
+    }
+
+
+    public int[] storeFlows(List<DataFlow> flows) throws SQLException {
         List<DataFlow> flowsExceptSameSourceAndTarget = flows.stream()
                 .filter(f -> !f.source().equals(f.target()))
                 .collect(Collectors.toList());
 
-        // need to retrieve the rating for each sourceApp, targetApp, datatype combination
-        // first turn targetApps into owning orgUnits
-        List<Long> targetApplicationIds = flowsExceptSameSourceAndTarget
-                .stream()
-                .map(df -> df.target().id())
-                .collect(Collectors.toList());
+        List<DataFlow> flowsToStore = dataFlowRatingsService.calculateRatings(flowsExceptSameSourceAndTarget);
 
-        return dataFlowDao.addFlows(flowsExceptSameSourceAndTarget);
+        return dataFlowDao.storeFlows(flowsToStore);
     }
 
 
@@ -124,6 +121,7 @@ public class DataFlowService {
                 .build();
     }
 
+
     public DataFlowStatistics calculateStatsForDataType(IdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);
@@ -141,7 +139,6 @@ public class DataFlowService {
     }
 
 
-
     public List<Tally<String>> tallyByDataType() {
         return dataFlowDao.tallyByDataType();
     }
@@ -151,4 +148,28 @@ public class DataFlowService {
         Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(options);
         return dataFlowDao.findByDataTypeIdSelector(dataTypeIdSelector);
     }
+
+
+    public void updateRatingsForConsumers(EntityReference parentRef, String dataType, Long appId) throws SQLException {
+        // get app id selector based on parentRef
+        ImmutableIdSelectionOptions options = ImmutableIdSelectionOptions.builder()
+                .scope(HierarchyQueryScope.CHILDREN)
+                .entityReference(parentRef)
+                .build();
+
+
+        List<DataFlow> consumingFlows = findConsumersBySelector(options,
+                ImmutableEntityReference.builder()
+                        .kind(EntityKind.APPLICATION)
+                        .id(appId)
+                        .build(),
+                dataType);
+
+        // update the rating
+        storeFlows(consumingFlows);
+    }
+
+
+
+
 }
