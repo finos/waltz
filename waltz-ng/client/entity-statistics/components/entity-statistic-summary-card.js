@@ -1,6 +1,6 @@
 import _ from "lodash";
 import {variableScale} from "../../common/colors";
-
+import {mkSummaryTableHeadings} from "../entity-statistic-utilities";
 
 const bindings = {
     definition: '<',
@@ -42,6 +42,7 @@ function controller($state) {
             ? vm.summary.tallies
             : [];
         vm.pie = mkStatChartData(tallies);
+        vm.tableHeadings = mkSummaryTableHeadings(vm.definition);
     };
 
     vm.goToStatistic = (definition) => {

@@ -13,5 +13,11 @@ public enum RollupKind {
     /**
      * This means group by outcome, then sum the values in each group (entity references are discarded)
      */
-    SUM_BY_VALUE
+    SUM_BY_VALUE,
+
+    /**
+     * This means group by outcome, then sum the values in each group (entity references are discarded)
+     * then divide by the number of records in the group
+     */
+    AVG_BY_VALUE
 }
