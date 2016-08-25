@@ -6,6 +6,7 @@
         <div class="row">
             <div class="col-md-9">
                 <waltz-asset-cost-graph amounts="ctrl.amounts"
+                                        scale="ctrl.scaleType"
                                         apps="ctrl.apps"
                                         on-hover="ctrl.onHover"
                                         on-select="ctrl.onSelect"
@@ -27,15 +28,28 @@
 
 
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-6">
                 <button ng-click="ctrl.all()">All</button>
                 <button ng-click="ctrl.more()">Almost All</button>
                 <button ng-click="ctrl.less()">Less</button>
                 <button ng-click="ctrl.low()">Low</button>
                 <button ng-click="ctrl.high()">High</button>
-                <hr>
+            </div>
+            <div class="col-md-6">
+                <label>
+                    Scale Type:
+                </label>
+                <a ng-click="ctrl.scaleType='log'">
+                    Log
+                </a>
+                /
+                <a ng-click="ctrl.scaleType='linear'">
+                    Linear
+                </a>
             </div>
         </div>
+
+        <hr>
 
         <div class="row">
             <div class="col-md-4">

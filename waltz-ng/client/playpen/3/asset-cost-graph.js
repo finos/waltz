@@ -12,6 +12,7 @@ const bindings = {
     onHover: '<',
     onSelect: '<',
     selected: '<', // id
+    scaleType: '<'
 };
 
 
@@ -19,6 +20,7 @@ const initialState = {
     amounts: [],
     apps: [],
     currency: '€',
+    scaleType: 'linear',
     onHover: (d) => console.log('asset-cost-graph: default on-hover', d),
     onSelect: (d) => console.log('asset-cost-graph: default on-select', d)
 };
@@ -50,6 +52,11 @@ function currencyLogFormat(d) {
     return Math.abs(x - Math.floor(x)) < .5
         ? '€ ' + numberFormat(d)
         : "";
+}
+
+
+function currencyFormat(d) {
+    return '€ ' + numberFormat(d);
 }
 
 
@@ -95,30 +102,56 @@ function prepareGraph(svg) {
 }
 
 
-function update(graph, axis, amounts = [], selected = null, handlers) {
+function mkScales(amounts = [], scaleType = 'log') {
+    const [minAmount, maxAmount] = d3.extent(amounts, getAmount);
+
+    const baseYScale = scaleType === 'log'
+            ? d3.scale.log()
+            : d3.scale.linear();
+
+    return {
+        x: d3.scale
+            .linear()
+            .domain([0, amounts.length])
+            .range([0, dimensions.graph.width]),
+        y: baseYScale
+            .domain([minAmount / 1.5, maxAmount * 1.2])
+            .range([dimensions.graph.height, 0])
+    }
+}
+
+
+function mkAxis(scale, scaleType = 'log') {
+    const axis = d3.svg.axis()
+        .scale(scale)
+        .orient("left");
+
+    if (scaleType === 'log') {
+        axis.ticks(5)
+            .tickFormat(currencyLogFormat);
+    }
+
+    if (scaleType === 'linear') {
+        axis.ticks(5)
+            .tickFormat(currencyFormat);
+    }
+    return axis;
+}
+
+
+function update(
+    { graph, axis },  // unpack
+    amounts = [],
+    selected = null,
+    handlers) {
 
     const amountsToDisplay = _.chain(amounts)
         .orderBy(getAmount)
         .value();
 
-    const [minAmount, maxAmount] = d3.extent(amountsToDisplay, getAmount);
+    const scales = mkScales(amountsToDisplay, "linear");
 
-    const scales = {
-        x: d3.scale
-            .linear()
-            .domain([0, amounts.length])
-            .range([0, dimensions.graph.width]),
-        y: d3.scale
-            .log()
-            .domain([minAmount / 1.5, maxAmount * 1.2])
-            .range([dimensions.graph.height, 0])
-    };
-
-    const yAxis = d3.svg.axis()
-        .scale(scales.y)
-        .ticks(4)
-        .orient("left")
-        .tickFormat(currencyLogFormat);
+    const yAxis = mkAxis(scales.y, "linear");
 
     axis.call(yAxis);
 
@@ -181,7 +214,7 @@ function controller($element) {
 
     const vm = initialiseData(this, initialState);
     const svg = d3.select($element.find('svg')[0]);
-    const { graph, axis } = prepareGraph(svg);
+    const svgSections = prepareGraph(svg);
 
 
     vm.$onChanges = (changes) => {
@@ -189,7 +222,7 @@ function controller($element) {
             onSelect: vm.onSelect,
             onHover: vm.onHover
         };
-        update(graph, axis, vm.amounts, vm.selected, handlers);
+        update(svgSections, vm.amounts, vm.selected, handlers);
     };
 
 }
