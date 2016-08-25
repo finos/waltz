@@ -66,7 +66,7 @@ public class ServerGenerator {
                                         rnd.nextInt(10) > 5
                                                 ? Date.valueOf(LocalDate.now().plusMonths(rnd.nextInt(12 * 6) - (12 * 3)))
                                                 : null)
-                                .operationSystemEndOfLifeDate(
+                                .operatingSystemEndOfLifeDate(
                                         rnd.nextInt(10) > 5
                                                 ? Date.valueOf(LocalDate.now().plusMonths(rnd.nextInt(12 * 6) - (12 * 3)))
                                                 : null)
