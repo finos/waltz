@@ -2,9 +2,6 @@ package com.khartec.waltz.data.entity_statistic;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticSummary;
-import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticSummary;
 import com.khartec.waltz.model.tally.ImmutableStringTally;
 import com.khartec.waltz.model.tally.ImmutableTallyPack;
 import com.khartec.waltz.model.tally.StringTally;
@@ -18,37 +15,22 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.data.JooqUtilities.TO_STRING_TALLY;
-import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 
 @Repository
 public class EntityStatisticSummaryDao {
 
-    private static final com.khartec.waltz.schema.tables.EntityStatisticDefinition esd = ENTITY_STATISTIC_DEFINITION.as("esd");
     private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
 
-    private static Field<Integer> COUNT = DSL.field("count", Integer.class);
-
-
-    private static final Function<? super Map.Entry<Record, Result<Record>>, EntityStatisticSummary> TO_SUMMARY_MAPPER = recordResultEntry -> {
-        EntityStatisticDefinition def = EntityStatisticDefinitionDao.TO_DEFINITION_MAPPER.map(recordResultEntry.getKey());
-
-        List<StringTally> counts = recordResultEntry.getValue()
-                .into(esv.field(esv.OUTCOME), COUNT)
-                .map(TO_STRING_TALLY);
-
-        return ImmutableEntityStatisticSummary.builder()
-                .definition(def)
-                .counts(counts)
-                .build();
-    };
-
+    private static final Field<BigDecimal> avgTotal = DSL.avg(DSL.cast(esv.VALUE, Long.class)).as("total");
+    private static final Field<BigDecimal> sumTotal = DSL.sum(DSL.cast(esv.VALUE, Long.class)).as("total");
+    private static final Field<Integer> countTotal = DSL.count();
+    private static final Function<BigDecimal, Double> toBigDecimalTally = v -> v.doubleValue();
+    private static final Function<Integer, Double> toIntegerTally = v -> v.doubleValue();
 
     private final DSLContext dsl;
 
@@ -60,34 +42,33 @@ public class EntityStatisticSummaryDao {
     }
 
 
-    public List<StringTally> generateWithSumByValue(Long statisticId, Select<Record1<Long>> appIdSelector) {
-        Field<BigDecimal> total = DSL.sum(DSL.cast(esv.VALUE, Long.class)).as("total");
-        Function<BigDecimal, Double> toTally = v -> v.doubleValue();
+    public List<StringTally> generateWithAvgByValue(Long statisticId, Select<Record1<Long>> appIdSelector) {
+        return generateSummary(statisticId, appIdSelector, avgTotal, toBigDecimalTally);
+    }
 
-        return generateSummary(statisticId, appIdSelector, total, toTally);
+
+    public List<TallyPack<String>> generateWithAvgByValue(Collection<Long> statisticIds, Select<Record1<Long>> appIdSelector) {
+        return generateSummaries(statisticIds, appIdSelector, avgTotal, toBigDecimalTally);
+    }
+
+
+    public List<StringTally> generateWithSumByValue(Long statisticId, Select<Record1<Long>> appIdSelector) {
+        return generateSummary(statisticId, appIdSelector, sumTotal, toBigDecimalTally);
     }
 
 
     public List<TallyPack<String>> generateWithSumByValue(Collection<Long> statisticIds, Select<Record1<Long>> appIdSelector) {
-        Field<BigDecimal> total = DSL.sum(DSL.cast(esv.VALUE, Long.class)).as("total");
-        Function<BigDecimal, Double> toTally = v -> v.doubleValue();
-
-        return generateSummaries(statisticIds, appIdSelector, total, toTally);
+        return generateSummaries(statisticIds, appIdSelector, sumTotal, toBigDecimalTally);
     }
 
 
     public List<TallyPack<String>> generateWithCountByEntity(Collection<Long> statisticIds, Select<Record1<Long>> appIdSelector) {
-        Field<Integer> total = DSL.count();
-        Function<Integer, Double> toTally = v -> v.doubleValue();
-
-        return generateSummaries(statisticIds, appIdSelector, total, toTally);
+        return generateSummaries(statisticIds, appIdSelector, countTotal, toIntegerTally);
     }
 
-    public List<StringTally> generateWithCountByEntity(Long statisticId, Select<Record1<Long>> appIdSelector) {
-        Field<Integer> total = DSL.count();
-        Function<Integer, Double> toTally = v -> v.doubleValue();
 
-        return generateSummary(statisticId, appIdSelector, total, toTally);
+    public List<StringTally> generateWithCountByEntity(Long statisticId, Select<Record1<Long>> appIdSelector) {
+        return generateSummary(statisticId, appIdSelector, countTotal, toIntegerTally);
     }
 
 

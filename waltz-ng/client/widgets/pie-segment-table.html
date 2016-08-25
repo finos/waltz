@@ -1,4 +1,15 @@
 <table class="table table-condensed small waltz-pie-segment-table">
+    <thead>
+    <tr ng-if="$ctrl.headings.length > 0">
+        <th></th>
+        <th ng-bind="$ctrl.headings[0]"></th>
+        <th ng-bind="$ctrl.headings[1]"></th>
+        <th ng-bind="$ctrl.headings[2]"></th>
+        <th></th>
+    </tr>
+    </thead>
+
+    <tbody>
     <tr ng-repeat="r in $ctrl.data"
         class="small"
         ng-click="$ctrl.rowSelected(r, $event)"
@@ -54,4 +65,5 @@
         <td></td>
         <td></td>
     </tr>
+    </tbody>
 </table>

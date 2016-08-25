@@ -1,5 +1,6 @@
 import _ from "lodash";
 import {variableScale} from "../../common/colors";
+import {mkSummaryTableHeadings} from "../entity-statistic-utilities";
 
 
 const bindings = {
@@ -40,6 +41,8 @@ function controller() {
         vm.pie = mkStatChartData(
             vm.summary,
             pieClickHandler);
+
+        vm.tableHeadings = mkSummaryTableHeadings(vm.definition);
     }
 }
 

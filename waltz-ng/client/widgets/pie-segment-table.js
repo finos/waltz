@@ -5,12 +5,14 @@ import {variableScale} from "../common/colors";
 const bindings = {
     config: '<',
     data: '<',
+    headings: '<',
     selectedSegmentKey: '<'
 };
 
 
 const initialState = {
-    total: 0
+    total: 0,
+    headings: []
 };
 
 

@@ -105,6 +105,9 @@ public class EntityStatisticService {
                         appIdSelector),
                 summaryDao.generateWithSumByValue(
                         definitionIdsByRollupKind.getOrDefault(RollupKind.SUM_BY_VALUE, emptyList()),
+                        appIdSelector),
+                summaryDao.generateWithAvgByValue(
+                        definitionIdsByRollupKind.getOrDefault(RollupKind.AVG_BY_VALUE, emptyList()),
                         appIdSelector)
         );
 
@@ -123,6 +126,8 @@ public class EntityStatisticService {
                 return summaryDao.generateWithCountByEntity(statisticId, appIdSelector);
             case SUM_BY_VALUE:
                 return summaryDao.generateWithSumByValue(statisticId, appIdSelector);
+            case AVG_BY_VALUE:
+                return summaryDao.generateWithAvgByValue(statisticId, appIdSelector);
             default:
                 throw new UnsupportedOperationException(String.format("Rollup kind [%s] not supported.", rollupKind));
         }
