@@ -46,7 +46,7 @@ public abstract class ServerInformation implements
     @Nullable
     public abstract Date hardwareEndOfLifeDate();
     @Nullable
-    public abstract Date operationSystemEndOfLifeDate();
+    public abstract Date operatingSystemEndOfLifeDate();
 
 
     @Value.Default

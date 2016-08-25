@@ -54,11 +54,16 @@ public class ServerInformationDao {
     private final RecordMapper<Record, ServerInformation> recordMapper = r -> {
 
         ServerInformationRecord row = r.into(ServerInformationRecord.class);
+
+        boolean isVirtual = row.getIsVirtual() == null
+                ? false
+                : row.getIsVirtual();
+
         return ImmutableServerInformation.builder()
                 .id(row.getId())
                 .assetCode(row.getAssetCode())
                 .hostname(row.getHostname())
-                .virtual(row.getIsVirtual() == null ? false : row.getIsVirtual())
+                .virtual(isVirtual)
                 .operatingSystem(row.getOperatingSystem())
                 .operatingSystemVersion(row.getOperatingSystemVersion())
                 .environment(row.getEnvironment())
@@ -66,7 +71,7 @@ public class ServerInformationDao {
                 .country(row.getCountry())
                 .provenance(row.getProvenance())
                 .hardwareEndOfLifeDate(row.getHwEndOfLifeDate())
-                .operationSystemEndOfLifeDate(row.getOsEndOfLifeDate())
+                .operatingSystemEndOfLifeDate(row.getOsEndOfLifeDate())
                 .build();
     };
 
@@ -123,7 +128,7 @@ public class ServerInformationDao {
                                     s.location(),
                                     s.assetCode(),
                                     toSqlDate(s.hardwareEndOfLifeDate()),
-                                    toSqlDate(s.operationSystemEndOfLifeDate()),
+                                    toSqlDate(s.operatingSystemEndOfLifeDate()),
                                     s.provenance()))
                     .collect(Collectors.toList()))
                 .execute();

@@ -1,6 +1,6 @@
-import {initialiseData} from '../../common'
+import {initialiseData} from '../../common';
+import _ from 'lodash';
 import d3 from 'd3';
-import {variableScale} from '../../common/colors';
 
 
 const template = "<div class='waltz-asset-cost-graph'><svg></svg></div>";
@@ -12,6 +12,7 @@ const bindings = {
     onHover: '<',
     onSelect: '<',
     selected: '<', // id
+    scaleType: '<'
 };
 
 
@@ -19,6 +20,7 @@ const initialState = {
     amounts: [],
     apps: [],
     currency: '€',
+    scaleType: 'linear',
     onHover: (d) => console.log('asset-cost-graph: default on-hover', d),
     onSelect: (d) => console.log('asset-cost-graph: default on-select', d)
 };
@@ -42,9 +44,33 @@ const dimensions = {
 };
 
 
+const numberFormat = d3.format(",d");
+
+
+function currencyLogFormat(d) {
+    var x = Math.log(d) / Math.log(10) + 1e-6;
+    return Math.abs(x - Math.floor(x)) < .5
+        ? '€ ' + numberFormat(d)
+        : "";
+}
+
+
+function currencyFormat(d) {
+    return '€ ' + numberFormat(d);
+}
+
+
+function calculateOpacity(size = 1) {
+    return _.max([
+        10 / Math.sqrt(size * 40),
+        0.1
+    ]);
+}
+
 function getAppId(a) {
     return a.v1;
 }
+
 
 function getAmount(a) {
     return a.v2;
@@ -76,38 +102,61 @@ function prepareGraph(svg) {
 }
 
 
-function update(graph, axis, amounts = [], selected = null, handlers) {
+function mkScales(amounts = [], scaleType = 'log') {
+    const [minAmount, maxAmount] = d3.extent(amounts, getAmount);
+
+    const baseYScale = scaleType === 'log'
+            ? d3.scale.log()
+            : d3.scale.linear();
+
+    return {
+        x: d3.scale
+            .linear()
+            .domain([0, amounts.length])
+            .range([0, dimensions.graph.width]),
+        y: baseYScale
+            .domain([minAmount / 1.5, maxAmount * 1.2])
+            .range([dimensions.graph.height, 0])
+    }
+}
+
+
+function mkAxis(scale, scaleType = 'log') {
+    const axis = d3.svg.axis()
+        .scale(scale)
+        .orient("left");
+
+    if (scaleType === 'log') {
+        axis.ticks(5)
+            .tickFormat(currencyLogFormat);
+    }
+
+    if (scaleType === 'linear') {
+        axis.ticks(5)
+            .tickFormat(currencyFormat);
+    }
+    return axis;
+}
+
+
+function update(
+    { graph, axis },  // unpack
+    amounts = [],
+    selected = null,
+    handlers) {
 
     const amountsToDisplay = _.chain(amounts)
         .orderBy(getAmount)
         .value();
 
-    const [minAmount, maxAmount] = d3.extent(amountsToDisplay, getAmount);
+    const scales = mkScales(amountsToDisplay, "linear");
 
-    const scales = {
-        x: d3.scale
-            .linear()
-            .domain([0, amounts.length])
-            .range([0, dimensions.graph.width]),
-        y: d3.scale
-            .linear()
-            .domain([minAmount / 1.5, maxAmount * 1.2])
-            .range([dimensions.graph.height, 0])
-    };
-
-
-    const format = d3.format(',d');
-
-    const yAxis = d3.svg.axis()
-        .scale(scales.y)
-        .ticks(5)
-        .orient("left")
-        .tickFormat(d => '€ ' + format(d));
+    const yAxis = mkAxis(scales.y, "linear");
 
     axis.call(yAxis);
 
     // hand-wavy opacity algorithm goes here
-    const opacity = 10 / Math.sqrt(amountsToDisplay.length * 40)
+    const opacity = calculateOpacity(amountsToDisplay.length);
 
     const circles = graph
         .selectAll('.wacg-amount')
@@ -151,7 +200,7 @@ function update(graph, axis, amounts = [], selected = null, handlers) {
     circles
         .classed('wacg-selected', (d) => getAppId(d) === selected)
         .transition()
-        .duration(animationDuration)
+        .duration(animationDuration / 2)
         .attr({
             opacity,
             r: d => getAppId(d) === selected ? radius * 1.5 : radius,
@@ -165,7 +214,7 @@ function controller($element) {
 
     const vm = initialiseData(this, initialState);
     const svg = d3.select($element.find('svg')[0]);
-    const { graph, axis } = prepareGraph(svg);
+    const svgSections = prepareGraph(svg);
 
 
     vm.$onChanges = (changes) => {
@@ -173,7 +222,7 @@ function controller($element) {
             onSelect: vm.onSelect,
             onHover: vm.onHover
         };
-        update(graph, axis, vm.amounts, vm.selected, handlers);
+        update(svgSections, vm.amounts, vm.selected, handlers);
     };
 
 }
