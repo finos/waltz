@@ -2520,7 +2520,7 @@
                author="dwatkins">
         <dropForeignKeyConstraint
                 baseTableName="application"
-                constraintName="idx_organisational_unit_id"/>
+                constraintName="application_organisational_unit_id_fkey"/>
     </changeSet>
 
     <changeSet id="20160826-442-3"
