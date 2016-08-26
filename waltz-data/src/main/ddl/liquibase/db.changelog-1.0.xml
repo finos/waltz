@@ -2506,4 +2506,28 @@
         </delete>
     </changeSet>
 
+
+    <!-- 442: Remove FK's from Org Unit -->
+
+    <changeSet id="20160826-442-1"
+               author="dwatkins">
+        <dropForeignKeyConstraint
+                baseTableName="end_user_application"
+                constraintName="end_user_application_organisational_unit_id_fkey"/>
+    </changeSet>
+
+    <changeSet id="20160826-442-2"
+               author="dwatkins">
+        <dropForeignKeyConstraint
+                baseTableName="application"
+                constraintName="idx_organisational_unit_id"/>
+    </changeSet>
+
+    <changeSet id="20160826-442-3"
+               author="dwatkins">
+        <dropForeignKeyConstraint
+                baseTableName="authoritative_source"
+                constraintName="authoritative_source_application_id_fkey"/>
+    </changeSet>
+
 </databaseChangeLog>
