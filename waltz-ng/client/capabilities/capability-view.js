@@ -25,6 +25,7 @@ const initialState = {
     capability: null,
     complexity: [],
     dataFlows: [],
+    dataFlowDecorators: [],
     entityStatisticDefinitions: [],
     groupedApps: null,
     processes: [],
@@ -130,6 +131,7 @@ function controller($q,
                     capabilities,
                     complexityStore,
                     dataFlowViewService,
+                    dataFlowDecoratorStore,
                     entityStatisticStore,
                     historyStore,
                     perspectiveStore,
@@ -216,9 +218,9 @@ function controller($q,
                 vm.techStats = techStats;
                 vm.sourceDataRatings = sourceDataRatings;
             });
-
-
-        });
+        })
+        .then(() => dataFlowDecoratorStore.findBySelectorAndKind(appIdSelector, 'DATA_TYPE'))
+        .then((flowDecorators => vm.dataFlowDecorators = flowDecorators));
 
 
     appCapabilityStore.findAssociatedApplicationCapabilitiesByCapabilityId(capability.id)
@@ -285,6 +287,7 @@ controller.$inject = [
     'capabilities',
     'ComplexityStore',
     'DataFlowViewService',
+    'DataFlowDecoratorStore',
     'EntityStatisticStore',
     'HistoryStore',
     'PerspectiveStore',

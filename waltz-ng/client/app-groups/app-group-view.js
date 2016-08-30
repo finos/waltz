@@ -74,6 +74,7 @@ const initialState = {
     capabilities: [],
     changeInitiatives: [],
     complexity: [],
+    dataFlowDecorators : [],
     dataFlows : null,
     entityStatisticDefinitions: [],
     flowOptions: null,
@@ -107,6 +108,7 @@ function controller($scope,
                     capabilityStore,
                     changeInitiativeStore,
                     complexityStore,
+                    dataFlowDecoratorStore,
                     dataFlowViewService,
                     entityStatisticStore,
                     ratingStore,
@@ -133,10 +135,16 @@ function controller($scope,
             member.role === 'OWNER'
             && member.userId === vm.user.userName;
 
-    dataFlowViewService.initialise(id, 'APP_GROUP', 'EXACT')
+    dataFlowViewService
+        .initialise(id, 'APP_GROUP', 'EXACT')
         .then(flows => vm.dataFlows = flows);
 
-    assetCostViewService.initialise(appIdSelector, 2016)
+    dataFlowDecoratorStore
+        .findBySelectorAndKind(appIdSelector, 'DATA_TYPE')
+        .then(decorators => vm.dataFlowDecorators = decorators);
+
+    assetCostViewService
+        .initialise(appIdSelector, 2016)
         .then(costs => vm.assetCostData = costs);
 
     bookmarkStore
@@ -218,6 +226,7 @@ controller.$inject = [
     'CapabilityStore',
     'ChangeInitiativeStore',
     'ComplexityStore',
+    'DataFlowDecoratorStore',
     'DataFlowViewService',
     'EntityStatisticStore',
     'RatingStore',

@@ -58,19 +58,24 @@ public class RatedDataFlowService {
     /** (dataflow, (type -> [authSource])) -> Rating */
     private static final BiFunction<DataFlow, Map<String, Map<Long, AuthoritativeSource>>, Rating> lookupRatingFn =
             (df, authSourceByTypeThenApp) -> {
-                Map<Long, AuthoritativeSource> authSourcesByApp = authSourceByTypeThenApp.get(df.dataType());
 
-                if (isEmpty(authSourcesByApp)) {
-                    return Rating.NO_OPINION;
-                }
 
-                long sourceAppId = df.source().id();
+                // TODO: Implement this
 
-                AuthoritativeSource authoritativeSource = authSourcesByApp.get(sourceAppId);
-
-                return authoritativeSource == null
-                        ? Rating.DISCOURAGED
-                        : authoritativeSource.rating();
+//                Map<Long, AuthoritativeSource> authSourcesByApp = authSourceByTypeThenApp.get(df.dataType());
+//
+//                if (isEmpty(authSourcesByApp)) {
+//                    return Rating.NO_OPINION;
+//                }
+//
+//                long sourceAppId = df.source().id();
+//
+//                AuthoritativeSource authoritativeSource = authSourcesByApp.get(sourceAppId);
+//
+//                return authoritativeSource == null
+//                        ? Rating.DISCOURAGED
+//                        : authoritativeSource.rating();
+                return Rating.NO_OPINION;
             };
 
 

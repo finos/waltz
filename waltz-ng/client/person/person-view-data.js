@@ -39,6 +39,7 @@ const initModel = {
     assetCostData: {},
     serverStats: null,
     dataFlows: [],
+    dataFlowDecorators: [],
     entityStatisticDefinitions: [],
     visibility: {
         techOverlay: false,
@@ -48,6 +49,11 @@ const initModel = {
         changeInitiativeOverlay: false
     }
 };
+
+
+function toSelector(personId, scope='CHILDREN') {
+    return { entityReference: { kind: 'PERSON', id: personId }, scope };
+}
 
 
 function buildAppInvolvementSummary(apps = [], involvements = []) {
@@ -80,6 +86,7 @@ function buildAppInvolvementSummary(apps = [], involvements = []) {
 function service($q,
                  assetCostViewService,
                  complexityStore,
+                 dataFlowDecoratorStore,
                  dataFlowViewService,
                  entityStatisticStore,
                  involvementStore,
@@ -161,7 +168,7 @@ function service($q,
 
     function loadCostStats(personId) {
         assetCostViewService
-            .initialise({ entityReference: { kind: 'PERSON', id: personId }, scope: 'CHILDREN' }, 2016)
+            .initialise(toSelector(personId), 2016)
             .then(assetCostData => state.model.assetCostData = assetCostData);
     }
 
@@ -177,6 +184,13 @@ function service($q,
         dataFlowViewService
             .initialise(personId, 'PERSON', 'CHILDREN')
             .then(flows => state.model.dataFlows = flows);
+    }
+
+
+    function loadFlowDecorators(personId) {
+        dataFlowDecoratorStore
+            .findBySelectorAndKind(toSelector(personId), 'DATA_TYPE')
+            .then(decorators => state.model.dataFlowDecorators = decorators);
     }
 
 
@@ -214,6 +228,7 @@ function service($q,
         const statsPromises = peoplePromise
             .then(personId => {
                 loadFlows(personId);
+                loadFlowDecorators(personId);
                 loadCostStats(personId);
                 loadTechStats(personId);
                 loadComplexity(personId);
@@ -252,6 +267,7 @@ service.$inject = [
     '$q',
     'AssetCostViewService',
     'ComplexityStore',
+    'DataFlowDecoratorStore',
     'DataFlowViewService',
     'EntityStatisticStore',
     'InvolvementStore',

@@ -1,8 +1,9 @@
 const BINDINGS = {
-    ratings: '=',
-    flowData: '=',
-    applications: '=',
-    onLoadDetail: '='
+    ratings: '<',
+    flowData: '<',
+    applications: '<',
+    onLoadDetail: '<',
+    flowDecorators: '<'
 };
 
 

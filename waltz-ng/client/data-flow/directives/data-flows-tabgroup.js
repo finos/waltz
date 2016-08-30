@@ -2,12 +2,13 @@ import _ from "lodash";
 
 
 const BINDINGS = {
-    flowData: '=',
-    applications: '=',
-    onLoadDetail: '=',
+    flowData: '<',
+    flowDecorators: '<',
+    applications: '<',
+    onLoadDetail: '<',
     options: '=?',
-    optionsVisible: '=',
-    onTabChange: '='
+    optionsVisible: '<',
+    onTabChange: '<'
 };
 
 
@@ -46,11 +47,24 @@ function calculateEntities(flows = []) {
 }
 
 
-function buildFilter(filterOptions = defaultFilterOptions, appIds) {
+function buildFilter(filterOptions = defaultFilterOptions,
+                     appIds = [],
+                     flowDecorators = []) {
 
-    const typeFilterFn = f => filterOptions.type === 'ALL'
-        ? true
-        : f.dataType === filterOptions.type;
+    const decoratorsByFlowById = _.groupBy(flowDecorators, 'dataFlowId');
+
+    const typeFilterFn = f => {
+        const decoratorsForFlow = decoratorsByFlowById[f.id] || [];
+
+        const typeMatchFn = ({ decoratorEntity }) => {
+            return decoratorEntity.id === Number(filterOptions.type)
+                && decoratorEntity.kind === 'DATA_TYPE';
+        };
+
+        return filterOptions.type === 'ALL'
+            ? true
+            : _.some(decoratorsForFlow, typeMatchFn);
+    };
 
     const scopeFilterFn =  f => {
         switch (filterOptions.scope) {
@@ -71,9 +85,10 @@ function buildFilter(filterOptions = defaultFilterOptions, appIds) {
 
 function calculateFlowData(allFlows = [],
                            appIds = [],
+                           flowDecorators = [],
                            filterOptions = defaultFilterOptions) {
 
-    const filterFn = buildFilter(filterOptions, appIds);
+    const filterFn = buildFilter(filterOptions, appIds, flowDecorators);
     const flows = _.filter(allFlows, filterFn);
     const entities = calculateEntities(flows);
 
@@ -85,12 +100,16 @@ function controller($scope, dataFlowUtilityService) {
 
     const vm = _.defaultsDeep(this, initialState);
 
-
     $scope.$watch(
         'ctrl.flowData.flows',
-        (flows = []) => {
-            vm.dataTypes = _.chain(flows)
-                .map('dataType')
+        () => vm.filterChanged(defaultFilterOptions));
+
+    $scope.$watch(
+        'ctrl.flowDecorators',
+        (decorators = []) => {
+            vm.dataTypes = _.chain(decorators)
+                .filter(dc => dc.decoratorEntity.kind === 'DATA_TYPE')
+                .map('decoratorEntity.id')
                 .uniq()
                 .value();
 
@@ -112,6 +131,7 @@ function controller($scope, dataFlowUtilityService) {
         vm.filteredFlowData = calculateFlowData(
             vm.flowData.flows,
             vm.appIds,
+            vm.flowDecorators,
             filterOptions);
 
     };
@@ -133,7 +153,8 @@ function controller($scope, dataFlowUtilityService) {
 
 controller.$inject = [
     '$scope',
-    'DataFlowUtilityService'
+    'DataFlowUtilityService',
+    'DataTypeService'
 ];
 
 

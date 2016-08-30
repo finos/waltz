@@ -20,6 +20,7 @@ const initialState = {
         data: []
     },
     dataFlows: [],
+    dataFlowDecorators: [],
     process: null,
     selectedCapability: null,
     selectedApplication: null,
@@ -69,6 +70,7 @@ function controller($scope,
                     assetCostViewService,
                     bookmarkStore,
                     capabilityStore,
+                    dataFlowDecoratorStore,
                     dataFlowViewService,
                     processStore,
                     sourceDataRatingStore) {
@@ -128,6 +130,10 @@ function controller($scope,
     dataFlowViewService
         .initialise(processId, 'PROCESS', 'EXACT')
         .then(data => vm.dataFlows = data);
+
+    dataFlowDecoratorStore
+        .findBySelectorAndKind(selectorOptions, 'DATA_TYPE')
+        .then(data => vm.dataFlowDecorators = data);
 
 
     // --  WATCHERS
@@ -202,6 +208,7 @@ controller.$inject = [
     'AssetCostViewService',
     'BookmarkStore',
     'CapabilityStore',
+    'DataFlowDecoratorStore',
     'DataFlowViewService',
     'ProcessStore',
     'SourceDataRatingStore'

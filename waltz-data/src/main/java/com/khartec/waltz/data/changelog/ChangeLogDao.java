@@ -23,7 +23,7 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -100,7 +100,7 @@ public class ChangeLogDao {
     }
 
 
-    public List<StringTally> getContributionLeaderBoard(int limit) {
+    public List<Tally<String>> getContributionLeaderBoard(int limit) {
         return makeTallyQuery(
                     dsl,
                     CHANGE_LOG,
@@ -112,7 +112,7 @@ public class ChangeLogDao {
     }
 
 
-    public List<StringTally> getContributionScoresForUsers(List<String> userIds) {
+    public List<Tally<String>> getContributionScoresForUsers(List<String> userIds) {
         return calculateStringTallies(
                 dsl,
                 CHANGE_LOG,

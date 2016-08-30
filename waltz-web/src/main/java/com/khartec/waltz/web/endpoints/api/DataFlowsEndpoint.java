@@ -36,9 +36,6 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
@@ -86,32 +83,18 @@ public class DataFlowsEndpoint implements Endpoint {
         DatumRoute<Boolean> updateFlowsRoute = (request, response) -> {
             requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
 
+            // TODO: #447
+
             UpdateDataFlowsAction dataFlowUpdate = readBody(request, UpdateDataFlowsAction.class);
-            List<DataFlow> addedFlows = dataFlowUpdate
-                    .addedTypes()
-                    .stream()
-                    .map(a -> ImmutableDataFlow.builder()
-                            .source(dataFlowUpdate.source())
-                            .target(dataFlowUpdate.target())
-                            .dataType(a)
-                            .build())
-                    .collect(Collectors.toList());
+            ImmutableDataFlow dataFlow = ImmutableDataFlow.builder()
+                    .source(dataFlowUpdate.source())
+                    .target(dataFlowUpdate.target())
+                    .build();
 
-            List<DataFlow> removedFlows = dataFlowUpdate
-                    .removedTypes()
-                    .stream()
-                    .map(a -> ImmutableDataFlow.builder()
-                            .source(dataFlowUpdate.source())
-                            .target(dataFlowUpdate.target())
-                            .dataType(a)
-                            .build())
-                    .collect(Collectors.toList());
+            DataFlow storedFlow = dataFlowService.addFlow(dataFlow);
 
-            dataFlowService
-                    .addFlows(addedFlows);
-
-            dataFlowService
-                    .removeFlows(removedFlows);
+//            dataFlowService
+//                    .removeFlows(removedFlows);
 
             String message = String.format(
                     "Flows updated between %s and %s, added: %s types and removed: %s types",

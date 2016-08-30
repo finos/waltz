@@ -17,14 +17,11 @@
 
 package com.khartec.waltz.data.data_flow;
 
-import com.khartec.waltz.common.ArrayBuilder;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
-import com.khartec.waltz.model.tally.ImmutableStringTally;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.DataFlowRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +29,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.utils.IdUtilities.toIds;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
-import static org.jooq.impl.DSL.count;
 
 
 @Repository
@@ -50,7 +46,7 @@ public class DataFlowDao {
     private RecordMapper<Record, DataFlow> dataFlowMapper = r -> {
         DataFlowRecord record = r.into(DataFlowRecord.class);
         return ImmutableDataFlow.builder()
-                .dataType(record.getDataType())
+                .id(record.getId())
                 .source(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(record.getSourceEntityKind()))
                         .id(record.getSourceEntityId())
@@ -98,14 +94,9 @@ public class DataFlowDao {
 
     private SelectConditionStep<Record> baseQuery() {
 
-        Field[] fields = new ArrayBuilder<Field>()
-                .add(DATA_FLOW.fields())
-                .add(sourceAppAlias.NAME)
-                .add(targetAppAlias.NAME)
-                .build(new Field[0]);
-
-
-        return dsl.select(fields)
+        return dsl
+                .select(DATA_FLOW.fields())
+                .select(sourceAppAlias.NAME, targetAppAlias.NAME)
                 .from(DATA_FLOW)
                 .innerJoin(sourceAppAlias)
                 .on(DATA_FLOW.SOURCE_ENTITY_ID.eq(sourceAppAlias.ID))
@@ -116,50 +107,26 @@ public class DataFlowDao {
     }
 
 
-    public int[] removeFlows(List<DataFlow> flows) {
-
-        List<DeleteConditionStep<DataFlowRecord>> deletes = flows.stream()
-                .map(f -> dsl.deleteFrom(DATA_FLOW)
-                        .where(DATA_FLOW.SOURCE_ENTITY_ID.eq(f.source().id()))
-                        .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(f.source().kind().name()))
-                        .and(DATA_FLOW.TARGET_ENTITY_ID.eq(f.target().id()))
-                        .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(f.target().kind().name()))
-                        .and(DATA_FLOW.DATA_TYPE.eq(f.dataType())))
-                .collect(Collectors.toList());
-
-        return dsl.batch(deletes).execute();
+    public int removeFlows(List<DataFlow> flows) {
+        return dsl.deleteFrom(DATA_FLOW)
+                .where(DATA_FLOW.ID.in(toIds(flows)))
+                .execute();
     }
 
 
-    public int[] addFlows(List<DataFlow> flows) {
-        List<Insert> inserts = flows.stream()
-                .map(f -> dsl
-                        .insertInto(DATA_FLOW)
-                        .columns(DATA_FLOW.DATA_TYPE,
-                                DATA_FLOW.SOURCE_ENTITY_KIND,
-                                DATA_FLOW.SOURCE_ENTITY_ID,
-                                DATA_FLOW.TARGET_ENTITY_KIND,
-                                DATA_FLOW.TARGET_ENTITY_ID,
-                                DATA_FLOW.PROVENANCE)
-                        .values(f.dataType(),
-                                f.source().kind().name(),
-                                f.source().id(),
-                                f.target().kind().name(),
-                                f.target().id(),
-                                f.provenance()))
-                .collect(Collectors.toList());
+    public DataFlow addFlow(DataFlow flow) {
+        DataFlowRecord record = dsl.newRecord(DATA_FLOW);
 
-        return dsl.batch(inserts).execute();
+        record.setProvenance(flow.provenance());
+        record.setSourceEntityId(flow.source().id());
+        record.setSourceEntityKind(flow.source().kind().name());
+        record.setTargetEntityId(flow.target().id());
+        record.setTargetEntityKind(flow.target().kind().name());
+
+        record.store();
+
+        return dataFlowMapper.map(record);
     }
 
 
-    public List<Tally<String>> tallyByDataType() {
-        return dsl.select(DATA_FLOW.DATA_TYPE, count(DATA_FLOW.DATA_TYPE))
-                .from(DATA_FLOW)
-                .groupBy(DATA_FLOW.DATA_TYPE)
-                .fetch(r -> ImmutableStringTally.builder()
-                        .id(r.value1())
-                        .count(r.value2())
-                        .build());
-    }
 }

@@ -1,7 +1,7 @@
 const BINDINGS = {
     visible: '=',
     onChange: '=',
-    types: '='
+    types: '=' // [ dataTypeId... ]
 };
 
 

@@ -1,7 +1,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
@@ -44,7 +44,7 @@ public class EntityHierarchyEndpoint implements Endpoint {
         String findTalliesPath = mkPath(BASE, "tallies");
         String buildByKindPath = mkPath(BASE, "build", ":kind");
 
-        ListRoute<StringTally> findTalliesRoute = (request, response) -> entityHierarchyService.tallyByKind();
+        ListRoute<Tally<String>> findTalliesRoute = (request, response) -> entityHierarchyService.tallyByKind();
 
         getForList(findTalliesPath, findTalliesRoute);
         postForDatum(buildByKindPath, this::buildByKindRoute);

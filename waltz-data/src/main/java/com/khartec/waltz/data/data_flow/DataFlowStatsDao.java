@@ -21,8 +21,10 @@ import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.dataflow.DataFlowMeasures;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowMeasures;
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.DataFlow;
+import com.khartec.waltz.schema.tables.DataFlowDecorator;
+import com.khartec.waltz.schema.tables.DataType;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
+import static com.khartec.waltz.data.JooqUtilities.TO_STRING_TALLY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 
@@ -41,11 +43,15 @@ public class DataFlowStatsDao {
 
     private final DSLContext dsl;
 
-    private final DataFlow df = DATA_FLOW.as("df");
+    private static final DataFlow df = DATA_FLOW.as("df");
+    private static final com.khartec.waltz.schema.tables.DataType dt = DataType.DATA_TYPE.as("dt");
+    private static final com.khartec.waltz.schema.tables.DataFlowDecorator dfd = DataFlowDecorator.DATA_FLOW_DECORATOR.as("dfd");
 
-    private final Condition bothApps =
+
+    private static final Condition BOTH_APPS =
             df.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                 .and(df.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+
 
     @Autowired
     public DataFlowStatsDao(DSLContext dsl) {
@@ -96,18 +102,28 @@ public class DataFlowStatsDao {
     }
 
 
-    public List<StringTally> tallyDataTypes(Select<Record1<Long>> appIdSelector) {
+    public List<Tally<String>> tallyDataTypes(Select<Record1<Long>> appIdSelector) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
         Condition condition = df.TARGET_ENTITY_ID.in(appIdSelector)
                 .or(df.SOURCE_ENTITY_ID.in(appIdSelector))
-                .and(bothApps);
+                .and(BOTH_APPS);
 
-        return calculateStringTallies(
-                dsl,
-                df,
-                df.DATA_TYPE,
-                condition);
+
+         // dataType.CODE should no longer be used as a 'pk' (use .ID instead)
+         // TODO: fix this, probably simple as client impact hidden behind toDisplayName etc..
+
+
+        return dsl.select(dt.CODE, DSL.count())
+                .from(df)
+                .innerJoin(dfd)
+                .on(df.ID.eq(dfd.DATA_FLOW_ID))
+                .innerJoin(dt)
+                .on(dt.ID.eq(dfd.DECORATOR_ENTITY_ID)
+                        .and(dfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
+                .where(dsl.renderInlined(condition))
+                .groupBy(dt.CODE)
+                .fetch(TO_STRING_TALLY);
     }
 
 
@@ -170,7 +186,7 @@ public class DataFlowStatsDao {
         Condition condition = fieldToCount
                 .notIn(appIdSelector)
                 .and(feederField.in(appIdSelector))
-                .and(bothApps);
+                .and(BOTH_APPS);
 
         return dsl.select(DSL.countDistinct(fieldToCount))
                 .from(df)

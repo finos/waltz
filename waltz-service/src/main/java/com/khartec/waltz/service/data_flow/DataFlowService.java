@@ -27,17 +27,17 @@ import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.DataFlowMeasures;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowStatistics;
-import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 
 @Service
@@ -71,16 +71,16 @@ public class DataFlowService {
     }
 
 
-    public int[] addFlows(List<DataFlow> flows) {
-        List<DataFlow> flowsExceptSameSourceAndTarget = flows.stream()
-                .filter(f -> !f.source().equals(f.target()))
-                .collect(Collectors.toList());
+    public DataFlow addFlow(DataFlow flow) {
+        if (flow.source().equals(flow.target())) {
+            throw new IllegalArgumentException("Cannot have a flow with same source and target");
+        }
 
-        return dataFlowDao.addFlows(flowsExceptSameSourceAndTarget);
+        return dataFlowDao.addFlow(flow);
     }
 
 
-    public int[] removeFlows(List<DataFlow> flows) {
+    public int removeFlows(List<DataFlow> flows) {
         return dataFlowDao.removeFlows(flows);
     }
 
@@ -88,7 +88,7 @@ public class DataFlowService {
     public DataFlowStatistics calculateStats(IdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);
-        List<StringTally> dataTypeCounts = FunctionUtilities.time("DFS.dataTypes", () -> dataFlowStatsDao.tallyDataTypes(appIdSelector));
+        List<Tally<String>> dataTypeCounts = FunctionUtilities.time("DFS.dataTypes", () -> dataFlowStatsDao.tallyDataTypes(appIdSelector));
         DataFlowMeasures appCounts = FunctionUtilities.time("DFS.appCounts", () -> dataFlowStatsDao.countDistinctAppInvolvement(appIdSelector));
         DataFlowMeasures flowCounts = FunctionUtilities.time("DFS.flowCounts", () -> dataFlowStatsDao.countDistinctFlowInvolvement(appIdSelector));
 
@@ -99,9 +99,9 @@ public class DataFlowService {
                 .build();
     }
 
-    public List<Tally<String>> tallyByDataType() {
-        return dataFlowDao.tallyByDataType();
-    }
 
+    public List<Tally<String>> tallyByDataType() {
+        return dataFlowStatsDao.tallyDataTypes(DSL.select(APPLICATION.ID).from(APPLICATION));
+    }
 
 }

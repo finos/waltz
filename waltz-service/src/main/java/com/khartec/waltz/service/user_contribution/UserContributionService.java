@@ -4,7 +4,7 @@ import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.changelog.ChangeLogDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +33,7 @@ public class UserContributionService {
     }
 
 
-    public List<StringTally> getLeaderBoard(int limit) {
+    public List<Tally<String>> getLeaderBoard(int limit) {
         return changeLogDao.getContributionLeaderBoard(limit);
     }
 
@@ -47,7 +47,7 @@ public class UserContributionService {
     }
 
 
-    public List<StringTally> findScoresForDirectReports(String userId) {
+    public List<Tally<String>> findScoresForDirectReports(String userId) {
         checkNotEmptyString(userId, "userId cannot be empty");
 
         Person person = personDao.findPersonByUserId(userId);

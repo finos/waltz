@@ -6,6 +6,7 @@ import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
 import com.khartec.waltz.model.database_information.ImmutableDatabaseInformation;
 import com.khartec.waltz.model.database_information.ImmutableDatabaseSummaryStatistics;
 import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.DatabaseInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -94,13 +95,13 @@ public class DatabaseInformationDao {
                 .and(APPLICATION.ID.in(appIdSelector))
                 .asTable();
 
-        List<StringTally> vendorCounts = calculateStringTallies(
+        List<Tally<String>> vendorCounts = calculateStringTallies(
                 dsl,
                 databaseInfo,
                 DATABASE_INFORMATION.DBMS_VENDOR,
                 DSL.trueCondition());
 
-        List<StringTally> environmentCounts = calculateStringTallies(
+        List<Tally<String>> environmentCounts = calculateStringTallies(
                 dsl,
                 databaseInfo,
                 DATABASE_INFORMATION.ENVIRONMENT,

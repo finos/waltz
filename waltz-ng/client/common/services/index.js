@@ -78,9 +78,14 @@ export default (module) => {
         dataTypeService
             .loadDataTypes()
             .then(results => {
-                const indexed = _.keyBy(results, 'code');
-                displayNameService.register('dataType', _.mapValues(indexed, 'name'));
-                descriptionService.register('dataType', _.mapValues(indexed, 'description'));
+                // DEPRECATED, should be byId
+                const indexedByCode = _.keyBy(results, 'code');
+                displayNameService.register('dataType', _.mapValues(indexedByCode, 'name'));
+                descriptionService.register('dataType', _.mapValues(indexedByCode, 'description'));
+
+                const indexedById = _.keyBy(results, 'id');
+                displayNameService.register('dataType', _.mapValues(indexedById, 'name'));
+                descriptionService.register('dataType', _.mapValues(indexedById, 'description'));
             })
     }
 

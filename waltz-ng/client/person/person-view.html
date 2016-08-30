@@ -1,4 +1,5 @@
 <div>
+
     <!-- HEADER -->
     <waltz-page-header icon="user" name="{{ ctrl.person.displayName }}">
         <ol class="waltz-breadcrumbs">
@@ -114,14 +115,13 @@
     <!-- FLOWS -->
     <waltz-data-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
                                        flow-data="ctrl.dataFlows"
+                                       flow-decorators="ctrl.dataFlowDecorators"
                                        on-load-detail="ctrl.loadFlowDetail"
                                        applications="ctrl.apps">
     </waltz-data-flows-tabgroup-section>
 
 
-
     <!-- INDICATORS -->
-
     <waltz-entity-statistic-summary-section name="Indicators"
                                             definitions="ctrl.entityStatisticDefinitions"
                                             parent-ref="ctrl.entityRef">

@@ -2,10 +2,7 @@ package com.khartec.waltz.data;
 
 import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.common.StringUtilities;
-import com.khartec.waltz.model.tally.ImmutableLongTally;
-import com.khartec.waltz.model.tally.ImmutableStringTally;
-import com.khartec.waltz.model.tally.LongTally;
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
@@ -33,7 +30,7 @@ public class JooqUtilities {
     /**
      * Expects result set like: { Id, Count }
      */
-    public static final RecordMapper<Record2<String,Integer>, StringTally> TO_STRING_TALLY = r ->
+    public static final RecordMapper<Record2<String,Integer>, Tally<String>> TO_STRING_TALLY = r ->
             ImmutableStringTally.builder()
                     .count(r.value2())
                     .id(r.value1())
@@ -52,7 +49,7 @@ public class JooqUtilities {
                 .fetch(mapper);
     }
 
-    public static List<StringTally> calculateStringTallies(
+    public static List<Tally<String>> calculateStringTallies(
             DSLContext dsl,
             Table table,
             Field<String> fieldToTally,

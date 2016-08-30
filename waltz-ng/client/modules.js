@@ -21,6 +21,7 @@ function setup(module) {
         require('./change-log'),
         require('./databases'),
         require('./data-flow'),
+        require('./data-flow-decorator'),
         require('./data-types'),
         require('./data-type-usage'),
         require('./end-user-apps'),

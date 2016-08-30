@@ -22,8 +22,6 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
-import com.khartec.waltz.model.dataflow.DataFlow;
-import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;
@@ -34,12 +32,10 @@ import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import javax.sql.DataSource;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.List;
+import java.util.Random;
 
 import static com.khartec.waltz.common.ListUtilities.randomPick;
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static java.util.stream.Collectors.toList;
 
 
@@ -65,47 +61,47 @@ public class FlowGenerator {
         List<OrganisationalUnit> orgUnits = orgUnitDao.findAll();
 
 
-        Set<DataFlow> expectedFlows = authSources.stream()
-                .flatMap(a -> {
-                    long orgUnitId = a.parentReference().id();
-
-                    return IntStream.range(0, rnd.nextInt(40))
-                            .mapToObj(i -> ImmutableDataFlow.builder()
-                                    .dataType(a.dataType())
-                                    .source(a.applicationReference())
-                                    .target(randomAppPick(apps, orgUnitId))
-                                    .build());
-                })
-                .collect(Collectors.toSet());
-
-
-        Set<DataFlow> probableFlows = authSources.stream()
-                .flatMap(a -> IntStream.range(0, rnd.nextInt(30))
-                        .mapToObj(i -> ImmutableDataFlow.builder()
-                                .dataType(a.dataType())
-                                .source(a.applicationReference())
-                                .target(randomAppPick(apps, randomPick(orgUnits).id().get()))
-                                .build()))
-                .collect(Collectors.toSet());
+//        Set<DataFlow> expectedFlows = authSources.stream()
+//                .flatMap(a -> {
+//                    long orgUnitId = a.parentReference().id();
+//
+//                    return IntStream.range(0, rnd.nextInt(40))
+//                            .mapToObj(i -> ImmutableDataFlow.builder()
+//                                    .dataType(a.dataType())
+//                                    .source(a.applicationReference())
+//                                    .target(randomAppPick(apps, orgUnitId))
+//                                    .build());
+//                })
+//                .collect(Collectors.toSet());
 
 
-        Set<DataFlow> randomFlows = apps.stream()
-                .map(a -> ImmutableDataFlow
-                        .builder()
-                        .source(a.toEntityReference()))
-                .map(b -> b.target(randomAppPick(apps, randomPick(orgUnits).id().get())))
-                .map(b -> b.dataType(randomPick(dataTypes)).build())
-                .collect(Collectors.toSet());
+//        Set<DataFlow> probableFlows = authSources.stream()
+//                .flatMap(a -> IntStream.range(0, rnd.nextInt(30))
+//                        .mapToObj(i -> ImmutableDataFlow.builder()
+//                                .dataType(a.dataType())
+//                                .source(a.applicationReference())
+//                                .target(randomAppPick(apps, randomPick(orgUnits).id().get()))
+//                                .build()))
+//                .collect(Collectors.toSet());
 
-
-        dsl.deleteFrom(DATA_FLOW).execute();
-
-        Set<DataFlow> all = new HashSet<>();
-        all.addAll(randomFlows);
-        all.addAll(expectedFlows);
-        all.addAll(probableFlows);
-
-        dataFlowDao.addFlows(new ArrayList<>(all));
+//
+//        Set<DataFlow> randomFlows = apps.stream()
+//                .map(a -> ImmutableDataFlow
+//                        .builder()
+//                        .source(a.toEntityReference()))
+//                .map(b -> b.target(randomAppPick(apps, randomPick(orgUnits).id().get())))
+//                .map(b -> b.dataType(randomPick(dataTypes)).build())
+//                .collect(Collectors.toSet());
+//
+//
+//        dsl.deleteFrom(DATA_FLOW).execute();
+//
+//        Set<DataFlow> all = new HashSet<>();
+//        all.addAll(randomFlows);
+//        all.addAll(expectedFlows);
+//        all.addAll(probableFlows);
+//
+//        dataFlowDao.addFlows(new ArrayList<>(all));
 
         System.out.println("Done");
 
