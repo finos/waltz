@@ -48,6 +48,7 @@
                     <th>Bookmark</th>
                     <th>Flow</th>
                     <th>Auth Source</th>
+                    <th>Beta Tester</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -96,6 +97,11 @@
                     </td>
                     <td align="left">
                         <span ng-if='ctrl.hasRole(user, "AUTHORITATIVE_SOURCE_EDITOR")'>
+                            <waltz-icon name='check'></waltz-icon>
+                        </span>
+                    </td>
+                    <td align="left">
+                        <span ng-if='ctrl.hasRole(user, "BETA_TESTER")'>
                             <waltz-icon name='check'></waltz-icon>
                         </span>
                     </td>
@@ -166,6 +172,12 @@
                                 <td>AUTHORITATIVE_SOURCE_EDITOR</td>
                                 <td>
                                     <input type="checkbox" ng-model="ctrl.roleSelections.AUTHORITATIVE_SOURCE_EDITOR">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>BETA_TESTER</td>
+                                <td>
+                                    <input type="checkbox" ng-model="ctrl.roleSelections.BETA_TESTER">
                                 </td>
                             </tr>
                             </tbody>

@@ -31,7 +31,8 @@ public enum Role {
     CAPABILITY_EDITOR,
     LOGICAL_DATA_FLOW_EDITOR,
     ORG_UNIT_EDITOR,
-    RATING_EDITOR;
+    RATING_EDITOR,
+    BETA_TESTER;
 
 
     public static Set<String> allNames() {
