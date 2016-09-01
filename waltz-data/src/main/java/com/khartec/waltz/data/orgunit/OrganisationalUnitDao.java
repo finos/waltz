@@ -17,11 +17,14 @@
 
 package com.khartec.waltz.data.orgunit;
 
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.orgunit.ImmutableOrganisationalUnit;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.model.orgunit.OrganisationalUnitKind;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,7 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
+import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 
@@ -52,6 +56,7 @@ public class OrganisationalUnitDao {
                 .build();
     };
 
+    private static final com.khartec.waltz.schema.tables.OrganisationalUnit ou = ORGANISATIONAL_UNIT.as("ou");
 
     private final DSLContext dsl;
 
@@ -63,43 +68,52 @@ public class OrganisationalUnitDao {
 
 
     public List<OrganisationalUnit> findAll() {
-        return dsl.select(ORGANISATIONAL_UNIT.fields())
-                .from(ORGANISATIONAL_UNIT)
+        return dsl.select(ou.fields())
+                .from(ou)
                 .fetch(recordMapper);
     }
 
 
     public OrganisationalUnit getById(long id) {
-        return dsl.select(ORGANISATIONAL_UNIT.fields())
-                .from(ORGANISATIONAL_UNIT)
-                .where(ORGANISATIONAL_UNIT.ID.eq(id))
+        return dsl.select(ou.fields())
+                .from(ou)
+                .where(ou.ID.eq(id))
                 .fetchOne(recordMapper);
     }
 
 
     public Integer updateDescription(long id, String description) {
-        return dsl.update(ORGANISATIONAL_UNIT)
-                .set(ORGANISATIONAL_UNIT.DESCRIPTION, description)
-                .where(ORGANISATIONAL_UNIT.ID.eq(id))
+        return dsl.update(ou)
+                .set(ou.DESCRIPTION, description)
+                .where(ou.ID.eq(id))
                 .execute();
     }
 
 
     public List<OrganisationalUnit> findBySelector(Select<Record1<Long>> selector) {
-        Condition condition = ORGANISATIONAL_UNIT.ID.in(selector);
+        Condition condition = ou.ID.in(selector);
         return findByCondition(condition);
     }
 
 
+    public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
+        checkNotNull(selector, "selector cannot be null");
+        return dsl.select(ou.ID, ou.NAME, DSL.val(EntityKind.ORG_UNIT.name()))
+                .from(ou)
+                .where(ou.ID.in(selector))
+                .fetch(TO_ENTITY_REFERENCE);
+    }
+
+
     public List<OrganisationalUnit> findByIds(Long... ids) {
-        Condition condition = ORGANISATIONAL_UNIT.ID.in(ids);
+        Condition condition = ou.ID.in(ids);
         return findByCondition(condition);
     }
 
 
     private List<OrganisationalUnit> findByCondition(Condition condition) {
-        return dsl.select(ORGANISATIONAL_UNIT.fields())
-                .from(ORGANISATIONAL_UNIT)
+        return dsl.select(ou.fields())
+                .from(ou)
                 .where(condition)
                 .fetch(recordMapper);
     }

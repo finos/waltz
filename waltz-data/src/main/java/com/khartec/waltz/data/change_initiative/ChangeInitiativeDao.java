@@ -7,14 +7,16 @@ import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.change_initiative.ChangeInitiativeKind;
 import com.khartec.waltz.model.change_initiative.ImmutableChangeInitiative;
 import com.khartec.waltz.schema.tables.records.ChangeInitiativeRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static java.util.Optional.ofNullable;
@@ -65,6 +67,15 @@ public class ChangeInitiativeDao {
                 .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()))
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
+        checkNotNull(selector, "selector cannot be null");
+        return dsl.select(CHANGE_INITIATIVE.ID, CHANGE_INITIATIVE.NAME, DSL.val(EntityKind.CHANGE_INITIATIVE.name()))
+                .from(CHANGE_INITIATIVE)
+                .where(CHANGE_INITIATIVE.ID.in(selector))
+                .fetch(TO_ENTITY_REFERENCE);
     }
 
 

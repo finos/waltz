@@ -2,6 +2,9 @@ package com.khartec.waltz.data;
 
 import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.common.StringUtilities;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.tally.ImmutableLongTally;
 import com.khartec.waltz.model.tally.ImmutableStringTally;
 import com.khartec.waltz.model.tally.LongTally;
@@ -44,6 +47,15 @@ public class JooqUtilities {
                     .count(r.value2())
                     .id(r.value1())
                     .build();
+
+
+    public static final RecordMapper<? super Record3<Long, String, String>, EntityReference> TO_ENTITY_REFERENCE = r ->
+        ImmutableEntityReference.builder()
+                .id(r.value1())
+                .name(r.value2())
+                .kind(EntityKind.valueOf(r.value3()))
+                .build();
+
 
     public static <R> List<R> queryTableForList(Table table, RecordMapper<? super Record, R> mapper, Condition condition) {
         return DSL.select(table.fields())
