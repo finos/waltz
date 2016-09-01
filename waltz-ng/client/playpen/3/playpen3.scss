@@ -19,10 +19,11 @@ text {
     font-weight: bold;
 }
 
-rect {
-    fill: none;
-    stroke: #fff;
-}
+// NOTE: this was commented out because it was blanking out all rects across waltz (KS)
+//rect {
+//    fill: none;
+//    stroke: #fff;
+//}
 
 rect.parent,
 .grandparent rect {
