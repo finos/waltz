@@ -15,34 +15,10 @@
 
     <div class="nav-bar-collapse">
         <ul class="nav navbar-nav navbar-left">
-            <li ui-sref-active="active">
-                <a ui-sref="main.org-unit.list">
-                    <waltz-icon name="sitemap"></waltz-icon>
-                    Org Units
-                </a>
-            </li>
-            <li ui-sref-active="active">
-                <a ui-sref="main.capability.list">
-                    <waltz-icon name="puzzle-piece"></waltz-icon>
-                    Capabilities
-                </a>
-            </li>
-            <li ui-sref-active="active">
-                <a ui-sref="main.process.list">
-                    <waltz-icon name="code-fork"></waltz-icon>
-                    Processes
-                </a>
-            </li>
-            <li ui-sref-active="active">
-                <a ui-sref="main.person">
-                    <waltz-icon name="users"></waltz-icon>
-                    People
-                </a>
-            </li>
-            <li ui-sref-active="active">
-                <a ui-sref="main.data-type.list">
-                    <waltz-icon name="qrcode"></waltz-icon>
-                    Data Types
+            <li ui-sref-active="active" ng-repeat="item in ctrl.navItemsForRole">
+                <a ui-sref="{{item.uiSref}}">
+                    <waltz-icon name="{{item.icon}}"></waltz-icon>
+                    <span ng-bind="item.displayName"> </span>
                 </a>
             </li>
         </ul>
