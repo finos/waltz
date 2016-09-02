@@ -18,6 +18,7 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.map;
+import static com.khartec.waltz.data.JooqUtilities.TO_STRING_TALLY;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 
 @Repository
@@ -67,4 +68,15 @@ public class EntityHierarchyDao {
     public List<StringTally> tallyByKind() {
         return JooqUtilities.calculateStringTallies(dsl, eh, eh.KIND, DSL.trueCondition());
     }
+
+
+    public List<StringTally> getRootTallies() {
+        return dsl.select(eh.KIND, DSL.count())
+                .from(eh)
+                .where(eh.LEVEL.eq(1)
+                        .and(eh.ID.eq(eh.ANCESTOR_ID)))
+                .groupBy(eh.KIND)
+                .fetch(TO_STRING_TALLY);
+    }
+
 }

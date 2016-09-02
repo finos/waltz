@@ -208,11 +208,17 @@ export function kindToViewState(kind) {
     if (kind === 'CAPABILITY') {
         return "main.capability.view";
     }
+    if (kind === 'DATA_TYPE') {
+        return "main.data-type.view";
+    }
     if (kind === 'ORG_UNIT') {
         return "main.org-unit.view";
     }
     if (kind === 'CHANGE_INITIATIVE') {
         return "main.change-initiative.view";
+    }
+    if (kind === 'ENTITY_STATISTIC') {
+        return "main.entity-statistic.view";
     }
     if (kind === 'PROCESS') {
         return "main.process.view";

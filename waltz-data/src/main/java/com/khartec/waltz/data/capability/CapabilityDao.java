@@ -18,11 +18,14 @@
 package com.khartec.waltz.data.capability;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.capability.ImmutableCapability;
 import com.khartec.waltz.schema.tables.AppCapability;
 import com.khartec.waltz.schema.tables.records.CapabilityRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,7 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.model.utils.IdUtilities.ensureHasId;
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
@@ -146,5 +150,14 @@ public class CapabilityDao {
                 .where(c.ID.in(selector))
                 .orderBy(c.NAME)
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
+        checkNotNull(selector, "selector cannot be null");
+        return dsl.select(c.ID, c.NAME, DSL.val(EntityKind.CAPABILITY.name()))
+                .from(c)
+                .where(c.ID.in(selector))
+                .fetch(TO_ENTITY_REFERENCE);
     }
 }

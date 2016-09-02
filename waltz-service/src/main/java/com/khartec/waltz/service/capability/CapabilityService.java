@@ -24,6 +24,9 @@ import com.khartec.waltz.common.hierarchy.Node;
 import com.khartec.waltz.data.capability.CapabilityDao;
 import com.khartec.waltz.data.capability.CapabilityIdSelectorFactory;
 import com.khartec.waltz.data.capability.search.CapabilitySearchDao;
+import com.khartec.waltz.data.entity_hierarchy.EntityRootsSelectorFactory;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.capability.ImmutableCapability;
@@ -50,18 +53,22 @@ public class CapabilityService {
     private final CapabilityDao capabilityDao;
     private final CapabilitySearchDao capabilitySearchDao;
     private final CapabilityIdSelectorFactory capabilityIdSelectorFactory;
+    private final EntityRootsSelectorFactory entityRootsSelectorFactory;
 
     @Autowired
     public CapabilityService(CapabilityDao capabilityDao,
                              CapabilitySearchDao capabilitySearchDao,
-                             CapabilityIdSelectorFactory capabilityIdSelectorFactory) {
+                             CapabilityIdSelectorFactory capabilityIdSelectorFactory,
+                             EntityRootsSelectorFactory entityRootsSelectorFactory) {
         checkNotNull(capabilityDao, "capabilityDao must not be null");
         checkNotNull(capabilitySearchDao, "capabilitySearchDao must not be null");
         checkNotNull(capabilityIdSelectorFactory, "capabilityIdSelectorFactory cannot be null");
+        checkNotNull(entityRootsSelectorFactory, "entityRootsSelectorFactory cannot be null");
 
         this.capabilityDao = capabilityDao;
         this.capabilitySearchDao = capabilitySearchDao;
         this.capabilityIdSelectorFactory = capabilityIdSelectorFactory;
+        this.entityRootsSelectorFactory = entityRootsSelectorFactory;
     }
 
     public List<Capability> findAll() {
@@ -158,6 +165,12 @@ public class CapabilityService {
 
         Select<Record1<Long>> selector = capabilityIdSelectorFactory.apply(idSelectionOptions);
         return capabilityDao.findByIdSelector(selector);
+    }
+
+
+    public List<EntityReference> findByIdSelectorAsEntityReference(EntityKind kind) {
+        Select<Record1<Long>> selector = entityRootsSelectorFactory.apply(kind);
+        return capabilityDao.findByIdSelectorAsEntityReference(selector);
     }
 }
 
