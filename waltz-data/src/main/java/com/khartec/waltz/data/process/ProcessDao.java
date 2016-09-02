@@ -1,6 +1,7 @@
 package com.khartec.waltz.data.process;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.data.FindEntityReferencesByIdSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
@@ -23,7 +24,7 @@ import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.tables.Process.PROCESS;
 
 @Repository
-public class ProcessDao {
+public class ProcessDao implements FindEntityReferencesByIdSelector {
 
     private static final com.khartec.waltz.schema.tables.Process p = PROCESS.as("p");
     private static final EntityRelationship rel = EntityRelationship.ENTITY_RELATIONSHIP.as("rel");
@@ -95,6 +96,7 @@ public class ProcessDao {
     }
 
 
+    @Override
     public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
         checkNotNull(selector, "selector cannot be null");
         return dsl.select(p.ID, p.NAME, DSL.val(EntityKind.PROCESS.name()))

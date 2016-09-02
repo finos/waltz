@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.data.data_type;
 
+import com.khartec.waltz.data.FindEntityReferencesByIdSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.datatype.DataType;
@@ -37,7 +38,7 @@ import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 
 
 @Repository
-public class DataTypeDao {
+public class DataTypeDao implements FindEntityReferencesByIdSelector {
 
     private final DSLContext dsl;
     private RecordMapper<? super Record, DataType> mapper = r -> {
@@ -67,6 +68,7 @@ public class DataTypeDao {
     }
 
 
+    @Override
     public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
         checkNotNull(selector, "selector cannot be null");
 

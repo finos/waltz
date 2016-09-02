@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.data.orgunit;
 
+import com.khartec.waltz.data.FindEntityReferencesByIdSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.orgunit.ImmutableOrganisationalUnit;
@@ -40,7 +41,7 @@ import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_
 
 
 @Repository
-public class OrganisationalUnitDao {
+public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrganisationalUnitDao.class);
 
@@ -96,6 +97,7 @@ public class OrganisationalUnitDao {
     }
 
 
+    @Override
     public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
         checkNotNull(selector, "selector cannot be null");
         return dsl.select(ou.ID, ou.NAME, DSL.val(EntityKind.ORG_UNIT.name()))

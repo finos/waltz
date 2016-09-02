@@ -1,6 +1,7 @@
 package com.khartec.waltz.data.entity_statistic;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.data.FindEntityReferencesByIdSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
@@ -19,7 +20,7 @@ import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_S
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 
 @Repository
-public class EntityStatisticDao {
+public class EntityStatisticDao implements FindEntityReferencesByIdSelector {
 
     private static final com.khartec.waltz.schema.tables.EntityStatisticDefinition es = ENTITY_STATISTIC_DEFINITION.as("es");
     private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
@@ -58,6 +59,7 @@ public class EntityStatisticDao {
     }
 
 
+    @Override
     public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
         checkNotNull(selector, "selector cannot be null");
         return dsl.select(es.ID, es.NAME, DSL.val(EntityKind.ENTITY_STATISTIC.name()))
