@@ -18,6 +18,7 @@
 package com.khartec.waltz.data.capability;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.data.FindEntityReferencesByIdSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.capability.Capability;
@@ -45,7 +46,7 @@ import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
 
 
 @Repository
-public class CapabilityDao {
+public class CapabilityDao implements FindEntityReferencesByIdSelector {
 
     private static final Logger LOG = LoggerFactory.getLogger(CapabilityDao.class);
 
@@ -153,6 +154,7 @@ public class CapabilityDao {
     }
 
 
+    @Override
     public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
         checkNotNull(selector, "selector cannot be null");
         return dsl.select(c.ID, c.NAME, DSL.val(EntityKind.CAPABILITY.name()))

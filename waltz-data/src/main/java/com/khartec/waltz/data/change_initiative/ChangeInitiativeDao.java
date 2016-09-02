@@ -1,5 +1,6 @@
 package com.khartec.waltz.data.change_initiative;
 
+import com.khartec.waltz.data.FindEntityReferencesByIdSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.LifecyclePhase;
@@ -22,7 +23,7 @@ import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATION
 import static java.util.Optional.ofNullable;
 
 @Repository
-public class ChangeInitiativeDao {
+public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
 
     public static final RecordMapper<Record, ChangeInitiative> TO_DOMAIN_MAPPER = r -> {
         ChangeInitiativeRecord record = r.into(CHANGE_INITIATIVE);
@@ -70,6 +71,7 @@ public class ChangeInitiativeDao {
     }
 
 
+    @Override
     public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
         checkNotNull(selector, "selector cannot be null");
         return dsl.select(CHANGE_INITIATIVE.ID, CHANGE_INITIATIVE.NAME, DSL.val(EntityKind.CHANGE_INITIATIVE.name()))
