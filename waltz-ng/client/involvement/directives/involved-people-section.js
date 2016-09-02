@@ -52,7 +52,7 @@ const columnDefs = [
     {
         field: 'involvements',
         displayName: 'Roles',
-        cellTemplate: '<div class="ui-grid-cell-contents"><span ng-repeat="role in COL_FIELD" ng-bind="role | toDisplayName:\'involvementKind\'"></span></div>'
+        cellTemplate: '<div class="ui-grid-cell-contents"><span ng-repeat="role in COL_FIELD"><span ng-bind="role | toDisplayName:\'involvementKind\'"></span><span ng-if="!$last">, </span></span></div>'
     }
 ];
 
