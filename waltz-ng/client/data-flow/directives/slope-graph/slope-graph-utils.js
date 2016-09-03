@@ -35,7 +35,6 @@ function convertFlows(fs, pred) {
         .map(f => ({
             source: f.source.id,
             target: f.target.id,
-            targetOrgUnit: f.targetEntity.organisationalUnitId,
             type: f.dataType,
             highlighted: false
         }))
@@ -60,8 +59,8 @@ function getColour(rating) {
  * @returns {*|string}
  */
 function getOutgoingRating(authSources, flow) {
-
-    const ouId = flow.targetOrgUnit;
+//TODO: fix
+    const ouId = 10;
 
     return _.chain(authSources)
             .filter({dataType: flow.type, parentReference: {id: ouId, kind: 'ORG_UNIT'}})
@@ -79,31 +78,4 @@ function getIncomingRating(authSources, flow) {
             .map(getColour)
             .head()
             .value() || 'red';
-}
-
-
-export function prepareSlopeGraph(appId, flows, dataTypes, appAuthSources, ouAuthSources, displayNameService, $state) {
-    const isIncoming = f => f.target.id === appId;
-    const isOutgoing = f => f.source.id === appId;
-    const addAppClickHandler = selection => selection.on('click', app => $state.go('main.app.view', { id: app.id }));
-
-    return {
-        data: {
-            incoming: convertFlows(flows, isIncoming),
-            outgoing: convertFlows(flows, isOutgoing),
-            flowTypes: _.map(dataTypes, dt => ({ code: dt, name: displayNameService.lookup('dataType', dt)})),
-            sources: getUniqueSourceEntities(_.filter(flows, isIncoming)),
-            targets: getUniqueTargetEntities(_.filter(flows, isOutgoing))
-        },
-        tweakers: {
-            incoming: {
-                enter: selection => selection.attr('stroke', f => getIncomingRating(ouAuthSources, f))
-            },
-            outgoing: {
-                enter: selection => selection.attr('stroke', f => getOutgoingRating(appAuthSources, f))
-            },
-            target: { enter: addAppClickHandler },
-            source: { enter: addAppClickHandler }
-        }
-    };
 }

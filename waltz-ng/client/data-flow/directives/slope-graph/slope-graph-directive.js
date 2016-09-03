@@ -15,6 +15,17 @@ import angular from 'angular';
 import { init, render } from './slope-graph-diagram';
 
 
+const bindings = {
+    entityRef: '<',
+    flows: '<',
+    decorators: '<',
+    tweakers: '<'
+};
+
+
+const template = "<div><div class='viz'></div></div>";
+
+
 const dimensions = {
     margin: { top: 80, left: 120, right: 120, bottom: 20 },
     label: { width: 200, height: 10},
@@ -31,54 +42,60 @@ function calculateDimensions(vizElem, types, sources, targets) {
 }
 
 
-function link(scope, elem) {
-    scope.vizElem = elem[0].querySelector('.viz');
-    scope.svg = init(scope.vizElem);
-}
+function controller($element,
+                    $window) {
 
-function controller(scope, $window) {
+    const vizElem = $element[0].querySelector('.viz');
+    const svg = init(vizElem);
+
+    const vm = this;
 
     const debouncedRender = _.debounce(() => {
-        if (!( scope.vizElem
-            && scope.incoming
-            && scope.outgoing
-            && scope.types
-            && scope.sources
-            && scope.targets
-            && scope.tweakers)) return;
+        if (!( vizElem
+            && vm.entityRef
+            && vm.flows
+            && vm.tweakers)) return;
 
-        const { incoming, outgoing, types, sources, targets, tweakers } = scope;
+        const { incoming = [], outgoing = [] } = _.groupBy(
+            vm.flows,
+            f => f.source.id === vm.entityRef.id
+                ? 'outgoing'
+                : 'incoming');
+
+        const types = [];
+        const sources = _.chain(incoming).map("source").uniqBy('id').value();
+        const targets = _.chain(outgoing).map("target").uniqBy('id').value();
+
         const data = { incoming, outgoing, types, sources, targets};
-        const vizDimensions = calculateDimensions(scope.vizElem, types, sources, targets);
+        const vizDimensions = calculateDimensions(vizElem, types, sources, targets);
 
-        render(scope.svg, { ...dimensions, viz: vizDimensions}, data, tweakers);
+        render(
+            svg,
+            { ...dimensions, viz: vizDimensions},
+            data,
+            vm.tweakers);
+
     }, 100);
 
+    angular
+        .element($window)
+        .on('resize', () => debouncedRender());
 
-    angular.element($window).on('resize', () => debouncedRender());
-    scope.$watchCollection('incoming', () => debouncedRender());
-    scope.$watchCollection('outgoing', () => debouncedRender());
-    scope.$watchCollection('sources', () => debouncedRender());
-    scope.$watchCollection('targets', () => debouncedRender());
-    scope.$watchCollection('types', () => debouncedRender());
-
+    vm.$onChanges = () => debouncedRender();
 }
 
 
-controller.$inject = ['$scope', '$window'];
+controller.$inject = [
+    '$element',
+    '$window'
+];
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
-    scope: {
-        incoming: '=',
-        sources: '=',
-        outgoing: '=',
-        targets: '=',
-        types: '=',
-        tweakers: '='
-    },
-    template: '<div><div class="viz"></div></div>',
-    link,
+
+const component = {
+    bindings,
+    template,
     controller
-});
+};
+
+
+export default component;

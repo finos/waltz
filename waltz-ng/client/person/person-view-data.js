@@ -39,7 +39,6 @@ const initModel = {
     assetCostData: {},
     serverStats: null,
     dataFlows: [],
-    dataFlowDecorators: [],
     entityStatisticDefinitions: [],
     visibility: {
         techOverlay: false,
@@ -86,7 +85,6 @@ function buildAppInvolvementSummary(apps = [], involvements = []) {
 function service($q,
                  assetCostViewService,
                  complexityStore,
-                 dataFlowDecoratorStore,
                  dataFlowViewService,
                  entityStatisticStore,
                  involvementStore,
@@ -187,13 +185,6 @@ function service($q,
     }
 
 
-    function loadFlowDecorators(personId) {
-        dataFlowDecoratorStore
-            .findBySelectorAndKind(toSelector(personId), 'DATA_TYPE')
-            .then(decorators => state.model.dataFlowDecorators = decorators);
-    }
-
-
     function loadTechStats(personId) {
         techStatsService
             .findBySelector(personId, 'PERSON', 'CHILDREN')
@@ -228,7 +219,6 @@ function service($q,
         const statsPromises = peoplePromise
             .then(personId => {
                 loadFlows(personId);
-                loadFlowDecorators(personId);
                 loadCostStats(personId);
                 loadTechStats(personId);
                 loadComplexity(personId);
@@ -267,7 +257,6 @@ service.$inject = [
     '$q',
     'AssetCostViewService',
     'ComplexityStore',
-    'DataFlowDecoratorStore',
     'DataFlowViewService',
     'EntityStatisticStore',
     'InvolvementStore',

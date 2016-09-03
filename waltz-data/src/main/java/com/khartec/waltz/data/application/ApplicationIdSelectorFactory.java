@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -82,10 +83,18 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 return mkForProcess(ref, options.scope());
             case DATA_TYPE:
                 return mkForDataType(ref, options.scope());
+            case APPLICATION:
+                return mkForApplication(ref, options.scope());
 
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: "+ref.kind());
         }
+    }
+
+
+    private Select<Record1<Long>> mkForApplication(EntityReference ref, HierarchyQueryScope scope) {
+        checkTrue(scope == EXACT, "Can only create selector for exact matches if given an app ref");
+        return DSL.select(DSL.val(ref.id()));
     }
 
 

@@ -10,66 +10,48 @@
  *
  */
 
-function service(dataFlowUtils, appStore, $http, BaseApiUrl) {
-
+function service($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/data-flows`;
 
+    // --- FINDERS ---
+    const findByAppIdSelector = (options) => $http
+        .post(`${BASE}/apps`, options)
+        .then(r => r.data);
 
     const findByEntityReference = (kind, id) => $http
         .get(`${BASE}/entity/${kind}/${id}`)
         .then(result => result.data);
 
-
-    const findEnrichedFlowsForApplication = (id) => {
-        const acc = {};
-
-        return findByEntityReference('APPLICATION', id)
-            .then(flows => {
-                acc.flows = flows;
-                return _.chain(flows)
-                    .map(f => [f.source.id, f.target.id])
-                    .flatten()
-                    .uniq()
-                    .value()
-            })
-            .then(appIds => appStore.findByIds(appIds))
-            .then(apps => dataFlowUtils.enrich(acc.flows, apps));
-    };
-
-
-    const create = (flow) => $http
-        .post(BASE, flow);
-
-
-    const findByAppIdSelector = (options) => $http
-        .post(`${BASE}/apps`, options)
-        .then(r => r.data);
-
-
+    // --- STATS ---
     const calculateStats = (options) => $http
         .post(`${BASE}/stats`, options)
         .then(r => r.data);
 
+    const countByDataType = () => $http
+        .get(`${BASE}/count-by/data-type`)
+        .then(result => result.data);
 
-    const countByDataType = () =>
-        $http.get(`${BASE}/count-by/data-type`)
-            .then(result => result.data);
+    // --- UPDATERS ---
+    const removeFlow = (id) => $http
+        .delete(`${BASE}/${id}`)
+        .then(r => r.data);
 
+    const addFlow = (flow) => $http
+        .post(`${BASE}`, flow)
+        .then(r => r.data);
 
     return {
-        findByEntityReference,
-        findEnrichedFlowsForApplication,
         findByAppIdSelector,
+        findByEntityReference,
         calculateStats,
-        create,
-        countByDataType
+        countByDataType,
+        removeFlow,
+        addFlow
     };
 }
 
 
 service.$inject = [
-    'DataFlowUtilityService',
-    'ApplicationStore',
     '$http',
     'BaseApiUrl'
 ];

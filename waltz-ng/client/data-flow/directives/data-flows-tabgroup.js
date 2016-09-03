@@ -3,7 +3,6 @@ import _ from "lodash";
 
 const BINDINGS = {
     flowData: '<',
-    flowDecorators: '<',
     applications: '<',
     onLoadDetail: '<',
     options: '=?',
@@ -105,7 +104,7 @@ function controller($scope, dataFlowUtilityService) {
         () => vm.filterChanged(defaultFilterOptions));
 
     $scope.$watch(
-        'ctrl.flowDecorators',
+        'ctrl.flowData.decorators',
         (decorators = []) => {
             vm.dataTypes = _.chain(decorators)
                 .filter(dc => dc.decoratorEntity.kind === 'DATA_TYPE')
@@ -123,7 +122,6 @@ function controller($scope, dataFlowUtilityService) {
             vm.graphTweakers = dataFlowUtilityService.buildGraphTweakers(vm.appIds)
         });
 
-
     vm.filterChanged = (filterOptions) => {
         if (! vm.flowData) return;
 
@@ -131,11 +129,10 @@ function controller($scope, dataFlowUtilityService) {
         vm.filteredFlowData = calculateFlowData(
             vm.flowData.flows,
             vm.appIds,
-            vm.flowDecorators,
+            vm.flowData.decorators,
             filterOptions);
 
     };
-
 
     vm.loadDetail = () => {
         if (vm.onLoadDetail) vm.onLoadDetail();

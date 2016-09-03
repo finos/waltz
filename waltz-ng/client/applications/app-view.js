@@ -16,13 +16,13 @@ import {
     loadChangeLog,
     loadDatabases,
     loadDataFlows,
+    loadDataFlowDecorators,
     loadDataTypeUsages,
     loadInvolvements,
     loadServers,
     loadSoftwareCatalog,
     loadSourceDataRatings
 } from "./data-load";
-import {prepareSlopeGraph} from "../data-flow/directives/slope-graph/slope-graph-utils";
 import {mkAppRatingsGroup, calculateHighestRatingCount} from "../ratings/directives/common";
 
 
@@ -60,6 +60,7 @@ function controller($q,
                     complexityStore,
                     databaseStore,
                     dataFlowStore,
+                    dataFlowDecoratorStore,
                     dataTypeUsageStore,
                     involvementStore,
                     orgUnitStore,
@@ -74,18 +75,28 @@ function controller($q,
     const { id, organisationalUnitId } = appView.app;
 
     const entityRef = { id, kind: 'APPLICATION' };
+    const vm = Object.assign(this, initialState, appView);
 
-    const vm = Object.assign(this, initialState);
+    const goToAppFn = d => $state.go('main.app.view', { id: d.id })
+    vm.flowTweakers = {
+        source: {
+            onSelect: goToAppFn
+        },
+        target: {
+            onSelect: goToAppFn
+        }
+    };
+
+    vm.entityRef = entityRef;
 
     const perspectiveCode = 'BUSINESS';
+
 
     $q.all([
         perspectiveStore.findByCode(perspectiveCode),
         ratingStore.findByParent('APPLICATION', id)
     ]).then(([perspective, ratings]) => {
-
         const appRef = { id: id, kind: 'APPLICATION', name: appView.app.name};
-
         const group = mkAppRatingsGroup(appRef, perspective.measurables, appView.capabilities, ratings);
 
         vm.ratings = {
@@ -97,11 +108,8 @@ function controller($q,
             },
             group
         };
-
     });
 
-
-    Object.assign(vm, appView);
 
     const promises = [
         loadDataFlows(dataFlowStore, id, vm),
@@ -110,25 +118,13 @@ function controller($q,
         loadServers(serverInfoStore, id, vm),
         loadSoftwareCatalog(softwareCatalogStore, id, vm),
         loadDatabases(databaseStore, id, vm),
-        loadDataTypeUsages(dataTypeUsageStore, id, vm)
+        loadDataTypeUsages(dataTypeUsageStore, id, vm),
+        loadDataFlowDecorators(dataFlowDecoratorStore, id, vm)
     ];
 
     $q.all(promises)
-        .then(() => {
-            const graphData = prepareSlopeGraph(
-                id,
-                vm.flows,
-                vm.dataTypes,
-                vm.appAuthSources,
-                vm.ouAuthSources,
-                displayNameService,
-                $state);
-
-            vm.flow = graphData;
-        })
         .then(() => loadChangeLog(changeLogStore, id, vm))
-        .then(() => loadSourceDataRatings(sourceDataRatingStore, vm))
-
+        .then(() => loadSourceDataRatings(sourceDataRatingStore, vm));
 
     complexityStore
         .findByApplication(id)
@@ -144,7 +140,6 @@ function controller($q,
             .update(entityRef, aliasValues)
             .then(() => vm.aliases = aliasValues);
     };
-
 }
 
 
@@ -158,6 +153,7 @@ controller.$inject = [
     'ComplexityStore',
     'DatabaseStore',
     'DataFlowDataStore',
+    'DataFlowDecoratorStore',
     'DataTypeUsageStore',
     'InvolvementStore',
     'OrgUnitStore',

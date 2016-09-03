@@ -66,16 +66,17 @@ public class CollectionUtilities {
     }
 
     public static <X> void maybe(Collection<X> xs, Consumer<Collection<X>> fn) {
-        if (isDefined(xs)) fn.accept(xs);
+        if (notEmpty(xs)) fn.accept(xs);
     }
+
 
     public static <X,Y> Y maybe(Collection<X> xs, Function<Collection<X>, Y> fn, Y dflt) {
-        return isDefined(xs)
-                ? fn.apply(xs)
-                : dflt;
+        if (notEmpty(xs)) return fn.apply(xs);
+        else return dflt;
     }
 
-    private static <X> boolean isDefined(Collection<X> xs) {
-        return !(xs == null || xs.isEmpty());
+
+    public static  <T> boolean notEmpty(Collection<T> ts) {
+        return ts != null && ! ts.isEmpty();
     }
 }

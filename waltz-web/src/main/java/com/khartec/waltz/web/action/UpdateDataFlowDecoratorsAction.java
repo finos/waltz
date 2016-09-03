@@ -26,13 +26,12 @@ import java.util.Set;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableUpdateDataFlowsAction.class)
-@JsonDeserialize(as = ImmutableUpdateDataFlowsAction.class)
-public abstract class UpdateDataFlowsAction {
+@JsonSerialize(as = ImmutableUpdateDataFlowDecoratorsAction.class)
+@JsonDeserialize(as = ImmutableUpdateDataFlowDecoratorsAction.class)
+public abstract class UpdateDataFlowDecoratorsAction {
 
-    public abstract Set<String> addedTypes();
-    public abstract Set<String> removedTypes();
-    public abstract EntityReference source();
-    public abstract EntityReference target();
+    public abstract Set<EntityReference> addedDecorators();
+    public abstract Set<EntityReference> removedDecorators();
+    public abstract Long flowId();
 
 }

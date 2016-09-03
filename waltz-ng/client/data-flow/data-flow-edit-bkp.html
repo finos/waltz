@@ -16,7 +16,7 @@
             <li><a ui-sref="main">Home</a></li>
             <li>
                 <a ui-sref="main.app.view ({id: ctrl.app.id})">
-                    <span ng-bind="ctrl.app.name"></span>
+                    {{ ctrl.app.name }}
                 </a>
             </li>
             <li>Register Logical Data Flows</li>
@@ -37,8 +37,8 @@
             </div>
         </div>
 
-        <hr>
 
+        <hr/>
 
         <form name="dataFlowForm"
               novalidate
@@ -127,12 +127,13 @@
                     </div>
 
                     <div ng-if="ctrl.mode === 'editCounterpart'">
-                        <waltz-data-flow-type-editor flow="ctrl.selectedFlow"
-                                                     decorators="ctrl.selectedDecorators"
+                        <waltz-data-flow-type-editor primary-entity="ctrl.app"
+                                                     counterpart-entity="ctrl.selectedApp"
+                                                     direction="ctrl.selectedDirection"
+                                                     current-data-types="ctrl.currentDataTypes"
                                                      all-data-types="ctrl.dataTypes"
                                                      on-cancel="ctrl.cancel"
-                                                     on-save="ctrl.updateFlow"
-                                                     on-delete="ctrl.deleteFlow"
+                                                     on-save="ctrl.saveFlows"
                                                      on-dirty="ctrl.setDirtyChange">
                         </waltz-data-flow-type-editor>
                     </div>
@@ -148,6 +149,7 @@
                 </div>
             </div>
         </form>
+
     </div>
 
 </div>

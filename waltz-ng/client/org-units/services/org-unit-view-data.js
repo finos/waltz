@@ -20,7 +20,6 @@ function service($q,
                  appCapabilityStore,
                  orgUnitUtils,
                  changeLogStore,
-                 dataFlowDecoratorStore,
                  dataFlowViewService,
                  entityStatisticStore,
                  involvementStore,
@@ -112,8 +111,7 @@ function service($q,
             techStatsService.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
             bookmarkStore.findByParent({id: orgUnitId, kind: 'ORG_UNIT'}),
             sourceDataRatingStore.findAll(),
-            entityStatisticStore.findAllActiveDefinitions(selector),
-            dataFlowDecoratorStore.findBySelectorAndKind(selector, 'DATA_TYPE')
+            entityStatisticStore.findAllActiveDefinitions(selector)
         ]);
 
         const prepareRawDataPromise = bulkPromise
@@ -128,8 +126,7 @@ function service($q,
                 techStats,
                 bookmarks,
                 sourceDataRatings,
-                entityStatisticDefinitions,
-                dataFlowDecorators
+                entityStatisticDefinitions
             ]) => {
 
                 const endUserAppsWithManagement = _.map(_.cloneDeep(endUserApps),
@@ -157,8 +154,7 @@ function service($q,
                     bookmarks,
                     sourceDataRatings,
                     entityStatisticDefinitions,
-                    combinedApps,
-                    dataFlowDecorators
+                    combinedApps
                 };
 
                 Object.assign(rawData, r);
@@ -201,7 +197,6 @@ service.$inject = [
     'AppCapabilityStore',
     'OrgUnitUtilityService',
     'ChangeLogDataService',
-    'DataFlowDecoratorStore',
     'DataFlowViewService',
     'EntityStatisticStore',
     'InvolvementStore',

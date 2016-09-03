@@ -4,6 +4,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.data_flow.DataFlowService;
 import com.khartec.waltz.service.involvement.InvolvementService;
@@ -12,6 +13,8 @@ import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.List;
 
 /**
  * Created by dwatkins on 13/05/2016.
@@ -31,10 +34,10 @@ public class ApplicationIdSelectorHarness {
         IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
                 .entityReference(ImmutableEntityReference
                         .builder()
-                        .kind(EntityKind.DATA_TYPE)
-                        .id(6000)
+                        .kind(EntityKind.APPLICATION)
+                        .id(6665)
                         .build())
-                .scope(HierarchyQueryScope.CHILDREN)
+                .scope(HierarchyQueryScope.EXACT)
                 .build();
 
 
@@ -45,6 +48,9 @@ public class ApplicationIdSelectorHarness {
         Result<Record1<Long>> fetch = dsl.fetch(selector);
 
         fetch.forEach(r -> System.out.println(r.value1()));
+
+        List<DataFlow> r = service.findByAppIdSelector(options);
+        System.out.println(r);
     }
 
 

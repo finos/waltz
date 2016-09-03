@@ -1,4 +1,4 @@
-import {checkIsApplicationIdSelector, checkIsEntityRef} from "../../common/checks";
+import {checkIsApplicationIdSelector} from "../../common/checks";
 
 
 function service($http,
@@ -13,8 +13,26 @@ function service($http,
             .then(result => result.data);
     };
 
+    /**
+     * where command like:
+     *    {
+     *      flowId: <number>,
+     *      addedDecorators: [<entityRef>],
+     *      removedDecorators: [<entityRef>]
+     *    }
+     *
+     * @param command
+     * @returns {*|Promise.<FlowDecorator>}
+     */
+    const updateDecorators = (command) => {
+        return $http
+            .post(`${BASE}/${command.flowId}`, command)
+            .then(r => r.data);
+    };
+
     return {
-        findBySelectorAndKind
+        findBySelectorAndKind,
+        updateDecorators
     };
 }
 

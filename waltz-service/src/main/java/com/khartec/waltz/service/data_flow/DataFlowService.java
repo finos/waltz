@@ -21,6 +21,7 @@ import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow.DataFlowDao;
 import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
+import com.khartec.waltz.data.data_flow_decorator.DataFlowDecoratorDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.dataflow.DataFlow;
@@ -45,18 +46,24 @@ public class DataFlowService {
 
     private final DataFlowDao dataFlowDao;
     private final DataFlowStatsDao dataFlowStatsDao;
+    private final DataFlowDecoratorDao dataFlowDecoratorDao;
     private final ApplicationIdSelectorFactory idSelectorFactory;
 
 
     @Autowired
-    public DataFlowService(DataFlowDao dataFlowDao, DataFlowStatsDao dataFlowStatsDao, ApplicationIdSelectorFactory idSelectorFactory) {
+    public DataFlowService(DataFlowDao dataFlowDao, 
+                           DataFlowStatsDao dataFlowStatsDao, 
+                           DataFlowDecoratorDao dataFlowDecoratorDao, 
+                           ApplicationIdSelectorFactory idSelectorFactory) {
         checkNotNull(dataFlowDao, "dataFlowDao must not be null");
         checkNotNull(dataFlowStatsDao, "dataFlowStatsDao cannot be null");
+        checkNotNull(dataFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
         checkNotNull(idSelectorFactory, "idSelectorFactory cannot be null");
 
         this.idSelectorFactory = idSelectorFactory;
         this.dataFlowStatsDao = dataFlowStatsDao;
         this.dataFlowDao = dataFlowDao;
+        this.dataFlowDecoratorDao = dataFlowDecoratorDao;
     }
 
 
@@ -80,8 +87,9 @@ public class DataFlowService {
     }
 
 
-    public int removeFlows(List<DataFlow> flows) {
-        return dataFlowDao.removeFlows(flows);
+    public int removeFlows(List<Long> flowIds) {
+        dataFlowDecoratorDao.removeAllDecoratorsForFlowIds(flowIds);
+        return dataFlowDao.removeFlows(flowIds);
     }
 
 

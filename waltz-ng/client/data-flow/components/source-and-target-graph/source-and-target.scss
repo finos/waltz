@@ -1,0 +1,22 @@
+.waltz-source-and-target-graph {
+
+    #wsat-arrowhead {
+        stroke: #bbb;
+        fill: #aaa;
+    }
+
+    .wsat-label {
+        font-size: 9pt;
+    }
+
+    .wsat-hover.wsat-arc {
+        stroke-width: 1.5;
+    }
+
+    .wsat-hover.wsat-label {
+        font-size: 10pt;
+        fill: blue;
+    }
+}
+
+

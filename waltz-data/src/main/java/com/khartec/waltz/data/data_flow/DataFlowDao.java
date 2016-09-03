@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.utils.IdUtilities.toIds;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 
@@ -107,9 +106,9 @@ public class DataFlowDao {
     }
 
 
-    public int removeFlows(List<DataFlow> flows) {
+    public int removeFlows(List<Long> flowIds) {
         return dsl.deleteFrom(DATA_FLOW)
-                .where(DATA_FLOW.ID.in(toIds(flows)))
+                .where(DATA_FLOW.ID.in(flowIds))
                 .execute();
     }
 
@@ -125,8 +124,9 @@ public class DataFlowDao {
 
         record.store();
 
-        return dataFlowMapper.map(record);
+        return ImmutableDataFlow
+                .copyOf(flow)
+                .withId(record.getId());
     }
-
 
 }

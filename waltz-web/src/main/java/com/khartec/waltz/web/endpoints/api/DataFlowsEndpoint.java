@@ -17,26 +17,26 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
-import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.user.Role;
-import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow.DataFlowService;
-import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.action.UpdateDataFlowsAction;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
+
+import java.io.IOException;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -44,29 +44,21 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 @Service
 public class DataFlowsEndpoint implements Endpoint {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DataFlowsEndpoint.class);
     private static final String BASE_URL = mkPath("api", "data-flows");
 
     private final DataFlowService dataFlowService;
-    private final DataTypeUsageService dataTypeUsageService;
-    private final ChangeLogService changeLogService;
     private final UserRoleService userRoleService;
 
 
     @Autowired
     public DataFlowsEndpoint(DataFlowService dataFlowService,
-                             DataTypeUsageService dataTypeUsageService,
-                             ChangeLogService changeLogService,
                              UserRoleService userRoleService) {
         checkNotNull(dataFlowService, "dataFlowService must not be null");
-        checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
-        checkNotNull(changeLogService, "changeLogService must not be null");
         checkNotNull(userRoleService, "userRoleService must not be null");
 
         this.dataFlowService = dataFlowService;
-        this.dataTypeUsageService = dataTypeUsageService;
-        this.changeLogService = changeLogService;
         this.userRoleService = userRoleService;
-
     }
 
 
@@ -76,56 +68,14 @@ public class DataFlowsEndpoint implements Endpoint {
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByAppIdSelectorPath = mkPath(BASE_URL, "apps");
         String findStatsPath = mkPath(BASE_URL, "stats");
-        String updateFlowsPath = BASE_URL;
         String tallyByDataTypePath = mkPath(BASE_URL, "count-by", "data-type");
 
 
-        DatumRoute<Boolean> updateFlowsRoute = (request, response) -> {
-            requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        String removeFlowPath = mkPath(BASE_URL, ":id");
+        String addFlowPath = mkPath(BASE_URL);
 
-            // TODO: #447
-
-            UpdateDataFlowsAction dataFlowUpdate = readBody(request, UpdateDataFlowsAction.class);
-            ImmutableDataFlow dataFlow = ImmutableDataFlow.builder()
-                    .source(dataFlowUpdate.source())
-                    .target(dataFlowUpdate.target())
-                    .build();
-
-            DataFlow storedFlow = dataFlowService.addFlow(dataFlow);
-
-//            dataFlowService
-//                    .removeFlows(removedFlows);
-
-            String message = String.format(
-                    "Flows updated between %s and %s, added: %s types and removed: %s types",
-                    dataFlowUpdate.source().name().orElse("?"),
-                    dataFlowUpdate.target().name().orElse("?"),
-                    dataFlowUpdate.addedTypes(),
-                    dataFlowUpdate.removedTypes());
-
-            changeLogService.write(ImmutableChangeLog.builder()
-                    .userId(getUsername(request))
-                    .parentReference(dataFlowUpdate.source())
-                    .severity(Severity.INFORMATION)
-                    .message(message)
-                    .build());
-
-            changeLogService.write(ImmutableChangeLog.builder()
-                    .userId(getUsername(request))
-                    .parentReference(dataFlowUpdate.target())
-                    .severity(Severity.INFORMATION)
-                    .message(message)
-                    .build());
-
-            dataTypeUsageService.recalculateForApplications(dataFlowUpdate.target(), dataFlowUpdate.source());
-            return true;
-        };
-
-
-        ListRoute<DataFlow> getByEntityRef = (request, response) -> {
-            EntityReference ref = getEntityReference(request);
-            return dataFlowService.findByEntityReference(ref);
-        };
+        ListRoute<DataFlow> getByEntityRef = (request, response)
+                -> dataFlowService.findByEntityReference(getEntityReference(request));
 
         ListRoute<DataFlow> findByAppIdSelectorRoute = (request, response)
                 -> dataFlowService.findByAppIdSelector(readIdSelectionOptionsFromBody(request));
@@ -133,17 +83,45 @@ public class DataFlowsEndpoint implements Endpoint {
         DatumRoute<DataFlowStatistics> findStatsRoute = (request, response)
                 -> dataFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
 
-
         ListRoute<Tally<String>> tallyByDataTypeRoute = (request, response)
                 -> dataFlowService.tallyByDataType();
 
-
         getForList(findByEntityPath, getByEntityRef);
         postForList(findByAppIdSelectorPath, findByAppIdSelectorRoute);
-        postForDatum(updateFlowsPath, updateFlowsRoute);
+        
         postForDatum(findStatsPath, findStatsRoute);
         getForList(tallyByDataTypePath, tallyByDataTypeRoute);
+        
+        deleteForDatum(removeFlowPath, this::removeFlowRoute);
+        postForDatum(addFlowPath, this::addFlowRoute);
     }
 
+    private DataFlow addFlowRoute(Request request, Response response) throws IOException {
+        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+
+        DataFlow dataFlow = readBody(request, DataFlow.class);
+        String username = getUsername(request);
+
+        if (dataFlow.id().isPresent()) {
+            LOG.warn("User: {}, ignoring attempt to add duplicate flow: {}", username, dataFlow);
+            return dataFlow;
+        }
+
+        LOG.info("User: {}, adding new flow: {}", username, dataFlow);
+        DataFlow savedFlow = dataFlowService.addFlow(dataFlow);
+        return savedFlow;
+    }
+
+
+    private int removeFlowRoute(Request request, Response response) {
+        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+
+        long flowId = getId(request);
+        String username = getUsername(request);
+
+        LOG.info("User: {} removing logical flow: {}", username, flowId);
+
+        return dataFlowService.removeFlows(newArrayList(flowId));
+    }
 
 }

@@ -1,19 +1,23 @@
 <div>
-
     <div class="row">
         <div class="col-md-11">
 
             <h4>
-                <span ng-bind="ctrl.title"></span>
+                Datatypes sent from:
+                <span style="font-style: italic"
+                      ng-bind="$ctrl.flow.source.name"></span>
+                to:
+                <span style="font-style: italic"
+                      ng-bind="$ctrl.flow.target.name"></span>
             </h4>
 
             <!-- DATA TYPE OPTIONS -->
             <ul class="list-unstyled">
-                <li ng-repeat="option in ctrl.workingTypes | orderBy:'name'">
+                <li ng-repeat="option in $ctrl.workingTypes | orderBy:'name'">
                     <span>
                         <input type="checkbox"
                                ng-model="option.selected"
-                               ng-change="ctrl.onChange()">
+                               ng-change="$ctrl.onChange()">
                         <span ng-style="{'font-weight': (option.selected ? 'bold' : 'none') }"
                               ng-bind="option.name">
                         </span>
@@ -24,17 +28,21 @@
                 </li>
             </ul>
 
+            <!-- ACTIONS -->
             <div class="pull-right">
-                <!-- ACTIONS -->
                 <button class="btn btn-success"
-                        ng-click="ctrl.save()">
+                        ng-disabled="! $ctrl.canSave()"
+                        ng-click="$ctrl.save()">
                     Apply
                 </button>
+                <button class="btn btn-danger"
+                        ng-click="$ctrl.delete()">
+                    Delete
+                </button>
                 <a href
-                   ng-click="ctrl.cancel()">
+                   ng-click="$ctrl.cancel()">
                     Cancel
                 </a>
-
             </div>
 
         </div>

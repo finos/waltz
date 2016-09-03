@@ -1,5 +1,6 @@
 <div>
 
+
     <waltz-page-header icon="desktop"
                        name="{{ ctrl.app.name }}"
                        small="{{ ctrl.app.assetCode }}">
@@ -144,13 +145,12 @@
                 </div>
 
                 <div ng-if="ctrl.flows.length > 0">
-                    <waltz-app-data-flow-diagram incoming="ctrl.flow.data.incoming"
-                                                 outgoing="ctrl.flow.data.outgoing"
-                                                 sources="ctrl.flow.data.sources"
-                                                 targets="ctrl.flow.data.targets"
-                                                 tweakers="ctrl.flow.tweakers"
-                                                 types="ctrl.flow.data.flowTypes">
-                    </waltz-app-data-flow-diagram>
+
+                    <waltz-source-and-target-graph entity-ref="ctrl.entityRef"
+                                                   flows="ctrl.flows"
+                                                   decorators="ctrl.dataFlowDecorators"
+                                                   tweakers="ctrl.flowTweakers">
+                    </waltz-source-and-target-graph>
 
                     <p class="text-muted small">
                         Diagram detailing the applications data types (Middle)
