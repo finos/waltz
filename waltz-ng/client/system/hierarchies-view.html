@@ -11,43 +11,73 @@
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div class="row">
 
-            <div class="col-md-6">
+            <div class="col-md-3">
+                <h4>Actions</h4>
+                <ul class="list-unstyled">
+                    <li ng-repeat="kind in ctrl.kinds">
+                        <a ng-click="ctrl.build(kind)"
+                           class="clickable">
+                            <waltz-icon name="recycle"></waltz-icon>
+                            Rebuild for
+                            <span ng-bind="kind | toDisplayName:'entity'"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-5">
                 <h4>Record Counts</h4>
                 <table class="table table-condensed table-striped">
                     <thead>
                     <tr>
                         <th>Entity</th>
                         <th>Hierarchy Count</th>
+                        <th>Roots</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="tally in ctrl.tallies">
+                    <tr ng-repeat="tally in ctrl.combinedTallies">
                         <td>
                             <span ng-bind="tally.id | toDisplayName:'entity'"></span>
                         </td>
                         <td>
-                            <span ng-bind="tally.count"></span>
+                            <span ng-bind="tally.hierarchyCount"></span>
                         </td>
-
+                        <td>
+                            <a ng-bind="tally.rootCount"
+                               class="clickable"
+                               ng-click="ctrl.getRoots(tally.id)">
+                            </a>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
 
-            <div class="col-md-6">
-                <h4>Actions</h4>
-                <ul class="list-unstyled">
-                    <li ng-repeat="kind in ctrl.kinds">
-                            <a ng-click="ctrl.build(kind)"
-                               class="clickable">
-                                <waltz-icon name="recycle"></waltz-icon>
-                                Rebuild for
-                                <span ng-bind="kind | toDisplayName:'entity'"></span>
-                            </a>
-                    </li>
-                </ul>
+            <div class="col-md-4"
+                 ng-if="ctrl.roots.length > 0">
+                <h4><span ng-bind="ctrl.roots[0].kind | toDisplayName:'entity'"></span> Roots</h4>
+                <div class="waltz-scroll-region"
+                     style="height: 300px">
+                    <table class="table table-condensed small">
+                        <tr ng-repeat="root in ctrl.roots">
+                            <td>
+                                <a ng-bind="root.name"
+                                   class="clickable"
+                                   ng-click="ctrl.goToRoot(root)"
+                                   ng-if="root.kind !== 'ENTITY_STATISTIC'">
+                                </a>
+                                <span ng-bind="root.name"
+                                      ng-if="root.kind === 'ENTITY_STATISTIC'">
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
 
+
         </div>
-    </waltz-section>
+
+    </div>
 </div>

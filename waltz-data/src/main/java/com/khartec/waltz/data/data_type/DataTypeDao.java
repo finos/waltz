@@ -17,12 +17,14 @@
 
 package com.khartec.waltz.data.data_type;
 
+import com.khartec.waltz.data.FindEntityReferencesByIdSelector;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.datatype.ImmutableDataType;
 import com.khartec.waltz.schema.tables.records.DataTypeRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -31,11 +33,12 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 
 
 @Repository
-public class DataTypeDao {
+public class DataTypeDao implements FindEntityReferencesByIdSelector {
 
     private final DSLContext dsl;
     private RecordMapper<? super Record, DataType> mapper = r -> {
@@ -63,4 +66,16 @@ public class DataTypeDao {
                 .fetch(mapper);
 
     }
+
+
+    @Override
+    public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
+        checkNotNull(selector, "selector cannot be null");
+
+        return dsl.select(DATA_TYPE.ID, DATA_TYPE.CODE, DSL.val(EntityKind.DATA_TYPE.name()))
+                .from(DATA_TYPE)
+                .where(DATA_TYPE.ID.in(selector))
+                .fetch(TO_ENTITY_REFERENCE);
+    }
+
 }

@@ -1,25 +1,26 @@
 package com.khartec.waltz.data.entity_statistic;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.data.FindEntityReferencesByIdSelector;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatistic;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 
 @Repository
-public class EntityStatisticDao {
+public class EntityStatisticDao implements FindEntityReferencesByIdSelector {
 
     private static final com.khartec.waltz.schema.tables.EntityStatisticDefinition es = ENTITY_STATISTIC_DEFINITION.as("es");
     private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
@@ -57,5 +58,14 @@ public class EntityStatisticDao {
                 .fetch(TO_COMPOUND_MAPPER);
     }
 
+
+    @Override
+    public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
+        checkNotNull(selector, "selector cannot be null");
+        return dsl.select(es.ID, es.NAME, DSL.val(EntityKind.ENTITY_STATISTIC.name()))
+                .from(es)
+                .where(es.ID.in(selector))
+                .fetch(TO_ENTITY_REFERENCE);
+    }
 
 }

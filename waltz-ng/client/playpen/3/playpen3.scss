@@ -11,24 +11,28 @@
     margin-top: 6px;
     margin-bottom: 6px;
 }
+text {
+    pointer-events: none;
+}
 
 .grandparent text {
     font-weight: bold;
 }
-//
+
+// NOTE: this was commented out because it was blanking out all rects across waltz (KS)
 //rect {
 //    fill: none;
 //    stroke: #fff;
 //}
-//
-//rect.parent,
-//.grandparent rect {
-//    stroke-width: 2px;
-//}
-//
-//rect.parent {
-//    pointer-events: none;
-//}
+
+rect.parent,
+.grandparent rect {
+    stroke-width: 2px;
+}
+
+rect.parent {
+    pointer-events: none;
+}
 
 .grandparent rect {
     fill: orange;

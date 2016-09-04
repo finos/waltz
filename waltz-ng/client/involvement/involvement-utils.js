@@ -11,7 +11,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 export function aggregatePeopleInvolvements(involvements, people) {
     const involvementsByPerson = _.chain(involvements)
@@ -19,9 +19,9 @@ export function aggregatePeopleInvolvements(involvements, people) {
         .mapValues(xs => _.map(xs, 'kind'))
         .value();
 
-    return _.map(people, person => ({
-        person,
-        involvements: involvementsByPerson[person.employeeId]
-    }));
+    return _.chain(people)
+            .map(person => ({person, involvements: involvementsByPerson[person.employeeId]}))
+            .uniqBy(i => i.person.id)
+            .value();
 }
 

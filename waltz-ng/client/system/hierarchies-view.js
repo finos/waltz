@@ -1,7 +1,8 @@
-import {initialiseData} from "../common";
+import _ from "lodash";
+import {initialiseData, kindToViewState} from "../common";
 
 const initialState = {
-    tallies: [],
+    combinedTallies: [],
     kinds: [
         'CAPABILITY',
         'CHANGE_INITIATIVE',
@@ -12,30 +13,54 @@ const initialState = {
     ]
 };
 
-function controller(hierarchiesStore, notification) {
+function controller($q,
+                    $state,
+                    hierarchiesStore,
+                    notification) {
 
     const vm = initialiseData(this, initialState);
 
 
     const loadTallies = () => {
-        hierarchiesStore
-            .findTallies()
-            .then(ts => vm.tallies = ts);
+        $q
+            .all([hierarchiesStore.findTallies(), hierarchiesStore.findRootTallies()])
+            .then( ([tallies, rootTallies]) => {
+                const rootTalliesKeyed = _.keyBy(rootTallies, 'id');
+                vm.combinedTallies = _.chain(tallies)
+                    .map(t => ({id: t.id, hierarchyCount: t.count, rootCount: rootTalliesKeyed[t.id].count}) )
+                    .value();
+            });
     };
 
     vm.build = (kind) => {
-        console.log('rebuild')
         hierarchiesStore
             .buildForKind(kind)
             .then((count) => notification.success(`Hierarchy rebuilt for ${kind} with ${count} records`))
             .then(loadTallies);
     };
 
+
+    vm.getRoots = (kind) => {
+        hierarchiesStore
+            .findRoots(kind)
+            .then(roots => vm.roots = roots);
+    };
+
+
+    vm.goToRoot = (entityRef) => {
+        if(entityRef.kind === 'ENTITY_STATISTIC') return;
+        const stateName = kindToViewState(entityRef.kind);
+        $state.go(stateName, { id: entityRef.id});
+    };
+
+
     loadTallies();
 }
 
 
 controller.$inject = [
+    '$q',
+    '$state',
     'HierarchiesStore',
     'Notification'
 ];

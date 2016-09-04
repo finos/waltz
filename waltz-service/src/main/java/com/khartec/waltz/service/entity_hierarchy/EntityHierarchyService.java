@@ -4,16 +4,21 @@ import com.khartec.waltz.common.hierarchy.FlatNode;
 import com.khartec.waltz.common.hierarchy.Forest;
 import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
 import com.khartec.waltz.common.hierarchy.Node;
+import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
+import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.entity_hierarchy.EntityHierarchyDao;
+import com.khartec.waltz.data.entity_hierarchy.EntityRootsSelectorFactory;
+import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.data.process.ProcessDao;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_hierarchy.EntityHierarchyItem;
 import com.khartec.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.service.capability.CapabilityService;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Table;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,28 +31,83 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityKind.CAPABILITY;
 
 @Service
 public class EntityHierarchyService {
 
     private final DSLContext dsl;
-    private final EntityHierarchyDao entityHierarchyDao;
     private final CapabilityService capabilityService;
+    private final ChangeInitiativeDao changeInitiativeDao;
+    private final DataTypeDao dataTypeDao;
+    private final EntityHierarchyDao entityHierarchyDao;
+    private final EntityRootsSelectorFactory entityRootsSelectorFactory;
+    private final EntityStatisticDao entityStatisticDao;
+    private final OrganisationalUnitDao organisationalUnitDao;
+    private final ProcessDao processDao;
 
     @Autowired
-    public EntityHierarchyService(DSLContext dsl, EntityHierarchyDao entityHierarchyDao, CapabilityService capabilityService ) {
+    public EntityHierarchyService(DSLContext dsl,
+                                  CapabilityService capabilityService,
+                                  ChangeInitiativeDao changeInitiativeDao,
+                                  DataTypeDao dataTypeDao,
+                                  EntityHierarchyDao entityHierarchyDao,
+                                  EntityRootsSelectorFactory entityRootsSelectorFactory,
+                                  EntityStatisticDao entityStatisticDao,
+                                  OrganisationalUnitDao organisationalUnitDao,
+                                  ProcessDao processDao) {
+
         checkNotNull(dsl, "dsl cannot be null");
-        checkNotNull(entityHierarchyDao, "entityHierarchyDao cannot be null");
         checkNotNull(capabilityService, "capabilityService cannot be null");
+        checkNotNull(changeInitiativeDao, "changeInitiativeDao cannot be null");
+        checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
+        checkNotNull(entityHierarchyDao, "entityHierarchyDao cannot be null");
+        checkNotNull(entityRootsSelectorFactory, "entityRootsSelectorFactory cannot be null");
+        checkNotNull(entityStatisticDao, "entityStatisticDao cannot be null");
+        checkNotNull(organisationalUnitDao, "organisationalUnitDao cannot be null");
+        checkNotNull(processDao, "processDao cannot be null");
 
         this.dsl = dsl;
-        this.entityHierarchyDao = entityHierarchyDao;
         this.capabilityService = capabilityService;
+        this.changeInitiativeDao = changeInitiativeDao;
+        this.dataTypeDao = dataTypeDao;
+        this.entityHierarchyDao = entityHierarchyDao;
+        this.entityRootsSelectorFactory = entityRootsSelectorFactory;
+        this.entityStatisticDao = entityStatisticDao;
+        this.organisationalUnitDao = organisationalUnitDao;
+        this.processDao = processDao;
     }
 
 
     public List<Tally<String>> tallyByKind() {
         return entityHierarchyDao.tallyByKind();
+    }
+
+
+    public List<StringTally> getRootTallies() {
+        return entityHierarchyDao.getRootTallies();
+    }
+
+
+    public List<EntityReference> getRoots(EntityKind kind) {
+        Select<Record1<Long>> selector = entityRootsSelectorFactory.apply(kind);
+
+        switch (kind) {
+            case CAPABILITY:
+                return capabilityService.findByIdSelectorAsEntityReference(kind);
+            case CHANGE_INITIATIVE:
+                return changeInitiativeDao.findByIdSelectorAsEntityReference(selector);
+            case DATA_TYPE:
+                return dataTypeDao.findByIdSelectorAsEntityReference(selector);
+            case ENTITY_STATISTIC:
+                return entityStatisticDao.findByIdSelectorAsEntityReference(selector);
+            case ORG_UNIT:
+                return organisationalUnitDao.findByIdSelectorAsEntityReference(selector);
+            case PROCESS:
+                return processDao.findByIdSelectorAsEntityReference(selector);
+            default:
+                throw new IllegalArgumentException("Cannot create selector for entity kind: " + kind);
+        }
     }
 
 
@@ -62,7 +122,7 @@ public class EntityHierarchyService {
         List<EntityHierarchyItem> hierarchyItems = convertFlatNodesToHierarchyItems(kind, flatNodes);
 
         //TODO: remove this once all code using the entity_hierarchy service and related fixes
-        if (kind == EntityKind.CAPABILITY) {
+        if (kind == CAPABILITY) {
             capabilityService.rebuildHierarchy();
         }
 
