@@ -1,6 +1,7 @@
 package com.khartec.waltz.data.entity_statistic;
 
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.tally.ImmutableStringTally;
 import com.khartec.waltz.model.tally.ImmutableTallyPack;
@@ -64,6 +65,35 @@ public class EntityStatisticSummaryDao {
 
     public List<TallyPack<String>> generateWithCountByEntity(Collection<Long> statisticIds, Select<Record1<Long>> appIdSelector) {
         return generateSummaries(statisticIds, appIdSelector, countTotal, toIntegerTally);
+    }
+
+
+    public List<TallyPack<String>> generateWithNoRollup(Collection<Long> statisticIds, EntityReference entityReference) {
+        Condition condition = esv.STATISTIC_ID.in(statisticIds)
+                .and(esv.ENTITY_KIND.eq(entityReference.kind().name()))
+                .and(esv.ENTITY_ID.eq(entityReference.id()))
+                .and(esv.CURRENT.eq(true));
+
+        Select<Record3<Long, String, String>> values = dsl
+                .select(esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE)
+                .from(esv)
+                .where(dsl.renderInlined(condition));
+
+        return values.fetch()
+                .intoGroups(esv.STATISTIC_ID, r -> ImmutableStringTally.builder()
+                        .count(Double.parseDouble(r.getValue(esv.VALUE)))
+                        .id(r.getValue(esv.OUTCOME))
+                        .build())
+                .entrySet()
+                .stream()
+                .map(entry -> ImmutableTallyPack.<String>builder()
+                        .entityReference(ImmutableEntityReference.builder()
+                                .kind(EntityKind.ENTITY_STATISTIC)
+                                .id(entry.getKey())
+                                .build())
+                        .tallies(entry.getValue())
+                        .build())
+                .collect(Collectors.toList());
     }
 
 

@@ -108,7 +108,10 @@ public class EntityStatisticService {
                         appIdSelector),
                 summaryDao.generateWithAvgByValue(
                         definitionIdsByRollupKind.getOrDefault(RollupKind.AVG_BY_VALUE, emptyList()),
-                        appIdSelector)
+                        appIdSelector),
+                summaryDao.generateWithNoRollup(
+                        definitionIdsByRollupKind.getOrDefault(RollupKind.NONE, emptyList()),
+                        options.entityReference())
         );
 
     }
