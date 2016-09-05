@@ -16,11 +16,14 @@
                 <li ng-repeat="option in $ctrl.workingTypes | orderBy:'name'">
                     <span>
                         <input type="checkbox"
+                               id="wdfte-{{option.id}}"
                                ng-model="option.selected"
                                ng-change="$ctrl.onChange()">
-                        <span ng-style="{'font-weight': (option.selected ? 'bold' : 'none') }"
-                              ng-bind="option.name">
-                        </span>
+
+                        <label ng-style="{'font-weight': (option.selected ? 'bold' : 'none') }"
+                               for="wdfte-{{option.id}}"
+                               ng-bind="option.name">
+                        </label>
                     </span>
                     <span class="text-muted small"
                           ng-bind="option.description">

@@ -20,7 +20,6 @@ export default (module) => {
         .directive('waltzSummaryRatedFlowChart', require('./rated-flow-chart/summary-rated-flow-chart'))
         .directive('waltzRatedFlowDetail', require('./rated-flow-chart/rated-flow-detail'))
         .directive('waltzRatedFlowSummaryDetail', require('./rated-flow-chart/rated-flow-summary-detail'))
-        .directive('waltzDataFlowDiagram', require('./boingy-graph/boingy-graph'))
         .directive('waltzFlowCloudDiagram', require('./flow-cloud-diagram'))
         .directive('waltzDataFlowsTabgroup', require('./data-flows-tabgroup'))
         .directive('waltzDataFlowsTabgroupSection', require('./data-flows-tabgroup-section'))

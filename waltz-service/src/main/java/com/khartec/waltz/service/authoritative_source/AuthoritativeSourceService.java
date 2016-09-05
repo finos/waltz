@@ -54,11 +54,6 @@ public class AuthoritativeSourceService {
     }
 
 
-    public List<AuthoritativeSource> findByEntityReferences(EntityKind kind, List<Long> ids) {
-        return authoritativeSourceDao.findByEntityReferences(kind, ids);
-    }
-
-
     public List<AuthoritativeSource> findByEntityReference(EntityReference ref) {
         return authoritativeSourceDao.findByEntityReference(ref);
     }

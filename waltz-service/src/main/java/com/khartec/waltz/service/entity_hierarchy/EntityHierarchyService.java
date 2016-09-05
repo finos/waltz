@@ -84,7 +84,7 @@ public class EntityHierarchyService {
     }
 
 
-    public List<StringTally> getRootTallies() {
+    public List<Tally<String>> getRootTallies() {
         return entityHierarchyDao.getRootTallies();
     }
 

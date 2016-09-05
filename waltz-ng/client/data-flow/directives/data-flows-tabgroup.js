@@ -29,6 +29,7 @@ const defaultOptions = {
 const initialState = {
     applications: [],
     appIds: [],
+    boingyEverShown: false,
     dataTypes: [],
     flowData: null,
     onLoadDetail: () => console.log("No onLoadDetail provided for data-flows-tabgroup"),
@@ -125,28 +126,33 @@ function controller($scope, dataFlowUtilityService) {
     vm.filterChanged = (filterOptions) => {
         if (! vm.flowData) return;
 
-
         vm.filteredFlowData = calculateFlowData(
             vm.flowData.flows,
             vm.appIds,
             vm.flowData.decorators,
             filterOptions);
-
     };
 
     vm.loadDetail = () => {
-        if (vm.onLoadDetail) vm.onLoadDetail();
-        else console.log("No handler for detail provided ('on-load-detail')");
+        if (vm.onLoadDetail) {
+            vm.onLoadDetail();
+        } else {
+            console.log("No handler for detail provided ('on-load-detail')");
+        }
     };
 
-
     vm.tabSelected = (tabName, index) => {
-        if(index > 0) vm.loadDetail();
-        if(index === 1) vm.boingyEverShown = true;
+        if(index > 0) {
+            vm.loadDetail();
+        }
+        if(index === 1) {
+            vm.boingyEverShown = true;
+        }
         vm.onTabChange(tabName, index);
     };
 
 }
+
 
 controller.$inject = [
     '$scope',
@@ -164,7 +170,6 @@ const directive = {
     bindToController: BINDINGS,
     template: require('./data-flows-tabgroup.html')
 };
-
 
 
 export default () => directive;

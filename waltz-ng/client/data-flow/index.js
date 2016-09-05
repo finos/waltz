@@ -19,7 +19,6 @@ export default (module) => {
 
     module.service('DataFlowDataStore', require('./services/data-flow-store'));
     module.service('DataFlowViewService', require('./services/data-flow-view-service'));
-    module.service('RatedDataFlowDataService', require('./services/rated-data-flow-service'));
     module.service('DataFlowUtilityService', require('./services/data-flow-utility'));
 
 

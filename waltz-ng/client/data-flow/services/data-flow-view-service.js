@@ -16,10 +16,10 @@ function service($q,
     function initialise(id, kind, scope = 'CHILDREN') {
         reset();
         data.loadingStats = true;
-        data.options = {
-            entityReference: { id, kind },
-            scope
-        };
+
+        data.options = _.isObject(id)
+            ? id
+            : { entityReference: { id, kind }, scope };
 
         return dataFlowStore
             .calculateStats(data.options)

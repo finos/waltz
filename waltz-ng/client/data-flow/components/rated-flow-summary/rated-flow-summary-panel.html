@@ -1,18 +1,18 @@
 <div class="row">
     <div class="col-md-7">
-        <waltz-rated-flow-summary-table rated-flows="$ctrl.ratedFlows"
-                                        apps="$ctrl.apps"
-                                        org-unit-id="$ctrl.orgUnitId"
-                                        on-click="$ctrl.onTableClick">
-        </waltz-rated-flow-summary-table>
+        <waltz-rated-summary-table decorator-entities="$ctrl.dataTypes"
+                                   exact-summaries="$ctrl.exactSummaries"
+                                   child-summaries="$ctrl.childSummaries"
+                                   on-click="$ctrl.onTableClick">
+        </waltz-rated-summary-table>
     </div>
     <div class="col-md-5">
-        <waltz-rated-flow-summary-info-cell ng-if="$ctrl.selectedBucket.type == 'CELL'"
-                                            applications="$ctrl.selectedBucket.applications"
-                                            type="$ctrl.selectedBucket.dataType"
-                                            flows="$ctrl.selectedBucket.flows"
-                                            org-unit-id="$ctrl.orgUnitId"
-                                            rating="$ctrl.selectedBucket.rating">
+        <waltz-rated-flow-summary-info-cell ng-if="$ctrl.infoPanel != null"
+                                            applications="$ctrl.infoPanel.applications"
+                                            type="$ctrl.infoPanel.dataType"
+                                            flows="$ctrl.infoPanel.flows"
+                                            org-unit-id="$ctrl.entityReference"
+                                            rating="$ctrl.infoPanel.rating">
         </waltz-rated-flow-summary-info-cell>
     </div>
 </div>

@@ -113,7 +113,6 @@ public class DataFlowStatsDao {
          // dataType.CODE should no longer be used as a 'pk' (use .ID instead)
          // TODO: fix this, probably simple as client impact hidden behind toDisplayName etc..
 
-
         return dsl.select(dt.CODE, DSL.count())
                 .from(df)
                 .innerJoin(dfd)

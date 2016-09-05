@@ -1,3 +1,6 @@
+import _ from 'lodash';
+
+
 const BINDINGS = {
     ratings: '<',
     flowData: '<',

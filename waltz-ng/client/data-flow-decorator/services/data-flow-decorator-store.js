@@ -30,9 +30,29 @@ function service($http,
             .then(r => r.data);
     };
 
+    /**
+     * Given a selector returns a promising giving results like:
+     *
+     *      [
+     *          { decoratorEntityReference : <entityRef>,
+     *            rating: PRIMARY | SECONDARY | NO_OPINION | DISCOURAGED,
+     *            count: <number>
+     *          }
+     *      ]
+     *
+     * @param selector
+     * @returns {*|Promise.<TResult>}
+     */
+    const summarizeBySelector = (selector) => {
+        checkIsApplicationIdSelector(selector);
+        return $http.post(`${BASE}/summarize`, selector)
+            .then(r => r.data);
+    };
+
     return {
         findBySelectorAndKind,
-        updateDecorators
+        updateDecorators,
+        summarizeBySelector
     };
 }
 

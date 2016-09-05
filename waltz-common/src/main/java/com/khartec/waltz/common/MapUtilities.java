@@ -112,6 +112,13 @@ public class MapUtilities {
     }
 
 
+    /**
+     * Returns true if map is null or empty
+     * @param map
+     * @param <K>
+     * @param <V>
+     * @return
+     */
     public static <K, V> boolean isEmpty(Map<K, V> map) {
         return map == null || map.isEmpty();
     }

@@ -5,18 +5,21 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.authoritativesource.Rating;
 import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
+import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableDataFlowDecorator;
+import com.khartec.waltz.model.data_flow_decorator.ImmutableDecoratorRatingSummary;
 import com.khartec.waltz.schema.tables.records.DataFlowDecoratorRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
 import static java.util.stream.Collectors.toList;
@@ -80,7 +83,7 @@ public class DataFlowDecoratorDao {
     }
 
 
-    public List<DataFlowDecorator> findByFlowIds(ArrayList<Long> flowIds) {
+    public List<DataFlowDecorator> findByFlowIds(Collection<Long> flowIds) {
         checkNotNull(flowIds, "flowIds cannot be null");
 
         Condition condition = DATA_FLOW_DECORATOR.DATA_FLOW_ID.in(flowIds);
@@ -101,23 +104,45 @@ public class DataFlowDecoratorDao {
     }
 
 
+    // --- STATS ---
 
-    // --- UPDATERS ---
+    public List<DecoratorRatingSummary> summarizeForSelector(Select<Record1<Long>> selector) {
+        Condition condition = DATA_FLOW.TARGET_ENTITY_ID.in(selector);
 
-    public boolean deleteDecorator(long flowId,
-                                   EntityReference decoratorEntity) {
-        checkNotNull(decoratorEntity, "decoratorEntity cannot be null");
+        Condition dataFlowJoinCondition = DATA_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID);
 
-        int count = dsl
-                .deleteFrom(DATA_FLOW_DECORATOR)
-                .where(DATA_FLOW_DECORATOR.DATA_FLOW_ID.eq(flowId))
-                .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorEntity.kind().name()))
-                .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(decoratorEntity.id()))
-                .execute();
+        Collection<Field<?>> groupingFields = newArrayList(
+                DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND,
+                DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID,
+                DATA_FLOW_DECORATOR.RATING);
 
-        return count == 1;
+        Field<Integer> countField = DSL.count(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID).as("count");
+
+        return dsl.select(groupingFields)
+                .select(countField)
+                .from(DATA_FLOW_DECORATOR)
+                .innerJoin(DATA_FLOW)
+                .on(dsl.renderInlined(dataFlowJoinCondition))
+                .where(dsl.renderInlined(condition))
+                .groupBy(groupingFields)
+                .fetch(r -> {
+                    EntityKind decoratorEntityKind = EntityKind.valueOf(r.getValue(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND));
+                    long decoratorEntityId = r.getValue(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID);
+
+                    EntityReference decoratorRef = EntityReference.mkRef(decoratorEntityKind, decoratorEntityId);
+                    Rating rating = Rating.valueOf(r.getValue(DATA_FLOW_DECORATOR.RATING));
+                    Integer count = r.getValue(countField);
+
+                    return ImmutableDecoratorRatingSummary.builder()
+                            .decoratorEntityReference(decoratorRef)
+                            .rating(rating)
+                            .count(count)
+                            .build();
+                });
     }
 
+
+    // --- UPDATERS ---
 
     public int[] deleteDecorators(Long flowId, Collection<EntityReference> decoratorReferences) {
         List<DataFlowDecoratorRecord> records = decoratorReferences

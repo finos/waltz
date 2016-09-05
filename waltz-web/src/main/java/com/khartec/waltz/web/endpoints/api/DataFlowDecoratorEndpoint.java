@@ -1,6 +1,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
+import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -49,9 +50,9 @@ public class DataFlowDecoratorEndpoint implements Endpoint {
 
     @Override
     public void register() {
-
         String findDecorationsBySelectorAndKindPath = mkPath(BASE_URL, "kind", ":kind");
         String updateDecoratorsPath = mkPath(BASE_URL, ":flowId");
+        String summarizeForSelectorPath = mkPath(BASE_URL, "summarize");
 
         ListRoute<DataFlowDecorator> findDecorationsBySelectorAndKindRoute =
                 (request, response) -> dataFlowDecoratorService
@@ -59,9 +60,17 @@ public class DataFlowDecoratorEndpoint implements Endpoint {
                                 readIdSelectionOptionsFromBody(request),
                                 getKind(request));
 
+        ListRoute<DecoratorRatingSummary> summarizeForSelectorRoute =
+                (request, response) -> dataFlowDecoratorService.summarizeForSelector(
+                        readIdSelectionOptionsFromBody(request));
+
         postForList(
                 findDecorationsBySelectorAndKindPath,
                 findDecorationsBySelectorAndKindRoute);
+
+        postForList(
+                summarizeForSelectorPath,
+                summarizeForSelectorRoute);
 
         postForList(
                 updateDecoratorsPath,
@@ -73,13 +82,13 @@ public class DataFlowDecoratorEndpoint implements Endpoint {
         requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
 
         String user = getUsername(request);
-
         UpdateDataFlowDecoratorsAction action = readBody(request, UpdateDataFlowDecoratorsAction.class);
 
         if (notEmpty(action.removedDecorators())) {
             LOG.info("User: {}, deleting decorators: {} for flow: {}", user, action.removedDecorators(), action.flowId());
             dataFlowDecoratorService.deleteDecorators(action.flowId(), action.removedDecorators());
         }
+
         if (notEmpty(action.addedDecorators())) {
             LOG.info("User: {}, adding decorators: {} for flow: {}", user, action.addedDecorators(), action.flowId());
             dataFlowDecoratorService.addDecorators(action.flowId(), action.addedDecorators());

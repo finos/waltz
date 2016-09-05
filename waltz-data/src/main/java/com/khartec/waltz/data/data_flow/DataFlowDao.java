@@ -84,6 +84,7 @@ public class DataFlowDao {
                 .fetch(dataFlowMapper);
     }
 
+
     public List<DataFlow> findByApplicationIds(Collection<Long> appIds) {
         return baseQuery()
                 .and(DATA_FLOW.SOURCE_ENTITY_ID.in(appIds))
@@ -129,4 +130,10 @@ public class DataFlowDao {
                 .withId(record.getId());
     }
 
+
+    public List<DataFlow> findByFlowIds(Collection<Long> dataFlowIds) {
+        return baseQuery()
+                .and(DATA_FLOW.ID.in(dataFlowIds))
+                .fetch(dataFlowMapper);
+    }
 }

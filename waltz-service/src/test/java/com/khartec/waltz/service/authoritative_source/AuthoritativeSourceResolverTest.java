@@ -1,4 +1,4 @@
-package com.khartec.waltz.service.authrortitative_source;
+package com.khartec.waltz.service.authoritative_source;
 
 
 import com.khartec.waltz.common.ListUtilities;
@@ -7,7 +7,6 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.authoritativesource.ImmutableAuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.authoritativesource.Rating;
-import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceResolver;
 import org.junit.Assert;
 import org.junit.Test;
 

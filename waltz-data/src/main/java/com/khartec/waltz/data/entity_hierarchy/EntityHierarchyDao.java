@@ -70,7 +70,7 @@ public class EntityHierarchyDao {
     }
 
 
-    public List<StringTally> getRootTallies() {
+    public List<Tally<String>> getRootTallies() {
         return dsl.select(eh.KIND, DSL.count())
                 .from(eh)
                 .where(eh.LEVEL.eq(1)
