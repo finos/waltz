@@ -1,0 +1,119 @@
+<div class="waltz-page-summary waltz-page-summary-attach"
+     style="margin-bottom: 24px">
+
+    <div class="row">
+
+        <div class="col-sm-12 ">
+            <div class="container-fluid">
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <waltz-apps-by-investment-pie applications="$ctrl.apps"
+                                                      size="70">
+                        </waltz-apps-by-investment-pie>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <waltz-apps-by-lifecycle-phase-pie applications="$ctrl.apps"
+                                                           size="70">
+                        </waltz-apps-by-lifecycle-phase-pie>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <waltz-basic-info-tile waltz-jump-to="dataflows-section"
+                                               icon="random"
+                                               name="Logical Data Flows">
+                            <br>
+                            <waltz-flow-cloud-diagram
+                                width="220"
+                                height="220"
+                                stats="$ctrl.flows">
+                            </waltz-flow-cloud-diagram>
+                        </waltz-basic-info-tile>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <waltz-basic-info-tile name="Portfolio Cost"
+                                               description="Cumulative value of infra and app dev costs"
+                                               waltz-jump-to="costs-section"
+                                               icon="money">
+                            <span style="font-size: x-large;"
+                                  ng-bind="$ctrl.portfolioCostStr">
+                            </span>
+                        </waltz-basic-info-tile>
+                    </div>
+                    <div class="col-sm-4">
+                        <waltz-basic-info-tile name="Complexity"
+                                               description="Derived from capabilities, connections and servers"
+                                               class="clickable"
+                                               waltz-jump-to="complexity-section"
+                                               icon="rocket">
+                            <div style="font-size: x-large;">
+                                &Sigma;
+                                <span ng-bind="$ctrl.complexitySummary.cumulativeScore | toFixed:1">
+                                </span>
+                            </div>
+                            <div class="small text-muted">
+                                <span ng-bind="$ctrl.complexitySummary.averageScore | toFixed:2">
+                                </span>
+                                per app
+                            </div>
+                        </waltz-basic-info-tile>
+
+                    </div>
+                    <div class="col-sm-4">
+                        <waltz-basic-info-tile name="Servers"
+                                               description="Number of servers supporting this org dataType"
+                                               icon="server">
+                            <div>
+                                <div style="font-size: x-large;">
+                                    # <span ng-bind="$ctrl.serverStats.total"></span>
+                                </div>
+                                <div class="small text-muted">
+                                    <span ng-bind="$ctrl.serverStats.virtualPercentage"></span>% virtual
+                                </div>
+                            </div>
+                        </waltz-basic-info-tile>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row no-overflow"
+                 ng-if="$ctrl.parents.length > 0 || $ctrl.dataType.children.length > 0"
+                 style="padding: 1em">
+
+                <div class="col-sm-4">
+
+                    <h4>Parent dataTypes: </h4>
+                    <ul>
+                        <li ng-repeat="parent in $ctrl.parents">
+                            <a ui-sref="main.data-type.view ({id: parent.id })"
+                               ng-bind="parent.name">
+                            </a>
+                            <span ng-if="!$last">&raquo;</span>
+                        </li>
+                    </ul>
+
+                    <span class="text-muted small "
+                          ng-bind="$ctrl.parent.description">
+                    </span>
+                </div>
+
+                <div ng-if="$ctrl.dataType.children.length > 0"
+                     class="col-sm-8">
+
+                    <h4>Sub dataTypes</h4>
+                    <waltz-data-type-tree trees="$ctrl.dataType.children">
+                    </waltz-data-type-tree>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

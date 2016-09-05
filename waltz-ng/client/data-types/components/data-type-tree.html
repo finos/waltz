@@ -1,53 +1,42 @@
-<waltz-section name="Data Types" small="All">
+<div>
+    <treecontrol class="tree-light"
+                 tree-model="$ctrl.trees"
+                 order-by="name"
+                 expanded-nodes="$ctrl.expandedNodes"
+                 on-selection="$ctrl.onNodeSelect(node)"
+                 options="$ctrl.treeOptions">
+            <span class="waltz-visibility-parent">
 
-    <ul class="list-unstyled"
-        ng-show="$ctrl.dataTypeHierarchy.length > 0">
-        <li ng-repeat="dataType in $ctrl.dataTypeHierarchy | orderBy:'name'">
-            <div ng-include="'inline/data-types/tree/node.html'"
-                 ng-init="node=dataType; level=1">
-            </div>
-        </li>
-    </ul>
+                <strong>
+                    <span ng-if="$ctrl.hasOwnDataFlows(node)"
+                          ng-bind="node.name">
+                    </span>
+                    <i ng-bind="node.name"
+                       ng-if="! $ctrl.hasOwnDataFlows(node)">
+                    </i>
+                </strong>
 
-    <div class="alert alert-warning"
-         ng-show="$ctrl.dataTypeHierarchy.length == 0">
-        <strong>No Data Types</strong> have been defined within this system.
-    </div>
+                <a ui-sref="main.data-type.view ({id: node.id })">
 
-</waltz-section>
+                    <span class="waltz-visibility-child-50">
+                        <span ng-if="$ctrl.hasAnyDataFlows(node)"
+                              class="small waltz-app-tally-count"
+                              title="Number of data flows">
 
+                            <span ng-if="$ctrl.hasOwnDataFlows(node)">
+                                <span ng-bind="node.dataFlowCount"></span>
+                            </span>
 
-<script type="text/ng-template"
-        id="inline/data-types/tree/node.html">
-    <div class="waltz-org-unit-level waltz-org-unit-level-{{ level }}">
-        <a ui-sref="main.data-type.code ({ code: node.code})"
-           class="waltz-org-unit-name clickable"
-           ng-bind="node.name">
-        </a>
-
-        <span class="waltz-visibility-child-50">
-            <span ng-if="$ctrl.hasAnyDataFlows(node)"
-                  class="small waltz-app-tally-count"
-                  title="Number of data flows">
-
-                <span ng-if="$ctrl.hasOwnDataFlows(node)">
-                    <span ng-bind="node.dataFlowCount"></span>
-                </span>
-
-                <i ng-if="$ctrl.hasInheritedDataFlows(node)">
-                    (<span ng-bind="node.totalDataFlowCount"></span>)
-                </i>
+                            <i ng-if="$ctrl.hasInheritedDataFlows(node)">
+                                (<span ng-bind="node.totalDataFlowCount"></span>)
+                            </i>
+                        </span>
+                    </span>
+                    &nbsp;
+                    <strong class="waltz-visibility-child-30">
+                            Show &raquo;
+                    </strong>
+                </a>
             </span>
-        </span>
-
-        <div class="text-muted no-overflow"
-             ng-bind="node.description">
-        </div>
-    </div>
-
-    <ul class="list-unstyled">
-        <li ng-repeat="node in node.children | orderBy:'name'"
-            ng-init="level=level+1"
-            ng-include="'inline/data-types/tree/node.html'"></li>
-    </ul>
-</script>
+    </treecontrol>
+</div>

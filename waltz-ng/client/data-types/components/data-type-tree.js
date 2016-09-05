@@ -1,56 +1,45 @@
-import {initialiseData, buildHierarchies} from "../../common";
-import {buildPropertySummer} from "../../common/tally-utils";
+import _ from "lodash";
+import {initialiseData} from "../../common";
 
 
 const bindings = {
-    dataTypes: '<',
-    tallies: '<'
+    trees: '<',
+    onSelection: '<'
 };
 
 
 const initialState = {
-    dataTypeHierarchy: []
+    expandedNodes: [],
 };
 
 
 const template = require('./data-type-tree.html');
 
 
-function prepareDataTypeTree(dataTypes, tallies) {
-
-    const dataTypesByCode = _.keyBy(dataTypes, 'code');
-
-    const enrichWithDirectCounts = (tallies, keyName) => {
-        _.each(tallies, t => {
-            const dt = dataTypesByCode[t.id];
-            if (dt) dt[keyName] = t.count;
-        });
-    };
-
-    enrichWithDirectCounts(tallies, "dataFlowCount");
-
-    const rootDataTypes = buildHierarchies(dataTypes);
-
-    const dataFlowCountSummer = buildPropertySummer("dataFlowCount", "totalDataFlowCount", "childDataFlowCount");
-
-    _.each(rootDataTypes, dataFlowCountSummer);
-
-    return rootDataTypes;
-}
-
-
 function controller() {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = (changes => {
-        if(vm.tallies) {
-            vm.dataTypeHierarchy = prepareDataTypeTree(vm.dataTypes, vm.tallies);
-        }
-    });
+    vm.treeOptions = {
+        nodeChildren: "children",
+        dirSelectable: true,
+        equality: (a, b) => a && b && a.id === b.id
+    };
 
     vm.hasOwnDataFlows = (node) => node.dataFlowCount && node.dataFlowCount > 0;
     vm.hasAnyDataFlows = (node) => node.totalDataFlowCount && node.totalDataFlowCount > 0;
     vm.hasInheritedDataFlows = (node) => node.childDataFlowCount && node.childDataFlowCount > 0;
+    vm.onNodeSelect = (node) => {
+        if (node.children && node.children.length > 0) {
+            const idx = _.findIndex(vm.expandedNodes, n => n.id === node.id);
+            if (idx === -1) {
+                vm.expandedNodes.push(node);
+            } else {
+                vm.expandedNodes.splice(idx, 1);
+            }
+        }
+        if (vm.onSelection &&  _.isFunction(vm.onSelection)) vm.onSelection(node);
+    };
+
 };
 
 

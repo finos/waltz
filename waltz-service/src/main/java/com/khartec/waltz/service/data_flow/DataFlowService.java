@@ -22,6 +22,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow.DataFlowDao;
 import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
 import com.khartec.waltz.data.data_flow_decorator.DataFlowDecoratorDao;
+import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.dataflow.DataFlow;
@@ -35,6 +36,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -48,22 +50,26 @@ public class DataFlowService {
     private final DataFlowStatsDao dataFlowStatsDao;
     private final DataFlowDecoratorDao dataFlowDecoratorDao;
     private final ApplicationIdSelectorFactory idSelectorFactory;
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
 
 
     @Autowired
     public DataFlowService(DataFlowDao dataFlowDao, 
                            DataFlowStatsDao dataFlowStatsDao, 
                            DataFlowDecoratorDao dataFlowDecoratorDao, 
-                           ApplicationIdSelectorFactory idSelectorFactory) {
+                           ApplicationIdSelectorFactory appIdSelectorFactory,
+                           DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
         checkNotNull(dataFlowDao, "dataFlowDao must not be null");
         checkNotNull(dataFlowStatsDao, "dataFlowStatsDao cannot be null");
         checkNotNull(dataFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
-        checkNotNull(idSelectorFactory, "idSelectorFactory cannot be null");
+        checkNotNull(appIdSelectorFactory, "idSelectorFactory cannot be null");
+        checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
 
-        this.idSelectorFactory = idSelectorFactory;
+        this.idSelectorFactory = appIdSelectorFactory;
         this.dataFlowStatsDao = dataFlowStatsDao;
         this.dataFlowDao = dataFlowDao;
         this.dataFlowDecoratorDao = dataFlowDecoratorDao;
+        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
     }
 
 
@@ -110,6 +116,12 @@ public class DataFlowService {
 
     public List<Tally<String>> tallyByDataType() {
         return dataFlowStatsDao.tallyDataTypes(DSL.select(APPLICATION.ID).from(APPLICATION));
+    }
+
+
+    public Collection<DataFlow> findByDataTypeIdSelector(IdSelectionOptions options) {
+        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(options);
+        return dataFlowDao.findByDataTypeIdSelector(dataTypeIdSelector);
     }
 
 }

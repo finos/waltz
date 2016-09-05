@@ -33,6 +33,7 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
 
 
 @Repository
@@ -134,6 +135,26 @@ public class DataFlowDao {
     public List<DataFlow> findByFlowIds(Collection<Long> dataFlowIds) {
         return baseQuery()
                 .and(DATA_FLOW.ID.in(dataFlowIds))
+                .fetch(dataFlowMapper);
+    }
+
+
+    public Collection<DataFlow> findByDataTypeIdSelector(Select<Record1<Long>> typeIdSelector) {
+        Condition condition = DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())
+                .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(typeIdSelector))
+                .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+
+        return dsl.select(DATA_FLOW.fields())
+                .select(sourceAppAlias.NAME, targetAppAlias.NAME)
+                .from(DATA_FLOW)
+                .innerJoin(sourceAppAlias)
+                .on(DATA_FLOW.SOURCE_ENTITY_ID.eq(sourceAppAlias.ID))
+                .innerJoin(targetAppAlias)
+                .on(DATA_FLOW.TARGET_ENTITY_ID.eq(targetAppAlias.ID))
+                .innerJoin(DATA_FLOW_DECORATOR)
+                .on(DATA_FLOW_DECORATOR.DATA_FLOW_ID.eq(DATA_FLOW.ID))
+                .where(dsl.renderInlined(condition))
                 .fetch(dataFlowMapper);
     }
 }

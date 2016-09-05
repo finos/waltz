@@ -22,6 +22,10 @@ function service($http, BaseApiUrl) {
         .get(`${BASE}/entity/${kind}/${id}`)
         .then(result => result.data);
 
+    const findByDataTypeIdSelector = (options) => $http
+        .post(`${BASE}/data-type`, options)
+        .then(r => r.data);
+
     // --- STATS ---
     const calculateStats = (options) => $http
         .post(`${BASE}/stats`, options)
@@ -43,6 +47,7 @@ function service($http, BaseApiUrl) {
     return {
         findByAppIdSelector,
         findByEntityReference,
+        findByDataTypeIdSelector,
         calculateStats,
         countByDataType,
         removeFlow,

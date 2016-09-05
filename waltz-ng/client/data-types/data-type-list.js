@@ -1,10 +1,12 @@
 import angular from "angular";
 import {initialiseData} from "../common";
+import {prepareDataTypeTree} from "./utilities";
 
 
 const initialState = {
     dataTypes: [],
     tallies: [],
+    trees: []
 };
 
 
@@ -17,6 +19,8 @@ function controller($state,
     const vm = initialiseData(this, initialState);
 
     vm.dataTypes = dataTypes;
+
+    vm.nodeSelected = (node) => vm.selectedNode = node;
 
     svgStore
         .findByKind('DATA_TYPE')
@@ -32,7 +36,8 @@ function controller($state,
     };
 
     dataFlowStore.countByDataType()
-        .then(tallies => vm.tallies = tallies );
+        .then(tallies => vm.tallies = tallies )
+        .then(tallies => vm.trees = prepareDataTypeTree(vm.dataTypes, vm.tallies));
 
 }
 

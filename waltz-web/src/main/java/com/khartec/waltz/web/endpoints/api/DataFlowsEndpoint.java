@@ -64,12 +64,11 @@ public class DataFlowsEndpoint implements Endpoint {
 
     @Override
     public void register() {
-
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByAppIdSelectorPath = mkPath(BASE_URL, "apps");
         String findStatsPath = mkPath(BASE_URL, "stats");
         String tallyByDataTypePath = mkPath(BASE_URL, "count-by", "data-type");
-
+        String findByDataTypeIdSelectorPath = mkPath(BASE_URL, "data-type");
 
         String removeFlowPath = mkPath(BASE_URL, ":id");
         String addFlowPath = mkPath(BASE_URL);
@@ -86,12 +85,16 @@ public class DataFlowsEndpoint implements Endpoint {
         ListRoute<Tally<String>> tallyByDataTypeRoute = (request, response)
                 -> dataFlowService.tallyByDataType();
 
+        ListRoute<DataFlow> findByDataTypeIdSelectorRoute = (request, response)
+                -> dataFlowService.findByDataTypeIdSelector(readIdSelectionOptionsFromBody(request));
+
         getForList(findByEntityPath, getByEntityRef);
         postForList(findByAppIdSelectorPath, findByAppIdSelectorRoute);
+        postForList(findByDataTypeIdSelectorPath, findByDataTypeIdSelectorRoute);
         
         postForDatum(findStatsPath, findStatsRoute);
         getForList(tallyByDataTypePath, tallyByDataTypeRoute);
-        
+
         deleteForDatum(removeFlowPath, this::removeFlowRoute);
         postForDatum(addFlowPath, this::addFlowRoute);
     }
