@@ -131,6 +131,8 @@ public class EntityStatisticService {
                 return summaryDao.generateWithSumByValue(statisticId, appIdSelector);
             case AVG_BY_VALUE:
                 return summaryDao.generateWithAvgByValue(statisticId, appIdSelector);
+            case NONE:
+                return summaryDao.generateWithNoRollup(statisticId, options.entityReference());
             default:
                 throw new UnsupportedOperationException(String.format("Rollup kind [%s] not supported.", rollupKind));
         }

@@ -68,6 +68,11 @@ public class EntityStatisticSummaryDao {
     }
 
 
+    public List<StringTally> generateWithCountByEntity(Long statisticId, Select<Record1<Long>> appIdSelector) {
+        return generateSummary(statisticId, appIdSelector, countTotal, toIntegerTally);
+    }
+
+
     public List<TallyPack<String>> generateWithNoRollup(Collection<Long> statisticIds, EntityReference entityReference) {
         Condition condition = esv.STATISTIC_ID.in(statisticIds)
                 .and(esv.ENTITY_KIND.eq(entityReference.kind().name()))
@@ -97,8 +102,24 @@ public class EntityStatisticSummaryDao {
     }
 
 
-    public List<StringTally> generateWithCountByEntity(Long statisticId, Select<Record1<Long>> appIdSelector) {
-        return generateSummary(statisticId, appIdSelector, countTotal, toIntegerTally);
+    public List<StringTally> generateWithNoRollup(Long statisticId, EntityReference entityReference) {
+        Condition condition = esv.STATISTIC_ID.eq(statisticId)
+                .and(esv.ENTITY_KIND.eq(entityReference.kind().name()))
+                .and(esv.ENTITY_ID.eq(entityReference.id()))
+                .and(esv.CURRENT.eq(true));
+
+        Select<Record3<Long, String, String>> values = dsl
+                .select(esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE)
+                .from(esv)
+                .where(dsl.renderInlined(condition));
+
+        return values.fetch()
+                .stream()
+                .map(r -> ImmutableStringTally.builder()
+                        .count(Double.parseDouble(r.getValue(esv.VALUE)))
+                        .id(r.getValue(esv.OUTCOME))
+                        .build())
+                .collect(Collectors.toList());
     }
 
 
