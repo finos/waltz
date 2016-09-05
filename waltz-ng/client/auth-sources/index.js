@@ -11,7 +11,13 @@
  *
  */
 
-import { authSourcesResolver, flowResolver, idResolver, orgUnitsResolver } from './resolvers';
+import {
+    authSourcesResolver,
+    flowResolver,
+    idResolver,
+    orgUnitsResolver,
+    dataTypesResolver,
+    flowDecoratorsResolver } from './resolvers';
 
 import editView from './edit';
 
@@ -31,13 +37,15 @@ export default (module) => {
                     url: 'auth-sources'
                 })
                 .state('main.auth-sources.edit', {
-                    url: '/:kind/:id/edit',
+                    url: '/:kind/{id:int}/edit',
                     views: { 'content@': editView },
                     resolve: {
                         authSources: authSourcesResolver,
                         orgUnits: orgUnitsResolver,
                         id: idResolver,
-                        flows: flowResolver
+                        flows: flowResolver,
+                        flowDecorators: flowDecoratorsResolver,
+                        dataTypes: dataTypesResolver
                     }
                 });
         }

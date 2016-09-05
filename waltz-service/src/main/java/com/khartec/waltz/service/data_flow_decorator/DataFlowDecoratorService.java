@@ -71,6 +71,16 @@ public class DataFlowDecoratorService {
     }
 
 
+    public Collection<DataFlowDecorator> findBySelectorAndDecoratorEntity(IdSelectionOptions options,
+                                                                          EntityReference decoratorRef) {
+        checkNotNull(options, "options cannot be null");
+        checkNotNull(decoratorRef, "decoratorRef cannot be null");
+
+        Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
+        return dataFlowDecoratorDao.findBySelectorAndDecoratorEntity(selector, decoratorRef);
+    }
+
+
     // --- UPDATERS ---
 
     public int[] deleteDecorators(long flowId,

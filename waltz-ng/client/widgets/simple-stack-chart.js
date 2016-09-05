@@ -53,9 +53,6 @@ function controller($element) {
                 width - 30
             ]);
 
-        global.xs = xScale;
-        global.m = max;
-
         const coords = calculateLayoutData(values, xScale);
 
         svg.selectAll('.wssc-stack')

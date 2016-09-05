@@ -10,28 +10,14 @@
     </waltz-page-header>
 
 
+
     <waltz-section>
-
-        <div class="row">
-            <div class="col-md-8">
-                <waltz-source-and-target-graph entity-ref="ctrl.entityRef"
-                                               flows="ctrl.flows"
-                                               decorators="ctrl.dataFlowDecorators"
-                                               tweakers="ctrl.tweakers">
-                </waltz-source-and-target-graph>
-
-                <hr>
-
-                <button class="btn btn-primary" ng-click="ctrl.some()">Some</button>
-                <button class="btn btn-primary" ng-click="ctrl.all()">All</button>
-
-            </div>
-            <div class="col-md-4">
-                <pre>{{ ctrl.selected | json }}</pre>
-            </div>
-        </div>
-
-
+        <waltz-rated-flow-summary-panel apps="ctrl.apps"
+                                        entity-reference="ctrl.entityReference"
+                                        flow-data="ctrl.flowData"
+                                        on-load-detail="ctrl.loadFlowDetail">
+        </waltz-rated-flow-summary-panel>
     </waltz-section>
+
 
 </div>

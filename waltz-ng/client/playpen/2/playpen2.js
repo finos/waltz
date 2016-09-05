@@ -1,52 +1,47 @@
-import { loadDataFlowDecorators, loadDataFlows } from '../../applications/data-load';
-
 
 const initData = {
-
+    dataTypes: []
 };
 
 
-function controller($scope, flowStore, decoratorStore) {
+function controller(appStore, dataTypeService, dataFlowService) {
 
     const vm = Object.assign(this, initData);
 
     const entityRef = {
-        id: 6665,
-        kind: 'APPLICATION'
+        id: 260, // 50 FO, 260 FO - IT, 270 Eq IT
+        kind: 'ORG_UNIT'
     };
 
-    vm.entityRef = entityRef;
-
-    loadDataFlows(flowStore, entityRef.id, vm)
-        .then(() => vm.all());
-
-    loadDataFlowDecorators(decoratorStore, entityRef.id, vm)
-        ;
-
-    vm.tweakers = {
-        app: {
-            onSelect: (d) => { vm.selected = d; $scope.$apply(); }
-        },
-        type: {
-            onSelect: (d) => { vm.selected = d; $scope.$apply(); }
-        }
+    const selector = {
+        entityReference: entityRef,
+        scope: 'CHILDREN'
     };
 
-    vm.some = () => {
-        vm.dataFlows = _.filter(vm.flows, f => f.source.id % 2 == 0)
-    };
+    dataFlowService
+        .initialise(selector)
+        .then(flowData => vm.flowData = flowData);
 
-    vm.all = () => {
-        vm.dataFlows = vm.flows;
-    };
+    dataTypeService
+        .loadDataTypes()
+        .then(dts => vm.dataTypes = dts);
 
+    vm.loadFlowDetail = () => dataFlowService
+        .loadDetail()
+        .then(flowData => vm.flowData = flowData);
+
+    vm.entityReference = entityRef;
+
+    appStore
+        .findBySelector(selector)
+        .then(apps => vm.apps = apps);
 }
 
 
 controller.$inject = [
-    '$scope',
-    'DataFlowDataStore',
-    'DataFlowDecoratorStore'
+    'ApplicationStore',
+    'DataTypeService',
+    'DataFlowViewService'
 ];
 
 

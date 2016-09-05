@@ -12,22 +12,43 @@
 import _ from "lodash";
 
 
+function calculateUsedTypes(allTypes = [], decorators = []) {
+    const dataTypesById = _.keyBy(
+        allTypes,
+        "id");
+    return _.chain(decorators)
+        .map('decoratorEntity.id')
+        .uniq()
+        .map(id => dataTypesById[id])
+        .value();
+}
+
+
+function calculateUnusedTypes(allTypes = [], used =[]) {
+    const usedIds = _.map(used, 'id');
+    return _.reject(
+        allTypes,
+        t => _.includes(usedIds, t.id));
+}
+
+
 function editController($state,
                         authSources,
                         flows,
+                        flowDecorators,
                         orgUnits,
                         id,
                         authSourceStore,
                         notification,
-                        displayNameService) {
+                        dataTypes) {
+    const vm = this;
 
-    const dataTypes = displayNameService.toOptions('dataType');
-
-    const authSourcesByType = _.groupBy(authSources, 'dataType');
+    const authSourcesByCode = _.groupBy(authSources, 'dataType');
     const orgUnitsById = _.keyBy(orgUnits, 'id');
     const orgUnit = orgUnitsById[id];
-    const usedTypes = _.chain(flows).map('dataType').uniq().value();
-    const unusedTypes = _.chain(dataTypes).map('code').without(...usedTypes).value();
+
+    const usedDataTypes = calculateUsedTypes(dataTypes, flowDecorators);
+    const unusedDataTypes = calculateUnusedTypes(dataTypes, usedDataTypes);
 
     const wizard = {
         dataType: null,
@@ -35,15 +56,21 @@ function editController($state,
         rating: null
     };
 
-    function getSupplyingApps(dataType) {
-        const apps = _.chain(flows)
-            .filter(f => f.dataType === dataType)
-            .filter(f => f.source.kind === 'APPLICATION')
-            .map('source')
-            .uniqBy('id')
-            .value();
+    function getSupplyingApps(dataTypeCode) {
+        const dataTypesByCode = _.keyBy(
+            dataTypes,
+            "code");
+        const dataType = dataTypesByCode[dataTypeCode];
+        const flowsById = _.keyBy(flows, 'id');
 
-        return apps;
+        return _.chain(flowDecorators)
+            .filter(d => d.decoratorEntity.id == dataType.id)
+            .map('dataFlowId')
+            .uniq()
+            .map(id => flowsById[id])
+            .map(f => f.source)
+            .uniqBy(app => app.id)
+            .value();
     }
 
     function isDisabled() {
@@ -55,13 +82,6 @@ function editController($state,
         wizard.app = authSource.applicationReference;
         wizard.rating = authSource.rating;
     }
-
-    function resetWizard() {
-        wizard.dataType = null;
-        wizard.app = null;
-        wizard.rating = null;
-    }
-
 
     function refresh() {
         $state.reload();
@@ -76,8 +96,10 @@ function editController($state,
         if (existingAuthSource) {
             authSourceStore
                 .update(existingAuthSource.id, wizard.rating)
-                .then(() => existingAuthSource.rating = wizard.rating)
-                .then(() => resetWizard());
+                .then(
+                    () => notification.success('Authoritative Sources updated'),
+                    (e) => notification.error('Update failed, ' + e.data.message || e.statusText))
+                .then(refresh);
         } else {
             const insertRequest = {
                 kind: 'ORG_UNIT',
@@ -89,8 +111,8 @@ function editController($state,
             authSourceStore
                 .insert(insertRequest)
                 .then(
-                    () => notification.success('Authoritative Sources updated'),
-                    (e) => notification.error('Update failed, ' + e.data.message || e.statusText))
+                    () => notification.success('Authoritative Sources added'),
+                    (e) => notification.error('Add failed, ' + e.data.message || e.statusText))
                 .then(refresh);
         }
     }
@@ -104,7 +126,6 @@ function editController($state,
     }
 
 
-    const vm = this;
     Object.assign(vm, {
         authSources,
         flows,
@@ -112,9 +133,9 @@ function editController($state,
         id,
         orgUnit,
         orgUnitsById,
-        authSourcesByType,
-        usedTypes,
-        unusedTypes,
+        authSourcesByCode,
+        usedDataTypes,
+        unusedDataTypes,
 
         getSupplyingApps,
         isDisabled,
@@ -130,11 +151,12 @@ editController.$inject = [
     '$state',
     'authSources',
     'flows',
+    'flowDecorators',
     'orgUnits',
     'id',
     'AuthSourcesStore',
     'Notification',
-    'WaltzDisplayNameService'
+    'dataTypes'
 ];
 
 

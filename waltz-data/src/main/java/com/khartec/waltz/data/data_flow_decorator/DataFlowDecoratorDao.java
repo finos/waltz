@@ -1,5 +1,6 @@
 package com.khartec.waltz.data.data_flow_decorator;
 
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -104,6 +106,21 @@ public class DataFlowDecoratorDao {
     }
 
 
+    public Collection<DataFlowDecorator> findBySelectorAndDecoratorEntity(Select<Record1<Long>> appIdSelector,
+                                                                          EntityReference decoratorRef) {
+        Condition condition = DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorRef.kind().name())
+                .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(decoratorRef.id()))
+                .and(DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector));
+
+        return dsl.select(DATA_FLOW_DECORATOR.fields())
+                .from(DATA_FLOW_DECORATOR)
+                .innerJoin(DATA_FLOW)
+                .on(DATA_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID))
+                .where(dsl.renderInlined(condition))
+                .fetch(TO_DECORATOR_MAPPER);
+    }
+
+
     // --- STATS ---
 
     public List<DecoratorRatingSummary> summarizeForSelector(Select<Record1<Long>> selector) {
@@ -176,6 +193,12 @@ public class DataFlowDecoratorDao {
                 .collect(toList());
 
         return dsl.batchInsert(records).execute();
+    }
+
+
+    public int[] updateDecorators(Set<DataFlowDecorator> decorators) {
+        Set<DataFlowDecoratorRecord> records = SetUtilities.map(decorators, TO_RECORD);
+        return dsl.batchUpdate(records).execute();
     }
 
 

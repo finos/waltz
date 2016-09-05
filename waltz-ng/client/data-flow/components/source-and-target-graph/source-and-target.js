@@ -20,7 +20,7 @@ let redraw = null;
 
 
 function mkDfltTweaker(name) {
-    return (d) => console.log(name, d);
+    return (d) => console.log(name, d); // default tweaker
 }
 
 

@@ -2,20 +2,45 @@
 
 
 const initData = {
-
+    apps: [],
+    flowData: null
 };
 
 
 
-function controller($q) {
+function controller(appStore, flowService) {
 
     const vm = Object.assign(this, initData);
 
+    const entityReference = {
+        id: 260,
+        kind: 'ORG_UNIT'
+    };
+
+    const selector = {
+        entityReference,
+        scope: 'CHILDREN'
+    };
+
+    appStore
+        .findBySelector(selector)
+        .then(apps => vm.apps = apps);
+
+    flowService
+        .initialise(selector)
+        .then(fd => vm.flowData = fd);
+
+    vm.onLoadDetail = () => {
+        flowService
+            .loadDetail()
+            .then(fd => vm.flowData = fd);
+    };
 }
 
 
 controller.$inject = [
-    '$q'
+    'ApplicationStore',
+    'DataFlowViewService'
 ];
 
 

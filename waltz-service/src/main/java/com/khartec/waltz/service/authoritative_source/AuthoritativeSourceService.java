@@ -22,6 +22,11 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.authoritativesource.Rating;
+import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorRatingsService;
+import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
+import com.khartec.waltz.service.data_type.DataTypeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,14 +38,28 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 @Service
 public class AuthoritativeSourceService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AuthoritativeSourceService.class);
 
     private final AuthoritativeSourceDao authoritativeSourceDao;
+    private final DataFlowDecoratorRatingsService ratingService;
+    private final DataFlowDecoratorService decoratorService;
+    private final DataTypeService dataTypeService;
 
 
     @Autowired
-    public AuthoritativeSourceService(AuthoritativeSourceDao authoritativeSourceDao) {
+    public AuthoritativeSourceService(AuthoritativeSourceDao authoritativeSourceDao,
+                                      DataFlowDecoratorRatingsService ratingService,
+                                      DataFlowDecoratorService dataFlowDecoratorService,
+                                      DataTypeService dataTypeService) {
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao must not be null");
+        checkNotNull(ratingService, "ratingService cannot be null");
+        checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
+        checkNotNull(dataTypeService, "dataTypeService cannot be null");
+
         this.authoritativeSourceDao = authoritativeSourceDao;
+        this.ratingService = ratingService;
+        this.decoratorService = dataFlowDecoratorService;
+        this.dataTypeService = dataTypeService;
     }
 
 
@@ -65,17 +84,40 @@ public class AuthoritativeSourceService {
 
 
     public int update(long id, Rating rating) {
-        return authoritativeSourceDao.update(id, rating);
+        int updateCount = authoritativeSourceDao.update(id, rating);
+        AuthoritativeSource updatedAuthSource = getById(id);
+        ratingService.updateRatingsForAuthSource(updatedAuthSource.dataType(), updatedAuthSource.parentReference());
+        return updateCount;
     }
 
 
-    public int insert(EntityReference parentRef, String dataType, Long appId, Rating rating) {
-        return authoritativeSourceDao.insert(parentRef, dataType, appId, rating);
+    public int insert(EntityReference parentRef, String dataTypeCode, Long appId, Rating rating) {
+        int insertedCount = authoritativeSourceDao.insert(parentRef, dataTypeCode, appId, rating);
+        ratingService.updateRatingsForAuthSource(dataTypeCode, parentRef);
+        return insertedCount;
     }
 
 
     public int remove(long id) {
-        return authoritativeSourceDao.remove(id);
+        AuthoritativeSource authSourceToDelete = getById(id);
+        int deletedCount = authoritativeSourceDao.remove(id);
+        ratingService.updateRatingsForAuthSource(authSourceToDelete.dataType(), authSourceToDelete.parentReference());
+        return deletedCount;
+    }
+
+
+    public List<AuthoritativeSource> findAll() {
+        return authoritativeSourceDao.findAll();
+    }
+
+
+    public boolean recalculateAllFlowRatings() {
+        findAll()
+                .forEach(authSource -> ratingService.updateRatingsForAuthSource(
+                        authSource.dataType(),
+                        authSource.parentReference()));
+
+        return true;
     }
 
 }

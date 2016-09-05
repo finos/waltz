@@ -29,19 +29,23 @@ import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.post;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static spark.Spark.delete;
 
 
 @Service
 public class AuthoritativeSourceEndpoint implements Endpoint {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AuthoritativeSourceEndpoint.class);
     private static final String BASE_URL = mkPath("api", "authoritative-source");
 
     private final AuthoritativeSourceService authoritativeSourceService;
@@ -66,6 +70,13 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
 
     @Override
     public void register() {
+
+        String recalculateFlowRatingsPath = mkPath(BASE_URL, "recalculate-flow-ratings");
+
+        getForDatum(
+                recalculateFlowRatingsPath,
+                this:: recalculateFlowRatingsRoute);
+
         getForList(mkPath(BASE_URL, "kind", ":kind"), (request, response)
                 -> authoritativeSourceService.findByEntityKind(getKind(request)));
 
@@ -122,6 +133,16 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
             authoritativeSourceService.insert(parentRef, dataType, appId, rating);
             return "done";
         });
+    }
+
+
+    private boolean recalculateFlowRatingsRoute(Request request, Response response) {
+        requireRole(userRoleService, request, Role.ADMIN);
+
+        String username = getUsername(request);
+        LOG.info("Recalculating all flow ratings (requested by: {})", username);
+
+        return authoritativeSourceService.recalculateAllFlowRatings();
     }
 
 }

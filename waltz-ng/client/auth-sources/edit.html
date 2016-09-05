@@ -1,16 +1,22 @@
 <div>
-    <waltz-page-header name="Authoritative Source Editor" small="{{ ctrl.orgUnit.name }}">
+    <waltz-page-header name="Authoritative Source Editor"
+                       small="{{ ctrl.orgUnit.name }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.org-unit.view ({id: ctrl.orgUnit.id})">{{ ctrl.orgUnit.name }}</a></li>
+            <li>
+                <a ui-sref="main.org-unit.view ({id: ctrl.orgUnit.id})">
+                    {{ ctrl.orgUnit.name }}
+                </a>
+            </li>
             <li>Authoritative Source Editor</li>
         </ol>
     </waltz-page-header>
 
+    <!-- CURRENT -->
     <waltz-section name="Current Authoritative Sources">
 
         <div ng-if="ctrl.authSources.length > 0">
-            <div ng-repeat="(dataType, sources) in ctrl.authSourcesByType">
+            <div ng-repeat="(dataType, sources) in ctrl.authSourcesByCode">
                 <h4>{{ dataType | toDisplayName:'dataType' }}</h4>
                 <table class="table">
                     <colgroup>
@@ -25,16 +31,17 @@
                             <waltz-rating-indicator value="{{ source.rating }}">
                             </waltz-rating-indicator>
 
-                            <span class="text-muted">
-                                {{ source.rating | toDisplayName:'rating' }}
+                            <span class="text-muted"
+                                  ng-bind="source.rating | toDisplayName:'rating'">
                             </span>
                         </td>
                         <td>
-                            <a class="clickable" ng-click="ctrl.selectExisting(source)">
-                                {{ source.applicationReference.name }}
+                            <a class="clickable"
+                               ng-click="ctrl.selectExisting(source)"
+                               ng-bind="source.applicationReference.name">
                             </a>
                             <small class="text-muted">
-                                ( {{ source.appOrgUnitReference.name }} )
+                                ( <span ng-bind="source.appOrgUnitReference.name"></span> )
                             </small>
                         </td>
                         <td class="waltz-visibility-child-30">
@@ -49,49 +56,57 @@
         </div>
         <div ng-if="ctrl.authSources.length == 0">
             <div class="alert alert-warning">
-                <strong>No Authoritative Sources</strong> have been defined for {{ ctrl.unit.name }}.
+                <strong>No Authoritative Sources</strong> have been defined for
+                <span ng-bind="ctrl.orgUnit.name"></span>.
             </div>
         </div>
-
     </waltz-section>
 
+
+    <!-- EDIT/NEW -->
     <waltz-section name="Edit or Add New Authoritative Sources">
-
-
         <div>
-            <form name="editForm" ng-submit="ctrl.submit()">
+            <form name="editForm"
+                  ng-submit="ctrl.submit()">
                 <fieldset ng-disabled="editForm.$submitted">
                     <div>
                         <!-- STEP 1 -->
                         <span class="vertical-align">
-                            <waltz-step-count count="1" colour="#d6f3ff"></waltz-step-count>
+                            <waltz-step-count count="1"
+                                              colour="#d6f3ff"></waltz-step-count>
                             &nbsp;
-                            <span style="font-size: larger">Select a data type to update:</span>
+                            <span style="font-size: larger">Select a data type to update...</span>
                         </span>
 
                         <div class="row" style="margin-left: 25px">
                             <div class="col-md-6">
-                                From data types already used with this organisational unit:
+                                ...from data types already used with this organisational unit:
                                 <div style="margin-left: 25px; margin-top:10px">
-                                    <div ng-repeat="type in ctrl.usedTypes | orderBy" >
+                                    <div ng-repeat="type in ctrl.usedDataTypes | orderBy:'name'" >
                                         <input type="radio"
+                                               id="wased-used-{{type.id}}"
                                                name="dataType"
                                                ng-model="ctrl.wizard.dataType"
-                                               value="{{ type }}">
-                                        {{ type | toDisplayName:'dataType' }}
+                                               value="{{ type.code }}">
+                                        <label for="wased-used-{{type.id}}"
+                                               ng-bind="type.name">
+                                        </label>
                                     </div>
 
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                Or from data types that have yet to be used:
+                                ...or from data types that have yet to be used:
                                 <div style="margin-left: 25px; margin-top:10px">
-                                    <div ng-repeat="type in ctrl.unusedTypes | orderBy" >
+                                    <div ng-repeat="type in ctrl.unusedDataTypes | orderBy:'name'" >
                                         <input type="radio"
                                                name="dataType"
+                                               id="wased-unused-{{type.id}}"
                                                ng-model="ctrl.wizard.dataType"
-                                               value="{{ type }}">
-                                        {{ type | toDisplayName:'dataType' }}
+                                               value="{{ type.code }}">
+                                        <label for="wased-unused-{{type.id}}"
+                                               ng-bind="type.name">
+                                        </label>
                                     </div>
 
                                 </div>
@@ -106,13 +121,13 @@
                         <span class="vertical-align">
                             <waltz-step-count count="2" colour="#d6f3ff"></waltz-step-count>
                             &nbsp;
-                            <span style="font-size: large">Choose an application to rate as a source</span>
+                            <span style="font-size: large">Choose an application to rate as a source...</span>
                         </span>
 
                         <div class="row" style="margin-left: 25px;">
                             <div class="col-md-6">
-                                From applications which already provide this organisational unit with:
-                                <code>{{ ctrl.wizard.dataType | toDisplayName:'dataType' }}</code>
+                                ...from applications which already provide this organisational unit with:
+                                <code ng-bind="ctrl.wizard.dataType | toDisplayName:'dataType'"></code>
 
                                 <ul style="margin-top:10px">
                                    <li ng-repeat="app in ctrl.getSupplyingApps(ctrl.wizard.dataType)| orderBy:'name'">
@@ -120,11 +135,11 @@
                                           <a href
                                              ng-click="ctrl.wizard.app = app"
                                              ng-if="!editForm.$submitted">
-                                              {{ app.name }}
+                                              <span ng-bind="app.name"></span>
                                           </a>
                                            <span class="text-muted"
                                                  ng-if="editForm.$submitted">
-                                               {{ app.name }}
+                                               <span ng-bind="app.name"></span>
                                            </span>
                                        </span>
 
@@ -133,7 +148,7 @@
                             </div>
 
                             <div class="col-md-6">
-                                Or search for an application:
+                                ...or search for an application:
                                 <waltz-app-selector model="ctrl.wizard"></waltz-app-selector>
                             </div>
                         </div>
@@ -146,13 +161,19 @@
                         <span class="vertical-align">
                             <waltz-step-count count="3" colour="#d6f3ff"></waltz-step-count>
                             &nbsp;
-                            <span style="font-size: large">Rate {{ ctrl.wizard.app.name }} as a strategic source </span>
+                            <span style="font-size: large">
+                                Rate
+                                <span ng-bind="ctrl.wizard.app.name"></span>
+                                as a strategic source
+                            </span>
                         </span>
 
                         <div class="row" style="margin-left: 25px">
 
-                            Rate {{ ctrl.wizard.app.name }} as a strategic source for
-                            <code>{{ ctrl.wizard.dataType | toDisplayName:'dataType' }}</code>
+                            Rate
+                            <span ng-bind="ctrl.wizard.app.name"></span>
+                            as a strategic source for
+                            <code ng-bind="ctrl.wizard.dataType | toDisplayName:'dataType'"></code>
 
                             <div style="margin-left: 25px; margin-top:10px">
                                 <div>
@@ -175,15 +196,17 @@
 
                     <hr/>
                     <div>
-                        <input class='btn btn-success' type="submit" value="Submit" ng-disabled="ctrl.isDisabled()">
-                        <a ui-sref="main.org-unit.view ({id: ctrl.id})">Cancel</a>
+                        <input class='btn btn-success'
+                               type="submit"
+                               value="Submit"
+                               ng-disabled="ctrl.isDisabled()">
+                        <a ui-sref="main.org-unit.view ({id: ctrl.id})">
+                            Cancel
+                        </a>
                     </div>
                 </fieldset>
             </form>
         </div>
-
-
     </waltz-section>
-
 
 </div>

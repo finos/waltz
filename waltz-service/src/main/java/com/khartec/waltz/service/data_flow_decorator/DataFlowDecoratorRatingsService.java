@@ -1,10 +1,12 @@
 package com.khartec.waltz.service.data_flow_decorator;
 
+import com.khartec.waltz.common.SetUtilities;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_flow.DataFlowDao;
+import com.khartec.waltz.data.data_flow_decorator.DataFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.authoritativesource.Rating;
@@ -14,6 +16,10 @@ import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceResolver;
+import org.jooq.Record1;
+import org.jooq.Select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,32 +29,43 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.SetUtilities.fromCollection;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.model.utils.IdUtilities.indexById;
 
 @Service
 public class DataFlowDecoratorRatingsService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DataFlowDecoratorRatingsService.class);
+
     private final ApplicationService applicationService;
     private final AuthoritativeSourceDao authoritativeSourceDao;
     private final DataFlowDao dataFlowDao;
     private final DataTypeDao dataTypeDao;
+    private final DataFlowDecoratorDao dataFlowDecoratorDao;
+    private final ApplicationIdSelectorFactory selectorFactory;
 
 
     @Autowired
     public DataFlowDecoratorRatingsService(ApplicationService applicationService,
+                                           ApplicationIdSelectorFactory selectorFactory,
                                            AuthoritativeSourceDao authoritativeSourceDao,
-                                           DataFlowDao dataFlowDao, 
-                                           DataTypeDao dataTypeDao) {
+                                           DataFlowDao dataFlowDao,
+                                           DataTypeDao dataTypeDao,
+                                           DataFlowDecoratorDao dataFlowDecoratorDao) {
         checkNotNull(applicationService, "applicationService cannot be null");
+        checkNotNull(selectorFactory, "selectorFactory cannot be null");
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao cannot be null");
         checkNotNull(dataFlowDao, "dataFlowDao cannot be null");
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
+        checkNotNull(dataFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
 
         this.applicationService = applicationService;
+        this.selectorFactory = selectorFactory;
         this.authoritativeSourceDao = authoritativeSourceDao;
         this.dataFlowDao = dataFlowDao;
         this.dataTypeDao = dataTypeDao;
+        this.dataFlowDecoratorDao = dataFlowDecoratorDao;
     }
 
 
@@ -140,4 +157,54 @@ public class DataFlowDecoratorRatingsService {
         return resolver;
     }
 
+
+    public int[] updateRatingsForAuthSource(String dataTypeCode, EntityReference parentRef) {
+        DataType dataType = dataTypeDao.getByCode(dataTypeCode);
+
+        if (dataType == null) {
+            LOG.error("Cannot update ratings for data type code: {} for parent: {} as cannot find corresponding data type",
+                    dataTypeCode,
+                    parentRef);
+            return new int[0];
+        }
+
+        LOG.info("Updating ratings for auth source - dataType: {}, parent: {}",
+                dataType,
+                parentRef);
+
+        EntityReference decoratorRef = EntityReference.mkRef(
+                EntityKind.DATA_TYPE,
+                dataType.id().get());
+
+        IdSelectionOptions selectorOptions = ImmutableIdSelectionOptions.builder()
+                .entityReference(parentRef)
+                .scope(HierarchyQueryScope.CHILDREN)
+                .build();
+
+        Select<Record1<Long>> selector = selectorFactory.apply(selectorOptions);
+
+        Collection<DataFlowDecorator> impactedDecorators = dataFlowDecoratorDao.findBySelectorAndDecoratorEntity(
+                selector,
+                decoratorRef);
+
+        Collection<DataFlowDecorator> updatedDecorators = calculateRatings(impactedDecorators);
+
+        Set<DataFlowDecorator> modifiedDecorators = SetUtilities.minus(
+                fromCollection(updatedDecorators),
+                fromCollection(impactedDecorators));
+
+        LOG.info("Need to update {} ratings due to auth source change - dataType: {}, parent: {}",
+                modifiedDecorators.size(),
+                dataType,
+                parentRef);
+
+        return updateDecorators(modifiedDecorators);
+    }
+
+
+    public int[] updateDecorators(Set<DataFlowDecorator> decorators) {
+        checkNotNull(decorators, "decorators cannot be null");
+        if (decorators.isEmpty()) return new int[] {};
+        return dataFlowDecoratorDao.updateDecorators(decorators);
+    }
 }

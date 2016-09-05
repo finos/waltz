@@ -38,6 +38,7 @@ public abstract class EntityReference {
         return mkRef(kind, id, null);
     }
 
+
     public static EntityReference mkRef(EntityKind kind, long id, String name) {
         return ImmutableEntityReference.builder()
                 .kind(kind)

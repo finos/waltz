@@ -45,29 +45,6 @@
     </waltz-org-unit-overview>
 
 
-    <waltz-section>
-        <waltz-rated-flow-summary-panel apps="ctrl.viewData.apps"
-                                        entity-reference="ctrl.entityRef"
-                                        flow-data="ctrl.viewData.dataFlows"
-                                        on-load-detail="ctrl.loadFlowDetail">
-        </waltz-rated-flow-summary-panel>
-    </waltz-section>
-
-
-    <!-- COMPLEXITY -->
-    <waltz-complexity-section complexity="ctrl.viewData.complexity"
-                              apps="ctrl.viewData.apps">
-    </waltz-complexity-section>
-
-
-    <!-- PEOPLE -->
-    <waltz-involved-people-section
-        id="people-section"
-        involvements="ctrl.viewData.involvements"
-        source-data-ratings="ctrl.viewData.sourceDataRatings">
-    </waltz-involved-people-section>
-
-
     <!-- CAPABILITIES -->
     <waltz-rating-explorer-section applications="ctrl.viewData.apps"
                                    app-capabilities="ctrl.viewData.rawAppCapabilities"
@@ -166,6 +143,20 @@
             </uib-tab>
         </uib-tabset>
     </waltz-section>
+
+
+    <!-- COMPLEXITY -->
+    <waltz-complexity-section complexity="ctrl.viewData.complexity"
+                              apps="ctrl.viewData.apps">
+    </waltz-complexity-section>
+
+
+    <!-- PEOPLE -->
+    <waltz-involved-people-section
+        id="people-section"
+        involvements="ctrl.viewData.involvements"
+        source-data-ratings="ctrl.viewData.sourceDataRatings">
+    </waltz-involved-people-section>
 
 
     <!-- APPS -->

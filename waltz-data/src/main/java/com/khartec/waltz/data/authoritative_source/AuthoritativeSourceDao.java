@@ -202,4 +202,10 @@ public class AuthoritativeSourceDao {
                 .orderBy(ENTITY_HIERARCHY.ID, ENTITY_HIERARCHY.LEVEL)
                 .fetch(TO_VANTAGE_MAPPER);
     }
+
+
+    public List<AuthoritativeSource> findAll() {
+        return baseSelect()
+                .fetch(authSourceMapper);
+    }
 }
