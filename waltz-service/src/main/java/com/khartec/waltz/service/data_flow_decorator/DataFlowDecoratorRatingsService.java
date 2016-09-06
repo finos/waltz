@@ -43,7 +43,7 @@ public class DataFlowDecoratorRatingsService {
     private final DataFlowDao dataFlowDao;
     private final DataTypeDao dataTypeDao;
     private final DataFlowDecoratorDao dataFlowDecoratorDao;
-    private final ApplicationIdSelectorFactory selectorFactory;
+    private final ApplicationIdSelectorFactory appIdSelectorFactory;
 
 
     @Autowired
@@ -54,18 +54,62 @@ public class DataFlowDecoratorRatingsService {
                                            DataTypeDao dataTypeDao,
                                            DataFlowDecoratorDao dataFlowDecoratorDao) {
         checkNotNull(applicationService, "applicationService cannot be null");
-        checkNotNull(selectorFactory, "selectorFactory cannot be null");
+        checkNotNull(selectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao cannot be null");
         checkNotNull(dataFlowDao, "dataFlowDao cannot be null");
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
         checkNotNull(dataFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
 
         this.applicationService = applicationService;
-        this.selectorFactory = selectorFactory;
+        this.appIdSelectorFactory = selectorFactory;
         this.authoritativeSourceDao = authoritativeSourceDao;
         this.dataFlowDao = dataFlowDao;
         this.dataTypeDao = dataTypeDao;
         this.dataFlowDecoratorDao = dataFlowDecoratorDao;
+    }
+
+
+    public int[] updateRatingsForAuthSource(String dataTypeCode, EntityReference parentRef) {
+        DataType dataType = dataTypeDao.getByCode(dataTypeCode);
+
+        if (dataType == null) {
+            LOG.error("Cannot update ratings for data type code: {} for parent: {} as cannot find corresponding data type",
+                    dataTypeCode,
+                    parentRef);
+            return new int[0];
+        }
+
+        LOG.info("Updating ratings for auth source - dataType: {}, parent: {}",
+                dataType,
+                parentRef);
+
+        EntityReference decoratorRef = EntityReference.mkRef(
+                EntityKind.DATA_TYPE,
+                dataType.id().get());
+
+        IdSelectionOptions selectorOptions = ImmutableIdSelectionOptions.builder()
+                .entityReference(parentRef)
+                .scope(HierarchyQueryScope.CHILDREN)
+                .build();
+
+        Select<Record1<Long>> selector = appIdSelectorFactory.apply(selectorOptions);
+
+        Collection<DataFlowDecorator> impactedDecorators = dataFlowDecoratorDao.findBySelectorAndDecoratorEntity(
+                selector,
+                decoratorRef);
+
+        Collection<DataFlowDecorator> reRatedDecorators = calculateRatings(impactedDecorators);
+
+        Set<DataFlowDecorator> modifiedDecorators = SetUtilities.minus(
+                fromCollection(reRatedDecorators),
+                fromCollection(impactedDecorators));
+
+        LOG.info("Need to update {} ratings due to auth source change - dataType: {}, parent: {}",
+                modifiedDecorators.size(),
+                dataType,
+                parentRef);
+
+        return updateDecorators(modifiedDecorators);
     }
 
 
@@ -158,53 +202,10 @@ public class DataFlowDecoratorRatingsService {
     }
 
 
-    public int[] updateRatingsForAuthSource(String dataTypeCode, EntityReference parentRef) {
-        DataType dataType = dataTypeDao.getByCode(dataTypeCode);
-
-        if (dataType == null) {
-            LOG.error("Cannot update ratings for data type code: {} for parent: {} as cannot find corresponding data type",
-                    dataTypeCode,
-                    parentRef);
-            return new int[0];
-        }
-
-        LOG.info("Updating ratings for auth source - dataType: {}, parent: {}",
-                dataType,
-                parentRef);
-
-        EntityReference decoratorRef = EntityReference.mkRef(
-                EntityKind.DATA_TYPE,
-                dataType.id().get());
-
-        IdSelectionOptions selectorOptions = ImmutableIdSelectionOptions.builder()
-                .entityReference(parentRef)
-                .scope(HierarchyQueryScope.CHILDREN)
-                .build();
-
-        Select<Record1<Long>> selector = selectorFactory.apply(selectorOptions);
-
-        Collection<DataFlowDecorator> impactedDecorators = dataFlowDecoratorDao.findBySelectorAndDecoratorEntity(
-                selector,
-                decoratorRef);
-
-        Collection<DataFlowDecorator> updatedDecorators = calculateRatings(impactedDecorators);
-
-        Set<DataFlowDecorator> modifiedDecorators = SetUtilities.minus(
-                fromCollection(updatedDecorators),
-                fromCollection(impactedDecorators));
-
-        LOG.info("Need to update {} ratings due to auth source change - dataType: {}, parent: {}",
-                modifiedDecorators.size(),
-                dataType,
-                parentRef);
-
-        return updateDecorators(modifiedDecorators);
-    }
-
-
-    public int[] updateDecorators(Set<DataFlowDecorator> decorators) {
+    private int[] updateDecorators(Set<DataFlowDecorator> decorators) {
         checkNotNull(decorators, "decorators cannot be null");
         if (decorators.isEmpty()) return new int[] {};
         return dataFlowDecoratorDao.updateDecorators(decorators);
     }
+
 }

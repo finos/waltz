@@ -129,22 +129,24 @@
                                 ...from applications which already provide this organisational unit with:
                                 <code ng-bind="ctrl.wizard.dataType | toDisplayName:'dataType'"></code>
 
-                                <ul style="margin-top:10px">
-                                   <li ng-repeat="app in ctrl.getSupplyingApps(ctrl.wizard.dataType)| orderBy:'name'">
-                                       <span style="font-weight: {{ctrl.wizard.app == app ? 'bolder' : ''}}">
-                                          <a href
-                                             ng-click="ctrl.wizard.app = app"
-                                             ng-if="!editForm.$submitted">
-                                              <span ng-bind="app.name"></span>
-                                          </a>
-                                           <span class="text-muted"
-                                                 ng-if="editForm.$submitted">
-                                               <span ng-bind="app.name"></span>
+                                <div class="waltz-scroll-region" style="height: 300px">
+                                    <ul style="margin-top:10px">
+                                        <li ng-repeat="app in ctrl.getSupplyingApps(ctrl.wizard.dataType)| orderBy:'name'">
+                                           <span style="font-weight: {{ctrl.wizard.app == app ? 'bolder' : ''}}">
+                                              <a href
+                                                 ng-click="ctrl.wizard.app = app"
+                                                 ng-if="!editForm.$submitted">
+                                                  <span ng-bind="app.name"></span>
+                                              </a>
+                                               <span class="text-muted"
+                                                     ng-if="editForm.$submitted">
+                                                   <span ng-bind="app.name"></span>
+                                               </span>
                                            </span>
-                                       </span>
+                                        </li>
+                                    </ul>
+                                </div>
 
-                                   </li>
-                                </ul>
                             </div>
 
                             <div class="col-md-6">

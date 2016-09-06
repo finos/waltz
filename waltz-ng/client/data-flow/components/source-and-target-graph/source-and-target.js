@@ -277,11 +277,11 @@ function getColumnScaleRange(dimensions) {
 }
 
 
-function mkScale(apps, dimensions) {
+function mkScale(items, dimensions) {
     return d3
         .scale
         .ordinal()
-        .domain(_.chain(apps)
+        .domain(_.chain(items)
             .sortBy(a => a.name.toLowerCase())
             .map('id')
             .value())
