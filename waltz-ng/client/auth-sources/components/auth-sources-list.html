@@ -1,0 +1,37 @@
+<div>
+    <table class="table table-condensed">
+        <thead>
+        <tr>
+            <th>Declaring entity</th>
+            <th>Application</th>
+            <th>Data Type</th>
+            <th>Rating</th>
+        </tr>
+        </thead>
+        <tbody ng-repeat="group in $ctrl.authSourcesGroupedByOrgUnit">
+            <tr ng-repeat="authSource in group.authSources">
+                <td>
+                    <a ng-if="$first"
+                       ng-bind="group.orgUnit.name"
+                       ui-sref="main.org-unit.view( { id: group.orgUnit.id })">
+                    </a>
+                </td>
+                <td>
+                    <a ng-bind="authSource.applicationReference.name"
+                       ui-sref="main.app.view( { id: authSource.applicationReference.id })">
+                    </a>
+                </td>
+                <td>
+                    <a ng-bind="authSource.dataType | toDisplayName:'dataType'"
+                        ui-sref="main.data-type.code ({ code: authSource.dataType })">
+
+                    </a>
+                </td>
+                <td>
+                    <waltz-rating-indicator value="{{authSource.rating}}"></waltz-rating-indicator>
+                    <span ng-bind="authSource.rating | toDisplayName:'rating'"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

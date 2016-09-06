@@ -28,6 +28,7 @@ import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.user.UserRoleService;
+import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,10 +73,18 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
     public void register() {
 
         String recalculateFlowRatingsPath = mkPath(BASE_URL, "recalculate-flow-ratings");
+        String findByDataTypeIdSelectPath = mkPath(BASE_URL, "data-type");
+
+        ListRoute<AuthoritativeSource> findByDataTypeIdSelectorRoute = (request, response)
+                -> authoritativeSourceService.findByDataTypeIdSelector(readIdSelectionOptionsFromBody(request));
 
         getForDatum(
                 recalculateFlowRatingsPath,
                 this:: recalculateFlowRatingsRoute);
+
+        postForList(
+                findByDataTypeIdSelectPath,
+                findByDataTypeIdSelectorRoute);
 
         getForList(mkPath(BASE_URL, "kind", ":kind"), (request, response)
                 -> authoritativeSourceService.findByEntityKind(getKind(request)));

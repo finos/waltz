@@ -27,8 +27,9 @@ function service($q,
                  techStatsService,
                  bookmarkStore,
                  sourceDataRatingStore,
-                 dataTypeUsageStore
-                 // sourceSinkStore
+                 dataTypeUsageStore,
+                 authSourcesStore,
+                 orgUnitStore
 ) {
 
     const rawData = {};
@@ -49,11 +50,9 @@ function service($q,
             dataTypeService.loadDataTypes(),
             appStore.findBySelector(dataTypeIdSelector),
             dataFlowStore.findByDataTypeIdSelector(dataTypeIdSelector),
-            // dataFlowStore.calculateStatsForDataType(dataTypeIdSelector),
             changeLogStore.findByEntityReference('DATA_TYPE', dataTypeId),
             assetCostViewService.initialise(dataTypeIdSelector, 2016),
             dataTypeUsageStore.findUsageStatsForDataTypeSelector(dataTypeIdSelector)
-        // sourceSinkStore.findByDataTypeSelector(dataTypeIdSelector)
         ];
 
         return $q.all(promises)
@@ -61,11 +60,9 @@ function service($q,
                 dataTypes,
                 apps,
                 dataFlows,
-                // dataFlowTallies,
                 changeLogs,
                 assetCostData,
                 usageStats
-                // sourceSinks
             ]) => {
 
                 const appsWithManagement = _.map(apps, a => _.assign(a, {management: 'IT'}));
@@ -74,11 +71,9 @@ function service($q,
                     dataTypes,
                     apps: appsWithManagement,
                     dataFlows,
-                    // dataFlowTallies,
                     changeLogs,
                     assetCostData,
                     usageStats
-                    // sourceSinks
                 };
 
                 Object.assign(rawData, r);
@@ -135,10 +130,17 @@ function service($q,
                 Object.assign(rawData, r);
 
                 rawData.dataType = _.find(rawData.dataTypes, { id: dataTypeId });
-                // rawData.ratedFlows = new RatedFlowsData(rawData.ratedDataFlows, rawData.apps, rawData.orgUnits, dataTypeId);
 
                 return rawData;
             });
+
+        authSourcesStore
+            .findByDataTypeIdSelector(selector)
+            .then(authSources => rawData.authSources = authSources)
+            .then(authSources => _.chain(authSources).map('parentReference.id').uniq().value() )
+            .then(orgUnitStore.findByIds)
+            .then(orgUnits => rawData.orgUnits = orgUnits);
+
 
         return prepareRawDataPromise;
     }
@@ -173,8 +175,9 @@ service.$inject = [
     'TechnologyStatisticsService',
     'BookmarkStore',
     'SourceDataRatingStore',
-    'DataTypeUsageStore'
-    // 'SourceSinkStore'
+    'DataTypeUsageStore',
+    'AuthSourcesStore',
+    'OrgUnitStore'
 ];
 
 

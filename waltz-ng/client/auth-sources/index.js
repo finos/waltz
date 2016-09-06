@@ -17,17 +17,21 @@ import {
     idResolver,
     orgUnitsResolver,
     dataTypesResolver,
-    flowDecoratorsResolver } from './resolvers';
-
-import editView from './edit';
+    flowDecoratorsResolver
+} from "./resolvers";
+import editView from "./edit";
 
 
 export default (module) => {
 
     require('./directives')(module);
 
-    module.service('AuthSourcesStore', require('./services/auth-sources-store'));
-    module.service('AuthSourcesCalculator', require('./services/auth-sources-calculator'));
+    module
+        .service('AuthSourcesStore', require('./services/auth-sources-store'))
+        .service('AuthSourcesCalculator', require('./services/auth-sources-calculator'));
+
+    module
+        .component('waltzAuthSourcesList', require('./components/auth-sources-list'));
 
     module.config([
         '$stateProvider',

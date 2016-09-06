@@ -4,12 +4,12 @@ const initData = {
 };
 
 
-function controller(appStore, dataTypeService, dataTypeUsageStore) {
+function controller(appStore, dataTypeService, dataTypeUsageStore, authSourcesStore, orgUnitStore) {
 
     const vm = Object.assign(this, initData);
 
     const entityRef = {
-        id: 5000,
+        id: 6000,
         kind: 'DATA_TYPE'
     };
 
@@ -20,9 +20,12 @@ function controller(appStore, dataTypeService, dataTypeUsageStore) {
 
     vm.entityReference = entityRef;
 
-    dataTypeUsageStore
-        .findUsageStatsForDataTypeSelector(selector)
-        .then(usageStats => vm.usageStats = usageStats);
+    authSourcesStore
+        .findByDataTypeIdSelector(selector)
+        .then(authSources => vm.authSources = authSources)
+        .then(authSources => _.chain(authSources).map('parentReference.id').uniq().value() )
+        .then(orgUnitStore.findByIds)
+        .then(orgUnits => vm.orgUnits = orgUnits);
 
 }
 
@@ -30,7 +33,9 @@ function controller(appStore, dataTypeService, dataTypeUsageStore) {
 controller.$inject = [
     'ApplicationStore',
     'DataTypeService',
-    'DataTypeUsageStore'
+    'DataTypeUsageStore',
+    'AuthSourcesStore',
+    'OrgUnitStore'
 ];
 
 
