@@ -17,12 +17,12 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceCalculator;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.Map;
+import java.util.List;
 
 
 public class AuthSourceHarness {
@@ -33,44 +33,9 @@ public class AuthSourceHarness {
     public static void main(String[] args) {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        AuthoritativeSourceCalculator authoritativeSourceCalculator = ctx.getBean(AuthoritativeSourceCalculator.class);
+        AuthoritativeSourceDao dao = ctx.getBean(AuthoritativeSourceDao.class);
 
-        long CTO_OFFICE = 40;
-        long CTO_ADMIN = 400;
-        long CEO_OFFICE = 10;
-        long CIO_OFFICE = 20;
-        long MARKET_RISK = 220;
-        long CREDIT_RISK = 230;
-        long OPERATIONS_IT = 200;
-        long RISK = 210;
-
-        long orgUnitId = CIO_OFFICE;
-
-        authoritativeSourceCalculator.calculateAuthSourcesForOrgUnitTree(orgUnitId);
-
-        long st = System.currentTimeMillis();
-        for (int i = 0 ; i < 100; i ++ ) {
-            authoritativeSourceCalculator.calculateAuthSourcesForOrgUnitTree(orgUnitId);
-        }
-        long end = System.currentTimeMillis();
-
-        System.out.println("DUR " + (end - st));
-        Map<Long, Map<String, Map<Long, AuthoritativeSource>>> rulesByOrgId = authoritativeSourceCalculator.calculateAuthSourcesForOrgUnitTree(orgUnitId);
-
-        System.out.println("--CIO---");
-        AuthoritativeSourceCalculator.prettyPrint(rulesByOrgId.get(CIO_OFFICE));
-
-        System.out.println("--RISK---");
-        AuthoritativeSourceCalculator.prettyPrint(rulesByOrgId.get(RISK));
-
-        System.out.println("--MARKETRISK---");
-        AuthoritativeSourceCalculator.prettyPrint(rulesByOrgId.get(MARKET_RISK));
-
-        System.out.println("--OPS---");
-        AuthoritativeSourceCalculator.prettyPrint(rulesByOrgId.get(OPERATIONS_IT));
-
-        System.out.println("--CREDIT RISK---");
-        AuthoritativeSourceCalculator.prettyPrint(rulesByOrgId.get(CREDIT_RISK));
+        List<AuthoritativeSource> all = dao.findAll();
 
     }
 

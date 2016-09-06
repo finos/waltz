@@ -23,10 +23,8 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.authoritativesource.*;
 import com.khartec.waltz.schema.tables.records.AuthoritativeSourceRecord;
 import com.khartec.waltz.schema.tables.records.EntityHierarchyRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
-import org.jooq.SelectOnConditionStep;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -36,6 +34,7 @@ import java.util.Set;
 import static com.khartec.waltz.common.Checks.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
+import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
@@ -46,7 +45,7 @@ public class AuthoritativeSourceDao {
 
     private final DSLContext dsl;
 
-    private final RecordMapper<Record, AuthoritativeSource> authSourceMapper = r -> {
+    private static final RecordMapper<Record, AuthoritativeSource> TO_AUTH_SOURCE_MAPPER = r -> {
         AuthoritativeSourceRecord record = r.into(AuthoritativeSourceRecord.class);
 
         EntityReference parentRef = ImmutableEntityReference.builder()
@@ -78,7 +77,7 @@ public class AuthoritativeSourceDao {
     };
 
 
-    private final RecordMapper<Record, AuthoritativeRatingVantagePoint> TO_VANTAGE_MAPPER = r -> {
+    private static final RecordMapper<Record, AuthoritativeRatingVantagePoint> TO_VANTAGE_MAPPER = r -> {
         AuthoritativeSourceRecord authRecord = r.into(AuthoritativeSourceRecord.class);
         EntityHierarchyRecord entityHierarchyRecord = r.into(EntityHierarchyRecord.class);
 
@@ -107,7 +106,7 @@ public class AuthoritativeSourceDao {
         
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(kind.name()))
-                .fetch(authSourceMapper);
+                .fetch(TO_AUTH_SOURCE_MAPPER);
     }
 
 
@@ -118,7 +117,7 @@ public class AuthoritativeSourceDao {
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(ref.kind().name()))
                 .and(AUTHORITATIVE_SOURCE.PARENT_ID.eq(ref.id()))
-                .fetch(authSourceMapper);
+                .fetch(TO_AUTH_SOURCE_MAPPER);
     }
 
 
@@ -137,7 +136,7 @@ public class AuthoritativeSourceDao {
         
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.APPLICATION_ID.eq(applicationId))
-                .fetch(authSourceMapper);
+                .fetch(TO_AUTH_SOURCE_MAPPER);
     }
 
 
@@ -177,7 +176,7 @@ public class AuthoritativeSourceDao {
     public AuthoritativeSource getById(long id) {
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.ID.eq(id))
-                .fetchOne(authSourceMapper);
+                .fetchOne(TO_AUTH_SOURCE_MAPPER);
     }
 
 
@@ -185,7 +184,7 @@ public class AuthoritativeSourceDao {
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(kind.name()))
                 .and(AUTHORITATIVE_SOURCE.PARENT_ID.in(ids))
-                .fetch(authSourceMapper);
+                .fetch(TO_AUTH_SOURCE_MAPPER);
     }
 
 
@@ -206,6 +205,19 @@ public class AuthoritativeSourceDao {
 
     public List<AuthoritativeSource> findAll() {
         return baseSelect()
-                .fetch(authSourceMapper);
+                .fetch(TO_AUTH_SOURCE_MAPPER);
     }
+
+
+    public List<AuthoritativeSource> findByDataTypeIdSelector(Select<Record1<Long>> selector) {
+        SelectConditionStep<Record1<String>> codeSelector = DSL
+                .select(DATA_TYPE.CODE)
+                .from(DATA_TYPE)
+                .where(DATA_TYPE.ID.in(selector));
+
+        return baseSelect()
+                .where(AUTHORITATIVE_SOURCE.DATA_TYPE.in(codeSelector))
+                .fetch(TO_AUTH_SOURCE_MAPPER);
+    }
+
 }

@@ -34,12 +34,21 @@
     </waltz-data-type-flows-tabgroup-section>
 
 
-    <!-- SOURCES AND SINKS -->
-    <waltz-source-sink-section source-sinks="ctrl.viewData.sourceSinks"
-                               ratings="ctrl.viewData.sourceDataRatings">
+    <!-- AUTH SOURCES -->
+    <waltz-section name="Authoritative Sources"
+                   icon="shield">
+        <waltz-auth-sources-list auth-sources="ctrl.viewData.authSources"
+                                 org-units="ctrl.viewData.orgUnits"
+                                 ng-if="ctrl.viewData.authSources.length > 0">
+        </waltz-auth-sources-list>
 
-    </waltz-source-sink-section>
-
+        <div class="alert alert-warning"
+             ng-if="ctrl.viewData.authSources.length === 0">
+            <strong>
+                No Authoritative Sources declared by any Organisational Units
+            </strong>
+        </div>
+    </waltz-section>
 
     <!-- INDICATORS -->
     <waltz-entity-statistic-summary-section name="Indicators"

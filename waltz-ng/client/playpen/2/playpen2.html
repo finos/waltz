@@ -13,10 +13,14 @@
 
     <waltz-section>
 
-        <pre>{{ ctrl.usageStats }}</pre>
+        <pre>{{ ctrl.orgUnits}}</pre>
 
-        <waltz-data-type-usage-stat-table stats="ctrl.usageStats">
-        </waltz-data-type-usage-stat-table>
+
+        <waltz-auth-sources-list
+            auth-sources="ctrl.authSources"
+            org-units="ctrl.orgUnits">
+        </waltz-auth-sources-list>
+
     </waltz-section>
 
 

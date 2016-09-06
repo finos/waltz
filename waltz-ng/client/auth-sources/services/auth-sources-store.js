@@ -11,6 +11,8 @@
  *
  */
 
+import {checkIsIdSelector} from "../../common/checks";
+
 
 const service = (http, root) => {
 
@@ -32,6 +34,13 @@ const service = (http, root) => {
             .then(result => result.data);
 
 
+    const findByDataTypeIdSelector = (selector) => {
+        checkIsIdSelector(selector);
+        return http.post(`${BASE}/data-type`, selector)
+            .then(result => result.data);
+    };
+
+
     const update = (id, newRating) =>
         http.post(`${BASE}/id/${id}`, newRating);
 
@@ -51,6 +60,7 @@ const service = (http, root) => {
         findByKind,
         findByReference,
         findByApp,
+        findByDataTypeIdSelector,
         update,
         insert,
         remove

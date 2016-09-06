@@ -18,13 +18,17 @@
 package com.khartec.waltz.service.authoritative_source;
 
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
+import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.authoritativesource.Rating;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorRatingsService;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.data_type.DataTypeService;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,22 +48,26 @@ public class AuthoritativeSourceService {
     private final DataFlowDecoratorRatingsService ratingService;
     private final DataFlowDecoratorService decoratorService;
     private final DataTypeService dataTypeService;
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
 
 
     @Autowired
     public AuthoritativeSourceService(AuthoritativeSourceDao authoritativeSourceDao,
                                       DataFlowDecoratorRatingsService ratingService,
                                       DataFlowDecoratorService dataFlowDecoratorService,
-                                      DataTypeService dataTypeService) {
+                                      DataTypeService dataTypeService,
+                                      DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao must not be null");
         checkNotNull(ratingService, "ratingService cannot be null");
         checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
+        checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
 
         this.authoritativeSourceDao = authoritativeSourceDao;
         this.ratingService = ratingService;
         this.decoratorService = dataFlowDecoratorService;
         this.dataTypeService = dataTypeService;
+        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
     }
 
 
@@ -120,4 +128,9 @@ public class AuthoritativeSourceService {
         return true;
     }
 
+
+    public List<AuthoritativeSource> findByDataTypeIdSelector(IdSelectionOptions idSelectionOptions) {
+        Select<Record1<Long>> selector = dataTypeIdSelectorFactory.apply(idSelectionOptions);
+        return authoritativeSourceDao.findByDataTypeIdSelector(selector);
+    }
 }
