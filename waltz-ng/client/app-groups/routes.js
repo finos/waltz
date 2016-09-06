@@ -7,13 +7,13 @@ const baseState = {
 
 
 const viewState = {
-    url: '/:id',
+    url: '/{id:int}',
     views: { 'content@': require('./app-group-view') }
 };
 
 
 const editState = {
-    url: '/:id/edit',
+    url: '/{id:int}/edit',
     views: { 'content@': require('./app-group-edit') }
 };
 
