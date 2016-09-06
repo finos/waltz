@@ -1,4 +1,4 @@
-import {checkIsApplicationIdSelector, checkIsEntityRef} from "../../common/checks";
+import {checkIsIdSelector, checkIsEntityRef} from "../../common/checks";
 
 
 function service($http,
@@ -10,12 +10,26 @@ function service($http,
         .get(`${BASE}/entity/${kind}/${id}`)
         .then(result => result.data);
 
-    const findForDataType = (type) => $http
-        .get(`${BASE}/type/${type}`)
-        .then(result => result.data);
+    const findForDataTypeSelector = (selector) => {
+        checkIsIdSelector(selector);
+        return $http
+            .post(`${BASE}/type/`, selector)
+            .then(result => result.data);
+    }
+
+    /**
+     * returns tallies by usage-kind
+     * @param selector
+     */
+    const findUsageStatsForDataTypeSelector = (selector) => {
+        checkIsIdSelector(selector);
+        return $http
+            .post(`${BASE}/type/stats`, selector)
+            .then(result => result.data);
+    }
 
     const findForSelector = (selector) => {
-        checkIsApplicationIdSelector(selector);
+        checkIsIdSelector(selector);
         return $http
             .post(`${BASE}/selector`, selector)
             .then(result => result.data);
@@ -31,7 +45,8 @@ function service($http,
 
     return {
         findForEntity,
-        findForDataType,
+        findForDataTypeSelector,
+        findUsageStatsForDataTypeSelector,
         findForSelector,
         save
     };

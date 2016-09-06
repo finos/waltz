@@ -20,15 +20,12 @@
                     </div>
 
                     <div class="col-sm-4">
-                        <waltz-basic-info-tile waltz-jump-to="dataflows-section"
-                                               icon="random"
-                                               name="Logical Data Flows">
+                        <waltz-basic-info-tile waltz-jump-to="data-type-usage-section"
+                                               icon="crosshairs"
+                                               name="Data Type Usage">
                             <br>
-                            <waltz-flow-cloud-diagram
-                                width="220"
-                                height="220"
-                                stats="$ctrl.flows">
-                            </waltz-flow-cloud-diagram>
+                            <waltz-data-type-usage-stat-table stats="$ctrl.usageStats">
+                            </waltz-data-type-usage-stat-table>
                         </waltz-basic-info-tile>
                     </div>
                 </div>
@@ -86,8 +83,8 @@
                  ng-if="$ctrl.parents.length > 0 || $ctrl.dataType.children.length > 0"
                  style="padding: 1em">
 
-                <div class="col-sm-4">
-
+                <div class="col-sm-4"
+                     ng-if="$ctrl.parents.length > 0">
                     <h4>Parent dataTypes: </h4>
                     <ul>
                         <li ng-repeat="parent in $ctrl.parents">
