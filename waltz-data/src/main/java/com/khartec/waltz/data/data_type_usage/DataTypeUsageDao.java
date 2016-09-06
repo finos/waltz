@@ -1,16 +1,18 @@
 package com.khartec.waltz.data.data_type_usage;
 
-import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
 import com.khartec.waltz.model.data_type_usage.ImmutableDataTypeUsage;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.usage_info.ImmutableUsageInfo;
 import com.khartec.waltz.model.usage_info.UsageInfo;
 import com.khartec.waltz.model.usage_info.UsageKind;
 import com.khartec.waltz.schema.tables.records.DataTypeUsageRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.limit;
+import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
 
 @Repository
@@ -97,9 +100,27 @@ public class DataTypeUsageDao {
     }
 
 
-    public List<DataTypeUsage> findForDataType(String dataTypeCode) {
-        Checks.checkNotEmptyString(dataTypeCode, "dataTypeCode cannot be empty");
-        return findByCondition(DATA_TYPE_USAGE.DATA_TYPE_CODE.eq(dataTypeCode));
+    public List<Tally<String>> findUsageStatsForDataTypeSelector(Select<Record1<Long>> dataTypeIdSelector) {
+        SelectConditionStep<Record1<String>> codeSelector = DSL.select(DATA_TYPE.CODE)
+                .from(DATA_TYPE)
+                .where(DATA_TYPE.ID.in(dataTypeIdSelector));
+
+        return dsl.select(DATA_TYPE_USAGE.USAGE_KIND, DSL.count())
+                .from(DATA_TYPE_USAGE)
+                .where(DATA_TYPE_USAGE.DATA_TYPE_CODE.in(codeSelector))
+                .groupBy(DATA_TYPE_USAGE.USAGE_KIND)
+                .fetch(JooqUtilities.TO_STRING_TALLY);
+    }
+
+
+    public List<DataTypeUsage> findForDataTypeSelector(Select<Record1<Long>> dataTypeIdSelector) {
+        checkNotNull(dataTypeIdSelector, "dataTypeIdSelector cannot be null");
+
+        SelectConditionStep<Record1<String>> codeSelector = DSL.select(DATA_TYPE.CODE)
+                .from(DATA_TYPE)
+                .where(DATA_TYPE.ID.in(dataTypeIdSelector));
+
+        return findByCondition(DATA_TYPE_USAGE.DATA_TYPE_CODE.in(codeSelector));
     }
 
 

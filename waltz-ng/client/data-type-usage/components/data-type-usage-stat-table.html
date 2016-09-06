@@ -1,0 +1,18 @@
+<table class="small table table-condensed">
+    <thead>
+    <tr>
+        <th>Usage Kind</th>
+        <th>Count</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="stat in $ctrl.stats | orderBy:'id'">
+        <td>
+            <span ng-bind="stat.id | toDisplayName:'usageKind'"></span>
+        </td>
+        <td>
+            <span ng-bind="stat.count"></span>
+        </td>
+    </tr>
+    </tbody>
+</table>

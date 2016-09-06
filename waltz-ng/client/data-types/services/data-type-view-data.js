@@ -27,6 +27,7 @@ function service($q,
                  techStatsService,
                  bookmarkStore,
                  sourceDataRatingStore,
+                 dataTypeUsageStore
                  // sourceSinkStore
 ) {
 
@@ -51,7 +52,8 @@ function service($q,
             // dataFlowStore.calculateStatsForDataType(dataTypeIdSelector),
             changeLogStore.findByEntityReference('DATA_TYPE', dataTypeId),
             assetCostViewService.initialise(dataTypeIdSelector, 2016),
-            // sourceSinkStore.findByDataTypeSelector(dataTypeIdSelector)
+            dataTypeUsageStore.findUsageStatsForDataTypeSelector(dataTypeIdSelector)
+        // sourceSinkStore.findByDataTypeSelector(dataTypeIdSelector)
         ];
 
         return $q.all(promises)
@@ -62,6 +64,7 @@ function service($q,
                 // dataFlowTallies,
                 changeLogs,
                 assetCostData,
+                usageStats
                 // sourceSinks
             ]) => {
 
@@ -74,6 +77,7 @@ function service($q,
                     // dataFlowTallies,
                     changeLogs,
                     assetCostData,
+                    usageStats
                     // sourceSinks
                 };
 
@@ -169,6 +173,7 @@ service.$inject = [
     'TechnologyStatisticsService',
     'BookmarkStore',
     'SourceDataRatingStore',
+    'DataTypeUsageStore'
     // 'SourceSinkStore'
 ];
 

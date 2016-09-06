@@ -4,13 +4,13 @@ const initData = {
 };
 
 
-function controller(appStore, dataTypeService, dataFlowService) {
+function controller(appStore, dataTypeService, dataTypeUsageStore) {
 
     const vm = Object.assign(this, initData);
 
     const entityRef = {
-        id: 260, // 50 FO, 260 FO - IT, 270 Eq IT
-        kind: 'ORG_UNIT'
+        id: 5000,
+        kind: 'DATA_TYPE'
     };
 
     const selector = {
@@ -18,30 +18,19 @@ function controller(appStore, dataTypeService, dataFlowService) {
         scope: 'CHILDREN'
     };
 
-    dataFlowService
-        .initialise(selector)
-        .then(flowData => vm.flowData = flowData);
-
-    dataTypeService
-        .loadDataTypes()
-        .then(dts => vm.dataTypes = dts);
-
-    vm.loadFlowDetail = () => dataFlowService
-        .loadDetail()
-        .then(flowData => vm.flowData = flowData);
-
     vm.entityReference = entityRef;
 
-    appStore
-        .findBySelector(selector)
-        .then(apps => vm.apps = apps);
+    dataTypeUsageStore
+        .findUsageStatsForDataTypeSelector(selector)
+        .then(usageStats => vm.usageStats = usageStats);
+
 }
 
 
 controller.$inject = [
     'ApplicationStore',
     'DataTypeService',
-    'DataFlowViewService'
+    'DataTypeUsageStore'
 ];
 
 

@@ -8,6 +8,7 @@ import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
 import com.khartec.waltz.model.system.SystemChangeSet;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.usage_info.UsageInfo;
 import com.khartec.waltz.model.usage_info.UsageKind;
 import com.khartec.waltz.model.user.Role;
@@ -55,18 +56,23 @@ public class DataTypeUsageEndpoint implements Endpoint {
     public void register() {
 
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
-        String findForDataTypePath = mkPath(BASE_URL, "type", ":type");
+        String findForDataTypeSelectorPath = mkPath(BASE_URL, "type");
+        String findUsageStatsForDataTypeSelectorPath = mkPath(BASE_URL, "type", "stats");
+
         String findForSelectorPath = mkPath(BASE_URL, "selector");
         String savePath = mkPath(BASE_URL, "entity", ":kind", ":id", ":type");
 
         ListRoute<DataTypeUsage> findForEntityRoute = (request, response)
                 -> dataTypeUsageService.findForEntity(getEntityReference(request));
 
-        ListRoute<DataTypeUsage> findForDataTypeRoute = (request, response)
-                -> dataTypeUsageService.findForDataType(request.params("type"));
+        ListRoute<DataTypeUsage> findForDataTypeSelectorRoute = (request, response)
+                -> dataTypeUsageService.findForDataTypeSelector(readIdSelectionOptionsFromBody(request));
+
+        ListRoute<Tally<String>> findUsageStatsForDataTypeSelectorRoute = (request, response)
+                -> dataTypeUsageService.findUsageStatsForDataTypeSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<DataTypeUsage> findForSelectorRoute = (request, response)
-                -> dataTypeUsageService.findForIdSelector(EntityKind.APPLICATION, readIdSelectionOptionsFromBody(request));
+                -> dataTypeUsageService.findForAppIdSelector(EntityKind.APPLICATION, readIdSelectionOptionsFromBody(request));
 
         ListRoute<DataTypeUsage> saveRoute = (request, response)
                 -> {
@@ -85,7 +91,8 @@ public class DataTypeUsageEndpoint implements Endpoint {
         };
 
         getForList(findForEntityPath, findForEntityRoute);
-        getForList(findForDataTypePath, findForDataTypeRoute);
+        postForList(findForDataTypeSelectorPath, findForDataTypeSelectorRoute);
+        postForList(findUsageStatsForDataTypeSelectorPath, findUsageStatsForDataTypeSelectorRoute);
         postForList(findForSelectorPath, findForSelectorRoute);
         postForList(savePath, saveRoute);
     }

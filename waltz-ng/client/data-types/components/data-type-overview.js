@@ -16,6 +16,7 @@ import {calcComplexitySummary} from "../../complexity/services/complexity-utilit
 import {findNode, getParents} from "../../common";
 import {prepareDataTypeTree} from "../utilities";
 
+
 const bindings = {
     dataTypeId: '<',
     allDataTypes: '<',
@@ -25,7 +26,8 @@ const bindings = {
     costs: '<',
     serverStats: '<',
     complexity: '<',
-    dataFlowTallies: '<'
+    dataFlowTallies: '<',
+    usageStats: '<'
 };
 
 

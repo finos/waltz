@@ -22,12 +22,16 @@ export const checkIsStringList = xs =>
     check(myApiCheck.arrayOf(apiCheck.string), xs);
 
 
+/* @Deprecated - use checkIsIdSelector instead */
 export const checkIsApplicationIdSelector = opt =>
     check(
         myApiCheck.shape({
             entityReference: myApiCheck.shape(entityRefShape),
             scope: myApiCheck.oneOf(['EXACT', 'PARENTS', 'CHILDREN'])}),
         opt);
+
+
+export const checkIsIdSelector = checkIsApplicationIdSelector;
 
 
 export function ensureIsArray(xs, message) {

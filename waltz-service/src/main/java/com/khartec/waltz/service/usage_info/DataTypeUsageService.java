@@ -3,6 +3,7 @@ package com.khartec.waltz.service.usage_info;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.data_type_usage.DataTypeUsageDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -11,12 +12,15 @@ import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
 import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.system.SystemChangeSet;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.usage_info.ImmutableUsageInfo;
 import com.khartec.waltz.model.usage_info.UsageInfo;
 import com.khartec.waltz.model.usage_info.UsageKind;
 import com.khartec.waltz.service.data_flow.DataFlowService;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.data_type.DataTypeService;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +42,8 @@ public class DataTypeUsageService {
     private final DataTypeService dataTypeService;
     private final DataFlowService dataFlowService;
     private final DataFlowDecoratorService dataFlowDecoratorService;
-    private final ApplicationIdSelectorFactory selectorFactory;
+    private final ApplicationIdSelectorFactory appIdSelectorFactor;
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
 
 
     @Autowired
@@ -46,23 +51,26 @@ public class DataTypeUsageService {
                                 DataTypeService dataTypeService,
                                 DataFlowService dataFlowService,
                                 DataFlowDecoratorService dataFlowDecoratorService,
-                                ApplicationIdSelectorFactory selectorFactory) {
+                                ApplicationIdSelectorFactory selectorFactory,
+                                DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
         checkNotNull(dataTypeUsageDao, "dataTypeUsageDao cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
         checkNotNull(dataFlowService, "dataFlowService cannot be null");
         checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
-        checkNotNull(selectorFactory, "selectorFactory cannot be null");
+        checkNotNull(selectorFactory, "appIdSelectorFactor cannot be null");
+        checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
 
         this.dataTypeUsageDao = dataTypeUsageDao;
         this.dataTypeService = dataTypeService;
         this.dataFlowService = dataFlowService;
         this.dataFlowDecoratorService = dataFlowDecoratorService;
-        this.selectorFactory = selectorFactory;
+        this.appIdSelectorFactor = selectorFactory;
+        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
     }
 
 
-    public List<DataTypeUsage> findForIdSelector(EntityKind kind, IdSelectionOptions options) {
-        return dataTypeUsageDao.findForIdSelector(kind, selectorFactory.apply(options));
+    public List<DataTypeUsage> findForAppIdSelector(EntityKind kind, IdSelectionOptions options) {
+        return dataTypeUsageDao.findForIdSelector(kind, appIdSelectorFactor.apply(options));
     }
 
 
@@ -71,12 +79,20 @@ public class DataTypeUsageService {
     }
 
 
-    public List<DataTypeUsage> findForDataType(String dataTypeCode) {
-        return dataTypeUsageDao.findForDataType(dataTypeCode);
+    public List<DataTypeUsage> findForDataTypeSelector(IdSelectionOptions dataTypeOptions) {
+        Select<Record1<Long>> selector = dataTypeIdSelectorFactory.apply(dataTypeOptions);
+        return dataTypeUsageDao.findForDataTypeSelector(selector);
     }
+
 
     public List<DataTypeUsage> findForEntityAndDataType(EntityReference entityReference, String dataTypeCode) {
         return dataTypeUsageDao.findForEntityAndDataType(entityReference, dataTypeCode);
+    }
+
+
+    public List<Tally<String>> findUsageStatsForDataTypeSelector(IdSelectionOptions dataTypeIdSelectionOptions) {
+        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(dataTypeIdSelectionOptions);
+        return dataTypeUsageDao.findUsageStatsForDataTypeSelector(dataTypeIdSelector);
     }
 
 
