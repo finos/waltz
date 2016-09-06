@@ -21,7 +21,10 @@ const initialState = {
 };
 
 
-function controller(dataType) {
+function controller($scope,
+                    dataType,
+                    viewDataService,
+                    historyStore) {
 
     const vm = initialiseData(this, initialState);
 
@@ -36,11 +39,33 @@ function controller(dataType) {
     vm.entityRef = appIdSelector.entityReference;
 
     vm.dataType = dataType;
+
+    vm.loadFlowDetail = () => viewDataService.loadFlowDetail();
+    vm.onAssetBucketSelect = (bucket) => {
+        $scope.$applyAsync(() => viewDataService.selectAssetBucket(bucket));
+    };
+
+    const refresh = () => {
+        if (!vm.rawViewData) return;
+        const dataType = vm.rawViewData.dataType;
+
+        historyStore.put(dataType.name, 'DATA_TYPE', 'main.data-type.view', { id: dataType.id });
+
+        vm.viewData = vm.rawViewData;
+    };
+
+    viewDataService
+        .loadAll(dataType.id)
+        .then(data => vm.rawViewData = data)
+        .then(d => refresh());
 }
 
 
 controller.$inject = [
-    'dataType'
+    '$scope',
+    'dataType',
+    'DataTypeViewDataService',
+    'HistoryStore'
 ];
 
 

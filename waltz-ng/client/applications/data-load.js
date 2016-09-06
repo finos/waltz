@@ -35,15 +35,9 @@ function addOrgUnits(extras, vm) {
 
 
 export function loadDataFlows(dataFlowStore, id, vm) {
-    const flowsPromise = dataFlowStore.findEnrichedFlowsForApplication(id);
-
-    flowsPromise
+    return dataFlowStore
+        .findByEntityReference('APPLICATION', id)
         .then(flows => vm.flows = flows);
-
-    return flowsPromise
-        .then(flows => vm.flowsByType = _.groupBy(flows, 'dataType'))
-        .then(byType => addDataTypes(_.keys(byType), vm));
-
 }
 
 
@@ -115,7 +109,19 @@ export function loadAuthSources(authSourceStore, orgUnitStore, appId, ouId, vm) 
 
 
 export function loadDataTypeUsages(dataTypeUsageStore, appId, vm) {
-    dataTypeUsageStore
+    return dataTypeUsageStore
         .findForEntity('APPLICATION', appId)
         .then(usages => vm.dataTypeUsages = usages);
+}
+
+
+export function loadDataFlowDecorators(store, appId, vm) {
+    const selector = {
+        entityReference: { id: appId, kind: 'APPLICATION'},
+        scope: 'EXACT'
+    };
+
+    return store
+        .findBySelectorAndKind(selector, 'DATA_TYPE')
+        .then(r => vm.dataFlowDecorators = r);
 }

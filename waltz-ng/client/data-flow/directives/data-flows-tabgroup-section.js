@@ -1,8 +1,11 @@
+import _ from 'lodash';
+
+
 const BINDINGS = {
-    ratings: '=',
-    flowData: '=',
-    applications: '=',
-    onLoadDetail: '='
+    ratings: '<',
+    flowData: '<',
+    applications: '<',
+    onLoadDetail: '<'
 };
 
 
@@ -26,7 +29,6 @@ function controller() {
         vm.visibility.flowConfigButton = index > 0;
         if(index === 0) vm.visibility.flowConfigOverlay = false;
     }
-
 }
 
 

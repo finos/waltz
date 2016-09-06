@@ -31,6 +31,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import static com.khartec.waltz.common.Checks.checkNotEmptyString;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
@@ -78,4 +79,12 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
                 .fetch(TO_ENTITY_REFERENCE);
     }
 
+
+    public DataType getByCode(String code) {
+        checkNotEmptyString(code, "Code cannot be null/empty");
+        return dsl.select(DATA_TYPE.fields())
+                .from(DATA_TYPE)
+                .where(DATA_TYPE.CODE.eq(code))
+                .fetchOne(mapper);
+    }
 }

@@ -16,7 +16,7 @@
             <li><a ui-sref="main">Home</a></li>
             <li>
                 <a ui-sref="main.app.view ({id: ctrl.app.id})">
-                    {{ ctrl.app.name }}
+                    <span ng-bind="ctrl.app.name"></span>
                 </a>
             </li>
             <li>Register Logical Data Flows</li>
@@ -24,23 +24,25 @@
     </waltz-page-header>
 
 
-    <waltz-section name="Details">
-        <form name="dataFlowForm" novalidate ng-submit="ctrl.submit()">
+    <div class="waltz-page-summary waltz-page-summary-attach">
 
-            <!-- SLOPE DIAGRAM -->
-            <div class="row">
-                <div class="col-md-12">
-                    <waltz-app-data-flow-diagram incoming="ctrl.graphOptions.data.incoming"
-                                                 outgoing="ctrl.graphOptions.data.outgoing"
-                                                 sources="ctrl.graphOptions.data.sources"
-                                                 targets="ctrl.graphOptions.data.targets"
-                                                 tweakers="ctrl.graphOptions.tweakers"
-                                                 types="ctrl.graphOptions.data.flowTypes"></waltz-app-data-flow-diagram>
-                </div>
+        <div class="row">
+            <div class="col-md-12">
+                <!-- SLOPE DIAGRAM -->
+                <waltz-source-and-target-graph entity-ref="ctrl.entityRef"
+                                               flows="ctrl.flows"
+                                               decorators="ctrl.dataFlowDecorators"
+                                               tweakers="ctrl.flowTweakers">
+                </waltz-source-and-target-graph>
             </div>
+        </div>
 
-            <hr/>
+        <hr>
 
+
+        <form name="dataFlowForm"
+              novalidate
+              ng-submit="ctrl.submit()">
 
             <!-- ACTIONS -->
             <div class="row">
@@ -125,13 +127,12 @@
                     </div>
 
                     <div ng-if="ctrl.mode === 'editCounterpart'">
-                        <waltz-data-flow-type-editor primary-entity="ctrl.app"
-                                                     counterpart-entity="ctrl.selectedApp"
-                                                     direction="ctrl.selectedDirection"
-                                                     current-data-types="ctrl.currentDataTypes"
+                        <waltz-data-flow-type-editor flow="ctrl.selectedFlow"
+                                                     decorators="ctrl.selectedDecorators"
                                                      all-data-types="ctrl.dataTypes"
                                                      on-cancel="ctrl.cancel"
-                                                     on-save="ctrl.saveFlows"
+                                                     on-save="ctrl.updateFlow"
+                                                     on-delete="ctrl.deleteFlow"
                                                      on-dirty="ctrl.setDirtyChange">
                         </waltz-data-flow-type-editor>
                     </div>
@@ -147,8 +148,7 @@
                 </div>
             </div>
         </form>
-
-    </waltz-section>
+    </div>
 
 </div>
 

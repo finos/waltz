@@ -12,18 +12,18 @@
 
 export default (module) => {
     module
+        .component('waltzAppDataFlowDiagram', require('./slope-graph/slope-graph-directive'));
+
+    module
         .directive('waltzDataFlowSection', require('./data-flow-section'))
         .directive('waltzDataFlowTable', require('./data-flow-table'))
         .directive('waltzSummaryRatedFlowChart', require('./rated-flow-chart/summary-rated-flow-chart'))
         .directive('waltzRatedFlowDetail', require('./rated-flow-chart/rated-flow-detail'))
         .directive('waltzRatedFlowSummaryDetail', require('./rated-flow-chart/rated-flow-summary-detail'))
-        .directive('waltzAppDataFlowDiagram', require('./slope-graph/slope-graph-directive'))
-        .directive('waltzDataFlowDiagram', require('./boingy-graph/boingy-graph'))
         .directive('waltzFlowCloudDiagram', require('./flow-cloud-diagram'))
         .directive('waltzDataFlowsTabgroup', require('./data-flows-tabgroup'))
         .directive('waltzDataFlowsTabgroupSection', require('./data-flows-tabgroup-section'))
-        .directive('waltzFlowFilterOptionsOverlay', require('./flow-filter-options-overlay'))
-        .directive('waltzDataFlowTypeEditor', require('./edit/data-flow-type-editor'))
+        .directive('waltzFlowFilterOptionsOverlay', require('./flow-filter-options-overlay'));
 
 
 };

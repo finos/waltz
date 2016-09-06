@@ -33,4 +33,18 @@ public abstract class EntityReference {
     public abstract long id();
     public abstract Optional<String> name();
 
+
+    public static EntityReference mkRef(EntityKind kind, long id) {
+        return mkRef(kind, id, null);
+    }
+
+
+    public static EntityReference mkRef(EntityKind kind, long id, String name) {
+        return ImmutableEntityReference.builder()
+                .kind(kind)
+                .id(id)
+                .name(Optional.ofNullable(name))
+                .build();
+    }
+
 }

@@ -43,4 +43,9 @@ public class DataTypeService {
     public List<DataType> getAll() {
         return dataTypeDao.getAll();
     }
+
+
+    public DataType getByCode(String code) {
+        return dataTypeDao.getByCode(code);
+    }
 }

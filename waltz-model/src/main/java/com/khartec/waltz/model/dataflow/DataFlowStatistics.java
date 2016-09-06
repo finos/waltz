@@ -3,7 +3,7 @@ package com.khartec.waltz.model.dataflow;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.SummaryStatistics;
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -16,5 +16,5 @@ public abstract class DataFlowStatistics implements SummaryStatistics {
     public abstract DataFlowMeasures appCounts();
     public abstract DataFlowMeasures flowCounts();
 
-    public abstract List<StringTally> dataTypeCounts();
+    public abstract List<Tally<String>> dataTypeCounts();
 }

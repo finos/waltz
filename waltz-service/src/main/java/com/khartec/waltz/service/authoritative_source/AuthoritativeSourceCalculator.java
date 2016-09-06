@@ -35,6 +35,7 @@ import static com.khartec.waltz.common.MapUtilities.newHashMap;
 import static com.khartec.waltz.common.hierarchy.HierarchyUtilities.parents;
 
 
+@Deprecated
 @Service
 public class AuthoritativeSourceCalculator {
 

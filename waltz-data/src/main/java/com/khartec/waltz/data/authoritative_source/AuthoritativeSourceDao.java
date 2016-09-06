@@ -20,10 +20,9 @@ package com.khartec.waltz.data.authoritative_source;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
-import com.khartec.waltz.model.authoritativesource.ImmutableAuthoritativeSource;
-import com.khartec.waltz.model.authoritativesource.Rating;
+import com.khartec.waltz.model.authoritativesource.*;
 import com.khartec.waltz.schema.tables.records.AuthoritativeSourceRecord;
+import com.khartec.waltz.schema.tables.records.EntityHierarchyRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -32,10 +31,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
+import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 
@@ -73,6 +74,23 @@ public class AuthoritativeSourceDao {
                 .dataType(record.getDataType())
                 .rating(Rating.valueOf(record.getRating()))
                 .provenance(record.getProvenance())
+                .build();
+    };
+
+
+    private final RecordMapper<Record, AuthoritativeRatingVantagePoint> TO_VANTAGE_MAPPER = r -> {
+        AuthoritativeSourceRecord authRecord = r.into(AuthoritativeSourceRecord.class);
+        EntityHierarchyRecord entityHierarchyRecord = r.into(EntityHierarchyRecord.class);
+
+        return ImmutableAuthoritativeRatingVantagePoint.builder()
+                .vantagePoint(ImmutableEntityReference.builder()
+                        .kind(EntityKind.ORG_UNIT)
+                        .id(entityHierarchyRecord.getId())
+                        .build())
+                .rank(entityHierarchyRecord.getLevel())
+                .applicationId(authRecord.getApplicationId())
+                .rating(Rating.valueOf(authRecord.getRating()))
+                .dataTypeCode(authRecord.getDataType())
                 .build();
     };
 
@@ -167,6 +185,27 @@ public class AuthoritativeSourceDao {
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(kind.name()))
                 .and(AUTHORITATIVE_SOURCE.PARENT_ID.in(ids))
+                .fetch(authSourceMapper);
+    }
+
+
+    public List<AuthoritativeRatingVantagePoint> findAuthoritativeRatingVantagePoints(Set<Long> orgIds) {
+        return dsl.select(
+                ENTITY_HIERARCHY.ID,
+                ENTITY_HIERARCHY.LEVEL,
+                AUTHORITATIVE_SOURCE.DATA_TYPE,
+                AUTHORITATIVE_SOURCE.APPLICATION_ID,
+                AUTHORITATIVE_SOURCE.RATING)
+                .from(ENTITY_HIERARCHY)
+                .join(AUTHORITATIVE_SOURCE).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID))
+                .where(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name()).and(ENTITY_HIERARCHY.ID.in(orgIds)))
+                .orderBy(ENTITY_HIERARCHY.ID, ENTITY_HIERARCHY.LEVEL)
+                .fetch(TO_VANTAGE_MAPPER);
+    }
+
+
+    public List<AuthoritativeSource> findAll() {
+        return baseSelect()
                 .fetch(authSourceMapper);
     }
 }

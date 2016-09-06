@@ -21,23 +21,26 @@ import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow.DataFlowDao;
 import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
+import com.khartec.waltz.data.data_flow_decorator.DataFlowDecoratorDao;
+import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.DataFlowMeasures;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowStatistics;
-import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 
 @Service
@@ -45,18 +48,28 @@ public class DataFlowService {
 
     private final DataFlowDao dataFlowDao;
     private final DataFlowStatsDao dataFlowStatsDao;
+    private final DataFlowDecoratorDao dataFlowDecoratorDao;
     private final ApplicationIdSelectorFactory idSelectorFactory;
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
 
 
     @Autowired
-    public DataFlowService(DataFlowDao dataFlowDao, DataFlowStatsDao dataFlowStatsDao, ApplicationIdSelectorFactory idSelectorFactory) {
+    public DataFlowService(DataFlowDao dataFlowDao, 
+                           DataFlowStatsDao dataFlowStatsDao, 
+                           DataFlowDecoratorDao dataFlowDecoratorDao, 
+                           ApplicationIdSelectorFactory appIdSelectorFactory,
+                           DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
         checkNotNull(dataFlowDao, "dataFlowDao must not be null");
         checkNotNull(dataFlowStatsDao, "dataFlowStatsDao cannot be null");
-        checkNotNull(idSelectorFactory, "idSelectorFactory cannot be null");
+        checkNotNull(dataFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
+        checkNotNull(appIdSelectorFactory, "idSelectorFactory cannot be null");
+        checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
 
-        this.idSelectorFactory = idSelectorFactory;
+        this.idSelectorFactory = appIdSelectorFactory;
         this.dataFlowStatsDao = dataFlowStatsDao;
         this.dataFlowDao = dataFlowDao;
+        this.dataFlowDecoratorDao = dataFlowDecoratorDao;
+        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
     }
 
 
@@ -71,24 +84,25 @@ public class DataFlowService {
     }
 
 
-    public int[] addFlows(List<DataFlow> flows) {
-        List<DataFlow> flowsExceptSameSourceAndTarget = flows.stream()
-                .filter(f -> !f.source().equals(f.target()))
-                .collect(Collectors.toList());
+    public DataFlow addFlow(DataFlow flow) {
+        if (flow.source().equals(flow.target())) {
+            throw new IllegalArgumentException("Cannot have a flow with same source and target");
+        }
 
-        return dataFlowDao.addFlows(flowsExceptSameSourceAndTarget);
+        return dataFlowDao.addFlow(flow);
     }
 
 
-    public int[] removeFlows(List<DataFlow> flows) {
-        return dataFlowDao.removeFlows(flows);
+    public int removeFlows(List<Long> flowIds) {
+        dataFlowDecoratorDao.removeAllDecoratorsForFlowIds(flowIds);
+        return dataFlowDao.removeFlows(flowIds);
     }
 
 
     public DataFlowStatistics calculateStats(IdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);
-        List<StringTally> dataTypeCounts = FunctionUtilities.time("DFS.dataTypes", () -> dataFlowStatsDao.tallyDataTypes(appIdSelector));
+        List<Tally<String>> dataTypeCounts = FunctionUtilities.time("DFS.dataTypes", () -> dataFlowStatsDao.tallyDataTypes(appIdSelector));
         DataFlowMeasures appCounts = FunctionUtilities.time("DFS.appCounts", () -> dataFlowStatsDao.countDistinctAppInvolvement(appIdSelector));
         DataFlowMeasures flowCounts = FunctionUtilities.time("DFS.flowCounts", () -> dataFlowStatsDao.countDistinctFlowInvolvement(appIdSelector));
 
@@ -99,9 +113,15 @@ public class DataFlowService {
                 .build();
     }
 
+
     public List<Tally<String>> tallyByDataType() {
-        return dataFlowDao.tallyByDataType();
+        return dataFlowStatsDao.tallyDataTypes(DSL.select(APPLICATION.ID).from(APPLICATION));
     }
 
+
+    public Collection<DataFlow> findByDataTypeIdSelector(IdSelectionOptions options) {
+        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(options);
+        return dataFlowDao.findByDataTypeIdSelector(dataTypeIdSelector);
+    }
 
 }

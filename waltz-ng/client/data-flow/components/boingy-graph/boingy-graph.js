@@ -14,9 +14,21 @@ import d3 from "d3";
 import _ from "lodash";
 import EventDispatcher from "../../../common/EventDispatcher";
 
+
+const template = require('./boingy-graph.html');
+
+const bindings = {
+    data: '<',
+    tweakers: '<'
+};
+
+
 const dispatcher = new EventDispatcher();
 
-const dimensions = { height: 600, width: 1000 };
+function setupDimensions(vizElem) {
+    const width = vizElem.node().clientWidth || 1000;
+    return { width, height: 600 };
+}
 
 
 function handleNodeClick(node) {
@@ -30,12 +42,10 @@ const force = d3.layout.force()
     .charge(-120);
 
 
-function setup(holder) {
-    const svg = d3.select(holder)
-        .append('svg:svg')
-        .attr({ width: dimensions.width, height: dimensions.height });
+function setup(vizElem) {
+    const svg = vizElem
+        .append('svg');
 
-    force.size([dimensions.width, dimensions.height]);
 
     svg.append('defs').append('marker')
         .attr({
@@ -49,7 +59,7 @@ function setup(holder) {
         .append('path')
         .attr('d', 'M 0,0 V 8 L8,4 Z'); // this is actual shape for arrowhead
 
-    return { svg };
+    return { svg, vizElem };
 }
 
 
@@ -74,23 +84,24 @@ function addNodeLabel(selection) {
 }
 
 
-function draw(data, parts, tweakers) {
-
-    const nodes = data.entities;
+function drawLinks(flows = [], nodes = [], svg) {
     const nodeIds = _.map(nodes, 'id');
 
-    const links = _.map(data.flows, f => ({
-        source: _.indexOf(nodeIds, f.source.id),
-        target: _.indexOf(nodeIds, f.target.id),
-        data: f
-    }));
+    const links = _.map(
+        flows,
+        f => ({
+            source: _.indexOf(nodeIds, f.source.id),
+            target: _.indexOf(nodeIds, f.target.id),
+            data: f
+        }));
 
     force
         .links(links)
-        .nodes(data.entities)
+        .nodes(nodes)
         .start();
 
-    const link = parts.svg.selectAll('.wdfd-link')
+    const link = svg
+        .selectAll('.wdfd-link')
         .data(links);
 
     link.enter()
@@ -98,17 +109,22 @@ function draw(data, parts, tweakers) {
         .attr('marker-end', 'url(#arrowhead)')
         .classed('wdfd-link', true);
 
-
     link.exit()
         .remove();
 
-    const node = parts.svg.selectAll('.wdfd-node')
-        .data(data.entities, n => n.id);
+    return link;
+}
+
+
+function drawNodes(entities = [], svg, nodeTweakers) {
+    const node = svg
+        .selectAll('.wdfd-node')
+        .data(entities, n => n.id);
 
     node.enter()
         .append('g')
         .classed('wdfd-node', true)
-        .call(tweakers.node.enter)
+        .call(nodeTweakers.enter)
         .call(force.drag)
         .call(addNodeCircle)
         .call(addNodeLabel);
@@ -116,23 +132,46 @@ function draw(data, parts, tweakers) {
     node.exit()
         .remove();
 
+    return node;
+}
+
+
+function draw(data, parts, tweakers) {
+
+    const dimensions = setupDimensions(parts.vizElem);
+
+    force.size([dimensions.width, dimensions.height]);
+
+    parts.svg.attr({ width: dimensions.width, height: dimensions.height });
+
+    const linkSelection = drawLinks(data.flows, data.entities, parts.svg);
+
+    const nodeSelection = drawNodes(data.entities, parts.svg, tweakers.node);
 
     force.on('tick', () => {
+        linkSelection
+            .each(function () {this.parentNode.insertBefore(this, this); });
 
-        link.each(function () {this.parentNode.insertBefore(this, this); });
-
-        link.attr('x1', d => d.source.x)
+        linkSelection
+            .attr('x1', d => d.source.x)
             .attr('y1', d => d.source.y)
             .attr('x2', d => d.target.x)
             .attr('y2', d => d.target.y);
 
-        node.attr('transform', d => { return `translate(${d.x}, ${d.y})`; });
+        nodeSelection
+            .attr('transform', d => { return `translate(${d.x}, ${d.y})`; });
     });
 }
 
-function controller($scope) {
 
+function controller($scope, $element) {
     const vm = this;
+
+    const vizElem = d3
+        .select($element[0])
+        .select('.viz');
+
+    const parts = setup(vizElem);
 
     dispatcher.subscribe((e) => {
         $scope.$applyAsync(() => vm.focusItem = e.data);
@@ -140,34 +179,23 @@ function controller($scope) {
 
     vm.focusItem = null;
 
-    $scope.$watch('vizElem', (vizElem) => {
-        if (vizElem) {
-            dimensions.width = vizElem.offsetWidth;
-            const parts = setup(vizElem);
-            $scope.$watch('ctrl.data', () => {
-                if (vm.data && vm.tweakers) {
-                    draw(vm.data, parts, vm.tweakers);
-                }
-            });
+    vm.$onChanges = () => {
+        if (vm.data && vm.tweakers) {
+            // we draw using async to prevent clientWidth reporting '0'
+            $scope.$applyAsync(() => draw(vm.data, parts, vm.tweakers));
         }
-    });
+    };
 }
 
-controller.$inject = ['$scope'];
+
+controller.$inject = ['$scope', '$element'];
 
 
-export default () => ({
-    restrict: 'E',
-    template: require('./boingy-graph.html'),
-    scope: {},
-    bindToController: {
-        data: '=',
-        tweakers: '='
-    },
-    link: (scope, elem) => {
-        const vizElem = elem[0].querySelector('.viz');
-        scope.vizElem = vizElem;
-    },
-    controllerAs: 'ctrl',
+const component = {
+    bindings,
+    template,
     controller
-});
+};
+
+
+export default component;

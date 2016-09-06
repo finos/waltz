@@ -129,7 +129,6 @@ function controller($scope,
         .initialise(processId, 'PROCESS', 'EXACT')
         .then(data => vm.dataFlows = data);
 
-
     // --  WATCHERS
 
     $scope.$watchGroup(

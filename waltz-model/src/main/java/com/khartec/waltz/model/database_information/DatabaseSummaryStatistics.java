@@ -3,7 +3,7 @@ package com.khartec.waltz.model.database_information;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.SummaryStatistics;
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -13,8 +13,8 @@ import java.util.List;
 @JsonDeserialize(as = ImmutableDatabaseSummaryStatistics.class)
 public abstract class DatabaseSummaryStatistics implements SummaryStatistics {
 
-    public abstract List<StringTally> environmentCounts();
-    public abstract List<StringTally> vendorCounts();
+    public abstract List<Tally<String>> environmentCounts();
+    public abstract List<Tally<String>> vendorCounts();
 
 
 }

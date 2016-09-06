@@ -9,7 +9,15 @@
         </ol>
     </waltz-page-header>
 
-    <waltz-section name="Section">
 
+
+    <waltz-section>
+        <waltz-rated-flow-summary-panel apps="ctrl.apps"
+                                        entity-reference="ctrl.entityReference"
+                                        flow-data="ctrl.flowData"
+                                        on-load-detail="ctrl.loadFlowDetail">
+        </waltz-rated-flow-summary-panel>
     </waltz-section>
+
+
 </div>

@@ -10,6 +10,19 @@
  *
  */
 
+
+function mkSelector(params) {
+    const { id } = params;
+
+    const options = {
+        entityReference: {id, kind: "ORG_UNIT"},
+        scope: "CHILDREN"
+    };
+
+    return options;
+}
+
+
 export function authSourcesResolver(authSourcesStore, params) {
     const { kind, id } = params;
     return authSourcesStore.findByReference(kind, id);
@@ -19,15 +32,7 @@ authSourcesResolver.$inject = ['AuthSourcesStore', '$stateParams'];
 
 
 export function flowResolver(flowStore, params) {
-    const { id } = params;
-
-    const options = {
-        entityReference: {id, kind: "ORG_UNIT"},
-        scope: "CHILDREN"
-    };
-
-    return flowStore.findByAppIdSelector(options);
-
+    return flowStore.findByAppIdSelector(mkSelector(params));
 }
 
 flowResolver.$inject = ['DataFlowDataStore', '$stateParams'];
@@ -46,3 +51,17 @@ export function orgUnitsResolver(orgUnitStore) {
 
 orgUnitsResolver.$inject = ['OrgUnitStore'];
 
+
+export function dataTypesResolver(dataTypeService) {
+    return dataTypeService.loadDataTypes();
+}
+
+dataTypesResolver.$inject = ['DataTypeService'];
+
+
+export function flowDecoratorsResolver(dataFlowDecoratorStore, params) {
+    return dataFlowDecoratorStore
+        .findBySelectorAndKind(mkSelector(params), 'DATA_TYPE');
+}
+
+flowDecoratorsResolver.$inject = ['DataFlowDecoratorStore', '$stateParams'];

@@ -22,6 +22,7 @@ import com.khartec.waltz.model.server_information.ImmutableServerSummaryStatisti
 import com.khartec.waltz.model.server_information.ServerInformation;
 import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
 import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ServerInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -145,19 +146,19 @@ public class ServerInformationDao {
         Future<Tuple2<Integer, Integer>> typePromise = DB_EXECUTOR_POOL.submit(() ->
                 calculateVirtualAndPhysicalCounts(condition));
 
-        Future<List<StringTally>> envPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
+        Future<List<Tally<String>>> envPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
                 SERVER_INFORMATION,
                 SERVER_INFORMATION.ENVIRONMENT,
                 condition));
 
-        Future<List<StringTally>> osPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
+        Future<List<Tally<String>>> osPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
                 SERVER_INFORMATION,
                 SERVER_INFORMATION.OPERATING_SYSTEM,
                 condition));
 
-        Future<List<StringTally>> locationPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
+        Future<List<Tally<String>>> locationPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
                 SERVER_INFORMATION,
                 SERVER_INFORMATION.LOCATION,

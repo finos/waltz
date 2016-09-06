@@ -2530,4 +2530,140 @@
                 constraintName="authoritative_source_application_id_fkey"/>
     </changeSet>
 
+
+    <!-- 447: Move datatype out of logical flow -->
+
+    <changeSet id="20160830-447-1"
+               author="rovats">
+        <dropPrimaryKey tableName="data_flow"/>
+    </changeSet>
+
+    <changeSet id="20160830-447-2"
+               author="rovats">
+        <addColumn tableName="data_flow">
+            <column autoIncrement="true"
+                    name="id"
+                    type="BIGSERIAL">
+                <constraints primaryKey="true"
+                             primaryKeyName="data_flow_pkey"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20160830-447-3"
+               author="rovats">
+        <createTable tableName="data_flow_decorator">
+            <column name="data_flow_id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="decorator_entity_kind"
+                    type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="decorator_entity_id"
+                    type="${long.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating"
+                    type="VARCHAR(32)"
+                    defaultValue="NO_OPINION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="VARCHAR(64)"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20160830-447-4"
+               author="rovats">
+        <sql>
+            insert data_flow_decorator (data_flow_id, decorator_entity_kind, decorator_entity_id, provenance)
+            select df_u.id, 'DATA_TYPE', dt.id, provenance
+            from data_flow df
+            inner join (select min(id) as id, source_entity_id, target_entity_id
+                        from data_flow
+                        group by source_entity_id, target_entity_id) df_u
+                on df_u.source_entity_id = df.source_entity_id
+                    and df_u.target_entity_id = df.target_entity_id
+            inner join data_type dt
+                on dt.code = df.data_type
+            order by df_u.id desc
+        </sql>
+    </changeSet>
+
+    <changeSet id="20160830-447-5"
+               author="rovats">
+        <dropColumn tableName="data_flow"
+                    columnName="data_type"/>
+    </changeSet>
+
+    <changeSet id="20160830-447-6"
+               author="rovats">
+        <sql>
+            delete df
+            from data_flow df
+            inner join (select min(id) as id, source_entity_id, target_entity_id
+                        from data_flow
+                        group by source_entity_id, target_entity_id) df_u
+                on df_u.source_entity_id = df.source_entity_id
+                and df_u.target_entity_id = df.target_entity_id
+                and df_u.id != df.id
+        </sql>
+    </changeSet>
+
+    <changeSet id="20160830-447-7"
+               author="rovats"
+               dbms="mssql">
+        <sql>
+            update df set
+                df.provenance = dfd.provenance
+            from data_flow df
+            inner join (select data_flow_id, min(provenance) as provenance
+                        from data_flow_decorator
+                        group by data_flow_id) dfd
+                on dfd.data_flow_id = df.id
+        </sql>
+    </changeSet>
+
+    <changeSet id="20160830-447-8"
+               author="rovats"
+               dbms="mysql">
+        <sql>
+            update
+            data_flow df
+            inner join (select data_flow_id, min(provenance) as provenance
+                        from data_flow_decorator
+                        group by data_flow_id) dfd
+                on dfd.data_flow_id = df.id
+            set df.provenance = dfd.provenance
+        </sql>
+    </changeSet>
+
+    <changeSet id="20160830-447-9"
+               author="rovats">
+        <addUniqueConstraint tableName="data_flow"
+                             constraintName="unique_data_flow"
+                             columnNames="source_entity_kind, source_entity_id, target_entity_kind, target_entity_id"/>
+    </changeSet>
+
+    <changeSet id="20160830-447-10"
+               author="rovats">
+        <addPrimaryKey tableName="data_flow_decorator"
+                       constraintName="data_flow_decorator_pkey"
+                       columnNames="data_flow_id, decorator_entity_kind, decorator_entity_id"/>
+    </changeSet>
+
+    <changeSet id="20160830-447-11"
+               author="rovats">
+        <createIndex tableName="data_flow_decorator"
+                     indexName="idx_df_dec_df_id_dec_kind">
+            <column name="data_flow_id"/>
+            <column name="decorator_entity_kind"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

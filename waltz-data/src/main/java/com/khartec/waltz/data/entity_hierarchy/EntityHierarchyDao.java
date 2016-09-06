@@ -3,7 +3,7 @@ package com.khartec.waltz.data.entity_hierarchy;
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.entity_hierarchy.EntityHierarchyItem;
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.EntityHierarchy;
 import com.khartec.waltz.schema.tables.records.EntityHierarchyRecord;
 import org.jooq.DSLContext;
@@ -65,12 +65,12 @@ public class EntityHierarchyDao {
     }
 
 
-    public List<StringTally> tallyByKind() {
+    public List<Tally<String>> tallyByKind() {
         return JooqUtilities.calculateStringTallies(dsl, eh, eh.KIND, DSL.trueCondition());
     }
 
 
-    public List<StringTally> getRootTallies() {
+    public List<Tally<String>> getRootTallies() {
         return dsl.select(eh.KIND, DSL.count())
                 .from(eh)
                 .where(eh.LEVEL.eq(1)

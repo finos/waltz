@@ -2,12 +2,12 @@ import _ from "lodash";
 
 
 const BINDINGS = {
-    flowData: '=',
-    applications: '=',
-    onLoadDetail: '=',
+    flowData: '<',
+    applications: '<',
+    onLoadDetail: '<',
     options: '=?',
-    optionsVisible: '=',
-    onTabChange: '='
+    optionsVisible: '<',
+    onTabChange: '<'
 };
 
 
@@ -29,6 +29,7 @@ const defaultOptions = {
 const initialState = {
     applications: [],
     appIds: [],
+    boingyEverShown: false,
     dataTypes: [],
     flowData: null,
     onLoadDetail: () => console.log("No onLoadDetail provided for data-flows-tabgroup"),
@@ -46,11 +47,24 @@ function calculateEntities(flows = []) {
 }
 
 
-function buildFilter(filterOptions = defaultFilterOptions, appIds) {
+function buildFilter(filterOptions = defaultFilterOptions,
+                     appIds = [],
+                     flowDecorators = []) {
 
-    const typeFilterFn = f => filterOptions.type === 'ALL'
-        ? true
-        : f.dataType === filterOptions.type;
+    const decoratorsByFlowById = _.groupBy(flowDecorators, 'dataFlowId');
+
+    const typeFilterFn = f => {
+        const decoratorsForFlow = decoratorsByFlowById[f.id] || [];
+
+        const typeMatchFn = ({ decoratorEntity }) => {
+            return decoratorEntity.id === Number(filterOptions.type)
+                && decoratorEntity.kind === 'DATA_TYPE';
+        };
+
+        return filterOptions.type === 'ALL'
+            ? true
+            : _.some(decoratorsForFlow, typeMatchFn);
+    };
 
     const scopeFilterFn =  f => {
         switch (filterOptions.scope) {
@@ -71,9 +85,10 @@ function buildFilter(filterOptions = defaultFilterOptions, appIds) {
 
 function calculateFlowData(allFlows = [],
                            appIds = [],
+                           flowDecorators = [],
                            filterOptions = defaultFilterOptions) {
 
-    const filterFn = buildFilter(filterOptions, appIds);
+    const filterFn = buildFilter(filterOptions, appIds, flowDecorators);
     const flows = _.filter(allFlows, filterFn);
     const entities = calculateEntities(flows);
 
@@ -85,12 +100,16 @@ function controller($scope, dataFlowUtilityService) {
 
     const vm = _.defaultsDeep(this, initialState);
 
-
     $scope.$watch(
         'ctrl.flowData.flows',
-        (flows = []) => {
-            vm.dataTypes = _.chain(flows)
-                .map('dataType')
+        () => vm.filterChanged(defaultFilterOptions));
+
+    $scope.$watch(
+        'ctrl.flowData.decorators',
+        (decorators = []) => {
+            vm.dataTypes = _.chain(decorators)
+                .filter(dc => dc.decoratorEntity.kind === 'DATA_TYPE')
+                .map('decoratorEntity.id')
                 .uniq()
                 .value();
 
@@ -104,36 +123,41 @@ function controller($scope, dataFlowUtilityService) {
             vm.graphTweakers = dataFlowUtilityService.buildGraphTweakers(vm.appIds)
         });
 
-
     vm.filterChanged = (filterOptions) => {
         if (! vm.flowData) return;
-
 
         vm.filteredFlowData = calculateFlowData(
             vm.flowData.flows,
             vm.appIds,
+            vm.flowData.decorators,
             filterOptions);
-
     };
-
 
     vm.loadDetail = () => {
-        if (vm.onLoadDetail) vm.onLoadDetail();
-        else console.log("No handler for detail provided ('on-load-detail')");
+        if (vm.onLoadDetail) {
+            vm.onLoadDetail();
+        } else {
+            console.log("No handler for detail provided ('on-load-detail')");
+        }
     };
 
-
     vm.tabSelected = (tabName, index) => {
-        if(index > 0) vm.loadDetail();
-        if(index === 1) vm.boingyEverShown = true;
+        if(index > 0) {
+            vm.loadDetail();
+        }
+        if(index === 1) {
+            vm.boingyEverShown = true;
+        }
         vm.onTabChange(tabName, index);
     };
 
 }
 
+
 controller.$inject = [
     '$scope',
-    'DataFlowUtilityService'
+    'DataFlowUtilityService',
+    'DataTypeService'
 ];
 
 
@@ -146,7 +170,6 @@ const directive = {
     bindToController: BINDINGS,
     template: require('./data-flows-tabgroup.html')
 };
-
 
 
 export default () => directive;

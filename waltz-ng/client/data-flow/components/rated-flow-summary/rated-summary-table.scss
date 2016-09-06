@@ -1,18 +1,17 @@
-.waltz-rated-flow-summary-table {
-    .primary {
+.waltz-rated-summary-table {
+    .wrst-primary {
         fill: #3cd32f;
     }
 
-    .secondary {
+    .wrst-secondary {
         fill: #d3c433;
     }
 
-    .discouraged {
+    .wrst-discouraged {
         fill: #d33035;
     }
 
-    .no-opinion {
+    .wrst-no-opinion {
         fill: #6d6b70;
     }
-
 }

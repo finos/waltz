@@ -3,93 +3,126 @@ import d3 from "d3";
 
 
 const bindings = {
-    ratedFlows: '<',
     apps: '<',
-    orgUnitId: '<'
+    entityReference: '<',
+    flowData: '<',
+    onLoadDetail: '<'
 };
 
 
 const template = require('./rated-flow-summary-panel.html');
 
+
 const initialState = {
     apps: [],
-    ratedFlows: [],
-    shouldShowIndirectApps: false
+    infoCell : null
 };
 
 
-function isDirectlyInvolvedFlow(appIds = [], flow) {
-    return _.includes(appIds, flow.dataFlow.source.id)
-        || _.includes(appIds, flow.dataFlow.target.id);
+function findMatchingDecorators(selection, decorators = []) {
+    const matcher = {
+        decoratorEntity: {
+            kind: 'DATA_TYPE',
+            id: selection.dataType.id
+        },
+        rating: selection.rating
+    };
+
+    return _.filter(decorators, matcher);
 }
 
 
-function findDirectlyInvolvedFlows(flows = [], apps = [], orgUnitId) {
-    const directlyInvolvedAppIds = _.chain(apps)
-        .filter(a => a.organisationalUnitId === orgUnitId)
-        .map('id')
+function findMatchingFlows(flows = [], decorators = []) {
+    const flowIds = _.chain(decorators)
+        .map('dataFlowId')
+        .uniq()
         .value();
 
-    return _.filter(flows, f => isDirectlyInvolvedFlow(directlyInvolvedAppIds, f));
+    return _.filter(
+        flows,
+        f => _.includes(flowIds, f.id));
 }
 
 
-function groupByTypeThenRating(flows = []) {
-    return d3
-        .nest()
-        .key(d => d.dataFlow.dataType)
-        .sortKeys(d3.ascending)
-        .key(d => d.rating)
-        .rollup(xs => _.map(xs, 'dataFlow'))
-        .map(flows);
+function findConsumingApps(flows = [], apps = []) {
+    const appsById = _.keyBy(apps, 'id');
+    return _.chain(flows)
+        .filter(f => f.target.kind === 'APPLICATION')
+        .map('target.id')
+        .uniq()
+        .map(id => appsById[id])
+        .value();
 }
 
 
-function prepareData(flows = [], apps = [], orgUnitId) {
-
-    const directlyInvolvedFlows = findDirectlyInvolvedFlows(flows, apps, orgUnitId);
-    const direct = groupByTypeThenRating(directlyInvolvedFlows);
-    const all = groupByTypeThenRating(flows);
-
-    return {
-        all,
-        direct
-    };
+/**
+ * Only interested in flows coming into this group
+ * @param flows
+ * @param apps
+ * @returns {Array}
+ */
+function findPotentialFlows(flows = [], apps =[]) {
+    const appIds = _.map(apps, 'id');
+    return _.filter(flows, f => _.includes(appIds, f.target.id));
 }
 
 
-function controller() {
+function mkInfoCell(selection, flowData, apps = []) {
+    if (! selection) return null;
+    if (flowData.flows.length == 0) return null;
+
+    const potentialFlows = findPotentialFlows(flowData.flows, apps);
+
+    const matchingDecorators = findMatchingDecorators(selection, flowData.decorators);
+    const matchingFlows = findMatchingFlows(potentialFlows, matchingDecorators )
+    const consumingApps = findConsumingApps(matchingFlows, apps);
+
+    return { dataType: selection.dataType, rating: selection.rating, applications: consumingApps };
+}
+
+
+function controller(dataTypeService, dataFlowDecoratorStore) {
     const vm = _.defaultsDeep(this, initialState);
 
-    const refresh = () => Object.assign(
-            vm,
-            prepareData(
-                vm.ratedFlows,
-                vm.apps,
-                vm.orgUnitId));
+    const childSelector = {
+        entityReference: vm.entityReference,
+        scope: 'CHILDREN'
+    };
 
-    vm.$onChanges = refresh;
+    const exactSelector = {
+        entityReference: vm.entityReference,
+        scope: 'EXACT'
+    };
 
-    vm.onTableClick = (d) => {
-        const { dataType, rating, type } = d;
+    dataFlowDecoratorStore
+        .summarizeBySelector(childSelector)
+        .then(r => vm.childSummaries = r);
 
+    dataFlowDecoratorStore
+        .summarizeBySelector(exactSelector)
+        .then(r => vm.exactSummaries = r);
 
-        if (type === 'CELL') {
-            const flows = vm.all[dataType][rating];
-            vm.selectedBucket =  {
-                type,
-                rating,
-                dataType,
-                flows,
-                applications: vm.apps
-            };
-        }
-        else {
-            console.log('rated-flow-summary-panel: unsupported selection', d);
+    dataTypeService
+        .loadDataTypes()
+        .then(dts => vm.dataTypes = dts);
+
+    vm.onTableClick = (clickData) => {
+        if (clickData.type === 'CELL') {
+            vm.onLoadDetail()
+                .then(() => vm.infoPanel = mkInfoCell(clickData, vm.flowData, vm.apps));
+        } else {
+            console.log('rated-flow-summary-panel: unsupported selection', clickData);
         }
     };
 
 }
+
+
+controller.$inject = [
+    'DataTypeService',
+    'DataFlowDecoratorStore',
+    'DataFlowDataStore'
+];
 
 
 const component = {

@@ -1,6 +1,5 @@
 package com.khartec.waltz.data;
 
-import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -8,7 +7,7 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.tally.ImmutableLongTally;
 import com.khartec.waltz.model.tally.ImmutableStringTally;
 import com.khartec.waltz.model.tally.LongTally;
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
@@ -18,6 +17,8 @@ import java.util.StringJoiner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
+
+import static com.khartec.waltz.common.Checks.checkNotNull;
 
 public class JooqUtilities {
 
@@ -33,14 +34,16 @@ public class JooqUtilities {
 
     public static final Field<Integer> TALLY_COUNT_FIELD = DSL.field("count", Integer.class);
 
+
     /**
      * Expects result set like: { Id, Count }
      */
-    public static final RecordMapper<Record2<String,Integer>, StringTally> TO_STRING_TALLY = r ->
+    public static final RecordMapper<Record2<String,Integer>, Tally<String>> TO_STRING_TALLY = r ->
             ImmutableStringTally.builder()
                     .count(r.value2())
                     .id(r.value1())
                     .build();
+
 
     public static final RecordMapper<Record2<Long,Integer>, LongTally> TO_LONG_TALLY = r ->
             ImmutableLongTally.builder()
@@ -49,6 +52,13 @@ public class JooqUtilities {
                     .build();
 
 
+    /**
+     * <ul>
+     *     <li>value1 : id</li>
+     *     <li>value2 : name</li>
+     *     <li>value3 : kind</li>
+     * </ul>
+     */
     public static final RecordMapper<? super Record3<Long, String, String>, EntityReference> TO_ENTITY_REFERENCE = r ->
         ImmutableEntityReference.builder()
                 .id(r.value1())
@@ -57,14 +67,7 @@ public class JooqUtilities {
                 .build();
 
 
-    public static <R> List<R> queryTableForList(Table table, RecordMapper<? super Record, R> mapper, Condition condition) {
-        return DSL.select(table.fields())
-                .from(table)
-                .where(condition)
-                .fetch(mapper);
-    }
-
-    public static List<StringTally> calculateStringTallies(
+    public static List<Tally<String>> calculateStringTallies(
             DSLContext dsl,
             Table table,
             Field<String> fieldToTally,
@@ -78,8 +81,8 @@ public class JooqUtilities {
 
         return tallyQuery
                 .fetch(TO_STRING_TALLY);
-
     }
+
 
     public static List<LongTally> calculateLongTallies(
             DSLContext dsl,
@@ -94,13 +97,13 @@ public class JooqUtilities {
         .fetch(TO_LONG_TALLY);
     }
 
+
     public static class MSSQL {
 
         public static SQL mkContains(Collection<String> terms) {
-            Checks.checkNotNull(terms, "terms cannot be null");
+            checkNotNull(terms, "terms cannot be null");
             return mkContains(terms.toArray(new String[0]));
         }
-
 
         public static SQL mkContains(String... terms) {
             StringJoiner joiner = new StringJoiner(" AND ", "CONTAINS(*, '", "')");
@@ -111,11 +114,11 @@ public class JooqUtilities {
             return DSL.sql(joiner.toString());
         }
 
-
         private static String wrapSpecialInQuotes(String t) {
             return t.contains("&") ? "\"" + t + "\"" : t;
         }
     }
+
 
     public static <T> SelectHavingStep<Record2<T, Integer>> makeTallyQuery(
             DSLContext dsl,
@@ -128,7 +131,6 @@ public class JooqUtilities {
                 .from(table)
                 .where(dsl.renderInlined(recordsInScopeCondition))
                 .groupBy(fieldToTally);
-
     }
 
 }

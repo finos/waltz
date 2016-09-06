@@ -1,7 +1,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.user_contribution.UserContributionService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -38,7 +38,7 @@ public class UserContributionEndpoint implements Endpoint {
         String getScoreForUserPath = mkPath(BASE_URL, "user", ":userId", "score");
         String findScoresForDirectReportsPath = mkPath(BASE_URL, "user", ":userId", "directs", "score");
 
-        ListRoute<StringTally> getLeaderBoardRoute = (request, response) -> {
+        ListRoute<Tally<String>> getLeaderBoardRoute = (request, response) -> {
             String limitStr = request.queryParams("limit");
             int limit = parseInteger(limitStr, DEFAULT_LIMIT);
 
@@ -48,7 +48,7 @@ public class UserContributionEndpoint implements Endpoint {
         DatumRoute<Double> getScoreForUserRoute = (request, response) ->
                 userContributionService.getScoreForUser(request.params("userId"));
 
-        ListRoute<StringTally> findScoresForDirectReportsRoute = (request, response) ->
+        ListRoute<Tally<String>> findScoresForDirectReportsRoute = (request, response) ->
                 userContributionService.findScoresForDirectReports(request.params("userId"));
 
         getForList(getLeaderBoardPath, getLeaderBoardRoute);

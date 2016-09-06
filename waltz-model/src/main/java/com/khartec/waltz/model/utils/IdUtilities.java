@@ -20,9 +20,11 @@ package com.khartec.waltz.model.utils;
 import com.khartec.waltz.model.IdProvider;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.MapUtilities.indexBy;
 
 
 public class IdUtilities {
@@ -70,5 +72,9 @@ public class IdUtilities {
                 .id()
                 .orElseThrow(() -> new IllegalArgumentException(exceptionMessage));
 
+    }
+
+    public static <T extends IdProvider> Map<Long, T> indexById(List<T> ts) {
+        return indexBy(t -> t.id().get(), ts);
     }
 }

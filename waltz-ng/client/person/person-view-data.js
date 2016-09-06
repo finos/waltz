@@ -50,6 +50,11 @@ const initModel = {
 };
 
 
+function toSelector(personId, scope='CHILDREN') {
+    return { entityReference: { kind: 'PERSON', id: personId }, scope };
+}
+
+
 function buildAppInvolvementSummary(apps = [], involvements = []) {
     const appsById = _.keyBy(apps, 'id');
 
@@ -161,7 +166,7 @@ function service($q,
 
     function loadCostStats(personId) {
         assetCostViewService
-            .initialise({ entityReference: { kind: 'PERSON', id: personId }, scope: 'CHILDREN' }, 2016)
+            .initialise(toSelector(personId), 2016)
             .then(assetCostData => state.model.assetCostData = assetCostData);
     }
 

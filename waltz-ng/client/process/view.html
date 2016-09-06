@@ -10,7 +10,7 @@
             <li>
                 <a ui-sref="main.process.list">Processes</a>
             </li>
-            <li>{{ ctrl.process.name }}</li>
+            <li ng-bind="ctrl.process.name"></li>
         </ol>
     </waltz-page-header>
 
@@ -184,7 +184,6 @@
                                        flow-data="ctrl.dataFlows"
                                        on-load-detail="ctrl.loadFlowDetail"
                                        applications="ctrl.applications">
-
     </waltz-data-flows-tabgroup-section>
 
 

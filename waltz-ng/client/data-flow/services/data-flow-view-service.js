@@ -1,22 +1,25 @@
 const initData = {
     loadingStats: false,
     loadingFlows: false,
+    decorators: [],
     flows: [],
     options: {},
     stats: {}
 };
 
 
-function service($q, dataFlowStore) {
+function service($q,
+                 dataFlowStore,
+                 dataFlowDecoratorStore) {
     let data = initData;
 
     function initialise(id, kind, scope = 'CHILDREN') {
         reset();
         data.loadingStats = true;
-        data.options = {
-            entityReference: { id, kind },
-            scope
-        };
+
+        data.options = _.isObject(id)
+            ? id
+            : { entityReference: { id, kind }, scope };
 
         return dataFlowStore
             .calculateStats(data.options)
@@ -34,13 +37,20 @@ function service($q, dataFlowStore) {
         }
 
         data.loadingFlows = true;
-        return dataFlowStore
+
+
+        const flowPromise = dataFlowStore
             .findByAppIdSelector(data.options)
-            .then(flows => {
-                data.loadingFlows = false;
-                data.flows = flows;
-                return data;
-            });
+            .then(flows => data.flows = flows);
+
+        const decoratorPromise = dataFlowDecoratorStore
+            .findBySelectorAndKind(data.options, 'DATA_TYPE')
+            .then(decorators => data.decorators = decorators);
+
+        return $q
+            .all([flowPromise, decoratorPromise])
+            .then(() => data.loadingFlows = false)
+            .then(() => data);
     }
 
 
@@ -59,7 +69,8 @@ function service($q, dataFlowStore) {
 
 service.$inject = [
     '$q',
-    'DataFlowDataStore'
+    'DataFlowDataStore',
+    'DataFlowDecoratorStore'
 ];
 
 

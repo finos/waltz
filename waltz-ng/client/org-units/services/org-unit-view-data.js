@@ -11,7 +11,6 @@
  */
 
 import _ from "lodash";
-import RatedFlowsData from "../../data-flow/RatedFlowsData";
 import {aggregatePeopleInvolvements} from "../../involvement/involvement-utils";
 
 
@@ -26,7 +25,6 @@ function service($q,
                  ratingStore,
                  perspectiveStore,
                  orgUnitStore,
-                 ratedDataFlowDataService,
                  authSourceCalculator,
                  endUserAppStore,
                  assetCostViewService,
@@ -41,12 +39,13 @@ function service($q,
 
 
     function loadAll(orgUnitId) {
+        const entityReference = {
+            id: orgUnitId,
+            kind: 'ORG_UNIT'
+        };
 
         const appIdSelector = {
-            entityReference: {
-                id: orgUnitId,
-                kind: 'ORG_UNIT'
-            },
+            entityReference,
             scope: 'CHILDREN'
         };
 
@@ -75,6 +74,7 @@ function service($q,
                 const appsWithManagement = _.map(apps, a => _.assign(a, {management: 'IT'}));
 
                 const r = {
+                    entityReference,
                     orgUnits,
                     apps: appsWithManagement,
                     involvements,
@@ -104,7 +104,6 @@ function service($q,
             ratingStore.findByAppIdSelector(selector),
             appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(selector),
             capabilityStore.findAll(),
-            ratedDataFlowDataService.findByOrgUnitTree(orgUnitId),  // use orgIds (ASC + DESC)
             authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
             endUserAppStore.findBySelector(selector),   // use orgIds(DESC)
             complexityStore.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
@@ -119,7 +118,6 @@ function service($q,
                 capabilityRatings,
                 rawAppCapabilities,
                 capabilities,
-                ratedDataFlows,
                 authSources,
                 endUserApps,
                 complexity,
@@ -146,7 +144,6 @@ function service($q,
                     capabilityRatings,
                     rawAppCapabilities,
                     capabilities,
-                    ratedDataFlows,
                     authSources,
                     endUserApps: endUserAppsWithManagement,
                     complexity,
@@ -162,7 +159,6 @@ function service($q,
                 rawData.immediateHierarchy = orgUnitUtils.getImmediateHierarchy(rawData.orgUnits, orgUnitId);
                 rawData.involvements = aggregatePeopleInvolvements(rawData.involvements, rawData.people);
                 rawData.orgUnit = _.find(rawData.orgUnits, { id: orgUnitId });
-                rawData.ratedFlows = new RatedFlowsData(rawData.ratedDataFlows, rawData.apps, rawData.orgUnits, orgUnitId);
 
                 return rawData;
             });
@@ -179,7 +175,7 @@ function service($q,
 
 
     function loadFlowDetail() {
-        dataFlowViewService.loadDetail();
+        return dataFlowViewService.loadDetail();
     }
 
 
@@ -203,7 +199,6 @@ service.$inject = [
     'RatingStore',
     'PerspectiveStore',
     'OrgUnitStore',
-    'RatedDataFlowDataService',
     'AuthSourcesCalculator',
     'EndUserAppStore',
     'AssetCostViewService',

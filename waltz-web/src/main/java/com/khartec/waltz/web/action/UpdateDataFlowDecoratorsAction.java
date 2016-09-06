@@ -15,20 +15,23 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.dataflow;
+package com.khartec.waltz.web.action;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.authoritativesource.Rating;
+import com.khartec.waltz.model.EntityReference;
 import org.immutables.value.Value;
+
+import java.util.Set;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableRatedDataFlow.class)
-@JsonDeserialize(as = ImmutableRatedDataFlow.class)
-public abstract class RatedDataFlow {
+@JsonSerialize(as = ImmutableUpdateDataFlowDecoratorsAction.class)
+@JsonDeserialize(as = ImmutableUpdateDataFlowDecoratorsAction.class)
+public abstract class UpdateDataFlowDecoratorsAction {
 
-    public abstract Rating rating();
-    public abstract DataFlow dataFlow();
+    public abstract Set<EntityReference> addedDecorators();
+    public abstract Set<EntityReference> removedDecorators();
+    public abstract Long flowId();
 
 }

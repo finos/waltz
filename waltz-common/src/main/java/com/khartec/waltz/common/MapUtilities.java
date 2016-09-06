@@ -112,6 +112,13 @@ public class MapUtilities {
     }
 
 
+    /**
+     * Returns true if map is null or empty
+     * @param map
+     * @param <K>
+     * @param <V>
+     * @return
+     */
     public static <K, V> boolean isEmpty(Map<K, V> map) {
         return map == null || map.isEmpty();
     }
@@ -122,5 +129,36 @@ public class MapUtilities {
         return map == null
                 ? Optional.empty()
                 : Optional.ofNullable(map.get(key));
+    }
+
+    /**
+     * Similar to groupby, however the valueFn runs over the entire group after the initial grouping
+     * has been performed
+     * @param keyFn  - extracts/derives the grouping key
+     * @param valueFn - function which transforms each group
+     * @param xs - initial values
+     * @param <K> - key type
+     * @param <V> - (initial value type)
+     * @param <V2> - resultant value type
+     * @return
+     */
+    public static <K, V, V2> Map<K, V2> groupAndThen(Function<V, K> keyFn,
+                                                     Function<Collection<V>, V2> valueFn,
+                                                     Collection<V> xs) {
+        checkNotNull(xs, "xs cannot be null");
+        checkNotNull(keyFn, "keyFn cannot be null");
+        checkNotNull(valueFn, "valueFn cannot be null");
+
+        Map<K, V2> result = MapUtilities.newHashMap();
+        Map<K, Collection<V>> step1 = groupBy(keyFn, xs);
+
+        for (Map.Entry<K, Collection<V>> entry : step1.entrySet()) {
+
+            K key = entry.getKey();
+            Collection<V> group = entry.getValue();
+            V2 transformedGroup = valueFn.apply(group);
+            result.put(key, transformedGroup);
+        }
+        return result;
     }
 }

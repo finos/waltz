@@ -82,7 +82,10 @@ function drawTypesColumn(svg, dimensions, types, typeScale, tweaker) {
 
 function drawSourcesColumn(svg, dimensions, sources, scale, tweaker) {
 
-    const sourcesGroup = svg.selectAll('#sources')
+    console.log('t', tweaker.enter || noop);
+
+    const sourcesGroup = svg
+        .selectAll('#sources')
         .data([true]);
 
     sourcesGroup
@@ -207,8 +210,9 @@ function internetExplorerFix(selection) {
 
 
 function drawIncomingLines(svg, dimensions, incoming, sourceScale, typeScale, tweaker) {
-    const incomingFlows = svg.selectAll('#incoming-flows').data([true]);
-
+    const incomingFlows = svg
+        .selectAll('#incoming-flows')
+        .data([true]);
 
     incomingFlows
         .enter()
@@ -217,9 +221,10 @@ function drawIncomingLines(svg, dimensions, incoming, sourceScale, typeScale, tw
 
     const inbound = incomingFlows
         .selectAll('.wafd-flow')
-        .data(incoming, f => f.type + '_' + f.source);
+        .data(incoming, f => f.source.id);
 
-    inbound.enter()
+    inbound
+        .enter()
         .append('line')
         .attr('stroke', '#999')
         .attr('marker-end', 'url(#arrowhead)')
@@ -232,8 +237,9 @@ function drawIncomingLines(svg, dimensions, incoming, sourceScale, typeScale, tw
             y2: dimensions.viz.height / 2
         });
 
-    inbound.exit().remove();
-
+    inbound
+        .exit()
+        .remove();
 
     const isHighlighted = f => highlighted === f.source || highlighted === f.type;
 
@@ -246,7 +252,7 @@ function drawIncomingLines(svg, dimensions, incoming, sourceScale, typeScale, tw
             x1: dimensions.label.width + 5,
             x2: dimensions.viz.width / 2 - dimensions.label.width / 2
         })
-        .attr('y1', f => sourceScale(f.source) - dimensions.label.height / 2)
+        .attr('y1', f => sourceScale(f.source.id) - dimensions.label.height / 2)
         .attr('y2', f => typeScale(f.type) - dimensions.label.height / 2);
 
     inbound.call(internetExplorerFix);
@@ -278,7 +284,9 @@ function drawOutgoingLines(svg, dimensions, outgoing, targetScale, typeScale, tw
             y2: dimensions.viz.height / 2
         });
 
-    outbound.exit().remove();
+    outbound
+        .exit()
+        .remove();
 
     const isHighlighted = f => highlighted === f.target || highlighted === f.type;
 
@@ -292,7 +300,7 @@ function drawOutgoingLines(svg, dimensions, outgoing, targetScale, typeScale, tw
             x2: dimensions.viz.width - dimensions.label.width - 5
         })
         .attr('y1', f => typeScale(f.type) - dimensions.label.height / 2)
-        .attr('y2', f => targetScale(f.target) - dimensions.label.height / 2);
+        .attr('y2', f => targetScale(f.target.id) - dimensions.label.height / 2);
 
     outbound.call(internetExplorerFix);
 }
@@ -302,12 +310,13 @@ function draw(data, dimensions, svg, tweakers) {
 
     redraw = () => draw(data, dimensions, svg, tweakers);
 
-
     svg.attr({width: dimensions.viz.width, height: dimensions.viz.height});
 
     const { incoming, outgoing, types, sources, targets } = data;
 
-    const typeScale = d3.scale.ordinal()
+    const typeScale = d3
+        .scale
+        .ordinal()
         .domain(_.chain(types)
             .sortBy('name')
             .map('code')
@@ -318,12 +327,12 @@ function draw(data, dimensions, svg, tweakers) {
     const targetScale = mkAppScale(targets, dimensions);
 
     drawTitleBar(svg, dimensions);
-    drawTypesColumn(svg, dimensions, types, typeScale, tweakers.type || dfltTweaker);
-    drawSourcesColumn(svg, dimensions, sources, sourceScale, tweakers.source || dfltTweaker);
-    drawTargetsColumn(svg, dimensions, targets, targetScale, tweakers.target || dfltTweaker);
+    // drawTypesColumn(svg, dimensions, types, typeScale, tweakers.type || dfltTweaker);
+    drawSourcesColumn(svg, dimensions, sources, sourceScale, tweakers['source'] || dfltTweaker);
+    drawTargetsColumn(svg, dimensions, targets, targetScale, tweakers['target'] || dfltTweaker);
 
-    drawIncomingLines(svg, dimensions, incoming, sourceScale, typeScale, tweakers.incoming || dfltTweaker);
-    drawOutgoingLines(svg, dimensions, outgoing, targetScale, typeScale, tweakers.outgoing || dfltTweaker);
+    // drawIncomingLines(svg, dimensions, incoming, sourceScale, typeScale, tweakers.incoming || dfltTweaker);
+    // drawOutgoingLines(svg, dimensions, outgoing, targetScale, typeScale, tweakers.outgoing || dfltTweaker);
 }
 
 

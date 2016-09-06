@@ -18,6 +18,7 @@
 
 <div>
 
+
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.viewData.orgUnit.name }}"
                        icon="sitemap"
@@ -44,20 +45,6 @@
     </waltz-org-unit-overview>
 
 
-    <!-- COMPLEXITY -->
-    <waltz-complexity-section complexity="ctrl.viewData.complexity"
-                              apps="ctrl.viewData.apps">
-    </waltz-complexity-section>
-
-
-    <!-- PEOPLE -->
-    <waltz-involved-people-section
-        id="people-section"
-        involvements="ctrl.viewData.involvements"
-        source-data-ratings="ctrl.viewData.sourceDataRatings">
-    </waltz-involved-people-section>
-
-
     <!-- CAPABILITIES -->
     <waltz-rating-explorer-section applications="ctrl.viewData.apps"
                                    app-capabilities="ctrl.viewData.rawAppCapabilities"
@@ -72,7 +59,6 @@
                                        flow-data="ctrl.viewData.dataFlows"
                                        on-load-detail="ctrl.loadFlowDetail"
                                        applications="ctrl.viewData.apps">
-
     </waltz-data-flows-tabgroup-section>
 
 
@@ -80,13 +66,12 @@
     <waltz-section name="Authoritative Sources"
                    id="flows-section">
         <waltz-section-actions>
-            <span waltz-has-role="AUTHORITATIVE_SOURCE_EDITOR">
-                <a ng-if="ctrl.showAuthSourceEditBtn"
-                   ui-sref="main.auth-sources.edit (ctrl.entityRef)"
-                   class="btn btn-xs btn-primary">
-                    Edit
-                </a>
-            </span>
+            <a waltz-has-role="AUTHORITATIVE_SOURCE_EDITOR"
+               ng-if="ctrl.showAuthSourceEditBtn"
+               ui-sref="main.auth-sources.edit (ctrl.entityRef)"
+                  class="btn btn-xs btn-primary">
+                Edit
+            </a>
             <button class="btn btn-xs waltz-btn-transparent"
                     ng-click="ctrl.visibility.authOverlay = ! ctrl.visibility.authOverlay">
                 <waltz-icon name="map-signs"></waltz-icon>
@@ -105,36 +90,15 @@
                     Rated Flows
                 </uib-tab-heading>
 
-                <waltz-rated-flow-summary-panel ng-if="ctrl.viewData.ratedDataFlows.length > 0"
-                                                rated-flows="ctrl.viewData.ratedDataFlows"
-                                                apps="ctrl.viewData.apps"
-                                                org-unit-id="ctrl.viewData.orgUnitId">
+                <waltz-rated-flow-summary-panel apps="ctrl.viewData.apps"
+                                                entity-reference="ctrl.entityRef"
+                                                flow-data="ctrl.viewData.dataFlows"
+                                                on-load-detail="ctrl.loadFlowDetail">
                 </waltz-rated-flow-summary-panel>
 
-                <div ng-if="ctrl.viewData.ratedDataFlows.length == 0"
+                <div ng-if="ctrl.viewData.dataFlows.length == 0"
                      class="alert alert-warning">
                     No inbound data flows registered for this organisational unit
-                </div>
-
-                <div class="row"
-                     ng-if="shownRatedFlows && ctrl.viewData.ratedFlows.root.children.length > 0">
-                    <div class="col-md-8">
-                        <hr>
-
-                        <div>
-                            <h4 class="text-center">
-                                Child Organisational Units
-                            </h4>
-                            <waltz-summary-rated-flow-chart data="ctrl.viewData.ratedFlows.root"
-                                                            event-dispatcher="ctrl.eventDispatcher" >
-                            </waltz-summary-rated-flow-chart>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <waltz-rated-flow-summary-detail style="margin-top: 170px"
-                                                         event-dispatcher="ctrl.eventDispatcher">
-                        </waltz-rated-flow-summary-detail>
-                    </div>
                 </div>
 
                 <div class="row" style="padding-top: 12px;">
@@ -181,6 +145,20 @@
     </waltz-section>
 
 
+    <!-- COMPLEXITY -->
+    <waltz-complexity-section complexity="ctrl.viewData.complexity"
+                              apps="ctrl.viewData.apps">
+    </waltz-complexity-section>
+
+
+    <!-- PEOPLE -->
+    <waltz-involved-people-section
+        id="people-section"
+        involvements="ctrl.viewData.involvements"
+        source-data-ratings="ctrl.viewData.sourceDataRatings">
+    </waltz-involved-people-section>
+
+
     <!-- APPS -->
     <waltz-section name="Applications"
                    id="apps-section"
@@ -209,7 +187,6 @@
             <uib-tab select="showTableTab = true"
                      heading="Applications"
                      ng-if="ctrl.viewData.combinedApps.length">
-
                 <br>
                 <div ng-if="showTableTab">
                     <waltz-app-table filter="appQuery"

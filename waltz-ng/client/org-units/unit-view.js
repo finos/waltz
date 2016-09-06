@@ -50,6 +50,7 @@ function controller($stateParams,
     };
 
     vm.loadFlowDetail = () => viewDataService.loadFlowDetail();
+
 }
 
 controller.$inject = [

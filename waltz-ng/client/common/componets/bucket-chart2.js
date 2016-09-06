@@ -24,7 +24,6 @@ const bindings = {
 
 function render(config, onBucketSelect) {
 
-    console.log("config", config)
     const { svg, buckets, dimensions } = config;
 
     svg.attr({

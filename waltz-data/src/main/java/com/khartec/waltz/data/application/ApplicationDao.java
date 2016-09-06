@@ -33,6 +33,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,7 +97,7 @@ public class ApplicationDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-    public List<Application> findByIds(List<Long> ids) {
+    public List<Application> findByIds(Collection<Long> ids) {
         return dsl.select()
                 .from(APPLICATION)
                 .where(APPLICATION.ID.in(ids))

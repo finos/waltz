@@ -15,7 +15,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_hierarchy.EntityHierarchyItem;
 import com.khartec.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.service.capability.CapabilityService;
 import org.jooq.*;
@@ -79,12 +79,12 @@ public class EntityHierarchyService {
     }
 
 
-    public List<StringTally> tallyByKind() {
+    public List<Tally<String>> tallyByKind() {
         return entityHierarchyDao.tallyByKind();
     }
 
 
-    public List<StringTally> getRootTallies() {
+    public List<Tally<String>> getRootTallies() {
         return entityHierarchyDao.getRootTallies();
     }
 

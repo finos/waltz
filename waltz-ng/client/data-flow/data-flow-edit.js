@@ -10,16 +10,12 @@
  *
  */
 import _ from "lodash";
-import {loadDataFlows, loadDataTypes, loadAppAuthSources, loadOrgUnitAuthSources} from "./registration-utils";
-import {prepareSlopeGraph} from "./directives/slope-graph/slope-graph-utils";
-
-
-function calculateWorkingTypes(flows = [], predicate) {
-    return _.chain(flows)
-        .filter(predicate)
-        .map('dataType')
-        .value();
-}
+import {
+    loadDataTypes,
+    loadAppAuthSources} from "./registration-utils";
+import {
+    loadDataFlows,
+    loadDataFlowDecorators} from "../applications/data-load";
 
 
 function vetoMove(isDirty) {
@@ -31,13 +27,6 @@ function vetoMove(isDirty) {
 }
 
 
-function addApplication(app, appGroup) {
-    if (!app) return;
-    if (_.some(appGroup, a => a.id === app.id)) return;
-    appGroup.push(app);
-}
-
-
 function loadDataTypeUsages(dataTypeUsageStore, appId, vm) {
     dataTypeUsageStore
         .findForEntity('APPLICATION', appId)
@@ -46,7 +35,7 @@ function loadDataTypeUsages(dataTypeUsageStore, appId, vm) {
 
 
 function notifyIllegalFlow(notification, targetApp, flowApp) {
-    if(targetApp.id == flowApp.id) {
+    if (targetApp.id === flowApp.id) {
         notification.warning("An application may not link to itself.");
         return true;
     }
@@ -56,84 +45,89 @@ function notifyIllegalFlow(notification, targetApp, flowApp) {
 
 const initialState = {
     app: null,
-    currentDataTypes: [],
+    appsById: {},
     dataTypes: [],
     dataTypeUsages: [],
     flows: [],
-    graphOptions: {
-        data: {
-            incoming: [],
-            outgoing: [],
-            sources: [],
-            targets: [],
-            types: []
-        },
-        tweakers: {}
-    },
     isDirty: false,
-    mode: '',
+    mode: '', // editCounterpart | editDataTypeUsage
     selectedApp: null,
-    selectedDirection: null,
+    selectedDecorators: null,
+    selectedFlow: null,
     selectedUsages: []
 };
 
 
-function controller($q,
-                    $scope,
-                    $state,
+function mkAppRef(app) {
+    return {
+        id: app.id,
+        name: app.name,
+        kind: 'APPLICATION'
+    };
+}
+
+
+function mkNewFlow(source, target) {
+    return {
+        source: mkAppRef(source),
+        target: mkAppRef(target)
+    };
+}
+
+
+function addFlow(flows, flow) {
+    const alreadyRegistered = _.some(
+        flows,
+        f => f.source.id === flow.source.id && f.target.id === flow.targetId);
+
+    if (! alreadyRegistered) {
+        flows.push(flow);
+    }
+}
+
+
+function controller($scope,
                     application,
                     authSourceStore,
                     dataFlowStore,
+                    dataFlowDecoratorStore,
                     dataTypeService,
                     dataTypeUsageStore,
-                    displayNameService,
                     notification) {
-
     const primaryAppId = application.id;
-    const ouId = application.organisationalUnitId;
 
     const vm = _.defaultsDeep(this, initialState);
     vm.app = application;
 
-    const reload = () => {
-        loadDataFlows(dataFlowStore, primaryAppId, vm)
-            .then(() => prepareData());
+    vm.entityRef = {
+        kind: 'APPLICATION',
+        id: application.id,
+        name: application.name
+    };
 
+    const reload = () => {
+        loadDataFlows(dataFlowStore, primaryAppId, vm);
+        loadDataFlowDecorators(dataFlowDecoratorStore, primaryAppId, vm);
         loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm);
         vm.cancel();
     };
 
-
-    const selectSource = (app) => {
-        if (!app) return;
-        if (vetoMove(vm.isDirty)) {
-            return;
-        }
-
-        vm.selectedApp = app;
-        vm.selectedDirection = 'source';
-
-        vm.currentDataTypes = calculateWorkingTypes(
-            vm.flows,
-            { source: { id: app.id }});
-
-        vm.setMode('editCounterpart');
-
+    const selectSourceApp = (selection) => {
+        selectApp(selection, { source: { id: selection.id }});
     };
 
-    const selectTarget = (app) => {
-        if (vetoMove(vm.isDirty)) {
-            return;
-        }
-        vm.selectedApp = app;
-        vm.selectedDirection = 'target';
+    const selectTargetApp = (selection) => {
+        selectApp(selection, { target: { id: selection.id }});
+    };
 
-        vm.currentDataTypes = calculateWorkingTypes(
-            vm.flows,
-            { target: { id: app.id }});
-
+    const selectApp = (selection, flowSelectionPredicate) => {
+        if (vetoMove(vm.isDirty)) { return; }
         vm.setMode('editCounterpart');
-
+        vm.selectedApp = selection;
+        vm.selectedFlow = _.find(vm.flows, flowSelectionPredicate);
+        vm.selectedDecorators = vm.selectedFlow
+            ? _.filter(vm.dataFlowDecorators, { dataFlowId: vm.selectedFlow.id })
+            : [];
     };
 
     const selectType = (type) => {
@@ -145,81 +139,63 @@ function controller($q,
             .value()
     };
 
-    const promises = [
-        loadDataFlows(dataFlowStore, primaryAppId, vm),
-        loadAppAuthSources(authSourceStore, primaryAppId, vm),
-        loadOrgUnitAuthSources(authSourceStore, ouId, vm),
-        loadDataTypes(dataTypeService, vm),
-        loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm)
-    ];
-
-
-    const prepareData = () => {
-        const dataTypes = _.chain(vm.flows)
-            .map('dataType')
-            .uniq()
-            .value();
-
-        const graphOptions = prepareSlopeGraph(
-            primaryAppId,
-            vm.flows,
-            dataTypes,
-            vm.appAuthSources,
-            vm.ouAuthSources,
-            displayNameService,
-            $state);
-
-        graphOptions.tweakers.target = {
-            enter: selection => selection.on('click', app => $scope.$evalAsync(() => selectTarget(app)))
-        };
-
-        graphOptions.tweakers.source = {
-            enter: selection => selection.on('click', app => $scope.$evalAsync(() => selectSource(app)))
-        };
-
-        graphOptions.tweakers.type = {
-            enter: selection => selection
-                .classed('clickable', true)
-                .on('click', type => $scope.$evalAsync(() => selectType(type)))
-        };
-
-        vm.graphOptions = graphOptions;
+    const updateDecorators = (command) => {
+        dataFlowDecoratorStore
+            .updateDecorators(command)
+            .then(reload)
+            .then(() => notification.success('Data flow updated'));
     };
 
-    $q.all(promises)
-        .then(() => prepareData());
+    vm.flowTweakers = {
+        source: { onSelect: a => $scope.$applyAsync(() => selectSourceApp(a)) },
+        target: { onSelect: a => $scope.$applyAsync(() => selectTargetApp(a)) },
+        type: { onSelect: a => $scope.$applyAsync(() => selectType(a)) }
+    };
 
     vm.cancel = () => {
         vm.selectedApp = null;
-        vm.selectedDirection = null;
+        vm.selectedDecorators = null;
+        vm.selectedFlow = null;
         vm.isDirty = false;
         vm.setMode('');
     };
 
-    vm.saveFlows = (command) => {
-        dataFlowStore.create(command)
-            .then(() => reload())
-            .then(() => notification.success('Logical flows updated'));
+    vm.updateFlow = (command) => {
+        if (! command.flowId) {
+            dataFlowStore.addFlow(vm.selectedFlow)
+                .then(flow => Object.assign(command, { flowId: flow.id }))
+                .then(updateDecorators);
+
+        } else {
+            updateDecorators(command)
+        }
+    };
+
+    vm.deleteFlow = (flow) => {
+        dataFlowStore
+            .removeFlow(flow.id)
+            .then(reload)
+            .then(() => notification.warning('Data flow removed'));
     };
 
     vm.saveUsages = (usages = []) => {
-        const ref = { id: vm.app.id, kind: 'APPLICATION' };
         const dataTypeCode = vm.selectedDataType.code;
-        dataTypeUsageStore.save(ref, dataTypeCode, usages)
+        dataTypeUsageStore
+            .save(vm.entityRef, dataTypeCode, usages)
             .then(() => reload())
             .then(() => notification.success('Data usage updated'));
     };
 
-    vm.addSource = (app) => {
-        if(notifyIllegalFlow(notification, vm.app, app)) return;
-        selectSource(app);
-        addApplication(app, vm.graphOptions.data.sources);
+    vm.addSource = (srcApp) => {
+        if (notifyIllegalFlow(notification, application, srcApp)) return;
+        addFlow(vm.flows, mkNewFlow(srcApp, application));
+        selectSourceApp(srcApp);
     };
 
-    vm.addTarget = (app) => {
-        if(notifyIllegalFlow(notification, vm.app, app)) return;
-        selectTarget(app);
-        addApplication(app, vm.graphOptions.data.targets);
+    vm.addTarget = (targetApp) => {
+        if (notifyIllegalFlow(notification, application, targetApp)) return;
+        addFlow(vm.flows, mkNewFlow(application, targetApp));
+        selectTargetApp(targetApp);
     };
 
     vm.setDirtyChange = (dirty) => vm.isDirty = dirty;
@@ -230,19 +206,23 @@ function controller($q,
         }
         vm.mode = mode;
     };
+
+    // -- BOOT
+    loadAppAuthSources(authSourceStore, primaryAppId, vm);
+    loadDataTypes(dataTypeService, vm);
+    reload();
+
 }
 
 
 controller.$inject = [
-    '$q',
     '$scope',
-    '$state',
     'application',
     'AuthSourcesStore',
     'DataFlowDataStore',
+    'DataFlowDecoratorStore',
     'DataTypeService',
     'DataTypeUsageStore',
-    'WaltzDisplayNameService',
     'Notification'
 ];
 

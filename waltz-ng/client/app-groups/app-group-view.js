@@ -133,10 +133,12 @@ function controller($scope,
             member.role === 'OWNER'
             && member.userId === vm.user.userName;
 
-    dataFlowViewService.initialise(id, 'APP_GROUP', 'EXACT')
+    dataFlowViewService
+        .initialise(id, 'APP_GROUP', 'EXACT')
         .then(flows => vm.dataFlows = flows);
 
-    assetCostViewService.initialise(appIdSelector, 2016)
+    assetCostViewService
+        .initialise(appIdSelector, 2016)
         .then(costs => vm.assetCostData = costs);
 
     bookmarkStore
