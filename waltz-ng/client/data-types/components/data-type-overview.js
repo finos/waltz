@@ -11,7 +11,6 @@
  *
  */
 import {enrichServerStats} from "../../server-info/services/server-utilities";
-import {calcPortfolioCost} from "../../asset-cost/services/asset-cost-utilities";
 import {calcComplexitySummary} from "../../complexity/services/complexity-utilities";
 import {findNode, getParents} from "../../common";
 import {prepareDataTypeTree} from "../utilities";
@@ -23,7 +22,6 @@ const bindings = {
     apps: '<',
     flows: '<',
     ratings: '<',
-    costs: '<',
     serverStats: '<',
     complexity: '<',
     dataFlowTallies: '<',
@@ -43,10 +41,6 @@ function controller() {
             const node = findNode(roots, vm.dataTypeId);
             vm.dataType = node;
             vm.parents = getParents(node);
-        }
-
-        if(vm.costs) {
-            vm.portfolioCostStr = calcPortfolioCost(vm.costs);
         }
 
         if(vm.complexity) {

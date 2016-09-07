@@ -17,7 +17,6 @@
                               data-data-type-id="ctrl.viewData.dataType.id"
                               apps="ctrl.viewData.apps"
                               flows="ctrl.viewData.dataFlowTallies"
-                              costs="ctrl.viewData.assetCostData.stats"
                               server-stats="ctrl.viewData.techStats.serverStats"
                               complexity="ctrl.viewData.complexity"
                               usage-stats="ctrl.viewData.usageStats"
@@ -49,20 +48,6 @@
             </strong>
         </div>
     </waltz-section>
-
-    <!-- INDICATORS -->
-    <waltz-entity-statistic-summary-section name="Indicators"
-                                            definitions="ctrl.viewData.entityStatisticDefinitions"
-                                            parent-ref="ctrl.entityRef">
-    </waltz-entity-statistic-summary-section>
-
-
-    <!-- COSTS -->
-    <waltz-asset-costs-section data="ctrl.viewData.assetCostData"
-                               source-data-ratings="ctrl.viewData.sourceDataRatings"
-                               on-bucket-select="ctrl.onAssetBucketSelect"
-                               csv-name="asset_costs.csv">
-    </waltz-asset-costs-section>
 
 
     <!-- BOOKMARKS -->

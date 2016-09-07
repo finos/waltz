@@ -18,10 +18,8 @@ function service($q,
                  appCapabilityStore,
                  changeLogStore,
                  dataFlowStore,
-                 entityStatisticStore,
                  ratingStore,
                  dataTypeService,
-                 assetCostViewService,
                  complexityStore,
                  capabilityStore,
                  techStatsService,
@@ -51,7 +49,6 @@ function service($q,
             appStore.findBySelector(dataTypeIdSelector),
             dataFlowStore.findByDataTypeIdSelector(dataTypeIdSelector),
             changeLogStore.findByEntityReference('DATA_TYPE', dataTypeId),
-            assetCostViewService.initialise(dataTypeIdSelector, 2016),
             dataTypeUsageStore.findUsageStatsForDataTypeSelector(dataTypeIdSelector)
         ];
 
@@ -61,7 +58,6 @@ function service($q,
                 apps,
                 dataFlows,
                 changeLogs,
-                assetCostData,
                 usageStats
             ]) => {
 
@@ -72,7 +68,6 @@ function service($q,
                     apps: appsWithManagement,
                     dataFlows,
                     changeLogs,
-                    assetCostData,
                     usageStats
                 };
 
@@ -99,8 +94,7 @@ function service($q,
             complexityStore.findBySelector(dataTypeId, 'DATA_TYPE', 'CHILDREN'),
             techStatsService.findBySelector(dataTypeId, 'DATA_TYPE', 'CHILDREN'),
             bookmarkStore.findByParent({id: dataTypeId, kind: 'DATA_TYPE'}),
-            sourceDataRatingStore.findAll(),
-            entityStatisticStore.findAllActiveDefinitions(selector)
+            sourceDataRatingStore.findAll()
         ]);
 
         const prepareRawDataPromise = bulkPromise
@@ -111,8 +105,7 @@ function service($q,
                 complexity,
                 techStats,
                 bookmarks,
-                sourceDataRatings,
-                entityStatisticDefinitions
+                sourceDataRatings
             ]) => {
 
                 const r = {
@@ -123,8 +116,7 @@ function service($q,
                     complexity,
                     techStats,
                     bookmarks,
-                    sourceDataRatings,
-                    entityStatisticDefinitions,
+                    sourceDataRatings
                 };
 
                 Object.assign(rawData, r);
@@ -146,16 +138,8 @@ function service($q,
     }
 
 
-    function selectAssetBucket(bucket) {
-        assetCostViewService.selectBucket(bucket);
-        assetCostViewService.loadDetail()
-            .then(data => rawData.assetCostData = data);
-    }
-
-
     return {
-        loadAll,
-        selectAssetBucket,
+        loadAll
     };
 
 }
@@ -166,10 +150,8 @@ service.$inject = [
     'AppCapabilityStore',
     'ChangeLogDataService',
     'DataFlowDataStore',
-    'EntityStatisticStore',
     'RatingStore',
     'DataTypeService',
-    'AssetCostViewService',
     'ComplexityStore',
     'CapabilityStore',
     'TechnologyStatisticsService',
