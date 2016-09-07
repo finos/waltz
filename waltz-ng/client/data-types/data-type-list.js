@@ -31,7 +31,7 @@ function controller($state,
         .then(panels => vm.panels = panels);
 
     vm.blockProcessor = b => {
-        b.block.onclick = () => $state.go('main.data-type.view', { dataTypeId: b.value });
+        b.block.onclick = () => $state.go('main.data-type.code', { code: b.value });
         angular.element(b.block).addClass('clickable');
     };
 
