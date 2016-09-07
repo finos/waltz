@@ -12,17 +12,26 @@
             </li>
             <li>Data Types</li>
         </ol>
-
     </waltz-page-header>
 
 
-    <!-- OVERVIEW -->
-    <waltz-section name="Overview"
-                   ng-if="ctrl.diagrams.length > 0">
-        <waltz-svg-diagrams diagrams="ctrl.diagrams"
-                            block-processor="ctrl.blockProcessor">
-        </waltz-svg-diagrams>
-    </waltz-section>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="waltz-page-summary waltz-page-summary-attach">
+                <blockquote>
+                    Data Types describe what items of significance to the business are captured,
+                    consumed or produced by applications.
+                </blockquote>
+
+                <waltz-svg-diagrams diagrams="ctrl.diagrams"
+                                    block-processor="ctrl.blockProcessor">
+                                    block-processor="ctrl.blockProcessor">
+                </waltz-svg-diagrams>
+            </div>
+        </div>
+    </div>
+
+    <br>
 
 
     <!-- STATIC PANELS -->
@@ -81,7 +90,5 @@
             </div>
         </div>
     </waltz-section>
-
-
 
 </div>
