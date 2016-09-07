@@ -15,8 +15,11 @@
                     <p>
                         <span ng-bind="ctrl.selectedApp.description"></span>
                     </p>
-                    <h6 ng-if="ctrl.selectedApp.role" uib-tooltip="This persons role on the application">
-                        <strong>Role: </strong> {{ctrl.selectedApp.role | toDisplayName:'involvementKind'}}
+                    <h6 ng-if="ctrl.selectedApp.roles" uib-tooltip="This persons role(s) on the application">
+                        <strong>Role(s): </strong>
+                        <span ng-repeat="role in ctrl.selectedApp.roles">
+                            <span ng-bind="role | toDisplayName:'involvementKind'"></span><span ng-if="!$last">, </span>
+                        </span>
                     </h6>
                     <h6 ng-if="ctrl.selectedApp.assetCode">
                         <strong>Asset code: </strong> {{ctrl.selectedApp.assetCode}}
