@@ -58,15 +58,18 @@ function toSelector(personId, scope='CHILDREN') {
 function buildAppInvolvementSummary(apps = [], involvements = []) {
     const appsById = _.keyBy(apps, 'id');
 
-    const directlyInvolvedAppIds = _.map(involvements, 'entityReference.id');
+    const directlyInvolvedAppIds = _.chain(involvements).map('entityReference.id').uniq().value();
+
+
 
     const allAppIds = _.map(apps, 'id');
     const indirectlyInvolvedAppIds = _.difference(allAppIds, directlyInvolvedAppIds);
 
     const directAppInvolvements = _.chain(involvements)
-        .map(inv => {
-            let app = appsById[inv.entityReference.id];
-            app = _.assign(app, {role: inv.kind});
+        .groupBy('entityReference.id')
+        .map((grp, key) => {
+            let app = appsById[key];
+            app = _.assign(app, {roles: _.map(grp, g => g.kind)});
             return app;
         })
         .value();
