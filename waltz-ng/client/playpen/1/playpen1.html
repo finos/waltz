@@ -10,9 +10,15 @@
     </waltz-page-header>
 
     <!-- FLOWS -->
-    <waltz-data-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
+
+    <waltz-rated-flow-boingy-graph data="ctrl.flowData"
+                                   type-id="ctrl.entityReference.id">
+    </waltz-rated-flow-boingy-graph>
+
+
+    <xx-waltz-data-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
                                        flow-data="ctrl.flowData"
                                        on-load-detail="ctrl.onLoadDetail"
                                        applications="ctrl.apps">
-    </waltz-data-flows-tabgroup-section>
+    </xx-waltz-data-flows-tabgroup-section>
 </div>

@@ -24,15 +24,6 @@
     </waltz-data-type-overview>
 
 
-    <!-- FLOWS -->
-    <waltz-data-type-flows-tabgroup-section ratings="ctrl.viewData.sourceDataRatings"
-                                            flow-data="ctrl.viewData.dataFlows"
-                                            on-load-detail="ctrl.loadFlowDetail"
-                                            applications="ctrl.viewData.apps">
-
-    </waltz-data-type-flows-tabgroup-section>
-
-
     <!-- AUTH SOURCES -->
     <waltz-section name="Authoritative Sources"
                    icon="shield">
@@ -48,6 +39,12 @@
             </strong>
         </div>
     </waltz-section>
+
+
+    <!-- FLOWS -->
+    <waltz-rated-flow-boingy-graph data="ctrl.flowData"
+                                   type-id="ctrl.dataType.id">
+    </waltz-rated-flow-boingy-graph>
 
 
     <!-- BOOKMARKS -->

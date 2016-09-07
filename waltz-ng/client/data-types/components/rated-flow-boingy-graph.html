@@ -1,0 +1,18 @@
+<waltz-section icon='random'
+               name="Data Flows">
+    <div class="row">
+        <div class="col-md-9">
+            <waltz-data-flow-diagram data="$ctrl.flowData"
+                                     tweakers="$ctrl.graphTweakers">
+            </waltz-data-flow-diagram>
+        </div>
+        <div class="col-md-3">
+            <div ng-if="$ctrl.selectedApp">
+                <h4 ng-bind="$ctrl.selectedApp.name"></h4>
+                <a ui-sref="main.app.view ({ id: $ctrl.selectedApp.id })">
+                    More &raquo;
+                </a>
+            </div>
+        </div>
+    </div>
+</waltz-section>

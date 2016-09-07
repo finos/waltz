@@ -24,20 +24,23 @@ const initialState = {
 function controller($scope,
                     dataType,
                     viewDataService,
+                    dataFlowService,
                     historyStore) {
 
     const vm = initialiseData(this, initialState);
 
-    const appIdSelector = {
-        entityReference: {
-            kind: 'DATA_TYPE',
-            id: dataType.id
-        },
+    const entityReference = {
+        kind: 'DATA_TYPE',
+        id: dataType.id
+    };
+
+
+    const selector = {
+        entityReference,
         scope: 'CHILDREN'
     };
 
-    vm.entityRef = appIdSelector.entityReference;
-
+    vm.entityRef = entityReference;
     vm.dataType = dataType;
 
     vm.loadFlowDetail = () => viewDataService.loadFlowDetail();
@@ -48,9 +51,7 @@ function controller($scope,
     const refresh = () => {
         if (!vm.rawViewData) return;
         const dataType = vm.rawViewData.dataType;
-
         historyStore.put(dataType.name, 'DATA_TYPE', 'main.data-type.view', { id: dataType.id });
-
         vm.viewData = vm.rawViewData;
     };
 
@@ -58,6 +59,10 @@ function controller($scope,
         .loadAll(dataType.id)
         .then(data => vm.rawViewData = data)
         .then(d => refresh());
+
+    dataFlowService.initialise(selector)
+        .then(() => dataFlowService.loadDetail())
+        .then(flowData => vm.flowData = flowData);
 }
 
 
@@ -65,6 +70,7 @@ controller.$inject = [
     '$scope',
     'dataType',
     'DataTypeViewDataService',
+    'DataFlowViewService',
     'HistoryStore'
 ];
 
