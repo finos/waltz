@@ -4,7 +4,6 @@
         <th>Source</th>
         <th></th>
         <th>Target</th>
-        <th>Data Type</th>
     </tr>
     </thead>
     <tbody>
@@ -26,12 +25,6 @@
                 <span ng-bind="flow.target.name">
                 </span>
             </a>
-        </td>
-
-        <td>
-            <span title="{{ flow.dataType | toDescription:'dataType' }}">
-                {{ flow.dataType | toDisplayName:'dataType' }}
-            </span>
         </td>
     </tr>
     </tbody>
