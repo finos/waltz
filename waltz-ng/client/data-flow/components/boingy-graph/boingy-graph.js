@@ -23,6 +23,13 @@ const bindings = {
 };
 
 
+const DEFAULT_TWEAKER = {
+    enter: (selection) => selection,
+    exit: (selection) => selection,
+    update: (selection) => selection
+};
+
+
 const dispatcher = new EventDispatcher();
 
 function setupDimensions(vizElem) {
@@ -47,14 +54,29 @@ function setup(vizElem) {
         .append('svg');
 
 
-    svg.append('defs').append('marker')
+    const defs = svg.append('defs');
+
+    const markers = [
+        { name: 'arrowhead' , color: '#333' },
+        { name: 'arrowhead-PRIMARY' , color: 'green' },
+        { name: 'arrowhead-SECONDARY' , color: 'orange' },
+        { name: 'arrowhead-DISCOURAGED' , color: 'red' },
+        { name: 'arrowhead-NO_OPINION' , color: '#333' }
+    ];
+
+    defs.selectAll('marker')
+        .data(markers, m => m.name)
+        .enter()
+        .append('marker')
         .attr({
-            id: 'arrowhead',
+            id: d => d.name,
             refX: 20,
             refY: 4,
             markerWidth: 8,
             markerHeight: 8,
-            orient: 'auto'
+            orient: 'auto',
+            stroke: d => d3.rgb(d.color).hsl().darker(0.5),
+            fill: d => d3.rgb(d.color).hsl().brighter(1.5),
         })
         .append('path')
         .attr('d', 'M 0,0 V 8 L8,4 Z'); // this is actual shape for arrowhead
@@ -84,7 +106,7 @@ function addNodeLabel(selection) {
 }
 
 
-function drawLinks(flows = [], nodes = [], svg) {
+function drawLinks(flows = [], nodes = [], svg, linkTweakers = DEFAULT_TWEAKER) {
     const nodeIds = _.map(nodes, 'id');
 
     const links = _.map(
@@ -107,16 +129,19 @@ function drawLinks(flows = [], nodes = [], svg) {
     link.enter()
         .append('svg:line')
         .attr('marker-end', 'url(#arrowhead)')
-        .classed('wdfd-link', true);
+        .attr({ 'stroke' : '#333' })
+        .classed('wdfd-link', true)
+        .call(linkTweakers.enter);
 
     link.exit()
+        .call(linkTweakers.exit)
         .remove();
 
     return link;
 }
 
 
-function drawNodes(entities = [], svg, nodeTweakers) {
+function drawNodes(entities = [], svg, nodeTweakers = DEFAULT_TWEAKER) {
     const node = svg
         .selectAll('.wdfd-node')
         .data(entities, n => n.id);
@@ -135,18 +160,7 @@ function drawNodes(entities = [], svg, nodeTweakers) {
     return node;
 }
 
-
-function draw(data, parts, tweakers) {
-
-    const dimensions = setupDimensions(parts.vizElem);
-
-    force.size([dimensions.width, dimensions.height]);
-
-    parts.svg.attr({ width: dimensions.width, height: dimensions.height });
-
-    const linkSelection = drawLinks(data.flows, data.entities, parts.svg);
-
-    const nodeSelection = drawNodes(data.entities, parts.svg, tweakers.node);
+function animateLinks(linkSelection, nodeSelection, linkTweakers = DEFAULT_TWEAKER) {
 
     force.on('tick', () => {
         linkSelection
@@ -156,11 +170,24 @@ function draw(data, parts, tweakers) {
             .attr('x1', d => d.source.x)
             .attr('y1', d => d.source.y)
             .attr('x2', d => d.target.x)
-            .attr('y2', d => d.target.y);
+            .attr('y2', d => d.target.y)
+            .call(linkTweakers.update);
 
         nodeSelection
             .attr('transform', d => { return `translate(${d.x}, ${d.y})`; });
     });
+}
+
+
+function draw(data, parts, tweakers = { node: DEFAULT_TWEAKER, link: DEFAULT_TWEAKER }) {
+    const dimensions = setupDimensions(parts.vizElem);
+
+    force.size([dimensions.width, dimensions.height]);
+    parts.svg.attr({ width: dimensions.width, height: dimensions.height });
+
+    const linkSelection = drawLinks(data.flows, data.entities, parts.svg, tweakers.link);
+    const nodeSelection = drawNodes(data.entities, parts.svg, tweakers.node);
+    animateLinks(linkSelection, nodeSelection, tweakers.link);
 }
 
 
@@ -180,7 +207,7 @@ function controller($scope, $element) {
     vm.focusItem = null;
 
     vm.$onChanges = () => {
-        if (vm.data && vm.tweakers) {
+        if (vm.data) {
             // we draw using async to prevent clientWidth reporting '0'
             $scope.$applyAsync(() => draw(vm.data, parts, vm.tweakers));
         }

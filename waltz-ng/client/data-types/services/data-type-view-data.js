@@ -17,7 +17,6 @@ function service($q,
                  appStore,
                  appCapabilityStore,
                  changeLogStore,
-                 dataFlowStore,
                  ratingStore,
                  dataTypeService,
                  complexityStore,
@@ -47,7 +46,6 @@ function service($q,
         const promises = [
             dataTypeService.loadDataTypes(),
             appStore.findBySelector(dataTypeIdSelector),
-            dataFlowStore.findByDataTypeIdSelector(dataTypeIdSelector),
             changeLogStore.findByEntityReference('DATA_TYPE', dataTypeId),
             dataTypeUsageStore.findUsageStatsForDataTypeSelector(dataTypeIdSelector)
         ];
@@ -56,7 +54,6 @@ function service($q,
             .then(([
                 dataTypes,
                 apps,
-                dataFlows,
                 changeLogs,
                 usageStats
             ]) => {
@@ -66,7 +63,6 @@ function service($q,
                 const r = {
                     dataTypes,
                     apps: appsWithManagement,
-                    dataFlows,
                     changeLogs,
                     usageStats
                 };
@@ -149,7 +145,6 @@ service.$inject = [
     'ApplicationStore',
     'AppCapabilityStore',
     'ChangeLogDataService',
-    'DataFlowDataStore',
     'RatingStore',
     'DataTypeService',
     'ComplexityStore',

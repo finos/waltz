@@ -1,10 +1,9 @@
 
-
-
 const initData = {
     apps: [],
     flowData: null
 };
+
 
 
 
@@ -13,8 +12,8 @@ function controller(appStore, flowService) {
     const vm = Object.assign(this, initData);
 
     const entityReference = {
-        id: 260,
-        kind: 'ORG_UNIT'
+        id: 5000,
+        kind: 'DATA_TYPE'
     };
 
     const selector = {
@@ -28,13 +27,13 @@ function controller(appStore, flowService) {
 
     flowService
         .initialise(selector)
-        .then(fd => vm.flowData = fd);
+        .then(() => flowService.loadDetail())
+        .then(flowData => {
+            vm.flowData = flowData;
+        });
 
-    vm.onLoadDetail = () => {
-        flowService
-            .loadDetail()
-            .then(fd => vm.flowData = fd);
-    };
+    vm.entityReference = entityReference;
+
 }
 
 
