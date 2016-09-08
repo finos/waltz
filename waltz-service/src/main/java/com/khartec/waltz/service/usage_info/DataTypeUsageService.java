@@ -3,6 +3,8 @@ package com.khartec.waltz.service.usage_info;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.data.data_flow.DataFlowDao;
+import com.khartec.waltz.data.data_flow_decorator.DataFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.data_type_usage.DataTypeUsageDao;
 import com.khartec.waltz.model.EntityKind;
@@ -16,8 +18,6 @@ import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.usage_info.ImmutableUsageInfo;
 import com.khartec.waltz.model.usage_info.UsageInfo;
 import com.khartec.waltz.model.usage_info.UsageKind;
-import com.khartec.waltz.service.data_flow.DataFlowService;
-import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.data_type.DataTypeService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -40,32 +40,32 @@ public class DataTypeUsageService {
 
     private final DataTypeUsageDao dataTypeUsageDao;
     private final DataTypeService dataTypeService;
-    private final DataFlowService dataFlowService;
-    private final DataFlowDecoratorService dataFlowDecoratorService;
     private final ApplicationIdSelectorFactory appIdSelectorFactor;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
+    private final DataFlowDecoratorDao dataFlowDecoratorDao;
+    private DataFlowDao dataFlowDao;
 
 
     @Autowired
     public DataTypeUsageService(DataTypeUsageDao dataTypeUsageDao,
                                 DataTypeService dataTypeService,
-                                DataFlowService dataFlowService,
-                                DataFlowDecoratorService dataFlowDecoratorService,
                                 ApplicationIdSelectorFactory selectorFactory,
-                                DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
+                                DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
+                                DataFlowDao dataFlowDao,
+                                DataFlowDecoratorDao dataFlowDecoratorDao) {
         checkNotNull(dataTypeUsageDao, "dataTypeUsageDao cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
-        checkNotNull(dataFlowService, "dataFlowService cannot be null");
-        checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
         checkNotNull(selectorFactory, "appIdSelectorFactor cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
+        checkNotNull(dataFlowDao, "dataFlowDao cannot be null");
+        checkNotNull(dataFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
 
         this.dataTypeUsageDao = dataTypeUsageDao;
         this.dataTypeService = dataTypeService;
-        this.dataFlowService = dataFlowService;
-        this.dataFlowDecoratorService = dataFlowDecoratorService;
         this.appIdSelectorFactor = selectorFactory;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
+        this.dataFlowDao = dataFlowDao;
+        this.dataFlowDecoratorDao = dataFlowDecoratorDao;
     }
 
 
@@ -127,34 +127,36 @@ public class DataTypeUsageService {
         for (EntityReference ref : refs) {
             recalculateForApplication(ref);
         }
-
     }
+
 
     private void recalculateForApplication(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
 
-        List<DataFlow> flows = dataFlowService.findByEntityReference(ref);
-        List<DataFlowDecorator> dataTypeDecorators = dataFlowDecoratorService.findByFlowIdsAndKind(
+        List<DataFlow> flows = dataFlowDao.findByEntityReference(ref);
+        List<DataFlowDecorator> dataTypeDecorators = dataFlowDecoratorDao.findByFlowIdsAndKind(
                 toIds(flows),
                 EntityKind.DATA_TYPE);
         Map<Long, Collection<Long>> flowToDataTypeIds = groupBy(
                 d -> d.dataFlowId(),
                 d -> d.decoratorEntity().id(),
                 dataTypeDecorators);
-        Map<Optional<Long>, String> dataTypeIdToCode = indexBy(
-                dt -> dt.id(),
+        Map<Long, String> dataTypeIdToCode = indexBy(
+                dt -> dt.id().get(),
                 dt -> dt.code(),
                 dataTypeService.getAll());
 
         Set<String> incomingTypes = flows.stream()
                 .filter(f -> f.target().equals(ref)) // only incoming
-                .flatMap(f -> flowToDataTypeIds.get(f.id()).stream())
+                .map(f -> f.id().get())
+                .flatMap(fid -> flowToDataTypeIds.get(fid).stream())
                 .map(dtId -> dataTypeIdToCode.get(dtId))
                 .collect(Collectors.toSet());
 
         Set<String> outgoingTypes = flows.stream()
                 .filter(f -> f.source().equals(ref)) // only outgoing
-                .flatMap(f -> flowToDataTypeIds.get(f.id()).stream())
+                .map(f -> f.id().get())
+                .flatMap(fid -> flowToDataTypeIds.get(fid).stream())
                 .map(dtId -> dataTypeIdToCode.get(dtId))
                 .collect(Collectors.toSet());
 
@@ -166,6 +168,7 @@ public class DataTypeUsageService {
     private void recalculateUsage(UsageKind kind, EntityReference ref, Set<String> types) {
         List<DataTypeUsage> currentUsages = findForEntity(ref);
 
+        // Insert case
         for (String type: types) {
             Optional<DataTypeUsage> maybeExistingUsage = currentUsages.stream()
                     .filter(u -> u.dataTypeCode().equals(type))
@@ -191,9 +194,11 @@ public class DataTypeUsageService {
         }
 
 
+        // Delete case
         currentUsages.stream()
                 .filter(u -> ! types.contains(u.dataTypeCode()))
                 .filter(u -> u.usage().kind().equals(kind))
+                .filter(u -> StringUtilities.isEmpty(u.usage().description()))
                 .forEach(u -> dataTypeUsageDao.deleteUsageInfo(ref, u.dataTypeCode(), newArrayList(kind)));
 
 
