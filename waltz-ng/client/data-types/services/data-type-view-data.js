@@ -24,7 +24,6 @@ function service($q,
                  techStatsService,
                  bookmarkStore,
                  sourceDataRatingStore,
-                 dataTypeUsageStore,
                  authSourcesStore,
                  orgUnitStore
 ) {
@@ -47,7 +46,6 @@ function service($q,
             dataTypeService.loadDataTypes(),
             appStore.findBySelector(dataTypeIdSelector),
             changeLogStore.findByEntityReference('DATA_TYPE', dataTypeId),
-            dataTypeUsageStore.findUsageStatsForDataTypeSelector(dataTypeIdSelector)
         ];
 
         return $q.all(promises)
@@ -55,7 +53,6 @@ function service($q,
                 dataTypes,
                 apps,
                 changeLogs,
-                usageStats
             ]) => {
 
                 const appsWithManagement = _.map(apps, a => _.assign(a, {management: 'IT'}));
@@ -64,7 +61,6 @@ function service($q,
                     dataTypes,
                     apps: appsWithManagement,
                     changeLogs,
-                    usageStats
                 };
 
                 Object.assign(rawData, r);
@@ -152,7 +148,6 @@ service.$inject = [
     'TechnologyStatisticsService',
     'BookmarkStore',
     'SourceDataRatingStore',
-    'DataTypeUsageStore',
     'AuthSourcesStore',
     'OrgUnitStore'
 ];

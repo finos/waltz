@@ -21,7 +21,7 @@ function service($http,
      * returns tallies by usage-kind
      * @param selector
      */
-    const findUsageStatsForDataTypeSelector = (selector) => {
+    const calculateStats = (selector) => {
         checkIsIdSelector(selector);
         return $http
             .post(`${BASE}/type/stats`, selector)
@@ -46,7 +46,7 @@ function service($http,
     return {
         findForEntity,
         findForDataTypeSelector,
-        findUsageStatsForDataTypeSelector,
+        calculateStats,
         findForSelector,
         save
     };

@@ -2,9 +2,11 @@
                name="Data Flows">
     <div class="row">
         <div class="col-md-9">
-            <waltz-data-flow-diagram data="$ctrl.flowData"
-                                     tweakers="$ctrl.graphTweakers">
-            </waltz-data-flow-diagram>
+            <div style="border: 1px solid #ccc">
+                <waltz-data-flow-diagram data="$ctrl.flowData"
+                                         tweakers="$ctrl.graphTweakers">
+                </waltz-data-flow-diagram>
+            </div>
         </div>
         <div class="col-md-3">
             <div ng-if="$ctrl.selectedApp">

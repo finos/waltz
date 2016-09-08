@@ -23,6 +23,7 @@ import com.khartec.waltz.data.data_flow.DataFlowDao;
 import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
 import com.khartec.waltz.data.data_flow_decorator.DataFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.dataflow.DataFlow;
@@ -40,6 +41,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 
@@ -49,7 +51,7 @@ public class DataFlowService {
     private final DataFlowDao dataFlowDao;
     private final DataFlowStatsDao dataFlowStatsDao;
     private final DataFlowDecoratorDao dataFlowDecoratorDao;
-    private final ApplicationIdSelectorFactory idSelectorFactory;
+    private final ApplicationIdSelectorFactory appIdSelectorFactory;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
 
 
@@ -62,10 +64,10 @@ public class DataFlowService {
         checkNotNull(dataFlowDao, "dataFlowDao must not be null");
         checkNotNull(dataFlowStatsDao, "dataFlowStatsDao cannot be null");
         checkNotNull(dataFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
-        checkNotNull(appIdSelectorFactory, "idSelectorFactory cannot be null");
+        checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
 
-        this.idSelectorFactory = appIdSelectorFactory;
+        this.appIdSelectorFactory = appIdSelectorFactory;
         this.dataFlowStatsDao = dataFlowStatsDao;
         this.dataFlowDao = dataFlowDao;
         this.dataFlowDecoratorDao = dataFlowDecoratorDao;
@@ -78,9 +80,23 @@ public class DataFlowService {
     }
 
 
-    public List<DataFlow> findByAppIdSelector(IdSelectionOptions options) {
-        Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);
-        return dataFlowDao.findByApplicationIdSelector(appIdSelector);
+    /**
+     * Find decorators by selector. Supported desiredKinds:
+     * <ul>
+     *     <li>DATA_TYPE</li>
+     *     <li>APPLICATION</li>
+     * </ul>
+     * @param options
+     * @return
+     */
+    public List<DataFlow> findBySelector(IdSelectionOptions options) {
+        if (options.desiredKind() == DATA_TYPE) {
+            return (List<DataFlow>) findByDataTypeIdSelector(options);
+        }
+        if (options.desiredKind() == EntityKind.APPLICATION) {
+            return findByAppIdSelector(options);
+        }
+        throw new UnsupportedOperationException("Cannot find decorators for selector desiredKind: "+options.desiredKind());
     }
 
 
@@ -99,12 +115,54 @@ public class DataFlowService {
     }
 
 
+    /**
+     * Calculate Stats by selector. Supported desiredKinds:
+     * <ul>
+     *     <li>DATA_TYPE</li>
+     *     <li>APPLICATION</li>
+     * </ul>
+     * @param options
+     * @return
+     */
     public DataFlowStatistics calculateStats(IdSelectionOptions options) {
+        if (options.desiredKind() == EntityKind.APPLICATION) {
+            return calculateStatsForAppIdSelector(options);
+        }
+        throw new UnsupportedOperationException("Cannot calculate stats for selector desiredKind: "+options.desiredKind());
+    }
 
-        Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);
-        List<Tally<String>> dataTypeCounts = FunctionUtilities.time("DFS.dataTypes", () -> dataFlowStatsDao.tallyDataTypes(appIdSelector));
-        DataFlowMeasures appCounts = FunctionUtilities.time("DFS.appCounts", () -> dataFlowStatsDao.countDistinctAppInvolvement(appIdSelector));
-        DataFlowMeasures flowCounts = FunctionUtilities.time("DFS.flowCounts", () -> dataFlowStatsDao.countDistinctFlowInvolvement(appIdSelector));
+
+    public List<Tally<String>> tallyByDataType() {
+        return dataFlowStatsDao.tallyDataTypesByAppIdSelector(DSL.select(APPLICATION.ID).from(APPLICATION));
+    }
+
+
+    private List<DataFlow> findByAppIdSelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);
+        return dataFlowDao.findByApplicationIdSelector(appIdSelector);
+    }
+
+
+    private Collection<DataFlow> findByDataTypeIdSelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(options);
+        return dataFlowDao.findByDataTypeIdSelector(dataTypeIdSelector);
+    }
+
+
+    private DataFlowStatistics calculateStatsForAppIdSelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+
+        Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);
+        List<Tally<String>> dataTypeCounts = FunctionUtilities.time("DFS.dataTypes",
+                () -> dataFlowStatsDao.tallyDataTypesByAppIdSelector(appIdSelector));
+
+        DataFlowMeasures appCounts = FunctionUtilities.time("DFS.appCounts",
+                () -> dataFlowStatsDao.countDistinctAppInvolvementByAppIdSelector(appIdSelector));
+
+        DataFlowMeasures flowCounts = FunctionUtilities.time("DFS.flowCounts",
+                () -> dataFlowStatsDao.countDistinctFlowInvolvementByAppIdSelector(appIdSelector));
 
         return ImmutableDataFlowStatistics.builder()
                 .dataTypeCounts(dataTypeCounts)
@@ -113,15 +171,5 @@ public class DataFlowService {
                 .build();
     }
 
-
-    public List<Tally<String>> tallyByDataType() {
-        return dataFlowStatsDao.tallyDataTypes(DSL.select(APPLICATION.ID).from(APPLICATION));
-    }
-
-
-    public Collection<DataFlow> findByDataTypeIdSelector(IdSelectionOptions options) {
-        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(options);
-        return dataFlowDao.findByDataTypeIdSelector(dataTypeIdSelector);
-    }
 
 }

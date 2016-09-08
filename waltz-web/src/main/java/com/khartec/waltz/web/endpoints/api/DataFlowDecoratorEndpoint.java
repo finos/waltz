@@ -50,23 +50,33 @@ public class DataFlowDecoratorEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findDecorationsBySelectorAndKindPath = mkPath(BASE_URL, "kind", ":kind");
+        String findByIdSelectorAndKindPath = mkPath(BASE_URL, "kind", ":kind");
+        String findByIdSelectorPath = mkPath(BASE_URL, "selector");
         String updateDecoratorsPath = mkPath(BASE_URL, ":flowId");
         String summarizeForSelectorPath = mkPath(BASE_URL, "summarize");
 
-        ListRoute<DataFlowDecorator> findDecorationsBySelectorAndKindRoute =
+        ListRoute<DataFlowDecorator> findByIdSelectorAndKindRoute =
                 (request, response) -> dataFlowDecoratorService
-                        .findBySelectorAndKind(
+                        .findByIdSelectorAndKind(
                                 readIdSelectionOptionsFromBody(request),
                                 getKind(request));
+
+        ListRoute<DataFlowDecorator> findByIdSelectorRoute =
+                (request, response) -> dataFlowDecoratorService
+                        .findBySelector(
+                                readIdSelectionOptionsFromBody(request));
 
         ListRoute<DecoratorRatingSummary> summarizeForSelectorRoute =
                 (request, response) -> dataFlowDecoratorService.summarizeForSelector(
                         readIdSelectionOptionsFromBody(request));
 
         postForList(
-                findDecorationsBySelectorAndKindPath,
-                findDecorationsBySelectorAndKindRoute);
+                findByIdSelectorAndKindPath,
+                findByIdSelectorAndKindRoute);
+
+        postForList(
+                findByIdSelectorPath,
+                findByIdSelectorRoute);
 
         postForList(
                 summarizeForSelectorPath,

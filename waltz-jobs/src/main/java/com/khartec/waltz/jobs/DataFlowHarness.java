@@ -84,7 +84,7 @@ public class DataFlowHarness {
         union.stream().forEach(System.out::println);
 
 
-        FunctionUtilities.time("appCounts", () -> dataFlowStatsDao.countDistinctFlowInvolvement(DSL.select(APPLICATION.ID).from(APPLICATION)));
+        FunctionUtilities.time("appCounts", () -> dataFlowStatsDao.countDistinctFlowInvolvementByAppIdSelector(DSL.select(APPLICATION.ID).from(APPLICATION)));
 //
 
 
@@ -93,7 +93,7 @@ public class DataFlowHarness {
 
         dsl.renderNamedParams(selector);
         empIdParam.setValue("huSs97bwj");
-        FunctionUtilities.time("appCounts", () -> dataFlowStatsDao.countDistinctAppInvolvement(DSL.select(APPLICATION.ID).from(APPLICATION)));
+        FunctionUtilities.time("appCounts", () -> dataFlowStatsDao.countDistinctAppInvolvementByAppIdSelector(DSL.select(APPLICATION.ID).from(APPLICATION)));
         Select<Record1<Long>> subQ = HarnessUtilities.time("build person sub q", () -> mkForPersonReportees("huSs97bwj"));
 
             HarnessUtilities.time("build complex q", () -> bigQuery(dsl, mkForPersonReportees("huSs97bwj")));

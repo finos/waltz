@@ -66,8 +66,8 @@ public class DataFlowDecoratorDao {
 
     // --- FINDERS ---
 
-    public List<DataFlowDecorator> findBySelectorAndKind(Select<Record1<Long>> appIdSelector,
-                                                         EntityKind decoratorEntityKind) {
+    public List<DataFlowDecorator> findByAppIdSelectorAndKind(Select<Record1<Long>> appIdSelector,
+                                                              EntityKind decoratorEntityKind) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
         checkNotNull(decoratorEntityKind, "decoratorEntityKind cannot be null");
 
@@ -81,6 +81,22 @@ public class DataFlowDecoratorDao {
                 .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorEntityKind.name()))
                 .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .fetch(TO_DECORATOR_MAPPER);
+    }
+
+
+    public List<DataFlowDecorator> findByDecoratorEntityIdSelectorAndKind(Select<Record1<Long>> decoratorEntityIdSelector,
+                                                                          EntityKind decoratorKind) {
+        checkNotNull(decoratorEntityIdSelector, "decoratorEntityIdSelector cannot be null");
+        checkNotNull(decoratorKind, "decoratorKind cannot be null");
+
+        Condition condition = DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorKind.name())
+                .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(decoratorEntityIdSelector));
+
+        return dsl
+                .select(DATA_FLOW_DECORATOR.fields())
+                .from(DATA_FLOW_DECORATOR)
+                .where(dsl.renderInlined(condition))
                 .fetch(TO_DECORATOR_MAPPER);
     }
 
@@ -106,11 +122,8 @@ public class DataFlowDecoratorDao {
     }
 
 
-    public Collection<DataFlowDecorator> findBySelectorAndDecoratorEntity(Select<Record1<Long>> appIdSelector,
-                                                                          EntityReference decoratorRef) {
-        Condition condition = DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorRef.kind().name())
-                .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(decoratorRef.id()))
-                .and(DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector));
+    public Collection<DataFlowDecorator> findByAppIdSelector(Select<Record1<Long>> appIdSelector) {
+        Condition condition = DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector);
 
         return dsl.select(DATA_FLOW_DECORATOR.fields())
                 .from(DATA_FLOW_DECORATOR)

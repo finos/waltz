@@ -21,6 +21,8 @@ import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
+import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
@@ -228,21 +230,31 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
 
     private Select<Record1<Long>> mkForDataType(EntityReference ref, HierarchyQueryScope scope) {
-        ImmutableIdSelectionOptions dtSelectorOptions = ImmutableIdSelectionOptions.builder()
-                .entityReference(ref)
-                .scope(scope)
-                .build();
+        IdSelectionOptions dtSelectionOptions = IdSelectionOptions.mkOpts(ref, scope);
+        Select<Record1<Long>> dataTypeSelector = dataTypeIdSelectorFactory.apply(dtSelectionOptions);
 
-        Select<Record1<Long>> dtSelector = dataTypeIdSelectorFactory.apply(dtSelectorOptions);
+        Field appId = DSL.field("app_id", Long.class);
 
-        Condition condition = dataTypeUsage.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                .and(dataType.ID.in(dtSelector));
+        Condition condition = DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector)
+                .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()));
 
-        return dsl
-                .selectDistinct(dataTypeUsage.ENTITY_ID)
-                .from(dataTypeUsage)
-                .join(dataType).on(dataType.CODE.eq(dataTypeUsage.DATA_TYPE_CODE))
+        Select<Record1<Long>> targets = dsl
+                .select(DATA_FLOW.TARGET_ENTITY_ID.as(appId))
+                .from(DATA_FLOW)
+                .innerJoin(DATA_FLOW_DECORATOR)
+                .on(DATA_FLOW_DECORATOR.DATA_FLOW_ID.eq(DATA_FLOW.ID))
                 .where(dsl.renderInlined(condition));
+
+        Select<Record1<Long>> sources = dsl
+                .select(DATA_FLOW.SOURCE_ENTITY_ID.as(appId))
+                .from(DATA_FLOW)
+                .innerJoin(DATA_FLOW_DECORATOR)
+                .on(DATA_FLOW_DECORATOR.DATA_FLOW_ID.eq(DATA_FLOW.ID))
+                .where(dsl.renderInlined(condition));
+
+        return dsl.selectDistinct(appId)
+                .from(targets)
+                .union(sources);
     }
 
 }
