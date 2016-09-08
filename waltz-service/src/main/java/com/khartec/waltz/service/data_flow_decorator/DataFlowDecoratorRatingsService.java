@@ -32,6 +32,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.fromCollection;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.model.utils.IdUtilities.indexById;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class DataFlowDecoratorRatingsService {
@@ -83,10 +84,6 @@ public class DataFlowDecoratorRatingsService {
                 dataType,
                 parentRef);
 
-        EntityReference decoratorRef = EntityReference.mkRef(
-                EntityKind.DATA_TYPE,
-                dataType.id().get());
-
         IdSelectionOptions selectorOptions = ImmutableIdSelectionOptions.builder()
                 .entityReference(parentRef)
                 .scope(HierarchyQueryScope.CHILDREN)
@@ -94,9 +91,13 @@ public class DataFlowDecoratorRatingsService {
 
         Select<Record1<Long>> selector = appIdSelectorFactory.apply(selectorOptions);
 
-        Collection<DataFlowDecorator> impactedDecorators = dataFlowDecoratorDao.findBySelectorAndDecoratorEntity(
-                selector,
-                decoratorRef);
+        Collection<DataFlowDecorator> impactedDecorators = dataFlowDecoratorDao
+                .findByAppIdSelectorAndKind(
+                    selector,
+                    EntityKind.DATA_TYPE)
+                .stream()
+                .filter(decorator -> decorator.decoratorEntity().id() == dataType.id().get())
+                .collect(toList());
 
         Collection<DataFlowDecorator> reRatedDecorators = calculateRatings(impactedDecorators);
 

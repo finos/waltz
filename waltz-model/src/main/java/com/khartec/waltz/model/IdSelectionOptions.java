@@ -9,7 +9,24 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableIdSelectionOptions.class)
 public abstract class IdSelectionOptions {
 
+
+    @Value.Default
+    public EntityKind desiredKind() {
+        return EntityKind.APPLICATION;
+    }
+
     public abstract EntityReference entityReference();
     public abstract HierarchyQueryScope scope();
 
+    public static IdSelectionOptions mkOpts(EntityReference ref, HierarchyQueryScope scope) {
+        return mkOpts(ref, scope, EntityKind.APPLICATION);
+    }
+
+    public static IdSelectionOptions mkOpts(EntityReference ref, HierarchyQueryScope scope, EntityKind desiredKind) {
+        return ImmutableIdSelectionOptions.builder()
+                .entityReference(ref)
+                .scope(scope)
+                .desiredKind(desiredKind)
+                .build();
+    }
 }

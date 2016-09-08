@@ -7,6 +7,8 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntityIdSelectionOptions.class)
 @JsonDeserialize(as = ImmutableEntityIdSelectionOptions.class)
+@Deprecated
+// desiredKind migrated to (optional) field in IdSelectionOptions
 public abstract class EntityIdSelectionOptions {
     public abstract EntityKind desiredKind();
     public abstract EntityReference entityReference();

@@ -1,4 +1,4 @@
-import {checkIsApplicationIdSelector} from "../../common/checks";
+import {checkIsApplicationIdSelector, checkIsIdSelector} from "../../common/checks";
 
 
 function service($http,
@@ -12,6 +12,15 @@ function service($http,
             .post(`${BASE}/kind/${kind}`, selector)
             .then(result => result.data);
     };
+
+
+    const findBySelector = (selector) => {
+        checkIsIdSelector(selector);
+        return $http
+            .post(`${BASE}/selector`, selector)
+            .then(result => result.data);
+    };
+
 
     /**
      * where command like:
@@ -51,6 +60,7 @@ function service($http,
 
     return {
         findBySelectorAndKind,
+        findBySelector,
         updateDecorators,
         summarizeBySelector
     };
