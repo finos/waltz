@@ -229,25 +229,6 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForDataTypeOld(EntityReference ref, HierarchyQueryScope scope) {
-        ImmutableIdSelectionOptions dtSelectorOptions = ImmutableIdSelectionOptions.builder()
-                .entityReference(ref)
-                .scope(scope)
-                .build();
-
-        Select<Record1<Long>> dtSelector = dataTypeIdSelectorFactory.apply(dtSelectorOptions);
-
-        Condition condition = dataTypeUsage.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                .and(dataType.ID.in(dtSelector));
-
-        return dsl
-                .selectDistinct(dataTypeUsage.ENTITY_ID)
-                .from(dataTypeUsage)
-                .join(dataType).on(dataType.CODE.eq(dataTypeUsage.DATA_TYPE_CODE))
-                .where(dsl.renderInlined(condition));
-    }
-
-
     private Select<Record1<Long>> mkForDataType(EntityReference ref, HierarchyQueryScope scope) {
         IdSelectionOptions dtSelectionOptions = IdSelectionOptions.mkOpts(ref, scope);
         Select<Record1<Long>> dataTypeSelector = dataTypeIdSelectorFactory.apply(dtSelectionOptions);
