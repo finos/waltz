@@ -49,7 +49,7 @@ public class ApplicationIdSelectorHarness {
 
         fetch.forEach(r -> System.out.println(r.value1()));
 
-        List<DataFlow> r = service.findByAppIdSelector(options);
+        List<DataFlow> r = service.findBySelector(options);
         System.out.println(r);
     }
 

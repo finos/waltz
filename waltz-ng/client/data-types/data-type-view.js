@@ -64,8 +64,7 @@ function controller($scope,
     dataFlowService.initialise(selector)
         .then(flowData => vm.flowData = flowData)
         .then(() => dataFlowService.loadDetail())
-        .then(flowData => vm.flowData = flowData)
-        .then(d => console.log('intialise: ', d, selector));
+        .then(flowData => vm.flowData = flowData);
 }
 
 
