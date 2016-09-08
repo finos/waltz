@@ -1,5 +1,7 @@
 import _ from "lodash";
 import {kindToViewState, resetData} from "../common";
+import {updateUrlWithoutReload, hasRelatedDefinitions} from './utilities';
+
 
 const initData = {
     applications: [],
@@ -17,22 +19,6 @@ const initData = {
         related: false
     }
 };
-
-
-function updateUrlWithoutReload($state, navItem) {
-    $state.go('.', {id: navItem.id}, {notify: false});
-}
-
-
-function hasRelatedDefinitions(defs) {
-    const relatedCount = defs.children.length
-        + (defs.parent
-            ? 1
-            : 0)
-        + defs.siblings.length;
-
-    return relatedCount > 0;
-}
 
 
 function controller($q,
