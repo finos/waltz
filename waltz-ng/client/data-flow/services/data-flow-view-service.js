@@ -10,18 +10,23 @@ const initData = {
 
 function service($q,
                  dataFlowStore,
-                 dataFlowDecoratorStore) {
+                 dataFlowDecoratorStore,
+                 dataTypeUsageStore) {
     let data = initData;
 
-    function initialise(id, kind, scope = 'CHILDREN') {
+    function initialise(id, kind, scope = 'CHILDREN', desiredKind = 'APPLICATION') {
         reset();
         data.loadingStats = true;
 
         data.options = _.isObject(id)
             ? id
-            : { entityReference: { id, kind }, scope };
+            : { entityReference: { id, kind }, scope, desiredKind };
 
-        return dataFlowStore
+        const statStore = data.options.desiredKind === 'APPLICATION'
+            ? dataFlowStore
+            : dataTypeUsageStore;
+
+        return statStore
             .calculateStats(data.options)
             .then(stats => {
                 data.loadingStats = false;
@@ -40,17 +45,17 @@ function service($q,
 
 
         const flowPromise = dataFlowStore
-            .findByAppIdSelector(data.options)
+            .findBySelector(data.options)
             .then(flows => data.flows = flows);
 
         const decoratorPromise = dataFlowDecoratorStore
-            .findBySelectorAndKind(data.options, 'DATA_TYPE')
+            .findBySelector(data.options)
             .then(decorators => data.decorators = decorators);
 
         return $q
             .all([flowPromise, decoratorPromise])
             .then(() => data.loadingFlows = false)
-            .then(() => data);
+            .then(() => ({...data}));
     }
 
 
@@ -70,7 +75,8 @@ function service($q,
 service.$inject = [
     '$q',
     'DataFlowDataStore',
-    'DataFlowDecoratorStore'
+    'DataFlowDecoratorStore',
+    'DataTypeUsageStore'
 ];
 
 

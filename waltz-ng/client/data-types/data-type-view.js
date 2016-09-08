@@ -37,7 +37,8 @@ function controller($scope,
 
     const selector = {
         entityReference,
-        scope: 'CHILDREN'
+        scope: 'CHILDREN',
+        desiredKind: 'DATA_TYPE'
     };
 
     vm.entityRef = entityReference;
@@ -61,9 +62,10 @@ function controller($scope,
         .then(d => refresh());
 
     dataFlowService.initialise(selector)
+        .then(flowData => vm.flowData = flowData)
         .then(() => dataFlowService.loadDetail())
         .then(flowData => vm.flowData = flowData)
-        .then(d => console.log(d));
+        .then(d => console.log('intialise: ', d, selector));
 }
 
 

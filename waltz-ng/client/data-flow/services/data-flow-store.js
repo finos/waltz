@@ -14,17 +14,14 @@ function service($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/data-flows`;
 
     // --- FINDERS ---
-    const findByAppIdSelector = (options) => $http
-        .post(`${BASE}/apps`, options)
+    const findBySelector = (options) => $http
+        .post(`${BASE}/selector`, options)
         .then(r => r.data);
 
     const findByEntityReference = (kind, id) => $http
         .get(`${BASE}/entity/${kind}/${id}`)
         .then(result => result.data);
 
-    const findByDataTypeIdSelector = (options) => $http
-        .post(`${BASE}/data-type`, options)
-        .then(r => r.data);
 
     // --- STATS ---
     const calculateStats = (options) => $http
@@ -45,9 +42,8 @@ function service($http, BaseApiUrl) {
         .then(r => r.data);
 
     return {
-        findByAppIdSelector,
+        findBySelector,
         findByEntityReference,
-        findByDataTypeIdSelector,
         calculateStats,
         countByDataType,
         removeFlow,

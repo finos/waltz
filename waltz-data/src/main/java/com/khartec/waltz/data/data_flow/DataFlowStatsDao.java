@@ -34,6 +34,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.TO_STRING_TALLY;
+import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 
@@ -61,7 +62,7 @@ public class DataFlowStatsDao {
     }
 
 
-    public DataFlowMeasures countDistinctAppInvolvement(Select<Record1<Long>> appIdSelector) {
+    public DataFlowMeasures countDistinctAppInvolvementByAppIdSelector(Select<Record1<Long>> appIdSelector) {
 
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
@@ -102,7 +103,7 @@ public class DataFlowStatsDao {
     }
 
 
-    public List<Tally<String>> tallyDataTypes(Select<Record1<Long>> appIdSelector) {
+    public List<Tally<String>> tallyDataTypesByAppIdSelector(Select<Record1<Long>> appIdSelector) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
         Condition condition = df.TARGET_ENTITY_ID.in(appIdSelector)
@@ -119,14 +120,14 @@ public class DataFlowStatsDao {
                 .on(df.ID.eq(dfd.DATA_FLOW_ID))
                 .innerJoin(dt)
                 .on(dt.ID.eq(dfd.DECORATOR_ENTITY_ID)
-                        .and(dfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
+                        .and(dfd.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name())))
                 .where(dsl.renderInlined(condition))
                 .groupBy(dt.CODE)
                 .fetch(TO_STRING_TALLY);
     }
 
 
-    public DataFlowMeasures countDistinctFlowInvolvement(Select<Record1<Long>> appIdSelector) {
+    public DataFlowMeasures countDistinctFlowInvolvementByAppIdSelector(Select<Record1<Long>> appIdSelector) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
 

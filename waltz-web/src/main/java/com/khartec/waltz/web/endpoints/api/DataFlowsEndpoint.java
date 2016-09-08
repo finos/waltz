@@ -65,10 +65,9 @@ public class DataFlowsEndpoint implements Endpoint {
     @Override
     public void register() {
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
-        String findByAppIdSelectorPath = mkPath(BASE_URL, "apps");
+        String findBySelectorPath = mkPath(BASE_URL, "selector");
         String findStatsPath = mkPath(BASE_URL, "stats");
         String tallyByDataTypePath = mkPath(BASE_URL, "count-by", "data-type");
-        String findByDataTypeIdSelectorPath = mkPath(BASE_URL, "data-type");
 
         String removeFlowPath = mkPath(BASE_URL, ":id");
         String addFlowPath = mkPath(BASE_URL);
@@ -76,8 +75,8 @@ public class DataFlowsEndpoint implements Endpoint {
         ListRoute<DataFlow> getByEntityRef = (request, response)
                 -> dataFlowService.findByEntityReference(getEntityReference(request));
 
-        ListRoute<DataFlow> findByAppIdSelectorRoute = (request, response)
-                -> dataFlowService.findByAppIdSelector(readIdSelectionOptionsFromBody(request));
+        ListRoute<DataFlow> findBySelectorRoute = (request, response)
+                -> dataFlowService.findBySelector(readIdSelectionOptionsFromBody(request));
 
         DatumRoute<DataFlowStatistics> findStatsRoute = (request, response)
                 -> dataFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
@@ -85,13 +84,11 @@ public class DataFlowsEndpoint implements Endpoint {
         ListRoute<Tally<String>> tallyByDataTypeRoute = (request, response)
                 -> dataFlowService.tallyByDataType();
 
-        ListRoute<DataFlow> findByDataTypeIdSelectorRoute = (request, response)
-                -> dataFlowService.findByDataTypeIdSelector(readIdSelectionOptionsFromBody(request));
+
 
         getForList(findByEntityPath, getByEntityRef);
-        postForList(findByAppIdSelectorPath, findByAppIdSelectorRoute);
-        postForList(findByDataTypeIdSelectorPath, findByDataTypeIdSelectorRoute);
-        
+        postForList(findBySelectorPath, findBySelectorRoute);
+
         postForDatum(findStatsPath, findStatsRoute);
         getForList(tallyByDataTypePath, tallyByDataTypeRoute);
 

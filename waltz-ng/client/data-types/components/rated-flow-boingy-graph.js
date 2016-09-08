@@ -1,5 +1,5 @@
-import { authoritativeRatingColorScale } from '../../common/colors'
-import _ from 'lodash';
+import {authoritativeRatingColorScale} from "../../common/colors";
+import _ from "lodash";
 
 
 const bindings = {
@@ -62,25 +62,12 @@ const buildGraphTweakers = (decorators = [], onAppSelect) => {
 
 
 function prepareData(dataTypeId, flows = [], decorators = [], onAppSelect) {
-    const relevantDecorators = _.filter(
-        decorators,
-        d => d.decoratorEntity.id === dataTypeId && d.decoratorEntity.kind === 'DATA_TYPE');
-
-    const relevantFlowIds = _.chain(relevantDecorators)
-        .map(d => d.dataFlowId)
-        .uniq()
-        .value();
-
-    const relevantFlows = _.filter(
-        flows,
-        f => _.includes(relevantFlowIds, f.id));
-
-    const graphTweakers = buildGraphTweakers(relevantDecorators, onAppSelect);
+    const graphTweakers = buildGraphTweakers(decorators, onAppSelect);
 
     const flowData = {
-        entities: calculateEntities(relevantFlows),
-        flows: relevantFlows,
-        decorators: relevantDecorators
+        entities: calculateEntities(flows),
+        flows,
+        decorators
     };
 
 
