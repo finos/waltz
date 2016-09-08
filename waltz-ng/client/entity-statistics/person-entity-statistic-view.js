@@ -1,5 +1,6 @@
 import _ from "lodash";
 import {resetData} from "../common";
+import {updateUrlWithoutReload, hasRelatedDefinitions} from './utilities';
 
 const initData = {
     statistic: {
@@ -8,26 +9,26 @@ const initData = {
         values: []
     },
     relatedDefinitions: null,
+    bookmarks: [],
     summaries: [],
     directs: [],
     managers: [],
     peers: [],
-    person: null
+    person: null,
+    visibility: {
+        related: false
+    }
 };
 
 
 const template = require('./person-entity-statistic-view.html');
 
 
-function updateUrlWithoutReload($state, person) {
-    $state.go('.', {id: person.id}, {notify: false});
-}
-
-
 function controller($q,
                     $state,
                     $stateParams,
                     applicationStore,
+                    bookmarkStore,
                     entityStatisticStore,
                     personStore) {
 
@@ -38,10 +39,20 @@ function controller($q,
     const personPromise = personStore
         .getById(personId);
 
+    const statRef = {
+        id: statId,
+        kind: 'ENTITY_STATISTIC'
+    };
+
+    bookmarkStore
+        .findByParent(statRef)
+        .then(bs => vm.bookmarks = bs);
+
     const definitionPromise = entityStatisticStore
         .findRelatedStatDefinitions(statId)
         .then(ds => vm.relatedDefinitions = ds)
-        .then(ds => vm.statistic.definition = ds.self);
+        .then(ds => vm.statistic.definition = ds.self)
+        .then(() => vm.visibility.related = hasRelatedDefinitions(vm.relatedDefinitions));
 
 
     $q.all([personPromise, definitionPromise])
@@ -122,6 +133,7 @@ controller.$inject = [
     '$state',
     '$stateParams',
     'ApplicationStore',
+    'BookmarkStore',
     'EntityStatisticStore',
     'PersonStore'
 ];
