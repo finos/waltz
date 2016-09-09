@@ -2,6 +2,7 @@ package com.khartec.waltz.service.data_flow_decorator;
 
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.data.data_flow.DataFlowDao;
 import com.khartec.waltz.data.data_flow_decorator.DataFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
@@ -11,6 +12,8 @@ import com.khartec.waltz.model.authoritativesource.Rating;
 import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableDataFlowDecorator;
+import com.khartec.waltz.model.dataflow.DataFlow;
+import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,22 +36,29 @@ public class DataFlowDecoratorService {
     private final DataFlowDecoratorRatingsService ratingsService;
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
-
+    private final DataTypeUsageService dataTypeUsageService;
+    private final DataFlowDao dataFlowDao;
 
     @Autowired
     public DataFlowDecoratorService(DataFlowDecoratorDao dataFlowDecoratorDao,
                                     DataFlowDecoratorRatingsService ratingsService,
                                     ApplicationIdSelectorFactory applicationIdSelectorFactory,
-                                    DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
+                                    DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
+                                    DataTypeUsageService dataTypeUsageService,
+                                    DataFlowDao dataFlowDao) {
         checkNotNull(dataFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
         checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
         checkNotNull(ratingsService, "ratingsService cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
+        checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
+        checkNotNull(dataFlowDao, "dataFlowDao cannot be null");
 
         this.dataFlowDecoratorDao = dataFlowDecoratorDao;
         this.ratingsService = ratingsService;
         this.applicationIdSelectorFactory = applicationIdSelectorFactory;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
+        this.dataTypeUsageService = dataTypeUsageService;
+        this.dataFlowDao = dataFlowDao;
     }
 
 
@@ -104,14 +114,22 @@ public class DataFlowDecoratorService {
 
     // --- UPDATERS ---
 
-    public int[] deleteDecorators(long flowId,
-                                  Collection<EntityReference> decoratorReferences) {
-        checkNotNull(decoratorReferences, "decoratorReferences cannot be null");
-        return dataFlowDecoratorDao.deleteDecorators(flowId, decoratorReferences);
+    public int deleteAllDecoratorsForFlowIds(List<Long> flowIds) {
+        return dataFlowDecoratorDao.removeAllDecoratorsForFlowIds(flowIds);
     }
 
 
-    public int[] addDecorators(Long flowId, Set<EntityReference> decoratorReferences) {
+    public int[] deleteDecorators(long flowId,
+                                  Collection<EntityReference> decoratorReferences) {
+        checkNotNull(decoratorReferences, "decoratorReferences cannot be null");
+        DataFlow flow = dataFlowDao.findByFlowId(flowId);
+        int[] deleted = dataFlowDecoratorDao.deleteDecorators(flowId, decoratorReferences);
+        dataTypeUsageService.recalculateForApplications(flow.source(), flow.target());
+        return deleted;
+    }
+
+
+    public int[] addDecorators(long flowId, Set<EntityReference> decoratorReferences) {
         checkNotNull(decoratorReferences, "decoratorReferences cannot be null");
         if (decoratorReferences.isEmpty()) return new int[0];
 
@@ -127,8 +145,10 @@ public class DataFlowDecoratorService {
         Collection<DataFlowDecorator> ratedDecorators = ratingsService
                 .calculateRatings(unrated);
 
-        return dataFlowDecoratorDao
-                .addDecorators(ratedDecorators);
+        int[] added = dataFlowDecoratorDao.addDecorators(ratedDecorators);
+        DataFlow flow = dataFlowDao.findByFlowId(flowId);
+        dataTypeUsageService.recalculateForApplications(flow.source(), flow.target());
+        return added;
     }
 
 

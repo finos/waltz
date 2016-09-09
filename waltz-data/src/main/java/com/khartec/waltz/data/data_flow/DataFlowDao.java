@@ -132,6 +132,13 @@ public class DataFlowDao {
     }
 
 
+    public DataFlow findByFlowId(long dataFlowId) {
+        return baseQuery()
+                .and(DATA_FLOW.ID.eq(dataFlowId))
+                .fetchOne(dataFlowMapper);
+    }
+
+
     public List<DataFlow> findByFlowIds(Collection<Long> dataFlowIds) {
         return baseQuery()
                 .and(DATA_FLOW.ID.in(dataFlowIds))

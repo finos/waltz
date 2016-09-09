@@ -21,7 +21,6 @@ import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow.DataFlowDao;
 import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
-import com.khartec.waltz.data.data_flow_decorator.DataFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -31,6 +30,8 @@ import com.khartec.waltz.model.dataflow.DataFlowMeasures;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowStatistics;
 import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
+import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -39,6 +40,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
@@ -50,33 +54,42 @@ public class DataFlowService {
 
     private final DataFlowDao dataFlowDao;
     private final DataFlowStatsDao dataFlowStatsDao;
-    private final DataFlowDecoratorDao dataFlowDecoratorDao;
+    private final DataFlowDecoratorService dataFlowDecoratorService;
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
+    private DataTypeUsageService dataTypeUsageService;
 
 
     @Autowired
-    public DataFlowService(DataFlowDao dataFlowDao, 
-                           DataFlowStatsDao dataFlowStatsDao, 
-                           DataFlowDecoratorDao dataFlowDecoratorDao, 
+    public DataFlowService(DataFlowDao dataFlowDao,
+                           DataFlowStatsDao dataFlowStatsDao,
+                           DataFlowDecoratorService dataFlowDecoratorService,
                            ApplicationIdSelectorFactory appIdSelectorFactory,
-                           DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
+                           DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
+                           DataTypeUsageService dataTypeUsageService) {
         checkNotNull(dataFlowDao, "dataFlowDao must not be null");
         checkNotNull(dataFlowStatsDao, "dataFlowStatsDao cannot be null");
-        checkNotNull(dataFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
+        checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
         checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
+        checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
 
         this.appIdSelectorFactory = appIdSelectorFactory;
         this.dataFlowStatsDao = dataFlowStatsDao;
         this.dataFlowDao = dataFlowDao;
-        this.dataFlowDecoratorDao = dataFlowDecoratorDao;
+        this.dataFlowDecoratorService = dataFlowDecoratorService;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
+        this.dataTypeUsageService = dataTypeUsageService;
     }
 
 
     public List<DataFlow> findByEntityReference(EntityReference ref) {
         return dataFlowDao.findByEntityReference(ref);
+    }
+
+
+    public DataFlow getById(long flowId) {
+        return dataFlowDao.findByFlowId(flowId);
     }
 
 
@@ -110,8 +123,17 @@ public class DataFlowService {
 
 
     public int removeFlows(List<Long> flowIds) {
-        dataFlowDecoratorDao.removeAllDecoratorsForFlowIds(flowIds);
-        return dataFlowDao.removeFlows(flowIds);
+        List<DataFlow> dataFlows = dataFlowDao.findByFlowIds(flowIds);
+        int deleted = dataFlowDao.removeFlows(flowIds);
+        dataFlowDecoratorService.deleteAllDecoratorsForFlowIds(flowIds);
+
+        Set<EntityReference> affectedEntityRefs = dataFlows.stream()
+                .flatMap(df -> Stream.of(df.source(), df.target()))
+                .collect(Collectors.toSet());
+
+        dataTypeUsageService.recalculateForApplications(affectedEntityRefs.toArray(new EntityReference[affectedEntityRefs.size()]));
+
+        return deleted;
     }
 
 
