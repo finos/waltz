@@ -1,13 +1,6 @@
 <waltz-section icon='random'
                name="Data Flows">
     <div class="row">
-        <div class="col-md-9">
-            <div style="border: 1px solid #ccc">
-                <waltz-data-flow-diagram data="$ctrl.flowData"
-                                         tweakers="$ctrl.graphTweakers">
-                </waltz-data-flow-diagram>
-            </div>
-        </div>
         <div class="col-md-3">
             <div ng-if="$ctrl.selectedApp">
                 <h4 ng-bind="$ctrl.selectedApp.name"></h4>
@@ -15,6 +8,91 @@
                     More &raquo;
                 </a>
             </div>
+            <div>
+                <div class="waltz-paragraph">
+                    Use this panel to configure this view:
+                </div>
+
+                <hr>
+
+                <h5>
+                    <waltz-icon name="filter"></waltz-icon>
+                    Authoritative Rating
+                </h5>
+
+                <div class="waltz-paragraph small" style="padding-bottom: 4px;">
+                    Select one of the following ratings:
+
+                    <div class="wffoo-scopes">
+                        <label>
+                            <input type="radio" ng-model='$ctrl.selectedRating' value="PRIMARY">
+                            Primary -
+                            <span class="text-muted">Only show flows with a Primary rating</span>
+                        </label>
+
+                        <label>
+                            <input type="radio" ng-model='$ctrl.selectedRating' value="SECONDARY">
+                            Secondary -
+                            <span class="text-muted">Only show flows with a Secondary rating</span>
+                        </label>
+
+                        <label>
+                            <input type="radio" ng-model='$ctrl.selectedRating' value="DISCOURAGED">
+                            Discouraged -
+                            <span class="text-muted">Only show flows with a Discouraged rating</span>
+                        </label>
+
+                        <label>
+                            <input type="radio" ng-model='$ctrl.selectedRating' value="NO_OPINION">
+                            No opinion -
+                            <span class="text-muted">Only show flows with an unknown rating</span>
+                        </label>
+
+                        <label>
+                            <input type="radio" ng-model='$ctrl.selectedRating' value="ALL">
+                            All -
+                            <span class="text-muted">Show all flows</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div ng-if="$ctrl.flowData.entities.length == 0  && $ctrl.rawFlows.length > 0">
+                <div class="alert alert-warning">
+                    <strong>No data to show</strong> given the current filter options.  Use the
+                    configure button above to adjust these options.
+                </div>
+            </div>
+
+
+            <div ng-if="$ctrl.flowData.entities.length >= 200 && !$ctrl.visibility.ignoreLimits">
+                <div class="alert alert-warning">
+                    This graph will have <strong>too many nodes</strong> to render smoothly.
+                    Use the configure button too limit the amount of data to show.  Alternatively
+                    the data is available via the 'Table' tab.
+
+                    <br>
+
+                    If you still want to see the graph click
+                    <a class="clickable" ng-click="$ctrl.visibility.ignoreLimits = true">here</a>
+                    - however be aware that your machine may struggle.
+                </div>
+            </div>
+
+            <div ng-if="$ctrl.flowData.flows.length > 0">
+                <div ng-if="$ctrl.flowData.entities.length < 200  || $ctrl.visibility.ignoreLimits"
+                     style="border: 1px solid #ccc">
+                    <waltz-data-flow-diagram data="$ctrl.flowData"
+                                             tweakers="$ctrl.graphTweakers">
+                    </waltz-data-flow-diagram>
+                    <div class="small text-muted">
+                        Dragging nodes will pin them.  Double click to unpin.  If an application is gray
+                        it is not a member of this group.
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </waltz-section>

@@ -124,7 +124,7 @@ function drawLinks(flows = [], nodes = [], svg, linkTweakers = DEFAULT_TWEAKER) 
 
     const link = svg
         .selectAll('.wdfd-link')
-        .data(links);
+        .data(links, f => f.data.id);
 
     link.enter()
         .append('svg:line')
@@ -132,6 +132,9 @@ function drawLinks(flows = [], nodes = [], svg, linkTweakers = DEFAULT_TWEAKER) 
         .attr({ 'stroke' : '#333' })
         .classed('wdfd-link', true)
         .call(linkTweakers.enter);
+
+    link
+        .call(linkTweakers.update);
 
     link.exit()
         .call(linkTweakers.exit)
