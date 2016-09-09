@@ -4,7 +4,7 @@ import {initialiseData} from "../../common";
 
 const navItems = [
     { uiSref: 'main.org-unit.list', icon: 'sitemap', displayName: 'Org Units' },
-    { uiSref: 'main.capability.list', icon: 'puzzle-piece', displayName: 'Capabilities' },
+    { uiSref: 'main.capability.list', icon: 'puzzle-piece', displayName: 'Functions' },
     { uiSref: 'main.process.list', icon: 'code-fork', displayName: 'Processes' },
     { uiSref: 'main.person', icon: 'users', displayName: 'People' },
     { uiSref: 'main.data-type.list', icon: 'qrcode', displayName: 'Data Types', role: 'BETA_TESTER' }

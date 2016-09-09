@@ -2,11 +2,11 @@
 
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.capability.name }}"
-                       small="Capability"
+                       small="Function"
                        icon="puzzle-piece">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.capability.list">Capabilities</a></li>
+            <li><a ui-sref="main.capability.list">Functions</a></li>
             <li ng-bind="ctrl.capability.name"></li>
         </ol>
     </waltz-page-header>
@@ -27,7 +27,7 @@
 
 
     <!-- RATINGS -->
-    <waltz-section name="Application Capability Ratings">
+    <waltz-section name="Application Function Ratings">
 
         <waltz-section-actions>
             <button class="btn btn-xs waltz-btn-transparent"
@@ -165,7 +165,7 @@
 
 
     <!-- ASSOCIATED CAPABILITIES -->
-    <waltz-section name="Associated Capabilities">
+    <waltz-section name="Associated Functions">
         <ul>
             <li ng-repeat="assoc in ctrl.associatedCapabilities | orderBy:'capability.name'">
                 <strong>
@@ -191,8 +191,8 @@
         </ul>
 
         <p class="text-muted small">
-            This section shows capabilities performed by applications
-            who <i>also</i> perform this capability.
+            This section shows functions performed by applications
+            who <i>also</i> perform this function.
         </p>
 
     </waltz-section>

@@ -1,5 +1,5 @@
 <div>
-    <waltz-section name="Capabilities"
+    <waltz-section name="Functions"
                    icon="puzzle-piece">
 
         <waltz-section-actions>
@@ -23,8 +23,6 @@
             <div class="col-sm-12" style="border-left: 1px solid #eee">
 
                 <!-- CAPABILITIES -->
-
-                <h4>Capabilities</h4>
                 <div ng-if="ctrl.appCapabilities.length > 0">
                     <waltz-app-capability-table app-capabilities="ctrl.appCapabilities"
                                                 capabilities="ctrl.capabilities">
@@ -33,13 +31,13 @@
 
                 <div ng-if="ctrl.appCapabilities.length == 0">
                     <div class="alert alert-warning">
-                        <strong>No capabilities</strong>
+                        <strong>No functions</strong>
                         have been registered against this application yet.
                     </div>
                 </div>
 
                 <div class="small text-muted">
-                    Capabilities are used to describe what an application does.
+                    Functions are used to describe what an application does.
                 </div>
             </div>
         </div>

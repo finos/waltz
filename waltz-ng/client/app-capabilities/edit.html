@@ -1,23 +1,15 @@
 <div>
-    <waltz-page-header name="Capability Registration"
+    <waltz-page-header name="Function Registration"
                        small="{{ctrl.application.name}}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li><a ui-sref="main.app.view ({id: ctrl.application.id})">{{ctrl.application.name}}</a></li>
-            <li>Traits &amp; Capabilities</li>
+            <li>Functions</li>
         </ol>
     </waltz-page-header>
 
 
-    <waltz-section ng-if="false" name="Traits" icon="cubes">
-        <waltz-trait-usage-editor traits="ctrl.traits.all"
-                                  usages="ctrl.traits.usages"
-                                  add="ctrl.addTrait"
-                                  remove="ctrl.removeTrait">
-        </waltz-trait-usage-editor>
-    </waltz-section>
-
-    <waltz-section name="Capabilities" icon="puzzle-piece">
+    <waltz-section name="Functions" icon="puzzle-piece">
         <div class="row">
             <div class="col-md-12">
                 <waltz-app-capability-usage-editor usages="ctrl.capabilities.usages"

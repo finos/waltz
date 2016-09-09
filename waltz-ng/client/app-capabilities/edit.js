@@ -62,13 +62,13 @@ const controller = function(appCapabilityStore,
 
     vm.addCapability = (c) => appCapabilityStore
         .addCapability(id, c.id)
-        .then(() => notification.success(`Added capability: ${c.name}`))
+        .then(() => notification.success(`Added function: ${c.name}`))
         .then(() => appCapabilityStore.findCapabilitiesByApplicationId(id))
         .then(usages => vm.capabilities.usages = usages);
 
     vm.removeCapability = (c) => appCapabilityStore
         .removeCapability(id, c.id)
-        .then(() => notification.success(`Removed capability: ${c.name}`))
+        .then(() => notification.success(`Removed function: ${c.name}`))
         .then(() => appCapabilityStore.findCapabilitiesByApplicationId(id))
         .then(usages => vm.capabilities.usages = usages);
 
