@@ -2,14 +2,11 @@
 
     <div class="row">
         <div class="col-md-12">
-            <label>Register new capability:</label>
+            <label>Register new function:</label>
             <waltz-capability-picker capabilities="ctrl.availableCapabilities"
                                      selected-node="ctrl.selectedNode"
                                      on-add="ctrl.addCapability">
             </waltz-capability-picker>
-            <div class="help-block small" ng-if="ctrl.hasHiddenCapabilities">
-                Note, some capabilities are not available unless corresponding traits are selected.
-            </div>
         </div>
 
     </div>
@@ -18,7 +15,7 @@
 
     <div ng-if="ctrl.usedCapabilities.length == 0" class="alert alert-warning">
         <waltz-icon name="warning"></waltz-icon>
-        <strong>No capabilities</strong> have been registered.
+        <strong>No functions</strong> have been registered.
     </div>
 
     <div class="row" ng-if="ctrl.usedCapabilities.length > 0">
@@ -33,7 +30,7 @@
                 <thead>
                 <tr>
                     <th></th>
-                    <th>Capability</th>
+                    <th>Function</th>
                     <th>Description</th>
                     <th>Action</th>
                 </tr>

@@ -16,7 +16,7 @@
                     </span>
                     <span class="text-muted"
                           ng-if="ctrl.capability.children.length > 0">
-                        Sub Capabilities:
+                        Sub Functions:
                         &nbsp;
                         <select style="font-size: larger;"
                                 ng-change="ctrl.subCapabilitySelected()"
@@ -24,7 +24,7 @@
                             <option value=""
                                     disabled
                                     selected>
-                                Select sub capability
+                                Select sub function
                             </option>
                             <option ng-repeat="child in ctrl.capability.children | orderBy:'name'"
                                     ng-value="child.id">
@@ -96,7 +96,7 @@
             <!-- COMPLEXITY -->
             <div class="col-sm-4">
                 <waltz-basic-info-tile name="Complexity"
-                                       description="Derived from capabilities, connections and servers"
+                                       description="Derived from functions, connections and servers"
                                        class="clickable"
                                        waltz-jump-to="complexity-section"
                                        icon="rocket">

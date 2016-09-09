@@ -82,14 +82,14 @@ export const severityNames = {
 
 
 export const entityNames = {
-    APP_CAPABILITY: 'Application Capability',
+    APP_CAPABILITY: 'Application Function',
     APP_GROUP: 'Application Group',
     APP_RATING: 'Application Rating',
     APPLICATION: 'Application',
     ASSET_COST: 'Asset Cost',
     AUTHORITATIVE_SOURCE: "Authoritative Source",
     BOOKMARK: 'Bookmark',
-    CAPABILITY: 'Capability',
+    CAPABILITY: 'Function',
     CHANGE_INITIATIVE: 'Change Initiative',
     DATABASE: 'Database',
     DATA_TYPE: 'Data Type',

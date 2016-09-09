@@ -30,7 +30,7 @@
                         <td><span ng-bind="ctrl.applications.length"></span></td>
                     </tr>
                     <tr>
-                        <td>Capabilities</td>
+                        <td>Functions</td>
                         <td><span ng-bind="ctrl.supportingCapabilities.length"></span></td>
                     </tr>
                 </table>
@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <hr>
+    <br>
 
     <!-- EXPLORER -->
     <style>
@@ -58,13 +58,13 @@
     </style>
 
 
-    <waltz-section name="Capabilities"
+    <waltz-section name="Functions"
                    icon="puzzle-piece">
         <div class="row">
             <!-- TREE PANE -->
             <div class="col-md-4">
                 <p class="waltz-paragraph">
-                    Explore this process by capability:
+                    Explore this process by function:
                 </p>
                 <div>
                     <treecontrol class="tree-light"
@@ -84,9 +84,9 @@
                 </div>
                 <br>
                 <p class="small text-muted">
-                    This process is supported by the above capabilities.
-                    The number following the capability is the number of applications which perform the
-                    capability in the process.  Select a capability for more detail.  Capabilities
+                    This process is supported by the above functions.
+                    The number following the function is the number of applications which perform the
+                    function in the process.  Select a function for more detail.  Functions
                     shown in <i>italics</i> are not explicitly part of the process.
                 </p>
             </div>
@@ -147,7 +147,7 @@
                     <div class="small">
                         <div ng-if="ctrl.findCapabilitiesForApp(ctrl.selectedApplication.id).length > 0">
                             <strong style="margin-bottom: 3px">
-                                Application Capabilities:
+                                Application Functions:
                             </strong>
                             <div class="waltz-scroll-region"
                                  style="height: 250px">
