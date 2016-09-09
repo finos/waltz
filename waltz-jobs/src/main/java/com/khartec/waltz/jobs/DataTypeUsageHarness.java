@@ -17,8 +17,7 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.data.data_type_usage.DataTypeUsageDao;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
 import com.khartec.waltz.service.DIConfiguration;
@@ -37,10 +36,13 @@ public class DataTypeUsageHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DataTypeUsageService service = ctx.getBean(DataTypeUsageService.class);
+        DataTypeUsageDao dao = ctx.getBean(DataTypeUsageDao.class);
 
-        EntityReference appReference = EntityReference.mkRef(EntityKind.APPLICATION, 1L, "Kiwi - 0");
+//        EntityReference appReference = EntityReference.mkRef(EntityKind.APPLICATION, 1L, "Kiwi - 0");
+//
+//        service.recalculateForApplications(appReference);
 
-        service.recalculateForApplications(appReference);
+        dao.recalculateForAllApplications();
 
     }
 

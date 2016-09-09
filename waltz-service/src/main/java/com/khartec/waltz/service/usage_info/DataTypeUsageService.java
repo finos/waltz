@@ -122,6 +122,11 @@ public class DataTypeUsageService {
     }
 
 
+    public boolean recalculateForAllApplications() {
+        return dataTypeUsageDao.recalculateForAllApplications();
+    }
+
+
     public void recalculateForApplications(EntityReference... refs) {
         checkNotNull(refs, "refs cannot be null");
         for (EntityReference ref : refs) {

@@ -15,6 +15,7 @@ import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import com.khartec.waltz.service.user.UserRoleService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.maybe;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class DataTypeUsageEndpoint implements Endpoint {
@@ -58,6 +58,7 @@ public class DataTypeUsageEndpoint implements Endpoint {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findForDataTypeSelectorPath = mkPath(BASE_URL, "type");
         String findUsageStatsForDataTypeSelectorPath = mkPath(BASE_URL, "type", "stats");
+        String calculateForAllApplicationsPath = mkPath(BASE_URL, "calculate-all", "application");
 
         String findForSelectorPath = mkPath(BASE_URL, "selector");
         String savePath = mkPath(BASE_URL, "entity", ":kind", ":id", ":type");
@@ -90,11 +91,17 @@ public class DataTypeUsageEndpoint implements Endpoint {
             return dataTypeUsageService.findForEntityAndDataType(ref, dataTypeCode);
         };
 
+        DatumRoute<Boolean> calculateForAllApplicationsRoute = (request, response) -> {
+            requireRole(userRoleService, request, Role.ADMIN);
+            return dataTypeUsageService.recalculateForAllApplications();
+        };
+
         getForList(findForEntityPath, findForEntityRoute);
         postForList(findForDataTypeSelectorPath, findForDataTypeSelectorRoute);
         postForList(findUsageStatsForDataTypeSelectorPath, findUsageStatsForDataTypeSelectorRoute);
         postForList(findForSelectorPath, findForSelectorRoute);
         postForList(savePath, saveRoute);
+        getForDatum(calculateForAllApplicationsPath, calculateForAllApplicationsRoute);
     }
 
 
