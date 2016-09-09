@@ -23,11 +23,22 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.limit;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
+import static org.jooq.impl.DSL.*;
 
 @Repository
 public class DataTypeUsageDao {
+
+    private final com.khartec.waltz.schema.tables.DataType dt = DATA_TYPE.as("dt");
+    private final com.khartec.waltz.schema.tables.DataTypeUsage dtu = DATA_TYPE_USAGE.as("dtu");
+    private final com.khartec.waltz.schema.tables.DataFlow df = DATA_FLOW.as("df");
+    private final com.khartec.waltz.schema.tables.DataFlowDecorator dfd = DATA_FLOW_DECORATOR.as("dfd");
+    private final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
+
 
     private static final RecordMapper<Record, DataTypeUsage> TO_USAGE_MAPPER = r -> {
         DataTypeUsageRecord record = r.into(DATA_TYPE_USAGE);
@@ -213,4 +224,95 @@ public class DataTypeUsageDao {
                 .map(TO_RECORD_MAPPER)
                 .collect(Collectors.toSet());
     }
+
+
+    public boolean recalculateForAllApplications() {
+
+        dsl.transaction(configuration -> {
+            DSLContext tx = DSL.using(configuration);
+
+            Condition consumerDistributer = DATA_TYPE_USAGE.USAGE_KIND.in(UsageKind.CONSUMER.name(), UsageKind.DISTRIBUTOR.name());
+            Condition bothApps = df.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                            .and(df.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+
+            // clear usages
+            tx.deleteFrom(DATA_TYPE_USAGE)
+                    .where(consumerDistributer)
+                    .and(DATA_TYPE_USAGE.DESCRIPTION.eq(""))
+                    .execute();
+
+            // mark commented usages inactive
+            tx.update(DATA_TYPE_USAGE)
+                    .set(DATA_TYPE_USAGE.IS_SELECTED, false)
+                    .where(consumerDistributer)
+                    .and(DATA_TYPE_USAGE.DESCRIPTION.ne(""))
+                    .execute();
+
+            TableOnConditionStep<Record> flowsWithTypes = df.innerJoin(app)
+                    .on(app.ID.eq(df.SOURCE_ENTITY_ID)
+                            .or(app.ID.eq(df.TARGET_ENTITY_ID))
+                            .and(bothApps))
+                    .innerJoin(dfd)
+                    .on(dfd.DATA_FLOW_ID.eq(df.ID))
+                    .and(dfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+                    .innerJoin(dt)
+                    .on(dt.ID.eq(dfd.DECORATOR_ENTITY_ID));
+
+
+            Field<String> caseConsDistr = DSL.when(df.SOURCE_ENTITY_ID.eq(app.ID), UsageKind.DISTRIBUTOR.name())
+                    .otherwise(UsageKind.CONSUMER.name());
+
+            Select<Record7<Long, String, String, String, String, String, Boolean>> usagesToInsert =
+                    selectDistinct(
+                            app.ID,
+                            val(EntityKind.APPLICATION.name()),
+                            dt.CODE,
+                            caseConsDistr,
+                            val(""),
+                            val("waltz"),
+                            val(true))
+                        .from(flowsWithTypes)
+                        .leftJoin(dtu)
+                            .on(dtu.ENTITY_ID.eq(app.ID))
+                            .and(dtu.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                            .and(dtu.DATA_TYPE_CODE.eq(dt.CODE))
+                            .and(dtu.USAGE_KIND.eq(caseConsDistr))
+                            .and(dtu.IS_SELECTED.eq(false))
+                        .where(dt.CODE.ne("UNKNOWN"))
+                            .and(dtu.ENTITY_ID.isNull());
+
+
+            // insert new usages
+            tx.insertInto(DATA_TYPE_USAGE)
+                    .columns(
+                            DATA_TYPE_USAGE.ENTITY_ID,
+                            DATA_TYPE_USAGE.ENTITY_KIND,
+                            DATA_TYPE_USAGE.DATA_TYPE_CODE,
+                            DATA_TYPE_USAGE.USAGE_KIND,
+                            DATA_TYPE_USAGE.DESCRIPTION,
+                            DATA_TYPE_USAGE.PROVENANCE,
+                            DATA_TYPE_USAGE.IS_SELECTED)
+                    .select(usagesToInsert)
+                    .execute();
+
+            // update isSelected column
+            tx.update(DATA_TYPE_USAGE)
+                    .set(DATA_TYPE_USAGE.IS_SELECTED, true)
+                    .where(DATA_TYPE_USAGE.IS_SELECTED.eq(false))
+                    .and(exists(
+                            selectFrom(flowsWithTypes)
+                                .where(DATA_TYPE_USAGE.ENTITY_ID.eq(app.ID))
+                                .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                                .and(DATA_TYPE_USAGE.DATA_TYPE_CODE.eq(dt.CODE))
+                                .and(DATA_TYPE_USAGE.USAGE_KIND.eq(caseConsDistr))))
+                    .execute();
+
+
+        });
+
+        return true;
+
+    }
+
+
 }
