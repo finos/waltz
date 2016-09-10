@@ -18,7 +18,7 @@ const FIELDS_TO_SEARCH = {
 };
 
 
-const eolCellTemplate = '<div class="ui-grid-cell-contents"> <waltz-icon ng-if="COL_FIELD" name="power-off"></waltz-icon></div>';
+const EOL_CELL_TEMPLATE = '<div class="ui-grid-cell-contents"> <waltz-icon ng-if="COL_FIELD" name="power-off"></waltz-icon></div>';
 
 
 function mkBooleanColumnFilter(uiGridConstants) {
@@ -70,7 +70,7 @@ function prepareServerGridOptions($animate, uiGridConstants) {
             displayName: 'h/w EOL',
             width: "6%",
             filter: mkBooleanColumnFilter(uiGridConstants),
-            cellTemplate: eolCellTemplate
+            cellTemplate: EOL_CELL_TEMPLATE
         },
         { field: 'hardwareEndOfLifeDate', displayName: 'h/w EOL On' },
         {
@@ -78,7 +78,7 @@ function prepareServerGridOptions($animate, uiGridConstants) {
             displayName: 'OS EOL',
             width: "6%",
             filter: mkBooleanColumnFilter(uiGridConstants),
-            cellTemplate: eolCellTemplate
+            cellTemplate: EOL_CELL_TEMPLATE
         },
         { field: 'operatingSystemEndOfLifeDate', displayName: 'OS EOL On' }
     ];
@@ -105,7 +105,7 @@ function prepareDatabaseGridOptions($animate, uiGridConstants) {
             displayName: 'EOL',
             width: "5%",
             filter: mkBooleanColumnFilter(uiGridConstants),
-            cellTemplate: eolCellTemplate
+            cellTemplate: EOL_CELL_TEMPLATE
         },
         { field: 'endOfLifeDate', displayName: 'EOL On' }
     ];
