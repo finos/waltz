@@ -19,6 +19,8 @@ package com.khartec.waltz.web.endpoints.api;
 
 
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Entry;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.authoritativesource.Rating;
@@ -36,6 +38,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -74,6 +81,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
 
         String recalculateFlowRatingsPath = mkPath(BASE_URL, "recalculate-flow-ratings");
         String findByDataTypeIdSelectPath = mkPath(BASE_URL, "data-type");
+        String calculateConsumersForDataTypeIdSelectorPath = mkPath(BASE_URL, "data-type", "consumers");
 
         ListRoute<AuthoritativeSource> findByDataTypeIdSelectorRoute = (request, response)
                 -> authoritativeSourceService.findByDataTypeIdSelector(readIdSelectionOptionsFromBody(request));
@@ -82,9 +90,14 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
                 recalculateFlowRatingsPath,
                 this:: recalculateFlowRatingsRoute);
 
+        postForList(calculateConsumersForDataTypeIdSelectorPath,
+                this::calculateConsumersForDataTypeIdSelectorRoute);
+
         postForList(
                 findByDataTypeIdSelectPath,
                 findByDataTypeIdSelectorRoute);
+
+        // --- TODO: convert these into new style...
 
         getForList(mkPath(BASE_URL, "kind", ":kind"), (request, response)
                 -> authoritativeSourceService.findByEntityKind(getKind(request)));
@@ -152,6 +165,19 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         LOG.info("Recalculating all flow ratings (requested by: {})", username);
 
         return authoritativeSourceService.recalculateAllFlowRatings();
+    }
+
+
+    private List<Entry<EntityReference, Collection<EntityReference>>> calculateConsumersForDataTypeIdSelectorRoute(
+            Request request,
+            Response response) throws IOException
+    {
+        IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
+
+        Map<EntityReference, Collection<EntityReference>> result = authoritativeSourceService
+                .calculateConsumersForDataTypeIdSelector(options);
+
+        return simplifyMapToList(result);
     }
 
 }

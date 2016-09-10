@@ -34,7 +34,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -132,5 +134,12 @@ public class AuthoritativeSourceService {
     public List<AuthoritativeSource> findByDataTypeIdSelector(IdSelectionOptions idSelectionOptions) {
         Select<Record1<Long>> selector = dataTypeIdSelectorFactory.apply(idSelectionOptions);
         return authoritativeSourceDao.findByDataTypeIdSelector(selector);
+    }
+
+
+    public Map<EntityReference, Collection<EntityReference>> calculateConsumersForDataTypeIdSelector(
+            IdSelectionOptions options) {
+        Select<Record1<Long>> selector = dataTypeIdSelectorFactory.apply(options);
+        return authoritativeSourceDao.calculateConsumersForDataTypeIdSelector(selector);
     }
 }

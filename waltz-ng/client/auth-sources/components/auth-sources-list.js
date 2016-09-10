@@ -4,6 +4,7 @@ import {initialiseData} from "../../common";
 
 const bindings = {
     authSources: '<',
+    consumers: '<',
     orgUnits: '<'
 };
 
@@ -24,22 +25,39 @@ function indexById(entities = []) {
 }
 
 
-function calculate(authSources = [], orgUnits = []) {
+function calculate(authSources = [], orgUnits = [], allConsumers = []) {
     const orgUnitsById = indexById(orgUnits);
+    const consumersByAuthSource = _.keyBy(allConsumers, 'key.id');
 
-    return _.chain(authSources)
+    const authSourcesGroupedByOrgUnit = _.chain(authSources)
+        .map(authSource => {
+            const declaringOrgUnit = orgUnitsById[authSource.parentReference.id];
+            const consumers = consumersByAuthSource[authSource.id] || { value : [] };
+            return Object.assign({}, authSource, {consumers : consumers.value, declaringOrgUnit});
+        })
         .groupBy('parentReference.id')
         .map((v,k) => ({ orgUnit: orgUnitsById[k], authSources: v }) )
         .value();
+
+    return {
+        authSourcesGroupedByOrgUnit
+    };
 }
 
 
 function controller() {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = changes => {
-        vm.authSourcesGroupedByOrgUnit = calculate(vm.authSources, vm.orgUnits);
-    };
+    vm.$onChanges = changes =>
+        Object.assign(
+            vm,
+            calculate(
+                vm.authSources,
+                vm.orgUnits,
+                vm.consumers));
+
+    vm.showDetail = selected =>
+        vm.selected = selected;
 }
 
 
