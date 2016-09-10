@@ -117,6 +117,9 @@ function service($q,
             .then(orgUnitStore.findByIds)
             .then(orgUnits => rawData.orgUnits = orgUnits);
 
+        authSourcesStore
+            .calculateConsumersForDataTypeIdSelector(selector)
+            .then(d => rawData.authSourceConsumers = d);
 
         return prepareRawDataPromise;
     }

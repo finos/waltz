@@ -14,49 +14,64 @@
 import {checkIsIdSelector} from "../../common/checks";
 
 
-const service = (http, root) => {
+const service = ($http, root) => {
 
     const BASE = `${root}/authoritative-source`;
 
 
     const findByKind = kind =>
-        http.get(`${BASE}/kind/${kind}`)
+        $http
+            .get(`${BASE}/kind/${kind}`)
             .then(result => result.data);
 
 
     const findByReference = (kind, id) =>
-        http.get(`${BASE}/kind/${kind}/${id}`)
+        $http
+            .get(`${BASE}/kind/${kind}/${id}`)
             .then(result => result.data);
 
 
     const findByApp = (id) =>
-        http.get(`${BASE}/app/${id}`)
+        $http
+            .get(`${BASE}/app/${id}`)
             .then(result => result.data);
 
 
     const findByDataTypeIdSelector = (selector) => {
         checkIsIdSelector(selector);
-        return http.post(`${BASE}/data-type`, selector)
+        return $http
+            .post(`${BASE}/data-type`, selector)
             .then(result => result.data);
     };
 
 
+    const calculateConsumersForDataTypeIdSelector = (selector) => {
+        checkIsIdSelector(selector);
+        return $http
+            .post(`${BASE}/data-type/consumers`, selector)
+            .then(r => r.data);
+    };
+
+
     const update = (id, newRating) =>
-        http.post(`${BASE}/id/${id}`, newRating);
+        $http
+            .post(`${BASE}/id/${id}`, newRating);
 
 
     const remove = (id) =>
-        http.delete(`${BASE}/id/${id}`);
+        $http
+            .delete(`${BASE}/id/${id}`);
 
 
     const insert = (insertRequest) => {
         const { kind, id, dataType, appId, rating} = insertRequest;
         const url = `${BASE}/kind/${kind}/${id}/${dataType}/${appId}`;
-        return http.post(url, rating);
+        return $http
+            .post(url, rating);
     };
 
-
     return {
+        calculateConsumersForDataTypeIdSelector,
         findByKind,
         findByReference,
         findByApp,

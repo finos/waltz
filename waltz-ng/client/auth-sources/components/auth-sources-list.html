@@ -1,14 +1,16 @@
-<div>
-    <table class="table table-condensed">
-        <thead>
-        <tr>
-            <th>Declaring entity</th>
-            <th>Application</th>
-            <th>Data Type</th>
-            <th>Rating</th>
-        </tr>
-        </thead>
-        <tbody ng-repeat="group in $ctrl.authSourcesGroupedByOrgUnit">
+<div class="row">
+    <div class="col-md-9">
+        <table class="table table-condensed">
+            <thead>
+            <tr>
+                <th>Declaring entity</th>
+                <th>Application</th>
+                <th>Data Type</th>
+                <th>Rating</th>
+                <th>Consumers</th>
+            </tr>
+            </thead>
+            <tbody ng-repeat="group in $ctrl.authSourcesGroupedByOrgUnit">
             <tr ng-repeat="authSource in group.authSources">
                 <td>
                     <a ng-if="$first"
@@ -23,15 +25,60 @@
                 </td>
                 <td>
                     <a ng-bind="authSource.dataType | toDisplayName:'dataType'"
-                        ui-sref="main.data-type.code ({ code: authSource.dataType })">
-
+                       ui-sref="main.data-type.code ({ code: authSource.dataType })">
                     </a>
                 </td>
                 <td>
                     <waltz-rating-indicator value="{{authSource.rating}}"></waltz-rating-indicator>
                     <span ng-bind="authSource.rating | toDisplayName:'rating'"></span>
                 </td>
+                <td>
+                    <a ng-click="$ctrl.showDetail(authSource)" class="clickable">
+                        <span class="label"
+                              ng-class="{
+                                'label-success':authSource.consumers.length > 0,
+                                'label-danger':authSource.consumers.length == 0
+                                }"
+                              ng-bind="authSource.consumers.length">
+                        </span>
+                    </a>
+
+                </td>
             </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-3">
+        <div ng-if="$ctrl.selected != null">
+            <h5>Detail</h5>
+            <p class="small">
+                Application
+                <mark ng-bind="$ctrl.selected.applicationReference.name"></mark>
+                has been declared as a
+                <mark ng-bind="$ctrl.selected.rating | toDisplayName:'rating'"></mark>
+                of
+                <mark ng-bind="$ctrl.selected.dataType | toDisplayName:'dataType'"></mark>
+                data by the organisational unit -
+                <mark ng-bind="$ctrl.selected.declaringOrgUnit.name"></span>
+            </p>
+
+            <h5>Consumers</h5>
+            <div class="waltz-scroll-region" style="height:200px">
+                <ul class="list-unstyled small">
+                    <li ng-repeat="consumer in $ctrl.selected.consumers">
+                        <a ui-sref="main.app.view ({id: consumer.id })"
+                           ng-bind="consumer.name"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div ng-if="$ctrl.selected == null">
+            <h5>About</h5>
+            <p class="small text-muted">
+                This section lists any authoritative sources that have been declared
+                for this data type.  Click on the consumer count to see a list of
+                the consumers.
+            </p>
+        </div>
+    </div>
 </div>

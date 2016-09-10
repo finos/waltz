@@ -35,10 +35,9 @@ import spark.Response;
 import spark.ResponseTransformer;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkAll;
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -287,4 +286,27 @@ public class WebUtilities {
                 .ofNullable(limitVal)
                 .map(s -> Integer.valueOf(s));
     }
+
+
+    /**
+     * Helper method to flatten a map (m) into a list of Entry's.
+     * Typically used when the key (K) is a complex type
+     * as json object may only have simple keys.
+     * @param m
+     * @param <K>
+     * @param <V>
+     * @return
+     */
+    public static <K, V> List<Entry<K, V>> simplifyMapToList(Map<K, V> m) {
+        checkNotNull(m, "Map m cannot be null");
+
+        return m.entrySet()
+                .stream()
+                .map(entry -> (Entry<K,V>) ImmutableEntry.builder()
+                        .key(entry.getKey())
+                        .value(entry.getValue())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 }

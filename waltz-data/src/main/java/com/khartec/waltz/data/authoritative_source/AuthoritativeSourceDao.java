@@ -21,6 +21,9 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.authoritativesource.*;
+import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
+import com.khartec.waltz.schema.tables.*;
+import com.khartec.waltz.schema.tables.DataType;
 import com.khartec.waltz.schema.tables.records.AuthoritativeSourceRecord;
 import com.khartec.waltz.schema.tables.records.EntityHierarchyRecord;
 import org.jooq.*;
@@ -28,12 +31,18 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.*;
+import static com.khartec.waltz.common.MapUtilities.groupBy;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
+import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
@@ -42,6 +51,12 @@ import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_
 @Repository
 public class AuthoritativeSourceDao {
 
+    private static DataFlow df = DATA_FLOW.as("df");
+    private static DataType dt = DATA_TYPE.as("dt");
+    private static DataFlowDecorator dfd = DATA_FLOW_DECORATOR.as("dfd");
+    private static EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
+    private static Application app = APPLICATION.as("app");
+    private static com.khartec.waltz.schema.tables.AuthoritativeSource au = AUTHORITATIVE_SOURCE.as("au");
 
     private final DSLContext dsl;
 
@@ -220,4 +235,55 @@ public class AuthoritativeSourceDao {
                 .fetch(TO_AUTH_SOURCE_MAPPER);
     }
 
+
+    public Map<EntityReference, Collection<EntityReference>> calculateConsumersForDataTypeIdSelector(
+            Select<Record1<Long>> selector) {
+
+        SelectConditionStep<Record1<String>> dataTypeCodeSelector = DSL
+                .select(dt.CODE)
+                .from(dt)
+                .where(dt.ID.in(selector));
+
+        Condition appJoin = app.ID.eq(df.TARGET_ENTITY_ID)
+                .and(app.ORGANISATIONAL_UNIT_ID.eq(eh.ID));
+
+        Condition hierarchyJoin = eh.ANCESTOR_ID.eq(au.PARENT_ID)
+                .and(eh.KIND.eq(EntityKind.ORG_UNIT.name()));
+
+        Condition authSourceJoin = au.APPLICATION_ID.eq(df.SOURCE_ENTITY_ID)
+                .and(df.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+
+        Condition dataFlowDecoratorJoin = dfd.DATA_FLOW_ID.eq(df.ID);
+
+        Condition condition = dfd.DECORATOR_ENTITY_ID.in(selector)
+                .and(dfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+                .and(au.DATA_TYPE.in(dataTypeCodeSelector));
+
+        Field<Long> authSourceIdField = au.ID.as("auth_source_id");
+        Field<Long> applicationIdField = app.ID.as("application_id");
+        Field<String> applicationNameField = app.NAME.as("application_name");
+
+        Result<Record3<Long, Long, String>> records = dsl
+                .select(authSourceIdField,
+                        applicationIdField,
+                        applicationNameField)
+                .from(df)
+                .innerJoin(dfd).on(dataFlowDecoratorJoin)
+                .innerJoin(au).on(authSourceJoin)
+                .innerJoin(eh).on(hierarchyJoin)
+                .innerJoin(app).on(appJoin)
+                .where(condition)
+                .orderBy(au.ID, app.NAME)
+                .fetch();
+
+        return groupBy(
+                r -> mkRef(
+                        EntityKind.AUTHORITATIVE_SOURCE,
+                        r.getValue(authSourceIdField)),
+                r -> mkRef(
+                        EntityKind.APPLICATION,
+                        r.getValue(applicationIdField),
+                        r.getValue(applicationNameField)),
+                records);
+    }
 }
