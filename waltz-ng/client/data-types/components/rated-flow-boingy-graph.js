@@ -1,3 +1,4 @@
+import {initialiseData} from "../../common";
 import {authoritativeRatingColorScale} from "../../common/colors";
 import _ from "lodash";
 
@@ -5,6 +6,18 @@ import _ from "lodash";
 const bindings = {
     data: '<',
     typeId: '<'
+};
+
+
+const defaultFilterOptions = {
+    rating: 'PRIMARY',
+};
+
+
+const initialState = {
+    flowData: {},
+    filteredFlowData: {},
+    selectedRating: defaultFilterOptions.rating
 };
 
 
@@ -42,7 +55,9 @@ const buildGraphTweakers = (decorators = [], onAppSelect) => {
                             const rating = decorator
                                 ? decorator.rating
                                 : 'NO_OPINION';
-                            return authoritativeRatingColorScale(rating);
+                            const colour = authoritativeRatingColorScale(rating);
+                            return colour;
+
                         },
                         'marker-end': d => {
                             const decorator = decoratorsByFlowId[d.data.id];
@@ -61,33 +76,61 @@ const buildGraphTweakers = (decorators = [], onAppSelect) => {
 };
 
 
-function prepareData(dataTypeId, flows = [], decorators = [], onAppSelect) {
-    const graphTweakers = buildGraphTweakers(decorators, onAppSelect);
+function prepareData(dataTypeId, flows = [], decorators = [], onAppSelect, filterOptions = defaultFilterOptions) {
+    const filteredDecorators = _.filter(decorators, (d) => {
+        if(filterOptions.rating === 'ALL') return true;
+        return d.rating === filterOptions.rating;
+    })
 
+    const graphTweakers = buildGraphTweakers(filteredDecorators, onAppSelect);
+
+    const filteredFlowIds = _.map(filteredDecorators, 'dataFlowId');
+
+    const filteredFlows = _.filter(flows, f => _.includes(filteredFlowIds, f.id));
     const flowData = {
-        entities: calculateEntities(flows),
-        flows,
-        decorators
+        entities: calculateEntities(filteredFlows),
+        flows: filteredFlows,
+        decorators: filteredDecorators
     };
-
 
     return { graphTweakers, flowData };
 }
 
 
-function controller() {
-    const vm = this;
+function controller($scope) {
+    const vm = initialiseData(this, initialState);
+    const onAppSelect = (app) => vm.selectedApp = app;
 
-    vm.$onChanges = () => {
-        const flows = vm.data ? vm.data.flows : [];
-        const decorators = vm.data ? vm.data.decorators : [];
-        const onAppSelect = (app) => vm.selectedApp = app;
+    const filterData = (options = defaultFilterOptions) => {
+        const preparedData = prepareData(vm.typeId, vm.rawFlows, vm.rawDecorators, onAppSelect, options);
+        return preparedData;
+    };
 
-        Object.assign(vm, prepareData(vm.typeId, flows, decorators, onAppSelect));
+    vm.$onChanges = (changes) => {
+        const rawFlows = vm.data ? vm.data.flows : [];
+        const rawDecorators = vm.data ? vm.data.decorators : [];
+
+        vm.rawFlows = rawFlows;
+        vm.rawDecorators = rawDecorators;
+        Object.assign(vm, filterData(defaultFilterOptions));
     }
+
+    vm.filterChanged = (filterOptions) => {
+        Object.assign(vm, filterData(filterOptions));
+    };
+
+    $scope.$watch(
+        '$ctrl.selectedRating',
+        (rating = 'ALL') => {
+            const filterOptions = {
+                rating,
+            }
+            vm.filterChanged(filterOptions)
+        }
+    );
 }
 
-controller.$inject = [];
+controller.$inject = ['$scope'];
 
 const component = {
     bindings,
