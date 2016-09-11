@@ -9,15 +9,14 @@ const bindings = {
 };
 
 
-const defaultFilterOptions = {
-    rating: 'PRIMARY',
-};
-
-
 const initialState = {
     flowData: {},
-    filteredFlowData: {},
-    selectedRating: defaultFilterOptions.rating
+    filterOptions: {
+        showPrimary: true,
+        showSecondary: true,
+        showDiscouraged: false,
+        showNoOpinion: false
+    }
 };
 
 
@@ -32,8 +31,16 @@ function calculateEntities(flows = []) {
 }
 
 
-const buildGraphTweakers = (decorators = [], onAppSelect) => {
+const buildGraphTweakers = (decorators = [],
+                            onAppSelect) => {
     const decoratorsByFlowId = _.keyBy(decorators, 'dataFlowId');
+
+    const getRatingForLink = (link) => {
+        const decorator = decoratorsByFlowId[link.data.id];
+        return decorator
+            ? decorator.rating
+            : 'NO_OPINION';
+    };
 
     return {
         node : {
@@ -41,7 +48,7 @@ const buildGraphTweakers = (decorators = [], onAppSelect) => {
                 selection
                     .on('click.fixer', app => app.fixed = true)
                     .on('click.appSelect', onAppSelect)
-                    .on('dblclick', app => app.fixed = false)
+                    .on('dblclick.fixer', app => app.fixed = false)
             },
             exit: _.identity,
             update: _.identity
@@ -51,19 +58,11 @@ const buildGraphTweakers = (decorators = [], onAppSelect) => {
                 selection
                     .attr({
                         stroke: (d) => {
-                            const decorator = decoratorsByFlowId[d.data.id];
-                            const rating = decorator
-                                ? decorator.rating
-                                : 'NO_OPINION';
-                            const colour = authoritativeRatingColorScale(rating);
-                            return colour;
-
+                            const rating = getRatingForLink(d);
+                            return authoritativeRatingColorScale(rating);
                         },
                         'marker-end': d => {
-                            const decorator = decoratorsByFlowId[d.data.id];
-                            const rating = decorator
-                                ? decorator.rating
-                                : 'NO_OPINION';
+                            const rating = getRatingForLink(d);
                             return `url(#arrowhead-${rating})`;
                         }
 
@@ -76,61 +75,94 @@ const buildGraphTweakers = (decorators = [], onAppSelect) => {
 };
 
 
-function prepareData(dataTypeId, flows = [], decorators = [], onAppSelect, filterOptions = defaultFilterOptions) {
-    const filteredDecorators = _.filter(decorators, (d) => {
-        if(filterOptions.rating === 'ALL') return true;
-        return d.rating === filterOptions.rating;
-    })
+function mkKeepDecoratorFn(filterOptions = {}) {
+    return (decorator) => {
+        const rating = decorator.rating;
+        switch (rating) {
+            case 'PRIMARY':
+                return filterOptions.showPrimary;
+            case 'SECONDARY':
+                return filterOptions.showSecondary;
+            case 'DISCOURAGED':
+                return filterOptions.showDiscouraged;
+            case 'NO_OPINION':
+                return filterOptions.showNoOpinion;
+        }
+    };
+}
 
-    const graphTweakers = buildGraphTweakers(filteredDecorators, onAppSelect);
 
-    const filteredFlowIds = _.map(filteredDecorators, 'dataFlowId');
+function filterDecorators(decorators =[],
+                          filterOptions) {
+    return _.filter(decorators, mkKeepDecoratorFn(filterOptions));
+}
 
-    const filteredFlows = _.filter(flows, f => _.includes(filteredFlowIds, f.id));
-    const flowData = {
-        entities: calculateEntities(filteredFlows),
+
+function filterFlows(flows = [],
+                     decorators = []) {
+    const flowIds = _.map(decorators, 'dataFlowId');
+    return _.filter(flows, f => _.includes(flowIds, f.id));
+
+}
+
+
+function filterData(flows = [],
+                    decorators = [],
+                    filterOptions) {
+    const filteredDecorators = filterDecorators(decorators, filterOptions);
+    const filteredFlows = filterFlows(flows, filteredDecorators);
+    const filteredEntities = calculateEntities(filteredFlows);
+    return {
+        entities: filteredEntities,
         flows: filteredFlows,
         decorators: filteredDecorators
     };
-
-    return { graphTweakers, flowData };
 }
 
 
-function controller($scope) {
+function controller() {
     const vm = initialiseData(this, initialState);
     const onAppSelect = (app) => vm.selectedApp = app;
 
-    const filterData = (options = defaultFilterOptions) => {
-        const preparedData = prepareData(vm.typeId, vm.rawFlows, vm.rawDecorators, onAppSelect, options);
-        return preparedData;
+    vm.filterChanged = () => {
+        const filteredData = filterData(
+            vm.rawFlows,
+            vm.rawDecorators,
+            vm.filterOptions);
+        vm.flowData = filteredData;
     };
 
-    vm.$onChanges = (changes) => {
-        const rawFlows = vm.data ? vm.data.flows : [];
-        const rawDecorators = vm.data ? vm.data.decorators : [];
+    vm.showAll = () => {
+        vm.filterOptions = {
+            showPrimary: true,
+            showSecondary: true,
+            showDiscouraged: true,
+            showNoOpinion: true
+        };
+        vm.filterChanged();
+    };
+
+    vm.$onChanges = () => {
+        const rawFlows = vm.data
+            ? vm.data.flows
+            : [];
+        const rawDecorators = vm.data
+            ? vm.data.decorators
+            : [];
+
+        vm.graphTweakers = buildGraphTweakers(
+            rawDecorators,
+            onAppSelect);
 
         vm.rawFlows = rawFlows;
         vm.rawDecorators = rawDecorators;
-        Object.assign(vm, filterData(defaultFilterOptions));
-    }
-
-    vm.filterChanged = (filterOptions) => {
-        Object.assign(vm, filterData(filterOptions));
+        vm.filterChanged();
     };
-
-    $scope.$watch(
-        '$ctrl.selectedRating',
-        (rating = 'ALL') => {
-            const filterOptions = {
-                rating,
-            }
-            vm.filterChanged(filterOptions)
-        }
-    );
 }
 
-controller.$inject = ['$scope'];
+
+controller.$inject = [];
+
 
 const component = {
     bindings,
