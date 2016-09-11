@@ -18,16 +18,16 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.data_type_usage.DataTypeUsageDao;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.schema.tables.DataFlow;
+import com.khartec.waltz.schema.tables.DataFlowDecorator;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
+import org.jooq.DSLContext;
+import org.jooq.Record3;
+import org.jooq.Result;
+import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.List;
-import java.util.Map;
-
-import static com.khartec.waltz.common.ListUtilities.map;
 
 
 public class DataTypeUsageHarness {
@@ -36,25 +36,55 @@ public class DataTypeUsageHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DataTypeUsageService service = ctx.getBean(DataTypeUsageService.class);
+        DSLContext dsl = ctx.getBean(DSLContext.class);
         DataTypeUsageDao dao = ctx.getBean(DataTypeUsageDao.class);
 
-//        EntityReference appReference = EntityReference.mkRef(EntityKind.APPLICATION, 1L, "Kiwi - 0");
-//
-//        service.recalculateForApplications(appReference);
 
-        dao.recalculateForAllApplications();
+        /*
+select DISTINCT
+  df.source_entity_id as app_id,
+  dfd.decorator_entity_id as data_type_id,
+  app.name as app_name
+from data_flow df
+INNER JOIN data_flow_decorator dfd on dfd.data_flow_id = df.id
+INNER JOIN application app on df.source_entity_id = app.id
+where dfd.decorator_entity_id in (8100, 8000)
+  and dfd.decorator_entity_kind = 'DATA_TYPE'
+  and df.source_entity_kind = 'APPLICATION'
+  and df.target_entity_kind = 'APPLICATION'
+and source_entity_id not in (
+  SELECT target_entity_id
+  FROM data_flow df2
+    INNER JOIN data_flow_decorator dfd2 ON dfd2.data_flow_id = df2.id
+  WHERE dfd2.decorator_entity_id = dfd.decorator_entity_id
+)
+         */
 
+        DataFlow df = DataFlow.DATA_FLOW.as("df");
+        DataFlow df2 = DataFlow.DATA_FLOW.as("df2");
+        DataFlowDecorator dfd = DataFlowDecorator.DATA_FLOW_DECORATOR.as("dfd");
+        DataFlowDecorator dfd2 = DataFlowDecorator.DATA_FLOW_DECORATOR.as("dfd2");
+        com.khartec.waltz.schema.tables.Application app = com.khartec.waltz.schema.tables.Application.APPLICATION.as("app");
+
+        Result<Record3<Long, String, Long>> origins = dsl.selectDistinct(app.ID, app.NAME, dfd.DECORATOR_ENTITY_ID)
+                .from(df)
+                .innerJoin(dfd).on(dfd.DATA_FLOW_ID.eq(df.ID))
+                .innerJoin(app).on(app.ID.eq(df.SOURCE_ENTITY_ID))
+                .where(dfd.DECORATOR_ENTITY_ID.in(8000L, 8100L))
+                .and(dfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+                .and(df.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(df.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(df.SOURCE_ENTITY_ID.notIn(
+                        DSL.select(df2.TARGET_ENTITY_ID)
+                                .from(df2)
+                                .innerJoin(dfd2)
+                                .on(dfd2.DATA_FLOW_ID.eq(df2.ID))
+                                .where(dfd2.DECORATOR_ENTITY_ID.eq(dfd.DECORATOR_ENTITY_ID))
+                                .and(dfd2.DECORATOR_ENTITY_KIND.eq(dfd.DECORATOR_ENTITY_KIND))))
+                .fetch();
+
+        origins.forEach(System.out::println);
     }
 
-
-    private static void prettyPrint(Map<AssetCodeRelationshipKind, List<Application>> grouped) {
-        grouped.forEach((key, apps) ->
-                System.out.println(key.name() + map(apps, relatedApp -> "\n\t"+ toString(relatedApp))));
-    }
-
-
-    private static String toString(Application app) {
-        return app.name() + " " + app.assetCode() + " / " + app.parentAssetCode();
-    }
 
 }

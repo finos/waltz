@@ -13,5 +13,6 @@ export default (module) => {
     module
         .component('waltzDataTypeOverview', require('./components/data-type-overview'))
         .component('waltzRatedFlowBoingyGraph', require('./components/rated-flow-boingy-graph'))
-        .component('waltzDataTypeTree', require('./components/data-type-tree'));
+        .component('waltzDataTypeTree', require('./components/data-type-tree'))
+        .component('waltzDataTypeOriginators', require('./components/data-type-originators'));
 };

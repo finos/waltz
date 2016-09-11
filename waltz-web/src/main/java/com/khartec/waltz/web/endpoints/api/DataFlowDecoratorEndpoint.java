@@ -1,10 +1,12 @@
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.user.UserRoleService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.action.UpdateDataFlowDecoratorsAction;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -17,11 +19,13 @@ import spark.Response;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.notEmpty;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 /**
@@ -52,6 +56,7 @@ public class DataFlowDecoratorEndpoint implements Endpoint {
     public void register() {
         String findByIdSelectorAndKindPath = mkPath(BASE_URL, "kind", ":kind");
         String findByIdSelectorPath = mkPath(BASE_URL, "selector");
+        String findOriginatorsByDataTypeIdSelectionOptionsPath = mkPath(BASE_URL, "data-type-selector", "originators");
         String updateDecoratorsPath = mkPath(BASE_URL, ":flowId");
         String summarizeForSelectorPath = mkPath(BASE_URL, "summarize");
 
@@ -70,6 +75,11 @@ public class DataFlowDecoratorEndpoint implements Endpoint {
                 (request, response) -> dataFlowDecoratorService.summarizeForSelector(
                         readIdSelectionOptionsFromBody(request));
 
+        DatumRoute<Map<Long, Collection<EntityReference>>> findOriginatorsByDataTypeIdSelectionOptionsRoute =
+                (request, response) -> dataFlowDecoratorService.findOriginatorsByDataTypeIdSelectionOptions(
+                    readIdSelectionOptionsFromBody(request));
+
+
         postForList(
                 findByIdSelectorAndKindPath,
                 findByIdSelectorAndKindRoute);
@@ -85,6 +95,10 @@ public class DataFlowDecoratorEndpoint implements Endpoint {
         postForList(
                 updateDecoratorsPath,
                 this::updateDecoratorsRoute);
+
+        postForDatum(
+                findOriginatorsByDataTypeIdSelectionOptionsPath,
+                findOriginatorsByDataTypeIdSelectionOptionsRoute);
     }
 
 

@@ -25,6 +25,7 @@ function controller($scope,
                     dataType,
                     viewDataService,
                     dataFlowService,
+                    dataFlowDecoratorStore,
                     historyStore) {
 
     const vm = initialiseData(this, initialState);
@@ -61,10 +62,15 @@ function controller($scope,
         .then(data => vm.rawViewData = data)
         .then(d => refresh());
 
-    dataFlowService.initialise(selector)
+    dataFlowService
+        .initialise(selector)
         .then(flowData => vm.flowData = flowData)
         .then(() => dataFlowService.loadDetail())
         .then(flowData => vm.flowData = flowData);
+
+    dataFlowDecoratorStore
+        .findOriginatorsByDataTypeIdSelector(selector)
+        .then(originators => vm.flowOriginators = originators);
 }
 
 
@@ -73,6 +79,7 @@ controller.$inject = [
     'dataType',
     'DataTypeViewDataService',
     'DataFlowViewService',
+    'DataFlowDecoratorStore',
     'HistoryStore'
 ];
 

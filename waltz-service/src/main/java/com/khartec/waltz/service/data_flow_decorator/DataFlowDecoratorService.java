@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -108,7 +109,14 @@ public class DataFlowDecoratorService {
         if (options.desiredKind() == APPLICATION) {
             return findByAppIdSelector(options);
         }
-        throw new UnsupportedOperationException("Cannot find decorators for selector desiredKind: "+options.desiredKind());
+        String message = String.format("Cannot find decorators for selector desiredKind: %s", options.desiredKind());
+        throw new UnsupportedOperationException(message);
+    }
+
+
+    public Map<Long, Collection<EntityReference>> findOriginatorsByDataTypeIdSelectionOptions(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = dataTypeIdSelectorFactory.apply(options);
+        return dataFlowDecoratorDao.findOriginatorsByDataTypeIdSelector(selector);
     }
 
 
