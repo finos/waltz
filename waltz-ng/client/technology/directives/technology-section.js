@@ -17,6 +17,21 @@ const FIELDS_TO_SEARCH = {
     ]
 };
 
+
+const EOL_CELL_TEMPLATE = '<div class="ui-grid-cell-contents"> <waltz-icon ng-if="COL_FIELD" name="power-off"></waltz-icon></div>';
+
+
+function mkBooleanColumnFilter(uiGridConstants) {
+    return {
+        type: uiGridConstants.filter.SELECT,
+        selectOptions: [
+            {value: 'true', label: 'Yes'},
+            {value: 'false', label: 'No'}
+        ]
+    };
+}
+
+
 function createDefaultTableOptions($animate, uiGridConstants, exportFileName = "export.csv") {
     return {
         columnDefs: [],
@@ -43,25 +58,36 @@ function prepareServerGridOptions($animate, uiGridConstants) {
             field: 'virtual',
             displayName: 'Virtual',
             width: "5%",
-            filter: {
-                type: uiGridConstants.filter.SELECT,
-                selectOptions: [
-                    {value: 'true', label: 'Yes'},
-                    {value: 'false', label: 'No'}
-                ]
-            },
+            filter: mkBooleanColumnFilter(uiGridConstants),
             cellTemplate: '<div class="ui-grid-cell-contents"> <waltz-icon ng-if="COL_FIELD" name="check"></waltz-icon></div>'
         },
         { field: 'operatingSystem' },
         { field: 'operatingSystemVersion', displayName: 'Version' },
         { field: 'location' },
         { field: 'country' },
-        { field: 'hardwareEndOfLifeDate', displayName: 'h/w End of Life' },
-        { field: 'operatingSystemEndOfLifeDate', displayName: 'OS End of Life' }
+        {
+            field: 'isHwEndOfLife',
+            displayName: 'h/w EOL',
+            width: "6%",
+            filter: mkBooleanColumnFilter(uiGridConstants),
+            cellTemplate: EOL_CELL_TEMPLATE
+        },
+        { field: 'hardwareEndOfLifeDate', displayName: 'h/w EOL On' },
+        {
+            field: 'isOperatingSystemEndOfLife',
+            displayName: 'OS EOL',
+            width: "6%",
+            filter: mkBooleanColumnFilter(uiGridConstants),
+            cellTemplate: EOL_CELL_TEMPLATE
+        },
+        { field: 'operatingSystemEndOfLifeDate', displayName: 'OS EOL On' }
     ];
 
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "server.csv");
-    return _.extend(baseTable, { columnDefs });
+    return _.extend(baseTable, {
+        columnDefs,
+        rowTemplate: '<div ng-class="{\'bg-danger\': row.entity.isHwEndOfLife || row.entity.isOperatingSystemEndOfLife}"><div ng-repeat="col in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ui-grid-cell></div></div>'
+    });
 }
 
 
@@ -74,11 +100,21 @@ function prepareDatabaseGridOptions($animate, uiGridConstants) {
         { field: 'dbmsVendor', displayName: 'Vendor' },
         { field: 'dbmsName', displayName: 'Product Name' },
         { field: 'dbmsVersion', displayName: 'Version' },
-        { field: 'endOfLifeDate', displayName: 'End of Life' }
+        {
+            field: 'isEndOfLife',
+            displayName: 'EOL',
+            width: "5%",
+            filter: mkBooleanColumnFilter(uiGridConstants),
+            cellTemplate: EOL_CELL_TEMPLATE
+        },
+        { field: 'endOfLifeDate', displayName: 'EOL On' }
     ];
 
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "database.csv");
-    return _.extend(baseTable, { columnDefs });
+    return _.extend(baseTable, {
+        columnDefs,
+        rowTemplate: '<div ng-class="{\'bg-danger\': row.entity.isEndOfLife}"><div ng-repeat="col in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ui-grid-cell></div></div>'
+    });
 }
 
 
@@ -124,12 +160,30 @@ function controller($animate, $scope, uiGridConstants) {
 
     $scope.$watch(
         'ctrl.servers',
-        servers => vm.serverGridOptions.data = servers
+        servers => {
+            _.forEach(servers,
+                (svr) => Object.assign(svr, {
+                    "isHwEndOfLife": svr.hardwareEndOfLifeDate
+                                        && Date.parse(svr.hardwareEndOfLifeDate) < _.now(),
+                    "isOperatingSystemEndOfLife": svr.operatingSystemEndOfLifeDate
+                                                        && Date.parse(svr.operatingSystemEndOfLifeDate) < _.now()
+                })
+            );
+            vm.serverGridOptions.data = servers;
+        }
     );
 
     $scope.$watch(
         'ctrl.databases',
-        databases => vm.databaseGridOptions.data = databases
+        databases => {
+            _.forEach(databases,
+                (db) => Object.assign(db, {
+                    "isEndOfLife": db.endOfLifeDate
+                                        && Date.parse(db.endOfLifeDate) < _.now()
+                })
+            );
+            vm.databaseGridOptions.data = databases;
+        }
     );
 
 
