@@ -23,6 +23,20 @@ function service($http,
 
 
     /**
+     * selector -> { dataTypeId -> [ <entity_ref>... ] }
+     *
+     * @param selector
+     * @returns {*|Promise.<result.data|{}>}
+     */
+    const findOriginatorsByDataTypeIdSelector = (selector) => {
+        checkIsIdSelector(selector);
+        return $http
+            .post(`${BASE}/data-type-selector/originators`, selector)
+            .then(result => result.data);
+    };
+
+
+    /**
      * where command like:
      *    {
      *      flowId: <number>,
@@ -61,6 +75,7 @@ function service($http,
     return {
         findBySelectorAndKind,
         findBySelector,
+        findOriginatorsByDataTypeIdSelector,
         updateDecorators,
         summarizeBySelector
     };

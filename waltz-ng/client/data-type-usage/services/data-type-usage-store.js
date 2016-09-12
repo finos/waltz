@@ -15,7 +15,7 @@ function service($http,
         return $http
             .post(`${BASE}/type/`, selector)
             .then(result => result.data);
-    }
+    };
 
     /**
      * returns tallies by usage-kind
@@ -26,7 +26,7 @@ function service($http,
         return $http
             .post(`${BASE}/type/stats`, selector)
             .then(result => result.data);
-    }
+    };
 
     const findForSelector = (selector) => {
         checkIsIdSelector(selector);

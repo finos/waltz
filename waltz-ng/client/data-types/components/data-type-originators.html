@@ -1,0 +1,34 @@
+<waltz-section name="Originators">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p class="text-muted">
+                This section shows applications which originate data (they have no
+                incoming flow of that data type)
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6"
+             ng-repeat="typeGroup in $ctrl.originators">
+            <div>
+                <h4 ng-bind="typeGroup.dataType.name"></h4>
+
+                <div class="waltz-scroll-region" style="height:250px">
+
+                    <ul class="small list-unstyled">
+                        <ul ng-repeat="appRef in typeGroup.appReferences">
+                            <li>
+                                <a ui-sref='main.app.view ({id: appRef.id })'
+                                   ng-bind="appRef.name"></a>
+                            </li>
+                        </ul>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+</waltz-section>
