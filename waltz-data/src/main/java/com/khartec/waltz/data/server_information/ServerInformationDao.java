@@ -21,7 +21,6 @@ import com.khartec.waltz.model.server_information.ImmutableServerInformation;
 import com.khartec.waltz.model.server_information.ImmutableServerSummaryStatistics;
 import com.khartec.waltz.model.server_information.ServerInformation;
 import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
-import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ServerInformationRecord;
 import org.jooq.*;
@@ -43,6 +42,8 @@ import static com.khartec.waltz.data.JooqUtilities.DB_EXECUTOR_POOL;
 import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
+import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.select;
 
 
 @Repository
@@ -138,31 +139,45 @@ public class ServerInformationDao {
 
     public ServerSummaryStatistics findStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
 
+        Field<String> environment = DSL.field("environment", String.class);
+        Field<String> operatingSystem = DSL.field("operating_system", String.class);
+        Field<String> location = DSL.field("location", String.class);
+
         Condition condition = SERVER_INFORMATION.ASSET_CODE
                 .in(dsl.select(APPLICATION.ASSET_CODE)
                     .from(APPLICATION)
                     .where(APPLICATION.ID.in(appIdSelector)));
+
+        // de-duplicate host names, as one server can host multiple apps
+        Table serverInfoSubSelect = DSL.select(
+                    max(SERVER_INFORMATION.ENVIRONMENT).as(environment),
+                    max(SERVER_INFORMATION.OPERATING_SYSTEM).as(operatingSystem),
+                    max(SERVER_INFORMATION.LOCATION).as(location))
+                .from(SERVER_INFORMATION)
+                .where(condition)
+                .groupBy(SERVER_INFORMATION.HOSTNAME)
+                .asTable("server_info_sub_select");
 
         Future<Tuple2<Integer, Integer>> typePromise = DB_EXECUTOR_POOL.submit(() ->
                 calculateVirtualAndPhysicalCounts(condition));
 
         Future<List<Tally<String>>> envPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
-                SERVER_INFORMATION,
-                SERVER_INFORMATION.ENVIRONMENT,
-                condition));
+                serverInfoSubSelect,
+                environment,
+                DSL.trueCondition()));
 
         Future<List<Tally<String>>> osPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
-                SERVER_INFORMATION,
-                SERVER_INFORMATION.OPERATING_SYSTEM,
-                condition));
+                serverInfoSubSelect,
+                operatingSystem,
+                DSL.trueCondition()));
 
         Future<List<Tally<String>>> locationPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
-                SERVER_INFORMATION,
-                SERVER_INFORMATION.LOCATION,
-                condition));
+                serverInfoSubSelect,
+                location,
+                DSL.trueCondition()));
 
 
         return Unchecked.supplier(() -> {
@@ -181,21 +196,25 @@ public class ServerInformationDao {
     }
 
     private Tuple2<Integer, Integer> calculateVirtualAndPhysicalCounts(Condition condition) {
+        Field<Boolean> isVirtual = DSL.field("is_virtual", Boolean.class);
+
         Field<BigDecimal> virtualCount = DSL.coalesce(DSL.sum(
-                DSL.choose(SERVER_INFORMATION.IS_VIRTUAL)
+                DSL.choose(isVirtual)
                         .when(Boolean.TRUE, 1)
                         .otherwise(0)), BigDecimal.ZERO)
                 .as("virtual_count");
 
         Field<BigDecimal> physicalCount = DSL.coalesce(DSL.sum(
-                DSL.choose(SERVER_INFORMATION.IS_VIRTUAL)
+                DSL.choose(isVirtual)
                         .when(Boolean.TRUE, 0)
                         .otherwise(1)), BigDecimal.ZERO)
                 .as("physical_count");
 
-        SelectConditionStep<Record2<BigDecimal, BigDecimal>> typeQuery = dsl.select(virtualCount, physicalCount)
-                .from(SERVER_INFORMATION)
-                .where(dsl.renderInlined(condition));
+        Select<Record2<BigDecimal, BigDecimal>> typeQuery = dsl.select(virtualCount, physicalCount)
+                .from(select(max(SERVER_INFORMATION.IS_VIRTUAL).as(isVirtual))
+                            .from(SERVER_INFORMATION)
+                            .where(dsl.renderInlined(condition))
+                            .groupBy(SERVER_INFORMATION.HOSTNAME));
 
         return typeQuery
                 .fetchOne(r -> Tuple.tuple(
