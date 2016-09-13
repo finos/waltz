@@ -35,6 +35,6 @@ export default () => ({
     scope: {},
     bindToController: BINDINGS,
     controllerAs: 'ctrl',
-    template: '<div ng-show="!hide"><ng-transclude></ng-transclude></div>',
+    template: '<span ng-show="!hide"><ng-transclude></ng-transclude></span>',
     controller
 });
