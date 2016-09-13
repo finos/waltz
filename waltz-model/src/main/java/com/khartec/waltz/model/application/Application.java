@@ -51,7 +51,7 @@ public abstract class Application implements
 
 
     @Value.Default
-    public Criticality criticality() { return Criticality.UNKNOWN; }
+    public Criticality businessCriticality() { return Criticality.UNKNOWN; }
 
 
     public EntityReference toEntityReference() {

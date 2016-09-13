@@ -40,7 +40,7 @@ const fieldLayout = [
         className: 'row',
         fieldGroup: [
             { className: 'col-xs-8', fieldGroup: [ fields.descriptionField ]},
-            { className: 'col-xs-4', fieldGroup: [ fields.overallRatingField, fields.typeField, fields.lifecyclePhaseField ]}
+            { className: 'col-xs-4', fieldGroup: [ fields.overallRatingField, fields.typeField, fields.lifecyclePhaseField, fields.businessCriticalityField ]}
         ]
     }
 ];
@@ -93,7 +93,7 @@ function controller(appView, orgUnits, displayNameService, appStore, notificatio
     fields.aliasesField.model = formModel;
     fields.tagsField.model = formModel;
     fields.overallRatingField.model = formModel.app;
-    fields.criticalityField.model = formModel.app;
+    fields.businessCriticalityField.model = formModel.app;
 
 
     function onSubmit() {

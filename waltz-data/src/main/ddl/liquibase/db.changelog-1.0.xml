@@ -2679,4 +2679,13 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="kamransaleem"
+               id="20160905-427-2">
+
+        <renameColumn columnDataType="VARCHAR(128)"
+                      newColumnName="business_criticality"
+                      oldColumnName="criticality"
+                      tableName="application"/>
+    </changeSet>
+
 </databaseChangeLog>

@@ -18,6 +18,7 @@
 package com.khartec.waltz.jobs.sample;
 
 import com.khartec.waltz.common.IOUtilities;
+import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.application.AppRegistrationRequest;
 import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.application.ImmutableAppRegistrationRequest;
@@ -68,6 +69,10 @@ public class AppGenerator {
                     ? randomPick(LifecyclePhase.values())
                     : LifecyclePhase.PRODUCTION;
 
+            Criticality businessCriticality = rnd.nextInt(10) > 7
+                    ? randomPick(Criticality.values())
+                    : Criticality.HIGH;
+
             AppRegistrationRequest app = ImmutableAppRegistrationRequest.builder()
                     .name(animal)
                     .assetCode("wltz-0" + i)
@@ -76,6 +81,7 @@ public class AppGenerator {
                     .lifecyclePhase(phase)
                     .overallRating(randomPick(RagRating.R, RagRating.A, RagRating.A, RagRating.G, RagRating.G))
                     .organisationalUnitId(organisationalUnit.id().get())
+                    .businessCriticality(businessCriticality)
                     .build();
 
             registrationRequests.add(app);
