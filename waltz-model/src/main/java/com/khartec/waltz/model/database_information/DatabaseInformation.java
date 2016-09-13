@@ -2,13 +2,12 @@ package com.khartec.waltz.model.database_information;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.AssetCodeProvider;
-import com.khartec.waltz.model.ExternalIdProvider;
-import com.khartec.waltz.model.Nullable;
-import com.khartec.waltz.model.ProvenanceProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 import java.util.Date;
+
+import static com.khartec.waltz.model.EndOfLifeStatus.calculateEndOfLifeStatus;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableDatabaseInformation.class)
@@ -26,7 +25,14 @@ public abstract class DatabaseInformation implements
     public abstract String dbmsVersion();
     public abstract String dbmsVendor();
 
+
     @Nullable
     public abstract Date endOfLifeDate();
+
+
+    @Value.Derived
+    public EndOfLifeStatus endOfLifeStatus() {
+        return calculateEndOfLifeStatus(endOfLifeDate());
+    }
 
 }

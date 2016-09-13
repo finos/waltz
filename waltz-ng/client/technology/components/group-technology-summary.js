@@ -14,6 +14,11 @@ const initialState = {
     }
 };
 
+const endOfLifeLabels = {
+    'END_OF_LIFE': 'End of Life',
+    'NOT_END_OF_LIFE': 'Compliant'
+};
+
 const PIE_SIZE = 70;
 
 
@@ -37,6 +42,11 @@ const PIE_CONFIG = {
     maturity: {
         size: PIE_SIZE,
         colorProvider: (d) => maturityColorScale(d.data.key)
+    },
+    eol: {
+        size: PIE_SIZE,
+        colorProvider: (d) => variableScale(d.data.key),
+        labelProvider: (d) => endOfLifeLabels[d.key] || "Unknown"
     }
 };
 
@@ -61,7 +71,8 @@ function processDatabaseStats(stats) {
         databaseStats: {
             ...stats,
             environment: prepareForPieChart(stats.environmentCounts),
-            vendor: prepareForPieChart(stats.vendorCounts)
+            vendor: prepareForPieChart(stats.vendorCounts),
+            eol: prepareForPieChart(stats.eolCounts)
         }
     };
 }
@@ -80,7 +91,7 @@ function processSoftwareCatalogStats(stats) {
 function calculateVisibility(stats) {
     return {
         servers: stats.serverStats.totalCount > 0,
-        databases: stats.databaseStats.totalCount > 0,
+        databases: stats.databaseStats && _.keys(stats.databaseStats.vendorCounts).length > 0,
         software: stats.softwareStats && _.keys(stats.softwareStats.vendorCounts).length > 0
     };
 }

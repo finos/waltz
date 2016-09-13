@@ -1,11 +1,11 @@
 package com.khartec.waltz.data.database_information;
 
 import com.khartec.waltz.common.ArrayBuilder;
+import com.khartec.waltz.model.EndOfLifeStatus;
 import com.khartec.waltz.model.database_information.DatabaseInformation;
 import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
 import com.khartec.waltz.model.database_information.ImmutableDatabaseInformation;
 import com.khartec.waltz.model.database_information.ImmutableDatabaseSummaryStatistics;
-import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.DatabaseInformationRecord;
 import org.jooq.*;
@@ -13,11 +13,13 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
@@ -107,9 +109,17 @@ public class DatabaseInformationDao {
                 DATABASE_INFORMATION.ENVIRONMENT,
                 DSL.trueCondition());
 
+        List<Tally<String>> eolCounts = calculateStringTallies(
+                dsl,
+                databaseInfo,
+                DSL.when(DATABASE_INFORMATION.END_OF_LIFE_DATE.lt(toSqlDate(new Date())), EndOfLifeStatus.END_OF_LIFE.name())
+                        .otherwise(EndOfLifeStatus.NOT_END_OF_LIFE.name()),
+                DSL.trueCondition());
+
         return ImmutableDatabaseSummaryStatistics.builder()
                 .vendorCounts(vendorCounts)
                 .environmentCounts(environmentCounts)
+                .eolCounts(eolCounts)
                 .build();
     }
 
