@@ -25,7 +25,7 @@ const template = require('./section.html');
 
 
 const initialState = {
-  collapsed: false
+    collapsed: false
 };
 
 

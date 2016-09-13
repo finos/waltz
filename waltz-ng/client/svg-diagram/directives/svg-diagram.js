@@ -30,8 +30,8 @@ function controller($scope, $window) {
         const dataBlocks = svg.querySelectorAll('[' + dataProp + ']');
 
         const blocks = _.map(dataBlocks, b => ({
-                block: b,
-                value: b.attributes[dataProp].value
+            block: b,
+            value: b.attributes[dataProp].value
         }));
 
         _.each(blocks, vm.blockProcessor);

@@ -25,13 +25,11 @@ function service($q,
                 databaseStats,
                 softwareStats
             ]) => ({
-                    serverStats,
-                    databaseStats,
-                    softwareStats
-                })
-            );
+                serverStats,
+                databaseStats,
+                softwareStats
+            }));
     };
-
 
 
     return {

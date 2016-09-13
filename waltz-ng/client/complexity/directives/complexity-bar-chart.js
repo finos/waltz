@@ -17,6 +17,7 @@
  */
 
 import _ from "lodash";
+import d3 from 'd3';
 import {green, red} from "../../common/colors";
 
 
@@ -165,9 +166,9 @@ function render(config) {
         .append('svg');
 
     svg.attr({
-            width: sizing.w,
-            height: sizing.h
-        });
+        width: sizing.w,
+        height: sizing.h
+    });
 
     drawXAxis(buckets, svg, scales.x, sizing);
     drawBucketBars(buckets, svg, scales, sizing, repaint, config.onSelect);
