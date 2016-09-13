@@ -136,9 +136,11 @@ export const usageKindDisplayNames = {
 };
 
 
-export const riskRatingDisplayNames = {
+export const criticalityDisplayNames = {
+    NONE: 'None',
     LOW: 'Low',
     MEDIUM: 'Medium',
     HIGH: 'High',
-    VERY_HIGH: 'Very high'
+    VERY_HIGH: 'Very high',
+    UNKNOWN: 'Unknown'
 };

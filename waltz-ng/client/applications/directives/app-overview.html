@@ -4,7 +4,7 @@
             Name
         </div>
         <div class="col-sm-4">
-            {{ ctrl.app.name }}
+            <span ng-bind="ctrl.app.name"></span>
         </div>
 
         <div class="col-sm-2 waltz-display-field-label">
@@ -21,13 +21,13 @@
             Lifecycle Phase
         </div>
         <div class="col-sm-4">
-            {{ ctrl.app.lifecyclePhase | toDisplayName:'lifecyclePhase' }}
+            <span ng-bind="ctrl.app.lifecyclePhase | toDisplayName:'lifecyclePhase'"></span>
         </div>
         <div class="col-sm-2 waltz-display-field-label">
             Type
         </div>
         <div class="col-sm-4">
-            {{ ctrl.app.kind | toDisplayName:'applicationKind' }}
+            <span ng-bind="ctrl.app.kind | toDisplayName:'applicationKind'"></span>
         </div>
     </div>
 
@@ -44,7 +44,7 @@
             Overall Rating
         </div>
         <div class="col-sm-4">
-            {{ ctrl.app.overallRating | toDisplayName:'investmentRating' }}
+            <span ng-bind="ctrl.app.overallRating | toDisplayName:'investmentRating'"></span>
         </div>
     </div>
 
@@ -115,7 +115,7 @@
         <div class="col-sm-2 waltz-display-field-label">
             Complexity Rating:
         </div>
-        <div class="col-sm-10">
+        <div class="col-sm-4">
             <span class='waltz-clickable-definition'
                   popover-trigger="focus"
                   tabindex="99"
@@ -123,8 +123,14 @@
                   popover-animation="true"
                   popover-title="Application Complexity Rating"
                   uib-popover-template="'popup-app-complexity.html'">
-            {{ ctrl.complexity.overallScore | toFixed:2 }}
+                <span ng-bind="ctrl.complexity.overallScore | toFixed:2"></span>
             </span>
+        </div>
+        <div class="col-sm-2 waltz-display-field-label">
+            Criticality
+        </div>
+        <div class="col-sm-4">
+            <span ng-bind="ctrl.app.criticality | toDisplayName:'criticality'"></span>
         </div>
     </div>
 
@@ -133,7 +139,7 @@
             Description
         </div>
         <div class="col-sm-10">
-            {{ ctrl.app.description }}
+            <span ng-bind="ctrl.app.description"></span>
         </div>
     </div>
 
@@ -146,15 +152,21 @@
             <table class="table small">
                 <tr>
                     <td>Capability Complexity</td>
-                    <td>{{ ctrl.complexity.capabilityComplexity.score | toFixed:2 }}</td>
+                    <td>
+                        <span ng-bind="ctrl.complexity.capabilityComplexity.score | toFixed:2"></span>
+                    </td>
                 </tr>
                 <tr>
                     <td>Connection Complexity</td>
-                    <td>{{ ctrl.complexity.connectionComplexity.score | toFixed:2 }}</td>
+                    <td>
+                        <span ng-bind="ctrl.complexity.connectionComplexity.score | toFixed:2"></span>
+                    </td>
                 </tr>
                 <tr>
                     <td>Server Complexity</td>
-                    <td>{{ ctrl.complexity.serverComplexity.score | toFixed:2 }}</td>
+                    <td>
+                        <span ng-bind="ctrl.complexity.serverComplexity.score | toFixed:2"></span>
+                    </td>
                 </tr>
             </table>
 

@@ -1,8 +1,8 @@
 import _ from "lodash";
 import {tallyBy} from "../../common/tally-utils";
-import {lifecyclePhaseColorScale, riskRatingColorScale, variableScale} from "../../common/colors";
+import {lifecyclePhaseColorScale, criticalityColorScale, variableScale} from "../../common/colors";
 import {
-    riskRatingDisplayNames,
+    criticalityDisplayNames,
     lifecyclePhaseDisplayNames,
     applicationKindDisplayNames
 } from "../../common/services/display_names";
@@ -27,12 +27,12 @@ const PIE_SIZE = 70;
 
 const defaultLabelProvider = (d) => d.key;
 const lifecycleLabelProvider = d => lifecyclePhaseDisplayNames[d.key] || d.key;
-const riskRatingLabelProvider = d => riskRatingDisplayNames[d.key] || d.key;
+const criticalityLabelProvider = d => d ? (criticalityDisplayNames[d.key] || d.key) : d;
 const applicationKindLabelProvider = d => applicationKindDisplayNames[d.key] || d.key;
 
 const randomColorProvider = d => variableScale(d.data.key);
 const lifecycleColorProvider = d => lifecyclePhaseColorScale(d.data.key);
-const riskRatingColorProvider = d => riskRatingColorScale(d.data.key);
+const criticalityColorProvider = d => criticalityColorScale(d.data.key);
 
 
 function mkChartData(data,
@@ -82,8 +82,8 @@ function mkCharts(apps = [], endUserApps = []) {
                 endUserApps,
                 'riskRating',
                 PIE_SIZE,
-                riskRatingColorProvider,
-                riskRatingLabelProvider)
+                criticalityColorProvider,
+                criticalityLabelProvider())
         }
     };
 }

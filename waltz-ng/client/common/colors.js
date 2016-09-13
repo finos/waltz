@@ -72,9 +72,9 @@ export const lifecyclePhaseColorScale = d3.scale.ordinal()
     .range([blue, amber, green, grey]);
 
 
-export const riskRatingColorScale = d3.scale.ordinal()
-    .domain(['LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH'])
-    .range([green, amber, red, red.darker()]);
+export const criticalityColorScale = d3.scale.ordinal()
+    .domain(['LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH', 'NONE', 'UNKNOWN'])
+    .range([green, amber, red, red.darker(), grey, grey.darker()]);
 
 
 export const flowDirectionColorScale = d3.scale.ordinal()

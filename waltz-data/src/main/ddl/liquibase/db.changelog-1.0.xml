@@ -2666,4 +2666,17 @@
         </createIndex>
     </changeSet>
 
+
+    <!-- 427 : Application Business Criticality -->
+    <changeSet author="kamransaleem"
+               id="20160905-427-1">
+        <addColumn tableName="application">
+            <column name="criticality"
+                    type="VARCHAR(128)"
+                    defaultValue="UNKNOWN">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

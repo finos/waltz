@@ -18,8 +18,8 @@
 package com.khartec.waltz.jobs.sample;
 
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.application.LifecyclePhase;
-import com.khartec.waltz.model.enduserapp.RiskRating;
 import com.khartec.waltz.model.utils.IdUtilities;
 import com.khartec.waltz.schema.tables.records.EndUserApplicationRecord;
 import com.khartec.waltz.service.DIConfiguration;
@@ -91,7 +91,7 @@ public class EndUserAppMaker {
                 record.setName(name);
                 record.setDescription("About the " + name + " End user app");
                 record.setKind(randomPick(tech));
-                record.setRiskRating(randomPick(RiskRating.values()).name());
+                record.setRiskRating(randomPick(Criticality.values()).name());
                 record.setLifecyclePhase(randomPick(LifecyclePhase.values()).name());
                 record.setOrganisationalUnitId(ouId);
 

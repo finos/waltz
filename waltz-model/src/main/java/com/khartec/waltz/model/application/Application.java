@@ -50,6 +50,10 @@ public abstract class Application implements
     }
 
 
+    @Value.Default
+    public Criticality criticality() { return Criticality.UNKNOWN; }
+
+
     public EntityReference toEntityReference() {
         return ImmutableEntityReference.builder()
                 .kind(EntityKind.APPLICATION)

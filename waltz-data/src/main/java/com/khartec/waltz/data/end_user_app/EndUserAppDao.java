@@ -18,10 +18,10 @@
 package com.khartec.waltz.data.end_user_app;
 
 import com.khartec.waltz.data.JooqUtilities;
+import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.enduserapp.ImmutableEndUserApplication;
-import com.khartec.waltz.model.enduserapp.RiskRating;
 import com.khartec.waltz.model.tally.LongTally;
 import com.khartec.waltz.schema.tables.records.EndUserApplicationRecord;
 import org.jooq.*;
@@ -49,7 +49,7 @@ public class EndUserAppDao {
                 .id(record.getId())
                 .organisationalUnitId(record.getOrganisationalUnitId())
                 .lifecyclePhase(LifecyclePhase.valueOf(record.getLifecyclePhase()))
-                .riskRating(RiskRating.valueOf(record.getRiskRating()))
+                .riskRating(Criticality.valueOf(record.getRiskRating()))
                 .provenance(record.getProvenance())
                 .build();
     };

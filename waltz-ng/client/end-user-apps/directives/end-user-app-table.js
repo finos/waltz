@@ -1,7 +1,7 @@
 import d3 from "d3";
 import _ from "lodash";
 import {lifecyclePhaseDisplayNames} from "../../common/services/display_names";
-import {lifecyclePhaseColorScale, riskRatingColorScale} from "../../common/colors";
+import {lifecyclePhaseColorScale, criticalityColorScale} from "../../common/colors";
 
 function controller(uiGridConstants, $scope) {
     const vm = this;
@@ -70,7 +70,7 @@ function controller(uiGridConstants, $scope) {
             data: [],
             config: {
                 size: 60,
-                colorProvider: (d) => riskRatingColorScale(d.data.key)
+                colorProvider: (d) => criticalityColorScale(d.data.key)
             }
         }
     };

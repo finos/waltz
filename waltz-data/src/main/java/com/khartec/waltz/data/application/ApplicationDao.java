@@ -19,6 +19,7 @@ package com.khartec.waltz.data.application;
 
 
 import com.khartec.waltz.data.JooqUtilities;
+import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.tally.LongTally;
@@ -60,6 +61,7 @@ public class ApplicationDao {
                 .kind(readEnum(appRecord.getKind(), ApplicationKind.class, (s) -> ApplicationKind.IN_HOUSE))
                 .lifecyclePhase(readEnum(appRecord.getLifecyclePhase(), LifecyclePhase.class, (s) -> LifecyclePhase.DEVELOPMENT))
                 .overallRating(readEnum(appRecord.getOverallRating(), RagRating.class, (s) -> RagRating.Z))
+                .criticality(readEnum(appRecord.getCriticality(), Criticality.class, c -> Criticality.UNKNOWN))
                 .provenance(appRecord.getProvenance())
                 .build();
 
