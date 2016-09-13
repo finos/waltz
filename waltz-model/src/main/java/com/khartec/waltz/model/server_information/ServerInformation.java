@@ -19,13 +19,12 @@ package com.khartec.waltz.model.server_information;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.AssetCodeProvider;
-import com.khartec.waltz.model.IdProvider;
-import com.khartec.waltz.model.Nullable;
-import com.khartec.waltz.model.ProvenanceProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 import java.util.Date;
+
+import static com.khartec.waltz.model.EndOfLifeStatus.calculateEndOfLifeStatus;
 
 
 @Value.Immutable
@@ -45,14 +44,29 @@ public abstract class ServerInformation implements
 
     @Nullable
     public abstract Date hardwareEndOfLifeDate();
+
+
+    @Value.Derived
+    public EndOfLifeStatus hardwareEndOfLifeStatus() {
+        return calculateEndOfLifeStatus(hardwareEndOfLifeDate());
+    }
+
+
     @Nullable
     public abstract Date operatingSystemEndOfLifeDate();
+
+
+    @Value.Derived
+    public EndOfLifeStatus operatingSystemEndOfLifeStatus() {
+        return calculateEndOfLifeStatus(operatingSystemEndOfLifeDate());
+    }
 
 
     @Value.Default
     public String provenance() {
         return "waltz";
     }
+
 
     @Value.Default
     public boolean virtual() {

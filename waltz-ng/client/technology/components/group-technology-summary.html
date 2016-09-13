@@ -34,17 +34,24 @@
             </waltz-icon>
             Databases
         </h4>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <waltz-pie-table data="$ctrl.databaseStats.vendor"
                              config="$ctrl.pieConfig.vendor"
                              title="By Vendor">
             </waltz-pie-table>
         </div>
 
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <waltz-pie-table data="$ctrl.databaseStats.environment"
                              config="$ctrl.pieConfig.environment"
                              title="By Environment">
+            </waltz-pie-table>
+        </div>
+
+        <div class="col-sm-4">
+            <waltz-pie-table data="$ctrl.databaseStats.eol"
+                             config="$ctrl.pieConfig.eol"
+                             title="By EOL Status">
             </waltz-pie-table>
         </div>
     </div>

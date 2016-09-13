@@ -12,7 +12,7 @@
  */
 
 import d3 from "d3";
-import _ from 'lodash';
+import _ from "lodash";
 
 
 export const amber = d3.rgb('#D9923F');
@@ -100,7 +100,8 @@ const variableColorList = [
             'RED',
             'OVERDUE',
             'LATE',
-            'BAD'
+            'BAD',
+            'END_OF_LIFE'
         ]
     }, {
         color: green,
@@ -117,7 +118,8 @@ const variableColorList = [
             'STRATEGIC',
             'G',
             'GREEN',
-            'GOOD'
+            'GOOD',
+            'NOT_END_OF_LIFE'
         ]
     }, {
         color: amber,

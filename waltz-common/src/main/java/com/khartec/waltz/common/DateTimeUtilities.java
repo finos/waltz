@@ -1,5 +1,7 @@
 package com.khartec.waltz.common;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -19,6 +21,14 @@ public class DateTimeUtilities {
             return null;
         }
         return new java.sql.Date(date.getTime());
+    }
+
+
+    public static LocalDate toLocalDate(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return Instant.ofEpochMilli(date.getTime()).atZone(UTC).toLocalDate();
     }
 
 }

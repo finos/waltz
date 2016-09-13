@@ -21,6 +21,7 @@ import com.khartec.waltz.model.person.ImmutablePerson;
 import com.khartec.waltz.model.person.PersonKind;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.person.PersonService;
+import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import io.codearte.jfairy.Fairy;
 import io.codearte.jfairy.producer.person.Person;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -47,6 +48,7 @@ public class PersonDataGenerator {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         PersonService personService = ctx.getBean(PersonService.class);
+        PersonHierarchyService personHierarchyService = ctx.getBean(PersonHierarchyService.class);
 
         Person person = fairy.person();
 
@@ -69,6 +71,7 @@ public class PersonDataGenerator {
         System.out.println(peeps.size());
 
         personService.bulkSave(peeps);
+        personHierarchyService.build();
 
     }
 

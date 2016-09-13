@@ -14,7 +14,7 @@ function service($q,
 
         const promises = [
             serverInfoStore.findStatsForSelector(id, kind, scope),
-            //databaseStore.findStatsForSelector(id, kind, scope),
+            databaseStore.findStatsForSelector(id, kind, scope),
             softwareCatalogStore.findStatsForSelector(id, kind, scope)
         ];
 
@@ -22,11 +22,11 @@ function service($q,
             .all(promises)
             .then(([
                 serverStats,
-              //  databaseStats,
+                databaseStats,
                 softwareStats
             ]) => ({
                     serverStats,
-                    databaseStats : { count: 0 },
+                    databaseStats,
                     softwareStats
                 })
             );

@@ -15,6 +15,7 @@ public abstract class DatabaseSummaryStatistics implements SummaryStatistics {
 
     public abstract List<Tally<String>> environmentCounts();
     public abstract List<Tally<String>> vendorCounts();
+    public abstract List<Tally<String>> eolCounts();
 
 
 }

@@ -32,6 +32,11 @@ function mkBooleanColumnFilter(uiGridConstants) {
 }
 
 
+function isEndOfLife(endOfLifeStatus) {
+    return endOfLifeStatus === 'END_OF_LIFE';
+}
+
+
 function createDefaultTableOptions($animate, uiGridConstants, exportFileName = "export.csv") {
     return {
         columnDefs: [],
@@ -163,10 +168,8 @@ function controller($animate, $scope, uiGridConstants) {
         servers => {
             _.forEach(servers,
                 (svr) => Object.assign(svr, {
-                    "isHwEndOfLife": svr.hardwareEndOfLifeDate
-                                        && Date.parse(svr.hardwareEndOfLifeDate) < _.now(),
-                    "isOperatingSystemEndOfLife": svr.operatingSystemEndOfLifeDate
-                                                        && Date.parse(svr.operatingSystemEndOfLifeDate) < _.now()
+                    "isHwEndOfLife": isEndOfLife(svr.hardwareEndOfLifeStatus),
+                    "isOperatingSystemEndOfLife": isEndOfLife(svr.operatingSystemEndOfLifeStatus)
                 })
             );
             vm.serverGridOptions.data = servers;
@@ -178,8 +181,7 @@ function controller($animate, $scope, uiGridConstants) {
         databases => {
             _.forEach(databases,
                 (db) => Object.assign(db, {
-                    "isEndOfLife": db.endOfLifeDate
-                                        && Date.parse(db.endOfLifeDate) < _.now()
+                    "isEndOfLife": isEndOfLife(db.endOfLifeStatus)
                 })
             );
             vm.databaseGridOptions.data = databases;
