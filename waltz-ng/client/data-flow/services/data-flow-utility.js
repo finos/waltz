@@ -59,7 +59,7 @@ export default [
                     exit: _.identity
                 },
                 link : {
-                    enter: (selection) => {
+                    update: (selection) => {
                         selection
                             .attr('stroke', d => {
                                 const rating = calcRating(d);
@@ -71,7 +71,7 @@ export default [
                                 return `url(#arrowhead-${rating})`;
                             })
                     },
-                    update: _.identity,
+                    enter: _.identity,
                     exit: _.identity
                 }
             };
