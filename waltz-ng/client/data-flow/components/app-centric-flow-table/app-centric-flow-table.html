@@ -1,0 +1,38 @@
+<table class="table table-condensed table-hover small">
+    <thead>
+        <tr>
+            <th>Direction</th>
+            <th>Application</th>
+            <th>Type</th>
+        </tr>
+    </thead>
+    <tbody class="small" ng-repeat="(direction, flows) in $ctrl.groupedFlows">
+
+        <tr ng-repeat="flow in flows | orderBy:'source.name'"
+            ng-class="{
+                danger: flow.decorator.rating === 'DISCOURAGED',
+                warning: flow.decorator.rating === 'SECONDARY',
+                success: flow.decorator.rating === 'PRIMARY'
+            }">
+            <td>
+                <span ng-if="$first"
+                      ng-bind="direction">
+                </span>
+            </td>
+
+            <td>
+                <a ui-sref="main.app.view ({id: flow.app.id })">
+                    <span ng-bind="flow.app.name">
+                    </span>
+                </a>
+            </td>
+
+            <td>
+                <a ui-sref="main.data-type.view ({id: flow.decorator.id })">
+                    <span ng-bind="flow.decorator.name">
+                    </span>
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>

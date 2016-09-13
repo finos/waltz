@@ -11,15 +11,17 @@
 
 
 
-    <waltz-section>
+    <waltz-section >
+        <div class="row">
+            <div class="col-sm-4">
+                <waltz-app-centric-flow-table app="ctrl.app"
+                                              flows="ctrl.flows"
+                                              decorators="ctrl.decorators"
+                                              data-data-types="ctrl.dataTypes">
+                </waltz-app-centric-flow-table>
+            </div>
+        </div>
 
-        <pre>{{ ctrl.orgUnits}}</pre>
-
-
-        <waltz-auth-sources-list
-            auth-sources="ctrl.authSources"
-            org-units="ctrl.orgUnits">
-        </waltz-auth-sources-list>
 
     </waltz-section>
 
