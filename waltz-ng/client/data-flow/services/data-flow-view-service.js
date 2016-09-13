@@ -46,11 +46,13 @@ function service($q,
 
         const flowPromise = dataFlowStore
             .findBySelector(data.options)
-            .then(flows => data.flows = flows);
+            .then(flows => data.flows = flows)
+            .then(f => global.flows = f);
 
         const decoratorPromise = dataFlowDecoratorStore
             .findBySelector(data.options)
-            .then(decorators => data.decorators = decorators);
+            .then(decorators => data.decorators = decorators)
+            .then(d => global.decorators = d);
 
         return $q
             .all([flowPromise, decoratorPromise])

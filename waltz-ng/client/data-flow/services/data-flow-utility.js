@@ -12,6 +12,9 @@
  */
 
 import _ from "lodash";
+import { authoritativeRatingColorScale } from '../../common/colors';
+import { pickWorst } from '../../auth-sources/services/auth-sources-utils'
+
 
 export default [
     () => {
@@ -34,7 +37,15 @@ export default [
                 .value();
         };
 
-        const buildGraphTweakers = (appIds) => {
+        const buildGraphTweakers = (appIds = [], decorators = []) => {
+            const decoratorsByFlowId = _.groupBy(decorators, 'dataFlowId');
+            const calcRating = (d) => {
+                const flowId = d.data.id;
+                const flowDecorators = decoratorsByFlowId[flowId] || [];
+                const ratings = _.map(flowDecorators, 'rating');
+                return pickWorst(ratings);
+            };
+
             return {
                 node : {
                     enter: (selection) => {
@@ -43,7 +54,25 @@ export default [
                             .classed('wdfd-extra-node', d => ! _.includes(appIds, d.id))
                             .on('click', app => app.fixed = true)
                             .on('dblclick', app => app.fixed = false)
-                    }
+                    },
+                    update: _.identity,
+                    exit: _.identity
+                },
+                link : {
+                    enter: (selection) => {
+                        selection
+                            .attr('stroke', d => {
+                                const rating = calcRating(d);
+                                return authoritativeRatingColorScale(rating);
+                            })
+                            .attr('stroke-width', 1.5)
+                            .attr('marker-end', d => {
+                                const rating = calcRating(d);
+                                return `url(#arrowhead-${rating})`;
+                            })
+                    },
+                    update: _.identity,
+                    exit: _.identity
                 }
             };
         };

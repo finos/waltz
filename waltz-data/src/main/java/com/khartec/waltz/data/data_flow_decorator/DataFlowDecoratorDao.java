@@ -126,7 +126,8 @@ public class DataFlowDecoratorDao {
 
 
     public Collection<DataFlowDecorator> findByAppIdSelector(Select<Record1<Long>> appIdSelector) {
-        Condition condition = DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector);
+        Condition condition = DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector)
+                .or(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector));
 
         return dsl.select(DATA_FLOW_DECORATOR.fields())
                 .from(DATA_FLOW_DECORATOR)
@@ -177,6 +178,7 @@ public class DataFlowDecoratorDao {
     // --- STATS ---
 
     public List<DecoratorRatingSummary> summarizeForSelector(Select<Record1<Long>> selector) {
+        // this is intentionally TARGET only as we use to calculate auth source stats
         Condition condition = DATA_FLOW.TARGET_ENTITY_ID.in(selector);
 
         Condition dataFlowJoinCondition = DATA_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID);
