@@ -32,7 +32,7 @@ authSourcesResolver.$inject = ['AuthSourcesStore', '$stateParams'];
 
 
 export function flowResolver(flowStore, params) {
-    return flowStore.findByAppIdSelector(mkSelector(params));
+    return flowStore.findBySelector(mkSelector(params));
 }
 
 flowResolver.$inject = ['DataFlowDataStore', '$stateParams'];
