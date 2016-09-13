@@ -18,18 +18,19 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.database_information.DatabaseInformationDao;
+import com.khartec.waltz.model.EndOfLifeStatus;
 import com.khartec.waltz.model.database_information.DatabaseInformation;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.List;
-import java.util.Map;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
+import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
 
 
 public class DatabaseHarness {
@@ -44,14 +45,15 @@ public class DatabaseHarness {
         List<DatabaseInformation> dbs = databaseDao.findByApplicationId(801L);
         System.out.println(dbs.size());
 
-        SelectConditionStep<Record1<Long>> idSelector = dsl
-                .select(APPLICATION.ID)
-                .from(APPLICATION)
-                .where(APPLICATION.ID.in(801L, 802L, 803L));
 
-        Map<Long, List<DatabaseInformation>> moreDbs = databaseDao.findByAppSelector(idSelector);
-        System.out.println(moreDbs.size());
-        System.out.println(moreDbs.values().size());
+        List<Tally<String>> eolCounts = calculateStringTallies(
+                dsl,
+                DATABASE_INFORMATION,
+                DSL.when(DATABASE_INFORMATION.END_OF_LIFE_DATE.lt(DSL.currentDate()), DSL.inline(EndOfLifeStatus.END_OF_LIFE.name()))
+                        .otherwise(DSL.inline(EndOfLifeStatus.NOT_END_OF_LIFE.name())),
+                DSL.trueCondition());
+
+        System.out.println(eolCounts);
 
 
 

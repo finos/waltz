@@ -13,13 +13,11 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
@@ -112,8 +110,8 @@ public class DatabaseInformationDao {
         List<Tally<String>> eolCounts = calculateStringTallies(
                 dsl,
                 databaseInfo,
-                DSL.when(DATABASE_INFORMATION.END_OF_LIFE_DATE.lt(toSqlDate(new Date())), EndOfLifeStatus.END_OF_LIFE.name())
-                        .otherwise(EndOfLifeStatus.NOT_END_OF_LIFE.name()),
+                DSL.when(DATABASE_INFORMATION.END_OF_LIFE_DATE.lt(DSL.currentDate()), DSL.inline(EndOfLifeStatus.END_OF_LIFE.name()))
+                        .otherwise(DSL.inline(EndOfLifeStatus.NOT_END_OF_LIFE.name())),
                 DSL.trueCondition());
 
         return ImmutableDatabaseSummaryStatistics.builder()
