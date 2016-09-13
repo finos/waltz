@@ -196,22 +196,22 @@ public class ServerInformationDao {
     }
 
     private Tuple2<Integer, Integer> calculateVirtualAndPhysicalCounts(Condition condition) {
-        Field<Boolean> isVirtual = DSL.field("is_virtual", Boolean.class);
+        Field<Boolean> isVirtualInner = DSL.field("is_virtual_inner", Boolean.class);
 
         Field<BigDecimal> virtualCount = DSL.coalesce(DSL.sum(
-                DSL.choose(isVirtual)
+                DSL.choose(isVirtualInner)
                         .when(Boolean.TRUE, 1)
                         .otherwise(0)), BigDecimal.ZERO)
                 .as("virtual_count");
 
         Field<BigDecimal> physicalCount = DSL.coalesce(DSL.sum(
-                DSL.choose(isVirtual)
+                DSL.choose(isVirtualInner)
                         .when(Boolean.TRUE, 0)
                         .otherwise(1)), BigDecimal.ZERO)
                 .as("physical_count");
 
         Select<Record2<BigDecimal, BigDecimal>> typeQuery = dsl.select(virtualCount, physicalCount)
-                .from(select(max(SERVER_INFORMATION.IS_VIRTUAL).as(isVirtual))
+                .from(select(max(SERVER_INFORMATION.IS_VIRTUAL).as(isVirtualInner))
                             .from(SERVER_INFORMATION)
                             .where(dsl.renderInlined(condition))
                             .groupBy(SERVER_INFORMATION.HOSTNAME));
