@@ -109,6 +109,7 @@ function controller($scope,
                     complexityStore,
                     dataFlowViewService,
                     entityStatisticStore,
+                    historyStore,
                     ratingStore,
                     sourceDataRatingStore,
                     technologyStatsService,
@@ -152,6 +153,10 @@ function controller($scope,
 
     appGroupStore.getById(id)
         .then(groupDetail => vm.groupDetail = groupDetail)
+        .then(groupDetail => {
+            historyStore.put(groupDetail.appGroup.name, 'APP_GROUP', 'main.app-group.view', { id });
+            return groupDetail;
+        })
         .then(groupDetail => _.map(groupDetail.applications, 'id'))
         .then(appIds => $q.all([
             appStore.findByIds(appIds),
@@ -222,6 +227,7 @@ controller.$inject = [
     'ComplexityStore',
     'DataFlowViewService',
     'EntityStatisticStore',
+    'HistoryStore',
     'RatingStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService',

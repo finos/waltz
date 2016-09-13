@@ -70,6 +70,7 @@ function controller($scope,
                     bookmarkStore,
                     capabilityStore,
                     dataFlowViewService,
+                    historyStore,
                     processStore,
                     sourceDataRatingStore) {
 
@@ -92,7 +93,8 @@ function controller($scope,
 
     processStore
         .getById(processId)
-        .then(p => vm.process = p);
+        .then(p => vm.process = p)
+        .then(p => historyStore.put(p.name, 'PROCESS', 'main.process.view', { id: p.id }));
 
     processStore
         .findSupportingCapabilities(processId)
@@ -202,6 +204,7 @@ controller.$inject = [
     'BookmarkStore',
     'CapabilityStore',
     'DataFlowViewService',
+    'HistoryStore',
     'ProcessStore',
     'SourceDataRatingStore'
 ];
