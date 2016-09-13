@@ -15,11 +15,13 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.enduserapp;
+package com.khartec.waltz.model;
 
-public enum RiskRating {
+public enum Criticality {
     LOW,
     MEDIUM,
     HIGH,
-    VERY_HIGH
+    VERY_HIGH,
+    NONE,
+    UNKNOWN
 }

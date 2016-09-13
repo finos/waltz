@@ -19,13 +19,13 @@ import {
     bookmarkNames,
     capabilityRatingNames,
     changeInitiativeNames,
+    criticalityDisplayNames,
     entityNames,
     entityStatisticCategoryDisplayNames,
     investmentRatingNames,
     involvementKindNames,
     lifecyclePhaseDisplayNames,
     orgUnitKindNames,
-    riskRatingDisplayNames,
     severityNames,
     usageKindDisplayNames
 } from "./display_names";
@@ -54,13 +54,13 @@ export default (module) => {
     displayNameService.register('bookmark', bookmarkNames);
     displayNameService.register('capabilityRating', capabilityRatingNames);
     displayNameService.register('changeInitiative', changeInitiativeNames);
+    displayNameService.register('criticality', criticalityDisplayNames);
     displayNameService.register('entity', entityNames);
     displayNameService.register('entityStatistic', entityStatisticCategoryDisplayNames);
     displayNameService.register('investmentRating', investmentRatingNames);
     displayNameService.register('involvementKind', involvementKindNames);
     displayNameService.register('lifecyclePhase', lifecyclePhaseDisplayNames);
     displayNameService.register('orgUnitKind', orgUnitKindNames);
-    displayNameService.register('riskRating', riskRatingDisplayNames);
     displayNameService.register('rating', authSourceRatingNames);
     displayNameService.register('severity', severityNames);
     displayNameService.register('usageKind', usageKindDisplayNames);

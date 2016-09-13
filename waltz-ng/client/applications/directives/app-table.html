@@ -22,16 +22,19 @@
                         </span>
                     </h6>
                     <h6 ng-if="ctrl.selectedApp.assetCode">
-                        <strong>Asset code: </strong> {{ctrl.selectedApp.assetCode}}
+                        <strong>Asset code: </strong> <span ng-bind="ctrl.selectedApp.assetCode"></span>
                     </h6>
                     <h6 ng-if="ctrl.selectedApp.platform">
-                        <strong>Platform: </strong> {{ctrl.selectedApp.platform}}
+                        <strong>Platform: </strong> <span ng-bind="ctrl.selectedApp.platform"></span>
                     </h6>
                     <h6 ng-if="ctrl.selectedApp.riskRating">
-                        <strong>Risk Rating: </strong> {{ctrl.selectedApp.riskRating | toDisplayName:'riskRating'}}
+                        <strong>Risk Rating: </strong> <span ng-bind="ctrl.selectedApp.riskRating | toDisplayName:'criticality'"></span>
+                    </h6>
+                    <h6 ng-if="ctrl.selectedApp.criticality">
+                        <strong>Criticality: </strong> <span ng-bind="ctrl.selectedApp.criticality | toDisplayName:'criticality'"></span>
                     </h6>
                     <h6>
-                        <strong>Managed by: </strong> {{ctrl.selectedApp.management}}
+                        <strong>Managed by: </strong> <span ng-bind="ctrl.selectedApp.management"></span>
                     </h6>
                     <div ng-if="ctrl.selectedApp.management == 'IT'">
                         <strong>

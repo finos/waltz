@@ -93,6 +93,7 @@ function controller(appView, orgUnits, displayNameService, appStore, notificatio
     fields.aliasesField.model = formModel;
     fields.tagsField.model = formModel;
     fields.overallRatingField.model = formModel.app;
+    fields.criticalityField.model = formModel.app;
 
 
     function onSubmit() {

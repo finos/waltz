@@ -35,7 +35,7 @@ public abstract class EndUserApplication implements
     public abstract Long organisationalUnitId();
     public abstract String kind();
     public abstract LifecyclePhase lifecyclePhase();
-    public abstract RiskRating riskRating();
+    public abstract Criticality riskRating();
 
     @Value.Default
     public String provenance() {
