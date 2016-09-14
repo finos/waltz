@@ -5,6 +5,7 @@ import _ from "lodash";
 
 const bindings = {
     data: '<',
+    dataTypes: '<',
     typeId: '<'
 };
 
@@ -157,6 +158,10 @@ function controller() {
         vm.rawFlows = rawFlows;
         vm.rawDecorators = rawDecorators;
         vm.filterChanged();
+    };
+
+    vm.refocusApp = app => {
+        onAppSelect(app);
     };
 }
 
