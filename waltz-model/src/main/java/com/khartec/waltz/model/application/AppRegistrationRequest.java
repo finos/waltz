@@ -19,6 +19,7 @@ package com.khartec.waltz.model.application;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.capabilityrating.RagRating;
 import org.immutables.value.Value;
 
@@ -41,6 +42,7 @@ public abstract class AppRegistrationRequest {
     public abstract Set<String> aliases();
     public abstract Set<String> tags();
     public abstract RagRating overallRating();
+    public abstract Criticality businessCriticality();
 
 
 }

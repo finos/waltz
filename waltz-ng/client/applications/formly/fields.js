@@ -35,7 +35,7 @@ export const descriptionField = {
     key: 'description',
     templateOptions: {
         label: 'Description',
-        rows: 9,
+        rows: 13,
         placeholder: 'Name of application or service'
     }
 };
@@ -119,6 +119,27 @@ export const overallRatingField = {
             { code: 'Z', name: 'Unknown' }
         ],
         label: 'Overall Rating',
+        placeholder: '',
+        required: true
+    }
+}
+
+
+export const businessCriticalityField = {
+    type: 'select',
+    key: 'businessCriticality',
+    templateOptions: {
+        valueProp: 'code',
+        labelProp: 'name',
+        options: [
+            { code: 'LOW', name: 'Low'},
+            { code: 'MEDIUM', name: 'Medium' },
+            { code: 'HIGH', name: 'High' },
+            { code: 'VERY_HIGH', name: 'Very high' },
+            { code: 'NONE', name: 'None' },
+            { code: 'UNKNOWN', name: 'Unknown' }
+        ],
+        label: 'Business Criticality',
         placeholder: '',
         required: true
     }

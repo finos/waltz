@@ -43,7 +43,6 @@ function service($q,
 
         data.loadingFlows = true;
 
-
         const flowPromise = dataFlowStore
             .findBySelector(data.options)
             .then(flows => data.flows = flows);

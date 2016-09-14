@@ -20,7 +20,10 @@ const defaultFilterOptions = {
 const defaultOptions = {
     graphTweakers: {
         node : {
-            enter: (selection) => console.log("default graphTweaker.node.entry, selection: ", selection)
+            enter: (selection) => console.log("default graphTweaker.node.entry, selection: ", selection),
+        },
+        link : {
+            enter: (selection) => selection.attr('stroke', 'red')
         }
     }
 };
@@ -47,27 +50,9 @@ function calculateEntities(flows = []) {
 }
 
 
-function buildFilter(filterOptions = defaultFilterOptions,
-                     appIds = [],
-                     flowDecorators = []) {
-
-    const decoratorsByFlowById = _.groupBy(flowDecorators, 'dataFlowId');
-
-    const typeFilterFn = f => {
-        const decoratorsForFlow = decoratorsByFlowById[f.id] || [];
-
-        const typeMatchFn = ({ decoratorEntity }) => {
-            return decoratorEntity.id === Number(filterOptions.type)
-                && decoratorEntity.kind === 'DATA_TYPE';
-        };
-
-        return filterOptions.type === 'ALL'
-            ? true
-            : _.some(decoratorsForFlow, typeMatchFn);
-    };
-
-    const scopeFilterFn =  f => {
-        switch (filterOptions.scope) {
+function mkScopeFilterFn(appIds = [], scope = 'INTRA') {
+    return (f) => {
+        switch (scope) {
             case "INTRA":
                 return _.includes(appIds, f.target.id) && _.includes(appIds, f.source.id);
             case "ALL":
@@ -78,21 +63,50 @@ function buildFilter(filterOptions = defaultFilterOptions,
                 return _.includes(appIds, f.source.id);
         }
     };
-
-    return f => typeFilterFn(f) && scopeFilterFn(f);
-
 }
+
+
+function mkTypeFilterFn(decorators = []) {
+    const flowIds = _.chain(decorators)
+        .map('dataFlowId')
+        .uniq()
+        .value();
+    return f => _.includes(flowIds, f.id);
+}
+
+
+function buildFlowFilter(filterOptions = defaultFilterOptions,
+                         appIds = [],
+                         flowDecorators = []) {
+    const typeFilterFn = mkTypeFilterFn(flowDecorators);
+    const scopeFilterFn = mkScopeFilterFn(appIds, filterOptions.scope);
+    return f => typeFilterFn(f) && scopeFilterFn(f);
+}
+
+
+function buildDecoratorFilter(options = defaultFilterOptions) {
+    return d => {
+        const isDataType = d.decoratorEntity.kind === 'DATA_TYPE';
+        const matchesDataType = options.type === 'ALL' || d.decoratorEntity.id === Number(options.type);
+        return isDataType && matchesDataType;
+    };
+}
+
 
 function calculateFlowData(allFlows = [],
                            appIds = [],
-                           flowDecorators = [],
+                           allDecorators = [],
                            filterOptions = defaultFilterOptions) {
+    // note order is important.  We need to find decorators first
+    const decoratorFilterFn = buildDecoratorFilter(filterOptions);
+    const decorators = _.filter(allDecorators, decoratorFilterFn);
 
-    const filterFn = buildFilter(filterOptions, appIds, flowDecorators);
-    const flows = _.filter(allFlows, filterFn);
+    const flowFilterFn = buildFlowFilter(filterOptions, appIds, decorators);
+    const flows = _.filter(allFlows, flowFilterFn);
+
     const entities = calculateEntities(flows);
 
-    return {flows, entities};
+    return {flows, entities, decorators};
 }
 
 
@@ -131,6 +145,10 @@ function controller($scope, dataFlowUtilityService) {
             vm.appIds,
             vm.flowData.decorators,
             filterOptions);
+
+        vm.graphTweakers = dataFlowUtilityService.buildGraphTweakers(
+            vm.appIds,
+            vm.filteredFlowData.decorators)
     };
 
     vm.loadDetail = () => {
