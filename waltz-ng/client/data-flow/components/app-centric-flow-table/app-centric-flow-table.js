@@ -18,7 +18,8 @@ const initialState = {
 const template = require('./app-centric-flow-table.html');
 
 
-function enrichAndGroupFlows(app = {}, flows = [], decorators = [], dataTypes = []) {
+function enrichAndGroupFlows(app, flows = [], decorators = [], dataTypes = []) {
+    if(!app) return {};
 
     const dataTypesById = _.keyBy(dataTypes, 'id');
 
