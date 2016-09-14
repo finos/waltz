@@ -61,7 +61,7 @@ public class ApplicationDao {
                 .kind(readEnum(appRecord.getKind(), ApplicationKind.class, (s) -> ApplicationKind.IN_HOUSE))
                 .lifecyclePhase(readEnum(appRecord.getLifecyclePhase(), LifecyclePhase.class, (s) -> LifecyclePhase.DEVELOPMENT))
                 .overallRating(readEnum(appRecord.getOverallRating(), RagRating.class, (s) -> RagRating.Z))
-                .criticality(readEnum(appRecord.getCriticality(), Criticality.class, c -> Criticality.UNKNOWN))
+                .businessCriticality(readEnum(appRecord.getBusinessCriticality(), Criticality.class, c -> Criticality.UNKNOWN))
                 .provenance(appRecord.getProvenance())
                 .build();
 
@@ -161,6 +161,7 @@ public class ApplicationDao {
         record.setLifecyclePhase(request.lifecyclePhase().name());
         record.setOverallRating(request.overallRating().name());
         record.setUpdatedAt(Timestamp.from(Instant.now()));
+        record.setBusinessCriticality(request.businessCriticality().name());
 
         try {
             int count = record.insert();
@@ -204,6 +205,7 @@ public class ApplicationDao {
         record.setKind(application.kind().name());
         record.setOverallRating(application.overallRating().name());
         record.setProvenance(application.provenance());
+        record.setBusinessCriticality(application.businessCriticality().name());
 
         Condition condition = APPLICATION.ID.eq(application.id().get());
 
