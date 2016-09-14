@@ -22,7 +22,8 @@ import {
     tagsField,
     typeField,
     lifecyclePhaseField,
-    overallRatingField
+    overallRatingField,
+    businessCriticalityField
 } from "./formly/fields";
 
 
@@ -64,7 +65,7 @@ const controller = function(applicationStore,
             className: 'row',
             fieldGroup: [
                 { className: 'col-xs-8', fieldGroup: [descriptionField] },
-                { className: 'col-xs-4', fieldGroup: [overallRatingField, typeField, lifecyclePhaseField] }
+                { className: 'col-xs-4', fieldGroup: [overallRatingField, typeField, lifecyclePhaseField, businessCriticalityField] }
             ]
         }
     ];
