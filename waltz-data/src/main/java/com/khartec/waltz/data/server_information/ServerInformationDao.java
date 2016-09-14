@@ -211,10 +211,10 @@ public class ServerInformationDao {
                 .as("physical_count");
 
         Select<Record2<BigDecimal, BigDecimal>> typeQuery = dsl.select(virtualCount, physicalCount)
-                .from(select(max(SERVER_INFORMATION.IS_VIRTUAL).as(isVirtualInner))
+                .from(select(SERVER_INFORMATION.IS_VIRTUAL.as(isVirtualInner))
                             .from(SERVER_INFORMATION)
                             .where(dsl.renderInlined(condition))
-                            .groupBy(SERVER_INFORMATION.HOSTNAME));
+                            .groupBy(SERVER_INFORMATION.HOSTNAME, SERVER_INFORMATION.IS_VIRTUAL));
 
         return typeQuery
                 .fetchOne(r -> Tuple.tuple(
