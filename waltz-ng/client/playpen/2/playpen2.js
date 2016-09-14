@@ -24,19 +24,30 @@ function controller($q,
 
     vm.entityReference = entityRef;
 
-    $q.all([
-        appStore.getById(entityRef.id),
-        dataFlowStore.findByEntityReference(entityRef.kind, entityRef.id),
-        dataFlowDecoratorStore.findBySelectorAndKind(selector, 'DATA_TYPE'),
-        dataTypeStore.findAll()
 
-    ]).then(([app, flows, decorators, dataTypes]) => {
-        vm.app = app;
-        vm.flows = flows;
-        vm.decorators = decorators;
-        vm.dataTypes = dataTypes;
+    const loadData = () => {
+        $q.all([
+            appStore.getById(entityRef.id),
+            dataFlowStore.findByEntityReference(entityRef.kind, entityRef.id),
+            dataFlowDecoratorStore.findBySelectorAndKind(selector, 'DATA_TYPE'),
+            dataTypeStore.findAll()
 
-    });
+        ]).then(([app, flows, decorators, dataTypes]) => {
+            vm.app = app;
+            vm.flows = flows;
+            vm.decorators = decorators;
+            vm.dataTypes = dataTypes;
+
+        });
+    };
+
+
+    vm.refocus = app => {
+        entityRef.id = app.id;
+        loadData();
+    };
+
+    loadData();
 }
 
 

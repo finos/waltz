@@ -9,10 +9,13 @@
     <tbody class="small" ng-repeat="(direction, flows) in $ctrl.groupedFlows">
 
         <tr ng-repeat="flow in flows | orderBy:'source.name'"
+            uib-tooltip="Rating: {{flow.decorator.rating | toDisplayName:'rating'}}"
+            tooltip-placement="right"
             ng-class="{
                 danger: flow.decorator.rating === 'DISCOURAGED',
                 warning: flow.decorator.rating === 'SECONDARY',
-                success: flow.decorator.rating === 'PRIMARY'
+                success: flow.decorator.rating === 'PRIMARY',
+                unknown: flow.decorator.rating === 'NO_OPINION'
             }">
             <td>
                 <span ng-if="$first"
@@ -20,8 +23,9 @@
                 </span>
             </td>
 
-            <td>
-                <a ui-sref="main.app.view ({id: flow.app.id })">
+            <td class="waltz-visibility-parent">
+                <a ng-click="$ctrl.onSelect(flow.app)"
+                   class="clickable">
                     <span ng-bind="flow.app.name">
                     </span>
                 </a>
