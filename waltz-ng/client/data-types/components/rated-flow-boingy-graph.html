@@ -1,7 +1,7 @@
 <waltz-section icon='random'
                name="Data Flows">
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div>
                 <div class="waltz-paragraph text-muted small">
                     Use this panel to configure this view:
@@ -64,10 +64,17 @@
                 <a ui-sref="main.app.view ({ id: $ctrl.selectedApp.id })">
                     More &raquo;
                 </a>
+
+                <waltz-app-centric-flow-table app="$ctrl.selectedApp"
+                                              flows="$ctrl.flowData.flows"
+                                              decorators="$ctrl.flowData.decorators"
+                                              data-data-types="$ctrl.dataTypes"
+                                              on-select="$ctrl.refocusApp">
+                </waltz-app-centric-flow-table>
             </div>
 
         </div>
-        <div class="col-md-9">
+        <div class="col-md-8">
             <div ng-if="$ctrl.flowData.entities.length == 0">
                 <div class="alert alert-warning">
                     <strong>No data to show</strong> given the current filter options.

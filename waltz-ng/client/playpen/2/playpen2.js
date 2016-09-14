@@ -4,38 +4,59 @@ const initData = {
 };
 
 
-function controller(appStore, dataTypeService, dataTypeUsageStore, authSourcesStore, orgUnitStore) {
+function controller($q,
+                    appStore,
+                    dataFlowStore,
+                    dataFlowDecoratorStore,
+                    dataTypeStore) {
 
     const vm = Object.assign(this, initData);
 
     const entityRef = {
-        id: 6000,
-        kind: 'DATA_TYPE'
+        id: 2440,
+        kind: 'APPLICATION'
     };
 
     const selector = {
         entityReference: entityRef,
-        scope: 'CHILDREN'
+        scope: 'EXACT'
     };
 
     vm.entityReference = entityRef;
 
-    authSourcesStore
-        .findByDataTypeIdSelector(selector)
-        .then(authSources => vm.authSources = authSources)
-        .then(authSources => _.chain(authSources).map('parentReference.id').uniq().value() )
-        .then(orgUnitStore.findByIds)
-        .then(orgUnits => vm.orgUnits = orgUnits);
 
+    const loadData = () => {
+        $q.all([
+            appStore.getById(entityRef.id),
+            dataFlowStore.findByEntityReference(entityRef.kind, entityRef.id),
+            dataFlowDecoratorStore.findBySelectorAndKind(selector, 'DATA_TYPE'),
+            dataTypeStore.findAll()
+
+        ]).then(([app, flows, decorators, dataTypes]) => {
+            vm.app = app;
+            vm.flows = flows;
+            vm.decorators = decorators;
+            vm.dataTypes = dataTypes;
+
+        });
+    };
+
+
+    vm.refocus = app => {
+        entityRef.id = app.id;
+        loadData();
+    };
+
+    loadData();
 }
 
 
 controller.$inject = [
+    '$q',
     'ApplicationStore',
-    'DataTypeService',
-    'DataTypeUsageStore',
-    'AuthSourcesStore',
-    'OrgUnitStore'
+    'DataFlowDataStore',
+    'DataFlowDecoratorStore',
+    'DataTypeStore'
 ];
 
 
