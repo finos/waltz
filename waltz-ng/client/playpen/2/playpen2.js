@@ -1,14 +1,13 @@
+import {prepareDataTypeTree} from "../../data-types/utilities";
 
 const initData = {
-    dataTypes: []
+    dataTypes: [],
+    checkedDataTypes: []
 };
 
 
-function controller($q,
-                    appStore,
-                    dataFlowStore,
-                    dataFlowDecoratorStore,
-                    dataTypeStore) {
+function controller(dataTypeService,
+                    dataFlowStore) {
 
     const vm = Object.assign(this, initData);
 
@@ -26,37 +25,24 @@ function controller($q,
 
 
     const loadData = () => {
-        $q.all([
-            appStore.getById(entityRef.id),
-            dataFlowStore.findByEntityReference(entityRef.kind, entityRef.id),
-            dataFlowDecoratorStore.findBySelectorAndKind(selector, 'DATA_TYPE'),
-            dataTypeStore.findAll()
-
-        ]).then(([app, flows, decorators, dataTypes]) => {
-            vm.app = app;
-            vm.flows = flows;
-            vm.decorators = decorators;
-            vm.dataTypes = dataTypes;
-
-        });
-    };
-
-
-    vm.refocus = app => {
-        entityRef.id = app.id;
-        loadData();
+        dataTypeService.loadDataTypes()
+            .then(dataTypes => _.map(dataTypes, d => ({...d, selectable: d.name !== 'Ref Data'})))
+            .then(dataTypes => _.map(dataTypes, d => ({...d, checked: false})))
+            .then(dataTypes => vm.dataTypes = dataTypes)
+            .then(dataTypes => dataFlowStore.countByDataType())
+            .then(tallies => vm.trees = prepareDataTypeTree(vm.dataTypes, tallies));
     };
 
     loadData();
+
+    vm.nodeHighlighted = (node) => console.log('highlighted: ', node)
+    vm.nodeSelected = (node) => console.log('selected: ', node, vm.checkedDataTypes)
 }
 
 
 controller.$inject = [
-    '$q',
-    'ApplicationStore',
-    'DataFlowDataStore',
-    'DataFlowDecoratorStore',
-    'DataTypeStore'
+    'DataTypeService',
+    'DataFlowDataStore'
 ];
 
 

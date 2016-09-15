@@ -1,0 +1,22 @@
+<div>
+    <treecontrol class="tree-light"
+                 tree-model="$ctrl.trees"
+                 order-by="name"
+                 expanded-nodes="$ctrl.expandedNodes"
+                 on-selection="$ctrl.onNodeHighlight(node)"
+                 options="$ctrl.treeOptions">
+
+            <span>
+                <input type="checkbox"
+                       value="{{node.name}}"
+                       ng-model="node.checked"
+                       ng-disabled="!node.selectable"
+                       ng-style="{opacity : (node.selectable ? 1 : 0.3)}"
+                       ng-change="$ctrl.onNodeSelect(node)">
+
+                <ng-transclude>
+                    <span ng-bind="node.name"></span>
+                </ng-transclude>
+            </span>
+    </treecontrol>
+</div>

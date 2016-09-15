@@ -10,19 +10,53 @@
     </waltz-page-header>
 
 
-
-    <waltz-section>
+    <waltz-section name="Data Types" small="All">
         <div class="row">
-            <div class="col-sm-4">
-                <waltz-app-centric-flow-table app="ctrl.app"
-                                              flows="ctrl.flows"
-                                              decorators="ctrl.decorators"
-                                              data-data-types="ctrl.dataTypes"
-                                              on-select="ctrl.refocus">
-                </waltz-app-centric-flow-table>
+            <div class="col-sm-8">
+                <waltz-data-type-tree trees="ctrl.trees"
+                                      on-selection="ctrl.nodeSelected">
+                </waltz-data-type-tree>
             </div>
         </div>
     </waltz-section>
 
+
+    <waltz-section>
+        <waltz-multi-select-tree-control trees="ctrl.trees"
+                                         on-highlight="ctrl.nodeHighlighted"
+                                         on-select="ctrl.nodeSelected"
+                                         selected-nodes="ctrl.checkedDataTypes">
+            <span class="waltz-visibility-parent">
+                <strong>
+                        <span ng-if="node.dataFlowCount && node.dataFlowCount > 0"
+                              ng-bind="node.name">
+                        </span>
+                    <i ng-bind="node.name"
+                       ng-if="! (node.dataFlowCount && node.dataFlowCount > 0)">
+                    </i>
+                </strong>
+                <a ui-sref="main.data-type.view ({id: node.id })">
+                        <span class="waltz-visibility-child-50">
+                            <span ng-if="node.totalDataFlowCount && node.totalDataFlowCount > 0"
+                                  class="small waltz-app-tally-count"
+                                  title="Number of data flows">
+
+                                <span ng-if="node.dataFlowCount && node.dataFlowCount > 0">
+                                    <span ng-bind="node.dataFlowCount"></span>
+                                </span>
+
+                                <i ng-if="node.childDataFlowCount && node.childDataFlowCount > 0">
+                                    (<span ng-bind="node.totalDataFlowCount"></span>)
+                                </i>
+                            </span>
+                        </span>
+                    &nbsp;
+                    <strong class="waltz-visibility-child-30">
+                        Show &raquo;
+                    </strong>
+                </a>
+            </span>
+        </waltz-multi-select-tree-control>
+    </waltz-section>
 
 </div>
