@@ -3,6 +3,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
@@ -15,13 +16,17 @@ import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import com.khartec.waltz.service.user.UserRoleService;
-import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.maybe;
@@ -58,8 +63,8 @@ public class DataTypeUsageEndpoint implements Endpoint {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findForDataTypeSelectorPath = mkPath(BASE_URL, "type");
         String findUsageStatsForDataTypeSelectorPath = mkPath(BASE_URL, "type", "stats");
+        String findForUsageKindByDataTypeSelectorPath = mkPath(BASE_URL, "usage-kind", ":usage-kind");
         String calculateForAllApplicationsPath = mkPath(BASE_URL, "calculate-all", "application");
-
         String findForSelectorPath = mkPath(BASE_URL, "selector");
         String savePath = mkPath(BASE_URL, "entity", ":kind", ":id", ":type");
 
@@ -75,64 +80,94 @@ public class DataTypeUsageEndpoint implements Endpoint {
         ListRoute<DataTypeUsage> findForSelectorRoute = (request, response)
                 -> dataTypeUsageService.findForAppIdSelector(EntityKind.APPLICATION, readIdSelectionOptionsFromBody(request));
 
-        ListRoute<DataTypeUsage> saveRoute = (request, response)
-                -> {
-            requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
-
-            String user = getUsername(request);
-            EntityReference ref = getEntityReference(request);
-            String dataTypeCode = request.params("type");
-            UsageInfo[] usages = readBody(request, UsageInfo[].class);
-
-            SystemChangeSet<UsageInfo, UsageKind> changes = dataTypeUsageService.save(ref, dataTypeCode, newArrayList(usages));
-
-            logChanges(user, ref, dataTypeCode, changes);
-
-            return dataTypeUsageService.findForEntityAndDataType(ref, dataTypeCode);
-        };
-
-        DatumRoute<Boolean> calculateForAllApplicationsRoute = (request, response) -> {
-            requireRole(userRoleService, request, Role.ADMIN);
-            return dataTypeUsageService.recalculateForAllApplications();
-        };
-
         getForList(findForEntityPath, findForEntityRoute);
         postForList(findForDataTypeSelectorPath, findForDataTypeSelectorRoute);
         postForList(findUsageStatsForDataTypeSelectorPath, findUsageStatsForDataTypeSelectorRoute);
         postForList(findForSelectorPath, findForSelectorRoute);
-        postForList(savePath, saveRoute);
-        getForDatum(calculateForAllApplicationsPath, calculateForAllApplicationsRoute);
+        postForList(savePath, this::saveRoute);
+        getForDatum(calculateForAllApplicationsPath, this::calculateForAllApplicationsRoute);
+        postForDatum(findForUsageKindByDataTypeSelectorPath, this::findForUsageKindByDataTypeSelectorRoute);
     }
 
 
-    private void logChanges(String user, EntityReference ref, String dataTypeCode, SystemChangeSet<UsageInfo, UsageKind> changes) {
+    private Map<Long, Collection<EntityReference>> findForUsageKindByDataTypeSelectorRoute(Request request,
+                                                                                           Response response) throws IOException
+    {
+        IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
+        UsageKind usageKind = readEnum(request,
+                "usage-kind",
+                UsageKind.class,
+                s -> UsageKind.ORIGINATOR);
+        return dataTypeUsageService.findForUsageKindByDataTypeIdSelector(usageKind, options);
+    }
+
+
+    private Boolean calculateForAllApplicationsRoute(Request request,
+                                                     Response response) {
+        requireRole(userRoleService, request, Role.ADMIN);
+        return dataTypeUsageService.recalculateForAllApplications();
+    }
+
+
+    private List<DataTypeUsage> saveRoute(Request request,
+                                          Response response) throws IOException {
+        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+
+        String user = getUsername(request);
+        EntityReference ref = getEntityReference(request);
+        String dataTypeCode = request.params("type");
+        UsageInfo[] usages = readBody(request, UsageInfo[].class);
+
+        SystemChangeSet<UsageInfo, UsageKind> changes = dataTypeUsageService.save(ref, dataTypeCode, newArrayList(usages));
+
+        logChanges(user, ref, dataTypeCode, changes);
+
+        return dataTypeUsageService.findForEntityAndDataType(ref, dataTypeCode);
+    }
+
+
+    private void logChanges(String user,
+                            EntityReference ref,
+                            String dataTypeCode,
+                            SystemChangeSet<UsageInfo, UsageKind> changes) {
         maybe(changes.deletes(), deletes -> logDeletes(user, ref, dataTypeCode, deletes));
         maybe(changes.updates(), updates -> logUpdates(user, ref, dataTypeCode, updates));
         maybe(changes.inserts(), inserts -> logInserts(user, ref, dataTypeCode, inserts));
     }
 
 
-    private void logDeletes(String user, EntityReference ref, String dataTypeCode, Collection<UsageKind> deletes) {
+    private void logDeletes(String user,
+                            EntityReference ref,
+                            String dataTypeCode,
+                            Collection<UsageKind> deletes) {
         String message = "Deleted usage kind/s: " + deletes + " for data type: " + dataTypeCode;
         logChange(user, ref, message);
     }
 
 
-    private void logInserts(String user, EntityReference ref, String dataTypeCode, Collection<UsageInfo> inserts) {
+    private void logInserts(String user,
+                            EntityReference ref,
+                            String dataTypeCode,
+                            Collection<UsageInfo> inserts) {
         Collection<UsageKind> kinds = CollectionUtilities.map(inserts, u -> u.kind());
         String message = "Inserted usage kind/s: " + kinds + " for data type: " + dataTypeCode;
         logChange(user, ref, message);
     }
 
 
-    private void logUpdates(String user, EntityReference ref, String dataTypeCode, Collection<UsageInfo> updates) {
+    private void logUpdates(String user,
+                            EntityReference ref,
+                            String dataTypeCode,
+                            Collection<UsageInfo> updates) {
         Collection<UsageKind> kinds = CollectionUtilities.map(updates, u -> u.kind());
         String message = "Updated usage kind/s: " + kinds + " for data type: " + dataTypeCode;
         logChange(user, ref, message);
     }
 
 
-    private void logChange(String userId, EntityReference ref, String message) {
+    private void logChange(String userId,
+                           EntityReference ref,
+                           String message) {
         ChangeLog logEntry = ImmutableChangeLog.builder()
                 .parentReference(ref)
                 .message(message)

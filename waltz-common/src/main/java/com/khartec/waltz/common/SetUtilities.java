@@ -56,6 +56,13 @@ public class SetUtilities {
         return result;
     }
 
+    /**
+     * Remove <code>ys</code> from <code>xs</code>
+     * @param xs
+     * @param ys
+     * @param <T>
+     * @return
+     */
     public static <T> Set<T> minus(Set<T> xs, Set<T> ys) {
         checkNotNull(xs, "xs cannot be null");
         checkNotNull(ys, "ys cannot be null");

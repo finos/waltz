@@ -35,6 +35,19 @@ function service($http,
             .then(result => result.data);
     };
 
+    /**
+     * selector -> { dataTypeId -> [ <entity_ref>... ] }
+     *
+     * @param selector
+     * @returns {*|Promise.<result.data|{}>}
+     */
+    const findForUsageKindByDataTypeIdSelector = (usageKind, selector) => {
+        checkIsIdSelector(selector);
+        return $http
+            .post(`${BASE}/usage-kind/${usageKind}`, selector)
+            .then(result => result.data);
+    };
+
     const save = (ref, dataTypeCode, usages = []) => {
         checkIsEntityRef(ref);
         if (usages.length == 0) return;
@@ -46,6 +59,7 @@ function service($http,
     return {
         findForEntity,
         findForDataTypeSelector,
+        findForUsageKindByDataTypeIdSelector,
         calculateStats,
         findForSelector,
         save

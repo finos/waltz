@@ -114,12 +114,6 @@ public class DataFlowDecoratorService {
     }
 
 
-    public Map<Long, Collection<EntityReference>> findOriginatorsByDataTypeIdSelectionOptions(IdSelectionOptions options) {
-        Select<Record1<Long>> selector = dataTypeIdSelectorFactory.apply(options);
-        return dataFlowDecoratorDao.findOriginatorsByDataTypeIdSelector(selector);
-    }
-
-
     // --- UPDATERS ---
 
     public int deleteAllDecoratorsForFlowIds(List<Long> flowIds) {

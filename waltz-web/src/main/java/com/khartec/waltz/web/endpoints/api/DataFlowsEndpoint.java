@@ -96,8 +96,9 @@ public class DataFlowsEndpoint implements Endpoint {
         postForDatum(addFlowPath, this::addFlowRoute);
     }
 
+
     private DataFlow addFlowRoute(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        ensureUserHasEditRights(request);
 
         DataFlow dataFlow = readBody(request, DataFlow.class);
         String username = getUsername(request);
@@ -114,7 +115,7 @@ public class DataFlowsEndpoint implements Endpoint {
 
 
     private int removeFlowRoute(Request request, Response response) {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        ensureUserHasEditRights(request);
 
         long flowId = getId(request);
         String username = getUsername(request);
@@ -123,5 +124,11 @@ public class DataFlowsEndpoint implements Endpoint {
 
         return dataFlowService.removeFlows(newArrayList(flowId));
     }
+
+
+    private void ensureUserHasEditRights(Request request) {
+        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+    }
+
 
 }

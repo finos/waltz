@@ -1,6 +1,5 @@
 package com.khartec.waltz.data.data_flow_decorator;
 
-import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -10,7 +9,6 @@ import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableDataFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableDecoratorRatingSummary;
-import com.khartec.waltz.schema.tables.DataFlow;
 import com.khartec.waltz.schema.tables.records.DataFlowDecoratorRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -19,7 +17,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -137,43 +134,6 @@ public class DataFlowDecoratorDao {
                 .fetch(TO_DECORATOR_MAPPER);
     }
 
-
-    public Map<Long, Collection<EntityReference>> findOriginatorsByDataTypeIdSelector(Select<Record1<Long>> dataTypeIdSelector) {
-        DataFlow df = DataFlow.DATA_FLOW.as("df");
-        DataFlow df2 = DataFlow.DATA_FLOW.as("df2");
-        com.khartec.waltz.schema.tables.DataFlowDecorator dfd = com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR.as("dfd");
-        com.khartec.waltz.schema.tables.DataFlowDecorator dfd2 = com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR.as("dfd2");
-        com.khartec.waltz.schema.tables.Application app = com.khartec.waltz.schema.tables.Application.APPLICATION.as("app");
-
-        Condition condition = dfd.DECORATOR_ENTITY_ID.in(dataTypeIdSelector)
-                .and(dfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
-                .and(df.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(df.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(df.SOURCE_ENTITY_ID.notIn(
-                        DSL.select(df2.TARGET_ENTITY_ID)
-                                .from(df2)
-                                .innerJoin(dfd2)
-                                .on(dfd2.DATA_FLOW_ID.eq(df2.ID))
-                                .where(dfd2.DECORATOR_ENTITY_ID.eq(dfd.DECORATOR_ENTITY_ID))
-                                .and(dfd2.DECORATOR_ENTITY_KIND.eq(dfd.DECORATOR_ENTITY_KIND))));
-
-        Result<Record3<Long, String, Long>> origins = dsl.selectDistinct(app.ID, app.NAME, dfd.DECORATOR_ENTITY_ID)
-                .from(df)
-                .innerJoin(dfd).on(dfd.DATA_FLOW_ID.eq(df.ID))
-                .innerJoin(app).on(app.ID.eq(df.SOURCE_ENTITY_ID))
-                .where(dsl.renderInlined(condition))
-                .fetch();
-
-        Map<Long, Collection<EntityReference>> originsByDataTypeId = MapUtilities.groupBy(
-                r -> r.getValue(dfd.DECORATOR_ENTITY_ID),
-                r -> EntityReference.mkRef(
-                        EntityKind.APPLICATION,
-                        r.getValue(app.ID),
-                        r.getValue(app.NAME)),
-                origins);
-
-        return originsByDataTypeId;
-    }
 
     // --- STATS ---
 

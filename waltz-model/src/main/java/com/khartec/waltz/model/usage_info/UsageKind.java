@@ -4,7 +4,7 @@ public enum UsageKind {
     CONSUMER(true),
     DISTRIBUTOR(true),
     MODIFIER(false),
-    ORIGINATOR(false);
+    ORIGINATOR(true);
 
 
     private final boolean readOnly;

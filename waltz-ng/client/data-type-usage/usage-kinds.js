@@ -21,8 +21,8 @@ const usageKinds = [
         displayName: 'Originator / Manual Entry',
         kind: "ORIGINATOR",
         nameDescription: "An originator is an application that captures data via a GUI or other input type (e.g. scanner, smartphone, card reader)",
-        readOnly: false,
-        readOnlyDescription: ''
+        readOnly: true,
+        readOnlyDescription: 'This value is derived from the presence of <strong>outgoing</strong> flows without any corresponding incoming flows'
     }
 ];
 

@@ -1,71 +1,52 @@
 package com.khartec.waltz.service.usage_info;
 
+import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.data_flow.DataFlowDao;
-import com.khartec.waltz.data.data_flow_decorator.DataFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.data_type_usage.DataTypeUsageDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
 import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
-import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.system.SystemChangeSet;
 import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.model.usage_info.ImmutableUsageInfo;
 import com.khartec.waltz.model.usage_info.UsageInfo;
 import com.khartec.waltz.model.usage_info.UsageKind;
-import com.khartec.waltz.service.data_type.DataTypeService;
 import org.jooq.Record1;
+import org.jooq.Row1;
 import org.jooq.Select;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.map;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.model.usage_info.UsageInfoUtilities.mkChangeSet;
-import static com.khartec.waltz.model.utils.IdUtilities.toIds;
 
 @Service
 public class DataTypeUsageService {
 
     private final DataTypeUsageDao dataTypeUsageDao;
-    private final DataTypeService dataTypeService;
     private final ApplicationIdSelectorFactory appIdSelectorFactor;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
-    private final DataFlowDecoratorDao dataFlowDecoratorDao;
-    private DataFlowDao dataFlowDao;
 
 
     @Autowired
     public DataTypeUsageService(DataTypeUsageDao dataTypeUsageDao,
-                                DataTypeService dataTypeService,
                                 ApplicationIdSelectorFactory selectorFactory,
-                                DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
-                                DataFlowDao dataFlowDao,
-                                DataFlowDecoratorDao dataFlowDecoratorDao) {
+                                DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
         checkNotNull(dataTypeUsageDao, "dataTypeUsageDao cannot be null");
-        checkNotNull(dataTypeService, "dataTypeService cannot be null");
         checkNotNull(selectorFactory, "appIdSelectorFactor cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
-        checkNotNull(dataFlowDao, "dataFlowDao cannot be null");
-        checkNotNull(dataFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
 
         this.dataTypeUsageDao = dataTypeUsageDao;
-        this.dataTypeService = dataTypeService;
         this.appIdSelectorFactor = selectorFactory;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
-        this.dataFlowDao = dataFlowDao;
-        this.dataFlowDecoratorDao = dataFlowDecoratorDao;
     }
 
 
@@ -96,6 +77,25 @@ public class DataTypeUsageService {
     }
 
 
+    /**
+     * Given a usage kind and a dt selector, this will return a map, keyed by datatype id,
+     * of application references which exhibit that usage kind.
+     *
+     * (UsageKind, SelectionOptions) ->  { DataType.id -> [ EntityRef... ] }
+     * @param usageKind
+     * @param dataTypeIdSelectionOptions
+     * @return
+     */
+    public Map<Long, Collection<EntityReference>> findForUsageKindByDataTypeIdSelector(UsageKind usageKind,
+                                                                                       IdSelectionOptions dataTypeIdSelectionOptions) {
+        checkNotNull(usageKind, "usageKind cannot be null");
+        checkNotNull(dataTypeIdSelectionOptions, "dataTypeIdSelectionOptions cannot be null");
+
+        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(dataTypeIdSelectionOptions);
+        return dataTypeUsageDao.findForUsageKindByDataTypeIdSelector(usageKind, dataTypeIdSelector);
+    }
+
+
     public SystemChangeSet<UsageInfo, UsageKind> save(
             EntityReference entityReference,
             String dataTypeCode,
@@ -117,105 +117,23 @@ public class DataTypeUsageService {
     }
 
 
-    public int deleteForEntity(EntityReference ref) {
-        return dataTypeUsageDao.deleteForEntity(ref);
-    }
-
-
     public boolean recalculateForAllApplications() {
         return dataTypeUsageDao.recalculateForAllApplications();
     }
 
 
-    public void recalculateForApplications(EntityReference... refs) {
+    public boolean recalculateForApplications(EntityReference... refs) {
         checkNotNull(refs, "refs cannot be null");
-        for (EntityReference ref : refs) {
-            recalculateForApplication(ref);
-        }
+        Select<Record1<Long>> idSelector = convertRefsToIdSelector(refs);
+        return dataTypeUsageDao.recalculateForAppIdSelector(idSelector);
     }
 
 
-    private void recalculateForApplication(EntityReference ref) {
-        checkNotNull(ref, "ref cannot be null");
+    private Select<Record1<Long>> convertRefsToIdSelector(EntityReference[] refs) {
+        Row1<Long>[] idsAsRows = new Row1[refs.length];
+        ArrayUtilities.mapToList(refs, r -> DSL.row(r.id())).toArray(idsAsRows);
 
-        List<DataFlow> flows = dataFlowDao.findByEntityReference(ref);
-        List<DataFlowDecorator> dataTypeDecorators = dataFlowDecoratorDao.findByFlowIdsAndKind(
-                toIds(flows),
-                EntityKind.DATA_TYPE);
-        Map<Long, Collection<Long>> flowToDataTypeIds = groupBy(
-                d -> d.dataFlowId(),
-                d -> d.decoratorEntity().id(),
-                dataTypeDecorators);
-        Map<Long, String> dataTypeIdToCode = indexBy(
-                dt -> dt.id().get(),
-                dt -> dt.code(),
-                dataTypeService.getAll());
-
-        Set<String> incomingTypes = flows.stream()
-                .filter(f -> f.target().equals(ref)) // only incoming
-                .map(f -> f.id().get())
-                .flatMap(fid -> flowToDataTypeIds.get(fid).stream())
-                .map(dtId -> dataTypeIdToCode.get(dtId))
-                .collect(Collectors.toSet());
-
-        Set<String> outgoingTypes = flows.stream()
-                .filter(f -> f.source().equals(ref)) // only outgoing
-                .map(f -> f.id().get())
-                .flatMap(fid -> flowToDataTypeIds.get(fid).stream())
-                .map(dtId -> dataTypeIdToCode.get(dtId))
-                .collect(Collectors.toSet());
-
-        recalculateUsage(UsageKind.DISTRIBUTOR, ref, outgoingTypes);
-        recalculateUsage(UsageKind.CONSUMER, ref, incomingTypes);
-
+        return DSL.selectFrom(DSL.values(idsAsRows));
     }
 
-    private void recalculateUsage(UsageKind kind, EntityReference ref, Set<String> types) {
-        List<DataTypeUsage> currentUsages = findForEntity(ref);
-
-        // Insert case
-        for (String type: types) {
-            Optional<DataTypeUsage> maybeExistingUsage = currentUsages.stream()
-                    .filter(u -> u.dataTypeCode().equals(type))
-                    .filter(u -> u.usage().kind().equals(kind))
-                    .findFirst();
-
-            maybeExistingUsage
-                    .filter(u -> ! u.usage().isSelected())
-                    .ifPresent(u -> dataTypeUsageDao.updateUsageInfo(ref, type, newArrayList(
-                            ImmutableUsageInfo.builder()
-                                    .isSelected(true)
-                                    .description(u.usage().description())
-                                    .kind(kind)
-                                    .build())));
-
-            if (! maybeExistingUsage.isPresent()) {
-                dataTypeUsageDao.insertUsageInfo(ref, type, newArrayList(
-                        ImmutableUsageInfo.builder()
-                                .isSelected(true)
-                                .kind(kind)
-                                .build()));
-            }
-        }
-
-
-        // Delete case
-        currentUsages.stream()
-                .filter(u -> ! types.contains(u.dataTypeCode()))
-                .filter(u -> u.usage().kind().equals(kind))
-                .filter(u -> StringUtilities.isEmpty(u.usage().description()))
-                .forEach(u -> dataTypeUsageDao.deleteUsageInfo(ref, u.dataTypeCode(), newArrayList(kind)));
-
-
-        currentUsages.stream()
-                .filter(u -> ! types.contains(u.dataTypeCode()))
-                .filter(u -> u.usage().kind().equals(kind))
-                .filter(u -> StringUtilities.notEmpty(u.usage().description()))
-                .forEach(u ->  dataTypeUsageDao.updateUsageInfo(ref, u.dataTypeCode(), newArrayList(
-                        ImmutableUsageInfo.builder()
-                                .isSelected(false)
-                                .description(u.usage().description())
-                                .kind(kind)
-                                .build())));
-    }
 }
