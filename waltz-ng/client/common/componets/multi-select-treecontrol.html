@@ -3,17 +3,21 @@
                  tree-model="$ctrl.trees"
                  order-by="name"
                  expanded-nodes="$ctrl.expandedNodes"
-                 on-selection="$ctrl.onNodeHighlight(node)"
+                 on-selection="$ctrl.onNodeClick(node)"
                  options="$ctrl.treeOptions">
 
             <span>
                 <input type="checkbox"
-                       value="{{node.name}}"
-                       ng-model="node.checked"
+                       checked
+                       ng-if="$ctrl.checkedMap[node.id]"
                        ng-disabled="!node.selectable"
                        ng-style="{opacity : (node.selectable ? 1 : 0.3)}"
-                       ng-change="$ctrl.onNodeSelect(node)">
-
+                       ng-click="$ctrl.onNodeUncheck(node)">
+                <input type="checkbox"
+                       ng-if="!$ctrl.checkedMap[node.id]"
+                       ng-disabled="!node.selectable"
+                       ng-style="{opacity : (node.selectable ? 1 : 0.3)}"
+                       ng-click="$ctrl.onNodeCheck(node)">
                 <ng-transclude>
                     <span ng-bind="node.name"></span>
                 </ng-transclude>

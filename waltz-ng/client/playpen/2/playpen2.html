@@ -22,10 +22,12 @@
 
 
     <waltz-section>
-        <waltz-multi-select-tree-control trees="ctrl.trees"
-                                         on-highlight="ctrl.nodeHighlighted"
-                                         on-select="ctrl.nodeSelected"
-                                         selected-nodes="ctrl.checkedDataTypes">
+        <waltz-multi-select-tree-control items="ctrl.dataTypes"
+                                         on-click="ctrl.nodeSelected"
+                                         on-check="ctrl.nodeChecked"
+                                         on-uncheck="ctrl.nodeUnchecked"
+                                         checked-item-ids="ctrl.checkedItemIds"
+                                         expanded-item-ids="ctrl.expandedItemIds">
             <span class="waltz-visibility-parent">
                 <strong>
                         <span ng-if="node.dataFlowCount && node.dataFlowCount > 0"

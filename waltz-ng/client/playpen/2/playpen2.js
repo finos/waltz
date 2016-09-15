@@ -1,8 +1,7 @@
-import {prepareDataTypeTree} from "../../data-types/utilities";
-
 const initData = {
     dataTypes: [],
-    checkedDataTypes: []
+    checkedItemIds: [1000, 3000, 6002, 6310],
+    expandedItemIds: []
 };
 
 
@@ -27,16 +26,26 @@ function controller(dataTypeService,
     const loadData = () => {
         dataTypeService.loadDataTypes()
             .then(dataTypes => _.map(dataTypes, d => ({...d, selectable: d.name !== 'Ref Data'})))
-            .then(dataTypes => _.map(dataTypes, d => ({...d, checked: false})))
-            .then(dataTypes => vm.dataTypes = dataTypes)
-            .then(dataTypes => dataFlowStore.countByDataType())
-            .then(tallies => vm.trees = prepareDataTypeTree(vm.dataTypes, tallies));
+            .then(dataTypes => {
+                vm.expandedItemIds = _.union(vm.checkedItemIds);
+                vm.dataTypes = dataTypes;
+            });
     };
 
     loadData();
 
-    vm.nodeHighlighted = (node) => console.log('highlighted: ', node)
-    vm.nodeSelected = (node) => console.log('selected: ', node, vm.checkedDataTypes)
+    vm.nodeSelected = (id) => console.log('selected: ', id);
+
+    vm.nodeChecked = (id) => {
+        console.log('checked: ', id);
+        vm.checkedItemIds = _.union(vm.checkedItemIds, [id])
+    };
+
+    vm.nodeUnchecked = (id) => {
+        console.log('unchecked: ', id);
+        vm.checkedItemIds = _.without(vm.checkedItemIds, id);
+    };
+
 }
 
 
