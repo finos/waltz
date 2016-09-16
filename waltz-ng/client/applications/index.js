@@ -29,5 +29,6 @@ export default (module) => {
     module
         .component('waltzAppsByInvestmentPie', require('./components/apps-by-investment-pie'))
         .component('waltzAppsByLifecyclePhasePie', require('./components/apps-by-lifecycle-phase-pie'))
-        .component('waltzAppSummary', require('./components/app-summary'));
+        .component('waltzAppSummary', require('./components/app-summary'))
+        .component('waltzAppCostsSection', require('./components/app-costs-section/app-costs-section'));
 };

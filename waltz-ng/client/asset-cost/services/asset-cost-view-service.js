@@ -37,7 +37,7 @@ function service($q,
 
         data.loadingDetail = true;
         return assetCostStore
-            .findAppCostsByAppIds(data.options)
+            .findAppCostsByAppIdSelector(data.options)
             .then(costs => {
                 data.loadingDetail = false;
                 data.costs = costs;
