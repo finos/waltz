@@ -17,6 +17,8 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+import _ from 'lodash';
+
 
 function controller() {
 

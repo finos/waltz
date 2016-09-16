@@ -26,8 +26,7 @@ function controller($stateParams,
                     changeLogStore,
                     personStore,
                     userContributionStore,
-                    userStore,
-) {
+                    userStore) {
 
     const vm = Object.assign(this, initialState);
     const userId = $stateParams.userId;
@@ -74,7 +73,6 @@ function controller($stateParams,
     userContributionStore
         .getLeaderBoard()
         .then(leaderBoard => vm.contribution.leaderBoard = leaderBoard);
-
 
 }
 

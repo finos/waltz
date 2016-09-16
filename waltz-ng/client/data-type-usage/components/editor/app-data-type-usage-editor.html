@@ -3,7 +3,7 @@
         <h4>
             <waltz-icon name="dot-circle-o"></waltz-icon>
             Update data type usage
-            <small ng-bind='ctrl.type.name'></small>
+            <small ng-bind='$ctrl.type.name'></small>
         </h4>
 
         <p class="small text-muted waltz-paragraph">
@@ -19,7 +19,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="row in ctrl.usageRows">
+            <tr ng-repeat="row in $ctrl.usageRows">
                 <td>
                     <span uib-popover-html="row.nameDescription"
                           popover-append-to-body="true"
@@ -34,14 +34,14 @@
                            ng-disabled="row.readOnly">
                 </td>
                 <td>
-                    <span ng-if="row.selected">
+                    <span ng-if="row.description.length > 0 || row.selected">
                         <textarea rows="2"
                                   cols="30"
                                   placeholder="Description"
                                   ng-model="row.description">
                         </textarea>
                     </span>
-                    <span ng-if="! row.selected">
+                    <span ng-if="! row.description">
                         -
                     </span>
                 </td>
@@ -52,15 +52,13 @@
         <div class="pull-right">
             <!-- ACTIONS -->
             <button class="btn btn-success"
-                    ng-click="ctrl.save()">
+                    ng-click="$ctrl.save()">
                 Apply
             </button>
             <a href
-               ng-click="ctrl.cancel()">
+               ng-click="$ctrl.cancel()">
                 Cancel
             </a>
         </div>
-
-
     </div>
 </div>
