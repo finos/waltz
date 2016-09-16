@@ -1,14 +1,12 @@
-
 const initData = {
-    dataTypes: []
+    dataTypes: [],
+    checkedItemIds: [1000, 3000, 6002, 6310],
+    expandedItemIds: []
 };
 
 
-function controller($q,
-                    appStore,
-                    dataFlowStore,
-                    dataFlowDecoratorStore,
-                    dataTypeStore) {
+function controller(dataTypeService,
+                    dataFlowStore) {
 
     const vm = Object.assign(this, initData);
 
@@ -26,37 +24,34 @@ function controller($q,
 
 
     const loadData = () => {
-        $q.all([
-            appStore.getById(entityRef.id),
-            dataFlowStore.findByEntityReference(entityRef.kind, entityRef.id),
-            dataFlowDecoratorStore.findBySelectorAndKind(selector, 'DATA_TYPE'),
-            dataTypeStore.findAll()
-
-        ]).then(([app, flows, decorators, dataTypes]) => {
-            vm.app = app;
-            vm.flows = flows;
-            vm.decorators = decorators;
-            vm.dataTypes = dataTypes;
-
-        });
-    };
-
-
-    vm.refocus = app => {
-        entityRef.id = app.id;
-        loadData();
+        dataTypeService.loadDataTypes()
+            .then(dataTypes => _.map(dataTypes, d => ({...d, selectable: d.name !== 'Ref Data'})))
+            .then(dataTypes => {
+                vm.expandedItemIds = _.union(vm.checkedItemIds);
+                vm.dataTypes = dataTypes;
+            });
     };
 
     loadData();
+
+    vm.nodeSelected = (id) => console.log('selected: ', id);
+
+    vm.nodeChecked = (id) => {
+        console.log('checked: ', id);
+        vm.checkedItemIds = _.union(vm.checkedItemIds, [id])
+    };
+
+    vm.nodeUnchecked = (id) => {
+        console.log('unchecked: ', id);
+        vm.checkedItemIds = _.without(vm.checkedItemIds, id);
+    };
+
 }
 
 
 controller.$inject = [
-    '$q',
-    'ApplicationStore',
-    'DataFlowDataStore',
-    'DataFlowDecoratorStore',
-    'DataTypeStore'
+    'DataTypeService',
+    'DataFlowDataStore'
 ];
 
 
