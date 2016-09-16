@@ -2688,4 +2688,23 @@
                       tableName="application"/>
     </changeSet>
 
+
+    <!-- 536 : Update index on entity_statistic_value -->
+    <changeSet id="20160916-536-1"
+               author="rovats">
+        <dropIndex indexName="idx_esv_entity_ref"
+                   tableName="entity_statistic_value"/>
+    </changeSet>
+
+    <changeSet id="20160916-536-2"
+               author="rovats">
+        <createIndex indexName="idx_esv_entity_ref_current"
+                     tableName="entity_statistic_value"
+                     unique="false">
+            <column name="entity_id" type="${long.type}"/>
+            <column name="current" type="BOOLEAN"/>
+            <column name="entity_kind" type="VARCHAR(128)"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
