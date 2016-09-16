@@ -144,3 +144,9 @@ export const criticalityDisplayNames = {
     VERY_HIGH: 'Very high',
     UNKNOWN: 'Unknown'
 };
+
+
+export const endOfLifeStatusNames = {
+    'END_OF_LIFE': 'End of Life',
+    'NOT_END_OF_LIFE': 'Compliant'
+};

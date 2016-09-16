@@ -18,6 +18,8 @@ public abstract class ServerSummaryStatistics implements SummaryStatistics {
     public abstract List<Tally<String>> environmentCounts();
     public abstract List<Tally<String>> operatingSystemCounts();
     public abstract List<Tally<String>> locationCounts();
+    public abstract List<Tally<String>> operatingSystemEndOfLifeStatusCounts();
+    public abstract List<Tally<String>> hardwareEndOfLifeStatusCounts();
 
     @Value.Default
     public long totalCount() {

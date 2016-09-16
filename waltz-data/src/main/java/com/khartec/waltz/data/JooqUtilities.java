@@ -1,6 +1,7 @@
 package com.khartec.waltz.data;
 
 import com.khartec.waltz.common.StringUtilities;
+import com.khartec.waltz.model.EndOfLifeStatus;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
@@ -11,6 +12,7 @@ import com.khartec.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
+import java.sql.Date;
 import java.util.Collection;
 import java.util.List;
 import java.util.StringJoiner;
@@ -19,6 +21,8 @@ import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.jooq.impl.DSL.currentDate;
+import static org.jooq.impl.DSL.inline;
 
 public class JooqUtilities {
 
@@ -131,6 +135,13 @@ public class JooqUtilities {
                 .from(table)
                 .where(dsl.renderInlined(recordsInScopeCondition))
                 .groupBy(fieldToTally);
+    }
+
+
+    public static Field<String> mkEndOfLifeStatusDerivedField(Field<Date> endOfLifeDateField) {
+
+        return DSL.when(endOfLifeDateField.lt(currentDate()), inline(EndOfLifeStatus.END_OF_LIFE.name()))
+                .otherwise(inline(EndOfLifeStatus.NOT_END_OF_LIFE.name()));
     }
 
 }

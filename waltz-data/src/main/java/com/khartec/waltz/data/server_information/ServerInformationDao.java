@@ -38,8 +38,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
-import static com.khartec.waltz.data.JooqUtilities.DB_EXECUTOR_POOL;
-import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
+import static com.khartec.waltz.data.JooqUtilities.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 import static org.jooq.impl.DSL.max;
@@ -139,9 +138,11 @@ public class ServerInformationDao {
 
     public ServerSummaryStatistics findStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
 
-        Field<String> environment = DSL.field("environment", String.class);
-        Field<String> operatingSystem = DSL.field("operating_system", String.class);
-        Field<String> location = DSL.field("location", String.class);
+        Field<String> environmentInner = DSL.field("environment_inner", String.class);
+        Field<String> operatingSystemInner = DSL.field("operating_system_inner", String.class);
+        Field<String> locationInner = DSL.field("location_inner", String.class);
+        Field<String> osEolStatusInner = DSL.field("os_eol_status_inner", String.class);
+        Field<String> hwEolStatusInner = DSL.field("hw_eol_status_inner", String.class);
 
         Condition condition = SERVER_INFORMATION.ASSET_CODE
                 .in(dsl.select(APPLICATION.ASSET_CODE)
@@ -150,9 +151,11 @@ public class ServerInformationDao {
 
         // de-duplicate host names, as one server can host multiple apps
         Table serverInfoSubSelect = DSL.select(
-                    max(SERVER_INFORMATION.ENVIRONMENT).as(environment),
-                    max(SERVER_INFORMATION.OPERATING_SYSTEM).as(operatingSystem),
-                    max(SERVER_INFORMATION.LOCATION).as(location))
+                    max(SERVER_INFORMATION.ENVIRONMENT).as(environmentInner),
+                    max(SERVER_INFORMATION.OPERATING_SYSTEM).as(operatingSystemInner),
+                    max(SERVER_INFORMATION.LOCATION).as(locationInner),
+                    max(mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.OS_END_OF_LIFE_DATE)).as(osEolStatusInner),
+                    max(mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.HW_END_OF_LIFE_DATE)).as(hwEolStatusInner))
                 .from(SERVER_INFORMATION)
                 .where(condition)
                 .groupBy(SERVER_INFORMATION.HOSTNAME)
@@ -164,19 +167,31 @@ public class ServerInformationDao {
         Future<List<Tally<String>>> envPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
                 serverInfoSubSelect,
-                environment,
+                environmentInner,
                 DSL.trueCondition()));
 
         Future<List<Tally<String>>> osPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
                 serverInfoSubSelect,
-                operatingSystem,
+                operatingSystemInner,
                 DSL.trueCondition()));
 
         Future<List<Tally<String>>> locationPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
                 serverInfoSubSelect,
-                location,
+                locationInner,
+                DSL.trueCondition()));
+
+        Future<List<Tally<String>>> osEolStatusPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
+                dsl,
+                serverInfoSubSelect,
+                osEolStatusInner,
+                DSL.trueCondition()));
+
+        Future<List<Tally<String>>> hwEolStatusPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
+                dsl,
+                serverInfoSubSelect,
+                hwEolStatusInner,
                 DSL.trueCondition()));
 
 
@@ -189,6 +204,8 @@ public class ServerInformationDao {
                     .environmentCounts(envPromise.get())
                     .operatingSystemCounts(osPromise.get())
                     .locationCounts(locationPromise.get())
+                    .operatingSystemEndOfLifeStatusCounts(osEolStatusPromise.get())
+                    .hardwareEndOfLifeStatusCounts(hwEolStatusPromise.get())
                     .build();
         }).get();
 
