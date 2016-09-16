@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {initialiseData, buildHierarchies} from "../../common";
+import {initialiseData, buildHierarchies, switchToParentIds} from "../../../common";
 
 
 const bindings = {
@@ -37,7 +37,7 @@ function invokeHandler(handler) {
 
 
 function buildTrees(nodes) {
-    return buildHierarchies(nodes);
+    return switchToParentIds(buildHierarchies(nodes));
 }
 
 
@@ -75,7 +75,7 @@ function controller() {
         nodeChildren: "children",
         dirSelectable: true,
         equality: (a, b) => a && b && a.id === b.id,
-        multiSelection: true
+        multiSelection: false
     };
 
     vm.onNodeClick = (node) => {

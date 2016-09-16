@@ -1,5 +1,4 @@
 import _ from "lodash";
-import {toRef} from "../../registration-utils";
 
 
 const bindings = {
@@ -21,6 +20,9 @@ const initialState = {
     flow: null,
     decorators: [],
     allDataTypes: [],
+    checkedItemIds: [],
+    expandedItemIds: [],
+    originalSelectedItemIds: [],
     onSave: (x) => console.log('dfte: default onSave()', x),
     onDelete: (x) => console.log('dfte: default onDelete()', x),
     onCancel: (x) => console.log('dfte: default onCancel()', x),
@@ -28,17 +30,13 @@ const initialState = {
 };
 
 
-function isDirty(types = []) {
-    return _.some(
-        types,
-        wt => wt.original != wt.selected);
+function isDirty(selectedIds = [], originalSelectedIds = []) {
+    return !_.isEqual(selectedIds.sort(), originalSelectedIds.sort());
 }
 
 
-function anySelected(types = []) {
-    return _.some(
-        types,
-        wt => wt.selected);
+function anySelected(selectedIds = []) {
+    return selectedIds.length > 0;
 }
 
 
@@ -49,31 +47,22 @@ function mkTitle(flow) {
 }
 
 
-function mkWorkingTypes(allTypes = [], decorators = []) {
-    const currentTypeIds = _.chain(decorators)
+function mkSelectedTypeIds(decorators = []) {
+    return _.chain(decorators)
         .filter(d => d.decoratorEntity.kind === 'DATA_TYPE')
         .map('decoratorEntity.id')
         .value();
-
-    return _.map(
-        allTypes,
-        t => {
-            const selected = _.includes(currentTypeIds, t.id);
-            return Object.assign({}, t, { selected, original: selected });
-        });
 }
 
 
-function mkUpdateCommand(flow, workingTypes = []) {
-    const [added, removed] = _.chain(workingTypes)
-        .filter(st => st.selected !== st.original)
-        .partition('selected')
-        .value();
+function mkUpdateCommand(flow, selectedIds = [], originalIds = []) {
+    const addedIds = _.difference(selectedIds, originalIds);
+    const removedIds = _.difference(originalIds, selectedIds);
 
     const command = {
         flowId: flow.id,
-        addedDecorators: _.map(added, t => ({ id: t.id, kind: 'DATA_TYPE', name: t.name })),
-        removedDecorators: _.map(removed, t => ({ id: t.id, kind: 'DATA_TYPE', name: t.name }))
+        addedDecorators: _.map(addedIds, id => ({ id, kind: 'DATA_TYPE' })),
+        removedDecorators: _.map(removedIds, id => ({ id, kind: 'DATA_TYPE' }))
     };
 
     return command;
@@ -86,19 +75,31 @@ function controller() {
 
     vm.$onChanges = (changes) => {
         vm.title = mkTitle(vm.flow);
-        vm.workingTypes = mkWorkingTypes(vm.allDataTypes, vm.decorators);
+        vm.checkedItemIds = mkSelectedTypeIds(vm.decorators);
+        vm.originalSelectedItemIds = mkSelectedTypeIds(vm.decorators);
+        vm.expandedItemIds = mkSelectedTypeIds(vm.decorators);
     };
 
     vm.save = () => {
-        const command = mkUpdateCommand(vm.flow, vm.workingTypes);
+        const command = mkUpdateCommand(vm.flow, vm.checkedItemIds, vm.originalSelectedItemIds);
         vm.onSave(command);
     };
 
     vm.delete = () => vm.onDelete(vm.flow);
     vm.cancel = () => vm.onCancel();
-    vm.onChange = () => vm.onDirty(isDirty());
-    vm.canSave = () => isDirty(vm.workingTypes) && anySelected(vm.workingTypes);
-    vm.anySelected = () => anySelected(vm.workingTypes);
+    vm.onChange = () => vm.onDirty(isDirty(vm.checkedItemIds, vm.originalSelectedItemIds));
+    vm.canSave = () => isDirty(vm.checkedItemIds, vm.originalSelectedItemIds) && anySelected(vm.checkedItemIds);
+    vm.anySelected = () => anySelected(vm.checkedItemIds);
+
+    vm.typeSelected = (id) => {};
+
+    vm.typeChecked = (id) => {
+        vm.checkedItemIds = _.union(vm.checkedItemIds, [id])
+    };
+
+    vm.typeUnchecked = (id) => {
+        vm.checkedItemIds = _.without(vm.checkedItemIds, id);
+    };
 }
 
 
