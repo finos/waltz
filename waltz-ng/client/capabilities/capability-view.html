@@ -60,6 +60,30 @@
     </waltz-data-flows-tabgroup-section>
 
 
+    <!-- AUTH SOURCES -->
+    <waltz-section name="Authoritative Sources">
+        <waltz-rated-flow-summary-panel apps="ctrl.apps"
+                                        entity-reference="ctrl.entityRef"
+                                        flow-data="ctrl.dataFlows"
+                                        on-load-detail="ctrl.loadFlowDetail">
+        </waltz-rated-flow-summary-panel>
+
+        <div ng-if="ctrl.dataFlows.stats.flowCounts.inbound == 0"
+             class="alert alert-warning">
+            No inbound data flows registered for this organisational unit
+        </div>
+
+        <div class="row" style="padding-top: 12px;">
+            <div class="col-md-12">
+
+                <div class="small text-muted">
+                    This diagram summarises the data types sent to applications in this group.
+                </div>
+            </div>
+        </div>
+    </waltz-section>
+
+
     <!-- PROCESSES -->
     <waltz-process-section processes="ctrl.processes"
                            source-data-ratings="ctrl.sourceDataRatings">
