@@ -244,7 +244,7 @@ function service($q,
 
 
     function loadFlowDetail() {
-        dataFlowViewService.loadDetail();
+        return dataFlowViewService.loadDetail();
     }
 
 
