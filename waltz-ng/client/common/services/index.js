@@ -20,6 +20,7 @@ import {
     capabilityRatingNames,
     changeInitiativeNames,
     criticalityDisplayNames,
+    endOfLifeStatusNames,
     entityNames,
     entityStatisticCategoryDisplayNames,
     investmentRatingNames,
@@ -55,6 +56,7 @@ export default (module) => {
     displayNameService.register('capabilityRating', capabilityRatingNames);
     displayNameService.register('changeInitiative', changeInitiativeNames);
     displayNameService.register('criticality', criticalityDisplayNames);
+    displayNameService.register('endOfLifeStatus', endOfLifeStatusNames);
     displayNameService.register('entity', entityNames);
     displayNameService.register('entityStatistic', entityStatisticCategoryDisplayNames);
     displayNameService.register('investmentRating', investmentRatingNames);

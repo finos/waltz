@@ -1,6 +1,5 @@
 package com.khartec.waltz.service.usage_info;
 
-import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
@@ -14,7 +13,6 @@ import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.usage_info.UsageInfo;
 import com.khartec.waltz.model.usage_info.UsageKind;
 import org.jooq.Record1;
-import org.jooq.Row1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +22,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static com.khartec.waltz.common.ArrayUtilities.mapToList;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.model.usage_info.UsageInfoUtilities.mkChangeSet;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 @Service
 public class DataTypeUsageService {
@@ -124,16 +124,16 @@ public class DataTypeUsageService {
 
     public boolean recalculateForApplications(EntityReference... refs) {
         checkNotNull(refs, "refs cannot be null");
-        Select<Record1<Long>> idSelector = convertRefsToIdSelector(refs);
+        Select<Record1<Long>> idSelector = convertApplicationRefsToIdSelector(refs);
         return dataTypeUsageDao.recalculateForAppIdSelector(idSelector);
     }
 
 
-    private Select<Record1<Long>> convertRefsToIdSelector(EntityReference[] refs) {
-        Row1<Long>[] idsAsRows = new Row1[refs.length];
-        ArrayUtilities.mapToList(refs, r -> DSL.row(r.id())).toArray(idsAsRows);
+    private Select<Record1<Long>> convertApplicationRefsToIdSelector(EntityReference[] refs) {
 
-        return DSL.selectFrom(DSL.values(idsAsRows));
+        return DSL.select(APPLICATION.ID)
+                .from(APPLICATION)
+                .where(APPLICATION.ID.in(mapToList(refs, r -> r.id())));
     }
 
 }

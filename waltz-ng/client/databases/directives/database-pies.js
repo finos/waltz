@@ -1,5 +1,6 @@
 import {environmentColorScale, variableScale} from "../../common/colors";
 import {toKeyCounts} from "../../common";
+import {endOfLifeStatusNames} from "../../common/services/display_names";
 
 
 const BINDINGS = {
@@ -14,10 +15,12 @@ function prepareStats(databases) {
 
     const environment = toKeyCounts(databases, d => d.environment);
     const vendor = toKeyCounts(databases, d => d.dbmsVendor);
+    const endOfLifeStatus = toKeyCounts(databases, d => d.endOfLifeStatus);
 
     return {
         environment,
-        vendor
+        vendor,
+        endOfLifeStatus
     };
 }
 
@@ -34,6 +37,11 @@ function controller($scope) {
         vendor: {
             size: PIE_SIZE,
             colorProvider: (d) => variableScale(d.data.key)
+        },
+        endOfLifeStatus: {
+            size: PIE_SIZE,
+            colorProvider: (d) => variableScale(d.data.key),
+            labelProvider: (d) => endOfLifeStatusNames[d.key] || "Unknown"
         }
     };
 

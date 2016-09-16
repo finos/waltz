@@ -1,7 +1,6 @@
 package com.khartec.waltz.data.database_information;
 
 import com.khartec.waltz.common.ArrayBuilder;
-import com.khartec.waltz.model.EndOfLifeStatus;
 import com.khartec.waltz.model.database_information.DatabaseInformation;
 import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
 import com.khartec.waltz.model.database_information.ImmutableDatabaseInformation;
@@ -19,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
+import static com.khartec.waltz.data.JooqUtilities.mkEndOfLifeStatusDerivedField;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
@@ -107,17 +107,16 @@ public class DatabaseInformationDao {
                 DATABASE_INFORMATION.ENVIRONMENT,
                 DSL.trueCondition());
 
-        List<Tally<String>> eolCounts = calculateStringTallies(
+        List<Tally<String>> endOfLifeStatusCounts = calculateStringTallies(
                 dsl,
                 databaseInfo,
-                DSL.when(DATABASE_INFORMATION.END_OF_LIFE_DATE.lt(DSL.currentDate()), DSL.inline(EndOfLifeStatus.END_OF_LIFE.name()))
-                        .otherwise(DSL.inline(EndOfLifeStatus.NOT_END_OF_LIFE.name())),
+                mkEndOfLifeStatusDerivedField(DATABASE_INFORMATION.END_OF_LIFE_DATE),
                 DSL.trueCondition());
 
         return ImmutableDatabaseSummaryStatistics.builder()
                 .vendorCounts(vendorCounts)
                 .environmentCounts(environmentCounts)
-                .eolCounts(eolCounts)
+                .endOfLifeStatusCounts(endOfLifeStatusCounts)
                 .build();
     }
 

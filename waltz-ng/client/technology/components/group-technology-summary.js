@@ -1,5 +1,6 @@
 import _ from "lodash";
 import {environmentColorScale, operatingSystemColorScale, maturityColorScale, variableScale} from "../../common/colors";
+import {endOfLifeStatusNames} from "../../common/services/display_names";
 
 
 const bindings = {
@@ -14,10 +15,6 @@ const initialState = {
     }
 };
 
-const endOfLifeLabels = {
-    'END_OF_LIFE': 'End of Life',
-    'NOT_END_OF_LIFE': 'Compliant'
-};
 
 const PIE_SIZE = 70;
 
@@ -43,10 +40,10 @@ const PIE_CONFIG = {
         size: PIE_SIZE,
         colorProvider: (d) => maturityColorScale(d.data.key)
     },
-    eol: {
+    endOfLifeStatus: {
         size: PIE_SIZE,
         colorProvider: (d) => variableScale(d.data.key),
-        labelProvider: (d) => endOfLifeLabels[d.key] || "Unknown"
+        labelProvider: (d) => endOfLifeStatusNames[d.key] || "Unknown"
     }
 };
 
@@ -61,7 +58,9 @@ function processServerStats(stats) {
             ...stats,
             environment: prepareForPieChart(stats.environmentCounts),
             operatingSystem: prepareForPieChart(stats.operatingSystemCounts),
-            location: prepareForPieChart(stats.locationCounts)
+            location: prepareForPieChart(stats.locationCounts),
+            operatingSystemEndOfLifeStatus: prepareForPieChart(stats.operatingSystemEndOfLifeStatusCounts),
+            hardwareEndOfLifeStatus: prepareForPieChart(stats.hardwareEndOfLifeStatusCounts)
         }
     };
 }
@@ -72,7 +71,7 @@ function processDatabaseStats(stats) {
             ...stats,
             environment: prepareForPieChart(stats.environmentCounts),
             vendor: prepareForPieChart(stats.vendorCounts),
-            eol: prepareForPieChart(stats.eolCounts)
+            endOfLifeStatus: prepareForPieChart(stats.endOfLifeStatusCounts)
         }
     };
 }
