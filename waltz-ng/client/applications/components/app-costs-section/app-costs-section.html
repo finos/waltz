@@ -1,0 +1,77 @@
+<waltz-section name="Costs">
+    <waltz-source-data-section-addon ratings="$ctrl.sourceDataRatings"
+                                     entities="['ASSET_COST']">
+    </waltz-source-data-section-addon>
+
+    <div ng-if="$ctrl.costs.length == 0">
+        <div class="alert alert-warning">
+            <strong>
+                No costs registered
+            </strong> against this application
+        </div>
+    </div>
+
+    <div ng-if="$ctrl.costs.length > 0">
+            <uib-tabset>
+                <uib-tab>
+                    <uib-tab-heading>
+                        Summary
+                    </uib-tab-heading>
+
+                    <div class="row">
+                        <div class="col-md-offset-1 col-md-4">
+                            <br>
+                            <h3>
+                                Total Cost:
+                                <span style='font-weight: bolder'
+                                      ng-bind="$ctrl.currentTotal | currency:'€'">
+                                </span>
+                            </h3>
+                            <h4>
+                                <span ng-bind="$ctrl.currentYear"></span>
+                            </h4>
+                        </div>
+                        <div class="col-md-7">
+                            <br>
+                            <table class="table small table-condensed">
+                                <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Cost</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="item in $ctrl.currentCosts">
+                                    <td>
+                                        <span ng-bind="item.cost.kind | toDisplayName:'assetCost'">
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span ng-bind="item.cost.amount | currency:'€'"></span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+                </uib-tab>
+
+                <uib-tab select="showTableTab = true">
+                    <uib-tab-heading>
+                        Detail
+                    </uib-tab-heading>
+                    <p class="small">
+                        The table shows historic cost entries for this application
+                    </p>
+                    <div ng-if="showTableTab">
+                        <waltz-asset-cost-table costs="$ctrl.costs">
+                        </waltz-asset-cost-table>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+        </div>
+    </div>
+
+</waltz-section>

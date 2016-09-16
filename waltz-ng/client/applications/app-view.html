@@ -238,23 +238,9 @@
 
 
     <!-- COSTS -->
-    <waltz-section name="Costs">
-        <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
-                                         entities="['ASSET_COST']">
-        </waltz-source-data-section-addon>
-
-        <div ng-if="ctrl.costs.length == 0">
-            <div class="alert alert-warning">
-                <strong>
-                    No costs registered
-                </strong> against this application
-            </div>
-        </div>
-        <div ng-if="ctrl.costs.length > 0">
-            <waltz-asset-cost-table costs="ctrl.costs">
-            </waltz-asset-cost-table>
-        </div>
-    </waltz-section>
+    <waltz-app-costs-section costs="ctrl.costs"
+                             source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-app-costs-section>
 
 
     <!-- INDICATORS -->

@@ -11,20 +11,11 @@
 
 
 
-    <waltz-section>
-        <div class="row">
-            <div class="col-md-12">
-                <waltz-source-and-target-graph entity-ref="ctrl.entityReference"
-                                               flows="ctrl.flows"
-                                               decorators="ctrl.decorators"
-                                               tweakers="ctrl.flowTweakers">
-                </waltz-source-and-target-graph>
-            </div>
-        </div>
+    <!-- COSTS -->
+    <waltz-app-costs-section costs="ctrl.costs"
+                             source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-app-costs-section>
 
-    </waltz-section>
-
-    <pre ng-bind="ctrl.entityReference | json"></pre>
-    <pre ng-bind="ctrl.decorators | json"></pre>
+    <pre ng-bind="ctrl.costs"></pre>
 
 </div>

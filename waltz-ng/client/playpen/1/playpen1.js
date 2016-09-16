@@ -7,7 +7,7 @@ const initData = {
 
 
 
-function controller(appStore, dataFlowStore, dataFlowDecoratorStore) {
+function controller(appStore, assetCostStore) {
 
     const vm = Object.assign(this, initData);
 
@@ -21,22 +21,17 @@ function controller(appStore, dataFlowStore, dataFlowDecoratorStore) {
         scope: 'EXACT'
     };
 
-    dataFlowStore
-        .findByEntityReference(entityReference)
-        .then(f => vm.flows = f)
-        .then(t => console.log(t));
-    dataFlowDecoratorStore
-        .findBySelector(selector)
-        .then(d => vm.decorators = d);
-    vm.entityReference = entityReference;
+
+    assetCostStore
+        .findAppCostsByAppIdSelector(selector)
+        .then(costs => vm.costs = costs);
 
 }
 
 
 controller.$inject = [
     'ApplicationStore',
-    'DataFlowDataStore',
-    'DataFlowDecoratorStore'
+    'AssetCostStore'
 ];
 
 
