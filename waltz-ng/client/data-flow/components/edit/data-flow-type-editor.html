@@ -12,24 +12,18 @@
             </h4>
 
             <!-- DATA TYPE OPTIONS -->
-            <ul class="list-unstyled">
-                <li ng-repeat="option in $ctrl.workingTypes | orderBy:'name'">
-                    <span>
-                        <input type="checkbox"
-                               id="wdfte-{{option.id}}"
-                               ng-model="option.selected"
-                               ng-change="$ctrl.onChange()">
-
-                        <label ng-style="{'font-weight': (option.selected ? 'bold' : 'none') }"
-                               for="wdfte-{{option.id}}"
-                               ng-bind="option.name">
-                        </label>
-                    </span>
-                    <span class="text-muted small"
-                          ng-bind="option.description">
-                    </span>
-                </li>
-            </ul>
+            <waltz-multi-select-tree-control items="$ctrl.allDataTypes"
+                                             on-click="$ctrl.typeSelected"
+                                             on-check="$ctrl.typeChecked"
+                                             on-uncheck="$ctrl.typeUnchecked"
+                                             checked-item-ids="$ctrl.checkedItemIds"
+                                             expanded-item-ids="$ctrl.expandedItemIds">
+                <strong ng-bind="node.name">
+                </strong>
+                <span class="text-muted small"
+                      ng-bind="node.description">
+                </span>
+            </waltz-multi-select-tree-control>
 
             <!-- ACTIONS -->
             <div class="pull-right">

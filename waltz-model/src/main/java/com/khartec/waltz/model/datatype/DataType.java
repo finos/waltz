@@ -33,4 +33,7 @@ public abstract class DataType implements
         IdProvider,
         ParentIdProvider {
 
+    @Value.Default
+    public boolean selectable() { return true; }
+
 }
