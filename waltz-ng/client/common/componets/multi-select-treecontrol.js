@@ -19,8 +19,8 @@ const initialState = {
     checkedItemIds: [],
     checkedMap: {},
     trees: [],
-    onCheck: node => console.log('default handler in multi-select-treecontrol for node check: ', node),
-    onUncheck: node => console.log('default handler in multi-select-treecontrol for node uncheck: ', node),
+    onCheck: id => console.log('default handler in multi-select-treecontrol for node id check: ', id),
+    onUncheck: id => console.log('default handler in multi-select-treecontrol for node id uncheck: ', id),
     onClick: node => console.log('default handler in multi-select-treecontrol for node click: ', node),
 };
 
@@ -49,9 +49,9 @@ function mkCheckedMap(nodes = [], checked = []) {
 }
 
 
-function mkExpandedNodes(nodes = [], expandedNodeIds = []) {
-    function recurse(nodes, nodeIds) {
-        const filteredNodes = _.filter(nodes, n => nodeIds.includes(n.id));
+function mkExpandedNodes(nodes = [], expandedIds = []) {
+    function recurse(nodes, ids) {
+        const filteredNodes = _.filter(nodes, n => ids.includes(n.id));
         const newParentIds = _.chain(filteredNodes)
             .filter(n => n.parentId)
             .map('parentId')
@@ -64,7 +64,7 @@ function mkExpandedNodes(nodes = [], expandedNodeIds = []) {
         }
     }
 
-    return _.flattenDeep(recurse(nodes, expandedNodeIds));
+    return _.flattenDeep(recurse(nodes, expandedIds));
 }
 
 
@@ -90,14 +90,14 @@ function controller() {
         invokeHandler(vm.onClick, node.id);
     };
 
-    vm.onNodeCheck = (node) => {
-        invokeHandler(vm.onCheck, node.id);
+    vm.onNodeCheck = (id) => {
+        invokeHandler(vm.onCheck, id);
         event.preventDefault();
         event.stopPropagation();
     };
 
-    vm.onNodeUncheck = (node) => {
-        invokeHandler(vm.onUncheck, node.id);
+    vm.onNodeUncheck = (id) => {
+        invokeHandler(vm.onUncheck, id);
         event.preventDefault();
         event.stopPropagation();
     };
