@@ -21,7 +21,7 @@ function getCurrentYear(costs = []) {
 
 
 function calcTotalCost(costs = []) {
-    return _.sumBy(costs, 'cost.amount');
+    return _.sumBy(costs, 'cost.amount').toFixed(2);
 }
 
 
