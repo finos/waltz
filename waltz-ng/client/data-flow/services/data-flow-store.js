@@ -9,24 +9,40 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import _ from 'lodash';
+import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks'
 
 function service($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/data-flows`;
 
     // --- FINDERS ---
-    const findBySelector = (options) => $http
-        .post(`${BASE}/selector`, options)
-        .then(r => r.data);
+    const findBySelector = (options) => {
+        checkIsIdSelector(options);
+        return $http
+            .post(`${BASE}/selector`, options)
+            .then(r => r.data);
+    };
 
-    const findByEntityReference = (kind, id) => $http
-        .get(`${BASE}/entity/${kind}/${id}`)
-        .then(result => result.data);
+    const findByEntityReference = (kind, id) => {
+        const entityReference = _.isObject(kind)
+            ? kind
+            : { kind, id };
+
+        checkIsEntityRef(entityReference);
+
+        return $http
+            .get(`${BASE}/entity/${entityReference.kind}/${entityReference.id}`)
+            .then(result => result.data);
+    };
 
 
     // --- STATS ---
-    const calculateStats = (options) => $http
-        .post(`${BASE}/stats`, options)
-        .then(r => r.data);
+    const calculateStats = (options) => {
+        checkIsIdSelector(options);
+        return $http
+            .post(`${BASE}/stats`, options)
+            .then(r => r.data);
+    };
 
     const countByDataType = () => $http
         .get(`${BASE}/count-by/data-type`)

@@ -7,31 +7,27 @@ const initData = {
 
 
 
-function controller(appStore, flowService) {
+function controller(appStore, dataFlowStore, dataFlowDecoratorStore) {
 
     const vm = Object.assign(this, initData);
 
     const entityReference = {
-        id: 5000,
-        kind: 'DATA_TYPE'
+        id: 6591,
+        kind: 'APPLICATION'
     };
 
     const selector = {
         entityReference,
-        scope: 'CHILDREN'
+        scope: 'EXACT'
     };
 
-    appStore
+    dataFlowStore
+        .findByEntityReference(entityReference)
+        .then(f => vm.flows = f)
+        .then(t => console.log(t));
+    dataFlowDecoratorStore
         .findBySelector(selector)
-        .then(apps => vm.apps = apps);
-
-    flowService
-        .initialise(selector)
-        .then(() => flowService.loadDetail())
-        .then(flowData => {
-            vm.flowData = flowData;
-        });
-
+        .then(d => vm.decorators = d);
     vm.entityReference = entityReference;
 
 }
@@ -39,7 +35,8 @@ function controller(appStore, flowService) {
 
 controller.$inject = [
     'ApplicationStore',
-    'DataFlowViewService'
+    'DataFlowDataStore',
+    'DataFlowDecoratorStore'
 ];
 
 

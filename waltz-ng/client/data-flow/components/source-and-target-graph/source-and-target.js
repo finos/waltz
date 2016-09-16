@@ -382,10 +382,14 @@ function internetExplorerFix(selection) {
 }
 
 
-function drawTypeBoxes(section, items, scale, dimensions) {
+function drawTypeBoxes(section, model, scale, dimensions) {
+
     const boxes = section
         .selectAll('.wsat-type-box')
-        .data(items, d => d.id);
+        .data(model.types, d => d.id);
+
+    const hasIncoming = (type) => _.some(model.sourceToType, f => f.to === type);
+    const hasOutgoing = (type) => _.some(model.typeToTarget, f => f.from === type);
 
     boxes
         .enter()
@@ -393,7 +397,7 @@ function drawTypeBoxes(section, items, scale, dimensions) {
         .classed('wsat-type-box', true)
         .attr({
             fill: '#fafafa',
-            stroke: '#eee',
+            stroke: '#ccc',
             x: dimensions.width / 2 * -1 + 2,
             y: 0,
             opacity: 0
@@ -403,9 +407,17 @@ function drawTypeBoxes(section, items, scale, dimensions) {
         .transition()
         .duration(animationDuration)
         .attr({
-            x: dimensions.width / 2 * -1 + 2,
+            x: (d) => {
+                const x = dimensions.width / 2 * -1 + 2;
+                return hasIncoming(d.id)
+                    ? x
+                    : x + 20;
+            },
             y: d => scale(d.id) - dimensions.height - 2,
-            width: dimensions.width - 4,
+            width: (d) => {
+                const b = dimensions.width - 4;
+                return b - (hasIncoming(d.id) ? 0 : 20) - (hasOutgoing(d.id) ? 0 : 20);
+            },
             height: dimensions.height + 6,
             opacity: 1
         });
@@ -441,11 +453,33 @@ function drawOutbound(section, model, scales, dimensions) {
 }
 
 
-function update(
-    sections,
-    model,
-    tweakers) {
+function drawCenterBox(section, dimensions) {
+    const centerBox = section
+        .selectAll('.center-box')
+        .data([1], _.identity);
 
+    centerBox
+        .enter()
+        .append('rect')
+        .classed('center-box', true)
+        .attr({
+            fill: '#f5f5f5',
+            stroke: '#ddd'
+        });
+
+    centerBox
+        .attr({
+            x: -90,
+            y: 15,
+            width: 180,
+            height: dimensions.graph.height - dimensions.margin.bottom - 6
+        });
+}
+
+
+function update(sections,
+                model,
+                tweakers) {
     redraw = () => update(sections, model, tweakers);
 
     const dimensions = calculateDimensions(model);
@@ -453,13 +487,14 @@ function update(
     setupSizing(sections, dimensions);
 
     drawTitleBar(sections.header, dimensions);
+    drawCenterBox(sections.types, dimensions);
 
     const scales = setupScales(model, dimensions);
 
     drawLabels(sections.sources, model.sources, scales.source, 'end', tweakers.source, redraw);
     drawLabels(sections.targets, model.targets, scales.target, 'start', tweakers.target, redraw);
 
-    drawTypeBoxes(sections.types, model.types, scales.type, dimensions.label);
+    drawTypeBoxes(sections.types, model, scales.type, dimensions.label);
     drawLabels(sections.types, model.types, scales.type, 'middle', tweakers.type, redraw);
 
     drawInbound(sections.inbound, model.sourceToType, scales, dimensions);
@@ -467,6 +502,14 @@ function update(
 }
 
 
+/**
+ * Note: it is v. important the $element is an element with some width,
+ * simply placing this in a element like a waltz-section will cause it
+ * to render with 0x0....
+ * @param $element
+ * @param $window
+ * @param dataTypeService
+ */
 function controller($element, $window, dataTypeService) {
 
     const vm = initialiseData(this, initialState);
@@ -492,10 +535,7 @@ function controller($element, $window, dataTypeService) {
                     entityRef: vm.entityRef,
                     allTypes: types
                 };
-
-
                 const model = mkModel(data);
-
                 update(svgSections, model, tweakers);
             });
     }, 100);
@@ -505,7 +545,6 @@ function controller($element, $window, dataTypeService) {
     angular
         .element($window)
         .on('resize', () => debouncedRender());
-
 }
 
 
