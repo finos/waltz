@@ -1,0 +1,27 @@
+<waltz-section icon='history'
+               name="Recently Viewed">
+    <ul class="list-unstyled">
+        <li ng-repeat="item in $ctrl.history">
+            <a ui-sref="{{ ::item.state }} ({{ ::item.stateParams }})">
+                <waltz-icon class='text-muted'
+                            fixed-width="true"
+                            name="{{ item.kind | toIconName:'entity' }}"></waltz-icon>
+                <span ng-bind="::item.name"></span>
+            </a>
+        </li>
+
+    </ul>
+
+    <div class="alert alert-info"
+         ng-if="$ctrl.history.length == 0">
+        <strong>Recently viewed</strong>
+        items will be added as you navigate through Waltz
+    </div>
+
+    <div class="small text-muted"
+         ng-if="$ctrl.history.length > 0">
+        The recently viewed list can be quickly accessed
+        from any point in Waltz via the 'Recent'
+        button on the menu bar at the top of the screen.
+    </div>
+</waltz-section>

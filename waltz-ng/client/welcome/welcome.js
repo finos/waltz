@@ -16,12 +16,14 @@
  *
  */
 const initialState = {
+    appGroupSubscriptions: [],
     panels: [],
-    appGroupSubscriptions: []
+    history: []
 };
 
 
 function controller(appGroupStore,
+                    localStorageService,
                     staticPanelStore) {
 
     const vm = Object.assign(this, initialState);
@@ -34,10 +36,14 @@ function controller(appGroupStore,
         .findMyGroupSubscriptions()
         .then(groupSubscriptions => vm.appGroupSubscriptions = groupSubscriptions);
 
+    vm.history = localStorageService
+            .get('history_2') || [];
+
 }
 
 controller.$inject = [
     'AppGroupStore',
+    'localStorageService',
     'StaticPanelStore'
 ];
 
