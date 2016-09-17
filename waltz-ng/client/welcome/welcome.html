@@ -1,6 +1,7 @@
 <div class="container-fluid">
 
-    <div style="margin-bottom: 24px;">
+    <div style="margin-bottom: 24px; padding: 24px"
+         class="waltz-page-header">
         <img height="100px"
              src="../../images/branding/waltz_icon+text_positive_bw_300px.png">
         <span style="font-size: x-large; padding-left: 30px;">
@@ -8,18 +9,26 @@
         </span>
     </div>
     <div class="row">
-        <div class="col-sm-6" ng-if="ctrl.panels.length > 0">
-            <waltz-static-panels panels="ctrl.panels"
-                                 render-mode="chromeless">
+        <div class="col-sm-6"
+             ng-if="ctrl.panels.length > 0">
 
-            </waltz-static-panels>
+            <div class="waltz-page-summary"
+                 style="xxmargin-top: 20px; padding: 24px">
+                <waltz-static-panels panels="ctrl.panels"
+                                     render-mode="chromeless">
+
+                </waltz-static-panels>
+            </div>
+
         </div>
 
         <div class="col-sm-6">
             <waltz-app-group-list-section group-subscriptions="ctrl.appGroupSubscriptions">
-
             </waltz-app-group-list-section>
-        </div>
 
+            <waltz-recently-viewed-section history="ctrl.history">
+            </waltz-recently-viewed-section>
+        </div>
     </div>
+
 </div>

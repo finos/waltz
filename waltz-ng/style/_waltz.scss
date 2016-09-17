@@ -187,7 +187,8 @@ textarea {
   background: #fff;
   border: 1px solid $waltz-border-color-lighter;
   padding: 1em;
-  border-radius: 6px;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
     @include waltz-box-shadow();
 }
 

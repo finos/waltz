@@ -28,6 +28,7 @@ function setup(module) {
         require('./entity'),
         require('./entity-statistics'),
         require('./examples'),
+        require('./formly'),
         require('./history'),
         require('./involvement'),
         require('./navbar'),
@@ -49,7 +50,7 @@ function setup(module) {
         require('./traits'),
         require('./user'),
         require('./user-contribution'),
-        require('./formly'),
+        require('./welcome'),
         require('./widgets'),
         require('./reports')
     ];
