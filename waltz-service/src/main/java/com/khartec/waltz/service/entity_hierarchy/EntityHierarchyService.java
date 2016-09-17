@@ -1,5 +1,6 @@
 package com.khartec.waltz.service.entity_hierarchy;
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.hierarchy.FlatNode;
 import com.khartec.waltz.common.hierarchy.Forest;
 import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
@@ -15,23 +16,23 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_hierarchy.EntityHierarchyItem;
 import com.khartec.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
+import com.khartec.waltz.model.tally.ImmutableStringTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.service.capability.CapabilityService;
+import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityKind.CAPABILITY;
+import static com.khartec.waltz.model.EntityKind.PERSON;
 
 @Service
 public class EntityHierarchyService {
@@ -45,6 +46,7 @@ public class EntityHierarchyService {
     private final EntityStatisticDao entityStatisticDao;
     private final OrganisationalUnitDao organisationalUnitDao;
     private final ProcessDao processDao;
+    private final PersonHierarchyService personHierarchyService;
 
     @Autowired
     public EntityHierarchyService(DSLContext dsl,
@@ -55,6 +57,7 @@ public class EntityHierarchyService {
                                   EntityRootsSelectorFactory entityRootsSelectorFactory,
                                   EntityStatisticDao entityStatisticDao,
                                   OrganisationalUnitDao organisationalUnitDao,
+                                  PersonHierarchyService personHierarchyService,
                                   ProcessDao processDao) {
 
         checkNotNull(dsl, "dsl cannot be null");
@@ -65,6 +68,7 @@ public class EntityHierarchyService {
         checkNotNull(entityRootsSelectorFactory, "entityRootsSelectorFactory cannot be null");
         checkNotNull(entityStatisticDao, "entityStatisticDao cannot be null");
         checkNotNull(organisationalUnitDao, "organisationalUnitDao cannot be null");
+        checkNotNull(personHierarchyService, "personHierarchyService cannot be null");
         checkNotNull(processDao, "processDao cannot be null");
 
         this.dsl = dsl;
@@ -75,17 +79,28 @@ public class EntityHierarchyService {
         this.entityRootsSelectorFactory = entityRootsSelectorFactory;
         this.entityStatisticDao = entityStatisticDao;
         this.organisationalUnitDao = organisationalUnitDao;
+        this.personHierarchyService = personHierarchyService;
         this.processDao = processDao;
     }
 
 
     public List<Tally<String>> tallyByKind() {
-        return entityHierarchyDao.tallyByKind();
+        return ListUtilities.append(
+                entityHierarchyDao.tallyByKind(),
+                ImmutableStringTally.builder()
+                        .id(EntityKind.PERSON.name())
+                        .count(personHierarchyService.count())
+                        .build());
     }
 
 
     public List<Tally<String>> getRootTallies() {
-        return entityHierarchyDao.getRootTallies();
+        return ListUtilities.append(
+                entityHierarchyDao.getRootTallies(),
+                ImmutableStringTally.builder()
+                        .id(EntityKind.PERSON.name())
+                        .count(personHierarchyService.countRoots())
+                        .build());
     }
 
 
@@ -105,6 +120,8 @@ public class EntityHierarchyService {
                 return organisationalUnitDao.findByIdSelectorAsEntityReference(selector);
             case PROCESS:
                 return processDao.findByIdSelectorAsEntityReference(selector);
+            case PERSON:
+                return Collections.emptyList();
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + kind);
         }
@@ -112,8 +129,13 @@ public class EntityHierarchyService {
 
 
     public int buildFor(EntityKind kind) {
-        Table table = determineTableToRebuild(kind);
-        return buildFor(table, kind);
+        if (kind == PERSON) {
+            int[] rc = personHierarchyService.build();
+            return rc.length;
+        } else {
+            Table table = determineTableToRebuild(kind);
+            return buildFor(table, kind);
+        }
     }
 
 
@@ -202,9 +224,8 @@ public class EntityHierarchyService {
             case PROCESS:
                 return Tables.PROCESS;
             default:
-                throw new IllegalArgumentException("Cannot deteremine hierarchy table for kind: "+kind);
+                throw new IllegalArgumentException("Cannot determine hierarchy table for kind: "+kind);
         }
     }
-
 
 }

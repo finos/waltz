@@ -9,9 +9,28 @@ const initialState = {
         'DATA_TYPE',
         'ENTITY_STATISTIC',
         'ORG_UNIT',
-        'PROCESS'
+        'PROCESS',
+        'PERSON'
     ]
 };
+
+
+function combineTallies(entryCounts = [], rootCounts = []) {
+
+    const rootTalliesKeyed = _.keyBy(rootCounts, 'id');
+
+    return _.chain(entryCounts)
+        .map(t => {
+            const associatedRootCount = rootTalliesKeyed[t.id] || { count: 0 };
+            return {
+                id: t.id,
+                hierarchyCount: t.count,
+                rootCount: associatedRootCount.count
+            };
+        })
+        .value();
+}
+
 
 function controller($q,
                     $state,
@@ -22,14 +41,15 @@ function controller($q,
 
 
     const loadTallies = () => {
-        $q
-            .all([hierarchiesStore.findTallies(), hierarchiesStore.findRootTallies()])
-            .then( ([tallies, rootTallies]) => {
-                const rootTalliesKeyed = _.keyBy(rootTallies, 'id');
-                vm.combinedTallies = _.chain(tallies)
-                    .map(t => ({id: t.id, hierarchyCount: t.count, rootCount: rootTalliesKeyed[t.id].count}) )
-                    .value();
-            });
+        const promises = [
+            hierarchiesStore.findTallies(),
+            hierarchiesStore.findRootTallies()
+        ];
+
+        $q.all(promises)
+            .then( ([tallies, rootTallies]) =>
+                vm.combinedTallies = combineTallies(tallies, rootTallies));
+
     };
 
     vm.build = (kind) => {

@@ -1,0 +1,107 @@
+<div>
+    <waltz-page-header name="System Admin"
+                       icon="wrench">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>System Admin</li>
+        </ol>
+
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-md-12">
+
+
+                <div waltz-has-role="ADMIN">
+                    <h3>User Management</h3>
+
+                    <div>
+                        <a ui-sref="main.user.management">
+                            <waltz-icon class='text-muted'
+                                        fixed-width="true"
+                                        name="users"></waltz-icon>
+                            Manage Users
+                        </a>
+                        <p class="text-muted small">
+                            Register users and alter their permissions
+                        </p>
+                    </div>
+
+                    <div>
+                        <a ui-sref="main.user.log">
+                            <waltz-icon class='text-muted'
+                                        fixed-width="true"
+                                        name="list-ul"></waltz-icon>
+                            User Logs
+                        </a>
+                        <p class="text-muted small">
+                            See information about accessed pages and actions performed
+                        </p>
+                    </div>
+                </div>
+
+
+                <hr>
+
+                <div waltz-has-role="ADMIN">
+                    <h3>Maintenance</h3>
+                    <div>
+                        <a ui-sref="main.system.hierarchies">
+                            <waltz-icon class='text-muted'
+                                        fixed-width="true"
+                                        name="sitemap"></waltz-icon>
+                            Hierarchy Maintenance
+                        </a>
+                        <p class="text-muted small">
+                            If hierarchies change they may need rebuilding
+                        </p>
+                    </div>
+
+                    <div>
+                        <a ui-sref="main.system.recalculate">
+                            <waltz-icon class='text-muted'
+                                        fixed-width="true"
+                                        name="calculator"></waltz-icon>
+                            Recalculate Derived Fields
+                        </a>
+                        <p class="text-muted small">
+                            Recompute: Data Type Usages, Flow Authoritative Source Ratings
+                        </p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div waltz-has-role="ADMIN">
+                    <h3>Internals</h3>
+
+
+                    <div>
+                        <a ui-sref="main.system.settings">
+                            <waltz-icon class='text-muted'
+                                        fixed-width="true"
+                                        name="cog"></waltz-icon>
+                            Settings
+                        </a>
+                        <p class="text-muted small">
+                            See configuration settings
+                        </p>
+                    </div>
+
+                    <div>
+                        <a ui-sref="main.traits">
+                            <waltz-icon class='text-muted'
+                                        fixed-width="true"
+                                        name="cubes"></waltz-icon>
+                            Manage Traits
+                        </a>
+                        <p class="text-muted small">
+                            Deprecated:  traits are being phased out...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

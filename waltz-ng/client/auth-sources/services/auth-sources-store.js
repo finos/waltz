@@ -63,6 +63,12 @@ const service = ($http, root) => {
             .delete(`${BASE}/id/${id}`);
 
 
+    const recalculateAll = () =>
+        $http
+            .get(`${BASE}/recalculate-flow-ratings`)
+            .then(r => r.data);
+
+
     const insert = (insertRequest) => {
         const { kind, id, dataType, appId, rating} = insertRequest;
         const url = `${BASE}/kind/${kind}/${id}/${dataType}/${appId}`;
@@ -78,6 +84,7 @@ const service = ($http, root) => {
         findByDataTypeIdSelector,
         update,
         insert,
+        recalculateAll,
         remove
     };
 

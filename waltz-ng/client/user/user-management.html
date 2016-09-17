@@ -24,10 +24,18 @@
             background-color: #eee;
         }
     </style>
-    <waltz-page-header icon="users" name="User Management"></waltz-page-header>
 
-    <waltz-section name="Users">
+    <waltz-page-header icon="users"
+                       name="User Management">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.system.list">System Admin</a></li>
+            <li>User Management</li>
+        </ol>
+    </waltz-page-header>
 
+
+    <div class='waltz-page-summary waltz-page-summary-attach'>
         <form class="form-inline">
             <div class="form-group">
                 <label>Search</label>
@@ -277,9 +285,8 @@
                 <waltz-icon name="times"></waltz-icon>
             </a>
         </div>
+    </div>
 
-
-    </waltz-section>
 
 
 </div>
