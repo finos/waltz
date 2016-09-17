@@ -1,6 +1,13 @@
 
+
 const baseState = {
     url: 'system'
+};
+
+
+const listViewState = {
+    url: '/list',
+    views: { 'content@': require('./system-admin-list') }
 };
 
 
@@ -15,12 +22,19 @@ const hierarchiesState = {
     views: { 'content@': require('./hierarchies-view') }
 };
 
+const recalculateState = {
+    url: '/recalculate',
+    views: { 'content@': require('./recalculate-view') }
+};
+
 
 function setupRoutes($stateProvider) {
     $stateProvider
         .state('main.system', baseState)
+        .state('main.system.list', listViewState)
         .state('main.system.settings', settingsState)
-        .state('main.system.hierarchies', hierarchiesState);
+        .state('main.system.hierarchies', hierarchiesState)
+        .state('main.system.recalculate', recalculateState);
 }
 
 setupRoutes.$inject = ['$stateProvider'];

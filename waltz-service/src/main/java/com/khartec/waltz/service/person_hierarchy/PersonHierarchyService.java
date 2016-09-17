@@ -26,6 +26,9 @@ import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.schema.tables.records.PersonHierarchyRecord;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +57,7 @@ public class PersonHierarchyService {
     }
 
 
-    public boolean build() {
+    public int[] build() {
         LOG.warn("Building person hierarchy");
         List<Person> all = personDao.all();
 
@@ -63,9 +66,7 @@ public class PersonHierarchyService {
         List<PersonHierarchyRecord> records = toHierarchyRecords(forest);
 
         dsl.deleteFrom(PERSON_HIERARCHY).execute();
-        dsl.batchStore(records).execute();
-
-        return true;
+        return dsl.batchStore(records).execute();
     }
 
 
@@ -99,4 +100,18 @@ public class PersonHierarchyService {
         return HierarchyUtilities.toForest(allFlatNodes);
     }
 
+
+    public int count() {
+        return dsl.fetchCount(PERSON_HIERARCHY);
+    }
+
+
+    public double countRoots() {
+        SelectConditionStep<Record1<String>> rootSelector = DSL
+                .selectDistinct(PERSON_HIERARCHY.MANAGER_ID)
+                .from(PERSON_HIERARCHY)
+                .where(PERSON_HIERARCHY.LEVEL.eq(1));
+
+        return dsl.fetchCount(rootSelector);
+    }
 }

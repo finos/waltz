@@ -22,9 +22,9 @@ public class PersonMaintenance {
 
 
     @ManagedOperation(description = "Rebuild the person hierarchy table")
-    public boolean rebuildHierarchyTable() {
+    public int rebuildHierarchyTable() {
         LOG.warn("Rebuild person hierarchy (via jmx)");
-        return personHierarchyService.build();
+        return personHierarchyService.build().length;
     }
 
 

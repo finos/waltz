@@ -22,10 +22,18 @@
             padding: 8px;
         }
     </style>
-    <waltz-page-header icon="list-ul" name="User Logs"></waltz-page-header>
 
-    <waltz-section name="Select User">
+    <waltz-page-header icon="list-ul" name="User Logs">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.system.list">System Admin</a></li>
+            <li>User Logs</li>
+        </ol>
+    </waltz-page-header>
 
+
+    <div class='waltz-page-summary waltz-page-summary-attach'>
+        <h3> Select User </h3>
         <form class="form-inline">
             <div class="form-group">
                 <label>Search</label>
@@ -38,72 +46,88 @@
             </div>
         </form>
 
-    </waltz-section>
-
-    <waltz-section name="Access" small="{{ctrl.userName}}">
-        <div ng-if="ctrl.accesslogs.length > 0" class="waltz-user-log-scroll">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>State</th>
-                    <th>Params</th>
-                    <th>Timestamp</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="log in ctrl.accesslogs">
-                    <td>{{ log.state }}</td>
-                    <td>{{ log.params }}</td>
-                    <td>
-                        <waltz-from-now timestamp="log.createdAt">
-                        </waltz-from-now>
-                    </td>
-                    <td><a href ng-click="ctrl.visit(log)">Visit</a></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div ng-if="ctrl.accesslogs.length == 0" class="alert alert-warning">
-            No Access logs
-        </div>
-    </waltz-section>
 
 
-    <waltz-section name="Audit" small="{{ctrl.userName}}">
-        <div ng-if="ctrl.changeLogs.length > 0" class="waltz-user-log-scroll">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Message</th>
-                    <th>Entity</th>
-                    <th>Timestamp</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="log in ctrl.changeLogs">
-                    <td>{{ log.message }}</td>
-                    <td>
-                        {{ log.parentReference.kind }} / {{ log.parentReference.id }}
-                        <span ng-if="log.parentReference.name">
+        <div ng-if="ctrl.userName">
+            <hr>
+
+            <div>
+                <h4>
+                    Audit Log
+                    <small ng-bind="ctrl.userName"></small>
+                </h4>
+
+
+                <div ng-if="ctrl.changeLogs.length > 0" class="waltz-user-log-scroll">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Message</th>
+                            <th>Entity</th>
+                            <th>Timestamp</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="log in ctrl.changeLogs">
+                            <td><span ng-bind="log.message"></span></td>
+                            <td>
+                                {{ log.parentReference.kind }} / {{ log.parentReference.id }}
+                                <span ng-if="log.parentReference.name">
                             / {{ log.parentReference.name }}
                         </span>
-                    </td>
-                    <td>
-                        <waltz-from-now timestamp="log.createdAt">
-                        </waltz-from-now>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+                            </td>
+                            <td>
+                                <waltz-from-now timestamp="log.createdAt">
+                                </waltz-from-now>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-        <div ng-if="ctrl.changeLogs.length == 0" class="alert alert-warning">
-            No audit logs
-        </div>
-    </waltz-section>
+                <div ng-if="ctrl.changeLogs.length == 0" class="alert alert-warning">
+                    No audit logs
+                </div>
+            </div>
 
+
+            <div>
+                <hr>
+
+                <h4>
+                    Access Log
+                    <small ng-bind="ctrl.userName"></small>
+                </h4>
+
+                <div ng-if="ctrl.accesslogs.length > 0" class="waltz-user-log-scroll">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>Params</th>
+                            <th>Timestamp</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="log in ctrl.accesslogs">
+                            <td>{{ log.state }}</td>
+                            <td>{{ log.params }}</td>
+                            <td>
+                                <waltz-from-now timestamp="log.createdAt">
+                                </waltz-from-now>
+                            </td>
+                            <td><a href ng-click="ctrl.visit(log)">Visit</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div ng-if="ctrl.accesslogs.length == 0" class="alert alert-warning">
+                    No Access logs
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 

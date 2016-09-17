@@ -56,12 +56,18 @@ function service($http,
             .then(r => r.data);
     };
 
+    const recalculateAll = () =>
+        $http
+            .get(`${BASE}/calculate-all/application`)
+            .then(r => r.data);
+
     return {
         findForEntity,
         findForDataTypeSelector,
         findForUsageKindByDataTypeIdSelector,
         calculateStats,
         findForSelector,
+        recalculateAll,
         save
     };
 }
