@@ -12,7 +12,6 @@
 
 import d3 from "d3";
 import _ from "lodash";
-import EventDispatcher from "../../../common/EventDispatcher";
 
 
 const template = require('./boingy-graph.html');
@@ -30,16 +29,9 @@ const DEFAULT_TWEAKER = {
 };
 
 
-const dispatcher = new EventDispatcher();
-
 function setupDimensions(vizElem) {
     const width = vizElem.node().clientWidth || 1000;
     return { width, height: 600 };
-}
-
-
-function handleNodeClick(node) {
-    dispatcher.dispatch({ type: 'NODE_CLICK', data: node });
 }
 
 
@@ -92,8 +84,7 @@ function addNodeCircle(selection) {
             cx: 0,
             cy: 0,
             r: 8
-        })
-        .on('click', handleNodeClick);
+        });
 }
 
 
@@ -101,8 +92,7 @@ function addNodeLabel(selection) {
     selection
         .append('text')
         .attr({ dx: 10, dy: '.35em' })
-        .text(d => d.name)
-        .on('click', handleNodeClick);
+        .text(d => d.name);
 }
 
 
@@ -202,12 +192,6 @@ function controller($scope, $element) {
         .select('.viz');
 
     const parts = setup(vizElem);
-
-    dispatcher.subscribe((e) => {
-        $scope.$applyAsync(() => vm.focusItem = e.data);
-    }, 'NODE_CLICK');
-
-    vm.focusItem = null;
 
     vm.$onChanges = () => {
         if (vm.data) {

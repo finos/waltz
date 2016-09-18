@@ -244,7 +244,9 @@ function service($q,
 
 
     function loadFlowDetail() {
-        return dataFlowViewService.loadDetail();
+        return dataFlowViewService
+            .loadDetail()
+            .then(flowData => state.model.dataFlows = flowData);
     }
 
 

@@ -49,9 +49,11 @@ function controller($stateParams,
         $scope.$applyAsync(() => viewDataService.selectAssetBucket(bucket));
     };
 
-    vm.loadFlowDetail = () => viewDataService.loadFlowDetail();
-
+    vm.loadFlowDetail = () => viewDataService
+        .loadFlowDetail()
+        .then(flowData => vm.viewData.dataFlows = flowData);
 }
+
 
 controller.$inject = [
     '$stateParams',

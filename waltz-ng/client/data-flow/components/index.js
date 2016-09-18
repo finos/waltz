@@ -8,6 +8,8 @@ function setup(module) {
         .component('waltzAppCentricFlowTable', require('./app-centric-flow-table/app-centric-flow-table'))
         .component('waltzDataFlowTypeEditor', require('./edit/data-flow-type-editor'))
         .component('waltzDataFlowDiagram', require('./boingy-graph/boingy-graph'))
+        .component('waltzDataFlowsTabgroup', require('./data-flows-tabgroup/data-flows-tabgroup'))
+
 
 }
 

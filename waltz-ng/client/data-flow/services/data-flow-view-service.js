@@ -22,9 +22,9 @@ function service($q,
             ? id
             : { entityReference: { id, kind }, scope, desiredKind };
 
-        const statStore = data.options.desiredKind === 'APPLICATION'
-            ? dataFlowStore
-            : dataTypeUsageStore;
+        const statStore = data.options.desiredKind === 'DATA_TYPE'
+            ? dataTypeUsageStore
+            : dataFlowStore;
 
         return statStore
             .calculateStats(data.options)
