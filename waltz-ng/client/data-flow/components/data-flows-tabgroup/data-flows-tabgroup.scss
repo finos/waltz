@@ -1,0 +1,14 @@
+.waltz-data-flows-tabgroup {
+    .wdftg-info-box {
+        display: inline-block;
+        position: absolute;
+        top: 52px;
+        right: 32px;
+        border: 1px solid $waltz-border-color-lighter;
+        padding: 6px;
+        border-radius: 6px;
+        width: 300px;
+        background-color: rgba($waltz-background-color, 0.7);
+        @include waltz-box-shadow();
+    }
+}

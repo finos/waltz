@@ -189,7 +189,9 @@ function controller($scope,
     };
 
     vm.loadFlowDetail = () => {
-        dataFlowViewService.loadDetail();
+        dataFlowViewService
+            .loadDetail()
+            .then(flowData => vm.dataFlows = flowData);
     };
 
 }

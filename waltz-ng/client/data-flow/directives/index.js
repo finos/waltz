@@ -21,7 +21,6 @@ export default (module) => {
         .directive('waltzRatedFlowDetail', require('./rated-flow-chart/rated-flow-detail'))
         .directive('waltzRatedFlowSummaryDetail', require('./rated-flow-chart/rated-flow-summary-detail'))
         .directive('waltzFlowCloudDiagram', require('./flow-cloud-diagram'))
-        .directive('waltzDataFlowsTabgroup', require('./data-flows-tabgroup'))
         .directive('waltzDataFlowsTabgroupSection', require('./data-flows-tabgroup-section'))
         .directive('waltzFlowFilterOptionsOverlay', require('./flow-filter-options-overlay'));
 

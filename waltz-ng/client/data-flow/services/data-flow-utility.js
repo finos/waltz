@@ -38,6 +38,7 @@ export default [
         };
 
         const buildGraphTweakers = (appIds = [], decorators = []) => {
+
             const decoratorsByFlowId = _.groupBy(decorators, 'dataFlowId');
             const calcRating = (d) => {
                 const flowId = d.data.id;
@@ -52,8 +53,8 @@ export default [
                         selection
                             .classed('wdfd-intra-node', d => _.includes(appIds, d.id))
                             .classed('wdfd-extra-node', d => ! _.includes(appIds, d.id))
-                            .on('click', app => app.fixed = true)
-                            .on('dblclick', app => app.fixed = false)
+                            .on('click.fix', app => app.fixed = true)
+                            .on('dblclick.unfix', app => app.fixed = false)
                     },
                     update: _.identity,
                     exit: _.identity

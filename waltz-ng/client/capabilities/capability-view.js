@@ -24,7 +24,7 @@ const initialState = {
     bookmarks: [],
     capability: null,
     complexity: [],
-    dataFlows: [],
+    dataFlows: null,
     entityStatisticDefinitions: [],
     groupedApps: null,
     processes: [],
@@ -262,7 +262,9 @@ function controller($q,
         })
     };
 
-    vm.loadFlowDetail = () => dataFlowViewService.loadDetail();
+    vm.loadFlowDetail = () => dataFlowViewService
+        .loadDetail()
+        .then(flowData => vm.dataFlows = flowData);
 
 
     loadTraitInfo(traitStore, traitUsageStore, capability.id)

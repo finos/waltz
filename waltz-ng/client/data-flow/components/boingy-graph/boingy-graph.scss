@@ -10,30 +10,6 @@
  *
  */
 
-.waltz-boingy-graph-container {
-  position: relative;
-
-  .info-box {
-    display: inline-block;
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    border: 1px solid $waltz-border-color-lighter;
-    padding: 6px;
-    border-radius: 6px;
-    width: 300px;
-    background-color: rgba($waltz-background-color, 0.7);
-    @include waltz-box-shadow();
-  }
-
-}
-
-
-#arrowhead {
-  fill: #aaa;
-  stroke: #777;
-}
-
 .wdfd-node {
   circle {
     fill-opacity: 0.5;

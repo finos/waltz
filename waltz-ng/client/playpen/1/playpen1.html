@@ -11,11 +11,13 @@
 
 
 
-    <!-- COSTS -->
-    <waltz-app-costs-section costs="ctrl.costs"
-                             source-data-ratings="ctrl.sourceDataRatings">
-    </waltz-app-costs-section>
+    <waltz-section name="boing">
+        <waltz-data-flows-tabgroup flow-data="ctrl.flowData"
+                                   on-load-detail="ctrl.loadDetail"
+                                   applications="ctrl.applications">
 
-    <pre ng-bind="ctrl.costs"></pre>
+        </waltz-data-flows-tabgroup>
+
+    </waltz-section>
 
 </div>

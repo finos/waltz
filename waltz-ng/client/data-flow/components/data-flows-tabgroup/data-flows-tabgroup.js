@@ -1,11 +1,11 @@
 import _ from "lodash";
 
 
-const BINDINGS = {
+const bindings = {
     flowData: '<',
     applications: '<',
     onLoadDetail: '<',
-    options: '=?',
+    options: '<',  // { graphTweakers ... }
     optionsVisible: '<',
     onTabChange: '<'
 };
@@ -31,7 +31,7 @@ const defaultOptions = {
 
 const initialState = {
     applications: [],
-    appIds: [],
+    selectedApplication: null,
     boingyEverShown: false,
     dataTypes: [],
     flowData: null,
@@ -94,13 +94,14 @@ function buildDecoratorFilter(options = defaultFilterOptions) {
 
 
 function calculateFlowData(allFlows = [],
-                           appIds = [],
+                           applications = [],
                            allDecorators = [],
                            filterOptions = defaultFilterOptions) {
     // note order is important.  We need to find decorators first
     const decoratorFilterFn = buildDecoratorFilter(filterOptions);
     const decorators = _.filter(allDecorators, decoratorFilterFn);
 
+    const appIds = _.map(applications, "id");
     const flowFilterFn = buildFlowFilter(filterOptions, appIds, decorators);
     const flows = _.filter(allFlows, flowFilterFn);
 
@@ -110,45 +111,58 @@ function calculateFlowData(allFlows = [],
 }
 
 
+function getDataTypeIds(decorators = []) {
+    return _.chain(decorators)
+        .filter(dc => dc.decoratorEntity.kind === 'DATA_TYPE')
+        .map('decoratorEntity.id')
+        .uniq()
+        .value();
+}
+
+
+function prepareGraphTweakers(dataFlowUtilityService,
+                              applications = [],
+                              decorators = [],
+                              appSelectFn = (d) => console.log("dftg: no appSelectFn given", d))
+{
+    const appIds = _.map(applications, 'id');
+    const tweakers = dataFlowUtilityService.buildGraphTweakers(appIds, decorators);
+
+    const dfltNodeEnter = tweakers.node.enter;
+    const nodeEnter = selection => selection
+        .on('click.app-select', appSelectFn)
+        .call(dfltNodeEnter);
+
+    tweakers.node.enter = nodeEnter;
+    return tweakers;
+}
+
+
 function controller($scope, dataFlowUtilityService) {
 
     const vm = _.defaultsDeep(this, initialState);
 
-    $scope.$watch(
-        'ctrl.flowData.flows',
-        () => vm.filterChanged(defaultFilterOptions));
-
-    $scope.$watch(
-        'ctrl.flowData.decorators',
-        (decorators = []) => {
-            vm.dataTypes = _.chain(decorators)
-                .filter(dc => dc.decoratorEntity.kind === 'DATA_TYPE')
-                .map('decoratorEntity.id')
-                .uniq()
-                .value();
-
-            vm.filterChanged(defaultFilterOptions);
-        });
-
-    $scope.$watch(
-        'ctrl.applications',
-        (applications = []) => {
-            vm.appIds = _.map(applications, 'id');
-            vm.graphTweakers = dataFlowUtilityService.buildGraphTweakers(vm.appIds)
-        });
+    vm.$onChanges = (c) => {
+        if (vm.flowData) {
+            vm.dataTypes = getDataTypeIds(vm.flowData.decorators);
+        }
+        vm.filterChanged(defaultFilterOptions);
+    };
 
     vm.filterChanged = (filterOptions) => {
         if (! vm.flowData) return;
 
         vm.filteredFlowData = calculateFlowData(
             vm.flowData.flows,
-            vm.appIds,
+            vm.applications,
             vm.flowData.decorators,
             filterOptions);
 
-        vm.graphTweakers = dataFlowUtilityService.buildGraphTweakers(
-            vm.appIds,
-            vm.filteredFlowData.decorators)
+        vm.graphTweakers = prepareGraphTweakers(
+            dataFlowUtilityService,
+            vm.applications,
+            vm.filteredFlowData.decorators,
+            app => $scope.$applyAsync(() => vm.selectedApplication = app));
     };
 
     vm.loadDetail = () => {
@@ -168,26 +182,20 @@ function controller($scope, dataFlowUtilityService) {
         }
         vm.onTabChange(tabName, index);
     };
-
 }
 
 
 controller.$inject = [
     '$scope',
-    'DataFlowUtilityService',
-    'DataTypeService'
+    'DataFlowUtilityService'
 ];
 
 
-const directive = {
-    restrict: 'E',
-    replace: true,
-    scope: {},
+const component = {
     controller,
-    controllerAs: 'ctrl',
-    bindToController: BINDINGS,
+    bindings,
     template: require('./data-flows-tabgroup.html')
 };
 
 
-export default () => directive;
+export default component;

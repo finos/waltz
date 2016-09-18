@@ -5,33 +5,46 @@ const initData = {
 };
 
 
-
-
-function controller(appStore, assetCostStore) {
+function controller(appStore, flowViewService) {
 
     const vm = Object.assign(this, initData);
 
     const entityReference = {
-        id: 6591,
-        kind: 'APPLICATION'
+        id: 170,
+        kind: 'ORG_UNIT'
     };
 
     const selector = {
         entityReference,
-        scope: 'EXACT'
+        scope: 'CHILDREN'
     };
 
+    appStore
+        .findBySelector(selector)
+        .then(apps => vm.applications = apps);
 
-    assetCostStore
-        .findAppCostsByAppIdSelector(selector)
-        .then(costs => vm.costs = costs);
+    flowViewService
+        .initialise(selector)
+        .then(flowViewService.loadDetail)
+        .then(d => vm.flowData = d);
 
+    vm.loadDetail = () => {};
+
+    vm.options = {
+        graphTweakers: {
+            node: {
+                enter: (selection) => selection.on('click.app-click', d => console.log(d)),
+                update: _.identity,
+                exit: _.identity
+            }
+        }
+    };
 }
 
 
 controller.$inject = [
     'ApplicationStore',
-    'AssetCostStore'
+    'DataFlowViewService'
 ];
 
 

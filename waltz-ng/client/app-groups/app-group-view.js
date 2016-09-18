@@ -204,7 +204,9 @@ function controller($scope,
         })
     };
 
-    vm.loadFlowDetail = () => dataFlowViewService.loadDetail();
+    vm.loadFlowDetail = () => dataFlowViewService
+        .loadDetail()
+        .then(flowData => vm.dataFlows = flowData);
 
     entityStatisticStore
         .findAllActiveDefinitions()
