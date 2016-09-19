@@ -121,9 +121,9 @@ function filterData(flows = [],
 }
 
 
-function controller() {
+function controller($scope) {
     const vm = initialiseData(this, initialState);
-    const onAppSelect = (app) => vm.selectedApp = app;
+    const onAppSelect = (app) => $scope.$applyAsync(() => vm.selectedApp = app);
 
     vm.filterChanged = () => {
         const filteredData = filterData(
@@ -166,7 +166,9 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    '$scope'
+];
 
 
 const component = {
