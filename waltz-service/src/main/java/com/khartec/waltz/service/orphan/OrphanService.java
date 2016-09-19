@@ -1,7 +1,7 @@
 package com.khartec.waltz.service.orphan;
 
 import com.khartec.waltz.data.orphan.OrphanDao;
-import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.orphan.OrphanRelationship;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +22,18 @@ public class OrphanService {
     }
 
 
-    public Collection<EntityReference> findApplicationsWithNonExistingOrgUnit() {
-        return orphanDao.findApplicationsWithNonExistingOrgUnit();
+    public Collection<OrphanRelationship> findApplicationsWithNonExistingOrgUnit() {
+        return orphanDao.findApplicationsWithNonExistentOrgUnit();
+    }
+
+
+    public Collection<OrphanRelationship> findOrphanApplicationCapabilities() {
+        return orphanDao.findOrphanApplicationCapabilities();
+    }
+
+
+    public Collection<OrphanRelationship> findOrphanAuthoritativeSources() {
+        return orphanDao.findOrphanAuthoritativeSources();
     }
 
 }

@@ -1,6 +1,6 @@
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.orphan.OrphanRelationship;
 import com.khartec.waltz.service.orphan.OrphanService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
@@ -39,13 +39,30 @@ public class OrphanEndpoint implements Endpoint {
     @Override
     public void register() {
         String findApplicationsWithNonExistingOrgUnitPath = mkPath(BASE_URL, "application-non-existing-org-unit");
+        String findOrphanApplicationCapabilitiesPath = mkPath(BASE_URL, "application-capability");
+        String findOrphanAuthoritativeSourcesPath = mkPath(BASE_URL, "authoritative-source");
 
 
-        ListRoute<EntityReference> findApplicationsWithNonExistingOrgUnitRoute = (request, response) -> {
+        ListRoute<OrphanRelationship> findApplicationsWithNonExistingOrgUnitRoute = (request, response) -> {
             requireRole(userRoleService, request, ADMIN);
             return orphanService.findApplicationsWithNonExistingOrgUnit();
         };
 
+
+        ListRoute<OrphanRelationship> findOrphanApplicationCapabilitiesRoute = (request, response) -> {
+            requireRole(userRoleService, request, ADMIN);
+            return orphanService.findOrphanApplicationCapabilities();
+        };
+
+
+        ListRoute<OrphanRelationship> findOrphanAuthoritativeSourcesRoute = (request, response) -> {
+            requireRole(userRoleService, request, ADMIN);
+            return orphanService.findOrphanAuthoritativeSources();
+        };
+
+
         getForList(findApplicationsWithNonExistingOrgUnitPath, findApplicationsWithNonExistingOrgUnitRoute);
+        getForList(findOrphanApplicationCapabilitiesPath, findOrphanApplicationCapabilitiesRoute);
+        getForList(findOrphanAuthoritativeSourcesPath, findOrphanAuthoritativeSourcesRoute);
     }
 }

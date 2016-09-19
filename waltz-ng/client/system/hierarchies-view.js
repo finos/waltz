@@ -3,6 +3,7 @@ import {initialiseData, kindToViewState} from "../common";
 
 const initialState = {
     combinedTallies: [],
+    orphans: [],
     kinds: [
         'CAPABILITY',
         'CHANGE_INITIATIVE',
@@ -16,7 +17,8 @@ const initialState = {
 function controller($q,
                     $state,
                     hierarchiesStore,
-                    notification) {
+                    notification,
+                    orphanStore) {
 
     const vm = initialiseData(this, initialState);
 
@@ -54,7 +56,29 @@ function controller($q,
     };
 
 
+    vm.showOrphans = (values) => {
+        vm.selectedOrphanValues = values;
+    };
+
+
+    const loadOrphans = () => {
+        $q
+            .all([orphanStore.findAppsWithNonExistentOrgUnits(),
+                orphanStore.findOrphanAppCaps(),
+                orphanStore.findOrphanAuthoritativeSources()])
+            .then( ([apps, appCaps, authSources]) => {
+                const orphans = [
+                    {description: 'Applications referencing non existent Org Units', values: apps},
+                    {description: 'Functions', values: appCaps},
+                    {description: 'Authoritative Sources', values: authSources}
+                ];
+                vm.orphans = orphans;
+            });
+
+    }
+
     loadTallies();
+    loadOrphans();
 }
 
 
@@ -62,7 +86,8 @@ controller.$inject = [
     '$q',
     '$state',
     'HierarchiesStore',
-    'Notification'
+    'Notification',
+    'OrphanStore'
 ];
 
 
