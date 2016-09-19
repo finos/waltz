@@ -35,6 +35,7 @@ const initialState = {
     boingyEverShown: false,
     dataTypes: [],
     flowData: null,
+    filterOptions: defaultFilterOptions,
     onLoadDetail: () => console.log("No onLoadDetail provided for data-flows-tabgroup"),
     options: defaultOptions,
     optionsVisible: false,
@@ -142,14 +143,16 @@ function controller($scope, dataFlowUtilityService) {
 
     const vm = _.defaultsDeep(this, initialState);
 
-    vm.$onChanges = (c) => {
+    vm.$onChanges = () => {
         if (vm.flowData) {
             vm.dataTypes = getDataTypeIds(vm.flowData.decorators);
         }
-        vm.filterChanged(defaultFilterOptions);
+        vm.filterChanged();
     };
 
-    vm.filterChanged = (filterOptions) => {
+    vm.filterChanged = (filterOptions = vm.filterOptions) => {
+        vm.filterOptions = filterOptions;
+
         if (! vm.flowData) return;
 
         vm.filteredFlowData = calculateFlowData(
