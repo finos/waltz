@@ -35,7 +35,7 @@ public class OrphanDao {
 
 
     public List<OrphanRelationship> findApplicationsWithNonExistentOrgUnit() {
-        return dsl.select(APPLICATION.ID, APPLICATION.NAME, DSL.val(EntityKind.APPLICATION.name()), APPLICATION.ORGANISATIONAL_UNIT_ID)
+        return dsl.select(APPLICATION.ID, APPLICATION.NAME, APPLICATION.ORGANISATIONAL_UNIT_ID)
                 .from(APPLICATION)
                 .where(APPLICATION.ORGANISATIONAL_UNIT_ID
                         .notIn(DSL.select(ORGANISATIONAL_UNIT.ID)
@@ -43,10 +43,11 @@ public class OrphanDao {
                 .fetch(r -> ImmutableOrphanRelationship.builder()
                         .entityA(ImmutableEntityReference.builder()
                                 .id(r.value1())
-                                .kind(EntityKind.valueOf(r.value3()))
+                                .name(r.value2())
+                                .kind(EntityKind.APPLICATION)
                                 .build())
                         .entityB(ImmutableEntityReference.builder()
-                                .id(r.value4())
+                                .id(r.value3())
                                 .kind(EntityKind.ORG_UNIT)
                                 .build())
                         .orphanSide(OrphanSide.A)
@@ -65,8 +66,7 @@ public class OrphanDao {
 
 
         List<ImmutableOrphanRelationship> missingCaps = dsl.select(APP_CAPABILITY.CAPABILITY_ID,
-                APP_CAPABILITY.APPLICATION_ID,
-                DSL.val(EntityKind.APP_CAPABILITY.name()))
+                APP_CAPABILITY.APPLICATION_ID)
                 .from(APP_CAPABILITY)
                 .where(missingCapability)
                 .fetch(r -> ImmutableOrphanRelationship.builder()
@@ -83,8 +83,7 @@ public class OrphanDao {
 
 
         List<ImmutableOrphanRelationship> missingApps = dsl.select(APP_CAPABILITY.CAPABILITY_ID,
-                APP_CAPABILITY.APPLICATION_ID,
-                DSL.val(EntityKind.APP_CAPABILITY.name()))
+                APP_CAPABILITY.APPLICATION_ID)
                 .from(APP_CAPABILITY)
                 .where(missingApplication)
                 .fetch(r -> ImmutableOrphanRelationship.builder()
