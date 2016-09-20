@@ -40,7 +40,9 @@ public class OrphanEndpoint implements Endpoint {
     public void register() {
         String findApplicationsWithNonExistingOrgUnitPath = mkPath(BASE_URL, "application-non-existing-org-unit");
         String findOrphanApplicationCapabilitiesPath = mkPath(BASE_URL, "application-capability");
-        String findOrphanAuthoritativeSourcesPath = mkPath(BASE_URL, "authoritative-source");
+        String findOrphanAuthoritativeSourcesByAppPath = mkPath(BASE_URL, "authoritative-source", "application");
+        String findOrphanAuthoritativeSourcesByOrgUnitPath = mkPath(BASE_URL, "authoritative-source", "org-unit");
+        String findOrphanAuthoritativeSourcesByDataTypePath = mkPath(BASE_URL, "authoritative-source", "data-type");
 
 
         ListRoute<OrphanRelationship> findApplicationsWithNonExistingOrgUnitRoute = (request, response) -> {
@@ -55,14 +57,28 @@ public class OrphanEndpoint implements Endpoint {
         };
 
 
-        ListRoute<OrphanRelationship> findOrphanAuthoritativeSourcesRoute = (request, response) -> {
+        ListRoute<OrphanRelationship> findOrphanAuthoritativeSourcesByAppRoute = (request, response) -> {
             requireRole(userRoleService, request, ADMIN);
-            return orphanService.findOrphanAuthoritativeSources();
+            return orphanService.findOrphanAuthoritativeSourceByApp();
+        };
+
+
+        ListRoute<OrphanRelationship> findOrphanAuthoritativeSourcesByOrgUnitRoute = (request, response) -> {
+            requireRole(userRoleService, request, ADMIN);
+            return orphanService.findOrphanAuthoritativeSourceByOrgUnit();
+        };
+
+
+        ListRoute<OrphanRelationship> findOrphanAuthoritativeSourcesByDataTypeRoute = (request, response) -> {
+            requireRole(userRoleService, request, ADMIN);
+            return orphanService.findOrphanAuthoritiveSourceByDataType();
         };
 
 
         getForList(findApplicationsWithNonExistingOrgUnitPath, findApplicationsWithNonExistingOrgUnitRoute);
         getForList(findOrphanApplicationCapabilitiesPath, findOrphanApplicationCapabilitiesRoute);
-        getForList(findOrphanAuthoritativeSourcesPath, findOrphanAuthoritativeSourcesRoute);
+        getForList(findOrphanAuthoritativeSourcesByAppPath, findOrphanAuthoritativeSourcesByAppRoute);
+        getForList(findOrphanAuthoritativeSourcesByOrgUnitPath, findOrphanAuthoritativeSourcesByOrgUnitRoute);
+        getForList(findOrphanAuthoritativeSourcesByDataTypePath, findOrphanAuthoritativeSourcesByDataTypeRoute);
     }
 }

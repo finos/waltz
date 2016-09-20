@@ -25,15 +25,27 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
-    const findOrphanAuthoritativeSources = () => $http
-        .get(`${BASE}/authoritative-source`)
+    const findOrphanAuthoritativeSourcesByApp = () => $http
+        .get(`${BASE}/authoritative-source/application`)
+        .then(result => result.data);
+
+
+    const findOrphanAuthoritativeSourcesByOrgUnit = () => $http
+        .get(`${BASE}/authoritative-source/org-unit`)
+        .then(result => result.data);
+
+
+    const findOrphanAuthoritativeSourcesByDataType = () => $http
+        .get(`${BASE}/authoritative-source/data-type`)
         .then(result => result.data);
 
 
     return {
         findAppsWithNonExistentOrgUnits,
         findOrphanAppCaps,
-        findOrphanAuthoritativeSources
+        findOrphanAuthoritativeSourcesByApp,
+        findOrphanAuthoritativeSourcesByOrgUnit,
+        findOrphanAuthoritativeSourcesByDataType
     };
 
 }

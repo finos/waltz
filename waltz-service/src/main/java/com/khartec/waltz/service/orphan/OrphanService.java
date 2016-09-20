@@ -32,8 +32,18 @@ public class OrphanService {
     }
 
 
-    public Collection<OrphanRelationship> findOrphanAuthoritativeSources() {
-        return orphanDao.findOrphanAuthoritativeSources();
+    public Collection<OrphanRelationship> findOrphanAuthoritativeSourceByOrgUnit() {
+        return orphanDao.findOrphanAuthoritativeSourceByOrgUnit();
+    }
+
+
+    public Collection<OrphanRelationship> findOrphanAuthoritativeSourceByApp() {
+        return orphanDao.findOrphanAuthoritativeSourceByApp();
+    }
+
+
+    public Collection<OrphanRelationship> findOrphanAuthoritiveSourceByDataType() {
+        return orphanDao.findOrphanAuthoritiveSourceByDataType();
     }
 
 }

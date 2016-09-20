@@ -1,7 +1,6 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.orphan.OrphanDao;
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.orphan.OrphanRelationship;
 import com.khartec.waltz.service.DIConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -16,9 +15,7 @@ public class OrphanHarness {
         OrphanDao orphanDao = ctx.getBean(OrphanDao.class);
 
         List<OrphanRelationship> applicationsWithNonExistingOrgUnit = orphanDao.findApplicationsWithNonExistentOrgUnit();
-        List<OrphanRelationship> orphanAuthoritativeSources = orphanDao.findOrphanAuthoritativeSources();
-//        List<EntityReference> appCapsWithNonExistentCaps = orphanDao.findOrphanApplicationCapabilities();
-//        List<EntityReference> appCapsWithNonExistentApps = orphanDao.findAppCapsWithNonExistentApps();
+        List<OrphanRelationship> orphanAuthoritativeSources = orphanDao.findOrphanAuthoritiveSourceByDataType();
         System.out.println(applicationsWithNonExistingOrgUnit.size());
     }
 

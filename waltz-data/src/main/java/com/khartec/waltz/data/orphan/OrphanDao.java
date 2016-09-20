@@ -8,8 +8,6 @@ import com.khartec.waltz.model.orphan.OrphanSide;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -24,7 +22,6 @@ import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_
 @Repository
 public class OrphanDao {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OrphanDao.class);
     private final DSLContext dsl;
 
     @Autowired
@@ -106,35 +103,13 @@ public class OrphanDao {
     }
 
 
-    public List<OrphanRelationship> findOrphanAuthoritativeSources() {
+    public List<OrphanRelationship> findOrphanAuthoritativeSourceByOrgUnit() {
         Condition missingOrgUnit = AUTHORITATIVE_SOURCE.PARENT_ID
                 .notIn(DSL.select(ORGANISATIONAL_UNIT.ID)
                         .from(ORGANISATIONAL_UNIT))
                 .and(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()));
 
-        Condition missingApplication = AUTHORITATIVE_SOURCE.APPLICATION_ID
-                .notIn(DSL.select(APPLICATION.ID)
-                        .from(APPLICATION));
-
-
-        List<ImmutableOrphanRelationship> missingApps = dsl.select(AUTHORITATIVE_SOURCE.ID,
-                AUTHORITATIVE_SOURCE.APPLICATION_ID)
-                .from(AUTHORITATIVE_SOURCE)
-                .where(missingApplication)
-                .fetch(r -> ImmutableOrphanRelationship.builder()
-                        .entityA(ImmutableEntityReference.builder()
-                                .id(r.value1())
-                                .kind(EntityKind.AUTHORITATIVE_SOURCE)
-                                .build())
-                        .entityB(ImmutableEntityReference.builder()
-                                .id(r.value2())
-                                .kind(EntityKind.APPLICATION)
-                                .build())
-                        .orphanSide(OrphanSide.A)
-                        .build());
-
-
-        List<ImmutableOrphanRelationship> missingOrgUnits = dsl.select(AUTHORITATIVE_SOURCE.ID,
+       return dsl.select(AUTHORITATIVE_SOURCE.ID,
                 AUTHORITATIVE_SOURCE.PARENT_ID)
                 .from(AUTHORITATIVE_SOURCE)
                 .where(missingOrgUnit)
@@ -150,11 +125,58 @@ public class OrphanDao {
                         .orphanSide(OrphanSide.A)
                         .build());
 
+    }
 
-        List<OrphanRelationship> union = new LinkedList<>();
-        union.addAll(missingApps);
-        union.addAll(missingOrgUnits);
-        return union;
+
+    public List<OrphanRelationship> findOrphanAuthoritativeSourceByApp() {
+        Condition missingApplication = AUTHORITATIVE_SOURCE.APPLICATION_ID
+                .notIn(DSL.select(APPLICATION.ID)
+                        .from(APPLICATION));
+
+
+        return dsl.select(AUTHORITATIVE_SOURCE.ID,
+                AUTHORITATIVE_SOURCE.APPLICATION_ID)
+                .from(AUTHORITATIVE_SOURCE)
+                .where(missingApplication)
+                .fetch(r -> ImmutableOrphanRelationship.builder()
+                        .entityA(ImmutableEntityReference.builder()
+                                .id(r.value1())
+                                .kind(EntityKind.AUTHORITATIVE_SOURCE)
+                                .build())
+                        .entityB(ImmutableEntityReference.builder()
+                                .id(r.value2())
+                                .kind(EntityKind.APPLICATION)
+                                .build())
+                        .orphanSide(OrphanSide.A)
+                        .build());
+    }
+
+
+    public List<OrphanRelationship> findOrphanAuthoritiveSourceByDataType() {
+        Condition missingDataType = AUTHORITATIVE_SOURCE.DATA_TYPE
+                .notIn(DSL.select(DATA_TYPE.CODE)
+                        .from(DATA_TYPE));
+
+
+        return dsl.select(AUTHORITATIVE_SOURCE.ID,
+                DATA_TYPE.ID,
+                AUTHORITATIVE_SOURCE.DATA_TYPE)
+                .from(AUTHORITATIVE_SOURCE)
+                .leftJoin(DATA_TYPE)
+                    .on(AUTHORITATIVE_SOURCE.DATA_TYPE.eq(DATA_TYPE.CODE))
+                .where(missingDataType)
+                .fetch(r -> ImmutableOrphanRelationship.builder()
+                        .entityA(ImmutableEntityReference.builder()
+                                .id(r.value1())
+                                .kind(EntityKind.AUTHORITATIVE_SOURCE)
+                                .build())
+                        .entityB(ImmutableEntityReference.builder()
+                                .id(r.value2() != null ? r.value2() : -1)
+                                .name(r.value3())
+                                .kind(EntityKind.DATA_TYPE)
+                                .build())
+                        .orphanSide(OrphanSide.A)
+                        .build());
     }
 
 }
