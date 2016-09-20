@@ -1,6 +1,9 @@
 package com.khartec.waltz.data.orphan;
 
+import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.orphan.ImmutableOrphanRelationship;
 import com.khartec.waltz.model.orphan.OrphanRelationship;
@@ -15,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
@@ -38,15 +42,8 @@ public class OrphanDao {
                         .notIn(DSL.select(ORGANISATIONAL_UNIT.ID)
                                 .from(ORGANISATIONAL_UNIT)))
                 .fetch(r -> ImmutableOrphanRelationship.builder()
-                        .entityA(ImmutableEntityReference.builder()
-                                .id(r.value1())
-                                .name(r.value2())
-                                .kind(EntityKind.APPLICATION)
-                                .build())
-                        .entityB(ImmutableEntityReference.builder()
-                                .id(r.value3())
-                                .kind(EntityKind.ORG_UNIT)
-                                .build())
+                        .entityA(mkRef(EntityKind.APPLICATION, r.value1(), r.value2()))
+                        .entityB(EntityReference.mkRef(EntityKind.ORG_UNIT, r.value3()))
                         .orphanSide(OrphanSide.A)
                         .build());
     }
@@ -62,44 +59,29 @@ public class OrphanDao {
                         .from(APPLICATION));
 
 
-        List<ImmutableOrphanRelationship> missingCaps = dsl.select(APP_CAPABILITY.CAPABILITY_ID,
+        List<OrphanRelationship> missingCaps = dsl.select(APP_CAPABILITY.CAPABILITY_ID,
                 APP_CAPABILITY.APPLICATION_ID)
                 .from(APP_CAPABILITY)
                 .where(missingCapability)
                 .fetch(r -> ImmutableOrphanRelationship.builder()
-                        .entityA(ImmutableEntityReference.builder()
-                                .id(r.value1())
-                                .kind(EntityKind.CAPABILITY)
-                                .build())
-                        .entityB(ImmutableEntityReference.builder()
-                                .id(r.value2())
-                                .kind(EntityKind.APPLICATION)
-                                .build())
+                        .entityA(mkRef(EntityKind.CAPABILITY, r.value1()))
+                        .entityB(mkRef(EntityKind.APPLICATION, r.value2()))
                         .orphanSide(OrphanSide.B)
                         .build());
 
 
-        List<ImmutableOrphanRelationship> missingApps = dsl.select(APP_CAPABILITY.CAPABILITY_ID,
+        List<OrphanRelationship> missingApps = dsl.select(APP_CAPABILITY.CAPABILITY_ID,
                 APP_CAPABILITY.APPLICATION_ID)
                 .from(APP_CAPABILITY)
                 .where(missingApplication)
                 .fetch(r -> ImmutableOrphanRelationship.builder()
-                        .entityA(ImmutableEntityReference.builder()
-                                .id(r.value1())
-                                .kind(EntityKind.CAPABILITY)
-                                .build())
-                        .entityB(ImmutableEntityReference.builder()
-                                .id(r.value2())
-                                .kind(EntityKind.APPLICATION)
-                                .build())
+                        .entityA(mkRef(EntityKind.CAPABILITY, r.value1()))
+                        .entityB(mkRef(EntityKind.APPLICATION, r.value2()))
                         .orphanSide(OrphanSide.A)
                         .build());
 
 
-        List<OrphanRelationship> union = new LinkedList<>();
-        union.addAll(missingCaps);
-        union.addAll(missingApps);
-        return union;
+        return ListUtilities.concat(missingApps, missingCaps);
     }
 
 
@@ -114,14 +96,8 @@ public class OrphanDao {
                 .from(AUTHORITATIVE_SOURCE)
                 .where(missingOrgUnit)
                 .fetch(r -> ImmutableOrphanRelationship.builder()
-                        .entityA(ImmutableEntityReference.builder()
-                                .id(r.value1())
-                                .kind(EntityKind.AUTHORITATIVE_SOURCE)
-                                .build())
-                        .entityB(ImmutableEntityReference.builder()
-                                .id(r.value2())
-                                .kind(EntityKind.ORG_UNIT)
-                                .build())
+                        .entityA(mkRef(EntityKind.AUTHORITATIVE_SOURCE, r.value1()))
+                        .entityB(mkRef(EntityKind.ORG_UNIT, r.value2()))
                         .orphanSide(OrphanSide.A)
                         .build());
 
@@ -139,14 +115,8 @@ public class OrphanDao {
                 .from(AUTHORITATIVE_SOURCE)
                 .where(missingApplication)
                 .fetch(r -> ImmutableOrphanRelationship.builder()
-                        .entityA(ImmutableEntityReference.builder()
-                                .id(r.value1())
-                                .kind(EntityKind.AUTHORITATIVE_SOURCE)
-                                .build())
-                        .entityB(ImmutableEntityReference.builder()
-                                .id(r.value2())
-                                .kind(EntityKind.APPLICATION)
-                                .build())
+                        .entityA(mkRef(EntityKind.AUTHORITATIVE_SOURCE, r.value1()))
+                        .entityB(mkRef(EntityKind.APPLICATION, r.value2()))
                         .orphanSide(OrphanSide.A)
                         .build());
     }
@@ -166,15 +136,8 @@ public class OrphanDao {
                     .on(AUTHORITATIVE_SOURCE.DATA_TYPE.eq(DATA_TYPE.CODE))
                 .where(missingDataType)
                 .fetch(r -> ImmutableOrphanRelationship.builder()
-                        .entityA(ImmutableEntityReference.builder()
-                                .id(r.value1())
-                                .kind(EntityKind.AUTHORITATIVE_SOURCE)
-                                .build())
-                        .entityB(ImmutableEntityReference.builder()
-                                .id(r.value2() != null ? r.value2() : -1)
-                                .name(r.value3())
-                                .kind(EntityKind.DATA_TYPE)
-                                .build())
+                        .entityA(mkRef(EntityKind.AUTHORITATIVE_SOURCE, r.value1()))
+                        .entityB(mkRef(EntityKind.DATA_TYPE, r.value2() != null ? r.value2() : -1, r.value3()))
                         .orphanSide(OrphanSide.A)
                         .build());
     }
