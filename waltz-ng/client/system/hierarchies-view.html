@@ -8,7 +8,9 @@
         </ol>
     </waltz-page-header>
 
-    <div class="waltz-page-summary waltz-page-summary-attach">
+
+    <!-- Hierarchy -->
+    <waltz-section name="Hierarchy">
         <div class="row">
 
             <div class="col-md-3">
@@ -79,5 +81,76 @@
 
         </div>
 
-    </div>
+    </waltz-section>
+
+
+    <!-- Orphans -->
+    <waltz-section name="Orphans">
+        <div class="row">
+            <div class="col-md-8">
+                <table class="table table-condensed table-striped">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="orphan in ctrl.orphans">
+                        <td>
+                            <span ng-bind="orphan.description"></span>
+                        </td>
+                        <td>
+                            <kbd ng-style="{ 'background-color': (orphan.values.length > 0 ? 'red' : 'green') }">
+                                <a ng-bind="orphan.values.length"
+                                   style="color: white"
+                                   class="clickable"
+                                   ng-click="ctrl.showOrphans(orphan.values)">
+                                </a>
+                            </kbd>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-4"
+                 ng-if="ctrl.selectedOrphanValues.length > 0">
+                <div class="waltz-scroll-region"
+                     style="height: 250px">
+                    <table class="table table-condensed small">
+                        <thead>
+                            <tr>
+                                <th>Entity A</th>
+                                <th>Entity B</th>
+                                <th>Orphan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="value in ctrl.selectedOrphanValues">
+                                <td>
+                                    <span ng-bind="value.entityA.kind | toDisplayName:'entity'"></span>:
+                                    <span ng-if="value.entityA.id > 0"
+                                          ng-bind="value.entityA.id">
+                                    </span>
+                                    <span ng-bind="value.entityA.name"> </span>
+                                </td>
+                                <td>
+                                    <span ng-bind="value.entityB.kind | toDisplayName:'entity'"></span>:
+                                    <span ng-if="value.entityB.id > 0"
+                                          ng-bind="value.entityB.id">
+                                    </span>
+                                    <span ng-bind="value.entityB.name"> </span>
+                                </td>
+                                <td>
+                                    <span ng-bind="value.orphanSide"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </waltz-section>
+
 </div>

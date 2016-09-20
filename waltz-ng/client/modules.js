@@ -33,6 +33,7 @@ function setup(module) {
         require('./involvement'),
         require('./navbar'),
         require('./org-units'),
+        require('./orphan'),
         require('./performance-metrics'),
         require('./perspectives'),
         require('./person'),
