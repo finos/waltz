@@ -59,6 +59,29 @@ public class DatabaseGenerator {
             }
         }
 
+        // insert duplicate database instance records (more than one app using the same database)
+        SoftwarePackage dupDbPackage = ArrayUtilities.randomPick(DatabaseSoftwarePackages.dbs);
+        String dupDbEnvironment = ArrayUtilities.randomPick("PROD", "PROD", "QA", "DEV", "DEV");
+        Date dupDbEolDate = rnd.nextInt(10) > 5
+                ? Date.valueOf(LocalDate.now().plusMonths(rnd.nextInt(12 * 6) - (12 * 3)))
+                : null;
+        for (int i = 0; i < 10; i++) {
+            DatabaseInformationRecord databaseRecord = dsl.newRecord(DATABASE_INFORMATION);
+            databaseRecord.setDatabaseName("DB_LON_REF_DATA");
+            databaseRecord.setInstanceName("DB_INST_REF_DATA");
+            databaseRecord.setEnvironment(dupDbEnvironment);
+            databaseRecord.setDbmsVendor(dupDbPackage.vendor());
+            databaseRecord.setDbmsName(dupDbPackage.name());
+            databaseRecord.setDbmsVersion(dupDbPackage.version());
+            databaseRecord.setExternalId("ext_ref_data");
+            databaseRecord.setProvenance("RANDOM_GENERATOR");
+            databaseRecord.setAssetCode(randomPick(codes));
+            databaseRecord.setEndOfLifeDate(
+                    dupDbEolDate);
+
+            databaseRecords.add(databaseRecord);
+        }
+
         System.out.println("-- deleting db records");
         dsl.deleteFrom(DATABASE_INFORMATION)
                 .where(DATABASE_INFORMATION.PROVENANCE.eq("RANDOM_GENERATOR"))

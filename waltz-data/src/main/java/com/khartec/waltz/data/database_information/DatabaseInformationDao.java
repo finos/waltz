@@ -12,6 +12,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +25,7 @@ import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFOR
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
+import static org.jooq.impl.DSL.selectDistinct;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
@@ -89,28 +91,41 @@ public class DatabaseInformationDao {
 
 
     public DatabaseSummaryStatistics findStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
-        Table databaseInfo = DATABASE_INFORMATION
+
+        Field<String> dbmsVendorInner = DSL.field("dbms_vendor_inner", String.class);
+        Field<String> environmentInner = DSL.field("environment_inner", String.class);
+        Field<Date> eolDateInner = DSL.field("eol_date_inner", Date.class);
+
+        Table distinctDbInfo = selectDistinct(
+                    DATABASE_INFORMATION.DATABASE_NAME,
+                    DATABASE_INFORMATION.INSTANCE_NAME,
+                    DATABASE_INFORMATION.ENVIRONMENT.as(environmentInner),
+                    DATABASE_INFORMATION.DBMS_VENDOR.as(dbmsVendorInner),
+                    DATABASE_INFORMATION.DBMS_NAME,
+                    DATABASE_INFORMATION.DBMS_VERSION,
+                    DATABASE_INFORMATION.END_OF_LIFE_DATE.as(eolDateInner))
+                .from(DATABASE_INFORMATION)
                 .innerJoin(APPLICATION)
-                .on(APPLICATION.ASSET_CODE.eq(DATABASE_INFORMATION.ASSET_CODE))
-                .and(APPLICATION.ID.in(appIdSelector))
-                .asTable();
+                    .on(APPLICATION.ASSET_CODE.eq(DATABASE_INFORMATION.ASSET_CODE))
+                .where(APPLICATION.ID.in(appIdSelector))
+                .asTable("distinct_db_info");
 
         List<Tally<String>> vendorCounts = calculateStringTallies(
                 dsl,
-                databaseInfo,
-                DATABASE_INFORMATION.DBMS_VENDOR,
+                distinctDbInfo,
+                dbmsVendorInner,
                 DSL.trueCondition());
 
         List<Tally<String>> environmentCounts = calculateStringTallies(
                 dsl,
-                databaseInfo,
-                DATABASE_INFORMATION.ENVIRONMENT,
+                distinctDbInfo,
+                environmentInner,
                 DSL.trueCondition());
 
         List<Tally<String>> endOfLifeStatusCounts = calculateStringTallies(
                 dsl,
-                databaseInfo,
-                mkEndOfLifeStatusDerivedField(DATABASE_INFORMATION.END_OF_LIFE_DATE),
+                distinctDbInfo,
+                mkEndOfLifeStatusDerivedField(eolDateInner),
                 DSL.trueCondition());
 
         return ImmutableDatabaseSummaryStatistics.builder()
