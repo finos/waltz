@@ -11,28 +11,27 @@
  */
 
 .waltz-breadcrumbs {
-  @extend .list-inline;
-  font-size: small;
-  margin-bottom: 1px;
-  border-bottom: 1px solid #f8f8f8;
-  opacity: 0.6;
-}
+    @extend .list-inline;
+    font-size: small;
+    margin-bottom: 1px;
+    border-bottom: 1px solid #f8f8f8;
+    opacity: 0.6;
 
-.waltz-breadcrumbs:hover {
-  opacity: 1;
-}
+    &:hover {
+        opacity: 1;
+    }
 
-.waltz-breadcrumbs li{
-  padding: 0px;
-}
-.waltz-breadcrumbs li:after {
-  content: ' / '
-}
-.waltz-breadcrumbs li:last-child:after {
-  content: ''
-}
+    a:hover {
+        text-decoration: none;
+    }
 
-
-.waltz-breadcrumbs a:hover {
-  text-decoration: none;
+    li{
+        padding: 0px;
+        &:after {
+            content: ' / '
+        }
+        &:last-child:after {
+            content: ''
+        }
+    }
 }

@@ -22,6 +22,7 @@
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.viewData.orgUnit.name }}"
                        icon="sitemap"
+                       tour="ctrl.tour"
                        small="{{ ctrl.viewData.orgUnit.kind | toDisplayName:'orgUnitKind' }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>

@@ -2707,4 +2707,51 @@
         </createIndex>
     </changeSet>
 
+
+    <!-- 553: Tours -->
+    <changeSet id="20160920-553-1"
+               author="dwatkins">
+        <createTable tableName="tour">
+            <column name="tour_key"
+                    type="VARCHAR(64)">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="step_id"
+                    type="${int.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="selector"
+                    type="VARCHAR(256)">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="position"
+                    type="VARCHAR(16)"
+                    defaultValue="top">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="description"
+                    type="VARCHAR(1024)">
+                <constraints nullable="false"></constraints>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20160920-553-2">
+        <addPrimaryKey columnNames="tour_key, step_id"
+                       constraintName="tour_pkey"
+                       tableName="tour"/>
+    </changeSet>
+
+    
+    <!-- 451: auth source description -->
+    <changeSet author="dwatkins"
+               id="20160920-451-1">
+        <addColumn tableName="authoritative_source">
+            <column name="description"
+                    type="${longvarchar.type}"/>
+        </addColumn>
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -19,6 +19,7 @@ function hasInvolvements(involvements) {
 function controller($scope,
                     $stateParams,
                     viewService,
+                    tourService,
                     historyStore) {
 
     const vm = this;
@@ -27,7 +28,10 @@ function controller($scope,
     const employeeId = $stateParams.empId;
 
     viewService
-        .load(employeeId);
+        .load(employeeId)
+        .then(() => tourService.initialiseForKey('main.person.view', true))
+        .then(tour => vm.tour = tour);
+
 
 
     $scope.$watch(() => viewService.state.model, () => {
@@ -60,6 +64,7 @@ controller.$inject = [
     '$scope',
     '$stateParams',
     'PersonViewDataService',
+    'TourService',
     'HistoryStore'
 ];
 

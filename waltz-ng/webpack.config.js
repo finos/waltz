@@ -1,6 +1,7 @@
 var path = require('path');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var Visualizer = require('webpack-visualizer-plugin');
 
 var basePath = path.resolve(__dirname);
 var nodeModulesDir = path.resolve(__dirname, 'node_modules');
@@ -21,7 +22,8 @@ module.exports = {
         }),
         new webpack.DefinePlugin({
             __ENV__: JSON.stringify(process.env.BUILD_ENV || 'dev')
-        })
+        }),
+        new Visualizer()
     ],
     module: {
         loaders: [

@@ -1,22 +1,33 @@
 <div class="container-fluid">
 
-    <div style="margin-bottom: 24px; padding: 24px"
+    <div style="margin-bottom: 24px; padding: 24px;"
          class="waltz-page-header">
         <img height="100px"
              src="../../images/branding/waltz_icon+text_positive_bw_300px.png">
         <span style="font-size: x-large; padding-left: 30px;">
             Enterprise Architecture on the Wire
         </span>
+
+        <span class="pull-right"
+              style="margin-top: 36px; margin-right:20px;"
+              ng-if="ctrl.tour.stepCount > 0"
+              id="tour-guide">
+            <waltz-icon size='2x'
+                        ng-click="ctrl.tour.start()"
+                        name="map-o">
+            </waltz-icon>
+        </span>
+
+
     </div>
+
     <div class="row">
         <div class="col-sm-6"
              ng-if="ctrl.panels.length > 0">
-
             <div class="waltz-page-summary"
                  style="xxmargin-top: 20px; padding: 24px">
                 <waltz-static-panels panels="ctrl.panels"
                                      render-mode="chromeless">
-
                 </waltz-static-panels>
             </div>
 

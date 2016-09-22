@@ -15,9 +15,11 @@
 
     <div class="nav-bar-collapse">
         <ul class="nav navbar-nav navbar-left">
-            <li ui-sref-active="active" ng-repeat="item in ctrl.navItemsForRole">
-                <a ui-sref="{{item.uiSref}}">
-                    <waltz-icon name="{{item.icon}}"></waltz-icon>
+            <li ui-sref-active="active"
+                ng-repeat="item in ctrl.navItemsForRole"
+                id="{{ item.id }}">
+                <a ui-sref="{{ item.uiSref }}">
+                    <waltz-icon name="{{ item.icon }}"></waltz-icon>
                     <span ng-bind="item.displayName"> </span>
                 </a>
             </li>

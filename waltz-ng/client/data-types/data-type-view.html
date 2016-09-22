@@ -2,6 +2,7 @@
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.dataType.name }}"
                        small="Data Type"
+                       tour="ctrl.tour"
                        icon="qrcode">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
@@ -24,6 +25,7 @@
 
     <!-- AUTH SOURCES -->
     <waltz-section name="Authoritative Sources"
+                   id="authoritative-sources-section"
                    icon="shield">
         <waltz-auth-sources-list auth-sources="ctrl.viewData.authSources"
                                  org-units="ctrl.viewData.orgUnits"

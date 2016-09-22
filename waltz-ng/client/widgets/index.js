@@ -23,7 +23,6 @@ export default (module) => {
     module.directive('waltzLoadingNotification', require('./loading-notification'));
     module.directive('waltzMailTo', require('./mail-to'));
     module.directive('waltzOverlayPanel', require('./overlay-panel'));
-    module.directive('waltzPageHeader', require('./page-header'));
     module.directive('waltzPhoneLink', require('./phone-link'));
     module.directive('waltzPieTable', require('./pie-table'));
     module.directive('waltzRagIndicator', require('./rag-indicator'));
@@ -36,6 +35,7 @@ export default (module) => {
 
     module
         .component('waltzIcon', require('./icon'))
+        .component('waltzPageHeader', require('./page-header'))
         .component('waltzPie', require('./pie'))
         .component('waltzPieSegmentTable', require('./pie-segment-table'))
         .component('waltzSimpleStackChart', require('./simple-stack-chart'))

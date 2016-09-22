@@ -10,13 +10,17 @@
  *
  */
 
+/* We style the element so that the 'tour' will be easy to configure */
+waltz-section {
+    display: block;
+}
+
 .waltz-section {
   border: 1px solid $waltz-border-color-lighter;
   border-radius: 3px;
   margin-bottom: 24px;
   background: #fff;
-
-
+  display: block;
 
   @include waltz-box-shadow()
 }

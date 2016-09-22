@@ -1,7 +1,9 @@
 <div>
 
     <!-- HEADER -->
-    <waltz-page-header icon="user" name="{{ ctrl.person.displayName }}">
+    <waltz-page-header icon="user"
+                       tour="ctrl.tour"
+                       name="{{ ctrl.person.displayName }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li><a ui-sref="main.person">People</a></li>
@@ -24,7 +26,8 @@
     <br>
 
 
-    <waltz-section name="Hierarchy">
+    <waltz-section id='hierarchy-section'
+                   name="Hierarchy">
 
         <div ng-if="ctrl.managers.length > 0">
             <h4>Managers</h4>
@@ -41,6 +44,7 @@
 
     <!-- CHANGE INITIATIVES -->
     <waltz-section name="Change Initiatives"
+                   id="change-initiatives-section"
                    icon="paper-plane-o">
 
         <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
@@ -62,6 +66,7 @@
     <div ng-if="ctrl.hasInvolvements">
 
         <waltz-section icon="desktop"
+                       id="app-portfolio-section"
                        name="Application Portfolio">
 
             <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"

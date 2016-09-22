@@ -2,22 +2,323 @@
 
     <waltz-page-header name="Playpen"
                        small="1"
-                       icon="rocket">
+                       icon="rocket"
+                       start-tour="ctrl.startTour">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>Playpen</li>
         </ol>
     </waltz-page-header>
 
+    <button class="btn btn-info"
+            ng-click="ctrl.start()">
+        Start
+    </button>
 
-
-    <waltz-section name="boing">
+    <waltz-section name="boing" id="step1">
         <waltz-data-flows-tabgroup flow-data="ctrl.flowData"
                                    on-load-detail="ctrl.loadDetail"
                                    applications="ctrl.applications">
 
         </waltz-data-flows-tabgroup>
+    </waltz-section>
 
+
+    <waltz-section name="name1" id="step1">
+        <table class="table">
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+        </table>
+    </waltz-section>
+    <waltz-section name="name2" id="step2">
+        <table class="table">
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+        </table>
+    </waltz-section>
+    <waltz-section name="name3" id="step3">
+        <table class="table">
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+        </table>
+    </waltz-section>
+    <waltz-section name="name4" id="step4">
+        <table class="table">
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+            <tr>
+                <td><span>cell 1</span></td>
+                <td><span>cell 2</span></td>
+                <td><span>cell 3</span></td>
+                <td><span>cell 4</span></td>
+                <td><span>cell 5</span></td>
+            </tr>
+        </table>
     </waltz-section>
 
 </div>

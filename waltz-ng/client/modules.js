@@ -48,6 +48,7 @@ function setup(module) {
         require('./svg-diagram'),
         require('./system'),
         require('./technology'),
+        require('./tour'),
         require('./traits'),
         require('./user'),
         require('./user-contribution'),

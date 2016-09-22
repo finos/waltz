@@ -17,7 +17,8 @@ function controller($stateParams,
                     $scope,
                     viewDataService,
                     viewOptions,
-                    historyStore) {
+                    historyStore,
+                    tourService) {
 
     const id = $stateParams.id;
     const vm = this;
@@ -43,7 +44,9 @@ function controller($stateParams,
     viewDataService
         .loadAll(id)
         .then(data => vm.rawViewData = data)
-        .then(refresh);
+        .then(refresh)
+        .then(() => tourService.initialiseForKey('main.org-unit.view', true))
+        .then(tour => vm.tour = tour);
 
     vm.onAssetBucketSelect = (bucket) => {
         $scope.$applyAsync(() => viewDataService.selectAssetBucket(bucket));
@@ -60,7 +63,8 @@ controller.$inject = [
     '$scope',
     'OrgUnitViewDataService',
     'OrgUnitViewOptionsService',
-    'HistoryStore'
+    'HistoryStore',
+    'TourService'
 ];
 
 

@@ -15,46 +15,44 @@ import _ from "lodash";
 import {stringToBoolean} from "../../common";
 
 let preferencePromise = null;
-let preferences = {};
 
-function service($q, userPreferenceStore, userService) {
+function service($q, userPreferenceStore) {
 
     const loadPreferences = (force = false) => {
         if (force || (preferencePromise == null)) {
-            preferencePromise = userService
-                .whoami()
-                .then(user => userPreferenceStore.findAllForUser())
-                .then(preferences => _.keyBy(preferences, 'key'))
-                .then(p => preferences = p);
+            preferencePromise = userPreferenceStore.findAllForUser();
         }
-        return preferencePromise;
+        return preferencePromise
+            .then(preferences => _.keyBy(preferences, 'key'));
     };
 
 
+    /**
+     * ( key , value) -> { prefs... }
+     * @param key
+     * @param value
+     * @returns {*}
+     */
     const savePreference = (key, value) => {
         if(!preferencePromise || value === undefined || value === null) return;
 
-        const deferred = $q.defer();
+        return loadPreferences()
+            .then(preferencesByKey => {
+                const isNewPreference = !preferencesByKey[key];
+                const hasPreferenceChanged = !isNewPreference && stringToBoolean(preferencesByKey[key].value) != value;
 
-        if(!preferences[key] || stringToBoolean(preferences[key].value) != value) {
-            userService
-                .whoami()
-                .then(user => {
+                if(isNewPreference || hasPreferenceChanged) {
                     const preference = {
                         key,
                         value
                     };
 
-                    return userPreferenceStore.saveForUser(preference)
-                        .then(preferences => _.keyBy(preferences, 'key'))
-                        .then(p => preferences = p);
-
-                })
-                .then(p => deferred.resolve(preferences));
-        }
-        else {
-            deferred.resolve(preferences)
-        }
+                    return userPreferenceStore
+                        .saveForUser(preference)
+                        .then(updatedPrefs => preferencePromise = $q.defer().resolve(updatedPrefs));
+                }
+            })
+            .then(() => loadPreferences());
     };
 
 
@@ -69,8 +67,7 @@ function service($q, userPreferenceStore, userService) {
 
 service.$inject = [
     '$q',
-    'UserPreferenceStore',
-    'UserService',
+    'UserPreferenceStore'
 ];
 
 

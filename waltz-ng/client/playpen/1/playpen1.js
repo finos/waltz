@@ -5,9 +5,37 @@ const initData = {
 };
 
 
-function controller(appStore, flowViewService) {
+const steps = [
+    {
+        //element: '#step1 div',
+        intro: 'General blurb.',
+        // position: 'top'
+    }, {
+        element: '#step1 div',
+        intro: 'More features, more fun.',
+        position: 'top'
+    }, {
+        element: '#step2 div',
+        intro: 'Blah de blah',
+        position: 'top'
+    }, {
+        element: '#step3 div',
+        intro: 'Lah lah lah ',
+        position: 'top'
+    }, {
+        element: '#step4 div',
+        intro: 'Ho hom',
+        position: 'top'
+    }
+];
+
+
+function controller(appStore, flowViewService, tourService) {
 
     const vm = Object.assign(this, initData);
+
+    //
+    tourService.initialiseWithSteps(steps);
 
     const entityReference = {
         id: 170,
@@ -39,12 +67,17 @@ function controller(appStore, flowViewService) {
             }
         }
     };
+
+    vm.startTour = () => {
+        tourService.start();
+    };
 }
 
 
 controller.$inject = [
     'ApplicationStore',
-    'DataFlowViewService'
+    'DataFlowViewService',
+    'TourService'
 ];
 
 
