@@ -3,7 +3,6 @@ import {initialiseData, kindToViewState} from "../common";
 
 const initialState = {
     combinedTallies: [],
-    orphans: [],
     kinds: [
         'CAPABILITY',
         'CHANGE_INITIATIVE',
@@ -36,8 +35,7 @@ function combineTallies(entryCounts = [], rootCounts = []) {
 function controller($q,
                     $state,
                     hierarchiesStore,
-                    notification,
-                    orphanStore) {
+                    notification) {
 
     const vm = initialiseData(this, initialState);
 
@@ -76,39 +74,7 @@ function controller($q,
     };
 
 
-    vm.showOrphans = (values) => {
-        vm.selectedOrphanValues = values;
-    };
-
-
-    const loadOrphans = () => {
-        $q
-            .all([orphanStore.findAppsWithNonExistentOrgUnits(),
-                orphanStore.findOrphanAppCaps(),
-                orphanStore.findOrphanAuthoritativeSourcesByOrgUnit(),
-                orphanStore.findOrphanAuthoritativeSourcesByApp(),
-                orphanStore.findOrphanAuthoritativeSourcesByDataType(),
-            ])
-            .then( ([apps,
-                appCaps,
-                authSourcesByOrgUnit,
-                authSourcesByApp,
-                authSourcesByDataType
-            ]) => {
-                const orphans = [
-                    {description: 'Applications referencing non existent Org Units', values: apps},
-                    {description: 'Application Capabilities mapping to non existent Functions or Apps', values: appCaps},
-                    {description: 'Authoritative Sources with non-existent Org Unit', values: authSourcesByOrgUnit},
-                    {description: 'Authoritative Sources with non-existent Application', values: authSourcesByApp},
-                    {description: 'Authoritative Sources with non-existent Data Type', values: authSourcesByDataType}
-                ];
-                vm.orphans = orphans;
-            });
-
-    }
-
     loadTallies();
-    loadOrphans();
 }
 
 
@@ -117,7 +83,6 @@ controller.$inject = [
     '$state',
     'HierarchiesStore',
     'Notification',
-    'OrphanStore'
 ];
 
 

@@ -22,6 +22,13 @@ const hierarchiesState = {
     views: { 'content@': require('./hierarchies-view') }
 };
 
+
+const orphansState = {
+    url: '/orphans',
+    views: { 'content@': require('./orphans-view') }
+};
+
+
 const recalculateState = {
     url: '/recalculate',
     views: { 'content@': require('./recalculate-view') }
@@ -34,6 +41,7 @@ function setupRoutes($stateProvider) {
         .state('main.system.list', listViewState)
         .state('main.system.settings', settingsState)
         .state('main.system.hierarchies', hierarchiesState)
+        .state('main.system.orphans', orphansState)
         .state('main.system.recalculate', recalculateState);
 }
 
