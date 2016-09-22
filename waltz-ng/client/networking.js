@@ -1,11 +1,11 @@
 import _ from "lodash";
 import namedSettings from "./system/named-settings";
 
-function run($http, settingsStore) {
+function run($http, settingsService) {
 
-    settingsStore.findAll()
+    settingsService.findAll()
         .then(settings => {
-            if (settingsStore.isDevModeEnabled(settings)) {
+            if (settingsService.isDevModeEnabled(settings)) {
                 console.log('Dev Extensions enabled');
                 _.chain(settings)
                     .filter(s => s.name.startsWith(namedSettings.httpHeaderPrefix))
@@ -21,7 +21,7 @@ function run($http, settingsStore) {
 
 run.$inject = [
     '$http',
-    'SettingsStore'
+    'SettingsService'
 ];
 
 

@@ -24,14 +24,14 @@ function getNavItemsFilteredByRole(userService, user, navItems) {
 }
 
 
-function controller(settingsStore, userService) {
+function controller(settingsService, userService) {
     const vm = initialiseData(this, initialState);
 
-    settingsStore
+    settingsService
         .findAll()
         .then(settings => {
-            vm.logoOverlayText = settingsStore.findOrDefault(settings, "ui.logo.overlay.text", "");
-            vm.logoOverlayColor = settingsStore.findOrDefault(settings, "ui.logo.overlay.color", "");
+            vm.logoOverlayText = settingsService.findOrDefault(settings, "ui.logo.overlay.text", "");
+            vm.logoOverlayColor = settingsService.findOrDefault(settings, "ui.logo.overlay.color", "");
         });
 
 
@@ -44,7 +44,7 @@ function controller(settingsStore, userService) {
 }
 
 
-controller.$inject = ['SettingsStore', 'UserService'];
+controller.$inject = ['SettingsService', 'UserService'];
 
 
 export default () => {
