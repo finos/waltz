@@ -12,30 +12,40 @@ function isBetaServer(settingsStore) {
 
     return settingsStore
         .findAll()
-        .then(settings => settingsStore.findOrDefault(settings, namedSettings.betaServer, false))
+        .then(settings => settingsStore.findOrDefault(settings, namedSettings.betaEnvironment, false))
         .then(isBeta => { return isBeta === 'true'; });
+}
+
+
+function getNagEnabled($q, userService, settingsStore) {
+
+    return $q.all( [ hasRole(userService, 'BETA_TESTER'), isBetaServer(settingsStore) ] )
+        .then( ([isBetaTester, isBetaServer]) => !isBetaTester && isBetaServer) ;
+}
+
+
+function getNagMessage(settingsStore) {
+    return settingsStore
+        .findAll()
+        .then(settings => settingsStore.findOrDefault(settings, namedSettings.betaNagMessage, ""));
 }
 
 
 function service($q, settingsStore, userService) {
 
-    const getNagEnabled = () => {
-
-        return $q.all( [ hasRole(userService, 'BETA_TESTER'), isBetaServer(settingsStore) ] )
-            .then( ([isBetaTester, isBetaServer]) => !isBetaTester && isBetaServer) ;
-    };
-
-
-    const getNagMessage = () => {
-        return settingsStore
-            .findAll()
-            .then(settings => settingsStore.findOrDefault(settings, namedSettings.betaNagMessage, ""));
+    const setupNag = (nagFunction) => {
+        getNagEnabled($q, userService, settingsStore)
+            .then(nagEnabled => {
+                if(nagEnabled) {
+                    getNagMessage(settingsStore)
+                        .then(nagMessage => nagFunction(nagMessage));
+                }
+            });
     };
 
 
     return {
-        getNagEnabled,
-        getNagMessage
+        setupNag
     };
 }
 

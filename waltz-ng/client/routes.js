@@ -42,22 +42,13 @@ function configureBetaNagMessageNotification($rootScope,
                                              nagMessageService,
                                              notification) {
 
-    const setupNagNotification = (message = "") => {
+    const nagFunction = (message = "") => {
         $rootScope.$on('$stateChangeSuccess', () => {
             notification.info(message);
         });
     };
 
-
-    nagMessageService
-        .getNagEnabled()
-        .then(nagEnabled => {
-            if(nagEnabled) {
-                nagMessageService
-                    .getNagMessage()
-                    .then(nagMessage => setupNagNotification(nagMessage));
-            }
-        });
+    nagMessageService.setupNag(nagFunction);
 }
 
 
