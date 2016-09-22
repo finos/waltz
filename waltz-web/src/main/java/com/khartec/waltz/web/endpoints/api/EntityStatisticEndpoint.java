@@ -22,7 +22,6 @@ import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
 import com.khartec.waltz.model.entity_statistic.RollupKind;
 import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchy;
-import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import com.khartec.waltz.web.DatumRoute;
@@ -72,7 +71,7 @@ public class EntityStatisticEndpoint implements Endpoint {
     }
 
 
-    private List<StringTally> calculateStatTallyRoute(Request request, Response response) throws IOException {
+    private TallyPack<String> calculateStatTallyRoute(Request request, Response response) throws IOException {
         IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
         RollupKind rollupKind = readEnum(
                 request,
@@ -113,7 +112,7 @@ public class EntityStatisticEndpoint implements Endpoint {
         getForList(findAllActiveDefinitionsPath, findAllActiveDefinitionsRoute);
         postForList(findStatValuesBySelectorPath, findStatValuesForAppSelectorRoute);
         postForList(findStatTalliesPath, this::findStatTalliesRoute);
-        postForList(calculateStatTallyPath, this::calculateStatTallyRoute);
+        postForDatum(calculateStatTallyPath, this::calculateStatTallyRoute);
         getForDatum(findRelatedStatDefinitionsPath, findRelatedStatDefinitionsRoute);
         getForDatum(findDefinitionPath, findDefinitionRoute);
     }
