@@ -31,15 +31,48 @@ function configureScrollToTopOnChange($rootScope, $doc) {
     });
 }
 
+
 configureScrollToTopOnChange.$inject = [
     '$rootScope',
     '$document'
 ];
 
 
+function configureBetaNagMessageNotification($rootScope,
+                                             nagMessageService,
+                                             notification) {
+
+    const setupNagNotification = (message = "") => {
+        $rootScope.$on('$stateChangeSuccess', () => {
+            notification.info(message);
+        });
+    };
+
+
+    nagMessageService
+        .getNagEnabled()
+        .then(nagEnabled => {
+            if(nagEnabled) {
+                nagMessageService
+                    .getNagMessage()
+                    .then(nagMessage => setupNagNotification(nagMessage));
+            }
+        });
+}
+
+
+configureBetaNagMessageNotification.$inject = [
+    '$rootScope',
+    'NagMessageService',
+    'Notification'
+];
+
+
 function setup(module) {
     module.config(configureRoutes);
-    module.run(configureScrollToTopOnChange);
+    module
+        .run(configureScrollToTopOnChange)
+        .run(configureBetaNagMessageNotification);
 }
 
 
