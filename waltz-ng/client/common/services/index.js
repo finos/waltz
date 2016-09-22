@@ -46,9 +46,10 @@ const iconNameService = new BaseLookupService();
 const descriptionService = new BaseLookupService();
 
 export default (module) => {
-    module.service('WaltzDisplayNameService', () => displayNameService);
-    module.service('WaltzIconNameService', () => iconNameService);
-    module.service('WaltzDescriptionService', () => descriptionService);
+    module
+        .service('WaltzDisplayNameService', () => displayNameService)
+        .service('WaltzIconNameService', () => iconNameService)
+        .service('WaltzDescriptionService', () => descriptionService);
 
     displayNameService.register('applicationKind', applicationKindDisplayNames);
     displayNameService.register('assetCost', assetCostKindNames);

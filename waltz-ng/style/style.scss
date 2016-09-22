@@ -15,6 +15,23 @@ $fa-font-path: "../node_modules/font-awesome/fonts";
 @import "../node_modules/ng-tags-input/build/ng-tags-input.bootstrap.min.css";
 @import "../node_modules/angular-ui-notification/dist/angular-ui-notification.min.css";
 @import "../node_modules/angular-tree-control/css/tree-control.css";
+@import "../node_modules/intro.js/introjs.css";
+
+/** Prevent the extra box with intro js - it doesn't work well when the page-header resizes */
+.introjs-helperLayer {
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 0;
+    background-color: inherit;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -ms-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+}
 
 @import "util";
 @import "waltz";

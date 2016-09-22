@@ -26,7 +26,8 @@ function controller($scope,
                     viewDataService,
                     dataFlowService,
                     dataTypeUsageStore,
-                    historyStore) {
+                    historyStore,
+                    tourService) {
 
     const vm = initialiseData(this, initialState);
 
@@ -60,7 +61,10 @@ function controller($scope,
     viewDataService
         .loadAll(dataType.id)
         .then(data => vm.rawViewData = data)
-        .then(d => refresh());
+        .then(d => refresh())
+        .then(() => tourService.initialiseForKey('main.data-type.view', true))
+        .then(tour => vm.tour = tour);
+
 
     dataFlowService
         .initialise(selector)
@@ -80,7 +84,8 @@ controller.$inject = [
     'DataTypeViewDataService',
     'DataFlowViewService',
     'DataTypeUsageStore',
-    'HistoryStore'
+    'HistoryStore',
+    'TourService'
 ];
 
 

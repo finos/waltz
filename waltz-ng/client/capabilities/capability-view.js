@@ -138,6 +138,7 @@ function controller($q,
                     ratingStore,
                     sourceDataRatingStore,
                     techStatsService,
+                    tourService,
                     traitStore,
                     traitUsageStore) {
 
@@ -219,7 +220,10 @@ function controller($q,
             });
         })
         .then(() => dataFlowDecoratorStore.findBySelectorAndKind(appIdSelector, 'DATA_TYPE'))
-        .then((flowDecorators => vm.dataFlowDecorators = flowDecorators));
+        .then((flowDecorators => vm.dataFlowDecorators = flowDecorators))
+        .then(() => tourService.initialiseForKey('main.capability.view', true))
+        .then(tour => vm.tour = tour);
+
 
 
     appCapabilityStore.findAssociatedApplicationCapabilitiesByCapabilityId(capability.id)
@@ -296,6 +300,7 @@ controller.$inject = [
     'RatingStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService',
+    'TourService',
     'TraitStore',
     'TraitUsageStore'
 ];

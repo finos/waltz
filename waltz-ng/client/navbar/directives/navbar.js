@@ -3,12 +3,12 @@ import {initialiseData} from "../../common";
 
 
 const navItems = [
-    // { uiSref, icon, displayName, <role> }
-    { uiSref: 'main.org-unit.list', icon: 'sitemap', displayName: 'Org Units' },
-    { uiSref: 'main.capability.list', icon: 'puzzle-piece', displayName: 'Functions' },
-    { uiSref: 'main.process.list', icon: 'code-fork', displayName: 'Processes' },
-    { uiSref: 'main.person', icon: 'users', displayName: 'People' },
-    { uiSref: 'main.data-type.list', icon: 'qrcode', displayName: 'Data Types' }
+    // { uiSref, icon, displayName, <role>, id }
+    { uiSref: 'main.org-unit.list', icon: 'sitemap', displayName: 'Org Units', id: 'navbar-org-units' },
+    { uiSref: 'main.capability.list', icon: 'puzzle-piece', displayName: 'Functions', id: 'navbar-capabilities' },
+    { uiSref: 'main.process.list', icon: 'code-fork', displayName: 'Processes', id: 'navbar-processes' },
+    { uiSref: 'main.person', icon: 'users', displayName: 'People', id: 'navbar-people' },
+    { uiSref: 'main.data-type.list', icon: 'qrcode', displayName: 'Data Types', id: 'navbar-data-types' }
 ];
 
 

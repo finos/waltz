@@ -15,9 +15,17 @@ function store($http, BaseApiUrl) {
 
     const findAllForUser = () => $http.get(`${BASE}`).then(r => r.data);
 
+    /**
+     * preference -> [ preferences... ]
+     * @param preference
+     */
     const saveForUser = (preference) => $http.post(`${BASE}/save`, preference)
         .then(r => r.data);
 
+    /**
+     * [ preferences ... ] -> [ preferences... ]
+     * @param preferences
+     */
     const saveAllForUser = (preferences) => $http.post(`${BASE}/save-all`, preferences)
         .then(r => r.data);
 

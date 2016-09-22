@@ -11,20 +11,28 @@
  */
 
 import angular from 'angular';
+import {initialiseData} from '../common';
 
-const BINDINGS = {
+const bindings = {
     name: '@',
     icon: '@',
-    small: '@'
+    small: '@',
+    tour: '<'
 };
 
 
-function controller($anchorScroll,
-                    $document,
-                    $location,
+const transclude = true;
+
+
+const initialState = {
+
+};
+
+
+function controller($document,
                     $scope,
                     $window) {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     vm.sticky = false;
 
@@ -39,31 +47,31 @@ function controller($anchorScroll,
             $scope.$apply();
         });
 
-
-    vm.goTo = (sectionId) => {
-        $location.hash(sectionId);
-        $anchorScroll();
+    vm.startTour = () => {
+        if (vm.tour) {
+            vm.tour.start();
+        }
     };
+
 }
 
 
 controller.$inject=[
-    '$anchorScroll',
     '$document',
-    '$location',
     '$scope',
     '$window'
 ];
 
 
-export default () => ({
-    restrict: 'E',
-    replace: false,
-    template: require('./page-header.html'),
-    scope: {},
-    bindToController: BINDINGS,
+const template = require('./page-header.html');
+
+
+const component = {
+    bindings,
+    template,
     controller,
-    controllerAs: 'ctrl',
-    transclude: true
-});
+    transclude
+};
+
+export default component;
 
