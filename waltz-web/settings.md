@@ -1,9 +1,16 @@
+
 # Settings
 
 ## Presentation
 
 * ```ui.logo.overlay.text``` - optional text to overlay on the logo, keep it short
 * ```ui.logo.overlay.color``` - colour used to render the optional overlay on the logo
+
+Use these settings to let users know if they are on a beta instance. 
+
+* ```web.beta``` - is this instance of waltz running beta code (```true | false```)
+* ```web.beta.nag-message``` - the message to display if non-beta user on a beta environment
+
 
 ## Security
 
