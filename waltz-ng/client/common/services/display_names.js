@@ -101,7 +101,8 @@ export const entityNames = {
     PERSON: 'Person',
     PROCESS: 'Process',
     SERVER: 'Server',
-    SOFTWARE: 'Software'
+    SOFTWARE: 'Software',
+    SYSTEM: 'System'
 };
 
 

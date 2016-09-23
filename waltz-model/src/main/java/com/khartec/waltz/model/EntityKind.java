@@ -40,6 +40,7 @@ public enum EntityKind {
     PERSON,
     PROCESS,
     SERVER,
-    SOFTWARE
+    SOFTWARE,
+    SYSTEM
 
 }
