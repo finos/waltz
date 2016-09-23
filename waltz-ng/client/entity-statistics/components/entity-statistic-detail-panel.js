@@ -39,10 +39,11 @@ function controller() {
 
     vm.$onChanges = () => {
         vm.pie = mkStatChartData(
-            vm.summary,
+            vm.summary ? vm.summary.tallies : [],
             pieClickHandler);
 
         vm.tableHeadings = mkSummaryTableHeadings(vm.definition);
+        vm.lastUpdatedAt = vm.summary ? vm.summary.lastUpdatedAt : '';
     }
 }
 

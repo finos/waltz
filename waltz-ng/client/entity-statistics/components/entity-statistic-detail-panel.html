@@ -14,9 +14,19 @@
             </waltz-pie-segment-table>
         </div>
     </div>
-    <div class="small text-muted"
-         style="padding-bottom: 12px"
-         ng-bind="$ctrl.definition.description">
+    <div class="row"
+         style="padding-bottom: 12px">
+        <div class="col-md-8">
+            <span class="small text-muted"
+                 ng-bind="$ctrl.definition.description">
+            </span>
+        </div>
+        <div class="col-md-3 col-md-offset-1">
+            <span class="small text-muted">
+                <strong>Updated:</strong>
+                <waltz-from-now timestamp="$ctrl.lastUpdatedAt"></waltz-from-now>
+            </span>
+        </div>
     </div>
 
     <waltz-entity-statistic-detail-table statistic-values="$ctrl.values"

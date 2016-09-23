@@ -5,7 +5,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.tally.ImmutableStringTally;
 import com.khartec.waltz.model.tally.ImmutableTallyPack;
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.tally.TallyPack;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -13,14 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
+import static java.util.stream.Collectors.*;
+import static org.jooq.impl.DSL.max;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class EntityStatisticSummaryDao {
@@ -32,6 +35,7 @@ public class EntityStatisticSummaryDao {
     private static final Field<Integer> countTotal = DSL.count();
     private static final Function<BigDecimal, Double> toBigDecimalTally = v -> v.doubleValue();
     private static final Function<Integer, Double> toIntegerTally = v -> v.doubleValue();
+    private static final Field<Timestamp> maxCreatedAtField = DSL.field("max_created_at", Timestamp.class);
 
     private final DSLContext dsl;
 
@@ -43,7 +47,7 @@ public class EntityStatisticSummaryDao {
     }
 
 
-    public List<StringTally> generateWithAvgByValue(Long statisticId, Select<Record1<Long>> appIdSelector) {
+    public TallyPack<String> generateWithAvgByValue(Long statisticId, Select<Record1<Long>> appIdSelector) {
         return generateSummary(statisticId, appIdSelector, avgTotal, toBigDecimalTally);
     }
 
@@ -53,7 +57,7 @@ public class EntityStatisticSummaryDao {
     }
 
 
-    public List<StringTally> generateWithSumByValue(Long statisticId, Select<Record1<Long>> appIdSelector) {
+    public TallyPack<String> generateWithSumByValue(Long statisticId, Select<Record1<Long>> appIdSelector) {
         return generateSummary(statisticId, appIdSelector, sumTotal, toBigDecimalTally);
     }
 
@@ -68,7 +72,7 @@ public class EntityStatisticSummaryDao {
     }
 
 
-    public List<StringTally> generateWithCountByEntity(Long statisticId, Select<Record1<Long>> appIdSelector) {
+    public TallyPack<String> generateWithCountByEntity(Long statisticId, Select<Record1<Long>> appIdSelector) {
         return generateSummary(statisticId, appIdSelector, countTotal, toIntegerTally);
     }
 
@@ -79,16 +83,26 @@ public class EntityStatisticSummaryDao {
                 .and(esv.ENTITY_ID.eq(entityReference.id()))
                 .and(esv.CURRENT.eq(true));
 
-        Select<Record3<Long, String, String>> values = dsl
-                .select(esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE)
+        Result<Record4<Long, String, String, Timestamp>> values = dsl
+                .select(esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE, max(esv.CREATED_AT).as(maxCreatedAtField))
                 .from(esv)
-                .where(dsl.renderInlined(condition));
+                .where(dsl.renderInlined(condition))
+                .groupBy(esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE)
+                .fetch();
 
-        return values.fetch()
-                .intoGroups(esv.STATISTIC_ID, r -> ImmutableStringTally.builder()
-                        .count(Double.parseDouble(r.getValue(esv.VALUE)))
-                        .id(r.getValue(esv.OUTCOME))
-                        .build())
+        Map<Long, Optional<Timestamp>> statIdToMaxCreatedAt = values.stream()
+                .map(r -> tuple(r.getValue(esv.STATISTIC_ID), r.getValue(maxCreatedAtField)))
+                .collect(groupingBy(t -> t.v1(),
+                            mapping(t -> t.v2(),
+                                    maxBy(Timestamp::compareTo))));
+
+        return values.stream()
+                .collect(groupingBy(r -> r.getValue(esv.STATISTIC_ID),
+                         mapping(r -> ImmutableStringTally.builder()
+                                    .count(Double.parseDouble(r.getValue(esv.VALUE)))
+                                    .id(r.getValue(esv.OUTCOME))
+                                    .build(),
+                                 toList())))
                 .entrySet()
                 .stream()
                 .map(entry -> ImmutableTallyPack.<String>builder()
@@ -97,33 +111,45 @@ public class EntityStatisticSummaryDao {
                                 .id(entry.getKey())
                                 .build())
                         .tallies(entry.getValue())
+                        .lastUpdatedAt(getMaxCreatedAt(statIdToMaxCreatedAt, entry.getKey()))
                         .build())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
 
-    public List<StringTally> generateWithNoRollup(Long statisticId, EntityReference entityReference) {
+    public TallyPack<String> generateWithNoRollup(Long statisticId, EntityReference entityReference) {
         Condition condition = esv.STATISTIC_ID.eq(statisticId)
                 .and(esv.ENTITY_KIND.eq(entityReference.kind().name()))
                 .and(esv.ENTITY_ID.eq(entityReference.id()))
                 .and(esv.CURRENT.eq(true));
 
-        Select<Record3<Long, String, String>> values = dsl
-                .select(esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE)
+        Result<Record4<Long, String, String, Timestamp>> values = dsl
+                .select(esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE, max(esv.CREATED_AT).as(maxCreatedAtField))
                 .from(esv)
-                .where(dsl.renderInlined(condition));
+                .where(dsl.renderInlined(condition))
+                .groupBy(esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE)
+                .fetch();
 
-        return values.fetch()
-                .stream()
+        LocalDateTime maxCreatedAt = values.isNotEmpty()
+                                    ? values.get(0).getValue(maxCreatedAtField).toLocalDateTime()
+                                    : nowUtc();
+
+        List<Tally<String>> tallies = values.stream()
                 .map(r -> ImmutableStringTally.builder()
                         .count(Double.parseDouble(r.getValue(esv.VALUE)))
                         .id(r.getValue(esv.OUTCOME))
                         .build())
-                .collect(Collectors.toList());
+                .collect(toList());
+
+        return ImmutableTallyPack.<String>builder()
+                .entityReference(EntityReference.mkRef(EntityKind.ENTITY_STATISTIC, statisticId))
+                .tallies(tallies)
+                .lastUpdatedAt(maxCreatedAt)
+                .build();
     }
 
 
-    private <T> List<StringTally> generateSummary(
+    private <T> TallyPack<String> generateSummary(
             Long statisticId,
             Select<Record1<Long>> appIdSelector,
             Field<T> aggregateField,
@@ -134,17 +160,30 @@ public class EntityStatisticSummaryDao {
                 .and(esv.ENTITY_ID.in(appIdSelector))
                 .and(esv.CURRENT.eq(true));
 
-        return dsl.select(esv.OUTCOME, aggregateField)
+        Result<Record3<String, T, Timestamp>> values = dsl
+                .select(esv.OUTCOME, aggregateField, max(esv.CREATED_AT).as(maxCreatedAtField))
                 .from(esv)
                 .where(condition)
                 .groupBy(esv.OUTCOME)
-                .fetch()
+                .fetch();
+
+        LocalDateTime maxCreatedAt = values.isNotEmpty()
+                                        ? values.get(0).getValue(maxCreatedAtField).toLocalDateTime()
+                                        : nowUtc();
+
+        List<Tally<String>> tallies = values
                 .stream()
                 .map(r -> ImmutableStringTally.builder()
                         .count(toTally.apply(r.getValue(aggregateField)))
                         .id(r.getValue(esv.OUTCOME))
                         .build())
-                .collect(Collectors.toList());
+                .collect(toList());
+
+        return ImmutableTallyPack.<String>builder()
+                .entityReference(EntityReference.mkRef(EntityKind.ENTITY_STATISTIC, statisticId))
+                .tallies(tallies)
+                .lastUpdatedAt(maxCreatedAt)
+                .build();
     }
 
 
@@ -167,18 +206,26 @@ public class EntityStatisticSummaryDao {
                 .and(esv.ENTITY_ID.in(appIdSelector))
                 .and(esv.CURRENT.eq(true));
 
-
-        SelectHavingStep<Record3<Long, String, T>> aggregates = dsl
-                .select(esv.STATISTIC_ID, esv.OUTCOME, aggregateField)
+        Result<Record4<Long, String, T, Timestamp>> aggregates = dsl
+                .select(esv.STATISTIC_ID, esv.OUTCOME, aggregateField, max(esv.CREATED_AT).as(maxCreatedAtField))
                 .from(esv)
                 .where(dsl.renderInlined(condition))
-                .groupBy(esv.STATISTIC_ID, esv.OUTCOME);
+                .groupBy(esv.STATISTIC_ID, esv.OUTCOME)
+                .fetch();
 
-        return aggregates.fetch()
-                .intoGroups(esv.STATISTIC_ID, r -> ImmutableStringTally.builder()
-                        .count(toTally.apply(r.getValue(aggregateField)))
-                        .id(r.getValue(esv.OUTCOME))
-                        .build())
+        Map<Long, Optional<Timestamp>> statIdToMaxCreatedAt = aggregates.stream()
+                .map(r -> tuple(r.getValue(esv.STATISTIC_ID), r.getValue(maxCreatedAtField)))
+                .collect(groupingBy(t -> t.v1(),
+                         mapping(t -> t.v2(),
+                                 maxBy(Timestamp::compareTo))));
+
+        return aggregates.stream()
+                .collect(groupingBy(r -> r.getValue(esv.STATISTIC_ID),
+                         mapping(r -> ImmutableStringTally.builder()
+                                    .count(toTally.apply(r.getValue(aggregateField)))
+                                    .id(r.getValue(esv.OUTCOME))
+                                    .build(),
+                                toList())))
                 .entrySet()
                 .stream()
                 .map(entry -> ImmutableTallyPack.<String>builder()
@@ -187,8 +234,16 @@ public class EntityStatisticSummaryDao {
                                 .id(entry.getKey())
                                 .build())
                         .tallies(entry.getValue())
+                        .lastUpdatedAt(getMaxCreatedAt(statIdToMaxCreatedAt, entry.getKey()))
                         .build())
-                .collect(Collectors.toList());
+                .collect(toList());
+    }
+
+
+    private LocalDateTime getMaxCreatedAt(Map<Long, Optional<Timestamp>> statIdToMaxCreatedAt, Long statisticId) {
+        return statIdToMaxCreatedAt.get(statisticId)
+                        .map(t -> t.toLocalDateTime())
+                        .orElse(nowUtc());
     }
 
 }

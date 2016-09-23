@@ -14,7 +14,6 @@ import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
 import com.khartec.waltz.model.entity_statistic.RollupKind;
 import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchy;
 import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchyUtilities;
-import com.khartec.waltz.model.tally.StringTally;
 import com.khartec.waltz.model.tally.TallyPack;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -117,7 +116,7 @@ public class EntityStatisticService {
     }
 
 
-    public List<StringTally> calculateStatTally(Long statisticId, RollupKind rollupKind, IdSelectionOptions options) {
+    public TallyPack<String> calculateStatTally(Long statisticId, RollupKind rollupKind, IdSelectionOptions options) {
         Checks.checkNotNull(statisticId, "statisticId cannot be null");
         Checks.checkNotNull(options, "options cannot be null");
         Checks.checkNotNull(rollupKind, "rollupKind cannot be null");
