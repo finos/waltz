@@ -11,8 +11,7 @@ function hasRole(userService, role) {
 function isBetaServer(settingsService) {
 
     return settingsService
-        .findAll()
-        .then(settings => settingsService.findOrDefault(settings, namedSettings.betaEnvironment, false))
+        .findOrDefault(namedSettings.betaEnvironment, false)
         .then(isBeta => { return isBeta === 'true'; });
 }
 
@@ -26,8 +25,7 @@ function getNagEnabled($q, userService, settingsService) {
 
 function getNagMessage(settingsService) {
     return settingsService
-        .findAll()
-        .then(settings => settingsService.findOrDefault(settings, namedSettings.betaNagMessage, ""));
+        .findOrDefault(namedSettings.betaNagMessage, "You are using a test server, data will not be preserved");
 }
 
 

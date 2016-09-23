@@ -3,17 +3,25 @@ import namedSettings from "./system/named-settings";
 
 function run($http, settingsService) {
 
-    settingsService.findAll()
-        .then(settings => {
-            if (settingsService.isDevModeEnabled(settings)) {
-                console.log('Dev Extensions enabled');
-                _.chain(settings)
-                    .filter(s => s.name.startsWith(namedSettings.httpHeaderPrefix))
-                    .each(s => {
-                        const headerName = s.name.replace(namedSettings.httpHeaderPrefix, '');
-                        $http.defaults.headers.common[headerName] = s.value;
+    settingsService
+        .isDevModeEnabled()
+        .then(devModeEnabled => {
+            if (devModeEnabled) {
+
+                settingsService.findAll()
+                    .then(settings => {
+
+                        console.log('Dev Extensions enabled');
+                        _.chain(settings)
+                            .filter(s => s.name.startsWith(namedSettings.httpHeaderPrefix))
+                            .each(s => {
+                                const headerName = s.name.replace(namedSettings.httpHeaderPrefix, '');
+                                $http.defaults.headers.common[headerName] = s.value;
+                            })
+                            .value()
+
                     })
-                    .value()
+
             }
         });
 

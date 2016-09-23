@@ -14,18 +14,18 @@ function service(settingsStore) {
     };
 
 
-    const findOrDefault = (settings, name = "", dflt = null) => {
-        if (!_.isArray(settings)) {
-            throw "First argument to findOrDefault must be an array of settings";
-        }
-        const found = _.find(settings, { name });
-        return found ? found.value : dflt;
+    const findOrDefault = (name = "", dflt = null) => {
+        return findAll()
+            .then(settings => {
+                const found = _.find(settings, { name });
+                return found ? found.value : dflt;
+        });
     };
 
 
-    const isDevModeEnabled = (settings) => {
-        const devModeEnabled = findOrDefault(settings, namedSettings.devExtEnabled, false);
-        return 'true' === devModeEnabled
+    const isDevModeEnabled = () => {
+        return findOrDefault(namedSettings.devExtEnabled, false)
+            .then(devModeEnabled => 'true' === devModeEnabled );
     };
 
 

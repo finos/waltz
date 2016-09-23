@@ -45,9 +45,9 @@ function controller($state,
     const vm = _.defaultsDeep(this, initialState);
 
     settingsService
-        .findAll()
-        .then(settings => {
-            vm.allowDirectLogin = settingsService.findOrDefault(settings, 'web.authentication', "") === 'waltz';
+        .findOrDefault('web.authentication', "")
+        .then(webAuthentication => {
+            vm.allowDirectLogin = webAuthentication === 'waltz';
         });
 
     userService

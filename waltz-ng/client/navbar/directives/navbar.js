@@ -28,12 +28,12 @@ function controller(settingsService, userService) {
     const vm = initialiseData(this, initialState);
 
     settingsService
-        .findAll()
-        .then(settings => {
-            vm.logoOverlayText = settingsService.findOrDefault(settings, "ui.logo.overlay.text", "");
-            vm.logoOverlayColor = settingsService.findOrDefault(settings, "ui.logo.overlay.color", "");
-        });
+        .findOrDefault("ui.logo.overlay.text", "")
+        .then(setting => vm.logoOverlayText = setting);
 
+    settingsService
+        .findOrDefault("ui.logo.overlay.color", "")
+        .then(setting => vm.logoOverlayColor = setting);
 
     userService
         .whoami()
