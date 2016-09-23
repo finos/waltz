@@ -6,6 +6,7 @@ import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticSummaryDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
+import com.khartec.waltz.model.Duration;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
@@ -132,6 +133,32 @@ public class EntityStatisticService {
                 return summaryDao.generateWithAvgByValue(statisticId, appIdSelector);
             case NONE:
                 return summaryDao.generateWithNoRollup(statisticId, options.entityReference());
+            default:
+                throw new UnsupportedOperationException(String.format("Rollup kind [%s] not supported.", rollupKind));
+        }
+    }
+
+
+    public List<TallyPack<String>> calculateHistoricStatTally(Long statisticId,
+                                                              RollupKind rollupKind,
+                                                              IdSelectionOptions options,
+                                                              Duration duration) {
+        Checks.checkNotNull(statisticId, "statisticId cannot be null");
+        Checks.checkNotNull(rollupKind, "rollupKind cannot be null");
+        Checks.checkNotNull(options, "options cannot be null");
+        Checks.checkNotNull(duration, "duration cannot be null");
+
+        Select<Record1<Long>> appIdSelector = factory.apply(options);
+
+        switch(rollupKind) {
+            case COUNT_BY_ENTITY:
+                return summaryDao.generateHistoricWithCountByEntity(statisticId, appIdSelector, duration);
+            case SUM_BY_VALUE:
+                return summaryDao.generateHistoricWithSumByValue(statisticId, appIdSelector, duration);
+            case AVG_BY_VALUE:
+                return summaryDao.generateHistoricWithAvgByValue(statisticId, appIdSelector, duration);
+            case NONE:
+                return summaryDao.generateHistoricWithNoRollup(statisticId, options.entityReference(), duration);
             default:
                 throw new UnsupportedOperationException(String.format("Rollup kind [%s] not supported.", rollupKind));
         }
