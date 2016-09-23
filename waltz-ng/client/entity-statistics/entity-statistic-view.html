@@ -18,14 +18,39 @@
     <div class="waltz-page-summary waltz-page-summary-attach">
 
         <div class="row">
-            <!-- SUMMARY -->
             <div class="col-md-8"
                  style="border-right: 2px solid #eee">
-                <waltz-entity-statistic-detail-panel definition='ctrl.statistic.definition'
-                                                     summary="ctrl.statistic.summary"
-                                                     values="ctrl.statistic.values"
-                                                     applications="ctrl.applications">
-                </waltz-entity-statistic-detail-panel>
+                <!-- CURRENT -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <waltz-entity-statistic-detail-panel definition='ctrl.statistic.definition'
+                                                             summary="ctrl.statistic.summary"
+                                                             values="ctrl.statistic.values"
+                                                             applications="ctrl.applications">
+                        </waltz-entity-statistic-detail-panel>
+                    </div>
+                </div>
+
+                <!-- HISTORY -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <hr>
+                        <h3>History</h3>
+                    </div>
+                </div>
+
+                <!-- RELATED -->
+                <div class="row">
+                    <div class="col-md-12"
+                         ng-if="ctrl.visibility.related">
+                        <hr>
+                        <h3>Related Indicators</h3>
+                        <waltz-related-entity-statistics-summaries definitions='ctrl.relatedDefinitions'
+                                                                   parent-ref="ctrl.parentRef"
+                                                                   summaries="ctrl.summaries">
+                        </waltz-related-entity-statistics-summaries>
+                    </div>
+                </div>
             </div>
 
             <!-- NAV -->
@@ -50,20 +75,6 @@
                 </p>
             </div>
 
-        </div>
-
-
-        <div class="row"
-             ng-if="ctrl.visibility.related">
-            <!-- RELATED -->
-            <div class="col-md-12">
-                <hr>
-                <h3>Related Indicators</h3>
-                <waltz-related-entity-statistics-summaries definitions='ctrl.relatedDefinitions'
-                                                           parent-ref="ctrl.parentRef"
-                                                           summaries="ctrl.summaries">
-                </waltz-related-entity-statistics-summaries>
-            </div>
         </div>
 
     </div>
