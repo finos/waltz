@@ -16,11 +16,11 @@ const BINDINGS = {
     expr: '@waltzHasSetting'
 };
 
-function controller(settingsStore) {
+function controller(settingsService) {
 
     const vm = this;
 
-    settingsStore
+    settingsService
         .findAll()
         .then(settings => {
             const [name, value] = vm.expr.split(/\s*=\s*/);
@@ -30,7 +30,7 @@ function controller(settingsStore) {
     vm.show = false;
 }
 
-controller.$inject = ['SettingsStore'];
+controller.$inject = ['SettingsService'];
 
 
 export default () => ({

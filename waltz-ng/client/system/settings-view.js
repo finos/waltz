@@ -1,10 +1,10 @@
-function controller(settingsStore) {
+function controller(settingsService) {
 
     const vm = this;
 
     vm.settings = [];
 
-    const load = (force = false) => settingsStore
+    const load = (force = false) => settingsService
         .findAll(force)
         .then(settings => vm.settings = settings);
 
@@ -16,7 +16,7 @@ function controller(settingsStore) {
 
 }
 
-controller.$inject = [ 'SettingsStore' ];
+controller.$inject = [ 'SettingsService' ];
 
 
 export default {

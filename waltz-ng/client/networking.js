@@ -1,19 +1,27 @@
 import _ from "lodash";
 import namedSettings from "./system/named-settings";
 
-function run($http, settingsStore) {
+function run($http, settingsService) {
 
-    settingsStore.findAll()
-        .then(settings => {
-            if (settingsStore.isDevModeEnabled(settings)) {
-                console.log('Dev Extensions enabled');
-                _.chain(settings)
-                    .filter(s => s.name.startsWith(namedSettings.httpHeaderPrefix))
-                    .each(s => {
-                        const headerName = s.name.replace(namedSettings.httpHeaderPrefix, '');
-                        $http.defaults.headers.common[headerName] = s.value;
+    settingsService
+        .isDevModeEnabled()
+        .then(devModeEnabled => {
+            if (devModeEnabled) {
+
+                settingsService.findAll()
+                    .then(settings => {
+
+                        console.log('Dev Extensions enabled');
+                        _.chain(settings)
+                            .filter(s => s.name.startsWith(namedSettings.httpHeaderPrefix))
+                            .each(s => {
+                                const headerName = s.name.replace(namedSettings.httpHeaderPrefix, '');
+                                $http.defaults.headers.common[headerName] = s.value;
+                            })
+                            .value()
+
                     })
-                    .value()
+
             }
         });
 
@@ -21,7 +29,7 @@ function run($http, settingsStore) {
 
 run.$inject = [
     '$http',
-    'SettingsStore'
+    'SettingsService'
 ];
 
 
