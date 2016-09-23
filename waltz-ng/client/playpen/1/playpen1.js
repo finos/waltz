@@ -5,27 +5,31 @@ const initData = {
 };
 
 
-const steps = [
+const data = [
     {
-        //element: '#step1 div',
-        intro: 'General blurb.',
-        // position: 'top'
+        tallies: [
+            { id:"A", count: 10},
+            { id:"B", count: 15},
+            { id:"C", count: 20},
+        ],
+        entityRef: { id: 10, kind: 'ENTITY_STATISTIC' },
+        lastUpdatedAt: new Date(2016, 9, 21)
     }, {
-        element: '#step1 div',
-        intro: 'More features, more fun.',
-        position: 'top'
+        tallies: [
+            { id:"A", count: 5},
+            { id:"B", count: 10},
+            { id:"C", count: 5},
+        ],
+        entityRef: { id: 10, kind: 'ENTITY_STATISTIC' },
+        lastUpdatedAt: new Date(2016, 9, 20)
     }, {
-        element: '#step2 div',
-        intro: 'Blah de blah',
-        position: 'top'
-    }, {
-        element: '#step3 div',
-        intro: 'Lah lah lah ',
-        position: 'top'
-    }, {
-        element: '#step4 div',
-        intro: 'Ho hom',
-        position: 'top'
+        tallies: [
+            { id:"A", count: 15},
+            { id:"B", count: 20},
+            { id:"C", count: 25},
+        ],
+        entityRef: { id: 10, kind: 'ENTITY_STATISTIC' },
+        lastUpdatedAt: new Date(2016, 9, 19)
     }
 ];
 
@@ -34,43 +38,7 @@ function controller(appStore, flowViewService, tourService) {
 
     const vm = Object.assign(this, initData);
 
-    //
-    tourService.initialiseWithSteps(steps);
-
-    const entityReference = {
-        id: 170,
-        kind: 'ORG_UNIT'
-    };
-
-    const selector = {
-        entityReference,
-        scope: 'CHILDREN'
-    };
-
-    appStore
-        .findBySelector(selector)
-        .then(apps => vm.applications = apps);
-
-    flowViewService
-        .initialise(selector)
-        .then(flowViewService.loadDetail)
-        .then(d => vm.flowData = d);
-
-    vm.loadDetail = () => {};
-
-    vm.options = {
-        graphTweakers: {
-            node: {
-                enter: (selection) => selection.on('click.app-click', d => console.log(d)),
-                update: _.identity,
-                exit: _.identity
-            }
-        }
-    };
-
-    vm.startTour = () => {
-        tourService.start();
-    };
+    vm.history = data;
 }
 
 
