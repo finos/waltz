@@ -18,14 +18,15 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
+import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.entity_statistic.RollupKind;
+import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
-import org.jooq.AggregateFunction;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
@@ -52,6 +53,7 @@ where statistic_id = 20010
 GROUP BY outcome;
          */
 
+        /*
         AggregateFunction<BigDecimal> summer = DSL.sum(DSL.cast(esv.VALUE, Long.class));
 
         dsl.select(esv.OUTCOME, summer)
@@ -61,7 +63,21 @@ GROUP BY outcome;
                 .fetch()
                 .forEach(System.out::println);
 
+*/
+        IdSelectionOptions selectionOptions = ImmutableIdSelectionOptions.builder()
+                .entityReference(EntityReference.mkRef(EntityKind.ORG_UNIT, 70))
+                .scope(HierarchyQueryScope.CHILDREN)
+                .build();
 
+        // count by value
+        List<TallyPack<String>> countByValueTallyPacks = service.calculateHistoricStatTally(10100L, RollupKind.COUNT_BY_ENTITY, selectionOptions, Duration.Week);
+        System.out.println(countByValueTallyPacks);
+        // sum by value
+        List<TallyPack<String>> sumByValueTallyPacks = service.calculateHistoricStatTally(20010L, RollupKind.SUM_BY_VALUE, selectionOptions, Duration.Year);
+        System.out.println(sumByValueTallyPacks);
+        // pre-computed
+        List<TallyPack<String>> preComputedTallyPacks = service.calculateHistoricStatTally(11000L, RollupKind.NONE, selectionOptions, Duration.Month);
+        System.out.println(preComputedTallyPacks);
         System.out.println("done");
     }
 

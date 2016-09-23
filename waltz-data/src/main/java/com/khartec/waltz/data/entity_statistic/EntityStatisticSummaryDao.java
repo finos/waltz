@@ -1,5 +1,6 @@
 package com.khartec.waltz.data.entity_statistic;
 
+import com.khartec.waltz.model.Duration;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -20,9 +22,10 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 import static java.util.stream.Collectors.*;
-import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.*;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
@@ -30,12 +33,13 @@ public class EntityStatisticSummaryDao {
 
     private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
 
-    private static final Field<BigDecimal> avgTotal = DSL.avg(DSL.cast(esv.VALUE, Long.class)).as("total");
-    private static final Field<BigDecimal> sumTotal = DSL.sum(DSL.cast(esv.VALUE, Long.class)).as("total");
+    private static final Field<BigDecimal> avgTotal = DSL.avg(cast(esv.VALUE, Long.class)).as("total");
+    private static final Field<BigDecimal> sumTotal = DSL.sum(cast(esv.VALUE, Long.class)).as("total");
     private static final Field<Integer> countTotal = DSL.count();
     private static final Function<BigDecimal, Double> toBigDecimalTally = v -> v.doubleValue();
     private static final Function<Integer, Double> toIntegerTally = v -> v.doubleValue();
     private static final Field<Timestamp> maxCreatedAtField = DSL.field("max_created_at", Timestamp.class);
+    private static final Field<java.sql.Date> esvCreatedAtDateOnly = cast(esv.CREATED_AT, java.sql.Date.class).as("esv_created_at_date_only");
 
     private final DSLContext dsl;
 
@@ -57,6 +61,13 @@ public class EntityStatisticSummaryDao {
     }
 
 
+    public List<TallyPack<String>> generateHistoricWithAvgByValue(Long statisticId,
+                                                                  Select<Record1<Long>> appIdSelector,
+                                                                  Duration duration) {
+        return generateHistoricSummary(statisticId, appIdSelector, avgTotal, toBigDecimalTally, duration);
+    }
+
+
     public TallyPack<String> generateWithSumByValue(Long statisticId, Select<Record1<Long>> appIdSelector) {
         return generateSummary(statisticId, appIdSelector, sumTotal, toBigDecimalTally);
     }
@@ -67,8 +78,10 @@ public class EntityStatisticSummaryDao {
     }
 
 
-    public List<TallyPack<String>> generateWithCountByEntity(Collection<Long> statisticIds, Select<Record1<Long>> appIdSelector) {
-        return generateSummaries(statisticIds, appIdSelector, countTotal, toIntegerTally);
+    public List<TallyPack<String>> generateHistoricWithSumByValue(Long statisticId,
+                                                                  Select<Record1<Long>> appIdSelector,
+                                                                  Duration duration) {
+        return generateHistoricSummary(statisticId, appIdSelector, sumTotal, toBigDecimalTally, duration);
     }
 
 
@@ -77,11 +90,22 @@ public class EntityStatisticSummaryDao {
     }
 
 
-    public List<TallyPack<String>> generateWithNoRollup(Collection<Long> statisticIds, EntityReference entityReference) {
-        Condition condition = esv.STATISTIC_ID.in(statisticIds)
-                .and(esv.ENTITY_KIND.eq(entityReference.kind().name()))
-                .and(esv.ENTITY_ID.eq(entityReference.id()))
-                .and(esv.CURRENT.eq(true));
+    public List<TallyPack<String>> generateWithCountByEntity(Collection<Long> statisticIds, Select<Record1<Long>> appIdSelector) {
+        return generateSummaries(statisticIds, appIdSelector, countTotal, toIntegerTally);
+    }
+
+
+    public List<TallyPack<String>> generateHistoricWithCountByEntity(Long statisticId,
+                                                                     Select<Record1<Long>> appIdSelector,
+                                                                     Duration duration) {
+        return generateHistoricSummary(statisticId, appIdSelector, countTotal, toIntegerTally, duration);
+    }
+
+
+    public List<TallyPack<String>> generateWithNoRollup(Collection<Long> statisticIds,
+                                                        EntityReference entityReference) {
+
+        Condition condition = mkNoRollupCondition(statisticIds, entityReference, true);
 
         Result<Record4<Long, String, String, Timestamp>> values = dsl
                 .select(esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE, max(esv.CREATED_AT).as(maxCreatedAtField))
@@ -98,11 +122,11 @@ public class EntityStatisticSummaryDao {
 
         return values.stream()
                 .collect(groupingBy(r -> r.getValue(esv.STATISTIC_ID),
-                         mapping(r -> ImmutableStringTally.builder()
-                                    .count(Double.parseDouble(r.getValue(esv.VALUE)))
-                                    .id(r.getValue(esv.OUTCOME))
-                                    .build(),
-                                 toList())))
+                             mapping(r -> ImmutableStringTally.builder()
+                                        .count(Double.parseDouble(r.getValue(esv.VALUE)))
+                                        .id(r.getValue(esv.OUTCOME))
+                                        .build(),
+                                     toList())))
                 .entrySet()
                 .stream()
                 .map(entry -> ImmutableTallyPack.<String>builder()
@@ -118,10 +142,7 @@ public class EntityStatisticSummaryDao {
 
 
     public TallyPack<String> generateWithNoRollup(Long statisticId, EntityReference entityReference) {
-        Condition condition = esv.STATISTIC_ID.eq(statisticId)
-                .and(esv.ENTITY_KIND.eq(entityReference.kind().name()))
-                .and(esv.ENTITY_ID.eq(entityReference.id()))
-                .and(esv.CURRENT.eq(true));
+        Condition condition = mkNoRollupCondition(newArrayList(statisticId), entityReference, true);
 
         Result<Record4<Long, String, String, Timestamp>> values = dsl
                 .select(esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE, max(esv.CREATED_AT).as(maxCreatedAtField))
@@ -149,16 +170,47 @@ public class EntityStatisticSummaryDao {
     }
 
 
-    private <T> TallyPack<String> generateSummary(
-            Long statisticId,
-            Select<Record1<Long>> appIdSelector,
-            Field<T> aggregateField,
-            Function<T, Double> toTally) {
+    public List<TallyPack<String>> generateHistoricWithNoRollup(Long statisticId,
+                                                                EntityReference entityReference,
+                                                                Duration duration) {
 
-        Condition condition = esv.STATISTIC_ID.eq(statisticId)
-                .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(esv.ENTITY_ID.in(appIdSelector))
-                .and(esv.CURRENT.eq(true));
+        Condition condition = mkNoRollupCondition(newArrayList(statisticId), entityReference, false);
+
+        Result<Record4<java.sql.Date, Long, String, String>> values = dsl
+                .select(esvCreatedAtDateOnly, esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE)
+                .from(esv)
+                .where(dsl.renderInlined(condition))
+                .and(cast(esv.CREATED_AT, Date.class).gt(currentDate().minus(duration.numDays())))
+                .groupBy(esvCreatedAtDateOnly, esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE)
+                .fetch();
+
+        return values
+                .stream()
+                .map(r -> tuple(r.getValue(esvCreatedAtDateOnly),
+                                ImmutableStringTally.builder()
+                                        .count(Double.parseDouble(r.getValue(esv.VALUE)))
+                                        .id(r.getValue(esv.OUTCOME))
+                                        .build()))
+                .collect(groupingBy(t -> t.v1().toLocalDate(),
+                             mapping(t -> t.v2(),
+                                     toList())))
+                .entrySet()
+                .stream()
+                .map(e -> ImmutableTallyPack.<String>builder()
+                        .entityReference(EntityReference.mkRef(EntityKind.ENTITY_STATISTIC, statisticId))
+                        .tallies(e.getValue())
+                        .lastUpdatedAt(e.getKey().atStartOfDay())
+                        .build())
+                .collect(toList());
+    }
+
+
+    private <T> TallyPack<String> generateSummary(Long statisticId,
+                                                  Select<Record1<Long>> appIdSelector,
+                                                  Field<T> aggregateField,
+                                                  Function<T, Double> toTally) {
+
+        Condition condition = mkSummaryCondition(newArrayList(statisticId), appIdSelector, true);
 
         Result<Record3<String, T, Timestamp>> values = dsl
                 .select(esv.OUTCOME, aggregateField, max(esv.CREATED_AT).as(maxCreatedAtField))
@@ -188,9 +240,9 @@ public class EntityStatisticSummaryDao {
 
 
     private <T> List<TallyPack<String>> generateSummaries(Collection<Long> statisticIds,
-                                                      Select<Record1<Long>> appIdSelector,
-                                                      Field<T> aggregateField,
-                                                      Function<T, Double> toTally) {
+                                                          Select<Record1<Long>> appIdSelector,
+                                                          Field<T> aggregateField,
+                                                          Function<T, Double> toTally) {
 
         checkNotNull(statisticIds, "statisticIds cannot be null");
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
@@ -201,10 +253,7 @@ public class EntityStatisticSummaryDao {
             return Collections.emptyList();
         }
 
-        Condition condition = esv.STATISTIC_ID.in(statisticIds)
-                .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(esv.ENTITY_ID.in(appIdSelector))
-                .and(esv.CURRENT.eq(true));
+        Condition condition = mkSummaryCondition(statisticIds, appIdSelector, true);
 
         Result<Record4<Long, String, T, Timestamp>> aggregates = dsl
                 .select(esv.STATISTIC_ID, esv.OUTCOME, aggregateField, max(esv.CREATED_AT).as(maxCreatedAtField))
@@ -221,11 +270,11 @@ public class EntityStatisticSummaryDao {
 
         return aggregates.stream()
                 .collect(groupingBy(r -> r.getValue(esv.STATISTIC_ID),
-                         mapping(r -> ImmutableStringTally.builder()
-                                    .count(toTally.apply(r.getValue(aggregateField)))
-                                    .id(r.getValue(esv.OUTCOME))
-                                    .build(),
-                                toList())))
+                             mapping(r -> ImmutableStringTally.builder()
+                                        .count(toTally.apply(r.getValue(aggregateField)))
+                                        .id(r.getValue(esv.OUTCOME))
+                                        .build(),
+                                     toList())))
                 .entrySet()
                 .stream()
                 .map(entry -> ImmutableTallyPack.<String>builder()
@@ -237,6 +286,63 @@ public class EntityStatisticSummaryDao {
                         .lastUpdatedAt(getMaxCreatedAt(statIdToMaxCreatedAt, entry.getKey()))
                         .build())
                 .collect(toList());
+    }
+
+
+    private <T> List<TallyPack<String>> generateHistoricSummary(Long statisticId,
+                                                                Select<Record1<Long>> appIdSelector,
+                                                                Field<T> aggregateField,
+                                                                Function<T, Double> toTally,
+                                                                Duration duration) {
+
+        Condition condition = mkSummaryCondition(newArrayList(statisticId), appIdSelector, false);
+
+        Result<Record3<Date, String, T>> values = dsl
+                .select(esvCreatedAtDateOnly, esv.OUTCOME, aggregateField)
+                .from(esv)
+                .where(condition)
+                .and(cast(esv.CREATED_AT, Date.class).gt(currentDate().minus(duration.numDays())))
+                .groupBy(esvCreatedAtDateOnly, esv.OUTCOME)
+                .fetch();
+
+        return values
+                .stream()
+                .map(r -> tuple(r.getValue(esvCreatedAtDateOnly),
+                                ImmutableStringTally.builder()
+                                        .count(toTally.apply(r.getValue(aggregateField)))
+                                        .id(r.getValue(esv.OUTCOME))
+                                        .build()))
+                .collect(groupingBy(t -> t.v1().toLocalDate(),
+                             mapping(t -> t.v2(),
+                                     toList())))
+                .entrySet()
+                .stream()
+                .map(e -> ImmutableTallyPack.<String>builder()
+                        .entityReference(EntityReference.mkRef(EntityKind.ENTITY_STATISTIC, statisticId))
+                        .tallies(e.getValue())
+                        .lastUpdatedAt(e.getKey().atStartOfDay())
+                        .build())
+                .collect(toList());
+    }
+
+
+    private Condition mkSummaryCondition(Collection<Long> statisticIds,
+                                         Select<Record1<Long>> appIdSelector,
+                                         boolean current) {
+        return esv.STATISTIC_ID.in(statisticIds)
+                    .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                    .and(esv.ENTITY_ID.in(appIdSelector))
+                    .and(esv.CURRENT.eq(current));
+    }
+
+
+    private Condition mkNoRollupCondition(Collection<Long> statisticIds,
+                                          EntityReference ref,
+                                          boolean current) {
+        return esv.STATISTIC_ID.in(statisticIds)
+                .and(esv.ENTITY_KIND.eq(ref.kind().name()))
+                .and(esv.ENTITY_ID.eq(ref.id()))
+                .and(esv.CURRENT.eq(current));
     }
 
 

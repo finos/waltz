@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.Duration;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
@@ -73,17 +74,30 @@ public class EntityStatisticEndpoint implements Endpoint {
 
     private TallyPack<String> calculateStatTallyRoute(Request request, Response response) throws IOException {
         IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
-        RollupKind rollupKind = readEnum(
-                request,
-                "rollupKind",
-                RollupKind.class,
-                (s) -> {
-                    String msg = String.format("rollupKind cannot be [%s]", s);
-                    throw new UnsupportedOperationException(msg);
-                });
-
+        RollupKind rollupKind = extractRollupKind(request);
         Long statisticId = getId(request);
         return entityStatisticService.calculateStatTally(statisticId, rollupKind, idSelectionOptions);
+    }
+
+
+    private List<TallyPack<String>> calculateHistoricStatTallyRoute(Request request, Response response) throws IOException {
+        IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
+        RollupKind rollupKind = extractRollupKind(request);
+        Duration duration = readEnum(request, "duration", Duration.class, s -> Duration.Month);
+        Long statisticId = getId(request);
+        return entityStatisticService.calculateHistoricStatTally(statisticId, rollupKind, idSelectionOptions, duration);
+    }
+
+
+    private RollupKind extractRollupKind(Request request) {
+        return readEnum(
+                    request,
+                    "rollupKind",
+                    RollupKind.class,
+                    (s) -> {
+                        String msg = String.format("rollupKind cannot be [%s]", s);
+                        throw new UnsupportedOperationException(msg);
+                    });
     }
 
 
@@ -96,6 +110,7 @@ public class EntityStatisticEndpoint implements Endpoint {
         String findStatValuesBySelectorPath = mkPath(BASE_URL, "value", ":statId");
         String findStatTalliesPath = mkPath(BASE_URL, "tally");
         String calculateStatTallyPath = mkPath(BASE_URL, "tally", ":id", ":rollupKind");
+        String calculateHistoricStatTallyPath = mkPath(BASE_URL, "tally", "historic", ":id", ":rollupKind");
 
         ListRoute<EntityStatisticDefinition> findAllActiveDefinitionsRoute = (request, response)
                 -> entityStatisticService.findAllActiveDefinitions();
@@ -113,6 +128,7 @@ public class EntityStatisticEndpoint implements Endpoint {
         postForList(findStatValuesBySelectorPath, findStatValuesForAppSelectorRoute);
         postForList(findStatTalliesPath, this::findStatTalliesRoute);
         postForDatum(calculateStatTallyPath, this::calculateStatTallyRoute);
+        postForDatum(calculateHistoricStatTallyPath, this::calculateHistoricStatTallyRoute);
         getForDatum(findRelatedStatDefinitionsPath, findRelatedStatDefinitionsRoute);
         getForDatum(findDefinitionPath, findDefinitionRoute);
     }
