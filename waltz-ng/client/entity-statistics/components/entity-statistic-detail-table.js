@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from "lodash";
 
 
 /**
@@ -108,6 +108,7 @@ const dateCell = {
     field: 'createdAt',
     displayName: 'Last Updated',
     enableFiltering: false,
+    visible: false,
     cellTemplate: '<div class="ui-grid-cell-contents">\n     <waltz-from-now timestamp="COL_FIELD"></waltz-from-now>\n</div>'
 };
 
@@ -115,7 +116,7 @@ const dateCell = {
 function setupGrid($animate, uiGridConstants, statisticDefinition) {
     return {
         enableGridMenu: true,
-        exporterCsvFilename: "stats",
+        exporterCsvFilename: "stats.csv",
         exporterMenuPdf: false,
         enableSorting: true,
         enableFiltering: true,
