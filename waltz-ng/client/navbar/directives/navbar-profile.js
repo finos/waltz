@@ -40,14 +40,14 @@ loginController.$inject = [
 
 function controller($state,
                     $uibModal,
-                    settingsStore,
+                    settingsService,
                     userService) {
     const vm = _.defaultsDeep(this, initialState);
 
-    settingsStore
-        .findAll()
-        .then(settings => {
-            vm.allowDirectLogin = settingsStore.findOrDefault(settings, 'web.authentication', "") === 'waltz';
+    settingsService
+        .findOrDefault('web.authentication', "")
+        .then(webAuthentication => {
+            vm.allowDirectLogin = webAuthentication === 'waltz';
         });
 
     userService
@@ -93,7 +93,7 @@ function controller($state,
 controller.$inject = [
     '$state',
     '$uibModal',
-    'SettingsStore',
+    'SettingsService',
     'UserService'];
 
 
