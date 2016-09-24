@@ -1,4 +1,4 @@
-<waltz-section>
+<div>
 
     <waltz-page-header name="Playpen"
                        small="1"
@@ -10,11 +10,11 @@
     </waltz-page-header>
 
     <waltz-section name="foo">
-        <waltz-entity-statistic-history-chart history="ctrl.history"></waltz-entity-statistic-history-chart>
+        <waltz-entity-statistic-history-panel history="ctrl.history">
 
-        <pre>{{ ctrl.history | json }}</pre>
+        </waltz-entity-statistic-history-panel>
+
+        <pre>{{ctrl.options}}</pre>
     </waltz-section>
-
-
 
 </div>

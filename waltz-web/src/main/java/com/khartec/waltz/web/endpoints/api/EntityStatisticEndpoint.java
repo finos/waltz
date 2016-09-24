@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.common.EnumUtilities;
 import com.khartec.waltz.model.Duration;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
@@ -83,7 +84,7 @@ public class EntityStatisticEndpoint implements Endpoint {
     private List<TallyPack<String>> calculateHistoricStatTallyRoute(Request request, Response response) throws IOException {
         IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
         RollupKind rollupKind = extractRollupKind(request);
-        Duration duration = readEnum(request, "duration", Duration.class, s -> Duration.Month);
+        Duration duration = EnumUtilities.readEnum(request.queryParams("duration"), Duration.class, s -> Duration.Month);
         Long statisticId = getId(request);
         return entityStatisticService.calculateHistoricStatTally(statisticId, rollupKind, idSelectionOptions, duration);
     }

@@ -235,7 +235,8 @@ public class WebUtilities {
                                                  String paramName,
                                                  Class<T> enumClass,
                                                  Function<String, T> failedParseSupplier) {
-        return EnumUtilities.readEnum(request.params(paramName), enumClass, failedParseSupplier);
+        String paramValue = request.params(paramName);
+        return EnumUtilities.readEnum(paramValue, enumClass, failedParseSupplier);
     }
 
 

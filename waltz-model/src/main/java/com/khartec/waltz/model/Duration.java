@@ -2,11 +2,11 @@ package com.khartec.waltz.model;
 
 public enum Duration {
 
-    Day(1),
-    Week(7),
-    Month(31),
-    Year(365),
-    All(Integer.MAX_VALUE);
+    DAY(1),
+    WEEK(7),
+    MONTH(31),
+    YEAR(365),
+    ALL(Integer.MAX_VALUE);
 
 
     private final int numDays;

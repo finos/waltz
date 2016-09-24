@@ -70,13 +70,13 @@ GROUP BY outcome;
                 .build();
 
         // count by value
-        List<TallyPack<String>> countByValueTallyPacks = service.calculateHistoricStatTally(10100L, RollupKind.COUNT_BY_ENTITY, selectionOptions, Duration.Week);
+        List<TallyPack<String>> countByValueTallyPacks = service.calculateHistoricStatTally(10100L, RollupKind.COUNT_BY_ENTITY, selectionOptions, Duration.WEEK);
         System.out.println(countByValueTallyPacks);
         // sum by value
-        List<TallyPack<String>> sumByValueTallyPacks = service.calculateHistoricStatTally(20010L, RollupKind.SUM_BY_VALUE, selectionOptions, Duration.Year);
+        List<TallyPack<String>> sumByValueTallyPacks = service.calculateHistoricStatTally(20010L, RollupKind.SUM_BY_VALUE, selectionOptions, Duration.YEAR);
         System.out.println(sumByValueTallyPacks);
         // pre-computed
-        List<TallyPack<String>> preComputedTallyPacks = service.calculateHistoricStatTally(11000L, RollupKind.NONE, selectionOptions, Duration.Month);
+        List<TallyPack<String>> preComputedTallyPacks = service.calculateHistoricStatTally(11000L, RollupKind.NONE, selectionOptions, Duration.MONTH);
         System.out.println(preComputedTallyPacks);
         System.out.println("done");
     }

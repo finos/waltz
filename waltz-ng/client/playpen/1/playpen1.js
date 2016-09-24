@@ -34,18 +34,33 @@ const data = [
 ];
 
 
-function controller(appStore, flowViewService, tourService) {
-
+function controller($scope, entityStatisticStore) {
     const vm = Object.assign(this, initData);
 
-    vm.history = data;
+    const statDefn = {
+        id: 10100,
+        rollupKind: 'COUNT_BY_ENTITY'
+    };
+
+    const selector = {
+        entityReference: { kind: 'ORG_UNIT', id: 170 },
+        scope: 'EXACT'
+    };
+
+
+    entityStatisticStore.calculateHistoricStatTally(statDefn, selector)
+        .then(x => {
+            console.log(x);
+            return x;
+        })
+        .then(h => vm.history = h)
+
 }
 
 
 controller.$inject = [
-    'ApplicationStore',
-    'DataFlowViewService',
-    'TourService'
+    '$scope',
+    'EntityStatisticStore'
 ];
 
 

@@ -46,13 +46,23 @@ function store($http, BaseApiUrl) {
             .then(r => r.data);
     };
 
+    const calculateHistoricStatTally = (definition, selector) => {
+        return $http
+            .post(
+                `${BASE}/tally/historic/${definition.id}/${definition.rollupKind}`,
+                selector,
+                { params: { duration:'ALL' } })
+            .then(r => r.data);
+    };
+
     return {
         findAllActiveDefinitions,
         findStatDefinition,
         findStatValuesByIdSelector,
         findRelatedStatDefinitions,
         findStatTallies,
-        calculateStatTally
+        calculateStatTally,
+        calculateHistoricStatTally
     };
 }
 
