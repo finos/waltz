@@ -40,7 +40,8 @@ export const entityIconNames = {
     PERSON: 'user',
     PROCESS: 'code-fork',
     SERVER: 'server',
-    SOFTWARE: 'gift'
+    SOFTWARE: 'gift',
+    SYSTEM: 'gears'
 };
 
 
