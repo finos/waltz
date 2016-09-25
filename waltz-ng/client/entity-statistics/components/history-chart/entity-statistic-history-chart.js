@@ -44,7 +44,7 @@ function mkDimensions(width = 400) {
     const height = 200;
 
     const margins = {
-        left: 50,
+        left: 60,
         right: 20,
         top: 20,
         bottom: 30
@@ -85,14 +85,23 @@ function mkScales(points = [], dimensions) {
 
 function drawPoints(section, points = [], scales, options) {
     const pointSelection = section
-        .selectAll('circle')
+        .selectAll('.point')
         .data(points, p => p.date + '_' + p.series);
 
     pointSelection
         .enter()
         .append('circle')
-        .attr('fill', d => variableScale(d.series))
-        .attr('opacity', 0.7);
+        .classed('point', true)
+        .attr({
+            fill: d => variableScale(d.series),
+            opacity: 0.7,
+            r: 0
+        })
+        .attr();
+
+    pointSelection
+        .exit()
+        .remove();
 
     pointSelection
         .transition()
@@ -122,18 +131,23 @@ function drawLines(section, points = [], scales) {
         .entries(points);
 
     const pathSelector = section
-        .selectAll('path')
+        .selectAll('.line')
         .data(bySeries, s => s.key);
 
     pathSelector
         .enter()
         .append("path")
+        .classed('line', true)
         .attr({
             stroke: d => variableScale(d.key),
             "stroke-width": 1,
             fill: 'none',
             opacity: 0.7
         });
+
+    pathSelector
+        .exit()
+        .remove();
 
     pathSelector
         .transition()
@@ -195,7 +209,7 @@ function drawBands(section,
         .attr({
             'pointer-events': 'all'
         })
-        .style('visibility', 'hidden')
+        .style('visibility', 'hidden');
 
     bands
         .attr({

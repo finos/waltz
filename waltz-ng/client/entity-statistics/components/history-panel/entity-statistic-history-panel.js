@@ -1,13 +1,20 @@
 import _ from 'lodash';
+import d3 from 'd3';
 import {variableScale} from '../../../common/colors';
 
 
 const bindings = {
-    history: '<'
+    history: '<',
+    definition: '<'
 };
 
 
 const template = require('./entity-statistic-history-panel.html');
+
+
+const dateFormatter = d3
+    .time
+    .format('%a %d %b %Y');
 
 
 function prepareData(data = []) {
@@ -24,34 +31,53 @@ function prepareData(data = []) {
         .value();
 }
 
-function prepareStyles(data = []) {
+
+function getOutcomeIds(data = []) {
     return _.chain(data)
         .flatMap('tallies')
         .map('id')
         .uniq()
-        .reduce((acc, outcome) => {
-            acc[outcome] = {
-                color: variableScale(outcome)
-            };
-            return acc;
-        }, {})
         .value();
 }
 
-function findRelevantStats(history = [], d) {
-    return _.find(
-        history,
-        t => new Date(d).getTime() === new Date(t.lastUpdatedAt).getTime());
+
+function prepareStyles(data = []) {
+    const reducer = (acc, outcomeId) => {
+        acc[outcomeId] = { color: variableScale(outcomeId) };
+        return acc;
+    };
+    return _.reduce(
+        getOutcomeIds(data),
+        reducer,
+        {});
 }
 
-function controller($scope) {
 
+function findRelevantStats(history = [], d) {
+    const soughtTime = new Date(d).getTime();
+    return _.find(
+        history,
+        t => soughtTime === new Date(t.lastUpdatedAt).getTime());
+}
+
+
+function lookupStatColumnName(displayNameService, definition) {
+    return definition
+        ? displayNameService.lookup('rollupKind', definition.rollupKind)
+        : 'Value';
+}
+
+
+function controller($scope, displayNameService) {
     const vm = this;
 
     const highlight = (d) => {
         vm.options = Object.assign({}, vm.options, { highlightedDate: d });
         const relevantStats = findRelevantStats(vm.history, d);
-        if (relevantStats) vm.selected = relevantStats;
+        if (relevantStats) {
+            vm.selected = relevantStats;
+            vm.selected.dateString = dateFormatter(d);
+        }
     };
 
     vm.options = {
@@ -59,16 +85,18 @@ function controller($scope) {
         onHover: (d) => $scope.$applyAsync(() => highlight(d))
     };
 
-
     vm.$onChanges = () => {
+        vm.selected  = null;
         vm.points = prepareData(vm.history);
         vm.styles = prepareStyles(vm.history);
+        vm.statColumnName = lookupStatColumnName(displayNameService, vm.definition);
     };
 }
 
 
 controller.$inject = [
-    '$scope'
+    '$scope',
+    'WaltzDisplayNameService'
 ];
 
 

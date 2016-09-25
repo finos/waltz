@@ -49,10 +49,6 @@ function controller($scope, entityStatisticStore) {
 
 
     entityStatisticStore.calculateHistoricStatTally(statDefn, selector)
-        .then(x => {
-            console.log(x);
-            return x;
-        })
         .then(h => vm.history = h)
 
 }

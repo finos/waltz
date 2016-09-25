@@ -27,6 +27,7 @@ import {
     involvementKindNames,
     lifecyclePhaseDisplayNames,
     orgUnitKindNames,
+    rollupKindNames,
     severityNames,
     usageKindDisplayNames
 } from "./display_names";
@@ -65,6 +66,7 @@ export default (module) => {
     displayNameService.register('lifecyclePhase', lifecyclePhaseDisplayNames);
     displayNameService.register('orgUnitKind', orgUnitKindNames);
     displayNameService.register('rating', authSourceRatingNames);
+    displayNameService.register('rollupKind', rollupKindNames);
     displayNameService.register('severity', severityNames);
     displayNameService.register('usageKind', usageKindDisplayNames);
 

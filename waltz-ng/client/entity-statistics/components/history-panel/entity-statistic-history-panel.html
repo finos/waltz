@@ -6,29 +6,39 @@
         </waltz-entity-statistic-history-chart>
     </div>
     <div class="col-sm-5">
-        <h4 ng-bind="$ctrl.selected.lastUpdatedAt"></h4>
-        <table class="table table-condensed small">
-            <thead>
-            <tr>
-                <th></th>
-                <th>Outcome</th>
-                <th>Count</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="row in $ctrl.selected.tallies">
-                <td>
-                    <waltz-icon name="square"
-                                ng-style="$ctrl.styles[row.id]"></waltz-icon>
-                </td>
-                <td>
-                    <span ng-bind="row.id"></span>
-                </td>
-                <td>
-                    <span ng-bind="row.count"></span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div ng-if="$ctrl.selected">
+            <h5 ng-bind="$ctrl.selected.dateString"></h5>
+            <table class="table table-condensed small">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Outcome</th>
+                    <th ng-bind="$ctrl.statColumnName"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="row in $ctrl.selected.tallies">
+                    <td>
+                        <waltz-icon name="square"
+                                    ng-style="$ctrl.styles[row.id]"></waltz-icon>
+                    </td>
+                    <td>
+                        <span ng-bind="row.id"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="row.count"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div ng-if="!$ctrl.selected"
+             style='padding-top: 30px'>
+            <span class="text-muted small">
+                Hover over the graph to see more detail.
+            </span>
+        </div>
+
     </div>
 </div>
