@@ -147,6 +147,14 @@ export const criticalityDisplayNames = {
 };
 
 
+export const rollupKindNames = {
+    SUM_BY_VALUE: "Sum",
+    AVG_BY_VALUE: "Average",
+    COUNT_BY_ENTITY: "Count",
+    NONE: "Value"
+};
+
+
 export const endOfLifeStatusNames = {
     'END_OF_LIFE': 'End of Life',
     'NOT_END_OF_LIFE': 'Compliant'

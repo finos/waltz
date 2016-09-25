@@ -1,0 +1,25 @@
+.waltz-entity-statistic-history-chart {
+
+    .weshc-axis {
+        font-weight: normal;
+        fill: grey;
+
+        path {
+            stroke-width: 0.6;
+            fill: none;
+            stroke: grey;
+        }
+
+        line {
+            stroke-width: 0.6;
+            stroke: grey
+        }
+
+        text {
+            font-family: Arial;
+            font-size: smaller;
+        }
+    }
+}
+
+

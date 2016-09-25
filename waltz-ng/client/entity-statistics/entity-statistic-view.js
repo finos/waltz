@@ -63,7 +63,6 @@ function controller($q,
         vm.summaries = clearData.summaries;
     }
 
-
     vm.onSelectNavItem = (navItem) => {
         resetValueData();
 
@@ -106,6 +105,10 @@ function controller($q,
         applicationStore
             .findBySelector(selector)
             .then(apps => vm.applications = apps);
+
+        entityStatisticStore
+            .calculateHistoricStatTally(vm.statistic.definition, selector)
+            .then(h => vm.history = h);
 
         updateUrlWithoutReload($state, navItem);
     };

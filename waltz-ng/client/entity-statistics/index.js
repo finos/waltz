@@ -32,5 +32,7 @@ export default (module) => {
         .component('waltzEntityStatisticDetailPanel', require('./components/entity-statistic-detail-panel'))
         .component('waltzEntityStatisticSummaryCard', require('./components/entity-statistic-summary-card'))
         .component('waltzEntityStatisticSummarySection', require('./components/entity-statistic-summary-section'))
+        .component('waltzEntityStatisticHistoryChart', require('./components/history-chart/entity-statistic-history-chart'))
+        .component('waltzEntityStatisticHistoryPanel', require('./components/history-panel/entity-statistic-history-panel'))
         .component('waltzRelatedEntityStatisticsSummaries', require('./components/related-entity-statistics-summaries'));
 };

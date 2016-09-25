@@ -32,10 +32,14 @@
                 </div>
 
                 <!-- HISTORY -->
-                <div class="row">
+                <div class="row" ng-if="ctrl.history">
                     <div class="col-md-12">
                         <hr>
                         <h3>History</h3>
+
+                        <waltz-entity-statistic-history-panel history="ctrl.history"
+                                                              definition='ctrl.statistic.definition'>
+                        </waltz-entity-statistic-history-panel>
                     </div>
                 </div>
 
