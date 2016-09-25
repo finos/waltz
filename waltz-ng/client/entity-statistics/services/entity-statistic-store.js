@@ -51,7 +51,7 @@ function store($http, BaseApiUrl) {
             .post(
                 `${BASE}/tally/historic/${definition.id}/${definition.rollupKind}`,
                 selector,
-                { params: { duration:'ALL' } })
+                { params: { duration:'MONTH' } })
             .then(r => r.data);
     };
 
