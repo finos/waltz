@@ -84,7 +84,7 @@ public class EntityStatisticEndpoint implements Endpoint {
     private List<TallyPack<String>> calculateHistoricStatTallyRoute(Request request, Response response) throws IOException {
         IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
         RollupKind rollupKind = extractRollupKind(request);
-        Duration duration = EnumUtilities.readEnum(request.queryParams("duration"), Duration.class, s -> Duration.Month);
+        Duration duration = EnumUtilities.readEnum(request.queryParams("duration"), Duration.class, s -> Duration.MONTH);
         Long statisticId = getId(request);
         return entityStatisticService.calculateHistoricStatTally(statisticId, rollupKind, idSelectionOptions, duration);
     }
