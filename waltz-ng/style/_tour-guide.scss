@@ -1,0 +1,17 @@
+@import "../node_modules/intro.js/introjs.css";
+
+/** Prevent the extra box with intro js - it doesn't work well when the page-header resizes */
+.introjs-helperLayer {
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 0;
+    background-color: inherit;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -ms-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+}

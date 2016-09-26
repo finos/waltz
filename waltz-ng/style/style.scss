@@ -1,7 +1,7 @@
 @import "variables";
 
 $icon-font-path: "../node_modules/bootstrap-sass/assets/fonts/bootstrap/";
-@import "../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap";
+ @import "../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap";
 
 
 /* FONT-AWESOME */
@@ -15,44 +15,9 @@ $fa-font-path: "../node_modules/font-awesome/fonts";
 @import "../node_modules/ng-tags-input/build/ng-tags-input.bootstrap.min.css";
 @import "../node_modules/angular-ui-notification/dist/angular-ui-notification.min.css";
 @import "../node_modules/angular-tree-control/css/tree-control.css";
-@import "../node_modules/intro.js/introjs.css";
-@import "../node_modules/angular-loading-bar/build/loading-bar.css";
 
-
-/** Tweak angular-loading-bar **/
-#loading-bar .bar {
-    background: #edcd2a;
-    height: 4px;
-    top: 52px;
-}
-
-#loading-bar-spinner {
-    top: 18px;
-    left: 8px;
-}
-
-#loading-bar .peg {
-    height: 4px;
-    box-shadow: #edcd2a 1px 0 6px 1px;
-}
-
-
-/** Prevent the extra box with intro js - it doesn't work well when the page-header resizes */
-.introjs-helperLayer {
-    box-sizing: border-box;
-    position: absolute;
-    z-index: 0;
-    background-color: inherit;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    -webkit-transition: all 0.3s ease-out;
-    -moz-transition: all 0.3s ease-out;
-    -ms-transition: all 0.3s ease-out;
-    -o-transition: all 0.3s ease-out;
-    transition: all 0.3s ease-out;
-}
-
+@import "tour-guide";
+@import "loading-bar";
 @import "util";
 @import "waltz";
 @import "animations";

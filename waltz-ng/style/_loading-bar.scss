@@ -1,0 +1,18 @@
+@import "../node_modules/angular-loading-bar/build/loading-bar.css";
+
+/** Tweak angular-loading-bar **/
+#loading-bar .bar {
+    background: #edcd2a;
+    height: 4px;
+    top: 52px;
+}
+
+#loading-bar-spinner {
+    top: 18px;
+    left: 8px;
+}
+
+#loading-bar .peg {
+    height: 4px;
+    box-shadow: #edcd2a 1px 0 6px 1px;
+}
