@@ -12,20 +12,21 @@
 
 import "../style/style.scss";
 import angular from "angular";
+
+import "angular-animate";
+import "angular-loading-bar";
+import "angular-local-storage";
+import "angular-sanitize";
+import "angular-tree-control";
 import "angular-ui-notification";
 import "angular-ui-grid/ui-grid";
 import "angular-ui-router";
 import "angular-ui-bootstrap";
-import "angular-tree-control";
-import "ui-select";
-import "satellizer";
-import "angular-animate";
-import "angular-sanitize";
-import "ng-tags-input";
 import "babel-core/polyfill";
-import "angular-local-storage";
 import "ng-redux";
-
+import "ng-tags-input";
+import "satellizer";
+import "ui-select";
 
 const dependencies = [
     'ui.bootstrap',
@@ -43,7 +44,8 @@ const dependencies = [
     'ngRedux',
     require('angular-formly'),
     require('angular-formly-templates-bootstrap'),
-    'treeControl'
+    'treeControl',
+    'angular-loading-bar'
 ];
 
 
