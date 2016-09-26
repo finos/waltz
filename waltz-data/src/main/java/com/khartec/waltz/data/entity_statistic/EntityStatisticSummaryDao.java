@@ -181,6 +181,10 @@ public class EntityStatisticSummaryDao {
                                                                 EntityReference entityReference,
                                                                 Duration duration) {
 
+        checkNotNull(statisticId, "statisticId cannot be null");
+        checkNotNull(entityReference, "entityReference cannot be null");
+        checkNotNull(duration, "duration cannot be null");
+
         Condition condition = mkNoRollupCondition(
                 newArrayList(statisticId),
                 entityReference,
@@ -190,7 +194,7 @@ public class EntityStatisticSummaryDao {
                 .select(esvCreatedAtDateOnly, esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE)
                 .from(esv)
                 .where(dsl.renderInlined(condition))
-                .and(castDateField.gt(currentDate().minus(duration.numDays())))
+                .and(mkHistoryDurationCondition(duration))
                 .groupBy(castDateField, esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE)
                 .orderBy(esvCreatedAtDateOnly.asc())
                 .fetch();
@@ -312,6 +316,12 @@ public class EntityStatisticSummaryDao {
                                                                 Function<T, Double> toTally,
                                                                 Duration duration) {
 
+        checkNotNull(statisticId, "statisticId cannot be null");
+        checkNotNull(appIdSelector, "appIdSelector cannot be null");
+        checkNotNull(aggregateField, "aggregateField cannot be null");
+        checkNotNull(toTally, "toTally function cannot be null");
+        checkNotNull(duration, "duration cannot be null");
+
         Condition condition = mkSummaryCondition(
                 newArrayList(statisticId),
                 appIdSelector,
@@ -321,7 +331,7 @@ public class EntityStatisticSummaryDao {
                 .select(esvCreatedAtDateOnly, esv.OUTCOME, aggregateField)
                 .from(esv)
                 .where(condition)
-                .and(castDateField.gt(currentDate().minus(duration.numDays())))
+                .and(mkHistoryDurationCondition(duration))
                 .groupBy(castDateField, esv.OUTCOME)
                 .orderBy(esvCreatedAtDateOnly.asc())
                 .fetch();
@@ -365,6 +375,14 @@ public class EntityStatisticSummaryDao {
                 .and(esv.ENTITY_KIND.eq(ref.kind().name()))
                 .and(esv.ENTITY_ID.eq(ref.id()))
                 .and(additionalCondition);
+    }
+
+
+    private Condition mkHistoryDurationCondition(Duration duration) {
+        if (duration == Duration.ALL) {
+            return DSL.trueCondition();
+        }
+        return castDateField.gt(currentDate().minus(duration.numDays()));
     }
 
 
