@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.web;
 
+import com.khartec.waltz.common.LoggingUtilities;
 import com.khartec.waltz.common.exception.DuplicateKeyException;
 import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.service.DIConfiguration;
@@ -77,6 +78,9 @@ public class Main {
     }
 
     public void start(ServerMode mode) {
+        // configure logging
+        LoggingUtilities.configureLogging();
+
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         Map<String, Endpoint> endpoints = ctx.getBeansOfType(Endpoint.class);

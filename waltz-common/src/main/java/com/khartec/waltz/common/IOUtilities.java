@@ -17,6 +17,10 @@
 
 package com.khartec.waltz.common;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+
 import java.io.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,6 +59,7 @@ public class IOUtilities {
         }
     }
 
+
     public static String readFully(InputStream stream) throws IOException {
         try {
             InputStreamReader streamReader = new InputStreamReader(stream);
@@ -66,5 +71,15 @@ public class IOUtilities {
             stream.close();
         }
 
+    }
+
+
+    public static Resource getFileResource(String fileName) {
+        Resource resource = new ClassPathResource(fileName);
+        if (!resource.exists()) {
+            String home = System.getProperty("user.home");
+            resource = new FileSystemResource(home + "/.waltz/" + fileName);
+        }
+        return resource;
     }
 }
