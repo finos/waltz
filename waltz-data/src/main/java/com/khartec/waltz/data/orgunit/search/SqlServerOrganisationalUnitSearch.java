@@ -9,15 +9,17 @@ import org.jooq.DSLContext;
 
 import java.util.List;
 
+import static com.khartec.waltz.common.StringUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 public class SqlServerOrganisationalUnitSearch implements FullTextSearch<OrganisationalUnit>, DatabaseVendorSpecific {
 
     @Override
-    public List<OrganisationalUnit> search(DSLContext dsl, String terms) {
+    public List<OrganisationalUnit> search(DSLContext dsl, String query) {
+        List<String> terms = mkTerms(query);
         return dsl.select(ORGANISATIONAL_UNIT.fields())
                 .from(ORGANISATIONAL_UNIT)
-                .where(JooqUtilities.MSSQL.mkContains(terms.split(" ")))
+                .where(JooqUtilities.MSSQL.mkContains(terms))
                 .limit(20)
                 .fetch(OrganisationalUnitDao.recordMapper);
     }

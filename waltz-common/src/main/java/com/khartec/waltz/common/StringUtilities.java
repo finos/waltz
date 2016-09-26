@@ -17,7 +17,10 @@
 
 package com.khartec.waltz.common;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class StringUtilities {
@@ -79,5 +82,27 @@ public class StringUtilities {
         if (str == null) return null;
         int howMuch = Math.min(maxLength, str.length());
         return str.substring(0, howMuch);
+    }
+
+
+
+    public static List<String> mkTerms(String query) {
+        String safeQuery = query
+                .replace("[", " ")
+                .replace("]", " ")
+                .replace("'", " ")
+                .replace("\"", " ")
+                .replace("|", " ")
+                .replace("!", " ")
+                .replace("%", " ")
+                .replace("(", " ")
+                .replace(")", " ")
+                .replace(",", " ")
+                .replace("~", " ");
+
+        return Stream.of(safeQuery.split(" "))
+                .filter(StringUtilities::notEmpty)
+                .filter(s -> s.length() > 2)
+                .collect(Collectors.toList());
     }
 }
