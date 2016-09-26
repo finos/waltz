@@ -8,7 +8,7 @@ const navItems = [
     { uiSref: 'main.capability.list', icon: 'puzzle-piece', displayName: 'Functions', id: 'navbar-capabilities' },
     { uiSref: 'main.process.list', icon: 'code-fork', displayName: 'Processes', id: 'navbar-processes' },
     { uiSref: 'main.person', icon: 'users', displayName: 'People', id: 'navbar-people' },
-    { uiSref: 'main.data-type.list', icon: 'qrcode', displayName: 'Data Types', id: 'navbar-data-types' }
+    { uiSref: 'main.data-type.list', icon: 'qrcode', displayName: 'Data', id: 'navbar-data-types' }
 ];
 
 
