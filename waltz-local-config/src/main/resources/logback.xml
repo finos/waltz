@@ -28,7 +28,8 @@
     </appender>
 
 
-    <appender name="TIME_BASED_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="TIME_BASED_FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/waltz.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover -->
