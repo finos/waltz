@@ -20,17 +20,22 @@
     <div class="container-fluid">
 
         <!-- Header -->
-        <div ui-view="header" class="row"></div>
+        <div ui-view="header"
+             class="row">
+        </div>
 
         <div class="row">
-
             <!-- Content -->
-            <div ui-view="content" class="waltz-content col-xs-12"></div>
+            <div ui-view="content"
+                 class="waltz-content col-xs-12">
+            </div>
         </div>
     </div>
 
     {% for (var chunk in o.htmlWebpackPlugin.files.chunks) { %}
-    <script type="text/javascript" src="{%=o.htmlWebpackPlugin.files.chunks[chunk].entry%}"></script>
+    <script type="text/javascript"
+            src="{%=o.htmlWebpackPlugin.files.chunks[chunk].entry%}">
+    </script>
     {% } %}
 
     <div style="padding-bottom: 60px">
