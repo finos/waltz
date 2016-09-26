@@ -101,11 +101,12 @@ function drawPoints(section, points = [], scales, options) {
 
     pointSelection
         .exit()
+        .transition()
+        .duration(animationDuration)
+        .attr({r: 0})
         .remove();
 
     pointSelection
-        .transition()
-        .duration(animationDuration)
         .attr({
             cx: p => scales.x(p.date),
             cy: p => scales.y(p.count),
