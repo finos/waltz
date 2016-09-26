@@ -2,6 +2,7 @@ import _ from "lodash";
 import {resetData} from "../common";
 import {updateUrlWithoutReload, hasRelatedDefinitions} from './utilities';
 
+
 const initData = {
     statistic: {
         definition: null,
@@ -117,6 +118,10 @@ function controller($q,
             .findDirects(person.managerEmployeeId)
             .then(peers => _.reject(peers, p => p.id === person.id))
             .then(peers => vm.peers = peers);
+
+        entityStatisticStore
+            .calculateHistoricStatTally(vm.statistic.definition, selector)
+            .then(h => vm.history = h);
 
         applicationStore
             .findBySelector(selector)

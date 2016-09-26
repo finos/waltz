@@ -25,7 +25,29 @@
                                                      values="ctrl.statistic.values"
                                                      applications="ctrl.applications">
                 </waltz-entity-statistic-detail-panel>
+
+
+                <!-- HISTORY -->
+                <div ng-if="ctrl.history">
+                    <hr>
+                    <h3>History</h3>
+                    <waltz-entity-statistic-history-panel history="ctrl.history"
+                                                          definition='ctrl.statistic.definition'>
+                    </waltz-entity-statistic-history-panel>
+                </div>
+
+
+                <!-- RELATED -->
+                <div ng-if="ctrl.visibility.related">
+                    <hr>
+                    <h3>Related Indicators</h3>
+                    <waltz-related-entity-statistics-summaries definitions='ctrl.relatedDefinitions'
+                                                               parent-ref="ctrl.parentRef"
+                                                               summaries="ctrl.summaries">
+                    </waltz-related-entity-statistics-summaries>
+                </div>
             </div>
+
 
             <!-- NAV -->
             <div class="col-md-4" >
@@ -89,22 +111,11 @@
                     Select a person listed above to change the vantage point you are viewing
                     this statistic from.
                 </p>
+
+                <hr>
+
             </div>
 
-        </div>
-
-        <hr>
-
-        <div class="row"
-             ng-if="ctrl.visibility.related">
-            <!-- RELATED -->
-            <div class="col-md-12">
-                <h3>Related Indicators</h3>
-                <waltz-related-entity-statistics-summaries definitions='ctrl.relatedDefinitions'
-                                                           parent-ref="ctrl.parentRef"
-                                                           summaries="ctrl.summaries">
-                </waltz-related-entity-statistics-summaries>
-            </div>
         </div>
 
     </div>
