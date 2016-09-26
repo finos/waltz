@@ -9,15 +9,17 @@ import org.jooq.DSLContext;
 
 import java.util.List;
 
+import static com.khartec.waltz.common.StringUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
 
 public class SqlServerCapabilitySearch implements FullTextSearch<Capability>, DatabaseVendorSpecific {
 
     @Override
-    public List<Capability> search(DSLContext dsl, String terms) {
+    public List<Capability> search(DSLContext dsl, String query) {
+        List<String> terms = mkTerms(query);
         return dsl.select(CAPABILITY.fields())
                 .from(CAPABILITY)
-                .where(JooqUtilities.MSSQL.mkContains(terms.split(" ")))
+                .where(JooqUtilities.MSSQL.mkContains(terms))
                 .limit(20)
                 .fetch(CapabilityDao.TO_DOMAIN_MAPPER);
     }

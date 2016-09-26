@@ -1,6 +1,5 @@
 package com.khartec.waltz.data.application.search;
 
-import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.JooqUtilities;
@@ -14,9 +13,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.SetUtilities.union;
+import static com.khartec.waltz.common.StringUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 
@@ -24,10 +23,7 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
 
     @Override
     public List<Application> search(DSLContext dsl, String query) {
-        List<String> terms = Stream.of(query.split(" "))
-                .filter(StringUtilities::notEmpty)
-                .filter(s -> s.length() > 2)
-                .collect(Collectors.toList());
+        List<String> terms = mkTerms(query);
 
         if (terms.isEmpty()) {
             return Collections.emptyList();

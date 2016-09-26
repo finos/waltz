@@ -9,15 +9,17 @@ import org.jooq.DSLContext;
 
 import java.util.List;
 
+import static com.khartec.waltz.common.StringUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 
 public class SqlServerChangeInitiativeSearch implements FullTextSearch<ChangeInitiative>, DatabaseVendorSpecific {
 
     @Override
-    public List<ChangeInitiative> search(DSLContext dsl, String terms) {
+    public List<ChangeInitiative> search(DSLContext dsl, String query) {
+        List<String> terms = mkTerms(query);
         return dsl.select(CHANGE_INITIATIVE.fields())
                 .from(CHANGE_INITIATIVE)
-                .where(JooqUtilities.MSSQL.mkContains(terms.split(" ")))
+                .where(JooqUtilities.MSSQL.mkContains(terms))
                 .limit(20)
                 .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
     }
