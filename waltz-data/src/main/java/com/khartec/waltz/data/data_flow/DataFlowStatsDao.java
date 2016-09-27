@@ -66,26 +66,22 @@ public class DataFlowStatsDao {
 
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
-        Select<Record1<Integer>> inAppCounter = FunctionUtilities.time("DFSD.inAppCounter", ()
-                -> countDistinctApps(
+        Select<Record1<Integer>> inAppCounter = countDistinctApps(
                     appIdSelector,
                     df.TARGET_ENTITY_ID,
                     df.SOURCE_ENTITY_ID
-        ));
+        );
 
-        Select<Record1<Integer>> outAppCounter = FunctionUtilities.time("DFSD.outAppCounter", ()
-                -> countDistinctApps(
+        Select<Record1<Integer>> outAppCounter = countDistinctApps(
                     appIdSelector,
                     df.SOURCE_ENTITY_ID,
                     df.TARGET_ENTITY_ID
-        ));
+        );
 
-
-        Select<Record1<Integer>> intraAppCounter = FunctionUtilities.time("DFSD.intraAppCounter", ()
-                -> dsl
+        Select<Record1<Integer>> intraAppCounter = dsl
                     .select(DSL.count())
                     .from(APPLICATION)
-                    .where(dsl.renderInlined(APPLICATION.ID.in(appIdSelector))));
+                    .where(dsl.renderInlined(APPLICATION.ID.in(appIdSelector)));
 
         Select<Record1<Integer>> query = inAppCounter
                 .unionAll(outAppCounter)
