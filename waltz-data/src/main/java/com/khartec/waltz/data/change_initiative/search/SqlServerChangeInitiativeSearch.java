@@ -7,6 +7,7 @@ import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import org.jooq.DSLContext;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.khartec.waltz.common.StringUtilities.mkTerms;
@@ -17,6 +18,10 @@ public class SqlServerChangeInitiativeSearch implements FullTextSearch<ChangeIni
     @Override
     public List<ChangeInitiative> search(DSLContext dsl, String query) {
         List<String> terms = mkTerms(query);
+        if (terms.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return dsl.select(CHANGE_INITIATIVE.fields())
                 .from(CHANGE_INITIATIVE)
                 .where(JooqUtilities.MSSQL.mkContains(terms))

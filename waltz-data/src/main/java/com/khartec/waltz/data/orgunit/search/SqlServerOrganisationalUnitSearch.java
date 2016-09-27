@@ -7,6 +7,7 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.DSLContext;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.khartec.waltz.common.StringUtilities.mkTerms;
@@ -17,6 +18,9 @@ public class SqlServerOrganisationalUnitSearch implements FullTextSearch<Organis
     @Override
     public List<OrganisationalUnit> search(DSLContext dsl, String query) {
         List<String> terms = mkTerms(query);
+        if (terms.isEmpty()) {
+            return Collections.emptyList();
+        }
         return dsl.select(ORGANISATIONAL_UNIT.fields())
                 .from(ORGANISATIONAL_UNIT)
                 .where(JooqUtilities.MSSQL.mkContains(terms))

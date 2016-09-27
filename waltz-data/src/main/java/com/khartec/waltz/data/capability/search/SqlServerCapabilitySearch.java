@@ -7,6 +7,7 @@ import com.khartec.waltz.data.capability.CapabilityDao;
 import com.khartec.waltz.model.capability.Capability;
 import org.jooq.DSLContext;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.khartec.waltz.common.StringUtilities.mkTerms;
@@ -17,6 +18,10 @@ public class SqlServerCapabilitySearch implements FullTextSearch<Capability>, Da
     @Override
     public List<Capability> search(DSLContext dsl, String query) {
         List<String> terms = mkTerms(query);
+        if (terms.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return dsl.select(CAPABILITY.fields())
                 .from(CAPABILITY)
                 .where(JooqUtilities.MSSQL.mkContains(terms))
