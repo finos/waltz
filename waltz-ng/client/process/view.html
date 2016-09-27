@@ -69,7 +69,7 @@
                 <div>
                     <treecontrol class="tree-light"
                                  tree-model="ctrl.capabilityTree.data"
-                                 order-by="name"
+                                 order-by="'-name'"
                                  on-selection="ctrl.onCapabilityNodeSelect(node)"
                                  options="ctrl.capabilityTree.options">
                         <span ng-class="{ 'waltz-inherited-value' : ctrl.isInferredCapability(node.id) }">
