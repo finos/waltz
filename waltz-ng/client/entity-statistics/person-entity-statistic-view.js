@@ -16,6 +16,7 @@ const initData = {
     managers: [],
     peers: [],
     person: null,
+    history: [],
     visibility: {
         related: false
     }
@@ -65,6 +66,7 @@ function controller($q,
         vm.statistic.summary = clearData.statistic.summary;
         vm.statistic.values = clearData.statistic.values;
         vm.summaries = clearData.summaries;
+        vm.history = [];
     }
 
     vm.onSelectPerson = (person) => {
@@ -81,7 +83,6 @@ function controller($q,
             scope: 'CHILDREN',
             entityReference
         };
-
 
         entityStatisticStore
             .calculateStatTally(vm.statistic.definition, selector)
@@ -100,7 +101,6 @@ function controller($q,
                 return entityStatisticStore.findStatTallies(relatedIds, selector);
             })
             .then(summaries => vm.summaries = summaries);
-
 
         entityStatisticStore
             .findStatValuesByIdSelector(statId, selector)
@@ -129,7 +129,6 @@ function controller($q,
 
         updateUrlWithoutReload($state, person);
     };
-
 }
 
 
