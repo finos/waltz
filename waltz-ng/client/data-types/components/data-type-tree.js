@@ -19,6 +19,8 @@ const template = require('./data-type-tree.html');
 function controller() {
     const vm = initialiseData(this, initialState);
 
+    vm.t = true;
+
     vm.treeOptions = {
         nodeChildren: "children",
         dirSelectable: true,
