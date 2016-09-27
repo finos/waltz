@@ -2745,6 +2745,7 @@
 
     
     <!-- 451: auth source description -->
+
     <changeSet author="dwatkins"
                id="20160920-451-1">
         <addColumn tableName="authoritative_source">
@@ -2753,5 +2754,32 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 605: review indexes -->
+
+    <changeSet id="20160927-605-1"
+               author="dwatkins">
+        <createIndex tableName="asset_cost"
+                     indexName="idx_asset_cost_yr_code">
+            <column name="year"
+                    descending="true"
+                    type="${int.type}">
+            </column>
+            <column name="asset_code"
+                    type="VARCHAR(255)">
+            </column>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20160927-605-2"
+               author="dwatkins">
+        <createIndex tableName="asset_cost"
+                     indexName="idx_asset_cost_yr">
+            <column name="year"
+                    descending="true"
+                    type="${int.type}">
+            </column>
+        </createIndex>
+    </changeSet>
 
 </databaseChangeLog>
