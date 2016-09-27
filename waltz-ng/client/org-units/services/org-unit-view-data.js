@@ -14,6 +14,17 @@ import _ from "lodash";
 import {aggregatePeopleInvolvements} from "../../involvement/involvement-utils";
 
 
+function mkSelector(orgUnitId) {
+    return {
+        entityReference: {
+            kind: 'ORG_UNIT',
+            id: orgUnitId
+        },
+        scope: 'CHILDREN'
+    };
+}
+
+
 function service($q,
                  appStore,
                  appCapabilityStore,
@@ -23,7 +34,6 @@ function service($q,
                  entityStatisticStore,
                  involvementStore,
                  ratingStore,
-                 perspectiveStore,
                  orgUnitStore,
                  authSourceCalculator,
                  endUserAppStore,
@@ -36,27 +46,15 @@ function service($q,
 
     const rawData = {};
 
-
-
     function loadAll(orgUnitId) {
-        const entityReference = {
-            id: orgUnitId,
-            kind: 'ORG_UNIT'
-        };
-
-        const appIdSelector = {
-            entityReference,
-            scope: 'CHILDREN'
-        };
+        const appIdSelector = mkSelector(orgUnitId);
 
         const promises = [
             orgUnitStore.findAll(),
             appStore.findBySelector(appIdSelector),
             involvementStore.findPeopleByEntityReference('ORG_UNIT', orgUnitId),
             involvementStore.findByEntityReference('ORG_UNIT', orgUnitId),
-            perspectiveStore.findByCode('BUSINESS'),
             dataFlowViewService.initialise(orgUnitId, "ORG_UNIT", "CHILDREN"),
-            changeLogStore.findByEntityReference('ORG_UNIT', orgUnitId),
             assetCostViewService.initialise(appIdSelector, 2016)
         ];
 
@@ -66,39 +64,37 @@ function service($q,
                 apps,
                 people,
                 involvements,
-                perspective,
                 dataFlows,
-                changeLogs,
                 assetCostData]) => {
 
-                const appsWithManagement = _.map(apps, a => _.assign(a, {management: 'IT'}));
+                const appsWithManagement = _.map(
+                    apps,
+                    a => _.assign(a, { management: 'IT' }));
 
                 const r = {
-                    entityReference,
+                    entityReference: appIdSelector.entityReference,
                     orgUnits,
                     apps: appsWithManagement,
                     involvements,
-                    perspective,
                     dataFlows,
-                    changeLogs,
                     assetCostData
                 };
 
                 Object.assign(rawData, r);
             })
             .then(() => loadAll2(orgUnitId))
+            .then(() => loadChangeLogs(orgUnitId, rawData))
+            .then(() => rawData);
     }
 
+    function loadChangeLogs(orgUnitId, holder = {}) {
+        return changeLogStore
+            .findByEntityReference('ORG_UNIT', orgUnitId)
+            .then(changeLogs => holder.changeLogs = changeLogs);
+    }
 
     function loadAll2(orgUnitId) {
-
-        const selector = {
-            entityReference: {
-                kind: 'ORG_UNIT',
-                id: orgUnitId
-            },
-            scope: 'CHILDREN'
-        };
+        const selector = mkSelector(orgUnitId);
 
         const bulkPromise = $q.all([
             ratingStore.findByAppIdSelector(selector),
@@ -126,7 +122,6 @@ function service($q,
                 sourceDataRatings,
                 entityStatisticDefinitions
             ]) => {
-
                 const endUserAppsWithManagement = _.map(_.cloneDeep(endUserApps),
                     a => _.assign(a, {
                         management: 'End User',
@@ -135,9 +130,7 @@ function service($q,
                         overallRating: 'Z'
                     }));
 
-
                 const combinedApps = _.concat(rawData.apps, endUserAppsWithManagement);
-
 
                 const r = {
                     orgUnitId,
@@ -199,7 +192,6 @@ service.$inject = [
     'EntityStatisticStore',
     'InvolvementStore',
     'RatingStore',
-    'PerspectiveStore',
     'OrgUnitStore',
     'AuthSourcesCalculator',
     'EndUserAppStore',
