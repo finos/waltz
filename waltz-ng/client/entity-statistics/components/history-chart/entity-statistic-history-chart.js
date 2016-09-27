@@ -109,7 +109,11 @@ function drawPoints(section, points = [], scales, options) {
     pointSelection
         .attr({
             cx: p => scales.x(p.date),
-            cy: p => scales.y(p.count),
+            cy: p => scales.y(p.count)
+        })
+        .transition()
+        .duration(50)
+        .attr({
             r: p => {
                 return options.highlightedDate && p.date.getTime() === options.highlightedDate.getTime()
                     ? 6
@@ -148,6 +152,9 @@ function drawLines(section, points = [], scales) {
 
     pathSelector
         .exit()
+        .transition()
+        .duration(animationDuration)
+        .attr({opacity: 0})
         .remove();
 
     pathSelector
