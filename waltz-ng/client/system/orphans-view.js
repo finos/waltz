@@ -24,19 +24,22 @@ function controller($q,
                 orphanStore.findOrphanAuthoritativeSourcesByOrgUnit(),
                 orphanStore.findOrphanAuthoritativeSourcesByApp(),
                 orphanStore.findOrphanAuthoritativeSourcesByDataType(),
+                orphanStore.findOrphanChangeInitiatives()
             ])
             .then( ([apps,
                 appCaps,
                 authSourcesByOrgUnit,
                 authSourcesByApp,
-                authSourcesByDataType
+                authSourcesByDataType,
+                changeInitiatives
             ]) => {
                 const orphans = [
-                    {description: 'Applications referencing non existent Org Units', values: apps},
+                    {description: 'Applications referencing non-existent Org Units', values: apps},
                     {description: 'Application Capabilities mapping to non existent Functions or Apps', values: appCaps},
                     {description: 'Authoritative Sources with non-existent Org Unit', values: authSourcesByOrgUnit},
                     {description: 'Authoritative Sources with non-existent Application', values: authSourcesByApp},
-                    {description: 'Authoritative Sources with non-existent Data Type', values: authSourcesByDataType}
+                    {description: 'Authoritative Sources with non-existent Data Type', values: authSourcesByDataType},
+                    {description: 'Change Initiatives with non-existent parent', values: changeInitiatives}
                 ];
                 vm.orphans = orphans;
             });
