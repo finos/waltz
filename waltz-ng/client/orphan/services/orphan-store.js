@@ -40,12 +40,18 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const findOrphanChangeInitiatives = () => $http
+        .get(`${BASE}/change-initiative`)
+        .then(result => result.data);
+
+
     return {
         findAppsWithNonExistentOrgUnits,
         findOrphanAppCaps,
         findOrphanAuthoritativeSourcesByApp,
         findOrphanAuthoritativeSourcesByOrgUnit,
-        findOrphanAuthoritativeSourcesByDataType
+        findOrphanAuthoritativeSourcesByDataType,
+        findOrphanChangeInitiatives
     };
 
 }

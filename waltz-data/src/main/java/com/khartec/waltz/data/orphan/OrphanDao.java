@@ -142,4 +142,22 @@ public class OrphanDao {
                         .build());
     }
 
+
+    public List<OrphanRelationship> findOrphanChangeInitiatives() {
+        Condition missingParent = CHANGE_INITIATIVE.PARENT_ID
+                .notIn(DSL.select(CHANGE_INITIATIVE.ID)
+                        .from(CHANGE_INITIATIVE));
+
+
+        return dsl.select(CHANGE_INITIATIVE.ID,
+                CHANGE_INITIATIVE.PARENT_ID)
+                .from(CHANGE_INITIATIVE)
+                .where(missingParent)
+                .fetch(r -> ImmutableOrphanRelationship.builder()
+                        .entityA(mkRef(EntityKind.CHANGE_INITIATIVE, r.value1()))
+                        .entityB(mkRef(EntityKind.CHANGE_INITIATIVE, r.value2()))
+                        .orphanSide(OrphanSide.A)
+                        .build());
+    }
+
 }

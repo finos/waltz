@@ -43,6 +43,7 @@ public class OrphanEndpoint implements Endpoint {
         String findOrphanAuthoritativeSourcesByAppPath = mkPath(BASE_URL, "authoritative-source", "application");
         String findOrphanAuthoritativeSourcesByOrgUnitPath = mkPath(BASE_URL, "authoritative-source", "org-unit");
         String findOrphanAuthoritativeSourcesByDataTypePath = mkPath(BASE_URL, "authoritative-source", "data-type");
+        String findOrphanChangeInitiativesPath = mkPath(BASE_URL, "change-initiative");
 
 
         ListRoute<OrphanRelationship> findApplicationsWithNonExistingOrgUnitRoute = (request, response) -> {
@@ -75,10 +76,17 @@ public class OrphanEndpoint implements Endpoint {
         };
 
 
+        ListRoute<OrphanRelationship> findOrphanChangeInitiativesRoute = (request, response) -> {
+            requireRole(userRoleService, request, ADMIN);
+            return orphanService.findOrphanChangeInitiatives();
+        };
+
+
         getForList(findApplicationsWithNonExistingOrgUnitPath, findApplicationsWithNonExistingOrgUnitRoute);
         getForList(findOrphanApplicationCapabilitiesPath, findOrphanApplicationCapabilitiesRoute);
         getForList(findOrphanAuthoritativeSourcesByAppPath, findOrphanAuthoritativeSourcesByAppRoute);
         getForList(findOrphanAuthoritativeSourcesByOrgUnitPath, findOrphanAuthoritativeSourcesByOrgUnitRoute);
         getForList(findOrphanAuthoritativeSourcesByDataTypePath, findOrphanAuthoritativeSourcesByDataTypeRoute);
+        getForList(findOrphanChangeInitiativesPath, findOrphanChangeInitiativesRoute);
     }
 }
