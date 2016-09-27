@@ -140,7 +140,7 @@ function controller($scope,
     };
 
     const updateDecorators = (command) => {
-        dataFlowDecoratorStore
+        return dataFlowDecoratorStore
             .updateDecorators(command)
             .then(reload)
             .then(() => notification.success('Data flow updated'));
@@ -162,12 +162,12 @@ function controller($scope,
 
     vm.updateFlow = (command) => {
         if (! command.flowId) {
-            dataFlowStore.addFlow(vm.selectedFlow)
+            return dataFlowStore.addFlow(vm.selectedFlow)
                 .then(flow => Object.assign(command, { flowId: flow.id }))
                 .then(updateDecorators);
 
         } else {
-            updateDecorators(command)
+            return updateDecorators(command);
         }
     };
 

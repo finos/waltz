@@ -23,6 +23,7 @@ const initialState = {
     checkedItemIds: [],
     expandedItemIds: [],
     originalSelectedItemIds: [],
+    saving: false,
     onSave: (x) => console.log('dfte: default onSave()', x),
     onDelete: (x) => console.log('dfte: default onDelete()', x),
     onCancel: (x) => console.log('dfte: default onCancel()', x),
@@ -81,14 +82,19 @@ function controller() {
     };
 
     vm.save = () => {
+        if(vm.saving) return;
+        vm.saving = true;
         const command = mkUpdateCommand(vm.flow, vm.checkedItemIds, vm.originalSelectedItemIds);
-        vm.onSave(command);
+        vm.onSave(command)
+            .then(() => vm.saving = false);
     };
 
     vm.delete = () => vm.onDelete(vm.flow);
     vm.cancel = () => vm.onCancel();
     vm.onChange = () => vm.onDirty(isDirty(vm.checkedItemIds, vm.originalSelectedItemIds));
-    vm.canSave = () => isDirty(vm.checkedItemIds, vm.originalSelectedItemIds) && anySelected(vm.checkedItemIds);
+    vm.canSave = () => isDirty(vm.checkedItemIds, vm.originalSelectedItemIds)
+                        && anySelected(vm.checkedItemIds)
+                        && !vm.saving;
     vm.anySelected = () => anySelected(vm.checkedItemIds);
 
     vm.typeSelected = (id) => {};
