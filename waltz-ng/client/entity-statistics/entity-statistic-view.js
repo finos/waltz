@@ -15,6 +15,7 @@ const initData = {
     navItems: [],
     selectedNavItem: null,
     parentStateRef: '.',
+    history: [],
     visibility: {
         related: false
     }
@@ -60,7 +61,8 @@ function controller($q,
         const clearData = resetData({}, initData);
         vm.statistic.summary = clearData.statistic.summary;
         vm.statistic.values = clearData.statistic.values;
-        vm.summaries = clearData.summaries;
+        vm.summaries = clearData.summaries
+        vm.history = [];
     }
 
     vm.onSelectNavItem = (navItem) => {
