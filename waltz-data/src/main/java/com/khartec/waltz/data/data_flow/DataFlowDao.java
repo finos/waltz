@@ -29,6 +29,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -39,11 +40,10 @@ import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORA
 @Repository
 public class DataFlowDao {
 
-    private final DSLContext dsl;
-    private final com.khartec.waltz.schema.tables.Application sourceAppAlias = APPLICATION.as("sourceAppAlias");
-    private final com.khartec.waltz.schema.tables.Application targetAppAlias = APPLICATION.as("targetAppAlias");
+    private static final com.khartec.waltz.schema.tables.Application sourceAppAlias = APPLICATION.as("sourceAppAlias");
+    private static final com.khartec.waltz.schema.tables.Application targetAppAlias = APPLICATION.as("targetAppAlias");
 
-    private RecordMapper<Record, DataFlow> dataFlowMapper = r -> {
+    public static final RecordMapper<Record, DataFlow> TO_DOMAIN_MAPPER = r -> {
         DataFlowRecord record = r.into(DataFlowRecord.class);
         return ImmutableDataFlow.builder()
                 .id(record.getId())
@@ -62,10 +62,23 @@ public class DataFlowDao {
     };
 
 
+    public static final BiFunction<DataFlow, DSLContext, DataFlowRecord> TO_RECORD_MAPPER = (flow, dsl) -> {
+        DataFlowRecord record = dsl.newRecord(DATA_FLOW);
+        record.setProvenance(flow.provenance());
+        record.setSourceEntityId(flow.source().id());
+        record.setSourceEntityKind(flow.source().kind().name());
+        record.setTargetEntityId(flow.target().id());
+        record.setTargetEntityKind(flow.target().kind().name());
+        return record;
+    };
+
+
+    private final DSLContext dsl;
+
+
     @Autowired
     public DataFlowDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl must not be null");
-
         this.dsl = dsl;
     }
 
@@ -74,7 +87,7 @@ public class DataFlowDao {
         return baseQuery()
                 .and(DATA_FLOW.SOURCE_ENTITY_ID.eq(ref.id()))
                 .or(DATA_FLOW.TARGET_ENTITY_ID.eq(ref.id()))
-                .fetch(dataFlowMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -82,16 +95,9 @@ public class DataFlowDao {
         return baseQuery()
                 .and(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector))
                 .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector))
-                .fetch(dataFlowMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
-
-    public List<DataFlow> findByApplicationIds(Collection<Long> appIds) {
-        return baseQuery()
-                .and(DATA_FLOW.SOURCE_ENTITY_ID.in(appIds))
-                .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIds))
-                .fetch(dataFlowMapper);
-    }
 
     private SelectConditionStep<Record> baseQuery() {
 
@@ -116,13 +122,7 @@ public class DataFlowDao {
 
 
     public DataFlow addFlow(DataFlow flow) {
-        DataFlowRecord record = dsl.newRecord(DATA_FLOW);
-
-        record.setProvenance(flow.provenance());
-        record.setSourceEntityId(flow.source().id());
-        record.setSourceEntityKind(flow.source().kind().name());
-        record.setTargetEntityId(flow.target().id());
-        record.setTargetEntityKind(flow.target().kind().name());
+        DataFlowRecord record = TO_RECORD_MAPPER.apply(flow, dsl);
 
         record.store();
 
@@ -135,14 +135,14 @@ public class DataFlowDao {
     public DataFlow findByFlowId(long dataFlowId) {
         return baseQuery()
                 .and(DATA_FLOW.ID.eq(dataFlowId))
-                .fetchOne(dataFlowMapper);
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     public List<DataFlow> findByFlowIds(Collection<Long> dataFlowIds) {
         return baseQuery()
                 .and(DATA_FLOW.ID.in(dataFlowIds))
-                .fetch(dataFlowMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -162,6 +162,6 @@ public class DataFlowDao {
                 .innerJoin(DATA_FLOW_DECORATOR)
                 .on(DATA_FLOW_DECORATOR.DATA_FLOW_ID.eq(DATA_FLOW.ID))
                 .where(dsl.renderInlined(condition))
-                .fetch(dataFlowMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

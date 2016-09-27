@@ -42,30 +42,34 @@ function service($q,
 
         const promises = [
             dataTypeService.loadDataTypes(),
-            appStore.findBySelector(dataTypeIdSelector),
-            changeLogStore.findByEntityReference('DATA_TYPE', dataTypeId),
+            appStore.findBySelector(dataTypeIdSelector)
         ];
 
         return $q.all(promises)
             .then(([
                 dataTypes,
                 apps,
-                changeLogs,
             ]) => {
 
                 const appsWithManagement = _.map(apps, a => _.assign(a, {management: 'IT'}));
 
                 const r = {
                     dataTypes,
-                    apps: appsWithManagement,
-                    changeLogs,
+                    apps: appsWithManagement
                 };
 
                 Object.assign(rawData, r);
             })
             .then(() => loadAll2(dataTypeId))
+            .then(() => loadChangeLog(dataTypeId, rawData))
+            .then(() => rawData)
     }
 
+    function loadChangeLog(dataTypeId, holder = {}) {
+        return changeLogStore
+            .findByEntityReference('DATA_TYPE', dataTypeId)
+            .then(changes => holder.changeLogs = changes);
+    }
 
     function loadAll2(dataTypeId) {
 

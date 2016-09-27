@@ -7,6 +7,7 @@ import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.person.Person;
 import org.jooq.DSLContext;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.khartec.waltz.common.StringUtilities.mkTerms;
@@ -17,6 +18,10 @@ public class SqlServerPersonSearch implements FullTextSearch<Person>, DatabaseVe
     @Override
     public List<Person> search(DSLContext dsl, String query) {
         List<String> terms = mkTerms(query);
+        if (terms.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return dsl.select(PERSON.fields())
                 .from(PERSON)
                 .where(JooqUtilities.MSSQL.mkContains(terms))
