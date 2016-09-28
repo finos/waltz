@@ -1,0 +1,36 @@
+<div class="row waltz-immediate-hierarchy-navigator">
+    <div class="col-md-6">
+        <strong>Parents: </strong>
+        <div class="wihn-list">
+            <ul class="list-unstyled"
+                ng-if="$ctrl.parents.length > 0">
+                <li ng-repeat="child in $ctrl.parents">
+                    <a ng-href="{{ child.url }}"
+                       ng-bind="child.entityReference.name">
+                    </a>
+                </li>
+            </ul>
+            <i ng-if="$ctrl.parents.length == 0">
+                -
+            </i>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <strong>Children: </strong>
+        <div class="wihn-list">
+            <ul class="list-unstyled"
+                ng-if="$ctrl.children.length > 0">
+                <li ng-repeat="child in $ctrl.children">
+                    <a ng-href="{{ child.url }}"
+                       ng-bind="child.entityReference.name">
+                    </a>
+                </li>
+            </ul>
+            <i ng-if="$ctrl.children.length == 0">
+                -
+            </i>
+        </div>
+    </div>
+
+</div>

@@ -31,7 +31,7 @@ public class PostgresOrganisationalUnitSearch implements FullTextSearch<Organisa
     @Override
     public List<OrganisationalUnit> search(DSLContext dsl, String terms) {
         Result<Record> records = dsl.fetch(QUERY, terms, terms);
-        return records.map(OrganisationalUnitDao.recordMapper);
+        return records.map(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
     }
 
 }

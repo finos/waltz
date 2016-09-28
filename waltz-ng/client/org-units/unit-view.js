@@ -55,6 +55,12 @@ function controller($stateParams,
     vm.loadFlowDetail = () => viewDataService
         .loadFlowDetail()
         .then(flowData => vm.viewData.dataFlows = flowData);
+
+
+    vm.loadOrgUnitDescendants = (id) => viewDataService
+        .loadOrgUnitDescendants(id)
+        .then(descendants => vm.viewData.orgUnitDescendants = descendants);
+
 }
 
 

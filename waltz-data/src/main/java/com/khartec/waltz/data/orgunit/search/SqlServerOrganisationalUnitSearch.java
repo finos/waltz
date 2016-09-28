@@ -25,6 +25,6 @@ public class SqlServerOrganisationalUnitSearch implements FullTextSearch<Organis
                 .from(ORGANISATIONAL_UNIT)
                 .where(JooqUtilities.MSSQL.mkContains(terms))
                 .limit(20)
-                .fetch(OrganisationalUnitDao.recordMapper);
+                .fetch(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
     }
 }

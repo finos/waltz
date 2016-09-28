@@ -4,7 +4,7 @@
     <div class="row">
 
         <div class="col-sm-12 ">
-            <div ng-bind="ctrl.unit.description"></div>
+            <div ng-bind="$ctrl.orgUnit.description"></div>
 
             <br>
 
@@ -12,13 +12,13 @@
 
                 <div class="row">
                     <div class="col-sm-4">
-                        <waltz-apps-by-investment-pie applications="ctrl.apps"
+                        <waltz-apps-by-investment-pie applications="$ctrl.apps"
                                                       size="70">
                         </waltz-apps-by-investment-pie>
                     </div>
 
                     <div class="col-sm-4">
-                        <waltz-apps-by-lifecycle-phase-pie applications="ctrl.apps"
+                        <waltz-apps-by-lifecycle-phase-pie applications="$ctrl.apps"
                                                            size="70">
                         </waltz-apps-by-lifecycle-phase-pie>
                     </div>
@@ -31,7 +31,7 @@
                             <waltz-flow-cloud-diagram
                                 width="220"
                                 height="220"
-                                stats="ctrl.flows">
+                                stats="$ctrl.flows">
                             </waltz-flow-cloud-diagram>
                         </waltz-basic-info-tile>
                     </div>
@@ -44,7 +44,7 @@
                                                waltz-jump-to="costs-section"
                                                icon="money">
                             <span style="font-size: x-large;"
-                                  ng-bind="ctrl.portfolioCostStr">
+                                  ng-bind="$ctrl.portfolioCostStr">
                             </span>
                         </waltz-basic-info-tile>
                     </div>
@@ -56,11 +56,11 @@
                                                icon="rocket">
                             <div style="font-size: x-large;">
                                 &Sigma;
-                                <span ng-bind="ctrl.complexitySummary.cumulativeScore | toFixed:1">
+                                <span ng-bind="$ctrl.complexitySummary.cumulativeScore | toFixed:1">
                                 </span>
                             </div>
                             <div class="small text-muted">
-                                <span ng-bind="ctrl.complexitySummary.averageScore | toFixed:2">
+                                <span ng-bind="$ctrl.complexitySummary.averageScore | toFixed:2">
                                 </span>
                                 per app
                             </div>
@@ -73,10 +73,10 @@
                                                icon="server">
                             <div>
                                 <div style="font-size: x-large;">
-                                    # <span ng-bind="ctrl.serverStats.total"></span>
+                                    # <span ng-bind="$ctrl.enrichedServerStats.total"></span>
                                 </div>
                                 <div class="small text-muted">
-                                    <span ng-bind="ctrl.serverStats.virtualPercentage"></span>% virtual
+                                    <span ng-bind="$ctrl.enrichedServerStats.virtualPercentage"></span>% virtual
                                 </div>
                             </div>
                         </waltz-basic-info-tile>
@@ -91,10 +91,10 @@
                             <div>
                                 <div style="font-size: xx-large;">
                                     #
-                                    <span ng-bind="ctrl.capabilityStats.total"></span>
+                                    <span ng-bind="$ctrl.capabilityStats.total"></span>
                                 </div>
                                 <div class="small text-muted">
-                                    <span ng-bind="ctrl.capabilityStats.perApplication"></span>
+                                    <span ng-bind="$ctrl.capabilityStats.perApplication"></span>
                                     per app
                                 </div>
                             </div>
@@ -106,39 +106,35 @@
             <hr>
 
             <!-- NAV -->
-
-            <div class="row no-overflow"
-                 ng-if="ctrl.parents.length > 0 || ctrl.unit.children.length > 0"
+            <div class="row"
                  style="padding: 1em">
-
-                <div ng-if="ctrl.parents.length > 0"
-                     class="col-sm-4">
-
-                    <h4>Parent Units: </h4>
-                    <ul>
-                        <li ng-repeat="parent in ctrl.parents">
-                            <a ui-sref="main.org-unit.view ({id: parent.id })"
-                               ng-bind="parent.name">
-                            </a>
-                            <span ng-if="!$last">&raquo;</span>
-                        </li>
-                    </ul>
-
-                    <span class="text-muted small"
-                          ng-bind="ctrl.parent.description">
-                    </span>
+                <div class="col-md-6">
+                    <waltz-immediate-hierarchy-navigator parents="$ctrl.parentOrgUnits"
+                                                         children="$ctrl.childOrgUnits">
+                    </waltz-immediate-hierarchy-navigator>
                 </div>
 
-                <div ng-if="ctrl.unit.children.length > 0"
-                     class="col-sm-8">
+                <div class="col-md-6">
+                    <div>
+                        <strong>Hierarchy:</strong>
+                        <span style="padding-left: 10px">
+                            <a ng-click="$ctrl.loadOrgUnitDescendants($ctrl.orgUnit.id)"
+                               ng-if="$ctrl.childOrgUnits.length > 0 && $ctrl.descendantsTree.length == 0"
+                               class="clickable">
+                                browse ...
+                            </a>
 
-                    <h4>Sub Units</h4>
+                            <div style="display: inline-block; vertical-align: top">
+                                <waltz-org-unit-tree tree="$ctrl.descendantsTree"
+                                                     on-selection="$ctrl.nodeSelected">
+                                </waltz-org-unit-tree>
+                            </div>
+                        </span>
+                    </div>
 
-                    <waltz-org-unit-tree tree="ctrl.unit.children"
-                                         on-selection="ctrl.nodeSelected">
-                    </waltz-org-unit-tree>
                 </div>
             </div>
+
         </div>
     </div>
 

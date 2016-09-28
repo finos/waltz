@@ -27,6 +27,7 @@
 @import "../client/data-flow/directives/slope-graph/slope-graph";
 @import "../client/data-flow/components/boingy-graph/boingy-graph";
 @import "../client/data-type-usage/components/editor/app-data-type-usage-editor";
+@import "../client/entity/components/immediate-hierarchy-navigator/immediate-hierarchy-navigator";
 @import "../client/entity-statistics/directives/entity-statistic";
 @import "../client/entity-statistics/components/entity-statistic-summary-card";
 @import "../client/entity-statistics/components/history-chart/entity-statistic-history-chart";
@@ -50,12 +51,8 @@ html {
 body {
     color: $waltz-font-color;
     padding-top: 70px;
-    //background-image: url("../images/stucco.png");
-    //background-repeat: repeat;
     background: $waltz-background-color;
-    //font-family: 'Noto Sans', sans-serif;
     font-family: 'Oxygen', sans-serif;
-    //font-family: sans-serif;
     margin-right: 12px;
 }
 
@@ -63,8 +60,6 @@ body {
 textarea {
   padding: 10px;
 }
-
-
 
 
 .clickable:hover {
