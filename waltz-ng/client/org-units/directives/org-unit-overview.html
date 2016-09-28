@@ -4,8 +4,7 @@
     <div class="row">
 
         <div class="col-sm-12 ">
-            <div ng-bind="ctrl.unit.description">
-            </div>
+            <div ng-bind="ctrl.unit.description"></div>
 
             <br>
 
@@ -95,7 +94,8 @@
                                     <span ng-bind="ctrl.capabilityStats.total"></span>
                                 </div>
                                 <div class="small text-muted">
-                                    <span ng-bind="ctrl.capabilityStats.perApplication"></span> per app
+                                    <span ng-bind="ctrl.capabilityStats.perApplication"></span>
+                                    per app
                                 </div>
                             </div>
                         </waltz-basic-info-tile>
@@ -105,11 +105,14 @@
 
             <hr>
 
+            <!-- NAV -->
+
             <div class="row no-overflow"
-                 ng-if="ctrl.parents.length > 0"
+                 ng-if="ctrl.parents.length > 0 || ctrl.unit.children.length > 0"
                  style="padding: 1em">
 
-                <div class="col-sm-4">
+                <div ng-if="ctrl.parents.length > 0"
+                     class="col-sm-4">
 
                     <h4>Parent Units: </h4>
                     <ul>
@@ -121,7 +124,7 @@
                         </li>
                     </ul>
 
-                    <span class="text-muted small "
+                    <span class="text-muted small"
                           ng-bind="ctrl.parent.description">
                     </span>
                 </div>
@@ -136,7 +139,6 @@
                     </waltz-org-unit-tree>
                 </div>
             </div>
-
         </div>
     </div>
 
