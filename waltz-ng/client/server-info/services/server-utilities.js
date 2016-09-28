@@ -37,8 +37,8 @@ export function enrichServerStats(serverStats) {
         ? Number((virtualCount / total) * 100).toFixed(1)
         : "-";
 
-    serverStats.total = total;
-    serverStats.virtualPercentage = virtualPercentage;
-
-    return serverStats;
+    return Object.assign(
+        {} ,
+        serverStats,
+        { total, virtualPercentage });
 }

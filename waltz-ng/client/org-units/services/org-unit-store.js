@@ -30,6 +30,25 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const findDescendants = (id) => $http
+        .get(`${BASE}/${id}/descendants`)
+        .then(result => result.data);
+
+
+    /**
+     * id -> [{level, entityReference}...]
+     * @param id
+     */
+    const findImmediateHierarchy = (id) => $http
+        .get(`${BASE}/${id}/immediate-hierarchy`)
+        .then(result => result.data);
+
+
+    const search = (query) => $http
+        .get(`${BASE}/search/${query}`)
+        .then(x => x.data);
+
+
     const updateDescription = (id, newValue, oldValue) =>
         $http.post(
             `${BASE}/${id}/description`, {
@@ -39,15 +58,12 @@ function service($http, BaseApiUrl) {
             });
 
 
-    const search = (query) => $http
-        .get(`${BASE}/search/${query}`)
-        .then(x => x.data);
-
-
     return {
         getById,
-        findByIds,
         findAll,
+        findByIds,
+        findDescendants,
+        findImmediateHierarchy,
         search,
         updateDescription
     };

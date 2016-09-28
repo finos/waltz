@@ -34,15 +34,16 @@
 
     <!-- OVERVIEW -->
     <waltz-org-unit-overview class='waltz-page-summary-attach'
-                             parent="ctrl.viewData.immediateHierarchy.parent"
-                             all-units="ctrl.viewData.orgUnits"
-                             unit-id="ctrl.viewData.orgUnit.id"
+                             org-unit="ctrl.viewData.orgUnit"
+                             org-unit-descendants="ctrl.viewData.orgUnitDescendants"
                              apps="ctrl.viewData.apps"
                              flows="ctrl.viewData.dataFlows.stats"
                              ratings="ctrl.viewData.capabilityRatings"
                              costs="ctrl.viewData.assetCostData.stats"
                              server-stats="ctrl.viewData.techStats.serverStats"
-                             complexity="ctrl.viewData.complexity">
+                             immediate-hierarchy="ctrl.viewData.immediateHierarchy"
+                             complexity="ctrl.viewData.complexity"
+                             load-org-unit-descendants="ctrl.loadOrgUnitDescendants">
     </waltz-org-unit-overview>
 
 
@@ -84,6 +85,7 @@
                                    ratings="ctrl.viewData.sourceDataRatings"
                                    entities="['AUTHORITATIVE_SOURCE']">
         </waltz-source-data-overlay>
+
         <uib-tabset>
 
             <!-- RATED FLOWS -->

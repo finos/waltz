@@ -19,6 +19,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.LeveledEntityReference;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
@@ -74,12 +75,16 @@ public class OrganisationUnitEndpoint implements Endpoint {
         String searchPath = mkPath(BASE_URL, "search", ":query");
         String findByIdsPath = mkPath(BASE_URL, "by-ids");
         String getByIdPath = mkPath(BASE_URL, ":id");
+        String findDescendantsPath = mkPath(BASE_URL, ":id", "descendants");
+        String findImmediateHierarchyPath = mkPath(BASE_URL, ":id", "immediate-hierarchy");
         String postDescriptionPath = mkPath(BASE_URL, ":id", "description");
 
 
         ListRoute<OrganisationalUnit> findAllRoute = (request, response) -> service.findAll();
         ListRoute<OrganisationalUnit> searchRoute = (request, response) -> service.search(request.params("query"));
         ListRoute<OrganisationalUnit> findByIdsRoute = (req, res) -> service.findByIds(readBody(req, Long[].class));
+        ListRoute<LeveledEntityReference> findImmediateHierarchyRoute = (req, res) -> service.findImmediateHierarchy(getId(req));
+        ListRoute<OrganisationalUnit> findDescendantsRoute = (req, res) -> service.findDescendants(getId(req));
 
         DatumRoute<OrganisationalUnit> getByIdRoute = (request, response) -> service.getById(getId(request));
 
@@ -110,6 +115,8 @@ public class OrganisationUnitEndpoint implements Endpoint {
 
         getForList(findAllPath, findAllRoute);
         getForList(searchPath, searchRoute);
+        getForList(findImmediateHierarchyPath, findImmediateHierarchyRoute);
+        getForList(findDescendantsPath, findDescendantsRoute);
         postForList(findByIdsPath, findByIdsRoute);
 
         getForDatum(getByIdPath, getByIdRoute);

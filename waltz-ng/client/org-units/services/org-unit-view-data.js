@@ -28,7 +28,6 @@ function mkSelector(orgUnitId) {
 function service($q,
                  appStore,
                  appCapabilityStore,
-                 orgUnitUtils,
                  changeLogStore,
                  dataFlowViewService,
                  entityStatisticStore,
@@ -50,7 +49,8 @@ function service($q,
         const appIdSelector = mkSelector(orgUnitId);
 
         const promises = [
-            orgUnitStore.findAll(),
+            orgUnitStore.getById(orgUnitId),
+            orgUnitStore.findImmediateHierarchy(orgUnitId),
             appStore.findBySelector(appIdSelector),
             involvementStore.findPeopleByEntityReference('ORG_UNIT', orgUnitId),
             involvementStore.findByEntityReference('ORG_UNIT', orgUnitId),
@@ -60,7 +60,8 @@ function service($q,
 
         return $q.all(promises)
             .then(([
-                orgUnits,
+                orgUnit,
+                immediateHierarchy,
                 apps,
                 people,
                 involvements,
@@ -72,8 +73,9 @@ function service($q,
                     a => _.assign(a, { management: 'IT' }));
 
                 const r = {
+                    orgUnit,
                     entityReference: appIdSelector.entityReference,
-                    orgUnits,
+                    immediateHierarchy,
                     apps: appsWithManagement,
                     involvements,
                     dataFlows,
@@ -149,9 +151,7 @@ function service($q,
 
                 Object.assign(rawData, r);
 
-                rawData.immediateHierarchy = orgUnitUtils.getImmediateHierarchy(rawData.orgUnits, orgUnitId);
                 rawData.involvements = aggregatePeopleInvolvements(rawData.involvements, rawData.people);
-                rawData.orgUnit = _.find(rawData.orgUnits, { id: orgUnitId });
 
                 return rawData;
             });
@@ -174,10 +174,18 @@ function service($q,
     }
 
 
+    function loadOrgUnitDescendants(orgUnitId) {
+        return orgUnitStore
+            .findDescendants(orgUnitId)
+            .then(descendants => rawData.orgUnitDescendants = descendants);
+    }
+
+
     return {
         loadAll,
         selectAssetBucket,
-        loadFlowDetail
+        loadFlowDetail,
+        loadOrgUnitDescendants
     };
 
 }
@@ -186,7 +194,6 @@ service.$inject = [
     '$q',
     'ApplicationStore',
     'AppCapabilityStore',
-    'OrgUnitUtilityService',
     'ChangeLogDataService',
     'DataFlowViewService',
     'EntityStatisticStore',

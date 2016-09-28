@@ -20,6 +20,8 @@ package com.khartec.waltz.data.orgunit;
 import com.khartec.waltz.data.FindEntityReferencesByIdSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.ImmutableLeveledEntityReference;
+import com.khartec.waltz.model.LeveledEntityReference;
 import com.khartec.waltz.model.orgunit.ImmutableOrganisationalUnit;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.model.orgunit.OrganisationalUnitKind;
@@ -37,6 +39,7 @@ import java.util.Optional;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
+import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 
@@ -44,9 +47,10 @@ import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_
 public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrganisationalUnitDao.class);
+    private static final com.khartec.waltz.schema.tables.OrganisationalUnit ou = ORGANISATIONAL_UNIT.as("ou");
 
 
-    public static final RecordMapper<Record, OrganisationalUnit> recordMapper = record -> {
+    public static final RecordMapper<Record, OrganisationalUnit> TO_DOMAIN_MAPPER = record -> {
         OrganisationalUnitRecord orgUnitRecord = record.into(OrganisationalUnitRecord.class);
         return ImmutableOrganisationalUnit.builder()
                 .name(orgUnitRecord.getName())
@@ -57,9 +61,22 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
                 .build();
     };
 
-    private static final com.khartec.waltz.schema.tables.OrganisationalUnit ou = ORGANISATIONAL_UNIT.as("ou");
+
+    private static final RecordMapper<Record, LeveledEntityReference> TO_LEVELED_ENTITY_REF_MAPPER = record -> {
+        EntityReference entityRef = EntityReference.mkRef(
+                EntityKind.ORG_UNIT,
+                record.getValue(ORGANISATIONAL_UNIT.ID),
+                record.getValue(ORGANISATIONAL_UNIT.NAME));
+
+        return ImmutableLeveledEntityReference.builder()
+                .entityReference(entityRef)
+                .level(record.getValue(ENTITY_HIERARCHY.LEVEL))
+                .build();
+    };
+
 
     private final DSLContext dsl;
+
 
     @Autowired
     public OrganisationalUnitDao(DSLContext dsl) {
@@ -71,7 +88,7 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
     public List<OrganisationalUnit> findAll() {
         return dsl.select(ou.fields())
                 .from(ou)
-                .fetch(recordMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -79,7 +96,7 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
         return dsl.select(ou.fields())
                 .from(ou)
                 .where(ou.ID.eq(id))
-                .fetchOne(recordMapper);
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
@@ -117,7 +134,49 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
         return dsl.select(ou.fields())
                 .from(ou)
                 .where(condition)
-                .fetch(recordMapper);
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+
+    public List<LeveledEntityReference> findImmediateHierarchy(long id) {
+
+        Select<Record3<Long, String, Integer>> immediateChildren = DSL.select(
+                    ORGANISATIONAL_UNIT.ID,
+                    ORGANISATIONAL_UNIT.NAME,
+                    ENTITY_HIERARCHY.LEVEL.plus(1).as(ENTITY_HIERARCHY.LEVEL))  // immediate children always at 'level + 1'
+                .from(ORGANISATIONAL_UNIT)
+                .innerJoin(ENTITY_HIERARCHY)
+                .on(ENTITY_HIERARCHY.ID.eq(ORGANISATIONAL_UNIT.ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())))
+                .where(ORGANISATIONAL_UNIT.PARENT_ID.eq(id))
+                .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(id));
+
+        Select<Record3<Long, String, Integer>> allParents = DSL.select(
+                    ORGANISATIONAL_UNIT.ID,
+                    ORGANISATIONAL_UNIT.NAME,
+                    ENTITY_HIERARCHY.LEVEL)
+                .from(ORGANISATIONAL_UNIT)
+                .innerJoin(ENTITY_HIERARCHY)
+                .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(ORGANISATIONAL_UNIT.ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())))
+                .where(ENTITY_HIERARCHY.ID.eq(id));
+
+        return dsl.selectFrom(immediateChildren.asTable())
+                .unionAll(allParents)
+                .orderBy(ENTITY_HIERARCHY.LEVEL, ORGANISATIONAL_UNIT.NAME)
+                .fetch(TO_LEVELED_ENTITY_REF_MAPPER);
+    }
+
+
+    public List<OrganisationalUnit> findDescendants(long id) {
+        return dsl.select(ORGANISATIONAL_UNIT.fields())
+                .from(ORGANISATIONAL_UNIT)
+                .innerJoin(ENTITY_HIERARCHY)
+                .on(ENTITY_HIERARCHY.ID.eq(ORGANISATIONAL_UNIT.ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())))
+                .where(ENTITY_HIERARCHY.ANCESTOR_ID.eq(id))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -127,4 +186,5 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
                 "dsl=" + dsl +
                 '}';
     }
+
 }

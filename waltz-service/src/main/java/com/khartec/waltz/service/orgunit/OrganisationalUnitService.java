@@ -166,4 +166,13 @@ public class OrganisationalUnitService {
     }
 
 
+    public List<LeveledEntityReference> findImmediateHierarchy(long id) {
+        return dao.findImmediateHierarchy(id);
+    }
+
+
+    public List<OrganisationalUnit> findDescendants(long id) {
+        return dao.findDescendants(id);
+    }
+
 }

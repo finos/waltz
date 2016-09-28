@@ -10,11 +10,14 @@
     </waltz-page-header>
 
     <waltz-section name="foo">
-        <waltz-entity-statistic-history-panel history="ctrl.history">
+        <div class="row">
+            <div class="col-md-6">
+                <waltz-immediate-hierarchy-navigator hierarchy="ctrl.hierarchy"
+                                                     self-id="50">
+                </waltz-immediate-hierarchy-navigator>
+            </div>
+        </div>
 
-        </waltz-entity-statistic-history-panel>
-
-        <pre>{{ctrl.options}}</pre>
     </waltz-section>
 
 </div>

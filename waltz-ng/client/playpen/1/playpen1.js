@@ -34,7 +34,7 @@ const data = [
 ];
 
 
-function controller($scope, entityStatisticStore) {
+function controller($scope, orgUnitStore) {
     const vm = Object.assign(this, initData);
 
     const statDefn = {
@@ -48,15 +48,14 @@ function controller($scope, entityStatisticStore) {
     };
 
 
-    entityStatisticStore.calculateHistoricStatTally(statDefn, selector)
-        .then(h => vm.history = h)
-
+    orgUnitStore.findImmediateHierarchy(50)
+        .then(h => vm.hierarchy = h);
 }
 
 
 controller.$inject = [
     '$scope',
-    'EntityStatisticStore'
+    'OrgUnitStore'
 ];
 
 

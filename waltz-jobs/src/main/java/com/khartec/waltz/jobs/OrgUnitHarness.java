@@ -30,6 +30,7 @@ public class OrgUnitHarness {
 
         OrganisationalUnitDao dao = ctx.getBean(OrganisationalUnitDao.class);
 
+        System.out.println(dao.findImmediateHierarchy(50L));
 
 
 
