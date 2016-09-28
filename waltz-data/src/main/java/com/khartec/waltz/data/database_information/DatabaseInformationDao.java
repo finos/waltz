@@ -9,6 +9,7 @@ import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.DatabaseInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -16,10 +17,10 @@ import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
-import static com.khartec.waltz.data.JooqUtilities.mkEndOfLifeStatusDerivedField;
+import static com.khartec.waltz.data.JooqUtilities.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
@@ -110,29 +111,31 @@ public class DatabaseInformationDao {
                 .where(APPLICATION.ID.in(appIdSelector))
                 .asTable("distinct_db_info");
 
-        List<Tally<String>> vendorCounts = calculateStringTallies(
+        Future<List<Tally<String>>> vendorPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
                 distinctDbInfo,
                 dbmsVendorInner,
-                DSL.trueCondition());
+                DSL.trueCondition()));
 
-        List<Tally<String>> environmentCounts = calculateStringTallies(
+        Future<List<Tally<String>>> environmentPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
                 distinctDbInfo,
                 environmentInner,
-                DSL.trueCondition());
+                DSL.trueCondition()));
 
-        List<Tally<String>> endOfLifeStatusCounts = calculateStringTallies(
+        Future<List<Tally<String>>> endOfLifeStatusPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
                 dsl,
                 distinctDbInfo,
                 mkEndOfLifeStatusDerivedField(eolDateInner),
-                DSL.trueCondition());
+                DSL.trueCondition()));
 
-        return ImmutableDatabaseSummaryStatistics.builder()
-                .vendorCounts(vendorCounts)
-                .environmentCounts(environmentCounts)
-                .endOfLifeStatusCounts(endOfLifeStatusCounts)
-                .build();
+        return Unchecked.supplier(() ->
+                    ImmutableDatabaseSummaryStatistics.builder()
+                            .vendorCounts(vendorPromise.get())
+                            .environmentCounts(environmentPromise.get())
+                            .endOfLifeStatusCounts(endOfLifeStatusPromise.get())
+                            .build())
+                .get();
     }
 
 }
