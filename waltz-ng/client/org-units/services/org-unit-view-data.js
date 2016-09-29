@@ -25,6 +25,11 @@ function mkSelector(orgUnitId) {
 }
 
 
+function reset(data = {}) {
+    _.each(data, (v, k) => data[k] = null);
+}
+
+
 function service($q,
                  appStore,
                  appCapabilityStore,
@@ -46,6 +51,8 @@ function service($q,
     const rawData = {};
 
     function loadAll(orgUnitId) {
+
+        reset(rawData);
         const appIdSelector = mkSelector(orgUnitId);
 
         const promises = [
