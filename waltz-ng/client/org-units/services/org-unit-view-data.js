@@ -25,6 +25,145 @@ function mkSelector(orgUnitId) {
 }
 
 
+function reset(data = {}) {
+    _.each(data, (v, k) => data[k] = null);
+}
+
+
+function loadOrgUnit(orgUnitStore, id, holder) {
+    return orgUnitStore
+        .getById(id)
+        .then(unit => holder.orgUnit = unit);
+}
+
+
+function loadImmediateHierarchy(store, id, holder) {
+    return store
+        .findImmediateHierarchy(id)
+        .then(d => holder.immediateHierarchy = d);
+}
+
+
+function loadApps(store, selector, holder) {
+    return store
+        .findBySelector(selector)
+        .then(apps => _.map(
+            apps,
+            a => _.assign(a, { management: 'IT' })))
+        .then(apps => holder.apps = apps);
+}
+
+
+function loadInvolvement(store, id, holder) {
+    return store
+        .findPeopleByEntityReference('ORG_UNIT', id)
+        .then(people => holder.people = people)
+        .then(() => store.findByEntityReference('ORG_UNIT', id))
+        .then(involvements => holder.involvements = aggregatePeopleInvolvements(involvements, holder.people));
+}
+
+
+function initialiseDataFlows(service, id, holder) {
+    return service
+        .initialise(id, "ORG_UNIT", "CHILDREN")
+        .then(dataFlows => holder.dataFlows = dataFlows);
+}
+
+
+function initialiseAssetCosts(service, selector, holder) {
+    return service
+        .initialise(selector, 2016)
+        .then(r => holder.assetCostData = r);
+}
+
+
+function loadCapabilityRatings(store, selector, holder) {
+    return store
+        .findByAppIdSelector(selector)
+        .then(r => holder.ratings = r);
+}
+
+
+function loadAppCapabilities(store, selector, holder) {
+    return store
+        .findApplicationCapabilitiesByAppIdSelector(selector)
+        .then(r => holder.rawAppCapabilities = r);
+}
+
+
+function loadAllCapabilities(store, holder) {
+    return store
+        .findAll()
+        .then(r => holder.capabilities = r);
+}
+
+
+function loadAuthSources(store, id, holder) {
+    return store
+        .findByOrgUnit(id)  // use orgIds(ASC)
+        .then(r => holder.authSources = r);
+}
+
+
+function loadEndUserApps(store, selector, holder) {
+    return store
+        .findBySelector(selector)   // use orgIds(DESC)
+        .then(apps => _.map(
+                apps,
+                a => _.assign(
+                    a,
+                    {
+                        management: 'End User',
+                        platform: a.kind,
+                        kind: 'EUC',
+                        overallRating: 'Z'
+                    })))
+        .then(apps => holder.endUserApps = apps);
+}
+
+
+function loadComplexity(store, id, holder) {
+    return store
+        .findBySelector(id, 'ORG_UNIT', 'CHILDREN')
+        .then(r => holder.complexity = r);
+}
+
+
+function loadTechStats(service, id, holder) {
+    return service
+        .findBySelector(id, 'ORG_UNIT', 'CHILDREN')
+        .then(r => holder.techStats = r);
+}
+
+
+function loadBookmarks(store, id, holder) {
+    return store
+        .findByParent({id, kind: 'ORG_UNIT'})
+        .then(r => holder.bookmarks = r);
+}
+
+
+function loadSourceDataRatings(store, holder) {
+    return store
+        .findAll()
+        .then(r => holder.sourceDataRatings = r);
+}
+
+
+function loadEntityStatisticDefinitions(store, selector, holder) {
+    return store
+        .findAllActiveDefinitions(selector)
+        .then(r => holder.entityStatisticDefinitions = r);
+}
+
+
+function loadChangeLogs(store, id, holder = {}) {
+    return store
+        .findByEntityReference('ORG_UNIT', id)
+        .then(changeLogs => holder.changeLogs = changeLogs);
+}
+
+
 function service($q,
                  appStore,
                  appCapabilityStore,
@@ -45,118 +184,69 @@ function service($q,
 
     const rawData = {};
 
+    /*
+     * As this page is quite large we load it in 4 'waves' so that
+     * we have some control over the order data is requested (and
+     * hopefully displayed
+     */
     function loadAll(orgUnitId) {
-        const appIdSelector = mkSelector(orgUnitId);
-
-        const promises = [
-            orgUnitStore.getById(orgUnitId),
-            orgUnitStore.findImmediateHierarchy(orgUnitId),
-            appStore.findBySelector(appIdSelector),
-            involvementStore.findPeopleByEntityReference('ORG_UNIT', orgUnitId),
-            involvementStore.findByEntityReference('ORG_UNIT', orgUnitId),
-            dataFlowViewService.initialise(orgUnitId, "ORG_UNIT", "CHILDREN"),
-            assetCostViewService.initialise(appIdSelector, 2016)
-        ];
-
-        return $q.all(promises)
-            .then(([
-                orgUnit,
-                immediateHierarchy,
-                apps,
-                people,
-                involvements,
-                dataFlows,
-                assetCostData]) => {
-
-                const appsWithManagement = _.map(
-                    apps,
-                    a => _.assign(a, { management: 'IT' }));
-
-                const r = {
-                    orgUnit,
-                    entityReference: appIdSelector.entityReference,
-                    immediateHierarchy,
-                    apps: appsWithManagement,
-                    involvements,
-                    dataFlows,
-                    assetCostData
-                };
-
-                Object.assign(rawData, r);
-            })
-            .then(() => loadAll2(orgUnitId))
-            .then(() => loadChangeLogs(orgUnitId, rawData))
+        reset(rawData);
+        return loadFirstWave(orgUnitId)
+            .then(() => loadSecondWave(orgUnitId))
+            .then(() => loadThirdWave(orgUnitId))
+            .then(() => rawData.combinedApps = _.concat(rawData.apps, rawData.endUserApps))
+            .then(() => loadFourthWave(orgUnitId))
             .then(() => rawData);
     }
 
-    function loadChangeLogs(orgUnitId, holder = {}) {
-        return changeLogStore
-            .findByEntityReference('ORG_UNIT', orgUnitId)
-            .then(changeLogs => holder.changeLogs = changeLogs);
-    }
 
-    function loadAll2(orgUnitId) {
+    function loadFirstWave(orgUnitId) {
         const selector = mkSelector(orgUnitId);
 
-        const bulkPromise = $q.all([
-            ratingStore.findByAppIdSelector(selector),
-            appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(selector),
-            capabilityStore.findAll(),
-            authSourceCalculator.findByOrgUnit(orgUnitId),  // use orgIds(ASC)
-            endUserAppStore.findBySelector(selector),   // use orgIds(DESC)
-            complexityStore.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
-            techStatsService.findBySelector(orgUnitId, 'ORG_UNIT', 'CHILDREN'),
-            bookmarkStore.findByParent({id: orgUnitId, kind: 'ORG_UNIT'}),
-            sourceDataRatingStore.findAll(),
-            entityStatisticStore.findAllActiveDefinitions(selector)
+        rawData.entityReference = selector.entityReference;
+        rawData.orgUnitId = orgUnitId;
+
+        return $q.all([
+            loadOrgUnit(orgUnitStore, orgUnitId, rawData),
+            loadImmediateHierarchy(orgUnitStore, orgUnitId, rawData),
+            loadApps(appStore, selector, rawData),
+            initialiseDataFlows(dataFlowViewService, orgUnitId, rawData),
+            initialiseAssetCosts(assetCostViewService, selector, rawData)
         ]);
+    }
 
-        const prepareRawDataPromise = bulkPromise
-            .then(([
-                capabilityRatings,
-                rawAppCapabilities,
-                capabilities,
-                authSources,
-                endUserApps,
-                complexity,
-                techStats,
-                bookmarks,
-                sourceDataRatings,
-                entityStatisticDefinitions
-            ]) => {
-                const endUserAppsWithManagement = _.map(_.cloneDeep(endUserApps),
-                    a => _.assign(a, {
-                        management: 'End User',
-                        platform: a.kind,
-                        kind: 'EUC',
-                        overallRating: 'Z'
-                    }));
 
-                const combinedApps = _.concat(rawData.apps, endUserAppsWithManagement);
+    function loadSecondWave(orgUnitId) {
+        const selector = mkSelector(orgUnitId);
 
-                const r = {
-                    orgUnitId,
-                    capabilityRatings,
-                    rawAppCapabilities,
-                    capabilities,
-                    authSources,
-                    endUserApps: endUserAppsWithManagement,
-                    complexity,
-                    techStats,
-                    bookmarks,
-                    sourceDataRatings,
-                    entityStatisticDefinitions,
-                    combinedApps
-                };
+        return $q.all([
+            loadInvolvement(involvementStore, orgUnitId, rawData),
+            loadCapabilityRatings(ratingStore, selector, rawData),
+            loadAppCapabilities(appCapabilityStore, selector, rawData),
+            loadAllCapabilities(capabilityStore, rawData),
+            loadAuthSources(authSourceCalculator, orgUnitId, rawData),
+            loadComplexity(complexityStore, orgUnitId, rawData),
+            loadEntityStatisticDefinitions(entityStatisticStore, selector, rawData)
+        ]);
+    }
 
-                Object.assign(rawData, r);
 
-                rawData.involvements = aggregatePeopleInvolvements(rawData.involvements, rawData.people);
+    function loadThirdWave(orgUnitId) {
+        const selector = mkSelector(orgUnitId);
 
-                return rawData;
-            });
+        return $q.all([
+            loadEndUserApps(endUserAppStore, selector, rawData),
+            loadBookmarks(bookmarkStore, orgUnitId, rawData),
+            loadTechStats(techStatsService, orgUnitId, rawData),
+        ]);
+    }
 
-        return prepareRawDataPromise;
+
+    function loadFourthWave(orgUnitId) {
+        return $q.all([
+            loadSourceDataRatings(sourceDataRatingStore, rawData),
+            loadChangeLogs(changeLogStore, orgUnitId, rawData)
+        ]);
     }
 
 
