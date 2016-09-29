@@ -32,8 +32,6 @@ function controller($scope,
         .then(() => tourService.initialiseForKey('main.person.view', true))
         .then(tour => vm.tour = tour);
 
-
-
     $scope.$watch(() => viewService.state.model, () => {
         const model = viewService.state.model;
         Object.assign(vm, model);
@@ -43,9 +41,7 @@ function controller($scope,
             vm.entityRef = { kind: 'PERSON', id: model.person.id };
         }
 
-        vm.hasAppInvolvements = hasInvolvements(model.appInvolvements);
-        vm.hasEndUserAppInvolvements = hasInvolvements(model.endUserAppInvolvements);
-        vm.hasInvolvements = vm.hasAppInvolvements || vm.hasEndUserAppInvolvements;
+        vm.hasInvolvements = hasInvolvements(viewService.state.model.combinedAppInvolvements);
     }, true);
 
 

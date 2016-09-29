@@ -23,7 +23,7 @@ export default [
                 .then(result => result.data);
 
 
-        const findEndUserAppsBydSelector = (options) => $http
+        const findEndUserAppsByIdSelector = (options) => $http
             .post(`${BASE}/end-user-application`, options)
             .then(r => r.data);
 
@@ -50,7 +50,7 @@ export default [
 
         return {
             findAppsForEmployeeId,
-            findEndUserAppsBydSelector,
+            findEndUserAppsByIdSelector,
             findByEmployeeId,
             findByEntityReference,
             findChangeInitiativesForEmployeeId,

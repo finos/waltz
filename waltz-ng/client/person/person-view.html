@@ -115,19 +115,22 @@
 
     <!-- COMPLEXITY -->
     <waltz-complexity-section complexity="ctrl.complexity"
+                              ng-if="ctrl.hasInvolvements"
                               apps="ctrl.apps">
     </waltz-complexity-section>
 
 
     <!-- FLOWS -->
     <waltz-data-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
+                                       ng-if="ctrl.hasInvolvements"
                                        flow-data="ctrl.dataFlows"
                                        on-load-detail="ctrl.loadFlowDetail"
                                        applications="ctrl.apps">
     </waltz-data-flows-tabgroup-section>
 
     <!-- AUTH SOURCES -->
-    <waltz-section name="Authoritative Sources">
+    <waltz-section name="Authoritative Sources"
+                   ng-if="ctrl.hasInvolvements">
         <waltz-rated-flow-summary-panel ng-if='ctrl.entityRef'
                                         apps="ctrl.apps"
                                         entity-reference="ctrl.entityRef"
@@ -153,13 +156,15 @@
 
     <!-- INDICATORS -->
     <waltz-entity-statistic-summary-section name="Indicators"
+                                            ng-if="ctrl.hasInvolvements"
                                             definitions="ctrl.entityStatisticDefinitions"
                                             parent-ref="ctrl.entityRef">
     </waltz-entity-statistic-summary-section>
 
 
     <!-- TECHNOLOGIES -->
-    <waltz-section name="Technologies">
+    <waltz-section name="Technologies"
+                   ng-if="ctrl.hasInvolvements">
 
         <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
                                          entities="['SERVER', 'DATABASE', 'SOFTWARE']">
@@ -172,6 +177,7 @@
 
     <!-- COSTS -->
     <waltz-asset-costs-section data="ctrl.assetCostData"
+                               ng-if="ctrl.hasInvolvements"
                                on-bucket-select="ctrl.onAssetBucketSelect"
                                source-data-ratings="ctrl.sourceDataRatings">
     </waltz-asset-costs-section>

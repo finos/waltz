@@ -1,7 +1,10 @@
 const template = require('./recalculate-view.html');
 
 
-function controller(notification, authSourceStore, dataTypeUsageStore) {
+function controller(notification,
+                    authSourceStore,
+                    complexityStore,
+                    dataTypeUsageStore) {
     const vm = this;
 
 
@@ -18,12 +21,20 @@ function controller(notification, authSourceStore, dataTypeUsageStore) {
             .recalculateAll()
             .then(() => notification.success('Data Type Usage recalculated'));
     };
+
+    vm.recalcComplexity = () => {
+        notification.info('Complexity recalculation requested');
+        complexityStore
+            .recalculateAll()
+            .then(() => notification.success('Complexity recalculated'));
+    }
 }
 
 
 controller.$inject = [
     'Notification',
     'AuthSourcesStore',
+    'ComplexityStore',
     'DataTypeUsageStore'
 ];
 

@@ -5,12 +5,12 @@
         <col width="35%">
         <col width="15%">
     </colgroup>
-    <tr ng-repeat="direct in ctrl.directs | orderBy:'displayName'">
+    <tr ng-repeat="direct in ctrl.directs">
         <td>
             <waltz-person-link person="direct"></waltz-person-link>
         </td>
         <td>
-            {{ direct.title }}
+            <span ng-bind="direct.title"></span>
         </td>
         <td>
             <waltz-mail-to person="direct"></waltz-mail-to>

@@ -20,18 +20,27 @@ export default [
 
 
         const findByApplication = id =>
-            $http.get(`${BASE}/application/${id}`)
+            $http
+                .get(`${BASE}/application/${id}`)
                 .then(result => result.data);
 
 
         const findBySelector = (id, kind, scope = 'CHILDREN') =>
-            $http.post(BASE, { scope, entityReference: { id, kind }})
+            $http
+                .post(BASE, { scope, entityReference: { id, kind }})
                 .then(result => result.data);
+
+
+        const recalculateAll = () =>
+            $http
+                .get(`${BASE}/rebuild`)
+                .then(r => r.data);
 
 
         return {
             findByApplication,
-            findBySelector
+            findBySelector,
+            recalculateAll
         };
     }
 ];
