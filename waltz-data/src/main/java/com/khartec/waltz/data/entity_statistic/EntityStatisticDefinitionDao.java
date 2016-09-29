@@ -112,14 +112,12 @@ public class EntityStatisticDefinitionDao {
                 .where(findSelf);
 
         Condition findParent = esd.ID.eq(parentIdSelector);
-        Condition findSiblings = esd.PARENT_ID.eq(parentIdSelector);
 
         return dsl.select(esd.fields())
                 .from(esd)
                 .where(findChildren
                         .or(findSelf)
                         .or(findParent)
-                        .or(findSiblings)
                 )
                 .and(esd.ACTIVE.eq(Boolean.TRUE))
                 .fetch(TO_DEFINITION_MAPPER);

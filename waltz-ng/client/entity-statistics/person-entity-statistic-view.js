@@ -1,6 +1,6 @@
 import _ from "lodash";
 import {resetData} from "../common";
-import {updateUrlWithoutReload, hasRelatedDefinitions} from './utilities';
+import {updateUrlWithoutReload, hasRelatedDefinitions} from "./utilities";
 
 
 const initData = {
@@ -88,10 +88,7 @@ function controller($q,
             .calculateStatTally(vm.statistic.definition, selector)
             .then(summary => vm.statistic.summary = summary)
             .then(() => {
-                const related = [
-                    vm.relatedDefinitions.parent,
-                    ...vm.relatedDefinitions.siblings,
-                    ...vm.relatedDefinitions.children ];
+                const related = vm.relatedDefinitions.children;
 
                 const relatedIds = _.chain(related)
                     .filter(s => s != null)

@@ -1,28 +1,12 @@
 <div class="row">
-    <div class="col-md-6 waltz-stat-summary" ng-if="$ctrl.definitions.parent">
-        <waltz-entity-statistic-summary-card summary="$ctrl.summariesByDefinitionId[$ctrl.definitions.parent.id]"
-                                             definition="$ctrl.definitions.parent"
-                                             parent-ref="$ctrl.parentRef"
-                                             sub-title="Parent">
-        </waltz-entity-statistic-summary-card>
-    </div>
 
-    <div class="col-md-6 waltz-stat-summary" ng-repeat="sibling in $ctrl.definitions.siblings">
-        <waltz-entity-statistic-summary-card summary="$ctrl.summariesByDefinitionId[sibling.id]"
-                                             definition="sibling"
-                                             parent-ref="$ctrl.parentRef"
-                                             sub-title="Sibling">
-        </waltz-entity-statistic-summary-card>
-    </div>
-
-    <div class="col-md-6 waltz-stat-summary" ng-repeat="child in $ctrl.definitions.children">
+    <div class="col-sm-6 waltz-stat-summary" ng-repeat="child in $ctrl.definitions.children">
         <waltz-entity-statistic-summary-card summary="$ctrl.summariesByDefinitionId[child.id]"
                                              definition="child"
                                              parent-ref="$ctrl.parentRef"
                                              sub-title="Child">
         </waltz-entity-statistic-summary-card>
-
-
+        <br>
     </div>
 
 </div>

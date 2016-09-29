@@ -5,8 +5,7 @@ export function updateUrlWithoutReload($state, navItem) {
 
 const defaultDefinitions = {
     children: [],
-    parent: null,
-    siblings: []
+    parent: null
 };
 
 
@@ -14,8 +13,7 @@ export function hasRelatedDefinitions(definitions = defaultDefinitions) {
     const relatedCount = definitions.children.length
         + (definitions.parent
             ? 1
-            : 0)
-        + definitions.siblings.length;
+            : 0);
 
     return relatedCount > 0;
 }

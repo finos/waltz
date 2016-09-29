@@ -14,7 +14,6 @@ public abstract class ImmediateHierarchy<T> {
 
     public abstract T self();
     public abstract Optional<T> parent();
-    public abstract List<T> siblings();
     public abstract List<T> children();
 
 }

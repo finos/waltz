@@ -48,12 +48,6 @@ public class ImmediateHierarchyUtilities {
                 .map(pId -> byId.get(pId))
                 .map(parent -> builder.parent(parent));
 
-        // siblings
-        converter.apply(self).parentId()
-                .map(pId -> byParentId.get(pId))
-                .map(siblings -> filter(siblings, x -> converter.apply(x).id().get() != selfId))
-                .map(siblings -> builder.siblings(siblings));
-
         // children
         builder.children(ensureNotNull(byParentId.get(selfId)));
 
