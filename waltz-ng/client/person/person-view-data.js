@@ -17,23 +17,12 @@ const initModel = {
     managers: [],
     directs: [],
     person: null,
-    appInvolvements: {
-        direct: [],
-        indirect: [],
-        all: []
-    },
-    endUserAppInvolvements: {
-        direct: [],
-        indirect: [],
-        all: []
-    },
     combinedAppInvolvements: {
         direct: [],
         indirect: [],
         all: []
     },
     apps: [],
-    appIds: [],
     changeInitiatives: [],
     complexity: [],
     assetCostData: {},
@@ -97,11 +86,19 @@ function service($q,
 
     const state = { model: initModel };
 
-    function loadPeople(employeeId) {
-        const personPromise = personStore
+    function reset() {
+        state.model = { ...initModel };
+    }
+
+
+    function loadPerson(employeeId) {
+        return personStore
             .getByEmployeeId(employeeId)
             .then(person => state.model.person = person);
+    }
 
+
+    function loadRelatedPeople(employeeId) {
         const directsPromise = personStore
             .findDirects(employeeId)
             .then(directs => state.model.directs = directs);
@@ -110,10 +107,13 @@ function service($q,
             .findManagers(employeeId)
             .then(managers => state.model.managers = managers);
 
-        return $q.all([personPromise, directsPromise, managersPromise]);
+        return $q.all([
+            directsPromise,
+            managersPromise]);
     }
 
-    function loadApplications(employeeId, personId) {
+
+    function loadEndUserApps(personId) {
         const endUserAppIdSelector = {
             desiredKind: 'END_USER_APPLICATION',
             entityReference: {
@@ -123,80 +123,97 @@ function service($q,
             scope: 'CHILDREN'
         };
 
-        return $q.all([
-            involvementStore.findByEmployeeId(employeeId),
-            involvementStore.findAppsForEmployeeId(employeeId),
-            involvementStore.findEndUserAppsBydSelector(endUserAppIdSelector)
-        ]).then(([involvements, apps, endUserApps]) => {
-
-            const involvementsByKind = _.groupBy(involvements, 'entityReference.kind');
-
-            const appsSummary = buildAppInvolvementSummary(apps, involvementsByKind['APPLICATION']);
-            const endUserAppsSummary = buildAppInvolvementSummary(endUserApps, involvementsByKind['END_USER_APPLICATION']);
-
-            const appsWithManagement = _.map(apps, a => _.assign(a, {management: 'IT'}));
-            const endUserAppsWithManagement = _.map(_.cloneDeep(endUserApps),
+        return involvementStore
+            .findEndUserAppsByIdSelector(endUserAppIdSelector)
+            .then(endUserApps => _.map(
+                _.cloneDeep(endUserApps),
                 a => _.assign(a, {
                     management: 'End User',
                     platform: a.kind,
                     kind: 'EUC',
                     overallRating: 'Z'
-                }));
-            const combinedApps = _.concat(appsWithManagement, endUserAppsWithManagement);
+                })))
+            .then(endUserApps => {
+                state.model.endUserApps = endUserApps;
+                return endUserApps;
+            });
+    }
 
-            const combinedSummary = buildAppInvolvementSummary(combinedApps, _.concat(
-                involvementsByKind['APPLICATION'] || [],
-                involvementsByKind['END_USER_APPLICATION'] || []
-            ));
 
-            state.model.apps = appsWithManagement;
-            state.model.endUserApps = endUserAppsWithManagement
-            state.model.appInvolvements = appsSummary;
-            state.model.endUserAppInvolvements = endUserAppsSummary;
-            state.model.combinedAppInvolvements = combinedSummary;
+    function buildInvolvementSummaries(employeeId, combinedApps = []) {
+        return involvementStore
+            .findByEmployeeId(employeeId)
+            .then(involvements => {
+                const involvementsByKind = _.groupBy(involvements, 'entityReference.kind');
+                const combinedSummary = buildAppInvolvementSummary(combinedApps, _.concat(
+                    involvementsByKind['APPLICATION'] || [],
+                    involvementsByKind['END_USER_APPLICATION'] || []
+                ));
+                state.model.combinedAppInvolvements = combinedSummary
+            });
+    }
 
-            return state.model;
-        });
+
+    function loadAllApplications(employeeId, personId) {
+        return $q
+            .all([
+                loadApplications(employeeId, personId),
+                loadEndUserApps(personId)
+            ])
+            .then(([apps, endUserApps]) => _.concat(apps, endUserApps))
+            .then(combinedApps => buildInvolvementSummaries(employeeId, combinedApps));
+    }
+
+
+    function loadApplications(employeeId) {
+
+        return involvementStore
+            .findAppsForEmployeeId(employeeId)
+            .then((xs = []) => {
+                const apps = _.map(xs, a => _.assign(a, {management: 'IT'}));
+                state.model.apps = apps;
+                return apps;
+            });
     }
 
 
     function loadChangeInitiatives(employeeId) {
-        involvementStore
+        return involvementStore
             .findChangeInitiativesForEmployeeId(employeeId)
             .then(list => state.model.changeInitiatives = list);
     }
 
 
     function loadCostStats(personId) {
-        assetCostViewService
+        return assetCostViewService
             .initialise(toSelector(personId), 2016)
             .then(assetCostData => state.model.assetCostData = assetCostData);
     }
 
 
     function loadComplexity(personId) {
-        complexityStore
+        return complexityStore
             .findBySelector(personId, 'PERSON', 'CHILDREN')
             .then(complexity => state.model.complexity = complexity);
     }
 
 
     function loadFlows(personId) {
-        dataFlowViewService
+        return dataFlowViewService
             .initialise(personId, 'PERSON', 'CHILDREN')
             .then(flows => state.model.dataFlows = flows);
     }
 
 
     function loadTechStats(personId) {
-        techStatsService
+        return techStatsService
             .findBySelector(personId, 'PERSON', 'CHILDREN')
             .then(stats => state.model.techStats = stats);
     }
 
     function loadSourceDataRatings()
     {
-        sourceDataRatingStore
+        return sourceDataRatingStore
             .findAll()
             .then(ratings => state.model.sourceDataRatings = ratings);
     }
@@ -207,34 +224,57 @@ function service($q,
             .then(defns => state.model.entityStatisticDefinitions = defns);
     }
 
-    function reset() {
-        state.model = { ...initModel };
+
+    // --- MAIN LOADERS
+
+    function loadFirstWave(empId) {
+        return loadPerson(empId);
     }
+
+
+    function loadSecondWave(employeeId) {
+        const personId = state.model.person.id;
+        return $q
+            .all([
+                loadRelatedPeople(employeeId),
+                loadAllApplications(employeeId, personId),
+                loadCostStats(personId)
+            ])
+            .then(() => personId);
+    }
+
+
+    function loadThirdWave(employeeId) {
+        const personId = state.model.person.id;
+        return $q
+            .all([
+                loadFlows(personId),
+                loadTechStats(personId),
+                loadComplexity(personId),
+                loadChangeInitiatives(employeeId)
+            ]);
+    }
+
+
+    function loadFourthWave() {
+        return $q.all([
+            loadSourceDataRatings(),
+            loadEntityStatistics()
+        ]);
+    }
+
 
     function load(employeeId) {
         reset();
 
-        loadChangeInitiatives(employeeId);
-
-        const peoplePromise = loadPeople(employeeId)
-            .then(() => state.model.person.id);
-
-        const statsPromises = peoplePromise
-            .then(personId => {
-                loadFlows(personId);
-                loadCostStats(personId);
-                loadTechStats(personId);
-                loadComplexity(personId);
-                loadSourceDataRatings();
-                loadEntityStatistics();
-            });
-
-        const appPromise = peoplePromise
-            .then((personId) => loadApplications(employeeId, personId));
-
-        return $q.all([statsPromises, appPromise]);
+        return loadFirstWave(employeeId)
+            .then(() => loadSecondWave(employeeId))
+            .then(() => loadThirdWave(employeeId))
+            .then(() => loadFourthWave(employeeId));
     }
 
+
+    // -- INTERACTION ---
 
     function selectAssetBucket(bucket) {
         assetCostViewService.selectBucket(bucket);

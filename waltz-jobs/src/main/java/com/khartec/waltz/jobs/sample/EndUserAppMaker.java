@@ -23,7 +23,6 @@ import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.model.utils.IdUtilities;
 import com.khartec.waltz.schema.tables.records.EndUserApplicationRecord;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.end_user_app.EndUserAppService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -46,8 +45,6 @@ public class EndUserAppMaker {
         OrganisationalUnitDao organisationalUnitDao = ctx.getBean(OrganisationalUnitDao.class);
 
         DSLContext dsl = ctx.getBean(DSLContext.class);
-
-        EndUserAppService endUserService = ctx.getBean(EndUserAppService.class);
 
         List<Long> ids = IdUtilities.toIds(organisationalUnitDao.findAll());
 

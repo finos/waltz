@@ -103,10 +103,12 @@ public class FlowGenerator {
         all.addAll(expectedFlows);
         all.addAll(probableFlows);
 
-        Set<DataFlowRecord> records = SetUtilities.map(all, df -> DataFlowDao.TO_RECORD_MAPPER.apply(df, dsl));
-        dsl.batchStore(records);
+        System.out.println("--- saving: " + all.size());
 
-        System.out.println("Done");
+        Set<DataFlowRecord> records = SetUtilities.map(all, df -> DataFlowDao.TO_RECORD_MAPPER.apply(df, dsl));
+        dsl.batchStore(records).execute();
+
+        System.out.println("--- done");
 
 
     }
