@@ -88,27 +88,20 @@ public class ImmediateHierarchyUtilitiesTest {
 
         assertEquals(d1, r1.self());
         assertEquals(empty(), r1.parent());
-        assertEmpty(r1.siblings());
         assertSize(2, r1.children());
         assertContains(r1.children(), d11, d12);
 
         assertEquals(d11, r11.self());
         assertEquals(Optional.of(d1), r11.parent());
-        assertSize(1, r11.siblings());
-        assertContains(r11.siblings(), d12);
         assertSize(2, r11.children());
         assertContains(r11.children(), d111, d112);
 
         assertEquals(d12, r12.self());
         assertEquals(Optional.of(d1), r12.parent());
-        assertSize(1, r12.siblings());
-        assertContains(r12.siblings(), d11);
         assertEmpty(r12.children());
 
         assertEquals(d112, r112.self());
         assertEquals(Optional.of(d11), r112.parent());
-        assertSize(1, r112.siblings());
-        assertContains(r112.siblings(), d111);
         assertEmpty(r112.children());
 
 
