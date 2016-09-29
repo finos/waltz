@@ -22,6 +22,13 @@ const initData = {
 };
 
 
+function mkHistory(history = [], current) {
+    if (!current) return history;
+
+    return _.concat([current], history);
+}
+
+
 function controller($q,
                     $state,
                     $stateParams,
@@ -85,6 +92,7 @@ function controller($q,
         entityStatisticStore
             .calculateStatTally(vm.statistic.definition, selector)
             .then(summary => vm.statistic.summary = summary)
+            .then(() => vm.history = mkHistory(vm.history, vm.statistic.summary))
             .then(() => {
                 const related = vm.relatedDefinitions.children;
 
@@ -107,7 +115,7 @@ function controller($q,
 
         entityStatisticStore
             .calculateHistoricStatTally(vm.statistic.definition, selector)
-            .then(h => vm.history = h);
+            .then(h => vm.history = mkHistory(h, vm.statistic.summary));
 
         updateUrlWithoutReload($state, navItem);
     };

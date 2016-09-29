@@ -32,6 +32,7 @@
     <waltz-entity-statistic-detail-table statistic-values="$ctrl.values"
                                          statistic-definition='$ctrl.definition'
                                          filter-outcome="$ctrl.selectedPieSegment.key"
-                                         applications="$ctrl.applications">
+                                         applications="$ctrl.applications"
+                                         ng-if="$ctrl.values.length > 0">
     </waltz-entity-statistic-detail-table>
 </div>
