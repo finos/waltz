@@ -117,7 +117,10 @@ export function determineChanges(group) {
 }
 
 
-export function mkAppRatingsGroup(appRef, measurables, capabilities, ratings) {
+export function mkAppRatingsGroup(appRef,
+                                  measurables = [],
+                                  capabilities = [],
+                                  ratings = []) {
 
     const bySubjectThenMeasurable = d3.nest()
         .key(r => r.capabilityId)

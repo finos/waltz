@@ -16,7 +16,7 @@
  *
  */
 
-function service($http, BaseApiUrl) {
+function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/app-view`;
 
@@ -30,10 +30,10 @@ function service($http, BaseApiUrl) {
 
 }
 
-service.$inject = [
+store.$inject = [
     '$http',
     'BaseApiUrl',
 ];
 
 
-export default service;
+export default store;

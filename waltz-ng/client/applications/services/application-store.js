@@ -14,9 +14,14 @@
 function service($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/app`;
 
-    
+
     const getById = (id) => $http
         .get(`${BASE}/id/${id}`)
+        .then(result => result.data);
+
+
+    const getAppTagsById = (id) => $http
+        .get(`${BASE}/id/${id}/tags`)
         .then(result => result.data);
 
 
@@ -69,6 +74,7 @@ function service($http, BaseApiUrl) {
         getById,
         findAllTags,
         findByTag,
+        getAppTagsById,
         findRelatedById,
         findByIds,
         findBySelector,

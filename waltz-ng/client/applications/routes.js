@@ -13,7 +13,8 @@
 import AppEdit from "./app-edit";
 import AppRegistration from "./app-registration";
 import appTagExplorerView from "./app-tag-explorer";
-import {appViewResolver, orgUnitsResolver} from "./resolvers";
+import {appResolver, tagsResolver, aliasesResolver, orgUnitsResolver} from "./resolvers";
+
 
 const base = {
     url: 'application'
@@ -27,9 +28,9 @@ const appRegistrationState = {
 
 
 const appViewState = {
-    url: '/:id',
+    url: '/{id:int}',
     resolve: {
-        appView: appViewResolver
+        app: appResolver
     },
     views: {
         'content@': require('./app-view')
@@ -39,9 +40,11 @@ const appViewState = {
 
 
 const appEditState = {
-    url: '/:id/edit',
+    url: '/{id:int}/edit',
     resolve: {
-        appView: appViewResolver,
+        app: appResolver,
+        tags: tagsResolver,
+        aliases: aliasesResolver,
         orgUnits: orgUnitsResolver
     },
     views: {'content@': AppEdit}
@@ -54,17 +57,15 @@ const appTagExplorerState = {
 };
 
 
-function onAppViewEnter(appView, historyStore) {
+function onAppViewEnter(app, historyStore) {
     historyStore.put(
-        appView.app.name,
+        app.name,
         'APPLICATION',
         'main.app.view',
-        { id: appView.app.id });
+        { id: app.id });
 }
 
-onAppViewEnter.$inject = ['appView', 'HistoryStore'];
-
-
+onAppViewEnter.$inject = ['app', 'HistoryStore'];
 
 
 function setup($stateProvider) {

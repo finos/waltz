@@ -72,15 +72,22 @@ function fieldDiff(field) {
 }
 
 
-function controller(appView, orgUnits, displayNameService, appStore, notification, $state) {
+function controller(app,
+                    tags,
+                    aliases,
+                    orgUnits,
+                    displayNameService,
+                    appStore,
+                    notification,
+                    $state) {
 
     setupDropDowns(orgUnits, displayNameService);
     setupTagAutoComplete(appStore);
 
     const formModel = {
-        app: appView.app,
-        tags: appView.tags,
-        aliases: appView.aliases
+        app,
+        tags,
+        aliases
     };
 
     fields.nameField.model = formModel.app;
@@ -99,7 +106,7 @@ function controller(appView, orgUnits, displayNameService, appStore, notificatio
     function onSubmit() {
         const onSuccess = () => {
             notification.success('Application updated');
-            $state.go('main.app.view', {id: appView.app.id});
+            $state.go('main.app.view', { id: app.id });
         };
 
         const onFailure = (result) => {
@@ -119,13 +126,13 @@ function controller(appView, orgUnits, displayNameService, appStore, notificatio
             changes
         };
 
-        appStore.update(appView.app.id, action)
+        appStore.update(app.id, action)
             .then(onSuccess, onFailure);
 
     }
 
     const ctrl = this;
-    ctrl.application = appView.app;
+    ctrl.application = app;
     ctrl.formModel = formModel;
     ctrl.fieldLayout = fieldLayout;
     ctrl.onSubmit = onSubmit;
@@ -133,7 +140,9 @@ function controller(appView, orgUnits, displayNameService, appStore, notificatio
 }
 
 controller.$inject = [
-    'appView',
+    'app',
+    'tags',
+    'aliases',
     'orgUnits',
     'WaltzDisplayNameService',
     'ApplicationStore',

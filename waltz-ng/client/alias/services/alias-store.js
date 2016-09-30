@@ -14,7 +14,13 @@ function service($http, BaseApiUrl) {
             .then(r => r.data);
     };
 
-    const getForEntity = () => {};
+    const getForEntity = (entityRef) => {
+        checkIsEntityRef(entityRef);
+
+        return $http
+            .get(`${BASE}/${entityRef.kind}/${entityRef.id}`)
+            .then(r => r.data);
+    };
 
 
     return {

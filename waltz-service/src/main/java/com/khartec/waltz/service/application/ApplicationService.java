@@ -22,7 +22,6 @@ import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.application.search.ApplicationSearchDao;
 import com.khartec.waltz.data.entity_alias.EntityAliasDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -52,7 +51,6 @@ public class ApplicationService {
 
 
     private final ApplicationDao applicationDao;
-    private final OrganisationalUnitDao orgUnitDao;
     private final AppTagDao appTagDao;
     private final EntityAliasDao entityAliasDao;
     private final ApplicationSearchDao appSearchDao;
@@ -63,20 +61,17 @@ public class ApplicationService {
     public ApplicationService(ApplicationDao appDao,
                               AppTagDao appTagDao,
                               EntityAliasDao entityAliasDao,
-                              OrganisationalUnitDao orgUnitDao,
                               ApplicationSearchDao appSearchDao,
                               ApplicationIdSelectorFactory appIdSelectorFactory) {
         checkNotNull(appDao, "appDao must not be null");
         checkNotNull(appTagDao, "appTagDao must not be null");
         checkNotNull(entityAliasDao, "entityAliasDao must not be null");
-        checkNotNull(orgUnitDao, "orgUnitDao must not be null");
         checkNotNull(appSearchDao, "appSearchDao must not be null");
         checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
 
         this.applicationDao = appDao;
         this.appTagDao = appTagDao;
         this.entityAliasDao = entityAliasDao;
-        this.orgUnitDao = orgUnitDao;
         this.appSearchDao = appSearchDao;
         this.appIdSelectorFactory = appIdSelectorFactory;
     }
@@ -179,24 +174,5 @@ public class ApplicationService {
 
     }
 
-
-    public List<String> findAllTags() {
-        return appTagDao.findAllTags();
-    }
-
-
-    public List<Application> findByTag(String tag) {
-        return appTagDao.findByTag(tag);
-    }
-
-
-    public List<String> findTagsForApplication(long appId) {
-        return appTagDao.findTagsForApplication(appId);
-    }
-
-
-    public int[] updateTags(long appId, Collection<String> tags) {
-        return appTagDao.updateTags(appId, tags);
-    }
 }
 

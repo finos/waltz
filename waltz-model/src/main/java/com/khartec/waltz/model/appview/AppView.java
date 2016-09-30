@@ -19,14 +19,12 @@ package com.khartec.waltz.model.appview;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
 import com.khartec.waltz.model.bookmark.Bookmark;
 import com.khartec.waltz.model.capability.Capability;
 import com.khartec.waltz.model.cost.AssetCost;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.model.trait.Trait;
 import org.immutables.value.Value;
 
 import java.util.Collection;
@@ -38,7 +36,6 @@ import java.util.List;
 @JsonDeserialize(as = ImmutableAppView.class)
 public abstract class AppView {
 
-    public abstract Application app();
     public abstract List<String> tags();
     public abstract List<String> aliases();
     public abstract OrganisationalUnit organisationalUnit();
@@ -46,6 +43,5 @@ public abstract class AppView {
     public abstract Collection<ApplicationCapability> appCapabilities();
     public abstract Collection<Capability> capabilities();
     public abstract List<AssetCost> costs();
-    public abstract List<Trait> explicitTraits();
     public abstract List<EntityStatistic> entityStatistics();
 }
