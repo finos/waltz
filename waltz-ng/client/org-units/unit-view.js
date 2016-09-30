@@ -13,38 +13,33 @@
 import EventDispatcher from "../common/EventDispatcher";
 
 
+const addToHistory = (historyStore, orgUnit) => {
+    historyStore.put(
+        orgUnit.name,
+        'ORG_UNIT',
+        'main.org-unit.view',
+        { id: orgUnit.id });
+};
+
+
 function controller($stateParams,
                     $scope,
                     viewDataService,
-                    viewOptions,
                     historyStore,
                     tourService) {
 
     const id = $stateParams.id;
     const vm = this;
 
-    const refresh = () => {
-        if (!vm.rawViewData) return;
-        const orgUnit = vm.rawViewData.orgUnit;
-
-        historyStore.put(orgUnit.name, 'ORG_UNIT', 'main.org-unit.view', { id: orgUnit.id });
-
-        vm.viewData = viewOptions.filter(vm.rawViewData);
-    };
-
-    $scope.$watch(
-        () => viewOptions.options,
-        refresh,
-        true);
-
     vm.entityRef = { kind: 'ORG_UNIT', id };
 
     vm.eventDispatcher = new EventDispatcher();
 
+    vm.viewData = viewDataService.data;
+
     viewDataService
         .loadAll(id)
-        .then(data => vm.rawViewData = data)
-        .then(refresh)
+        .then(() => addToHistory(historyStore, vm.viewData.orgUnit))
         .then(() => tourService.initialiseForKey('main.org-unit.view', true))
         .then(tour => vm.tour = tour);
 
@@ -68,7 +63,6 @@ controller.$inject = [
     '$stateParams',
     '$scope',
     'OrgUnitViewDataService',
-    'OrgUnitViewOptionsService',
     'HistoryStore',
     'TourService'
 ];
