@@ -80,7 +80,7 @@ function initialiseAssetCosts(service, selector, holder) {
 function loadCapabilityRatings(store, selector, holder) {
     return store
         .findByAppIdSelector(selector)
-        .then(r => holder.ratings = r);
+        .then(r => holder.capabilityRatings = r);
 }
 
 
@@ -210,7 +210,6 @@ function service($q,
             loadOrgUnit(orgUnitStore, orgUnitId, rawData),
             loadImmediateHierarchy(orgUnitStore, orgUnitId, rawData),
             loadApps(appStore, selector, rawData),
-            initialiseDataFlows(dataFlowViewService, orgUnitId, rawData),
             initialiseAssetCosts(assetCostViewService, selector, rawData)
         ]);
     }
@@ -220,6 +219,7 @@ function service($q,
         const selector = mkSelector(orgUnitId);
 
         return $q.all([
+            initialiseDataFlows(dataFlowViewService, orgUnitId, rawData),
             loadInvolvement(involvementStore, orgUnitId, rawData),
             loadCapabilityRatings(ratingStore, selector, rawData),
             loadAppCapabilities(appCapabilityStore, selector, rawData),
