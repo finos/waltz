@@ -53,7 +53,8 @@ const initialState = {
 
 function controller($q,
                     $state,
-                    appView,
+                    app,
+                    appViewStore,
                     aliasStore,
                     authSourcesStore,
                     changeLogStore,
@@ -69,15 +70,13 @@ function controller($q,
                     ratingStore,
                     serverInfoStore,
                     softwareCatalogStore,
-                    sourceDataRatingStore,
-                    displayNameService ) {
+                    sourceDataRatingStore) {
 
-    const { id, organisationalUnitId } = appView.app;
-
+    const { id, organisationalUnitId } = app;
     const entityRef = { id, kind: 'APPLICATION' };
-    const vm = Object.assign(this, initialState, appView);
+    const vm = Object.assign(this, initialState, { app });
 
-    const goToAppFn = d => $state.go('main.app.view', { id: d.id })
+    const goToAppFn = d => $state.go('main.app.view', { id: d.id });
     vm.flowTweakers = {
         source: {
             onSelect: goToAppFn
@@ -91,19 +90,22 @@ function controller($q,
 
     const perspectiveCode = 'BUSINESS';
 
-
     $q.all([
+        appViewStore.getById(id),
         perspectiveStore.findByCode(perspectiveCode),
         ratingStore.findByParent('APPLICATION', id)
-    ]).then(([perspective, ratings]) => {
-        const appRef = { id: id, kind: 'APPLICATION', name: appView.app.name};
+    ]).then(([appView, perspective, ratings]) => {
+        Object.assign(vm, appView);
+        const appRef = { id: id, kind: 'APPLICATION', name: app.name};
         const group = mkAppRatingsGroup(appRef, perspective.measurables, appView.capabilities, ratings);
 
         vm.ratings = {
             highestRatingCount: calculateHighestRatingCount([group]),
             tweakers: {
                 subjectLabel: {
-                    enter: (selection) => selection.on('click', (d) => $state.go('main.capability.view', { id: d.subject.id }))
+                    enter: (selection) => selection.on(
+                        'click',
+                        (d) => $state.go('main.capability.view', { id: d.subject.id }))
                 }
             },
             group
@@ -146,7 +148,8 @@ function controller($q,
 controller.$inject = [
     '$q',
     '$state',
-    'appView',
+    'app',
+    'ApplicationViewStore',
     'AliasStore',
     'AuthSourcesStore',
     'ChangeLogDataService',
@@ -162,8 +165,7 @@ controller.$inject = [
     'RatingStore',
     'ServerInfoStore',
     'SoftwareCatalogStore',
-    'SourceDataRatingStore',
-    'WaltzDisplayNameService'
+    'SourceDataRatingStore'
 ];
 
 

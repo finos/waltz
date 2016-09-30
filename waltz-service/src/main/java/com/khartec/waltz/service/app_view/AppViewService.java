@@ -20,13 +20,14 @@ package com.khartec.waltz.service.app_view;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
 import com.khartec.waltz.model.appview.AppView;
 import com.khartec.waltz.model.appview.ImmutableAppView;
+import com.khartec.waltz.model.bookmark.Bookmark;
 import com.khartec.waltz.model.capability.Capability;
-import com.khartec.waltz.model.trait.Trait;
-import com.khartec.waltz.model.trait.TraitUsage;
+import com.khartec.waltz.model.cost.AssetCost;
+import com.khartec.waltz.model.entity_statistic.EntityStatistic;
+import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.service.app_capability.AppCapabilityService;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
@@ -35,16 +36,16 @@ import com.khartec.waltz.service.capability.CapabilityService;
 import com.khartec.waltz.service.entity_alias.EntityAliasService;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
-import com.khartec.waltz.service.trait.TraitService;
-import com.khartec.waltz.service.trait.TraitUsageService;
+import com.khartec.waltz.service.tags.AppTagService;
+import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.map;
-import static java.util.Collections.emptyList;
+import static com.khartec.waltz.data.JooqUtilities.DB_EXECUTOR_POOL;
 
 
 @Service
@@ -58,22 +59,21 @@ public class AppViewService {
     private final EntityAliasService entityAliasService;
     private final EntityStatisticService entityStatisticService;
     private final OrganisationalUnitService organisationalUnitService;
-    private final TraitService traitService;
-    private final TraitUsageService traitUsageService;
+    private final AppTagService appTagService;
 
 
     @Autowired
     public AppViewService(ApplicationService appService,
+                          AppTagService appTagService,
                           AppCapabilityService appCapabilityService,
                           AssetCostService assetCostService,
                           BookmarkService bookmarkService,
                           CapabilityService capabilityService,
                           EntityAliasService entityAliasService,
                           EntityStatisticService entityStatisticService,
-                          OrganisationalUnitService organisationalUnitService,
-                          TraitService traitService,
-                          TraitUsageService traitUsageService) {
+                          OrganisationalUnitService organisationalUnitService) {
         checkNotNull(appService, "ApplicationService must not be null");
+        checkNotNull(appTagService, "appTagService cannot be null");
         checkNotNull(appCapabilityService, "appCapabilityService must not be null");
         checkNotNull(assetCostService, "assetCostService must not be null");
         checkNotNull(bookmarkService, "BookmarkDao must not be null");
@@ -81,10 +81,9 @@ public class AppViewService {
         checkNotNull(entityAliasService, "entityAliasService cannot be null");
         checkNotNull(entityStatisticService, "entityStatisticService must not be null");
         checkNotNull(organisationalUnitService, "organisationalUnitService must not be null");
-        checkNotNull(traitService, "traitService must not be null");
-        checkNotNull(traitUsageService, "traitUsageService must not be null");
 
         this.appService = appService;
+        this.appTagService = appTagService;
         this.appCapabilityDao = appCapabilityService;
         this.assetCostService = assetCostService;
         this.bookmarkService = bookmarkService;
@@ -92,8 +91,6 @@ public class AppViewService {
         this.entityAliasService = entityAliasService;
         this.entityStatisticService = entityStatisticService;
         this.organisationalUnitService = organisationalUnitService;
-        this.traitUsageService = traitUsageService;
-        this.traitService = traitService;
     }
 
 
@@ -103,32 +100,33 @@ public class AppViewService {
                 .id(id)
                 .build();
 
-        Application app = appService.getById(id);
+        Future<List<ApplicationCapability>> appCapabilities = DB_EXECUTOR_POOL.submit(() ->
+                appCapabilityDao.findCapabilitiesForApp(id));
+        Future<List<Capability>> capabilities = DB_EXECUTOR_POOL.submit(() ->
+                capabilityService.findByAppIds(id));
+        Future<OrganisationalUnit> orgUnit = DB_EXECUTOR_POOL.submit(() ->
+                organisationalUnitService.getByAppId(id));
+        Future<List<Bookmark>> bookmarks = DB_EXECUTOR_POOL.submit(() ->
+                bookmarkService.findByReference(ref));
+        Future<List<String>> tags = DB_EXECUTOR_POOL.submit(() ->
+                appTagService.findTagsForApplication(id));
+        Future<List<String>> aliases = DB_EXECUTOR_POOL.submit(() ->
+                entityAliasService.findAliasesForEntityReference(ref));
+        Future<List<AssetCost>> costs = DB_EXECUTOR_POOL.submit(() ->
+                assetCostService.findByAppId(id));
+        Future<List<EntityStatistic>> stats = DB_EXECUTOR_POOL.submit(() ->
+                entityStatisticService.findStatisticsForEntity(ref, true));
 
-        List<ApplicationCapability> appCapabilities = appCapabilityDao.findCapabilitiesForApp(id);
-        List<Trait> traits = findTraitsForApplication(ref);
-
-        List<Capability> capabilities = capabilityService.findByIds(map(appCapabilities, ac -> ac.capabilityId()).toArray(new Long[0]));
-
-        return ImmutableAppView.builder()
-                .app(app)
-                .organisationalUnit(organisationalUnitService.getById(app.organisationalUnitId()))
-                .bookmarks(bookmarkService.findByReference(ref))
-                .tags(appService.findTagsForApplication(id))
-                .aliases(entityAliasService.findAliasesForEntityReference(ref))
-                .appCapabilities(appCapabilities)
-                .capabilities(capabilities)
-                .costs(assetCostService.findByAppId(id))
-                .explicitTraits(traits)
-                .entityStatistics(entityStatisticService.findStatisticsForEntity(ref, true))
-                .build();
+        return Unchecked.supplier(() -> ImmutableAppView.builder()
+                    .organisationalUnit(orgUnit.get())
+                    .bookmarks(bookmarks.get())
+                    .tags(tags.get())
+                    .aliases(aliases.get())
+                    .appCapabilities(appCapabilities.get())
+                    .capabilities(capabilities.get())
+                    .costs(costs.get())
+                    .entityStatistics(stats.get())
+                    .build()).get();
     }
 
-
-    private List<Trait> findTraitsForApplication(EntityReference ref) {
-        List<TraitUsage> traitUsages = traitUsageService.findByEntityReference(ref);
-        return traitUsages.isEmpty()
-                ? emptyList()
-                : traitService.findByIds(map(traitUsages, tu -> tu.traitId()));
-    }
 }

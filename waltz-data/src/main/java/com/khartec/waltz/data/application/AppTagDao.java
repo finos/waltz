@@ -80,7 +80,7 @@ public class AppTagDao {
 
 
     public int[] updateTags(long id, Collection<String> tags) {
-        LOG.info("Updating tags for application " + id + ", tags: "+ tags);
+        LOG.info("Updating tags for application: {}, tags: {} ", id, tags);
 
         dsl.delete(APPLICATION_TAG)
                 .where(APPLICATION_TAG.APPLICATION_ID.eq(id))

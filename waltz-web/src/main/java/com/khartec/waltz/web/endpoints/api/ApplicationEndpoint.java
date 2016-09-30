@@ -31,6 +31,7 @@ import com.khartec.waltz.model.tally.LongTally;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.entity_alias.EntityAliasService;
+import com.khartec.waltz.service.tags.AppTagService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
@@ -63,19 +64,23 @@ public class ApplicationEndpoint implements Endpoint {
     private final ApplicationService appService;
     private final ChangeLogService changeLogService;
     private final EntityAliasService entityAliasService;
+    private final AppTagService appTagService;
 
 
     @Autowired
     public ApplicationEndpoint(ApplicationService appService,
                                ChangeLogService changeLogService,
-                               EntityAliasService entityAliasService) {
+                               EntityAliasService entityAliasService, 
+                               AppTagService appTagService) {
         checkNotNull(appService, "appService must not be null");
         checkNotNull(changeLogService, "changeLogService must not be null");
         checkNotNull(entityAliasService, "entityAliasService cannot be null");
+        checkNotNull(appTagService, "appTagService cannot be null");
 
         this.appService = appService;
         this.changeLogService = changeLogService;
         this.entityAliasService = entityAliasService;
+        this.appTagService = appTagService;
     }
 
 
@@ -110,7 +115,7 @@ public class ApplicationEndpoint implements Endpoint {
                                 .build()));
 
             appService.update(appChange.app());
-            appService.updateTags(appId, appChange.tags());
+            appTagService.updateTags(appId, appChange.tags());
             entityAliasService.updateAliases(ref, appChange.aliases());
 
             return true;
@@ -176,19 +181,23 @@ public class ApplicationEndpoint implements Endpoint {
         };
 
         ListRoute<String> findAllTagsRoute = (request, response)
-                -> appService.findAllTags();
+                -> appTagService.findAllTags();
 
         ListRoute<Application> findByTagRoute = (request, response)
-                -> appService.findByTag(request.body());
+                -> appTagService.findByTag(request.body());
 
         ListRoute<Application> findBySelectorRoute = ((request, response)
                 -> appService.findByAppIdSelector(readIdSelectionOptionsFromBody(request)));
+
+        ListRoute<String> getAppTagsRoute = (request, response)
+                -> appTagService.findTagsForApplication(getId(request));
 
         getForList(mkPath(BASE_URL, "search", ":query"), searchRoute);
         getForList(mkPath(BASE_URL, "count-by", "org-unit"), tallyByOrgUnitRoute);
         getForList(mkPath(BASE_URL, "tags"), findAllTagsRoute);
 
         getForDatum(mkPath(BASE_URL, "id", ":id"), getByIdRoute);
+        getForList(mkPath(BASE_URL, "id", ":id", "tags"), getAppTagsRoute);
         getForDatum(mkPath(BASE_URL, "id", ":id", "related"), findRelatedRoute);
 
         postForList(mkPath(BASE_URL, "tags"), findByTagRoute);  // POST as may not be good for qparam

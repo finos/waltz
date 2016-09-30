@@ -375,10 +375,19 @@ function drawArcs(section, model, layoutFn) {
  * (non-duplicative)
  */
 function internetExplorerFix(selection) {
-    setTimeout(
-        () => selection.each(function() { this.parentNode.insertBefore(this, this); }),
-        200
-    );
+    const fixFn = () => {
+        if (selection) {
+            selection.each(
+                function() {
+                    if (this.parentNode) {
+                        this.parentNode.insertBefore(this, this);
+                    }
+                });
+        }
+
+    };
+
+    setTimeout(fixFn, 200);
 }
 
 

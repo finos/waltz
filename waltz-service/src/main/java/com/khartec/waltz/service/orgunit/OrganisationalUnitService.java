@@ -175,4 +175,8 @@ public class OrganisationalUnitService {
         return dao.findDescendants(id);
     }
 
+    public OrganisationalUnit getByAppId(long id) {
+        return dao.getByAppId(id);
+    }
+
 }

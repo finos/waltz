@@ -10,15 +10,41 @@
  *
  */
 
-export function appViewResolver(appViewStore, $stateParams) {
-    return appViewStore.getById($stateParams.id);
+// -- APP --
+export function appResolver(appStore, $stateParams) {
+    return appStore.getById($stateParams.id);
 }
 
-appViewResolver.$inject = ['ApplicationViewDataService', '$stateParams'];
+appResolver.$inject = ['ApplicationStore', '$stateParams'];
 
 
+// -- ALIASES --
+export function aliasesResolver(aliasStore, $stateParams) {
+
+    const ref = {
+        id: $stateParams.id,
+        kind: 'APPLICATION'
+    };
+
+    return aliasStore.getForEntity(ref);
+}
+
+aliasesResolver.$inject = ['AliasStore', '$stateParams'];
+
+
+// -- TAGS --
+export function tagsResolver(appStore, $stateParams) {
+    return appStore.getAppTagsById($stateParams.id);
+}
+
+tagsResolver.$inject = ['ApplicationStore', '$stateParams'];
+
+
+// -- OUs --
 export function orgUnitsResolver(orgUnitStore) {
     return orgUnitStore.findAll();
 }
 
 orgUnitsResolver.$inject = [ 'OrgUnitStore' ];
+
+
