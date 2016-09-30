@@ -10,12 +10,7 @@ const defaultDefinitions = {
 
 
 export function hasRelatedDefinitions(definitions = defaultDefinitions) {
-    const relatedCount = definitions.children.length
-        + (definitions.parent
-            ? 1
-            : 0);
-
-    return relatedCount > 0;
+    return definitions.children.length > 0;
 }
 
 
