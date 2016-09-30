@@ -10,16 +10,20 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import EventDispatcher from "../common/EventDispatcher";
-
-
 const addToHistory = (historyStore, orgUnit) => {
+    if (! orgUnit) { return; }
     historyStore.put(
         orgUnit.name,
         'ORG_UNIT',
         'main.org-unit.view',
         { id: orgUnit.id });
 };
+
+
+function initTour(tourService, holder = {}) {
+    return tourService.initialiseForKey('main.org-unit.view', true)
+        .then(tour => holder.tour = tour);
+}
 
 
 function controller($stateParams,
@@ -32,16 +36,15 @@ function controller($stateParams,
     const vm = this;
 
     vm.entityRef = { kind: 'ORG_UNIT', id };
-
-    vm.eventDispatcher = new EventDispatcher();
-
     vm.viewData = viewDataService.data;
 
     viewDataService
         .loadAll(id)
         .then(() => addToHistory(historyStore, vm.viewData.orgUnit))
-        .then(() => tourService.initialiseForKey('main.org-unit.view', true))
-        .then(tour => vm.tour = tour);
+        .then(() => initTour(tourService, vm));
+
+
+    // -- INTERACTIONS ---
 
     vm.onAssetBucketSelect = (bucket) => {
         $scope.$applyAsync(() => viewDataService.selectAssetBucket(bucket));
@@ -50,7 +53,6 @@ function controller($stateParams,
     vm.loadFlowDetail = () => viewDataService
         .loadFlowDetail()
         .then(flowData => vm.viewData.dataFlows = flowData);
-
 
     vm.loadOrgUnitDescendants = (id) => viewDataService
         .loadOrgUnitDescendants(id)

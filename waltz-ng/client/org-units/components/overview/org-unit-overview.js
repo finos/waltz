@@ -60,7 +60,8 @@ function buildTree(orgUnits = [], self = {}) {
 }
 
 
-function calcParentsAndChildren(hierarchy = [], orgUnit = {}) {
+function calcParentsAndChildren(hierarchy = [], orgUnit) {
+    if (! orgUnit) return { parentOrgUnits: [], childOrgUnits: [] };
     const self = _.find(hierarchy, { entityReference: { id: orgUnit.id } });
     const parentOrgUnits = self
         ? _.filter(hierarchy, h => h.level < self.level)
