@@ -29,7 +29,6 @@ import com.khartec.waltz.model.cost.AssetCost;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.service.app_capability.AppCapabilityService;
-import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
 import com.khartec.waltz.service.bookmark.BookmarkService;
 import com.khartec.waltz.service.capability.CapabilityService;
@@ -52,7 +51,6 @@ import static com.khartec.waltz.data.JooqUtilities.DB_EXECUTOR_POOL;
 public class AppViewService {
 
     private final AppCapabilityService appCapabilityDao;
-    private final ApplicationService appService;
     private final AssetCostService assetCostService;
     private final BookmarkService bookmarkService;
     private final CapabilityService capabilityService;
@@ -63,8 +61,7 @@ public class AppViewService {
 
 
     @Autowired
-    public AppViewService(ApplicationService appService,
-                          AppTagService appTagService,
+    public AppViewService(AppTagService appTagService,
                           AppCapabilityService appCapabilityService,
                           AssetCostService assetCostService,
                           BookmarkService bookmarkService,
@@ -72,7 +69,6 @@ public class AppViewService {
                           EntityAliasService entityAliasService,
                           EntityStatisticService entityStatisticService,
                           OrganisationalUnitService organisationalUnitService) {
-        checkNotNull(appService, "ApplicationService must not be null");
         checkNotNull(appTagService, "appTagService cannot be null");
         checkNotNull(appCapabilityService, "appCapabilityService must not be null");
         checkNotNull(assetCostService, "assetCostService must not be null");
@@ -82,7 +78,6 @@ public class AppViewService {
         checkNotNull(entityStatisticService, "entityStatisticService must not be null");
         checkNotNull(organisationalUnitService, "organisationalUnitService must not be null");
 
-        this.appService = appService;
         this.appTagService = appTagService;
         this.appCapabilityDao = appCapabilityService;
         this.assetCostService = assetCostService;
@@ -95,7 +90,8 @@ public class AppViewService {
 
 
     public AppView getAppView(long id) {
-        EntityReference ref = ImmutableEntityReference.builder()
+        EntityReference ref = ImmutableEntityReference
+                .builder()
                 .kind(EntityKind.APPLICATION)
                 .id(id)
                 .build();
