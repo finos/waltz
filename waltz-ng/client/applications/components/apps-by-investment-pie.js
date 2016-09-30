@@ -47,7 +47,7 @@ const config = {
 };
 
 
-function calcAppInvestmentPieStats(apps) {
+function calcAppInvestmentPieStats(apps = []) {
     return toKeyCounts(apps, a => a.overallRating);
 }
 

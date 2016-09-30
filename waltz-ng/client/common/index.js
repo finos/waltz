@@ -1,5 +1,5 @@
 import _ from "lodash";
-
+import d3 from 'd3';
 
 /**
  * Given data that looks like:
@@ -184,10 +184,11 @@ function toCountData(data) {
 
 
 export function toKeyCounts(items = [], fn = x => x) {
+    if (! items) return [];
     return toCountData(d3.nest()
         .key(fn)
         .rollup(d => d.length)
-        .entries(items))
+        .entries(items));
 }
 
 
