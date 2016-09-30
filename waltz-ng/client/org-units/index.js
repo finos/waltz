@@ -18,8 +18,7 @@ export default (module) => {
     module
         .config(require('./routes'))
         .service('OrgUnitStore', require('./services/org-unit-store'))
-        .service('OrgUnitViewDataService', require('./services/org-unit-view-data'))
-        .service('OrgUnitViewOptionsService', require('./services/org-unit-view-options'));
+        .service('OrgUnitViewDataService', require('./services/org-unit-view-data'));
 
     module.component(
         'waltzOrgUnitOverview',

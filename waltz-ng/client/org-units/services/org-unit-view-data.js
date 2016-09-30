@@ -87,7 +87,7 @@ function loadCapabilityRatings(store, selector, holder) {
 function loadAppCapabilities(store, selector, holder) {
     return store
         .findApplicationCapabilitiesByAppIdSelector(selector)
-        .then(r => holder.rawAppCapabilities = r);
+        .then(r => holder.appCapabilities = r);
 }
 
 
@@ -272,6 +272,7 @@ function service($q,
 
 
     return {
+        data: rawData,
         loadAll,
         selectAssetBucket,
         loadFlowDetail,
