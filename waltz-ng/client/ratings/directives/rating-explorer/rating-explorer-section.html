@@ -4,8 +4,6 @@
                    id="ratings-section"
                    icon="puzzle-piece">
 
-
-
         <waltz-section-actions xng-if="ctrl.ratings.groups.length > 0">
             <button class="btn btn-xs waltz-btn-transparent"
                     ng-click="ctrl.visibility.sourceDataRatings = ! ctrl.visibility.sourceDataRatings">
@@ -60,6 +58,18 @@
                             </span>
                         </span>
                 </treecontrol>
+
+
+                <p class="waltz-paragraph small"
+                   style="margin-top: 18px;">
+                    The functions shown in this section are derived by looking
+                    at the underlying applications in this group.  The bars under
+                    each function give an indication of how many apps perform each
+                    function and are coloured according to their strategic rating.
+                </p>
+                <p class="waltz-paragraph small">
+                    Click on a function to see the associated applications.
+                </p>
             </div>
 
             <div class="col-md-7">
@@ -97,10 +107,7 @@
 
         </div>
 
-        <p class="waltz-paragraph small">
-            This view allows you to select a function related to this group and
-            see a breakdown of which apps preform that function and their rating.
-        </p>
+
 
     </waltz-section>
 

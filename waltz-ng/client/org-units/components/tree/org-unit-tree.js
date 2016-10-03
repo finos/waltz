@@ -13,9 +13,28 @@
 import _ from "lodash";
 
 
-const BINDINGS = {
-    tree: '=',
-    onSelection: '='
+const bindings = {
+    tree: '<',
+    onSelection: '<'
+};
+
+
+/**
+ * Pre-expand the tree a little bit
+ * @param tree
+ * @returns {Array}
+ */
+function expandTree(tree = []) {
+    if (! tree || tree.length === 0) return;
+    const expandedNodes =  _.concat(tree, tree[0].children);
+    return expandedNodes;
+}
+
+
+const treeOptions =  {
+    nodeChildren: "children",
+    dirSelectable: true,
+    equality: (a, b) => a && b && a.id === b.id
 };
 
 
@@ -24,11 +43,7 @@ function controller() {
 
     vm.expandedNodes = [];
 
-    vm.treeOptions = {
-        nodeChildren: "children",
-        dirSelectable: true,
-        equality: (a, b) => a && b && a.id === b.id
-    };
+    vm.treeOptions = treeOptions;
 
     vm.onNodeSelect = (node) => {
         if (node.children && node.children.length > 0) {
@@ -50,19 +65,28 @@ function controller() {
     vm.hasAnyEndUserApps = (node) => node.totalEndUserAppCount && node.totalEndUserAppCount > 0;
     vm.hasInheritedEndUserApps = (node) => node.childEndUserAppCount && node.childEndUserAppCount > 0;
 
+    vm.$onChanges = (changes) => {
+        if (changes.tree) {
+            _.each(
+                expandTree(vm.tree),
+                n => vm.expandedNodes.push(n));
+        }
+    };
 
 }
 
 controller.$inject = [ ];
 
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
-    template: require('./org-unit-tree.html'),
-    scope: {},
-    bindToController: BINDINGS,
-    controllerAs: 'ctrl',
+const template = require('./org-unit-tree.html');
+
+
+const component = {
+    bindings,
+    template,
     controller
-});
+};
+
+
+export default component;
 

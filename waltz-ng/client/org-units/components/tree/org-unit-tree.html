@@ -1,0 +1,66 @@
+<div>
+    <treecontrol class="tree-light"
+                 tree-model="$ctrl.tree"
+                 order-by="'-name'"
+                 expanded-nodes="$ctrl.expandedNodes"
+                 on-selection="$ctrl.onNodeSelect(node)"
+                 options="$ctrl.treeOptions">
+            <span class="waltz-visibility-parent">
+
+                <strong>
+                    <span ng-if="$ctrl.hasOwnApps(node)"
+                          ng-bind="node.name">
+                    </span>
+                    <i ng-bind="node.name"
+                       ng-if="! $ctrl.hasOwnApps(node)">
+                    </i>
+                </strong>
+
+                <a ui-sref="main.org-unit.view ({id: node.id })">
+
+                    <span class="waltz-visibility-child-50"
+                          title="Applications owned by this unit (direct / inherited)">
+                        <span ng-if="$ctrl.hasAnyApps(node)"
+                              class="small waltz-app-tally-count">
+
+                            <span ng-if="$ctrl.hasOwnApps(node)">
+                                <span ng-bind="node.appCount"></span>
+                            </span>
+
+                            <i ng-if="$ctrl.hasInheritedApps(node)">
+                                (<span ng-bind="node.totalAppCount"></span>)
+                            </i>
+                            <span class="small">
+                                &nbsp; Apps
+                            </span>
+                        </span>
+                    </span>
+                    &nbsp;
+                    <span class="waltz-visibility-child-50"
+                          title="End User Applications owned by this unit (direct / inherited)">
+                        <span ng-if="$ctrl.hasAnyEndUserApps(node)"
+                              class="small waltz-end-user-app-tally-count">
+
+                            <span ng-if="$ctrl.hasOwnEndUserApps(node)"
+                                  title="End user apps owned directly by this unit">
+                                <span ng-bind="node.endUserAppCount"></span>
+                            </span>
+
+                            <i ng-if="$ctrl.hasInheritedEndUserApps(node)"
+                               title="Inherited from sub units">
+                                (<span ng-bind="node.totalEndUserAppCount"></span>)
+                            </i>
+                            <span class="small">
+                                &nbsp; End User Apps
+                            </span>
+
+                        </span>
+                    </span>
+                    &nbsp;
+                    <strong class="waltz-visibility-child-30">
+                            Show &raquo;
+                    </strong>
+                </a>
+            </span>
+    </treecontrol>
+</div>
