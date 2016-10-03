@@ -21,6 +21,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.0.xml">
 
+    <!-- PRIMITIVES -->
     <property name="clob.type" value="clob" dbms="oracle"></property>
     <property name="clob.type" value="text" dbms="mssql"></property>
     <property name="clob.type" value="longtext" dbms="mysql"></property>
@@ -43,6 +44,17 @@
 
     <property name="longvarchar.type" value="nvarchar(4000)" dbms="mssql"></property>
     <property name="longvarchar.type" value="LONGVARCHAR" dbms="mysql"></property>
+
+
+    <!-- DICTIONARY -->
+    <property name="assetcode.type" value="VARCHAR(255)"></property>
+    <property name="description.type" value="${longvarchar.type}"></property>
+    <property name="enum.type" value="VARCHAR(64)"></property>
+    <property name="external-id.type" value="VARCHAR(200)"></property>
+    <property name="id.type" value="${long.type}"></property>
+    <property name="name.type" value="VARCHAR(255)"></property>
+    <property name="provenance.type" value="VARCHAR(64)"></property>
+
 
     <!-- TABLES -->
     <changeSet author="dwatkins" id="20151129-tbl-1">
@@ -80,9 +92,9 @@
             <column autoIncrement="true" name="id" type="BIGSERIAL">
                 <constraints primaryKey="true" primaryKeyName="application_pkey"/>
             </column>
-            <column name="name" type="VARCHAR(255)"/>
+            <column name="name" type="${name.type}"/>
             <column name="description" type="${longvarchar.type}"/>
-            <column name="asset_code" type="VARCHAR(255)"/>
+            <column name="asset_code" type="${assetcode.type}"/>
             <column defaultValueComputed="${now.value}" name="created_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
@@ -98,7 +110,7 @@
             <column defaultValue="PRODUCTION" name="lifecycle_phase" type="VARCHAR(128)">
                 <constraints nullable="false"/>
             </column>
-            <column name="parent_asset_code" type="VARCHAR(255)"/>
+            <column name="parent_asset_code" type="${assetcode.type}"/>
         </createTable>
     </changeSet>
 
@@ -142,7 +154,9 @@
             <column name="updated_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValueBoolean="false" name="is_primary" type="BOOLEAN">
+            <column defaultValueBoolean="false"
+                    name="is_primary"
+                    type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -2780,6 +2794,45 @@
                     type="${int.type}">
             </column>
         </createIndex>
+    </changeSet>
+
+
+    <!-- 654: Data Article -->
+    <changeSet id="20161003-654-1"
+               author="dwatkins">
+        <createTable tableName="data_article">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="data_article_pkey"/>
+            </column>
+            <column name="owning_application_id"
+                    type="${id.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="format"
+                    type="${enum.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+        </createTable>
     </changeSet>
 
 </databaseChangeLog>
