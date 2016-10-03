@@ -1,7 +1,7 @@
 /**
  * Additional scroll amount to compensate for navbar etc.
 */
-const OFFSET = 90;
+const OFFSET = 160;
 
 
 /**

@@ -12,5 +12,5 @@
 
 export default (module) => {
     module.directive('waltzOrgUnit', require('./org-unit'));
-    module.directive('waltzOrgUnitTree', require('./org-unit-tree'));
+
 };

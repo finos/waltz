@@ -69,40 +69,16 @@
             </div>
             <div class="col-sm-4">
                 <div ng-if="ctrl.selectedNode"
-                     class="waltz-detail-callout">
+                     style="border: 1px solid #ccc; border-radius: 3px; padding: 12px;">
 
-                    <h3>
+                    <h4>
                         <span ng-bind="ctrl.selectedNode.name"></span>
                         <small class="pull-right clickable">
                             <waltz-icon name="times"
                                         ng-click="ctrl.selectedNode = null">
                             </waltz-icon>
                         </small>
-                    </h3>
-
-                    <h4 ng-if="ctrl.selectedNode.appCount > 0">
-                        <span ng-bind="ctrl.selectedNode.appCount"></span>
-                        Application/s
                     </h4>
-
-                    <h5 ng-if="ctrl.selectedNode.childAppCount > 0">
-                        <span ng-bind="ctrl.selectedNode.totalAppCount">
-                        </span>
-                        Applications (incl. sub-units)
-                    </h5>
-
-                    <hr>
-
-                    <h4 ng-if="ctrl.selectedNode.endUserAppCount > 0">
-                        <span ng-bind="ctrl.selectedNode.endUserAppCount"></span>
-                        End User Application/s
-                    </h4>
-
-                    <h5 ng-if="ctrl.selectedNode.childEndUserAppCount > 0">
-                        <span ng-bind="ctrl.selectedNode.totalEndUserAppCount">
-                        </span>
-                        End User Applications (incl. sub-units)
-                    </h5>
 
                     <div class="small waltz-paragraph"
                          ng-bind="ctrl.selectedNode.description">
@@ -111,6 +87,36 @@
                     <a ui-sref="main.org-unit.view ({ id: ctrl.selectedNode.id })">
                         Show &raquo;
                     </a>
+
+
+
+                    <hr>
+
+                    <h5 ng-if="ctrl.selectedNode.appCount > 0">
+                        <span ng-bind="ctrl.selectedNode.appCount"></span>
+                        Application/s
+                    </h5>
+
+                    <div class='small'
+                         ng-if="ctrl.selectedNode.childAppCount > 0">
+                        <span ng-bind="ctrl.selectedNode.totalAppCount">
+                        </span>
+                        (incl. sub-units)
+                    </div>
+
+                    <hr>
+
+                    <h5 ng-if="ctrl.selectedNode.endUserAppCount > 0">
+                        <span ng-bind="ctrl.selectedNode.endUserAppCount"></span>
+                        End User Application/s
+                    </h5>
+
+                    <div class="small"
+                         ng-if="ctrl.selectedNode.childEndUserAppCount > 0">
+                        <span ng-bind="ctrl.selectedNode.totalEndUserAppCount">
+                        </span>
+                        (incl. sub-units)
+                    </h5>
 
                     <br>
                 </div>
@@ -122,7 +128,8 @@
         <!-- SEARCH -->
         <div class="row">
             <div class="col-md-6">
-                <waltz-search clear="ctrl.clearSearch" search="ctrl.doSearch"></waltz-search>
+                <waltz-search clear="ctrl.clearSearch"
+                              search="ctrl.doSearch"></waltz-search>
             </div>
         </div>
 

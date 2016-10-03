@@ -9,8 +9,10 @@
         </waltz-app-group-list>
 
         <div ng-if="!ctrl.editing" class="small waltz-paragraph text-muted">
-            Application groups can be used to create an ad-hoc view over
-            a specified subset of applications in the organisation.
+            Application groups are used to create ad-hoc views over
+            a specified subset of applications within the organisation.
+            You can create groups and assign applications to them. These
+            groups are private by default.
         </div>
 
         <div ng-if="ctrl.editing">
@@ -31,7 +33,11 @@
                    typeahead-min-length="0">
 
             <div class="waltz-paragraph">
-                ...or <a class="clickable" ng-click="ctrl.createNewGroup()">create a new group</a>
+                ...or
+                <a class="clickable"
+                   ng-click="ctrl.createNewGroup()">
+                    create a new group
+                </a>
             </div>
         </div>
 
@@ -39,7 +45,8 @@
             <a ng-click="ctrl.toggleEditing()"
                class="clickable">
                 <span ng-if="! ctrl.editing">
-                    Edit <waltz-icon name="plus-circle"></waltz-icon>
+                    Edit
+                    <waltz-icon name="plus-circle"></waltz-icon>
                 </span>
                 <span ng-if="ctrl.editing">
                     Cancel &#10006;
@@ -49,11 +56,13 @@
     </waltz-section>
 
 
-    <script type="text/ng-template" id="app-group-list-section/app-group-search-result.html">
+    <script type="text/ng-template"
+            id="app-group-list-section/app-group-search-result.html">
         <a style="padding-left: 6px">
             <span ng-bind-html="match.label | uibTypeaheadHighlight:query"></span>
             <span class="small no-overflow">
-                - {{ match.model.description | limitTo:100 }}
+                -
+                <span ng-bind="match.model.description | limitTo:100"></span>
             </span>
         </a>
     </script>

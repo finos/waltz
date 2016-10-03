@@ -20,7 +20,11 @@ export default (module) => {
         .service('OrgUnitStore', require('./services/org-unit-store'))
         .service('OrgUnitViewDataService', require('./services/org-unit-view-data'));
 
-    module.component(
-        'waltzOrgUnitOverview',
-        require('./components/overview/org-unit-overview'));
+    module
+        .component(
+            'waltzOrgUnitOverview',
+            require('./components/overview/org-unit-overview'))
+        .component(
+            'waltzOrgUnitTree',
+            require('./components/tree/org-unit-tree'));
 };
