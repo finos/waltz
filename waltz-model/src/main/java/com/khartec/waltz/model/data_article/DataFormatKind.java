@@ -3,7 +3,7 @@ package com.khartec.waltz.model.data_article;
 /**
  * How an article manifests itself 'physically'
  */
-public enum DataFormat {
+public enum DataFormatKind {
 
     BINARY,
     FLAT_FILE,

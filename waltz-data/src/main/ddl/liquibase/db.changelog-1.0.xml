@@ -2835,4 +2835,48 @@
         </createTable>
     </changeSet>
 
+
+    <!-- 655: Physical Data Flow -->
+    <changeSet id="20161003-655-1"
+               author="dwatkins">
+        <createTable tableName="physical_data_flow">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="physical_data_flow_pkey"/>
+            </column>
+            <column name="article_id"
+                    type="${id.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="flow_id"
+                    type="${id.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="basis_offset"
+                    type="${int.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="frequency"
+                    type="${enum.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="transport"
+                    type="${enum.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+        </createTable>
+    </changeSet>
+
+
 </databaseChangeLog>

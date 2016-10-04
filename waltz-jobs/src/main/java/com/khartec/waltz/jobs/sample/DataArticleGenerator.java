@@ -1,6 +1,6 @@
 package com.khartec.waltz.jobs.sample;
 
-import com.khartec.waltz.model.data_article.DataFormat;
+import com.khartec.waltz.model.data_article.DataFormatKind;
 import com.khartec.waltz.schema.tables.records.DataArticleRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
@@ -92,7 +92,7 @@ public class DataArticleGenerator {
                     String name = mkName();
                     DataArticleRecord record = dsl.newRecord(DATA_ARTICLE);
                     record.setOwningApplicationId(t.v1);
-                    record.setFormat(randomPick(DataFormat.values()).name());
+                    record.setFormat(randomPick(DataFormatKind.values()).name());
                     record.setProvenance("DEMO");
                     record.setDescription("Desc "+ name + " " + t.v2);
                     record.setName(name);

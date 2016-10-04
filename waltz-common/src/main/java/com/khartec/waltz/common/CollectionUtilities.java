@@ -29,6 +29,15 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 
 public class CollectionUtilities {
 
+    /**
+     * Returns an optional item representing the first thing in a collection to pass the given
+     * predicate.  Since some collections are unordered first in this case means 'the first
+     * item offered when streaming the collection'
+     * @param pred
+     * @param ts
+     * @param <T>
+     * @return
+     */
     public static <T> Optional<T> find(Predicate<T> pred, Collection<T> ts) {
         checkNotNull(ts, "collection must not be null");
         checkNotNull(pred, "predicate cannot be null");
@@ -39,6 +48,13 @@ public class CollectionUtilities {
     }
 
 
+    /**
+     * Returns the first item in a collections (as given by an iterator) or null if the
+     * collection is empty.  A null collection
+     * @param ts
+     * @param <T>
+     * @return
+     */
     public static <T> T first(Collection<T> ts) {
         checkNotEmpty(ts, "Cannot get first item from an empty collection");
 
@@ -46,6 +62,14 @@ public class CollectionUtilities {
     }
 
 
+    /**
+     * convert the given collection into another using a transformation function
+     * @param xs
+     * @param fn
+     * @param <X>
+     * @param <Y>
+     * @return
+     */
     public static <X, Y> Collection<Y> map(Collection<X> xs, Function<X, Y> fn) {
         checkNotNull(xs, "collection must not be null");
         checkNotNull(fn, "transformation fn cannot be null");
@@ -54,6 +78,7 @@ public class CollectionUtilities {
                 .map(fn)
                 .collect(Collectors.toList());
     }
+
 
     public static <X> Collection<X> filter(Collection<X> xs, Predicate<X> pred) {
         checkNotNull(xs, "collection must not be null");
@@ -110,5 +135,15 @@ public class CollectionUtilities {
         return sorted;
     }
 
+
+    public static <X> X randomPick(Collection<X> xs) {
+        checkNotNull(xs, "xs cannot be null");
+        return ListUtilities.randomPick(new ArrayList<>(xs));
+    }
+
+
+    public static <X> boolean isEmpty(Collection<X> xs) {
+        return xs == null || xs.isEmpty();
+    }
 
 }
