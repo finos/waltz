@@ -1,4 +1,4 @@
-package com.khartec.waltz.model.data_article;
+package com.khartec.waltz.model.physical_data_article;
 
 /**
  * How an article manifests itself 'physically'
@@ -9,6 +9,7 @@ public enum DataFormatKind {
     FLAT_FILE,
     JSON,
     UNSTRUCTURED,
+    OTHER,
     XML
 
 }

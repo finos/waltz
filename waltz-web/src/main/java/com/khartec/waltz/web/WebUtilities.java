@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkAll;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ObjectUtilities.firstNotNull;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 
 public class WebUtilities {
 
@@ -151,7 +152,6 @@ public class WebUtilities {
      */
     public static EntityKind getKind(Request request) {
         checkNotNull(request, "request must not be null");
-
         return EntityKind.valueOf(request.params("kind"));
     }
 
@@ -163,10 +163,9 @@ public class WebUtilities {
      */
     public static EntityReference getEntityReference(Request request) {
         checkNotNull(request, "request must not be null");
-        return ImmutableEntityReference.builder()
-                .kind(getKind(request))
-                .id(getId(request))
-                .build();
+        return mkRef(
+                getKind(request),
+                getId(request));
     }
 
 

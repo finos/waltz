@@ -33,6 +33,7 @@ const initialState = {
     capabilities: [],
     complexity: [],
     databases: [],
+    dataArticles: [],
     dataTypes: [],
     dataTypeUsages: [],
     explicitTraits: [],
@@ -60,6 +61,7 @@ function controller($q,
                     changeLogStore,
                     complexityStore,
                     databaseStore,
+                    dataArticleStore,
                     dataFlowStore,
                     dataFlowDecoratorStore,
                     dataTypeUsageStore,
@@ -142,6 +144,10 @@ function controller($q,
             .update(entityRef, aliasValues)
             .then(() => vm.aliases = aliasValues);
     };
+
+    dataArticleStore
+        .findByAppId(id)
+        .then(x => console.log("pcs", x));
 }
 
 
@@ -155,6 +161,7 @@ controller.$inject = [
     'ChangeLogDataService',
     'ComplexityStore',
     'DatabaseStore',
+    'DataArticleStore',
     'DataFlowDataStore',
     'DataFlowDecoratorStore',
     'DataTypeUsageStore',

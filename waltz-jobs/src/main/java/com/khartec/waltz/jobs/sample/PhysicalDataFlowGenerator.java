@@ -2,8 +2,8 @@ package com.khartec.waltz.jobs.sample;
 
 import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.common.CollectionUtilities;
-import com.khartec.waltz.data.data_article.DataArticleDao;
-import com.khartec.waltz.model.data_article.DataArticle;
+import com.khartec.waltz.data.physical_data_article.PhysicalDataArticleDao;
+import com.khartec.waltz.model.physical_data_article.PhysicalDataArticle;
 import com.khartec.waltz.model.physical_data_flow.FrequencyKind;
 import com.khartec.waltz.model.physical_data_flow.TransportKind;
 import com.khartec.waltz.schema.tables.records.PhysicalDataFlowRecord;
@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.CollectionUtilities.randomPick;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.schema.tables.DataArticle.DATA_ARTICLE;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalDataArticle.PHYSICAL_DATA_ARTICLE;
 import static com.khartec.waltz.schema.tables.PhysicalDataFlow.PHYSICAL_DATA_FLOW;
 
 
@@ -34,9 +34,9 @@ public class PhysicalDataFlowGenerator {
 
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<DataArticle> articles = dsl.select(DATA_ARTICLE.fields())
-                .from(DATA_ARTICLE)
-                .fetch(DataArticleDao.TO_DOMAIN_MAPPER);
+        List<PhysicalDataArticle> articles = dsl.select(PHYSICAL_DATA_ARTICLE.fields())
+                .from(PHYSICAL_DATA_ARTICLE)
+                .fetch(PhysicalDataArticleDao.TO_DOMAIN_MAPPER);
 
         List<Tuple2<Long, Long>> allLogicalFLows = dsl.select(DATA_FLOW.ID, DATA_FLOW.SOURCE_ENTITY_ID)
                 .from(DATA_FLOW)

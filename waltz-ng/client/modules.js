@@ -37,6 +37,8 @@ function setup(module) {
         require('./performance-metrics'),
         require('./perspectives'),
         require('./person'),
+        require('./physical-data-articles'),
+        require('./physical-data-flows'),
         require('./playpen'),
         require('./process'),
         require('./profile'),

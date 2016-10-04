@@ -12,9 +12,56 @@
     <waltz-section name="foo">
         <div class="row">
             <div class="col-md-6">
-                <waltz-immediate-hierarchy-navigator hierarchy="ctrl.hierarchy"
-                                                     self-id="50">
-                </waltz-immediate-hierarchy-navigator>
+
+                <table class="table table-condensed table-striped table-hover small">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Ext. Id</th>
+                        <th>Format</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="p in ctrl.articles.produces">
+                        <td>
+                            <strong ng-if="$first">
+                                Produces
+                            </strong>
+                        </td>
+                        <td><span ng-bind="p.name"></span></td>
+                        <td><span ng-bind="p.externalId"></span></td>
+                        <td><span ng-bind="p.format"></span></td>
+                        <td><span ng-bind="p.description"></span></td>
+                    </tr>
+                    </tbody>
+                    <tbody>
+                    <tr ng-repeat="p in ctrl.articles.consumes">
+                        <td>
+                            <strong ng-if="$first">
+                                Consumes
+                            </strong>
+                        </td>
+                        <td><span ng-bind="p.name"></span></td>
+                        <td><span ng-bind="p.externalId"></span></td>
+                        <td><span ng-bind="p.format"></span></td>
+                        <td><span ng-bind="p.description"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <pre>{{ ctrl.dataArticles | json }}</pre>
+            </div>
+            <div class="col-md-4">
+                <pre>{{ ctrl.logicalFlows | json }}</pre>
+            </div>
+            <div class="col-md-4">
+                <pre>{{ ctrl.physicalFlows | json }}</pre>
             </div>
         </div>
 
