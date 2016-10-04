@@ -1,7 +1,7 @@
 package com.khartec.waltz.data.data_article;
 
 import com.khartec.waltz.model.data_article.DataArticle;
-import com.khartec.waltz.model.data_article.DataFormat;
+import com.khartec.waltz.model.data_article.DataFormatKind;
 import com.khartec.waltz.model.data_article.ImmutableDataArticle;
 import com.khartec.waltz.schema.tables.records.DataArticleRecord;
 import org.jooq.DSLContext;
@@ -18,7 +18,7 @@ import static com.khartec.waltz.schema.tables.DataArticle.DATA_ARTICLE;
 @Repository
 public class DataArticleDao {
 
-    private static final RecordMapper<? super Record, DataArticle> TO_DOMAIN = r -> {
+    public static final RecordMapper<? super Record, DataArticle> TO_DOMAIN_MAPPER = r -> {
         DataArticleRecord record = r.into(DATA_ARTICLE);
         return ImmutableDataArticle.builder()
                 .id(record.getId())
@@ -26,7 +26,7 @@ public class DataArticleDao {
                 .owningApplicationId(record.getOwningApplicationId())
                 .name(record.getName())
                 .description(record.getDescription())
-                .format(DataFormat.valueOf(record.getFormat()))
+                .format(DataFormatKind.valueOf(record.getFormat()))
                 .provenance(record.getProvenance())
                 .build();
     };
@@ -46,6 +46,6 @@ public class DataArticleDao {
         return dsl.select(DATA_ARTICLE.fields())
                 .from(DATA_ARTICLE)
                 .where(DATA_ARTICLE.OWNING_APPLICATION_ID.eq(id))
-                .fetch(TO_DOMAIN);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

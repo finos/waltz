@@ -22,6 +22,6 @@ public abstract class DataArticle implements
         ProvenanceProvider {
 
     public abstract long owningApplicationId();
-    public abstract DataFormat format();
+    public abstract DataFormatKind format();
 
 }
