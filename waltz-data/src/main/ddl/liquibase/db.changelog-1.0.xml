@@ -2800,13 +2800,13 @@
     <!-- 654: Data Article -->
     <changeSet id="20161003-654-1"
                author="dwatkins">
-        <createTable tableName="data_article">
+        <createTable tableName="physical_data_article">
             <column name="id"
                     autoIncrement="true"
                     type="${id.type}">
                 <constraints nullable="false"
                              primaryKey="true"
-                             primaryKeyName="data_article_pkey"/>
+                             primaryKeyName="physical_data_article_pkey"/>
             </column>
             <column name="owning_application_id"
                     type="${id.type}">

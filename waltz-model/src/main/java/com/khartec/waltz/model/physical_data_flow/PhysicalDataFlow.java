@@ -7,6 +7,13 @@ import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
+
+/**
+ * Binds a data article (e.g. a file specification) to a logical data flow.
+ * As such it can be thought of a realisation of the logical into the
+ * physical. A Logical may have many such realisations whereas a a physical
+ * data flow may only associated to a single logical flow.
+ */
 @Value.Immutable
 @JsonSerialize(as = ImmutablePhysicalDataFlow.class)
 @JsonDeserialize(as = ImmutablePhysicalDataFlow.class)
