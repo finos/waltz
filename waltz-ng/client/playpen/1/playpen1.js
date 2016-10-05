@@ -9,7 +9,7 @@ function controller($scope, dataFlowStore, physicalDataArticleStore, physicalDat
     const vm = Object.assign(this, initData);
 
 
-    const appId = 67575;
+    const appId = 67165;
     const ref = {
         kind: 'APPLICATION',
         id: appId

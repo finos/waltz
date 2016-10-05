@@ -11,36 +11,41 @@ const bindings = {
 const template = require('./physical-data-section.html');
 
 
-
 function enrichProduces(articles = [],
                 physicalFlows = [],
                 logicalFlows = [])
 {
-    return _.map(
-        articles,
-        a => {
+    return _.chain(articles)
+        .flatMap((a, i) => {
             const logicalById = _.keyBy(logicalFlows, "id");
-
-            const relevantPhysicalFlows = _.chain(physicalFlows)
-                .filter({ articleId: a.id })
-                .map(pf => Object.assign({}, pf, { logicalFlow: logicalById[pf.flowId] }))
-                .value();
-
-            return {
-                article: a,
-                physicalFlows: relevantPhysicalFlows
-            };
-
-        });
+            const relevantPhysicalFlows = _.filter(physicalFlows, { articleId: a.id });
+            if (relevantPhysicalFlows.length === 0) {
+                return {
+                    article: a,
+                    firstArticle: true
+                }
+            } else {
+                return _.flatMap(relevantPhysicalFlows, (pf, j) => {
+                    return {
+                        article: a,
+                        firstArticle: j === 0,
+                        physicalFlow: pf,
+                        firstPhysical: j === 0,
+                        logicalFlow: logicalById[pf.flowId]
+                    };
+                });
+            }
+        })
+        .value();
 }
+
 
 function enrichConsumes(articles = [],
                 physicalFlows = [],
                 logicalFlows = [])
 {
-    return _.map(
-        articles,
-        article => {
+    return _.chain(articles)
+        .map(article => {
             const physicalFlow = _.find(physicalFlows, { articleId: article.id });
             const logicalFlow = _.find(logicalFlows, f => f.id === physicalFlow.flowId);
             return {
@@ -48,7 +53,9 @@ function enrichConsumes(articles = [],
                 logicalFlow,
                 physicalFlow
             };
-        });
+        })
+        .groupBy("logicalFlow.source.id")
+        .value();
 }
 
 
@@ -73,7 +80,7 @@ function controller() {
     const vm = this;
 
     vm.$onChanges = (changes) => {
-        vm.enrichedArticles = mkData(vm.articles, vm.physicalFlows, vm.logicalFlows);
+        Object.assign(vm, mkData(vm.articles, vm.physicalFlows, vm.logicalFlows));
     };
 }
 
