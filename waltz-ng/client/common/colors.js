@@ -21,6 +21,11 @@ export const red = d3.rgb('#DA524B');
 export const grey = d3.rgb('#939393');
 export const blue = d3.rgb('#5271CC');
 
+export const amberBg = d3.rgb('#FCF2D7');
+export const greenBg = d3.rgb('#DFF1D2');
+export const redBg = d3.rgb('#F2D7D7');
+export const greyBg = d3.rgb('#F5F5F5');
+
 
 export const ragColorScale = d3.scale.ordinal()
     .domain(['R', 'A', 'G', 'Z'])
@@ -55,6 +60,11 @@ export const authoritativeSourceColorScale = d3.scale.ordinal()
 export const authoritativeRatingColorScale = d3.scale.ordinal()
     .domain(['DISCOURAGED', 'SECONDARY', 'PRIMARY', 'NO_OPINION'])
     .range([red, amber, green, grey.darker()]);
+
+
+export const authoritativeRatingBackgroundColorScale = d3.scale.ordinal()
+    .domain(['DISCOURAGED', 'SECONDARY', 'PRIMARY', 'NO_OPINION'])
+    .range([redBg, amberBg, greenBg, greyBg]);
 
 
 export const environmentColorScale = d3.scale.ordinal()

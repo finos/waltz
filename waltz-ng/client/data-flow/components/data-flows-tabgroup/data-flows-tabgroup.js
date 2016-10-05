@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {authoritativeRatingColorScale} from "../../../common/colors";
+import {authoritativeRatingBackgroundColorScale} from "../../../common/colors";
 
 
 const bindings = {
@@ -149,17 +149,6 @@ function mkEntityNameCell(entityDataObjectField, valueField, columnHeading, enti
 }
 
 
-function mkGridRowBgColor(authSourceRating = '') {
-    var brightnessScale = authSourceRating === 'NO_OPINION'
-        ? 2
-        : 1;
-    const ratingColor = authoritativeRatingColorScale(authSourceRating).brighter(brightnessScale);
-    const backgroundColor = `rgba(${ratingColor.r}, ${ratingColor.g}, ${ratingColor.b}, .7`;
-
-    return backgroundColor;
-}
-
-
 function groupDecoratorsByFlowId(decorators = [], displayNameService) {
     return _.chain(decorators)
         .filter(dc => dc.decoratorEntity.kind === 'DATA_TYPE')
@@ -187,7 +176,7 @@ function prepareGridData(flows = [], decorators = [], displayNameService) {
                                         f,
                                         { dataType: dc.dataType },
                                         { authSourceRating: dc.authSourceRating },
-                                        { rowStyle: { 'background-color': mkGridRowBgColor(dc.authSourceRating) } })));
+                                        { rowStyle: { 'background-color': authoritativeRatingBackgroundColorScale(dc.authSourceRating) } })));
 }
 
 
