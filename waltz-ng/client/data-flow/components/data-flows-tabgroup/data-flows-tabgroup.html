@@ -125,9 +125,11 @@
                 <div ng-if="$ctrl.flowData.flows.length >0"
                      class="waltz-scroll-region"
                      style="height: 300px">
-                    <waltz-data-flow-table flows="$ctrl.filteredFlowData.flows">
-
-                    </waltz-data-flow-table>
+                    <div style="font-size: smaller; height: 300px"
+                         ui-grid-exporter
+                         ui-grid-resize-columns
+                         ui-grid="$ctrl.gridOptions">
+                    </div>
                 </div>
 
             </uib-tab>
