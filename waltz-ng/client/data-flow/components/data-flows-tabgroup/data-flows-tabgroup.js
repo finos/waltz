@@ -150,11 +150,13 @@ function mkEntityNameCell(entityDataObjectField, valueField, columnHeading, enti
 
 
 function mkGridRowBgColor(authSourceRating = '') {
-    const color = authoritativeRatingColorScale(authSourceRating);
     var brightnessScale = authSourceRating === 'NO_OPINION'
-                            ? 2
-                            : 1;
-    return color.brighter(brightnessScale).toString();
+        ? 2
+        : 1;
+    const ratingColor = authoritativeRatingColorScale(authSourceRating).brighter(brightnessScale);
+    const backgroundColor = `rgba(${ratingColor.r}, ${ratingColor.g}, ${ratingColor.b}, .7`;
+
+    return backgroundColor;
 }
 
 
