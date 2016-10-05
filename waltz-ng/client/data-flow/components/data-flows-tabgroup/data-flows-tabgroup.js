@@ -1,4 +1,5 @@
 import _ from "lodash";
+import {authoritativeRatingColorScale} from "../../../common/colors";
 
 
 const bindings = {
@@ -139,7 +140,87 @@ function prepareGraphTweakers(dataFlowUtilityService,
 }
 
 
-function controller($scope, dataFlowUtilityService) {
+function mkEntityNameCell(entityDataObjectField, valueField, columnHeading, entityNavViewName) {
+    return {
+        field: valueField,
+        displayName: columnHeading,
+        cellTemplate: `<div class="ui-grid-cell-contents">\n<a ui-sref="main.${entityNavViewName}.view ({ id: row.entity[\'${entityDataObjectField}\'][\'id\']})" ng-bind="COL_FIELD">\n</a>\n</div>`
+    };
+}
+
+
+function mkGridRowBgColor(authSourceRating = '') {
+    const color = authoritativeRatingColorScale(authSourceRating);
+    var brightnessScale = authSourceRating === 'NO_OPINION'
+                            ? 2
+                            : 1;
+    return color.brighter(brightnessScale).toString();
+}
+
+
+function groupDecoratorsByFlowId(decorators = [], displayNameService) {
+    return _.chain(decorators)
+        .filter(dc => dc.decoratorEntity.kind === 'DATA_TYPE')
+        .map(dc => _.assign(
+                    {},
+                    {
+                        dataFlowId: dc.dataFlowId,
+                        dataType: {
+                            id: dc.decoratorEntity.id,
+                            name: displayNameService.lookup('dataType', dc.decoratorEntity.id)
+                        },
+                        authSourceRating: dc.rating
+                    }))
+        .groupBy('dataFlowId')
+        .value();
+}
+
+
+function prepareGridData(flows = [], decorators = [], displayNameService) {
+    const groupedDecorators = groupDecoratorsByFlowId(decorators, displayNameService);
+    return _.flatMap(flows,
+                    f => _.map(groupedDecorators[f.id],
+                                dc => _.assign(
+                                        {},
+                                        f,
+                                        { dataType: dc.dataType },
+                                        { authSourceRating: dc.authSourceRating },
+                                        { rowStyle: { 'background-color': mkGridRowBgColor(dc.authSourceRating) } })));
+}
+
+
+function prepareGridOptions(filteredFlowData = {}, $animate, uiGridConstants, displayNameService) {
+    const gridData = prepareGridData(filteredFlowData.flows, filteredFlowData.decorators, displayNameService);
+
+    const columnDefs = [
+        mkEntityNameCell('source', 'source.name', 'Source', 'app'),
+        mkEntityNameCell('target', 'target.name', 'Target', 'app'),
+        mkEntityNameCell('dataType', 'dataType.name', 'Data Type', 'data-type'),
+        { field: 'authSourceRating', displayName: 'Source Rating', cellFilter: 'toDisplayName:"rating"' }
+    ];
+
+    return {
+        columnDefs,
+        data: gridData,
+        enableGridMenu: true,
+        enableFiltering: true,
+        enableHorizontalScrollbar: uiGridConstants.scrollbars.NEVER,
+        enableSorting: true,
+        exporterCsvFilename: "flows.csv",
+        exporterMenuPdf: false,
+        rowTemplate: '<div ng-style="row.entity.rowStyle"><div ng-repeat="col in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ui-grid-cell></div></div>',
+        onRegisterApi: (gridApi) => {
+            $animate.enabled(gridApi.grid.element, false);
+        }
+    };
+}
+
+
+function controller($animate,
+                    $scope,
+                    dataFlowUtilityService,
+                    uiGridConstants,
+                    displayNameService) {
 
     const vm = _.defaultsDeep(this, initialState);
 
@@ -166,6 +247,8 @@ function controller($scope, dataFlowUtilityService) {
             vm.applications,
             vm.filteredFlowData.decorators,
             app => $scope.$applyAsync(() => vm.selectedApplication = app));
+
+        vm.gridOptions = prepareGridOptions(vm.filteredFlowData, $animate, uiGridConstants, displayNameService);
     };
 
     vm.loadDetail = () => {
@@ -189,8 +272,11 @@ function controller($scope, dataFlowUtilityService) {
 
 
 controller.$inject = [
+    '$animate',
     '$scope',
-    'DataFlowUtilityService'
+    'DataFlowUtilityService',
+    'uiGridConstants',
+    'WaltzDisplayNameService'
 ];
 
 
