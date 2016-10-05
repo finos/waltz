@@ -9,7 +9,8 @@ public enum DataFormatKind {
     FLAT_FILE,
     JSON,
     UNSTRUCTURED,
-    OTHER,
-    XML
+    DATABASE,
+    XML,
+    OTHER
 
 }

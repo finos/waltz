@@ -55,8 +55,8 @@ public class PhysicalDataFlowDao {
 
         Condition matchingSource = DATA_FLOW.SOURCE_ENTITY_ID.eq(ref.id())
                 .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name()));
-        Condition matchingTarget = DATA_FLOW.SOURCE_ENTITY_ID.eq(ref.id())
-                .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name()));
+        Condition matchingTarget = DATA_FLOW.TARGET_ENTITY_ID.eq(ref.id())
+                .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()));
 
         return dsl.select(PHYSICAL_DATA_FLOW.fields())
                 .from(PHYSICAL_DATA_FLOW)

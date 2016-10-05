@@ -1,0 +1,125 @@
+<div class="row">
+    <div class="col-md-12">
+
+        <h4>Produces</h4>
+        <p class="small text-muted">
+            I think this wants to be have a counter showing how many physical instantiations it has
+            and possibly list the applications
+        </p>
+        <table class="table table-condensed table-striped table-hover small">
+            <thead>
+            <tr>
+                <th width="15%">Name</th>
+                <th width="8%">Ext. Id</th>
+                <th width="8%">Format</th>
+                <th width="19%">Description</th>
+                <th width="15%">Receiver/s</th>
+                <th width="8%">Transport</th>
+                <th width="8%">Frequency</th>
+                <th width="19%">Description</th>
+            </tr>
+            </thead>
+            <tbody ng-repeat="p in $ctrl.enrichedArticles.produces">
+            <tr ng-repeat="f in p.physicalFlows | orderBy: ''">
+                <td>
+                    <span ng-if="$first"
+                          ng-bind="p.article.name"></span>
+                    <span ng-if="!$first">~</span>
+                </td>
+                <td>
+                    <span ng-if="$first"
+                          ng-bind="p.article.externalId"></span>
+                    <span ng-if="!$first">~</span>
+                </td>
+                <td>
+                    <span ng-if="$first"
+                          ng-bind="p.article.format"></span>
+                    <span ng-if="!$first">~</span>
+                </td>
+                <td>
+                    <span ng-if="$first"
+                          ng-bind="p.article.description | limitTo:100"></span>
+                    <span ng-if="!$first">~</span>
+                </td>
+                <td>
+                    <a ui-sref="main.app.view ({ id: f.logicalFlow.target.id })">
+                        <span ng-bind="f.logicalFlow.target.name">
+                        </span>
+                    </a>
+                </td>
+                <td>
+                    <span ng-bind="f.transport"></span>
+                </td>
+                <td>
+                    <span ng-bind="f.frequency"></span>
+                </td>
+                <td>
+                    <span ng-bind="f.description"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Consumes</h4>
+        <p class="small text-muted">
+            I think this wants to be categorized by sending app
+        </p>
+        <table class="table table-condensed table-striped table-hover small">
+            <thead>
+            <tr>
+                <th width="15%">Name</th>
+                <th width="10%">Ext. Id</th>
+                <th width="15%">Source Application</th>
+                <th width="10%">Format</th>
+                <th width="10%">Transport</th>
+                <th width="10%">Frequency</th>
+                <th width="30%">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="c in $ctrl.enrichedArticles.consumes">
+
+                <td>
+                    <span ng-bind="c.article.name"></span>
+                </td>
+                <td>
+                    <span ng-bind="c.article.externalId"></span>
+                </td>
+                <td>
+                    <a ui-sref="main.app.view ({ id: c.logicalFlow.source.id })">
+                        <strong ng-bind="c.logicalFlow.source.name">
+                        </strong>
+                    </a>
+                </td>
+                <td>
+                    <span ng-bind="c.article.format"></span>
+                </td>
+                <td>
+                    <span ng-bind="c.physicalFlow.transport"></span>
+                </td>
+                <td>
+                    <span ng-bind="c.physicalFlow.frequency"></span>
+                </td>
+                <td>
+                    <span ng-bind="c.article.description"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!--
+<hr>
+<div class="row">
+    <div class="col-md-6">
+        <pre>{{ $ctrl.enrichedArticles.produces | json }}</pre>
+    </div>
+    <div class="col-md-6">
+        <pre>{{ $ctrl.enrichedArticles.consumes | json }}</pre>
+    </div>
+</div>
+-->
