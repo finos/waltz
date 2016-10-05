@@ -89,10 +89,15 @@ public class FlowGenerator {
 
 
         Set<DataFlow> randomFlows = apps.stream()
-                .map(a -> ImmutableDataFlow
-                        .builder()
-                        .source(a.toEntityReference()))
-                .map(b -> b.target(randomAppPick(apps, randomPick(orgUnits).id().get())).build())
+                .flatMap(a -> IntStream
+                        .range(0, rnd.nextInt(5))
+                        .mapToObj(i -> {
+                            EntityReference target = randomAppPick(apps, randomPick(orgUnits).id().get());
+                            return ImmutableDataFlow.builder()
+                                    .source(a.toEntityReference())
+                                    .target(target)
+                                    .build();
+                        }))
                 .collect(toSet());
 
 

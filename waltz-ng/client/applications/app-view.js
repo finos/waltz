@@ -61,13 +61,14 @@ function controller($q,
                     changeLogStore,
                     complexityStore,
                     databaseStore,
-                    dataArticleStore,
                     dataFlowStore,
                     dataFlowDecoratorStore,
                     dataTypeUsageStore,
                     involvementStore,
                     orgUnitStore,
                     perspectiveStore,
+                    physicalDataArticleStore,
+                    physicalDataFlowStore,
                     processStore,
                     ratingStore,
                     serverInfoStore,
@@ -145,9 +146,13 @@ function controller($q,
             .then(() => vm.aliases = aliasValues);
     };
 
-    dataArticleStore
+    physicalDataArticleStore
         .findByAppId(id)
-        .then(x => console.log("pcs", x));
+        .then(xs => vm.physicalDataArticles = xs);
+
+    physicalDataFlowStore
+        .findByEntityReference(entityRef)
+        .then(xs => vm.physicalDataFlows = xs);
 }
 
 
@@ -161,13 +166,14 @@ controller.$inject = [
     'ChangeLogDataService',
     'ComplexityStore',
     'DatabaseStore',
-    'DataArticleStore',
     'DataFlowDataStore',
     'DataFlowDecoratorStore',
     'DataTypeUsageStore',
     'InvolvementStore',
     'OrgUnitStore',
     'PerspectiveStore',
+    'PhysicalDataArticleStore',
+    'PhysicalDataFlowStore',
     'ProcessStore',
     'RatingStore',
     'ServerInfoStore',
