@@ -38,6 +38,8 @@ public enum EntityKind {
     ORG_UNIT,
     PERFORMANCE_METRIC_PACK,
     PERSON,
+    PHYSICAL_DATA_ARTICLE,
+    PHYSICAL_DATA_FLOW,
     PROCESS,
     SERVER,
     SOFTWARE,

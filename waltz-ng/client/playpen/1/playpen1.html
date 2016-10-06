@@ -11,24 +11,35 @@
 
     <waltz-section name="foo">
 
-        <waltz-physical-data-section articles="ctrl.articles"
-                                     physical-flows="ctrl.physicalFlows"
-                                     logical-flows="ctrl.logicalFlows">
-        </waltz-physical-data-section>
+        <div width="100%">
+            <waltz-source-and-target-panel entity-ref="ctrl.entityRef"
+                                           logical-flows="ctrl.logicalFlows"
+                                           decorators="ctrl.dataFlowDecorators"
+                                           physical-flows="ctrl.physicalFlows"
+                                           physical-articles="ctrl.articles">
+            </waltz-source-and-target-panel>
 
+        </div>
 
     </waltz-section>
 
     <waltz-section name="stuff">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <h4>Articles</h4>
                 <pre>{{ ctrl.articles | json }}</pre>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <h4>Logical Flows</h4>
                 <pre>{{ ctrl.logicalFlows | json }}</pre>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <h4>Physical Flows</h4>
                 <pre>{{ ctrl.physicalFlows | json }}</pre>
+            </div>
+            <div class="col-md-3">
+                <h4>Decorators</h4>
+                <pre>{{ ctrl.dataFlowDecorators | json }}</pre>
             </div>
         </div>
     </waltz-section>

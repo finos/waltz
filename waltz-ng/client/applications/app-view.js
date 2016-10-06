@@ -82,10 +82,10 @@ function controller($q,
     const goToAppFn = d => $state.go('main.app.view', { id: d.id });
     vm.flowTweakers = {
         source: {
-            onSelect: goToAppFn
+            onSelect: goToAppFn,
         },
         target: {
-            onSelect: goToAppFn
+            onSelect: goToAppFn,
         }
     };
 

@@ -5,6 +5,7 @@ function setup(module) {
         .component('waltzRatedSummaryTable', require('./rated-flow-summary/rated-summary-table'))
         .component('waltzRatedSummaryCell', require('./rated-flow-summary/rated-summary-cell'))
         .component('waltzSourceAndTargetGraph', require('./source-and-target-graph/source-and-target'))
+        .component('waltzSourceAndTargetPanel', require('./source-and-target-panel/source-and-target-panel'))
         .component('waltzAppCentricFlowTable', require('./app-centric-flow-table/app-centric-flow-table'))
         .component('waltzDataFlowTypeEditor', require('./edit/data-flow-type-editor'))
         .component('waltzDataFlowDiagram', require('./boingy-graph/boingy-graph'))

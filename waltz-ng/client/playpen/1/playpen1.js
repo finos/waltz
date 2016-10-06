@@ -5,14 +5,18 @@ const initData = {
 
 
 
-function controller($scope, dataFlowStore, physicalDataArticleStore, physicalDataFlowStore) {
+function controller($q, dataFlowStore, dataFlowDecoratorStore, physicalDataArticleStore, physicalDataFlowStore) {
     const vm = Object.assign(this, initData);
 
-
-    const appId = 67165;
+    const appId = 66766;
     const ref = {
         kind: 'APPLICATION',
         id: appId
+    };
+
+    const selector = {
+        entityReference: ref,
+        scope: 'EXACT'
     };
 
     physicalDataArticleStore
@@ -27,14 +31,18 @@ function controller($scope, dataFlowStore, physicalDataArticleStore, physicalDat
         .findByEntityReference(ref)
         .then(xs => vm.physicalFlows = xs);
 
-    global.vm = vm;
+    dataFlowDecoratorStore
+        .findBySelector(selector)
+        .then(xs => vm.dataFlowDecorators = xs);
 
+    vm.entityRef = ref;
 }
 
 
 controller.$inject = [
-    '$scope',
+    '$q',
     'DataFlowDataStore',
+    'DataFlowDecoratorStore',
     'PhysicalDataArticleStore',
     'PhysicalDataFlowStore'
 ];

@@ -1,0 +1,19 @@
+.waltz-source-and-target-panel {
+    .wsatp-popup {
+        border: 2px solid #ddd;
+        border-radius: 1.5px;
+        padding: 12px;
+        opacity: 0.93;
+        position: absolute;
+        background-color: white;
+        z-index: 10000;
+        width: 60%;
+        @include waltz-box-shadow();
+    }
+
+    .wsatp-data-types {
+        li {
+            margin-left: 3px;
+        }
+    }
+}
