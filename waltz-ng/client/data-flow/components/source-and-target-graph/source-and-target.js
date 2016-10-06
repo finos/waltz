@@ -9,7 +9,7 @@ const template = require('./source-and-target.html');
 
 const bindings = {
     entityRef: '<',
-    flows: '<',
+    logicalFlows: '<',
     decorators: '<',
     tweakers: '<'
 };
@@ -167,20 +167,27 @@ function prepareGraph(svg) {
 }
 
 
-function mkModel({ flows = [], decorators = [], entityRef, allTypes = []}) {
-    const flowIds = _.map(flows, 'id');
+function mkModel({ logicalFlows = [], decorators = [], entityRef, allTypes = []}) {
+    const logicalFlowIds = _.map(logicalFlows, 'id');
     const relevantDecorators = _.filter(
         decorators,
-        d => _.includes(flowIds, d.dataFlowId));
+        d => _.includes(logicalFlowIds, d.dataFlowId));
 
     const { inbound = [], outbound = [] } = _.groupBy(
-        flows,
+        logicalFlows,
         f => f.source.id === entityRef.id
             ? 'outbound'
             : 'inbound');
 
-    const sources = _.chain(inbound).map("source").uniqBy('id').value();
-    const targets = _.chain(outbound).map("target").uniqBy('id').value();
+    const sources = _.chain(inbound)
+        .map("source")
+        .uniqBy('id')
+        .value();
+
+    const targets = _.chain(outbound)
+        .map("target")
+        .uniqBy('id')
+        .value();
 
     const allTypesById = _.keyBy(allTypes, 'id');
 
@@ -302,25 +309,56 @@ function setupScales(model, dimensions) {
 }
 
 
+function determineLabelTextAdjustment(anchor) {
+    switch (anchor) {
+        case 'start':
+            return 10;
+        case 'end':
+            return -10;
+        default:
+            return 0;
+    }
+}
+
+
+function determineLabelIconAdjustment(anchor) {
+    switch (anchor) {
+        case 'start':
+            return -6;
+        case 'end':
+            return -6;
+        default:
+            return 0;
+    }
+}
+
+
 function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
     const labels = section
         .selectAll('.wsat-label')
         .data(items, d => d.id);
 
-    labels
+    const newLabels = labels
         .enter()
-        .append('text')
+        .append('g')
         .classed('clickable', true)
         .classed('wsat-label', true)
-        .attr({
-            'text-anchor': anchor,
-            opacity: 0
-        })
+        .attr({ opacity: 0 })
         .on('mouseenter.highlight', d => { highlighted = d.id; redraw(); })
         .on('mouseleave.highlight', d => { highlighted = null; redraw(); })
         .on('click.tweaker', tweakers.onSelect)
         .on('mouseenter.tweaker', tweakers.onEnter)
-        .on('mouseleave.tweaker', tweakers.onLeave)
+        .on('mouseleave.tweaker', tweakers.onLeave);
+
+    const textAdjustment = determineLabelTextAdjustment(anchor);
+    const iconAdjustment = determineLabelIconAdjustment(anchor);
+
+    newLabels
+        .append("text")
+        .attr({
+            'text-anchor': anchor,
+            dx: textAdjustment
+        })
         .text(app => _.truncate(app.name, 26));
 
     labels
@@ -331,6 +369,22 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
             'transform':  (d, i) => `translate(0, ${ scale(d.id) })`,
             opacity: 1
         });
+
+
+    newLabels
+        .append('text')
+        .classed('wsat-icon',true)
+        .attr({
+            'dx': iconAdjustment,
+            "font-family": "FontAwesome"
+        });
+
+    if (tweakers.icon) {
+        labels
+            .selectAll('.wsat-icon')
+            .attr({ fill: d => tweakers.icon(d).color })
+            .text((d) => tweakers.icon(d).code || '');
+    }
 
     labels
         .exit()
@@ -499,7 +553,6 @@ function update(sections,
     drawCenterBox(sections.types, dimensions);
 
     const scales = setupScales(model, dimensions);
-
     drawLabels(sections.sources, model.sources, scales.source, 'end', tweakers.source, redraw);
     drawLabels(sections.targets, model.targets, scales.target, 'start', tweakers.target, redraw);
 
@@ -539,7 +592,7 @@ function controller($element, $window, dataTypeService) {
             .loadDataTypes()
             .then(types => {
                 const data = {
-                    flows: vm.flows || [],
+                    logicalFlows: vm.logicalFlows || [],
                     decorators: vm.decorators || [],
                     entityRef: vm.entityRef,
                     allTypes: types

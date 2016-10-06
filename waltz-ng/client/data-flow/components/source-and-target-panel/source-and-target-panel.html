@@ -1,0 +1,91 @@
+<div class="row waltz-source-and-target-panel">
+    <div class="col-sm-12 padding-0">
+        <waltz-source-and-target-graph entity-ref="$ctrl.entityRef"
+                                       logical-flows="$ctrl.logicalFlows"
+                                       decorators="$ctrl.decorators"
+                                       tweakers="$ctrl.tweakers">
+        </waltz-source-and-target-graph>
+    </div>
+
+    <div ng-if="$ctrl.selected"
+         ng-style="{
+            right: $ctrl.selected.type == 'source' ? '100px' : null,
+            left: $ctrl.selected.type == 'target' ? '100px' : null
+         }"
+         class="wsatp-popup">
+
+        <h4>
+            <span ng-bind="$ctrl.selected.app.name"></span>
+            <a class="clickable pull-right small"
+               style="color: blue"
+               ng-click="$ctrl.selected = null">
+                Dismiss
+                <waltz-icon name="close"></waltz-icon>
+            </a>
+        </h4>
+
+        <strong>Data Types</strong>
+        <div ng-if="$ctrl.selected.types.length > 0" class="wsatp-data-types">
+            <ul class="list-inline">
+                <li ng-repeat='type in $ctrl.selected.types'>
+                    <a ui-sref="main.data-type.view ({id: type.id})">
+                        <span class="label"
+                              ng-class="{
+                                'label-success' : type.rating == 'PRIMARY',
+                                'label-warning' : type.rating == 'SECONDARY',
+                                'label-danger' : type.rating == 'DISCOURAGED',
+                                'label-default' : type.rating == 'NO_OPINION',
+                              }"
+                              ng-bind="type.id | toDisplayName:'dataType'">
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <strong>Physical Data</strong>
+        <div ng-if="$ctrl.selected.physicalFlows.length > 0">
+            <table class="table table-condensed small small">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Format</th>
+                    <th>Transport</th>
+                    <th>Frequency</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="pf in $ctrl.selected.physicalFlows">
+                    <td>
+                        <span ng-bind="pf.article.name"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="pf.article.format"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="pf.transport"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="pf.frequency"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div ng-if="$ctrl.selected.physicalFlows.length == 0">
+            <div class="alert alert-warning">
+                No records of physical data flows found.
+            </div>
+        </div>
+
+        <hr>
+
+        <a ui-sref="main.app.view ({ id: $ctrl.selected.app.id })">
+            &raquo; More about
+            <span ng-bind='$ctrl.selected.app.name'></span>
+        </a>
+    </div>
+</div>

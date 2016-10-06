@@ -84,8 +84,9 @@
     <!-- DATA TYPES & FLOWS -->
     <waltz-section name="Data" icon="random" small="( types and flows )">
 
-        <waltz-section-actions >
+        <waltz-section-actions>
             <a waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
+               ng-if="ctrl.dataTab == 0"
                ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'
                class="btn btn-xs btn-primary">
                 Edit
@@ -98,82 +99,88 @@
 
         <waltz-source-data-overlay visible="ctrl.visibility.logicalFlows"
                                    ratings="ctrl.sourceDataRatings"
-                                   entities="['LOGICAL_DATA_FLOW']">
+                                   entities="['LOGICAL_DATA_FLOW', 'PHYSICAL_DATA_ARTICLE', 'PHYSICAL_DATA_FLOW']">
         </waltz-source-data-overlay>
 
-        <div ng-if="ctrl.dataTypeUsages.length == 0 && ctrl.flows.length == 0">
-            <div class="alert alert-warning"
-                 ng-if="ctrl.dataTypeUsages.length == 0">
-                <strong>
-                    No flows or types
-                </strong>
-                registered for this application.  Add them
-                <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>
-                    here.
-                </a>
-            </div>
-        </div>
-
-        <div ng-if="ctrl.dataTypeUsages.length > 0 || ctrl.flows.length > 0">
-            <div>
-                <h4>Data Types</h4>
-                <div class="alert alert-warning"
-                     ng-if="ctrl.dataTypeUsages.length == 0">
-                    <strong>
-                        No Types
-                    </strong>
-                    registered for this application.  Add them
-                    <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>
-                        here.
-                    </a>
+        <uib-tabset active="active" ng-init="ctrl.dataTab = 0">
+            <uib-tab index="0"
+                     select="ctrl.dataTab = 0"
+                     heading="Summary">
+                <div ng-if="ctrl.dataTypeUsages.length == 0 && ctrl.flows.length == 0">
+                    <div class="alert alert-warning"
+                         ng-if="ctrl.dataTypeUsages.length == 0">
+                        <strong>
+                            No flows or types
+                        </strong>
+                        registered for this application.  Add them
+                        <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>
+                            here.
+                        </a>
+                    </div>
                 </div>
 
-                <waltz-app-data-type-usage-list usages="ctrl.dataTypeUsages"
-                                                ng-if="ctrl.dataTypeUsages.length > 0">
-                </waltz-app-data-type-usage-list>
-                <hr>
-            </div>
-            <div>
-                <h4>Logical Flows</h4>
-                <div class="alert alert-warning"
-                     ng-if="ctrl.flows.length == 0">
-                    <strong>
-                        No Data Flows
-                    </strong>
-                    registered for this application.  Add one
-                    <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>here</a>.
+                <div ng-if="ctrl.dataTypeUsages.length > 0 || ctrl.flows.length > 0">
+                    <div>
+                        <h4>Data Types</h4>
+                        <div class="alert alert-warning"
+                             ng-if="ctrl.dataTypeUsages.length == 0">
+                            <strong>
+                                No Types
+                            </strong>
+                            registered for this application.  Add them
+                            <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>
+                                here.
+                            </a>
+                        </div>
+
+                        <waltz-app-data-type-usage-list usages="ctrl.dataTypeUsages"
+                                                        ng-if="ctrl.dataTypeUsages.length > 0">
+                        </waltz-app-data-type-usage-list>
+                        <hr>
+                    </div>
+                    <div>
+                        <h4>Logical Flows</h4>
+                        <div class="alert alert-warning"
+                             ng-if="ctrl.flows.length == 0">
+                            <strong>
+                                No Data Flows
+                            </strong>
+                            registered for this application.  Add one
+                            <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>here</a>.
+                        </div>
+
+                        <div ng-if="ctrl.flows.length > 0">
+
+                            <waltz-source-and-target-panel entity-ref="ctrl.entityRef"
+                                                           logical-flows="ctrl.flows"
+                                                           decorators="ctrl.dataFlowDecorators"
+                                                           physical-flows="ctrl.physicalDataFlows"
+                                                           physical-articles="ctrl.physicalDataArticles">
+                            </waltz-source-and-target-panel>
+
+                            <p class="text-muted small">
+                                Diagram detailing the applications data types (Middle)
+                                from the sending system (LHS)
+                                to the receiving system on the (RHS).
+                                <span style="color: darkred">Red lines</span> indicate non-strategic flows,
+                                <span style="color: orange">Amber</span> indicates secondary and
+                                <span style="color: darkgreen">Green</span> indicates a primary system.
+                            </p>
+                        </div>
+                    </div>
                 </div>
+            </uib-tab>
+            <uib-tab index="1"
+                     select="ctrl.dataTab = 1"
+                     heading="Physical Flow Detail">
+                <waltz-physical-data-section articles="ctrl.physicalDataArticles"
+                                             physical-flows="ctrl.physicalDataFlows"
+                                             logical-flows="ctrl.flows">
+                </waltz-physical-data-section>
+            </uib-tab>
+        </uib-tabset>
 
-                <div ng-if="ctrl.flows.length > 0">
-
-                    <waltz-source-and-target-graph entity-ref="ctrl.entityRef"
-                                                   flows="ctrl.flows"
-                                                   decorators="ctrl.dataFlowDecorators"
-                                                   tweakers="ctrl.flowTweakers">
-                    </waltz-source-and-target-graph>
-
-                    <p class="text-muted small">
-                        Diagram detailing the applications data types (Middle)
-                        from the sending system (LHS)
-                        to the receiving system on the (RHS).
-                        <span style="color: darkred">Red lines</span> indicate non-strategic flows,
-                        <span style="color: orange">Amber</span> indicates secondary and
-                        <span style="color: darkgreen">Green</span> indicates a primary system.
-                    </p>
-                </div>
-            </div>
-        </div>
     </waltz-section>
-
-    <!-- PHYSICAL DATA -->
-    <div waltz-has-role="BETA_TESTER">
-        <waltz-section name="Physical Data">
-            <waltz-physical-data-section articles="ctrl.physicalDataArticles"
-                                         physical-flows="ctrl.physicalDataFlows"
-                                         logical-flows="ctrl.flows">
-            </waltz-physical-data-section>
-        </waltz-section>
-    </div>
 
 
     <!-- AUTH SOURCES -->
