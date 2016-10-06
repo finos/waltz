@@ -42,6 +42,7 @@ import javax.sql.DataSource;
 @PropertySource(value = "file:${user.home}/.waltz/waltz.properties", ignoreResourceNotFound = true)
 public class DIConfiguration {
 
+    private static final String JOOQ_DEBUG_PROPERTY = "jooq.debug.enabled";
 
     @Value("${database.url}")
     private String dbUrl;
@@ -88,12 +89,18 @@ public class DIConfiguration {
             System.err.println("Cannot parse sql dialect: "+dialect);
             throw iae;
         }
+
+        Settings dslSettings = null;
+        if ("true".equals(System.getProperty(JOOQ_DEBUG_PROPERTY))) {
+            dslSettings = new Settings()
+                    .withRenderFormatted(true)
+                    .withExecuteLogging(true);
+        }
+
         return DSL.using(
                 dataSource,
                 SQLDialect.valueOf(dialect),
-                new Settings()
-                        .withRenderFormatted(true)
-                        .withExecuteLogging(true));
+                dslSettings);
     }
 
 
