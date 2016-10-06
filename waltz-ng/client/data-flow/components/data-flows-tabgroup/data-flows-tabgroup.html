@@ -125,7 +125,8 @@
                 <div ng-if="$ctrl.flowData.flows.length >0"
                      class="waltz-scroll-region"
                      style="height: 300px">
-                    <waltz-data-flow-table flows="$ctrl.filteredFlowData.flows">
+                    <waltz-data-flow-table flows="$ctrl.filteredFlowData.flows"
+                                           decorators="$ctrl.filteredFlowData.decorators">
 
                     </waltz-data-flow-table>
                 </div>
