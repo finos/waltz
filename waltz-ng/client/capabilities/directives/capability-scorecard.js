@@ -39,7 +39,7 @@ function controller($scope, $state) {
 
     $scope.$watch('ctrl.assetCosts', cs => vm.portfolioCostStr = calcPortfolioCost(cs));
     $scope.$watch('ctrl.complexity', cs => vm.complexitySummary = calcComplexitySummary(cs));
-    $scope.$watch('ctrl.serverStats', enrichServerStats);
+    $scope.$watch('ctrl.serverStats', stats => vm.enrichedServerStats = enrichServerStats(stats));
 
     vm.subCapabilitySelected = () => $state.go('main.capability.view', { id: vm.selectedSubCapability} );
 }
