@@ -73,6 +73,7 @@ function mkPhysicalFlowInfo(physicalArticles = { consumes: [], produces: [] },
         .value();
 }
 
+
 // flowId -> [ { id (typeId), rating }... ]
 function mkTypeInfo(decorators = []) {
     return _.chain(decorators)
@@ -113,7 +114,8 @@ const iconCodes = {
     files: '\uf0c5',
     file: '\uf016',
     question: '\uf128',
-    questionCircle: '\uf29c'
+    questionCircle: '\uf29c',
+    folder: '\uf115'
 };
 
 
@@ -129,9 +131,14 @@ function toIcon(count = 0) {
                 code: iconCodes.file,
                 color: '#000'
             };
-        default:
+        case 2:
             return {
                 code: iconCodes.files,
+                color: '#000'
+            };
+        default:
+            return {
+                code: iconCodes.folder,
                 color: '#000'
             };
     }
