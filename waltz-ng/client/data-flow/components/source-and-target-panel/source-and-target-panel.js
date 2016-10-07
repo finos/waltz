@@ -17,7 +17,7 @@ function controller($scope) {
             vm.entityRef,
             vm.logicalFlows);
 
-        function select(app, type, flowId) {
+        function select(app, type, flowId, evt) {
             const typeInfoByFlowId = mkTypeInfo(vm.decorators);
             const physicalFlowsByLogicalFlowId = mkPhysicalFlowInfo(vm.physicalArticles, vm.physicalFlows);
             const types = typeInfoByFlowId[flowId] || [];
@@ -26,21 +26,22 @@ function controller($scope) {
                 type,
                 types,
                 physicalFlows,
-                app
+                app,
+                y: evt.pageY
             };
         }
 
         const baseTweakers = {
             source: {
-                onSelect: app => $scope.$applyAsync(() => {
+                onSelect: (app, evt) => $scope.$applyAsync(() => {
                     const flowId = keyedLogicalFlows.sourceFlowsByAppId[app.id];
-                    vm.selected = select(app, 'source', flowId);
+                    vm.selected = select(app, 'source', flowId, evt);
                 })
             },
             target: {
-                onSelect: app => $scope.$applyAsync(() => {
+                onSelect: (app, evt) => $scope.$applyAsync(() => {
                     const flowId = keyedLogicalFlows.targetFlowsByAppId[app.id];
-                    vm.selected = select(app, 'target', flowId);
+                    vm.selected = select(app, 'target', flowId, evt);
                 })
             }
         };
