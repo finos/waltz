@@ -16,10 +16,9 @@
  *
  */
 
-import { numberFormatter } from '../../common';
-import { enrichServerStats } from  '../../server-info/services/server-utilities';
-import { calcPortfolioCost } from '../../asset-cost/services/asset-cost-utilities';
-import { calcComplexitySummary } from '../../complexity/services/complexity-utilities';
+import {enrichServerStats} from "../../server-info/services/server-utilities";
+import {calcPortfolioCost} from "../../asset-cost/services/asset-cost-utilities";
+import {calcComplexitySummary} from "../../complexity/services/complexity-utilities";
 
 
 const BINDINGS = {
@@ -40,7 +39,7 @@ function controller($scope) {
 
     $scope.$watch('ctrl.assetCosts', cs => vm.portfolioCostStr = calcPortfolioCost(cs));
     $scope.$watch('ctrl.complexity', cs => vm.complexitySummary = calcComplexitySummary(cs));
-    $scope.$watch('ctrl.serverStats', (stats) => enrichServerStats(stats));
+    $scope.$watch('ctrl.serverStats', stats => vm.enrichedServerStats = enrichServerStats(stats));
 
 }
 
