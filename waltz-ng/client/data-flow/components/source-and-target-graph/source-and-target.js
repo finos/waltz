@@ -579,7 +579,8 @@ function controller($element, $window, dataTypeService) {
 
     const svgSections = prepareGraph(svg);
 
-    const debouncedRender = _.debounce(() => {
+    const render = () => {
+
         if (! vm.entityRef) { return; }
 
         baseDimensions.graph.width = $element
@@ -600,7 +601,9 @@ function controller($element, $window, dataTypeService) {
                 const model = mkModel(data);
                 update(svgSections, model, tweakers);
             });
-    }, 100);
+    };
+
+    const debouncedRender = _.debounce(render, 100);
 
     vm.$onChanges = (changes) => debouncedRender();
 
