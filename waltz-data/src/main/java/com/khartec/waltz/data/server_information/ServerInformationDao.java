@@ -21,28 +21,26 @@ import com.khartec.waltz.model.server_information.ImmutableServerInformation;
 import com.khartec.waltz.model.server_information.ImmutableServerSummaryStatistics;
 import com.khartec.waltz.model.server_information.ServerInformation;
 import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
+import com.khartec.waltz.model.tally.ImmutableStringTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ServerInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.Unchecked;
-import org.jooq.lambda.tuple.Tuple;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
-import static com.khartec.waltz.data.JooqUtilities.*;
+import static com.khartec.waltz.data.JooqUtilities.mkEndOfLifeStatusDerivedField;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
-import static org.jooq.impl.DSL.max;
-import static org.jooq.impl.DSL.select;
+import static java.util.stream.Collectors.*;
+import static org.jooq.impl.DSL.*;
 
 
 @Repository
@@ -143,101 +141,48 @@ public class ServerInformationDao {
         Field<String> locationInner = DSL.field("location_inner", String.class);
         Field<String> osEolStatusInner = DSL.field("os_eol_status_inner", String.class);
         Field<String> hwEolStatusInner = DSL.field("hw_eol_status_inner", String.class);
+        Field<Boolean> isVirtualInner = DSL.field("is_virtual_inner", Boolean.class);
 
         Condition condition = SERVER_INFORMATION.ASSET_CODE
-                .in(dsl.select(APPLICATION.ASSET_CODE)
-                    .from(APPLICATION)
-                    .where(APPLICATION.ID.in(appIdSelector)));
+                .in(select(APPLICATION.ASSET_CODE)
+                        .from(APPLICATION)
+                        .where(APPLICATION.ID.in(appIdSelector)));
 
         // de-duplicate host names, as one server can host multiple apps
-        Table serverInfoSubSelect = DSL.select(
+        Result<Record6<String, String, String, String, String, Boolean>> serverInfo = dsl.select(
                     max(SERVER_INFORMATION.ENVIRONMENT).as(environmentInner),
                     max(SERVER_INFORMATION.OPERATING_SYSTEM).as(operatingSystemInner),
                     max(SERVER_INFORMATION.LOCATION).as(locationInner),
                     max(mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.OS_END_OF_LIFE_DATE)).as(osEolStatusInner),
-                    max(mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.HW_END_OF_LIFE_DATE)).as(hwEolStatusInner))
+                    max(mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.HW_END_OF_LIFE_DATE)).as(hwEolStatusInner),
+                    cast(max(when(SERVER_INFORMATION.IS_VIRTUAL.eq(true), 1).otherwise(0)), Boolean.class).as(isVirtualInner))
                 .from(SERVER_INFORMATION)
                 .where(condition)
                 .groupBy(SERVER_INFORMATION.HOSTNAME)
-                .asTable("server_info_sub_select");
+                .fetch();
 
-        Future<Tuple2<Integer, Integer>> typePromise = DB_EXECUTOR_POOL.submit(() ->
-                calculateVirtualAndPhysicalCounts(condition));
+        Map<Boolean, Long> virtualAndPhysicalCounts = serverInfo.stream()
+                .collect(Collectors.groupingBy(r -> r.getValue(isVirtualInner), counting()));
 
-        Future<List<Tally<String>>> envPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
-                dsl,
-                serverInfoSubSelect,
-                environmentInner,
-                DSL.trueCondition()));
+        // tally calc function
+        Function<Field<String>, List<Tally<String>>> calculateTallies = field -> serverInfo.stream()
+                .collect(groupingBy(r -> r.getValue(field), counting()))
+                .entrySet()
+                .stream()
+                .map(e -> ImmutableStringTally.builder()
+                        .id(e.getKey())
+                        .count(e.getValue())
+                        .build())
+                .collect(toList());
 
-        Future<List<Tally<String>>> osPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
-                dsl,
-                serverInfoSubSelect,
-                operatingSystemInner,
-                DSL.trueCondition()));
-
-        Future<List<Tally<String>>> locationPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
-                dsl,
-                serverInfoSubSelect,
-                locationInner,
-                DSL.trueCondition()));
-
-        Future<List<Tally<String>>> osEolStatusPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
-                dsl,
-                serverInfoSubSelect,
-                osEolStatusInner,
-                DSL.trueCondition()));
-
-        Future<List<Tally<String>>> hwEolStatusPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
-                dsl,
-                serverInfoSubSelect,
-                hwEolStatusInner,
-                DSL.trueCondition()));
-
-
-        return Unchecked.supplier(() -> {
-            Tuple2<Integer, Integer> virtualAndPhysicalCounts = typePromise.get();
-
-            return ImmutableServerSummaryStatistics.builder()
-                    .virtualCount(virtualAndPhysicalCounts.v1)
-                    .physicalCount(virtualAndPhysicalCounts.v2)
-                    .environmentCounts(envPromise.get())
-                    .operatingSystemCounts(osPromise.get())
-                    .locationCounts(locationPromise.get())
-                    .operatingSystemEndOfLifeStatusCounts(osEolStatusPromise.get())
-                    .hardwareEndOfLifeStatusCounts(hwEolStatusPromise.get())
-                    .build();
-        }).get();
-
-
+        return ImmutableServerSummaryStatistics.builder()
+                .virtualCount(virtualAndPhysicalCounts.get(true))
+                .physicalCount(virtualAndPhysicalCounts.get(false))
+                .environmentCounts(calculateTallies.apply(environmentInner))
+                .operatingSystemCounts(calculateTallies.apply(operatingSystemInner))
+                .locationCounts(calculateTallies.apply(locationInner))
+                .operatingSystemEndOfLifeStatusCounts(calculateTallies.apply(osEolStatusInner))
+                .hardwareEndOfLifeStatusCounts(calculateTallies.apply(hwEolStatusInner))
+                .build();
     }
-
-    private Tuple2<Integer, Integer> calculateVirtualAndPhysicalCounts(Condition condition) {
-        Field<Boolean> isVirtualInner = DSL.field("is_virtual_inner", Boolean.class);
-
-        Field<BigDecimal> virtualCount = DSL.coalesce(DSL.sum(
-                DSL.choose(isVirtualInner)
-                        .when(Boolean.TRUE, 1)
-                        .otherwise(0)), BigDecimal.ZERO)
-                .as("virtual_count");
-
-        Field<BigDecimal> physicalCount = DSL.coalesce(DSL.sum(
-                DSL.choose(isVirtualInner)
-                        .when(Boolean.TRUE, 0)
-                        .otherwise(1)), BigDecimal.ZERO)
-                .as("physical_count");
-
-        Select<Record2<BigDecimal, BigDecimal>> typeQuery = dsl.select(virtualCount, physicalCount)
-                .from(select(SERVER_INFORMATION.IS_VIRTUAL.as(isVirtualInner))
-                            .from(SERVER_INFORMATION)
-                            .where(dsl.renderInlined(condition))
-                            .groupBy(SERVER_INFORMATION.HOSTNAME, SERVER_INFORMATION.IS_VIRTUAL));
-
-        return typeQuery
-                .fetchOne(r -> Tuple.tuple(
-                        r.value1().intValue(),
-                        r.value2().intValue()));
-    }
-
-
 }
