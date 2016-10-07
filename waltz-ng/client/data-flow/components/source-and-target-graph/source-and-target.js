@@ -346,7 +346,7 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
         .attr({ opacity: 0 })
         .on('mouseenter.highlight', d => { highlighted = d.id; redraw(); })
         .on('mouseleave.highlight', d => { highlighted = null; redraw(); })
-        .on('click.tweaker', tweakers.onSelect)
+        .on('click.tweaker', (d) => tweakers.onSelect(d, d3.event))
         .on('mouseenter.tweaker', tweakers.onEnter)
         .on('mouseleave.tweaker', tweakers.onLeave);
 
