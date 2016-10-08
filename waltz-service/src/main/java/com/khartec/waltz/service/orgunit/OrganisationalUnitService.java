@@ -18,7 +18,6 @@
 package com.khartec.waltz.service.orgunit;
 
 import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.common.hierarchy.FlatNode;
 import com.khartec.waltz.common.hierarchy.Forest;
 import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
@@ -34,11 +33,16 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.*;
 import static com.khartec.waltz.common.FunctionUtilities.time;
+import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static java.util.Collections.emptyList;
 
 
 @Service
@@ -161,7 +165,7 @@ public class OrganisationalUnitService {
 
 
     public List<OrganisationalUnit> search(String query) {
-        if (StringUtilities.isEmpty(query)) return Collections.emptyList();
+        if (isEmpty(query)) return emptyList();
         return organisationalUnitSearchDao.search(query);
     }
 

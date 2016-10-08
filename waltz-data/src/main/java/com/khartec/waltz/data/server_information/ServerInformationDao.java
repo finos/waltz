@@ -176,8 +176,8 @@ public class ServerInformationDao {
                 .collect(toList());
 
         return ImmutableServerSummaryStatistics.builder()
-                .virtualCount(virtualAndPhysicalCounts.get(true))
-                .physicalCount(virtualAndPhysicalCounts.get(false))
+                .virtualCount(virtualAndPhysicalCounts.getOrDefault(true, 0L))
+                .physicalCount(virtualAndPhysicalCounts.getOrDefault(false, 0L))
                 .environmentCounts(calculateTallies.apply(environmentInner))
                 .operatingSystemCounts(calculateTallies.apply(operatingSystemInner))
                 .locationCounts(calculateTallies.apply(locationInner))
