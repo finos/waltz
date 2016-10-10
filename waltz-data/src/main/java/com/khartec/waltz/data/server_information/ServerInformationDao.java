@@ -21,8 +21,6 @@ import com.khartec.waltz.model.server_information.ImmutableServerInformation;
 import com.khartec.waltz.model.server_information.ImmutableServerSummaryStatistics;
 import com.khartec.waltz.model.server_information.ServerInformation;
 import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
-import com.khartec.waltz.model.tally.ImmutableStringTally;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ServerInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -31,15 +29,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
+import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.data.JooqUtilities.mkEndOfLifeStatusDerivedField;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.counting;
 import static org.jooq.impl.DSL.*;
 
 
@@ -149,7 +147,7 @@ public class ServerInformationDao {
                         .where(APPLICATION.ID.in(appIdSelector)));
 
         // de-duplicate host names, as one server can host multiple apps
-        Result<Record6<String, String, String, String, String, Boolean>> serverInfo = dsl.select(
+        Result<? extends Record> serverInfo = dsl.select(
                     max(SERVER_INFORMATION.ENVIRONMENT).as(environmentInner),
                     max(SERVER_INFORMATION.OPERATING_SYSTEM).as(operatingSystemInner),
                     max(SERVER_INFORMATION.LOCATION).as(locationInner),
@@ -164,25 +162,14 @@ public class ServerInformationDao {
         Map<Boolean, Long> virtualAndPhysicalCounts = serverInfo.stream()
                 .collect(Collectors.groupingBy(r -> r.getValue(isVirtualInner), counting()));
 
-        // tally calc function
-        Function<Field<String>, List<Tally<String>>> calculateTallies = field -> serverInfo.stream()
-                .collect(groupingBy(r -> r.getValue(field), counting()))
-                .entrySet()
-                .stream()
-                .map(e -> ImmutableStringTally.builder()
-                        .id(e.getKey())
-                        .count(e.getValue())
-                        .build())
-                .collect(toList());
-
         return ImmutableServerSummaryStatistics.builder()
                 .virtualCount(virtualAndPhysicalCounts.getOrDefault(true, 0L))
                 .physicalCount(virtualAndPhysicalCounts.getOrDefault(false, 0L))
-                .environmentCounts(calculateTallies.apply(environmentInner))
-                .operatingSystemCounts(calculateTallies.apply(operatingSystemInner))
-                .locationCounts(calculateTallies.apply(locationInner))
-                .operatingSystemEndOfLifeStatusCounts(calculateTallies.apply(osEolStatusInner))
-                .hardwareEndOfLifeStatusCounts(calculateTallies.apply(hwEolStatusInner))
+                .environmentCounts(calculateStringTallies(serverInfo, environmentInner))
+                .operatingSystemCounts(calculateStringTallies(serverInfo, operatingSystemInner))
+                .locationCounts(calculateStringTallies(serverInfo, locationInner))
+                .operatingSystemEndOfLifeStatusCounts(calculateStringTallies(serverInfo, osEolStatusInner))
+                .hardwareEndOfLifeStatusCounts(calculateStringTallies(serverInfo, hwEolStatusInner))
                 .build();
     }
 }
