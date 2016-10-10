@@ -38,6 +38,8 @@ export const entityIconNames = {
     LOGICAL_DATA_FLOW: "random",
     ORG_UNIT: 'sitemap',
     PERSON: 'user',
+    PHYSICAL_DATA_ARTICLE: 'square',
+    PHYSICAL_DATA_FLOW: 'square',
     PROCESS: 'code-fork',
     SERVER: 'server',
     SOFTWARE: 'gift',

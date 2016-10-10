@@ -1,10 +1,11 @@
 export const applicationKindDisplayNames = {
+    CUSTOMISED: 'Customised',
+    EUC: 'End User Computing',
+    EXTERNAL: 'External to the organisation',
+    EXTERNALLY_HOSTED: 'Externally Hosted',
     IN_HOUSE: 'In House',
     INTERNALLY_HOSTED: 'Hosted Internally',
-    EXTERNALLY_HOSTED: 'Externally Hosted',
-    EUC: 'End User Computing',
-    THIRD_PARTY: 'Third Party',
-    CUSTOMISED: 'Customised'
+    THIRD_PARTY: 'Third Party'
 };
 
 
@@ -99,6 +100,8 @@ export const entityNames = {
     LOGICAL_DATA_FLOW: "Logical Data Flow",
     ORG_UNIT: 'Org Unit',
     PERSON: 'Person',
+    PHYSICAL_DATA_ARTICLE: 'Physical Data Article',
+    PHYSICAL_DATA_FLOW: 'Physical Data Flow',
     PROCESS: 'Process',
     SERVER: 'Server',
     SOFTWARE: 'Software',

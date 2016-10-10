@@ -3,12 +3,8 @@
 
 
 .waltz-page-header {
-
     background-color: $waltz-section-background-color;
-
-
     @include waltz-box-shadow();
-
 }
 
 
@@ -28,7 +24,6 @@
 
     @include transition(height 0.2s);
 }
-
 
 
 .waltz-page-header.wph-sticky {
@@ -57,7 +52,5 @@
     }
 
     @include transition(height 0.4s);
-
-
 }
 

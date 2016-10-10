@@ -1,11 +1,14 @@
+@import "../../../style/util";
+
+
 .waltz-nav-search-panel {
-    top: 42px;
+    top: 52px;
     right: 100px;
     position: absolute;
-    background-color: white;
+    background-color: #fafafa;
     width:75%;
     border: 1px solid #ccc;
-    box-shadow: 0px 4px 5px gray, -5px 4px 7px gray, 5px 4px 7px gray;
+    @include waltz-box-shadow();
 
     .wns-results {
         margin: 10px;
