@@ -18,19 +18,12 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.database_information.DatabaseInformationDao;
-import com.khartec.waltz.model.EndOfLifeStatus;
-import com.khartec.waltz.model.database_information.DatabaseInformation;
-import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.database_information.DatabaseInformationService;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.List;
-
-import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
-import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
 
 
 public class DatabaseHarness {
@@ -39,9 +32,11 @@ public class DatabaseHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
+        DatabaseInformationService databaseInfoService = ctx.getBean(DatabaseInformationService.class);
         DatabaseInformationDao databaseDao = ctx.getBean(DatabaseInformationDao.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
+        /*
         List<DatabaseInformation> dbs = databaseDao.findByApplicationId(801L);
         System.out.println(dbs.size());
 
@@ -54,7 +49,19 @@ public class DatabaseHarness {
                 DSL.trueCondition());
 
         System.out.println(eolCounts);
+        */
 
+        IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
+                .entityReference(ImmutableEntityReference.builder()
+                        .kind(EntityKind.ORG_UNIT)
+                        .id(10)
+                        .build())
+                .scope(HierarchyQueryScope.CHILDREN)
+                .build();
+
+        for (int i = 0; i < 5; i++) {
+            HarnessUtilities.time("stats", () -> databaseInfoService.findStatsForAppIdSelector(options));
+        }
 
 
     }
