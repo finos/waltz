@@ -21,8 +21,10 @@
             <tbody>
             <tr ng-repeat="p in $ctrl.produces">
                 <td>
-                    <span ng-class="{ 'text-muted' : !p.firstArticle}"
-                          ng-bind="p.article.name"></span>
+                    <a ui-sref="main.physical-data-article.view ({ id: p.article.id })">
+                        <span ng-class="{ 'text-muted' : !p.firstArticle}"
+                              ng-bind="p.article.name"></span>
+                    </a>
                 </td>
                 <td>
                     <span ng-class="{ 'text-muted' : !p.firstArticle}"
@@ -86,7 +88,9 @@
                     </span>
                 </td>
                 <td>
-                    <span ng-bind="c.article.name"></span>
+                    <a ui-sref="main.physical-data-article.view ({ id: c.article.id })">
+                        <span ng-bind="c.article.name"></span>
+                    </a>
                 </td>
                 <td>
                     <span ng-bind="c.article.externalId"></span>

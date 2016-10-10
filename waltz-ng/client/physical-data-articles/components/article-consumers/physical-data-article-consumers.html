@@ -1,0 +1,36 @@
+<div class="row">
+    <div class="col-sm-12">
+        <table class="table table-condensed small">
+            <thead>
+            <tr>
+                <th>Application</th>
+                <th>Transport</th>
+                <th>Frequency</th>
+                <th>Basis Offset</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="flow in $ctrl.flowData">
+                <td>
+                    <a ui-sref="main.app.view ({id: flow.logicalFlow.target.id})">
+                        <span ng-bind="flow.logicalFlow.target.name"></span>
+                    </a>
+                </td>
+                <td>
+                    <span ng-bind="flow.physicalFlow.transport"></span>
+                </td>
+                <td>
+                    <span ng-bind="flow.physicalFlow.frequency"></span>
+                </td>
+                <td>
+                    <span ng-bind="flow.physicalFlow.basisOffset"></span>
+                </td>
+                <td>
+                    <span ng-bind="flow.physicalFlow.description"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

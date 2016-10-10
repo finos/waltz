@@ -35,6 +35,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
+import static com.khartec.waltz.schema.tables.PhysicalDataFlow.PHYSICAL_DATA_FLOW;
 
 
 @Repository
@@ -99,18 +100,18 @@ public class DataFlowDao {
     }
 
 
-    private SelectConditionStep<Record> baseQuery() {
+    private SelectOnConditionStep<Record> baseQuery() {
 
         return dsl
                 .select(DATA_FLOW.fields())
                 .select(sourceAppAlias.NAME, targetAppAlias.NAME)
                 .from(DATA_FLOW)
                 .innerJoin(sourceAppAlias)
-                .on(DATA_FLOW.SOURCE_ENTITY_ID.eq(sourceAppAlias.ID))
+                .on(DATA_FLOW.SOURCE_ENTITY_ID.eq(sourceAppAlias.ID)
+                        .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .innerJoin(targetAppAlias)
-                .on(DATA_FLOW.TARGET_ENTITY_ID.eq(targetAppAlias.ID))
-                .where(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+                .on(DATA_FLOW.TARGET_ENTITY_ID.eq(targetAppAlias.ID)
+                        .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
     }
 
 
@@ -152,16 +153,19 @@ public class DataFlowDao {
                 .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
-        return dsl.select(DATA_FLOW.fields())
-                .select(sourceAppAlias.NAME, targetAppAlias.NAME)
-                .from(DATA_FLOW)
-                .innerJoin(sourceAppAlias)
-                .on(DATA_FLOW.SOURCE_ENTITY_ID.eq(sourceAppAlias.ID))
-                .innerJoin(targetAppAlias)
-                .on(DATA_FLOW.TARGET_ENTITY_ID.eq(targetAppAlias.ID))
+        return baseQuery()
                 .innerJoin(DATA_FLOW_DECORATOR)
                 .on(DATA_FLOW_DECORATOR.DATA_FLOW_ID.eq(DATA_FLOW.ID))
                 .where(dsl.renderInlined(condition))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Collection<DataFlow> findByPhysicalDataArticleId(long articleId) {
+        return baseQuery()
+                .innerJoin(PHYSICAL_DATA_FLOW)
+                .on(DATA_FLOW.ID.eq(PHYSICAL_DATA_FLOW.FLOW_ID))
+                .where(PHYSICAL_DATA_FLOW.ARTICLE_ID.eq(articleId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

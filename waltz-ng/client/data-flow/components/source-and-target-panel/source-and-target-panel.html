@@ -59,7 +59,9 @@
                 <tbody>
                 <tr ng-repeat="pf in $ctrl.selected.physicalFlows">
                     <td>
-                        <span ng-bind="pf.article.name"></span>
+                        <a ui-sref="main.physical-data-article.view ({ id: pf.article.id })">
+                            <span ng-bind="pf.article.name"></span>
+                        </a>
                     </td>
                     <td>
                         <span ng-bind="pf.article.format"></span>

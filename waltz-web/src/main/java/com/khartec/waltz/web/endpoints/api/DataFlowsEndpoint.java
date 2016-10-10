@@ -68,6 +68,7 @@ public class DataFlowsEndpoint implements Endpoint {
         String findBySelectorPath = mkPath(BASE_URL, "selector");
         String findStatsPath = mkPath(BASE_URL, "stats");
         String tallyByDataTypePath = mkPath(BASE_URL, "count-by", "data-type");
+        String findByPhysicalDataArticleIdPath = mkPath(BASE_URL, "physical-data-article", ":id");
 
         String removeFlowPath = mkPath(BASE_URL, ":id");
         String addFlowPath = mkPath(BASE_URL);
@@ -84,10 +85,13 @@ public class DataFlowsEndpoint implements Endpoint {
         ListRoute<Tally<String>> tallyByDataTypeRoute = (request, response)
                 -> dataFlowService.tallyByDataType();
 
+        ListRoute<DataFlow> findByPhysicalDataArticleIdRoute = (request, response)
+                -> dataFlowService.findByPhysicalDataArticleId(getId(request));
 
 
         getForList(findByEntityPath, getByEntityRef);
         postForList(findBySelectorPath, findBySelectorRoute);
+        getForList(findByPhysicalDataArticleIdPath, findByPhysicalDataArticleIdRoute);
 
         postForDatum(findStatsPath, findStatsRoute);
         getForList(tallyByDataTypePath, tallyByDataTypeRoute);
