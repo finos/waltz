@@ -38,4 +38,9 @@ public class PhysicalDataArticleService {
     public Collection<PhysicalDataArticle> findByConsumerAppId(long id) {
         return dataArticleDao.findByConsumerAppId(id);
     }
+
+
+    public PhysicalDataArticle getById(long id) {
+        return dataArticleDao.getById(id);
+    }
 }

@@ -34,6 +34,7 @@ const initialState = {
     selectedApplication: null,
     boingyEverShown: false,
     dataTypes: [],
+    enrichedDataTypeCounts: [],
     flowData: null,
     filterOptions: defaultFilterOptions,
     onLoadDetail: () => console.log("No onLoadDetail provided for data-flows-tabgroup"),
@@ -139,13 +140,20 @@ function prepareGraphTweakers(dataFlowUtilityService,
 }
 
 
-function controller($scope, dataFlowUtilityService) {
+function controller($scope,
+                    dataFlowUtilityService,
+                    displayNameService) {
 
     const vm = _.defaultsDeep(this, initialState);
 
     vm.$onChanges = () => {
         if (vm.flowData) {
             vm.dataTypes = getDataTypeIds(vm.flowData.decorators);
+        }
+        if (vm.flowData && vm.flowData.stats) {
+            vm.enrichedDataTypeCounts = dataFlowUtilityService.enrichDataTypeCounts(
+                vm.flowData.stats.dataTypeCounts,
+                displayNameService);
         }
         vm.filterChanged();
     };
@@ -190,7 +198,8 @@ function controller($scope, dataFlowUtilityService) {
 
 controller.$inject = [
     '$scope',
-    'DataFlowUtilityService'
+    'DataFlowUtilityService',
+    'WaltzDisplayNameService'
 ];
 
 

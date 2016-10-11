@@ -20,12 +20,14 @@ export const authSourceRatingNames = {
 
 export const bookmarkNames = {
     APPLICATION_INSTANCE: 'Application Instance',
-    SOURCE_CODE_CONTROL: 'Source Code Control',
-    ISSUE_TRACKER: 'Issue Tracking',
-    QUALITY_CONTROL: 'Quality Control',
-    DOCUMENTATION: 'Documentation',
     BUILD_SYSTEM: 'Automated Build / Deployment System',
-    MONITORING: 'Monitoring Systems'
+    BUSINESS_SPECIFICATION: 'Business Specification',
+    DOCUMENTATION: 'Documentation',
+    ISSUE_TRACKER: 'Issue Tracking',
+    MONITORING: 'Monitoring Systems',
+    QUALITY_CONTROL: 'Quality Control',
+    SOURCE_CODE_CONTROL: 'Source Code Control',
+    TECHNICAL_SPECIFICATION: 'Technical Specification',
 };
 
 

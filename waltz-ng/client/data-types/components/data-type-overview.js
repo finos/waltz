@@ -12,19 +12,15 @@
  */
 import {enrichServerStats} from "../../server-info/services/server-utilities";
 import {calcComplexitySummary} from "../../complexity/services/complexity-utilities";
-import {findNode, getParents} from "../../common";
-import {prepareDataTypeTree} from "../utilities";
-
+import {buildHierarchies, findNode, getParents} from "../../common";
 
 const bindings = {
     dataTypeId: '<',
     allDataTypes: '<',
     apps: '<',
-    flows: '<',
     ratings: '<',
     serverStats: '<',
     complexity: '<',
-    dataFlowTallies: '<',
     usageStats: '<'
 };
 
@@ -37,7 +33,7 @@ function controller() {
 
     vm.$onChanges = () => {
         if(vm.allDataTypes) {
-            const roots = prepareDataTypeTree(vm.allDataTypes, vm.dataFlowTallies);
+            const roots = buildHierarchies(vm.allDataTypes);
             const node = findNode(roots, vm.dataTypeId);
             vm.dataType = node;
             vm.parents = getParents(node);

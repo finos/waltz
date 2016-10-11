@@ -24,8 +24,13 @@ public class PhysicalDataFlowService {
     }
 
 
-    public List<PhysicalDataFlow> findFlowsForEntityReference(EntityReference ref) {
+    public List<PhysicalDataFlow> findByEntityReference(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
-        return physicalDataFlowDao.findFlowsForEntityReference(ref);
+        return physicalDataFlowDao.findByEntityReference(ref);
+    }
+
+
+    public List<PhysicalDataFlow> findByArticleId(long articleId) {
+        return physicalDataFlowDao.findByArticleId(articleId);
     }
 }

@@ -10,12 +10,21 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import {checkIsEntityRef} from '../../common/checks';
+
 
 function store($http, baseApiUrl) {
     const baseUrl = `${baseApiUrl}/bookmarks`;
 
     const save = (bookmark) => $http.post(baseUrl, bookmark);
-    const findByParent = (ref) => $http.get(`${baseUrl}/${ref.kind}/${ref.id}`).then(d => d.data);
+
+    const findByParent = (ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${baseUrl}/${ref.kind}/${ref.id}`)
+            .then(d => d.data);
+    };
+
     const remove = (id) => $http.delete(`${baseUrl}/${id}`);
 
     return {

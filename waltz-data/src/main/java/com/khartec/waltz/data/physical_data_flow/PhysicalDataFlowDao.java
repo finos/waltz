@@ -49,7 +49,8 @@ public class PhysicalDataFlowDao {
         this.dsl = dsl;
     }
 
-    public List<PhysicalDataFlow> findFlowsForEntityReference(EntityReference ref) {
+
+    public List<PhysicalDataFlow> findByEntityReference(EntityReference ref) {
 
         checkNotNull(ref, "ref cannot be null");
 
@@ -63,6 +64,14 @@ public class PhysicalDataFlowDao {
                 .innerJoin(DATA_FLOW)
                 .on(DATA_FLOW.ID.eq(PHYSICAL_DATA_FLOW.FLOW_ID))
                 .where(matchingSource.or(matchingTarget))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<PhysicalDataFlow> findByArticleId(long articleId) {
+        return dsl.select(PHYSICAL_DATA_FLOW.fields())
+                .from(PHYSICAL_DATA_FLOW)
+                .where(PHYSICAL_DATA_FLOW.ARTICLE_ID.eq(articleId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

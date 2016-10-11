@@ -19,7 +19,6 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.data_flow.DataFlowService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -67,7 +66,7 @@ public class DataFlowsEndpoint implements Endpoint {
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findBySelectorPath = mkPath(BASE_URL, "selector");
         String findStatsPath = mkPath(BASE_URL, "stats");
-        String tallyByDataTypePath = mkPath(BASE_URL, "count-by", "data-type");
+        String findByPhysicalDataArticleIdPath = mkPath(BASE_URL, "physical-data-article", ":id");
 
         String removeFlowPath = mkPath(BASE_URL, ":id");
         String addFlowPath = mkPath(BASE_URL);
@@ -81,16 +80,16 @@ public class DataFlowsEndpoint implements Endpoint {
         DatumRoute<DataFlowStatistics> findStatsRoute = (request, response)
                 -> dataFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
 
-        ListRoute<Tally<String>> tallyByDataTypeRoute = (request, response)
-                -> dataFlowService.tallyByDataType();
 
+        ListRoute<DataFlow> findByPhysicalDataArticleIdRoute = (request, response)
+                -> dataFlowService.findByPhysicalDataArticleId(getId(request));
 
 
         getForList(findByEntityPath, getByEntityRef);
         postForList(findBySelectorPath, findBySelectorRoute);
+        getForList(findByPhysicalDataArticleIdPath, findByPhysicalDataArticleIdRoute);
 
         postForDatum(findStatsPath, findStatsRoute);
-        getForList(tallyByDataTypePath, tallyByDataTypeRoute);
 
         deleteForDatum(removeFlowPath, this::removeFlowRoute);
         postForDatum(addFlowPath, this::addFlowRoute);

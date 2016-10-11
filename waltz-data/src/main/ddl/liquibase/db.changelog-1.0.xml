@@ -2879,4 +2879,32 @@
     </changeSet>
 
 
+    <!-- 693: Adding indexes to Physical Data tables-->
+    <changeSet author="dwatkins"
+               id="20161011-693-1">
+        <createIndex indexName="idx_owning_application_id"
+                     tableName="physical_data_article"
+                     unique="false">
+            <column name="owning_application_id" type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20161011-693-2">
+        <createIndex indexName="idx_article_id"
+                     tableName="physical_data_flow"
+                     unique="false">
+            <column name="article_id" type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20161011-693-3">
+        <createIndex indexName="idx_flow_id"
+                     tableName="physical_data_flow"
+                     unique="false">
+            <column name="flow_id" type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

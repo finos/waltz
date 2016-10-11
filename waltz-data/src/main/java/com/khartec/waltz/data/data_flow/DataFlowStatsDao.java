@@ -19,9 +19,13 @@ package com.khartec.waltz.data.data_flow;
 
 import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.dataflow.DataFlowMeasures;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowMeasures;
+import com.khartec.waltz.model.tally.ImmutableStringTally;
+import com.khartec.waltz.model.tally.ImmutableTallyPack;
 import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.schema.tables.DataFlow;
 import com.khartec.waltz.schema.tables.DataFlowDecorator;
 import com.khartec.waltz.schema.tables.DataType;
@@ -31,12 +35,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.data.JooqUtilities.TO_STRING_TALLY;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static java.util.stream.Collectors.*;
+import static org.jooq.impl.DSL.*;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -79,7 +87,7 @@ public class DataFlowStatsDao {
         );
 
         Select<Record1<Integer>> intraAppCounter = dsl
-                    .select(DSL.count())
+                    .select(count())
                     .from(APPLICATION)
                     .where(dsl.renderInlined(APPLICATION.ID.in(appIdSelector)));
 
@@ -99,27 +107,59 @@ public class DataFlowStatsDao {
     }
 
 
-    public List<Tally<String>> tallyDataTypesByAppIdSelector(Select<Record1<Long>> appIdSelector) {
+    public List<TallyPack<String>> tallyDataTypesByAppIdSelector(Select<Record1<Long>> appIdSelector) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
         Condition condition = df.TARGET_ENTITY_ID.in(appIdSelector)
                 .or(df.SOURCE_ENTITY_ID.in(appIdSelector))
                 .and(BOTH_APPS);
 
+        Table<Record1<Long>> sourceApp = appIdSelector.asTable("source_app");
+        Table<Record1<Long>> targetApp = appIdSelector.asTable("target_app");
+        Field<Long> sourceAppId = sourceApp.field(0, Long.class);
+        Field<Long> targetAppId = targetApp.field(0, Long.class);
+        Field<Integer> flowCount = DSL.field("flow_count", Integer.class);
+        Field<String> flowTypeCase =
+                when(sourceAppId.isNotNull()
+                        .and(targetAppId.isNotNull()), inline("INTRA"))
+                .when(sourceAppId.isNotNull(), inline("OUTBOUND"))
+                .otherwise(inline("INBOUND"));
+        Field<String> flowType = DSL.field("flow_type", String.class);
 
-         // dataType.CODE should no longer be used as a 'pk' (use .ID instead)
-         // TODO: fix this, probably simple as client impact hidden behind toDisplayName etc..
-
-        return dsl.select(dt.CODE, DSL.count())
+        Result<Record3<Long, String, Integer>> records = dsl.select(
+                    dfd.DECORATOR_ENTITY_ID,
+                    flowTypeCase.as(flowType),
+                    count().as(flowCount))
                 .from(df)
                 .innerJoin(dfd)
-                .on(df.ID.eq(dfd.DATA_FLOW_ID))
-                .innerJoin(dt)
-                .on(dt.ID.eq(dfd.DECORATOR_ENTITY_ID)
+                    .on(df.ID.eq(dfd.DATA_FLOW_ID)
                         .and(dfd.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name())))
-                .where(dsl.renderInlined(condition))
-                .groupBy(dt.CODE)
-                .fetch(TO_STRING_TALLY);
+                .leftJoin(sourceApp)
+                    .on(sourceAppId.eq(df.SOURCE_ENTITY_ID))
+                .leftJoin(targetApp)
+                    .on(targetAppId.eq(df.TARGET_ENTITY_ID))
+                .where(condition)
+                .groupBy(dfd.DECORATOR_ENTITY_ID, flowTypeCase)
+                .fetch();
+
+        Map<EntityReference, List<Tally<String>>> dataTypeRefToTallies = records.stream()
+                .map(r -> tuple(
+                        mkRef(EntityKind.DATA_TYPE, r.getValue(dfd.DECORATOR_ENTITY_ID)),
+                        ImmutableStringTally.builder()
+                                .id(r.getValue(flowType))
+                                .count(r.getValue(flowCount))
+                                .build()))
+                .collect(groupingBy(t -> t.v1(),
+                            mapping(t -> t.v2(),
+                                    toList())));
+
+        return dataTypeRefToTallies.entrySet()
+                .stream()
+                .map(e -> ImmutableTallyPack.<String>builder()
+                        .entityReference(e.getKey())
+                        .tallies(e.getValue())
+                        .build())
+                .collect(toList());
     }
 
 
