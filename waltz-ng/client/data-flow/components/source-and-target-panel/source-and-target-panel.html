@@ -46,7 +46,8 @@
         <hr>
 
         <strong>Physical Data</strong>
-        <div ng-if="$ctrl.selected.physicalFlows.length > 0">
+        <div ng-if="$ctrl.selected.physicalFlows.length > 0"
+             ng-class="{'waltz-scroll-region-250': $ctrl.selected.physicalFlows.length > 8}" >
             <table class="table table-condensed small small">
                 <thead>
                 <tr>

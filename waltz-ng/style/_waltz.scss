@@ -9,6 +9,7 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+@import "waltz-scroll-region";
 @import "waltz-visibility";
 @import "breadcrumbs";
 @import "grid";
@@ -226,15 +227,6 @@ textarea {
   .dismiss:hover {
     color: mediumblue;
   }
-}
-
-
-.waltz-scroll-region {
-  width: 100%;
-  overflow: auto;
-  border: 1px solid lighten($waltz-border-color, 10);
-  border-radius: 3px;
-  padding: 8px;
 }
 
 
