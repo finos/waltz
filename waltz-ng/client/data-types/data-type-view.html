@@ -49,6 +49,25 @@
     </waltz-rated-flow-boingy-graph>
 
 
+    <!-- NON AUTH SOURCES -->
+    <waltz-section name="Non Authoritative Sources"
+                   id="non-authoritative-sources-section"
+                   icon="asterisk">
+        <waltz-non-auth-sources-list distributors="ctrl.flowDistributors"
+                                     consumers="ctrl.viewData.allConsumers"
+                                     data-data-types="ctrl.viewData.dataTypes"
+                                     ng-if="ctrl.getObjectLength(ctrl.flowDistributors) > 0">
+        </waltz-non-auth-sources-list>
+
+        <div class="alert alert-warning"
+             ng-if="ctrl.getObjectLength(ctrl.flowDistributors) === 0">
+            <strong>
+                No Non-Authoritative Sources distributing data
+            </strong>
+        </div>
+    </waltz-section>
+
+
     <!-- ORIGINATORS -->
     <waltz-data-type-originators flow-originators="ctrl.flowOriginators">
 

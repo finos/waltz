@@ -17,7 +17,9 @@ const template = require('./data-type-view.html');
 
 const initialState = {
     dataFlow: null,
-    entityRef: null
+    entityRef: null,
+    flowOriginators: [],
+    flowDistributors: []
 };
 
 
@@ -50,6 +52,10 @@ function controller($scope,
     vm.onAssetBucketSelect = (bucket) => {
         $scope.$applyAsync(() => viewDataService.selectAssetBucket(bucket));
     };
+    vm.getObjectLength = obj => {
+        if(_.isObject(obj)) return _.values(obj).length;
+        throw "Not an object: " + obj;
+    }
 
     const refresh = () => {
         if (!vm.rawViewData) return;
@@ -72,9 +78,17 @@ function controller($scope,
         .then(() => dataFlowService.loadDetail())
         .then(flowData => vm.flowData = flowData);
 
+
     dataTypeUsageStore
         .findForUsageKindByDataTypeIdSelector('ORIGINATOR', selector)
         .then(originators => vm.flowOriginators = originators);
+
+
+    dataTypeUsageStore
+        .findForUsageKindByDataTypeIdSelector('DISTRIBUTOR', selector)
+        .then(distributors => {
+            vm.flowDistributors = distributors
+        });
 }
 
 

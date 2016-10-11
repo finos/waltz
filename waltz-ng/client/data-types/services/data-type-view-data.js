@@ -17,6 +17,7 @@ function service($q,
                  appStore,
                  appCapabilityStore,
                  changeLogStore,
+                 dataFlowStore,
                  ratingStore,
                  dataTypeService,
                  capabilityStore,
@@ -81,6 +82,15 @@ function service($q,
             scope: 'CHILDREN'
         };
 
+        const dataTypeSelector = {
+            entityReference: {
+                kind: 'DATA_TYPE',
+                id: dataTypeId
+            },
+            scope: 'CHILDREN',
+            desiredKind: 'DATA_TYPE'
+        };
+
         const bulkPromise = $q.all([
             ratingStore.findByAppIdSelector(selector),
             appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(selector),
@@ -125,6 +135,10 @@ function service($q,
             .calculateConsumersForDataTypeIdSelector(selector)
             .then(d => rawData.authSourceConsumers = d);
 
+        dataFlowStore
+            .findBySelector(dataTypeSelector)
+            .then(d => rawData.allConsumers = d);
+
         return prepareRawDataPromise;
     }
 
@@ -140,6 +154,7 @@ service.$inject = [
     'ApplicationStore',
     'AppCapabilityStore',
     'ChangeLogDataService',
+    'DataFlowDataStore',
     'RatingStore',
     'DataTypeService',
     'CapabilityStore',
