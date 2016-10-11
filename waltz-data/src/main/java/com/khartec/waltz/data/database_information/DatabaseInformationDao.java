@@ -5,28 +5,24 @@ import com.khartec.waltz.model.database_information.DatabaseInformation;
 import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
 import com.khartec.waltz.model.database_information.ImmutableDatabaseInformation;
 import com.khartec.waltz.model.database_information.ImmutableDatabaseSummaryStatistics;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.DatabaseInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.data.JooqUtilities.*;
+import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
+import static com.khartec.waltz.data.JooqUtilities.mkEndOfLifeStatusDerivedField;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
-import static org.jooq.impl.DSL.selectDistinct;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
@@ -95,47 +91,29 @@ public class DatabaseInformationDao {
 
         Field<String> dbmsVendorInner = DSL.field("dbms_vendor_inner", String.class);
         Field<String> environmentInner = DSL.field("environment_inner", String.class);
-        Field<Date> eolDateInner = DSL.field("eol_date_inner", Date.class);
+        Field<String> eolStatusInner = DSL.field("eol_status_inner", String.class);
 
-        Table distinctDbInfo = selectDistinct(
+        // de-duplicate records, as one database can be linked to multiple apps
+        Result<? extends Record> dbInfo = dsl.selectDistinct(
                     DATABASE_INFORMATION.DATABASE_NAME,
                     DATABASE_INFORMATION.INSTANCE_NAME,
                     DATABASE_INFORMATION.ENVIRONMENT.as(environmentInner),
                     DATABASE_INFORMATION.DBMS_VENDOR.as(dbmsVendorInner),
                     DATABASE_INFORMATION.DBMS_NAME,
                     DATABASE_INFORMATION.DBMS_VERSION,
-                    DATABASE_INFORMATION.END_OF_LIFE_DATE.as(eolDateInner))
+                    mkEndOfLifeStatusDerivedField(DATABASE_INFORMATION.END_OF_LIFE_DATE).as(eolStatusInner))
                 .from(DATABASE_INFORMATION)
                 .innerJoin(APPLICATION)
                     .on(APPLICATION.ASSET_CODE.eq(DATABASE_INFORMATION.ASSET_CODE))
                 .where(APPLICATION.ID.in(appIdSelector))
-                .asTable("distinct_db_info");
+                .fetch();
 
-        Future<List<Tally<String>>> vendorPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
-                dsl,
-                distinctDbInfo,
-                dbmsVendorInner,
-                DSL.trueCondition()));
+        return ImmutableDatabaseSummaryStatistics.builder()
+                .vendorCounts(calculateStringTallies(dbInfo, dbmsVendorInner))
+                .environmentCounts(calculateStringTallies(dbInfo, environmentInner))
+                .endOfLifeStatusCounts(calculateStringTallies(dbInfo, eolStatusInner))
+                .build();
 
-        Future<List<Tally<String>>> environmentPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
-                dsl,
-                distinctDbInfo,
-                environmentInner,
-                DSL.trueCondition()));
-
-        Future<List<Tally<String>>> endOfLifeStatusPromise = DB_EXECUTOR_POOL.submit(() -> calculateStringTallies(
-                dsl,
-                distinctDbInfo,
-                mkEndOfLifeStatusDerivedField(eolDateInner),
-                DSL.trueCondition()));
-
-        return Unchecked.supplier(() ->
-                    ImmutableDatabaseSummaryStatistics.builder()
-                            .vendorCounts(vendorPromise.get())
-                            .environmentCounts(environmentPromise.get())
-                            .endOfLifeStatusCounts(endOfLifeStatusPromise.get())
-                            .build())
-                .get();
     }
 
 }

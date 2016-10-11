@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static java.util.stream.Collectors.*;
 import static org.jooq.impl.DSL.currentDate;
 import static org.jooq.impl.DSL.inline;
 
@@ -85,6 +86,22 @@ public class JooqUtilities {
 
         return tallyQuery
                 .fetch(TO_STRING_TALLY);
+    }
+
+
+    public static List<Tally<String>> calculateStringTallies(
+            Result<? extends Record> records,
+            Field<String> fieldToTally) {
+
+        return records.stream()
+                .collect(groupingBy(r -> r.getValue(fieldToTally), counting()))
+                .entrySet()
+                .stream()
+                .map(e -> ImmutableStringTally.builder()
+                        .id(e.getKey())
+                        .count(e.getValue())
+                        .build())
+                .collect(toList());
     }
 
 
