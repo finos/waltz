@@ -18,6 +18,7 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.common.FunctionUtilities;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
@@ -57,6 +58,7 @@ public class DataFlowHarness {
         DataFlowService service = ctx.getBean(DataFlowService.class);
         DataFlowStatsDao dataFlowStatsDao = ctx.getBean(DataFlowStatsDao.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
+        ApplicationIdSelectorFactory selectorFactory = ctx.getBean(ApplicationIdSelectorFactory.class);
 
         IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
                 .entityReference(ImmutableEntityReference
@@ -96,9 +98,19 @@ public class DataFlowHarness {
         FunctionUtilities.time("appCounts", () -> dataFlowStatsDao.countDistinctAppInvolvementByAppIdSelector(DSL.select(APPLICATION.ID).from(APPLICATION)));
         Select<Record1<Long>> subQ = HarnessUtilities.time("build person sub q", () -> mkForPersonReportees("huSs97bwj"));
 
-            HarnessUtilities.time("build complex q", () -> bigQuery(dsl, mkForPersonReportees("huSs97bwj")));
+        HarnessUtilities.time("build complex q", () -> bigQuery(dsl, mkForPersonReportees("huSs97bwj")));
 
 
+        // data type tallies
+        IdSelectionOptions byOrgUnitOptions = ImmutableIdSelectionOptions.builder()
+                .entityReference(ImmutableEntityReference.builder()
+                        .kind(EntityKind.ORG_UNIT)
+                        .id(10)
+                        .build())
+                .scope(HierarchyQueryScope.CHILDREN)
+                .build();
+
+        FunctionUtilities.time("tally by data type", () -> dataFlowStatsDao.tallyDataTypesByAppIdSelector(selectorFactory.apply(byOrgUnitOptions)));
 
     }
 
