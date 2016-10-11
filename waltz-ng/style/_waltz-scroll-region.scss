@@ -1,0 +1,22 @@
+.waltz-scroll-region {
+    width: 100%;
+    overflow: auto;
+    border: 1px solid lighten($waltz-border-color, 10);
+    border-radius: 3px;
+    padding: 8px;
+}
+
+
+@mixin waltz-scroll-region($height) {
+    .waltz-scroll-region-#{$height} {
+        @extend .waltz-scroll-region;
+        height: #{$height}px;
+    }
+}
+
+
+@include waltz-scroll-region(100);
+@include waltz-scroll-region(200);
+@include waltz-scroll-region(250);
+@include waltz-scroll-region(300);
+@include waltz-scroll-region(500);
