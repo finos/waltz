@@ -34,7 +34,6 @@ import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +45,6 @@ import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 
 @Service
@@ -151,11 +149,6 @@ public class DataFlowService {
             return calculateStatsForAppIdSelector(options);
         }
         throw new UnsupportedOperationException("Cannot calculate stats for selector desiredKind: "+options.desiredKind());
-    }
-
-
-    public List<TallyPack<String>> tallyByDataType() {
-        return dataFlowStatsDao.tallyDataTypesByAppIdSelector(DSL.select(APPLICATION.ID).from(APPLICATION));
     }
 
 

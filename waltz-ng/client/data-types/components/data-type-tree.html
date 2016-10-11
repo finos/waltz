@@ -2,39 +2,11 @@
     <treecontrol class="tree-light"
                  tree-model="$ctrl.trees"
                  order-by="'-name'"
-                 expanded-nodes="$ctrl.expandedNodes"
-                 on-selection="$ctrl.onNodeSelect(node)"
                  options="$ctrl.treeOptions">
             <span class="waltz-visibility-parent">
 
-                <strong>
-                    <span ng-if="$ctrl.hasOwnDataFlows(node)"
-                          ng-bind="node.name">
-                    </span>
-                    <i ng-bind="node.name"
-                       ng-if="! $ctrl.hasOwnDataFlows(node)">
-                    </i>
-                </strong>
-
                 <a ui-sref="main.data-type.view ({id: node.id })">
-
-                    <span class="waltz-visibility-child-50">
-                        <span ng-if="$ctrl.hasAnyDataFlows(node)"
-                              class="small waltz-app-tally-count"
-                              title="Number of data flows">
-
-                            <span ng-if="$ctrl.hasOwnDataFlows(node)">
-                                <span ng-bind="node.dataFlowCount"></span>
-                            </span>
-
-                            <i ng-if="$ctrl.hasInheritedDataFlows(node)">
-                                (<span ng-bind="node.totalDataFlowCount"></span>)
-                            </i>
-                        </span>
-                    </span>
-                    &nbsp;
-                    <strong class="waltz-visibility-child-30">
-                            Show &raquo;
+                    <strong ng-bind="node.name">
                     </strong>
                 </a>
             </span>
