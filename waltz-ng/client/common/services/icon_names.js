@@ -12,12 +12,15 @@
 
 export const bookmarkIconNames = {
     APPLICATION_INSTANCE: 'desktop',
-    SOURCE_CODE_CONTROL: 'code',
-    ISSUE_TRACKER: 'tasks',
-    QUALITY_CONTROL: 'sliders',
-    DOCUMENTATION: 'book',
     BUILD_SYSTEM: 'simplybuilt',
-    MONITORING: 'bar-chart'
+    BUSINESS_SPECIFICATION: 'briefcase',
+    DOCUMENTATION: 'book',
+    ISSUE_TRACKER: 'tasks',
+    MONITORING: 'bar-chart',
+    QUALITY_CONTROL: 'sliders',
+    SOURCE_CODE_CONTROL: 'code',
+    TECHNICAL_SPECIFICATION: 'tty',
+
 };
 
 

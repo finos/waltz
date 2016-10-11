@@ -3,6 +3,7 @@ const template = require('./physical-data-article-view.html');
 
 function controller($stateParams,
                     applicationStore,
+                    bookmarkStore,
                     logicalDataFlowStore,
                     orgUnitStore,
                     physicalDataArticleStore,
@@ -10,6 +11,10 @@ function controller($stateParams,
     const vm = this;
 
     const articleId = $stateParams.id;
+    const ref = {
+        kind: 'PHYSICAL_DATA_ARTICLE',
+        id: articleId
+    };
 
     physicalDataArticleStore
         .findById(articleId)
@@ -26,12 +31,17 @@ function controller($stateParams,
     logicalDataFlowStore
         .findByArticleId(articleId)
         .then(logicalFlows => vm.logicalFlows = logicalFlows);
+
+    bookmarkStore
+        .findByParent(ref)
+        .then(bs => vm.bookmarks = bs);
 }
 
 
 controller.$inject = [
     '$stateParams',
     'ApplicationStore',
+    'BookmarkStore',
     'DataFlowDataStore',
     'OrgUnitStore',
     'PhysicalDataArticleStore',
