@@ -119,16 +119,16 @@ public class DataFlowStatsDao {
         Field<Long> sourceAppId = sourceApp.field(0, Long.class);
         Field<Long> targetAppId = targetApp.field(0, Long.class);
         Field<Integer> flowCount = DSL.field("flow_count", Integer.class);
-        Field<String> flowType =
+        Field<String> flowTypeCase =
                 when(sourceAppId.isNotNull()
                         .and(targetAppId.isNotNull()), inline("INTRA"))
                 .when(sourceAppId.isNotNull(), inline("OUTBOUND"))
-                .otherwise(inline("INBOUND"))
-                .as("flow_type");
+                .otherwise(inline("INBOUND"));
+        Field<String> flowType = DSL.field("flow_type", String.class);
 
         Result<Record3<Long, String, Integer>> records = dsl.select(
                     dfd.DECORATOR_ENTITY_ID,
-                    flowType,
+                    flowTypeCase.as(flowType),
                     count().as(flowCount))
                 .from(df)
                 .innerJoin(dfd)
@@ -139,7 +139,7 @@ public class DataFlowStatsDao {
                 .leftJoin(targetApp)
                     .on(targetAppId.eq(df.TARGET_ENTITY_ID))
                 .where(condition)
-                .groupBy(dfd.DECORATOR_ENTITY_ID, flowType)
+                .groupBy(dfd.DECORATOR_ENTITY_ID, flowTypeCase)
                 .fetch();
 
         Map<EntityReference, List<Tally<String>>> dataTypeRefToTallies = records.stream()
