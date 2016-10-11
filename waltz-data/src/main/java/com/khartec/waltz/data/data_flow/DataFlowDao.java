@@ -86,7 +86,7 @@ public class DataFlowDao {
 
     public List<DataFlow> findByEntityReference(EntityReference ref) {
         return baseQuery()
-                .and(DATA_FLOW.SOURCE_ENTITY_ID.eq(ref.id()))
+                .where(DATA_FLOW.SOURCE_ENTITY_ID.eq(ref.id()))
                 .or(DATA_FLOW.TARGET_ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -94,7 +94,7 @@ public class DataFlowDao {
 
     public List<DataFlow> findByApplicationIdSelector(Select<Record1<Long>> appIdSelector) {
         return baseQuery()
-                .and(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector))
+                .where(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector))
                 .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -135,14 +135,14 @@ public class DataFlowDao {
 
     public DataFlow findByFlowId(long dataFlowId) {
         return baseQuery()
-                .and(DATA_FLOW.ID.eq(dataFlowId))
+                .where(DATA_FLOW.ID.eq(dataFlowId))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     public List<DataFlow> findByFlowIds(Collection<Long> dataFlowIds) {
         return baseQuery()
-                .and(DATA_FLOW.ID.in(dataFlowIds))
+                .where(DATA_FLOW.ID.in(dataFlowIds))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
