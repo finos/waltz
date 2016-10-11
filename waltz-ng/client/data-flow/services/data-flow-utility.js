@@ -12,8 +12,8 @@
  */
 
 import _ from "lodash";
-import { authoritativeRatingColorScale } from '../../common/colors';
-import { pickWorst } from '../../auth-sources/services/auth-sources-utils'
+import {authoritativeRatingColorScale} from "../../common/colors";
+import {pickWorst} from "../../auth-sources/services/auth-sources-utils";
 
 
 export default [
@@ -79,10 +79,34 @@ export default [
         };
 
 
+        const enrichDataTypeCounts = (dataTypeCounts = [], displayNameService) => {
+            return _.chain(dataTypeCounts)
+                .map(dc => {
+                    const enriched = {
+                        dataType: {
+                            id: dc.entityReference.id,
+                            name: displayNameService.lookup('dataType', dc.entityReference.id)
+                        },
+                        inbound: 0,
+                        outbound: 0,
+                        intra: 0,
+                        total: 0
+                    };
+                    _.forEach(dc.tallies, t => {
+                        enriched[_.lowerCase(t.id)] = t.count;
+                        enriched.total += t.count;
+                    });
+                    return enriched;
+                })
+                .value();
+        };
+
+
         return {
             enrich,
             getDataTypes,
             buildGraphTweakers,
+            enrichDataTypeCounts
         };
     }
 ];

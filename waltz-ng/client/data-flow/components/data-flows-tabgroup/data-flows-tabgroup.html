@@ -20,23 +20,35 @@
                             stats="$ctrl.flowData.stats">
                         </waltz-flow-cloud-diagram>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-sm-12 col-md-8">
                         <br>
                         <h4>Data Categories</h4>
                         <table class="table table-condensed small table-striped">
                             <thead>
                             <tr>
                                 <th>Category</th>
-                                <th>Count</th>
+                                <th>Intra</th>
+                                <th>Inbound</th>
+                                <th>Outbound</th>
+                                <th>Total</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="row in $ctrl.flowData.stats.dataTypeCounts">
+                            <tr ng-repeat="row in $ctrl.enrichedDataTypeCounts | orderBy:'dataType.name'">
                                 <td>
-                                    <span ng-bind="row.id | toDisplayName:'dataType'"></span>
+                                    <span ng-bind="row.dataType.name"></span>
                                 </td>
                                 <td>
-                                    <span ng-bind="row.count"></span>
+                                    <span ng-bind="row.intra"></span>
+                                </td>
+                                <td>
+                                    <span ng-bind="row.inbound"></span>
+                                </td>
+                                <td>
+                                    <span ng-bind="row.outbound"></span>
+                                </td>
+                                <td>
+                                    <span ng-bind="row.total"></span>
                                 </td>
                             </tr>
                             </tbody>

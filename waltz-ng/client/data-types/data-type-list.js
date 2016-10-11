@@ -12,7 +12,9 @@ const initialState = {
 
 function controller($state,
                     dataFlowStore,
+                    dataFlowUtilityService,
                     dataTypes,
+                    displayNameService,
                     staticPanelStore,
                     svgStore) {
 
@@ -36,7 +38,7 @@ function controller($state,
     };
 
     dataFlowStore.countByDataType()
-        .then(tallies => vm.tallies = tallies )
+        .then(tallies => vm.tallies = dataFlowUtilityService.enrichDataTypeCounts(tallies, displayNameService))
         .then(tallies => vm.trees = prepareDataTypeTree(vm.dataTypes, vm.tallies));
 
 }
@@ -45,7 +47,9 @@ function controller($state,
 controller.$inject = [
     '$state',
     'DataFlowDataStore',
+    'DataFlowUtilityService',
     'dataTypes',
+    'WaltzDisplayNameService',
     'StaticPanelStore',
     'SvgDiagramStore'
 ];

@@ -19,7 +19,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
-import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.data_flow.DataFlowService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -82,7 +82,7 @@ public class DataFlowsEndpoint implements Endpoint {
         DatumRoute<DataFlowStatistics> findStatsRoute = (request, response)
                 -> dataFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
 
-        ListRoute<Tally<String>> tallyByDataTypeRoute = (request, response)
+        ListRoute<TallyPack<String>> tallyByDataTypeRoute = (request, response)
                 -> dataFlowService.tallyByDataType();
 
         ListRoute<DataFlow> findByPhysicalDataArticleIdRoute = (request, response)

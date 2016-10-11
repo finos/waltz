@@ -29,7 +29,7 @@ import com.khartec.waltz.model.dataflow.DataFlow;
 import com.khartec.waltz.model.dataflow.DataFlowMeasures;
 import com.khartec.waltz.model.dataflow.DataFlowStatistics;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowStatistics;
-import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
@@ -154,7 +154,7 @@ public class DataFlowService {
     }
 
 
-    public List<Tally<String>> tallyByDataType() {
+    public List<TallyPack<String>> tallyByDataType() {
         return dataFlowStatsDao.tallyDataTypesByAppIdSelector(DSL.select(APPLICATION.ID).from(APPLICATION));
     }
 
@@ -177,7 +177,7 @@ public class DataFlowService {
         checkNotNull(options, "options cannot be null");
 
         Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);
-        List<Tally<String>> dataTypeCounts = FunctionUtilities.time("DFS.dataTypes",
+        List<TallyPack<String>> dataTypeCounts = FunctionUtilities.time("DFS.dataTypes",
                 () -> dataFlowStatsDao.tallyDataTypesByAppIdSelector(appIdSelector));
 
         DataFlowMeasures appCounts = FunctionUtilities.time("DFS.appCounts",
