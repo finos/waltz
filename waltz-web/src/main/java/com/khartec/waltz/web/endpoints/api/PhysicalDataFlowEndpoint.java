@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
+import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
@@ -32,13 +33,26 @@ public class PhysicalDataFlowEndpoint implements Endpoint {
     public void register() {
         String findByEntityRefPath = mkPath(
                 BASE_URL,
+                "entity",
                 ":kind",
                 ":id");
+
+        String findByArticleIdPath = mkPath(
+                BASE_URL,
+                "article",
+                ":id");
+
         ListRoute<PhysicalDataFlow> findByEntityRefRoute =
                 (request, response) -> physicalDataFlowService
-                        .findFlowsForEntityReference(
+                        .findByEntityReference(
                             getEntityReference(request));
 
+        ListRoute<PhysicalDataFlow> findByArticleIdRoute =
+                (request, response) -> physicalDataFlowService
+                        .findByArticleId(
+                                getId(request));
+
         getForList(findByEntityRefPath, findByEntityRefRoute);
+        getForList(findByArticleIdPath, findByArticleIdRoute);
     }
 }

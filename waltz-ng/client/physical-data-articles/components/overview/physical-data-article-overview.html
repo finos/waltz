@@ -1,0 +1,48 @@
+<div class="waltz-page-summary waltz-page-summary-attach">
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Owning Application
+        </div>
+        <div class="col-sm-4">
+            <a ui-sref="main.app.view ({ id: $ctrl.owningApp.id })">
+                <span ng-bind="$ctrl.owningApp.name"></span>
+            </a>
+        </div>
+
+        <div class="col-sm-2 waltz-display-field-label">
+            Organisational Unit
+        </div>
+        <div class="col-sm-4">
+            <a ui-sref="main.org-unit.view ({ id: $ctrl.organisationalUnit.id })">
+                <span ng-bind="$ctrl.organisationalUnit.name"></span>
+            </a>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Format
+        </div>
+        <div class="col-sm-4">
+            <span ng-bind="$ctrl.article.format"></span>
+        </div>
+
+        <div class="col-sm-2 waltz-display-field-label">
+            External Id
+        </div>
+        <div class="col-sm-4">
+            <span ng-bind="$ctrl.article.externalId"></span>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Description
+        </div>
+        <div class="col-sm-10">
+            <span ng-bind="$ctrl.article.description"></span>
+        </div>
+    </div>
+</div>

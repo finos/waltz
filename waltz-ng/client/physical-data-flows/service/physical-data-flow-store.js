@@ -8,12 +8,19 @@ function store($http, baseApiUrl) {
     const findByEntityReference = (ref) => {
         checkIsEntityRef(ref);
         return $http
-            .get(`${base}/${ref.kind}/${ref.id}`)
+            .get(`${base}/entity/${ref.kind}/${ref.id}`)
+            .then(r => r.data);
+    };
+
+    const findByArticleId = (id) => {
+        return $http
+            .get(`${base}/article/${id}`)
             .then(r => r.data);
     };
 
     return {
-        findByEntityReference
+        findByEntityReference,
+        findByArticleId
     };
 }
 

@@ -35,6 +35,9 @@ function service($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
+    const findByArticleId = (articleId) => $http
+        .get(`${BASE}/physical-data-article/${articleId}`)
+        .then(result => result.data);
 
     // --- STATS ---
     const calculateStats = (options) => {
@@ -58,6 +61,7 @@ function service($http, BaseApiUrl) {
         .then(r => r.data);
 
     return {
+        findByArticleId,
         findBySelector,
         findByEntityReference,
         calculateStats,

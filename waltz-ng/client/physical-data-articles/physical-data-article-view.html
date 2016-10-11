@@ -1,0 +1,34 @@
+<div>
+
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.article.name }}"
+                       small="Physical Data Article"
+                       icon="qrcode">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>
+                <a ui-sref="main.app.view ({ id: ctrl.owningApp.id })">
+                    <span ng-bind="ctrl.owningApp.name"></span>
+                </a>
+            </li>
+            <li ng-bind="ctrl.article.name"></li>
+        </ol>
+    </waltz-page-header>
+
+
+    <waltz-physical-data-article-overview owning-app="ctrl.owningApp"
+                                          article="ctrl.article"
+                                          organisational-unit="ctrl.organisationalUnit">
+    </waltz-physical-data-article-overview>
+
+    <br>
+
+    <waltz-section name="Consumers">
+         <waltz-physical-data-article-consumers logical-flows="ctrl.logicalFlows"
+                                                physical-flows="ctrl.physicalFlows">
+        </waltz-physical-data-article-consumers>
+    </waltz-section>
+
+
+
+</div>

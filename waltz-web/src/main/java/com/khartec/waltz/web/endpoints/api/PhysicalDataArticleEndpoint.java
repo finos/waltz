@@ -16,15 +16,15 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
 @Service
-public class DataArticleEndpoint implements Endpoint {
+public class PhysicalDataArticleEndpoint implements Endpoint {
 
-    private static final String BASE_URL = mkPath("api", "data-article");
+    private static final String BASE_URL = mkPath("api", "physical-data-article");
 
     private final PhysicalDataArticleService dataArticleService;
 
 
     @Autowired
-    public DataArticleEndpoint(PhysicalDataArticleService dataArticleService) {
+    public PhysicalDataArticleEndpoint(PhysicalDataArticleService dataArticleService) {
         checkNotNull(dataArticleService, "dataArticleService cannot be null");
         this.dataArticleService = dataArticleService;
     }
@@ -49,6 +49,11 @@ public class DataArticleEndpoint implements Endpoint {
                 "application",
                 ":id");
 
+        String getByIdPath = mkPath(
+                BASE_URL,
+                "id",
+                ":id");
+
         ListRoute<PhysicalDataArticle> findByProducerAppRoute =
                 (request, response) -> dataArticleService.findByProducerAppId(getId(request));
 
@@ -58,8 +63,12 @@ public class DataArticleEndpoint implements Endpoint {
         DatumRoute<ProduceConsumeGroup<PhysicalDataArticle>> findByAppRoute =
                 (request, response) -> dataArticleService.findByAppId(getId(request));
 
+        DatumRoute<PhysicalDataArticle> getByIdRoute =
+                (request, response) -> dataArticleService.getById(getId(request));
+
         getForList(findByProducerAppPath, findByProducerAppRoute);
         getForList(findByConsumerAppIdPath, findByConsumerAppIdRoute);
         getForDatum(findByAppPath, findByAppRoute);
+        getForDatum(getByIdPath, getByIdRoute);
     }
 }

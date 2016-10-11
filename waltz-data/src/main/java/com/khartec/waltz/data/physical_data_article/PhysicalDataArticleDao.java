@@ -3,9 +3,9 @@ package com.khartec.waltz.data.physical_data_article;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableProduceConsumeGroup;
 import com.khartec.waltz.model.ProduceConsumeGroup;
+import com.khartec.waltz.model.physical_data_article.DataFormatKind;
 import com.khartec.waltz.model.physical_data_article.ImmutablePhysicalDataArticle;
 import com.khartec.waltz.model.physical_data_article.PhysicalDataArticle;
-import com.khartec.waltz.model.physical_data_article.DataFormatKind;
 import com.khartec.waltz.schema.tables.records.PhysicalDataArticleRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -23,8 +23,8 @@ import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.schema.tables.PhysicalDataArticle.PHYSICAL_DATA_ARTICLE;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalDataArticle.PHYSICAL_DATA_ARTICLE;
 import static com.khartec.waltz.schema.tables.PhysicalDataFlow.PHYSICAL_DATA_FLOW;
 import static java.util.Collections.emptyList;
 
@@ -109,4 +109,11 @@ public class PhysicalDataArticleDao {
                 .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
     }
 
+    public PhysicalDataArticle getById(long id) {
+        return dsl
+                .select(PHYSICAL_DATA_ARTICLE.fields())
+                .from(PHYSICAL_DATA_ARTICLE)
+                .where(PHYSICAL_DATA_ARTICLE.ID.eq(id))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
 }
