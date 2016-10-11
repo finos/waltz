@@ -116,11 +116,13 @@ public class DataFlowStatsDao {
 
         Table<Record1<Long>> sourceApp = appIdSelector.asTable("source_app");
         Table<Record1<Long>> targetApp = appIdSelector.asTable("target_app");
+        Field<Long> sourceAppId = sourceApp.field(0, Long.class);
+        Field<Long> targetAppId = targetApp.field(0, Long.class);
         Field<Integer> flowCount = DSL.field("flow_count", Integer.class);
         Field<String> flowType =
-                when(sourceApp.field(0).isNotNull()
-                        .and(targetApp.field(0).isNotNull()), inline("INTRA"))
-                .when(sourceApp.field(0).isNotNull(), inline("OUTBOUND"))
+                when(sourceAppId.isNotNull()
+                        .and(targetAppId.isNotNull()), inline("INTRA"))
+                .when(sourceAppId.isNotNull(), inline("OUTBOUND"))
                 .otherwise(inline("INBOUND"))
                 .as("flow_type");
 
@@ -133,9 +135,9 @@ public class DataFlowStatsDao {
                     .on(df.ID.eq(dfd.DATA_FLOW_ID)
                         .and(dfd.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name())))
                 .leftJoin(sourceApp)
-                    .on(sourceApp.field(0, Long.class).eq(df.SOURCE_ENTITY_ID))
+                    .on(sourceAppId.eq(df.SOURCE_ENTITY_ID))
                 .leftJoin(targetApp)
-                    .on(targetApp.field(0, Long.class).eq(df.TARGET_ENTITY_ID))
+                    .on(targetAppId.eq(df.TARGET_ENTITY_ID))
                 .where(condition)
                 .groupBy(dfd.DECORATOR_ENTITY_ID, flowType)
                 .fetch();
