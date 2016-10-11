@@ -17,3 +17,10 @@
     @include gradient-vertical($start-color: $dropdown-link-hover-bg, $end-color: darken($dropdown-link-hover-bg, 5%));
     background-color: darken($dropdown-link-hover-bg, 5%);
 }
+
+
+// Text
+.text-muted-more {
+    @extend .text-muted;
+    opacity: 0.4;
+}

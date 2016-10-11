@@ -22,21 +22,21 @@
             <tr ng-repeat="p in $ctrl.produces">
                 <td>
                     <a ui-sref="main.physical-data-article.view ({ id: p.article.id })">
-                        <span ng-class="{ 'text-muted' : !p.firstArticle}"
+                        <span ng-class="{ 'text-muted-more' : !p.firstArticle}"
                               ng-bind="p.article.name"></span>
                     </a>
                 </td>
                 <td>
-                    <span ng-class="{ 'text-muted' : !p.firstArticle}"
+                    <span ng-class="{ 'text-muted-more' : !p.firstArticle}"
                           ng-bind="p.article.externalId"></span>
 
                 </td>
                 <td>
-                    <span ng-class="{ 'text-muted' : !p.firstArticle}"
+                    <span ng-class="{ 'text-muted-more' : !p.firstArticle}"
                           ng-bind="p.article.format"></span>
                 </td>
                 <td>
-                    <span ng-class="{ 'text-muted' : !p.firstArticle}"
+                    <span ng-class="{ 'text-muted-more' : !p.firstArticle}"
                           ng-bind="p.article.description | limitTo:100"></span>
 
                 </td>
