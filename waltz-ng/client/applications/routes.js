@@ -29,13 +29,9 @@ const appRegistrationState = {
 
 const appViewState = {
     url: '/{id:int}',
-    resolve: {
-        app: appResolver
-    },
     views: {
         'content@': require('./app-view')
-    },
-    onEnter: onAppViewEnter
+    }
 };
 
 
@@ -55,17 +51,6 @@ const appTagExplorerState = {
     url: 'tag-explorer/:tag',
     views: {'content@': appTagExplorerView }
 };
-
-
-function onAppViewEnter(app, historyStore) {
-    historyStore.put(
-        app.name,
-        'APPLICATION',
-        'main.app.view',
-        { id: app.id });
-}
-
-onAppViewEnter.$inject = ['app', 'HistoryStore'];
 
 
 function setup($stateProvider) {
