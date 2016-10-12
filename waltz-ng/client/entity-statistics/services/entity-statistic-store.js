@@ -9,6 +9,8 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import {checkIsEntityRef} from "../../common/checks";
+
 
 function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/entity-statistic`;
@@ -20,6 +22,14 @@ function store($http, BaseApiUrl) {
     const findStatDefinition = (id) => $http
         .get(`${BASE}/definition/${id}`)
         .then(r => r.data);
+
+    const findStatsForEntity = (entityRef) => {
+        checkIsEntityRef(entityRef);
+
+        return $http
+            .get(`${BASE}/${entityRef.kind}/${entityRef.id}`)
+            .then(r => r.data);
+    };
 
     const findStatValuesByIdSelector = (statId, options) => $http
         .post(`${BASE}/value/${statId}`, options)
@@ -58,6 +68,7 @@ function store($http, BaseApiUrl) {
     return {
         findAllActiveDefinitions,
         findStatDefinition,
+        findStatsForEntity,
         findStatValuesByIdSelector,
         findRelatedStatDefinitions,
         findStatTallies,

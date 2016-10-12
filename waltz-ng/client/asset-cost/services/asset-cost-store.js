@@ -15,7 +15,7 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-import {checkIsIdSelector} from '../../common/checks'
+import {checkIsIdSelector} from "../../common/checks";
 
 
 const service = ($http, root) => {
@@ -25,6 +25,12 @@ const service = ($http, root) => {
     const findByCode = code =>
         $http
             .get(`${BASE}/code/${code}`)
+            .then(result => result.data);
+
+
+    const findByAppId = appId =>
+        $http
+            .get(`${BASE}/app-cost/${appId}`)
             .then(result => result.data);
 
 
@@ -54,11 +60,12 @@ const service = ($http, root) => {
         return $http
             .post(`${BASE}/amount/app-selector`, options)
             .then(r => r.data);
-    }
+    };
 
 
     return {
         findByCode,
+        findByAppId,
         findAppCostsByAppIdSelector,
         findStatsByAppIds,
         calculateCombinedAmountsForSelector

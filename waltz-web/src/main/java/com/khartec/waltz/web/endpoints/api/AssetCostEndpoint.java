@@ -16,8 +16,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
@@ -39,11 +38,13 @@ public class AssetCostEndpoint implements Endpoint {
     public void register() {
 
         String findByAssetCodePath = mkPath(BASE_URL, "code", ":code");
+        String findByAppIdPath = mkPath(BASE_URL, "app-cost", ":id");
         String findAppCostsByAppIdsPath = mkPath(BASE_URL, "app-cost", "apps");
         String calcStatisticsByAppIdsPath = mkPath(BASE_URL, "app-cost", "apps", "stats");
         String calcCombinedAmountsForSelectorPath = mkPath(BASE_URL, "amount", "app-selector");
 
         getForList(findByAssetCodePath, this::findByAssetCodeRoute);
+        getForList(findByAppIdPath, this::findByAppIdRoute);
         postForList(findAppCostsByAppIdsPath, this::findAppCostsByAppIds);
         postForDatum(calcStatisticsByAppIdsPath, this::calcStatisticsByAppIdsRoute);
         postForList(calcCombinedAmountsForSelectorPath, this::calcCombinedAmountsForSelectorRoute);
@@ -53,6 +54,11 @@ public class AssetCostEndpoint implements Endpoint {
 
     private List<AssetCost> findByAssetCodeRoute(Request request, Response response) {
         return assetCostService.findByAssetCode(request.params("code"));
+    }
+
+
+    private List<AssetCost> findByAppIdRoute(Request request, Response response) {
+        return assetCostService.findByAppId(getId(request));
     }
 
 

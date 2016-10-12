@@ -12,10 +12,7 @@
 
 const BINDINGS = {
     appCapabilities: '=',
-    capabilities: '=',
-    selfId: '@',
-    sourceDataRatings: '=',
-    traits: '='
+    capabilities: '='
 };
 
 
