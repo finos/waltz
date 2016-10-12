@@ -10,7 +10,7 @@
     </thead>
 
     <tbody>
-    <tr ng-repeat="r in $ctrl.data"
+    <tr ng-repeat="r in $ctrl.data | orderBy:'key'"
         class="small"
         ng-click="$ctrl.rowSelected(r, $event)"
         ng-class="{

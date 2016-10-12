@@ -17,7 +17,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="row in $ctrl.selected.tallies">
+                <tr ng-repeat="row in $ctrl.selected.tallies | orderBy:'id'">
                     <td>
                         <waltz-icon name="square"
                                     ng-style="$ctrl.styles[row.id]"></waltz-icon>
