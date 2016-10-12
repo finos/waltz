@@ -4,7 +4,7 @@ import {initialiseData} from "../../common";
 const bindings = {
     dataTypes: '<',
     distributors: '<',
-    flows: '<',
+    logicalFlows: '<',
 };
 
 
@@ -17,8 +17,8 @@ const initialState = {
 const template = require('./non-auth-sources-list.html');
 
 
-function calculate(dataTypes = [], distributorsByDataType = [], flows = []) {
-    const flowsBySource = _.groupBy(flows, 'source.id');
+function calculate(dataTypes = [], distributorsByDataType = [], logicalFlows = []) {
+    const logicalFlowsBySource = _.groupBy(logicalFlows, 'source.id');
     const dataTypesById = _.keyBy(dataTypes, 'id');
 
     const nonAuthSources = _.chain(distributorsByDataType)
@@ -27,7 +27,7 @@ function calculate(dataTypes = [], distributorsByDataType = [], flows = []) {
             return  _.map(values, v => Object.assign(v, {dataType} ));
         })
         .map(distributor => {
-            const consumers = _.map(flowsBySource[distributor.id] || [], f => f.target);
+            const consumers = _.map(logicalFlowsBySource[distributor.id] || [], f => f.target);
             return Object.assign({}, distributor, {consumers});
         })
         .value();
@@ -45,7 +45,7 @@ function controller() {
         const nonAuthSources = calculate(
             vm.dataTypes,
             vm.distributors,
-            vm.flows);
+            vm.logicalFlows);
         Object.assign(vm, nonAuthSources);
     };
 
