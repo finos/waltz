@@ -71,12 +71,12 @@ public class CapabilityComplexityDao {
 
     // -- HELPER ---
 
-    private SelectHavingStep<Record2<Long, BigDecimal>> mkSelectQueryWhere(Condition conditionStep) {
+    private SelectHavingStep<Record2<Long, BigDecimal>> mkSelectQueryWhere(Condition condition) {
         return dsl.select(APP_CAPABILITY.APPLICATION_ID, SCORE_FIELD.as(SCORE_ALIAS))
                 .from(APP_CAPABILITY)
                 .innerJoin(CAPABILITY)
                 .on(CAPABILITY.ID.eq(APP_CAPABILITY.CAPABILITY_ID))
-                .where(conditionStep.toString())
+                .where(condition)
                 .groupBy(APP_CAPABILITY.APPLICATION_ID);
     }
 
