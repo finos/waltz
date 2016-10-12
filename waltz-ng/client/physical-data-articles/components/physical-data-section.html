@@ -3,41 +3,44 @@
 
     <div class="col-md-12">
         <h4>Produces</h4>
-        <p class="small text-muted">
 
-        </p>
+        <div class="input-group waltz-input-group col-md-6"
+             ng-if="$ctrl.produces.length > 10">
+            <input type="text"
+                   ng-model="$ctrl.producesQuery"
+                   ng-model-options="{debounce: 250}"
+                   placeholder="Search..."
+                   class="form-control">
+
+            <div class="input-group-addon">
+                <waltz-icon name="search"></waltz-icon>
+            </div>
+        </div>
+
         <table class="table table-condensed table-striped table-hover small">
             <thead>
             <tr>
                 <th width="20%">Name</th>
                 <th width="7%">Ext. Id</th>
-                <th width="8%">Format</th>
-                <th width="30%">Description</th>
                 <th width="15%">Receiver/s</th>
+                <th width="8%">Format</th>
                 <th width="8%">Transport</th>
                 <th width="8%">Frequency</th>
+                <th width="30%">Description</th>
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="p in $ctrl.produces">
+            <tr ng-repeat="p in $ctrl.filteredProduces"
+                class="waltz-visibility-parent">
                 <td>
                     <a ui-sref="main.physical-data-article.view ({ id: p.article.id })">
-                        <span ng-class="{ 'text-muted-more' : !p.firstArticle}"
+                        <span ng-class="{ 'waltz-visibility-child-40' : !p.firstArticle}"
                               ng-bind="p.article.name"></span>
                     </a>
                 </td>
                 <td>
-                    <span ng-class="{ 'text-muted-more' : !p.firstArticle}"
+                    <span ng-class="{ 'waltz-visibility-child-40' : !p.firstArticle}"
                           ng-bind="p.article.externalId"></span>
-
-                </td>
-                <td>
-                    <span ng-class="{ 'text-muted-more' : !p.firstArticle}"
-                          ng-bind="p.article.format"></span>
-                </td>
-                <td>
-                    <span ng-class="{ 'text-muted-more' : !p.firstArticle}"
-                          ng-bind="p.article.description | limitTo:100"></span>
 
                 </td>
                 <td>
@@ -47,10 +50,19 @@
                     </a>
                 </td>
                 <td>
+                    <span ng-class="{ 'waltz-visibility-child-40' : !p.firstArticle}"
+                          ng-bind="p.article.format"></span>
+                </td>
+                <td>
                     <span ng-bind="p.physicalFlow.transport"></span>
                 </td>
                 <td>
                     <span ng-bind="p.physicalFlow.frequency"></span>
+                </td>
+                <td>
+                    <span ng-class="{ 'waltz-visibility-child-40' : !p.firstArticle}"
+                          ng-bind="p.article.description | limitTo:100"></span>
+
                 </td>
             </tr>
             </tbody>
@@ -62,6 +74,18 @@
      ng-hide="$ctrl.consumes | isEmpty">
     <div class="col-md-12">
         <h4>Consumes</h4>
+        <div class="input-group waltz-input-group col-md-6"
+             ng-if="$ctrl.consumes.length > 10">
+            <input type="text"
+                   ng-model="$ctrl.consumesQuery"
+                   ng-model-options="{debounce: 250}"
+                   placeholder="Search..."
+                   class="form-control">
+
+            <div class="input-group-addon">
+                <waltz-icon name="search"></waltz-icon>
+            </div>
+        </div>
         <table class="table table-condensed table-striped table-hover small">
             <thead>
             <tr>
@@ -74,13 +98,15 @@
                 <th width="25%">Description</th>
             </tr>
             </thead>
-            <tbody ng-repeat="(k,cs) in $ctrl.consumes">
-            <tr ng-repeat="c in cs">
+            <tbody>
+            <tr ng-repeat="c in $ctrl.filteredConsumes"
+                class="waltz-visibility-parent">
                 <td>
-                    <span ng-if="$first">
-                        <a ui-sref="main.app.view ({ id: c.logicalFlow.source.id })">
-                            <strong ng-bind="c.logicalFlow.source.name">
-                            </strong>
+                    <span>
+                        <a ui-sref="main.app.view ({ id: c.logicalFlow.source.id })"
+                           ng-class="{ 'waltz-visibility-child-40' : !c.firstSource}">
+                            <span ng-bind="c.logicalFlow.source.name">
+                            </span>
                         </a>
                     </span>
                 </td>

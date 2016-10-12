@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import {termSearch} from "../../common"
 
 
 const bindings = {
@@ -44,17 +45,24 @@ function enrichConsumes(articles = [],
                 physicalFlows = [],
                 logicalFlows = [])
 {
+    const visitedApps = [];
+
     return _.chain(articles)
-        .map(article => {
+        .map((article, i) => {
             const physicalFlow = _.find(physicalFlows, { articleId: article.id });
             const logicalFlow = _.find(logicalFlows, f => f.id === physicalFlow.flowId);
+            const firstSource = !_.includes(visitedApps, article.owningApplicationId);
+            if(firstSource === true) {
+                visitedApps.push(article.owningApplicationId);
+            }
+
             return {
                 article,
                 logicalFlow,
-                physicalFlow
+                physicalFlow,
+                firstSource
             };
         })
-        .groupBy("logicalFlow.source.id")
         .value();
 }
 
@@ -75,17 +83,47 @@ function mkData(articles = { produces: [], consumes: [] },
 }
 
 
-function controller() {
+function controller($scope) {
 
     const vm = this;
+
+    const produceFields = [
+        'article.name',
+        'article.externalId',
+        'article.format',
+        'article.description',
+        'physicalFlow.transport',
+        'physicalFlow.frequency',
+        'logicalFlow.target.name'
+    ];
+
+
+    const consumeFields = [
+        'article.name',
+        'article.externalId',
+        'article.format',
+        'article.description',
+        'physicalFlow.transport',
+        'physicalFlow.frequency',
+        'logicalFlow.source.name'
+    ];
 
     vm.$onChanges = (changes) => {
         Object.assign(vm, mkData(vm.articles, vm.physicalFlows, vm.logicalFlows));
     };
-}
+
+    $scope.$watchGroup(
+        ["$ctrl.producesQuery", "$ctrl.produces"],
+        ([q, items]) => vm.filteredProduces = termSearch(items, q, produceFields)
+    );
+
+    $scope.$watchGroup(
+        ["$ctrl.consumesQuery", "$ctrl.consumes"],
+        ([q, items]) => vm.filteredConsumes = termSearch(items, q, consumeFields));
+    }
 
 
-controller.$inject = [];
+controller.$inject = ['$scope'];
 
 
 const component = {
