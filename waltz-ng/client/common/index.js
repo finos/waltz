@@ -151,18 +151,16 @@ export function switchToParentIds(treeData = []) {
  */
 
 export function termSearch(items = [], searchStr = '', searchFields = []) {
-
     const terms = searchStr.toLowerCase().split(/\W/);
 
     return _.filter(items, item => {
-
         const fields = _.isEmpty(searchFields)
             ? _.keys(item)
             : searchFields;
 
         const targetStr = _.chain(fields)
-            .reject(field => field.startsWith('$') || _.isFunction(item[field]))
-            .map(field => item[field])
+            .reject(field => field.startsWith('$') || _.isFunction(_.get(item, field)))
+            .map(field => _.get(item, field))
             .join(' ')
             .value()
             .toLowerCase();
