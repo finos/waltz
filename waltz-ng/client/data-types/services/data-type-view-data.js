@@ -17,7 +17,7 @@ function service($q,
                  appStore,
                  appCapabilityStore,
                  changeLogStore,
-                 dataFlowStore,
+                 dataTypeUsageStore,
                  ratingStore,
                  dataTypeService,
                  capabilityStore,
@@ -91,12 +91,15 @@ function service($q,
             desiredKind: 'DATA_TYPE'
         };
 
+
         const bulkPromise = $q.all([
             ratingStore.findByAppIdSelector(selector),
             appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(selector),
             capabilityStore.findAll(),
             bookmarkStore.findByParent({id: dataTypeId, kind: 'DATA_TYPE'}),
-            sourceDataRatingStore.findAll()
+            sourceDataRatingStore.findAll(),
+            dataTypeUsageStore.findForUsageKindByDataTypeIdSelector('ORIGINATOR', dataTypeSelector),
+            dataTypeUsageStore.findForUsageKindByDataTypeIdSelector('DISTRIBUTOR', dataTypeSelector)
         ]);
 
         const prepareRawDataPromise = bulkPromise
@@ -105,7 +108,9 @@ function service($q,
                 rawAppCapabilities,
                 capabilities,
                 bookmarks,
-                sourceDataRatings
+                sourceDataRatings,
+                flowOriginators,
+                flowDistributors
             ]) => {
 
                 const r = {
@@ -114,7 +119,9 @@ function service($q,
                     rawAppCapabilities,
                     capabilities,
                     bookmarks,
-                    sourceDataRatings
+                    sourceDataRatings,
+                    flowOriginators,
+                    flowDistributors
                 };
 
                 Object.assign(rawData, r);
@@ -135,11 +142,7 @@ function service($q,
             .calculateConsumersForDataTypeIdSelector(selector)
             .then(d => rawData.authSourceConsumers = d);
 
-        dataFlowStore
-            .findBySelector(dataTypeSelector)
-            .then(d => rawData.allConsumers = d);
-
-        return prepareRawDataPromise;
+       return prepareRawDataPromise;
     }
 
 
@@ -154,7 +157,7 @@ service.$inject = [
     'ApplicationStore',
     'AppCapabilityStore',
     'ChangeLogDataService',
-    'DataFlowDataStore',
+    'DataTypeUsageStore',
     'RatingStore',
     'DataTypeService',
     'CapabilityStore',

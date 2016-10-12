@@ -1,40 +1,42 @@
 <div class="row">
     <div class="col-md-9">
-        <table class="table table-condensed">
-            <thead>
-            <tr>
-                <th>Application</th>
-                <th>Data Type</th>
-                <th>Consumers</th>
-            </tr>
-            </thead>
-            <tbody >
-            <tr ng-repeat="source in $ctrl.nonAuthSources">
-                <td>
-                    <a ng-bind="source.name"
-                       ui-sref="main.app.view( { id: source.id })">
-                    </a>
-                </td>
-                <td>
-                    <a ng-bind="source.dataType.code | toDisplayName:'dataType'"
-                       ui-sref="main.data-type.code ({ code: source.dataType.code })">
-                    </a>
-                </td>
-                <td>
-                    <a ng-click="$ctrl.showDetail(source)" class="clickable">
-                        <span class="label"
-                              ng-class="{
-                                'label-danger':source.consumers.length > 0,
-                                'label-success':source.consumers.length == 0
-                                }"
-                              ng-bind="source.consumers.length">
-                        </span>
-                    </a>
+        <div ng-class="{'waltz-scroll-region-350': $ctrl.nonAuthSources.length > 11 }">
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>Application</th>
+                        <th>Data Type</th>
+                        <th>Consumers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="source in $ctrl.nonAuthSources | orderBy:['-consumers.length', '+name']">
+                        <td>
+                            <a ng-bind="source.name"
+                               ui-sref="main.app.view( { id: source.id })">
+                            </a>
+                        </td>
+                        <td>
+                            <a ng-bind="source.dataType.code | toDisplayName:'dataType'"
+                               ui-sref="main.data-type.code ({ code: source.dataType.code })">
+                            </a>
+                        </td>
+                        <td>
+                            <a ng-click="$ctrl.showDetail(source)" class="clickable">
+                                <span class="label"
+                                      ng-class="{
+                                        'label-danger':source.consumers.length > 0,
+                                        'label-success':source.consumers.length == 0
+                                        }"
+                                      ng-bind="source.consumers.length">
+                                </span>
+                            </a>
 
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="col-md-3">
         <div ng-if="$ctrl.selected != null">
@@ -46,11 +48,11 @@
             </p>
 
             <h5>Consumers</h5>
-            <div class="waltz-scroll-region" style="height:200px">
+            <div ng-class="{'waltz-scroll-region-200': $ctrl.selected.consumers.length > 12 }">
                 <ul class="list-unstyled small">
                     <li ng-repeat="consumer in $ctrl.selected.consumers">
-                        <a ui-sref="main.app.view ({id: consumer.target.id })"
-                           ng-bind="consumer.target.name"></a>
+                        <a ui-sref="main.app.view ({id: consumer.id })"
+                           ng-bind="consumer.name"></a>
                     </li>
                 </ul>
             </div>

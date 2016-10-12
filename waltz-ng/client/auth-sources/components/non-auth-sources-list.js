@@ -4,7 +4,7 @@ import {initialiseData} from "../../common";
 const bindings = {
     dataTypes: '<',
     distributors: '<',
-    consumers: '<',
+    flows: '<',
 };
 
 
@@ -17,18 +17,17 @@ const initialState = {
 const template = require('./non-auth-sources-list.html');
 
 
-function calculate(dataTypes = [], distributorsByDataType = [], allConsumers = []) {
-    const consumersBySource = _.groupBy(allConsumers, 'source.id');
+function calculate(dataTypes = [], distributorsByDataType = [], flows = []) {
+    const flowsBySource = _.groupBy(flows, 'source.id');
     const dataTypesById = _.keyBy(dataTypes, 'id');
 
-    const distributersFlattened = _.flatMap(distributorsByDataType, (values, key) => {
-        const dataType = dataTypesById[key] || {};
-        return  _.map(values, v => Object.assign(v, {dataType} ));
-    } );
-
-    const nonAuthSources = _.chain(distributersFlattened)
+    const nonAuthSources = _.chain(distributorsByDataType)
+        .flatMap((values, key) => {
+            const dataType = dataTypesById[key] || {};
+            return  _.map(values, v => Object.assign(v, {dataType} ));
+        })
         .map(distributor => {
-            const consumers = consumersBySource[distributor.id] || [];
+            const consumers = _.map(flowsBySource[distributor.id] || [], f => f.target);
             return Object.assign({}, distributor, {consumers});
         })
         .value();
@@ -46,7 +45,7 @@ function controller() {
         const nonAuthSources = calculate(
             vm.dataTypes,
             vm.distributors,
-            vm.consumers);
+            vm.flows);
         Object.assign(vm, nonAuthSources);
     };
 

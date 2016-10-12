@@ -63,7 +63,7 @@
             </p>
 
             <h5>Consumers</h5>
-            <div class="waltz-scroll-region" style="height:200px">
+            <div ng-class="{'waltz-scroll-region-200': $ctrl.selected.consumers.length > 12 }">
                 <ul class="list-unstyled small">
                     <li ng-repeat="consumer in $ctrl.selected.consumers">
                         <a ui-sref="main.app.view ({id: consumer.id })"
