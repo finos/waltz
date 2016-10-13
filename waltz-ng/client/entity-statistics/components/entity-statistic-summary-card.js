@@ -1,7 +1,6 @@
 import _ from "lodash";
 import {variableScale} from "../../common/colors";
-import {mkSummaryTableHeadings} from "../entity-statistic-utilities";
-import {navigateToStatistic} from "../utilities";
+import {mkSummaryTableHeadings, navigateToStatistic} from "../utilities";
 
 const bindings = {
     definition: '<',

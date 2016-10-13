@@ -1,3 +1,5 @@
+import {rollupKindNames} from "../common/services/display_names";
+
 export function updateUrlWithoutReload($state, navItem) {
     $state.go('.', {id: navItem.id}, {notify: false});
 }
@@ -27,5 +29,23 @@ export function navigateToStatistic($state, statisticId, parentEntityReference) 
 
     $state.go(stateName, params);
 }
+
+
+export function mkSummaryTableHeadings(definition) {
+    return [
+        "Outcome",
+        mkValueHeading(definition),
+        "%"
+    ];
+}
+
+
+function mkValueHeading(definition) {
+    if (!definition) {
+        return "";
+    }
+    return rollupKindNames[definition.rollupKind] || '-';
+}
+
 
 
