@@ -35,14 +35,3 @@
 @include waltz-text-muted(60);
 @include waltz-text-muted(70);
 @include waltz-text-muted(80);
-
-
-// Forms
-.waltz-input-group .input-group-addon{
-    background: white !important;
-}
-.waltz-input-group .form-control{
-    border-right:0;
-    box-shadow:0 0 0;
-    border-color:#ccc;
-}

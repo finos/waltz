@@ -110,18 +110,18 @@ function controller($scope) {
 
     vm.$onChanges = (changes) => {
         Object.assign(vm, mkData(vm.articles, vm.physicalFlows, vm.logicalFlows));
+        vm.filterProduces("");
+        vm.filterConsumes("");
     };
 
-    $scope.$watchGroup(
-        ["$ctrl.producesQuery", "$ctrl.produces"],
-        ([q, items]) => vm.filteredProduces = termSearch(items, q, produceFields)
-    );
+    vm.filterProduces = query => {
+        vm.filteredProduces = termSearch(vm.produces, query, produceFields)
+    };
 
-    $scope.$watchGroup(
-        ["$ctrl.consumesQuery", "$ctrl.consumes"],
-        ([q, items]) => vm.filteredConsumes = termSearch(items, q, consumeFields));
-    }
-
+    vm.filterConsumes = query => {
+        vm.filteredConsumes = termSearch(vm.consumes, query, consumeFields)
+    };
+}
 
 controller.$inject = ['$scope'];
 

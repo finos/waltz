@@ -46,6 +46,10 @@ function controller(dataTypeService,
         vm.checkedItemIds = _.without(vm.checkedItemIds, id);
     };
 
+    vm.search = (query) => {
+        console.log("searching: ", query);
+    }
+
 }
 
 
