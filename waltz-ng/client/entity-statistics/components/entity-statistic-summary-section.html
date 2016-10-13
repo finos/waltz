@@ -6,12 +6,9 @@
         <div class="row"
              ng-if="$ctrl.definitions.length > 0">
             <div class="col-md-4">
-                <treecontrol class="tree-light"
-                             order-by="'-name'"
-                             tree-model="$ctrl.definitionTree"
-                             on-selection="$ctrl.onDefinitionSelection(node)">
-                    <span ng-bind="node.name"></span>
-                </treecontrol>
+                <waltz-entity-statistic-tree definitions="$ctrl.definitions"
+                                             on-selection="$ctrl.onDefinitionSelection">
+                </waltz-entity-statistic-tree>
 
                 <hr>
 

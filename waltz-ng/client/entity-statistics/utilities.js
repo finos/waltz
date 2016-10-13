@@ -14,4 +14,18 @@ export function hasRelatedDefinitions(definitions = defaultDefinitions) {
 }
 
 
+export function navigateToStatistic($state, statisticId, parentEntityReference) {
+    const params = {
+        id: parentEntityReference.id,
+        kind: parentEntityReference.kind,
+        statId: statisticId
+    };
+
+    const stateName = parentEntityReference.kind === 'PERSON'
+        ? "main.entity-statistic.view-person"
+        : "main.entity-statistic.view";
+
+    $state.go(stateName, params);
+}
+
 

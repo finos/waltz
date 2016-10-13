@@ -1,6 +1,7 @@
 import _ from "lodash";
 import {variableScale} from "../../common/colors";
 import {mkSummaryTableHeadings} from "../entity-statistic-utilities";
+import {navigateToStatistic} from "../utilities";
 
 const bindings = {
     definition: '<',
@@ -46,17 +47,7 @@ function controller($state) {
     };
 
     vm.goToStatistic = (definition) => {
-        const params = {
-            id: vm.parentRef.id,
-            kind: vm.parentRef.kind,
-            statId: definition.id
-        };
-
-        const stateName = vm.parentRef.kind === 'PERSON'
-            ? "main.entity-statistic.view-person"
-            : "main.entity-statistic.view";
-
-        $state.go(stateName, params);
+        navigateToStatistic($state, definition.id, vm.parentRef);
     };
 }
 
