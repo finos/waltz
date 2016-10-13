@@ -252,3 +252,21 @@ export function stringToBoolean(string){
             return Boolean(string);
     }
 }
+
+
+/**
+ * Invokes a function and also passes in any provided arguments in order
+ * e.g. invokeFunction(onClick, arg1, arg2)
+ * @param fn
+ * @returns {*}
+ */
+export function invokeFunction(fn) {
+    if (_.isFunction(fn)) {
+        const parameters = _.slice(arguments, 1);
+        return fn(...parameters);
+    }
+    console.log("invokeFunction - attempted to invoke emtpy function: ", fn)
+    return null;
+}
+
+

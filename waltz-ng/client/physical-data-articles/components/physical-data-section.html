@@ -4,16 +4,14 @@
     <div class="col-md-12">
         <h4>Produces</h4>
 
-        <div class="input-group waltz-input-group col-md-6"
+        <div class="row"
              ng-if="$ctrl.produces.length > 10">
-            <input type="text"
-                   ng-model="$ctrl.producesQuery"
-                   ng-model-options="{debounce: 250}"
-                   placeholder="Search..."
-                   class="form-control">
-
-            <div class="input-group-addon">
-                <waltz-icon name="search"></waltz-icon>
+            <div class="col-md-6">
+                <waltz-search-control min-characters="3"
+                                      delay="250"
+                                      on-query="$ctrl.filterProduces"
+                                      placeholder-text="Search producers...">
+                </waltz-search-control>
             </div>
         </div>
 
@@ -74,18 +72,18 @@
      ng-hide="$ctrl.consumes | isEmpty">
     <div class="col-md-12">
         <h4>Consumes</h4>
-        <div class="input-group waltz-input-group col-md-6"
-             ng-if="$ctrl.consumes.length > 10">
-            <input type="text"
-                   ng-model="$ctrl.consumesQuery"
-                   ng-model-options="{debounce: 250}"
-                   placeholder="Search..."
-                   class="form-control">
 
-            <div class="input-group-addon">
-                <waltz-icon name="search"></waltz-icon>
+        <div class="row"
+             ng-if="$ctrl.consumes.length > 10">
+            <div class="col-md-6">
+                <waltz-search-control min-characters="3"
+                                      delay="250"
+                                      on-query="$ctrl.filterConsumes"
+                                      placeholder-text="Search consumers...">
+                </waltz-search-control>
             </div>
         </div>
+
         <table class="table table-condensed table-striped table-hover small">
             <thead>
             <tr>

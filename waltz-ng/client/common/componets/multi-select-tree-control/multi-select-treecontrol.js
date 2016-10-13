@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {initialiseData, buildHierarchies, switchToParentIds} from "../../../common";
+import {initialiseData, buildHierarchies, switchToParentIds, invokeFunction} from "../../../common";
 
 
 const bindings = {
@@ -28,12 +28,7 @@ const initialState = {
 const template = require('./multi-select-treecontrol.html');
 
 
-function invokeHandler(handler) {
-    if (handler &&  _.isFunction(handler)) {
-        const parameters = _.slice(arguments, 1);
-        handler(...parameters);
-    }
-}
+
 
 
 function buildTrees(nodes) {
@@ -87,17 +82,17 @@ function controller() {
                 vm.expandedNodes.splice(idx, 1);
             }
         }
-        invokeHandler(vm.onClick, node.id);
+        invokeFunction(vm.onClick, node.id);
     };
 
     vm.onNodeCheck = (id) => {
-        invokeHandler(vm.onCheck, id);
+        invokeFunction(vm.onCheck, id);
         event.preventDefault();
         event.stopPropagation();
     };
 
     vm.onNodeUncheck = (id) => {
-        invokeHandler(vm.onUncheck, id);
+        invokeFunction(vm.onUncheck, id);
         event.preventDefault();
         event.stopPropagation();
     };
