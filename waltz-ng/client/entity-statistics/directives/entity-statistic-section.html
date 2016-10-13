@@ -5,7 +5,7 @@
         <div class="row col-sm-12 value"
              ng-if="ctrl.entityStatisticsGrouped.length > 0">
 
-            <table class="table table-condensed"
+            <table class="table table-condensed waltz-entity-statistic"
                    style="border-collapse: separate;">
                 <thead>
                     <tr>
@@ -17,8 +17,7 @@
                     </tr>
                 </thead>
 
-                <tbody ng-repeat="(group, stats) in ctrl.entityStatisticsGrouped"
-                       class="waltz-entity-statistic">
+                <tbody ng-repeat-start="(group, stats) in ctrl.entityStatisticsGrouped">
                     <tr class="category">
                         <td colspan="5">
                             <waltz-icon name="{{ stats.key | toIconName:'entityStatistic' }}">
@@ -27,39 +26,43 @@
                             </strong>
                         </td>
                     </tr>
-                    <tr ng-repeat="stat in (sortedStatValues = (stats.values | orderBy:['definition.name', 'value.outcome']))"
-                        class="small text-muted">
+                </tbody>
+
+                <tbody ng-repeat-end
+                       ng-repeat="stat in stats.values"
+                       class="small text-muted">
+                    <tr ng-repeat="statValue in stat.values">
                         <td></td>
                         <td>
-                            <span ng-if="$first || stat.definition.name != sortedStatValues[$index - 1].definition.name"
-                                  ng-bind="stat.definition.name"
-                                  uib-tooltip="{{stat.definition.description}}">
+                            <span ng-if="$first"
+                                  ng-bind="statValue.definition.name"
+                                  uib-tooltip="{{statValue.definition.description}}">
                             </span>
                         </td>
-                        <td ng-switch="stat.definition.type">
-                            <waltz-entity-statistic-boolean-renderer statistic="stat.definition"
-                                                                     value="stat.value"
+                        <td ng-switch="statValue.definition.type">
+                            <waltz-entity-statistic-boolean-renderer statistic="statValue.definition"
+                                                                     value="statValue.value"
                                                                      ng-switch-when="BOOLEAN">
                             </waltz-entity-statistic-boolean-renderer>
 
-                            <waltz-entity-statistic-percentage-renderer statistic="stat.definition"
-                                                                        value="stat.value"
+                            <waltz-entity-statistic-percentage-renderer statistic="statValue.definition"
+                                                                        value="statValue.value"
                                                                         ng-switch-when="PERCENTAGE">
                             </waltz-entity-statistic-percentage-renderer>
 
-                            <waltz-entity-statistic-numeric-renderer statistic="stat.definition"
-                                                                     value="stat.value"
+                            <waltz-entity-statistic-numeric-renderer statistic="statValue.definition"
+                                                                     value="statValue.value"
                                                                      ng-switch-when="NUMERIC">
                             </waltz-entity-statistic-numeric-renderer>
-                            <kbd ng-switch-default ng-bind="stat.value.outcome">
+                            <kbd ng-switch-default ng-bind="statValue.value.outcome">
                             </kbd>
                         </td>
                         <td>
-                            <span ng-bind="stat.value.reason">
+                            <span ng-bind="statValue.value.reason">
                             </span>
                         </td>
                         <td>
-                            <waltz-from-now timestamp="stat.value.createdAt">
+                            <waltz-from-now timestamp="statValue.value.createdAt">
                             </waltz-from-now>
                         </td>
                     </tr>

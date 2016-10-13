@@ -33,7 +33,9 @@ function controller($scope) {
             vm.entityStatisticsGrouped = d3.nest()
                 .key(x => x.definition.category)
                 .sortKeys(d3.ascending)
-                .sortValues((a, b) => a.definition.name < b.definition.name)
+                .key(x => x.definition.name)
+                .sortKeys(d3.ascending)
+                .sortValues((a, b) => a.value.outcome < b.value.outcome)
                 .entries(entityStats);
         }
     });
