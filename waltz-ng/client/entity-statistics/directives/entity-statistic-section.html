@@ -27,11 +27,12 @@
                             </strong>
                         </td>
                     </tr>
-                    <tr ng-repeat="stat in stats.values | orderBy:['definition.name', 'value.outcome']"
+                    <tr ng-repeat="stat in (sortedStatValues = (stats.values | orderBy:['definition.name', 'value.outcome']))"
                         class="small text-muted">
                         <td></td>
                         <td>
-                            <span ng-bind="stat.definition.name"
+                            <span ng-if="$first || stat.definition.name != sortedStatValues[$index - 1].definition.name"
+                                  ng-bind="stat.definition.name"
                                   uib-tooltip="{{stat.definition.description}}">
                             </span>
                         </td>
