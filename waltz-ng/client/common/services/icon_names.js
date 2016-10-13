@@ -37,6 +37,7 @@ export const entityIconNames = {
     DATABASE: 'database',
     DATA_TYPE: 'qrcode',
     END_USER_APPLICATION: 'table',
+    ENTITY_STATISTIC: 'pie-chart',
     INVOLVEMENT: 'share-alt-square',
     LOGICAL_DATA_FLOW: "random",
     ORG_UNIT: 'sitemap',

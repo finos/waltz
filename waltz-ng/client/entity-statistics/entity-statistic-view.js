@@ -1,9 +1,10 @@
 import _ from "lodash";
 import {kindToViewState, resetData} from "../common";
-import {updateUrlWithoutReload, hasRelatedDefinitions} from "./utilities";
+import {hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload} from "./utilities";
 
 
 const initData = {
+    allDefinitions: [],
     applications: [],
     statistic: {
         definition: null,
@@ -61,8 +62,13 @@ function controller($q,
         .findAllForKind(entityKind)
         .then(xs => vm.navItems = xs);
 
+    const allDefinitionsPromise = entityStatisticStore
+        .findAllActiveDefinitions()
+        .then(ds => vm.allDefinitions = ds);
+
     $q.all([navItemPromise, definitionPromise])
-        .then(() => /* boot */ vm.onSelectNavItem(_.find(vm.navItems, { id: entityId })));
+        .then(() => /* boot */ vm.onSelectNavItem(_.find(vm.navItems, { id: entityId })))
+        .then(allDefinitionsPromise);
 
     function resetValueData() {
         const clearData = resetData({}, initData);
@@ -118,6 +124,10 @@ function controller($q,
             .then(h => vm.history = mkHistory(h, vm.statistic.summary));
 
         updateUrlWithoutReload($state, navItem);
+    };
+
+    vm.onSelectDefinition = (node) => {
+        navigateToStatistic($state, node.id, vm.parentRef);
     };
 
     vm.goToParent = () => {
