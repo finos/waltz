@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import {combineFlowData} from '../../../utilities';
-import {termSearch} from "../../common"
+import {combineFlowData} from '../../utilities';
+import {termSearch} from "../../../common"
 
 
 const bindings = {
