@@ -46,22 +46,6 @@ export const investmentRatingNames = {
 };
 
 
-export const involvementKindNames = {
-    IT_ARCHITECT: 'IT Architect',
-    DATA_ARCHITECT: 'Data Architect',
-    IT_LEAD: 'IT Lead',
-    PROJECT_MANAGER: 'Project Manager',
-    SUPPORT_MANAGER: 'Support Manager',
-    BUSINESS_SPONSOR: 'Business Sponsor',
-    DEVELOPER: 'Developer',
-    QA: 'Quality Assurance',
-    BUSINESS_ANALYST: 'Business Analyst',
-    SENIOR_MANAGER: "Senior Manager",
-    ADMINISTRATIVE: "Administrative",
-    DATA_OWNER: 'Data Owner'
-};
-
-
 export const lifecyclePhaseDisplayNames = {
     PRODUCTION: 'Production',
     DEVELOPMENT: 'Development',
