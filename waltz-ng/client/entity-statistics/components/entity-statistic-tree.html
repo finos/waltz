@@ -1,0 +1,10 @@
+<div>
+    <treecontrol class="tree-light"
+                 order-by="'-name'"
+                 tree-model="$ctrl.definitionTree"
+                 selected-node="$ctrl.currentNode"
+                 expanded-nodes="$ctrl.expandedNodes"
+                 on-selection="$ctrl.handleSelection(node)">
+        <span ng-bind="node.name"></span>
+    </treecontrol>
+</div>

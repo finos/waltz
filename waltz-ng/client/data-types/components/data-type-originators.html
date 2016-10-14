@@ -14,7 +14,7 @@
             <div>
                 <h4 ng-bind="typeGroup.dataType.name"></h4>
 
-                <div class="waltz-scroll-region" style="height:250px">
+                <div ng-class="{'waltz-scroll-region-250': typeGroup.appReferences.length > 15 }">
 
                     <ul class="small list-unstyled">
                         <ul ng-repeat="appRef in typeGroup.appReferences">

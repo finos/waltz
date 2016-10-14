@@ -27,6 +27,7 @@ import {mkAppRatingsGroup, calculateHighestRatingCount} from "../ratings/directi
 
 
 const initialState = {
+    app: {},
     aliases: [],
     appAuthSources: [],
     appCapabilities: [],
@@ -52,18 +53,33 @@ const initialState = {
 };
 
 
+const addToHistory = (historyStore, app) => {
+    if (! app) { return; }
+    historyStore.put(
+        app.name,
+        'APPLICATION',
+        'main.app.view',
+        { id: app.id });
+};
+
+
 function controller($q,
                     $state,
-                    app,
+                    $stateParams,
                     appViewStore,
+                    appCapabilityStore,
+                    assetCostStore,
                     aliasStore,
                     authSourcesStore,
+                    bookmarkStore,
+                    capabilityStore,
                     changeLogStore,
-                    complexityStore,
                     databaseStore,
                     dataFlowStore,
                     dataFlowDecoratorStore,
                     dataTypeUsageStore,
+                    entityStatisticStore,
+                    historyStore,
                     involvementStore,
                     orgUnitStore,
                     perspectiveStore,
@@ -75,9 +91,9 @@ function controller($q,
                     softwareCatalogStore,
                     sourceDataRatingStore) {
 
-    const { id, organisationalUnitId } = app;
+    const id = $stateParams.id;
     const entityRef = { id, kind: 'APPLICATION' };
-    const vm = Object.assign(this, initialState, { app });
+    const vm = Object.assign(this, initialState);
 
     const goToAppFn = d => $state.go('main.app.view', { id: d.id });
     vm.flowTweakers = {
@@ -88,56 +104,8 @@ function controller($q,
             onSelect: goToAppFn,
         }
     };
-
     vm.entityRef = entityRef;
-
     const perspectiveCode = 'BUSINESS';
-
-    $q.all([
-        appViewStore.getById(id),
-        perspectiveStore.findByCode(perspectiveCode),
-        ratingStore.findByParent('APPLICATION', id)
-    ]).then(([appView, perspective, ratings]) => {
-        Object.assign(vm, appView);
-        const appRef = { id: id, kind: 'APPLICATION', name: app.name};
-        const group = mkAppRatingsGroup(appRef, perspective.measurables, appView.capabilities, ratings);
-
-        vm.ratings = {
-            highestRatingCount: calculateHighestRatingCount([group]),
-            tweakers: {
-                subjectLabel: {
-                    enter: (selection) => selection.on(
-                        'click',
-                        (d) => $state.go('main.capability.view', { id: d.subject.id }))
-                }
-            },
-            group
-        };
-    });
-
-
-    const promises = [
-        loadDataFlows(dataFlowStore, id, vm),
-        loadInvolvements($q, involvementStore, id, vm),
-        loadAuthSources(authSourcesStore, orgUnitStore, id, organisationalUnitId, vm),
-        loadServers(serverInfoStore, id, vm),
-        loadSoftwareCatalog(softwareCatalogStore, id, vm),
-        loadDatabases(databaseStore, id, vm),
-        loadDataTypeUsages(dataTypeUsageStore, id, vm),
-        loadDataFlowDecorators(dataFlowDecoratorStore, id, vm)
-    ];
-
-    $q.all(promises)
-        .then(() => loadChangeLog(changeLogStore, id, vm))
-        .then(() => loadSourceDataRatings(sourceDataRatingStore, vm));
-
-    complexityStore
-        .findByApplication(id)
-        .then(c => vm.complexity = c);
-
-    processStore
-        .findForApplication(id)
-        .then(ps => vm.processes = ps);
 
     vm.saveAliases = (aliases) => {
         const aliasValues = _.map(aliases, 'text');
@@ -146,29 +114,131 @@ function controller($q,
             .then(() => vm.aliases = aliasValues);
     };
 
-    physicalDataArticleStore
-        .findByAppId(id)
-        .then(xs => vm.physicalDataArticles = xs);
 
-    physicalDataFlowStore
-        .findByEntityReference(entityRef)
-        .then(xs => vm.physicalDataFlows = xs);
+    function loadAll() {
+        loadFirstWave()
+            .then(() => loadSecondWave())
+            .then(() => loadThirdWave())
+            .then(() => loadFourthWave())
+            .then(() => postLoadActions());
+    }
+
+
+    function loadFirstWave() {
+        const promises = [
+            appViewStore.getById(id)
+                .then(appView => Object.assign(vm, appView)),
+        ];
+
+        return $q.all(promises);
+    }
+
+
+    function loadSecondWave() {
+        const promises = [
+            appCapabilityStore.findCapabilitiesByApplicationId(id)
+                .then(appCapabilities => vm.appCapabilities = appCapabilities),
+
+            capabilityStore.findByAppIds([id])
+                .then(capabilities => vm.capabilities = capabilities),
+
+            bookmarkStore.findByParent(entityRef)
+                .then(bookmarks => vm.bookmarks = bookmarks)
+        ];
+
+        return $q.all(promises);
+    }
+
+
+    function loadThirdWave() {
+        const promises = [
+            loadDataFlows(dataFlowStore, id, vm),
+            loadInvolvements($q, involvementStore, id, vm),
+            loadAuthSources(authSourcesStore, orgUnitStore, id, vm.organisationalUnit.id, vm),
+            loadServers(serverInfoStore, id, vm),
+            loadSoftwareCatalog(softwareCatalogStore, id, vm),
+            loadDatabases(databaseStore, id, vm),
+            loadDataTypeUsages(dataTypeUsageStore, id, vm),
+            loadDataFlowDecorators(dataFlowDecoratorStore, id, vm),
+
+            processStore
+                .findForApplication(id)
+                .then(ps => vm.processes = ps),
+
+            physicalDataArticleStore
+                .findByAppId(id)
+                .then(xs => vm.physicalDataArticles = xs),
+
+            physicalDataFlowStore
+                .findByEntityReference(entityRef)
+                .then(xs => vm.physicalDataFlows = xs),
+
+            entityStatisticStore
+                .findStatsForEntity(entityRef)
+                .then(stats => vm.entityStatistics = stats),
+
+            assetCostStore
+                .findByAppId(id)
+                .then(costs => vm.costs = costs)
+        ];
+
+        return $q.all(promises)
+            .then(() => loadChangeLog(changeLogStore, id, vm))
+            .then(() => loadSourceDataRatings(sourceDataRatingStore, vm));
+    }
+
+
+    function loadFourthWave() {
+        return $q.all([
+            perspectiveStore.findByCode(perspectiveCode),
+            ratingStore.findByParent('APPLICATION', id)
+        ]).then(([perspective, ratings]) => {
+            const appRef = { id: id, kind: 'APPLICATION', name: vm.app.name};
+            const group = mkAppRatingsGroup(appRef, perspective.measurables, vm.capabilities, ratings);
+
+            vm.ratings = {
+                highestRatingCount: calculateHighestRatingCount([group]),
+                tweakers: {
+                    subjectLabel: {
+                        enter: (selection) => selection.on(
+                            'click',
+                            (d) => $state.go('main.capability.view', { id: d.subject.id }))
+                    }
+                },
+                group
+            };
+        });
+
+    }
+
+
+    function postLoadActions() {
+        addToHistory(historyStore, vm.app);
+    }
+
+    // load everything in priority order
+    loadAll();
 }
 
 
 controller.$inject = [
     '$q',
     '$state',
-    'app',
+    '$stateParams',
     'ApplicationViewStore',
+    'AppCapabilityStore',
+    'AssetCostStore',
     'AliasStore',
     'AuthSourcesStore',
+    'BookmarkStore',
+    'CapabilityStore',
     'ChangeLogDataService',
-    'ComplexityStore',
     'DatabaseStore',
     'DataFlowDataStore',
     'DataFlowDecoratorStore',
     'DataTypeUsageStore',
+    'EntityStatisticStore',
+    'HistoryStore',
     'InvolvementStore',
     'OrgUnitStore',
     'PerspectiveStore',

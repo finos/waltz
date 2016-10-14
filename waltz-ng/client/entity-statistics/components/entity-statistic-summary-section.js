@@ -9,7 +9,7 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import {buildHierarchies, resetData, switchToParentIds} from "../../common";
+import {resetData} from "../../common";
 
 
 const bindings = {
@@ -28,19 +28,11 @@ const initData = {
 };
 
 
-function buildDefinitionTree(defns = []) {
-    return switchToParentIds(buildHierarchies(defns));
-}
-
 const template = require('./entity-statistic-summary-section.html');
 
 
 function controller(entityStatisticStore) {
     const vm = resetData(this, initData);
-
-    vm.$onChanges = () => {
-        vm.definitionTree = buildDefinitionTree(vm.definitions);
-    };
 
     vm.onDefinitionSelection = (d) => {
         vm.activeDefinition = d;

@@ -151,18 +151,16 @@ export function switchToParentIds(treeData = []) {
  */
 
 export function termSearch(items = [], searchStr = '', searchFields = []) {
-
     const terms = searchStr.toLowerCase().split(/\W/);
 
     return _.filter(items, item => {
-
         const fields = _.isEmpty(searchFields)
             ? _.keys(item)
             : searchFields;
 
         const targetStr = _.chain(fields)
-            .reject(field => field.startsWith('$') || _.isFunction(item[field]))
-            .map(field => item[field])
+            .reject(field => field.startsWith('$') || _.isFunction(_.get(item, field)))
+            .map(field => _.get(item, field))
             .join(' ')
             .value()
             .toLowerCase();
@@ -254,3 +252,21 @@ export function stringToBoolean(string){
             return Boolean(string);
     }
 }
+
+
+/**
+ * Invokes a function and also passes in any provided arguments in order
+ * e.g. invokeFunction(onClick, arg1, arg2)
+ * @param fn
+ * @returns {*}
+ */
+export function invokeFunction(fn) {
+    if (_.isFunction(fn)) {
+        const parameters = _.slice(arguments, 1);
+        return fn(...parameters);
+    }
+    console.log("invokeFunction - attempted to invoke emtpy function: ", fn)
+    return null;
+}
+
+

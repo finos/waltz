@@ -17,7 +17,7 @@ const template = require('./data-type-view.html');
 
 const initialState = {
     dataFlow: null,
-    entityRef: null
+    entityRef: null,
 };
 
 
@@ -25,7 +25,6 @@ function controller($scope,
                     dataType,
                     viewDataService,
                     dataFlowService,
-                    dataTypeUsageStore,
                     historyStore,
                     tourService) {
 
@@ -46,7 +45,6 @@ function controller($scope,
     vm.entityRef = entityReference;
     vm.dataType = dataType;
 
-    vm.loadFlowDetail = () => viewDataService.loadFlowDetail();
     vm.onAssetBucketSelect = (bucket) => {
         $scope.$applyAsync(() => viewDataService.selectAssetBucket(bucket));
     };
@@ -72,9 +70,6 @@ function controller($scope,
         .then(() => dataFlowService.loadDetail())
         .then(flowData => vm.flowData = flowData);
 
-    dataTypeUsageStore
-        .findForUsageKindByDataTypeIdSelector('ORIGINATOR', selector)
-        .then(originators => vm.flowOriginators = originators);
 }
 
 
@@ -83,7 +78,6 @@ controller.$inject = [
     'dataType',
     'DataTypeViewDataService',
     'DataFlowViewService',
-    'DataTypeUsageStore',
     'HistoryStore',
     'TourService'
 ];

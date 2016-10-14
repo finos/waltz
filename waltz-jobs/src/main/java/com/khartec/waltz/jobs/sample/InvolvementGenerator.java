@@ -104,7 +104,8 @@ public class InvolvementGenerator {
                         id,
                         InvolvementKind.IT_ARCHITECT.name(),
                         randomPick(directors),
-                        "RANDOM_GENERATOR"))
+                        "RANDOM_GENERATOR",
+                        Long.valueOf(rnd.nextInt(13) + 1)))
                 .collect(Collectors.toList());
 
         List<InvolvementRecord> ouSponsors = orgUnitIds.stream()
@@ -113,7 +114,8 @@ public class InvolvementGenerator {
                         id,
                         InvolvementKind.BUSINESS_SPONSOR.name(),
                         randomPick(directors),
-                        "RANDOM_GENERATOR"))
+                        "RANDOM_GENERATOR",
+                        Long.valueOf(rnd.nextInt(13) + 1)))
                 .collect(Collectors.toList());
 
         dsl.delete(INVOLVEMENT).execute();
@@ -147,7 +149,8 @@ public class InvolvementGenerator {
                         appRef.id(),
                         kind.name(),
                         randomPick(employeeIds),
-                        "RANDOM_GENERATOR"));
+                        "RANDOM_GENERATOR",
+                        Long.valueOf(rnd.nextInt(13) + 1)));
     }
 
 
