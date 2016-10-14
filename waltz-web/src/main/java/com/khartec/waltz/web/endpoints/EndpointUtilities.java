@@ -78,6 +78,10 @@ public class EndpointUtilities {
         Spark.post(path, wrapDatumHandler(handler), transformer);
     }
 
+    public static <T> void putForDatum(String path, DatumRoute<T> handler) {
+        Spark.put(path, wrapDatumHandler(handler), transformer);
+    }
+
 
 
     // -- helpers ---
