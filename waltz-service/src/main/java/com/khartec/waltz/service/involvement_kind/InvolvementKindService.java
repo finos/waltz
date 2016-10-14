@@ -26,4 +26,29 @@ public class InvolvementKindService {
     public List<InvolvementKind> findAll() {
         return involvementKindDao.findAll();
     }
+
+
+    public InvolvementKind getById(long id) {
+        return involvementKindDao.getById(id);
+    }
+
+
+    public InvolvementKind create(InvolvementKind involvementKind) {
+        checkNotNull(involvementKind, "involvementKind cannot be null");
+
+        return involvementKindDao.create(involvementKind);
+    }
+
+
+    public InvolvementKind update(InvolvementKind involvementKind) {
+        checkNotNull(involvementKind, "involvementKind cannot be null");
+
+        return involvementKindDao.update(involvementKind);
+    }
+
+
+    public boolean delete(long id) {
+        return involvementKindDao.deleteIfNotUsed(id);
+    }
+
 }
