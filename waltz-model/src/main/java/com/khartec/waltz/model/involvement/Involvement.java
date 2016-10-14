@@ -29,7 +29,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableInvolvement.class)
 public abstract class Involvement implements ProvenanceProvider {
 
-    public abstract InvolvementKind kind();
+    public abstract long kindId();
     public abstract EntityReference entityReference();
     public abstract String employeeId();
 

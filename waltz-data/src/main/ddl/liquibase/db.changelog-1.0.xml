@@ -3043,4 +3043,12 @@
         </sql>
     </changeSet>
 
+
+    <!-- 714: Drop Involvement.Kind -->
+    <changeSet id="20161014-714-1"
+               author="rovats">
+        <dropColumn tableName="involvement"
+                    columnName="kind"/>
+    </changeSet>
+
 </databaseChangeLog>

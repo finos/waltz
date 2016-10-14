@@ -16,7 +16,7 @@ import _ from "lodash";
 export function aggregatePeopleInvolvements(involvements, people) {
     const involvementsByPerson = _.chain(involvements)
         .groupBy('employeeId')
-        .mapValues(xs => _.map(xs, 'kind'))
+        .mapValues(xs => _.map(xs, 'kindId'))
         .value();
 
     return _.chain(people)
