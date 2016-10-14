@@ -48,7 +48,7 @@ const columnDefs = [
         cellTemplate: '<div class="ui-grid-cell-contents"> <a ui-sref="main.person.view ({empId: COL_FIELD.employeeId})" ng-bind="COL_FIELD.displayName CUSTOM_FILTERS"></a> - <a href="mailto:{{COL_FIELD.email}}"><waltz-icon name="envelope-o"></waltz-icon></a></div>'
     },
     { field: 'person.title', displayName: 'Title' },
-    { field: 'person.officePhone', displayName: 'Telelphone' },
+    { field: 'person.officePhone', displayName: 'Telephone' },
     {
         field: 'involvements',
         displayName: 'Roles',

@@ -29,7 +29,6 @@ import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.involvement.ImmutableInvolvement;
 import com.khartec.waltz.model.involvement.Involvement;
-import com.khartec.waltz.model.involvement.InvolvementKind;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.schema.tables.records.InvolvementRecord;
 import org.jooq.*;
@@ -58,7 +57,7 @@ public class InvolvementDao {
         InvolvementRecord involvementRecord = r.into(InvolvementRecord.class);
         return ImmutableInvolvement.builder()
                 .employeeId(involvementRecord.getEmployeeId())
-                .kind(InvolvementKind.valueOf(involvementRecord.getKind()))
+                .kindId(involvementRecord.getKindId())
                 .entityReference(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(involvementRecord.getEntityKind()))
                         .id(involvementRecord.getEntityId())
