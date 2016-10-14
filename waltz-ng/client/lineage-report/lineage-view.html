@@ -1,0 +1,41 @@
+<div>
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.report.name }}"
+                       small="Lineage Report"
+                       icon="qrcode">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>
+                Data Lineage Reports
+            </li>
+            <li>Lineage edit</li>
+        </ol>
+    </waltz-page-header>
+
+
+    <waltz-section name="apps">
+        <ul>
+            <li ng-repeat="app in ctrl.apps.all">
+                <span ng-bind="app.name"></span>
+            </li>
+        </ul>
+    </waltz-section>
+
+
+    <waltz-section name="stuff">
+        <div class="row">
+            <div class="col-md-3">
+                <pre ng-bind="ctrl.articles.all | json"></pre>
+            </div>
+            <div class="col-md-3">
+                <pre ng-bind="ctrl.apps.all | json"></pre>
+            </div>
+            <div class="col-md-3">
+                <pre ng-bind="ctrl.physicalFlows.all | json"></pre>
+            </div>
+            <div class="col-md-3">
+                <pre ng-bind="ctrl.logicalFlows.all | json"></pre>
+            </div>
+        </div>
+    </waltz-section>
+</div>

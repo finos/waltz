@@ -1,5 +1,5 @@
 import _ from 'lodash';
-
+import {combineFlowData} from '../../utilities';
 
 const bindings = {
     logicalFlows: '<',
@@ -10,34 +10,6 @@ const bindings = {
 
 const template = require('./physical-data-section.html');
 
-
-function enrichProduces(articles = [],
-                physicalFlows = [],
-                logicalFlows = [])
-{
-    return _.chain(articles)
-        .flatMap((a, i) => {
-            const logicalById = _.keyBy(logicalFlows, "id");
-            const relevantPhysicalFlows = _.filter(physicalFlows, { articleId: a.id });
-            if (relevantPhysicalFlows.length === 0) {
-                return {
-                    article: a,
-                    firstArticle: true
-                }
-            } else {
-                return _.flatMap(relevantPhysicalFlows, (pf, j) => {
-                    return {
-                        article: a,
-                        firstArticle: j === 0,
-                        physicalFlow: pf,
-                        firstPhysical: j === 0,
-                        logicalFlow: logicalById[pf.flowId]
-                    };
-                });
-            }
-        })
-        .value();
-}
 
 
 function enrichConsumes(articles = [],
@@ -63,7 +35,7 @@ function mkData(articles = { produces: [], consumes: [] },
                 physicalFlows = [],
                 logicalFlows = [])
 {
-    const produces = enrichProduces(
+    const produces = combineFlowData(
         articles.produces,
         physicalFlows,
         logicalFlows);

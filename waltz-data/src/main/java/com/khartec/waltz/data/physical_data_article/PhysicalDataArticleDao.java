@@ -7,10 +7,7 @@ import com.khartec.waltz.model.physical_data_article.DataFormatKind;
 import com.khartec.waltz.model.physical_data_article.ImmutablePhysicalDataArticle;
 import com.khartec.waltz.model.physical_data_article.PhysicalDataArticle;
 import com.khartec.waltz.schema.tables.records.PhysicalDataArticleRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
-import org.jooq.Select;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
@@ -87,6 +84,23 @@ public class PhysicalDataArticleDao {
     }
 
 
+    public PhysicalDataArticle getById(long id) {
+        return dsl
+                .select(PHYSICAL_DATA_ARTICLE.fields())
+                .from(PHYSICAL_DATA_ARTICLE)
+                .where(PHYSICAL_DATA_ARTICLE.ID.eq(id))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+    public List<PhysicalDataArticle> findBySelector(Select<Record1<Long>> selector) {
+        return dsl
+                .select(PHYSICAL_DATA_ARTICLE.fields())
+                .from(PHYSICAL_DATA_ARTICLE)
+                .where(PHYSICAL_DATA_ARTICLE.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
     private Select<Record> findByProducerAppIdQuery(long appId) {
         return dsl
                 .select(DSL.value("producer").as("relationship"))
@@ -109,11 +123,4 @@ public class PhysicalDataArticleDao {
                 .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
     }
 
-    public PhysicalDataArticle getById(long id) {
-        return dsl
-                .select(PHYSICAL_DATA_ARTICLE.fields())
-                .from(PHYSICAL_DATA_ARTICLE)
-                .where(PHYSICAL_DATA_ARTICLE.ID.eq(id))
-                .fetchOne(TO_DOMAIN_MAPPER);
-    }
 }

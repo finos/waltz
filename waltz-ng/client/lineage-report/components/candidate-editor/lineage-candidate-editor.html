@@ -1,0 +1,32 @@
+<table class="table table-condensed small">
+    <thead>
+    <tr>
+        <th>Article Name</th>
+        <th>Consumer</th>
+        <th>Action</th>
+        <th>Format</th>
+        <th>Transport</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="c in $ctrl.candidates"
+        class="waltz-visibility-parent">
+        <td><span ng-bind="c.article.name"></span></td>
+        <td>
+            <span ng-bind="c.logicalFlow.target.name"></span>
+            <a ng-click="$ctrl.onRefocus(c.logicalFlow.target)"
+               class="waltz-visibility-10">Focus</a>
+        </td>
+        <td>
+            <span class="waltz-visibility-child-30">
+                <button ng-click='$ctrl.onAdd(c.physicalFlow.id)'
+                        class="btn btn-xs btn-primary">
+                    Add
+                </button>
+            </span>
+        </td>
+        <td><span class='text-muted' ng-bind="c.article.format"></span></td>
+        <td><span class='text-muted' ng-bind="c.physicalFlow.transport"></span></td>
+    </tr>
+    </tbody>
+</table>

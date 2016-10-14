@@ -21,6 +21,7 @@ import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow.DataFlowDao;
 import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
+import com.khartec.waltz.data.data_flow.LogicalDataFlowIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -44,7 +45,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 
 
 @Service
@@ -55,6 +55,7 @@ public class DataFlowService {
     private final DataFlowDecoratorService dataFlowDecoratorService;
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
+    private final LogicalDataFlowIdSelectorFactory logicalFlowIdSelectorFactory;
     private DataTypeUsageService dataTypeUsageService;
 
 
@@ -63,6 +64,7 @@ public class DataFlowService {
                            DataFlowStatsDao dataFlowStatsDao,
                            DataFlowDecoratorService dataFlowDecoratorService,
                            ApplicationIdSelectorFactory appIdSelectorFactory,
+                           LogicalDataFlowIdSelectorFactory logicalFlowIdSelectorFactory,
                            DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
                            DataTypeUsageService dataTypeUsageService) {
         checkNotNull(dataFlowDao, "dataFlowDao must not be null");
@@ -71,6 +73,7 @@ public class DataFlowService {
         checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
+        checkNotNull(logicalFlowIdSelectorFactory, "logicalFlowIdSelectorFactory cannot be null");
 
         this.appIdSelectorFactory = appIdSelectorFactory;
         this.dataFlowStatsDao = dataFlowStatsDao;
@@ -78,6 +81,7 @@ public class DataFlowService {
         this.dataFlowDecoratorService = dataFlowDecoratorService;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
         this.dataTypeUsageService = dataTypeUsageService;
+        this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
     }
 
 
@@ -101,13 +105,12 @@ public class DataFlowService {
      * @return
      */
     public List<DataFlow> findBySelector(IdSelectionOptions options) {
-        if (options.desiredKind() == DATA_TYPE) {
-            return (List<DataFlow>) findByDataTypeIdSelector(options);
+        switch (options.desiredKind()) {
+            case DATA_TYPE:
+                return (List<DataFlow>) findByDataTypeIdSelector(options);
+            default:
+                return dataFlowDao.findBySelector(logicalFlowIdSelectorFactory.apply(options));
         }
-        if (options.desiredKind() == EntityKind.APPLICATION) {
-            return findByAppIdSelector(options);
-        }
-        throw new UnsupportedOperationException("Cannot find decorators for selector desiredKind: "+options.desiredKind());
     }
 
 

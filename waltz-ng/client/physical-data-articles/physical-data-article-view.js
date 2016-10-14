@@ -17,7 +17,7 @@ function controller($stateParams,
     };
 
     physicalDataArticleStore
-        .findById(articleId)
+        .getById(articleId)
         .then(article => vm.article = article)
         .then(article => applicationStore.getById(article.owningApplicationId))
         .then(app => vm.owningApp = app)
