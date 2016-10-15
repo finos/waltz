@@ -37,8 +37,9 @@ function setupDimensions(vizElem) {
 
 const force = d3.layout.force()
     .distance(100)
-    .linkDistance(60)
-    .charge(-120);
+    .linkDistance(70)
+    .gravity(0.05)
+    .charge(-200);
 
 
 function setup(vizElem) {
@@ -142,13 +143,15 @@ function drawNodes(entities = [], svg, nodeTweakers = DEFAULT_TWEAKER) {
     node.enter()
         .append('g')
         .classed('wdfd-node', true)
-        .call(nodeTweakers.enter)
         .call(force.drag)
         .call(addNodeCircle)
-        .call(addNodeLabel);
+        .call(addNodeLabel)
+        .call(nodeTweakers.enter);
 
     node.exit()
         .remove();
+
+    node.call(nodeTweakers.update);
 
     return node;
 }

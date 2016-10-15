@@ -1,5 +1,5 @@
-import _ from 'lodash';
 import {initialiseData} from '../common'
+import {green, grey} from '../common/colors';
 
 
 const template = require('./lineage-view.html');
@@ -10,18 +10,37 @@ const initialState = {
 };
 
 
-function process(xs = []) {
+function setupGraphTweakers(application) {
     return {
-        all: xs,
-        byId: _.keyBy(xs, 'id')
+        node: {
+            update: (selection) => {
+                selection
+                    .select('circle')
+                    .attr({
+                        'fill': d => d.id === application.id
+                            ? green
+                            : grey,
+                        'stroke': d => d.id === application.id
+                            ? green.darker()
+                            : grey.darker(),
+                        'r': d => d.id === application.id
+                            ? 15
+                            : 10
+                    });
+            },
+            exit: () => {},
+            enter: () => {}
+        }
     };
 }
 
 
 function controller($stateParams,
                     appStore,
+                    bookmarkStore,
                     lineageReportStore,
                     logicalFlowStore,
+                    orgUnitStore,
                     physicalDataArticleStore,
                     physicalDataFlowStore) {
 
@@ -40,45 +59,54 @@ function controller($stateParams,
 
     lineageReportStore
         .getById(reportId)
-        .then(r => vm.report = r);
+        .then(report => vm.report = report)
+        .then(report => physicalDataArticleStore.getById(report.physicalArticleId))
+        .then(article => vm.article = article)
+        .then(article => appStore.getById(article.owningApplicationId))
+        .then(app => vm.application = app)
+        .then(app => orgUnitStore.getById(app.organisationalUnitId))
+        .then(ou => vm.organisationalUnit = ou)
+        .then(() => vm.graphTweakers = setupGraphTweakers(vm.application));
 
     appStore
         .findBySelector(selectorOptions)
-        .then(apps => Object.assign(vm, { apps: process(apps) }));
+        .then(apps => vm.apps = apps);
 
     physicalDataArticleStore
         .findBySelector(selectorOptions)
-        .then(articles => Object.assign(vm, { articles: process(articles) }));
+        .then(articles => vm.articles = articles);
 
     physicalDataFlowStore
         .findBySelector(selectorOptions)
-        .then(physicalFlows => Object.assign(vm, { physicalFlows: process(physicalFlows) }));
+        .then(physicalFlows => vm.physicalFlows = physicalFlows);
 
     logicalFlowStore
         .findBySelector(Object.assign({}, selectorOptions, { desiredKind: 'LOGICAL_DATA_FLOW' }))
-        .then(x => {
-            console.log(x);
-            return x;
-        })
-        .then(logicalFlows => Object.assign(vm, { logicalFlows: process(logicalFlows) }));
+        .then(logicalFlows => vm.logicalFlows = logicalFlows);
 
+    bookmarkStore
+        .findByParent(reportRef)
+        .then(bs => vm.bookmarks = bs);
 }
-
 
 
 controller.$inject = [
     '$stateParams',
     'ApplicationStore',
+    'BookmarkStore',
     'LineageReportStore',
     'DataFlowDataStore', // LogicalFlowStore
+    'OrgUnitStore',
     'PhysicalDataArticleStore',
     'PhysicalDataFlowStore'
 ];
+
 
 const view = {
     template,
     controller,
     controllerAs: 'ctrl'
 };
+
 
 export default view;

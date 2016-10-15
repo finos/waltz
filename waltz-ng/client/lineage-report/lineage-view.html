@@ -13,28 +13,102 @@
     </waltz-page-header>
 
 
-    <waltz-section name="apps">
-        <ul>
-            <li ng-repeat="app in ctrl.apps.all">
-                <span ng-bind="app.name"></span>
-            </li>
-        </ul>
+    <!-- SUMMARY -->
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Report Name
+                    </div>
+                    <div class="col-sm-10">
+                        <span ng-bind="ctrl.report.name"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Description
+                    </div>
+                    <div class="col-sm-10">
+                        <span ng-bind="ctrl.report.description"></span>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h5>
+                    This report describes the lineage for physical data article:
+                    <a ui-sref="main.physical-data-article.view ({ id: ctrl.article.id })"
+                       ng-bind="ctrl.article.name">
+                    </a>
+                </h5>
+                <waltz-physical-data-article-overview owning-app="ctrl.application"
+                                                      organisational-unit="ctrl.organisationalUnit"
+                                                      article="ctrl.article">
+                </waltz-physical-data-article-overview>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+
+    <waltz-section name="Flow">
+        <waltz-data-flow-diagram data="{ flows: ctrl.logicalFlows, entities: ctrl.apps }"
+                                 tweakers="ctrl.graphTweakers">
+        </waltz-data-flow-diagram>
+
+        <hr>
+
+        <waltz-lineage-flow-tabgroup article="ctrl.article"
+                                     lineage-data="{
+                                        applications: ctrl.apps,
+                                        logicalFlows: ctrl.logicalFlows,
+                                        physicalFlows: ctrl.physicalFlows,
+                                        articles: ctrl.articles
+                                     }">
+        </waltz-lineage-flow-tabgroup>
+
+
     </waltz-section>
 
 
-    <waltz-section name="stuff">
+    <!-- BOOKMARKS -->
+    <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
+                             entity-id="{{ ctrl.report.id }}"
+                             kind="LINEAGE_REPORT"
+                             parent-name="{{ ctrl.report.name }}">
+    </waltz-bookmarks-section>
+
+
+    <!-- DEBUG -->
+    <waltz-section name="stuff" ng-show="false">
         <div class="row">
-            <div class="col-md-3">
-                <pre ng-bind="ctrl.articles.all | json"></pre>
+            <div class="col-md-2">
+                <h4>Report / Article / App</h4>
+                <pre ng-bind="ctrl.report | json"></pre>
+                <pre ng-bind="ctrl.article | json"></pre>
+                <pre ng-bind="ctrl.application | json"></pre>
             </div>
-            <div class="col-md-3">
-                <pre ng-bind="ctrl.apps.all | json"></pre>
+            <div class="col-md-2">
+                <h4>Articles</h4>
+                <pre ng-bind="ctrl.articles | json"></pre>
             </div>
-            <div class="col-md-3">
-                <pre ng-bind="ctrl.physicalFlows.all | json"></pre>
+            <div class="col-md-2">
+                <h4>Apps</h4>
+                <pre ng-bind="ctrl.apps | json"></pre>
             </div>
-            <div class="col-md-3">
-                <pre ng-bind="ctrl.logicalFlows.all | json"></pre>
+            <div class="col-md-2">
+                <h4>Phys Flows</h4>
+                <pre ng-bind="ctrl.physicalFlows | json"></pre>
+            </div>
+            <div class="col-md-2">
+                <h4>Logical Flows</h4>
+                <pre ng-bind="ctrl.logicalFlows | json"></pre>
+            </div>
+            <div class="col-md-2">
+                <h4>Combined</h4>
+                <pre ng-bind="ctrl.flowData | json"></pre>
             </div>
         </div>
     </waltz-section>
