@@ -4,7 +4,7 @@ function setup(module) {
         .config(require('./routes'))
         .component(
             'waltzPhysicalDataSection',
-            require('./components/physical-data-section'))
+            require('./components/physical-data-section/physical-data-section'))
         .component(
             'waltzPhysicalDataArticleOverview',
             require('./components/overview/physical-data-article-overview'))
@@ -13,7 +13,7 @@ function setup(module) {
             require('./components/article-consumers/physical-data-article-consumers'))
         .service(
             'PhysicalDataArticleStore',
-            require('./service/physical-data-article-store'))
+            require('./services/physical-data-article-store'))
         ;
 }
 

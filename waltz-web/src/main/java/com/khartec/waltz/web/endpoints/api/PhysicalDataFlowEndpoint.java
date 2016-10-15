@@ -8,10 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
-import static com.khartec.waltz.web.WebUtilities.getId;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 @Service
 public class PhysicalDataFlowEndpoint implements Endpoint {
@@ -42,6 +41,10 @@ public class PhysicalDataFlowEndpoint implements Endpoint {
                 "article",
                 ":id");
 
+        String findBySelectorPath = mkPath(
+                BASE_URL,
+                "selector");
+
         ListRoute<PhysicalDataFlow> findByEntityRefRoute =
                 (request, response) -> physicalDataFlowService
                         .findByEntityReference(
@@ -52,7 +55,13 @@ public class PhysicalDataFlowEndpoint implements Endpoint {
                         .findByArticleId(
                                 getId(request));
 
+        ListRoute<PhysicalDataFlow> findBySelectorRoute =
+                (request, response) -> physicalDataFlowService
+                        .findBySelector(readIdSelectionOptionsFromBody(request));
+
+
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findByArticleIdPath, findByArticleIdRoute);
+        postForList(findBySelectorPath, findBySelectorRoute);
     }
 }

@@ -1,9 +1,10 @@
-import {checkIsEntityRef} from '../../common/checks';
+import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks';
 
 
 function store($http, baseApiUrl) {
 
     const base = `${baseApiUrl}/physical-data-flow`;
+
 
     const findByEntityReference = (ref) => {
         checkIsEntityRef(ref);
@@ -12,15 +13,26 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+
     const findByArticleId = (id) => {
         return $http
             .get(`${base}/article/${id}`)
             .then(r => r.data);
     };
 
+
+    const findBySelector = (options) => {
+        checkIsIdSelector(options);
+        return $http
+            .post(`${base}/selector`, options)
+            .then(r => r.data);
+    };
+
+
     return {
+        findByArticleId,
         findByEntityReference,
-        findByArticleId
+        findBySelector
     };
 }
 

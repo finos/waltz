@@ -1,0 +1,135 @@
+<uib-tabset>
+    <uib-tab heading="Flows">
+        <br>
+        <p class="small waltz-text-muted-10">
+            Flows identified as contributors to
+            <span ng-bind="$ctrl.article.name"></span>
+        </p>
+        <table class="table table-condensed table-hover small">
+            <thead>
+            <tr>
+                <th>Article</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Format</th>
+                <th>Transport</th>
+                <th>Description</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="flow in $ctrl.flowData | orderBy:'article.name'">
+                <td>
+                    <a ui-sref="main.physical-data-article.view ({ id: article.id })"
+                       ng-bind="flow.article.name">
+                    </a>
+                </td>
+                <td>
+                    <a ui-sref='main.app.view ({ id: flow.logicalFlow.source.id })'
+                       ng-bind="flow.logicalFlow.source.name">
+                    </a>
+                </td>
+                <td>
+                    <a ui-sref='main.app.view ({ id: flow.logicalFlow.target.id })'
+                       ng-bind="flow.logicalFlow.target.name">
+                    </a>
+                </td>
+                <td><span ng-bind="flow.article.format"></span></td>
+                <td><span ng-bind="flow.physicalFlow.transport"></span></td>
+                <td><span ng-bind="flow.physicalFlow.description"></span></td>
+                <td>
+                    <a ui-sref='main.app.view ({ id: $ctrl.apps.byId[article.owningApplicationId].id })'
+                       ng-bind="$ctrl.apps.byId[article.owningApplicationId].name">
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </uib-tab>
+    <uib-tab heading="Articles">
+        <br>
+        <p class="small waltz-text-muted-10">
+            Articles identified as contributors to
+            <span ng-bind="$ctrl.article.name"></span>
+        </p>
+        <table class="table table-condensed table-hover small">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>External Id</th>
+                <th>Format</th>
+                <th>Description</th>
+                <th>Owning Application</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="article in $ctrl.articles.all | orderBy:'name'">
+                <td>
+                    <a ui-sref="main.physical-data-article.view ({ id: article.id })"
+                       ng-bind="article.name">
+                    </a>
+                </td>
+                <td><span ng-bind="article.externalId"></span></td>
+                <td><span ng-bind="article.format"></span></td>
+                <td><span ng-bind="article.description"></span></td>
+                <td>
+                    <a ui-sref='main.app.view ({ id: $ctrl.applications.byId[article.owningApplicationId].id })'
+                       ng-bind="$ctrl.applications.byId[article.owningApplicationId].name">
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </uib-tab>
+    <uib-tab heading="Applications">
+        <br>
+        <p class="small waltz-text-muted-10">
+            Applications which contribute to
+            <span ng-bind="$ctrl.article.name"></span>
+        </p>
+        <table class="table table-condensed table-hover small">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Asset Code</th>
+                <th>Type</th>
+                <th>Investment Status</th>
+                <th>Business Criticality</th>
+                <th>Lifecycle Phase</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="app in $ctrl.applications.all | orderBy:'name'">
+                <td>
+                    <a ui-sref="main.app.view ({ id: app.id })"
+                       ng-bind="app.name">
+                    </a>
+                </td>
+                <td>
+                    <span ng-bind="app.assetCode"></span>
+                </td>
+                <td>
+                    <span ng-bind="app.kind | toDisplayName:'applicationKind'"></span>
+                </td>
+                <td>
+                    <span ng-bind="app.overallRating | toDisplayName:'investmentRating'"></span>
+                </td>
+                <td>
+                    <span ng-bind="app.businessCriticality | toDisplayName:'criticality'"></span>
+                </td>
+                <td>
+                    <span ng-bind="app.lifecyclePhase | toDisplayName:'lifecyclePhase'"></span>
+                </td>
+                <td>
+                    <span ng-bind="app.description"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <waltz-app-summary apps="$ctrl.applications.all">
+        </waltz-app-summary>
+    </uib-tab>
+
+
+</uib-tabset>

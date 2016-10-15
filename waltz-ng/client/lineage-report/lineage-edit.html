@@ -1,0 +1,95 @@
+<div>
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.article.name }}"
+                       small="Lineage Editor"
+                       icon="qrcode">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>
+                <a ui-sref="main.app.view ({ id: ctrl.owningApp.id })">
+                    <span ng-bind="ctrl.owningApp.name"></span>
+                </a>
+            </li>
+            <li>
+                <a ui-sref="main.physical-data-article.view ({ id: ctrl.article.id })">
+                    <span ng-bind="ctrl.article.name"></span>
+                </a>
+            </li>
+            <li>Lineage edit</li>
+        </ol>
+    </waltz-page-header>
+
+
+    <waltz-physical-data-article-overview owning-app="ctrl.owningApp"
+                                          article="ctrl.article"
+                                          organisational-unit="ctrl.organisationalUnit">
+    </waltz-physical-data-article-overview>
+
+    <br>
+
+    <waltz-section name="edit">
+        <div class="row">
+            <div class="col-sm-12">
+                <h4>Contributors</h4>
+                <table class="table table-condensed small">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="c in $ctrl.contributors">
+                        <td><span ng-bind="c.article.name"></span></td>
+                        <td><span ng-bind="c.logicalFlow.target.name"></span></td>
+                        <td><span ng-bind="c.article.format"></span></td>
+                        <td><span ng-bind="c.physicalFlow.transport"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-sm-9">
+                <h4 ng-bind="ctrl.searchResults.app.name"></h4>
+
+                <waltz-lineage-candidate-editor logical-flows="ctrl.searchResults.logicalFlows"
+                                                physical-flows="ctrl.searchResults.physicalFlows"
+                                                articles="ctrl.searchResults.articles"
+                                                on-add="ctrl.addPhysicalFlowToLineage"
+                                                on-remove="ctrl.removePhysicalFlowFromLineage"
+                                                on-refocus="ctrl.doSearch">
+                </waltz-lineage-candidate-editor>
+
+            </div>
+            <div class="col-sm-3">
+                <waltz-app-selector model="ctrl.selectedApp"></waltz-app-selector>
+
+            </div>
+        </div>
+
+
+    </waltz-section>
+
+    <waltz-section name="dump">
+        <div class="row">
+            <div class="col-sm-3">
+                <pre ng-bind="ctrl.searchResults | json"></pre>
+            </div>
+            <div class="col-sm-3">
+                <pre ng-bind="ctrl.xxx"></pre>
+            </div>
+            <div class="col-sm-3">
+                <pre ng-bind="ctrl.xxx"></pre>
+            </div>
+            <div class="col-sm-3">
+                <pre ng-bind="ctrl.xxx"></pre>
+            </div>
+        </div>
+    </waltz-section>
+</div>

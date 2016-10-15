@@ -6,10 +6,7 @@ import com.khartec.waltz.model.physical_data_flow.ImmutablePhysicalDataFlow;
 import com.khartec.waltz.model.physical_data_flow.PhysicalDataFlow;
 import com.khartec.waltz.model.physical_data_flow.TransportKind;
 import com.khartec.waltz.schema.tables.records.PhysicalDataFlowRecord;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -69,9 +66,19 @@ public class PhysicalDataFlowDao {
 
 
     public List<PhysicalDataFlow> findByArticleId(long articleId) {
+        return findByCondition(PHYSICAL_DATA_FLOW.ARTICLE_ID.eq(articleId));
+    }
+
+
+    public List<PhysicalDataFlow> findBySelector(Select<Record1<Long>> selector) {
+        return findByCondition(PHYSICAL_DATA_FLOW.ID.in(selector));
+    }
+
+
+    private List<PhysicalDataFlow> findByCondition(Condition condition) {
         return dsl.select(PHYSICAL_DATA_FLOW.fields())
                 .from(PHYSICAL_DATA_FLOW)
-                .where(PHYSICAL_DATA_FLOW.ARTICLE_ID.eq(articleId))
+                .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import {termSearch} from "../../common"
+import {combineFlowData} from '../../utilities';
+import {termSearch} from "../../../common"
 
 
 const bindings = {
@@ -48,7 +49,7 @@ function enrichConsumes(articles = [],
     const visitedApps = [];
 
     return _.chain(articles)
-        .map((article, i) => {
+        .map(article => {
             const physicalFlow = _.find(physicalFlows, { articleId: article.id });
             const logicalFlow = _.find(logicalFlows, f => f.id === physicalFlow.flowId);
             const firstSource = !_.includes(visitedApps, article.owningApplicationId);
@@ -63,6 +64,7 @@ function enrichConsumes(articles = [],
                 firstSource
             };
         })
+        .groupBy("logicalFlow.source.id")
         .value();
 }
 
@@ -71,7 +73,7 @@ function mkData(articles = { produces: [], consumes: [] },
                 physicalFlows = [],
                 logicalFlows = [])
 {
-    const produces = enrichProduces(
+    const produces = combineFlowData(
         articles.produces,
         physicalFlows,
         logicalFlows);
@@ -83,7 +85,7 @@ function mkData(articles = { produces: [], consumes: [] },
 }
 
 
-function controller($scope) {
+function controller() {
 
     const vm = this;
 

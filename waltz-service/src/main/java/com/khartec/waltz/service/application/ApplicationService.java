@@ -31,6 +31,8 @@ import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
 import com.khartec.waltz.model.tally.LongTally;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -103,7 +105,8 @@ public class ApplicationService {
 
 
     public List<Application> findByAppIdSelector(IdSelectionOptions options) {
-        return applicationDao.findByAppIdSelector(appIdSelectorFactory.apply(options));
+        Select<Record1<Long>> selector = appIdSelectorFactory.apply(options);
+        return applicationDao.findByAppIdSelector(selector);
     }
 
 

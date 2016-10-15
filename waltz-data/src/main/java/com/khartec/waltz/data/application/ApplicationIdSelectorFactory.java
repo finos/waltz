@@ -26,8 +26,10 @@ import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORA
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static com.khartec.waltz.schema.tables.LineageReportContributor.LINEAGE_REPORT_CONTRIBUTOR;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static com.khartec.waltz.schema.tables.PhysicalDataFlow.PHYSICAL_DATA_FLOW;
 import static com.khartec.waltz.schema.tables.Process.PROCESS;
 
 @Service
@@ -75,21 +77,22 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
         switch (ref.kind()) {
             case APP_GROUP:
                 return mkForAppGroup(ref, options.scope());
-            case PERSON:
-                return mkForPerson(ref, options.scope());
-            case CAPABILITY:
-                return mkForCapability(ref, options.scope());
-            case ORG_UNIT:
-                return mkForOrgUnit(ref, options.scope());
-            case PROCESS:
-                return mkForProcess(ref, options.scope());
-            case DATA_TYPE:
-                return mkForDataType(ref, options.scope());
             case APPLICATION:
                 return mkForApplication(ref, options.scope());
-
+            case CAPABILITY:
+                return mkForCapability(ref, options.scope());
+            case DATA_TYPE:
+                return mkForDataType(options);
+            case LINEAGE_REPORT:
+                return mkForLineageReport(options);
+            case ORG_UNIT:
+                return mkForOrgUnit(ref, options.scope());
+            case PERSON:
+                return mkForPerson(ref, options.scope());
+            case PROCESS:
+                return mkForProcess(ref, options.scope());
             default:
-                throw new IllegalArgumentException("Cannot create selector for entity kind: "+ref.kind());
+                throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
     }
 
@@ -149,7 +152,7 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
     private SelectConditionStep<Record1<Long>> mkForAppGroup(EntityReference ref, HierarchyQueryScope scope) {
         if (scope != EXACT) {
-            LOG.info("App Groups are not hierarchical therefore ignoring requested scope of: "+scope);
+            LOG.info("App Groups are not hierarchical therefore ignoring requested scope of: " + scope);
         }
         return dsl
                 .selectDistinct(appGroup.APPLICATION_ID)
@@ -164,7 +167,7 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 return mkForSinglePerson(ref);
             case CHILDREN:
                 return mkForPersonReportees(ref);
-           default:
+            default:
                 throw new UnsupportedOperationException(
                         "Querying for appIds of person using (scope: '"
                                 + scope
@@ -182,7 +185,7 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
         Condition condition = involvement.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                 .and(involvement.EMPLOYEE_ID.eq(employeeId)
-                .or(involvement.EMPLOYEE_ID.in(reporteeIds)));
+                        .or(involvement.EMPLOYEE_ID.in(reporteeIds)));
 
         return dsl
                 .selectDistinct(involvement.ENTITY_ID)
@@ -193,15 +196,15 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
     private String findEmployeeId(EntityReference ref) {
         return dsl.select(person.EMPLOYEE_ID)
-                    .from(person)
-                    .where(person.ID.eq(ref.id()))
-                    .fetchOne(person.EMPLOYEE_ID);
+                .from(person)
+                .where(person.ID.eq(ref.id()))
+                .fetchOne(person.EMPLOYEE_ID);
     }
 
 
     private Select<Record1<Long>> mkForSinglePerson(EntityReference ref) {
 
-       String employeeId = dsl.select(person.EMPLOYEE_ID)
+        String employeeId = dsl.select(person.EMPLOYEE_ID)
                 .from(person)
                 .where(person.ID.eq(ref.id()))
                 .fetchOne(person.EMPLOYEE_ID);
@@ -229,32 +232,65 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForDataType(EntityReference ref, HierarchyQueryScope scope) {
-        IdSelectionOptions dtSelectionOptions = IdSelectionOptions.mkOpts(ref, scope);
-        Select<Record1<Long>> dataTypeSelector = dataTypeIdSelectorFactory.apply(dtSelectionOptions);
-
-        Field appId = DSL.field("app_id", Long.class);
+    private Select<Record1<Long>> mkForDataType(IdSelectionOptions options) {
+        Select<Record1<Long>> dataTypeSelector = dataTypeIdSelectorFactory.apply(options);
 
         Condition condition = DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector)
                 .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()));
 
-        Select<Record1<Long>> targets = dsl
-                .select(DATA_FLOW.TARGET_ENTITY_ID.as(appId))
-                .from(DATA_FLOW)
-                .innerJoin(DATA_FLOW_DECORATOR)
-                .on(DATA_FLOW_DECORATOR.DATA_FLOW_ID.eq(DATA_FLOW.ID))
-                .where(dsl.renderInlined(condition));
+        Field appId = DSL.field("app_id", Long.class);
 
-        Select<Record1<Long>> sources = dsl
-                .select(DATA_FLOW.SOURCE_ENTITY_ID.as(appId))
-                .from(DATA_FLOW)
-                .innerJoin(DATA_FLOW_DECORATOR)
-                .on(DATA_FLOW_DECORATOR.DATA_FLOW_ID.eq(DATA_FLOW.ID))
-                .where(dsl.renderInlined(condition));
+        SelectConditionStep<Record1<Long>> sources = selectLogicalFlowAppsByDataType(
+                DATA_FLOW.SOURCE_ENTITY_ID.as(appId),
+                condition.and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+
+        SelectConditionStep<Record1<Long>> targets = selectLogicalFlowAppsByDataType(
+                DATA_FLOW.TARGET_ENTITY_ID.as(appId),
+                condition.and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+
+        return dsl.selectDistinct(appId)
+                .from(sources)
+                .union(targets);
+    }
+
+
+    private Select<Record1<Long>> mkForLineageReport(IdSelectionOptions options) {
+        Condition condition = LINEAGE_REPORT_CONTRIBUTOR.LINEAGE_REPORT_ID.eq(options.entityReference().id());
+        Field appId = DSL.field("app_id", Long.class);
+
+        SelectConditionStep<Record1<Long>> sources = selectLogicalFlowAppsByLineage(
+                DATA_FLOW.SOURCE_ENTITY_ID.as(appId),
+                condition.and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+
+        SelectConditionStep<Record1<Long>> targets = selectLogicalFlowAppsByLineage(
+                DATA_FLOW.TARGET_ENTITY_ID.as(appId),
+                condition.and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
 
         return dsl.selectDistinct(appId)
                 .from(targets)
                 .union(sources);
+    }
+
+
+    private SelectConditionStep<Record1<Long>> selectLogicalFlowAppsByLineage(Field<Long> appField, Condition condition) {
+        return dsl
+                .select(appField)
+                .from(DATA_FLOW)
+                .innerJoin(PHYSICAL_DATA_FLOW)
+                .on(PHYSICAL_DATA_FLOW.FLOW_ID.eq(DATA_FLOW.ID))
+                .innerJoin(LINEAGE_REPORT_CONTRIBUTOR)
+                .on(LINEAGE_REPORT_CONTRIBUTOR.PHYSICAL_FLOW_ID.eq(PHYSICAL_DATA_FLOW.ID))
+                .where(dsl.renderInlined(condition));
+    }
+
+
+    private SelectConditionStep<Record1<Long>> selectLogicalFlowAppsByDataType(Field<Long> appField, Condition condition) {
+        return dsl
+                .select(appField)
+                .from(DATA_FLOW)
+                .innerJoin(DATA_FLOW_DECORATOR)
+                .on(DATA_FLOW_DECORATOR.DATA_FLOW_ID.eq(DATA_FLOW.ID))
+                .where(dsl.renderInlined(condition));
     }
 
 }

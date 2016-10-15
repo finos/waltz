@@ -3044,6 +3044,58 @@
     </changeSet>
 
 
+    <!-- 701: lineage edit -->
+    <changeSet author="dwatkins"
+               id="20161012-701-1">
+        <createTable tableName="lineage_report">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="lineage_report_pkey"/>
+            </column>
+            <column name="physical_article_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+            <constraints nullable="false"/>
+        </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20161012-701-2">
+        <createTable tableName="lineage_report_contributor">
+            <column name="lineage_report_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="physical_flow_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="lineage_report_contributor"
+                       columnNames="lineage_report_id, physical_flow_id"/>
+    </changeSet>
+
+
     <!-- 714: Drop Involvement.Kind -->
     <changeSet id="20161014-714-1"
                author="rovats">

@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 @Service
 public class PhysicalDataArticleEndpoint implements Endpoint {
@@ -49,6 +51,10 @@ public class PhysicalDataArticleEndpoint implements Endpoint {
                 "application",
                 ":id");
 
+        String findBySelectorPath = mkPath(
+                BASE_URL,
+                "selector");
+
         String getByIdPath = mkPath(
                 BASE_URL,
                 "id",
@@ -60,6 +66,9 @@ public class PhysicalDataArticleEndpoint implements Endpoint {
         ListRoute<PhysicalDataArticle> findByConsumerAppIdRoute =
                 (request, response) -> dataArticleService.findByConsumerAppId(getId(request));
 
+        ListRoute<PhysicalDataArticle> findBySelectorRoute =
+                (request, response) -> dataArticleService.findBySelector(readIdSelectionOptionsFromBody(request));
+
         DatumRoute<ProduceConsumeGroup<PhysicalDataArticle>> findByAppRoute =
                 (request, response) -> dataArticleService.findByAppId(getId(request));
 
@@ -68,6 +77,8 @@ public class PhysicalDataArticleEndpoint implements Endpoint {
 
         getForList(findByProducerAppPath, findByProducerAppRoute);
         getForList(findByConsumerAppIdPath, findByConsumerAppIdRoute);
+        postForList(findBySelectorPath, findBySelectorRoute);
+
         getForDatum(findByAppPath, findByAppRoute);
         getForDatum(getByIdPath, getByIdRoute);
     }

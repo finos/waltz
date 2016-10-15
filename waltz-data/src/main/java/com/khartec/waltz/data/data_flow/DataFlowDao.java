@@ -41,8 +41,8 @@ import static com.khartec.waltz.schema.tables.PhysicalDataFlow.PHYSICAL_DATA_FLO
 @Repository
 public class DataFlowDao {
 
-    private static final com.khartec.waltz.schema.tables.Application sourceAppAlias = APPLICATION.as("sourceAppAlias");
-    private static final com.khartec.waltz.schema.tables.Application targetAppAlias = APPLICATION.as("targetAppAlias");
+    public static final com.khartec.waltz.schema.tables.Application sourceAppAlias = APPLICATION.as("sourceAppAlias");
+    public static final com.khartec.waltz.schema.tables.Application targetAppAlias = APPLICATION.as("targetAppAlias");
 
     public static final RecordMapper<Record, DataFlow> TO_DOMAIN_MAPPER = r -> {
         DataFlowRecord record = r.into(DataFlowRecord.class);
@@ -100,21 +100,6 @@ public class DataFlowDao {
     }
 
 
-    private SelectOnConditionStep<Record> baseQuery() {
-
-        return dsl
-                .select(DATA_FLOW.fields())
-                .select(sourceAppAlias.NAME, targetAppAlias.NAME)
-                .from(DATA_FLOW)
-                .innerJoin(sourceAppAlias)
-                .on(DATA_FLOW.SOURCE_ENTITY_ID.eq(sourceAppAlias.ID)
-                        .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .innerJoin(targetAppAlias)
-                .on(DATA_FLOW.TARGET_ENTITY_ID.eq(targetAppAlias.ID)
-                        .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
-    }
-
-
     public int removeFlows(List<Long> flowIds) {
         return dsl.deleteFrom(DATA_FLOW)
                 .where(DATA_FLOW.ID.in(flowIds))
@@ -140,6 +125,7 @@ public class DataFlowDao {
     }
 
 
+    @Deprecated
     public List<DataFlow> findByFlowIds(Collection<Long> dataFlowIds) {
         return baseQuery()
                 .where(DATA_FLOW.ID.in(dataFlowIds))
@@ -147,6 +133,7 @@ public class DataFlowDao {
     }
 
 
+    @Deprecated
     public Collection<DataFlow> findByDataTypeIdSelector(Select<Record1<Long>> typeIdSelector) {
         Condition condition = DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())
                 .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(typeIdSelector))
@@ -161,6 +148,7 @@ public class DataFlowDao {
     }
 
 
+    @Deprecated
     public Collection<DataFlow> findByPhysicalDataArticleId(long articleId) {
         return baseQuery()
                 .innerJoin(PHYSICAL_DATA_FLOW)
@@ -168,4 +156,28 @@ public class DataFlowDao {
                 .where(PHYSICAL_DATA_FLOW.ARTICLE_ID.eq(articleId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
+
+    public List<DataFlow> findBySelector(Select<Record1<Long>> selector) {
+        return baseQuery()
+                .where(DATA_FLOW.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    // -- HELPERS ---
+
+    private SelectOnConditionStep<Record> baseQuery() {
+        return dsl
+                .select(DATA_FLOW.fields())
+                .select(sourceAppAlias.NAME, targetAppAlias.NAME)
+                .from(DATA_FLOW)
+                .innerJoin(sourceAppAlias)
+                .on(DATA_FLOW.SOURCE_ENTITY_ID.eq(sourceAppAlias.ID)
+                        .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .innerJoin(targetAppAlias)
+                .on(DATA_FLOW.TARGET_ENTITY_ID.eq(targetAppAlias.ID)
+                        .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+    }
+
 }
