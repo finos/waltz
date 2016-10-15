@@ -11,17 +11,21 @@
  *
  */
 
-import _ from "lodash";
+export default [
+    '$http',
+    'BaseApiUrl',
+    ($http, BaseApiUrl) => {
 
-export function aggregatePeopleInvolvements(involvements, people) {
-    const involvementsByPerson = _.chain(involvements)
-        .groupBy('employeeId')
-        .mapValues(xs => _.map(xs, 'kindId'))
-        .value();
+        const BASE = `${BaseApiUrl}/involvement-kind`;
 
-    return _.chain(people)
-            .map(person => ({person, involvements: involvementsByPerson[person.employeeId]}))
-            .uniqBy(i => i.person.id)
-            .value();
-}
 
+        const findAll = () =>
+            $http.get(BASE)
+                .then(result => result.data);
+
+
+        return {
+            findAll
+        };
+    }
+];

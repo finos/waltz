@@ -21,13 +21,13 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.ApplicationKind;
-import com.khartec.waltz.model.involvement.InvolvementKind;
 import com.khartec.waltz.schema.tables.records.InvolvementRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -37,8 +37,10 @@ import static com.khartec.waltz.common.ListUtilities.concat;
 import static com.khartec.waltz.common.ListUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
+import static java.util.stream.Collectors.toMap;
 
 
 public class InvolvementGenerator {
@@ -64,6 +66,12 @@ public class InvolvementGenerator {
                 .from(ORGANISATIONAL_UNIT)
                 .fetch(ORGANISATIONAL_UNIT.ID);
 
+        Map<String, Long> involvementKindMap = dsl.select(INVOLVEMENT_KIND.NAME, INVOLVEMENT_KIND.ID)
+                .from(INVOLVEMENT_KIND)
+                .fetch()
+                .stream()
+                .collect(toMap(r -> r.getValue(INVOLVEMENT_KIND.NAME), r -> r.getValue(INVOLVEMENT_KIND.ID)));
+
         List<Long> inHouseApps = getAppIdsByKind(dsl, ApplicationKind.IN_HOUSE);
         List<Long> hostedApps = getAppIdsByKind(dsl, ApplicationKind.INTERNALLY_HOSTED);
         List<Long> externalApps = getAppIdsByKind(dsl, ApplicationKind.EXTERNALLY_HOSTED);
@@ -71,38 +79,37 @@ public class InvolvementGenerator {
 
         List<InvolvementRecord> devInvolvements = inHouseApps.stream()
                 .map(id -> toAppRef(id))
-                .flatMap(appRef -> mkInvolvments(appRef, developers, InvolvementKind.DEVELOPER, 7))
+                .flatMap(appRef -> mkInvolvments(appRef, developers, involvementKindMap.get("Developer"), 7))
                 .collect(Collectors.toList());
 
         List<InvolvementRecord> qaInvolvements = concat(inHouseApps, hostedApps)
                 .stream()
                 .map(id -> toAppRef(id))
-                .flatMap(appRef -> mkInvolvments(appRef, qa, InvolvementKind.QA, 3))
+                .flatMap(appRef -> mkInvolvments(appRef, qa, involvementKindMap.get("Quality Assurance"), 3))
                 .collect(Collectors.toList());
 
         List<InvolvementRecord> projectManagerInvolvements = concat(inHouseApps, externalApps, hostedApps, eucApps)
                 .stream()
                 .map(id -> toAppRef(id))
-                .flatMap(appRef -> mkInvolvments(appRef, managers, InvolvementKind.PROJECT_MANAGER, 1))
+                .flatMap(appRef -> mkInvolvments(appRef, managers, involvementKindMap.get("Project Manager"), 1))
                 .collect(Collectors.toList());
 
         List<InvolvementRecord> supportManagerInvolvments = concat(inHouseApps, externalApps, hostedApps)
                 .stream()
                 .map(id -> toAppRef(id))
-                .flatMap(appRef -> mkInvolvments(appRef, managers, InvolvementKind.SUPPORT_MANAGER, 1))
+                .flatMap(appRef -> mkInvolvments(appRef, managers, involvementKindMap.get("Support Manager"), 1))
                 .collect(Collectors.toList());
 
         List<InvolvementRecord> analystInvolvments = concat(inHouseApps, externalApps, hostedApps)
                 .stream()
                 .map(id -> toAppRef(id))
-                .flatMap(appRef -> mkInvolvments(appRef, analysts, InvolvementKind.BUSINESS_ANALYST, 3))
+                .flatMap(appRef -> mkInvolvments(appRef, analysts, involvementKindMap.get("Business Analyst"), 3))
                 .collect(Collectors.toList());
 
         List<InvolvementRecord> ouArchitects = orgUnitIds.stream()
                 .map(id -> new InvolvementRecord(
                         EntityKind.ORG_UNIT.name(),
                         id,
-                        InvolvementKind.IT_ARCHITECT.name(),
                         randomPick(directors),
                         "RANDOM_GENERATOR",
                         Long.valueOf(rnd.nextInt(13) + 1)))
@@ -112,7 +119,6 @@ public class InvolvementGenerator {
                 .map(id -> new InvolvementRecord(
                         EntityKind.ORG_UNIT.name(),
                         id,
-                        InvolvementKind.BUSINESS_SPONSOR.name(),
                         randomPick(directors),
                         "RANDOM_GENERATOR",
                         Long.valueOf(rnd.nextInt(13) + 1)))
@@ -141,16 +147,15 @@ public class InvolvementGenerator {
         return dsl.select(PERSON.EMPLOYEE_ID).from(PERSON).where(PERSON.TITLE.like(title)).fetch(PERSON.EMPLOYEE_ID);
     }
 
-    private static Stream<InvolvementRecord> mkInvolvments(EntityReference appRef, List<String> employeeIds, InvolvementKind kind, int upperBound) {
+    private static Stream<InvolvementRecord> mkInvolvments(EntityReference appRef, List<String> employeeIds, long kindId, int upperBound) {
         int count = rnd.nextInt(upperBound) + 1;
         return IntStream.range(0, count)
                 .mapToObj(i -> new InvolvementRecord(
                         appRef.kind().name(),
                         appRef.id(),
-                        kind.name(),
                         randomPick(employeeIds),
                         "RANDOM_GENERATOR",
-                        Long.valueOf(rnd.nextInt(13) + 1)));
+                        kindId));
     }
 
 

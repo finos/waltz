@@ -1,15 +1,14 @@
 package com.khartec.waltz.jobs.sample;
 
-import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.involvement.InvolvementKind;
 import com.khartec.waltz.schema.tables.records.InvolvementRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.List;
+import java.util.Random;
 
 import static com.khartec.waltz.common.ListUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
@@ -22,6 +21,8 @@ import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
  * Created by dwatkins on 29/09/2016.
  */
 public class EndUserAppInvolvmentGenerator {
+
+    private static final Random rnd = new Random();
 
     public static void main(String[] args) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
@@ -45,7 +46,7 @@ public class EndUserAppInvolvmentGenerator {
             record.setEmployeeId(randomPick(empIds));
             record.setEntityId(id);
             record.setEntityKind(EntityKind.END_USER_APPLICATION.name());
-            record.setKind(ArrayUtilities.randomPick(InvolvementKind.values()).name());
+            record.setKindId(Long.valueOf(rnd.nextInt(13) + 1));
             return record;
         });
 

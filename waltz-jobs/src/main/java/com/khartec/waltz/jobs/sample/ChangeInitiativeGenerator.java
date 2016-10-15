@@ -4,7 +4,6 @@ import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
-import com.khartec.waltz.model.involvement.InvolvementKind;
 import com.khartec.waltz.schema.tables.records.ChangeInitiativeRecord;
 import com.khartec.waltz.schema.tables.records.EntityRelationshipRecord;
 import com.khartec.waltz.schema.tables.records.InvolvementRecord;
@@ -106,7 +105,7 @@ public class ChangeInitiativeGenerator {
         return IntStream.range(0, 5)
                 .mapToObj(i -> {
                     InvolvementRecord record = new InvolvementRecord();
-                    record.setKind(randomPick(InvolvementKind.values()).name());
+                    record.setKindId(Long.valueOf(rnd.nextInt(13) + 1));
                     record.setProvenance("dummy");
                     record.setEntityId(r.getId());
                     record.setEntityKind(EntityKind.CHANGE_INITIATIVE.name());

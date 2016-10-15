@@ -24,7 +24,6 @@ import {
     entityNames,
     entityStatisticCategoryDisplayNames,
     investmentRatingNames,
-    involvementKindNames,
     lifecyclePhaseDisplayNames,
     orgUnitKindNames,
     rollupKindNames,
@@ -62,7 +61,6 @@ export default (module) => {
     displayNameService.register('entity', entityNames);
     displayNameService.register('entityStatistic', entityStatisticCategoryDisplayNames);
     displayNameService.register('investmentRating', investmentRatingNames);
-    displayNameService.register('involvementKind', involvementKindNames);
     displayNameService.register('lifecyclePhase', lifecyclePhaseDisplayNames);
     displayNameService.register('orgUnitKind', orgUnitKindNames);
     displayNameService.register('rating', authSourceRatingNames);
@@ -79,7 +77,8 @@ export default (module) => {
     iconNameService.register('usageKind', usageKindIconNames);
 
 
-    function runner(dataTypeService) {
+    function runner(dataTypeService,
+                    involvementKindService) {
         dataTypeService
             .loadDataTypes()
             .then(results => {
@@ -91,10 +90,21 @@ export default (module) => {
                 const indexedById = _.keyBy(results, 'id');
                 displayNameService.register('dataType', _.mapValues(indexedById, 'name'));
                 descriptionService.register('dataType', _.mapValues(indexedById, 'description'));
-            })
+            });
+
+        involvementKindService
+            .loadInvolvementKinds()
+            .then(results => {
+                const indexedById = _.keyBy(results, 'id');
+                displayNameService.register('involvementKind', _.mapValues(indexedById, 'name'));
+                descriptionService.register('involvementKind', _.mapValues(indexedById, 'description'));
+            });
     }
 
-    runner.$inject = ['DataTypeService'];
+    runner.$inject = [
+        'DataTypeService',
+        'InvolvementKindService'
+    ];
 
     module.run(runner);
 

@@ -31,6 +31,7 @@ function setup(module) {
         require('./formly'),
         require('./history'),
         require('./involvement'),
+        require('./involvement-kind'),
         require('./lineage-report'),
         require('./navbar'),
         require('./org-units'),
