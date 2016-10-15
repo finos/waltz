@@ -20,10 +20,12 @@
     </waltz-page-header>
 
 
-    <waltz-physical-data-article-overview owning-app="ctrl.owningApp"
-                                          article="ctrl.article"
-                                          organisational-unit="ctrl.organisationalUnit">
-    </waltz-physical-data-article-overview>
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-physical-data-article-overview owning-app="ctrl.owningApp"
+                                              article="ctrl.article"
+                                              organisational-unit="ctrl.organisationalUnit">
+        </waltz-physical-data-article-overview>
+    </div>
 
     <br>
 
@@ -79,10 +81,12 @@
     <waltz-section name="dump">
         <div class="row">
             <div class="col-sm-3">
+                <h4>Search Results</h4>
                 <pre ng-bind="ctrl.searchResults | json"></pre>
             </div>
             <div class="col-sm-3">
-                <pre ng-bind="ctrl.xxx"></pre>
+                <h4>Contributors</h4>
+                <pre ng-bind="ctrl.contributors"></pre>
             </div>
             <div class="col-sm-3">
                 <pre ng-bind="ctrl.xxx"></pre>

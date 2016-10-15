@@ -20,7 +20,7 @@
             <tbody>
             <tr ng-repeat="flow in $ctrl.flowData | orderBy:'article.name'">
                 <td>
-                    <a ui-sref="main.physical-data-article.view ({ id: article.id })"
+                    <a ui-sref="main.physical-data-article.view ({ id: flow.article.id })"
                        ng-bind="flow.article.name">
                     </a>
                 </td>
