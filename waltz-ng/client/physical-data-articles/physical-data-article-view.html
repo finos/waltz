@@ -23,13 +23,96 @@
         </waltz-physical-data-article-overview>
     </div>
 
-
     <br>
 
+    <!-- CONSUMERS -->
     <waltz-section name="Consumers">
          <waltz-physical-data-article-consumers logical-flows="ctrl.logicalFlows"
                                                 physical-flows="ctrl.physicalFlows">
         </waltz-physical-data-article-consumers>
+    </waltz-section>
+
+
+    <!-- LINEAGE REPORTS -->
+    <waltz-section name="Lineage">
+        <!-- DESCRIBED BY.. -->
+        <div ng-if="ctrl.lineageReports.length > 0"
+             class="row">
+            <div class="col-md-9">
+                <h4>Describing Lineage Reports</h4>
+                <table class="table table-condensed table-striped table-hover small">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="lineageReport in ctrl.lineageReports">
+                        <td>
+                            <a ng-bind="lineageReport.name"
+                               ui-sref="main.lineage-report.view ({ id: lineageReport.id })">
+                            </a>
+                        </td>
+                        <td><span ng-bind="lineageReport.description"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p class="text-muted small">
+                    Lineage reports describe how an article is produced
+                </p>
+            </div>
+            <div class="col-md-3">
+
+            </div>
+        </div>
+
+        <hr ng-if="ctrl.lineageReports.length > 0 && ctrl.lineageMentions.length > 0">
+
+        <!-- MENTIONED BY.. -->
+        <div ng-if="ctrl.lineageMentions.length > 0" class="row">
+
+            <div class="col-md-12">
+                <h4>Lineage Report Mentions</h4>
+                <table class="table table-condensed table-striped table-hover small">
+                    <thead>
+                    <tr>
+                        <th>Report Name</th>
+                        <th>Description</th>
+                        <th>Article Name</th>
+                        <th>Article Description</th>
+                        <th>Owning Application</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="mention in ctrl.lineageMentions">
+                        <td>
+                            <a ui-sref="main.lineage-report.view ({id: mention.reportReference.id })"
+                               ng-bind="mention.reportReference.name"></a>
+                        </td>
+                        <td>
+                            <span ng-bind="mention.reportReference.description"></span>
+                        </td>
+                        <td>
+                            <a ui-sref="main.physical-data-article.view ({id: mention.articleReference.id })"
+                               ng-bind="mention.articleReference.name"></a>
+                        </td>
+                        <td>
+                            <span ng-bind="mention.articleReference.description"></span>
+                        </td>
+                        <td>
+                            <a ui-sref="main.app.view ({id: mention.applicationReference.id })"
+                               ng-bind="mention.applicationReference.name"></a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p class="text-muted small">
+                    Lineage reports that mention this articles
+                </p>
+            </div>
+        </div>
+
     </waltz-section>
 
 

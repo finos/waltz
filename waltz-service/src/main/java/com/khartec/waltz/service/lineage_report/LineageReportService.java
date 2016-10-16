@@ -2,7 +2,7 @@ package com.khartec.waltz.service.lineage_report;
 
 import com.khartec.waltz.data.lineage_report.LineageReportDao;
 import com.khartec.waltz.model.lineage_report.LineageReport;
-import com.khartec.waltz.model.lineage_report.LineageReportContributor;
+import com.khartec.waltz.model.lineage_report.LineageReportDescriptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +31,9 @@ public class LineageReportService {
         return lineageReportDao.findByPhysicalArticleId(physicalArticleId);
     }
 
-
-    public List<LineageReportContributor> findContributors(long reportId) {
-        return lineageReportDao.findContributors(reportId);
+    public List<LineageReportDescriptor> findReportsContributedToByArticle(long physicalArticleId) {
+        return lineageReportDao.findReportsContributedToByArticle(physicalArticleId);
     }
+
+
 }

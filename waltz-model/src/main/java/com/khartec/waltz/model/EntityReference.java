@@ -32,6 +32,14 @@ public abstract class EntityReference {
     public abstract EntityKind kind();
     public abstract long id();
     public abstract Optional<String> name();
+    public abstract Optional<String> description();
+
+
+    public static <T extends NameProvider & IdProvider & DescriptionProvider> EntityReference fromEntity(T entity, EntityKind kind) {
+        Long id = entity.id()
+                .orElseThrow(() -> new IllegalArgumentException("Cannot create a reference from an entity with an empty id"));
+        return mkRef(kind, id, entity.name(), entity.description());
+    }
 
 
     public static EntityReference mkRef(EntityKind kind, long id) {
@@ -40,10 +48,16 @@ public abstract class EntityReference {
 
 
     public static EntityReference mkRef(EntityKind kind, long id, String name) {
+        return mkRef(kind, id, name, null);
+    }
+
+
+    public static EntityReference mkRef(EntityKind kind, long id, String name, String description) {
         return ImmutableEntityReference.builder()
                 .kind(kind)
                 .id(id)
                 .name(Optional.ofNullable(name))
+                .description(Optional.ofNullable(description))
                 .build();
     }
 

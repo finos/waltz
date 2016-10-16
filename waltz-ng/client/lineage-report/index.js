@@ -11,6 +11,9 @@ function setup(module) {
         .service(
             'LineageReportStore',
             require('./services/lineage-report-store'))
+        .service(
+            'LineageReportContributorStore',
+            require('./services/lineage-report-contributor-store'))
         ;
 }
 

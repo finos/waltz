@@ -108,10 +108,12 @@ function drawLinks(flows = [], nodes = [], svg, linkTweakers = DEFAULT_TWEAKER) 
             data: f
         }));
 
-    force
-        .links(links)
-        .nodes(nodes)
-        .start();
+    if (links.length > 0) {
+        force
+            .links(links)
+            .nodes(nodes)
+            .start();
+    }
 
     const link = svg
         .selectAll('.wdfd-link')
