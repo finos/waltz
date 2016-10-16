@@ -1,22 +1,42 @@
+import {initialiseData} from '../common';
+
+
 const template = require('./physical-data-article-view.html');
 
 
-function controller($stateParams,
+const initialState = {
+    visibility: {
+        createReportOverlay: false,
+        createReportButton: true,
+        createReportBusy: false
+    },
+    createReportForm: {
+        name: ""
+    }
+};
+
+
+
+function controller($state,
+                    $stateParams,
                     applicationStore,
                     bookmarkStore,
                     lineageReportStore,
-                    lineageReportContributorStore,
                     logicalDataFlowStore,
+                    notification,
                     orgUnitStore,
                     physicalDataArticleStore,
-                    physicalDataFlowStore) {
-    const vm = this;
+                    physicalDataFlowStore)
+{
+    const vm = initialiseData(this, initialState);
 
     const articleId = $stateParams.id;
     const ref = {
         kind: 'PHYSICAL_DATA_ARTICLE',
         id: articleId
     };
+
+    // -- LOAD ---
 
     physicalDataArticleStore
         .getById(articleId)
@@ -45,16 +65,47 @@ function controller($stateParams,
     bookmarkStore
         .findByParent(ref)
         .then(bs => vm.bookmarks = bs);
+
+
+    // -- INTERACT ---
+
+    vm.openCreateReportPopup = () => {
+        vm.visibility.createReportOverlay = ! vm.visibility.createReportOverlay;
+        if (!vm.createReportForm.name) {
+            vm.createReportForm.name = vm.article.name + " Lineage Report";
+        }
+    };
+
+    vm.canCreateReport = () => {
+        const name = vm.createReportForm.name || "";
+        return name.length > 1;
+    };
+
+    vm.createReport = () => {
+        vm.visibility.createReportButton = false;
+        vm.visibility.createReportBusy = true;
+
+        lineageReportStore
+            .create({ name: vm.createReportForm.name, articleId: vm.article.id })
+            .then(reportId => {
+                notification.success("Lineage Report created");
+                $state.go('main.lineage-report.edit', { id: reportId });
+                vm.visibility.createReportButton = true;
+                vm.visibility.createReportBusy = false;
+            });
+    };
+
 }
 
 
 controller.$inject = [
+    '$state',
     '$stateParams',
     'ApplicationStore',
     'BookmarkStore',
     'LineageReportStore',
-    'LineageReportContributorStore',
     'DataFlowDataStore', // LogicalDataFlowStore
+    'Notification',
     'OrgUnitStore',
     'PhysicalDataArticleStore',
     'PhysicalDataFlowStore'

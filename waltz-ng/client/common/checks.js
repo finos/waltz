@@ -10,12 +10,21 @@ const entityRefShape = {
     kind: apiCheck.string
 };
 
+const createLineageReportCommandShape = {
+    articleId: apiCheck.number,
+    name: apiCheck.string
+};
+
 
 const check = (test, x) => myApiCheck.throw(test, x);
 
 
 export const checkIsEntityRef = ref =>
     check(myApiCheck.shape(entityRefShape), ref);
+
+
+export const checkIsCreateLineageReportCommand = ref =>
+    check(myApiCheck.shape(createLineageReportCommandShape), ref);
 
 
 export const checkIsStringList = xs =>

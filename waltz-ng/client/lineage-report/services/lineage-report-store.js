@@ -1,3 +1,6 @@
+import {checkIsCreateLineageReportCommand} from '../../common/checks';
+
+
 function store($http, baseApiUrl) {
 
     const base = `${baseApiUrl}/lineage-report`;
@@ -14,8 +17,22 @@ function store($http, baseApiUrl) {
         .get(`${base}/physical-article/${id}/contributions`)
         .then(r => r.data);
 
+    /**
+     * Creates a new lineage report describing the
+     * referenced article.
+     *
+     * @param cmd : { name: <str>, articleId: <num> }
+     * @returns {Promise.<TResult>|*}
+     */
+    const create = (cmd) => {
+        checkIsCreateLineageReportCommand(cmd);
+        return $http
+            .post(base, cmd)
+            .then(r => r.data);
+    };
 
     return {
+        create,
         getById,
         findByPhysicalArticleId,
         findReportsContributedToByArticleId
