@@ -4,6 +4,8 @@ const template = require('./physical-data-article-view.html');
 function controller($stateParams,
                     applicationStore,
                     bookmarkStore,
+                    lineageReportStore,
+                    lineageReportContributorStore,
                     logicalDataFlowStore,
                     orgUnitStore,
                     physicalDataArticleStore,
@@ -32,6 +34,14 @@ function controller($stateParams,
         .findByArticleId(articleId)
         .then(logicalFlows => vm.logicalFlows = logicalFlows);
 
+    lineageReportStore
+        .findByPhysicalArticleId(articleId)
+        .then(lineageReports => vm.lineageReports = lineageReports);
+
+    lineageReportStore
+        .findReportsContributedToByArticleId(articleId)
+        .then(mentions => vm.lineageMentions = mentions);
+
     bookmarkStore
         .findByParent(ref)
         .then(bs => vm.bookmarks = bs);
@@ -42,7 +52,9 @@ controller.$inject = [
     '$stateParams',
     'ApplicationStore',
     'BookmarkStore',
-    'DataFlowDataStore',
+    'LineageReportStore',
+    'LineageReportContributorStore',
+    'DataFlowDataStore', // LogicalDataFlowStore
     'OrgUnitStore',
     'PhysicalDataArticleStore',
     'PhysicalDataFlowStore'

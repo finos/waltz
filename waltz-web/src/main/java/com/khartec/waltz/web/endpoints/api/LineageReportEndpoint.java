@@ -1,7 +1,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.lineage_report.LineageReport;
-import com.khartec.waltz.model.lineage_report.LineageReportContributor;
+import com.khartec.waltz.model.lineage_report.LineageReportDescriptor;
 import com.khartec.waltz.service.lineage_report.LineageReportService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -20,7 +20,9 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
  */
 @Service
 public class LineageReportEndpoint implements Endpoint {
+
     private static final String BASE_URL = mkPath("api", "lineage-report");
+
 
     private final LineageReportService lineageReportService;
 
@@ -44,23 +46,27 @@ public class LineageReportEndpoint implements Endpoint {
                 "physical-article",
                 ":id");
 
-        String findContributorsPath = mkPath(
+        String findReportsContributedToByArticlePath = mkPath(
                 BASE_URL,
-                "id",
+                "physical-article",
                 ":id",
-                "contributor");
+                "contributions");
 
         DatumRoute<LineageReport> getByIdRoute =
                 (request, response) -> lineageReportService.getById(getId(request));
 
+
         ListRoute<LineageReport> findByPhysicalArticleIdRoute =
                 (request, response) -> lineageReportService.findByPhysicalArticleId(getId(request));
 
-        ListRoute<LineageReportContributor> findContributorsRoute =
-                (request, response) -> lineageReportService.findContributors(getId(request));
+        ListRoute<LineageReportDescriptor> findReportsContributedToByArticleRoute =
+                (request, response) -> lineageReportService.findReportsContributedToByArticle(getId(request));
 
+
+        // .. -> Reports
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByPhysicalArticleIdPath, findByPhysicalArticleIdRoute);
-        getForList(findContributorsPath, findContributorsRoute);
+        getForList(findReportsContributedToByArticlePath, findReportsContributedToByArticleRoute);
     }
+
 }

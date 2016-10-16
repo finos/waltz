@@ -87,6 +87,7 @@ function controller($stateParams,
     bookmarkStore
         .findByParent(reportRef)
         .then(bs => vm.bookmarks = bs);
+
 }
 
 
