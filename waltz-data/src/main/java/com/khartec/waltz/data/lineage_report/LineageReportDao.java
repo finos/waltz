@@ -1,10 +1,7 @@
 package com.khartec.waltz.data.lineage_report;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.lineage_report.ImmutableLineageReport;
-import com.khartec.waltz.model.lineage_report.ImmutableLineageReportDescriptor;
-import com.khartec.waltz.model.lineage_report.LineageReport;
-import com.khartec.waltz.model.lineage_report.LineageReportDescriptor;
+import com.khartec.waltz.model.lineage_report.*;
 import com.khartec.waltz.schema.tables.Application;
 import com.khartec.waltz.schema.tables.LineageReportContributor;
 import com.khartec.waltz.schema.tables.PhysicalDataArticle;
@@ -17,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.LineageReport.LINEAGE_REPORT;
 import static com.khartec.waltz.schema.tables.PhysicalDataArticle.PHYSICAL_DATA_ARTICLE;
@@ -115,6 +113,18 @@ public class LineageReportDao {
                                 r.getValue(app.DESCRIPTION)))
                         .build());
 
+    }
+
+    public long create(CreateLineageReportCommand command, String username) {
+        LineageReportRecord record = dsl.newRecord(LINEAGE_REPORT);
+        record.setProvenance("waltz");
+        record.setDescription(mkSafe(command.description()));
+        record.setName(command.name());
+        record.setPhysicalArticleId(command.articleId());
+
+        record.store();
+
+        return record.getId();
     }
 }
 

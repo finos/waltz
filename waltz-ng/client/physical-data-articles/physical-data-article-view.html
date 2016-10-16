@@ -35,12 +35,59 @@
 
     <!-- LINEAGE REPORTS -->
     <waltz-section name="Lineage">
+        <div class="waltz-section-actions">
+            <span waltz-has-role='LOGICAL_DATA_FLOW_EDITOR'>
+                <button class="btn btn-xs btn-primary"
+                        ng-click="ctrl.openCreateReportPopup()">
+                    Create Lineage Report
+                </button>
+            </span>
+        </div>
+
+        <waltz-overlay-panel name="Create Lineage Report "
+                             icon="plus"
+                             visible="ctrl.visibility.createReportOverlay">
+            <form name="create-report-form">
+                <div class="alert alert-warning">
+                    Lineage reports already exist for this article.
+                    <br>
+                    Are you sure you wish to create another?
+                </div>
+                <label for="report-name-field">
+                    Name
+                </label>
+                <input id="report-name-field"
+                       name="nameField"
+                       class="form-control"
+                       type="text"
+                       ng-model="ctrl.createReportForm.name">
+                <span class="help-block small">
+                    By default the name for this report will be based upon the article name.
+                    <br>
+                    Report names should be unique within Waltz.
+                </span>
+                <br>
+                <button class="btn btn-success btn-sm"
+                        ng-show="ctrl.visibility.createReportButton"
+                        ng-click="ctrl.createReport()"
+                        ng-disabled="! ctrl.canCreateReport()">
+                    Create
+                </button>
+
+                <span ng-if="ctrl.visibility.createReportBusy">
+                    <waltz-icon name="spinner"
+                                spin="true"></waltz-icon>
+                    Submitted
+                </span>
+            </form>
+        </waltz-overlay-panel>
+
         <!-- DESCRIBED BY.. -->
-        <div ng-if="ctrl.lineageReports.length > 0"
-             class="row">
-            <div class="col-md-9">
+        <div class="row">
+            <div class="col-md-12">
                 <h4>Describing Lineage Reports</h4>
-                <table class="table table-condensed table-striped table-hover small">
+                <table ng-if="ctrl.lineageReports.length > 0"
+                       class="table table-condensed table-striped table-hover small">
                     <thead>
                     <tr>
                         <th>Name</th>
@@ -58,6 +105,14 @@
                     </tr>
                     </tbody>
                 </table>
+
+                <div waltz-has-role='LOGICAL_DATA_FLOW_EDITOR'>
+                    <div ng-if="ctrl.lineageReports.length == 0"
+                         class="alert alert-info">
+                        No lineage reports exist which describe this article.
+                    </div>
+                </div>
+
                 <p class="text-muted small">
                     Lineage reports describe how an article is produced
                 </p>
