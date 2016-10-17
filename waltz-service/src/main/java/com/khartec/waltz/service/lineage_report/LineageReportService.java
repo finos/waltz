@@ -1,7 +1,7 @@
 package com.khartec.waltz.service.lineage_report;
 
 import com.khartec.waltz.data.lineage_report.LineageReportDao;
-import com.khartec.waltz.model.lineage_report.CreateLineageReportCommand;
+import com.khartec.waltz.model.lineage_report.LineageReportCreateCommand;
 import com.khartec.waltz.model.lineage_report.LineageReport;
 import com.khartec.waltz.model.lineage_report.LineageReportDescriptor;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class LineageReportService {
     }
 
 
-    public long create(CreateLineageReportCommand command, String username) {
+    public long create(LineageReportCreateCommand command, String username) {
         LOG.info("Creating lineage report: {} for {}", command, username);
         return lineageReportDao.create(command, username);
     }

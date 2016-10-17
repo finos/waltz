@@ -17,21 +17,13 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.LeveledEntityReference;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.WebUtilities;
-import com.khartec.waltz.web.action.FieldChange;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,8 +69,6 @@ public class OrganisationUnitEndpoint implements Endpoint {
         String getByIdPath = mkPath(BASE_URL, ":id");
         String findDescendantsPath = mkPath(BASE_URL, ":id", "descendants");
         String findImmediateHierarchyPath = mkPath(BASE_URL, ":id", "immediate-hierarchy");
-        String postDescriptionPath = mkPath(BASE_URL, ":id", "description");
-
 
         ListRoute<OrganisationalUnit> findAllRoute = (request, response) -> service.findAll();
         ListRoute<OrganisationalUnit> searchRoute = (request, response) -> service.search(request.params("query"));
@@ -88,40 +78,13 @@ public class OrganisationUnitEndpoint implements Endpoint {
 
         DatumRoute<OrganisationalUnit> getByIdRoute = (request, response) -> service.getById(getId(request));
 
-        DatumRoute<Integer> postDescriptionRoute = (request, response) -> {
-            requireRole(userRoleService, request, Role.ORG_UNIT_EDITOR);
-
-            ChangeLog changeLogEntry = ImmutableChangeLog.builder()
-                    .parentReference(ImmutableEntityReference.builder()
-                            .id(getId(request))
-                            .kind(EntityKind.ORG_UNIT)
-                            .build())
-                    .message("Description updated")
-                    .userId(getUsername(request))
-                    .severity(Severity.INFORMATION)
-                    .build();
-
-            response.type(WebUtilities.TYPE_JSON);
-            FieldChange valueChange = readBody(request, FieldChange.class);
-            int updateCount = service.updateDescription(
-                    getId(request),
-                    valueChange.current().orElse(null));
-
-            changeLogService.write(changeLogEntry);
-
-            return updateCount;
-        };
-
 
         getForList(findAllPath, findAllRoute);
         getForList(searchPath, searchRoute);
         getForList(findImmediateHierarchyPath, findImmediateHierarchyRoute);
         getForList(findDescendantsPath, findDescendantsRoute);
         postForList(findByIdsPath, findByIdsRoute);
-
         getForDatum(getByIdPath, getByIdRoute);
-        postForDatum(postDescriptionPath, postDescriptionRoute);
-
     }
 
 }

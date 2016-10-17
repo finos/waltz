@@ -9,7 +9,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableCreateLineageReportCommand.class)
 @JsonDeserialize(as = ImmutableCreateLineageReportCommand.class)
-public abstract class CreateLineageReportCommand implements NameProvider, DescriptionProvider {
+public abstract class LineageReportCreateCommand implements NameProvider, DescriptionProvider {
 
     public abstract long articleId();
 
