@@ -7,8 +7,8 @@ import com.khartec.waltz.model.NameProvider;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableCreateLineageReportCommand.class)
-@JsonDeserialize(as = ImmutableCreateLineageReportCommand.class)
+@JsonSerialize(as = ImmutableLineageReportCreateCommand.class)
+@JsonDeserialize(as = ImmutableLineageReportCreateCommand.class)
 public abstract class LineageReportCreateCommand implements NameProvider, DescriptionProvider {
 
     public abstract long articleId();
