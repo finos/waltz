@@ -1,13 +1,13 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.lineage_report.LineageReport;
+import com.khartec.waltz.model.lineage_report.LineageReportCreateCommand;
 import com.khartec.waltz.model.lineage_report.LineageReportDescriptor;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.lineage_report.LineageReportService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.model.lineage_report.CreateLineageReportCommand;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,7 +83,7 @@ public class LineageReportEndpoint implements Endpoint {
 
     private Long createRoute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
-        CreateLineageReportCommand cmd = readBody(request, CreateLineageReportCommand.class);
+        LineageReportCreateCommand cmd = readBody(request, LineageReportCreateCommand.class);
         return lineageReportService.create(cmd, getUsername(request));
     }
 
