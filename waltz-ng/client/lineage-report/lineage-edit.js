@@ -12,6 +12,12 @@ const initialState = {
         physicalFlows: [],
         articles: [],
         loading: false
+    },
+    visibility: {
+        report: {
+            nameEditor: false,
+            descriptionEditor: false
+        },
     }
 };
 
@@ -86,9 +92,13 @@ function controller($q,
     }
 
 
+    // -- BOOT
+    // TODO: remove!
     applicationStore.getById(67502)
         .then(app => vm.selectedApp = { app });
 
+
+    // -- INTERACTION
 
     vm.doSearch = (appRef) => searchForCandidateArticles(appRef.id);
     vm.addPhysicalFlowToLineage = (physicalFlowId) => {
@@ -103,6 +113,10 @@ function controller($q,
 
         // contributorStore.remove(articleId, physicalFlowId)
         //     .then(() => reloadContributors(articleId));
+    };
+
+    vm.showReportNameEditor = () => {
+        vm.visibility.report.nameEditor = true;
     }
 
 }

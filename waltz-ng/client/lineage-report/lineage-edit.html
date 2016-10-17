@@ -1,6 +1,6 @@
 <div>
     <!-- HEADER -->
-    <waltz-page-header name="{{ ctrl.article.name }}"
+    <waltz-page-header name="{{ ctrl.lineageReport.name }}"
                        small="Lineage Editor"
                        icon="qrcode">
         <ol class="waltz-breadcrumbs">
@@ -15,16 +15,77 @@
                     <span ng-bind="ctrl.article.name"></span>
                 </a>
             </li>
-            <li>Lineage edit</li>
+            <li>Lineage</li>
+            <li>
+                <a ui-sref="main.lineage-report.view ({ id: ctrl.lineageReport.id })"
+                   ng-bind="ctrl.lineageReport.name">
+                </a>
+            </li>
+            <li>Edit</li>
         </ol>
     </waltz-page-header>
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-physical-data-article-overview owning-app="ctrl.owningApp"
-                                              article="ctrl.article"
-                                              organisational-unit="ctrl.organisationalUnit">
-        </waltz-physical-data-article-overview>
+        <div class="row">
+            <div class="col-sm-2">
+                <label>
+                    Report Name:
+                </label>
+            </div>
+            <div class="col-sm-10 waltz-visibility-parent">
+                <div ng-show="ctrl.visibility.report.nameEditor">
+                    Editor goes here
+                </div>
+                <div ng-hide="ctrl.visibility.report.nameEditor" >
+                    <span ng-bind="ctrl.lineageReport.name"></span>
+                    <a class="clickable waltz-visibility-child-50"
+                       style="margin-left: 24px"
+                       ng-click="ctrl.showReportNameEditor()">update</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-2">
+                <label>
+                    Report Description:
+                </label>
+            </div>
+            <div class="col-sm-10">
+                <div ng-show="ctrl.visibility.report.descriptionEditor">
+                    Editor goes here
+                </div>
+                <div ng-hide="ctrl.visibility.report.descriptionEditor" >
+                    <span ng-bind="ctrl.lineageReport.name"></span>
+                    <a class="clickable waltz-visibility-child-50"
+                       style="margin-left: 24px"
+                       ng-click="ctrl.showReportDescriptionEditor()">update</a>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+        <div class="row">
+            <div class="col-sm-3">
+                <strong>
+                    <waltz-icon name="info-circle"></waltz-icon>
+                    This report describes the lineage for physical data article:
+                    <br>
+                    <a ui-sref="main.physical-data-article.view ({ id: ctrl.article.id })"
+                       ng-bind="ctrl.article.name"></a>
+                </strong>
+            </div>
+            <div class="col-sm-9">
+                <div style="border: 1px solid #f4f4f4; border-radius: 3px; padding: 12px">
+                    <waltz-physical-data-article-overview owning-app="ctrl.owningApp"
+                                                          article="ctrl.article"
+                                                          organisational-unit="ctrl.organisationalUnit">
+                    </waltz-physical-data-article-overview>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <br>
@@ -89,9 +150,11 @@
                 <pre ng-bind="ctrl.contributors"></pre>
             </div>
             <div class="col-sm-3">
+                <h4></h4>
                 <pre ng-bind="ctrl.xxx"></pre>
             </div>
             <div class="col-sm-3">
+                <h4></h4>
                 <pre ng-bind="ctrl.xxx"></pre>
             </div>
         </div>
