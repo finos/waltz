@@ -1,8 +1,8 @@
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.lineage_report.LineageReport;
-import com.khartec.waltz.model.lineage_report.LineageReportCreateCommand;
-import com.khartec.waltz.model.lineage_report.LineageReportDescriptor;
+import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.command.CommandResponse;
+import com.khartec.waltz.model.lineage_report.*;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.lineage_report.LineageReportService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -20,9 +20,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
-/**
- * Created by dwatkins on 12/10/2016.
- */
+
 @Service
 public class LineageReportEndpoint implements Endpoint {
 
@@ -46,7 +44,14 @@ public class LineageReportEndpoint implements Endpoint {
     @Override
     public void register() {
         String createPath = mkPath(
-                BASE_URL);
+                BASE_URL,
+                "update");
+
+
+        String updatePath = mkPath(
+                BASE_URL,
+                "update");
+
 
         String getByIdPath = mkPath(
                 BASE_URL,
@@ -76,15 +81,27 @@ public class LineageReportEndpoint implements Endpoint {
 
 
         postForDatum(createPath, this::createRoute);
+        putForDatum(createPath, this::updateRoute);
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByPhysicalArticleIdPath, findByPhysicalArticleIdRoute);
         getForList(findReportsContributedToByArticlePath, findReportsContributedToByArticleRoute);
     }
 
+
     private Long createRoute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
         LineageReportCreateCommand cmd = readBody(request, LineageReportCreateCommand.class);
         return lineageReportService.create(cmd, getUsername(request));
+    }
+
+
+    private CommandResponse<LineageReportChangeCommand> updateRoute(Request request, Response response) throws IOException {
+        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        LineageReportChangeCommand cmd = ImmutableLineageReportChangeCommand
+                .copyOf(readBody(request, LineageReportChangeCommand.class))
+                .withLastUpdate(LastUpdate.mkForUser(getUsername(request)));
+
+        return lineageReportService.update(cmd);
     }
 
 }

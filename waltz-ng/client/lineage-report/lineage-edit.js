@@ -12,6 +12,12 @@ const initialState = {
         physicalFlows: [],
         articles: [],
         loading: false
+    },
+    visibility: {
+        report: {
+            nameEditor: false,
+            descriptionEditor: false
+        },
     }
 };
 
@@ -22,6 +28,7 @@ function controller($q,
                     applicationStore,
                     lineageReportStore,
                     logicalDataFlowStore,
+                    notification,
                     orgUnitStore,
                     physicalDataArticleStore,
                     physicalDataFlowStore) {
@@ -30,9 +37,11 @@ function controller($q,
 
     const lineageReportId = $stateParams.id;
 
-    lineageReportStore
+    const loadReport = () => lineageReportStore
         .getById(lineageReportId)
-        .then(lineageReport => vm.lineageReport = lineageReport)
+        .then(lineageReport => vm.lineageReport = lineageReport);
+
+    loadReport()
         .then(lineageReport => physicalDataArticleStore.getById(lineageReport.physicalArticleId))
         .then(article => vm.article = article)
         .then(article => applicationStore.getById(article.owningApplicationId))
@@ -86,9 +95,13 @@ function controller($q,
     }
 
 
+    // -- BOOT
+    // TODO: remove!
     applicationStore.getById(67502)
         .then(app => vm.selectedApp = { app });
 
+
+    // -- INTERACTION
 
     vm.doSearch = (appRef) => searchForCandidateArticles(appRef.id);
     vm.addPhysicalFlowToLineage = (physicalFlowId) => {
@@ -103,7 +116,20 @@ function controller($q,
 
         // contributorStore.remove(articleId, physicalFlowId)
         //     .then(() => reloadContributors(articleId));
+    };
+
+    vm.showReportNameEditor = () => {
+        vm.visibility.report.nameEditor = true;
+    };
+
+    function update(change) {
+        return lineageReportStore.update(Object.assign(change, { id: lineageReportId }))
+            .then(() => notification.success('Updated'))
+            .then(loadReport);
     }
+
+    vm.updateName = (change) => update({ name: change });
+    vm.updateDescription = (change) => update({ description: change });
 
 }
 
@@ -115,7 +141,8 @@ controller.$inject = [
     '$stateParams',
     'ApplicationStore',
     'LineageReportStore',
-    'DataFlowDataStore',
+    'DataFlowDataStore', // LogicalDataFlowStore
+    'Notification',
     'OrgUnitStore',
     'PhysicalDataArticleStore',
     'PhysicalDataFlowStore'

@@ -1,6 +1,12 @@
 package com.khartec.waltz.service.lineage_report;
 
 import com.khartec.waltz.data.lineage_report.LineageReportDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.command.CommandOutcome;
+import com.khartec.waltz.model.command.CommandResponse;
+import com.khartec.waltz.model.command.ImmutableCommandResponse;
+import com.khartec.waltz.model.lineage_report.LineageReportChangeCommand;
 import com.khartec.waltz.model.lineage_report.LineageReportCreateCommand;
 import com.khartec.waltz.model.lineage_report.LineageReport;
 import com.khartec.waltz.model.lineage_report.LineageReportDescriptor;
@@ -11,9 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Created by dwatkins on 12/10/2016.
- */
+
 @Service
 public class LineageReportService {
 
@@ -47,4 +51,16 @@ public class LineageReportService {
         LOG.info("Creating lineage report: {} for {}", command, username);
         return lineageReportDao.create(command, username);
     }
+
+
+    public CommandResponse<LineageReportChangeCommand> update(LineageReportChangeCommand cmd) {
+        LOG.info("Updating lineage report: {}", cmd);
+        boolean success = lineageReportDao.update(cmd);
+        return ImmutableCommandResponse.<LineageReportChangeCommand>builder()
+                .originalCommand(cmd)
+                .entityReference(EntityReference.mkRef(EntityKind.LINEAGE_REPORT, cmd.id()))
+                .outcome(success ? CommandOutcome.SUCCESS : CommandOutcome.FAILURE)
+                .build();
+    }
+
 }
