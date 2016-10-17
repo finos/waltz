@@ -1,7 +1,12 @@
 package com.khartec.waltz.service.involvement_kind;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.involvement_kind.InvolvementKindDao;
+import com.khartec.waltz.model.invovement_kind.ImmutableInvolvementKindChangeCommand;
 import com.khartec.waltz.model.invovement_kind.InvolvementKind;
+import com.khartec.waltz.model.invovement_kind.InvolvementKindChangeCommand;
+import com.khartec.waltz.model.invovement_kind.InvolvementKindCreateCommand;
+import com.khartec.waltz.model.utils.CommandUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,17 +38,23 @@ public class InvolvementKindService {
     }
 
 
-    public InvolvementKind create(InvolvementKind involvementKind) {
-        checkNotNull(involvementKind, "involvementKind cannot be null");
+    public Long create(InvolvementKindCreateCommand command, String username) {
+        checkNotNull(command, "command cannot be null");
+        checkNotNull(username, "username cannot be null");
 
-        return involvementKindDao.create(involvementKind);
+        return involvementKindDao.create(command, username);
     }
 
 
-    public InvolvementKind update(InvolvementKind involvementKind) {
-        checkNotNull(involvementKind, "involvementKind cannot be null");
+    public Long update(InvolvementKindChangeCommand command, String username) {
+        checkNotNull(command, "command cannot be null");
+        checkNotNull(username, "username cannot be null");
 
-        return involvementKindDao.update(involvementKind);
+        ImmutableInvolvementKindChangeCommand updateCommand = ImmutableInvolvementKindChangeCommand
+                .copyOf(command)
+                .withLastUpdate(CommandUtilities.mkLastUpdate(username, DateTimeUtilities.nowUtc()));
+
+        return involvementKindDao.update(updateCommand);
     }
 
 
