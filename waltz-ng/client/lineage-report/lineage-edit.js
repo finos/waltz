@@ -28,6 +28,7 @@ function controller($q,
                     applicationStore,
                     lineageReportStore,
                     logicalDataFlowStore,
+                    notification,
                     orgUnitStore,
                     physicalDataArticleStore,
                     physicalDataFlowStore) {
@@ -36,9 +37,11 @@ function controller($q,
 
     const lineageReportId = $stateParams.id;
 
-    lineageReportStore
+    const loadReport = () => lineageReportStore
         .getById(lineageReportId)
-        .then(lineageReport => vm.lineageReport = lineageReport)
+        .then(lineageReport => vm.lineageReport = lineageReport);
+
+    loadReport()
         .then(lineageReport => physicalDataArticleStore.getById(lineageReport.physicalArticleId))
         .then(article => vm.article = article)
         .then(article => applicationStore.getById(article.owningApplicationId))
@@ -117,7 +120,16 @@ function controller($q,
 
     vm.showReportNameEditor = () => {
         vm.visibility.report.nameEditor = true;
+    };
+
+    function update(change) {
+        return lineageReportStore.update(Object.assign(change, { id: lineageReportId }))
+            .then(() => notification.success('Updated'))
+            .then(loadReport);
     }
+
+    vm.updateName = (change) => update({ name: change });
+    vm.updateDescription = (change) => update({ description: change });
 
 }
 
@@ -129,7 +141,8 @@ controller.$inject = [
     '$stateParams',
     'ApplicationStore',
     'LineageReportStore',
-    'DataFlowDataStore',
+    'DataFlowDataStore', // LogicalDataFlowStore
+    'Notification',
     'OrgUnitStore',
     'PhysicalDataArticleStore',
     'PhysicalDataFlowStore'

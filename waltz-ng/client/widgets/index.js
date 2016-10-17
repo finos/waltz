@@ -35,6 +35,7 @@ export default (module) => {
 
     module
         .component('waltzIcon', require('./icon'))
+        .component('waltzEditableField', require('./editable-field'))
         .component('waltzPageHeader', require('./page-header'))
         .component('waltzPie', require('./pie'))
         .component('waltzPieSegmentTable', require('./pie-segment-table'))

@@ -27,12 +27,20 @@ function store($http, baseApiUrl) {
     const create = (cmd) => {
         checkIsCreateLineageReportCommand(cmd);
         return $http
-            .post(base, cmd)
+            .post(`${base}/update`, cmd)
             .then(r => r.data);
     };
 
+    const update = (cmd) => {
+        return $http
+            .put(`${base}/update`, cmd)
+            .then(r => r.data);
+    };
+
+
     return {
         create,
+        update,
         getById,
         findByPhysicalArticleId,
         findReportsContributedToByArticleId

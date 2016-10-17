@@ -34,15 +34,10 @@
                 </label>
             </div>
             <div class="col-sm-10 waltz-visibility-parent">
-                <div ng-show="ctrl.visibility.report.nameEditor">
-                    Editor goes here
-                </div>
-                <div ng-hide="ctrl.visibility.report.nameEditor" >
-                    <span ng-bind="ctrl.lineageReport.name"></span>
-                    <a class="clickable waltz-visibility-child-50"
-                       style="margin-left: 24px"
-                       ng-click="ctrl.showReportNameEditor()">update</a>
-                </div>
+                <waltz-editable-field on-save="ctrl.updateName"
+                                      field-type="text"
+                                      initial-val="ctrl.lineageReport.name">
+                </waltz-editable-field>
             </div>
         </div>
 
@@ -53,15 +48,10 @@
                 </label>
             </div>
             <div class="col-sm-10">
-                <div ng-show="ctrl.visibility.report.descriptionEditor">
-                    Editor goes here
-                </div>
-                <div ng-hide="ctrl.visibility.report.descriptionEditor" >
-                    <span ng-bind="ctrl.lineageReport.name"></span>
-                    <a class="clickable waltz-visibility-child-50"
-                       style="margin-left: 24px"
-                       ng-click="ctrl.showReportDescriptionEditor()">update</a>
-                </div>
+                <waltz-editable-field on-save="ctrl.updateDescription"
+                                      field-type="textarea"
+                                      initial-val="ctrl.lineageReport.description">
+                </waltz-editable-field>
             </div>
         </div>
 

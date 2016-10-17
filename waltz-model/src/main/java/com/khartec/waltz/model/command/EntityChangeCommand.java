@@ -5,7 +5,7 @@ import com.khartec.waltz.model.LastUpdate;
 import java.util.Optional;
 
 
-public interface EntityChangeCommand {
+public interface EntityChangeCommand extends Command {
 
     long id();
     Optional<LastUpdate> lastUpdate();

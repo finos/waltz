@@ -20,4 +20,10 @@ public abstract class LastUpdate {
 
 
     public abstract String by();
+
+    public static LastUpdate mkForUser(String username) {
+        return ImmutableLastUpdate.builder()
+                .by(username)
+                .build();
+    }
 }

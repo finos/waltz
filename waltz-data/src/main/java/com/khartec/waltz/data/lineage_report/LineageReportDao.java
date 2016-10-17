@@ -126,5 +126,21 @@ public class LineageReportDao {
 
         return record.getId();
     }
+
+    public boolean update(LineageReportChangeCommand cmd) {
+
+        LineageReportRecord record = dsl.newRecord(LINEAGE_REPORT);
+
+        record.setId(cmd.id());
+        record.changed(LINEAGE_REPORT.ID, false);
+
+        cmd.name().ifPresent(change -> record.setName(change.newVal()));
+        cmd.description().ifPresent(change -> record.setDescription(change.newVal()));
+
+        int count = record.update();
+
+        return count == 1;
+
+    }
 }
 
