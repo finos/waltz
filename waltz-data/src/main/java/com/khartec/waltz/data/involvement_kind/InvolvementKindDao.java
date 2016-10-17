@@ -1,7 +1,11 @@
 package com.khartec.waltz.data.involvement_kind;
 
+import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.model.LastUpdate;
 import com.khartec.waltz.model.invovement_kind.ImmutableInvolvementKind;
 import com.khartec.waltz.model.invovement_kind.InvolvementKind;
+import com.khartec.waltz.model.invovement_kind.InvolvementKindChangeCommand;
+import com.khartec.waltz.model.invovement_kind.InvolvementKindCreateCommand;
 import com.khartec.waltz.schema.tables.records.InvolvementKindRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -16,6 +20,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkOptionalIsPresent;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 
@@ -83,41 +88,41 @@ public class InvolvementKindDao {
     }
 
 
-    public InvolvementKind create(InvolvementKind involvementKind) {
-        checkNotNull(involvementKind, "involvementKind cannot be null");
+    public Long create(InvolvementKindCreateCommand command, String username) {
+        checkNotNull(command, "command cannot be null");
 
-        if(involvementKind.id().isPresent())
-            throw new IllegalArgumentException("Involvement Kind record already has an ID, cannot create a duplicate");
+        InvolvementKindRecord record = dsl.newRecord(INVOLVEMENT_KIND);
+        record.setName(command.name());
+        record.setDescription(command.description());
+        record.setLastUpdatedBy(username);
+        record.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
 
-        InvolvementKindRecord record = TO_RECORD_MAPPER.apply(involvementKind);
-        dsl.attach(record);
-        record.store();
-
-        return TO_DOMAIN_MAPPER.map(record);
+        return record.getId();
     }
 
 
-    public InvolvementKind update(InvolvementKind involvementKind) {
-        checkNotNull(involvementKind, "involvementKind cannot be null");
-
-        long id = involvementKind.id()
-                .orElseThrow(() ->  new IllegalArgumentException("Involvement Kind missing id, cannot update"));
+    public Long update(InvolvementKindChangeCommand command) {
+        checkNotNull(command, "command cannot be null");
+        checkOptionalIsPresent(command.lastUpdate(), "lastUpdate must be present");
 
         InvolvementKindRecord record = dsl.select(INVOLVEMENT_KIND.fields())
                 .from(INVOLVEMENT_KIND)
-                .where(INVOLVEMENT_KIND.ID.eq(id))
+                .where(INVOLVEMENT_KIND.ID.eq(command.id()))
                 .fetchOneInto(InvolvementKindRecord.class);
 
         if(record == null) {
-            throw new NoDataFoundException("Could not find Involvement Kind record with id: " + id);
+            throw new NoDataFoundException("Could not find Involvement Kind record with id: " + command.id());
         }
 
-        record.setName(involvementKind.name());
-        record.setDescription(involvementKind.description());
-        record.setLastUpdatedAt(Timestamp.valueOf(involvementKind.lastUpdatedAt()));
-        record.setLastUpdatedBy(involvementKind.lastUpdatedBy());
+        command.name().ifPresent(f -> record.setName(f.newVal()));
+        command.description().ifPresent(f -> record.setDescription(f.newVal()));
+
+        LastUpdate lastUpdate = command.lastUpdate().get();
+        record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));
+        record.setLastUpdatedBy(lastUpdate.by());
         record.update();
-        return involvementKind;
+
+        return record.getId();
     }
 
 
@@ -127,5 +132,6 @@ public class InvolvementKindDao {
                 .and(DSL.notExists(DSL.selectFrom(INVOLVEMENT).where(INVOLVEMENT.KIND_ID.eq(id))))
                 .execute() > 0;
     }
+
 
 }

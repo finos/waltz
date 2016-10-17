@@ -1,8 +1,8 @@
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.invovement_kind.ImmutableInvolvementKind;
 import com.khartec.waltz.model.invovement_kind.InvolvementKind;
+import com.khartec.waltz.model.invovement_kind.InvolvementKindChangeCommand;
+import com.khartec.waltz.model.invovement_kind.InvolvementKindCreateCommand;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -30,6 +30,7 @@ public class InvolvementKindEndpoint implements Endpoint {
     private final InvolvementKindService service;
     private UserRoleService userRoleService;
 
+
     @Autowired
     public InvolvementKindEndpoint(InvolvementKindService service, UserRoleService userRoleService) {
         checkNotNull(service, "service must not be null");
@@ -39,17 +40,19 @@ public class InvolvementKindEndpoint implements Endpoint {
         this.userRoleService = userRoleService;
     }
 
+
     @Override
     public void register() {
 
+        // read
         getForList(BASE_URL, (request, response) -> service.findAll());
         getForDatum(mkPath(BASE_URL, ":id"), this::getByIdRoute );
 
         // create
-        postForDatum(BASE_URL, this::createInvolvementKindRoute );
+        postForDatum(mkPath(BASE_URL, "update"), this::createInvolvementKindRoute );
 
         // update
-        putForDatum(BASE_URL, this::updateInvolvementKindRoute );
+        putForDatum(mkPath(BASE_URL, "update"), this::updateInvolvementKindRoute );
 
         // delete
         deleteForDatum(mkPath(BASE_URL, ":id"), this::deleteInvolvementKindRoute);
@@ -63,23 +66,25 @@ public class InvolvementKindEndpoint implements Endpoint {
     }
 
 
-    private InvolvementKind createInvolvementKindRoute(Request request, Response response) throws IOException {
+    private Long createInvolvementKindRoute(Request request, Response response) throws IOException {
         ensureUserHasAdminRights(request);
 
-        InvolvementKind involvementKind = extractAndPopulateLastUpdatedData(request);
+        InvolvementKindCreateCommand command = readBody(request, InvolvementKindCreateCommand.class);
+        String username = getUsername(request);
+        LOG.info("User: {} creating Involvement Kind: {}", username, command);
 
-        LOG.info("User: {} creating Involvement Kind: {}", involvementKind.lastUpdatedBy(), involvementKind);
-        return service.create(involvementKind);
+        return service.create(command, username);
     }
 
 
-    private InvolvementKind updateInvolvementKindRoute(Request request, Response response) throws IOException {
+    private Long updateInvolvementKindRoute(Request request, Response response) throws IOException {
         ensureUserHasAdminRights(request);
 
-        InvolvementKind involvementKind = extractAndPopulateLastUpdatedData(request);
+        String username = getUsername(request);
+        InvolvementKindChangeCommand command = readBody(request, InvolvementKindChangeCommand.class);
 
-        LOG.info("User: {} updating Involvement Kind: {}", involvementKind.lastUpdatedBy(), involvementKind);
-        return service.update(involvementKind);
+        LOG.info("User: {} updating Involvement Kind: {}", username, command);
+        return service.update(command, username);
     }
 
 
@@ -97,14 +102,6 @@ public class InvolvementKindEndpoint implements Endpoint {
 
     private void ensureUserHasAdminRights(Request request) {
         requireRole(userRoleService, request, Role.ADMIN);
-    }
-
-
-    private InvolvementKind extractAndPopulateLastUpdatedData(Request request) throws IOException {
-        return ImmutableInvolvementKind
-                .copyOf(readBody(request, InvolvementKind.class))
-                .withLastUpdatedBy(getUsername(request))
-                .withLastUpdatedAt(DateTimeUtilities.nowUtc());
     }
 
 }
