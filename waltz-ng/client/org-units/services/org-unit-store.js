@@ -49,23 +49,13 @@ function service($http, BaseApiUrl) {
         .then(x => x.data);
 
 
-    const updateDescription = (id, newValue, oldValue) =>
-        $http.post(
-            `${BASE}/${id}/description`, {
-                field: 'description',
-                newValue,
-                oldValue
-            });
-
-
     return {
         getById,
         findAll,
         findByIds,
         findDescendants,
         findImmediateHierarchy,
-        search,
-        updateDescription
+        search
     };
 
 }

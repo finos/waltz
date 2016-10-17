@@ -27,6 +27,7 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutableFieldChange.class)
 @JsonDeserialize(as = ImmutableFieldChange.class)
+@Deprecated
 public abstract class FieldChange {
 
     private static String describeChange(FieldChange c) {
