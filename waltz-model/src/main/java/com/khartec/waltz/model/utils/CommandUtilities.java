@@ -1,18 +1,15 @@
 package com.khartec.waltz.model.utils;
 
-import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.ImmutableLastUpdate;
 import com.khartec.waltz.model.LastUpdate;
-import com.khartec.waltz.model.command.ChangeFieldCommand;
-import com.khartec.waltz.model.command.ImmutableChangeFieldCommand;
-
-import java.util.Optional;
+import com.khartec.waltz.model.command.EntityChangeCommand;
+import com.khartec.waltz.model.command.ImmutableEntityChangeCommand;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
 public class CommandUtilities {
 
-    public static ChangeFieldCommand withUser(ChangeFieldCommand cmd, String username) {
+    public static EntityChangeCommand withUser(EntityChangeCommand cmd, String username) {
         checkNotNull(cmd, "cmd cannot be null");
         checkNotNull(username, "username cannot be null");
 
@@ -20,18 +17,9 @@ public class CommandUtilities {
                 .by(username)
                 .build();
 
-        return ImmutableChangeFieldCommand
+        return ImmutableEntityChangeCommand
                 .copyOf(cmd)
                 .withLastUpdate(lastUpdate);
     }
 
-
-    public static Optional<Integer> newValAsInt(ChangeFieldCommand cmd) {
-        checkNotNull(cmd, "cmd cannot be null");
-        if (StringUtilities.isEmpty(cmd.newVal())) {
-            return Optional.empty();
-        } else {
-            return Optional.of(Integer.parseInt(cmd.newVal()));
-        }
-    }
 }

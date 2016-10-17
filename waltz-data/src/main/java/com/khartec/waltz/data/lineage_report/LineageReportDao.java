@@ -115,7 +115,7 @@ public class LineageReportDao {
 
     }
 
-    public long create(CreateLineageReportCommand command, String username) {
+    public long create(LineageReportCreateCommand command, String username) {
         LineageReportRecord record = dsl.newRecord(LINEAGE_REPORT);
         record.setProvenance("waltz");
         record.setDescription(mkSafe(command.description()));
