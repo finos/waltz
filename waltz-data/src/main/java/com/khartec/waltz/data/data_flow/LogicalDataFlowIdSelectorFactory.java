@@ -2,6 +2,7 @@ package com.khartec.waltz.data.data_flow;
 
 import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Condition;
@@ -13,22 +14,26 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.LineageReportContributor.LINEAGE_REPORT_CONTRIBUTOR;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 
-/**
- * Created by dwatkins on 13/10/2016.
- */
 @Service
 public class LogicalDataFlowIdSelectorFactory implements IdSelectorFactory {
 
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
 
 
     @Autowired
-    public LogicalDataFlowIdSelectorFactory(ApplicationIdSelectorFactory applicationIdSelectorFactory) {
+    public LogicalDataFlowIdSelectorFactory(ApplicationIdSelectorFactory applicationIdSelectorFactory,
+                                            DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
+        checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
+        checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
+
         this.applicationIdSelectorFactory = applicationIdSelectorFactory;
+        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
     }
 
 
@@ -49,7 +54,7 @@ public class LogicalDataFlowIdSelectorFactory implements IdSelectorFactory {
                 return wrapAppIdSelector(options);
 
             case DATA_TYPE:
-                return wrapAppIdSelector(options);
+                return mkForDataType(options);
 
             case PROCESS:
                 return wrapAppIdSelector(options);
@@ -101,5 +106,16 @@ public class LogicalDataFlowIdSelectorFactory implements IdSelectorFactory {
                 .innerJoin(LINEAGE_REPORT_CONTRIBUTOR)
                 .on(PHYSICAL_FLOW.ID.eq(LINEAGE_REPORT_CONTRIBUTOR.PHYSICAL_FLOW_ID))
                 .where(LINEAGE_REPORT_CONTRIBUTOR.LINEAGE_REPORT_ID.eq(options.entityReference().id()));
+    }
+
+
+    private Select<Record1<Long>> mkForDataType(IdSelectionOptions options) {
+        Select<Record1<Long>> dataTypeSelector = dataTypeIdSelectorFactory.apply(options);
+
+        return DSL.select(DATA_FLOW_DECORATOR.DATA_FLOW_ID)
+                .from(DATA_FLOW_DECORATOR)
+                .where(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector)
+                        .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())));
+
     }
 }

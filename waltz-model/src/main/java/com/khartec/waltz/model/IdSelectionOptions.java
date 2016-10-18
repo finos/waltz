@@ -11,6 +11,7 @@ public abstract class IdSelectionOptions {
 
 
     @Value.Default
+    @Deprecated
     public EntityKind desiredKind() {
         return EntityKind.APPLICATION;
     }

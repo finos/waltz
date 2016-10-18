@@ -34,7 +34,6 @@ import java.util.function.BiFunction;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
-import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 
 
@@ -92,14 +91,6 @@ public class DataFlowDao {
     }
 
 
-    public List<DataFlow> findByApplicationIdSelector(Select<Record1<Long>> appIdSelector) {
-        return baseQuery()
-                .where(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector))
-                .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector))
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
-
     public int removeFlows(List<Long> flowIds) {
         return dsl.deleteFrom(DATA_FLOW)
                 .where(DATA_FLOW.ID.in(flowIds))
@@ -134,21 +125,6 @@ public class DataFlowDao {
 
 
     @Deprecated
-    public Collection<DataFlow> findByDataTypeIdSelector(Select<Record1<Long>> typeIdSelector) {
-        Condition condition = DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())
-                .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(typeIdSelector))
-                .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
-
-        return baseQuery()
-                .innerJoin(DATA_FLOW_DECORATOR)
-                .on(DATA_FLOW_DECORATOR.DATA_FLOW_ID.eq(DATA_FLOW.ID))
-                .where(dsl.renderInlined(condition))
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
-
-    @Deprecated
     public Collection<DataFlow> findByPhysicalSpecificationId(long specificationId) {
         return baseQuery()
                 .innerJoin(PHYSICAL_FLOW)
@@ -158,9 +134,9 @@ public class DataFlowDao {
     }
 
 
-    public List<DataFlow> findBySelector(Select<Record1<Long>> selector) {
+    public List<DataFlow> findBySelector(Select<Record1<Long>> flowIdSelector) {
         return baseQuery()
-                .where(DATA_FLOW.ID.in(selector))
+                .where(DATA_FLOW.ID.in(flowIdSelector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
