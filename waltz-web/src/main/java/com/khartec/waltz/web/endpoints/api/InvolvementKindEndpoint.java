@@ -47,7 +47,7 @@ public class InvolvementKindEndpoint implements Endpoint {
 
         // read
         getForList(BASE_URL, (request, response) -> service.findAll());
-        getForDatum(mkPath(BASE_URL, ":id"), this::getByIdRoute );
+        getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute );
 
         // create
         postForDatum(mkPath(BASE_URL, "update"), this::createInvolvementKindRoute );

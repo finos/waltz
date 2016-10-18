@@ -1,0 +1,96 @@
+<div>
+
+    <waltz-page-header icon="diamond" name="Actors">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>System</li>
+            <li>Settings</li>
+        </ol>
+    </waltz-page-header>
+
+
+    <div class='waltz-page-summary waltz-page-summary-attach'>
+        <blockquote>
+            <p>
+                Deletion of Actors is not supported in the user interface because an actor could be in use in Person
+                Involvements and also in Physical Flows.  Please check these before removing an actor from the system.
+            </p>
+        </blockquote>
+        <hr>
+
+        <form class="form-inline">
+            <div class="form-group">
+                <label>Search</label>
+                <input type="search" class="form-control" placeholder="Filter..." ng-model="userQuery">
+            </div>
+        </form>
+        <hr>
+        <div class="waltz-user-admin-scroll">
+            <table class="table table-condensed">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="actor in ctrl.actors | orderBy:'name' | filter:userQuery"
+                    class="waltz-visibility-parent">
+                    <td>
+                        <waltz-editable-field on-save="ctrl.updateName"
+                                              field-type="text"
+                                              initial-val="actor.name"
+                                              item-id="actor.id">
+                        </waltz-editable-field>
+                    </td>
+                    <td align="left">
+                        <waltz-editable-field on-save="ctrl.updateDescription"
+                                              field-type="text"
+                                              initial-val="actor.description"
+                                              item-id="actor.id">
+                        </waltz-editable-field>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button class="btn btn-primary btn-sm"
+                                ng-if="ctrl.creatingActor === false"
+                                ng-click="ctrl.startNewActor()">
+                            Add
+                        </button>
+                        <div ng-if="ctrl.creatingActor === true">
+                            <input type="text"
+                                   ng-model="ctrl.newActor.name"
+                                   class="form-control input-sm">
+                        </div>
+                    </td>
+                    <td>
+                        <div ng-if="ctrl.creatingActor === true">
+                            <input type="text"
+                                   ng-model="ctrl.newActor.description"
+                                   class="form-control input-sm">
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-success btn-sm"
+                                ng-if="ctrl.creatingActor === true"
+                                ng-click="ctrl.saveNewActor()">
+                            Save
+                        </button>
+                        <button class="btn btn-default btn-sm"
+                                ng-if="ctrl.creatingActor === true"
+                                ng-click="ctrl.cancelNewActor()">
+                            Cancel
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</div>

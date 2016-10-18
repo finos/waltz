@@ -6,7 +6,8 @@ const template = require('./editable-field.html');
 const bindings = {
     initialVal: '<',
     onSave: '<',
-    fieldType: '@'
+    fieldType: '@',
+    itemId: '<'
 };
 
 
@@ -36,7 +37,7 @@ function controller($timeout) {
 
         vm.saving = true;
 
-        const promise = vm.onSave(data);
+        const promise = vm.onSave(vm.itemId, data);
 
         if (promise) {
             promise.then(saveComplete)

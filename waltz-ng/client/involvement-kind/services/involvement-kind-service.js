@@ -12,23 +12,64 @@
  */
 
 let involvementKindsPromise = null;
-let involvementKinds = [];
 
 function service(involvementKindStore) {
 
     const loadInvolvementKinds = (force = false) => {
         if (force || (involvementKindsPromise == null)) {
-            involvementKindsPromise = involvementKindStore.findAll()
-                .then(d => involvementKinds = d);
+            involvementKindsPromise = involvementKindStore.findAll();
         }
         return involvementKindsPromise;
+    };
+
+
+    const update = (command) => {
+        if(!involvementKindsPromise || command === undefined || command === null) return;
+
+        return involvementKindStore
+            .update(command)
+            .then(response => {
+                if(response.outcome === "SUCCESS") {
+                    return loadInvolvementKinds(true)
+                        .then(kinds => true);
+                } else {
+                    throw "could not update: " + command;
+                }
+            });
+    };
+
+
+    const deleteById = (id) => {
+        return involvementKindStore
+            .deleteById(id)
+            .then(status => {
+                return loadInvolvementKinds(true)
+                    .then(kinds => status);
+            });
+    };
+
+
+    const create = (cmd) => {
+        return involvementKindStore
+            .create(cmd)
+            .then(createdId => {
+                if(createdId > 0) {
+                    return loadInvolvementKinds(true)
+                        .then((kinds) => createdId);
+                } else {
+                    throw "could not create: " + cmd;
+                }
+            });
     };
 
 
     loadInvolvementKinds();
 
     return {
-        loadInvolvementKinds
+        loadInvolvementKinds,
+        update,
+        deleteById,
+        create
     };
 }
 
