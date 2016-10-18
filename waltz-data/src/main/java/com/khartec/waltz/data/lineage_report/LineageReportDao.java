@@ -5,7 +5,7 @@ import com.khartec.waltz.model.lineage_report.*;
 import com.khartec.waltz.schema.tables.Application;
 import com.khartec.waltz.schema.tables.LineageReportContributor;
 import com.khartec.waltz.schema.tables.PhysicalDataArticle;
-import com.khartec.waltz.schema.tables.PhysicalDataFlow;
+import com.khartec.waltz.schema.tables.PhysicalFlow;
 import com.khartec.waltz.schema.tables.records.LineageReportRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -70,7 +70,7 @@ public class LineageReportDao {
         com.khartec.waltz.schema.tables.LineageReport report = com.khartec.waltz.schema.tables.LineageReport.LINEAGE_REPORT.as("report");
 
         LineageReportContributor contributor = LineageReportContributor.LINEAGE_REPORT_CONTRIBUTOR.as("contributor");
-        PhysicalDataFlow physFlow = PhysicalDataFlow.PHYSICAL_DATA_FLOW.as("physFlow");
+        PhysicalFlow physFlow = PhysicalFlow.PHYSICAL_FLOW.as("physFlow");
 
         SelectConditionStep<Record1<Long>> mentionedReportIds = DSL
                 .selectDistinct(contributor.LINEAGE_REPORT_ID)

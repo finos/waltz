@@ -40,7 +40,7 @@ function setup(module) {
         require('./perspectives'),
         require('./person'),
         require('./physical-data-articles'),
-        require('./physical-data-flows'),
+        require('./physical-flows'),
         require('./playpen'),
         require('./process'),
         require('./profile'),

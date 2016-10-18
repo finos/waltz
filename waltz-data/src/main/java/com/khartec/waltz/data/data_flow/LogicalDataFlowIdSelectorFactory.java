@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.LineageReportContributor.LINEAGE_REPORT_CONTRIBUTOR;
-import static com.khartec.waltz.schema.tables.PhysicalDataFlow.PHYSICAL_DATA_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 
 /**
  * Created by dwatkins on 13/10/2016.
@@ -96,10 +96,10 @@ public class LogicalDataFlowIdSelectorFactory implements IdSelectorFactory {
         ensureScopeIsExact(options);
         return DSL.select(DATA_FLOW.ID)
                 .from(DATA_FLOW)
-                .innerJoin(PHYSICAL_DATA_FLOW)
-                .on(DATA_FLOW.ID.eq(PHYSICAL_DATA_FLOW.FLOW_ID))
+                .innerJoin(PHYSICAL_FLOW)
+                .on(DATA_FLOW.ID.eq(PHYSICAL_FLOW.FLOW_ID))
                 .innerJoin(LINEAGE_REPORT_CONTRIBUTOR)
-                .on(PHYSICAL_DATA_FLOW.ID.eq(LINEAGE_REPORT_CONTRIBUTOR.PHYSICAL_FLOW_ID))
+                .on(PHYSICAL_FLOW.ID.eq(LINEAGE_REPORT_CONTRIBUTOR.PHYSICAL_FLOW_ID))
                 .where(LINEAGE_REPORT_CONTRIBUTOR.LINEAGE_REPORT_ID.eq(options.entityReference().id()));
     }
 }

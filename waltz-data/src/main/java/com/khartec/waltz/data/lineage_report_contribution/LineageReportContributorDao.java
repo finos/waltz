@@ -11,16 +11,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.LineageReport.LINEAGE_REPORT;
 import static com.khartec.waltz.schema.tables.LineageReportContributor.LINEAGE_REPORT_CONTRIBUTOR;
-import static com.khartec.waltz.schema.tables.PhysicalDataFlow.PHYSICAL_DATA_FLOW;
 
 @Repository
 public class LineageReportContributorDao {
 
-    private static final com.khartec.waltz.schema.tables.PhysicalDataFlow physicalFlows = PHYSICAL_DATA_FLOW.as("physicalFlows");
-    private static final com.khartec.waltz.schema.tables.DataFlow logicalFlows = DATA_FLOW.as("logicalFlows");
     private final static com.khartec.waltz.schema.tables.LineageReport report = LINEAGE_REPORT.as("report");
     private final static com.khartec.waltz.schema.tables.LineageReportContributor contrib = LINEAGE_REPORT_CONTRIBUTOR.as("contrib");
 
