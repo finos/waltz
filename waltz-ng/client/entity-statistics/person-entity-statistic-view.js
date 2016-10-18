@@ -1,9 +1,10 @@
 import _ from "lodash";
 import {resetData} from "../common";
-import {updateUrlWithoutReload, hasRelatedDefinitions} from "./utilities";
+import {hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload} from "./utilities";
 
 
 const initData = {
+    allDefinitions: [],
     statistic: {
         definition: null,
         summary: null,
@@ -56,9 +57,13 @@ function controller($q,
         .then(ds => vm.statistic.definition = ds.self)
         .then(() => vm.visibility.related = hasRelatedDefinitions(vm.relatedDefinitions));
 
+    const allDefinitionsPromise = entityStatisticStore
+        .findAllActiveDefinitions()
+        .then(ds => vm.allDefinitions = ds);
 
     $q.all([personPromise, definitionPromise])
-        .then(([person, definitions]) => vm.onSelectPerson(person));
+        .then(([person, definitions]) => vm.onSelectPerson(person))
+        .then(allDefinitionsPromise);
 
 
     function resetValueData() {
@@ -125,6 +130,10 @@ function controller($q,
             .then(apps => vm.applications = apps);
 
         updateUrlWithoutReload($state, person);
+    };
+
+    vm.onSelectDefinition = (node) => {
+        navigateToStatistic($state, node.id, vm.parentRef);
     };
 }
 
