@@ -6,7 +6,7 @@ const bindings = {
     logicalFlows: '<',
     decorators: '<',
     physicalFlows: '<',
-    physicalArticles: '<'
+    physicalSpecifications: '<'
 };
 
 function controller($scope) {
@@ -19,7 +19,7 @@ function controller($scope) {
 
         function select(app, type, flowId, evt) {
             const typeInfoByFlowId = mkTypeInfo(vm.decorators);
-            const physicalFlowsByLogicalFlowId = mkPhysicalFlowInfo(vm.physicalArticles, vm.physicalFlows);
+            const physicalFlowsByLogicalFlowId = mkPhysicalFlowInfo(vm.physicalSpecifications, vm.physicalFlows);
             const types = typeInfoByFlowId[flowId] || [];
             const physicalFlows = physicalFlowsByLogicalFlowId[flowId] || [];
             return {
@@ -61,15 +61,15 @@ controller.$inject = [
 
 const template = require('./source-and-target-panel.html');
 
-// flowId -> [ { ...physicalFlow, article: {} } ... ]
-function mkPhysicalFlowInfo(physicalArticles = { consumes: [], produces: [] },
+// flowId -> [ { ...physicalFlow, specification: {} } ... ]
+function mkPhysicalFlowInfo(physicalSpecifications = { consumes: [], produces: [] },
                             physicalFlows = [])
 {
 
-    const allArticles = _.concat(physicalArticles.consumes, physicalArticles.produces);
-    const articlesById = _.keyBy(allArticles || [], "id");
+    const allSpecs = _.concat(physicalSpecifications.consumes, physicalSpecifications.produces);
+    const specsById = _.keyBy(allSpecs || [], "id");
     return _.chain(physicalFlows)
-        .map(pf => Object.assign({}, pf, { article: articlesById[pf.articleId] }))
+        .map(pf => Object.assign({}, pf, { specification: specsById[pf.specificationId] }))
         .groupBy("flowId")
         .value();
 }

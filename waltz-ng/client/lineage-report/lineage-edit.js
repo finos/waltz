@@ -10,7 +10,7 @@ const initialState = {
         selectedApp : null,
         logicalFlows: [],
         physicalFlows: [],
-        articles: [],
+        specifications: [],
         loading: false
     },
     visibility: {
@@ -30,7 +30,7 @@ function controller($q,
                     logicalDataFlowStore,
                     notification,
                     orgUnitStore,
-                    physicalDataArticleStore,
+                    physicalSpecificationStore,
                     physicalFlowStore) {
 
     const vm = initialiseData(this, initialState);
@@ -42,9 +42,9 @@ function controller($q,
         .then(lineageReport => vm.lineageReport = lineageReport);
 
     loadReport()
-        .then(lineageReport => physicalDataArticleStore.getById(lineageReport.physicalArticleId))
-        .then(article => vm.article = article)
-        .then(article => applicationStore.getById(article.owningApplicationId))
+        .then(lineageReport => physicalSpecificationStore.getById(lineageReport.specificationId))
+        .then(specification => vm.specification = specification)
+        .then(specification => applicationStore.getById(specification.owningApplicationId))
         .then(app => vm.owningApp = app)
         .then(app => orgUnitStore.getById(app.organisationalUnitId))
         .then(ou => vm.organisationalUnit = ou);
@@ -57,16 +57,16 @@ function controller($q,
         vm.searchResults.loading = false;
         vm.searchResults.logicalFlows = [];
         vm.searchResults.physicalFlows = [];
-        vm.searchResults.articles = [];
+        vm.searchResults.specifications = [];
     }
 
     function searchViaQuery(holder = { app : null }) {
         const app = holder.app;
         if (! app) return;
-        return searchForCandidateArticles(app.id);
+        return searchForCandidateSpecifications(app.id);
     }
 
-    function searchForCandidateArticles( appId ) {
+    function searchForCandidateSpecifications( appId ) {
         resetSearch();
 
         vm.searchResults.loading = true;
@@ -79,9 +79,9 @@ function controller($q,
         const promises = [
             applicationStore.getById(appId)
                 .then(app => vm.searchResults.app = app),
-            physicalDataArticleStore
+            physicalSpecificationStore
                 .findByAppId(appId)
-                .then(xs => vm.searchResults.articles = xs),
+                .then(xs => vm.searchResults.specifications = xs),
             physicalFlowStore
                 .findByEntityReference(ref)
                 .then(xs => vm.searchResults.physicalFlows = xs),
@@ -103,7 +103,7 @@ function controller($q,
 
     // -- INTERACTION
 
-    vm.doSearch = (appRef) => searchForCandidateArticles(appRef.id);
+    vm.doSearch = (appRef) => searchForCandidateSpecifications(appRef.id);
     vm.addPhysicalFlowToLineage = (physicalFlowId) => {
         console.log(physicalFlowId);
 
@@ -144,7 +144,7 @@ controller.$inject = [
     'DataFlowDataStore', // LogicalDataFlowStore
     'Notification',
     'OrgUnitStore',
-    'PhysicalDataArticleStore',
+    'PhysicalSpecificationStore',
     'PhysicalFlowStore'
 ];
 

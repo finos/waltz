@@ -1,10 +1,10 @@
-import {combineFlowData} from '../../../physical-data-articles/utilities';
+import {combineFlowData} from '../../../physical-specifications/utilities';
 
 const template = require('./lineage-flow-tabgroup.html');
 
 
 const bindings = {
-    article: '<',
+    spec: '<',
     lineageData: '<'
 };
 
@@ -23,13 +23,13 @@ function controller() {
 
     vm.$onChanges = () => {
         if (! vm.lineageData) return;
-        vm.articles = process(vm.lineageData.articles);
+        vm.specifications = process(vm.lineageData.specifications);
         vm.logicalFlows = process(vm.lineageData.logicalFlows);
         vm.physicalFlows = process(vm.lineageData.physicalFlows);
         vm.applications = process(vm.lineageData.applications);
 
         vm.flowData = combineFlowData(
-            vm.articles.all,
+            vm.specifications.all,
             vm.physicalFlows.all,
             vm.logicalFlows.all);
     }

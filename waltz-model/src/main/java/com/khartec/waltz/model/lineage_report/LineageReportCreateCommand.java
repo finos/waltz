@@ -11,6 +11,6 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableLineageReportCreateCommand.class)
 public abstract class LineageReportCreateCommand implements NameProvider, DescriptionProvider {
 
-    public abstract long articleId();
+    public abstract long specificationId();
 
 }

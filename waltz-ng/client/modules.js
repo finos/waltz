@@ -39,7 +39,7 @@ function setup(module) {
         require('./performance-metrics'),
         require('./perspectives'),
         require('./person'),
-        require('./physical-data-articles'),
+        require('./physical-specifications'),
         require('./physical-flows'),
         require('./playpen'),
         require('./process'),

@@ -190,8 +190,8 @@ public class DataFlowService {
     }
 
 
-    public Collection<DataFlow> findByPhysicalDataArticleId(long articleId) {
-        return dataFlowDao.findByPhysicalDataArticleId(articleId);
+    public Collection<DataFlow> findByPhysicalSpecificationId(long specificationId) {
+        return dataFlowDao.findByPhysicalSpecificationId(specificationId);
     }
 
 }

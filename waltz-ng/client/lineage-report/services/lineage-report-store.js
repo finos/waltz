@@ -9,19 +9,19 @@ function store($http, baseApiUrl) {
         .get(`${base}/id/${id}`)
         .then(r => r.data);
 
-    const findByPhysicalArticleId = (id) => $http
-        .get(`${base}/physical-article/${id}`)
+    const findBySpecificationId = (id) => $http
+        .get(`${base}/specification/${id}`)
         .then(r => r.data);
 
-    const findReportsContributedToByArticleId = (id) => $http
-        .get(`${base}/physical-article/${id}/contributions`)
+    const findReportsContributedToBySpecificationId = (id) => $http
+        .get(`${base}/specification/${id}/contributions`)
         .then(r => r.data);
 
     /**
      * Creates a new lineage report describing the
-     * referenced article.
+     * referenced specification.
      *
-     * @param cmd : { name: <str>, articleId: <num> }
+     * @param cmd : { name: <str>, specificationId: <num> }
      * @returns {Promise.<TResult>|*}
      */
     const create = (cmd) => {
@@ -42,8 +42,8 @@ function store($http, baseApiUrl) {
         create,
         update,
         getById,
-        findByPhysicalArticleId,
-        findReportsContributedToByArticleId
+        findBySpecificationId,
+        findReportsContributedToBySpecificationId
     };
 }
 

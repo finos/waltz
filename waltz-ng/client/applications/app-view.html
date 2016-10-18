@@ -129,7 +129,7 @@
 
         <waltz-source-data-overlay visible="ctrl.visibility.logicalFlows"
                                    ratings="ctrl.sourceDataRatings"
-                                   entities="['LOGICAL_DATA_FLOW', 'PHYSICAL_DATA_ARTICLE', 'PHYSICAL_DATA_FLOW']">
+                                   entities="['LOGICAL_DATA_FLOW', 'PHYSICAL_SPECIFICATION', 'PHYSICAL_FLOW']">
         </waltz-source-data-overlay>
 
         <uib-tabset active="active" ng-init="ctrl.dataTab = 0">
@@ -184,8 +184,8 @@
                             <waltz-source-and-target-panel entity-ref="ctrl.entityRef"
                                                            logical-flows="ctrl.flows"
                                                            decorators="ctrl.dataFlowDecorators"
-                                                           physical-flows="ctrl.physicalDataFlows"
-                                                           physical-articles="ctrl.physicalDataArticles">
+                                                           physical-flows="ctrl.physicalFlows"
+                                                           physical-specifications="ctrl.physicalSpecifications">
                             </waltz-source-and-target-panel>
 
                             <p class="text-muted small">
@@ -203,8 +203,8 @@
             <uib-tab index="1"
                      select="ctrl.dataTab = 1"
                      heading="Physical Flow Detail">
-                <waltz-physical-data-section articles="ctrl.physicalDataArticles"
-                                             physical-flows="ctrl.physicalDataFlows"
+                <waltz-physical-data-section specifications="ctrl.physicalSpecifications"
+                                             physical-flows="ctrl.physicalFlows"
                                              logical-flows="ctrl.flows">
                 </waltz-physical-data-section>
             </uib-tab>

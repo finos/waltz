@@ -1,8 +1,8 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.ProduceConsumeGroup;
-import com.khartec.waltz.model.physical_data_article.PhysicalDataArticle;
-import com.khartec.waltz.service.physical_data_article.PhysicalDataArticleService;
+import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
+import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -18,17 +18,17 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 @Service
-public class PhysicalDataArticleEndpoint implements Endpoint {
+public class PhysicalSpecificationEndpoint implements Endpoint {
 
-    private static final String BASE_URL = mkPath("api", "physical-data-article");
+    private static final String BASE_URL = mkPath("api", "physical-specification");
 
-    private final PhysicalDataArticleService dataArticleService;
+    private final PhysicalSpecificationService specificationService;
 
 
     @Autowired
-    public PhysicalDataArticleEndpoint(PhysicalDataArticleService dataArticleService) {
-        checkNotNull(dataArticleService, "dataArticleService cannot be null");
-        this.dataArticleService = dataArticleService;
+    public PhysicalSpecificationEndpoint(PhysicalSpecificationService specificationService) {
+        checkNotNull(specificationService, "specificationService cannot be null");
+        this.specificationService = specificationService;
     }
 
 
@@ -60,20 +60,20 @@ public class PhysicalDataArticleEndpoint implements Endpoint {
                 "id",
                 ":id");
 
-        ListRoute<PhysicalDataArticle> findByProducerAppRoute =
-                (request, response) -> dataArticleService.findByProducerAppId(getId(request));
+        ListRoute<PhysicalSpecification> findByProducerAppRoute =
+                (request, response) -> specificationService.findByProducerAppId(getId(request));
 
-        ListRoute<PhysicalDataArticle> findByConsumerAppIdRoute =
-                (request, response) -> dataArticleService.findByConsumerAppId(getId(request));
+        ListRoute<PhysicalSpecification> findByConsumerAppIdRoute =
+                (request, response) -> specificationService.findByConsumerAppId(getId(request));
 
-        ListRoute<PhysicalDataArticle> findBySelectorRoute =
-                (request, response) -> dataArticleService.findBySelector(readIdSelectionOptionsFromBody(request));
+        ListRoute<PhysicalSpecification> findBySelectorRoute =
+                (request, response) -> specificationService.findBySelector(readIdSelectionOptionsFromBody(request));
 
-        DatumRoute<ProduceConsumeGroup<PhysicalDataArticle>> findByAppRoute =
-                (request, response) -> dataArticleService.findByAppId(getId(request));
+        DatumRoute<ProduceConsumeGroup<PhysicalSpecification>> findByAppRoute =
+                (request, response) -> specificationService.findByAppId(getId(request));
 
-        DatumRoute<PhysicalDataArticle> getByIdRoute =
-                (request, response) -> dataArticleService.getById(getId(request));
+        DatumRoute<PhysicalSpecification> getByIdRoute =
+                (request, response) -> specificationService.getById(getId(request));
 
         getForList(findByProducerAppPath, findByProducerAppRoute);
         getForList(findByConsumerAppIdPath, findByConsumerAppIdRoute);

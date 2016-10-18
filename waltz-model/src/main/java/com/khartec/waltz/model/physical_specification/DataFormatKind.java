@@ -1,7 +1,7 @@
-package com.khartec.waltz.model.physical_data_article;
+package com.khartec.waltz.model.physical_specification;
 
 /**
- * How an article manifests itself 'physically'
+ * How an specification manifests itself 'physically'
  */
 public enum DataFormatKind {
 

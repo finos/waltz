@@ -1,11 +1,11 @@
 import _ from 'lodash';
-import {combineFlowData} from '../../../physical-data-articles/utilities';
+import {combineFlowData} from '../../../physical-specifications/utilities';
 
 
 const bindings = {
     logicalFlows: '<',
     physicalFlows: '<',
-    articles: '<',
+    specifications: '<',
     onRefocus: '<',
     onAdd: '<',
     onRemove: '<',
@@ -27,7 +27,7 @@ function controller() {
     const vm = this;
 
     vm.$onChanges = () => {
-        const flowData = combineFlowData(vm.articles.produces, vm.physicalFlows, vm.logicalFlows);
+        const flowData = combineFlowData(vm.specifications.produces, vm.physicalFlows, vm.logicalFlows);
         vm.candidates = removeCandidatesWithNoPhysicalFlows(flowData);
     };
 }

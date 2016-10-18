@@ -14,9 +14,9 @@ function store($http, baseApiUrl) {
     };
 
 
-    const findByArticleId = (id) => {
+    const findBySpecificationId = (id) => {
         return $http
-            .get(`${base}/article/${id}`)
+            .get(`${base}/specification/${id}`)
             .then(r => r.data);
     };
 
@@ -30,7 +30,7 @@ function store($http, baseApiUrl) {
 
 
     return {
-        findByArticleId,
+        findBySpecificationId,
         findByEntityReference,
         findBySelector
     };

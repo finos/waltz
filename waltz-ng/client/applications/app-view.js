@@ -34,7 +34,7 @@ const initialState = {
     capabilities: [],
     complexity: [],
     databases: [],
-    dataArticles: [],
+    specifications: [],
     dataTypes: [],
     dataTypeUsages: [],
     explicitTraits: [],
@@ -83,7 +83,7 @@ function controller($q,
                     involvementStore,
                     orgUnitStore,
                     perspectiveStore,
-                    physicalDataArticleStore,
+                    physicalSpecificationStore,
                     physicalFlowStore,
                     processStore,
                     ratingStore,
@@ -165,13 +165,13 @@ function controller($q,
                 .findForApplication(id)
                 .then(ps => vm.processes = ps),
 
-            physicalDataArticleStore
+            physicalSpecificationStore
                 .findByAppId(id)
-                .then(xs => vm.physicalDataArticles = xs),
+                .then(xs => vm.physicalSpecifications = xs),
 
             physicalFlowStore
                 .findByEntityReference(entityRef)
-                .then(xs => vm.physicalDataFlows = xs),
+                .then(xs => vm.physicalFlows = xs),
 
             entityStatisticStore
                 .findStatsForEntity(entityRef)
@@ -242,7 +242,7 @@ controller.$inject = [
     'InvolvementStore',
     'OrgUnitStore',
     'PerspectiveStore',
-    'PhysicalDataArticleStore',
+    'PhysicalSpecificationStore',
     'PhysicalFlowStore',
     'ProcessStore',
     'RatingStore',

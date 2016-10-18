@@ -1,7 +1,7 @@
 package com.khartec.waltz.jobs.sample;
 
-import com.khartec.waltz.model.physical_data_article.DataFormatKind;
-import com.khartec.waltz.schema.tables.records.PhysicalDataArticleRecord;
+import com.khartec.waltz.model.physical_specification.DataFormatKind;
+import com.khartec.waltz.schema.tables.records.PhysicalSpecificationRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
@@ -14,13 +14,13 @@ import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.ArrayUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.PhysicalDataArticle.PHYSICAL_DATA_ARTICLE;
+import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 /**
  * Created by dwatkins on 03/10/2016.
  */
-public class PhysicalDataArticleGenerator {
+public class PhysicalSpecificationGenerator {
 
     private static final Random rnd = new Random();
 
@@ -83,14 +83,14 @@ public class PhysicalDataArticleGenerator {
                 .from(APPLICATION)
                 .fetch(APPLICATION.ID);
 
-        List<PhysicalDataArticleRecord> records = appIds
+        List<PhysicalSpecificationRecord> records = appIds
                 .stream()
                 .flatMap(appId -> IntStream
                         .range(0, rnd.nextInt(4))
                         .mapToObj(i -> tuple(appId, i)))
                 .map(t -> {
                     String name = mkName();
-                    PhysicalDataArticleRecord record = dsl.newRecord(PHYSICAL_DATA_ARTICLE);
+                    PhysicalSpecificationRecord record = dsl.newRecord(PHYSICAL_SPECIFICATION);
                     record.setOwningApplicationId(t.v1);
                     record.setFormat(randomPick(DataFormatKind.values()).name());
                     record.setProvenance("DEMO");
@@ -103,8 +103,8 @@ public class PhysicalDataArticleGenerator {
 
 
         System.out.println("---deleting old demo records");
-        dsl.deleteFrom(PHYSICAL_DATA_ARTICLE)
-                .where(PHYSICAL_DATA_ARTICLE.PROVENANCE.eq("DEMO"))
+        dsl.deleteFrom(PHYSICAL_SPECIFICATION)
+                .where(PHYSICAL_SPECIFICATION.PROVENANCE.eq("DEMO"))
                 .execute();
         System.out.println("---saving: "+records.size());
         dsl.batchInsert(records).execute();

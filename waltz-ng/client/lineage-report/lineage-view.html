@@ -48,19 +48,19 @@
             <div class="col-sm-3">
                 <strong>
                     <waltz-icon name="info-circle"></waltz-icon>
-                    This report describes the lineage for physical data article:
+                    This report describes the lineage for physical data specification:
                     <br>
-                    <a ui-sref="main.physical-data-article.view ({ id: ctrl.article.id })"
-                       ng-bind="ctrl.article.name">
+                    <a ui-sref="main.physical-specification.view ({ id: ctrl.specification.id })"
+                       ng-bind="ctrl.specification.name">
                     </a>
                 </strong>
             </div>
             <div class="col-sm-9">
                 <div style="border: 1px solid #f4f4f4; border-radius: 3px; padding: 12px">
-                    <waltz-physical-data-article-overview owning-app="ctrl.application"
-                                                          organisational-unit="ctrl.organisationalUnit"
-                                                          article="ctrl.article">
-                    </waltz-physical-data-article-overview>
+                    <waltz-physical-specification-overview owning-app="ctrl.application"
+                                                           organisational-unit="ctrl.organisationalUnit"
+                                                           specification="ctrl.specification">
+                    </waltz-physical-specification-overview>
                 </div>
 
             </div>
@@ -77,12 +77,12 @@
 
         <hr>
 
-        <waltz-lineage-flow-tabgroup article="ctrl.article"
+        <waltz-lineage-flow-tabgroup specification="ctrl.specification"
                                      lineage-data="{
                                         applications: ctrl.apps,
                                         logicalFlows: ctrl.logicalFlows,
                                         physicalFlows: ctrl.physicalFlows,
-                                        articles: ctrl.articles
+                                        specifications: ctrl.specifications
                                      }">
         </waltz-lineage-flow-tabgroup>
 
@@ -102,14 +102,14 @@
     <waltz-section name="stuff" ng-show="false">
         <div class="row">
             <div class="col-md-2">
-                <h4>Report / Article / App</h4>
+                <h4>Report / Specification / App</h4>
                 <pre ng-bind="ctrl.report | json"></pre>
-                <pre ng-bind="ctrl.article | json"></pre>
+                <pre ng-bind="ctrl.specification | json"></pre>
                 <pre ng-bind="ctrl.application | json"></pre>
             </div>
             <div class="col-md-2">
-                <h4>Articles</h4>
-                <pre ng-bind="ctrl.articles | json"></pre>
+                <h4>specifications</h4>
+                <pre ng-bind="ctrl.specifications | json"></pre>
             </div>
             <div class="col-md-2">
                 <h4>Apps</h4>

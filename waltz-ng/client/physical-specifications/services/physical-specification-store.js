@@ -2,7 +2,8 @@ import {checkIsIdSelector} from '../../common/checks';
 
 function store($http, baseApiUrl) {
 
-    const base = `${baseApiUrl}/physical-data-article`;
+    const base = `${baseApiUrl}/physical-specification`;
+
 
     const findByAppId = (id) => $http
         .get(`${base}/application/${id}`)
@@ -20,6 +21,7 @@ function store($http, baseApiUrl) {
     const getById = (id) => $http
         .get(`${base}/id/${id}`)
         .then(r => r.data);
+
 
     return {
         findByAppId,

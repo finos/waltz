@@ -3111,4 +3111,28 @@
                      newTableName="physical_flow" />
     </changeSet>
 
+
+    <!-- 749: Physical Data Flow - Physical Flow -->
+    <changeSet id="201610118-748-1"
+               author="dwatkins">
+        <renameTable oldTableName="physical_data_article"
+                     newTableName="physical_specification" />
+    </changeSet>
+
+    <changeSet id="201610118-748-2"
+               author="dwatkins">
+        <renameColumn tableName="physical_flow"
+                      oldColumnName="article_id"
+                      columnDataType="${id.type}"
+                      newColumnName="specification_id"/>
+    </changeSet>
+
+    <changeSet id="201610118-748-3"
+               author="dwatkins">
+        <renameColumn tableName="lineage_report"
+                      oldColumnName="physical_article_id"
+                      columnDataType="${id.type}"
+                      newColumnName="specification_id"/>
+    </changeSet>
+
 </databaseChangeLog>

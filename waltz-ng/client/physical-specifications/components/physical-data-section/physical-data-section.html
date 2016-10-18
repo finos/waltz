@@ -31,14 +31,14 @@
             <tr ng-repeat="p in $ctrl.filteredProduces"
                 class="waltz-visibility-parent">
                 <td>
-                    <a ui-sref="main.physical-data-article.view ({ id: p.article.id })">
-                        <span ng-class="{ 'waltz-visibility-child-40' : !p.firstArticle}"
-                              ng-bind="p.article.name"></span>
+                    <a ui-sref="main.physical-specification.view ({ id: p.specification.id })">
+                        <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
+                              ng-bind="p.specification.name"></span>
                     </a>
                 </td>
                 <td>
-                    <span ng-class="{ 'waltz-visibility-child-40' : !p.firstArticle}"
-                          ng-bind="p.article.externalId"></span>
+                    <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
+                          ng-bind="p.specification.externalId"></span>
 
                 </td>
                 <td>
@@ -48,8 +48,8 @@
                     </a>
                 </td>
                 <td>
-                    <span ng-class="{ 'waltz-visibility-child-40' : !p.firstArticle}"
-                          ng-bind="p.article.format"></span>
+                    <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
+                          ng-bind="p.specification.format"></span>
                 </td>
                 <td>
                     <span ng-bind="p.physicalFlow.transport"></span>
@@ -58,8 +58,8 @@
                     <span ng-bind="p.physicalFlow.frequency"></span>
                 </td>
                 <td>
-                    <span ng-class="{ 'waltz-visibility-child-40' : !p.firstArticle}"
-                          ng-bind="p.article.description | limitTo:100"></span>
+                    <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
+                          ng-bind="p.specification.description | limitTo:100"></span>
 
                 </td>
             </tr>
@@ -109,15 +109,15 @@
                     </span>
                 </td>
                 <td>
-                    <a ui-sref="main.physical-data-article.view ({ id: c.article.id })">
-                        <span ng-bind="c.article.name"></span>
+                    <a ui-sref="main.physical-specification.view ({ id: c.specification.id })">
+                        <span ng-bind="c.specification.name"></span>
                     </a>
                 </td>
                 <td>
-                    <span ng-bind="c.article.externalId"></span>
+                    <span ng-bind="c.specification.externalId"></span>
                 </td>
                 <td>
-                    <span ng-bind="c.article.format"></span>
+                    <span ng-bind="c.specification.format"></span>
                 </td>
                 <td>
                     <span ng-bind="c.physicalFlow.transport"></span>
@@ -126,10 +126,12 @@
                     <span ng-bind="c.physicalFlow.frequency"></span>
                 </td>
                 <td>
-                    <span ng-bind="c.article.description"></span>
+                    <span ng-bind="c.specification.description"></span>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
 </div>
+
+<pre ng-bind="$ctrl.produces|json"></pre>

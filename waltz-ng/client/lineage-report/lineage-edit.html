@@ -11,8 +11,8 @@
                 </a>
             </li>
             <li>
-                <a ui-sref="main.physical-data-article.view ({ id: ctrl.article.id })">
-                    <span ng-bind="ctrl.article.name"></span>
+                <a ui-sref="main.physical-specification.view ({ id: ctrl.specification.id })">
+                    <span ng-bind="ctrl.specification.name"></span>
                 </a>
             </li>
             <li>Lineage</li>
@@ -60,18 +60,18 @@
             <div class="col-sm-3">
                 <strong>
                     <waltz-icon name="info-circle"></waltz-icon>
-                    This report describes the lineage for physical data article:
+                    This report describes the lineage for physical specification:
                     <br>
-                    <a ui-sref="main.physical-data-article.view ({ id: ctrl.article.id })"
-                       ng-bind="ctrl.article.name"></a>
+                    <a ui-sref="main.physical-specification.view ({ id: ctrl.specification.id })"
+                       ng-bind="ctrl.specification.name"></a>
                 </strong>
             </div>
             <div class="col-sm-9">
                 <div style="border: 1px solid #f4f4f4; border-radius: 3px; padding: 12px">
-                    <waltz-physical-data-article-overview owning-app="ctrl.owningApp"
-                                                          article="ctrl.article"
-                                                          organisational-unit="ctrl.organisationalUnit">
-                    </waltz-physical-data-article-overview>
+                    <waltz-physical-specification-overview owning-app="ctrl.owningApp"
+                                                           specification="ctrl.specification"
+                                                           organisational-unit="ctrl.organisationalUnit">
+                    </waltz-physical-specification-overview>
                 </div>
             </div>
         </div>
@@ -95,9 +95,9 @@
                     </thead>
                     <tbody>
                     <tr ng-repeat="c in $ctrl.contributors">
-                        <td><span ng-bind="c.article.name"></span></td>
+                        <td><span ng-bind="c.specification.name"></span></td>
                         <td><span ng-bind="c.logicalFlow.target.name"></span></td>
-                        <td><span ng-bind="c.article.format"></span></td>
+                        <td><span ng-bind="c.specification.format"></span></td>
                         <td><span ng-bind="c.physicalFlow.transport"></span></td>
                     </tr>
                     </tbody>
@@ -113,7 +113,7 @@
 
                 <waltz-lineage-candidate-editor logical-flows="ctrl.searchResults.logicalFlows"
                                                 physical-flows="ctrl.searchResults.physicalFlows"
-                                                articles="ctrl.searchResults.articles"
+                                                specifications="ctrl.searchResults.specification"
                                                 on-add="ctrl.addPhysicalFlowToLineage"
                                                 on-remove="ctrl.removePhysicalFlowFromLineage"
                                                 on-refocus="ctrl.doSearch">

@@ -2,10 +2,9 @@ package com.khartec.waltz.data.lineage_report;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.lineage_report.*;
-import com.khartec.waltz.schema.tables.Application;
+import com.khartec.waltz.model.lineage_report.LineageReport;
+import com.khartec.waltz.schema.tables.*;
 import com.khartec.waltz.schema.tables.LineageReportContributor;
-import com.khartec.waltz.schema.tables.PhysicalDataArticle;
-import com.khartec.waltz.schema.tables.PhysicalFlow;
 import com.khartec.waltz.schema.tables.records.LineageReportRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -17,7 +16,7 @@ import java.util.List;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.LineageReport.LINEAGE_REPORT;
-import static com.khartec.waltz.schema.tables.PhysicalDataArticle.PHYSICAL_DATA_ARTICLE;
+import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 
 @Repository
@@ -32,7 +31,7 @@ public class LineageReportDao {
                 .id(record.getId())
                 .name(record.getName())
                 .description(record.getDescription())
-                .physicalArticleId(record.getPhysicalArticleId())
+                .specificationId(record.getSpecificationId())
                 .provenance(record.getProvenance())
                 .build();
     };
@@ -55,18 +54,18 @@ public class LineageReportDao {
     }
 
 
-    public List<LineageReport> findByPhysicalArticleId(long physicalArticleId) {
+    public List<LineageReport> findByPhysicalSpecificationId(long specificationId) {
         return dsl.select(report.fields())
                 .from(report)
-                .where(report.PHYSICAL_ARTICLE_ID.eq(physicalArticleId))
+                .where(report.SPECIFICATION_ID.eq(specificationId))
                 .orderBy(report.NAME)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public List<LineageReportDescriptor> findReportsContributedToByArticle(long physicalArticleId) {
+    public List<LineageReportDescriptor> findReportsContributedToBySpecification(long specificationId) {
         Application app = Application.APPLICATION.as("app");
-        PhysicalDataArticle targetArticle = PHYSICAL_DATA_ARTICLE.as("targetArticle");
+        PhysicalSpecification targetSpecification = PHYSICAL_SPECIFICATION.as("targetSpecification");
         com.khartec.waltz.schema.tables.LineageReport report = com.khartec.waltz.schema.tables.LineageReport.LINEAGE_REPORT.as("report");
 
         LineageReportContributor contributor = LineageReportContributor.LINEAGE_REPORT_CONTRIBUTOR.as("contributor");
@@ -77,23 +76,23 @@ public class LineageReportDao {
                 .from(contributor)
                 .innerJoin(physFlow)
                 .on(physFlow.ID.eq(contributor.PHYSICAL_FLOW_ID))
-                .where(physFlow.ARTICLE_ID.eq(physicalArticleId));
+                .where(physFlow.SPECIFICATION_ID.eq(specificationId));
 
         return dsl
                 .select(report.ID,
                         report.NAME,
                         report.DESCRIPTION,
-                        targetArticle.ID,
-                        targetArticle.NAME,
-                        targetArticle.DESCRIPTION,
+                        targetSpecification.ID,
+                        targetSpecification.NAME,
+                        targetSpecification.DESCRIPTION,
                         app.ID,
                         app.NAME,
                         app.DESCRIPTION)
                 .from(report)
-                .innerJoin(targetArticle)
-                .on(targetArticle.ID.eq(report.PHYSICAL_ARTICLE_ID))
+                .innerJoin(targetSpecification)
+                .on(targetSpecification.ID.eq(report.SPECIFICATION_ID))
                 .innerJoin(app)
-                .on(app.ID.eq(targetArticle.OWNING_APPLICATION_ID))
+                .on(app.ID.eq(targetSpecification.OWNING_APPLICATION_ID))
                 .where(report.ID.in(mentionedReportIds))
                 .fetch(r -> ImmutableLineageReportDescriptor.builder()
                         .reportReference(mkRef(
@@ -101,11 +100,11 @@ public class LineageReportDao {
                                 r.getValue(report.ID),
                                 r.getValue(report.NAME),
                                 r.getValue(report.DESCRIPTION)))
-                        .articleReference(mkRef(
-                                EntityKind.PHYSICAL_DATA_ARTICLE,
-                                r.getValue(targetArticle.ID),
-                                r.getValue(targetArticle.NAME),
-                                r.getValue(targetArticle.DESCRIPTION)))
+                        .specificationReference(mkRef(
+                                EntityKind.PHYSICAL_SPECIFICATION,
+                                r.getValue(targetSpecification.ID),
+                                r.getValue(targetSpecification.NAME),
+                                r.getValue(targetSpecification.DESCRIPTION)))
                         .applicationReference(mkRef(
                                 EntityKind.APPLICATION,
                                 r.getValue(app.ID),
@@ -120,7 +119,7 @@ public class LineageReportDao {
         record.setProvenance("waltz");
         record.setDescription(mkSafe(command.description()));
         record.setName(command.name());
-        record.setPhysicalArticleId(command.articleId());
+        record.setSpecificationId(command.specificationId());
 
         record.store();
 

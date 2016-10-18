@@ -41,7 +41,7 @@ function controller($stateParams,
                     lineageReportStore,
                     logicalFlowStore,
                     orgUnitStore,
-                    physicalDataArticleStore,
+                    physicalSpecificationStore,
                     physicalFlowStore) {
 
     const vm = initialiseData(this, initialState);
@@ -60,9 +60,9 @@ function controller($stateParams,
     lineageReportStore
         .getById(reportId)
         .then(report => vm.report = report)
-        .then(report => physicalDataArticleStore.getById(report.physicalArticleId))
-        .then(article => vm.article = article)
-        .then(article => appStore.getById(article.owningApplicationId))
+        .then(report => physicalSpecificationStore.getById(report.specificationId))
+        .then(specification => vm.specification = specification)
+        .then(specification => appStore.getById(specification.owningApplicationId))
         .then(app => vm.application = app)
         .then(app => orgUnitStore.getById(app.organisationalUnitId))
         .then(ou => vm.organisationalUnit = ou)
@@ -72,9 +72,9 @@ function controller($stateParams,
         .findBySelector(selectorOptions)
         .then(apps => vm.apps = apps);
 
-    physicalDataArticleStore
+    physicalSpecificationStore
         .findBySelector(selectorOptions)
-        .then(articles => vm.articles = articles);
+        .then(specifications => vm.specifications = specifications);
 
     physicalFlowStore
         .findBySelector(selectorOptions)
@@ -98,7 +98,7 @@ controller.$inject = [
     'LineageReportStore',
     'DataFlowDataStore', // LogicalFlowStore
     'OrgUnitStore',
-    'PhysicalDataArticleStore',
+    'PhysicalSpecificationStore',
     'PhysicalFlowStore'
 ];
 

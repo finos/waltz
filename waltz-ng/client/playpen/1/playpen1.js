@@ -5,7 +5,7 @@ const initData = {
 
 
 
-function controller($q, dataFlowStore, dataFlowDecoratorStore, physicalDataArticleStore, physicalFlowStore) {
+function controller($q, dataFlowStore, dataFlowDecoratorStore, physicalSpecificationStore, physicalFlowStore) {
     const vm = Object.assign(this, initData);
 
     const appId = 66766;
@@ -19,9 +19,9 @@ function controller($q, dataFlowStore, dataFlowDecoratorStore, physicalDataArtic
         scope: 'EXACT'
     };
 
-    physicalDataArticleStore
+    physicalSpecificationStore
         .findByAppId(appId)
-        .then(xs => vm.articles = xs);
+        .then(xs => vm.specifications = xs);
 
     dataFlowStore
         .findByEntityReference(ref)
@@ -43,7 +43,7 @@ controller.$inject = [
     '$q',
     'DataFlowDataStore',
     'DataFlowDecoratorStore',
-    'PhysicalDataArticleStore',
+    'PhysicalSpecificationStore',
     'PhysicalFlowStore'
 ];
 

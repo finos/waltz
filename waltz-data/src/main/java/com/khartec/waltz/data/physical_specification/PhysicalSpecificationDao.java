@@ -1,12 +1,12 @@
-package com.khartec.waltz.data.physical_data_article;
+package com.khartec.waltz.data.physical_specification;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableProduceConsumeGroup;
 import com.khartec.waltz.model.ProduceConsumeGroup;
-import com.khartec.waltz.model.physical_data_article.DataFormatKind;
-import com.khartec.waltz.model.physical_data_article.ImmutablePhysicalDataArticle;
-import com.khartec.waltz.model.physical_data_article.PhysicalDataArticle;
-import com.khartec.waltz.schema.tables.records.PhysicalDataArticleRecord;
+import com.khartec.waltz.model.physical_specification.DataFormatKind;
+import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
+import com.khartec.waltz.schema.tables.records.PhysicalSpecificationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple;
@@ -21,16 +21,16 @@ import java.util.Map;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalDataArticle.PHYSICAL_DATA_ARTICLE;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static java.util.Collections.emptyList;
 
 @Repository
-public class PhysicalDataArticleDao {
+public class PhysicalSpecificationDao {
 
-    public static final RecordMapper<? super Record, PhysicalDataArticle> TO_DOMAIN_MAPPER = r -> {
-        PhysicalDataArticleRecord record = r.into(PHYSICAL_DATA_ARTICLE);
-        return ImmutablePhysicalDataArticle.builder()
+    public static final RecordMapper<? super Record, PhysicalSpecification> TO_DOMAIN_MAPPER = r -> {
+        PhysicalSpecificationRecord record = r.into(PHYSICAL_SPECIFICATION);
+        return ImmutablePhysicalSpecification.builder()
                 .id(record.getId())
                 .externalId(record.getExternalId())
                 .owningApplicationId(record.getOwningApplicationId())
@@ -46,57 +46,57 @@ public class PhysicalDataArticleDao {
 
 
     @Autowired
-    public PhysicalDataArticleDao(DSLContext dsl) {
+    public PhysicalSpecificationDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
         this.dsl = dsl;
     }
 
 
-    public List<PhysicalDataArticle> findByProducerAppId(long appId) {
+    public List<PhysicalSpecification> findByProducerAppId(long appId) {
         return findByProducerAppIdQuery(appId)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public List<PhysicalDataArticle> findByConsumerAppId(long appId) {
+    public List<PhysicalSpecification> findByConsumerAppId(long appId) {
         return findByConsumerAppIdQuery(appId)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public ProduceConsumeGroup<PhysicalDataArticle> findByAppId(long appId) {
+    public ProduceConsumeGroup<PhysicalSpecification> findByAppId(long appId) {
 
-        List<Tuple2<String, PhysicalDataArticle>> results = findByProducerAppIdQuery(appId)
+        List<Tuple2<String, PhysicalSpecification>> results = findByProducerAppIdQuery(appId)
                 .unionAll(findByConsumerAppIdQuery(appId))
                 .fetch(r -> Tuple.tuple(
                         r.getValue("relationship", String.class),
                         TO_DOMAIN_MAPPER.map(r)));
 
-        Map<String, Collection<PhysicalDataArticle>> groupedResults = groupBy(
+        Map<String, Collection<PhysicalSpecification>> groupedResults = groupBy(
                 t -> t.v1, // relationship
-                t -> t.v2, // article
+                t -> t.v2, // specification
                 results);
 
-        return ImmutableProduceConsumeGroup.<PhysicalDataArticle>builder()
+        return ImmutableProduceConsumeGroup.<PhysicalSpecification>builder()
                 .produces(groupedResults.getOrDefault("producer", emptyList()))
                 .consumes(groupedResults.getOrDefault("consumer", emptyList()))
                 .build();
     }
 
 
-    public PhysicalDataArticle getById(long id) {
+    public PhysicalSpecification getById(long id) {
         return dsl
-                .select(PHYSICAL_DATA_ARTICLE.fields())
-                .from(PHYSICAL_DATA_ARTICLE)
-                .where(PHYSICAL_DATA_ARTICLE.ID.eq(id))
+                .select(PHYSICAL_SPECIFICATION.fields())
+                .from(PHYSICAL_SPECIFICATION)
+                .where(PHYSICAL_SPECIFICATION.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
-    public List<PhysicalDataArticle> findBySelector(Select<Record1<Long>> selector) {
+    public List<PhysicalSpecification> findBySelector(Select<Record1<Long>> selector) {
         return dsl
-                .select(PHYSICAL_DATA_ARTICLE.fields())
-                .from(PHYSICAL_DATA_ARTICLE)
-                .where(PHYSICAL_DATA_ARTICLE.ID.in(selector))
+                .select(PHYSICAL_SPECIFICATION.fields())
+                .from(PHYSICAL_SPECIFICATION)
+                .where(PHYSICAL_SPECIFICATION.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -104,19 +104,19 @@ public class PhysicalDataArticleDao {
     private Select<Record> findByProducerAppIdQuery(long appId) {
         return dsl
                 .select(DSL.value("producer").as("relationship"))
-                .select(PHYSICAL_DATA_ARTICLE.fields())
-                .from(PHYSICAL_DATA_ARTICLE)
-                .where(PHYSICAL_DATA_ARTICLE.OWNING_APPLICATION_ID.eq(appId));
+                .select(PHYSICAL_SPECIFICATION.fields())
+                .from(PHYSICAL_SPECIFICATION)
+                .where(PHYSICAL_SPECIFICATION.OWNING_APPLICATION_ID.eq(appId));
     }
 
 
     private Select<Record> findByConsumerAppIdQuery(long appId) {
         return dsl
                 .select(DSL.value("consumer").as("relationship"))
-                .select(PHYSICAL_DATA_ARTICLE.fields())
-                .from(PHYSICAL_DATA_ARTICLE)
+                .select(PHYSICAL_SPECIFICATION.fields())
+                .from(PHYSICAL_SPECIFICATION)
                 .innerJoin(PHYSICAL_FLOW)
-                .on(PHYSICAL_FLOW.ARTICLE_ID.eq(PHYSICAL_DATA_ARTICLE.ID))
+                .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
                 .innerJoin(DATA_FLOW)
                 .on(PHYSICAL_FLOW.FLOW_ID.eq(DATA_FLOW.ID))
                 .where(DATA_FLOW.TARGET_ENTITY_ID.eq(appId))

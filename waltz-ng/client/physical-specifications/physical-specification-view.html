@@ -1,8 +1,8 @@
 <div>
 
     <!-- HEADER -->
-    <waltz-page-header name="{{ ctrl.article.name }}"
-                       small="Physical Data Article"
+    <waltz-page-header name="{{ ctrl.specification.name }}"
+                       small="Physical Specification"
                        icon="qrcode">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
@@ -11,25 +11,25 @@
                     <span ng-bind="ctrl.owningApp.name"></span>
                 </a>
             </li>
-            <li ng-bind="ctrl.article.name"></li>
+            <li ng-bind="ctrl.specification.name"></li>
         </ol>
     </waltz-page-header>
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-physical-data-article-overview owning-app="ctrl.owningApp"
-                                              article="ctrl.article"
-                                              organisational-unit="ctrl.organisationalUnit">
-        </waltz-physical-data-article-overview>
+        <waltz-physical-specification-overview owning-app="ctrl.owningApp"
+                                               specification="ctrl.specification"
+                                               organisational-unit="ctrl.organisationalUnit">
+        </waltz-physical-specification-overview>
     </div>
 
     <br>
 
     <!-- CONSUMERS -->
     <waltz-section name="Consumers">
-         <waltz-physical-data-article-consumers logical-flows="ctrl.logicalFlows"
-                                                physical-flows="ctrl.physicalFlows">
-        </waltz-physical-data-article-consumers>
+         <waltz-physical-specification-consumers logical-flows="ctrl.logicalFlows"
+                                                 physical-flows="ctrl.physicalFlows">
+        </waltz-physical-specification-consumers>
     </waltz-section>
 
 
@@ -49,7 +49,7 @@
                              visible="ctrl.visibility.createReportOverlay">
             <form name="create-report-form">
                 <div class="alert alert-warning">
-                    Lineage reports already exist for this article.
+                    Lineage reports already exist for this specification.
                     <br>
                     Are you sure you wish to create another?
                 </div>
@@ -62,7 +62,7 @@
                        type="text"
                        ng-model="ctrl.createReportForm.name">
                 <span class="help-block small">
-                    By default the name for this report will be based upon the article name.
+                    By default the name for this report will be based upon the specification name.
                     <br>
                     Report names should be unique within Waltz.
                 </span>
@@ -109,12 +109,12 @@
                 <div waltz-has-role='LOGICAL_DATA_FLOW_EDITOR'>
                     <div ng-if="ctrl.lineageReports.length == 0"
                          class="alert alert-info">
-                        No lineage reports exist which describe this article.
+                        No lineage reports exist which describe this specification.
                     </div>
                 </div>
 
                 <p class="text-muted small">
-                    Lineage reports describe how an article is produced
+                    Lineage reports describe how a specification is produced
                 </p>
             </div>
             <div class="col-md-3">
@@ -134,8 +134,8 @@
                     <tr>
                         <th>Report Name</th>
                         <th>Description</th>
-                        <th>Article Name</th>
-                        <th>Article Description</th>
+                        <th>Specification Name</th>
+                        <th>Specification Description</th>
                         <th>Owning Application</th>
                     </tr>
                     </thead>
@@ -149,11 +149,11 @@
                             <span ng-bind="mention.reportReference.description"></span>
                         </td>
                         <td>
-                            <a ui-sref="main.physical-data-article.view ({id: mention.articleReference.id })"
-                               ng-bind="mention.articleReference.name"></a>
+                            <a ui-sref="main.physical-specification.view ({id: mention.specificationReference.id })"
+                               ng-bind="mention.specificationReference.name"></a>
                         </td>
                         <td>
-                            <span ng-bind="mention.articleReference.description"></span>
+                            <span ng-bind="mention.specificationReference.description"></span>
                         </td>
                         <td>
                             <a ui-sref="main.app.view ({id: mention.applicationReference.id })"
@@ -163,7 +163,7 @@
                     </tbody>
                 </table>
                 <p class="text-muted small">
-                    Lineage reports that mention this articles
+                    Lineage reports that mention this specification.
                 </p>
             </div>
         </div>
@@ -173,9 +173,9 @@
 
     <!-- BOOKMARKS -->
     <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
-                             entity-id="{{ ctrl.article.id }}"
-                             kind="PHYSICAL_DATA_ARTICLE"
-                             parent-name="{{ ctrl.article.name }}">
+                             entity-id="{{ ctrl.specification.id }}"
+                             kind="PHYSICAL_SPECIFICATION"
+                             parent-name="{{ ctrl.specification.name }}">
     </waltz-bookmarks-section>
 
 </div>
