@@ -114,6 +114,25 @@
 
                 <hr>
 
+                <h4>
+                    <waltz-icon fixed-width="true"
+                                size="lg"
+                                name="{{ 'ENTITY_STATISTIC' | toIconName:'entity' }}">
+                    </waltz-icon>
+                    <span>Indicators
+                        <small>Selector</small>
+                    </span>
+                </h4>
+                <waltz-entity-statistic-tree definitions="ctrl.allDefinitions"
+                                             on-selection="ctrl.onSelectDefinition"
+                                             current-definition-id="ctrl.statistic.definition.id">
+                </waltz-entity-statistic-tree>
+
+                <p class="waltz-paragraph small text-muted"
+                   style="padding-top: 12px">
+                    Use the tree above to switch to a different indicator.
+                </p>
+
             </div>
 
         </div>
