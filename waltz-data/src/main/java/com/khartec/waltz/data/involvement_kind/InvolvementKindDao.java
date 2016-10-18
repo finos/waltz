@@ -101,28 +101,23 @@ public class InvolvementKindDao {
     }
 
 
-    public Long update(InvolvementKindChangeCommand command) {
+    public boolean update(InvolvementKindChangeCommand command) {
         checkNotNull(command, "command cannot be null");
         checkOptionalIsPresent(command.lastUpdate(), "lastUpdate must be present");
 
-        InvolvementKindRecord record = dsl.select(INVOLVEMENT_KIND.fields())
-                .from(INVOLVEMENT_KIND)
-                .where(INVOLVEMENT_KIND.ID.eq(command.id()))
-                .fetchOneInto(InvolvementKindRecord.class);
+        InvolvementKindRecord record = dsl.newRecord(INVOLVEMENT_KIND);
+        record.setId(command.id());
+        record.changed(INVOLVEMENT_KIND.ID, false);
 
-        if(record == null) {
-            throw new NoDataFoundException("Could not find Involvement Kind record with id: " + command.id());
-        }
-
-        command.name().ifPresent(f -> record.setName(f.newVal()));
-        command.description().ifPresent(f -> record.setDescription(f.newVal()));
+        command.name().ifPresent(change -> record.setName(change.newVal()));
+        command.description().ifPresent(change -> record.setDescription(change.newVal()));
 
         LastUpdate lastUpdate = command.lastUpdate().get();
         record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));
         record.setLastUpdatedBy(lastUpdate.by());
-        record.update();
 
-        return record.getId();
+        int count = record.update();
+        return count == 1;
     }
 
 
