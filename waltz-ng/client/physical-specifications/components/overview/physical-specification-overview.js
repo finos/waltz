@@ -1,10 +1,10 @@
 const bindings = {
-    article: '<',
+    spec: '<',
     owningApp: '<',
     organisationalUnit: '<'
 };
 
-const template = require('./physical-data-article-overview.html');
+const template = require('./physical-specification-overview.html');
 
 const component = {
     template,

@@ -22,7 +22,7 @@ public class LineageHarness {
         LineageReportService service = ctx.getBean(LineageReportService.class);
 
 
-        List<LineageReportDescriptor> reports = service.findReportsContributedToByArticle(1484);
+        List<LineageReportDescriptor> reports = service.findReportsContributedToBySpecification(1484);
 
         reports.forEach(r -> System.out.println(r));
 

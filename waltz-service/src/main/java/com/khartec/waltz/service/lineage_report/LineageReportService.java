@@ -37,13 +37,13 @@ public class LineageReportService {
     }
 
 
-    public List<LineageReport> findByPhysicalArticleId(long physicalArticleId) {
-        return lineageReportDao.findByPhysicalArticleId(physicalArticleId);
+    public List<LineageReport> findByPhysicalSpecificationId(long physicalSpecificationId) {
+        return lineageReportDao.findByPhysicalSpecificationId(physicalSpecificationId);
     }
 
 
-    public List<LineageReportDescriptor> findReportsContributedToByArticle(long physicalArticleId) {
-        return lineageReportDao.findReportsContributedToByArticle(physicalArticleId);
+    public List<LineageReportDescriptor> findReportsContributedToBySpecification(long physicalSpecificationId) {
+        return lineageReportDao.findReportsContributedToBySpecification(physicalSpecificationId);
     }
 
 

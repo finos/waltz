@@ -9,7 +9,7 @@ import org.immutables.value.Value;
 
 
 /**
- * Binds a data article (e.g. a file specification) to a logical data flow.
+ * Binds a data specification (e.g. a file specification) to a logical data flow.
  * As such it can be thought of a realisation of the logical into the
  * physical. A Logical may have many such realisations whereas a a physical
  * data flow may only associated to a single logical flow.
@@ -24,7 +24,7 @@ public abstract class PhysicalFlow implements
 
     public abstract long flowId();
 
-    public abstract long articleId();
+    public abstract long specificationId();
 
     public abstract FrequencyKind frequency();
 

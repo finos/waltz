@@ -39,8 +39,8 @@ public class PhysicalFlowService {
     }
 
 
-    public List<PhysicalFlow> findByArticleId(long articleId) {
-        return physicalFlowDao.findByArticleId(articleId);
+    public List<PhysicalFlow> findBySpecificationId(long specificationId) {
+        return physicalFlowDao.findBySpecificationId(specificationId);
     }
 
     public Collection<PhysicalFlow> findBySelector(IdSelectionOptions options) {

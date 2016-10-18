@@ -149,11 +149,11 @@ public class DataFlowDao {
 
 
     @Deprecated
-    public Collection<DataFlow> findByPhysicalDataArticleId(long articleId) {
+    public Collection<DataFlow> findByPhysicalSpecificationId(long specificationId) {
         return baseQuery()
                 .innerJoin(PHYSICAL_FLOW)
                 .on(DATA_FLOW.ID.eq(PHYSICAL_FLOW.FLOW_ID))
-                .where(PHYSICAL_FLOW.ARTICLE_ID.eq(articleId))
+                .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specificationId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

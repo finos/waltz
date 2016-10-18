@@ -1,7 +1,7 @@
 import {initialiseData} from '../common';
 
 
-const template = require('./physical-data-article-view.html');
+const template = require('./physical-specification-view.html');
 
 
 const initialState = {
@@ -25,41 +25,41 @@ function controller($state,
                     logicalDataFlowStore,
                     notification,
                     orgUnitStore,
-                    physicalDataArticleStore,
+                    physicalSpecificationStore,
                     physicalFlowStore)
 {
     const vm = initialiseData(this, initialState);
 
-    const articleId = $stateParams.id;
+    const specId = $stateParams.id;
     const ref = {
-        kind: 'PHYSICAL_DATA_ARTICLE',
-        id: articleId
+        kind: 'PHYSICAL_SPECIFICATION',
+        id: specId
     };
 
     // -- LOAD ---
 
-    physicalDataArticleStore
-        .getById(articleId)
-        .then(article => vm.article = article)
-        .then(article => applicationStore.getById(article.owningApplicationId))
+    physicalSpecificationStore
+        .getById(specId)
+        .then(spec => vm.specification = spec)
+        .then(spec => applicationStore.getById(spec.owningApplicationId))
         .then(app => vm.owningApp = app)
         .then(app => orgUnitStore.getById(app.organisationalUnitId))
         .then(ou => vm.organisationalUnit = ou);
 
     physicalFlowStore
-        .findByArticleId(articleId)
+        .findBySpecificationId(specId)
         .then(physicalFlows => vm.physicalFlows = physicalFlows);
 
     logicalDataFlowStore
-        .findByArticleId(articleId)
+        .findBySpecificationId(specId)
         .then(logicalFlows => vm.logicalFlows = logicalFlows);
 
     lineageReportStore
-        .findByPhysicalArticleId(articleId)
+        .findBySpecificationId(specId)
         .then(lineageReports => vm.lineageReports = lineageReports);
 
     lineageReportStore
-        .findReportsContributedToByArticleId(articleId)
+        .findReportsContributedToBySpecificationId(specId)
         .then(mentions => vm.lineageMentions = mentions);
 
     bookmarkStore
@@ -72,7 +72,7 @@ function controller($state,
     vm.openCreateReportPopup = () => {
         vm.visibility.createReportOverlay = ! vm.visibility.createReportOverlay;
         if (!vm.createReportForm.name) {
-            vm.createReportForm.name = vm.article.name + " Lineage Report";
+            vm.createReportForm.name = vm.spec.name + " Lineage Report";
         }
     };
 
@@ -86,7 +86,7 @@ function controller($state,
         vm.visibility.createReportBusy = true;
 
         lineageReportStore
-            .create({ name: vm.createReportForm.name, articleId: vm.article.id })
+            .create({ name: vm.createReportForm.name, specificationId: vm.specification.id })
             .then(reportId => {
                 notification.success("Lineage Report created");
                 $state.go('main.lineage-report.edit', { id: reportId });
@@ -107,7 +107,7 @@ controller.$inject = [
     'DataFlowDataStore', // LogicalDataFlowStore
     'Notification',
     'OrgUnitStore',
-    'PhysicalDataArticleStore',
+    'PhysicalSpecificationStore',
     'PhysicalFlowStore'
 ];
 

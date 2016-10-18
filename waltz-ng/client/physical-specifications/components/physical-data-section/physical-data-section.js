@@ -6,59 +6,30 @@ import {termSearch} from "../../../common"
 const bindings = {
     logicalFlows: '<',
     physicalFlows: '<',
-    articles: '<'
+    specifications: '<'
 };
 
 
 const template = require('./physical-data-section.html');
 
 
-function enrichProduces(articles = [],
-                physicalFlows = [],
-                logicalFlows = [])
-{
-    return _.chain(articles)
-        .flatMap((a, i) => {
-            const logicalById = _.keyBy(logicalFlows, "id");
-            const relevantPhysicalFlows = _.filter(physicalFlows, { articleId: a.id });
-            if (relevantPhysicalFlows.length === 0) {
-                return {
-                    article: a,
-                    firstArticle: true
-                }
-            } else {
-                return _.flatMap(relevantPhysicalFlows, (pf, j) => {
-                    return {
-                        article: a,
-                        firstArticle: j === 0,
-                        physicalFlow: pf,
-                        firstPhysical: j === 0,
-                        logicalFlow: logicalById[pf.flowId]
-                    };
-                });
-            }
-        })
-        .value();
-}
-
-
-function enrichConsumes(articles = [],
+function enrichConsumes(specifications = [],
                 physicalFlows = [],
                 logicalFlows = [])
 {
     const visitedApps = [];
 
-    return _.chain(articles)
-        .map(article => {
-            const physicalFlow = _.find(physicalFlows, { articleId: article.id });
+    return _.chain(specifications)
+        .map(specification => {
+            const physicalFlow = _.find(physicalFlows, { specificationId: specification.id });
             const logicalFlow = _.find(logicalFlows, f => f.id === physicalFlow.flowId);
-            const firstSource = !_.includes(visitedApps, article.owningApplicationId);
+            const firstSource = !_.includes(visitedApps, specification.owningApplicationId);
             if(firstSource === true) {
-                visitedApps.push(article.owningApplicationId);
+                visitedApps.push(specification.owningApplicationId);
             }
 
             return {
-                article,
+                specification,
                 logicalFlow,
                 physicalFlow,
                 firstSource
@@ -69,16 +40,16 @@ function enrichConsumes(articles = [],
 }
 
 
-function mkData(articles = { produces: [], consumes: [] },
+function mkData(specifications = { produces: [], consumes: [] },
                 physicalFlows = [],
                 logicalFlows = [])
 {
     const produces = combineFlowData(
-        articles.produces,
+        specifications.produces,
         physicalFlows,
         logicalFlows);
     const consumes = enrichConsumes(
-        articles.consumes,
+        specifications.consumes,
         physicalFlows,
         logicalFlows);
     return { produces, consumes };
@@ -90,10 +61,10 @@ function controller() {
     const vm = this;
 
     const produceFields = [
-        'article.name',
-        'article.externalId',
-        'article.format',
-        'article.description',
+        'specification.name',
+        'specification.externalId',
+        'specification.format',
+        'specification.description',
         'physicalFlow.transport',
         'physicalFlow.frequency',
         'logicalFlow.target.name'
@@ -101,17 +72,17 @@ function controller() {
 
 
     const consumeFields = [
-        'article.name',
-        'article.externalId',
-        'article.format',
-        'article.description',
+        'specification.name',
+        'specification.externalId',
+        'specification.format',
+        'specification.description',
         'physicalFlow.transport',
         'physicalFlow.frequency',
         'logicalFlow.source.name'
     ];
 
     vm.$onChanges = (changes) => {
-        Object.assign(vm, mkData(vm.articles, vm.physicalFlows, vm.logicalFlows));
+        Object.assign(vm, mkData(vm.specifications, vm.physicalFlows, vm.logicalFlows));
         vm.filterProduces("");
         vm.filterConsumes("");
     };

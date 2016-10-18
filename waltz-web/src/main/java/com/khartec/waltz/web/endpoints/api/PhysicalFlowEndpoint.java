@@ -36,9 +36,9 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 ":kind",
                 ":id");
 
-        String findByArticleIdPath = mkPath(
+        String findBySpecificationIdPath = mkPath(
                 BASE_URL,
-                "article",
+                "specification",
                 ":id");
 
         String findBySelectorPath = mkPath(
@@ -50,9 +50,9 @@ public class PhysicalFlowEndpoint implements Endpoint {
                         .findByEntityReference(
                             getEntityReference(request));
 
-        ListRoute<PhysicalFlow> findByArticleIdRoute =
+        ListRoute<PhysicalFlow> findBySpecificationIdRoute =
                 (request, response) -> physicalFlowService
-                        .findByArticleId(
+                        .findBySpecificationId(
                                 getId(request));
 
         ListRoute<PhysicalFlow> findBySelectorRoute =
@@ -61,7 +61,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
         getForList(findByEntityRefPath, findByEntityRefRoute);
-        getForList(findByArticleIdPath, findByArticleIdRoute);
+        getForList(findBySpecificationIdPath, findBySpecificationIdRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
     }
 }

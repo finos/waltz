@@ -22,7 +22,7 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
             case LINEAGE_REPORT:
                 return mkForLineageReport(options);
             default:
-                throw new UnsupportedOperationException("Cannot create physical data article selector from options: "+options);
+                throw new UnsupportedOperationException("Cannot create physical specification selector from options: "+options);
         }
     }
 

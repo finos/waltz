@@ -58,14 +58,14 @@ public class LineageReportEndpoint implements Endpoint {
                 "id",
                 ":id");
 
-        String findByPhysicalArticleIdPath = mkPath(
+        String findByPhysicalSpecificationIdPath = mkPath(
                 BASE_URL,
-                "physical-article",
+                "specification",
                 ":id");
 
-        String findReportsContributedToByArticlePath = mkPath(
+        String findReportsContributedToBySpecificationPath = mkPath(
                 BASE_URL,
-                "physical-article",
+                "specification",
                 ":id",
                 "contributions");
 
@@ -73,18 +73,18 @@ public class LineageReportEndpoint implements Endpoint {
         DatumRoute<LineageReport> getByIdRoute =
                 (request, response) -> lineageReportService.getById(getId(request));
 
-        ListRoute<LineageReport> findByPhysicalArticleIdRoute =
-                (request, response) -> lineageReportService.findByPhysicalArticleId(getId(request));
+        ListRoute<LineageReport> findByPhysicalSpecificationIdRoute =
+                (request, response) -> lineageReportService.findByPhysicalSpecificationId(getId(request));
 
-        ListRoute<LineageReportDescriptor> findReportsContributedToByArticleRoute =
-                (request, response) -> lineageReportService.findReportsContributedToByArticle(getId(request));
+        ListRoute<LineageReportDescriptor> findReportsContributedToBySpecificationRoute =
+                (request, response) -> lineageReportService.findReportsContributedToBySpecification(getId(request));
 
 
         postForDatum(createPath, this::createRoute);
         putForDatum(createPath, this::updateRoute);
         getForDatum(getByIdPath, getByIdRoute);
-        getForList(findByPhysicalArticleIdPath, findByPhysicalArticleIdRoute);
-        getForList(findReportsContributedToByArticlePath, findReportsContributedToByArticleRoute);
+        getForList(findByPhysicalSpecificationIdPath, findByPhysicalSpecificationIdRoute);
+        getForList(findReportsContributedToBySpecificationPath, findReportsContributedToBySpecificationRoute);
     }
 
 

@@ -35,8 +35,8 @@ function service($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
-    const findByArticleId = (articleId) => $http
-        .get(`${BASE}/physical-data-article/${articleId}`)
+    const findBySpecificationId = (specId) => $http
+        .get(`${BASE}/specification/${specId}`)
         .then(result => result.data);
 
     // --- STATS ---
@@ -61,7 +61,7 @@ function service($http, BaseApiUrl) {
         .then(r => r.data);
 
     return {
-        findByArticleId,
+        findBySpecificationId,
         findBySelector,
         findByEntityReference,
         calculateStats,

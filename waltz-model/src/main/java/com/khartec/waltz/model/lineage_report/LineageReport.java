@@ -20,5 +20,5 @@ public abstract class LineageReport implements
         DescriptionProvider,
         ProvenanceProvider
 {
-    public abstract Long physicalArticleId();
+    public abstract Long specificationId();
 }

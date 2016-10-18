@@ -11,7 +11,7 @@ const entityRefShape = {
 };
 
 const createLineageReportCommandShape = {
-    articleId: apiCheck.number,
+    specificationId: apiCheck.number,
     name: apiCheck.string
 };
 

@@ -1,8 +1,8 @@
 package com.khartec.waltz.jobs.sample;
 
 import com.khartec.waltz.common.ArrayUtilities;
-import com.khartec.waltz.data.physical_data_article.PhysicalDataArticleDao;
-import com.khartec.waltz.model.physical_data_article.PhysicalDataArticle;
+import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
+import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.model.physical_flow.FrequencyKind;
 import com.khartec.waltz.model.physical_flow.TransportKind;
 import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
@@ -22,8 +22,8 @@ import static com.khartec.waltz.common.CollectionUtilities.randomPick;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalDataArticle.PHYSICAL_DATA_ARTICLE;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 
 public class PhysicalFlowGenerator {
@@ -36,9 +36,9 @@ public class PhysicalFlowGenerator {
 
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<PhysicalDataArticle> articles = dsl.select(PHYSICAL_DATA_ARTICLE.fields())
-                .from(PHYSICAL_DATA_ARTICLE)
-                .fetch(PhysicalDataArticleDao.TO_DOMAIN_MAPPER);
+        List<PhysicalSpecification> specifications = dsl.select(PHYSICAL_SPECIFICATION.fields())
+                .from(PHYSICAL_SPECIFICATION)
+                .fetch(PhysicalSpecificationDao.TO_DOMAIN_MAPPER);
 
         List<Tuple2<Long, Long>> allLogicalFLows = dsl.select(DATA_FLOW.ID, DATA_FLOW.SOURCE_ENTITY_ID)
                 .from(DATA_FLOW)
@@ -49,7 +49,7 @@ public class PhysicalFlowGenerator {
                 t -> t.v1(),
                 allLogicalFLows);
 
-        List<PhysicalFlowRecord> records = articles.stream()
+        List<PhysicalFlowRecord> records = specifications.stream()
                 .map(a -> {
                     Collection<Long> flowIds = logicalByApp.get(a.owningApplicationId());
                     if (isEmpty(flowIds)) return null;
@@ -61,7 +61,7 @@ public class PhysicalFlowGenerator {
                     return IntStream.range(0, t.v2.size() - 1)
                         .mapToObj(i -> {
                             PhysicalFlowRecord record = dsl.newRecord(PHYSICAL_FLOW);
-                            record.setArticleId(t.v1);
+                            record.setSpecificationId(t.v1);
                             record.setFlowId(flowIds.remove(rnd.nextInt(flowIds.size() - 1)));
                             record.setDescription("Description: " + t.v1 + " - " + t.v2);
                             record.setProvenance("DEMO");

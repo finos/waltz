@@ -32,9 +32,9 @@ public class LineageReportContributorEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String findContributorsByArticleIdPath = mkPath(
+        String findContributorsBySpecificationIdPath = mkPath(
                 BASE_URL,
-                "physical-article",
+                "specification",
                 ":id");
 
         String findContributorsByReportIdPath = mkPath(
@@ -43,7 +43,7 @@ public class LineageReportContributorEndpoint implements Endpoint {
                 ":id");
 
         getForList(
-                findContributorsByArticleIdPath,
+                findContributorsBySpecificationIdPath,
                 (request, response) -> Collections.emptyList());
 
         getForList(

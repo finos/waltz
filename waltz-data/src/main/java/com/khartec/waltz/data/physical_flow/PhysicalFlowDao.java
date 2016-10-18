@@ -25,7 +25,7 @@ public class PhysicalFlowDao {
         return ImmutablePhysicalFlow.builder()
                 .id(record.getId())
                 .provenance(record.getProvenance())
-                .articleId(record.getArticleId())
+                .specificationId(record.getSpecificationId())
                 .basisOffset(record.getBasisOffset())
                 .frequency(FrequencyKind.valueOf(record.getFrequency()))
                 .description(record.getDescription())
@@ -63,8 +63,8 @@ public class PhysicalFlowDao {
     }
 
 
-    public List<PhysicalFlow> findByArticleId(long articleId) {
-        return findByCondition(PHYSICAL_FLOW.ARTICLE_ID.eq(articleId));
+    public List<PhysicalFlow> findBySpecificationId(long specificationId) {
+        return findByCondition(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specificationId));
     }
 
 

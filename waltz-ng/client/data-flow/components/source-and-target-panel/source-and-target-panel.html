@@ -60,12 +60,12 @@
                 <tbody>
                 <tr ng-repeat="pf in $ctrl.selected.physicalFlows">
                     <td>
-                        <a ui-sref="main.physical-data-article.view ({ id: pf.article.id })">
-                            <span ng-bind="pf.article.name"></span>
+                        <a ui-sref="main.physical-specification.view ({ id: pf.specification.id })">
+                            <span ng-bind="pf.specification.name"></span>
                         </a>
                     </td>
                     <td>
-                        <span ng-bind="pf.article.format"></span>
+                        <span ng-bind="pf.specification.format"></span>
                     </td>
                     <td>
                         <span ng-bind="pf.transport"></span>

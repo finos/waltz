@@ -61,7 +61,7 @@ public class LogicalDataFlowIdSelectorFactory implements IdSelectorFactory {
                 return wrapAppIdSelector(options);
 
             default:
-                throw new UnsupportedOperationException("Cannot create physical data article selector from options: " + options);
+                throw new UnsupportedOperationException("Cannot create physical specification selector from options: " + options);
         }
     }
 

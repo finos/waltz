@@ -11,7 +11,7 @@ import org.immutables.value.Value;
 public abstract class LineageReportDescriptor {
 
     public abstract EntityReference reportReference();
-    public abstract EntityReference articleReference();
+    public abstract EntityReference specificationReference();
     public abstract EntityReference applicationReference();
 
 }

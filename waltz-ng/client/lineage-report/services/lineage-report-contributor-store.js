@@ -8,13 +8,13 @@ function store($http, baseApiUrl) {
         .then(r => r.data);
 
 
-    const findContributorsByArticleId = id => $http
-        .get(`${base}/physical-article/${id}`)
+    const findContributorsBySpecificationId = id => $http
+        .get(`${base}/physical-specification/${id}`)
         .then(r => r.data);
 
     return {
         findContributorsByReportId,
-        findContributorsByArticleId,
+        findContributorsBySpecificationId,
     };
 }
 

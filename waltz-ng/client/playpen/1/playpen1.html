@@ -91,7 +91,7 @@
                                                logical-flows="ctrl.logicalFlows"
                                                decorators="ctrl.dataFlowDecorators"
                                                physical-flows="ctrl.physicalFlows"
-                                               physical-articles="ctrl.articles">
+                                               physical-specifications="ctrl.specifications">
                     </waltz-source-and-target-panel>
                 </uib-tab>
             </uib-tabset>
@@ -103,8 +103,8 @@
     <waltz-section name="stuff">
         <div class="row">
             <div class="col-md-3">
-                <h4>Articles</h4>
-                <pre>{{ ctrl.articles | json }}</pre>
+                <h4>specification</h4>
+                <pre>{{ ctrl.specifications | json }}</pre>
             </div>
             <div class="col-md-3">
                 <h4>Logical Flows</h4>

@@ -7,7 +7,7 @@ const bindings = {
 };
 
 
-const template = require('./physical-data-article-consumers.html');
+const template = require('./physical-specification-consumers.html');
 
 
 function controller() {
