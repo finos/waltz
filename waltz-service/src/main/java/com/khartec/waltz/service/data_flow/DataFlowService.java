@@ -141,8 +141,8 @@ public class DataFlowService {
             case APP_GROUP:
             case CAPABILITY:
             case ORG_UNIT:
-            case PROCESS:
             case PERSON:
+            case PROCESS:
                 return calculateStatsForAppIdSelector(options);
             default:
                 throw new UnsupportedOperationException("Cannot calculate stats for selector kind: "+ options.entityReference().kind());
