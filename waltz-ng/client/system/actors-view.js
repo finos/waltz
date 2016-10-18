@@ -8,7 +8,9 @@ const initialState = {
 };
 
 
-function controller(involvementKindService, notification) {
+function controller($q,
+                    involvementKindService,
+                    notification) {
 
     const vm = initialiseData(this, initialState);
 
@@ -19,12 +21,14 @@ function controller(involvementKindService, notification) {
     }
 
     vm.updateName = (id, change) => {
-        update(id, { name: change })
+        if(change.newVal === "") return $q.reject("Too short");
+        return update(id, { name: change })
             .then(() => _.find(vm.actors, {'id': id}).name = change.newVal);
     };
 
     vm.updateDescription = (id, change) => {
-        update(id, { description: change })
+        if(change.newVal === "") return $q.reject("Too short");
+        return update(id, { description: change })
             .then(() => _.find(vm.actors, {'id': id}).description = change.newVal);
     };
 
@@ -49,7 +53,7 @@ function controller(involvementKindService, notification) {
     vm.cancelNewActor = () => {
         vm.creatingActor = false;
         console.log('cancelled new');
-    }
+    };
 
 
     function loadInvolvementKinds() {
@@ -60,14 +64,12 @@ function controller(involvementKindService, notification) {
             });
     };
 
-
     loadInvolvementKinds();
-
-
 }
 
 
 controller.$inject = [
+    '$q',
     'InvolvementKindService',
     'Notification'
 ];

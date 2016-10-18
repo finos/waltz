@@ -257,3 +257,12 @@ a.subtle-link:hover {
     @extend .btn-default;
     background-color: transparent;
 }
+
+.waltz-error {
+    @extend small;
+    padding: 2px 4px;
+    color: #c7254e;
+    background-color: #f4edef;
+    border-radius: 2px;
+    font-style: italic;
+}

@@ -37,7 +37,13 @@
                 Cancel
             </button>
             <span ng-if="$ctrl.saving">
-                <waltz-icon name="spinner" spin="true"></waltz-icon>
+                <waltz-icon name="spinner"
+                            spin="true">
+                </waltz-icon>
+            </span>
+            <span ng-if="$ctrl.errorMessage.length > 0"
+                  ng-bind="$ctrl.errorMessage"
+                  class="waltz-error">
             </span>
         </div>
     </div>
