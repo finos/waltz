@@ -1,5 +1,6 @@
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.invovement_kind.InvolvementKind;
 import com.khartec.waltz.model.invovement_kind.InvolvementKindChangeCommand;
 import com.khartec.waltz.model.invovement_kind.InvolvementKindCreateCommand;
@@ -77,7 +78,8 @@ public class InvolvementKindEndpoint implements Endpoint {
     }
 
 
-    private Long updateInvolvementKindRoute(Request request, Response response) throws IOException {
+    private CommandResponse<InvolvementKindChangeCommand> updateInvolvementKindRoute(Request request, Response response)
+            throws IOException {
         ensureUserHasAdminRights(request);
 
         String username = getUsername(request);
