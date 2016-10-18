@@ -1,4 +1,4 @@
-package com.khartec.waltz.model.physical_data_flow;
+package com.khartec.waltz.model.physical_flow;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -15,9 +15,9 @@ import org.immutables.value.Value;
  * data flow may only associated to a single logical flow.
  */
 @Value.Immutable
-@JsonSerialize(as = ImmutablePhysicalDataFlow.class)
-@JsonDeserialize(as = ImmutablePhysicalDataFlow.class)
-public abstract class PhysicalDataFlow implements
+@JsonSerialize(as = ImmutablePhysicalFlow.class)
+@JsonDeserialize(as = ImmutablePhysicalFlow.class)
+public abstract class PhysicalFlow implements
         IdProvider,
         DescriptionProvider,
         ProvenanceProvider {

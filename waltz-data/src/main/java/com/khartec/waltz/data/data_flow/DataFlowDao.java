@@ -35,7 +35,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
-import static com.khartec.waltz.schema.tables.PhysicalDataFlow.PHYSICAL_DATA_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 
 
 @Repository
@@ -151,9 +151,9 @@ public class DataFlowDao {
     @Deprecated
     public Collection<DataFlow> findByPhysicalDataArticleId(long articleId) {
         return baseQuery()
-                .innerJoin(PHYSICAL_DATA_FLOW)
-                .on(DATA_FLOW.ID.eq(PHYSICAL_DATA_FLOW.FLOW_ID))
-                .where(PHYSICAL_DATA_FLOW.ARTICLE_ID.eq(articleId))
+                .innerJoin(PHYSICAL_FLOW)
+                .on(DATA_FLOW.ID.eq(PHYSICAL_FLOW.FLOW_ID))
+                .where(PHYSICAL_FLOW.ARTICLE_ID.eq(articleId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

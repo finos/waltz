@@ -31,7 +31,7 @@ function controller($q,
                     notification,
                     orgUnitStore,
                     physicalDataArticleStore,
-                    physicalDataFlowStore) {
+                    physicalFlowStore) {
 
     const vm = initialiseData(this, initialState);
 
@@ -82,7 +82,7 @@ function controller($q,
             physicalDataArticleStore
                 .findByAppId(appId)
                 .then(xs => vm.searchResults.articles = xs),
-            physicalDataFlowStore
+            physicalFlowStore
                 .findByEntityReference(ref)
                 .then(xs => vm.searchResults.physicalFlows = xs),
             logicalDataFlowStore
@@ -145,7 +145,7 @@ controller.$inject = [
     'Notification',
     'OrgUnitStore',
     'PhysicalDataArticleStore',
-    'PhysicalDataFlowStore'
+    'PhysicalFlowStore'
 ];
 
 

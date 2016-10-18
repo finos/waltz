@@ -29,7 +29,7 @@ import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.LineageReportContributor.LINEAGE_REPORT_CONTRIBUTOR;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
-import static com.khartec.waltz.schema.tables.PhysicalDataFlow.PHYSICAL_DATA_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.Process.PROCESS;
 
 @Service
@@ -276,10 +276,10 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
         return dsl
                 .select(appField)
                 .from(DATA_FLOW)
-                .innerJoin(PHYSICAL_DATA_FLOW)
-                .on(PHYSICAL_DATA_FLOW.FLOW_ID.eq(DATA_FLOW.ID))
+                .innerJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.FLOW_ID.eq(DATA_FLOW.ID))
                 .innerJoin(LINEAGE_REPORT_CONTRIBUTOR)
-                .on(LINEAGE_REPORT_CONTRIBUTOR.PHYSICAL_FLOW_ID.eq(PHYSICAL_DATA_FLOW.ID))
+                .on(LINEAGE_REPORT_CONTRIBUTOR.PHYSICAL_FLOW_ID.eq(PHYSICAL_FLOW.ID))
                 .where(dsl.renderInlined(condition));
     }
 

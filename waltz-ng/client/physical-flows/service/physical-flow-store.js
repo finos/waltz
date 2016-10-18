@@ -3,7 +3,7 @@ import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks';
 
 function store($http, baseApiUrl) {
 
-    const base = `${baseApiUrl}/physical-data-flow`;
+    const base = `${baseApiUrl}/physical-flow`;
 
 
     const findByEntityReference = (ref) => {

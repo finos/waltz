@@ -84,7 +84,7 @@ function controller($q,
                     orgUnitStore,
                     perspectiveStore,
                     physicalDataArticleStore,
-                    physicalDataFlowStore,
+                    physicalFlowStore,
                     processStore,
                     ratingStore,
                     serverInfoStore,
@@ -169,7 +169,7 @@ function controller($q,
                 .findByAppId(id)
                 .then(xs => vm.physicalDataArticles = xs),
 
-            physicalDataFlowStore
+            physicalFlowStore
                 .findByEntityReference(entityRef)
                 .then(xs => vm.physicalDataFlows = xs),
 
@@ -243,7 +243,7 @@ controller.$inject = [
     'OrgUnitStore',
     'PerspectiveStore',
     'PhysicalDataArticleStore',
-    'PhysicalDataFlowStore',
+    'PhysicalFlowStore',
     'ProcessStore',
     'RatingStore',
     'ServerInfoStore',

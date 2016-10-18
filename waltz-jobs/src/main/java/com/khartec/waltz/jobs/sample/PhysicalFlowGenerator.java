@@ -3,9 +3,9 @@ package com.khartec.waltz.jobs.sample;
 import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.data.physical_data_article.PhysicalDataArticleDao;
 import com.khartec.waltz.model.physical_data_article.PhysicalDataArticle;
-import com.khartec.waltz.model.physical_data_flow.FrequencyKind;
-import com.khartec.waltz.model.physical_data_flow.TransportKind;
-import com.khartec.waltz.schema.tables.records.PhysicalDataFlowRecord;
+import com.khartec.waltz.model.physical_flow.FrequencyKind;
+import com.khartec.waltz.model.physical_flow.TransportKind;
+import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple;
@@ -23,10 +23,10 @@ import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalDataArticle.PHYSICAL_DATA_ARTICLE;
-import static com.khartec.waltz.schema.tables.PhysicalDataFlow.PHYSICAL_DATA_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 
 
-public class PhysicalDataFlowGenerator {
+public class PhysicalFlowGenerator {
 
     private static final Random rnd = new Random();
 
@@ -49,7 +49,7 @@ public class PhysicalDataFlowGenerator {
                 t -> t.v1(),
                 allLogicalFLows);
 
-        List<PhysicalDataFlowRecord> records = articles.stream()
+        List<PhysicalFlowRecord> records = articles.stream()
                 .map(a -> {
                     Collection<Long> flowIds = logicalByApp.get(a.owningApplicationId());
                     if (isEmpty(flowIds)) return null;
@@ -60,7 +60,7 @@ public class PhysicalDataFlowGenerator {
                     List<Long> flowIds = new LinkedList(t.v2);
                     return IntStream.range(0, t.v2.size() - 1)
                         .mapToObj(i -> {
-                            PhysicalDataFlowRecord record = dsl.newRecord(PHYSICAL_DATA_FLOW);
+                            PhysicalFlowRecord record = dsl.newRecord(PHYSICAL_FLOW);
                             record.setArticleId(t.v1);
                             record.setFlowId(flowIds.remove(rnd.nextInt(flowIds.size() - 1)));
                             record.setDescription("Description: " + t.v1 + " - " + t.v2);
@@ -74,8 +74,8 @@ public class PhysicalDataFlowGenerator {
                 .collect(Collectors.toList());
 
         System.out.println("---removing demo records");
-        dsl.deleteFrom(PHYSICAL_DATA_FLOW)
-                .where(PHYSICAL_DATA_FLOW.PROVENANCE.eq("DEMO"))
+        dsl.deleteFrom(PHYSICAL_FLOW)
+                .where(PHYSICAL_FLOW.PROVENANCE.eq("DEMO"))
                 .execute();
 
         System.out.println("---saving record: "+records.size());

@@ -1,4 +1,4 @@
-package com.khartec.waltz.model.physical_data_flow;
+package com.khartec.waltz.model.physical_flow;
 
 public enum TransportKind {
 

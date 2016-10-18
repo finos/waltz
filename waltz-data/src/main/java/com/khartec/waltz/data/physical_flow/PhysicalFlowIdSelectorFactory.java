@@ -1,4 +1,4 @@
-package com.khartec.waltz.data.physical_data_flow;
+package com.khartec.waltz.data.physical_flow;
 
 import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -9,10 +9,11 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.LineageReportContributor.LINEAGE_REPORT_CONTRIBUTOR;
-import static com.khartec.waltz.schema.tables.PhysicalDataFlow.PHYSICAL_DATA_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+
 
 @Service
-public class PhysicalDataFlowIdSelectorFactory implements IdSelectorFactory {
+public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
 
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
@@ -28,10 +29,10 @@ public class PhysicalDataFlowIdSelectorFactory implements IdSelectorFactory {
 
     private Select<Record1<Long>> mkForLineageReport(IdSelectionOptions options) {
         ensureScopeIsExact(options);
-        return DSL.select(PHYSICAL_DATA_FLOW.ID)
-                .from(PHYSICAL_DATA_FLOW)
+        return DSL.select(PHYSICAL_FLOW.ID)
+                .from(PHYSICAL_FLOW)
                 .innerJoin(LINEAGE_REPORT_CONTRIBUTOR)
-                .on(LINEAGE_REPORT_CONTRIBUTOR.PHYSICAL_FLOW_ID.eq(PHYSICAL_DATA_FLOW.ID))
+                .on(LINEAGE_REPORT_CONTRIBUTOR.PHYSICAL_FLOW_ID.eq(PHYSICAL_FLOW.ID))
                 .where(LINEAGE_REPORT_CONTRIBUTOR.LINEAGE_REPORT_ID.eq(options.entityReference().id()));
     }
 

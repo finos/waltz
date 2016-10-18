@@ -42,7 +42,7 @@ function controller($stateParams,
                     logicalFlowStore,
                     orgUnitStore,
                     physicalDataArticleStore,
-                    physicalDataFlowStore) {
+                    physicalFlowStore) {
 
     const vm = initialiseData(this, initialState);
     const reportId = $stateParams.id;
@@ -76,7 +76,7 @@ function controller($stateParams,
         .findBySelector(selectorOptions)
         .then(articles => vm.articles = articles);
 
-    physicalDataFlowStore
+    physicalFlowStore
         .findBySelector(selectorOptions)
         .then(physicalFlows => vm.physicalFlows = physicalFlows);
 
@@ -99,7 +99,7 @@ controller.$inject = [
     'DataFlowDataStore', // LogicalFlowStore
     'OrgUnitStore',
     'PhysicalDataArticleStore',
-    'PhysicalDataFlowStore'
+    'PhysicalFlowStore'
 ];
 
 

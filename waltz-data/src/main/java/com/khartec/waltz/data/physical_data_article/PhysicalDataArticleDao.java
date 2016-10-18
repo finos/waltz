@@ -22,7 +22,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalDataArticle.PHYSICAL_DATA_ARTICLE;
-import static com.khartec.waltz.schema.tables.PhysicalDataFlow.PHYSICAL_DATA_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static java.util.Collections.emptyList;
 
 @Repository
@@ -115,10 +115,10 @@ public class PhysicalDataArticleDao {
                 .select(DSL.value("consumer").as("relationship"))
                 .select(PHYSICAL_DATA_ARTICLE.fields())
                 .from(PHYSICAL_DATA_ARTICLE)
-                .innerJoin(PHYSICAL_DATA_FLOW)
-                .on(PHYSICAL_DATA_FLOW.ARTICLE_ID.eq(PHYSICAL_DATA_ARTICLE.ID))
+                .innerJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.ARTICLE_ID.eq(PHYSICAL_DATA_ARTICLE.ID))
                 .innerJoin(DATA_FLOW)
-                .on(PHYSICAL_DATA_FLOW.FLOW_ID.eq(DATA_FLOW.ID))
+                .on(PHYSICAL_FLOW.FLOW_ID.eq(DATA_FLOW.ID))
                 .where(DATA_FLOW.TARGET_ENTITY_ID.eq(appId))
                 .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
     }

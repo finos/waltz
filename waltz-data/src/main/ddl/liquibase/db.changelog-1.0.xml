@@ -3103,4 +3103,12 @@
                     columnName="kind"/>
     </changeSet>
 
+
+    <!-- 749: Physical Data Flow - Physical Flow -->
+    <changeSet id="201610118-749-1"
+               author="dwatkins">
+        <renameTable oldTableName="physical_data_flow"
+                     newTableName="physical_flow" />
+    </changeSet>
+
 </databaseChangeLog>
