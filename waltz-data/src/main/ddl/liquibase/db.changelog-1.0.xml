@@ -3006,6 +3006,15 @@
             <column name="last_updated_by" value="admin"/>
         </insert>
     </changeSet>
+  
+    <changeSet id="20161019-713-1"
+               author="kamransaleem">
+        <insert tableName="involvement_kind">
+            <column name="name" value="ASSET_OWNER"/>
+            <column name="description" value="Asset Owner"/>
+            <column name="last_updated_by" value="admin"/>
+        </insert>
+    </changeSet>
 
     <changeSet id="20161014-713-3"
                author="rovats">
