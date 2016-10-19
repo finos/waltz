@@ -25,7 +25,7 @@ function controller($scope) {
                 types,
                 physicalFlows: calcPhysicalFlows(vm.physicalFlows, vm.physicalSpecifications, app, type, vm.entityRef),
                 app,
-                y: evt.pageY
+                y: evt.layerY
             };
         }
 

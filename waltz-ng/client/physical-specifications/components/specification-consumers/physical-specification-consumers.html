@@ -1,14 +1,14 @@
 <div class="row">
     <div class="col-sm-12">
 
-        <div class="alert alert-danger"><strong>TBC</strong></div>
+        <div ng-if="$ctrl.physicalFlows.length > 7">
+            <input type="search"
+                   placeholder="search ..."
+                   ng-model="$ctrl.searchTerms"
+                   class="form-control">
+            <br>
+        </div>
 
-        <input type="search"
-               placeholder="search ..."
-               ng-model="$ctrl.searchTerms"
-               class="form-control">
-
-        <br>
 
         <div class="small text-muted">
             Select an application to see more detail about the flow and it's lineage
@@ -52,7 +52,6 @@
                 </tbody>
             </table>
         </div>
-
 
         <p class="small text-muted">
             Applications which declare a physical flow which consumes this item.

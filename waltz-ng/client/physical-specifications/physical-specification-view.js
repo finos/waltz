@@ -1,4 +1,5 @@
 import {initialiseData} from '../common';
+import {green, grey} from '../common/colors';
 
 
 const template = require('./physical-specification-view.html');
@@ -18,14 +19,37 @@ const initialState = {
 
 
 
+function setupGraphTweakers(application) {
+    return {
+        node: {
+            update: (selection) => {
+                selection
+                    .select('circle')
+                    .attr({
+                        'fill': d => d.id === application.id
+                            ? green
+                            : grey,
+                        'stroke': d => d.id === application.id
+                            ? green.darker()
+                            : grey.darker(),
+                        'r': d => d.id === application.id
+                            ? 15
+                            : 10
+                    });
+            },
+            exit: () => {},
+            enter: () => {}
+        }
+    };
+}
+
+
 function controller($state,
                     $stateParams,
                     applicationStore,
                     bookmarkStore,
-                    lineageReportStore,
-                    logicalDataFlowStore,
-                    notification,
                     orgUnitStore,
+                    physicalFlowLineageStore,
                     physicalSpecificationStore,
                     physicalFlowStore)
 {
@@ -45,7 +69,8 @@ function controller($state,
         .then(spec => applicationStore.getById(spec.owningEntity.id))
         .then(app => vm.owningEntity = app)
         .then(app => orgUnitStore.getById(app.organisationalUnitId))
-        .then(ou => vm.organisationalUnit = ou);
+        .then(ou => vm.organisationalUnit = ou)
+        .then(() => vm.graphTweakers = setupGraphTweakers(vm.owningEntity));
 
     physicalFlowStore
         .findBySpecificationId(specId)
@@ -57,42 +82,50 @@ function controller($state,
         .then(bs => vm.bookmarks = bs);
 
 
-    // -- INTERACT ---
-
-    vm.openCreateReportPopup = () => {
-        vm.visibility.createReportOverlay = ! vm.visibility.createReportOverlay;
-        if (!vm.createReportForm.name) {
-            vm.createReportForm.name = vm.spec.name + " Lineage Report";
-        }
-    };
-
-    vm.canCreateReport = () => {
-        const name = vm.createReportForm.name || "";
-        return name.length > 1;
-    };
-
-    vm.createReport = () => {
-        vm.visibility.createReportButton = false;
-        vm.visibility.createReportBusy = true;
-
-        lineageReportStore
-            .create({ name: vm.createReportForm.name, specificationId: vm.specification.id })
-            .then(reportId => {
-                notification.success("Lineage Report created");
-                $state.go('main.lineage-report.edit', { id: reportId });
-                vm.visibility.createReportButton = true;
-                vm.visibility.createReportBusy = false;
-            });
-    };
 
     vm.onFlowSelect = (flow) => {
-        console.log("ofs", flow);
         vm.selectedFlow = {
             flow,
             mentions: [],
             lineage: []
-        }
-    }
+        };
+
+        physicalFlowLineageStore
+            .findByPhysicalFlowId(flow.id)
+            .then(lineage => {
+                const lineageFlows =_.map(
+                    lineage,
+                    (x) => {
+                        return {
+                            id: x.flow.id,
+                            source: x.sourceApplication,
+                            target: x.targetApplication
+                        };
+                    });
+
+                const lineageEntities = _.chain(lineage)
+                    .flatMap(
+                        x => [
+                            vm.owningEntity,
+                            x.sourceApplication,
+                            x.targetApplication])
+                    .uniqBy('id')
+                    .value();
+
+                vm.selectedFlow = Object.assign(
+                    {},
+                    vm.selectedFlow,
+                    {
+                        lineage,
+                        lineageFlows,
+                        lineageEntities
+                    });
+            });
+
+        physicalFlowLineageStore
+            .findContributionsByPhysicalFlowId(flow.id)
+            .then(mentions => vm.selectedFlow = Object.assign({}, vm.selectedFlow, { mentions }))
+    };
 
 }
 
@@ -102,10 +135,8 @@ controller.$inject = [
     '$stateParams',
     'ApplicationStore',
     'BookmarkStore',
-    'LineageReportStore',
-    'DataFlowDataStore', // LogicalDataFlowStore
-    'Notification',
     'OrgUnitStore',
+    'PhysicalFlowLineageStore',
     'PhysicalSpecificationStore',
     'PhysicalFlowStore'
 ];

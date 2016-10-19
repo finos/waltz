@@ -3,18 +3,14 @@ import {checkIsCreateLineageReportCommand} from '../../common/checks';
 
 function store($http, baseApiUrl) {
 
-    const base = `${baseApiUrl}/lineage-report`;
+    const base = `${baseApiUrl}/physical-flow-lineage`;
 
-    const getById = (id) => $http
-        .get(`${base}/id/${id}`)
+    const findByPhysicalFlowId = (id) => $http
+        .get(`${base}/physical-flow/${id}`)
         .then(r => r.data);
 
-    const findBySpecificationId = (id) => $http
-        .get(`${base}/specification/${id}`)
-        .then(r => r.data);
-
-    const findReportsContributedToBySpecificationId = (id) => $http
-        .get(`${base}/specification/${id}/contributions`)
+    const findContributionsByPhysicalFlowId = (id) => $http
+        .get(`${base}/physical-flow/${id}/contributions`)
         .then(r => r.data);
 
     /**
@@ -41,9 +37,8 @@ function store($http, baseApiUrl) {
     return {
         create,
         update,
-        getById,
-        findBySpecificationId,
-        findReportsContributedToBySpecificationId
+        findByPhysicalFlowId,
+        findContributionsByPhysicalFlowId
     };
 }
 

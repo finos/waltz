@@ -11,7 +11,8 @@
     white-space: nowrap;
     text-decoration: none;
 }
-//
+
+
 .dropdown-menu > li span a:hover,
 .dropdown-menu > li span a:focus {
     @include gradient-vertical($start-color: $dropdown-link-hover-bg, $end-color: darken($dropdown-link-hover-bg, 5%));
@@ -35,3 +36,9 @@
 @include waltz-text-muted(60);
 @include waltz-text-muted(70);
 @include waltz-text-muted(80);
+
+
+.tab-pane {
+    border-left: 1px solid #ddd;
+    padding-left: 12px;
+}
