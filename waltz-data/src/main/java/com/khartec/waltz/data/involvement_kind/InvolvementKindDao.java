@@ -96,6 +96,7 @@ public class InvolvementKindDao {
         record.setDescription(command.description());
         record.setLastUpdatedBy(username);
         record.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
+        record.store();
 
         return record.getId();
     }

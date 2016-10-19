@@ -6,11 +6,13 @@ const template = require('./editable-field.html');
 const bindings = {
     initialVal: '<',
     onSave: '<',
-    fieldType: '@'
+    fieldType: '@',
+    itemId: '<'
 };
 
 
 const initialState = {
+    errorMessage: "",
     editing: false,
     saving: false,
     fieldType: 'text',
@@ -25,6 +27,13 @@ function controller($timeout) {
     const saveComplete = () => {
         vm.saving = false;
         vm.editing = false;
+        vm.errorMessage = "";
+    };
+
+    const saveFailed = (e) => {
+        vm.saving = false;
+        vm.editing = true;
+        vm.errorMessage = e;
     };
 
 
@@ -36,10 +45,10 @@ function controller($timeout) {
 
         vm.saving = true;
 
-        const promise = vm.onSave(data);
+        const promise = vm.onSave(vm.itemId, data);
 
         if (promise) {
-            promise.then(saveComplete)
+            promise.then(saveComplete, saveFailed)
         } else {
             saveComplete();
         }
@@ -55,6 +64,7 @@ function controller($timeout) {
     vm.cancel = () => {
         vm.editing = false;
         vm.saving = false;
+        vm.errorMessage = "";
     };
 
 }

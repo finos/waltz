@@ -128,8 +128,8 @@ function controller($q,
             .then(loadReport);
     }
 
-    vm.updateName = (change) => update({ name: change });
-    vm.updateDescription = (change) => update({ description: change });
+    vm.updateName = (id, change) => update({ name: change });
+    vm.updateDescription = (id, change) => update({ description: change });
 
 }
 

@@ -15,6 +15,11 @@ const createLineageReportCommandShape = {
     name: apiCheck.string
 };
 
+const createInvolvementKindCommandShape = {
+    name: apiCheck.string,
+    description: apiCheck.string
+}
+
 
 const check = (test, x) => myApiCheck.throw(test, x);
 
@@ -25,6 +30,10 @@ export const checkIsEntityRef = ref =>
 
 export const checkIsCreateLineageReportCommand = ref =>
     check(myApiCheck.shape(createLineageReportCommandShape), ref);
+
+
+export const checkIsCreateInvolvementKindCommand = ref =>
+    check(myApiCheck.shape(createInvolvementKindCommandShape), ref);
 
 
 export const checkIsStringList = xs =>

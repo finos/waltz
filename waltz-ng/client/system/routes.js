@@ -35,6 +35,12 @@ const recalculateState = {
 };
 
 
+const actorsState = {
+    url: '/actors',
+    views: { 'content@': require('./actors-view') }
+};
+
+
 function setupRoutes($stateProvider) {
     $stateProvider
         .state('main.system', baseState)
@@ -42,6 +48,7 @@ function setupRoutes($stateProvider) {
         .state('main.system.settings', settingsState)
         .state('main.system.hierarchies', hierarchiesState)
         .state('main.system.orphans', orphansState)
+        .state('main.system.actors', actorsState)
         .state('main.system.recalculate', recalculateState);
 }
 
