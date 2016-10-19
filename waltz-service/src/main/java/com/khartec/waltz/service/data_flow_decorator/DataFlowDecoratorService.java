@@ -74,6 +74,7 @@ public class DataFlowDecoratorService {
         checkNotNull(decoratorEntityKind, "decoratorEntityKind cannot be null");
 
         switch (options.entityReference().kind()) {
+            case APPLICATION:
             case APP_GROUP:
             case CAPABILITY:
             case ORG_UNIT:
