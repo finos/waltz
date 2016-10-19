@@ -21,7 +21,7 @@ public class DataFlowDecoratorHarness {
         DataFlowDecoratorService service = ctx.getBean(DataFlowDecoratorService.class);
 
         EntityReference dataType = EntityReference.mkRef(EntityKind.DATA_TYPE, 8000);
-        IdSelectionOptions options = IdSelectionOptions.mkOpts(dataType, HierarchyQueryScope.CHILDREN, EntityKind.DATA_TYPE);
+        IdSelectionOptions options = IdSelectionOptions.mkOpts(dataType, HierarchyQueryScope.CHILDREN);
 
         service.findBySelector(options).forEach(System.out::println);
 

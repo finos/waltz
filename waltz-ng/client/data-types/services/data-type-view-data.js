@@ -82,24 +82,14 @@ function service($q,
             scope: 'CHILDREN'
         };
 
-        const dataTypeSelector = {
-            entityReference: {
-                kind: 'DATA_TYPE',
-                id: dataTypeId
-            },
-            scope: 'CHILDREN',
-            desiredKind: 'DATA_TYPE'
-        };
-
-
         const bulkPromise = $q.all([
             ratingStore.findByAppIdSelector(selector),
             appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(selector),
             capabilityStore.findAll(),
             bookmarkStore.findByParent({id: dataTypeId, kind: 'DATA_TYPE'}),
             sourceDataRatingStore.findAll(),
-            dataTypeUsageStore.findForUsageKindByDataTypeIdSelector('ORIGINATOR', dataTypeSelector),
-            dataTypeUsageStore.findForUsageKindByDataTypeIdSelector('DISTRIBUTOR', dataTypeSelector)
+            dataTypeUsageStore.findForUsageKindByDataTypeIdSelector('ORIGINATOR', selector),
+            dataTypeUsageStore.findForUsageKindByDataTypeIdSelector('DISTRIBUTOR', selector)
         ]);
 
         const prepareRawDataPromise = bulkPromise
