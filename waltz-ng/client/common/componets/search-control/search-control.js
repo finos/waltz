@@ -1,4 +1,6 @@
 import { initialiseData, invokeFunction } from "../../../common"
+import _ from 'lodash';
+
 
 const bindings = {
     onQuery: '<',
@@ -22,15 +24,8 @@ const initialState = {
 function controller($scope) {
     const vm = initialiseData(this, initialState);
 
-    console.log("initialised search control");
     vm.options = {
         debounce: vm.delay
-    };
-
-
-    vm.$onChanges = changes => {
-        console.log('changes: ', changes);
-
     };
 
 
