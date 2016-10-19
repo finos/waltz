@@ -3105,21 +3105,21 @@
 
 
     <!-- 749: Physical Data Flow - Physical Flow -->
-    <changeSet id="201610118-749-1"
+    <changeSet id="20161018-749-1"
                author="dwatkins">
         <renameTable oldTableName="physical_data_flow"
                      newTableName="physical_flow" />
     </changeSet>
 
 
-    <!-- 749: Physical Data Flow - Physical Flow -->
-    <changeSet id="201610118-748-1"
+    <!-- 748: Physical Data Article rename to PhysicalSpecification -->
+    <changeSet id="20161018-748-1"
                author="dwatkins">
         <renameTable oldTableName="physical_data_article"
                      newTableName="physical_specification" />
     </changeSet>
 
-    <changeSet id="201610118-748-2"
+    <changeSet id="20161018-748-2"
                author="dwatkins">
         <renameColumn tableName="physical_flow"
                       oldColumnName="article_id"
@@ -3127,12 +3127,46 @@
                       newColumnName="specification_id"/>
     </changeSet>
 
-    <changeSet id="201610118-748-3"
+    <changeSet id="20161018-748-3"
                author="dwatkins">
         <renameColumn tableName="lineage_report"
                       oldColumnName="physical_article_id"
                       columnDataType="${id.type}"
                       newColumnName="specification_id"/>
     </changeSet>
+
+
+    <!-- 761: Physical Flow Lineage -->
+    <changeSet author="dwatkins"
+               id="20161018-761-1">
+        <createTable tableName="physical_flow_lineage">
+            <column name="report_flow_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contributor_flow_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="physical_flow_lineage"
+                       constraintName="physical_flow_lineage_pkey"
+                       columnNames="report_flow_id, contributor_flow_id"/>
+    </changeSet>
+
 
 </databaseChangeLog>
