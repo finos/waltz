@@ -15,8 +15,7 @@ import org.springframework.stereotype.Service;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
-import static com.khartec.waltz.schema.tables.LineageReportContributor.LINEAGE_REPORT_CONTRIBUTOR;
-import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+
 
 @Service
 public class LogicalDataFlowIdSelectorFactory implements IdSelectorFactory {

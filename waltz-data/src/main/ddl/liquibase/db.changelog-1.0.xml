@@ -3222,4 +3222,16 @@
     </changeSet>
 
 
+    <!-- 762: remove old lineage tables -->
+    <changeSet id="20161019-762-1"
+               author="dwatkins">
+        <dropTable tableName="lineage_report"/>
+    </changeSet>
+
+    <changeSet id="20161019-762-2"
+               author="dwatkins">
+        <dropTable tableName="lineage_report_contributor"/>
+    </changeSet>
+
+
 </databaseChangeLog>
