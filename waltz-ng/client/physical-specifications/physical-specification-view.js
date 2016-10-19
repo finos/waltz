@@ -12,7 +12,8 @@ const initialState = {
     },
     createReportForm: {
         name: ""
-    }
+    },
+    selectedFlow: null
 };
 
 
@@ -41,8 +42,8 @@ function controller($state,
     physicalSpecificationStore
         .getById(specId)
         .then(spec => vm.specification = spec)
-        .then(spec => applicationStore.getById(spec.owningApplicationId))
-        .then(app => vm.owningApp = app)
+        .then(spec => applicationStore.getById(spec.owningEntity.id))
+        .then(app => vm.owningEntity = app)
         .then(app => orgUnitStore.getById(app.organisationalUnitId))
         .then(ou => vm.organisationalUnit = ou);
 
@@ -50,17 +51,6 @@ function controller($state,
         .findBySpecificationId(specId)
         .then(physicalFlows => vm.physicalFlows = physicalFlows);
 
-    logicalDataFlowStore
-        .findBySpecificationId(specId)
-        .then(logicalFlows => vm.logicalFlows = logicalFlows);
-
-    lineageReportStore
-        .findBySpecificationId(specId)
-        .then(lineageReports => vm.lineageReports = lineageReports);
-
-    lineageReportStore
-        .findReportsContributedToBySpecificationId(specId)
-        .then(mentions => vm.lineageMentions = mentions);
 
     bookmarkStore
         .findByParent(ref)
@@ -94,6 +84,15 @@ function controller($state,
                 vm.visibility.createReportBusy = false;
             });
     };
+
+    vm.onFlowSelect = (flow) => {
+        console.log("ofs", flow);
+        vm.selectedFlow = {
+            flow,
+            mentions: [],
+            lineage: []
+        }
+    }
 
 }
 

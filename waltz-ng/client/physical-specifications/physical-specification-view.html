@@ -8,7 +8,7 @@
             <li><a ui-sref="main">Home</a></li>
             <li>
                 <a ui-sref="main.app.view ({ id: ctrl.owningApp.id })">
-                    <span ng-bind="ctrl.owningApp.name"></span>
+                    <span ng-bind="ctrl.owningEntity.name"></span>
                 </a>
             </li>
             <li ng-bind="ctrl.specification.name"></li>
@@ -17,7 +17,7 @@
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-physical-specification-overview owning-app="ctrl.owningApp"
+        <waltz-physical-specification-overview owning-entity="ctrl.owningEntity"
                                                specification="ctrl.specification"
                                                organisational-unit="ctrl.organisationalUnit">
         </waltz-physical-specification-overview>
@@ -27,13 +27,29 @@
 
     <!-- CONSUMERS -->
     <waltz-section name="Consumers" small="Physical Flows">
-         <waltz-physical-specification-consumers physical-flows="ctrl.consumers"
-                                                 lineage="ctrl.lineages"
-                                                 mentions="ctrl.mentions"
-                                                 on-lineage-select="ctrl.foo"
-                                                 on-lineage-create=""
-                                                 on-mention-select="ctrl.foo">
+         <waltz-physical-specification-consumers physical-flows="ctrl.physicalFlows"
+                                                 on-flow-select="ctrl.onFlowSelect">
          </waltz-physical-specification-consumers>
+
+
+        <div ng-if="ctrl.selectedFlow != null">
+            <div class="row">
+                <hr>
+                <div class="col-md-12">
+                    <div class="alert alert-info"><h3>Lineage Report</h3></div>
+                </div>
+            </div>
+
+
+            <div class="row" ng-if="ctrl.selectedFlow.mentions.length > 0">
+                <hr>
+                <div class="col-md-12">
+                    <waltz-physical-specification-mentions></waltz-physical-specification-mentions>
+                </div>
+            </div>
+        </div>
+
+        <pre>{{ ctrl.selectedFlow | json }}</pre>
 
 
     </waltz-section>
