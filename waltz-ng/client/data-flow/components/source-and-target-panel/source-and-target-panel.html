@@ -9,7 +9,7 @@
 
     <div ng-if="$ctrl.selected"
          ng-style="{
-            top: ($ctrl.selected.y - 140) + 'px',
+            top: ($ctrl.selected.y) + 'px',
             right: $ctrl.selected.type == 'source' ? '100px' : null,
             left: $ctrl.selected.type == 'target' ? '100px' : null
          }"

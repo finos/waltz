@@ -27,30 +27,49 @@
 
     <!-- CONSUMERS -->
     <waltz-section name="Consumers" small="Physical Flows">
-         <waltz-physical-specification-consumers physical-flows="ctrl.physicalFlows"
-                                                 on-flow-select="ctrl.onFlowSelect">
-         </waltz-physical-specification-consumers>
+        <waltz-physical-specification-consumers physical-flows="ctrl.physicalFlows"
+                                                on-flow-select="ctrl.onFlowSelect">
+        </waltz-physical-specification-consumers>
 
 
-        <div ng-if="ctrl.selectedFlow != null">
-            <div class="row">
-                <hr>
-                <div class="col-md-12">
-                    <div class="alert alert-info"><h3>Lineage Report</h3></div>
+        <uib-tabset active="active"
+                    ng-if="ctrl.selectedFlow != null">
+            <!-- LINEAGE -->
+            <uib-tab ng-if="ctrl.selectedFlow.lineage.length > 0"
+                     index="0"
+                     heading="Lineage">
+                <div class="row" >
+                    <div class="col-md-12">
+                        <br>
+                        <p class="small text-muted">Lineage foo baa</p>
+                        <br>
+                        <waltz-physical-flow-lineage-panel lineage="ctrl.selectedFlow.lineage">
+
+                        </waltz-physical-flow-lineage-panel>
+
+                        <hr>
+
+                        <waltz-data-flow-diagram data="{ flows: ctrl.selectedFlow.lineageFlows, entities: ctrl.selectedFlow.lineageEntities }"
+                                                 tweakers="ctrl.graphTweakers">
+                        </waltz-data-flow-diagram>
+
+                    </div>
                 </div>
-            </div>
+            </uib-tab>
 
+            <!-- MENTIONS -->
+            <uib-tab ng-if="ctrl.selectedFlow.mentions.length > 0"
+                     index="1"
+                     heading="Mentions">
 
-            <div class="row" ng-if="ctrl.selectedFlow.mentions.length > 0">
-                <hr>
-                <div class="col-md-12">
-                    <waltz-physical-specification-mentions></waltz-physical-specification-mentions>
+                <div class="row">
+                    <div class="col-md-12">
+                        <waltz-physical-specification-mentions mentions="ctrl.selectedFlow.mentions">
+                        </waltz-physical-specification-mentions>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <pre>{{ ctrl.selectedFlow | json }}</pre>
-
+            </uib-tab>
+        </uib-tabset>
 
     </waltz-section>
 

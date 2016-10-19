@@ -1,0 +1,42 @@
+<div>
+    <table class="table table-condensed table-hover small">
+        <thead>
+        <tr>
+            <th>Specification</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Format</th>
+            <th>Transport</th>
+            <th>Description</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="flow in $ctrl.lineage | orderBy:'specification.name'">
+            <td>
+                <a ui-sref="main.physical-specification.view ({ id: flow.specification.id })"
+                   ng-bind="flow.specification.name">
+                </a>
+            </td>
+            <td>
+                <a ui-sref='main.app.view ({ id: flow.sourceApplication.id })'
+                   ng-bind="flow.sourceApplication.name">
+                </a>
+            </td>
+            <td>
+                <a ui-sref='main.app.view ({ id: flow.targetApplication.id })'
+                   ng-bind="flow.targetApplication.name">
+                </a>
+            </td>
+            <td><span ng-bind="flow.specification.format"></span></td>
+            <td><span ng-bind="flow.flow.transport"></span></td>
+            <td><span ng-bind="flow.flow.description"></span></td>
+            <td>
+                <a ui-sref='main.app.view ({ id: $ctrl.apps.byId[specification.owningApplicationId].id })'
+                   ng-bind="$ctrl.apps.byId[specification.owningApplicationId].name">
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

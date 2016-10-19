@@ -1,10 +1,12 @@
-<div xxng-if="$ctrl.physicalFlows.length > 0" class="row">
-
-    <div class="alert alert-danger">
-        <strong>TBC</strong>
-    </div>
+<div class="row">
     <div class="col-md-12">
-        <h4>Lineage Mentions</h4>
+
+        <br>
+        <p class="text-muted small">
+            This table outlines where this specification is mentioned in the lineage of other specifications.
+        </p>
+        <br>
+
         <table class="table table-condensed table-striped table-hover small">
             <thead>
             <tr>
@@ -12,19 +14,46 @@
                 <th>Description</th>
                 <th>From</th>
                 <th>To</th>
+                <th>Transport</th>
+                <th>Frequency</th>
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="flow in $ctrl.physicalFlows">
+            <tr ng-repeat="mention in $ctrl.mentions">
                 <td>
-                    <a ui-sref="main.physical-specification.view ({id: flow.specification.id })"
-                       ng-bind="flow.specification.name"></a>
+                    <a ui-sref="main.physical-specification.view ({id: mention.specification.id })"
+                       uib-popover="{{ mention.specification.description }}"
+                       popover-trigger="mouseenter"
+                       ng-bind="mention.specification.name"></a>
                 </td>
+                <td>
+                    <span ng-bind="mention.specification.format"></span>
+                </td>
+                <td>
+                    <a uib-popover="{{ mention.sourceApplication.description }}"
+                       popover-trigger="mouseenter"
+                       ui-sref="main.app.view ({ id: mention.sourceApplication.id })">
+                        <span ng-bind="mention.sourceApplication.name"></span>
+                        <span class="small">
+                            ( <span ng-bind="mention.sourceApplication.assetCode"></span> )
+                        </span>
+                    </a>
+                </td>
+                <td>
+                    <a uib-popover="{{ mention.targetApplication.description }}"
+                       popover-trigger="mouseenter"
+                       ui-sref="main.app.view ({ id: mention.targetApplication.id })">
+                        <span ng-bind="mention.targetApplication.name"></span>
+                        <span class="small">
+                            ( <span ng-bind="mention.sourceApplication.assetCode"></span> )
+                        </span>
+                    </a>
+                </td>
+                <td><span ng-bind="mention.flow.transport"></span></td>
+                <td><span ng-bind="mention.flow.frequency"></span></td>
             </tr>
             </tbody>
         </table>
-        <p class="text-muted small">
-            This table outlines where this specification participates in lineage.
-        </p>
+
     </div>
 </div>
