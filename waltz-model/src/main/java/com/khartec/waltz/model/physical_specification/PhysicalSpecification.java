@@ -22,7 +22,7 @@ public abstract class PhysicalSpecification implements
         DescriptionProvider,
         ProvenanceProvider {
 
-    public abstract long owningApplicationId();
+    public abstract EntityReference owningEntity();
     public abstract DataFormatKind format();
 
 }

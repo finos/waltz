@@ -1,5 +1,6 @@
 package com.khartec.waltz.data.physical_flow;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.physical_flow.FrequencyKind;
 import com.khartec.waltz.model.physical_flow.ImmutablePhysicalFlow;
@@ -13,8 +14,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 
 @Repository
@@ -29,7 +30,9 @@ public class PhysicalFlowDao {
                 .basisOffset(record.getBasisOffset())
                 .frequency(FrequencyKind.valueOf(record.getFrequency()))
                 .description(record.getDescription())
-                .flowId(record.getFlowId())
+                .target(EntityReference.mkRef(
+                        EntityKind.valueOf(record.getTargetEntityKind()),
+                        record.getTargetEntityId()))
                 .transport(TransportKind.valueOf(record.getTransport()))
                 .build();
     };
@@ -49,16 +52,16 @@ public class PhysicalFlowDao {
 
         checkNotNull(ref, "ref cannot be null");
 
-        Condition matchingSource = DATA_FLOW.SOURCE_ENTITY_ID.eq(ref.id())
-                .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name()));
-        Condition matchingTarget = DATA_FLOW.TARGET_ENTITY_ID.eq(ref.id())
-                .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()));
+        Condition isTarget = PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name())
+                .and(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id()));
+
+        Condition isSource = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(ref.id())
+                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(ref.kind().name()));
 
         return dsl.select(PHYSICAL_FLOW.fields())
                 .from(PHYSICAL_FLOW)
-                .innerJoin(DATA_FLOW)
-                .on(DATA_FLOW.ID.eq(PHYSICAL_FLOW.FLOW_ID))
-                .where(matchingSource.or(matchingTarget))
+                .innerJoin(PHYSICAL_SPECIFICATION).on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
+                .where(isTarget.or(isSource))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

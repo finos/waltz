@@ -34,7 +34,6 @@ import java.util.function.BiFunction;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 
 
 @Repository
@@ -123,15 +122,6 @@ public class DataFlowDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-
-    @Deprecated
-    public Collection<DataFlow> findByPhysicalSpecificationId(long specificationId) {
-        return baseQuery()
-                .innerJoin(PHYSICAL_FLOW)
-                .on(DATA_FLOW.ID.eq(PHYSICAL_FLOW.FLOW_ID))
-                .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specificationId))
-                .fetch(TO_DOMAIN_MAPPER);
-    }
 
 
     public List<DataFlow> findBySelector(Select<Record1<Long>> flowIdSelector) {

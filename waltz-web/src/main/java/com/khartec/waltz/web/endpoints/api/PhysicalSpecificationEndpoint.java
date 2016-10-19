@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getId;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
@@ -37,18 +35,21 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         String findByProducerAppPath = mkPath(
                 BASE_URL,
                 "application",
+                ":kind",
                 ":id",
                 "produces");
 
         String findByConsumerAppIdPath = mkPath(
                 BASE_URL,
                 "application",
+                ":kind",
                 ":id",
                 "consumes");
 
         String findByAppPath = mkPath(
                 BASE_URL,
                 "application",
+                ":kind",
                 ":id");
 
         String findBySelectorPath = mkPath(
@@ -61,16 +62,16 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
                 ":id");
 
         ListRoute<PhysicalSpecification> findByProducerAppRoute =
-                (request, response) -> specificationService.findByProducerAppId(getId(request));
+                (request, response) -> specificationService.findByProducer(getEntityReference(request));
 
         ListRoute<PhysicalSpecification> findByConsumerAppIdRoute =
-                (request, response) -> specificationService.findByConsumerAppId(getId(request));
+                (request, response) -> specificationService.findByConsumer(getEntityReference(request));
 
         ListRoute<PhysicalSpecification> findBySelectorRoute =
                 (request, response) -> specificationService.findBySelector(readIdSelectionOptionsFromBody(request));
 
         DatumRoute<ProduceConsumeGroup<PhysicalSpecification>> findByAppRoute =
-                (request, response) -> specificationService.findByAppId(getId(request));
+                (request, response) -> specificationService.findByEntityReference(getEntityReference(request));
 
         DatumRoute<PhysicalSpecification> getByIdRoute =
                 (request, response) -> specificationService.getById(getId(request));

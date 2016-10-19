@@ -1,13 +1,16 @@
-import {checkIsIdSelector} from '../../common/checks';
+import {checkIsIdSelector, checkIsEntityRef} from '../../common/checks';
 
 function store($http, baseApiUrl) {
 
     const base = `${baseApiUrl}/physical-specification`;
 
 
-    const findByAppId = (id) => $http
-        .get(`${base}/application/${id}`)
-        .then(r => r.data);
+    const findByEntityReference = (ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${base}/application/${ref.kind}/${ref.id}`)
+            .then(r => r.data);
+    }
 
 
     const findBySelector = (options) => {
@@ -24,7 +27,7 @@ function store($http, baseApiUrl) {
 
 
     return {
-        findByAppId,
+        findByEntityReference,
         findBySelector,
         getById
     };

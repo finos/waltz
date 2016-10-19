@@ -4,7 +4,7 @@ import {termSearch} from "../../../common"
 
 
 const bindings = {
-    logicalFlows: '<',
+    endpointReferences: '<',  // [ entityReference... ]
     physicalFlows: '<',
     specifications: '<'
 };
@@ -15,43 +15,53 @@ const template = require('./physical-data-section.html');
 
 function enrichConsumes(specifications = [],
                 physicalFlows = [],
-                logicalFlows = [])
+                endpointReferences = [])
 {
-    const visitedApps = [];
+    const visitedRefs = [];
 
     return _.chain(specifications)
         .map(specification => {
             const physicalFlow = _.find(physicalFlows, { specificationId: specification.id });
-            const logicalFlow = _.find(logicalFlows, f => f.id === physicalFlow.flowId);
-            const firstSource = !_.includes(visitedApps, specification.owningApplicationId);
-            if(firstSource === true) {
-                visitedApps.push(specification.owningApplicationId);
-            }
+            const sourceRef = _.find(endpointReferences, { id: specification.owningEntity.id, kind: specification.owningEntity.kind });
+            const targetRef = _.find(endpointReferences, { id: physicalFlow.target.id, kind: physicalFlow.target.kind });
 
-            return {
-                specification,
-                logicalFlow,
-                physicalFlow,
-                firstSource
-            };
+            if (!physicalFlow || !sourceRef || !targetRef) {
+                return null;
+            } else {
+                const firstSource = !_.includes(
+                    visitedRefs,
+                    sourceRef);
+
+                if(firstSource === true) {
+                    visitedRefs.push(sourceRef);
+                }
+
+                return {
+                    specification,
+                    physicalFlow,
+                    firstSource,
+                    sourceRef,
+                    targetRef
+                };
+            }
         })
-        .groupBy("logicalFlow.source.id")
+        .filter(r => r != null)
         .value();
 }
 
 
 function mkData(specifications = { produces: [], consumes: [] },
                 physicalFlows = [],
-                logicalFlows = [])
+                endpointReferences = [])
 {
     const produces = combineFlowData(
         specifications.produces,
         physicalFlows,
-        logicalFlows);
+        endpointReferences);
     const consumes = enrichConsumes(
         specifications.consumes,
         physicalFlows,
-        logicalFlows);
+        endpointReferences);
     return { produces, consumes };
 }
 
@@ -67,7 +77,7 @@ function controller() {
         'specification.description',
         'physicalFlow.transport',
         'physicalFlow.frequency',
-        'logicalFlow.target.name'
+        'targetRef.name'
     ];
 
 
@@ -78,11 +88,11 @@ function controller() {
         'specification.description',
         'physicalFlow.transport',
         'physicalFlow.frequency',
-        'logicalFlow.source.name'
+        'sourceRef.name'
     ];
 
     vm.$onChanges = (changes) => {
-        Object.assign(vm, mkData(vm.specifications, vm.physicalFlows, vm.logicalFlows));
+        Object.assign(vm, mkData(vm.specifications, vm.physicalFlows, vm.endpointReferences));
         vm.filterProduces("");
         vm.filterConsumes("");
     };

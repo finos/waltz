@@ -26,147 +26,15 @@
     <br>
 
     <!-- CONSUMERS -->
-    <waltz-section name="Consumers">
-         <waltz-physical-specification-consumers logical-flows="ctrl.logicalFlows"
-                                                 physical-flows="ctrl.physicalFlows">
-        </waltz-physical-specification-consumers>
-    </waltz-section>
+    <waltz-section name="Consumers" small="Physical Flows">
+         <waltz-physical-specification-consumers physical-flows="ctrl.consumers"
+                                                 lineage="ctrl.lineages"
+                                                 mentions="ctrl.mentions"
+                                                 on-lineage-select="ctrl.foo"
+                                                 on-lineage-create=""
+                                                 on-mention-select="ctrl.foo">
+         </waltz-physical-specification-consumers>
 
-
-    <!-- LINEAGE REPORTS -->
-    <waltz-section name="Lineage">
-        <div class="waltz-section-actions">
-            <span waltz-has-role='LOGICAL_DATA_FLOW_EDITOR'>
-                <button class="btn btn-xs btn-primary"
-                        ng-click="ctrl.openCreateReportPopup()">
-                    Create Lineage Report
-                </button>
-            </span>
-        </div>
-
-        <waltz-overlay-panel name="Create Lineage Report "
-                             icon="plus"
-                             visible="ctrl.visibility.createReportOverlay">
-            <form name="create-report-form">
-                <div class="alert alert-warning">
-                    Lineage reports already exist for this specification.
-                    <br>
-                    Are you sure you wish to create another?
-                </div>
-                <label for="report-name-field">
-                    Name
-                </label>
-                <input id="report-name-field"
-                       name="nameField"
-                       class="form-control"
-                       type="text"
-                       ng-model="ctrl.createReportForm.name">
-                <span class="help-block small">
-                    By default the name for this report will be based upon the specification name.
-                    <br>
-                    Report names should be unique within Waltz.
-                </span>
-                <br>
-                <button class="btn btn-success btn-sm"
-                        ng-show="ctrl.visibility.createReportButton"
-                        ng-click="ctrl.createReport()"
-                        ng-disabled="! ctrl.canCreateReport()">
-                    Create
-                </button>
-
-                <span ng-if="ctrl.visibility.createReportBusy">
-                    <waltz-icon name="spinner"
-                                spin="true"></waltz-icon>
-                    Submitted
-                </span>
-            </form>
-        </waltz-overlay-panel>
-
-        <!-- DESCRIBED BY.. -->
-        <div class="row">
-            <div class="col-md-12">
-                <h4>Describing Lineage Reports</h4>
-                <table ng-if="ctrl.lineageReports.length > 0"
-                       class="table table-condensed table-striped table-hover small">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="lineageReport in ctrl.lineageReports">
-                        <td>
-                            <a ng-bind="lineageReport.name"
-                               ui-sref="main.lineage-report.view ({ id: lineageReport.id })">
-                            </a>
-                        </td>
-                        <td><span ng-bind="lineageReport.description"></span></td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <div waltz-has-role='LOGICAL_DATA_FLOW_EDITOR'>
-                    <div ng-if="ctrl.lineageReports.length == 0"
-                         class="alert alert-info">
-                        No lineage reports exist which describe this specification.
-                    </div>
-                </div>
-
-                <p class="text-muted small">
-                    Lineage reports describe how a specification is produced
-                </p>
-            </div>
-            <div class="col-md-3">
-
-            </div>
-        </div>
-
-        <hr ng-if="ctrl.lineageReports.length > 0 && ctrl.lineageMentions.length > 0">
-
-        <!-- MENTIONED BY.. -->
-        <div ng-if="ctrl.lineageMentions.length > 0" class="row">
-
-            <div class="col-md-12">
-                <h4>Lineage Report Mentions</h4>
-                <table class="table table-condensed table-striped table-hover small">
-                    <thead>
-                    <tr>
-                        <th>Report Name</th>
-                        <th>Description</th>
-                        <th>Specification Name</th>
-                        <th>Specification Description</th>
-                        <th>Owning Application</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="mention in ctrl.lineageMentions">
-                        <td>
-                            <a ui-sref="main.lineage-report.view ({id: mention.reportReference.id })"
-                               ng-bind="mention.reportReference.name"></a>
-                        </td>
-                        <td>
-                            <span ng-bind="mention.reportReference.description"></span>
-                        </td>
-                        <td>
-                            <a ui-sref="main.physical-specification.view ({id: mention.specificationReference.id })"
-                               ng-bind="mention.specificationReference.name"></a>
-                        </td>
-                        <td>
-                            <span ng-bind="mention.specificationReference.description"></span>
-                        </td>
-                        <td>
-                            <a ui-sref="main.app.view ({id: mention.applicationReference.id })"
-                               ng-bind="mention.applicationReference.name"></a>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <p class="text-muted small">
-                    Lineage reports that mention this specification.
-                </p>
-            </div>
-        </div>
 
     </waltz-section>
 

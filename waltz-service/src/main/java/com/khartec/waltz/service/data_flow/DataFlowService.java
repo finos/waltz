@@ -36,7 +36,6 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -168,11 +167,6 @@ public class DataFlowService {
                 .appCounts(appCounts)
                 .flowCounts(flowCounts)
                 .build();
-    }
-
-
-    public Collection<DataFlow> findByPhysicalSpecificationId(long specificationId) {
-        return dataFlowDao.findByPhysicalSpecificationId(specificationId);
     }
 
 }

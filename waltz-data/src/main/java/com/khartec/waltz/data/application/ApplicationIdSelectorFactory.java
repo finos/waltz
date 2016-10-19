@@ -26,10 +26,8 @@ import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORA
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
-import static com.khartec.waltz.schema.tables.LineageReportContributor.LINEAGE_REPORT_CONTRIBUTOR;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
-import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.Process.PROCESS;
 
 @Service
@@ -83,8 +81,6 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 return mkForCapability(ref, options.scope());
             case DATA_TYPE:
                 return mkForDataType(options);
-            case LINEAGE_REPORT:
-                return mkForLineageReport(options);
             case ORG_UNIT:
                 return mkForOrgUnit(ref, options.scope());
             case PERSON:
@@ -254,34 +250,6 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForLineageReport(IdSelectionOptions options) {
-        Condition condition = LINEAGE_REPORT_CONTRIBUTOR.LINEAGE_REPORT_ID.eq(options.entityReference().id());
-        Field appId = DSL.field("app_id", Long.class);
-
-        SelectConditionStep<Record1<Long>> sources = selectLogicalFlowAppsByLineage(
-                DATA_FLOW.SOURCE_ENTITY_ID.as(appId),
-                condition.and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
-
-        SelectConditionStep<Record1<Long>> targets = selectLogicalFlowAppsByLineage(
-                DATA_FLOW.TARGET_ENTITY_ID.as(appId),
-                condition.and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
-
-        return dsl.selectDistinct(appId)
-                .from(targets)
-                .union(sources);
-    }
-
-
-    private SelectConditionStep<Record1<Long>> selectLogicalFlowAppsByLineage(Field<Long> appField, Condition condition) {
-        return dsl
-                .select(appField)
-                .from(DATA_FLOW)
-                .innerJoin(PHYSICAL_FLOW)
-                .on(PHYSICAL_FLOW.FLOW_ID.eq(DATA_FLOW.ID))
-                .innerJoin(LINEAGE_REPORT_CONTRIBUTOR)
-                .on(LINEAGE_REPORT_CONTRIBUTOR.PHYSICAL_FLOW_ID.eq(PHYSICAL_FLOW.ID))
-                .where(dsl.renderInlined(condition));
-    }
 
 
     private SelectConditionStep<Record1<Long>> selectLogicalFlowAppsByDataType(Field<Long> appField, Condition condition) {

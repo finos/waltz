@@ -1,3 +1,4 @@
+
 <div class="row"
      ng-if="$ctrl.produces.length > 0">
 
@@ -30,6 +31,7 @@
             <tbody>
             <tr ng-repeat="p in $ctrl.filteredProduces"
                 class="waltz-visibility-parent">
+                <!--<td><pre>{{ p | json }}</pre></td>-->
                 <td>
                     <a ui-sref="main.physical-specification.view ({ id: p.specification.id })">
                         <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
@@ -42,8 +44,8 @@
 
                 </td>
                 <td>
-                    <a ui-sref="main.app.view ({ id: p.logicalFlow.target.id })">
-                        <span ng-bind="p.logicalFlow.target.name">
+                    <a ui-sref="main.app.view ({ id: p.targetRef.id })">
+                        <span ng-bind="p.targetRef.name">
                         </span>
                     </a>
                 </td>
@@ -60,7 +62,6 @@
                 <td>
                     <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
                           ng-bind="p.specification.description | limitTo:100"></span>
-
                 </td>
             </tr>
             </tbody>
@@ -101,9 +102,9 @@
                 class="waltz-visibility-parent">
                 <td>
                     <span>
-                        <a ui-sref="main.app.view ({ id: c.logicalFlow.source.id })"
+                        <a ui-sref="main.app.view ({ id: c.sourceRef.id })"
                            ng-class="{ 'waltz-visibility-child-40' : !c.firstSource}">
-                            <span ng-bind="c.logicalFlow.source.name">
+                            <span ng-bind="c.sourceRef.name">
                             </span>
                         </a>
                     </span>
@@ -134,4 +135,3 @@
     </div>
 </div>
 
-<pre ng-bind="$ctrl.produces|json"></pre>
