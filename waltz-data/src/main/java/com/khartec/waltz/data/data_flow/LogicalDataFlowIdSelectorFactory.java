@@ -41,9 +41,6 @@ public class LogicalDataFlowIdSelectorFactory implements IdSelectorFactory {
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         switch (options.entityReference().kind()) {
-            case LINEAGE_REPORT:
-                return mkForLineageReport(options);
-
             case APPLICATION:
                 return mkForApplication(options);
 
@@ -94,18 +91,6 @@ public class LogicalDataFlowIdSelectorFactory implements IdSelectorFactory {
                         .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .or(DATA_FLOW.TARGET_ENTITY_ID.eq(appId)
                         .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
-    }
-
-
-    private Select<Record1<Long>> mkForLineageReport(IdSelectionOptions options) {
-        ensureScopeIsExact(options);
-        return DSL.select(DATA_FLOW.ID)
-                .from(DATA_FLOW)
-                .innerJoin(PHYSICAL_FLOW)
-                .on(DATA_FLOW.ID.eq(PHYSICAL_FLOW.FLOW_ID))
-                .innerJoin(LINEAGE_REPORT_CONTRIBUTOR)
-                .on(PHYSICAL_FLOW.ID.eq(LINEAGE_REPORT_CONTRIBUTOR.PHYSICAL_FLOW_ID))
-                .where(LINEAGE_REPORT_CONTRIBUTOR.LINEAGE_REPORT_ID.eq(options.entityReference().id()));
     }
 
 

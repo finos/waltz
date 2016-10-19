@@ -166,7 +166,7 @@ function controller($q,
                 .then(ps => vm.processes = ps),
 
             physicalSpecificationStore
-                .findByAppId(id)
+                .findByEntityReference(entityRef)
                 .then(xs => vm.physicalSpecifications = xs),
 
             physicalFlowStore
@@ -184,7 +184,11 @@ function controller($q,
 
         return $q.all(promises)
             .then(() => loadChangeLog(changeLogStore, id, vm))
-            .then(() => loadSourceDataRatings(sourceDataRatingStore, vm));
+            .then(() => loadSourceDataRatings(sourceDataRatingStore, vm))
+            .then(() => vm.physicalEndpointReferences = _.chain(vm.flows)
+                .flatMap(f => [f.source, f.target])
+                .uniqBy("id")
+                .value());
     }
 
 

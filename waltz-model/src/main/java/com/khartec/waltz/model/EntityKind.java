@@ -35,7 +35,6 @@ public enum EntityKind {
     ENTITY_STATISTIC,
     INVOLVEMENT,
     INVOLVEMENT_KIND,
-    LINEAGE_REPORT,
     LOGICAL_DATA_FLOW,
     ORG_UNIT,
     PERFORMANCE_METRIC_PACK,
@@ -46,5 +45,4 @@ public enum EntityKind {
     SERVER,
     SOFTWARE,
     SYSTEM
-
 }

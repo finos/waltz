@@ -6,7 +6,7 @@ import _ from 'lodash';
  * array based around the physicalFlows and it's associated specification and logical
  * flow:
  *
- * ([specifications], [physicalFlows], [logicalFlows]) -> [ { physicalFlow, specification, logicalFlow } ... ]
+ * ([specifications], [physicalFlows], [entityRefs]) -> [ { physicalFlow, specification, sourceRef, targetRef } ... ]
  *
  * @param specifications
  * @param physicalFlows
@@ -15,28 +15,42 @@ import _ from 'lodash';
  */
 export function combineFlowData(specifications = [],
                                 physicalFlows = [],
-                                logicalFlows = [])
+                                endpointReferences = [])
 {
-    return _.chain(specifications)
-        .flatMap((a) => {
-            const logicalById = _.keyBy(logicalFlows, "id");
-            const relevantPhysicalFlows = _.filter(physicalFlows, { specificationId: a.id });
-            if (relevantPhysicalFlows.length === 0) {
-                return {
-                    specification: a,
-                    firstSpecification: true
+    if (specifications.length === 0 || physicalFlows.length === 0 || endpointReferences.length === 0) {
+        return [];
+    } else {
+        return _.chain(specifications)
+            .flatMap((s) => {
+                const relevantPhysicalFlows = _.filter(physicalFlows, { specificationId: s.id });
+                const sourceRef = _.find(endpointReferences, {id: s.owningEntity.id, kind: s.owningEntity.kind});
+
+                if (sourceRef == null) {
+                    return null;
                 }
-            } else {
-                return _.flatMap(relevantPhysicalFlows, (pf, j) => {
+                if (relevantPhysicalFlows.length === 0) {
                     return {
-                        specification: a,
-                        firstSpecification: j === 0,
-                        physicalFlow: pf,
-                        firstPhysicalFlow: j === 0,
-                        logicalFlow: logicalById[pf.flowId]
-                    };
-                });
-            }
-        })
-        .value();
+                        sourceRef,
+                        specification: s,
+                        firstSpecification: true
+                    }
+                } else {
+                    return _.flatMap(relevantPhysicalFlows, (pf, j) => {
+                        const targetRef = _.find(endpointReferences, {id: pf.target.id, kind: pf.target.kind});
+
+                        if (targetRef == null) { return null; }
+                        return {
+                            specification: s,
+                            physicalFlow: pf,
+                            firstPhysicalFlow: j === 0,
+                            firstSpecification: j === 0,
+                            sourceRef,
+                            targetRef
+                        };
+                    });
+                }
+            })
+            .filter(r => r !== null)
+            .value();
+    }
 }

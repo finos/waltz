@@ -1,0 +1,30 @@
+<div xxng-if="$ctrl.physicalFlows.length > 0" class="row">
+
+    <div class="alert alert-danger">
+        <strong>TBC</strong>
+    </div>
+    <div class="col-md-12">
+        <h4>Lineage Mentions</h4>
+        <table class="table table-condensed table-striped table-hover small">
+            <thead>
+            <tr>
+                <th>Specification Name</th>
+                <th>Description</th>
+                <th>From</th>
+                <th>To</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="flow in $ctrl.physicalFlows">
+                <td>
+                    <a ui-sref="main.physical-specification.view ({id: flow.specification.id })"
+                       ng-bind="flow.specification.name"></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="text-muted small">
+            This table outlines where this specification participates in lineage.
+        </p>
+    </div>
+</div>

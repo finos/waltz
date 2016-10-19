@@ -1,5 +1,6 @@
 package com.khartec.waltz.jobs.sample;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.physical_specification.DataFormatKind;
 import com.khartec.waltz.schema.tables.records.PhysicalSpecificationRecord;
 import com.khartec.waltz.service.DIConfiguration;
@@ -91,7 +92,8 @@ public class PhysicalSpecificationGenerator {
                 .map(t -> {
                     String name = mkName();
                     PhysicalSpecificationRecord record = dsl.newRecord(PHYSICAL_SPECIFICATION);
-                    record.setOwningApplicationId(t.v1);
+                    record.setOwningEntityId(t.v1);
+                    record.setOwningEntityKind(EntityKind.APPLICATION.name());
                     record.setFormat(randomPick(DataFormatKind.values()).name());
                     record.setProvenance("DEMO");
                     record.setDescription("Desc "+ name + " " + t.v2);

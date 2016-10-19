@@ -1,6 +1,7 @@
 package com.khartec.waltz.data.physical_specification;
 
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableProduceConsumeGroup;
 import com.khartec.waltz.model.ProduceConsumeGroup;
 import com.khartec.waltz.model.physical_specification.DataFormatKind;
@@ -20,7 +21,6 @@ import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static java.util.Collections.emptyList;
@@ -33,7 +33,9 @@ public class PhysicalSpecificationDao {
         return ImmutablePhysicalSpecification.builder()
                 .id(record.getId())
                 .externalId(record.getExternalId())
-                .owningApplicationId(record.getOwningApplicationId())
+                .owningEntity(EntityReference.mkRef(
+                        EntityKind.valueOf(record.getOwningEntityKind()),
+                        record.getOwningEntityId()))
                 .name(record.getName())
                 .description(record.getDescription())
                 .format(DataFormatKind.valueOf(record.getFormat()))
@@ -52,22 +54,22 @@ public class PhysicalSpecificationDao {
     }
 
 
-    public List<PhysicalSpecification> findByProducerAppId(long appId) {
-        return findByProducerAppIdQuery(appId)
+    public List<PhysicalSpecification> findByProducer(EntityReference ref) {
+        return findByProducerEntityReferenceQuery(ref)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public List<PhysicalSpecification> findByConsumerAppId(long appId) {
-        return findByConsumerAppIdQuery(appId)
+    public List<PhysicalSpecification> findByConsumer(EntityReference ref) {
+        return findByConsumerEntityReferenceQuery(ref)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public ProduceConsumeGroup<PhysicalSpecification> findByAppId(long appId) {
+    public ProduceConsumeGroup<PhysicalSpecification> findByEntityReference(EntityReference ref) {
 
-        List<Tuple2<String, PhysicalSpecification>> results = findByProducerAppIdQuery(appId)
-                .unionAll(findByConsumerAppIdQuery(appId))
+        List<Tuple2<String, PhysicalSpecification>> results = findByProducerEntityReferenceQuery(ref)
+                .unionAll(findByConsumerEntityReferenceQuery(ref))
                 .fetch(r -> Tuple.tuple(
                         r.getValue("relationship", String.class),
                         TO_DOMAIN_MAPPER.map(r)));
@@ -101,26 +103,25 @@ public class PhysicalSpecificationDao {
     }
 
 
-    private Select<Record> findByProducerAppIdQuery(long appId) {
+    private Select<Record> findByProducerEntityReferenceQuery(EntityReference ref) {
         return dsl
                 .select(DSL.value("producer").as("relationship"))
                 .select(PHYSICAL_SPECIFICATION.fields())
                 .from(PHYSICAL_SPECIFICATION)
-                .where(PHYSICAL_SPECIFICATION.OWNING_APPLICATION_ID.eq(appId));
+                .where(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(ref.id()))
+                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(ref.kind().name()));
     }
 
 
-    private Select<Record> findByConsumerAppIdQuery(long appId) {
+    private Select<Record> findByConsumerEntityReferenceQuery(EntityReference ref) {
         return dsl
                 .select(DSL.value("consumer").as("relationship"))
                 .select(PHYSICAL_SPECIFICATION.fields())
                 .from(PHYSICAL_SPECIFICATION)
                 .innerJoin(PHYSICAL_FLOW)
                 .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
-                .innerJoin(DATA_FLOW)
-                .on(PHYSICAL_FLOW.FLOW_ID.eq(DATA_FLOW.ID))
-                .where(DATA_FLOW.TARGET_ENTITY_ID.eq(appId))
-                .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+                .where(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id()))
+                .and(PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()));
     }
 
 }

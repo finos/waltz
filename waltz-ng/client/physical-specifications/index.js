@@ -11,6 +11,9 @@ function setup(module) {
         .component(
             'waltzPhysicalSpecificationConsumers',
             require('./components/specification-consumers/physical-specification-consumers'))
+        .component(
+            'waltzPhysicalSpecificationMentions',
+            require('./components/mentions/physical-specification-mentions'))
         .service(
             'PhysicalSpecificationStore',
             require('./services/physical-specification-store'))

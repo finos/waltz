@@ -66,7 +66,6 @@ public class DataFlowsEndpoint implements Endpoint {
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findBySelectorPath = mkPath(BASE_URL, "selector");
         String findStatsPath = mkPath(BASE_URL, "stats");
-        String findByPhysicalSpecificationIdPath = mkPath(BASE_URL, "specification", ":id");
 
         String removeFlowPath = mkPath(BASE_URL, ":id");
         String addFlowPath = mkPath(BASE_URL);
@@ -81,13 +80,8 @@ public class DataFlowsEndpoint implements Endpoint {
                 -> dataFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
 
 
-        ListRoute<DataFlow> findByPhysicalSpecificationIdRoute = (request, response)
-                -> dataFlowService.findByPhysicalSpecificationId(getId(request));
-
-
         getForList(findByEntityPath, getByEntityRef);
         postForList(findBySelectorPath, findBySelectorRoute);
-        getForList(findByPhysicalSpecificationIdPath, findByPhysicalSpecificationIdRoute);
 
         postForDatum(findStatsPath, findStatsRoute);
 

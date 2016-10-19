@@ -48,8 +48,9 @@ function controller($scope) {
 
         vm.tweakers = mkTweakers(
             baseTweakers,
-            keyedLogicalFlows,
-            vm.physicalFlows);
+            vm.entityRef,
+            vm.physicalFlows,
+            vm.physicalSpecifications);
     };
 }
 
@@ -147,20 +148,41 @@ function toIcon(count = 0) {
 
 
 function mkTweakers(tweakers = {},
-                         keyedLogicalFlows = {},
-                         physicalFlows = []) {
-    const physicalCountsByLogicalId = _.countBy(physicalFlows, "flowId");
+                    entityRef = null,
+                    physicalFlows = [],
+                    physicalSpecifications = []) {
 
-    const getIcon = (id, relevantFlowsByAppId = {}) => {
-        const logicalFlowId = relevantFlowsByAppId[id];
-        const physicalCount = physicalCountsByLogicalId[logicalFlowId] || 0;
-        return toIcon(physicalCount);
+    const getSourceCount = (ref) => {
+        const potentialSpecs = _.chain(physicalSpecifications.consumes)
+            .filter({ owningEntity: { id: ref.id, kind: ref.kind }})
+            .map("id")
+            .value();
+
+        const count = _.chain(physicalFlows)
+            .filter(pf => _.includes(potentialSpecs, pf.specificationId))
+            .filter({ target : { kind: entityRef.kind, id: entityRef.id }})
+            .size()
+            .value();
+
+        return count;
     };
 
-    const { sourceFlowsByAppId = {}, targetFlowsByAppId = {} } = keyedLogicalFlows;
+    const getTargetCount = (ref) => {
+        const potentialSpecs = _.chain(physicalSpecifications.produces)
+            .map("id")
+            .value();
 
-    tweakers.source.icon = (d) => getIcon(d.id, sourceFlowsByAppId);
-    tweakers.target.icon = (d) => getIcon(d.id, targetFlowsByAppId);
+        const count = _.chain(physicalFlows)
+            .filter(pf => _.includes(potentialSpecs, pf.specificationId))
+            .filter({ target : { kind: ref.kind, id: ref.id }})
+            .size()
+            .value();
+
+        return count;
+    };
+
+    tweakers.source.icon = (appRef) => toIcon(getSourceCount(appRef));
+    tweakers.target.icon = (appRef) => toIcon(getTargetCount(appRef));
 
     return Object.assign({} , tweakers);
 }

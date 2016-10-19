@@ -3168,5 +3168,49 @@
                        columnNames="report_flow_id, contributor_flow_id"/>
     </changeSet>
 
+    <!-- 768: lineage scaffolding -->
+    <changeSet id="20161019-768-1"
+               author="dwatkins">
+        <renameColumn tableName="physical_specification"
+                      oldColumnName="owning_application_id"
+                      newColumnName="owning_entity_id"
+                      columnDataType="${id.type}"/>
+        <addColumn tableName="physical_specification">
+            <column name="owning_entity_kind"
+                    type="${enum.type}"
+                    defaultValue="APPLICATION">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20161019-768-2"
+               author="dwatkins">
+        <dropIndex tableName="physical_flow"
+                   indexName="idx_flow_id" />
+        <dropColumn tableName="physical_flow"
+                    columnName="flow_id"/>
+        <addColumn tableName="physical_flow">
+            <column name="target_entity_kind"
+                    type="${enum.type}"
+                    defaultValue="APPLICATION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_entity_id"
+                    type="${id.type}"
+                    defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20161019-768-3"
+               author="dwatkins">
+        <renameColumn tableName="physical_flow_lineage"
+                      oldColumnName="report_flow_id"
+                      newColumnName="described_flow_id"
+                      columnDataType="${id.type}"/>
+    </changeSet>
+
 
 </databaseChangeLog>

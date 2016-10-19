@@ -1,10 +1,14 @@
 <div class="row">
     <div class="col-sm-12">
 
+        <div class="alert alert-danger"><strong>TBC</strong></div>
+
         <table class="table table-condensed small">
             <thead>
             <tr>
-                <th>Application</th>
+                <th>Has Lineage</th>
+                <th>Contributes to Lineage</th>
+                <th>Target</th>
                 <th>Transport</th>
                 <th>Frequency</th>
                 <th>Basis Offset</th>
@@ -12,7 +16,41 @@
             </tr>
             </thead>
             <tbody>
+            <tr>
+                <td>
+                    <a ng-click="fake='lineage'">
+                        <waltz-icon name="check"></waltz-icon>
+                        Yes
+                    </a>
+                </td>
+                <td>
+                    <a ng-click="fake='mentions'">
+                        <waltz-icon name="check"></waltz-icon>
+                        Yes
+                    </a>
+                </td>
+                <td>
+                    <waltz-icon name="user"></waltz-icon>
+                    Regulator A
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><waltz-icon name="check"></waltz-icon></td>
+                <td><waltz-icon name="check"></waltz-icon></td>
+                <td>
+                    <waltz-icon name="square"></waltz-icon>
+                    Risk Report System
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+            </tbody>
+            <tbody>
             <tr ng-repeat="flow in $ctrl.flowData">
+                <td><waltz-icon name="check"></waltz-icon></td>
+                <td><waltz-icon name="check"></waltz-icon></td>
                 <td>
                     <a ui-sref="main.app.view ({id: flow.logicalFlow.target.id})">
                         <span ng-bind="flow.logicalFlow.target.name"></span>
@@ -38,5 +76,20 @@
             Applications which declare a physical flow which consumes this item.
         </p>
 
+    </div>
+</div>
+
+<div class="row" ng-if="fake=='mentions'">
+    <hr>
+    <div class="col-md-12">
+        <waltz-physical-specification-mentions></waltz-physical-specification-mentions>
+    </div>
+</div>
+
+
+<div class="row" ng-if="fake=='lineage'">
+    <hr>
+    <div class="col-md-12">
+        <div class="alert alert-info"><h3>Lineage Report</h3></div>
     </div>
 </div>

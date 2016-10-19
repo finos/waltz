@@ -2,6 +2,7 @@ package com.khartec.waltz.service.physical_specification;
 
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationSelectorFactory;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ProduceConsumeGroup;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
@@ -34,18 +35,18 @@ public class PhysicalSpecificationService {
     }
 
 
-    public ProduceConsumeGroup<PhysicalSpecification> findByAppId(long id) {
-        return specificationDao.findByAppId(id);
+    public ProduceConsumeGroup<PhysicalSpecification> findByEntityReference(EntityReference ref) {
+        return specificationDao.findByEntityReference(ref);
     }
 
 
-    public List<PhysicalSpecification> findByProducerAppId(long id) {
-        return specificationDao.findByProducerAppId(id);
+    public List<PhysicalSpecification> findByProducer(EntityReference ref) {
+        return specificationDao.findByProducer(ref);
     }
 
 
-    public Collection<PhysicalSpecification> findByConsumerAppId(long id) {
-        return specificationDao.findByConsumerAppId(id);
+    public Collection<PhysicalSpecification> findByConsumer(EntityReference ref) {
+        return specificationDao.findByConsumer(ref);
     }
 
 

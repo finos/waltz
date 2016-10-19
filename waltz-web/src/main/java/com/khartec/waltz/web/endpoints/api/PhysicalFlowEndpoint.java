@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 @Service
 public class PhysicalFlowEndpoint implements Endpoint {
@@ -41,10 +40,6 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 "specification",
                 ":id");
 
-        String findBySelectorPath = mkPath(
-                BASE_URL,
-                "selector");
-
         ListRoute<PhysicalFlow> findByEntityRefRoute =
                 (request, response) -> physicalFlowService
                         .findByEntityReference(
@@ -55,13 +50,8 @@ public class PhysicalFlowEndpoint implements Endpoint {
                         .findBySpecificationId(
                                 getId(request));
 
-        ListRoute<PhysicalFlow> findBySelectorRoute =
-                (request, response) -> physicalFlowService
-                        .findBySelector(readIdSelectionOptionsFromBody(request));
-
 
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findBySpecificationIdPath, findBySpecificationIdRoute);
-        postForList(findBySelectorPath, findBySelectorRoute);
     }
 }
