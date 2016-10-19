@@ -19,13 +19,11 @@ function controller($scope) {
 
         function select(app, type, flowId, evt) {
             const typeInfoByFlowId = mkTypeInfo(vm.decorators);
-            const physicalFlowsByLogicalFlowId = mkPhysicalFlowInfo(vm.physicalSpecifications, vm.physicalFlows);
             const types = typeInfoByFlowId[flowId] || [];
-            const physicalFlows = physicalFlowsByLogicalFlowId[flowId] || [];
             return {
                 type,
                 types,
-                physicalFlows,
+                physicalFlows: calcPhysicalFlows(vm.physicalFlows, vm.physicalSpecifications, app, type, vm.entityRef),
                 app,
                 y: evt.pageY
             };
@@ -62,16 +60,16 @@ controller.$inject = [
 
 const template = require('./source-and-target-panel.html');
 
-// flowId -> [ { ...physicalFlow, specification: {} } ... ]
-function mkPhysicalFlowInfo(physicalSpecifications = { consumes: [], produces: [] },
-                            physicalFlows = [])
-{
 
-    const allSpecs = _.concat(physicalSpecifications.consumes, physicalSpecifications.produces);
-    const specsById = _.keyBy(allSpecs || [], "id");
+function calcPhysicalFlows(physicalFlows, specifications, appRef, type, entityRef) {
+    const specs = type === 'source' ? specifications.consumes : specifications.produces;
+    const specsById = _.keyBy(specs, 'id');
+
     return _.chain(physicalFlows)
         .map(pf => Object.assign({}, pf, { specification: specsById[pf.specificationId] }))
-        .groupBy("flowId")
+        .filter(pf => type === 'source'
+            ? pf.target.id ==  entityRef.id && pf.specification.owningEntity.id === appRef.id
+            : pf.target.id ==  appRef.id && pf.specification.owningEntity.id === entityRef.id)
         .value();
 }
 
