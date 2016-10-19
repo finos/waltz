@@ -1,6 +1,6 @@
 const bindings = {
-    spec: '<',
-    owningApp: '<',
+    specification: '<',
+    owningEntity: '<',
     organisationalUnit: '<'
 };
 
