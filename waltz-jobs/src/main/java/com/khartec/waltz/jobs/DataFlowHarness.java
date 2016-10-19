@@ -61,7 +61,7 @@ public class DataFlowHarness {
 
         // by data type
         EntityReference dataType = EntityReference.mkRef(EntityKind.DATA_TYPE, 6000);
-        IdSelectionOptions dataTypeOptions = IdSelectionOptions.mkOpts(dataType, HierarchyQueryScope.CHILDREN, EntityKind.DATA_TYPE);
+        IdSelectionOptions dataTypeOptions = IdSelectionOptions.mkOpts(dataType, HierarchyQueryScope.CHILDREN);
         List<DataFlow> byDataTypeFlows = service.findBySelector(dataTypeOptions);
         byDataTypeFlows.forEach(System.out::println);
         System.out.println(byDataTypeFlows.size());

@@ -21,13 +21,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.CollectionUtilities.map;
-import static com.khartec.waltz.model.EntityKind.APPLICATION;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 
 @Service
@@ -76,22 +73,20 @@ public class DataFlowDecoratorService {
         checkNotNull(options, "options cannot be null");
         checkNotNull(decoratorEntityKind, "decoratorEntityKind cannot be null");
 
-        checkTrue(
-                options.desiredKind() == APPLICATION,
-                "Cannot find with desired kind " + options.desiredKind());
-
-        Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
-        return dataFlowDecoratorDao.findByAppIdSelectorAndKind(selector, decoratorEntityKind);
+        switch (options.entityReference().kind()) {
+            case APPLICATION:
+            case APP_GROUP:
+            case CAPABILITY:
+            case ORG_UNIT:
+            case PROCESS:
+            case PERSON:
+                Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
+                return dataFlowDecoratorDao.findByAppIdSelectorAndKind(selector, decoratorEntityKind);
+            default:
+                throw new UnsupportedOperationException("Cannot find decorators for selector kind: " + options.entityReference().kind());
+        }
     }
 
-
-    public List<DataFlowDecorator> findByFlowIdsAndKind(Collection<Long> flowIds,
-                                                        EntityKind decoratorEntityKind) {
-        checkNotNull(flowIds, "flowIds cannot be null");
-        checkNotNull(decoratorEntityKind, "decoratorEntityKind cannot be null");
-
-        return dataFlowDecoratorDao.findByFlowIdsAndKind(flowIds, decoratorEntityKind);
-    }
 
     /**
      * Find decorators by selector. Supported desiredKinds:
@@ -103,14 +98,18 @@ public class DataFlowDecoratorService {
      * @return
      */
     public Collection<DataFlowDecorator> findBySelector(IdSelectionOptions options) {
-        if (options.desiredKind() == DATA_TYPE) {
-            return findByDataTypeIdSelector(options);
+        switch (options.entityReference().kind()) {
+            case APP_GROUP:
+            case CAPABILITY:
+            case ORG_UNIT:
+            case PROCESS:
+            case PERSON:
+                return findByAppIdSelector(options);
+            case DATA_TYPE:
+                return findByDataTypeIdSelector(options);
+            default:
+                throw new UnsupportedOperationException("Cannot find decorators for selector kind: "+ options.entityReference().kind());
         }
-        if (options.desiredKind() == APPLICATION) {
-            return findByAppIdSelector(options);
-        }
-        String message = String.format("Cannot find decorators for selector desiredKind: %s", options.desiredKind());
-        throw new UnsupportedOperationException(message);
     }
 
 

@@ -14,15 +14,15 @@ function service($q,
                  dataTypeUsageStore) {
     let data = initData;
 
-    function initialise(id, kind, scope = 'CHILDREN', desiredKind = 'APPLICATION') {
+    function initialise(id, kind, scope = 'CHILDREN') {
         reset();
         data.loadingStats = true;
 
         data.options = _.isObject(id)
             ? id
-            : { entityReference: { id, kind }, scope, desiredKind };
+            : { entityReference: { id, kind }, scope };
 
-        const statStore = data.options.desiredKind === 'DATA_TYPE'
+        const statStore = data.options.entityReference.kind === 'DATA_TYPE'
             ? dataTypeUsageStore
             : dataFlowStore;
 

@@ -38,8 +38,7 @@ function controller($scope,
 
     const selector = {
         entityReference,
-        scope: 'CHILDREN',
-        desiredKind: 'DATA_TYPE'
+        scope: 'CHILDREN'
     };
 
     vm.entityRef = entityReference;
