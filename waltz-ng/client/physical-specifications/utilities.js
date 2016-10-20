@@ -14,16 +14,15 @@ import _ from 'lodash';
  * @returns {*}
  */
 export function combineFlowData(specifications = [],
-                                physicalFlows = [],
-                                endpointReferences = [])
+                                physicalFlows = [])
 {
-    if (specifications.length === 0 || physicalFlows.length === 0 || endpointReferences.length === 0) {
+    if (specifications.length === 0 || physicalFlows.length === 0) {
         return [];
     } else {
         return _.chain(specifications)
             .flatMap((s) => {
                 const relevantPhysicalFlows = _.filter(physicalFlows, { specificationId: s.id });
-                const sourceRef = _.find(endpointReferences, {id: s.owningEntity.id, kind: s.owningEntity.kind});
+                const sourceRef = s.owningEntity;
 
                 if (sourceRef == null) {
                     return null;
@@ -36,7 +35,7 @@ export function combineFlowData(specifications = [],
                     }
                 } else {
                     return _.flatMap(relevantPhysicalFlows, (pf, j) => {
-                        const targetRef = _.find(endpointReferences, {id: pf.target.id, kind: pf.target.kind});
+                        const targetRef = pf.target;
 
                         if (targetRef == null) { return null; }
                         return {
@@ -51,6 +50,46 @@ export function combineFlowData(specifications = [],
                 }
             })
             .filter(r => r !== null)
+            .value();
+    }
+}
+
+
+export function enrichConsumes(specifications = [],
+                        physicalFlows = [])
+{
+    const visitedRefs = [];
+
+    if (specifications.length === 0 || physicalFlows.length === 0) {
+        return [];
+    } else {
+        return _.chain(specifications)
+            .map(specification => {
+                const physicalFlow = _.find(physicalFlows, {specificationId: specification.id});
+                const sourceRef = specification.owningEntity;
+                const targetRef = physicalFlow.target.id;
+
+                if (!physicalFlow || !sourceRef || !targetRef) {
+                    return null;
+                } else {
+                    const firstSource = !_.includes(
+                        visitedRefs,
+                        sourceRef);
+
+                    if (firstSource === true) {
+                        visitedRefs.push(sourceRef);
+                    }
+
+                    return {
+                        specification,
+                        physicalFlow,
+                        firstSource,
+                        sourceRef,
+                        targetRef
+                    };
+                }
+            })
+            .filter(r => r != null)
             .value();
     }
 }

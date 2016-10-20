@@ -2,7 +2,7 @@
     <thead>
     <tr>
         <th>Specification Name</th>
-        <th>Consumer</th>
+        <th>Source</th>
         <th>Format</th>
         <th>Transport</th>
         <th>Action</th>
@@ -13,9 +13,9 @@
         class="waltz-visibility-parent">
         <td><span ng-bind="c.specification.name"></span></td>
         <td>
-            <a ng-click="$ctrl.onRefocus(c.targetRef)"
+            <a ng-click="$ctrl.onRefocus(c.sourceRef)"
                class="clickable"
-               ng-bind="c.targetRef.name"></a>
+               ng-bind="c.sourceRef.name"></a>
         </td>
         <td><span class='text-muted' ng-bind="c.specification.format"></span></td>
         <td><span class='text-muted' ng-bind="c.physicalFlow.transport"></span></td>
