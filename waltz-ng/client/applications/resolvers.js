@@ -18,6 +18,13 @@ export function appResolver(appStore, $stateParams) {
 appResolver.$inject = ['ApplicationStore', '$stateParams'];
 
 
+export function appByAssetCodeResolver(appStore, $stateParams) {
+    return appStore.findByAssetCode($stateParams.assetCode);
+}
+
+appByAssetCodeResolver.$inject = ['ApplicationStore', '$stateParams'];
+
+
 // -- ALIASES --
 export function aliasesResolver(aliasStore, $stateParams) {
 

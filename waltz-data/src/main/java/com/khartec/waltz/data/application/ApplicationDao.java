@@ -219,4 +219,14 @@ public class ApplicationDao {
                 .where(APPLICATION.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
+
+    public List<Application> findByAssetCode(String assetCode) {
+        checkNotNull(assetCode, "assetCode cannot be null");
+
+        return dsl.select()
+                .from(APPLICATION)
+                .where(APPLICATION.ASSET_CODE.eq(assetCode))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }

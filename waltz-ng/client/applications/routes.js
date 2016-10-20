@@ -13,7 +13,7 @@
 import AppEdit from "./app-edit";
 import AppRegistration from "./app-registration";
 import appTagExplorerView from "./app-tag-explorer";
-import {appResolver, tagsResolver, aliasesResolver, orgUnitsResolver} from "./resolvers";
+import {appResolver, appByAssetCodeResolver, tagsResolver, aliasesResolver, orgUnitsResolver} from "./resolvers";
 
 
 const base = {
@@ -32,6 +32,15 @@ const appViewState = {
     views: {
         'content@': require('./app-view')
     }
+};
+
+
+const appViewByAssetCodeState = {
+    url: '/asset-code/{assetCode}',
+    views: {
+        'content@': require('./app-asset-code-view')
+    },
+    resolve: { resolvedAppsByAssetCode: appByAssetCodeResolver }
 };
 
 
@@ -58,6 +67,7 @@ function setup($stateProvider) {
         .state('main.app', base)
         .state('main.app.registration', appRegistrationState)
         .state('main.app.view', appViewState)
+        .state('main.app.asset-code', appViewByAssetCodeState)
         .state('main.app.edit', appEditState)
         .state('main.app.tag-explorer', appTagExplorerState);
 }

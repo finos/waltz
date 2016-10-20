@@ -1,0 +1,19 @@
+<div ng-if="ctrl.resolvedAppsByAssetCode.length > 1">
+    <waltz-page-header icon="desktop"
+                       name="Matching Applications"
+                       small="{{ ctrl.assetCode }}">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>Waltz</li>
+        </ol>
+    </waltz-page-header>
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <ul class="list-unstyled">
+            <li ng-repeat="resolvedApp in ctrl.resolvedAppsByAssetCode | orderBy:'name'">
+                <a ng-bind='resolvedApp.name'
+                   ui-sref="main.app.view ({ id: resolvedApp.id })">
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
