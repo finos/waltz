@@ -8,11 +8,19 @@
 }
 
 #loading-bar-spinner {
-    top: 18px;
-    left: 8px;
-}
+    top: 7px;
+    left: 28px;
 
-#loading-bar .peg {
-    height: 4px;
-    box-shadow: #edcd2a 1px 0 6px 1px;
+    .spinner-icon {
+        width: 34px;
+        height: 34px;
+
+        border-top-color:  #edcd2a;
+        border-left-color: #edcd2a;
+    }
+
+    .peg {
+        height: 4px;
+        box-shadow: #edcd2a 1px 0 6px 1px;
+    }
 }
