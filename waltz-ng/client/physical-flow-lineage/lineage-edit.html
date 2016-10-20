@@ -27,8 +27,20 @@
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
+        <h4>
+                Physical flow of
+                <mark ng-bind="ctrl.describedSpecification.name"></mark>
+                from
+                <mark ng-bind="ctrl.describedSpecification.owningEntity.name"></mark>
+                to
+                <mark ng-bind="ctrl.describedFlow.target.name"></mark>
+        </h4>
+        <hr>
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-3">
+                <label>Specification Details:</label>
+            </div>
+            <div class="col-sm-9">
                 <waltz-physical-specification-overview owning-entity="ctrl.owningApplication"
                                                        specification="ctrl.describedSpecification"
                                                        organisational-unit="ctrl.owningOrgUnit">

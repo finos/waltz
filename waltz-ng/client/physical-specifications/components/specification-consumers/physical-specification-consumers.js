@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import {initialiseData} from '../../../common';
 
 const bindings = {
@@ -17,16 +16,7 @@ const initialState = {
 
 
 function controller() {
-    const vm = initialiseData(this, initialState);
-}
-
-
-function combineFlowData(logicalFlows = [], physicalFlows = []) {
-    const logicalById = _.keyBy(logicalFlows, "id");
-    return _.map(physicalFlows, physicalFlow => ({
-        physicalFlow,
-        logicalFlow: logicalById[physicalFlow.flowId]
-    }));
+    initialiseData(this, initialState);
 }
 
 

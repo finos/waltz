@@ -183,13 +183,8 @@ function controller($q,
         ];
 
         return $q.all(promises)
-            .then(() => vm.physicalEndpointReferences = _.chain(vm.flows)
-                .flatMap(f => [f.source, f.target])
-                .uniqBy("id")
-                .value())
             .then(() => loadChangeLog(changeLogStore, id, vm))
             .then(() => loadSourceDataRatings(sourceDataRatingStore, vm))
-
     }
 
 

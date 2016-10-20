@@ -31,54 +31,66 @@
                                                 on-flow-select="ctrl.onFlowSelect">
         </waltz-physical-specification-consumers>
 
+        <div ng-if="ctrl.selectedFlow != null">
+            <hr>
+            <h5>
+                Physical flow of
+                <mark ng-bind="ctrl.specification.name"></mark>
+                from
+                <mark ng-bind="ctrl.specification.owningEntity.name"></mark>
+                to
+                <mark ng-bind="ctrl.selectedFlow.flow.target.name"></mark>
+            </h5>
 
-        <uib-tabset active="active"
-                    ng-if="ctrl.selectedFlow != null">
-            <!-- LINEAGE -->
-            <uib-tab ng-if="ctrl.selectedFlow.lineage.length > 0"
-                     index="0"
-                     heading="Lineage">
-                <div class="row" >
-                    <div class="col-md-12">
-                        <br>
-                        <p class="small text-muted"><!-- TODO: need text --></p>
-                        <br>
-                        <waltz-physical-flow-lineage-panel lineage="ctrl.selectedFlow.lineage">
+            <uib-tabset active="active">
+                <!-- LINEAGE -->
+                <uib-tab ng-if="ctrl.selectedFlow.lineage.length > 0"
+                         index="0"
+                         heading="Lineage">
+                    <div class="row" >
+                        <div class="col-md-12">
+                            <br>
+                            <p class="small text-muted"><!-- TODO: need text --></p>
+                            <br>
+                            <waltz-physical-flow-lineage-panel lineage="ctrl.selectedFlow.lineage">
 
-                        </waltz-physical-flow-lineage-panel>
+                            </waltz-physical-flow-lineage-panel>
 
-                        <hr>
-
-                        <div waltz-has-role="LINEAGE_EDITOR">
-                            <a ui-sref="main.physical-flow-lineage.edit ({id: ctrl.selectedFlow.flow.id})" class="btn btn-sm btn-primary">
-                                <waltz-icon name="edit"></waltz-icon>
-                                Edit Lineage
-                            </a>
                             <hr>
+
+                            <div waltz-has-role="LINEAGE_EDITOR">
+                                <a ui-sref="main.physical-flow-lineage.edit ({id: ctrl.selectedFlow.flow.id})" class="btn btn-sm btn-primary">
+                                    <waltz-icon name="edit"></waltz-icon>
+                                    Edit Lineage
+                                </a>
+                                <hr>
+                            </div>
+
+                            <waltz-data-flow-diagram data="{ flows: ctrl.selectedFlow.lineageFlows, entities: ctrl.selectedFlow.lineageEntities }"
+                                                     tweakers="ctrl.graphTweakers">
+                            </waltz-data-flow-diagram>
+
                         </div>
-
-                        <waltz-data-flow-diagram data="{ flows: ctrl.selectedFlow.lineageFlows, entities: ctrl.selectedFlow.lineageEntities }"
-                                                 tweakers="ctrl.graphTweakers">
-                        </waltz-data-flow-diagram>
-
                     </div>
-                </div>
-            </uib-tab>
+                </uib-tab>
 
-            <!-- MENTIONS -->
-            <uib-tab ng-if="ctrl.selectedFlow.mentions.length > 0"
-                     index="1"
-                     heading="Mentions">
+                <!-- MENTIONS -->
+                <uib-tab ng-if="ctrl.selectedFlow.mentions.length > 0"
+                         index="1"
+                         heading="Mentions">
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <waltz-physical-specification-mentions mentions="ctrl.selectedFlow.mentions">
-                        </waltz-physical-specification-mentions>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <waltz-physical-specification-mentions mentions="ctrl.selectedFlow.mentions">
+                            </waltz-physical-specification-mentions>
+                        </div>
                     </div>
-                </div>
 
-            </uib-tab>
-        </uib-tabset>
+                </uib-tab>
+            </uib-tabset>
+        </div>
+
+
 
     </waltz-section>
 

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {combineFlowData} from '../../../physical-specifications/utilities';
+import {enrichConsumes} from '../../../physical-specifications/utilities';
 
 
 const bindings = {
@@ -32,7 +32,11 @@ function controller() {
             .uniqBy("id")
             .value();
 
-        const flowData = combineFlowData(vm.specifications.produces, vm.physicalFlows, endpointReferences);
+        const flowData = enrichConsumes(
+            vm.specifications.consumes,
+            vm.physicalFlows,
+            endpointReferences);
+
         vm.candidates = removeCandidatesWithNoPhysicalFlows(flowData);
     };
 }
