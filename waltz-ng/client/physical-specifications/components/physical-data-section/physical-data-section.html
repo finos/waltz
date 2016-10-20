@@ -1,137 +1,146 @@
+<div>
 
-<div class="row"
-     ng-if="$ctrl.produces.length > 0">
+    <div class="row"
+         ng-if="$ctrl.produces.length > 0">
 
-    <div class="col-md-12">
-        <h4>Produces</h4>
+        <div class="col-md-12">
+            <h4>Produces</h4>
 
-        <div class="row"
-             ng-if="$ctrl.produces.length > 10">
-            <div class="col-md-6">
-                <waltz-search-control min-characters="3"
-                                      delay="250"
-                                      on-query="$ctrl.filterProduces"
-                                      placeholder-text="Search producers...">
-                </waltz-search-control>
+            <div class="row"
+                 ng-if="$ctrl.produces.length > 10">
+                <div class="col-md-6">
+                    <waltz-search-control min-characters="3"
+                                          delay="250"
+                                          on-query="$ctrl.filterProduces"
+                                          placeholder-text="Search producers...">
+                    </waltz-search-control>
+                </div>
             </div>
-        </div>
 
-        <table class="table table-condensed table-striped table-hover small">
-            <thead>
-            <tr>
-                <th width="20%">Name</th>
-                <th width="7%">Ext. Id</th>
-                <th width="15%">Receiver/s</th>
-                <th width="8%">Format</th>
-                <th width="8%">Transport</th>
-                <th width="8%">Frequency</th>
-                <th width="30%">Description</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="p in $ctrl.filteredProduces"
-                class="waltz-visibility-parent">
-                <!--<td><pre>{{ p | json }}</pre></td>-->
-                <td>
-                    <a ui-sref="main.physical-specification.view ({ id: p.specification.id })">
+            <table class="table table-condensed table-striped table-hover small">
+                <thead>
+                <tr>
+                    <th width="20%">Name</th>
+                    <th width="7%">Ext. Id</th>
+                    <th width="15%">Receiver/s</th>
+                    <th width="8%">Format</th>
+                    <th width="8%">Transport</th>
+                    <th width="8%">Frequency</th>
+                    <th width="30%">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="p in $ctrl.filteredProduces"
+                    class="waltz-visibility-parent">
+                    <!--<td><pre>{{ p | json }}</pre></td>-->
+                    <td>
+                        <a ui-sref="main.physical-specification.view ({ id: p.specification.id })">
+                            <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
+                                  ng-bind="p.specification.name"></span>
+                        </a>
+                    </td>
+                    <td>
                         <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
-                              ng-bind="p.specification.name"></span>
-                    </a>
-                </td>
-                <td>
-                    <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
-                          ng-bind="p.specification.externalId"></span>
+                              ng-bind="p.specification.externalId"></span>
 
-                </td>
-                <td>
-                    <a ui-sref="main.app.view ({ id: p.targetRef.id })">
-                        <span ng-bind="p.targetRef.name">
-                        </span>
-                    </a>
-                </td>
-                <td>
-                    <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
-                          ng-bind="p.specification.format"></span>
-                </td>
-                <td>
-                    <span ng-bind="p.physicalFlow.transport"></span>
-                </td>
-                <td>
-                    <span ng-bind="p.physicalFlow.frequency"></span>
-                </td>
-                <td>
-                    <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
-                          ng-bind="p.specification.description | limitTo:100"></span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="row"
-     ng-hide="$ctrl.consumes | isEmpty">
-    <div class="col-md-12">
-        <h4>Consumes</h4>
-
-        <div class="row"
-             ng-if="$ctrl.consumes.length > 10">
-            <div class="col-md-6">
-                <waltz-search-control min-characters="3"
-                                      delay="250"
-                                      on-query="$ctrl.filterConsumes"
-                                      placeholder-text="Search consumers...">
-                </waltz-search-control>
-            </div>
-        </div>
-
-        <table class="table table-condensed table-striped table-hover small">
-            <thead>
-            <tr>
-                <th width="15%">Source Application</th>
-                <th width="20%">Name</th>
-                <th width="10%">Ext. Id</th>
-                <th width="10%">Format</th>
-                <th width="10%">Transport</th>
-                <th width="10%">Frequency</th>
-                <th width="25%">Description</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="c in $ctrl.filteredConsumes"
-                class="waltz-visibility-parent">
-                <td>
-                    <span>
-                        <a ui-sref="main.app.view ({ id: c.sourceRef.id })"
-                           ng-class="{ 'waltz-visibility-child-40' : !c.firstSource}">
-                            <span ng-bind="c.sourceRef.name">
+                    </td>
+                    <td>
+                        <a ui-sref="main.app.view ({ id: p.targetRef.id })">
+                            <span ng-bind="p.targetRef.name">
                             </span>
                         </a>
-                    </span>
-                </td>
-                <td>
-                    <a ui-sref="main.physical-specification.view ({ id: c.specification.id })">
-                        <span ng-bind="c.specification.name"></span>
-                    </a>
-                </td>
-                <td>
-                    <span ng-bind="c.specification.externalId"></span>
-                </td>
-                <td>
-                    <span ng-bind="c.specification.format"></span>
-                </td>
-                <td>
-                    <span ng-bind="c.physicalFlow.transport"></span>
-                </td>
-                <td>
-                    <span ng-bind="c.physicalFlow.frequency"></span>
-                </td>
-                <td>
-                    <span ng-bind="c.specification.description"></span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                    </td>
+                    <td>
+                        <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
+                              ng-bind="p.specification.format"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="p.physicalFlow.transport"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="p.physicalFlow.frequency"></span>
+                    </td>
+                    <td>
+                        <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
+                              ng-bind="p.specification.description | limitTo:100"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
+
+    <div class="row"
+         ng-hide="$ctrl.consumes | isEmpty">
+        <div class="col-md-12">
+            <h4>Consumes</h4>
+
+            <div class="row"
+                 ng-if="$ctrl.consumes.length > 10">
+                <div class="col-md-6">
+                    <waltz-search-control min-characters="3"
+                                          delay="250"
+                                          on-query="$ctrl.filterConsumes"
+                                          placeholder-text="Search consumers...">
+                    </waltz-search-control>
+                </div>
+            </div>
+
+            <table class="table table-condensed table-striped table-hover small">
+                <thead>
+                <tr>
+                    <th width="15%">Source Application</th>
+                    <th width="20%">Name</th>
+                    <th width="10%">Ext. Id</th>
+                    <th width="10%">Format</th>
+                    <th width="10%">Transport</th>
+                    <th width="10%">Frequency</th>
+                    <th width="25%">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="c in $ctrl.filteredConsumes"
+                    class="waltz-visibility-parent">
+                    <td>
+                        <span>
+                            <a ui-sref="main.app.view ({ id: c.sourceRef.id })"
+                               ng-class="{ 'waltz-visibility-child-40' : !c.firstSource}">
+                                <span ng-bind="c.sourceRef.name">
+                                </span>
+                            </a>
+                        </span>
+                    </td>
+                    <td>
+                        <a ui-sref="main.physical-specification.view ({ id: c.specification.id })">
+                            <span ng-bind="c.specification.name"></span>
+                        </a>
+                    </td>
+                    <td>
+                        <span ng-bind="c.specification.externalId"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="c.specification.format"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="c.physicalFlow.transport"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="c.physicalFlow.frequency"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="c.specification.description"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div ng-if="$ctrl.produces.length == 0 && $ctrl.consumes | isEmpty"
+         class="alert alert-warning">
+        <strong>No Physical Flow</strong> detail available for this application
+    </div>
+
+</div>
