@@ -20,6 +20,12 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const getById = (id) => {
+        return $http
+            .get(`${base}/id/${id}`)
+            .then(r => r.data);
+    };
+
 
     const findBySelector = (options) => {
         checkIsIdSelector(options);
@@ -32,7 +38,8 @@ function store($http, baseApiUrl) {
     return {
         findBySpecificationId,
         findByEntityReference,
-        findBySelector
+        findBySelector,
+        getById
     };
 }
 

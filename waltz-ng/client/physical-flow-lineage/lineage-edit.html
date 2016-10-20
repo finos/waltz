@@ -1,18 +1,18 @@
 <div>
     <!-- HEADER -->
-    <waltz-page-header name="{{ ctrl.lineageReport.name }}"
+    <waltz-page-header name="{{ ctrl.describedSpecification.name }}"
                        small="Lineage Editor"
                        icon="qrcode">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>
-                <a ui-sref="main.app.view ({ id: ctrl.owningApp.id })">
-                    <span ng-bind="ctrl.owningApp.name"></span>
+                <a ui-sref="main.app.view ({ id: ctrl.owningApplication.id })">
+                    <span ng-bind="ctrl.owningApplication.name"></span>
                 </a>
             </li>
             <li>
-                <a ui-sref="main.physical-specification.view ({ id: ctrl.specification.id })">
-                    <span ng-bind="ctrl.specification.name"></span>
+                <a ui-sref="main.physical-specification.view ({ id: ctrl.describedSpecification.id })">
+                    <span ng-bind="ctrl.describedSpecification.name"></span>
                 </a>
             </li>
             <li>Lineage</li>
@@ -28,51 +28,11 @@
 
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div class="row">
-            <div class="col-sm-2">
-                <label>
-                    Report Name:
-                </label>
-            </div>
-            <div class="col-sm-10 waltz-visibility-parent">
-                <waltz-editable-field on-save="ctrl.updateName"
-                                      field-type="text"
-                                      initial-val="ctrl.lineageReport.name">
-                </waltz-editable-field>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-sm-2">
-                <label>
-                    Report Description:
-                </label>
-            </div>
-            <div class="col-sm-10">
-                <waltz-editable-field on-save="ctrl.updateDescription"
-                                      field-type="textarea"
-                                      initial-val="ctrl.lineageReport.description">
-                </waltz-editable-field>
-            </div>
-        </div>
-
-        <hr>
-        <div class="row">
-            <div class="col-sm-3">
-                <strong>
-                    <waltz-icon name="info-circle"></waltz-icon>
-                    This report describes the lineage for physical specification:
-                    <br>
-                    <a ui-sref="main.physical-specification.view ({ id: ctrl.specification.id })"
-                       ng-bind="ctrl.specification.name"></a>
-                </strong>
-            </div>
-            <div class="col-sm-9">
-                <div style="border: 1px solid #f4f4f4; border-radius: 3px; padding: 12px">
-                    <waltz-physical-specification-overview owning-app="ctrl.owningApp"
-                                                           specification="ctrl.specification"
-                                                           organisational-unit="ctrl.organisationalUnit">
-                    </waltz-physical-specification-overview>
-                </div>
+            <div class="col-sm-12">
+                <waltz-physical-specification-overview owning-entity="ctrl.owningApplication"
+                                                       specification="ctrl.describedSpecification"
+                                                       organisational-unit="ctrl.owningOrgUnit">
+                </waltz-physical-specification-overview>
             </div>
         </div>
 
@@ -80,25 +40,58 @@
 
     <br>
 
-    <waltz-section name="edit">
+    <waltz-section name="Edit">
         <div class="row">
             <div class="col-sm-12">
                 <h4>Contributors</h4>
-                <table class="table table-condensed small">
+                <table class="table table-condensed table-striped table-hover small">
                     <thead>
                     <tr>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
+                        <th>Specification</th>
+                        <th>Source</th>
+                        <th>Target</th>
+                        <th>Format</th>
+                        <th>Transport</th>
+                        <th>Frequency</th>
+                        <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="c in $ctrl.contributors">
-                        <td><span ng-bind="c.specification.name"></span></td>
-                        <td><span ng-bind="c.logicalFlow.target.name"></span></td>
-                        <td><span ng-bind="c.specification.format"></span></td>
-                        <td><span ng-bind="c.physicalFlow.transport"></span></td>
+                    <tr ng-repeat="c in ctrl.lineage" class="waltz-visibility-parent">
+                        <td>
+                            <span uib-popover="{{ c.specification.description }}"
+                                  popover-trigger="mouseenter"
+                                  ng-bind="c.specification.name"></span>
+                        </td>
+                        <td>
+                            <a ng-click="ctrl.doSearch(c.sourceApplication)"
+                               uib-popover="Focus on app"
+                               popover-trigger="mouseenter"
+                               ng-bind="c.sourceApplication.name"></a>
+                        </td>
+                        <td>
+                            <a ng-click="ctrl.doSearch(c.targetApplication)"
+                               uib-popover="Focus on app"
+                               popover-trigger="mouseenter"
+                               ng-bind="c.targetApplication.name"></a>
+                        </td>
+                        <td>
+                            <span ng-bind="c.specification.format"></span>
+                        </td>
+                        <td>
+                            <span ng-bind="c.flow.transport"></span>
+                        </td>
+                        <td>
+                            <span ng-bind="c.flow.frequency"></span>
+                        </td>
+                        <td>
+                            <span class="waltz-visibility-child-30">
+                                <button class="btn btn-xs btn-danger"
+                                        ng-click="ctrl.removePhysicalFlow(c.flow)">
+                                    Remove
+                                </button>
+                            </span>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -113,15 +106,31 @@
 
                 <waltz-lineage-candidate-editor logical-flows="ctrl.searchResults.logicalFlows"
                                                 physical-flows="ctrl.searchResults.physicalFlows"
-                                                specifications="ctrl.searchResults.specification"
-                                                on-add="ctrl.addPhysicalFlowToLineage"
-                                                on-remove="ctrl.removePhysicalFlowFromLineage"
+                                                specifications="ctrl.searchResults.specifications"
+                                                on-add="ctrl.addPhysicalFlow"
                                                 on-refocus="ctrl.doSearch">
                 </waltz-lineage-candidate-editor>
 
             </div>
             <div class="col-sm-3">
+                <p class="small text-muted">
+                    Use this area to search for flows by first finding their associated applications.
+                </p>
                 <waltz-app-selector model="ctrl.selectedApp"></waltz-app-selector>
+                <hr>
+                <div ng-if="ctrl.searchResults.relatedApps.length > 0">
+                    <h5>Related Apps</h5>
+                    <div ng-class="{'waltz-scroll-region-250' : ctrl.searchResults.relatedApps.length > 12 }">
+                        <ul class="list-unstyled small">
+                            <li ng-repeat="app in ctrl.searchResults.relatedApps | orderBy:'name'">
+                                <a class="clickable"
+                                   ng-bind="app.name"
+                                   ng-click="ctrl.doSearch(app)"></a>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
 
             </div>
         </div>
@@ -129,19 +138,20 @@
 
     </waltz-section>
 
-    <waltz-section name="dump">
+    <waltz-section name="dump" ng-hide="true">
         <div class="row">
             <div class="col-sm-3">
                 <h4>Search Results</h4>
                 <pre ng-bind="ctrl.searchResults | json"></pre>
             </div>
             <div class="col-sm-3">
-                <h4>Contributors</h4>
-                <pre ng-bind="ctrl.contributors"></pre>
+                <h4>Lineage</h4>
+                <pre ng-bind="ctrl.lineage|json"></pre>
             </div>
             <div class="col-sm-3">
-                <h4></h4>
-                <pre ng-bind="ctrl.xxx"></pre>
+                <h4>Described</h4>
+                <pre ng-bind="ctrl.describedFlow|json"></pre>
+                <pre ng-bind="ctrl.describedSpecification|json"></pre>
             </div>
             <div class="col-sm-3">
                 <h4></h4>

@@ -1,5 +1,3 @@
-import {checkIsCreateLineageReportCommand} from '../../common/checks';
-
 
 function store($http, baseApiUrl) {
 
@@ -13,30 +11,17 @@ function store($http, baseApiUrl) {
         .get(`${base}/physical-flow/${id}/contributions`)
         .then(r => r.data);
 
-    /**
-     * Creates a new lineage report describing the
-     * referenced specification.
-     *
-     * @param cmd : { name: <str>, specificationId: <num> }
-     * @returns {Promise.<TResult>|*}
-     */
-    const create = (cmd) => {
-        checkIsCreateLineageReportCommand(cmd);
-        return $http
-            .post(`${base}/update`, cmd)
-            .then(r => r.data);
-    };
+    const removeContribution = (describedFlowId, contributorFlowId) => $http
+        .delete(`${base}/physical-flow/${describedFlowId}/contributions/${contributorFlowId}`)
+        .then(r => r.data);
 
-    const update = (cmd) => {
-        return $http
-            .put(`${base}/update`, cmd)
-            .then(r => r.data);
-    };
-
+    const addContribution = (describedFlowId, contributorFlowId) => $http
+        .put(`${base}/physical-flow/${describedFlowId}/contributions`, contributorFlowId)
+        .then(r => r.data);
 
     return {
-        create,
-        update,
+        removeContribution,
+        addContribution,
         findByPhysicalFlowId,
         findContributionsByPhysicalFlowId
     };

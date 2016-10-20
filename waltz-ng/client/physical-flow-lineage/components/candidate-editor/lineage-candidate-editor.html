@@ -3,9 +3,9 @@
     <tr>
         <th>Specification Name</th>
         <th>Consumer</th>
-        <th>Action</th>
         <th>Format</th>
         <th>Transport</th>
+        <th>Action</th>
     </tr>
     </thead>
     <tbody>
@@ -13,10 +13,12 @@
         class="waltz-visibility-parent">
         <td><span ng-bind="c.specification.name"></span></td>
         <td>
-            <span ng-bind="c.logicalFlow.target.name"></span>
-            <a ng-click="$ctrl.onRefocus(c.logicalFlow.target)"
-               class="waltz-visibility-10">Focus</a>
+            <a ng-click="$ctrl.onRefocus(c.targetRef)"
+               class="clickable"
+               ng-bind="c.targetRef.name"></a>
         </td>
+        <td><span class='text-muted' ng-bind="c.specification.format"></span></td>
+        <td><span class='text-muted' ng-bind="c.physicalFlow.transport"></span></td>
         <td>
             <span class="waltz-visibility-child-30">
                 <button ng-click='$ctrl.onAdd(c.physicalFlow.id)'
@@ -25,8 +27,6 @@
                 </button>
             </span>
         </td>
-        <td><span class='text-muted' ng-bind="c.specification.format"></span></td>
-        <td><span class='text-muted' ng-bind="c.physicalFlow.transport"></span></td>
     </tr>
     </tbody>
 </table>

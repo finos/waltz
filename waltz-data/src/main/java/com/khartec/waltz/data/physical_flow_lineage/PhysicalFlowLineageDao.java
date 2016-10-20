@@ -4,9 +4,17 @@ package com.khartec.waltz.data.physical_flow_lineage;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.command.CommandOutcome;
+import com.khartec.waltz.model.command.CommandResponse;
+import com.khartec.waltz.model.command.ImmutableCommandResponse;
 import com.khartec.waltz.model.physical_flow_lineage.ImmutablePhysicalFlowLineage;
 import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineage;
+import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineageAddCommand;
+import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineageRemoveCommand;
 import com.khartec.waltz.schema.tables.Application;
+import com.khartec.waltz.schema.tables.records.PhysicalFlowLineageRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -87,4 +95,36 @@ public class PhysicalFlowLineageDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
+    public CommandResponse<PhysicalFlowLineageRemoveCommand> removeContribution(PhysicalFlowLineageRemoveCommand removeCommand) {
+        int rc = dsl.deleteFrom(PHYSICAL_FLOW_LINEAGE)
+                .where(PHYSICAL_FLOW_LINEAGE.DESCRIBED_FLOW_ID.eq(removeCommand.describedFlowId()))
+                .and(PHYSICAL_FLOW_LINEAGE.CONTRIBUTOR_FLOW_ID.eq(removeCommand.contributingFlowId()))
+                .execute();
+
+        return ImmutableCommandResponse.<PhysicalFlowLineageRemoveCommand>builder()
+                .outcome(rc == 1 ? CommandOutcome.SUCCESS : CommandOutcome.FAILURE)
+                .originalCommand(removeCommand)
+                .entityReference(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, removeCommand.describedFlowId()))
+                .build();
+    }
+
+
+    public CommandResponse<PhysicalFlowLineageAddCommand> addContribution(PhysicalFlowLineageAddCommand addCommand) {
+        PhysicalFlowLineageRecord record = dsl.newRecord(PHYSICAL_FLOW_LINEAGE);
+
+        record.setDescription(addCommand.description());
+        record.setContributorFlowId(addCommand.contributingFlowId());
+        record.setDescribedFlowId(addCommand.describedFlowId());
+        record.setLastUpdatedBy(addCommand.lastUpdate().by());
+
+        int rc = record.store();
+
+        return ImmutableCommandResponse.<PhysicalFlowLineageAddCommand>builder()
+                .outcome(rc == 1 ? CommandOutcome.SUCCESS : CommandOutcome.FAILURE)
+                .originalCommand(addCommand)
+                .entityReference(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, addCommand.describedFlowId()))
+                .build();
+
+    }
 }

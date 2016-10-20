@@ -1,5 +1,5 @@
 const baseState = {
-    url: 'lineage-report',
+    url: 'physical-flow-lineage',
 };
 
 
@@ -9,17 +9,10 @@ const editState = {
 };
 
 
-const viewState = {
-    url: '/{id:int}',
-    views: {'content@': require('./lineage-view') },
-};
-
-
 function setup($stateProvider) {
     $stateProvider
-        .state('main.lineage-report', baseState)
-        .state('main.lineage-report.view', viewState)
-        .state('main.lineage-report.edit', editState);
+        .state('main.physical-flow-lineage', baseState)
+        .state('main.physical-flow-lineage.edit', editState);
 }
 
 

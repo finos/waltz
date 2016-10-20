@@ -39,12 +39,15 @@
         <form class="form-inline">
             <div class="form-group">
                 <label>Search</label>
-                <input type="search" class="form-control" placeholder="Filter by username/role...." ng-model="userQuery">
+                <input type="search"
+                       class="form-control"
+                       placeholder="Filter by username/role...."
+                       ng-model="userQuery">
             </div>
         </form>
         <hr>
         <div class="waltz-user-admin-scroll">
-            <table class="table table-condensed">
+            <table class="table table-condensed table-striped table-hover">
                 <thead>
                 <tr>
                     <th>User Name</th>
@@ -57,6 +60,7 @@
                     <th>Flow</th>
                     <th>Auth Source</th>
                     <th>Beta Tester</th>
+                    <th>Lineage</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -64,8 +68,7 @@
                     ng-click="ctrl.userSelected(user)"
                     ng-class="{ 'waltz-user-admin-selected' : user == ctrl.selectedUser }">
                     <td>
-                        <a class="clickable">
-                            {{ user.userName }}
+                        <a class="clickable" ng-bind="user.userName">
                         </a>
                     </td>
                     <td align="left">
@@ -110,6 +113,11 @@
                     </td>
                     <td align="left">
                         <span ng-if='ctrl.hasRole(user, "BETA_TESTER")'>
+                            <waltz-icon name='check'></waltz-icon>
+                        </span>
+                    </td>
+                    <td align="left">
+                        <span ng-if='ctrl.hasRole(user, "LINEAGE_EDITOR")'>
                             <waltz-icon name='check'></waltz-icon>
                         </span>
                     </td>
@@ -186,6 +194,12 @@
                                 <td>BETA_TESTER</td>
                                 <td>
                                     <input type="checkbox" ng-model="ctrl.roleSelections.BETA_TESTER">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>LINEAGE_EDITOR</td>
+                                <td>
+                                    <input type="checkbox" ng-model="ctrl.roleSelections.LINEAGE_EDITOR">
                                 </td>
                             </tr>
                             </tbody>

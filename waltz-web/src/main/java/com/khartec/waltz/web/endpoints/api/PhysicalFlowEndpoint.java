@@ -2,6 +2,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
 @Service
@@ -40,6 +42,11 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 "specification",
                 ":id");
 
+        String getByIdPath = mkPath(
+                BASE_URL,
+                "id",
+                ":id");
+
         ListRoute<PhysicalFlow> findByEntityRefRoute =
                 (request, response) -> physicalFlowService
                         .findByEntityReference(
@@ -50,6 +57,12 @@ public class PhysicalFlowEndpoint implements Endpoint {
                         .findBySpecificationId(
                                 getId(request));
 
+
+        DatumRoute<PhysicalFlow> getByIdRoute =
+                (request, response) -> physicalFlowService
+                        .getById(getId(request));
+
+        getForDatum(getByIdPath, getByIdRoute);
 
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findBySpecificationIdPath, findBySpecificationIdRoute);

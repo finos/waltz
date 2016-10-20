@@ -27,12 +27,14 @@ public enum Role {
     APP_EDITOR,
     ANONYMOUS,
     AUTHORITATIVE_SOURCE_EDITOR,
+    BETA_TESTER,
     BOOKMARK_EDITOR,
     CAPABILITY_EDITOR,
+    LINEAGE_EDITOR,
     LOGICAL_DATA_FLOW_EDITOR,
     ORG_UNIT_EDITOR,
-    RATING_EDITOR,
-    BETA_TESTER;
+    RATING_EDITOR
+    ;
 
 
     public static Set<String> allNames() {
