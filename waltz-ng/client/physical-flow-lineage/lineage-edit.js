@@ -1,4 +1,6 @@
 import {initialiseData} from '../common';
+import _ from 'lodash';
+
 
 const template = require('./lineage-edit.html');
 
@@ -26,7 +28,7 @@ function controller($q,
                     $scope,
                     $stateParams,
                     applicationStore,
-                    lineageReportStore,
+                    physicalFlowLineageStore,
                     logicalDataFlowStore,
                     notification,
                     orgUnitStore,
@@ -35,19 +37,24 @@ function controller($q,
 
     const vm = initialiseData(this, initialState);
 
-    const lineageReportId = $stateParams.id;
+    const physicalFlowId = $stateParams.id;
 
-    const loadReport = () => lineageReportStore
-        .getById(lineageReportId)
-        .then(lineageReport => vm.lineageReport = lineageReport);
+    const loadLineage = () => physicalFlowLineageStore
+        .findByPhysicalFlowId(physicalFlowId)
+        .then(lineage => vm.lineage = lineage);
 
-    loadReport()
-        .then(lineageReport => physicalSpecificationStore.getById(lineageReport.specificationId))
-        .then(specification => vm.specification = specification)
-        .then(specification => applicationStore.getById(specification.owningApplicationId))
-        .then(app => vm.owningApp = app)
+    loadLineage();
+
+    physicalFlowStore.getById(physicalFlowId)
+        .then(flow => vm.describedFlow = flow)
+        .then(flow => physicalSpecificationStore.getById(flow.specificationId))
+        .then(spec => vm.describedSpecification = spec)
+        .then(spec => applicationStore.getById(spec.owningEntity.id))
+        .then(app => vm.owningApplication = app)
         .then(app => orgUnitStore.getById(app.organisationalUnitId))
-        .then(ou => vm.organisationalUnit = ou);
+        .then(ou => vm.owningOrgUnit = ou)
+        .then(app => vm.selectedApp = { app: vm.owningApplication });
+
 
     $scope.$watch('ctrl.selectedApp.app', () =>
         searchViaQuery(vm.selectedApp));
@@ -58,6 +65,7 @@ function controller($q,
         vm.searchResults.logicalFlows = [];
         vm.searchResults.physicalFlows = [];
         vm.searchResults.specifications = [];
+        vm.searchResults.relatedApps = [];
     }
 
     function searchViaQuery(holder = { app : null }) {
@@ -71,7 +79,7 @@ function controller($q,
 
         vm.searchResults.loading = true;
 
-        const ref = {
+        const appRef = {
             kind: 'APPLICATION',
             id: appId
         };
@@ -80,56 +88,46 @@ function controller($q,
             applicationStore.getById(appId)
                 .then(app => vm.searchResults.app = app),
             physicalSpecificationStore
-                .findByAppId(appId)
+                .findByEntityReference(appRef)
                 .then(xs => vm.searchResults.specifications = xs),
             physicalFlowStore
-                .findByEntityReference(ref)
+                .findByEntityReference(appRef)
                 .then(xs => vm.searchResults.physicalFlows = xs),
             logicalDataFlowStore
-                .findByEntityReference(ref)
+                .findByEntityReference(appRef)
                 .then(xs => vm.searchResults.logicalFlows = xs)
         ];
 
         $q.all(promises)
+            .then(() => {
+                const logicalFlowApps = _.flatMap(vm.searchResults.logicalFlows, lf => [lf.source, lf.target]);
+
+                vm.searchResults.relatedApps = _.chain(logicalFlowApps)
+                    .uniqBy("id")
+                    .value();
+            })
             .then(() => vm.searchResults.loading = false);
     }
 
-
-    // -- BOOT
-    // TODO: remove!
-    applicationStore.getById(67502)
-        .then(app => vm.selectedApp = { app });
 
 
     // -- INTERACTION
 
     vm.doSearch = (appRef) => searchForCandidateSpecifications(appRef.id);
-    vm.addPhysicalFlowToLineage = (physicalFlowId) => {
-        console.log(physicalFlowId);
 
-        // contributorStore.add(articleId, physicalFlowId)
-        //     .then(() => reloadContributors(articleId));
+    vm.addPhysicalFlow = (physicalFlowId) => {
+        physicalFlowLineageStore
+            .addContribution(vm.describedFlow.id, physicalFlowId)
+            .then(() => notification.success("added"))
+            .then(() => loadLineage());
     };
 
-    vm.addPhysicalFlowToLineage = (physicalFlowId) => {
-        console.log(physicalFlowId);
-
-        // contributorStore.remove(articleId, physicalFlowId)
-        //     .then(() => reloadContributors(articleId));
+    vm.removePhysicalFlow = (physicalFlow) => {
+        physicalFlowLineageStore
+            .removeContribution(vm.describedFlow.id, physicalFlow.id)
+            .then(() => notification.warning("removed"))
+            .then(() => loadLineage());
     };
-
-    vm.showReportNameEditor = () => {
-        vm.visibility.report.nameEditor = true;
-    };
-
-    function update(change) {
-        return lineageReportStore.update(Object.assign(change, { id: lineageReportId }))
-            .then(() => notification.success('Updated'))
-            .then(loadReport);
-    }
-
-    vm.updateName = (id, change) => update({ name: change });
-    vm.updateDescription = (id, change) => update({ description: change });
 
 }
 
@@ -140,7 +138,7 @@ controller.$inject = [
     '$scope',
     '$stateParams',
     'ApplicationStore',
-    'LineageReportStore',
+    'PhysicalFlowLineageStore',
     'DataFlowDataStore', // LogicalDataFlowStore
     'Notification',
     'OrgUnitStore',

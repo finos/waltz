@@ -41,13 +41,21 @@
                 <div class="row" >
                     <div class="col-md-12">
                         <br>
-                        <p class="small text-muted">Lineage foo baa</p>
+                        <p class="small text-muted"><!-- TODO: need text --></p>
                         <br>
                         <waltz-physical-flow-lineage-panel lineage="ctrl.selectedFlow.lineage">
 
                         </waltz-physical-flow-lineage-panel>
 
                         <hr>
+
+                        <div waltz-has-role="LINEAGE_EDITOR">
+                            <a ui-sref="main.physical-flow-lineage.edit ({id: ctrl.selectedFlow.flow.id})" class="btn btn-sm btn-primary">
+                                <waltz-icon name="edit"></waltz-icon>
+                                Edit Lineage
+                            </a>
+                            <hr>
+                        </div>
 
                         <waltz-data-flow-diagram data="{ flows: ctrl.selectedFlow.lineageFlows, entities: ctrl.selectedFlow.lineageEntities }"
                                                  tweakers="ctrl.graphTweakers">
@@ -68,6 +76,7 @@
                         </waltz-physical-specification-mentions>
                     </div>
                 </div>
+
             </uib-tab>
         </uib-tabset>
 

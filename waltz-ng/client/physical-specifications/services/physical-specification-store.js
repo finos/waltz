@@ -10,7 +10,7 @@ function store($http, baseApiUrl) {
         return $http
             .get(`${base}/application/${ref.kind}/${ref.id}`)
             .then(r => r.data);
-    }
+    };
 
 
     const findBySelector = (options) => {

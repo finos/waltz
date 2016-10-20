@@ -73,6 +73,14 @@ public class PhysicalFlowDao {
     }
 
 
+    public PhysicalFlow getById(long id) {
+        return findByCondition(PHYSICAL_FLOW.ID.eq(id))
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
+
+
     public List<PhysicalFlow> findBySpecificationId(long specificationId) {
         return findByCondition(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specificationId));
     }
@@ -93,4 +101,5 @@ public class PhysicalFlowDao {
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
 }
