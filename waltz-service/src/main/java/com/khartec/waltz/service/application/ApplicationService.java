@@ -177,5 +177,10 @@ public class ApplicationService {
 
     }
 
+
+    public List<Application> findByAssetCode(String assetCode) {
+        return applicationDao.findByAssetCode(assetCode);
+    }
+
 }
 

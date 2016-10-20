@@ -70,6 +70,11 @@ function service($http, BaseApiUrl) {
         .then(x => x.data);
 
 
+    const findByAssetCode = (assetCode) => $http
+        .get(`${BASE}/asset-code/${assetCode}`)
+            .then(result => result.data);
+
+
     return {
         getById,
         findAllTags,
@@ -78,6 +83,7 @@ function service($http, BaseApiUrl) {
         findRelatedById,
         findByIds,
         findBySelector,
+        findByAssetCode,
         countByOrganisationalUnit,
         registerNewApp,
         search,

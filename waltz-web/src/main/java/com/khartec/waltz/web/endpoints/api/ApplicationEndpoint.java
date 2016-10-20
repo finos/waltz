@@ -189,6 +189,9 @@ public class ApplicationEndpoint implements Endpoint {
         ListRoute<Application> findBySelectorRoute = ((request, response)
                 -> appService.findByAppIdSelector(readIdSelectionOptionsFromBody(request)));
 
+        ListRoute<Application> findByAssetCodeRoute = ((request, response)
+                -> appService.findByAssetCode(request.params("assetCode")));
+
         ListRoute<String> getAppTagsRoute = (request, response)
                 -> appTagService.findTagsForApplication(getId(request));
 
@@ -203,6 +206,7 @@ public class ApplicationEndpoint implements Endpoint {
         postForList(mkPath(BASE_URL, "tags"), findByTagRoute);  // POST as may not be good for qparam
         postForList(mkPath(BASE_URL, "by-ids"), findByIdsRoute);
         postForList(mkPath(BASE_URL, "selector"), findBySelectorRoute);
+        getForList(mkPath(BASE_URL, "asset-code", ":assetCode"), findByAssetCodeRoute);
     }
 
 
