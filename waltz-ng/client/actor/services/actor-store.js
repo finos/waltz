@@ -11,12 +11,12 @@
  *
  */
 
-import { checkIsCreateInvolvementKindCommand } from "../../common/checks";
+import { checkIsCreateActorCommand } from "../../common/checks";
 
 
 function store($http, BaseApiUrl) {
 
-    const BASE = `${BaseApiUrl}/involvement-kind`;
+    const BASE = `${BaseApiUrl}/actor`;
 
 
     const findAll = () =>
@@ -36,7 +36,7 @@ function store($http, BaseApiUrl) {
      * @returns {Promise.<TResult>|*}
      */
     const create = (cmd) => {
-        checkIsCreateInvolvementKindCommand(cmd);
+        checkIsCreateActorCommand(cmd);
         return $http
             .post(`${BASE}/update`, cmd)
             .then(r => r.data);

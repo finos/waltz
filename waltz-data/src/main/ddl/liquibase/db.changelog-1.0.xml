@@ -3234,4 +3234,28 @@
     </changeSet>
 
 
+
+    <!-- 747 actor rename to actor-->
+    <changeSet author="kamransaleem"
+               id="20161021-747-1"
+               dbms="mssql">
+        <renameTable oldTableName="involvement_kind"
+                     newTableName="actor" />
+
+        <dropPrimaryKey constraintName="involvement_kind_pkey"
+                        tableName="actor" />
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="actor_pkey"
+                       tableName="actor" />
+
+    </changeSet>
+
+    <changeSet author="kamransaleem"
+               id="20161021-747-1"
+               dbms="mysql">
+        <renameTable oldTableName="involvement_kind"
+                     newTableName="actor" />
+    </changeSet>
+
 </databaseChangeLog>

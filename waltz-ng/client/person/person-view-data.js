@@ -44,12 +44,11 @@ function toSelector(personId, scope='CHILDREN') {
 }
 
 
-function buildAppInvolvementSummary(apps = [], involvements = []) {
+function buildAppInvolvementSummary(apps = [], involvements = [], actors = []) {
     const appsById = _.keyBy(apps, 'id');
+    const actorsById = _.keyBy(actors, 'id');
 
     const directlyInvolvedAppIds = _.chain(involvements).map('entityReference.id').uniq().value();
-
-
 
     const allAppIds = _.map(apps, 'id');
     const indirectlyInvolvedAppIds = _.difference(allAppIds, directlyInvolvedAppIds);
@@ -58,7 +57,7 @@ function buildAppInvolvementSummary(apps = [], involvements = []) {
         .groupBy('entityReference.id')
         .map((grp, key) => {
             let app = appsById[key];
-            app = _.assign(app, {roles: _.map(grp, g => g.kind)});
+            app = _.assign(app, {roles: _.map(grp, g => actorsById[g.kindId].name )});
             return app;
         })
         .value();
@@ -75,6 +74,7 @@ function buildAppInvolvementSummary(apps = [], involvements = []) {
 
 
 function service($q,
+                 actorService,
                  assetCostViewService,
                  complexityStore,
                  dataFlowViewService,
@@ -140,7 +140,7 @@ function service($q,
     }
 
 
-    function buildInvolvementSummaries(employeeId, combinedApps = []) {
+    function buildInvolvementSummaries(employeeId, combinedApps = [], actors = []) {
         return involvementStore
             .findByEmployeeId(employeeId)
             .then(involvements => {
@@ -148,7 +148,7 @@ function service($q,
                 const combinedSummary = buildAppInvolvementSummary(combinedApps, _.concat(
                     involvementsByKind['APPLICATION'] || [],
                     involvementsByKind['END_USER_APPLICATION'] || []
-                ));
+                ), actors);
                 state.model.combinedAppInvolvements = combinedSummary
             });
     }
@@ -158,10 +158,13 @@ function service($q,
         return $q
             .all([
                 loadApplications(employeeId, personId),
-                loadEndUserApps(personId)
+                loadEndUserApps(personId),
+                actorService.loadActors()
             ])
-            .then(([apps, endUserApps]) => _.concat(apps, endUserApps))
-            .then(combinedApps => buildInvolvementSummaries(employeeId, combinedApps));
+            .then(([apps, endUserApps, actors]) => ({combinedApps: _.concat(apps, endUserApps), actors }))
+            .then(({combinedApps, actors}) => {
+                buildInvolvementSummaries(employeeId, combinedApps, actors)
+            });
     }
 
 
@@ -300,6 +303,7 @@ function service($q,
 
 service.$inject = [
     '$q',
+    'ActorService',
     'AssetCostViewService',
     'ComplexityStore',
     'DataFlowViewService',
