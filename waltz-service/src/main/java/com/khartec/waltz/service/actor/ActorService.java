@@ -60,7 +60,7 @@ public class ActorService {
         boolean success = actorDao.update(updateCommand);
         return ImmutableCommandResponse.<ActorChangeCommand>builder()
                 .originalCommand(command)
-                .entityReference(EntityReference.mkRef(EntityKind.INVOLVEMENT_KIND, command.id()))
+                .entityReference(EntityReference.mkRef(EntityKind.ACTOR, command.id()))
                 .outcome(success ? CommandOutcome.SUCCESS : CommandOutcome.FAILURE)
                 .build();
     }
