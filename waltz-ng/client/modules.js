@@ -8,6 +8,7 @@ function setup(module) {
         require('./common/services'),
 
         require('./access-log'),
+        require('./actor'),
         require('./alias'),
         require('./applications'),
         require('./app-capabilities'),
@@ -31,7 +32,6 @@ function setup(module) {
         require('./formly'),
         require('./history'),
         require('./involvement'),
-        require('./involvement-kind'),
         require('./navbar'),
         require('./org-units'),
         require('./orphan'),

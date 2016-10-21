@@ -1,11 +1,11 @@
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.actor.Actor;
+import com.khartec.waltz.model.actor.ActorChangeCommand;
 import com.khartec.waltz.model.command.CommandResponse;
-import com.khartec.waltz.model.invovement_kind.InvolvementKind;
-import com.khartec.waltz.model.invovement_kind.InvolvementKindChangeCommand;
-import com.khartec.waltz.model.invovement_kind.InvolvementKindCreateCommand;
+import com.khartec.waltz.model.actor.ActorCreateCommand;
 import com.khartec.waltz.model.user.Role;
-import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
+import com.khartec.waltz.service.actor.ActorService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -23,17 +23,17 @@ import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
-public class InvolvementKindEndpoint implements Endpoint {
+public class ActorEndpoint implements Endpoint {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InvolvementKindEndpoint.class);
-    private static final String BASE_URL = WebUtilities.mkPath("api", "involvement-kind");
+    private static final Logger LOG = LoggerFactory.getLogger(ActorEndpoint.class);
+    private static final String BASE_URL = WebUtilities.mkPath("api", "actor");
 
-    private final InvolvementKindService service;
+    private final ActorService service;
     private UserRoleService userRoleService;
 
 
     @Autowired
-    public InvolvementKindEndpoint(InvolvementKindService service, UserRoleService userRoleService) {
+    public ActorEndpoint(ActorService service, UserRoleService userRoleService) {
         checkNotNull(service, "service must not be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
 
@@ -50,27 +50,27 @@ public class InvolvementKindEndpoint implements Endpoint {
         getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute );
 
         // create
-        postForDatum(mkPath(BASE_URL, "update"), this::createInvolvementKindRoute );
+        postForDatum(mkPath(BASE_URL, "update"), this::createRoute);
 
         // update
-        putForDatum(mkPath(BASE_URL, "update"), this::updateInvolvementKindRoute );
+        putForDatum(mkPath(BASE_URL, "update"), this::updateRoute);
 
         // delete
-        deleteForDatum(mkPath(BASE_URL, ":id"), this::deleteInvolvementKindRoute);
+        deleteForDatum(mkPath(BASE_URL, ":id"), this::deleteRoute);
 
     }
 
 
-    private InvolvementKind getByIdRoute(Request request, Response response) {
+    private Actor getByIdRoute(Request request, Response response) {
         long id = getId(request);
         return service.getById(id);
     }
 
 
-    private Long createInvolvementKindRoute(Request request, Response response) throws IOException {
+    private Long createRoute(Request request, Response response) throws IOException {
         ensureUserHasAdminRights(request);
 
-        InvolvementKindCreateCommand command = readBody(request, InvolvementKindCreateCommand.class);
+        ActorCreateCommand command = readBody(request, ActorCreateCommand.class);
         String username = getUsername(request);
         LOG.info("User: {} creating Involvement Kind: {}", username, command);
 
@@ -78,19 +78,19 @@ public class InvolvementKindEndpoint implements Endpoint {
     }
 
 
-    private CommandResponse<InvolvementKindChangeCommand> updateInvolvementKindRoute(Request request, Response response)
+    private CommandResponse<ActorChangeCommand> updateRoute(Request request, Response response)
             throws IOException {
         ensureUserHasAdminRights(request);
 
         String username = getUsername(request);
-        InvolvementKindChangeCommand command = readBody(request, InvolvementKindChangeCommand.class);
+        ActorChangeCommand command = readBody(request, ActorChangeCommand.class);
 
         LOG.info("User: {} updating Involvement Kind: {}", username, command);
         return service.update(command, username);
     }
 
 
-    private boolean deleteInvolvementKindRoute(Request request, Response response) {
+    private boolean deleteRoute(Request request, Response response) {
         ensureUserHasAdminRights(request);
 
         long id = getId(request);

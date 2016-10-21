@@ -18,7 +18,7 @@
                     <h6 ng-if="ctrl.selectedApp.roles" uib-tooltip="This persons role(s) on the application">
                         <strong>Role(s): </strong>
                         <span ng-repeat="role in ctrl.selectedApp.roles">
-                            <span ng-bind="role | toDisplayName:'involvementKind'"></span><span ng-if="!$last">, </span>
+                            <span ng-bind="role"></span><span ng-if="!$last">, </span>
                         </span>
                     </h6>
                     <h6 ng-if="ctrl.selectedApp.assetCode">

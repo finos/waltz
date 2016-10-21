@@ -1,12 +1,11 @@
-package com.khartec.waltz.data.involvement_kind;
+package com.khartec.waltz.data.actor;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.LastUpdate;
-import com.khartec.waltz.model.invovement_kind.ImmutableInvolvementKind;
-import com.khartec.waltz.model.invovement_kind.InvolvementKind;
-import com.khartec.waltz.model.invovement_kind.InvolvementKindChangeCommand;
-import com.khartec.waltz.model.invovement_kind.InvolvementKindCreateCommand;
-import com.khartec.waltz.schema.tables.records.InvolvementKindRecord;
+import com.khartec.waltz.model.actor.*;
+import com.khartec.waltz.model.actor.ImmutableActor;
+import com.khartec.waltz.model.actor.Actor;
+import com.khartec.waltz.schema.tables.records.ActorRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -21,18 +20,18 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkOptionalIsPresent;
+import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
-import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 
 @Repository
-public class InvolvementKindDao {
+public class ActorDao {
 
-    public static final com.khartec.waltz.schema.tables.InvolvementKind involvementKind = INVOLVEMENT_KIND.as("inv_kind");
+    public static final com.khartec.waltz.schema.tables.Actor actor = ACTOR.as("actor");
 
-    public static final RecordMapper<Record, InvolvementKind> TO_DOMAIN_MAPPER = r -> {
-        InvolvementKindRecord record = r.into(InvolvementKindRecord.class);
+    public static final RecordMapper<Record, Actor> TO_DOMAIN_MAPPER = r -> {
+        ActorRecord record = r.into(ActorRecord.class);
 
-        return ImmutableInvolvementKind.builder()
+        return ImmutableActor.builder()
                 .id(record.getId())
                 .name(record.getName())
                 .description(record.getDescription())
@@ -42,9 +41,9 @@ public class InvolvementKindDao {
     };
 
 
-    public static final Function<InvolvementKind, InvolvementKindRecord> TO_RECORD_MAPPER = ik -> {
+    public static final Function<Actor, ActorRecord> TO_RECORD_MAPPER = ik -> {
 
-        InvolvementKindRecord record = new InvolvementKindRecord();
+        ActorRecord record = new ActorRecord();
         record.setName(ik.name());
         record.setDescription(ik.description());
         record.setLastUpdatedAt(Timestamp.valueOf(ik.lastUpdatedAt()));
@@ -60,38 +59,38 @@ public class InvolvementKindDao {
 
 
     @Autowired
-    public InvolvementKindDao(DSLContext dsl) {
+    public ActorDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
 
         this.dsl = dsl;
     }
 
 
-    public List<InvolvementKind> findAll() {
-        return dsl.select(involvementKind.fields())
-                .from(involvementKind)
+    public List<Actor> findAll() {
+        return dsl.select(actor.fields())
+                .from(actor)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public InvolvementKind getById(long id) {
-        InvolvementKindRecord record = dsl.select(INVOLVEMENT_KIND.fields())
-                .from(INVOLVEMENT_KIND)
-                .where(INVOLVEMENT_KIND.ID.eq(id))
-                .fetchOneInto(InvolvementKindRecord.class);
+    public Actor getById(long id) {
+        ActorRecord record = dsl.select(ACTOR.fields())
+                .from(ACTOR)
+                .where(ACTOR.ID.eq(id))
+                .fetchOneInto(ActorRecord.class);
 
         if(record == null) {
-            throw new NoDataFoundException("Could not find Involvement Kind record with id: " + id);
+            throw new NoDataFoundException("Could not find Actor record with id: " + id);
         }
 
         return TO_DOMAIN_MAPPER.map(record);
     }
 
 
-    public Long create(InvolvementKindCreateCommand command, String username) {
+    public Long create(ActorCreateCommand command, String username) {
         checkNotNull(command, "command cannot be null");
 
-        InvolvementKindRecord record = dsl.newRecord(INVOLVEMENT_KIND);
+        ActorRecord record = dsl.newRecord(ACTOR);
         record.setName(command.name());
         record.setDescription(command.description());
         record.setLastUpdatedBy(username);
@@ -102,13 +101,13 @@ public class InvolvementKindDao {
     }
 
 
-    public boolean update(InvolvementKindChangeCommand command) {
+    public boolean update(ActorChangeCommand command) {
         checkNotNull(command, "command cannot be null");
         checkOptionalIsPresent(command.lastUpdate(), "lastUpdate must be present");
 
-        InvolvementKindRecord record = dsl.newRecord(INVOLVEMENT_KIND);
+        ActorRecord record = dsl.newRecord(ACTOR);
         record.setId(command.id());
-        record.changed(INVOLVEMENT_KIND.ID, false);
+        record.changed(ACTOR.ID, false);
 
         command.name().ifPresent(change -> record.setName(change.newVal()));
         command.description().ifPresent(change -> record.setDescription(change.newVal()));
@@ -123,8 +122,8 @@ public class InvolvementKindDao {
 
 
     public boolean deleteIfNotUsed(long id) {
-        return dsl.deleteFrom(INVOLVEMENT_KIND)
-                .where(INVOLVEMENT_KIND.ID.eq(id))
+        return dsl.deleteFrom(ACTOR)
+                .where(ACTOR.ID.eq(id))
                 .and(DSL.notExists(DSL.selectFrom(INVOLVEMENT).where(INVOLVEMENT.KIND_ID.eq(id))))
                 .execute() > 0;
     }

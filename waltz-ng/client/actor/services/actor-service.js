@@ -11,26 +11,26 @@
  *
  */
 
-let involvementKindsPromise = null;
+let actorsPromise = null;
 
-function service(involvementKindStore) {
+function service(actorStore) {
 
-    const loadInvolvementKinds = (force = false) => {
-        if (force || (involvementKindsPromise == null)) {
-            involvementKindsPromise = involvementKindStore.findAll();
+    const loadActors = (force = false) => {
+        if (force || (actorsPromise == null)) {
+            actorsPromise = actorStore.findAll();
         }
-        return involvementKindsPromise;
+        return actorsPromise;
     };
 
 
     const update = (command) => {
-        if(!involvementKindsPromise || command === undefined || command === null) return;
+        if(!actorsPromise || command === undefined || command === null) return;
 
-        return involvementKindStore
+        return actorStore
             .update(command)
             .then(response => {
                 if(response.outcome === "SUCCESS") {
-                    return loadInvolvementKinds(true)
+                    return loadActors(true)
                         .then(kinds => true);
                 } else {
                     throw "could not update: " + command;
@@ -40,21 +40,21 @@ function service(involvementKindStore) {
 
 
     const deleteById = (id) => {
-        return involvementKindStore
+        return actorStore
             .deleteById(id)
             .then(status => {
-                return loadInvolvementKinds(true)
+                return loadActors(true)
                     .then(kinds => status);
             });
     };
 
 
     const create = (cmd) => {
-        return involvementKindStore
+        return actorStore
             .create(cmd)
             .then(createdId => {
                 if(createdId > 0) {
-                    return loadInvolvementKinds(true)
+                    return loadActors(true)
                         .then((kinds) => createdId);
                 } else {
                     throw "could not create: " + cmd;
@@ -63,10 +63,10 @@ function service(involvementKindStore) {
     };
 
 
-    loadInvolvementKinds();
+    loadActors();
 
     return {
-        loadInvolvementKinds,
+        loadActors,
         update,
         deleteById,
         create
@@ -75,7 +75,7 @@ function service(involvementKindStore) {
 
 
 service.$inject = [
-    'InvolvementKindStore'
+    'ActorStore'
 ];
 
 

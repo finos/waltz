@@ -1,4 +1,4 @@
-package com.khartec.waltz.model.invovement_kind;
+package com.khartec.waltz.model.actor;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -10,9 +10,9 @@ import java.util.Optional;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableInvolvementKindChangeCommand.class)
-@JsonDeserialize(as = ImmutableInvolvementKindChangeCommand.class)
-public abstract class InvolvementKindChangeCommand implements EntityChangeCommand {
+@JsonSerialize(as = ImmutableActorChangeCommand.class)
+@JsonDeserialize(as = ImmutableActorChangeCommand.class)
+public abstract class ActorChangeCommand implements EntityChangeCommand {
 
     public abstract Optional<FieldChange<String>> name();
 

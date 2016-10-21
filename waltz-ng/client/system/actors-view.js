@@ -9,14 +9,14 @@ const initialState = {
 
 
 function controller($q,
-                    involvementKindService,
+                    actorService,
                     notification) {
 
     const vm = initialiseData(this, initialState);
 
     function update(id, change) {
         const updateCmd = Object.assign(change, { id });
-        return involvementKindService.update(updateCmd)
+        return actorService.update(updateCmd)
             .then(() => notification.success('Updated'));
     }
 
@@ -38,13 +38,13 @@ function controller($q,
     };
 
     vm.saveNewActor = () => {
-        involvementKindService
+        actorService
             .create(vm.newActor)
             .then(id => {
                 notification.success('Created');
                 vm.creatingActor = false;
                 vm.newActor = {};
-                loadInvolvementKinds();
+                loadActors();
             });
 
 
@@ -56,21 +56,21 @@ function controller($q,
     };
 
 
-    function loadInvolvementKinds() {
-        involvementKindService
-            .loadInvolvementKinds()
+    function loadActors() {
+        actorService
+            .loadActors()
             .then(kinds => {
                 vm.actors = kinds;
             });
     };
 
-    loadInvolvementKinds();
+    loadActors();
 }
 
 
 controller.$inject = [
     '$q',
-    'InvolvementKindService',
+    'ActorService',
     'Notification'
 ];
 
