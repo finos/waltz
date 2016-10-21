@@ -382,7 +382,7 @@ public class EntityStatisticSummaryDao {
         if (duration == Duration.ALL) {
             return DSL.trueCondition();
         }
-        return castDateField.gt(currentDate().minus(duration.numDays()));
+        return esv.CREATED_AT.gt(currentTimestamp().minus(duration.numDays()));
     }
 
 
