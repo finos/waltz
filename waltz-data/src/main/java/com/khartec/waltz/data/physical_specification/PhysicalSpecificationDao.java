@@ -20,14 +20,23 @@ import java.util.List;
 import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static java.util.Collections.emptyList;
 
 @Repository
 public class PhysicalSpecificationDao {
+
+
+    public static final Field<String> owningEntityNameField = mkEntityNameField(
+                PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID,
+                PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND,
+                newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR))
+            .as("owning_name_field");
+
 
     public static final RecordMapper<? super Record, PhysicalSpecification> TO_DOMAIN_MAPPER = r -> {
         PhysicalSpecificationRecord record = r.into(PHYSICAL_SPECIFICATION);
@@ -37,7 +46,7 @@ public class PhysicalSpecificationDao {
                 .owningEntity(EntityReference.mkRef(
                         EntityKind.valueOf(record.getOwningEntityKind()),
                         record.getOwningEntityId(),
-                        r.getValue(APPLICATION.NAME)))
+                        r.getValue(owningEntityNameField)))
                 .name(record.getName())
                 .description(record.getDescription())
                 .format(DataFormatKind.valueOf(record.getFormat()))
@@ -91,10 +100,8 @@ public class PhysicalSpecificationDao {
     public PhysicalSpecification getById(long id) {
         return dsl
                 .select(PHYSICAL_SPECIFICATION.fields())
-                .select(APPLICATION.NAME)
+                .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
-                .innerJoin(APPLICATION)
-                .on(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(APPLICATION.ID)) // TODO: waltz-776
                 .where(PHYSICAL_SPECIFICATION.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
@@ -102,10 +109,8 @@ public class PhysicalSpecificationDao {
     public List<PhysicalSpecification> findBySelector(Select<Record1<Long>> selector) {
         return dsl
                 .select(PHYSICAL_SPECIFICATION.fields())
-                .select(APPLICATION.NAME)
+                .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
-                .innerJoin(APPLICATION)
-                .on(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(APPLICATION.ID)) // TODO: waltz-776
                 .where(PHYSICAL_SPECIFICATION.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -115,10 +120,8 @@ public class PhysicalSpecificationDao {
         return dsl
                 .select(DSL.value("producer").as("relationship"))
                 .select(PHYSICAL_SPECIFICATION.fields())
-                .select(APPLICATION.NAME)
+                .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
-                .innerJoin(APPLICATION)
-                .on(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(APPLICATION.ID)) // TODO: waltz-776
                 .where(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(ref.id()))
                 .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(ref.kind().name()));
     }
@@ -128,10 +131,8 @@ public class PhysicalSpecificationDao {
         return dsl
                 .select(DSL.value("consumer").as("relationship"))
                 .select(PHYSICAL_SPECIFICATION.fields())
-                .select(APPLICATION.NAME)
+                .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
-                .innerJoin(APPLICATION)
-                .on(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(APPLICATION.ID)) // TODO: waltz-776
                 .innerJoin(PHYSICAL_FLOW)
                 .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
                 .where(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id()))
