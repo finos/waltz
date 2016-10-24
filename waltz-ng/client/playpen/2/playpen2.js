@@ -12,7 +12,9 @@ function controller(dataTypeService,
 
     const entityRef = {
         id: 2440,
-        kind: 'APPLICATION'
+        kind: 'APPLICATION',
+        name: 'Salamander',
+        description: 'descriptive text',
     };
 
     const selector = {

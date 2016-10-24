@@ -10,6 +10,19 @@
     </waltz-page-header>
 
     <waltz-section name="Search" small="All">
+
+        <waltz-entity-link entity-ref="ctrl.entityReference"
+                           icon-placement="'right'"
+                           tooltip-placement="'right'">
+        </waltz-entity-link>
+
+        <br>
+        <br>
+        <br>
+        <waltz-entity-icon-label entity-ref="ctrl.entityReference"
+                                 icon-placement="'left'">
+        </waltz-entity-icon-label>
+
         <waltz-search-control min-characters="3"
                               delay="250"
                               on-query="ctrl.search"

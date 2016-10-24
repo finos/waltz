@@ -1,0 +1,16 @@
+<span uib-tooltip="{{ $ctrl.entityRef.description }}"
+      tooltip-placement="{{ $ctrl.tooltipPlacement }}" >
+    <waltz-icon fixed-width="true"
+                name="{{ $ctrl.entityRef.kind | toIconName:'entity' }}"
+                ng-if="$ctrl.iconPlacement === 'left'"
+                style="color: #332b23;">
+    </waltz-icon>
+
+    <span ng-bind="$ctrl.entityRef.name"></span>
+
+    <waltz-icon fixed-width="true"
+                name="{{ $ctrl.entityRef.kind | toIconName:'entity' }}"
+                ng-if="$ctrl.iconPlacement === 'right'"
+                style="color: #332b23;">
+    </waltz-icon>
+</span>

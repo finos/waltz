@@ -1,0 +1,14 @@
+<a ng-if="$ctrl.viewState"
+   ui-sref="{{ $ctrl.viewState }} ({id: {{ $ctrl.entityRef.id }} })">
+
+    <waltz-entity-icon-label entity-ref="$ctrl.entityRef"
+                             icon-placement="$ctrl.iconPlacement"
+                             tooltip-placement="$ctrl.tooltipPlacement">
+    </waltz-entity-icon-label>
+</a>
+
+<waltz-entity-icon-label entity-ref="$ctrl.entityRef"
+                         icon-placement="$ctrl.iconPlacement"
+                         tooltip-placement="$ctrl.tooltipPlacement"
+                         ng-if="!$ctrl.viewState">
+</waltz-entity-icon-label>
