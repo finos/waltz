@@ -30,6 +30,13 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class EntityNameUtilities {
 
+    /**
+     * Stores the table and fields required to fetch name for each entity kind
+     * Tuple3:
+     * v1: Entity Table
+     * v2: ID field in the Entity table
+     * v3: Name field in the Entity table
+     */
     private static final Map<EntityKind, Tuple3<Table, Field<Long>, Field<String>>> MAPPINGS;
 
 
@@ -51,6 +58,56 @@ public class EntityNameUtilities {
     }
 
 
+    /**
+     * Creates a derived field to fetch entity names, given fields to compare id and kinds
+     * and a list of expected entity kinds.
+     *
+     * The id and kind comparison fields should refer to the outer table which will be
+     * used by the derived field to fetch entity names from appropriate entity tables.
+     *
+     * Example usage:
+     *
+     * To make a derived field to fetch entity names for the entity id and kind values
+     * stored in {@code Entity_Statistic_Value} table:
+     *
+     * <code>
+     *     <pre>
+     *         Field<String> entityNameField = EntityNameUtilities.mkEntityNameField(
+     *                                      ENTITY_STATISTIC_VALUE.ENTITY_ID,
+     *                                      ENTITY_STATISTIC_VALUE.ENTITY_KIND,
+     *                                      newArrayList(EntityKind.APPLICATION, EntityKind.ORG_UNIT));
+     *     </pre>
+     * <code>
+     *
+     * then the field can be used in a query as:
+     *
+     * <code>
+     *     <pre>
+     *         dsl.select(ENTITY_STATISTIC_VALUE.fields())
+     *            .select(entityNameField)
+     *            .from(ENTITY_STATISTIC_VALUE);
+     *     </pre>
+     * </code>
+     *
+     * the derived field will evaluate to:
+     *
+     * <code>
+     *     <pre>
+     *         case
+     *          when entity_statistic_value.entity_kind = 'APPLICATION'
+     *              then select name from application where id = entity_statistic_value.entity_id
+     *          when entity_statistic_value.entity_kind = 'ORG_UNIT'
+     *              then select name from organisational_unit where id = entity_statistic_value.entity_id
+     *         end
+     *     </pre>
+     * </code>
+     *
+     *
+     * @param idCompareField field in the outer query that stores entity ids
+     * @param kindCompareField field in the outer query that stores entity kinds
+     * @param searchEntityKinds list of expected entity kinds in the @kindCompareField
+     * @return {@code CASE} field to fetch entity name for each record
+     */
     public static Field<String> mkEntityNameField(Field<Long> idCompareField,
                                                   Field<String> kindCompareField,
                                                   List<EntityKind> searchEntityKinds) {
@@ -58,7 +115,7 @@ public class EntityNameUtilities {
         checkNotNull(kindCompareField, "kindCompareField cannot be null");
         checkNotNull(searchEntityKinds, "searchEntityKinds cannot be null");
 
-        // create case condition and select statement pairs
+        // create case condition and corresponding select statement pairs
         List<Tuple2<Condition, Select<Record1<String>>>> caseSteps = MAPPINGS.entrySet().stream()
                 .filter(e -> searchEntityKinds.contains(e.getKey()))
                 .map(e -> tuple(kindCompareField.eq(val(e.getKey().name())),
@@ -83,6 +140,14 @@ public class EntityNameUtilities {
 
     private static Select<Record1<String>> mkNameSelect(Tuple3<Table, Field<Long>, Field<String>> mapping,
                                                         Field<Long> idCompareField) {
+        // form the query to fetch entity names
+        //
+        // v1: entity table
+        // v3: name field in the entity table
+        // v2: id field in the entity table
+        //
+        // eg: select name from application where id = entity_statistic_value.entity_id
+        //
         return DSL.select(mapping.v3())
                 .from(mapping.v1())
                 .where(mapping.v2().eq(idCompareField));
