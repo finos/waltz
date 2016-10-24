@@ -98,8 +98,8 @@ function controller($state,
                     (x) => {
                         return {
                             id: x.flow.id,
-                            source: x.sourceApplication,
-                            target: x.targetApplication
+                            source: x.sourceEntity,
+                            target: x.targetEntity
                         };
                     });
 
@@ -107,8 +107,8 @@ function controller($state,
                     .flatMap(
                         x => [
                             vm.owningEntity,
-                            x.sourceApplication,
-                            x.targetApplication])
+                            x.sourceEntity,
+                            x.targetEntity])
                     .uniqBy('id')
                     .value();
 

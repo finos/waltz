@@ -30,23 +30,13 @@
                     <span ng-bind="mention.specification.format"></span>
                 </td>
                 <td>
-                    <a uib-popover="{{ mention.sourceApplication.description }}"
-                       popover-trigger="mouseenter"
-                       ui-sref="main.app.view ({ id: mention.sourceApplication.id })">
-                        <span ng-bind="mention.sourceApplication.name"></span>
-                        <span class="small">
-                            ( <span ng-bind="mention.sourceApplication.assetCode"></span> )
-                        </span>
+                    <a ui-sref="main.app.view ({ id: mention.sourceEntity.id })">
+                        <span ng-bind="mention.sourceEntity.name"></span>
                     </a>
                 </td>
                 <td>
-                    <a uib-popover="{{ mention.targetApplication.description }}"
-                       popover-trigger="mouseenter"
-                       ui-sref="main.app.view ({ id: mention.targetApplication.id })">
-                        <span ng-bind="mention.targetApplication.name"></span>
-                        <span class="small">
-                            ( <span ng-bind="mention.sourceApplication.assetCode"></span> )
-                        </span>
+                    <a ui-sref="main.app.view ({ id: mention.targetEntity.id })">
+                        <span ng-bind="mention.targetEntity.name"></span>
                     </a>
                 </td>
                 <td><span ng-bind="mention.flow.transport"></span></td>

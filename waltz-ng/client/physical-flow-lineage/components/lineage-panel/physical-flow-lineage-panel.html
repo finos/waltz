@@ -19,23 +19,18 @@
                 </a>
             </td>
             <td>
-                <a ui-sref='main.app.view ({ id: flow.sourceApplication.id })'
-                   ng-bind="flow.sourceApplication.name">
+                <a ui-sref='main.app.view ({ id: flow.sourceEntity.id })'
+                   ng-bind="flow.sourceEntity.name">
                 </a>
             </td>
             <td>
-                <a ui-sref='main.app.view ({ id: flow.targetApplication.id })'
-                   ng-bind="flow.targetApplication.name">
+                <a ui-sref='main.app.view ({ id: flow.targetEntity.id })'
+                   ng-bind="flow.targetEntity.name">
                 </a>
             </td>
             <td><span ng-bind="flow.specification.format"></span></td>
             <td><span ng-bind="flow.flow.transport"></span></td>
             <td><span ng-bind="flow.flow.description"></span></td>
-            <td>
-                <a ui-sref='main.app.view ({ id: $ctrl.apps.byId[specification.owningApplicationId].id })'
-                   ng-bind="$ctrl.apps.byId[specification.owningApplicationId].name">
-                </a>
-            </td>
         </tr>
         </tbody>
     </table>

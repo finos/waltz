@@ -7,7 +7,7 @@ function setup(module) {
             require('./components/candidate-editor/lineage-candidate-editor'))
         .component(
             'waltzPhysicalFlowLineagePanel',
-            require('./components/lineage-panel/lineage-panel'))
+            require('./components/lineage-panel/physical-flow-lineage-panel'))
         .service(
             'PhysicalFlowLineageStore',
             require('./services/physical-flow-lineage-store'))

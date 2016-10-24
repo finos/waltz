@@ -1,5 +1,7 @@
 package com.khartec.waltz.data.physical_flow;
 
+import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.data.EntityNameUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.physical_flow.FrequencyKind;
@@ -22,6 +24,13 @@ import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPE
 @Repository
 public class PhysicalFlowDao {
 
+
+    public static final Field<String> targetEntityNameField = EntityNameUtilities.mkEntityNameField(
+            PHYSICAL_FLOW.TARGET_ENTITY_ID,
+            PHYSICAL_FLOW.TARGET_ENTITY_KIND,
+            ListUtilities.newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR)).as("target_name_field");
+
+
     public static final RecordMapper<Record, PhysicalFlow> TO_DOMAIN_MAPPER = r -> {
         PhysicalFlowRecord record = r.into(PHYSICAL_FLOW);
         return ImmutablePhysicalFlow.builder()
@@ -35,7 +44,7 @@ public class PhysicalFlowDao {
                         EntityReference.mkRef(
                                 EntityKind.valueOf(record.getTargetEntityKind()),
                                 record.getTargetEntityId(),
-                                r.getValue(APPLICATION.NAME)))
+                                r.getValue(targetEntityNameField)))
                 .transport(TransportKind.valueOf(record.getTransport()))
                 .build();
     };
@@ -63,11 +72,11 @@ public class PhysicalFlowDao {
 
         return dsl
                 .select(PHYSICAL_FLOW.fields())
-                .select(APPLICATION.NAME)
+                .select(targetEntityNameField)
                 .from(PHYSICAL_FLOW)
                 .innerJoin(PHYSICAL_SPECIFICATION).on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
                 .innerJoin(APPLICATION)
-                .on(APPLICATION.ID.eq(PHYSICAL_FLOW.TARGET_ENTITY_ID)) // TODO: waltz-776
+                .on(APPLICATION.ID.eq(PHYSICAL_FLOW.TARGET_ENTITY_ID))
                 .where(isTarget.or(isSource))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -92,12 +101,13 @@ public class PhysicalFlowDao {
 
 
     private List<PhysicalFlow> findByCondition(Condition condition) {
+
         return dsl
                 .select(PHYSICAL_FLOW.fields())
-                .select(APPLICATION.NAME)
+                .select(targetEntityNameField)
                 .from(PHYSICAL_FLOW)
                 .innerJoin(APPLICATION)
-                .on(APPLICATION.ID.eq(PHYSICAL_FLOW.TARGET_ENTITY_ID))  // TODO: waltz-776
+                .on(APPLICATION.ID.eq(PHYSICAL_FLOW.TARGET_ENTITY_ID))
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }
