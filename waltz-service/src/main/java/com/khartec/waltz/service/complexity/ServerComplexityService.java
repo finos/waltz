@@ -3,7 +3,7 @@ package com.khartec.waltz.service.complexity;
 import com.khartec.waltz.data.complexity.ServerComplexityDao;
 import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ComplexityScore;
-import com.khartec.waltz.model.tally.LongTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -53,7 +53,7 @@ public class ServerComplexityService {
 
 
     public ComplexityScore getForApp(long appId, int baseline) {
-        List<LongTally> tallies = serverComplexityDao.findCountsByAppIdSelector(DSL.select(DSL.value(appId)));
+        List<Tally<Long>> tallies = serverComplexityDao.findCountsByAppIdSelector(DSL.select(DSL.value(appId)));
         if (tallies.isEmpty()) { return null; }
 
         return tallyToComplexityScore(

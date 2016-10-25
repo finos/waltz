@@ -1,6 +1,11 @@
 package com.khartec.waltz.data.asset_cost;
 
-import com.khartec.waltz.model.cost.*;
+import com.khartec.waltz.model.cost.Cost;
+import com.khartec.waltz.model.cost.CostBand;
+import com.khartec.waltz.model.cost.CostKind;
+import com.khartec.waltz.model.cost.ImmutableCost;
+import com.khartec.waltz.model.tally.ImmutableTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple;
@@ -56,7 +61,7 @@ public class AssetCostStatsDao {
     }
 
 
-    public List<CostBandTally> calculateCostBandStatisticsByAppIdSelector(int year, Select<Record1<Long>> appIdSelector) {
+    public List<Tally<CostBand>> calculateCostBandStatisticsByAppIdSelector(int year, Select<Record1<Long>> appIdSelector) {
         Condition relevantAssetCodesCondition = relevantAssetCodesCondition(appIdSelector);
         return calculateCostBandStatistics(
                 relevantAssetCodesCondition,
@@ -93,7 +98,7 @@ public class AssetCostStatsDao {
     }
 
 
-    private List<CostBandTally> calculateCostBandStatistics(Condition condition, int year) {
+    private List<Tally<CostBand>> calculateCostBandStatistics(Condition condition, int year) {
 
         SelectHavingStep<Record1<BigDecimal>> subTotals = DSL
                 .select(subTotalSum.as(subTotalAlias))
@@ -112,7 +117,7 @@ public class AssetCostStatsDao {
                                 .mapToObj(fieldIdx -> {
                                     Integer count = r.getValue(fieldIdx, Integer.class);
                                     CostBand costBand = costBands.get(fieldIdx);
-                                    return ImmutableCostBandTally.builder()
+                                    return ImmutableTally.<CostBand>builder()
                                             .count(count)
                                             .id(costBand)
                                             .build();

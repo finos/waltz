@@ -22,7 +22,7 @@ import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.enduserapp.ImmutableEndUserApplication;
-import com.khartec.waltz.model.tally.LongTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.EndUserApplicationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -69,7 +69,7 @@ public class EndUserAppDao {
 
     }
 
-    public List<LongTally> countByOrganisationalUnit() {
+    public List<Tally<Long>> countByOrganisationalUnit() {
         return JooqUtilities.calculateLongTallies(
                 dsl,
                 END_USER_APPLICATION,

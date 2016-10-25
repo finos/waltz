@@ -7,7 +7,7 @@ import com.khartec.waltz.data.software_catalog.SoftwarePackageDao;
 import com.khartec.waltz.data.software_catalog.SoftwareUsageDao;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.software_catalog.*;
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ public class SoftwareCatalogService {
     }
 
 
-    private List<StringTally> toTallies(Condition condition, Field groupingField) {
+    private List<Tally<String>> toTallies(Condition condition, Field groupingField) {
         return dsl.select(groupingField, DSL.count(groupingField))
                 .from(SOFTWARE_PACKAGE)
                 .innerJoin(SOFTWARE_USAGE)
@@ -78,8 +78,8 @@ public class SoftwareCatalogService {
 
         Condition condition = SOFTWARE_USAGE.APPLICATION_ID.in(appIdSelector);
 
-        List<StringTally> vendorCounts = toTallies(condition, SOFTWARE_PACKAGE.VENDOR);
-        List<StringTally> maturityCounts = toTallies(condition, SOFTWARE_PACKAGE.MATURITY_STATUS);
+        List<Tally<String>> vendorCounts = toTallies(condition, SOFTWARE_PACKAGE.VENDOR);
+        List<Tally<String>> maturityCounts = toTallies(condition, SOFTWARE_PACKAGE.MATURITY_STATUS);
 
         return ImmutableSoftwareSummaryStatistics.builder()
                 .vendorCounts(vendorCounts)

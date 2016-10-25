@@ -1,7 +1,7 @@
 package com.khartec.waltz.data.complexity;
 
-import com.khartec.waltz.model.tally.ImmutableLongTally;
-import com.khartec.waltz.model.tally.LongTally;
+import com.khartec.waltz.model.tally.ImmutableTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +24,8 @@ public class CapabilityComplexityDao {
                     DSL.value(1).div(
                         DSL.nullif(CAPABILITY.LEVEL, 0)), 1));
 
-    private static final RecordMapper<Record2<Long, BigDecimal>, LongTally> toScoreMapper =
-            r -> ImmutableLongTally.builder()
+    private static final RecordMapper<Record2<Long, BigDecimal>, Tally<Long>> toScoreMapper =
+            r -> ImmutableTally.<Long>builder()
                     .count(r.value2().doubleValue())
                     .id(r.value1())
                     .build();
@@ -40,19 +40,19 @@ public class CapabilityComplexityDao {
     }
 
 
-    public List<LongTally> findScores() {
+    public List<Tally<Long>> findScores() {
         return mkSelectQueryWhere(DSL.trueCondition())
                 .fetch(toScoreMapper);
     }
 
 
-    public List<LongTally> findScoresForAppIdSelector(Select<Record1<Long>> appIds) {
+    public List<Tally<Long>> findScoresForAppIdSelector(Select<Record1<Long>> appIds) {
         return mkSelectQueryWhere(APP_CAPABILITY.APPLICATION_ID.in(appIds))
                 .fetch(toScoreMapper);
     }
 
 
-    public LongTally findScoresForAppId(Long appId) {
+    public Tally<Long> findScoresForAppId(Long appId) {
         return mkSelectQueryWhere(APP_CAPABILITY.APPLICATION_ID.eq(appId))
                 .fetchOne(toScoreMapper);
     }

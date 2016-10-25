@@ -22,7 +22,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.dataflow.DataFlowMeasures;
 import com.khartec.waltz.model.dataflow.ImmutableDataFlowMeasures;
-import com.khartec.waltz.model.tally.ImmutableStringTally;
+import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.ImmutableTallyPack;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.tally.TallyPack;
@@ -145,7 +145,7 @@ public class DataFlowStatsDao {
         Map<EntityReference, List<Tally<String>>> dataTypeRefToTallies = records.stream()
                 .map(r -> tuple(
                         mkRef(EntityKind.DATA_TYPE, r.getValue(dfd.DECORATOR_ENTITY_ID)),
-                        ImmutableStringTally.builder()
+                        ImmutableTally.<String>builder()
                                 .id(r.getValue(flowType))
                                 .count(r.getValue(flowCount))
                                 .build()))

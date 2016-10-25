@@ -5,9 +5,7 @@ import com.khartec.waltz.model.EndOfLifeStatus;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.tally.ImmutableLongTally;
-import com.khartec.waltz.model.tally.ImmutableStringTally;
-import com.khartec.waltz.model.tally.LongTally;
+import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -44,14 +42,14 @@ public class JooqUtilities {
      * Expects result set like: { Id, Count }
      */
     public static final RecordMapper<Record2<String,Integer>, Tally<String>> TO_STRING_TALLY = r ->
-            ImmutableStringTally.builder()
+            ImmutableTally.<String>builder()
                     .count(r.value2())
                     .id(r.value1())
                     .build();
 
 
-    public static final RecordMapper<Record2<Long,Integer>, LongTally> TO_LONG_TALLY = r ->
-            ImmutableLongTally.builder()
+    public static final RecordMapper<Record2<Long,Integer>, Tally<Long>> TO_LONG_TALLY = r ->
+            ImmutableTally.<Long>builder()
                     .count(r.value2())
                     .id(r.value1())
                     .build();
@@ -97,7 +95,7 @@ public class JooqUtilities {
                 .collect(groupingBy(r -> r.getValue(fieldToTally), counting()))
                 .entrySet()
                 .stream()
-                .map(e -> ImmutableStringTally.builder()
+                .map(e -> ImmutableTally.<String>builder()
                         .id(e.getKey())
                         .count(e.getValue())
                         .build())
@@ -105,7 +103,7 @@ public class JooqUtilities {
     }
 
 
-    public static List<LongTally> calculateLongTallies(
+    public static List<Tally<Long>> calculateLongTallies(
             DSLContext dsl,
             Table table,
             Field<Long> fieldToTally,

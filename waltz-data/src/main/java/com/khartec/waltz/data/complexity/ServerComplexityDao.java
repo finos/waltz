@@ -1,10 +1,8 @@
 package com.khartec.waltz.data.complexity;
 
 import com.khartec.waltz.common.Checks;
-import com.khartec.waltz.model.tally.ImmutableLongTally;
-import com.khartec.waltz.model.tally.ImmutableStringTally;
-import com.khartec.waltz.model.tally.LongTally;
-import com.khartec.waltz.model.tally.StringTally;
+import com.khartec.waltz.model.tally.ImmutableTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +28,7 @@ public class ServerComplexityDao {
 
 
 
-    public List<StringTally> findCountsByAssetCodes(String... assetCodes) {
+    public List<Tally<String>> findCountsByAssetCodes(String... assetCodes) {
         return findCountsByAssetCodes(SERVER_INFORMATION.ASSET_CODE.in(assetCodes));
     }
 
@@ -40,12 +38,12 @@ public class ServerComplexityDao {
     }
 
 
-    public List<StringTally> findCounts() {
+    public List<Tally<String>> findCounts() {
         return findCountsByAssetCodes(DSL.trueCondition());
     }
 
 
-    public List<LongTally> findCountsByAppIdSelector(Select<Record1<Long>> idSelector) {
+    public List<Tally<Long>> findCountsByAppIdSelector(Select<Record1<Long>> idSelector) {
         Checks.checkNotNull(idSelector, "idSelector cannot be null");
 
         return dsl.select(APPLICATION.ID, SERVER_COUNT_FIELD)
@@ -54,14 +52,14 @@ public class ServerComplexityDao {
                 .on(SERVER_INFORMATION.ASSET_CODE.eq(APPLICATION.ASSET_CODE))
                 .where(APPLICATION.ID.in(idSelector))
                 .groupBy(APPLICATION.ID)
-                .fetch(r -> ImmutableLongTally.builder()
+                .fetch(r -> ImmutableTally.<Long>builder()
                         .id(r.value1())
                         .count(r.value2())
                         .build());
     }
 
 
-    private List<StringTally> findCountsByAssetCodes(Condition condition) {
+    private List<Tally<String>> findCountsByAssetCodes(Condition condition) {
         Checks.checkNotNull(condition, "Condition must be given, use DSL.trueCondition() for 'none'");
 
         return dsl.select(SERVER_INFORMATION.ASSET_CODE, SERVER_COUNT_FIELD)
@@ -69,7 +67,7 @@ public class ServerComplexityDao {
                 .where(condition)
                 .groupBy(SERVER_INFORMATION.ASSET_CODE)
                 .orderBy(SERVER_COUNT_FIELD.desc())
-                .fetch(r -> ImmutableStringTally.builder()
+                .fetch(r -> ImmutableTally.<String>builder()
                         .id(r.value1())
                         .count(r.value2())
                         .build());

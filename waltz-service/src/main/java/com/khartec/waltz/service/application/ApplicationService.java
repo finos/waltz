@@ -30,7 +30,7 @@ import com.khartec.waltz.model.application.AppRegistrationRequest;
 import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
-import com.khartec.waltz.model.tally.LongTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +89,7 @@ public class ApplicationService {
     }
 
 
-    public List<LongTally> countByOrganisationalUnit() {
+    public List<Tally<Long>> countByOrganisationalUnit() {
         return applicationDao.countByOrganisationalUnit();
     }
 

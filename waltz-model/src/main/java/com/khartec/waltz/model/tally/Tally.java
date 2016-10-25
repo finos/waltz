@@ -17,15 +17,22 @@
 
 package com.khartec.waltz.model.tally;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
+
 /**
  * Simple class used for representing a simple count of a given id.
  *
  * Typically used for returning the results of a query similar to:
  * <pre>SELECT id, COUNT(something) FROM somewhere GROUP BY something</pre>
  */
-public interface Tally<T> {
+@Value.Immutable
+@JsonSerialize(as = ImmutableTally.class)
+@JsonDeserialize(as = ImmutableTally.class)
+public abstract class Tally<T> {
 
-    T id();
-    double count();
+    public abstract T id();
+    public abstract double count();
 
 }

@@ -19,7 +19,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
-import com.khartec.waltz.model.tally.LongTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.end_user_app.EndUserAppService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -53,7 +53,7 @@ public class EndUserAppEndpoint implements Endpoint {
         ListRoute<EndUserApplication> findBySelectorRoute = (request, response)
                 -> endUserAppService.findByOrganisationalUnitSelector(readIdSelectionOptionsFromBody(request));
 
-        ListRoute<LongTally> countByOrgUnitRoute = (request, response) -> endUserAppService.countByOrgUnitId();
+        ListRoute<Tally<Long>> countByOrgUnitRoute = (request, response) -> endUserAppService.countByOrgUnitId();
 
         getForList(countByOrgUnitPath, countByOrgUnitRoute);
 

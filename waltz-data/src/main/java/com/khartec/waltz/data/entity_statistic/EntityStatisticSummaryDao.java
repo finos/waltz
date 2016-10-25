@@ -4,7 +4,7 @@ import com.khartec.waltz.model.Duration;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.tally.ImmutableStringTally;
+import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.ImmutableTallyPack;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.tally.TallyPack;
@@ -126,7 +126,7 @@ public class EntityStatisticSummaryDao {
 
         return values.stream()
                 .collect(groupingBy(r -> r.getValue(esv.STATISTIC_ID),
-                             mapping(r -> ImmutableStringTally.builder()
+                             mapping(r -> ImmutableTally.<String>builder()
                                         .count(Double.parseDouble(r.getValue(esv.VALUE)))
                                         .id(r.getValue(esv.OUTCOME))
                                         .build(),
@@ -163,7 +163,7 @@ public class EntityStatisticSummaryDao {
                                     : nowUtc();
 
         List<Tally<String>> tallies = values.stream()
-                .map(r -> ImmutableStringTally.builder()
+                .map(r -> ImmutableTally.<String>builder()
                         .count(Double.parseDouble(r.getValue(esv.VALUE)))
                         .id(r.getValue(esv.OUTCOME))
                         .build())
@@ -202,7 +202,7 @@ public class EntityStatisticSummaryDao {
         return values
                 .stream()
                 .map(r -> tuple(r.getValue(esvCreatedAtDateOnly),
-                                ImmutableStringTally.builder()
+                                ImmutableTally.<String>builder()
                                         .count(Double.parseDouble(r.getValue(esv.VALUE)))
                                         .id(r.getValue(esv.OUTCOME))
                                         .build()))
@@ -243,7 +243,7 @@ public class EntityStatisticSummaryDao {
 
         List<Tally<String>> tallies = values
                 .stream()
-                .map(r -> ImmutableStringTally.builder()
+                .map(r -> ImmutableTally.<String>builder()
                         .count(toTally.apply(r.getValue(aggregateField)))
                         .id(r.getValue(esv.OUTCOME))
                         .build())
@@ -291,7 +291,7 @@ public class EntityStatisticSummaryDao {
 
         return aggregates.stream()
                 .collect(groupingBy(r -> r.getValue(esv.STATISTIC_ID),
-                             mapping(r -> ImmutableStringTally.builder()
+                             mapping(r -> ImmutableTally.<String>builder()
                                         .count(toTally.apply(r.getValue(aggregateField)))
                                         .id(r.getValue(esv.OUTCOME))
                                         .build(),
@@ -339,7 +339,7 @@ public class EntityStatisticSummaryDao {
         return values
                 .stream()
                 .map(r -> tuple(r.getValue(esvCreatedAtDateOnly),
-                                ImmutableStringTally.builder()
+                                ImmutableTally.<String>builder()
                                         .count(toTally.apply(r.getValue(aggregateField)))
                                         .id(r.getValue(esv.OUTCOME))
                                         .build()))

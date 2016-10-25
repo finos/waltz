@@ -1,6 +1,6 @@
 package com.khartec.waltz.model.complexity;
 
-import com.khartec.waltz.model.tally.LongTally;
+import com.khartec.waltz.model.tally.Tally;
 
 import java.util.function.Function;
 
@@ -11,14 +11,14 @@ import static com.khartec.waltz.common.Checks.checkTrue;
 public class ComplexityUtilities {
 
     public static ComplexityScore tallyToComplexityScore(ComplexityKind kind,
-                                                         LongTally tally,
+                                                         Tally<Long> tally,
                                                          double baseline) {
         return tallyToComplexityScore(kind, tally, baseline, Function.identity());
     }
 
 
     public static ComplexityScore tallyToComplexityScore(ComplexityKind kind,
-                                                         LongTally tally,
+                                                         Tally<Long> tally,
                                                          double baseline,
                                                          Function<Double, Double> valueTransformer) {
         checkNotNull(tally, "Cannot create a complexity score from a null tally");

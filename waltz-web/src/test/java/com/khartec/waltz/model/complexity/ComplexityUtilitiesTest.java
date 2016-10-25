@@ -1,7 +1,7 @@
 package com.khartec.waltz.model.complexity;
 
-import com.khartec.waltz.model.tally.ImmutableLongTally;
-import com.khartec.waltz.model.tally.LongTally;
+import com.khartec.waltz.model.tally.ImmutableTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.junit.Test;
 
 import static com.khartec.waltz.model.complexity.ComplexityUtilities.tallyToComplexityScore;
@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class ComplexityUtilitiesTest {
 
-    private final LongTally tally = ImmutableLongTally.builder().id(1L).count(10).build();
+    private final Tally<Long> tally = ImmutableTally.<Long>builder().id(1L).count(10).build();
 
 
     @Test(expected = IllegalArgumentException.class)
@@ -53,7 +53,7 @@ public class ComplexityUtilitiesTest {
 
     @Test
     public void negativeCountGivesNegativeScore() {
-        LongTally negativeTally = ImmutableLongTally.builder().id(1L).count(-10).build();
+        Tally<Long> negativeTally = ImmutableTally.<Long>builder().id(1L).count(-10).build();
         ComplexityScore complexityScore = tallyToComplexityScore(ComplexityKind.CONNECTION, negativeTally, 10);
         assertEquals(-1, complexityScore.score(), 0);
     }
