@@ -1,27 +1,25 @@
 package com.khartec.waltz.data.orphan;
 
 import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.orphan.ImmutableOrphanRelationship;
 import com.khartec.waltz.model.orphan.OrphanRelationship;
 import com.khartec.waltz.model.orphan.OrphanSide;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.jooq.impl.DSL.select;
 
 @Repository
 public class OrphanDao {
@@ -39,7 +37,7 @@ public class OrphanDao {
         return dsl.select(APPLICATION.ID, APPLICATION.NAME, APPLICATION.ORGANISATIONAL_UNIT_ID)
                 .from(APPLICATION)
                 .where(APPLICATION.ORGANISATIONAL_UNIT_ID
-                        .notIn(DSL.select(ORGANISATIONAL_UNIT.ID)
+                        .notIn(select(ORGANISATIONAL_UNIT.ID)
                                 .from(ORGANISATIONAL_UNIT)))
                 .fetch(r -> ImmutableOrphanRelationship.builder()
                         .entityA(mkRef(EntityKind.APPLICATION, r.value1(), r.value2()))
@@ -51,11 +49,11 @@ public class OrphanDao {
 
     public List<OrphanRelationship> findOrphanApplicationCapabilities() {
         Condition missingCapability = APP_CAPABILITY.CAPABILITY_ID
-                .notIn(DSL.select(CAPABILITY.ID)
+                .notIn(select(CAPABILITY.ID)
                         .from(CAPABILITY));
 
         Condition missingApplication = APP_CAPABILITY.APPLICATION_ID
-                .notIn(DSL.select(APPLICATION.ID)
+                .notIn(select(APPLICATION.ID)
                         .from(APPLICATION));
 
 
@@ -87,7 +85,7 @@ public class OrphanDao {
 
     public List<OrphanRelationship> findOrphanAuthoritativeSourceByOrgUnit() {
         Condition missingOrgUnit = AUTHORITATIVE_SOURCE.PARENT_ID
-                .notIn(DSL.select(ORGANISATIONAL_UNIT.ID)
+                .notIn(select(ORGANISATIONAL_UNIT.ID)
                         .from(ORGANISATIONAL_UNIT))
                 .and(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()));
 
@@ -106,7 +104,7 @@ public class OrphanDao {
 
     public List<OrphanRelationship> findOrphanAuthoritativeSourceByApp() {
         Condition missingApplication = AUTHORITATIVE_SOURCE.APPLICATION_ID
-                .notIn(DSL.select(APPLICATION.ID)
+                .notIn(select(APPLICATION.ID)
                         .from(APPLICATION));
 
 
@@ -124,7 +122,7 @@ public class OrphanDao {
 
     public List<OrphanRelationship> findOrphanAuthoritiveSourceByDataType() {
         Condition missingDataType = AUTHORITATIVE_SOURCE.DATA_TYPE
-                .notIn(DSL.select(DATA_TYPE.CODE)
+                .notIn(select(DATA_TYPE.CODE)
                         .from(DATA_TYPE));
 
 
@@ -145,7 +143,7 @@ public class OrphanDao {
 
     public List<OrphanRelationship> findOrphanChangeInitiatives() {
         Condition missingParent = CHANGE_INITIATIVE.PARENT_ID
-                .notIn(DSL.select(CHANGE_INITIATIVE.ID)
+                .notIn(select(CHANGE_INITIATIVE.ID)
                         .from(CHANGE_INITIATIVE));
 
 
@@ -158,6 +156,26 @@ public class OrphanDao {
                         .entityB(mkRef(EntityKind.CHANGE_INITIATIVE, r.value2()))
                         .orphanSide(OrphanSide.A)
                         .build());
+    }
+
+
+    public List<OrphanRelationship> findOrphanLogicalDataFlows() {
+        BiFunction<Field<String>, Field<Long>, Select<Record2<Long, Long>>> queryFactory = (kindField, idField) ->
+                DSL.select(DATA_FLOW.ID, idField)
+                        .from(DATA_FLOW)
+                        .where(idField.notIn(
+                                select(APPLICATION.ID)
+                                        .from(APPLICATION)))
+                        .and(kindField.eq(EntityKind.APPLICATION.name()));
+
+        return dsl.selectFrom(queryFactory.apply(DATA_FLOW.SOURCE_ENTITY_KIND, DATA_FLOW.SOURCE_ENTITY_ID).asTable())
+                .unionAll(queryFactory.apply(DATA_FLOW.TARGET_ENTITY_KIND, DATA_FLOW.TARGET_ENTITY_ID))
+                .fetch(r -> ImmutableOrphanRelationship.builder()
+                        .entityA(mkRef(EntityKind.LOGICAL_DATA_FLOW, r.value1()))
+                        .entityB(mkRef(EntityKind.APPLICATION, r.value2()))
+                        .orphanSide(OrphanSide.A)
+                        .build());
+
     }
 
 }
