@@ -4,9 +4,8 @@
             Owner:
         </div>
         <div class="col-sm-4">
-            <a ui-sref="main.app.view ({ id: $ctrl.owningEntity.id })">
-                <span ng-bind="$ctrl.owningEntity.name"></span>
-            </a>
+            <waltz-entity-link entity-ref="$ctrl.specification.owningEntity">
+            </waltz-entity-link>
         </div>
 
         <div class="col-sm-2 waltz-display-field-label">

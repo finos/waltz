@@ -45,10 +45,7 @@
 
                     </td>
                     <td>
-                        <a ui-sref="main.app.view ({ id: p.targetRef.id })">
-                            <span ng-bind="p.targetRef.name">
-                            </span>
-                        </a>
+                        <waltz-entity-link entity-ref="p.targetRef"></waltz-entity-link>
                     </td>
                     <td>
                         <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"

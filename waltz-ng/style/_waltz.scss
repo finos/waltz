@@ -249,9 +249,17 @@ a.subtle-link {
     text-decoration: none;
 }
 
+
 a.subtle-link:hover {
-    color: blue;
+    color: $waltz-link-color;
 }
+
+
+.waltz-action-link {
+    @extend .clickable;
+    border-bottom: 1px blue dashed;
+}
+
 
 .waltz-btn-transparent {
     @extend .btn-default;
