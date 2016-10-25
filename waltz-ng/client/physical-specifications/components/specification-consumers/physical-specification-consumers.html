@@ -17,7 +17,7 @@
         <br>
 
         <div ng-class="{ 'waltz-scroll-region-300': $ctrl.physicalFlows.length > 10}">
-            <table class="table table-condensed small">
+            <table class="table table-condensed small table-hover">
                 <thead>
                 <tr>
                     <th width="30%">Target</th>
@@ -31,10 +31,10 @@
                 <tbody>
                 <tr ng-repeat="flow in $ctrl.physicalFlows | filter:$ctrl.searchTerms | orderBy:'target.name'">
                     <td>
-                        <a ng-click="$ctrl.onFlowSelect(flow)"
-                           class="clickable">
-                            <span ng-bind="flow.target.name"></span>
-                        </a>
+                        <waltz-entity-icon-label ng-click="$ctrl.onFlowSelect(flow)"
+                                                 entity-ref="flow.target"
+                                                 class="waltz-action-link">
+                        </waltz-entity-icon-label>
                     </td>
                     <td>
                         <span ng-bind="flow.transport"></span>

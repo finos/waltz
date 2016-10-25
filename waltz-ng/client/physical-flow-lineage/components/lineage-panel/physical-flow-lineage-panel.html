@@ -19,14 +19,10 @@
                 </a>
             </td>
             <td>
-                <a ui-sref='main.app.view ({ id: flow.sourceEntity.id })'
-                   ng-bind="flow.sourceEntity.name">
-                </a>
+                <waltz-entity-link entity-ref="flow.sourceEntity"></waltz-entity-link>
             </td>
             <td>
-                <a ui-sref='main.app.view ({ id: flow.targetEntity.id })'
-                   ng-bind="flow.targetEntity.name">
-                </a>
+                <waltz-entity-link entity-ref="flow.targetEntity"></waltz-entity-link>
             </td>
             <td><span ng-bind="flow.specification.format"></span></td>
             <td><span ng-bind="flow.flow.transport"></span></td>

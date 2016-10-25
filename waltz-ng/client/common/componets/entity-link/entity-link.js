@@ -20,8 +20,10 @@ const initialState = {
 function controller() {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = changes => {
-        vm.viewState = kindToViewState(vm.entityRef.kind);
+    vm.$onChanges = (changes) => {
+        if (vm.entityRef) {
+            vm.viewState = kindToViewState(vm.entityRef.kind);
+        }
     };
 }
 

@@ -76,16 +76,20 @@
                                   ng-bind="c.specification.name"></span>
                         </td>
                         <td>
-                            <a ng-click="ctrl.doSearch(c.sourceApplication)"
-                               uib-popover="Focus on app"
-                               popover-trigger="mouseenter"
-                               ng-bind="c.sourceApplication.name"></a>
+                            <waltz-entity-icon-label ng-click="ctrl.doSearch(c.sourceEntity)"
+                                                     uib-popover="Focus"
+                                                     popover-trigger="mouseenter"
+                                                     class="waltz-action-link"
+                                                     entity-ref="c.sourceEntity">
+                            </waltz-entity-icon-label>
                         </td>
                         <td>
-                            <a ng-click="ctrl.doSearch(c.targetApplication)"
-                               uib-popover="Focus on app"
-                               popover-trigger="mouseenter"
-                               ng-bind="c.targetApplication.name"></a>
+                            <waltz-entity-icon-label ng-click="ctrl.doSearch(c.targetEntity)"
+                                                     uib-popover="Focus"
+                                                     popover-trigger="mouseenter"
+                                                     class="waltz-action-link"
+                                                     entity-ref="c.targetEntity">
+                            </waltz-entity-icon-label>
                         </td>
                         <td>
                             <span ng-bind="c.specification.format"></span>
