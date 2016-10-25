@@ -12,7 +12,7 @@
 
 export default (module) => {
     module
-        .filter('extend', require('./extend-filter'))
+        .filter('merge', require('./merge-filter'))
         .filter('toDescription', require('./description-filter'))
         .filter('toDisplayName', require('./display-name-filter'))
         .filter('isEmpty', require('./is-empty'))
