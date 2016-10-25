@@ -1,8 +1,8 @@
 package com.khartec.waltz.data.complexity;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.tally.ImmutableLongTally;
-import com.khartec.waltz.model.tally.LongTally;
+import com.khartec.waltz.model.tally.ImmutableTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,15 +75,15 @@ public class ConnectionComplexityDao {
         return findBaseline(APP_ID_ALIAS.in(appIds));
     }
 
-    public List<LongTally> findCounts() {
+    public List<Tally<Long>> findCounts() {
         return findCounts(DSL.trueCondition());
     }
 
-    public List<LongTally> findCounts(Select<Record1<Long>> appIdProvider) {
+    public List<Tally<Long>> findCounts(Select<Record1<Long>> appIdProvider) {
         return findCounts(APP_ID_ALIAS.in(appIdProvider));
     }
 
-    public List<LongTally> findCounts(Long... appIds) {
+    public List<Tally<Long>> findCounts(Long... appIds) {
         return findCounts(APP_ID_ALIAS.in(appIds));
     }
 
@@ -99,11 +99,11 @@ public class ConnectionComplexityDao {
     }
 
 
-    private List<LongTally> findCounts(Condition condition) {
+    private List<Tally<Long>> findCounts(Condition condition) {
         return dsl.select(APP_ID_ALIAS, TOTAL_CONNECTIONS_FIELD)
                 .from(TOTAL_FLOW_COUNTS)
                 .where(condition)
-                .fetch(r -> ImmutableLongTally.builder()
+                .fetch(r -> ImmutableTally.<Long>builder()
                         .id(r.value1())
                         .count(r.value2())
                         .build());

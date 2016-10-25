@@ -24,7 +24,7 @@ import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
 import com.khartec.waltz.model.applicationcapability.GroupedApplications;
 import com.khartec.waltz.model.applicationcapability.ImmutableApplicationCapability;
 import com.khartec.waltz.model.applicationcapability.ImmutableGroupedApplications;
-import com.khartec.waltz.model.tally.ImmutableLongTally;
+import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.AppCapabilityRecord;
 import org.jooq.*;
@@ -112,7 +112,7 @@ public class AppCapabilityDao {
         return dsl.select(APP_CAPABILITY.CAPABILITY_ID, count(APP_CAPABILITY.APPLICATION_ID))
                 .from(APP_CAPABILITY)
                 .groupBy(APP_CAPABILITY.CAPABILITY_ID)
-                .fetch(r -> ImmutableLongTally.builder()
+                .fetch(r -> ImmutableTally.<Long>builder()
                         .id(r.value1())
                         .count(r.value2())
                         .build());

@@ -3,7 +3,7 @@ package com.khartec.waltz.service.complexity;
 import com.khartec.waltz.data.complexity.ConnectionComplexityDao;
 import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ComplexityScore;
-import com.khartec.waltz.model.tally.LongTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ public class ConnectionComplexityService {
      * @return
      */
     public ComplexityScore getForApp(long appId, int baseline) {
-        List<LongTally> flowCounts = connectionComplexityDao.findCounts(appId);
+        List<Tally<Long>> flowCounts = connectionComplexityDao.findCounts(appId);
 
         if (flowCounts.isEmpty()) { return null; }
 

@@ -21,7 +21,7 @@ import com.khartec.waltz.data.end_user_app.EndUserAppDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
-import com.khartec.waltz.model.tally.LongTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +58,7 @@ public class EndUserAppService {
     }
 
 
-    public Collection<LongTally> countByOrgUnitId() {
+    public Collection<Tally<Long>> countByOrgUnitId() {
         return time("EUAS.countByOrgUnitId", () -> endUserAppDao.countByOrganisationalUnit());
     }
 }

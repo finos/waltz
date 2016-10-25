@@ -3,7 +3,7 @@ package com.khartec.waltz.service.complexity;
 import com.khartec.waltz.data.complexity.CapabilityComplexityDao;
 import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ComplexityScore;
-import com.khartec.waltz.model.tally.LongTally;
+import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class CapabilityComplexityService {
 
 
     public ComplexityScore getForApp(long appId, double baseline) {
-        LongTally tally = capabilityComplexityDao.findScoresForAppId(appId);
+        Tally<Long> tally = capabilityComplexityDao.findScoresForAppId(appId);
         if (tally == null) return null;
 
         return tallyToComplexityScore(
