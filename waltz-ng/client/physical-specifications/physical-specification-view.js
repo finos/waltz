@@ -1,5 +1,5 @@
-import {initialiseData} from '../common';
-import {green, grey} from '../common/colors';
+import {initialiseData} from "../common";
+import {green, grey} from "../common/colors";
 
 
 const template = require('./physical-specification-view.html');
@@ -17,6 +17,15 @@ const initialState = {
     selectedFlow: null
 };
 
+
+const addToHistory = (historyStore, spec) => {
+    if (! spec) { return; }
+    historyStore.put(
+        spec.name,
+        'PHYSICAL_SPECIFICATION',
+        'main.physical-specification.view',
+        { id: spec.id });
+};
 
 
 function setupGraphTweakers(application) {
@@ -48,6 +57,7 @@ function controller($state,
                     $stateParams,
                     applicationStore,
                     bookmarkStore,
+                    historyStore,
                     orgUnitStore,
                     physicalFlowLineageStore,
                     physicalSpecificationStore,
@@ -70,7 +80,8 @@ function controller($state,
         .then(app => vm.owningEntity = app)
         .then(app => orgUnitStore.getById(app.organisationalUnitId))
         .then(ou => vm.organisationalUnit = ou)
-        .then(() => vm.graphTweakers = setupGraphTweakers(vm.owningEntity));
+        .then(() => vm.graphTweakers = setupGraphTweakers(vm.owningEntity))
+        .then(() => addToHistory(historyStore, vm.specification));
 
     physicalFlowStore
         .findBySpecificationId(specId)
@@ -135,6 +146,7 @@ controller.$inject = [
     '$stateParams',
     'ApplicationStore',
     'BookmarkStore',
+    'HistoryStore',
     'OrgUnitStore',
     'PhysicalFlowLineageStore',
     'PhysicalSpecificationStore',
