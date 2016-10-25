@@ -1,0 +1,157 @@
+<div>
+
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.specification.name }}"
+                       small="{{ ctrl.specification.owningEntity.name }} &rarr; {{ ctrl.physicalFlow.target.name }}"
+                       icon="qrcode">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>
+                <waltz-entity-link entity-ref="ctrl.specification.owningEntity"></waltz-entity-link>
+            </li>
+            <li ng-bind="ctrl.specification.name"></li>
+        </ol>
+    </waltz-page-header>
+
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+
+        <h4>
+            Physical flow of
+            <mark ng-bind="ctrl.specification.name"></mark>
+            from
+            <mark ng-bind="ctrl.specification.owningEntity.name"></mark>
+            to
+            <mark ng-bind="ctrl.physicalFlow.target.name"></mark>
+        </h4>
+
+        <hr>
+
+        <h5>Physical Flow</h5>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                From:
+            </div>
+            <div class="col-sm-4">
+                <waltz-entity-link entity-ref="ctrl.specification.owningEntity"></waltz-entity-link>
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                To:
+            </div>
+            <div class="col-sm-4">
+                <waltz-entity-link entity-ref="ctrl.physicalFlow.target"></waltz-entity-link>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Transport:
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="ctrl.physicalFlow.transport"></span>
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Frequency:
+            </div>
+            <div class="col-sm-4"><span ng-bind="ctrl.physicalFlow.frequency"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Basis:
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="ctrl.physicalFlow.basisOffset | toBasisOffset"></span>
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Description:
+            </div>
+            <div class="col-sm-4"><span ng-bind="ctrl.physicalFlow.description"></span>
+            </div>
+        </div>
+
+        <hr>
+
+        <h5>Specification</h5>
+        <waltz-physical-specification-overview owning-entity="ctrl.owningEntity"
+                                               specification="ctrl.specification"
+                                               organisational-unit="ctrl.organisationalUnit">
+        </waltz-physical-specification-overview>
+
+    </div>
+
+    <br>
+
+    <!-- LINEAGE -->
+    <waltz-section name="Lineage" small="Contributing flows">
+
+        <div class="waltz-section-actions">
+            <div waltz-has-role="LINEAGE_EDITOR">
+                <a ui-sref="main.physical-flow-lineage.edit ({id: ctrl.physicalFlow.id})"
+                   class="btn btn-xs btn-primary">
+                    <waltz-icon name="edit"></waltz-icon>
+                    <span ng-if="ctrl.lineage.length == 0">
+                        Create Lineage
+                    </span>
+                    <span ng-if="ctrl.lineage.length > 0">
+                        Edit Lineage
+                    </span>
+                </a>
+            </div>
+        </div>
+        <div ng-if="ctrl.lineage.length > 0">
+            <div class="row" >
+                <div class="col-sm-12">
+                    <waltz-physical-flow-lineage-panel lineage="ctrl.lineage">
+
+                    </waltz-physical-flow-lineage-panel>
+
+                    <hr>
+
+
+                    <waltz-data-flow-diagram data="{ flows: ctrl.lineageFlows, entities: ctrl.lineageEntities }"
+                                             tweakers="ctrl.graphTweakers">
+                    </waltz-data-flow-diagram>
+
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="ctrl.lineage.length == 0">
+            <div class="row" >
+                <div class="col-sm-12">
+                    <div class="alert alert-warning">
+                        <strong>No lineage</strong> defined for this flow.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </waltz-section>
+
+    <!-- MENTIONS -->
+    <waltz-section name="Mentions" small="as a contributor to other flows">
+        <div class="row">
+            <div class="col-sm-12">
+                <div ng-if="ctrl.mentions.length > 0">
+                    <waltz-physical-specification-mentions mentions="ctrl.mentions">
+                    </waltz-physical-specification-mentions>
+                </div>
+                <div class="alert alert-warning"
+                     ng-if="ctrl.mentions.length == 0">
+                    <strong>No mentions.</strong> This flow has not been mentioned as a contributor to any other flow.
+                </div>
+
+            </div>
+        </div>
+
+    </waltz-section>
+
+
+
+    <!-- BOOKMARKS -->
+    <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
+                             entity-id="{{ ctrl.specification.id }}"
+                             kind="PHYSICAL_SPECIFICATION"
+                             parent-name="{{ ctrl.specification.name }}">
+    </waltz-bookmarks-section>
+
+</div>

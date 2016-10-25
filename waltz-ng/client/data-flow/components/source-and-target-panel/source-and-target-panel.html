@@ -60,7 +60,7 @@
                 <tbody>
                 <tr ng-repeat="pf in $ctrl.selected.physicalFlows">
                     <td>
-                        <a ui-sref="main.physical-specification.view ({ id: pf.specification.id })">
+                        <a ui-sref="main.physical-flow.view ({ id: pf.id })">
                             <span ng-bind="pf.specification.name"></span>
                         </a>
                     </td>

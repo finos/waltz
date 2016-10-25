@@ -12,9 +12,7 @@
             Organisational Unit:
         </div>
         <div class="col-sm-4">
-            <a ui-sref="main.org-unit.view ({ id: $ctrl.organisationalUnit.id })">
-                <span ng-bind="$ctrl.organisationalUnit.name"></span>
-            </a>
+            <waltz-entity-link entity-ref="$ctrl.organisationalUnit | merge:{kind: 'ORG_UNIT'}"></waltz-entity-link>
         </div>
     </div>
 

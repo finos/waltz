@@ -23,7 +23,9 @@ const bindings = {
 
 
 const DEFAULT_TWEAKER = {
-    enter: (selection) => selection,
+    enter: (selection) => selection
+        .on('click.fix', d => d.fixed = true)
+        .on('dblclick.unfix', d => d.fixed = false),
     exit: (selection) => selection,
     update: (selection) => selection
 };

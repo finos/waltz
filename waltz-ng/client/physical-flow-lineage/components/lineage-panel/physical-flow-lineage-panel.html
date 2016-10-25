@@ -2,19 +2,18 @@
     <table class="table table-condensed table-hover small">
         <thead>
         <tr>
-            <th>Specification</th>
-            <th>From</th>
-            <th>To</th>
-            <th>Format</th>
-            <th>Transport</th>
-            <th>Description</th>
-            <th></th>
+            <th style="width:20%">Specification</th>
+            <th style="width:15%">From</th>
+            <th style="width:15%">To</th>
+            <th style="width:10%">Format</th>
+            <th style="width:10%">Transport</th>
+            <th style="width:30%">Description</th>
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="flow in $ctrl.lineage | orderBy:'specification.name'">
+        <tr ng-repeat="flow in $ctrl.lineage | orderBy:['specification.owningEntity.name', 'flow.target.name', 'specification.name']">
             <td>
-                <a ui-sref="main.physical-specification.view ({ id: flow.specification.id })"
+                <a ui-sref="main.physical-flow.view ({ id: flow.flow.id })"
                    ng-bind="flow.specification.name">
                 </a>
             </td>

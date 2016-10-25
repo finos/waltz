@@ -32,9 +32,8 @@
                 <tbody>
                 <tr ng-repeat="p in $ctrl.filteredProduces"
                     class="waltz-visibility-parent">
-                    <!--<td><pre>{{ p | json }}</pre></td>-->
                     <td>
-                        <a ui-sref="main.physical-specification.view ({ id: p.specification.id })">
+                        <a ui-sref="main.physical-flow.view ({ id: p.physicalFlow.id })">
                             <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
                                   ng-bind="p.specification.name"></span>
                         </a>
@@ -42,7 +41,6 @@
                     <td>
                         <span ng-class="{ 'waltz-visibility-child-40' : !p.firstSpecification}"
                               ng-bind="p.specification.externalId"></span>
-
                     </td>
                     <td>
                         <waltz-entity-link entity-ref="p.targetRef"></waltz-entity-link>
@@ -140,4 +138,34 @@
         <strong>No Physical Flow</strong> detail available for this application
     </div>
 
+
+    <div class="row"
+         ng-hide="$ctrl.unusedSpecifications | isEmpty">
+        <div class="col-md-12">
+            <h4>Unused Specifications</h4>
+
+            <br>
+            <small class="text-muted">
+                Specifications which have been registered, but are not sent to any consumers.
+            </small>
+            <br>
+
+            <table class="table small table-condensed table-hover">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Format</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="spec in $ctrl.unusedSpecifications">
+                    <td><span ng-bind="spec.name"></span></td>
+                    <td><span ng-bind="spec.format"></span></td>
+                    <td><span ng-bind="spec.description"></span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

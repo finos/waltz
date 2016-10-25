@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import {combineFlowData, enrichConsumes} from '../../utilities';
 import {termSearch} from "../../../common"
 
@@ -14,13 +16,26 @@ const template = require('./physical-data-section.html');
 function mkData(specifications = { produces: [], consumes: [] },
                 physicalFlows = [])
 {
-    const produces = combineFlowData(
+
+    const ownedData = combineFlowData(
         specifications.produces,
         physicalFlows);
+
+    const produces = _.filter(ownedData, p => p.physicalFlow != null);
+
     const consumes = enrichConsumes(
         specifications.consumes,
         physicalFlows);
-    return { produces, consumes };
+
+    const unusedSpecifications = _.chain(ownedData)
+        .filter(p => !p.physicalFlow)
+        .map('specification')
+        .value();
+
+    console.log('us', ownedData, unusedSpecifications)
+
+
+    return { produces, consumes, unusedSpecifications };
 }
 
 
