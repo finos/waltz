@@ -45,13 +45,19 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const findOrphanLogicalDataFlows = () => $http
+        .get(`${BASE}/logical-data-flow`)
+        .then(result => result.data);
+
+
     return {
         findAppsWithNonExistentOrgUnits,
         findOrphanAppCaps,
         findOrphanAuthoritativeSourcesByApp,
         findOrphanAuthoritativeSourcesByOrgUnit,
         findOrphanAuthoritativeSourcesByDataType,
-        findOrphanChangeInitiatives
+        findOrphanChangeInitiatives,
+        findOrphanLogicalDataFlows
     };
 
 }

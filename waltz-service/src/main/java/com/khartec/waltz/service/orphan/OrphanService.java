@@ -52,4 +52,8 @@ public class OrphanService {
         return orphanDao.findOrphanChangeInitiatives();
     }
 
+
+    public List<OrphanRelationship> findOrphanLogicalDataFlows() {
+        return orphanDao.findOrphanLogicalDataFlows();
+    }
 }
