@@ -77,8 +77,8 @@ public class DataFlowDecoratorDao {
                 .select(DATA_FLOW_DECORATOR.fields())
                 .from(DATA_FLOW_DECORATOR)
                 .innerJoin(DATA_FLOW)
-                .on(DATA_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID))
-                .innerJoin(sourceAppAlias)
+                .on(DATA_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID)) // join on application to prevent orphan flows
+                .innerJoin(sourceAppAlias)                             // being returned
                 .on(sourceAppAlias.ID.eq(DATA_FLOW.SOURCE_ENTITY_ID))
                 .innerJoin(targetAppAlias)
                 .on(targetAppAlias.ID.eq(DATA_FLOW.TARGET_ENTITY_ID))
