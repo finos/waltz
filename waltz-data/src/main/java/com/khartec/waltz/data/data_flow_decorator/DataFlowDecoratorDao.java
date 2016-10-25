@@ -22,6 +22,8 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.data.data_flow.DataFlowDao.sourceAppAlias;
+import static com.khartec.waltz.data.data_flow.DataFlowDao.targetAppAlias;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
 import static java.util.stream.Collectors.toList;
@@ -76,6 +78,10 @@ public class DataFlowDecoratorDao {
                 .from(DATA_FLOW_DECORATOR)
                 .innerJoin(DATA_FLOW)
                 .on(DATA_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID))
+                .innerJoin(sourceAppAlias)
+                .on(sourceAppAlias.ID.eq(DATA_FLOW.SOURCE_ENTITY_ID))
+                .innerJoin(targetAppAlias)
+                .on(targetAppAlias.ID.eq(DATA_FLOW.TARGET_ENTITY_ID))
                 .where(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector)
                                 .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector)))
                 .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorEntityKind.name()))
