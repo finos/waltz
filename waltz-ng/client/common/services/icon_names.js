@@ -25,6 +25,7 @@ export const bookmarkIconNames = {
 
 
 export const entityIconNames = {
+    ACTOR: 'user-circle',
     APP_GROUP: 'object-group',
     APP_CAPABILITY: 'puzzle-piece',
     APP_RATING: 'star-o',

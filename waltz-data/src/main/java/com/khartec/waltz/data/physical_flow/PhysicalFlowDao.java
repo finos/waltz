@@ -106,8 +106,6 @@ public class PhysicalFlowDao {
                 .select(PHYSICAL_FLOW.fields())
                 .select(targetEntityNameField)
                 .from(PHYSICAL_FLOW)
-                .innerJoin(APPLICATION)
-                .on(APPLICATION.ID.eq(PHYSICAL_FLOW.TARGET_ENTITY_ID))
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }

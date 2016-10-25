@@ -69,6 +69,7 @@ export const severityNames = {
 
 
 export const entityNames = {
+    ACTOR: 'Actor',
     APP_CAPABILITY: 'Application Function',
     APP_GROUP: 'Application Group',
     APP_RATING: 'Application Rating',
