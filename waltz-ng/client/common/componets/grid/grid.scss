@@ -1,0 +1,20 @@
+.waltz-grid {
+    border: none;
+
+    .ui-grid-top-panel {
+        background: none;
+    }
+
+    .ui-grid-row:nth-child(odd) .ui-grid-cell {
+        background-color: #f9f9f9 !important;
+    }
+
+    .ui-grid-header-cell {
+        border-right: none;
+        border-bottom: 1px solid #ddd
+    }
+
+    .ui-grid-cell {
+        border-right: none
+    }
+}

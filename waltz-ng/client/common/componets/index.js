@@ -17,6 +17,7 @@ export default (module) => {
         .component('waltzMultiSelectTreeControl', require('./multi-select-tree-control/multi-select-treecontrol'))
         .component('waltzSearchControl', require('./search-control/search-control'))
         .component('waltzEntityIconLabel', require('./entity-link/entity-icon-label'))
-        .component('waltzEntityLink', require('./entity-link/entity-link'));
+        .component('waltzEntityLink', require('./entity-link/entity-link'))
+        .component('waltzGrid', require('./grid/grid'));
 
 };
