@@ -21,7 +21,7 @@
             <tbody>
             <tr ng-repeat="mention in $ctrl.mentions">
                 <td>
-                    <a ui-sref="main.physical-specification.view ({id: mention.specification.id })"
+                    <a ui-sref="main.physical-flow.view ({id: mention.flow.id })"
                        uib-popover="{{ mention.specification.description }}"
                        popover-trigger="mouseenter"
                        ng-bind="mention.specification.name"></a>
@@ -30,14 +30,10 @@
                     <span ng-bind="mention.specification.format"></span>
                 </td>
                 <td>
-                    <a ui-sref="main.app.view ({ id: mention.sourceEntity.id })">
-                        <span ng-bind="mention.sourceEntity.name"></span>
-                    </a>
+                    <waltz-entity-link entity-ref="mention.sourceEntity"></waltz-entity-link>
                 </td>
                 <td>
-                    <a ui-sref="main.app.view ({ id: mention.targetEntity.id })">
-                        <span ng-bind="mention.targetEntity.name"></span>
-                    </a>
+                    <waltz-entity-link entity-ref="mention.targetEntity"></waltz-entity-link>
                 </td>
                 <td><span ng-bind="mention.flow.transport"></span></td>
                 <td><span ng-bind="mention.flow.frequency"></span></td>

@@ -3,6 +3,7 @@ import {enrichConsumes} from '../../../physical-specifications/utilities';
 
 
 const bindings = {
+    currentLineage: '<',
     logicalFlows: '<',
     physicalFlows: '<',
     specifications: '<',
@@ -18,6 +19,19 @@ const template = require('./lineage-candidate-editor.html');
 
 function removeCandidatesWithNoPhysicalFlows(candidates = []) {
     return _.filter(candidates, c => c.physicalFlow != null);
+}
+
+
+function removeUsedCandidates(candidates = [], currentLineage = []) {
+    const usedFlowIds = _.map(currentLineage, 'flow.id');
+
+    return _.reject(candidates, c => _.includes(usedFlowIds, c.physicalFlow.id));
+}
+
+
+function mkCandidates(flowData = [], currentLineage = []) {
+    const candidates = removeCandidatesWithNoPhysicalFlows(flowData);
+    return removeUsedCandidates(candidates, currentLineage);
 }
 
 
@@ -37,7 +51,7 @@ function controller() {
             vm.physicalFlows,
             endpointReferences);
 
-        vm.candidates = removeCandidatesWithNoPhysicalFlows(flowData);
+        vm.candidates = mkCandidates(flowData, vm.currentLineage);
     };
 }
 

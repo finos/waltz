@@ -11,17 +11,11 @@
                 </a>
             </li>
             <li>
-                <a ui-sref="main.physical-specification.view ({ id: ctrl.describedSpecification.id })">
+                <a ui-sref="main.physical-flow.view ({ id: ctrl.describedFlow.id })">
                     <span ng-bind="ctrl.describedSpecification.name"></span>
                 </a>
             </li>
-            <li>Lineage</li>
-            <li>
-                <a ui-sref="main.lineage-report.view ({ id: ctrl.lineageReport.id })"
-                   ng-bind="ctrl.lineageReport.name">
-                </a>
-            </li>
-            <li>Edit</li>
+            <li>Lineage Editor</li>
         </ol>
     </waltz-page-header>
 
@@ -69,7 +63,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="c in ctrl.lineage" class="waltz-visibility-parent">
+                    <tr ng-repeat="c in ctrl.lineage | orderBy:['specification.owningEntity.name', 'flow.target.name', 'specification.name']"
+                        class="waltz-visibility-parent">
                         <td>
                             <span uib-popover="{{ c.specification.description }}"
                                   popover-trigger="mouseenter"
@@ -123,6 +118,7 @@
                 <waltz-lineage-candidate-editor logical-flows="ctrl.searchResults.logicalFlows"
                                                 physical-flows="ctrl.searchResults.physicalFlows"
                                                 specifications="ctrl.searchResults.specifications"
+                                                current-lineage="ctrl.lineage"
                                                 on-add="ctrl.addPhysicalFlow"
                                                 on-refocus="ctrl.doSearch">
                 </waltz-lineage-candidate-editor>
