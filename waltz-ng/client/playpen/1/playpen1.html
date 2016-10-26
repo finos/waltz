@@ -10,89 +10,32 @@
     </waltz-page-header>
 
     <waltz-section name="foo">
-        <ul>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-        </ul>
-    </waltz-section>
-    <waltz-section name="foo">
-        <ul>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-        </ul>
-    </waltz-section>
-    <waltz-section name="foo">
-        <ul>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-        </ul>
-    </waltz-section>
-    <waltz-section name="foo">
-        <ul>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-        </ul>
-    </waltz-section>
-    <waltz-section name="foo">
-        <ul>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-            <li><span>foo</span></li>
-        </ul>
-    </waltz-section>
-
-    <waltz-section name="foo">
 
         <div width="100%">
             <uib-tabset active="active">
                 <uib-tab index="0"
                          heading="Summary">
 
-                    <waltz-source-and-target-panel entity-ref="ctrl.entityRef"
-                                               logical-flows="ctrl.logicalFlows"
-                                               decorators="ctrl.dataFlowDecorators"
-                                               physical-flows="ctrl.physicalFlows"
-                                               physical-specifications="ctrl.specifications">
-                    </waltz-source-and-target-panel>
+                    <waltz-source-and-target-graph entity-ref="ctrl.entityRef"
+                                                   logical-flows="ctrl.filteredFlowData.flows"
+                                                   tweakers="ctrl.tweakers"
+                                                   decorators="ctrl.filteredFlowData.decorators">
+                    </waltz-source-and-target-graph>
+
+                    <div ng-if='ctrl.filteredFlowData.selectedTypeId > 0'
+                         class="small">
+                        <hr>
+                        <waltz-icon name="filter"></waltz-icon>
+                        Showing only
+                        <span ng-bind="ctrl.filteredFlowData.selectedTypeId | toDisplayName:'dataType'"></span>
+                        -
+                        <a class="clickable"
+                            class="btn btn-xs btn-success"
+                            ng-click="ctrl.showAll()">
+                            Show All
+                        </a>
+                    </div>
+
                 </uib-tab>
             </uib-tabset>
 
@@ -100,25 +43,5 @@
 
     </waltz-section>
 
-    <waltz-section name="stuff">
-        <div class="row">
-            <div class="col-md-3">
-                <h4>specification</h4>
-                <pre>{{ ctrl.specifications | json }}</pre>
-            </div>
-            <div class="col-md-3">
-                <h4>Logical Flows</h4>
-                <pre>{{ ctrl.logicalFlows | json }}</pre>
-            </div>
-            <div class="col-md-3">
-                <h4>Physical Flows</h4>
-                <pre>{{ ctrl.physicalFlows | json }}</pre>
-            </div>
-            <div class="col-md-3">
-                <h4>Decorators</h4>
-                <pre>{{ ctrl.dataFlowDecorators | json }}</pre>
-            </div>
-        </div>
-    </waltz-section>
 
 </div>

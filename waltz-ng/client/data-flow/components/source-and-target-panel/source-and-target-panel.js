@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import d3 from 'd3';
+import {initialiseData} from '../../../common'
 
 
 const bindings = {
@@ -9,10 +11,24 @@ const bindings = {
     physicalSpecifications: '<'
 };
 
-function controller($scope) {
-    const vm = this;
 
+const initialState = {
+    filteredFlowData: {
+        selectedTypeId: 0,
+        flows: [],
+        decorators: []
+    }
+};
+
+
+function controller($scope) {
+    const vm = initialiseData(this, initialState);
+
+    vm.showAll = () => vm.filteredFlowData = filterByType(0, vm.logicalFlows, vm.decorators);
     vm.$onChanges = (changes) => {
+
+        if (changes.logicalFlows || changes.decorators) vm.filteredFlowData = vm.showAll();
+
         const keyedLogicalFlows = calculateSourceAndTargetFlowsByAppId(
             vm.entityRef,
             vm.logicalFlows);
@@ -41,6 +57,27 @@ function controller($scope) {
                     const flowId = keyedLogicalFlows.targetFlowsByAppId[app.id];
                     vm.selected = select(app, 'target', flowId, evt);
                 })
+            },
+            type: {
+                onSelect: d => {
+                    d3.event.stopPropagation();
+                    $scope.$applyAsync(
+                        () => vm.filteredFlowData = filterByType(
+                            d.id,
+                            vm.logicalFlows,
+                            vm.decorators));
+                }
+            },
+            typeBlock: {
+                onSelect: () => {
+                    d3.event.stopPropagation();
+                    $scope.$applyAsync(
+                        () => {
+                            if (vm.filteredFlowData.selectedTypeId > 0) {
+                                vm.showAll();
+                            }
+                        });
+                }
             }
         };
 
@@ -71,6 +108,27 @@ function calcPhysicalFlows(physicalFlows, specifications, appRef, type, entityRe
             ? pf.target.id ==  entityRef.id && pf.specification.owningEntity.id === appRef.id
             : pf.target.id ==  appRef.id && pf.specification.owningEntity.id === entityRef.id)
         .value();
+}
+
+
+function filterByType(typeId, flows = [], decorators = []) {
+    if (typeId == 0) {
+        return {
+            selectedTypeId: 0,
+            decorators,
+            flows
+        };
+    }
+
+    const ds = _.filter(decorators, d => d.decoratorEntity.id === typeId);
+    const dataFlowIds = _.map(ds, "dataFlowId");
+    const fs = _.filter(flows, f => _.includes(dataFlowIds, f.id));
+
+    return {
+        selectedTypeId: typeId,
+        decorators: ds,
+        flows: fs
+    };
 }
 
 

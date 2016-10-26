@@ -4,7 +4,7 @@ import _ from 'lodash';
 import d3 from 'd3';
 
 
-const template = require('./source-and-target.html');
+const template = require('./source-and-target-graph.html');
 
 
 const bindings = {
@@ -37,6 +37,7 @@ const dfltTweakers = {
     source: mkDfltTweakers("source"),
     target: mkDfltTweakers("target"),
     type: mkDfltTweakers("type"),
+    typeBlock: mkDfltTweakers("typeBlock")
 };
 
 
@@ -54,8 +55,8 @@ const baseDimensions = {
     },
     margin: {
         top: 40,
-        left: 20,
-        right: 20,
+        left: 5,
+        right: 5,
         bottom: 50
     },
     label: {
@@ -343,7 +344,10 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
         .append('g')
         .classed('clickable', true)
         .classed('wsat-label', true)
-        .attr({ opacity: 0 })
+        .attr({
+            'transform':  (d, i) => `translate(0, ${ scale(d.id) })`,
+            opacity: 0
+        })
         .on('mouseenter.highlight', d => { highlighted = d.id; redraw(); })
         .on('mouseleave.highlight', d => { highlighted = null; redraw(); })
         .on('click.tweaker', (d) => tweakers.onSelect(d, d3.event))
@@ -445,7 +449,9 @@ function internetExplorerFix(selection) {
 }
 
 
-function drawTypeBoxes(section, model, scale, dimensions) {
+function drawTypeBoxes(section, model, scale, dimensions, tweakers) {
+
+    section.on('click', tweakers.onSelect);
 
     const boxes = section
         .selectAll('.wsat-type-box')
@@ -461,10 +467,11 @@ function drawTypeBoxes(section, model, scale, dimensions) {
         .attr({
             fill: '#fafafa',
             stroke: '#ccc',
+            y: d => scale(d.id) - dimensions.height - 2,
             x: dimensions.width / 2 * -1 + 2,
-            y: 0,
             opacity: 0
         });
+
 
     boxes
         .transition()
@@ -556,7 +563,7 @@ function update(sections,
     drawLabels(sections.sources, model.sources, scales.source, 'end', tweakers.source, redraw);
     drawLabels(sections.targets, model.targets, scales.target, 'start', tweakers.target, redraw);
 
-    drawTypeBoxes(sections.types, model, scales.type, dimensions.label);
+    drawTypeBoxes(sections.types, model, scales.type, dimensions.label, tweakers.typeBlock);
     drawLabels(sections.types, model.types, scales.type, 'middle', tweakers.type, redraw);
 
     drawInbound(sections.inbound, model.sourceToType, scales, dimensions);
