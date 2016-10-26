@@ -13,9 +13,11 @@ import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineage;
 import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineageAddCommand;
 import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineageRemoveCommand;
 import com.khartec.waltz.schema.tables.records.PhysicalFlowLineageRecord;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -59,18 +61,26 @@ public class PhysicalFlowLineageDao {
 
 
     public Collection<PhysicalFlowLineage> findContributionsByPhysicalFlowId(long id) {
+        Condition condition = PHYSICAL_FLOW_LINEAGE.CONTRIBUTOR_FLOW_ID.eq(id);
+        return findContributionsByCondition(condition);
+    }
+
+
+    public Collection<PhysicalFlowLineage> findAllLineageReports() {
+        Condition condition = PHYSICAL_FLOW.ID.in(
+                DSL.selectDistinct(PHYSICAL_FLOW_LINEAGE.DESCRIBED_FLOW_ID).from(PHYSICAL_FLOW_LINEAGE));
+
         return dsl
-                .select(PHYSICAL_FLOW_LINEAGE.fields())
+                .selectDistinct(PHYSICAL_FLOW.fields())
                 .select(owningEntityNameField)
                 .select(targetEntityNameField)
-                .select(PHYSICAL_FLOW.fields())
                 .select(PHYSICAL_SPECIFICATION.fields())
                 .from(PHYSICAL_FLOW_LINEAGE)
                 .innerJoin(PHYSICAL_FLOW)
                 .on(PHYSICAL_FLOW.ID.eq(PHYSICAL_FLOW_LINEAGE.DESCRIBED_FLOW_ID))
                 .innerJoin(PHYSICAL_SPECIFICATION)
                 .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
-                .where(PHYSICAL_FLOW_LINEAGE.CONTRIBUTOR_FLOW_ID.eq(id))
+                .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -123,4 +133,22 @@ public class PhysicalFlowLineageDao {
                 .build();
 
     }
+
+
+    private Collection<PhysicalFlowLineage> findContributionsByCondition(Condition condition) {
+        return dsl
+                .select(PHYSICAL_FLOW_LINEAGE.fields())
+                .select(owningEntityNameField)
+                .select(targetEntityNameField)
+                .select(PHYSICAL_FLOW.fields())
+                .select(PHYSICAL_SPECIFICATION.fields())
+                .from(PHYSICAL_FLOW_LINEAGE)
+                .innerJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.ID.eq(PHYSICAL_FLOW_LINEAGE.DESCRIBED_FLOW_ID))
+                .innerJoin(PHYSICAL_SPECIFICATION)
+                .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
+                .where(condition)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
 }

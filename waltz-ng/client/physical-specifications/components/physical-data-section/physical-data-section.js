@@ -1,7 +1,6 @@
-import _ from 'lodash';
-
-import {combineFlowData, enrichConsumes} from '../../utilities';
-import {termSearch} from "../../../common"
+import _ from "lodash";
+import {combineFlowData, enrichConsumes} from "../../utilities";
+import {termSearch} from "../../../common";
 
 
 const bindings = {
@@ -31,9 +30,6 @@ function mkData(specifications = { produces: [], consumes: [] },
         .filter(p => !p.physicalFlow)
         .map('specification')
         .value();
-
-    console.log('us', ownedData, unusedSpecifications)
-
 
     return { produces, consumes, unusedSpecifications };
 }

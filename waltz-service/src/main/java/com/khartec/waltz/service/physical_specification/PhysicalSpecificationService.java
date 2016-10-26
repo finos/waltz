@@ -54,9 +54,11 @@ public class PhysicalSpecificationService {
         return specificationDao.getById(id);
     }
 
+
     public Collection<PhysicalSpecification> findBySelector(IdSelectionOptions options) {
         Select<Record1<Long>> selector = selectorFactory.apply(options);
         return specificationDao.findBySelector(selector);
 
     }
+
 }

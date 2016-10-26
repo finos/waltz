@@ -11,6 +11,10 @@ function store($http, baseApiUrl) {
         .get(`${base}/physical-flow/${id}/contributions`)
         .then(r => r.data);
 
+    const findAllContributions = () => $http
+        .get(`${base}/reports`)
+        .then(r => r.data);
+
     const removeContribution = (describedFlowId, contributorFlowId) => $http
         .delete(`${base}/physical-flow/${describedFlowId}/contributions/${contributorFlowId}`)
         .then(r => r.data);
@@ -23,7 +27,8 @@ function store($http, baseApiUrl) {
         removeContribution,
         addContribution,
         findByPhysicalFlowId,
-        findContributionsByPhysicalFlowId
+        findContributionsByPhysicalFlowId,
+        findAllContributions
     };
 }
 

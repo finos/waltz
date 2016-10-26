@@ -1,4 +1,4 @@
-import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks';
+import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
 
 
 function store($http, baseApiUrl) {

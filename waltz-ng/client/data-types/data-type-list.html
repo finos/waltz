@@ -43,15 +43,37 @@
     </div>
 
 
-    <!-- TREE -->
-    <waltz-section name="Data" small="Types">
-        <div class="row">
-            <div class="col-sm-12">
+    <div class="row">
+        <div class="col-md-4">
+            <!-- TREE -->
+            <waltz-section name="Data"
+                           small="Types">
                 <waltz-data-type-tree trees="ctrl.trees"
                                       on-selection="ctrl.nodeSelected">
                 </waltz-data-type-tree>
-            </div>
+            </waltz-section>
         </div>
-    </waltz-section>
+
+        <div class="col-md-8">
+            <!--LINEAGE REPORTS-->
+            <waltz-section name="Lineage Reports">
+                <waltz-section-actions>
+                    <button ng-click="ctrl.exportLineageReports()"
+                            class="btn btn-xs btn-primary">
+                        Export
+                    </button>
+                </waltz-section-actions>
+
+                <waltz-physical-flow-table lineage="ctrl.lineageReports"
+                                           on-initialise="ctrl.flowTableInitialised">
+                </waltz-physical-flow-table>
+            </waltz-section>
+        </div>
+
+    </div>
+
+
+
+
 
 </div>

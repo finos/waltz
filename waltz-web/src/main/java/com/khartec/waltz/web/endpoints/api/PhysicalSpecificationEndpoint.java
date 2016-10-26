@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class PhysicalSpecificationEndpoint implements Endpoint {
@@ -69,6 +67,7 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
 
         ListRoute<PhysicalSpecification> findBySelectorRoute =
                 (request, response) -> specificationService.findBySelector(readIdSelectionOptionsFromBody(request));
+
 
         DatumRoute<ProduceConsumeGroup<PhysicalSpecification>> findByAppRoute =
                 (request, response) -> specificationService.findByEntityReference(getEntityReference(request));

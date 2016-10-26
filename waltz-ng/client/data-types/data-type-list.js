@@ -11,7 +11,8 @@ const initialState = {
 function controller($state,
                     dataTypes,
                     staticPanelStore,
-                    svgStore) {
+                    svgStore,
+                    lineageStore) {
 
     const vm = initialiseData(this, initialState);
 
@@ -31,6 +32,17 @@ function controller($state,
         b.block.onclick = () => $state.go('main.data-type.code', { code: b.value });
         angular.element(b.block).addClass('clickable');
     };
+
+
+    vm.flowTableInitialised = (api) => {
+        vm.exportLineageReports = api.export;
+    }
+
+
+    lineageStore
+        .findAllContributions()
+        .then(lineageReports => vm.lineageReports = lineageReports);
+
 }
 
 
@@ -38,7 +50,8 @@ controller.$inject = [
     '$state',
     'dataTypes',
     'StaticPanelStore',
-    'SvgDiagramStore'
+    'SvgDiagramStore',
+    'PhysicalFlowLineageStore'
 ];
 
 

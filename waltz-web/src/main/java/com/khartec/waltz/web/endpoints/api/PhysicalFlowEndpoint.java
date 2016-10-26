@@ -42,10 +42,12 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 "specification",
                 ":id");
 
+
         String getByIdPath = mkPath(
                 BASE_URL,
                 "id",
                 ":id");
+
 
         ListRoute<PhysicalFlow> findByEntityRefRoute =
                 (request, response) -> physicalFlowService
@@ -57,13 +59,12 @@ public class PhysicalFlowEndpoint implements Endpoint {
                         .findBySpecificationId(
                                 getId(request));
 
-
         DatumRoute<PhysicalFlow> getByIdRoute =
                 (request, response) -> physicalFlowService
                         .getById(getId(request));
 
-        getForDatum(getByIdPath, getByIdRoute);
 
+        getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findBySpecificationIdPath, findBySpecificationIdRoute);
     }

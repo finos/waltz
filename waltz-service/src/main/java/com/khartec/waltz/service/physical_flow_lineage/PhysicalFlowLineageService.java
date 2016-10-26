@@ -18,9 +18,11 @@ public class PhysicalFlowLineageService {
 
     private final PhysicalFlowLineageDao physicalFlowLineageDao;
 
+
     @Autowired
     public PhysicalFlowLineageService(PhysicalFlowLineageDao physicalFlowLineageDao) {
         checkNotNull(physicalFlowLineageDao, "physicalFlowLineageDao cannot be null");
+
         this.physicalFlowLineageDao = physicalFlowLineageDao;
     }
 
@@ -32,6 +34,11 @@ public class PhysicalFlowLineageService {
 
     public Collection<PhysicalFlowLineage> findContributionsByPhysicalFlowId(long id) {
         return physicalFlowLineageDao.findContributionsByPhysicalFlowId(id);
+    }
+
+
+    public Collection<PhysicalFlowLineage> findAllLineageReports() {
+        return physicalFlowLineageDao.findAllLineageReports();
     }
 
 
