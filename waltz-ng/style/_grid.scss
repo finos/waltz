@@ -3,6 +3,20 @@
 }
 
 
+.ui-grid {
+    border-radius: $border-radius-large;
+
+    .ui-grid-top-panel {
+        border-top-left-radius: $border-radius-large;
+        border-top-right-radius: $border-radius-large;
+    }
+
+    *:focus {
+        outline: none;
+    }
+}
+
+
 .ui-grid-top-panel {
     background: $waltz-section-background-color;
 }
