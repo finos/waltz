@@ -59,14 +59,21 @@
             <waltz-section name="Lineage Reports">
                 <waltz-section-actions>
                     <button ng-click="ctrl.exportLineageReports()"
-                            class="btn btn-xs btn-primary">
+                            class="btn btn-xs btn-primary"
+                            ng-if="ctrl.lineageReports.length > 0">
                         Export
                     </button>
                 </waltz-section-actions>
 
                 <waltz-physical-flow-table lineage="ctrl.lineageReports"
-                                           on-initialise="ctrl.flowTableInitialised">
+                                           on-initialise="ctrl.flowTableInitialised"
+                                           ng-if="ctrl.lineageReports.length > 0">
                 </waltz-physical-flow-table>
+
+                <div ng-if="ctrl.lineageReports.length == 0"
+                     class="alert alert-warning">
+                    <strong>No Lineage Reports</strong> have been defined
+                </div>
             </waltz-section>
         </div>
 
