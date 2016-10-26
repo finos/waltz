@@ -1,4 +1,4 @@
-import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks';
+import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
 
 
 function store($http, baseApiUrl) {
@@ -35,10 +35,18 @@ function store($http, baseApiUrl) {
     };
 
 
+    const findForDescribedLineage = () => {
+        return $http
+            .get(`${base}/lineage`)
+            .then(r => r.data);
+    };
+
+
     return {
         findBySpecificationId,
         findByEntityReference,
         findBySelector,
+        findForDescribedLineage,
         getById
     };
 }

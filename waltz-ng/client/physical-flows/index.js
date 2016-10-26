@@ -4,6 +4,9 @@ function setup(module) {
         .service(
             'PhysicalFlowStore',
             require('./service/physical-flow-store'));
+
+    module
+        .component('waltzPhysicalFlowTable', require('./components/flow-table/flow-table'));
 }
 
 

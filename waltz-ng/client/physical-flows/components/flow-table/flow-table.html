@@ -1,0 +1,23 @@
+<div>
+    <div class="row"
+         ng-if="$ctrl.flows.length > 10">
+        <div class="col-md-6">
+            <waltz-search-control min-characters="3"
+                                  delay="250"
+                                  on-query="$ctrl.filterFlows"
+                                  placeholder-text="Search reports...">
+            </waltz-search-control>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div style="font-size: smaller; height: 300px"
+                 ui-grid-exporter
+                 ui-grid="$ctrl.gridOptions">
+            </div>
+        </div>
+    </div>
+</div>
