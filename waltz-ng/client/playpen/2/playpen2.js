@@ -1,63 +1,69 @@
+import {termSearch} from "../../common";
+
 const initData = {
-    dataTypes: [],
-    checkedItemIds: [1000, 3000, 6002, 6310],
-    expandedItemIds: []
+    gridData: [],
+    filteredGriData: []
 };
 
 
-function controller(dataTypeService,
-                    dataFlowStore) {
+function controller($interval) {
 
     const vm = Object.assign(this, initData);
 
-    const entityRef = {
-        id: 2440,
-        kind: 'APPLICATION',
-        name: 'Salamander',
-        description: 'descriptive text',
+    const gridData = [{
+        "firstName": "Cox",
+            "lastName": "Carney",
+            "company": "Enormo",
+            "employed": true
+        }, {
+        "firstName": "Lorraine",
+            "lastName": "Wise",
+            "company": "Comveyer",
+            "employed": false
+        }, {
+        "firstName": "Nancy",
+            "lastName": "Waters",
+            "company": "Fuelton",
+            "employed": false
+        }];
+
+    vm.columnDefs = [
+        {field: 'firstName'},
+        {field: 'lastName'},
+        {field: 'company'},
+        {field: 'employed'}
+    ];
+
+    const searchFields = [
+        'firstName',
+        'lastName',
+        'company',
+        'employed'
+    ];
+
+    vm.filterData = queryText => {
+        vm.filteredGridData = termSearch(vm.gridData, queryText, searchFields);
     };
 
-    const selector = {
-        entityReference: entityRef,
-        scope: 'EXACT'
+    vm.onGridInitialise = (e) => {
+        vm.gridExporter = e.exportFn;
     };
 
-    vm.entityReference = entityRef;
-
-
-    const loadData = () => {
-        dataTypeService.loadDataTypes()
-            .then(dataTypes => _.map(dataTypes, d => ({...d, selectable: d.name !== 'Ref Data'})))
-            .then(dataTypes => {
-                vm.expandedItemIds = _.union(vm.checkedItemIds);
-                vm.dataTypes = dataTypes;
-            });
+    vm.exportWaltzGrid = () => {
+        vm.gridExporter('playpen-grid-export.csv');
     };
 
-    loadData();
 
-    vm.nodeSelected = (id) => console.log('selected: ', id);
-
-    vm.nodeChecked = (id) => {
-        console.log('checked: ', id);
-        vm.checkedItemIds = _.union(vm.checkedItemIds, [id])
-    };
-
-    vm.nodeUnchecked = (id) => {
-        console.log('unchecked: ', id);
-        vm.checkedItemIds = _.without(vm.checkedItemIds, id);
-    };
-
-    vm.search = (query) => {
-        console.log("searching: ", query);
-    }
+    $interval(() => {
+        vm.gridData = gridData;
+        vm.filteredGridData = vm.gridData;
+    }, 1500, 1);
 
 }
 
 
 controller.$inject = [
-    'DataTypeService',
-    'DataFlowDataStore'
+    '$interval'
 ];
 
 
