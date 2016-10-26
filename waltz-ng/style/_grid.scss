@@ -3,8 +3,28 @@
 }
 
 
+.ui-grid {
+    border-radius: $border-radius-large;
+
+    .ui-grid-top-panel {
+        border-top-left-radius: $border-radius-large;
+        border-top-right-radius: $border-radius-large;
+    }
+
+    *:focus {
+        outline: none;
+    }
+}
+
+
 .ui-grid-top-panel {
-  @include gradient-vertical($waltz-section-background-color, $waltz-background-color, 0%, 100%);
+    background: $waltz-section-background-color;
+}
+
+
+.ui-grid-menu-button {
+    background: none;
+    border: none;
 }
 
 
