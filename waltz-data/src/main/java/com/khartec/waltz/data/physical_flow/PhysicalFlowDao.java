@@ -10,7 +10,6 @@ import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.physical_flow.TransportKind;
 import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
 import org.jooq.*;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -19,7 +18,6 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalFlowLineage.PHYSICAL_FLOW_LINEAGE;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 
@@ -109,17 +107,6 @@ public class PhysicalFlowDao {
                 .select(targetEntityNameField)
                 .from(PHYSICAL_FLOW)
                 .where(condition)
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
-
-    public List<PhysicalFlow> findAllDescribedLineageFlows() {
-
-        return dsl.selectDistinct(PHYSICAL_FLOW.fields())
-                .select(targetEntityNameField)
-                .from(PHYSICAL_FLOW)
-                .where(PHYSICAL_FLOW.ID.in(
-                        DSL.selectDistinct(PHYSICAL_FLOW_LINEAGE.DESCRIBED_FLOW_ID).from(PHYSICAL_FLOW_LINEAGE)))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

@@ -12,8 +12,7 @@ function controller($state,
                     dataTypes,
                     staticPanelStore,
                     svgStore,
-                    physicalFlowStore,
-                    specificationStore) {
+                    lineageStore) {
 
     const vm = initialiseData(this, initialState);
 
@@ -34,13 +33,13 @@ function controller($state,
         angular.element(b.block).addClass('clickable');
     };
 
-    physicalFlowStore
-        .findForDescribedLineage()
-        .then(flows => vm.lineageFlows = flows);
 
-    specificationStore
-        .findByDescribedLineage()
-        .then(specs => vm.lineageSpecs = specs);
+    lineageStore
+        .findAllContributions()
+        .then(lineageReports => {
+            console.log(lineageReports);
+            vm.lineageReports = lineageReports
+        });
 
 }
 
@@ -50,8 +49,7 @@ controller.$inject = [
     'dataTypes',
     'StaticPanelStore',
     'SvgDiagramStore',
-    'PhysicalFlowStore',
-    'PhysicalSpecificationStore'
+    'PhysicalFlowLineageStore'
 ];
 
 

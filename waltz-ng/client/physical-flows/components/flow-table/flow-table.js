@@ -1,9 +1,7 @@
-import _ from "lodash";
 import {initialiseData, termSearch} from "../../../common";
 
 const bindings = {
-    physicalFlows: '<',
-    specifications: '<'
+    lineage: '<'
 };
 
 
@@ -11,16 +9,8 @@ const template = require('./flow-table.html');
 
 
 const initialState = {
-    physicalFlows: [],
-    specifications: [],
-    filteredFlows: []
+    filteredLineage: []
 };
-
-
-function mkData(physicalFlows = [], specifications = []) {
-    const specsById = _.keyBy(specifications, 'id');
-    return _.map(physicalFlows, f => Object.assign({}, f, { specification: specsById[f.specificationId] }));
-}
 
 
 function controller($animate,
@@ -28,18 +18,17 @@ function controller($animate,
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (changes) => {
-        vm.flows = mkData(vm.physicalFlows, vm.specifications);
-        vm.filterFlows("");
-        vm.gridOptions.data = vm.filteredFlows;
+        vm.filterLineage("");
+        vm.gridOptions.data = vm.filteredLineage;
     };
 
 
     const fields = [
-        'target.name',
-        'description',
-        'basisOffset',
-        'transport',
-        'frequency',
+        'targetEntity.name',
+        'flow.description',
+        'flow.basisOffset',
+        'flow.transport',
+        'flow.frequency',
         'specification.name',
         'specification.externalId',
         'specification.format',
@@ -48,9 +37,9 @@ function controller($animate,
     ];
 
 
-    vm.filterFlows = query => {
-        vm.filteredFlows = termSearch(vm.flows, query, fields);
-        vm.gridOptions.data = vm.filteredFlows;
+    vm.filterLineage = query => {
+        vm.filteredLineage = termSearch(vm.lineage, query, fields);
+        vm.gridOptions.data = vm.filteredLineage;
     };
 
 
@@ -67,7 +56,7 @@ function controller($animate,
             {
                 field: 'specification.name',
                 name: 'Name',
-                cellTemplate: '<div class="ui-grid-cell-contents"><a ui-sref="main.physical-flow.view ({ id: row.entity[\'id\'] })"><span ng-bind="COL_FIELD"></span></a></div>'
+                cellTemplate: '<div class="ui-grid-cell-contents"><a ui-sref="main.physical-flow.view ({ id: row.entity[\'flow\'].id })"><span ng-bind="COL_FIELD"></span></a></div>'
             },
             {
                 field: 'specification.owningEntity.name',
@@ -75,9 +64,9 @@ function controller($animate,
                 cellTemplate: '<div class="ui-grid-cell-contents"><waltz-entity-link entity-ref="row.entity[\'specification\'].owningEntity"></waltz-entity-link></div>'
             },
             {
-                field: 'target.name',
+                field: 'targetEntity.name',
                 name: 'Target',
-                cellTemplate: '<div class="ui-grid-cell-contents"><waltz-entity-link entity-ref="row.entity[\'target\']"></waltz-entity-link></div>'
+                cellTemplate: '<div class="ui-grid-cell-contents"><waltz-entity-link entity-ref="row.entity[\'targetEntity\']"></waltz-entity-link></div>'
             },
             {
                 field: 'specification.format',
@@ -85,7 +74,7 @@ function controller($animate,
                 cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD"></span></div>'
             }
         ],
-        data: vm.filteredFlows
+        data: vm.filteredLineage
     };
 
 }

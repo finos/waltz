@@ -42,9 +42,6 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 "specification",
                 ":id");
 
-        String findDescibedLineageFlows = mkPath(
-                BASE_URL,
-                "lineage");
 
         String getByIdPath = mkPath(
                 BASE_URL,
@@ -62,10 +59,6 @@ public class PhysicalFlowEndpoint implements Endpoint {
                         .findBySpecificationId(
                                 getId(request));
 
-        ListRoute<PhysicalFlow> findDescribedLineageFlows =
-                (request, response) -> physicalFlowService
-                        .findAllDescribedLineageFlows();
-
         DatumRoute<PhysicalFlow> getByIdRoute =
                 (request, response) -> physicalFlowService
                         .getById(getId(request));
@@ -74,7 +67,5 @@ public class PhysicalFlowEndpoint implements Endpoint {
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findBySpecificationIdPath, findBySpecificationIdRoute);
-        getForList(findDescibedLineageFlows, findDescribedLineageFlows);
-
     }
 }

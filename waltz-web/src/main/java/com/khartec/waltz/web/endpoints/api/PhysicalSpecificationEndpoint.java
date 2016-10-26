@@ -54,10 +54,6 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
                 BASE_URL,
                 "selector");
 
-        String findDescibedLineageSpecs = mkPath(
-                BASE_URL,
-                "lineage");
-
         String getByIdPath = mkPath(
                 BASE_URL,
                 "id",
@@ -72,8 +68,6 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         ListRoute<PhysicalSpecification> findBySelectorRoute =
                 (request, response) -> specificationService.findBySelector(readIdSelectionOptionsFromBody(request));
 
-        ListRoute<PhysicalSpecification> findDescribedLineageSpecsRoute =
-                (request, response) -> specificationService.findForDescribedLineage();
 
         DatumRoute<ProduceConsumeGroup<PhysicalSpecification>> findByAppRoute =
                 (request, response) -> specificationService.findByEntityReference(getEntityReference(request));
@@ -83,7 +77,6 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
 
         getForList(findByProducerAppPath, findByProducerAppRoute);
         getForList(findByConsumerAppIdPath, findByConsumerAppIdRoute);
-        getForList(findDescibedLineageSpecs, findDescribedLineageSpecsRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
 
         getForDatum(findByAppPath, findByAppRoute);

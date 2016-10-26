@@ -61,8 +61,4 @@ public class PhysicalSpecificationService {
 
     }
 
-
-    public List<PhysicalSpecification> findForDescribedLineage() {
-        return specificationDao.findForDescribedLineage();
-    }
 }

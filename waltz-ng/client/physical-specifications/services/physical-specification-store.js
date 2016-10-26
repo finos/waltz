@@ -21,13 +21,6 @@ function store($http, baseApiUrl) {
     };
 
 
-    const findByDescribedLineage = () => {
-        return $http
-            .get(`${base}/lineage`)
-            .then(r => r.data);
-    };
-
-
     const getById = (id) => $http
         .get(`${base}/id/${id}`)
         .then(r => r.data);
@@ -36,7 +29,6 @@ function store($http, baseApiUrl) {
     return {
         findByEntityReference,
         findBySelector,
-        findByDescribedLineage,
         getById
     };
 }

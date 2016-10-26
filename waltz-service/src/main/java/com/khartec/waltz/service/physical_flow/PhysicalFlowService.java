@@ -39,9 +39,4 @@ public class PhysicalFlowService {
         return physicalFlowDao.getById(id);
     }
 
-
-    public List<PhysicalFlow> findAllDescribedLineageFlows() {
-        return physicalFlowDao.findAllDescribedLineageFlows();
-    }
-
 }

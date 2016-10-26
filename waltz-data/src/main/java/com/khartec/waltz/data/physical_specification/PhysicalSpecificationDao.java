@@ -24,7 +24,6 @@ import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalFlowLineage.PHYSICAL_FLOW_LINEAGE;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static java.util.Collections.emptyList;
 
@@ -113,18 +112,6 @@ public class PhysicalSpecificationDao {
                 .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
                 .where(PHYSICAL_SPECIFICATION.ID.in(selector))
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
-
-    public List<PhysicalSpecification> findForDescribedLineage() {
-
-        return dsl.selectDistinct(PHYSICAL_SPECIFICATION.fields())
-                .select(owningEntityNameField)
-                .from(PHYSICAL_SPECIFICATION)
-                .join(PHYSICAL_FLOW).on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
-                .where(PHYSICAL_FLOW.ID.in(
-                        DSL.selectDistinct(PHYSICAL_FLOW_LINEAGE.DESCRIBED_FLOW_ID).from(PHYSICAL_FLOW_LINEAGE)))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
