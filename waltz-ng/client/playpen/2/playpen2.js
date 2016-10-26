@@ -1,15 +1,16 @@
 import {termSearch} from "../../common";
 
 const initData = {
-
+    gridData: [],
+    filteredGriData: []
 };
 
 
-function controller() {
+function controller($interval) {
 
     const vm = Object.assign(this, initData);
 
-    vm.gridData = [{
+    const gridData = [{
         "firstName": "Cox",
             "lastName": "Carney",
             "company": "Enormo",
@@ -33,14 +34,16 @@ function controller() {
         {field: 'employed'}
     ];
 
-    vm.filteredGridData = vm.gridData;
-
     const searchFields = [
         'firstName',
         'lastName',
         'company',
         'employed'
     ];
+
+    vm.filterData = queryText => {
+        vm.filteredGridData = termSearch(vm.gridData, queryText, searchFields);
+    };
 
     vm.onGridInitialise = (e) => {
         vm.gridExporter = e.exportFn;
@@ -50,14 +53,17 @@ function controller() {
         vm.gridExporter('playpen-grid-export.csv');
     };
 
-    vm.filterData = queryText => {
-        vm.filteredGridData = termSearch(vm.gridData, queryText, searchFields);
-    };
+
+    $interval(() => {
+        vm.gridData = gridData;
+        vm.filteredGridData = vm.gridData;
+    }, 1500, 1);
+
 }
 
 
 controller.$inject = [
-
+    '$interval'
 ];
 
 

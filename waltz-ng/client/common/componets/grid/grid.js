@@ -3,7 +3,7 @@ import {initialiseData} from "../../../common";
 
 const bindings = {
     columnDefs: '<',
-    data: '<',
+    rowData: '<',
     onInitialise: '<'
 };
 
@@ -16,7 +16,7 @@ const exportDataSeparator = ',';
 
 const initialState = {
     columnDefs: [],
-    data: [],
+    rowData: [],
     onInitialise: (e) => {}
 };
 
@@ -26,11 +26,10 @@ function controller(uiGridExporterConstants,
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (changes) => {
-        vm.gridOptions.data = vm.data;
+        vm.gridOptions.data = vm.rowData;
     };
 
-    vm.exportData = (fileName) => {
-        fileName = fileName || "download.csv";
+    vm.exportData = (fileName = 'download.csv') => {
         const grid = vm.gridApi.grid;
         const rowVisibility = uiGridExporterConstants.ALL;
         const colVisibility = uiGridExporterConstants.ALL;
@@ -49,7 +48,7 @@ function controller(uiGridExporterConstants,
 
     vm.gridOptions = {
         columnDefs: vm.columnDefs,
-        data: vm.data,
+        data: vm.rowData,
         enableGridMenu: false,
         enableColumnMenus: false,
         exporterCsvFilename: vm.exportFileName,
