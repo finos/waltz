@@ -51,7 +51,6 @@ function controller(uiGridExporterConstants,
         data: vm.rowData,
         enableGridMenu: false,
         enableColumnMenus: false,
-        exporterCsvFilename: vm.exportFileName,
         onRegisterApi: function(gridApi){
             vm.gridApi = gridApi;
         }
