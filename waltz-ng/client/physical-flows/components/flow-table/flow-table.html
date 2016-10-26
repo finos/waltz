@@ -12,12 +12,9 @@
 
     <br>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div style="font-size: smaller; height: 300px"
-                 ui-grid-exporter
-                 ui-grid="$ctrl.gridOptions">
-            </div>
-        </div>
-    </div>
+    <waltz-grid column-defs="$ctrl.columnDefs"
+                row-data="$ctrl.filteredLineage"
+                on-initialise="$ctrl.onGridInitialise"
+                class="small">
+    </waltz-grid>
 </div>

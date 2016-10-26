@@ -34,12 +34,14 @@ function controller($state,
     };
 
 
+    vm.flowTableInitialised = (api) => {
+        vm.exportLineageReports = api.export;
+    }
+
+
     lineageStore
         .findAllContributions()
-        .then(lineageReports => {
-            console.log(lineageReports);
-            vm.lineageReports = lineageReports
-        });
+        .then(lineageReports => vm.lineageReports = lineageReports);
 
 }
 
