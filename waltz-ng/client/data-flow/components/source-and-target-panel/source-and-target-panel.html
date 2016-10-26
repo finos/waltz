@@ -1,10 +1,24 @@
 <div class="row waltz-source-and-target-panel">
-    <div class="col-sm-12 padding-0">
+    <div class="col-sm-12">
         <waltz-source-and-target-graph entity-ref="$ctrl.entityRef"
-                                       logical-flows="$ctrl.logicalFlows"
-                                       decorators="$ctrl.decorators"
+                                       logical-flows="$ctrl.filteredFlowData.flows"
+                                       decorators="$ctrl.filteredFlowData.decorators"
                                        tweakers="$ctrl.tweakers">
         </waltz-source-and-target-graph>
+        <div ng-if='$ctrl.filteredFlowData.selectedTypeId > 0'
+             class="small text-muted">
+            <hr>
+            <waltz-icon name="filter"></waltz-icon>
+            Showing only
+            <span ng-bind="$ctrl.filteredFlowData.selectedTypeId | toDisplayName:'dataType'"></span>
+            -
+            <a class="clickable"
+               class="btn btn-xs btn-success"
+               ng-click="$ctrl.showAll()">
+                Show All
+            </a>
+            <hr>
+        </div>
     </div>
 
     <div ng-if="$ctrl.selected"
