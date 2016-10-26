@@ -9,90 +9,26 @@
         </ol>
     </waltz-page-header>
 
-    <waltz-section name="Search" small="All">
-
-
-        <waltz-entity-link entity-ref="ctrl.entityReference | merge:({kind: 'ORG_UNIT'})"
-                           icon-placement="'right'"
-                           tooltip-placement="'right'">
-        </waltz-entity-link>
-
-        <br>
-        <br>
-        <br>
-
-
-
-        <waltz-entity-link entity-ref="ctrl.entityReference"
-                           icon-placement="'right'"
-                           tooltip-placement="'right'">
-        </waltz-entity-link>
-
-        <br>
-        <br>
-        <br>
-        <waltz-entity-icon-label entity-ref="ctrl.entityReference"
-                                 icon-placement="'left'">
-        </waltz-entity-icon-label>
+    <waltz-section name="Waltz Grid">
+        <waltz-section-actions>
+            <button ng-click="ctrl.exportWaltzGrid()"
+                    class="btn btn-xs btn-primary">
+                Export
+            </button>
+        </waltz-section-actions>
 
         <waltz-search-control min-characters="3"
                               delay="250"
-                              on-query="ctrl.search"
-                              placeholder-text="Search for records...">
+                              on-query="ctrl.filterData"
+                              placeholder-text="Filter waltz grid data...">
         </waltz-search-control>
+
+        <br>
+
+        <waltz-grid columnDefs="ctrl.columnDefs"
+                    data="ctrl.filteredGridData"
+                    on-initialise="ctrl.onGridInitialise"
+                    class="small">
+        </waltz-grid>
     </waltz-section>
-
-
-
-    <waltz-section name="Data Types" small="All">
-        <div class="row">
-            <div class="col-sm-8">
-                <waltz-data-type-tree trees="ctrl.trees"
-                                      on-selection="ctrl.nodeSelected">
-                </waltz-data-type-tree>
-            </div>
-        </div>
-    </waltz-section>
-
-
-    <waltz-section>
-        <waltz-multi-select-tree-control items="ctrl.dataTypes"
-                                         on-click="ctrl.nodeSelected"
-                                         on-check="ctrl.nodeChecked"
-                                         on-uncheck="ctrl.nodeUnchecked"
-                                         checked-item-ids="ctrl.checkedItemIds"
-                                         expanded-item-ids="ctrl.expandedItemIds">
-            <span class="waltz-visibility-parent">
-                <strong>
-                        <span ng-if="node.dataFlowCount && node.dataFlowCount > 0"
-                              ng-bind="node.name">
-                        </span>
-                    <i ng-bind="node.name"
-                       ng-if="! (node.dataFlowCount && node.dataFlowCount > 0)">
-                    </i>
-                </strong>
-                <a ui-sref="main.data-type.view ({id: node.id })">
-                        <span class="waltz-visibility-child-50">
-                            <span ng-if="node.totalDataFlowCount && node.totalDataFlowCount > 0"
-                                  class="small waltz-app-tally-count"
-                                  title="Number of data flows">
-
-                                <span ng-if="node.dataFlowCount && node.dataFlowCount > 0">
-                                    <span ng-bind="node.dataFlowCount"></span>
-                                </span>
-
-                                <i ng-if="node.childDataFlowCount && node.childDataFlowCount > 0">
-                                    (<span ng-bind="node.totalDataFlowCount"></span>)
-                                </i>
-                            </span>
-                        </span>
-                    &nbsp;
-                    <strong class="waltz-visibility-child-30">
-                        Show &raquo;
-                    </strong>
-                </a>
-            </span>
-        </waltz-multi-select-tree-control>
-    </waltz-section>
-
 </div>
