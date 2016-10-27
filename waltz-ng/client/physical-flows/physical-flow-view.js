@@ -70,15 +70,26 @@ function mkLineageFlows(lineage = []) {
 }
 
 
-function mkLineageEntities(lineage = [], specification) {
+function mkLineageEntities(lineage = []) {
     return _.chain(lineage)
         .flatMap(
             x => [
-                specification.owningEntity,
                 x.sourceEntity,
                 x.targetEntity])
         .uniqBy('id')
         .value();
+}
+
+
+function mkFullLineage(lineage = [], flow, spec) {
+    if (!flow || !spec) { return lineage; }
+    const finalEntry = {
+        flow,
+        specification: spec,
+        sourceEntity: spec.owningEntity,
+        targetEntity: flow.target
+    };
+    return _.concat(lineage, [finalEntry]);
 }
 
 
@@ -127,8 +138,9 @@ function controller($q,
         .then(() => {
             vm.graphTweakers = setupGraphTweakers(vm.specification.owningEntity, vm.physicalFlow.target);
 
-            vm.lineageFlows = mkLineageFlows(vm.lineage);
-            vm.lineageEntities = mkLineageEntities(vm.lineage, vm.specification);
+            const fullLineage = mkFullLineage(vm.lineage, vm.physicalFlow, vm.specification);
+            vm.lineageFlows = mkLineageFlows(fullLineage);
+            vm.lineageEntities = mkLineageEntities(fullLineage);
         });
 
     physicalFlowLineageStore

@@ -23,9 +23,7 @@ const bindings = {
 
 
 const DEFAULT_TWEAKER = {
-    enter: (selection) => selection
-        .on('click.fix', d => d.fixed = true)
-        .on('dblclick.unfix', d => d.fixed = false),
+    enter: (selection) => selection,
     exit: (selection) => selection,
     update: (selection) => selection
 };
@@ -147,6 +145,8 @@ function drawNodes(entities = [], svg, nodeTweakers = DEFAULT_TWEAKER) {
     node.enter()
         .append('g')
         .classed('wdfd-node', true)
+        .on('click.fix', d => d.fixed = true)
+        .on('dblclick.unfix', d => d.fixed = false)
         .call(force.drag)
         .call(addNodeCircle)
         .call(addNodeLabel)
