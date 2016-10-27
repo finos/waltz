@@ -40,7 +40,7 @@ function controller($state,
 
 
     lineageStore
-        .findAllContributions()
+        .findAllLineageReports()
         .then(lineageReports => vm.lineageReports = lineageReports);
 
 }

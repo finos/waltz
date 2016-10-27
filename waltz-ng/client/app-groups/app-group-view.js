@@ -110,6 +110,7 @@ function controller($scope,
                     dataFlowViewService,
                     entityStatisticStore,
                     historyStore,
+                    physicalFlowLineageStore,
                     ratingStore,
                     sourceDataRatingStore,
                     technologyStatsService,
@@ -212,6 +213,15 @@ function controller($scope,
         .findAllActiveDefinitions()
         .then(definitions => vm.entityStatisticDefinitions = definitions);
 
+
+    vm.lineageTableInitialised = (api) => {
+        vm.exportLineageReports = api.export;
+    }
+
+    physicalFlowLineageStore
+        .findLineageReportsBySelector(appIdSelector)
+        .then(lineageReports => vm.lineageReports = lineageReports);
+
 }
 
 
@@ -230,6 +240,7 @@ controller.$inject = [
     'DataFlowViewService',
     'EntityStatisticStore',
     'HistoryStore',
+    'PhysicalFlowLineageStore',
     'RatingStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService',

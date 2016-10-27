@@ -6,7 +6,7 @@ const initData = {
 };
 
 
-function controller($interval) {
+function controller($interval, lineageStore) {
 
     const vm = Object.assign(this, initData);
 
@@ -59,11 +59,27 @@ function controller($interval) {
         vm.filteredGridData = vm.gridData;
     }, 1500, 1);
 
+
+    const appId = 1;
+    const ref = {
+        kind: 'APP_GROUP',
+        id: appId
+    };
+
+    const selector = {
+        entityReference: ref,
+        scope: 'EXACT'
+    };
+
+    lineageStore
+        .findLineageReportsBySelector(selector)
+        .then(reports => console.log('reports: ', reports));
 }
 
 
 controller.$inject = [
-    '$interval'
+    '$interval',
+    'PhysicalFlowLineageStore'
 ];
 
 

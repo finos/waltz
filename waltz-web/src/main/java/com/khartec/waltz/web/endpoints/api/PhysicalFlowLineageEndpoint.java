@@ -68,6 +68,12 @@ public class PhysicalFlowLineageEndpoint implements Endpoint {
                 BASE_URL,
                 "reports");
 
+
+        String findLineageReportsBySelector = mkPath(
+                BASE_URL,
+                "reports",
+                "selector");
+
         String removeContributionPath = mkPath(
                 BASE_URL,
                 "physical-flow",
@@ -93,10 +99,15 @@ public class PhysicalFlowLineageEndpoint implements Endpoint {
                 (request, response)
                         -> physicalFlowLineageService.findAllLineageReports();
 
+        ListRoute<PhysicalFlowLineage> findLineageReportsBySelectorRoute =
+                (request, response)
+                        -> physicalFlowLineageService.findLineageReportsByAppIdSelector(readIdSelectionOptionsFromBody(request));
+
 
         getForList(findByPhysicalFlowIdPath, findByPhysicalFlowIdRoute);
         getForList(findContributionsByPhysicalFlowIdPath, findContributionsByPhysicalFlowIdRoute);
         getForList(findAllLineageReports, findAllLineageReportsRoute);
+        postForList(findLineageReportsBySelector, findLineageReportsBySelectorRoute);
 
         deleteForDatum(removeContributionPath, this::removeContribution);
         putForDatum(addContributionPath, this::addContribution);

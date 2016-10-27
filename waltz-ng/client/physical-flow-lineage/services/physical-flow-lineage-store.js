@@ -11,9 +11,15 @@ function store($http, baseApiUrl) {
         .get(`${base}/physical-flow/${id}/contributions`)
         .then(r => r.data);
 
-    const findAllContributions = () => $http
+    const findAllLineageReports = () => $http
         .get(`${base}/reports`)
         .then(r => r.data);
+
+
+    const findLineageReportsBySelector = (options) => $http
+        .post(`${base}/reports/selector`, options)
+        .then(r => r.data);
+
 
     const removeContribution = (describedFlowId, contributorFlowId) => $http
         .delete(`${base}/physical-flow/${describedFlowId}/contributions/${contributorFlowId}`)
@@ -28,7 +34,8 @@ function store($http, baseApiUrl) {
         addContribution,
         findByPhysicalFlowId,
         findContributionsByPhysicalFlowId,
-        findAllContributions
+        findAllLineageReports,
+        findLineageReportsBySelector
     };
 }
 
