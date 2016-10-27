@@ -99,6 +99,13 @@ function mkFullLineage(lineage = [], flow, spec) {
 }
 
 
+function loadBookmarks(bookmarkStore, entityRef) {
+    if(!bookmarkStore || !entityRef) return null;
+    return bookmarkStore
+        .findByParent(entityRef);
+}
+
+
 function controller($q,
                     $stateParams,
                     applicationStore,
@@ -130,11 +137,16 @@ function controller($q,
         .then(spec => applicationStore.getById(spec.owningEntity.id))
         .then(app => vm.owningEntity = app)
         .then(app => orgUnitStore.getById(app.organisationalUnitId))
-        .then(ou => vm.organisationalUnit = ou);
-
-    bookmarkStore
-        .findByParent(ref)
+        .then(ou => vm.organisationalUnit = ou)
+        .then(() =>  {
+            const specRef = {
+                kind: 'PHYSICAL_SPECIFICATION',
+                id: vm.specification.id
+            };
+            return loadBookmarks(bookmarkStore, specRef)
+        })
         .then(bs => vm.bookmarks = bs);
+
 
     const lineagePromise = physicalFlowLineageStore
         .findByPhysicalFlowId(flowId)
