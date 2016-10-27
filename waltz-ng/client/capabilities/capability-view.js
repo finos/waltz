@@ -135,6 +135,7 @@ function controller($q,
                     historyStore,
                     perspectiveStore,
                     processStore,
+                    physicalFlowLineageStore,
                     ratingStore,
                     sourceDataRatingStore,
                     techStatsService,
@@ -266,6 +267,10 @@ function controller($q,
         })
     };
 
+    vm.lineageTableInitialised = (api) => {
+        vm.exportLineageReports = api.export;
+    };
+
     vm.loadFlowDetail = () => dataFlowViewService
         .loadDetail()
         .then(flowData => vm.dataFlows = flowData);
@@ -277,6 +282,10 @@ function controller($q,
     entityStatisticStore
         .findAllActiveDefinitions()
         .then(defns => vm.entityStatisticDefinitions = defns);
+
+    physicalFlowLineageStore
+        .findLineageReportsBySelector(appIdSelector)
+        .then(lineageReports => vm.lineageReports = lineageReports);
 }
 
 
@@ -297,6 +306,7 @@ controller.$inject = [
     'HistoryStore',
     'PerspectiveStore',
     'ProcessStore',
+    'PhysicalFlowLineageStore',
     'RatingStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService',
