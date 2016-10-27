@@ -51,8 +51,13 @@ function controller($scope,
         });
     };
 
-    vm.loadFlowDetail = () => viewService.loadFlowDetail();
 
+    vm.lineageTableInitialised = (api) => {
+        vm.exportLineageReports = api.export;
+    };
+
+
+    vm.loadFlowDetail = () => viewService.loadFlowDetail();
 
 }
 

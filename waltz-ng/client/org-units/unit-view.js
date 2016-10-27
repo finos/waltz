@@ -60,7 +60,7 @@ function controller($stateParams,
 
     vm.lineageTableInitialised = (api) => {
         vm.exportLineageReports = api.export;
-    }
+    };
 
 }
 
