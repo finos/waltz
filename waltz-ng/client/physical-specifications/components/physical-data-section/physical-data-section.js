@@ -1,11 +1,19 @@
 import _ from "lodash";
 import {combineFlowData, enrichConsumes} from "../../utilities";
-import {mkEntityLinkGridCell, mkLinkGridCell, termSearch} from "../../../common";
+import {initialiseData, mkEntityLinkGridCell, mkLinkGridCell, termSearch} from "../../../common";
 
 
 const bindings = {
     physicalFlows: '<',
-    specifications: '<'
+    specifications: '<',
+    onInitialise: '<'
+};
+
+
+const initialState = {
+    physicalFlows: [],
+    specifications: [],
+    onInitialise: (e) => {}
 };
 
 
@@ -37,7 +45,7 @@ function mkData(specifications = { produces: [], consumes: [] },
 
 function controller() {
 
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     vm.produceColumnDefs = [
         Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
@@ -92,6 +100,12 @@ function controller() {
     vm.exportConsumes = () => {
         vm.consumesExportFn('consumes.csv');
     };
+
+    // callback
+    vm.onInitialise({
+        exportProducesFn: vm.exportProduces,
+        exportConsumesFn: vm.exportConsumes
+    });
 }
 
 controller.$inject = ['$scope'];

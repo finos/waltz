@@ -49,7 +49,9 @@ const initialState = {
     softwareCatalog: [],
     sourceDataRatings: [],
     tags: [],
-    visibility: {}
+    visibility: {},
+    physicalFlowProducesExportFn: () => {},
+    physicalFlowConsumesExportFn: () => {}
 };
 
 
@@ -112,6 +114,19 @@ function controller($q,
         return aliasStore
             .update(entityRef, aliasValues)
             .then(() => vm.aliases = aliasValues);
+    };
+
+    vm.onPhysicalFlowsInitialise = (e) => {
+        vm.physicalFlowProducesExportFn = e.exportProducesFn;
+        vm.physicalFlowConsumesExportFn = e.exportConsumesFn;
+    };
+
+    vm.exportPhysicalFlowProduces = () => {
+        vm.physicalFlowProducesExportFn();
+    };
+
+    vm.exportPhysicalFlowConsumes = () => {
+        vm.physicalFlowConsumesExportFn();
     };
 
 

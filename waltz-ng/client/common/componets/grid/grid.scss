@@ -9,12 +9,21 @@
         background-color: #f9f9f9 !important;
     }
 
+    .ui-grid-row:not(:first-child) .ui-grid-cell {
+        border-top: 1px solid #d4d4d4;
+    }
+
     .ui-grid-header-cell {
         border-right: none;
-        border-bottom: 1px solid #ddd
+        border-bottom: 1px solid #d4d4d4;
     }
 
     .ui-grid-cell {
         border-right: none
+    }
+
+    .ui-grid-viewport {
+        overflow-x: auto !important;
+        overflow-y: auto !important;
     }
 }
