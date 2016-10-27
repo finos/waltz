@@ -6,14 +6,16 @@ import {initialiseData, mkEntityLinkGridCell, mkLinkGridCell, termSearch} from "
 const bindings = {
     physicalFlows: '<',
     specifications: '<',
-    onInitialise: '<'
+    onInitialise: '<',
+    onChange: '<'
 };
 
 
 const initialState = {
     physicalFlows: [],
     specifications: [],
-    onInitialise: (e) => {}
+    onInitialise: (e) => {},
+    onChange: (e) => {}
 };
 
 
@@ -77,12 +79,22 @@ function controller() {
         vm.filterConsumes("");
     };
 
+    function notifyChange() {
+        // callback
+        vm.onChange({
+            producesCount: vm.filteredProduces ? vm.filteredProduces.length : 0,
+            consumesCount: vm.filteredConsumes ? vm.filteredConsumes.length : 0
+        });
+    }
+
     vm.filterProduces = (query) => {
-        vm.filteredProduces = termSearch(vm.produces, query, produceFields)
+        vm.filteredProduces = termSearch(vm.produces, query, produceFields);
+        notifyChange();
     };
 
     vm.filterConsumes = (query) => {
-        vm.filteredConsumes = termSearch(vm.consumes, query, consumeFields)
+        vm.filteredConsumes = termSearch(vm.consumes, query, consumeFields);
+        notifyChange();
     };
 
     vm.onProducesGridInitialise = (e) => {

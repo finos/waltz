@@ -50,6 +50,8 @@ const initialState = {
     sourceDataRatings: [],
     tags: [],
     visibility: {},
+    physicalFlowsProducesCount: 0,
+    physicalFlowsConsumesCount: 0,
     physicalFlowProducesExportFn: () => {},
     physicalFlowConsumesExportFn: () => {}
 };
@@ -119,6 +121,11 @@ function controller($q,
     vm.onPhysicalFlowsInitialise = (e) => {
         vm.physicalFlowProducesExportFn = e.exportProducesFn;
         vm.physicalFlowConsumesExportFn = e.exportConsumesFn;
+    };
+
+    vm.onPhysicalFlowsChange = (e) => {
+        vm.physicalFlowsProducesCount = e.producesCount;
+        vm.physicalFlowsConsumesCount = e.consumesCount;
     };
 
     vm.exportPhysicalFlowProduces = () => {
