@@ -38,7 +38,7 @@
     }
 
     .wpfo-arrow-col {
-        align: center;
+        text-align: center;
 
         span {
             font-size: xx-large;
@@ -49,7 +49,11 @@
         background: $waltz-blue-background;
     }
 
-    .wpfo-target-entity div {
+    .wpfo-entity-actor div {
+        background: $waltz-actor-background;
+    }
+
+    .wpfo-entity-application div {
         background: $waltz-green-background;
     }
 }

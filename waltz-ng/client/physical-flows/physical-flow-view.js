@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import {initialiseData} from '../common';
-import {green, grey, blue} from '../common/colors';
+import {green, grey, blue, actor} from '../common/colors';
 
 
 const template = require('./physical-flow-view.html');
@@ -14,7 +14,10 @@ const initialState = {
 function determineFillColor(d, owningEntity, targetEntity) {
     switch (d.id) {
         case (owningEntity.id): return blue;
-        case (targetEntity.id): return green;
+        case (targetEntity.id):
+            return targetEntity.kind === 'APPLICATION'
+                ? green
+                : actor;
         default: return grey;
     }
 }
@@ -22,9 +25,9 @@ function determineFillColor(d, owningEntity, targetEntity) {
 
 function determineRadius(d, owningEntity, targetEntity) {
     switch (d.id) {
-        case (owningEntity.id): return 10;
-        case (targetEntity.id): return 12;
-        default: return 7;
+        case (owningEntity.id): return 8;
+        case (targetEntity.id): return 10;
+        default: return 6;
     }
 }
 
@@ -32,7 +35,10 @@ function determineRadius(d, owningEntity, targetEntity) {
 function determineStrokeColor(d, owningEntity, targetEntity) {
     switch (d.id) {
         case (owningEntity.id): return blue.darker();
-        case (targetEntity.id): return green.darker();
+        case (targetEntity.id):
+            return targetEntity.kind === 'APPLICATION'
+                ? green.darker()
+                : actor.darker();
         default: return grey;
     }
 }

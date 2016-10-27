@@ -1,4 +1,3 @@
-
 /*
  *  Waltz
  * Copyright (c) David Watkins. All rights reserved.
@@ -20,11 +19,13 @@ export const green = d3.rgb('#5BB65D');
 export const red = d3.rgb('#DA524B');
 export const grey = d3.rgb('#939393');
 export const blue = d3.rgb('#5271CC');
+export const actor = d3.rgb('#d7bbdb');
 
 export const amberBg = d3.rgb('#FCF2D7');
 export const greenBg = d3.rgb('#DFF1D2');
 export const redBg = d3.rgb('#F2D7D7');
 export const greyBg = d3.rgb('#F5F5F5');
+export const actorBg = d3.rgb('#ede5ee');
 
 
 export const ragColorScale = d3.scale.ordinal()
