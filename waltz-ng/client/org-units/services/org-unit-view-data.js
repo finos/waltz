@@ -164,23 +164,31 @@ function loadChangeLogs(store, id, holder = {}) {
 }
 
 
+function loadLineageReports(store, selector, holder) {
+    return store
+        .findLineageReportsBySelector(selector)
+        .then(lineageReports => holder.lineageReports = lineageReports);
+}
+
+
 function service($q,
                  appStore,
                  appCapabilityStore,
+                 assetCostViewService,
+                 authSourceCalculator,
+                 bookmarkStore,
+                 capabilityStore,
                  changeLogStore,
+                 complexityStore,
                  dataFlowViewService,
+                 endUserAppStore,
                  entityStatisticStore,
                  involvementStore,
-                 ratingStore,
                  orgUnitStore,
-                 authSourceCalculator,
-                 endUserAppStore,
-                 assetCostViewService,
-                 complexityStore,
-                 capabilityStore,
-                 techStatsService,
-                 bookmarkStore,
-                 sourceDataRatingStore) {
+                 physicalFlowLineageStore,
+                 ratingStore,
+                 sourceDataRatingStore,
+                 techStatsService) {
 
     const rawData = {};
 
@@ -226,7 +234,8 @@ function service($q,
             loadAllCapabilities(capabilityStore, rawData),
             loadAuthSources(authSourceCalculator, orgUnitId, rawData),
             loadComplexity(complexityStore, orgUnitId, rawData),
-            loadEntityStatisticDefinitions(entityStatisticStore, selector, rawData)
+            loadEntityStatisticDefinitions(entityStatisticStore, selector, rawData),
+            loadLineageReports(physicalFlowLineageStore, selector, rawData)
         ]);
     }
 
@@ -281,24 +290,26 @@ function service($q,
 
 }
 
+
 service.$inject = [
     '$q',
     'ApplicationStore',
     'AppCapabilityStore',
+    'AssetCostViewService',
+    'AuthSourcesCalculator',
+    'BookmarkStore',
+    'CapabilityStore',
     'ChangeLogDataService',
+    'ComplexityStore',
     'DataFlowViewService',
+    'EndUserAppStore',
     'EntityStatisticStore',
     'InvolvementStore',
-    'RatingStore',
     'OrgUnitStore',
-    'AuthSourcesCalculator',
-    'EndUserAppStore',
-    'AssetCostViewService',
-    'ComplexityStore',
-    'CapabilityStore',
+    'PhysicalFlowLineageStore',
+    'RatingStore',
+    'SourceDataRatingStore',
     'TechnologyStatisticsService',
-    'BookmarkStore',
-    'SourceDataRatingStore'
 ];
 
 
