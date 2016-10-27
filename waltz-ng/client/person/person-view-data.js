@@ -81,6 +81,7 @@ function service($q,
                  entityStatisticStore,
                  involvementStore,
                  personStore,
+                 physicalFlowLineageStore,
                  sourceDataRatingStore,
                  techStatsService) {
 
@@ -228,6 +229,13 @@ function service($q,
     }
 
 
+    function loadLineageReports(personId) {
+        return physicalFlowLineageStore
+            .findLineageReportsBySelector(toSelector(personId))
+            .then(lineageReports => state.model.lineageReports = lineageReports);
+    }
+
+
     // --- MAIN LOADERS
 
     function loadFirstWave(empId) {
@@ -254,7 +262,8 @@ function service($q,
                 loadFlows(personId),
                 loadTechStats(personId),
                 loadComplexity(personId),
-                loadChangeInitiatives(employeeId)
+                loadChangeInitiatives(employeeId),
+                loadLineageReports(personId)
             ]);
     }
 
@@ -310,6 +319,7 @@ service.$inject = [
     'EntityStatisticStore',
     'InvolvementStore',
     'PersonStore',
+    'PhysicalFlowLineageStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService'
 ];
