@@ -1,8 +1,6 @@
 package com.khartec.waltz.jobs.sample;
 
-import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
@@ -17,7 +15,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.khartec.waltz.common.MapUtilities.*;
+import static com.khartec.waltz.common.MapUtilities.groupBy;
+import static com.khartec.waltz.common.MapUtilities.indexBy;
+import static com.khartec.waltz.data.physical_flow.PhysicalFlowDao.targetEntityNameField;
+import static com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
 import static com.khartec.waltz.schema.Tables.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
@@ -34,12 +35,14 @@ public class PhysicalLineageGenerator {
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
         List<PhysicalFlow> physicalFlows = dsl.select(PHYSICAL_FLOW.fields())
+                .select(targetEntityNameField)
                 .select(APPLICATION.NAME)
                 .from(PHYSICAL_FLOW)
                 .join(APPLICATION).on(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(APPLICATION.ID))
                 .fetch(PhysicalFlowDao.TO_DOMAIN_MAPPER);
 
         List<PhysicalSpecification> specifications = dsl.select(PHYSICAL_SPECIFICATION.fields())
+                .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
                 .fetch(PhysicalSpecificationDao.TO_DOMAIN_MAPPER);
 
