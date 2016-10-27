@@ -58,6 +58,10 @@ function controller($stateParams,
         .loadOrgUnitDescendants(id)
         .then(descendants => vm.viewData.orgUnitDescendants = descendants);
 
+    vm.lineageTableInitialised = (api) => {
+        vm.exportLineageReports = api.export;
+    }
+
 }
 
 
