@@ -22,6 +22,7 @@ import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.CollectionUtilities.randomPick;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
+import static com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
 import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
@@ -38,6 +39,7 @@ public class PhysicalFlowGenerator {
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
         List<PhysicalSpecification> specifications = dsl.select(PHYSICAL_SPECIFICATION.fields())
+                .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
                 .fetch(PhysicalSpecificationDao.TO_DOMAIN_MAPPER);
 
