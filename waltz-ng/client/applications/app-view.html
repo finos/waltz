@@ -209,6 +209,7 @@
                      select="ctrl.dataTab = 1"
                      heading="Physical Flow Detail">
                 <waltz-physical-data-section specifications="ctrl.physicalSpecifications"
+                                             ng-if="ctrl.dataTab == 1"
                                              physical-flows="ctrl.physicalFlows">
                 </waltz-physical-data-section>
             </uib-tab>

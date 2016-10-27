@@ -11,6 +11,7 @@
  *
  */
 import {authoritativeRatingBackgroundColorScale} from "../../../common/colors";
+import {mkEntityLinkGridCell} from "../../../common";
 
 
 const bindings = {
@@ -51,15 +52,6 @@ const component = {
 };
 
 
-function mkEntityNameCell(entityDataObjectField, valueField, columnHeading, entityNavViewName) {
-    return {
-        field: valueField,
-        displayName: columnHeading,
-        cellTemplate: `<div class="ui-grid-cell-contents">\n<a ui-sref="${entityNavViewName} ({ id: row.entity[\'${entityDataObjectField}\'][\'id\']})" ng-bind="COL_FIELD">\n</a>\n</div>`
-    };
-}
-
-
 function groupDecoratorsByFlowId(decorators = [], displayNameService) {
     return _.chain(decorators)
         .filter(dc => dc.decoratorEntity.kind === 'DATA_TYPE')
@@ -67,7 +59,8 @@ function groupDecoratorsByFlowId(decorators = [], displayNameService) {
             dataFlowId: dc.dataFlowId,
             dataType: {
                 id: dc.decoratorEntity.id,
-                name: displayNameService.lookup('dataType', dc.decoratorEntity.id)
+                name: displayNameService.lookup('dataType', dc.decoratorEntity.id),
+                kind: 'DATA_TYPE'
             },
             authSourceRating: dc.rating
         }))
@@ -96,9 +89,9 @@ function setupGrid($animate, displayNameService, uiGridConstants, flows = [], de
     const gridData = prepareGridData(flows, decorators, displayNameService);
 
     const columnDefs = [
-        mkEntityNameCell('source', 'source.name', 'Source', 'main.app.view'),
-        mkEntityNameCell('target', 'target.name', 'Target', 'main.app.view'),
-        mkEntityNameCell('dataType', 'dataType.name', 'Data Type', 'main.data-type.view'),
+        mkEntityLinkGridCell('Source', 'source', 'none'),
+        mkEntityLinkGridCell('Target', 'target', 'none'),
+        mkEntityLinkGridCell('Data Type', 'dataType', 'none'),
         { field: 'authSourceRating', displayName: 'Source Rating', cellFilter: 'toDisplayName:"rating"' }
     ];
 
