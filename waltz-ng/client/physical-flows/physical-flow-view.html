@@ -16,17 +16,62 @@
 
     <div class="waltz-page-summary waltz-page-summary-attach">
 
-        <h4>
-            Physical flow of
-            <mark ng-bind="ctrl.specification.name"></mark>
-            from
-            <mark ng-bind="ctrl.specification.owningEntity.name"></mark>
-            to
-            <mark ng-bind="ctrl.physicalFlow.target.name"></mark>
-        </h4>
+        <!--<h4>-->
+            <!--Physical flow of-->
+            <!--<mark ng-bind="ctrl.specification.name"></mark>-->
+            <!--from-->
+            <!--<mark ng-bind="ctrl.specification.owningEntity.name"></mark>-->
+            <!--to-->
+            <!--<mark ng-bind="ctrl.physicalFlow.target.name"></mark>-->
+        <!--</h4>-->
+
+        <div style="margin-left: 64px; margin-right: 64px">
+            <table style="width: 100%; border: 0px; vertical-align: middle;">
+                <tr>
+                    <td width="25%" align="center">
+                        <div style="background-color: #fafafa; border-radius: 12px; padding: 12px; border: 2px solid #ddd">
+                            <waltz-entity-link entity-ref="ctrl.specification.owningEntity"></waltz-entity-link>
+
+                        </div>
+                    </td>
+                    <td align="center">
+                        <span style="font-size: xx-large">&rarr;</span>
+                    </td>
+                    <td width="40%">
+                        <div style="background-color: #f5f5f5; border-radius: 12px; padding: 12px; border: 2px solid #ddd">
+                            <div ng-bind="ctrl.specification.name"></div>
+                            <hr>
+                            <div class="small">
+                                <label class="text-muted">Format:</label>
+                                <span ng-bind="ctrl.specification.format"></span>
+                                <br>
+                                <label class="text-muted">Transport:</label>
+                                <span ng-bind="ctrl.physicalFlow.transport"></span>
+                                <br>
+                                <label class="text-muted">Frequency:</label>
+                                <span ng-bind="ctrl.physicalFlow.frequency"></span>
+                                <br>
+                                <label class="text-muted">Description:</label>
+                                <div ng-bind="ctrl.specification.description"></div>
+                            </div>
+                        </div>
+
+                    </td>
+                    <td align="center">
+                        <span style="font-size: xx-large">&rarr;</span>
+                    </td>
+                    <td width="25%" align="center">
+                        <div style="background-color: #fafafa; border-radius: 12px; padding: 12px; border: 2px solid #ddd">
+                            <waltz-entity-link entity-ref="ctrl.physicalFlow.target"></waltz-entity-link>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
 
         <hr>
-
+<!--
         <h5>Physical Flow</h5>
         <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
@@ -76,7 +121,7 @@
                                                specification="ctrl.specification"
                                                organisational-unit="ctrl.organisationalUnit">
         </waltz-physical-specification-overview>
-
+-->
     </div>
 
     <br>
