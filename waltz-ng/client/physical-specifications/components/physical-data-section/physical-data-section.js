@@ -39,16 +39,6 @@ function controller() {
 
     const vm = this;
 
-    const produceFields = [
-        'specification.name',
-        'specification.externalId',
-        'specification.format',
-        'specification.description',
-        'physicalFlow.transport',
-        'physicalFlow.frequency',
-        'targetRef.name'
-    ];
-
     vm.produceColumnDefs = [
         Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
         { field: 'specification.externalId', displayName: 'Ext. Id', width: "8%" },
@@ -57,17 +47,6 @@ function controller() {
         { field: 'physicalFlow.transport', displayName: 'Transport', width: "10%" },
         { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "9%" },
         { field: 'specification.description', displayName: 'Description', width: "30%" }
-    ];
-
-
-    const consumeFields = [
-        'specification.name',
-        'specification.externalId',
-        'specification.format',
-        'specification.description',
-        'physicalFlow.transport',
-        'physicalFlow.frequency',
-        'sourceRef.name'
     ];
 
     vm.consumeColumnDefs = [
@@ -79,6 +58,10 @@ function controller() {
         { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "10%" },
         { field: 'specification.description', displayName: 'Description', width: "23%" }
     ];
+
+    const produceFields = _.map(vm.produceColumnDefs, 'field');
+
+    const consumeFields = _.map(vm.consumeColumnDefs, 'field');
 
     vm.$onChanges = (changes) => {
         Object.assign(vm, mkData(vm.specifications, vm.physicalFlows));
