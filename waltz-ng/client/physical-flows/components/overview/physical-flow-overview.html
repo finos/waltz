@@ -1,0 +1,43 @@
+<div class="waltz-physical-flow-overview">
+    <table>
+        <tr>
+            <td class="wpfo-entity-col wpfo-owning-entity">
+                <div>
+                    <waltz-entity-link entity-ref="$ctrl.specification.owningEntity"></waltz-entity-link>
+                </div>
+            </td>
+            <td class="wpfo-arrow-col">
+                <span>&rarr;</span>
+            </td>
+            <td class="wpfo-specification-col">
+                <div>
+                    <div class="wpfo-specification-title"
+                         ng-bind="$ctrl.specification.name"></div>
+                    <hr>
+                    <div class="small">
+                        <label class="text-muted">Format:</label>
+                        <span ng-bind="$ctrl.specification.format"></span>
+                        <br>
+                        <label class="text-muted">Transport:</label>
+                        <span ng-bind="$ctrl.physicalFlow.transport"></span>
+                        <br>
+                        <label class="text-muted">Frequency:</label>
+                        <span ng-bind="$ctrl.physicalFlow.frequency"></span>
+                        <br>
+                        <label class="text-muted">Description:</label>
+                        <div ng-bind="$ctrl.specification.description"></div>
+                    </div>
+                </div>
+
+            </td>
+            <td class="wpfo-arrow-col">
+                <span>&rarr;</span>
+            </td>
+            <td class="wpfo-entity-col wpfo-target-entity">
+                <div>
+                    <waltz-entity-link entity-ref="$ctrl.physicalFlow.target"></waltz-entity-link>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>

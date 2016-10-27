@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import {initialiseData} from '../common';
-import {green, grey} from '../common/colors';
+import {green, grey, blue} from '../common/colors';
 
 
 const template = require('./physical-flow-view.html');
@@ -11,24 +11,43 @@ const initialState = {
 
 };
 
+function determineFillColor(d, owningEntity, targetEntity) {
+    switch (d.id) {
+        case (owningEntity.id): return blue;
+        case (targetEntity.id): return green;
+        default: return grey;
+    }
+}
 
 
-function setupGraphTweakers(application) {
+function determineRadius(d, owningEntity, targetEntity) {
+    switch (d.id) {
+        case (owningEntity.id): return 10;
+        case (targetEntity.id): return 12;
+        default: return 7;
+    }
+}
+
+
+function determineStrokeColor(d, owningEntity, targetEntity) {
+    switch (d.id) {
+        case (owningEntity.id): return blue.darker();
+        case (targetEntity.id): return green.darker();
+        default: return grey;
+    }
+}
+
+
+function setupGraphTweakers(owningEntity, targetEntity) {
     return {
         node: {
             update: (selection) => {
                 selection
                     .select('circle')
                     .attr({
-                        'fill': d => d.id === application.id
-                            ? green
-                            : grey,
-                        'stroke': d => d.id === application.id
-                            ? green.darker()
-                            : grey.darker(),
-                        'r': d => d.id === application.id
-                            ? 15
-                            : 10
+                        'fill': d => determineFillColor(d, owningEntity, targetEntity),
+                        'stroke': d => determineStrokeColor(d, owningEntity, targetEntity),
+                        'r': d => determineRadius(d, owningEntity, targetEntity)
                     });
             },
             exit: () => {},
@@ -94,8 +113,7 @@ function controller($q,
         .then(spec => applicationStore.getById(spec.owningEntity.id))
         .then(app => vm.owningEntity = app)
         .then(app => orgUnitStore.getById(app.organisationalUnitId))
-        .then(ou => vm.organisationalUnit = ou)
-        .then(() => vm.graphTweakers = setupGraphTweakers(vm.owningEntity));
+        .then(ou => vm.organisationalUnit = ou);
 
     bookmarkStore
         .findByParent(ref)
@@ -107,6 +125,8 @@ function controller($q,
 
     $q.all([specPromise, lineagePromise])
         .then(() => {
+            vm.graphTweakers = setupGraphTweakers(vm.specification.owningEntity, vm.physicalFlow.target);
+
             vm.lineageFlows = mkLineageFlows(vm.lineage);
             vm.lineageEntities = mkLineageEntities(vm.lineage, vm.specification);
         });

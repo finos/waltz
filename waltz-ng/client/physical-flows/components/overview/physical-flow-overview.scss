@@ -1,0 +1,55 @@
+.waltz-physical-flow-overview {
+    margin-left: 64px;
+    margin-right: 64px;
+
+    table {
+        width: 100%;
+        border: 0px;
+        vertical-align: middle;
+    }
+
+    .wpfo-entity-col {
+        width: 25%;
+        align: center;
+        font-size: larger;
+
+        div {
+            background-color: #fafafa;
+            border-radius: 12px;
+            padding: 12px;
+            border: 2px solid #ddd
+        }
+
+    }
+
+    .wpfo-specification-col {
+        width: 40%;
+
+        .wpfo-specification-title {
+            font-size: larger;
+        }
+
+        >div {
+            background-color: #f5f5f5;
+            border-radius: 12px;
+            padding: 12px;
+            border: 2px solid #ddd
+        }
+    }
+
+    .wpfo-arrow-col {
+        align: center;
+
+        span {
+            font-size: xx-large;
+        }
+    }
+
+    .wpfo-owning-entity div {
+        background: $waltz-blue-background;
+    }
+
+    .wpfo-target-entity div {
+        background: $waltz-green-background;
+    }
+}
