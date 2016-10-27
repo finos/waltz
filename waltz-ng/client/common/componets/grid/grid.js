@@ -17,6 +17,7 @@ const exportDataSeparator = ',';
 const initialState = {
     columnDefs: [],
     rowData: [],
+    minRowsToShow: 10,
     onInitialise: (e) => {}
 };
 
@@ -26,6 +27,7 @@ function controller(uiGridExporterConstants,
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (changes) => {
+        vm.gridOptions.minRowsToShow = Math.min(vm.minRowsToShow, vm.rowData.length);
         vm.gridOptions.data = vm.rowData;
     };
 
@@ -51,6 +53,7 @@ function controller(uiGridExporterConstants,
         data: vm.rowData,
         enableGridMenu: false,
         enableColumnMenus: false,
+        minRowsToShow: vm.minRowsToShow,
         onRegisterApi: function(gridApi){
             vm.gridApi = gridApi;
         }
