@@ -24,6 +24,8 @@ function controller($state) {
         if (vm.entityRef) {
             vm.viewState = kindToViewState(vm.entityRef.kind);
             if (vm.viewState) {
+                // url needs to be re-computed when entityRef changes
+                // eg: when used in a ui-grid cell template
                 vm.viewUrl = $state.href(vm.viewState, { id: vm.entityRef.id });
             }
         }
