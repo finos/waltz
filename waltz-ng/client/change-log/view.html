@@ -4,6 +4,17 @@
     </waltz-page-header>
 
     <waltz-section name="Entries">
-        <waltz-change-log-table entries="ctrl.entries"></waltz-change-log-table>
+        <waltz-section-actions>
+            <button ng-click="ctrl.exportChangeLog()"
+                    class="btn btn-xs btn-primary"
+                    ng-if="ctrl.entries.length > 0">
+                Export
+            </button>
+        </waltz-section-actions>
+
+        <waltz-change-log-table entries="ctrl.entries"
+                                on-initialise="ctrl.changeLogTableInitialised">
+        </waltz-change-log-table>
     </waltz-section>
+
 </div>
