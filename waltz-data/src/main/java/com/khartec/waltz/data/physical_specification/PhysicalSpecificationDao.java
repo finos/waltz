@@ -26,6 +26,7 @@ import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static java.util.Collections.emptyList;
+import static org.jooq.impl.DSL.*;
 
 @Repository
 public class PhysicalSpecificationDao {
@@ -113,6 +114,18 @@ public class PhysicalSpecificationDao {
                 .from(PHYSICAL_SPECIFICATION)
                 .where(PHYSICAL_SPECIFICATION.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public boolean isUsed(long id) {
+        Field<Boolean> specUsed = DSL.when(
+                    exists(selectFrom(PHYSICAL_FLOW).where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(id))),
+                    val(true))
+                .otherwise(false).as("spec_used");
+
+        return dsl.select(specUsed)
+                .fetchOne(specUsed);
+
     }
 
 

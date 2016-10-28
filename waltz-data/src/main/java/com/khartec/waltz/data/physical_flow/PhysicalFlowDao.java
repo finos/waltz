@@ -18,7 +18,10 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalFlowLineage.PHYSICAL_FLOW_LINEAGE;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
+import static org.jooq.impl.DSL.notExists;
+import static org.jooq.impl.DSL.selectFrom;
 
 
 @Repository
@@ -97,6 +100,16 @@ public class PhysicalFlowDao {
 
     public List<PhysicalFlow> findBySelector(Select<Record1<Long>> selector) {
         return findByCondition(PHYSICAL_FLOW.ID.in(selector));
+    }
+
+
+    public int delete(long flowId) {
+
+        return dsl.delete(PHYSICAL_FLOW)
+                .where(PHYSICAL_FLOW.ID.eq(flowId))
+                .and(notExists(selectFrom(PHYSICAL_FLOW_LINEAGE)
+                        .where(PHYSICAL_FLOW_LINEAGE.CONTRIBUTOR_FLOW_ID.eq(flowId))))
+                .execute();
     }
 
 
