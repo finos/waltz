@@ -28,7 +28,8 @@
 
 
     <!-- RATINGS -->
-    <waltz-section name="Application Function Ratings">
+    <waltz-section name="Application Function Ratings"
+                   id="app-ratings-section">
 
         <waltz-section-actions>
             <button class="btn btn-xs waltz-btn-transparent"
@@ -62,7 +63,8 @@
 
 
     <!--LINEAGE REPORTS-->
-    <waltz-section name="Lineage Reports">
+    <waltz-section name="Lineage Reports"
+                   id="lineage-reports-section">
         <waltz-section-actions>
             <button ng-click="ctrl.exportLineageReports()"
                     class="btn btn-xs btn-primary"
@@ -84,7 +86,8 @@
 
 
     <!-- AUTH SOURCES -->
-    <waltz-section name="Authoritative Sources">
+    <waltz-section name="Authoritative Sources"
+                   id="authoritative-sources-section">
         <waltz-rated-flow-summary-panel apps="ctrl.apps"
                                         entity-reference="ctrl.entityRef"
                                         flow-data="ctrl.dataFlows"
@@ -174,7 +177,8 @@
 
 
     <!-- TECHNOLOGIES -->
-    <waltz-section name="Technologies">
+    <waltz-section name="Technologies"
+                   id="technologies-section">
 
         <waltz-section-actions>
             <button class="btn btn-xs waltz-btn-transparent"
@@ -212,7 +216,8 @@
 
 
     <!-- ASSOCIATED CAPABILITIES -->
-    <waltz-section name="Associated Functions">
+    <waltz-section name="Associated Functions"
+                   id="associated-functions-section">
         <ul>
             <li ng-repeat="assoc in ctrl.associatedCapabilities | orderBy:'capability.name'">
                 <strong>

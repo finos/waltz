@@ -47,7 +47,8 @@
         <div class="col-md-4">
             <!-- TREE -->
             <waltz-section name="Data"
-                           small="Types">
+                           small="Types"
+                           id="data-types-tree-section">
                 <waltz-data-type-tree trees="ctrl.trees"
                                       on-selection="ctrl.nodeSelected">
                 </waltz-data-type-tree>
@@ -56,7 +57,8 @@
 
         <div class="col-md-8">
             <!--LINEAGE REPORTS-->
-            <waltz-section name="Lineage Reports">
+            <waltz-section name="Lineage Reports"
+                           id="lineage-reports-section">
                 <waltz-section-actions>
                     <button ng-click="ctrl.exportLineageReports()"
                             class="btn btn-xs btn-primary"
@@ -78,9 +80,5 @@
         </div>
 
     </div>
-
-
-
-
 
 </div>

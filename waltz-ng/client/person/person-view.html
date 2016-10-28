@@ -131,7 +131,8 @@
 
 
     <!--LINEAGE REPORTS-->
-    <waltz-section name="Lineage Reports">
+    <waltz-section name="Lineage Reports"
+                   id="lineage-reports-section">
         <waltz-section-actions>
             <button ng-click="ctrl.exportLineageReports()"
                     class="btn btn-xs btn-primary"
@@ -154,7 +155,8 @@
 
     <!-- AUTH SOURCES -->
     <waltz-section name="Authoritative Sources"
-                   ng-if="ctrl.hasInvolvements">
+                   ng-if="ctrl.hasInvolvements"
+                   id="authoritative-sources-section">
         <waltz-rated-flow-summary-panel ng-if='ctrl.entityRef'
                                         apps="ctrl.apps"
                                         entity-reference="ctrl.entityRef"
@@ -188,7 +190,8 @@
 
     <!-- TECHNOLOGIES -->
     <waltz-section name="Technologies"
-                   ng-if="ctrl.hasInvolvements">
+                   ng-if="ctrl.hasInvolvements"
+                   id="technologies-section">
 
         <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
                                          entities="['SERVER', 'DATABASE', 'SOFTWARE']">
