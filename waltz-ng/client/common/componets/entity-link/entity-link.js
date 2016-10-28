@@ -1,4 +1,4 @@
-import { initialiseData, kindToViewState } from "../../../common";
+import {initialiseData, kindToViewState} from "../../../common";
 
 
 const bindings = {
@@ -17,15 +17,24 @@ const initialState = {
 };
 
 
-function controller() {
+function controller($state) {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (changes) => {
         if (vm.entityRef) {
-            vm.viewState = kindToViewState(vm.entityRef.kind);
+            const viewState = kindToViewState(vm.entityRef.kind);
+            if (viewState) {
+                // url needs to be re-computed when entityRef changes
+                // eg: when used in a ui-grid cell template
+                vm.viewUrl = $state.href(viewState, { id: vm.entityRef.id });
+            }
         }
     };
 }
+
+controller.$inject = [
+    '$state'
+];
 
 
 const component = {

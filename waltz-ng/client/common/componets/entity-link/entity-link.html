@@ -1,5 +1,7 @@
-<a ng-if="$ctrl.viewState"
-   ui-sref="{{ $ctrl.viewState }} ({id: {{ $ctrl.entityRef.id }} })">
+<!-- ng-href is used here so that the links get updated when entityRef changes -->
+<!-- eg: when used in a ui-grid cell template -->
+<a ng-if="$ctrl.viewUrl"
+   ng-href="{{ $ctrl.viewUrl }}">
 
     <waltz-entity-icon-label entity-ref="$ctrl.entityRef"
                              icon-placement="$ctrl.iconPlacement"
@@ -10,5 +12,5 @@
 <waltz-entity-icon-label entity-ref="$ctrl.entityRef"
                          icon-placement="$ctrl.iconPlacement"
                          tooltip-placement="$ctrl.tooltipPlacement"
-                         ng-if="!$ctrl.viewState">
+                         ng-if="!$ctrl.viewUrl">
 </waltz-entity-icon-label>
