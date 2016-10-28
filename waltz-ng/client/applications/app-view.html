@@ -125,7 +125,9 @@
                  ng-if="ctrl.dataTab == 1"
                  uib-dropdown>
                 <button type="button"
-                        ng-disabled="ctrl.physicalFlowsProducesCount == 0 && ctrl.physicalFlowsConsumesCount == 0"
+                        ng-disabled="ctrl.physicalFlowsProducesCount == 0
+                                        && ctrl.physicalFlowsConsumesCount == 0
+                                        && ctrl.physicalFlowsUnusedSpecificationsCount == 0"
                         class="btn btn-xs btn-primary"
                         uib-dropdown-toggle>
                     Export <span class="caret"></span>
@@ -150,6 +152,15 @@
                            class="small">
                             <span class="fa fa-download"></span>
                             Consumes
+                        </a>
+                    </li>
+                    <li role="menuitem">
+                        <a href=""
+                           ng-click="ctrl.exportPhysicalFlowUnusedSpecifications()"
+                           ng-hide="ctrl.physicalFlowsUnusedSpecificationsCount == 0"
+                           class="small">
+                            <span class="fa fa-download"></span>
+                            Unused
                         </a>
                     </li>
                 </ul>
