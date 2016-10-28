@@ -6,14 +6,16 @@ import {initialiseData, mkEntityLinkGridCell, mkLinkGridCell, termSearch} from "
 const bindings = {
     physicalFlows: '<',
     specifications: '<',
-    onInitialise: '<'
+    onInitialise: '<',
+    onChange: '<'
 };
 
 
 const initialState = {
     physicalFlows: [],
     specifications: [],
-    onInitialise: (e) => {}
+    onInitialise: (e) => {},
+    onChange: (e) => {}
 };
 
 
@@ -67,6 +69,12 @@ function controller() {
         { field: 'specification.description', displayName: 'Description', width: "23%" }
     ];
 
+    vm.unusedSpecificationsColumnDefs = [
+        { field: 'name', displayName: 'Name' },
+        { field: 'format', displayName: 'Format' },
+        { field: 'description', displayName: 'Description' }
+    ];
+
     const produceFields = _.map(vm.produceColumnDefs, 'field');
 
     const consumeFields = _.map(vm.consumeColumnDefs, 'field');
@@ -77,12 +85,23 @@ function controller() {
         vm.filterConsumes("");
     };
 
+    function notifyChange() {
+        // callback
+        vm.onChange({
+            producesCount: vm.filteredProduces ? vm.filteredProduces.length : 0,
+            consumesCount: vm.filteredConsumes ? vm.filteredConsumes.length : 0,
+            unusedSpecificationsCount: vm.unusedSpecifications ? vm.unusedSpecifications.length : 0
+        });
+    }
+
     vm.filterProduces = (query) => {
-        vm.filteredProduces = termSearch(vm.produces, query, produceFields)
+        vm.filteredProduces = termSearch(vm.produces, query, produceFields);
+        notifyChange();
     };
 
     vm.filterConsumes = (query) => {
-        vm.filteredConsumes = termSearch(vm.consumes, query, consumeFields)
+        vm.filteredConsumes = termSearch(vm.consumes, query, consumeFields);
+        notifyChange();
     };
 
     vm.onProducesGridInitialise = (e) => {
@@ -93,6 +112,10 @@ function controller() {
         vm.consumesExportFn = e.exportFn;
     };
 
+    vm.onUnusedSpecificationsGridInitialise = (e) => {
+        vm.unusedSpecificationsExportFn = e.exportFn;
+    };
+
     vm.exportProduces = () => {
         vm.producesExportFn('produces.csv');
     };
@@ -101,10 +124,15 @@ function controller() {
         vm.consumesExportFn('consumes.csv');
     };
 
+    vm.exportUnusedSpecifications = () => {
+        vm.unusedSpecificationsExportFn('unused-specifications.csv');
+    };
+
     // callback
     vm.onInitialise({
         exportProducesFn: vm.exportProduces,
-        exportConsumesFn: vm.exportConsumes
+        exportConsumesFn: vm.exportConsumes,
+        exportUnusedSpecificationsFn: vm.exportUnusedSpecifications
     });
 }
 

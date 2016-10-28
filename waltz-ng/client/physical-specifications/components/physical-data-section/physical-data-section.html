@@ -70,31 +70,22 @@
 
     <div class="row"
          ng-hide="$ctrl.unusedSpecifications | isEmpty">
+
+        <br>
+
         <div class="col-md-12">
             <h4>Unused Specifications</h4>
-
-            <br>
             <small class="text-muted">
                 Specifications which have been registered, but are not sent to any consumers.
             </small>
-            <br>
 
-            <table class="table small table-condensed table-hover">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Format</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="spec in $ctrl.unusedSpecifications">
-                    <td><span ng-bind="spec.name"></span></td>
-                    <td><span ng-bind="spec.format"></span></td>
-                    <td><span ng-bind="spec.description"></span></td>
-                </tr>
-                </tbody>
-            </table>
+            <br><br>
+
+            <waltz-grid column-defs="$ctrl.unusedSpecificationsColumnDefs"
+                        row-data="$ctrl.unusedSpecifications"
+                        on-initialise="$ctrl.onUnusedSpecificationsGridInitialise"
+                        class="small">
+            </waltz-grid>
         </div>
     </div>
 </div>

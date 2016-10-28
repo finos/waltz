@@ -125,6 +125,9 @@
                  ng-if="ctrl.dataTab == 1"
                  uib-dropdown>
                 <button type="button"
+                        ng-disabled="ctrl.physicalFlowsProducesCount == 0
+                                        && ctrl.physicalFlowsConsumesCount == 0
+                                        && ctrl.physicalFlowsUnusedSpecificationsCount == 0"
                         class="btn btn-xs btn-primary"
                         uib-dropdown-toggle>
                     Export <span class="caret"></span>
@@ -134,17 +137,30 @@
                     style="min-width: 50px;"
                     role="menu">
                     <li role="menuitem">
-                        <a href="" ng-click="ctrl.exportPhysicalFlowProduces()"
+                        <a href=""
+                           ng-click="ctrl.exportPhysicalFlowProduces()"
+                           ng-hide="ctrl.physicalFlowsProducesCount == 0"
                            class="small">
-                            <span class="fa fa-download"></span>
+                            <waltz-icon name="download"></waltz-icon>
                             Produces
                         </a>
                     </li>
                     <li role="menuitem">
-                        <a href="" ng-click="ctrl.exportPhysicalFlowConsumes()"
+                        <a href=""
+                           ng-click="ctrl.exportPhysicalFlowConsumes()"
+                           ng-hide="ctrl.physicalFlowsConsumesCount == 0"
                            class="small">
-                            <span class="fa fa-download"></span>
+                            <waltz-icon name="download"></waltz-icon>
                             Consumes
+                        </a>
+                    </li>
+                    <li role="menuitem">
+                        <a href=""
+                           ng-click="ctrl.exportPhysicalFlowUnusedSpecifications()"
+                           ng-hide="ctrl.physicalFlowsUnusedSpecificationsCount == 0"
+                           class="small">
+                            <waltz-icon name="download"></waltz-icon>
+                            Unused
                         </a>
                     </li>
                 </ul>
@@ -240,6 +256,7 @@
                 <waltz-physical-data-section specifications="ctrl.physicalSpecifications"
                                              ng-if="ctrl.dataTab == 1"
                                              on-initialise="ctrl.onPhysicalFlowsInitialise"
+                                             on-change="ctrl.onPhysicalFlowsChange"
                                              physical-flows="ctrl.physicalFlows">
                 </waltz-physical-data-section>
             </uib-tab>
