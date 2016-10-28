@@ -1,5 +1,5 @@
 <a ng-if="$ctrl.viewState"
-   ui-sref="{{ $ctrl.viewState }} ({id: {{ $ctrl.entityRef.id }} })">
+   ng-href="{{ $ctrl.viewUrl }}">
 
     <waltz-entity-icon-label entity-ref="$ctrl.entityRef"
                              icon-placement="$ctrl.iconPlacement"
