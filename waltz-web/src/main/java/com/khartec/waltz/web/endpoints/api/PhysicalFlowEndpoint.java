@@ -119,10 +119,10 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
             logChange(username,
                     specification.owningEntity(),
-                    "physical flow id: " + flowId + " to " + flow.target().name().get() + " deleted");
+                    "physical flow id: " + flowId + " to " + extractEntityName(flow.target()) + " deleted");
             logChange(username,
                     flow.target(),
-                    "physical flow id: " + flowId + " from " + specification.owningEntity().name().get() + " deleted");
+                    "physical flow id: " + flowId + " from " + extractEntityName(specification.owningEntity()) + " deleted");
         }
 
         return deleteCommandResponse;
@@ -141,5 +141,10 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 .build();
 
         changeLogService.write(logEntry);
+    }
+
+
+    private String extractEntityName(EntityReference ref) {
+        return ref.name().orElse(String.valueOf(ref.id()));
     }
 }
