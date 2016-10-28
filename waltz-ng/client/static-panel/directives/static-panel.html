@@ -1,7 +1,8 @@
 <div class="waltz-static-panel">
     <waltz-section icon="{{ $ctrl.panel.icon }}"
                    name="{{ $ctrl.panel.title }}"
-                   ng-if="$ctrl.renderMode === 'section'">
+                   ng-if="$ctrl.renderMode === 'section'"
+                   id="{{ $ctrl.panel.title }}-section">
         <div ng-bind-html="$ctrl.panel.content">
         </div>
     </waltz-section>

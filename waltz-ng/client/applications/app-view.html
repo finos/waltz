@@ -23,9 +23,10 @@
 
     <br>
 
-    <!-- CAPABILITIES and RATINGS -->
+    <!-- FUNCTIONS and RATINGS -->
     <waltz-section name="Functions and Ratings"
-                   icon="puzzle-piece">
+                   icon="puzzle-piece"
+                   id="functions-ratings-section">
 
         <waltz-section-actions>
             <a waltz-has-role="RATING_EDITOR"
@@ -112,7 +113,10 @@
 
 
     <!-- DATA TYPES & FLOWS -->
-    <waltz-section name="Data" icon="random" small="( types and flows )">
+    <waltz-section name="Data"
+                   icon="random"
+                   small="( types and flows )"
+                   id="data-types-flows-section">
 
         <waltz-section-actions>
             <a waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
@@ -250,7 +254,8 @@
 
     <!-- AUTH SOURCES -->
     <waltz-section name="Authoritative Flow Source"
-                   ng-if="!(ctrl.authSources|isEmpty)">
+                   ng-if="!(ctrl.authSources|isEmpty)"
+                   id="authoritative-source-section">
 
         <p>
             This application has been declared as an authoritative source for some of the datatypes
