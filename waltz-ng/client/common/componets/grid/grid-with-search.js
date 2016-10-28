@@ -9,7 +9,7 @@ const bindings = {
     onInitialise: '<'
 };
 
-const template = require('./grid-search.html');
+const template = require('./grid-with-search.html');
 
 
 const initialState = {
