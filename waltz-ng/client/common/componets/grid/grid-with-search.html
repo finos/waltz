@@ -1,0 +1,20 @@
+<div>
+    <div class="row"
+         ng-if="$ctrl.entries.length > 10">
+        <div class="col-md-6">
+            <waltz-search-control min-characters="3"
+                                  delay="250"
+                                  on-query="$ctrl.filterEntries"
+                                  placeholder-text="{{ $ctrl.searchPlaceholderText }}">
+            </waltz-search-control>
+        </div>
+    </div>
+
+    <br>
+
+    <waltz-grid column-defs="$ctrl.columnDefs"
+                row-data="$ctrl.filteredEntries"
+                on-initialise="$ctrl.onGridInitialise"
+                class="small">
+    </waltz-grid>
+</div>

@@ -18,6 +18,10 @@ function controller($stateParams,
         name: $stateParams.name
     };
 
+    vm.changeLogTableInitialised = (api) => {
+        vm.exportChangeLog = api.export;
+    };
+
 
     vm.entityRef = entityRef;
     changeLogStore
