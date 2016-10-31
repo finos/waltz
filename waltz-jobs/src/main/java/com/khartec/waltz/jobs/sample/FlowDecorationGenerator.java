@@ -44,6 +44,9 @@ public class FlowDecorationGenerator {
                 });
 
 
+        dsl.deleteFrom(DATA_FLOW_DECORATOR)
+                .where(DATA_FLOW_DECORATOR.PROVENANCE.eq("sample"))
+                .execute();
         System.out.println("--- saving: "+records.size());
         dsl.batchStore(records).execute();
         System.out.println("--- done");

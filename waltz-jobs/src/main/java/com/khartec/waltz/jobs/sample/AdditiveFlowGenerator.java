@@ -47,8 +47,8 @@ import static java.util.stream.Collectors.toSet;
 public class AdditiveFlowGenerator {
 
     private static final Random rnd = new Random();
-    private static final long APPLICATION_ID = 4209;
-    private static final int APPROX_FLOW_GENERATION_COUNT = 1500;
+    private static final long APPLICATION_ID = 67189;
+    private static final int APPROX_FLOW_GENERATION_COUNT = 800;
 
 
     public static void main(String[] args) {
