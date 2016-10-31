@@ -8,10 +8,18 @@ const viewState = {
 };
 
 
+
+const registrationState = {
+    url: 'physical-flow/registration/{kind:string}/{id:int}',
+    views: {'content@': require('./physical-flow-registration') },
+};
+
+
 function setup($stateProvider) {
 
     $stateProvider
         .state('main.physical-flow', baseState)
+        .state('main.physical-flow.registration', registrationState)
         .state('main.physical-flow.view', viewState);
 }
 

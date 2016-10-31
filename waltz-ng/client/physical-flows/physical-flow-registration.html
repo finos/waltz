@@ -1,0 +1,129 @@
+<div>
+    <!-- HEADER -->
+    <waltz-page-header name="Register new Physical Flow"
+                       small="From: {{ ctrl.sourceApp.name }}"
+                       icon="qrcode">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>
+                <waltz-entity-link entity-ref="ctrl.sourceApp | merge:{kind: 'APPLICATION'}"></waltz-entity-link>
+            </li>
+            <li>Register Physical Flow</li>
+        </ol>
+    </waltz-page-header>
+
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+
+        <div>
+            <waltz-physical-flow-edit-overview source-entity="ctrl.sourceEntity"
+                                               specification="__var__"
+                                               target-entity="__var__"
+                                               flow-attributes="{ basis: '', transport: '', frequency: '' }"
+                                               on-specification-focus="ctrl.focusSpecification()"
+                                               on-flow-attributes-focus="ctrl.focusFlowAttributes()"
+                                               on-target-focus="ctrl.focusTarget()">
+            </waltz-physical-flow-edit-overview>
+        </div>
+
+        <hr>
+
+        <div ng-if="ctrl.visibility.specificationFocused">
+            <waltz-physical-flow-edit-specification owning-entity="ctrl.sourceEntity"
+                                                    candidates="ctrl.candidateSpecifications"
+                                                    current="{}"
+                                                    on-dismiss="ctrl.visibility.specificationFocused = false"
+                                                    on-change="ctrl.changeSpecification">
+                <!--
+                Picker or add new, on-change cannot give a null spec, but can give a spec with
+                a null id (indicating new)
+                -->
+            </waltz-physical-flow-edit-specification>
+        </div>
+
+
+        <div ng-if="ctrl.visibility.flowAttributesFocused">
+            <waltz-physical-flow-edit-attributes current="{}"
+                                                 on-dismiss="ctrl.visibility.flowAttributesFocused = false"
+                                                 on-change="ctrl.changeFlowAttributes">
+                <!--
+                Attributes initially set to object with null fields.  Cannot 'save' until all three
+                are set, therefore on-change always gives non-null object containing the attributes
+                -->
+            </waltz-physical-flow-edit-attributes>
+        </div>
+
+
+        <div ng-if="ctrl.visibility.targetFocused">
+            <waltz-physical-flow-edit-target-entity current="{}"
+                                                    owning-entity="{}"
+                                                    on-dismiss="ctrl.visibility.targetFocused = false"
+                                                    on-change="ctrl.changeTarget">
+                <!--
+                Application or Actor picker, owning entity is required to prevent 'self-loops' and also
+                to prevent Actor to Actor flows.  As before on-change will not give nulls
+                -->
+            </waltz-physical-flow-edit-target-entity>
+        </div>
+
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Step 1</h3>
+                <div class="small text-muted">
+                    Choose an existing specification or add a new specification
+                </div>
+
+                <h4>Existing Specification</h4>
+                <ul>
+                    <li ng-repeat="spec in ctrl.candidateSpecifications.produces">
+                        <span ng-bind="spec.name" ng-click="ctrl.registration.specification = spec"></span>
+                    </li>
+                </ul>
+
+                <h4>Not listed ? </h4>
+                <a>Add new</a>
+
+                <h3>Step 2</h3>
+                Choose destination application/actor
+
+                <h3>Step 3</h3>
+                Set frequency/transport/basis
+            </div>
+        </div>
+
+
+        <hr>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Preview:</h4>
+                <waltz-physical-flow-overview specification="ctrl.registration.specification"
+                                              physical-flow="ctrl.registration.physicalFlow">
+
+                </waltz-physical-flow-overview>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <h4>CandidateSpecs</h4>
+            <pre ng-bind="ctrl.candidateSpecifications | json"></pre>
+        </div>
+        <div class="col-md-3">
+            <h4></h4>
+            <pre ng-bind="ctrl.xxx"></pre>
+        </div>
+        <div class="col-md-3">
+            <h4></h4>
+            <pre ng-bind="ctrl.xxx"></pre>
+        </div>
+        <div class="col-md-3">
+            <h4></h4>
+            <pre ng-bind="ctrl.xxx"></pre>
+        </div>
+    </div>
+
+</div>
