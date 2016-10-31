@@ -12,9 +12,15 @@
             </button>
         </waltz-section-actions>
 
-        <waltz-change-log-table entries="ctrl.entries"
-                                on-initialise="ctrl.changeLogTableInitialised">
-        </waltz-change-log-table>
+        <div ng-if="ctrl.entries.length > 0">
+            <waltz-change-log-table entries="ctrl.entries"
+                                    on-initialise="ctrl.changeLogTableInitialised">
+            </waltz-change-log-table>
+        </div>
+
+        <div ng-if="ctrl.entries.length == 0">
+            <i class="text-muted"> No changes yet </i>
+        </div>
     </waltz-section>
 
 </div>
