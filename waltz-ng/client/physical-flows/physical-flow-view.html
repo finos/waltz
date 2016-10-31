@@ -42,12 +42,19 @@
                     </span>
                 </a>
             </div>
+
+            <button type="button"
+                    ng-disabled="ctrl.lineage.length == 0 "
+                    ng-click="ctrl.exportLineage()"
+                    class="btn btn-xs btn-primary">
+                Export
+            </button>
         </div>
         <div ng-if="ctrl.lineage.length > 0">
             <div class="row" >
                 <div class="col-sm-12">
-                    <waltz-physical-flow-lineage-panel lineage="ctrl.lineage">
-
+                    <waltz-physical-flow-lineage-panel lineage="ctrl.lineage"
+                                                       on-initialise="ctrl.onLineagePanelInitialise">
                     </waltz-physical-flow-lineage-panel>
 
                     <hr>
@@ -76,10 +83,20 @@
     <waltz-section name="Mentions"
                    small="as a contributor to other flows"
                    id="mentions-section">
+
+        <div class="waltz-section-actions">
+            <button type="button"
+                    ng-disabled="ctrl.mentions.length == 0 "
+                    ng-click="ctrl.exportMentions()"
+                    class="btn btn-xs btn-primary">
+                Export
+            </button>
+        </div>
         <div class="row">
             <div class="col-sm-12">
                 <div ng-if="ctrl.mentions.length > 0">
-                    <waltz-physical-specification-mentions mentions="ctrl.mentions">
+                    <waltz-physical-specification-mentions mentions="ctrl.mentions"
+                                                           on-initialise="ctrl.onMentionsPanelInitialise">
                     </waltz-physical-specification-mentions>
                 </div>
                 <div class="alert alert-warning"

@@ -1,14 +1,14 @@
-import _ from 'lodash';
-
-import {initialiseData} from '../common';
-import {green, grey, blue, actor} from '../common/colors';
+import _ from "lodash";
+import {initialiseData} from "../common";
+import {green, grey, blue, actor} from "../common/colors";
 
 
 const template = require('./physical-flow-view.html');
 
 
 const initialState = {
-
+    lineageExportFn: () => {},
+    mentionsExportFn: () => {}
 };
 
 function determineFillColor(d, owningEntity, targetEntity) {
@@ -164,6 +164,23 @@ function controller($q,
     physicalFlowLineageStore
         .findContributionsByPhysicalFlowId(flowId)
         .then(mentions => vm.mentions = mentions);
+
+
+    vm.onLineagePanelInitialise = (e) => {
+        vm.lineageExportFn = e.exportFn;
+    };
+
+    vm.exportLineage = () => {
+        vm.lineageExportFn();
+    };
+
+    vm.onMentionsPanelInitialise = (e) => {
+        vm.mentionsExportFn = e.exportFn;
+    };
+
+    vm.exportMentions = () => {
+        vm.mentionsExportFn();
+    };
 
 }
 
