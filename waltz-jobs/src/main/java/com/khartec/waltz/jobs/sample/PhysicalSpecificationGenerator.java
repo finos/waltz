@@ -87,7 +87,7 @@ public class PhysicalSpecificationGenerator {
         List<PhysicalSpecificationRecord> records = appIds
                 .stream()
                 .flatMap(appId -> IntStream
-                        .range(0, rnd.nextInt(4))
+                        .range(0, rnd.nextInt(8))
                         .mapToObj(i -> tuple(appId, i)))
                 .map(t -> {
                     String name = mkName();

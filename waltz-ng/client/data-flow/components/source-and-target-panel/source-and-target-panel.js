@@ -206,35 +206,38 @@ function toIcon(count = 0) {
 function mkTweakers(tweakers = {},
                     entityRef = null,
                     physicalFlows = [],
-                    physicalSpecifications = []) {
+                    physicalSpecifications = { consumes: [], produces: []}) {
+
+    const allSpecs = _.concat(physicalSpecifications.produces, physicalSpecifications.consumes);
+    const specsById = _.keyBy(allSpecs, 'id');
+
+    const flows = _.map(physicalFlows, pf => {
+        return {
+            source: specsById[pf.specificationId].owningEntity,
+            target: pf.target
+        };
+    });
+
+    const flowsBySourceEntity = d3.nest()
+        .key(f => f.source.kind)
+        .key(f => f.source.id)
+        .map(flows);
+
+    const flowsByTargetEntity = d3.nest()
+        .key(f => f.target.kind)
+        .key(f => f.target.id)
+        .map(flows);
 
     const getSourceCount = (ref) => {
-        const potentialSpecs = _.chain(physicalSpecifications.consumes)
-            .filter({ owningEntity: { id: ref.id, kind: ref.kind }})
-            .map("id")
-            .value();
-
-        const count = _.chain(physicalFlows)
-            .filter(pf => _.includes(potentialSpecs, pf.specificationId))
-            .filter({ target : { kind: entityRef.kind, id: entityRef.id }})
-            .size()
-            .value();
-
-        return count;
+        const possibleFlows = _.get(flowsBySourceEntity, `${ref.kind}.${ref.id}`, []);
+        const actualFlows = _.filter(possibleFlows, f => f.target.id === entityRef.id && f.target.kind === entityRef.kind)
+        return actualFlows.length;
     };
 
     const getTargetCount = (ref) => {
-        const potentialSpecs = _.chain(physicalSpecifications.produces)
-            .map("id")
-            .value();
-
-        const count = _.chain(physicalFlows)
-            .filter(pf => _.includes(potentialSpecs, pf.specificationId))
-            .filter({ target : { kind: ref.kind, id: ref.id }})
-            .size()
-            .value();
-
-        return count;
+        const possibleFlows = _.get(flowsByTargetEntity, `${ref.kind}.${ref.id}`, []);
+        const actualFlows = _.filter(possibleFlows, f => f.source.id === entityRef.id && f.source.kind === entityRef.kind)
+        return actualFlows.length;
     };
 
     tweakers.source.icon = (appRef) => toIcon(getSourceCount(appRef));
