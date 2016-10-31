@@ -61,7 +61,7 @@ function controller() {
 
     vm.consumeColumnDefs = [
         Object.assign(mkEntityLinkGridCell('Source Application', 'sourceRef', 'none'), { width: "15%"} ),
-        Object.assign(mkLinkGridCell('Name', 'specification.name', 'specification.id', 'main.physical-specification.view'), { width: "20%"} ),
+        Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
         { field: 'specification.externalId', displayName: 'Ext. Id', width: "10%" },
         { field: 'specification.format', displayName: 'Format', width: "8%" },
         { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%" },
@@ -88,9 +88,9 @@ function controller() {
     function notifyChange() {
         // callback
         vm.onChange({
-            producesCount: vm.filteredProduces ? vm.filteredProduces.length : 0,
-            consumesCount: vm.filteredConsumes ? vm.filteredConsumes.length : 0,
-            unusedSpecificationsCount: vm.unusedSpecifications ? vm.unusedSpecifications.length : 0
+            producesCount: _.size(vm.filteredProduces),
+            consumesCount: _.size(vm.filteredConsumes),
+            unusedSpecificationsCount: _.size(vm.unusedSpecifications)
         });
     }
 
