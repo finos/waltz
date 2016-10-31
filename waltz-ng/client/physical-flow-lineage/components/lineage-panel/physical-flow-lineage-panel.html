@@ -1,32 +1,7 @@
 <div>
-    <table class="table table-condensed table-hover small">
-        <thead>
-        <tr>
-            <th style="width:20%">Specification</th>
-            <th style="width:15%">From</th>
-            <th style="width:15%">To</th>
-            <th style="width:10%">Format</th>
-            <th style="width:10%">Transport</th>
-            <th style="width:30%">Description</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr ng-repeat="flow in $ctrl.lineage | orderBy:['specification.owningEntity.name', 'flow.target.name', 'specification.name']">
-            <td>
-                <a ui-sref="main.physical-flow.view ({ id: flow.flow.id })"
-                   ng-bind="flow.specification.name">
-                </a>
-            </td>
-            <td>
-                <waltz-entity-link entity-ref="flow.sourceEntity"></waltz-entity-link>
-            </td>
-            <td>
-                <waltz-entity-link entity-ref="flow.targetEntity"></waltz-entity-link>
-            </td>
-            <td><span ng-bind="flow.specification.format"></span></td>
-            <td><span ng-bind="flow.flow.transport"></span></td>
-            <td><span ng-bind="flow.flow.description"></span></td>
-        </tr>
-        </tbody>
-    </table>
+    <waltz-grid column-defs="$ctrl.columnDefs"
+                row-data="$ctrl.lineage"
+                on-initialise="$ctrl.onGridInitialise"
+                class="small">
+    </waltz-grid>
 </div>

@@ -7,39 +7,10 @@
         </p>
         <br>
 
-        <table class="table table-condensed table-striped table-hover small">
-            <thead>
-            <tr>
-                <th>Specification Name</th>
-                <th>Description</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Transport</th>
-                <th>Frequency</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="mention in $ctrl.mentions">
-                <td>
-                    <a ui-sref="main.physical-flow.view ({id: mention.flow.id })"
-                       uib-popover="{{ mention.specification.description }}"
-                       popover-trigger="mouseenter"
-                       ng-bind="mention.specification.name"></a>
-                </td>
-                <td>
-                    <span ng-bind="mention.specification.format"></span>
-                </td>
-                <td>
-                    <waltz-entity-link entity-ref="mention.sourceEntity"></waltz-entity-link>
-                </td>
-                <td>
-                    <waltz-entity-link entity-ref="mention.targetEntity"></waltz-entity-link>
-                </td>
-                <td><span ng-bind="mention.flow.transport"></span></td>
-                <td><span ng-bind="mention.flow.frequency"></span></td>
-            </tr>
-            </tbody>
-        </table>
-
+        <waltz-grid column-defs="$ctrl.columnDefs"
+                    row-data="$ctrl.mentions"
+                    on-initialise="$ctrl.onGridInitialise"
+                    class="small">
+        </waltz-grid>
     </div>
 </div>
