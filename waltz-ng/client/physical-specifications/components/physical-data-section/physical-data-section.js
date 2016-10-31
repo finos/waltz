@@ -61,7 +61,7 @@ function controller() {
 
     vm.consumeColumnDefs = [
         Object.assign(mkEntityLinkGridCell('Source Application', 'sourceRef', 'none'), { width: "15%"} ),
-        Object.assign(mkLinkGridCell('Name', 'specification.name', 'specification.id', 'main.physical-specification.view'), { width: "20%"} ),
+        Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
         { field: 'specification.externalId', displayName: 'Ext. Id', width: "10%" },
         { field: 'specification.format', displayName: 'Format', width: "8%" },
         { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%" },
