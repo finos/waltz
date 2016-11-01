@@ -10,10 +10,13 @@
     </waltz-page-header>
 
     <waltz-section name="Waltz Grid">
+        <button ng-click="ctrl.showPicker = true">Show</button>
+
         <waltz-physical-flow-edit-target-entity current="ctrl.currentEntity"
                                                 owning-entity="ctrl.owningEntity"
                                                 on-dismiss="ctrl.dismiss"
-                                                on-change="ctrl.changeTarget">
+                                                on-change="ctrl.changeTarget"
+                                                ng-if="ctrl.showPicker">
         </waltz-physical-flow-edit-target-entity>
     </waltz-section>
 

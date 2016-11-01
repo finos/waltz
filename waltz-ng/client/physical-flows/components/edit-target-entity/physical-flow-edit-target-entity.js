@@ -28,6 +28,14 @@ function controller(actorStore) {
     const sameActor = (actor) => vm.owningEntity.kind === 'ACTOR' && actor.id === vm.owningEntity.id;
 
 
+    vm.$onChanges = (changes) => {
+        if(vm.current && vm.current.kind) {
+            console.log('kind: ', vm.current.kind);
+            vm.entityKind = vm.current.kind === 'ACTOR' ? vm.current.kind : 'APPLICATION';
+        }
+    }
+
+
     vm.addApp = (app) => {
         vm.appDuplicate = sameApp(app)
         if(!vm.appDuplicate) {

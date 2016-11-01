@@ -28,25 +28,34 @@ function controller($interval, lineageStore) {
         kind: 'ACTOR'
     };
 
+    // vm.currentEntity = {
+    //     assetCode:"wltz-01866",
+    //     businessCriticality:"UNKNOWN",
+    //     description:"Tiger 5243",
+    //     id:1489,
+    //     kind:"APPLICATION",
+    //     lifecyclePhase:"CONCEPTUAL",
+    //     name:"Bird - 1811",
+    //     organisationalUnitId:170,
+    //     overallRating:"G",
+    //     parentAssetCode:"",
+    //     provenance:"waltz"
+    // };
+
     vm.currentEntity = {
-        assetCode:"wltz-01866",
-        businessCriticality:"UNKNOWN",
-        description:"Tiger 5243",
-        id:1489,
-        kind:"APPLICATION",
-        lifecyclePhase:"CONCEPTUAL",
-        name:"Bird - 1811",
-        organisationalUnitId:170,
-        overallRating:"G",
-        parentAssetCode:"",
-        provenance:"waltz"
+        id: 4,
+        name: 'Developer',
+        kind: 'ACTOR'
     };
 
     vm.changeTarget = (target) => {
         console.log('change target: ', target);
+        vm.showPicker = false;
     };
 
-    vm.dismiss = () => console.log('dismiss');
+    vm.dismiss = () => vm.showPicker = false;
+
+    vm.showPicker = false;
 }
 
 
