@@ -10,7 +10,7 @@
  *
  */
 
-import {initialiseData} from "../../common";
+import {initialiseData, invokeFunction} from "../../common";
 
 
 const bindings = {
@@ -18,7 +18,8 @@ const bindings = {
     addLabel: '@',
     cancelLabel: '@',
     onCancel: '<',
-    onAdd: '<'
+    onAdd: '<',
+    onSelect: '<'
 };
 
 
@@ -28,8 +29,9 @@ const template = require('./basic-actor-selector.html');
 const initialState = {
     addLabel: 'Add',
     cancelLabel: 'Cancel',
-    onCancel: () => console.log('No onCancel provided to basic app selector'),
-    onAdd: (a) => console.log('No onAdd provided to basic app selector', a)
+    onCancel: () => console.log('No onCancel provided to basic actor selector'),
+    onAdd: (a) => console.log('No onAdd provided to basic actor selector', a),
+    onSelect: (a) => console.log('No onSelect provided to basic actor selector', a)
 };
 
 
@@ -45,8 +47,8 @@ function controller() {
 
     vm.select = (actor) => {
         vm.selectedActor = actor;
-    }
-
+        invokeFunction(vm.onSelect, actor);
+    };
 }
 
 

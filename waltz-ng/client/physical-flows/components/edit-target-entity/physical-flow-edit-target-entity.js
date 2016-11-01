@@ -22,12 +22,10 @@ function controller(actorStore) {
 
     actorStore
         .findAll()
-        .then((actors) => {
-            vm.allActors = _.filter(actors,
-                (a) => !(vm.owningEntity.kind === 'ACTOR' && a.id === vm.owningEntity.id));
-        });
+        .then((actors) => vm.allActors = actors );
 
     const sameApp = (app) => vm.owningEntity.kind !== 'ACTOR' && app.id === vm.owningEntity.id;
+    const sameActor = (actor) => vm.owningEntity.kind === 'ACTOR' && actor.id === vm.owningEntity.id;
 
 
     vm.addApp = (app) => {
@@ -47,11 +45,19 @@ function controller(actorStore) {
     };
 
     vm.addActor = (actor) => {
-        invokeFunction(vm.onChange, actor);
+        vm.actorDuplicate = sameActor(actor);
+        if(!vm.actorDuplicate) {
+            invokeFunction(vm.onChange, actor);
+        }
     };
 
     vm.cancelActor = () => {
+        vm.actorDuplicate = false;
         invokeFunction(vm.onDismiss);
+    };
+
+    vm.selectActor = (actor) => {
+        vm.actorDuplicate = sameActor(actor);
     };
 
 }

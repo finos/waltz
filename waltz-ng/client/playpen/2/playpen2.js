@@ -8,25 +8,25 @@ function controller($interval, lineageStore) {
 
     const vm = Object.assign(this, initData);
 
-    vm.owningEntity = {
-        assetCode:"wltz-01811",
-        businessCriticality:"UNKNOWN",
-        description:"All about Bird - 1811",
-        id:1812,
-        kind:"EUC",
-        lifecyclePhase:"CONCEPTUAL",
-        name:"Bird - 1811",
-        organisationalUnitId:170,
-        overallRating:"G",
-        parentAssetCode:"",
-        provenance:"waltz"
-    };
-
     // vm.owningEntity = {
-    //     id: 6,
-    //     name: 'Developer',
-    //     kind: 'ACTOR'
+    //     assetCode:"wltz-01811",
+    //     businessCriticality:"UNKNOWN",
+    //     description:"All about Bird - 1811",
+    //     id:1812,
+    //     kind:"EUC",
+    //     lifecyclePhase:"CONCEPTUAL",
+    //     name:"Bird - 1811",
+    //     organisationalUnitId:170,
+    //     overallRating:"G",
+    //     parentAssetCode:"",
+    //     provenance:"waltz"
     // };
+
+    vm.owningEntity = {
+        id: 6,
+        name: 'Developer',
+        kind: 'ACTOR'
+    };
 
     vm.currentEntity = {
         assetCode:"wltz-01866",

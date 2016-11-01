@@ -40,12 +40,16 @@
         </h4>
         <waltz-basic-actor-selector on-add="$ctrl.addActor"
                                     on-cancel="$ctrl.cancelActor"
-                                    all-actors="$ctrl.allActors">
+                                    all-actors="$ctrl.allActors"
+                                    on-select="$ctrl.selectActor">
 
         </waltz-basic-actor-selector>
         <div class="small text-muted waltz-paragraph">
             as a target for this physical flow
         </div>
+        <strong ng-if="$ctrl.actorDuplicate" style="color: red">
+            <mark><span ng-bind="$ctrl.owningEntity.name"></span></mark> is already a Source of this flow and cannot also be a Target
+        </strong>
     </div>
 
 </div>
