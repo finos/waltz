@@ -77,6 +77,8 @@ public class AppCapabilityDao {
                 .where(APP_CAPABILITY.APPLICATION_ID.in(
                         select(APP_CAPABILITY.APPLICATION_ID)
                         .from(APP_CAPABILITY)
+                        .innerJoin(APPLICATION)
+                            .on(APPLICATION.ID.eq(APP_CAPABILITY.APPLICATION_ID))
                         .where(APP_CAPABILITY.CAPABILITY_ID.eq(capabilityId))))
                 .and(APP_CAPABILITY.CAPABILITY_ID.ne(capabilityId))
                 .fetch(TO_DOMAIN_MAPPER);
