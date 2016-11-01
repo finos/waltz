@@ -1,0 +1,20 @@
+<div>
+    <ui-select ng-model="$ctrl.model.actor"
+               on-select="$ctrl.select($item)"
+               theme="bootstrap">
+
+        <ui-select-match placeholder="Search for an actor...">
+            {{$select.selected.name}}
+        </ui-select-match>
+
+        <ui-select-choices repeat="actor in $ctrl.actors"
+                           refresh="$ctrl.refresh($select.search)"
+                           refresh-delay="300">
+
+            <span ng-bind-html="actor.name | highlight: $select.search"></span>
+            <small style="display: block"
+                   ng-bind-html="actor.description | highlight: $select.search"></small>
+
+        </ui-select-choices>
+    </ui-select>
+</div>

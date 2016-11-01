@@ -9,7 +9,10 @@ function setup(module) {
             require('./components/overview/physical-flow-overview'))
         .component(
             'waltzPhysicalFlowTable',
-            require('./components/flow-table/flow-table'));
+            require('./components/flow-table/flow-table'))
+        .component(
+            'waltzPhysicalFlowEditTargetEntity',
+            require('./components/edit-target-entity/physical-flow-edit-target-entity'));
 }
 
 

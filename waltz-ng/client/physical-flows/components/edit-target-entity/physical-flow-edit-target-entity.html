@@ -1,0 +1,51 @@
+<div>
+    <h4>Please select a target entity for the flow</h4>
+
+    <label>
+        <input type="radio" value="APPLICATION" ng-model="$ctrl.entityKind">
+        Application
+    </label>
+    &nbsp;
+    <label>
+        <input type="radio" value="ACTOR" ng-model="$ctrl.entityKind">
+        Actor
+    </label>
+
+
+    <div ng-if="$ctrl.entityKind === 'APPLICATION'">
+        <h4>
+            <waltz-icon name="desktop">
+            </waltz-icon>
+            Pick an application
+        </h4>
+        <waltz-basic-app-selector on-add="$ctrl.addApp"
+                                  on-cancel="$ctrl.cancelApp"
+                                  on-select="$ctrl.selectApp">
+
+        </waltz-basic-app-selector>
+        <div class="small text-muted waltz-paragraph">
+            as a target for this physical flow
+        </div>
+        <strong ng-if="$ctrl.appDuplicate" style="color: red">
+            <mark><span ng-bind="$ctrl.owningEntity.name"></span></mark> is already a Source of this flow and cannot also be a Target
+        </strong>
+    </div>
+
+
+    <div ng-if="$ctrl.entityKind === 'ACTOR'">
+        <h4>
+            <waltz-icon name="user-circle">
+            </waltz-icon>
+            Pick an actor
+        </h4>
+        <waltz-basic-actor-selector on-add="$ctrl.addActor"
+                                    on-cancel="$ctrl.cancelActor"
+                                    all-actors="$ctrl.allActors">
+
+        </waltz-basic-actor-selector>
+        <div class="small text-muted waltz-paragraph">
+            as a target for this physical flow
+        </div>
+    </div>
+
+</div>

@@ -10,51 +10,49 @@
  *
  */
 
+import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../common";
 
 
-const BINDINGS = {
-    model: '=',
+const bindings = {
+    allActors: '<',
     onSelect: '<'
 };
 
 
+const template = require('./actor-selector.html');
+
+
 const initialState = {
-    apps: []
-}
-
-
-function controller(ApplicationStore) {
-    const vm = initialiseData(this, initialState);
-
-    vm.refresh = function(query) {
-        if (!query) return;
-        return ApplicationStore.search(query)
-            .then((apps) => {
-                vm.apps = apps;
-            });
-    };
-
-
-    vm.select = (item) => invokeFunction(vm.onSelect, item);
-
-}
-
-
-controller.$inject = ['ApplicationStore'];
-
-
-const directive = {
-    restrict: 'E',
-    replace: true,
-    template: require('./app-selector.html'),
-    scope: {},
-    bindToController: BINDINGS,
-    controller,
-    controllerAs: 'ctrl'
+    allActors: [],
+    actors: []
 };
 
 
-export default () => directive;
+function controller() {
+    const vm = initialiseData(this, initialState);
+
+    vm.refresh = function (query) {
+        if (!query) return;
+        vm.actors = _.filter(vm.allActors, (a) => _.startsWith(_.lowerCase(a.name), _.lowerCase(query)));
+    };
+
+    vm.select = (item) => {
+        invokeFunction(vm.onSelect, item);
+    };
+}
+
+
+controller.$inject = [];
+
+
+const component = {
+    bindings,
+    template,
+    controller
+};
+
+
+export default component;
 
 
