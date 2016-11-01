@@ -12,6 +12,6 @@
 
 
 export default (module) => {
-    module.directive('waltzInvolvedPeopleSection', require('./directives/involved-people-section'));
+    module.component('waltzInvolvedPeopleSection', require('./components/involved-people-section'));
     module.service('InvolvementStore', require('./services/involvement-store'));
 };
