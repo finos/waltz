@@ -1,0 +1,23 @@
+<div>
+    <form ng-submit="$ctrl.onSubmit()"
+          name="$ctrl.form"
+          novalidate>
+        <formly-form form="$ctrl.form"
+                     model="$ctrl.model"
+                     fields="$ctrl.fields">
+
+            <button type="submit"
+                    class="btn btn-success"
+                    style="margin-left: 12px"
+                    ng-disabled="$ctrl.form.$invalid">
+                Save
+            </button>
+            <a class="clickable"
+               ng-click="$ctrl.onCancel()">
+                <span>Cancel</span>
+            </a>
+
+        </formly-form>
+
+    </form>
+</div>
