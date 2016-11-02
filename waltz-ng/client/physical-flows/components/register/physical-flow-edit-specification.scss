@@ -1,0 +1,37 @@
+.waltz-physical-flow-edit-specification {
+
+    .wpfes-selected {
+        background-color: #c5ccde !important;
+        font-weight: bolder;
+    }
+
+
+    .wpfes-current {
+        background-color: #cfdff0 !important;
+        font-weight: bolder;
+    }
+
+    .wpfes-addNewForm-actions {
+        padding-top: 8px;
+    }
+
+    .wpfes-table {
+        font-size: smaller;
+
+        .wpfes-header {
+            font-weight: bolder;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 2px;
+        }
+
+        .wpfes-existing-row {
+            &:hover {
+                cursor: pointer;
+                background-color: #eee;
+            }
+
+            padding-bottom: 2px;
+        }
+    }
+}
+

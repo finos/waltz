@@ -1,0 +1,91 @@
+<div class="waltz-physical-flow-edit-specification">
+    <div ng-if="$ctrl.candidates.length > 0"
+         class="wpfes-table">
+
+        <!-- HEADER -->
+        <div class="row wpfes-header">
+            <div class="col-md-3">Name</div>
+            <div class="col-md-2">External Id</div>
+            <div class="col-md-2">Format</div>
+            <div class="col-md-5">Description</div>
+        </div>
+
+
+        <!-- EXISTING -->
+        <div class="row wpfes-existing-row"
+             ng-repeat="candidate in $ctrl.candidates | orderBy:'name'"
+             ng-class="{
+                'wpfes-current': candidate.id == $ctrl.current.id,
+                'wpfes-selected': candidate.id == $ctrl.selected.id
+             }"
+             ng-click="$ctrl.select(candidate)">
+            <div class="col-md-3"><span ng-bind="candidate.name"></span></div>
+            <div class="col-md-2"><span ng-bind="candidate.externalId"></span></div>
+            <div class="col-md-2"><span ng-bind="candidate.format"></span></div>
+            <div class="col-md-5"><span ng-bind="candidate.description"></span></div>
+        </div>
+
+
+        <!-- ADD BUTTON -->
+        <div class='row'
+             ng-if="$ctrl.visibility.showAddButton">
+            <div class="col-md-3">
+                <a ng-click='$ctrl.showAddNewForm()'
+                   class="">
+                    <waltz-icon name="plus"></waltz-icon>
+                    Add new
+                </a>
+            </div>
+        </div>
+
+
+        <!-- ADD FORM -->
+        <div ng-if="!$ctrl.visibility.showAddButton"
+             class="wpfes-addNewForm">
+
+            <div class="row">
+                <div class="col-md-3">
+                    <input type="text" ng-model="">
+                </div>
+                <div class="col-md-2"><input type="text" ng-model=""></div>
+                <div class="col-md-2"><input type="text" ng-model=""></div>
+                <div class="col-md-5"><input type="text" ng-model=""></div>
+            </div>
+
+            <div class="row wpfes-addNewForm-actions">
+                <div class="col-md-12">
+                    <a ng-click="$ctrl.addNew()"
+                       class="btn btn-xs btn-success">
+                        <waltz-icon name="check"></waltz-icon>
+                        Add
+                    </a>
+                    &nbsp;
+                    <a ng-click="$ctrl.cancelAddNew()">
+                        Cancel
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ADD FORM ACTIONS -->
+
+    </div>
+
+    <hr>
+
+    <div >
+        <button ng-click='$ctrl.change()'
+                ng-disabled="!$ctrl.visibility.showAddButton"
+                class="btn btn-sm btn-primary">
+            Select
+        </button>
+
+        <a class="clickable"
+
+           ng-click="$ctrl.cancel()">
+            Cancel
+        </a>
+    </div>
+
+</div>
