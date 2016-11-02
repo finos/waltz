@@ -148,7 +148,7 @@
 
                 <div ng-show="! (ctrl.viewData.authSources | isEmpty)">
                     <waltz-auth-sources-table org-unit-id="ctrl.viewData.orgUnit.id"
-                                              org-units="ctrl.viewData.orgUnits"
+                                              org-unit-refs="ctrl.viewData.immediateHierarchy"
                                               auth-sources="ctrl.viewData.authSources">
                     </waltz-auth-sources-table>
                 </div>

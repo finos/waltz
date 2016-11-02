@@ -279,11 +279,12 @@
             it deals with.
         </p>
 
-        <div ng-repeat="(dataType, data) in ctrl.authSources">
-            <h4 ng-span="dataType | toDisplayName:'dataType'">
+        <div ng-repeat="(dataType, data) in ctrl.authSources"
+             style="padding-top: 5px;">
+            <h4 ng-bind="dataType | toDisplayName:'dataType'">
             </h4>
             <p class="text-muted"
-               ng-span="dataType | toDescription:'dataType'">
+               ng-bind="dataType | toDescription:'dataType'">
             </p>
 
             <table class="table table-condensed">

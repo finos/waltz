@@ -10,15 +10,33 @@
  *
  */
 import _ from "lodash";
+import {initialiseData} from "../../common";
+
+
+const bindings = {
+    authSources: '<',
+    orgUnitId: '<',
+    orgUnitRefs: '<'
+};
+
+
+const initialState = {
+    authSources: [],
+    orgUnitRefs: []
+};
+
+
+const template = require('./auth-sources-table.html');
+
 
 function controller() {
 
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     vm.lookupOrgUnitName = (id) => {
-        if (this.orgUnits) {
-            const unit = _.keyBy(this.orgUnits, 'id')[id];
-            return unit ? unit.name : '-';
+        if (!_.isEmpty(vm.orgUnitRefs)) {
+            const unit = _.keyBy(vm.orgUnitRefs, o => o.entityReference.id)[id];
+            return unit ? unit.entityReference.name : '-';
         } else {
             return '-';
         }
@@ -26,18 +44,15 @@ function controller() {
 
 }
 
-export default [
-    () => ({
-        restrict: 'E',
-        replace: true,
-        template: require('./auth-sources-table.html'),
-        scope: {},
-        controller,
-        controllerAs: 'ctrl',
-        bindToController: {
-            authSources: '=',
-            orgUnitId: '=',
-            orgUnits: '='
-        }
-    })
-];
+
+controller.$inject = [];
+
+
+const component = {
+    bindings,
+    controller,
+    template
+};
+
+
+export default component;

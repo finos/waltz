@@ -11,6 +11,5 @@
  */
 
 export default (module) => {
-    module.directive('waltzAuthSourcesTable', require('./auth-sources-table'));
     module.directive('waltzRatingIndicator', require('./rating-indicator'));
 };

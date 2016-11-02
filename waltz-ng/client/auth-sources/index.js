@@ -32,7 +32,8 @@ export default (module) => {
 
     module
         .component('waltzAuthSourcesList', require('./components/auth-sources-list'))
-        .component('waltzNonAuthSourcesList', require('./components/non-auth-sources-list'));
+        .component('waltzNonAuthSourcesList', require('./components/non-auth-sources-list'))
+        .component('waltzAuthSourcesTable', require('./components/auth-sources-table'));
 
     module.config([
         '$stateProvider',
