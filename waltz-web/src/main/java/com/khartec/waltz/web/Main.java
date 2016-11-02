@@ -39,8 +39,15 @@ public class Main {
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
+    private static AnnotationConfigApplicationContext ctx;
+
     public static void main(String[] args) {
         new Main().go();
+    }
+
+
+    public static AnnotationConfigApplicationContext getSpringContext() {
+        return ctx;
     }
 
 
@@ -81,7 +88,7 @@ public class Main {
         // configure logging
         LoggingUtilities.configureLogging();
 
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         Map<String, Endpoint> endpoints = ctx.getBeansOfType(Endpoint.class);
         endpoints.forEach((name, endpoint) -> {

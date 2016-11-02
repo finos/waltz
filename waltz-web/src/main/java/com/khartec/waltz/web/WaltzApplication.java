@@ -17,6 +17,8 @@
 
 package com.khartec.waltz.web;
 
+import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import spark.servlet.SparkApplication;
 
 public class WaltzApplication implements SparkApplication {
@@ -24,6 +26,19 @@ public class WaltzApplication implements SparkApplication {
     @Override
     public void init() {
         new Main().start(ServerMode.DEPLOY);
+    }
+
+
+    @Override
+    public void destroy() {
+        AnnotationConfigApplicationContext ctx = Main.getSpringContext();
+        if (ctx != null) {
+            HikariDataSource dataSource = ctx.getBean(HikariDataSource.class);
+            if (dataSource != null) {
+                dataSource.close();
+            }
+            ctx.close();
+        }
     }
 
 }
