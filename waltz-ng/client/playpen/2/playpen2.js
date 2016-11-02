@@ -44,7 +44,7 @@ function controller($interval, lineageStore) {
 
     vm.currentEntity = {
         id: 4,
-        name: 'Developer',
+        name: 'Soft',
         kind: 'ACTOR'
     };
 

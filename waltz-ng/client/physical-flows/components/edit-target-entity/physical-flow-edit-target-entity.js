@@ -24,20 +24,19 @@ function controller(actorStore) {
         .findAll()
         .then((actors) => vm.allActors = actors );
 
-    const sameApp = (app) => vm.owningEntity.kind !== 'ACTOR' && app.id === vm.owningEntity.id;
-    const sameActor = (actor) => vm.owningEntity.kind === 'ACTOR' && actor.id === vm.owningEntity.id;
+    const sameApp = (app, owningEntity) => owningEntity.kind !== 'ACTOR' && app.id === owningEntity.id;
+    const sameActor = (actor, owningEntity) => owningEntity.kind === 'ACTOR' && actor.id === owningEntity.id;
 
 
     vm.$onChanges = (changes) => {
         if(vm.current && vm.current.kind) {
-            console.log('kind: ', vm.current.kind);
             vm.entityKind = vm.current.kind === 'ACTOR' ? vm.current.kind : 'APPLICATION';
         }
     }
 
 
     vm.addApp = (app) => {
-        vm.appDuplicate = sameApp(app)
+        vm.appDuplicate = sameApp(app, vm.owningEntity)
         if(!vm.appDuplicate) {
             invokeFunction(vm.onChange, app);
         }
@@ -49,11 +48,11 @@ function controller(actorStore) {
     };
 
     vm.selectApp = (app) => {
-        vm.appDuplicate = sameApp(app);
+        vm.appDuplicate = sameApp(app, vm.owningEntity);
     };
 
     vm.addActor = (actor) => {
-        vm.actorDuplicate = sameActor(actor);
+        vm.actorDuplicate = sameActor(actor, vm.owningEntity);
         if(!vm.actorDuplicate) {
             invokeFunction(vm.onChange, actor);
         }
@@ -65,7 +64,7 @@ function controller(actorStore) {
     };
 
     vm.selectActor = (actor) => {
-        vm.actorDuplicate = sameActor(actor);
+        vm.actorDuplicate = sameActor(actor, vm.owningEntity);
     };
 
 }

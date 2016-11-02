@@ -34,11 +34,12 @@ function controller() {
 
     vm.refresh = function (query) {
         if (!query) return;
-        vm.actors = _.filter(vm.allActors, (a) => _.startsWith(_.lowerCase(a.name), _.lowerCase(query)));
+        const queryLc = _.lowerCase(query);
+        vm.actors = _.filter(vm.allActors, (a) => _.startsWith(_.lowerCase(a.name), queryLc));
     };
 
     vm.select = (item) => {
-        invokeFunction(vm.onSelect, item);
+        invokeFunction(vm.onSelect, Object.assign(item, {kind: 'ACTOR'}));
     };
 }
 
