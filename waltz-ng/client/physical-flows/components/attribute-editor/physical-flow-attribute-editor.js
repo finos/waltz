@@ -71,16 +71,15 @@ function controller(waltzDisplayNameService) {
 
     vm.$onChanges = (changes) => {
         if(vm.current) {
-            // _.defaults(vm.model, vm.current);
-            vm.model = {};
-            vm.model.transport = vm.current.transport;
-            vm.model.frequency = vm.current.frequency;
-            if(_.includes(basisOffsetOptions, vm.current.basisOffset)) {
-                vm.model.basisOffsetSelect = vm.current.basisOffset;
-            } else {
-                vm.model.basisOffsetSelect = 'OTHER';
-                vm.model.basisOffsetInput = vm.current.basisOffset;
-            }
+            const isOtherBasisOffset = !_.includes(basisOffsetOptions, vm.current.basisOffset);
+
+            vm.model = {
+                transport: vm.current.transport,
+                frequency: vm.current.frequency,
+                basisOffsetSelect: isOtherBasisOffset ? 'OTHER' : vm.current.basisOffset,
+                basisOffsetInput: isOtherBasisOffset ? vm.current.basisOffset : undefined
+            };
+
         }
     };
 

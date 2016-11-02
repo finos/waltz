@@ -9,18 +9,19 @@ function controller($interval, lineageStore) {
     const vm = Object.assign(this, initData);
 
     vm.currentAttributes = {
-        basisOffset: "-25",
+        basisOffset: "-11",
         frequency: "ON_DEMAND",
         transport: "OTHER",
     };
 
     vm.attributesChanged = (attributes) => {
         vm.currentAttributes = attributes;
+        vm.editorVisible = false;
     };
 
     vm.editorDismissed = () =>
     {
-        vm.editorVisible = false
+        vm.editorVisible = false;
     };
 }
 
