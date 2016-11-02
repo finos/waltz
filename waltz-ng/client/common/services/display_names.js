@@ -149,3 +149,28 @@ export const endOfLifeStatusNames = {
     'END_OF_LIFE': 'End of Life',
     'NOT_END_OF_LIFE': 'Compliant'
 };
+
+
+export const transportKindNames  = {
+    WEB: "Web",
+    DATABASE_CONNECTION: "Database Connection",
+    MESSAGING: "Messaging",
+    RPC: "Remote Procedure Call",
+    FILE_TRANSPORT: "File Transport",
+    FILE_SHARE: "File Share",
+    EMAIL: "Email",
+    OTHER: "Other"
+};
+
+
+export const frequencyKindNames  = {
+    ON_DEMAND: "On Demand",
+    REAL_TIME: "Real Time",
+    INTRA_DAY: "Intra-day",
+    DAILY: "Daily",
+    WEEKLY: "Weekly",
+    MONTHLY: "Monthly",
+    QUARTERLY: "Quarterly",
+    BIANUALLY: "Biannually",
+    YEARLY: "Yearly"
+};

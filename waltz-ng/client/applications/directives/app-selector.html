@@ -1,5 +1,6 @@
 <div>
     <ui-select ng-model="ctrl.model.app"
+               on-select="ctrl.select($item)"
                theme="bootstrap">
 
         <ui-select-match placeholder="Search for app...">

@@ -9,10 +9,12 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from "lodash";
-import {invokeFunction} from "../../common";
 
-const BINDINGS = {
+import {initialiseData, invokeFunction} from "../../common";
+
+
+const bindings = {
+    allActors: '<',
     addLabel: '@',
     cancelLabel: '@',
     onCancel: '<',
@@ -21,43 +23,45 @@ const BINDINGS = {
 };
 
 
+const template = require('./basic-actor-selector.html');
+
+
 const initialState = {
     addLabel: 'Add',
     cancelLabel: 'Cancel',
-    onCancel: () => console.log('No onCancel provided to basic app selector'),
-    onAdd: (a) => console.log('No onAdd provided to basic app selector', a),
-    onSelect: (a) => console.log('No onSelect provided to basic app selector', a)
+    onCancel: () => console.log('No onCancel provided to basic actor selector'),
+    onAdd: (a) => console.log('No onAdd provided to basic actor selector', a),
+    onSelect: (a) => console.log('No onSelect provided to basic actor selector', a)
 };
 
 
 function controller() {
-    const vm = _.defaultsDeep(this, initialState);
+    const vm = initialiseData(this, initialState);
 
-    vm.add = (app) => {
-        if (! app) return ;
-        vm.onAdd(app);
+    vm.add = (actor) => {
+        if (! actor) return ;
+        vm.onAdd(actor);
     };
 
     vm.cancel = () => vm.onCancel();
 
-    vm.select = (app) => invokeFunction(vm.onSelect, app);
+    vm.select = (actor) => {
+        vm.selectedActor = actor;
+        invokeFunction(vm.onSelect, actor);
+    };
 }
 
 
 controller.$inject = [];
 
 
-const directive = {
-    restrict: 'E',
-    replace: false,
-    template: require('./basic-app-selector.html'),
-    scope: {},
-    bindToController: BINDINGS,
-    controller,
-    controllerAs: 'ctrl'
+const component = {
+    bindings,
+    template,
+    controller
 };
 
 
-export default () => directive;
+export default component;
 
 

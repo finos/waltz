@@ -6,7 +6,8 @@ const bindings = {
     entries: '<',
     searchPlaceholderText: '@',
     exportFilename: '@',
-    onInitialise: '<'
+    onInitialise: '<',
+    onChange: '<'
 };
 
 const template = require('./grid-with-search.html');
@@ -19,7 +20,8 @@ const initialState = {
     searchFields: [],
     searchPlaceholderText: 'Search...',
     exportFilename: 'export.csv',
-    onInitialise: (gridApi) => console.log('Default onOnitialise handler for grid-search: ', gridApi)
+    onInitialise: (gridApi) => console.log('Default onOnitialise handler for grid-search: ', gridApi),
+    onChange: (gridApi) => {}
 };
 
 
@@ -34,11 +36,13 @@ function controller() {
     vm.$onChanges = (changes) => {
         vm.filteredEntries = vm.entries;
         vm.searchFields = mkSearchFields(vm.columnDefs);
+        invokeFunction(vm.onChange, { entriesCount: _.size(vm.filteredEntries) });
     };
 
 
     vm.filterEntries = query => {
         vm.filteredEntries = termSearch(vm.entries, query, vm.searchFields);
+        invokeFunction(vm.onChange, { entriesCount: _.size(vm.filteredEntries) });
     };
 
 
