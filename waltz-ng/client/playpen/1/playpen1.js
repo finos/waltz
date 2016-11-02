@@ -12,7 +12,7 @@ function controller($q,
                     physicalSpecificationStore) {
     const vm = Object.assign(this, initData);
 
-    const appId = 66779;
+    const appId = 86;
     const sourceEntity = {
         kind: 'APPLICATION',
         id: appId

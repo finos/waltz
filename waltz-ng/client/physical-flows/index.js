@@ -8,6 +8,9 @@ function setup(module) {
             'waltzPhysicalFlowOverview',
             require('./components/overview/physical-flow-overview'))
         .component(
+            'waltzPhysicalFlowEditOverview',
+            require('./components/overview/physical-flow-edit-overview'))
+        .component(
             "waltzPhysicalFlowEditSpecification",
             require('./components/register/physical-flow-edit-specification'))
         .component(

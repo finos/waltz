@@ -30,7 +30,8 @@ import {
     severityNames,
     usageKindDisplayNames,
     transportKindNames,
-    frequencyKindNames
+    frequencyKindNames,
+    dataFormatKindNames
 } from "./display_names";
 import {
     bookmarkIconNames,
@@ -71,6 +72,7 @@ export default (module) => {
     displayNameService.register('usageKind', usageKindDisplayNames);
     displayNameService.register('transportKind', transportKindNames);
     displayNameService.register('frequencyKind', frequencyKindNames);
+    displayNameService.register('dataFormatKind', dataFormatKindNames);
 
     iconNameService.register('bookmark', bookmarkIconNames);
     iconNameService.register('BOOLEAN', booleanTypeIconNames);

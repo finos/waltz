@@ -1,0 +1,15 @@
+.waltz-physical-flow-attribute-editor {
+    @extend .small;
+
+    .form-group {
+        margin-bottom: 0;
+    }
+
+    select {
+        @extend .input-sm;
+    }
+
+    input {
+        @extend .input-sm;
+    }
+}

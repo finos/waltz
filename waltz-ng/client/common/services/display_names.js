@@ -174,3 +174,14 @@ export const frequencyKindNames  = {
     BIANUALLY: "Biannually",
     YEARLY: "Yearly"
 };
+
+
+export const dataFormatKindNames  = {
+    BINARY: "Binary",
+    FLAT_FILE: "Flat File",
+    JSON: "Json",
+    UNSTRUCTURED: "Unstructured",
+    DATABASE: "Database",
+    XML: "Xml",
+    OTHER: "Other"
+};
