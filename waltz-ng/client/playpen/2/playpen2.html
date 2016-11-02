@@ -10,25 +10,14 @@
     </waltz-page-header>
 
     <waltz-section name="Waltz Grid">
-        <waltz-section-actions>
-            <button ng-click="ctrl.exportWaltzGrid()"
-                    class="btn btn-xs btn-primary">
-                Export
-            </button>
-        </waltz-section-actions>
+        <button ng-click="ctrl.showPicker = true">Show</button>
 
-        <waltz-search-control min-characters="3"
-                              delay="250"
-                              on-query="ctrl.filterData"
-                              placeholder-text="Filter waltz grid data...">
-        </waltz-search-control>
-
-        <br>
-
-        <waltz-grid column-defs="ctrl.columnDefs"
-                    row-data="ctrl.filteredGridData"
-                    on-initialise="ctrl.onGridInitialise"
-                    class="small">
-        </waltz-grid>
+        <waltz-physical-flow-edit-target-entity current="ctrl.currentEntity"
+                                                owning-entity="ctrl.owningEntity"
+                                                on-dismiss="ctrl.dismiss"
+                                                on-change="ctrl.changeTarget"
+                                                ng-if="ctrl.showPicker">
+        </waltz-physical-flow-edit-target-entity>
     </waltz-section>
+
 </div>

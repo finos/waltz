@@ -1,0 +1,19 @@
+<div class="row">
+    <div class="col-md-8">
+        <waltz-actor-selector all-actors="$ctrl.allActors"
+                              on-select="$ctrl.select">
+        </waltz-actor-selector>
+    </div>
+    <div class="col-md-4">
+        <button ng-click='$ctrl.add($ctrl.selectedActor)'
+                ng-disabled="$ctrl.selectedActor == null"
+                class="btn btn-sm btn-primary">
+            <waltz-icon name="plus"></waltz-icon>
+            <span ng-bind="$ctrl.addLabel"></span>
+        </button>
+        <a class="clickable"
+           ng-click="$ctrl.cancel()">
+            <span ng-bind="$ctrl.cancelLabel"></span>
+        </a>
+    </div>
+</div>
