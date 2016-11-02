@@ -28,7 +28,9 @@ import {
     orgUnitKindNames,
     rollupKindNames,
     severityNames,
-    usageKindDisplayNames
+    usageKindDisplayNames,
+    transportKindNames,
+    frequencyKindNames
 } from "./display_names";
 import {
     bookmarkIconNames,
@@ -67,6 +69,8 @@ export default (module) => {
     displayNameService.register('rollupKind', rollupKindNames);
     displayNameService.register('severity', severityNames);
     displayNameService.register('usageKind', usageKindDisplayNames);
+    displayNameService.register('transportKind', transportKindNames);
+    displayNameService.register('frequencyKind', frequencyKindNames);
 
     iconNameService.register('bookmark', bookmarkIconNames);
     iconNameService.register('BOOLEAN', booleanTypeIconNames);
