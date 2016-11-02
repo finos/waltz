@@ -17,16 +17,22 @@ const initialState = {
 };
 
 
+function sameApp(app, owningEntity) {
+    return owningEntity.kind !== 'ACTOR' && app.id === owningEntity.id;
+}
+
+
+function sameActor(actor, owningEntity) {
+    return owningEntity.kind === 'ACTOR' && actor.id === owningEntity.id;
+}
+
+
 function controller(actorStore) {
     const vm = initialiseData(this, initialState);
 
     actorStore
         .findAll()
         .then((actors) => vm.allActors = actors );
-
-    const sameApp = (app, owningEntity) => owningEntity.kind !== 'ACTOR' && app.id === owningEntity.id;
-    const sameActor = (actor, owningEntity) => owningEntity.kind === 'ACTOR' && actor.id === owningEntity.id;
-
 
     vm.$onChanges = (changes) => {
         if(vm.current && vm.current.kind) {
