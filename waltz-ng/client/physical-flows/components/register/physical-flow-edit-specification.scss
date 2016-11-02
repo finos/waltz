@@ -6,14 +6,27 @@
     }
 
 
+    .wpfes-error {
+        font-size: smaller;
+        color: #d60000;
+    }
+
+
     .wpfes-current {
         background-color: #cfdff0 !important;
         font-weight: bolder;
     }
 
+
+    .wpfes-addNewForm {
+        padding-top: 2px;
+    }
+
+
     .wpfes-addNewForm-actions {
         padding-top: 8px;
     }
+
 
     .wpfes-table {
         font-size: smaller;
@@ -34,4 +47,3 @@
         }
     }
 }
-

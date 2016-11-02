@@ -31,7 +31,7 @@
              ng-if="$ctrl.visibility.showAddButton">
             <div class="col-md-3">
                 <a ng-click='$ctrl.showAddNewForm()'
-                   class="">
+                   class="clickable">
                     <waltz-icon name="plus"></waltz-icon>
                     Add new
                 </a>
@@ -43,38 +43,54 @@
         <div ng-if="!$ctrl.visibility.showAddButton"
              class="wpfes-addNewForm">
 
+            <!-- ADD FORM FIELDS -->
+
             <div class="row">
+
                 <div class="col-md-3">
-                    <input type="text" ng-model="">
+                    <input type="text"
+                           ng-model="$ctrl.form.name"
+                           ng-change="$ctrl.validateForm()"
+                           required="required"
+                           placeholder="Name"
+                           class="form-control input-sm">
                 </div>
-                <div class="col-md-2"><input type="text" ng-model=""></div>
-                <div class="col-md-2"><input type="text" ng-model=""></div>
-                <div class="col-md-5"><input type="text" ng-model=""></div>
+                <div class="col-md-2">
+                    <input type="text"
+                           name="externalId"
+                           ng-model="$ctrl.form.externalId"
+                           placeholder="External Id"
+                           class="form-control input-sm">
+                </div>
+                <div class="col-md-2">
+                    <select ng-model="$ctrl.form.format"
+                            ng-change="$ctrl.validateForm()"
+                            name="format">
+                        <option value="BINARY">Binary</option>
+                        <option value="DATABASE">Database</option>
+                        <option value="FLAT_FILE">Flat File</option>
+                        <option value="JSON">JSON</option>
+                        <option value="UNSTRUCTURED">Unstructured</option>
+                        <option value="XML">XML</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <textarea rows="4"
+                              name="description"
+                              ng-model="$ctrl.form.description"
+                              placeholder="Description"
+                              class="form-control input-sm">
+                    </textarea>
+                </div>
             </div>
 
-            <div class="row wpfes-addNewForm-actions">
-                <div class="col-md-12">
-                    <a ng-click="$ctrl.addNew()"
-                       class="btn btn-xs btn-success">
-                        <waltz-icon name="check"></waltz-icon>
-                        Add
-                    </a>
-                    &nbsp;
-                    <a ng-click="$ctrl.cancelAddNew()">
-                        Cancel
-                    </a>
-                </div>
-            </div>
         </div>
-
-
-        <!-- ADD FORM ACTIONS -->
 
     </div>
 
     <hr>
 
-    <div >
+    <div ng-if="$ctrl.visibility.showAddButton">
         <button ng-click='$ctrl.change()'
                 ng-disabled="!$ctrl.visibility.showAddButton"
                 class="btn btn-sm btn-primary">
@@ -86,6 +102,26 @@
            ng-click="$ctrl.cancel()">
             Cancel
         </a>
+    </div>
+
+    <div ng-if="!$ctrl.visibility.showAddButton">
+        <button type="submit"
+                class="btn btn-sm btn-success"
+                ng-click="$ctrl.doAddNew()"
+                ng-disabled="! $ctrl.validation.canSubmit">
+            <waltz-icon name="check"></waltz-icon>
+            Add and select
+        </button>
+        &nbsp;
+        <a class='clickable'
+           ng-click="$ctrl.cancelAddNew()">
+            Cancel
+        </a>
+
+        <div ng-if="$ctrl.validation.message"
+             class="wpfes-error"
+             ng-bind="$ctrl.validation.message">
+        </div>
     </div>
 
 </div>
