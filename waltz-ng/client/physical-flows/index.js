@@ -12,7 +12,10 @@ function setup(module) {
             require('./components/flow-table/flow-table'))
         .component(
             'waltzPhysicalFlowEditTargetEntity',
-            require('./components/edit-target-entity/physical-flow-edit-target-entity'));
+            require('./components/edit-target-entity/physical-flow-edit-target-entity'))
+        .component(
+            'waltzPhysicalFlowAttributeEditor',
+            require('./components/attribute-editor/physical-flow-attribute-editor'));
 }
 
 

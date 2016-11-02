@@ -9,15 +9,18 @@
         </ol>
     </waltz-page-header>
 
-    <waltz-section name="Waltz Grid">
-        <button ng-click="ctrl.showPicker = true">Show</button>
+    <waltz-section>
+        <button ng-click="ctrl.editorVisible = true">
+            Show
+        </button>
 
-        <waltz-physical-flow-edit-target-entity current="ctrl.currentEntity"
-                                                owning-entity="ctrl.owningEntity"
-                                                on-dismiss="ctrl.dismiss"
-                                                on-change="ctrl.changeTarget"
-                                                ng-if="ctrl.showPicker">
-        </waltz-physical-flow-edit-target-entity>
+        <waltz-physical-flow-attribute-editor ng-if="ctrl.editorVisible == true"
+                                              current="ctrl.currentAttributes"
+                                              on-change="ctrl.attributesChanged"
+                                              on-dismiss="ctrl.editorDismissed">
+
+        </waltz-physical-flow-attribute-editor>
+
     </waltz-section>
 
 </div>
