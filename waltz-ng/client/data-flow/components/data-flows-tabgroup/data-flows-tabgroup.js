@@ -191,6 +191,7 @@ function controller($scope,
         if(index === 1) {
             vm.boingyEverShown = true;
         }
+        vm.currentTabIndex = index;
         vm.onTabChange(tabName, index);
     };
 }
