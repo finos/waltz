@@ -1,0 +1,73 @@
+<div class="waltz-physical-flow-overview waltz-physical-flow-edit-overview">
+    <table>
+        <tr>
+            <td class="wpfo-entity-col wpfo-owning-entity">
+                <div>
+                    <waltz-entity-link entity-ref="$ctrl.sourceEntity"></waltz-entity-link>
+                </div>
+            </td>
+
+            <td class="wpfo-arrow-col">
+                <span>&rarr;</span>
+            </td>
+
+            <td class="wpfo-specification-col">
+                <div>
+                    <div class="clickable wpfeo-highlight-on-hover"
+                         ng-click="$ctrl.onSpecificationFocus()">
+
+                        <span ng-if="!$ctrl.specification" class="">
+                            <mark>Edit Specification</mark>
+                        </span>
+
+                        <div class="wpfo-specification-title"
+                             ng-bind="$ctrl.specification.name"></div>
+                        <div class='small text-muted'
+                             ng-bind="$ctrl.specification.description"></div>
+                    </div>
+
+                    <hr>
+
+                    <div class="small clickable wpfeo-highlight-on-hover"
+                         ng-click="$ctrl.onFlowAttributesFocus()">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="text-muted">Format:</label>
+                                <span ng-bind="$ctrl.specification.format | toDisplayName:'dataFormatKind'"></span>
+                                <br>
+                                <label class="text-muted">Transport:</label>
+                                <span ng-bind="$ctrl.flowAttributes.transport | toDisplayName:'transportKind'"></span>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="text-muted">Frequency:</label>
+                                <span ng-bind="$ctrl.flowAttributes.frequency | toDisplayName:'frequencyKind'"></span>
+                                <br>
+                                <label class="text-muted">Basis Offset:</label>
+                                <span ng-bind="$ctrl.flowAttributes.basisOffset | toBasisOffset"></span>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+
+            <td class="wpfo-arrow-col">
+                <span>&rarr;</span>
+            </td>
+
+            <td class="wpfo-entity-col wpfo-target-entity"
+                ng-class="{
+                    'wpfo-entity-application' : $ctrl.physicalFlow.target.kind == 'APPLICATION',
+                    'wpfo-entity-actor' : $ctrl.physicalFlow.target.kind == 'ACTOR'
+                }">
+                <div class="clickable wpfeo-highlight-on-hover"
+                     ng-click="$ctrl.onTargetFocus()">
+                    <span ng-if="!$ctrl.targetEntity">
+                        <mark>Edit Target</mark>
+                    </span>
+                    <waltz-entity-link entity-ref="$ctrl.targetEntity"></waltz-entity-link>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
