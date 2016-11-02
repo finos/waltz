@@ -7,11 +7,11 @@
             <th>Application</th>
         </tr>
         </thead>
-        <tbody ng-repeat="(dataType, sources) in ctrl.authSources">
+        <tbody ng-repeat="(dataType, sources) in $ctrl.authSources">
         <tr ng-repeat="source in sources"
             ng-class="{
-                    'direct' : source.parentReference.id == ctrl.orgUnitId,
-                    'indirect' : source.parentReference.id != ctrl.orgUnitId,
+                    'direct' : source.parentReference.id == $ctrl.orgUnitId,
+                    'indirect' : source.parentReference.id != $ctrl.orgUnitId,
                 }">
             <td><span ng-if='$first' ng-bind="dataType | toDisplayName:'dataType'"></span></td>
             <td>
@@ -20,8 +20,8 @@
                     <span>
                         {{source.rating|toDisplayName:'rating'}}
                     </span>
-                    <span ng-if="source.parentReference.id != ctrl.orgUnitId" class="small">
-                        (Declared by: {{ctrl.lookupOrgUnitName(source.parentReference.id)}})
+                    <span ng-if="source.parentReference.id != $ctrl.orgUnitId" class="small">
+                        (Declared by: {{$ctrl.lookupOrgUnitName(source.parentReference.id)}})
                     </span>
                 </span>
             </td>
