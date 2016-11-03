@@ -1,5 +1,7 @@
-<span uib-tooltip="{{ $ctrl.entityRef.description }}"
-      tooltip-placement="{{ $ctrl.tooltipPlacement }}" >
+<span uib-popover="{{ $ctrl.entityRef.description }}"
+      popover-trigger="mouseenter"
+      popover-append-to-body="true"
+      popover-placement="{{ $ctrl.tooltipPlacement }}" >
     <waltz-icon fixed-width="true"
                 name="{{ $ctrl.entityRef.kind | toIconName:'entity' }}"
                 ng-if="$ctrl.iconPlacement === 'left'"

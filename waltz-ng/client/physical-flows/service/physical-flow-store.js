@@ -1,4 +1,4 @@
-import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
+import {checkIsEntityRef, checkIsIdSelector, checkIsCreatePhysicalFlowCommand} from "../../common/checks";
 
 
 function store($http, baseApiUrl) {
@@ -35,11 +35,20 @@ function store($http, baseApiUrl) {
     };
 
 
+    const create = (cmd) => {
+        checkIsCreatePhysicalFlowCommand(cmd);
+        return $http
+            .post(base, cmd)
+            .then(r => r.data);
+    };
+
+
     return {
         findBySpecificationId,
         findByEntityReference,
         findBySelector,
-        getById
+        getById,
+        create
     };
 }
 

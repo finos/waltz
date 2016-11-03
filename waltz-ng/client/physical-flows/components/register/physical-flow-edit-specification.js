@@ -1,13 +1,14 @@
 import _ from 'lodash';
-import {initialiseData} from '../../../common';
+import {initialiseData, toEntityRef} from '../../../common';
 
 
 const bindings = {
     candidates: '<',
     current: '<',
-    selected: '<',
     onDismiss: '<',
-    onChange: '<'
+    onChange: '<',
+    owningEntity: '<',
+    selected: '<',
 };
 
 
@@ -50,7 +51,10 @@ function controller() {
     };
 
     vm.doAddNew = () => {
-        vm.onChange(vm.form);
+        vm.onChange(Object.assign(
+            {},
+            vm.form,
+            { owningEntity: toEntityRef(vm.owningEntity) }));
     };
 
     vm.cancel = () => vm.onDismiss();

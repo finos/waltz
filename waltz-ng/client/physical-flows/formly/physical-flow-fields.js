@@ -59,7 +59,7 @@ export const basisOffsetInputField = {
     type: 'input',
     key: 'basisOffsetInput',
     templateOptions: {
-        label: ' ',
+        label: 'Custom Offset',
         placeholder: 'please specify basis offset in (+/-)n format',
         required: true
     },

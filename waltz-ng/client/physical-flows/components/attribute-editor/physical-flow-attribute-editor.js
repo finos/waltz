@@ -25,15 +25,19 @@ const initialState = {
 
 
 function getBasisOffset(basisOffsetSelect, basisOffsetInput) {
-    if(basisOffsetSelect && basisOffsetSelect !== 'OTHER') return basisOffsetSelect;
-    else if(basisOffsetInput) {
+    if(basisOffsetSelect && basisOffsetSelect !== 'OTHER') {
+        return Number(basisOffsetSelect);
+    } else if(basisOffsetInput) {
         const basisOffsetRegex = /^(?:T|t)?((?:\+?|-)\d+)$/g;
         const match = basisOffsetRegex.exec(basisOffsetInput);
         if(match !== null && match[1]) {
-            return match[1];
-        } else throw "Could not parse basis offset: " + basisOffsetInput;
+            return Number(match[1]);
+        } else {
+            throw "Could not parse basis offset: " + basisOffsetInput;
+        }
+    } else {
+        throw "No valid Basis Offset value supplied"
     }
-    else throw "No valid Basis Offset value supplied"
 }
 
 
@@ -48,13 +52,7 @@ function controller(waltzDisplayNameService) {
             className: 'row',
             fieldGroup: [
                 { className: 'col-sm-6', fieldGroup: [transportField] },
-                { className: 'col-sm-6', fieldGroup: [] }
-            ]
-        }, {
-            className: 'row',
-            fieldGroup: [
-                { className: 'col-sm-6', fieldGroup: [frequencyField] },
-                { className: 'col-sm-6', fieldGroup: [] }
+                { className: 'col-sm-6', fieldGroup: [frequencyField] }
             ]
         }, {
             className: 'row',

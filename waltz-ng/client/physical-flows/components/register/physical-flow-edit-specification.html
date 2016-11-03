@@ -1,6 +1,5 @@
 <div class="waltz-physical-flow-edit-specification">
-    <div ng-if="$ctrl.candidates.length > 0"
-         class="wpfes-table">
+    <div class="wpfes-table">
 
         <!-- HEADER -->
         <div class="row wpfes-header">
@@ -88,40 +87,51 @@
 
     </div>
 
+
     <hr>
 
-    <div ng-if="$ctrl.visibility.showAddButton">
-        <button ng-click='$ctrl.change()'
-                ng-disabled="!$ctrl.visibility.showAddButton"
-                class="btn btn-sm btn-primary">
-            Select
-        </button>
+    <div ng-if="!$ctrl.visibility.showAddButton">
+        <div class="row">
+            <div class="col-md-offset-8 col-md-4">
+                <button type="submit"
+                        class="btn btn-sm btn-primary"
+                        ng-click="$ctrl.doAddNew()"
+                        ng-disabled="! $ctrl.validation.canSubmit">
+                    <waltz-icon name="check"></waltz-icon>
+                    Add and select
+                </button>
+                &nbsp;
+                <a class='clickable'
+                   ng-click="$ctrl.cancelAddNew()">
+                    Cancel
+                </a>
 
-        <a class="clickable"
+                <div ng-if="$ctrl.validation.message"
+                     class="wpfes-error"
+                     ng-bind="$ctrl.validation.message">
+                </div>
+            </div>
+        </div>
 
-           ng-click="$ctrl.cancel()">
-            Cancel
-        </a>
     </div>
 
-    <div ng-if="!$ctrl.visibility.showAddButton">
-        <button type="submit"
-                class="btn btn-sm btn-success"
-                ng-click="$ctrl.doAddNew()"
-                ng-disabled="! $ctrl.validation.canSubmit">
-            <waltz-icon name="check"></waltz-icon>
-            Add and select
-        </button>
-        &nbsp;
-        <a class='clickable'
-           ng-click="$ctrl.cancelAddNew()">
-            Cancel
-        </a>
+    <div ng-if="$ctrl.visibility.showAddButton">
+        <div class="row">
+            <div class="col-md-offset-8 col-md-4">
+                <button ng-click='$ctrl.change()'
+                        ng-disabled="!$ctrl.visibility.showAddButton"
+                        class="btn btn-sm btn-primary">
+                    Select
+                </button>
 
-        <div ng-if="$ctrl.validation.message"
-             class="wpfes-error"
-             ng-bind="$ctrl.validation.message">
+                <a class="clickable"
+
+                   ng-click="$ctrl.cancel()">
+                    Cancel
+                </a>
+            </div>
         </div>
     </div>
+
 
 </div>

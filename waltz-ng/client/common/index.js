@@ -1,6 +1,8 @@
 import _ from "lodash";
 import d3 from "d3";
 
+import {checkIsEntityRef} from "./checks";
+
 /**
  * Given data that looks like:
  *
@@ -304,4 +306,18 @@ export function mkLinkGridCell(columnHeading, displayField, linkIdField, linkNav
         displayName: columnHeading,
         cellTemplate: `<div class="ui-grid-cell-contents">\n<a ui-sref="${linkNavViewName} ({ id: row.entity.${linkIdField} })" ng-bind="COL_FIELD">\n</a>\n</div>`
     };
+}
+
+
+export function toEntityRef(obj) {
+    const ref = {
+        id: obj.id,
+        kind: obj.kind,
+        name: obj.name,
+        description: obj.description
+    };
+
+    checkIsEntityRef(ref);
+
+    return ref;
 }

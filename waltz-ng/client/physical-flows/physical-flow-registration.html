@@ -1,12 +1,12 @@
 <div>
     <!-- HEADER -->
     <waltz-page-header name="Register new Physical Flow"
-                       small="From: {{ ctrl.sourceApp.name }}"
+                       small="From: {{ ctrl.sourceEntity.name }}"
                        icon="qrcode">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>
-                <waltz-entity-link entity-ref="ctrl.sourceApp | merge:{kind: 'APPLICATION'}"></waltz-entity-link>
+                <waltz-entity-link entity-ref="ctrl.sourceEntity"></waltz-entity-link>
             </li>
             <li>Register Physical Flow</li>
         </ol>
@@ -17,113 +17,69 @@
 
         <div>
             <waltz-physical-flow-edit-overview source-entity="ctrl.sourceEntity"
-                                               specification="__var__"
-                                               target-entity="__var__"
-                                               flow-attributes="{ basis: '', transport: '', frequency: '' }"
-                                               on-specification-focus="ctrl.focusSpecification()"
-                                               on-flow-attributes-focus="ctrl.focusFlowAttributes()"
-                                               on-target-focus="ctrl.focusTarget()">
+                                               specification="ctrl.specification"
+                                               target-entity="ctrl.targetEntity"
+                                               flow-attributes="ctrl.flowAttributes"
+                                               on-specification-focus="ctrl.focusSpecification"
+                                               on-flow-attributes-focus="ctrl.focusFlowAttributes"
+                                               on-target-focus="ctrl.focusTarget">
             </waltz-physical-flow-edit-overview>
         </div>
 
         <hr>
 
-        <div ng-if="ctrl.visibility.specificationFocused">
-            <waltz-physical-flow-edit-specification owning-entity="ctrl.sourceEntity"
-                                                    candidates="ctrl.candidateSpecifications"
-                                                    current="{}"
-                                                    on-dismiss="ctrl.visibility.specificationFocused = false"
-                                                    on-change="ctrl.changeSpecification">
-                <!--
-                Picker or add new, on-change cannot give a null spec, but can give a spec with
-                a null id (indicating new)
-                -->
-            </waltz-physical-flow-edit-specification>
-        </div>
+        <waltz-physical-flow-attribute-editor ng-if="ctrl.visibility.editor === 'FLOW-ATTRIBUTES'"
+                                              current="ctrl.flowAttributes"
+                                              on-change="ctrl.attributesChanged"
+                                              on-dismiss="ctrl.editorDismiss">
+
+        </waltz-physical-flow-attribute-editor>
 
 
-        <div ng-if="ctrl.visibility.flowAttributesFocused">
-            <waltz-physical-flow-edit-attributes current="{}"
-                                                 on-dismiss="ctrl.visibility.flowAttributesFocused = false"
-                                                 on-change="ctrl.changeFlowAttributes">
-                <!--
-                Attributes initially set to object with null fields.  Cannot 'save' until all three
-                are set, therefore on-change always gives non-null object containing the attributes
-                -->
-            </waltz-physical-flow-edit-attributes>
-        </div>
+        <waltz-physical-flow-edit-target-entity ng-if="ctrl.visibility.editor === 'TARGET-ENTITY'"
+                                                current="ctrl.targetEntity"
+                                                owning-entity="ctrl.sourceEntity"
+                                                on-dismiss="ctrl.editorDismiss"
+                                                on-change="ctrl.targetChanged">
+        </waltz-physical-flow-edit-target-entity>
+
+        <waltz-physical-flow-edit-specification ng-if="ctrl.visibility.editor === 'SPECIFICATION'"
+                                                owning-entity="ctrl.sourceEntity"
+                                                candidates="ctrl.candidateSpecifications.produces"
+                                                current="ctrl.specification"
+                                                on-dismiss="ctrl.editorDismiss"
+                                                on-change="ctrl.specificationChanged">
+        </waltz-physical-flow-edit-specification>
 
 
-        <div ng-if="ctrl.visibility.targetFocused">
-            <waltz-physical-flow-edit-target-entity current="{}"
-                                                    owning-entity="{}"
-                                                    on-dismiss="ctrl.visibility.targetFocused = false"
-                                                    on-change="ctrl.changeTarget">
-                <!--
-                Application or Actor picker, owning entity is required to prevent 'self-loops' and also
-                to prevent Actor to Actor flows.  As before on-change will not give nulls
-                -->
-            </waltz-physical-flow-edit-target-entity>
-        </div>
+        <div ng-if="ctrl.visibility.editor == ''">
+            <div class="row">
+                <div class="col-md-offset-8 col-md-2">
+                    <button class="btn btn-success"
+                            ng-click="ctrl.doSave()"
+                            xxng-disabled="!ctrl.validation.canSave">
+                        <waltz-icon name="check"></waltz-icon>
+                        Save
+                    </button>
+                    &nbsp;
+                    <a ng-href="{{ ctrl.cancelLink }}"
+                       class="clickable">
+                        Cancel
+                    </a>
 
-
-
-        <div class="row">
-            <div class="col-md-12">
-                <h3>Step 1</h3>
-                <div class="small text-muted">
-                    Choose an existing specification or add a new specification
                 </div>
+                <div class="col-md-2">
 
-                <h4>Existing Specification</h4>
-                <ul>
-                    <li ng-repeat="spec in ctrl.candidateSpecifications.produces">
-                        <span ng-bind="spec.name" ng-click="ctrl.registration.specification = spec"></span>
-                    </li>
-                </ul>
-
-                <h4>Not listed ? </h4>
-                <a>Add new</a>
-
-                <h3>Step 2</h3>
-                Choose destination application/actor
-
-                <h3>Step 3</h3>
-                Set frequency/transport/basis
+                    <ul class="list-unstyled small text-muted">
+                        <li ng-repeat="message in ctrl.validation.messages">
+                            <span ng-bind="message" class="error"></span>
+                        </li>
+                    </ul>
+                </div>
             </div>
+
         </div>
 
-
-        <hr>
-
-        <div class="row">
-            <div class="col-md-12">
-                <h4>Preview:</h4>
-                <waltz-physical-flow-overview specification="ctrl.registration.specification"
-                                              physical-flow="ctrl.registration.physicalFlow">
-
-                </waltz-physical-flow-overview>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-3">
-            <h4>CandidateSpecs</h4>
-            <pre ng-bind="ctrl.candidateSpecifications | json"></pre>
-        </div>
-        <div class="col-md-3">
-            <h4></h4>
-            <pre ng-bind="ctrl.xxx"></pre>
-        </div>
-        <div class="col-md-3">
-            <h4></h4>
-            <pre ng-bind="ctrl.xxx"></pre>
-        </div>
-        <div class="col-md-3">
-            <h4></h4>
-            <pre ng-bind="ctrl.xxx"></pre>
-        </div>
     </div>
 
 </div>
