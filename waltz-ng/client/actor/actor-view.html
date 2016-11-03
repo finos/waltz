@@ -1,0 +1,41 @@
+<div>
+
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.actor.name }}"
+                       small="Actor"
+                       icon="user-circle">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            </li>
+            <li ng-bind="ctrl.actor.name"></li>
+        </ol>
+    </waltz-page-header>
+
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-actor-overview actor="ctrl.actor"></waltz-actor-overview>
+    </div>
+
+
+    <br>
+
+
+    <waltz-section name="Physical Flows">
+
+        <waltz-section-actions>
+            <a class="btn btn-xs btn-primary"
+               ui-sref="main.physical-flow.registration ({ kind: 'ACTOR', id: ctrl.actor.id })"
+               waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                Register
+            </a>
+        </waltz-section-actions>
+
+        <waltz-physical-data-section specifications="ctrl.physicalSpecifications"
+                                     on-initialise="ctrl.onPhysicalFlowsInitialise"
+                                     on-change="ctrl.onPhysicalFlowsChange"
+                                     physical-flows="ctrl.physicalFlows">
+        </waltz-physical-data-section>
+
+    </waltz-section>
+
+</div>

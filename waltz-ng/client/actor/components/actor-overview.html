@@ -1,0 +1,37 @@
+<div>
+    <div class="row">
+        <div class="col-sm-2">
+            <label>
+                Name
+            </label>
+        </div>
+        <div class="col-sm-6">
+            <span ng-bind="$ctrl.actor.name">
+            </span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">
+            <label>
+                Description
+            </label>
+        </div>
+        <div class="col-sm-10">
+            <span ng-bind="$ctrl.actor.description">
+            </span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-offset-8 col-sm-4">
+            <span class="small text-muted">
+                Last updated:
+                <span ng-bind="$ctrl.actor.lastUpdatedBy">
+                </span>
+                <span ng-bind="$ctrl.actor.lastUpdatedAt">
+                </span>
+            </span>
+        </div>
+    </div>
+</div>
