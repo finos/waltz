@@ -203,6 +203,9 @@ export function kindToViewState(kind) {
     if (kind === 'APPLICATION') {
         return "main.app.view";
     }
+    if (kind === 'ACTOR') {
+        return "main.actor.view";
+    }
     if (kind === 'APP_GROUP') {
         return "main.app-group.view";
     }
