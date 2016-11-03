@@ -17,7 +17,6 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlowLineage.PHYSICAL_FLOW_LINEAGE;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
@@ -78,9 +77,8 @@ public class PhysicalFlowDao {
                 .select(PHYSICAL_FLOW.fields())
                 .select(targetEntityNameField)
                 .from(PHYSICAL_FLOW)
-                .innerJoin(PHYSICAL_SPECIFICATION).on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
-                .innerJoin(APPLICATION)
-                .on(APPLICATION.ID.eq(PHYSICAL_FLOW.TARGET_ENTITY_ID))
+                .innerJoin(PHYSICAL_SPECIFICATION)
+                .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
                 .where(isTarget.or(isSource))
                 .fetch(TO_DOMAIN_MAPPER);
     }
