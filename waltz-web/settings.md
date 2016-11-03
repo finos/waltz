@@ -41,4 +41,12 @@ Development options can be used by developers to aid in writing code for Waltz
 Features can be enabled/disabled and configured via settings.  Currently available options are:
 
 * ```feature.software-catalog.enabled```
-  * (```true|false```) display software-catalog (technology sections)
+    * (```true|false```) display software-catalog (technology sections)
+
+
+## Defaults
+
+General default settings
+
+* ```server.data-type.default-code```
+    * (```UNKNOWN```) UNKNOWN is the code for the default data type

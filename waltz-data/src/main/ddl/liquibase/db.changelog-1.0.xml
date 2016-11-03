@@ -3258,4 +3258,14 @@
                      newTableName="actor" />
     </changeSet>
 
+
+    <!-- 873 - Physical Flow Create - settings.data-type.default-code -->
+    <changeSet id="20161103-873-1" author="kamransaleem">
+        <insert tableName="settings">
+            <column name="name" value="settings.data-type.default-code"/>
+            <column name="value" value="UNKNOWN"/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

@@ -90,6 +90,14 @@ public class DataFlowDao {
     }
 
 
+    public DataFlow findBySourceAndTarget(EntityReference source, EntityReference target) {
+        return baseQuery()
+                .where(DATA_FLOW.SOURCE_ENTITY_ID.eq(source.id()))
+                .and(DATA_FLOW.TARGET_ENTITY_ID.eq(target.id()))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
     public int removeFlows(List<Long> flowIds) {
         return dsl.deleteFrom(DATA_FLOW)
                 .where(DATA_FLOW.ID.in(flowIds))

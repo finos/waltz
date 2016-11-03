@@ -102,6 +102,11 @@ public class DataFlowService {
     }
 
 
+    public DataFlow findBySourceAndTarget(EntityReference source, EntityReference target) {
+        return dataFlowDao.findBySourceAndTarget(source, target);
+    }
+
+
     public DataFlow addFlow(DataFlow flow) {
         if (flow.source().equals(flow.target())) {
             throw new IllegalArgumentException("Cannot have a flow with same source and target");
