@@ -6,16 +6,22 @@
                      model="$ctrl.model"
                      fields="$ctrl.fields">
 
-            <button type="submit"
-                    class="btn btn-success"
-                    style="margin-left: 12px"
-                    ng-disabled="$ctrl.form.$invalid">
-                Save
-            </button>
-            <a class="clickable"
-               ng-click="$ctrl.onCancel()">
-                <span>Cancel</span>
-            </a>
+            <hr>
+
+            <div class="row">
+                <div class="col-md-offset-8 col-md-4">
+                    <button type="submit"
+                            class="btn btn-primary btn-sm"
+                            style="margin-left: 12px"
+                            ng-disabled="$ctrl.form.$invalid">
+                        Save
+                    </button>
+                    <a class="clickable"
+                       ng-click="$ctrl.onCancel()">
+                        <span>Cancel</span>
+                    </a>
+                </div>
+            </div>
 
         </formly-form>
 

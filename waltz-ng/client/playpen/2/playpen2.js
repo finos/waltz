@@ -15,35 +15,12 @@ function controller(notification,
     const vm = Object.assign(this, initData);
 
     vm.sourceEntity = {
-        id: 86,
+        id: 66779,
         name: 'Source App',
         kind: 'APPLICATION'
-    }
+    };
 
-    // vm.specification = {
-    //     id: 2,
-    //     name: 'sample spec',
-    //     description: 'description about the spec',
-    //     format: 'BINARY'
-    // }
-
-
-    // vm.targetEntity = {
-    //     id: 2,
-    //     name: 'Target App',
-    //     kind: 'ACTOR'
-    // }
-
-    // vm.flowAttributes = {
-    //     basis: '+1',
-    //     transport: 'FILE_TRANSPORT',
-    //     frequency: 'DAILY' };
-
-    vm.flowAttributes = {
-        basis: '0',
-        transport: '',
-        frequency: '' };
-
+    vm.flowAttributes = null;
 
 
     vm.focusSpecification = () => {
@@ -58,13 +35,10 @@ function controller(notification,
         vm.visibility.editor = 'TARGET-ENTITY';
     };
 
-
     vm.attributesChanged = (attributes) => {
         vm.flowAttributes = attributes;
         vm.editorDismiss();
     };
-
-
 
     vm.targetChanged = (target) => {
         vm.targetEntity = target;
@@ -73,10 +47,14 @@ function controller(notification,
 
     vm.editorDismiss = () => {
         vm.visibility.editor = '';
-    }
+    };
 
     physicalSpecificationStore
         .findByEntityReference(vm.sourceEntity)
+        .then(x => {
+            console.log(x);
+            return x;
+        })
         .then(xs => vm.candidateSpecifications = xs);
 
     vm.changeSpecification = (spec) => {

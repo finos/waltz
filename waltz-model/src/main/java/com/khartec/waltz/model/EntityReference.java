@@ -34,6 +34,12 @@ public abstract class EntityReference {
     public abstract Optional<String> name();
     public abstract Optional<String> description();
 
+    public String safeName() {
+        String idStr = "[" + id() +"]";
+        return name()
+                .map(n -> n + " " + idStr)
+                .orElse(idStr);
+    }
 
     public static <T extends NameProvider & IdProvider & DescriptionProvider> EntityReference fromEntity(T entity, EntityKind kind) {
         Long id = entity.id()

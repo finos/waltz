@@ -42,9 +42,10 @@ function controller(actorStore) {
 
 
     vm.addApp = (app) => {
-        vm.appDuplicate = sameApp(app, vm.owningEntity)
+        const appWithKind = Object.assign({}, app, {kind: 'APPLICATION'});
+        vm.appDuplicate = sameApp(appWithKind, vm.owningEntity);
         if(!vm.appDuplicate) {
-            invokeFunction(vm.onChange, app);
+            invokeFunction(vm.onChange, appWithKind);
         }
     };
 

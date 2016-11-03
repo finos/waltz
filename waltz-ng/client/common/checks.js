@@ -10,16 +10,41 @@ const entityRefShape = {
     kind: apiCheck.string
 };
 
-const createLineageReportCommandShape = {
-    specificationId: apiCheck.number,
-    name: apiCheck.string
+
+const idSelectorShape = {
+    entityReference: myApiCheck.shape(entityRefShape),
+    scope: myApiCheck.oneOf(['EXACT', 'PARENTS', 'CHILDREN'])
 };
+
+
+const specificationShape = {
+    name: apiCheck.string,
+    description: apiCheck.string,
+    format: apiCheck.string
+};
+
+const flowAttributesShape = {
+    transport: apiCheck.string,
+    frequency: apiCheck.string,
+    basisOffset: apiCheck.number,
+};
+
+
+// -- COMMANDS --
 
 const createActorCommandShape = {
     name: apiCheck.string,
     description: apiCheck.string
-}
+};
 
+const createPhysicalFlowCommandShape = {
+    specification: myApiCheck.shape(specificationShape),
+    flowAttributes: myApiCheck.shape(flowAttributesShape),
+    targetEntity: myApiCheck.shape(entityRefShape)
+};
+
+
+// -- CHECKERS
 
 const check = (test, x) => myApiCheck.throw(test, x);
 
@@ -28,12 +53,12 @@ export const checkIsEntityRef = ref =>
     check(myApiCheck.shape(entityRefShape), ref);
 
 
-export const checkIsCreateLineageReportCommand = ref =>
-    check(myApiCheck.shape(createLineageReportCommandShape), ref);
+export const checkIsCreatePhysicalFlowCommand = cmd =>
+    check(myApiCheck.shape(createPhysicalFlowCommandShape), cmd);
 
 
-export const checkIsCreateActorCommand = ref =>
-    check(myApiCheck.shape(createActorCommandShape), ref);
+export const checkIsCreateActorCommand = cmd =>
+    check(myApiCheck.shape(createActorCommandShape), cmd);
 
 
 export const checkIsStringList = xs =>
@@ -43,9 +68,7 @@ export const checkIsStringList = xs =>
 /* @Deprecated - use checkIsIdSelector instead */
 export const checkIsApplicationIdSelector = opt =>
     check(
-        myApiCheck.shape({
-            entityReference: myApiCheck.shape(entityRefShape),
-            scope: myApiCheck.oneOf(['EXACT', 'PARENTS', 'CHILDREN'])}),
+        myApiCheck.shape(idSelectorShape),
         opt);
 
 

@@ -125,10 +125,20 @@
                class="btn btn-xs btn-primary">
                 Edit
             </a>
+
+
+            <a class="btn btn-xs btn-primary"
+               ui-sref="main.physical-flow.registration ({ kind: 'APPLICATION', id: ctrl.app.id })"
+               ng-if="ctrl.dataTab == 1"
+               waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                Register
+            </a>
+
             <div class="btn-group"
                  ng-if="ctrl.dataTab == 1"
                  uib-dropdown>
-                <button type="button"
+
+                 <button type="button"
                         ng-disabled="ctrl.physicalFlowsProducesCount == 0
                                         && ctrl.physicalFlowsConsumesCount == 0
                                         && ctrl.physicalFlowsUnusedSpecificationsCount == 0"

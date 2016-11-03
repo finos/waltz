@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
@@ -123,4 +124,27 @@ public class PhysicalFlowDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
+    public long create(PhysicalFlow flow) {
+
+        checkNotNull(flow, "flow cannot be null");
+        checkFalse(flow.id().isPresent(), "flow must not have an id");
+
+        PhysicalFlowRecord record = dsl.newRecord(PHYSICAL_FLOW);
+        record.setTargetEntityKind(flow.target().kind().name());
+        record.setTargetEntityId(flow.target().id());
+
+        record.setFrequency(flow.frequency().name());
+        record.setTransport(flow.transport().name());
+        record.setBasisOffset(flow.basisOffset());
+
+        record.setSpecificationId(flow.specificationId());
+
+        record.setDescription(flow.description());
+        record.setProvenance("waltz");
+
+        record.store();
+        return record.getId();
+
+    }
 }

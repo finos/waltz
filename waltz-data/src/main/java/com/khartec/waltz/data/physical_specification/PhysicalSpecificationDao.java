@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
@@ -150,6 +151,25 @@ public class PhysicalSpecificationDao {
                 .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
                 .where(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id()))
                 .and(PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()));
+    }
+
+
+    public Long create(PhysicalSpecification specification) {
+        checkNotNull(specification, "specification cannot be null");
+        checkFalse(specification.id().isPresent(), "specification must not have an id");
+
+        PhysicalSpecificationRecord record = dsl.newRecord(PHYSICAL_SPECIFICATION);
+        record.setOwningEntityKind(specification.owningEntity().kind().name());
+        record.setOwningEntityId(specification.owningEntity().id());
+
+        record.setName(specification.name());
+        record.setExternalId(specification.externalId().orElse(""));
+        record.setDescription(specification.description());
+        record.setFormat(specification.format().name());
+        record.setProvenance("waltz");
+
+        record.store();
+        return record.getId();
     }
 
 }

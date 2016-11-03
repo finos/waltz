@@ -1,27 +1,25 @@
-import {initialiseData} from '../common';
+import _ from 'lodash';
+import {initialiseData, kindToViewState} from '../common';
 
 
 const template = require('./physical-flow-registration.html');
 
 
 const initialState = {
-    owningEntity: null,
+    sourceEntity: null,
     candidateSpecifications: [],
-    logicalFlows: [],
-    physicalFlows: [],
-
-
+    specification: null,
+    flowAttributes: null,
+    targetEntity: null,
+    cancelLink: '#/flibber',
     visibility: {
-        targetFocused: false,
-        specificationFocused: false,
-        attributesFocused: false
+        editor: ""
+    },
+    validation: {
+        messages: [],
+        canSave: false
     }
 };
-
-
-function updateSpecification(registration, specification) {
-    return Object.assign({}, registration, { specification });
-}
 
 
 function loadEntity(entityRef, appStore, actorStore) {
@@ -40,35 +38,112 @@ function loadEntity(entityRef, appStore, actorStore) {
 }
 
 
+function validate(specification, flowAttributes, targetEntity) {
+
+    const messages = [];
+    messages.push(specification ? null : "Missing specification. ");
+    messages.push(flowAttributes ? null : "Missing attributes. ");
+    messages.push(targetEntity ? null : "Missing target. ");
+
+    return {
+        canSave: specification && flowAttributes && targetEntity,
+        messages: _.reject(messages, m => m == null)
+    };
+}
+
+
 function controller(
+    $state,
     $stateParams,
     actorStore,
     applicationStore,
     logicalFlowStore,  // DataFlowDataStore
+    notification,
     physicalFlowStore,
     specificationStore) {
 
     const vm = initialiseData(this, initialState);
 
-    const owningEntityRef = {
+    const sourceEntityRef = {
         id: $stateParams.id,
         kind: $stateParams.kind
     };
 
-    loadEntity(owningEntityRef, applicationStore, actorStore)
-        .then(ent => vm.owningEntity = ent);
+    const viewState = kindToViewState(sourceEntityRef.kind);
+    vm.cancelLink = $state.href(viewState, { id: sourceEntityRef.id });
+
+    const doValidation = () => validate(vm.specification, vm.flowAttributes, vm.targetEntity);
+
+    vm.focusSpecification = () => {
+        vm.visibility.editor = 'SPECIFICATION';
+    };
+
+    vm.focusFlowAttributes = () => {
+        vm.visibility.editor = 'FLOW-ATTRIBUTES';
+    };
+
+    vm.focusTarget = () => {
+        vm.visibility.editor = 'TARGET-ENTITY';
+    };
+
+    vm.attributesChanged = (attributes) => {
+        vm.flowAttributes = attributes;
+        vm.editorDismiss();
+    };
+
+    vm.targetChanged = (target) => {
+        vm.targetEntity = target;
+        vm.editorDismiss();
+    };
+
+
+    vm.specificationChanged = (spec) => {
+        vm.specification = spec;
+        vm.editorDismiss();
+    };
+
+    vm.editorDismiss = () => {
+        vm.visibility.editor = '';
+        vm.validation = doValidation();
+    };
+
+
+    vm.doSave = () => {
+        const validationResult = doValidation();
+        if (validationResult.canSave) {
+            const cmd = {
+                specification: vm.specification,
+                flowAttributes: vm.flowAttributes,
+                targetEntity: { id: vm.targetEntity.id, kind: vm.targetEntity.kind }
+            };
+            physicalFlowStore
+                .create(cmd)
+                .then(resp => {
+                    notification.info("Created new flow");
+                    $state.go('main.physical-flow.view', {id: resp.entityReference.id });
+                })
+        } else {
+            const messages =  _.join(validationResult.messages, '<br> - ');
+            notification.warning("Cannot save: <br> - " + messages);
+        }
+    };
+
+    loadEntity(sourceEntityRef, applicationStore, actorStore)
+        .then(ent => vm.sourceEntity = ent);
 
     specificationStore
-        .findByEntityReference(owningEntityRef)
+        .findByEntityReference(sourceEntityRef)
         .then(specs => vm.candidateSpecifications = specs);
 }
 
 
 controller.$inject = [
+    '$state',
     '$stateParams',
     'ActorStore',
     'ApplicationStore',
     'DataFlowDataStore',  // LogicalFlowStore
+    'Notification',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore',
 ];

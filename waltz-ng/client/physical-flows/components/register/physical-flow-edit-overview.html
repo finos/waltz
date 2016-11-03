@@ -3,7 +3,7 @@
         <tr>
             <td class="wpfo-entity-col wpfo-owning-entity">
                 <div>
-                    <waltz-entity-link entity-ref="$ctrl.sourceEntity"></waltz-entity-link>
+                    <waltz-entity-icon-label entity-ref="$ctrl.sourceEntity"></waltz-entity-icon-label>
                 </div>
             </td>
 
@@ -14,37 +14,54 @@
             <td class="wpfo-specification-col">
                 <div>
                     <div class="clickable wpfeo-highlight-on-hover"
+                         ng-class="{
+                            'wpfeo-okay': $ctrl.specification,
+                            'wpfeo-missing': !$ctrl.specification
+                         }"
                          ng-click="$ctrl.onSpecificationFocus()">
 
-                        <span ng-if="!$ctrl.specification" class="">
-                            <mark>Edit Specification</mark>
-                        </span>
+                        <div ng-if="!$ctrl.specification">
+                            <code>Specify Specification</code>
+                        </div>
 
-                        <div class="wpfo-specification-title"
-                             ng-bind="$ctrl.specification.name"></div>
-                        <div class='small text-muted'
-                             ng-bind="$ctrl.specification.description"></div>
+                        <div ng-if="$ctrl.specification">
+                            <div class="wpfo-specification-title"
+                                 ng-bind="$ctrl.specification.name">
+                            </div>
+                            <div>
+                                <label class="text-muted">Format:</label>
+                                <span ng-bind="$ctrl.specification.format | toDisplayName:'dataFormatKind'"></span>
+                            </div>
+                            <div class='small text-muted'
+                                 ng-bind="$ctrl.specification.description">
+                            </div>
+                        </div>
+
                     </div>
 
                     <hr>
 
                     <div class="small clickable wpfeo-highlight-on-hover"
+                         ng-class="{
+                            'wpfeo-okay': $ctrl.flowAttributes,
+                            'wpfeo-missing': !$ctrl.flowAttributes
+                         }"
                          ng-click="$ctrl.onFlowAttributesFocus()">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <label class="text-muted">Format:</label>
-                                <span ng-bind="$ctrl.specification.format | toDisplayName:'dataFormatKind'"></span>
-                                <br>
+
+                        <div ng-if="!$ctrl.flowAttributes">
+                            <code>Specify Flow Attributes</code>
+                        </div>
+
+                        <div class="row" ng-if="$ctrl.flowAttributes">
+                            <div class="col-sm-12">
                                 <label class="text-muted">Transport:</label>
                                 <span ng-bind="$ctrl.flowAttributes.transport | toDisplayName:'transportKind'"></span>
-                            </div>
-                            <div class="col-sm-6">
+                                <br>
                                 <label class="text-muted">Frequency:</label>
                                 <span ng-bind="$ctrl.flowAttributes.frequency | toDisplayName:'frequencyKind'"></span>
                                 <br>
                                 <label class="text-muted">Basis Offset:</label>
                                 <span ng-bind="$ctrl.flowAttributes.basisOffset | toBasisOffset"></span>
-
                             </div>
                         </div>
                     </div>
@@ -61,9 +78,13 @@
                     'wpfo-entity-actor' : $ctrl.physicalFlow.target.kind == 'ACTOR'
                 }">
                 <div class="clickable wpfeo-highlight-on-hover"
+                     ng-class="{
+                            'wpfeo-okay': $ctrl.targetEntity,
+                            'wpfeo-missing': !$ctrl.targetEntity
+                         }"
                      ng-click="$ctrl.onTargetFocus()">
                     <span ng-if="!$ctrl.targetEntity">
-                        <mark>Edit Target</mark>
+                        <code>Specify Target</code>
                     </span>
                     <waltz-entity-link entity-ref="$ctrl.targetEntity"></waltz-entity-link>
                 </div>
