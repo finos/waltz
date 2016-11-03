@@ -33,10 +33,11 @@ public class PhysicalFlowHarness {
                 .groupBy(PHYSICAL_FLOW.SPECIFICATION_ID)
                 .having(havingCondition);
 
+
         // invalid flow id
         response = service.delete(ImmutablePhysicalFlowDeleteCommand.builder()
                 .flowId(-1)
-                .build());
+                .build(), "admin");
         System.out.println(response);
 
         // flow linked to a lineage
@@ -47,7 +48,7 @@ public class PhysicalFlowHarness {
                 .fetchAny(PHYSICAL_FLOW.ID);
         response = service.delete(ImmutablePhysicalFlowDeleteCommand.builder()
                 .flowId(lineageFlowId)
-                .build());
+                .build(), "admin");
         System.out.println(response);
 
         // flow id linked to a spec with more than 1 physical flow
@@ -58,7 +59,7 @@ public class PhysicalFlowHarness {
                 .fetchAny(PHYSICAL_FLOW.ID);
         response = service.delete(ImmutablePhysicalFlowDeleteCommand.builder()
                 .flowId(multiSpecFlowId)
-                .build());
+                .build(), "admin");
         System.out.println(response);
 
         // flow id linked to a spec with only 1 physical flow
@@ -69,7 +70,7 @@ public class PhysicalFlowHarness {
                 .fetchAny(PHYSICAL_FLOW.ID);
         response = service.delete(ImmutablePhysicalFlowDeleteCommand.builder()
                 .flowId(singleSpecFlowId)
-                .build());
+                .build(), "admin");
         System.out.println(response);
     }
 
