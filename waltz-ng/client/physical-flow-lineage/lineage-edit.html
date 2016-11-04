@@ -6,9 +6,8 @@
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>
-                <a ui-sref="main.app.view ({ id: ctrl.owningApplication.id })">
-                    <span ng-bind="ctrl.owningApplication.name"></span>
-                </a>
+                <waltz-entity-link entity-ref="ctrl.describedSpecification.owningEntity">
+                </waltz-entity-link>
             </li>
             <li>
                 <a ui-sref="main.physical-flow.view ({ id: ctrl.describedFlow.id })">
@@ -21,24 +20,11 @@
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <h4>
-                Physical flow of
-                <mark ng-bind="ctrl.describedSpecification.name"></mark>
-                from
-                <mark ng-bind="ctrl.describedSpecification.owningEntity.name"></mark>
-                to
-                <mark ng-bind="ctrl.describedFlow.target.name"></mark>
-        </h4>
-        <hr>
         <div class="row">
-            <div class="col-sm-3">
-                <label>Specification Details:</label>
-            </div>
-            <div class="col-sm-9">
-                <waltz-physical-specification-overview owning-entity="ctrl.owningApplication"
-                                                       specification="ctrl.describedSpecification"
-                                                       organisational-unit="ctrl.owningOrgUnit">
-                </waltz-physical-specification-overview>
+            <div class="col-sm-12">
+                <waltz-physical-flow-overview specification="ctrl.describedSpecification"
+                                              physical-flow="ctrl.describedFlow">
+                </waltz-physical-flow-overview>
             </div>
         </div>
 
@@ -47,6 +33,41 @@
     <br>
 
     <waltz-section name="Edit">
+
+        <div class="row">
+            <div class="col-sm-8"
+                 style="border-right: 1px solid #eee;">
+
+                <waltz-data-flow-diagram data="ctrl.graph.data"
+                                         tweakers="ctrl.graph.tweakers">
+                </waltz-data-flow-diagram>
+
+            </div>
+            <div class="col-sm-4">
+                <h4>
+                    <waltz-entity-icon-label entity-ref="ctrl.searchResults.entityRef">
+                    </waltz-entity-icon-label>
+                    <small>Incoming Flows</small>
+                </h4>
+
+                <p class="small text-muted">
+                    Select the relevant flows to describe lineage
+                </p>
+
+                <waltz-lineage-candidate-editor logical-flows="ctrl.searchResults.logicalFlows"
+                                                physical-flows="ctrl.searchResults.physicalFlows"
+                                                specifications="ctrl.searchResults.specifications"
+                                                current-lineage="ctrl.lineage"
+                                                on-add="ctrl.addPhysicalFlow"
+                                                on-refocus="ctrl.doSearch">
+                </waltz-lineage-candidate-editor>
+            </div>
+        </div>
+
+
+        <hr>
+
+
         <div class="row">
             <div class="col-sm-12">
                 <h4>Contributors</h4>
@@ -63,6 +84,25 @@
                     </tr>
                     </thead>
                     <tbody>
+                    <tr style="font-weight: bolder">
+                        <td><span ng-bind="ctrl.describedSpecification.name"></span></td>
+                        <td class="wpfle-owning-entity">
+                            <waltz-entity-icon-label ng-click="ctrl.doSearch(ctrl.describedSpecification.owningEntity)"
+                                                     uib-popover="Focus"
+                                                     popover-trigger="mouseenter"
+                                                     class="waltz-action-link"
+                                                     entity-ref="ctrl.describedSpecification.owningEntity" >
+                            </waltz-entity-icon-label>
+                        </td>
+                        <td class="wpfle-target-entity">
+                            <waltz-entity-icon-label entity-ref="ctrl.describedFlow.target">
+                            </waltz-entity-icon-label>
+                        </td>
+                        <td><span ng-bind="ctrl.describedSpecification.format"></span></td>
+                        <td><span ng-bind="ctrl.describedFlow.transport"></span></td>
+                        <td><span ng-bind="ctrl.describedFlow.frequency"></span></td>
+                        <td> - </td>
+                    </tr>
                     <tr ng-repeat="c in ctrl.lineage | orderBy:['specification.owningEntity.name', 'flow.target.name', 'specification.name']"
                         class="waltz-visibility-parent">
                         <td>
@@ -108,67 +148,6 @@
                 </table>
             </div>
         </div>
-
-        <hr>
-
-        <div class="row">
-            <div class="col-sm-9">
-                <h4 ng-bind="ctrl.searchResults.app.name"></h4>
-
-                <waltz-lineage-candidate-editor logical-flows="ctrl.searchResults.logicalFlows"
-                                                physical-flows="ctrl.searchResults.physicalFlows"
-                                                specifications="ctrl.searchResults.specifications"
-                                                current-lineage="ctrl.lineage"
-                                                on-add="ctrl.addPhysicalFlow"
-                                                on-refocus="ctrl.doSearch">
-                </waltz-lineage-candidate-editor>
-
-            </div>
-            <div class="col-sm-3">
-                <p class="small text-muted">
-                    Use this area to search for flows by first finding their associated applications.
-                </p>
-                <waltz-app-selector model="ctrl.selectedApp"></waltz-app-selector>
-                <hr>
-                <div ng-if="ctrl.searchResults.relatedApps.length > 0">
-                    <h5>Related Apps</h5>
-                    <div ng-class="{'waltz-scroll-region-250' : ctrl.searchResults.relatedApps.length > 12 }">
-                        <ul class="list-unstyled small">
-                            <li ng-repeat="app in ctrl.searchResults.relatedApps | orderBy:'name'">
-                                <a class="clickable"
-                                   ng-bind="app.name"
-                                   ng-click="ctrl.doSearch(app)"></a>
-                            </li>
-                        </ul>
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-
-
     </waltz-section>
 
-    <waltz-section name="dump" ng-hide="true">
-        <div class="row">
-            <div class="col-sm-3">
-                <h4>Search Results</h4>
-                <pre ng-bind="ctrl.searchResults | json"></pre>
-            </div>
-            <div class="col-sm-3">
-                <h4>Lineage</h4>
-                <pre ng-bind="ctrl.lineage|json"></pre>
-            </div>
-            <div class="col-sm-3">
-                <h4>Described</h4>
-                <pre ng-bind="ctrl.describedFlow|json"></pre>
-                <pre ng-bind="ctrl.describedSpecification|json"></pre>
-            </div>
-            <div class="col-sm-3">
-                <h4></h4>
-                <pre ng-bind="ctrl.xxx"></pre>
-            </div>
-        </div>
-    </waltz-section>
 </div>

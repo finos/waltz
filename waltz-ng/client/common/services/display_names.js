@@ -179,9 +179,9 @@ export const frequencyKindNames  = {
 export const dataFormatKindNames  = {
     BINARY: "Binary",
     FLAT_FILE: "Flat File",
-    JSON: "Json",
+    JSON: "JSON",
     UNSTRUCTURED: "Unstructured",
     DATABASE: "Database",
-    XML: "Xml",
+    XML: "XML",
     OTHER: "Other"
 };
