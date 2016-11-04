@@ -1,27 +1,42 @@
+import {initialiseData} from '../common';
+
 const template = require('./actor-view.html');
+
+
+const initialState = {
+    logs: [],
+    physicalFlows: [],
+    physicalSpecifications: []
+};
 
 
 function controller($stateParams,
                     actorStore,
+                    changeLogStore,
                     physicalFlowStore,
                     physicalSpecificationStore) {
 
-    const id = $stateParams.id;
-    const ref = { kind: 'ACTOR', id };
+    const vm = initialiseData(this, initialState);
 
-    const vm = this;
+    const id = $stateParams.id;
+    const entityRef = { kind: 'ACTOR', id };
+    Object.assign(vm, { id, entityRef });
 
     actorStore
         .getById(id)
         .then(a => vm.actor = a);
 
     physicalFlowStore
-        .findByEntityReference(ref)
+        .findByEntityReference(entityRef)
         .then(flows => vm.physicalFlows = flows);
 
     physicalSpecificationStore
-        .findByEntityReference(ref)
+        .findByEntityReference(entityRef)
         .then(specs => vm.physicalSpecifications = specs);
+
+    changeLogStore
+        .findByEntityReference('ACTOR', id)
+        .then(log => vm.log = log);
 
 }
 
@@ -29,6 +44,7 @@ function controller($stateParams,
 controller.$inject = [
     '$stateParams',
     'ActorStore',
+    'ChangeLogDataService',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore'
 ];
