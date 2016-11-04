@@ -43,12 +43,18 @@ function store($http, baseApiUrl) {
     };
 
 
+    const deleteById = (id) => $http
+            .delete(`${base}/${id}`)
+            .then(r => r.data);
+
+
     return {
         findBySpecificationId,
         findByEntityReference,
         findBySelector,
         getById,
-        create
+        create,
+        deleteById
     };
 }
 

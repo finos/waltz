@@ -15,7 +15,17 @@
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-
+        <waltz-section-actions>
+            <button waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
+                    class="btn btn-xs btn-danger"
+                    ng-disabled="! (ctrl.mentions | isEmpty)"
+                    uib-popover="This flow cannot be deleted as it is being used in a lineage"
+                    popover-trigger="mouseenter"
+                    popover-enable="{{ ! (ctrl.mentions | isEmpty) }}"
+                    ng-click="ctrl.deleteFlow()">
+                Delete
+            </button>
+        </waltz-section-actions>
 
         <waltz-physical-flow-overview physical-flow="ctrl.physicalFlow"
                                       specification="ctrl.specification">

@@ -1,13 +1,20 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.ProduceConsumeGroup;
+import com.khartec.waltz.model.command.CommandResponse;
+import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
+import com.khartec.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -19,12 +26,16 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "physical-specification");
 
     private final PhysicalSpecificationService specificationService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public PhysicalSpecificationEndpoint(PhysicalSpecificationService specificationService) {
+    public PhysicalSpecificationEndpoint(PhysicalSpecificationService specificationService, UserRoleService userRoleService) {
         checkNotNull(specificationService, "specificationService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
+
         this.specificationService = specificationService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -59,6 +70,9 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
                 "id",
                 ":id");
 
+        String deletePath = mkPath(BASE_URL,
+                ":id");
+
         ListRoute<PhysicalSpecification> findByProducerAppRoute =
                 (request, response) -> specificationService.findByProducer(getEntityReference(request));
 
@@ -81,5 +95,21 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
 
         getForDatum(findByAppPath, findByAppRoute);
         getForDatum(getByIdPath, getByIdRoute);
+
+        deleteForDatum(deletePath, this::deleteSpecification);
+    }
+
+
+    private CommandResponse<PhysicalSpecificationDeleteCommand> deleteSpecification(Request request, Response response) {
+        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+
+        long specId = getId(request);
+        String username = getUsername(request);
+
+        ImmutablePhysicalSpecificationDeleteCommand deleteCommand = ImmutablePhysicalSpecificationDeleteCommand.builder()
+                .specificationId(specId)
+                .build();
+
+        return specificationService.delete(deleteCommand, username);
     }
 }
