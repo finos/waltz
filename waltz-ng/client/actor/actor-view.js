@@ -6,7 +6,10 @@ const template = require('./actor-view.html');
 const initialState = {
     logs: [],
     physicalFlows: [],
-    physicalSpecifications: []
+    physicalSpecifications: [],
+    physicalFlowsUnusedSpecificationsCount: 0,
+    physicalFlowsProducesCount: 0,
+    physicalFlowsConsumesCount: 0
 };
 
 
@@ -37,6 +40,31 @@ function controller($stateParams,
     changeLogStore
         .findByEntityReference('ACTOR', id)
         .then(log => vm.log = log);
+
+    vm.onPhysicalFlowsInitialise = (e) => {
+        vm.physicalFlowProducesExportFn = e.exportProducesFn;
+        vm.physicalFlowConsumesExportFn = e.exportConsumesFn;
+        vm.physicalFlowUnusedSpecificationsExportFn = e.exportUnusedSpecificationsFn;
+    };
+
+    vm.onPhysicalFlowsChange = (e) => {
+        vm.physicalFlowsProducesCount = e.producesCount;
+        vm.physicalFlowsConsumesCount = e.consumesCount;
+        vm.physicalFlowsUnusedSpecificationsCount = e.unusedSpecificationsCount;
+    };
+
+    vm.exportPhysicalFlowProduces = () => {
+        vm.physicalFlowProducesExportFn();
+    };
+
+    vm.exportPhysicalFlowConsumes = () => {
+        vm.physicalFlowConsumesExportFn();
+    };
+
+    vm.exportPhysicalFlowUnusedSpecifications = () => {
+        vm.physicalFlowUnusedSpecificationsExportFn();
+    };
+
 
 }
 
