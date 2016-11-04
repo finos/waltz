@@ -3,22 +3,25 @@
     <tr>
         <th>Specification Name</th>
         <th>Source</th>
-        <th>Format</th>
-        <th>Transport</th>
         <th>Action</th>
     </tr>
     </thead>
     <tbody>
     <tr ng-repeat="c in $ctrl.candidates"
+        uib-popover="
+            {{ c.specification.format | toDisplayName:'dataFormatKind' }} /
+            {{ c.physicalFlow.transport | toDisplayName:'transportKind' }} /
+            {{ c.physicalFlow.frequency | toDisplayName:'frequencyKind' }} "
+        popover-trigger="mouseenter"
+        popover-placement="left"
         class="waltz-visibility-parent">
         <td><span ng-bind="c.specification.name"></span></td>
         <td>
-            <a ng-click="$ctrl.onRefocus(c.sourceRef)"
-               class="clickable"
-               ng-bind="c.sourceRef.name"></a>
+            <waltz-entity-icon-label ng-click="$ctrl.onRefocus(c.sourceRef)"
+                                     class="clickable waltz-action-link"
+                                     entity-ref="c.sourceRef">
+            </waltz-entity-icon-label>
         </td>
-        <td><span class='text-muted' ng-bind="c.specification.format"></span></td>
-        <td><span class='text-muted' ng-bind="c.physicalFlow.transport"></span></td>
         <td>
             <span class="waltz-visibility-child-30">
                 <button ng-click='$ctrl.onAdd(c.physicalFlow.id)'
@@ -30,3 +33,7 @@
     </tr>
     </tbody>
 </table>
+
+
+<td><span class='text-muted' ng-bind=""></span></td>
+<td><span class='text-muted' ng-bind="c.physicalFlow.transport"></span></td>

@@ -7,9 +7,27 @@ const template = require('./physical-flow-view.html');
 
 
 const initialState = {
+    bookmarks: [],
+    graph: {
+        data: {
+            flows: [],
+            entities: []
+        },
+        tweakers: {}
+    },
+    lineage: [],
     lineageExportFn: () => {},
-    mentionsExportFn: () => {}
+    mentions: [],
+    mentionsExportFn: () => {},
+    physicalFlow: null,
+    selected: {
+        entity: null,
+        incoming: [],
+        outgoing: []
+    },
+    specification: null,
 };
+
 
 function determineFillColor(d, owningEntity, targetEntity) {
     switch (d.id) {
@@ -44,7 +62,7 @@ function determineStrokeColor(d, owningEntity, targetEntity) {
 }
 
 
-function setupGraphTweakers(owningEntity, targetEntity) {
+function setupGraphTweakers(owningEntity, targetEntity, onClick) {
     return {
         node: {
             update: (selection) => {
@@ -57,7 +75,9 @@ function setupGraphTweakers(owningEntity, targetEntity) {
                     });
             },
             exit: () => {},
-            enter: () => {}
+            enter: (selection) => {
+                selection.on('click.view', onClick);
+            }
         }
     };
 }
@@ -107,10 +127,9 @@ function loadBookmarks(bookmarkStore, entityRef) {
 
 
 function controller($q,
+                    $scope,
                     $stateParams,
-                    applicationStore,
                     bookmarkStore,
-                    orgUnitStore,
                     physicalFlowLineageStore,
                     physicalSpecificationStore,
                     physicalFlowStore)
@@ -118,10 +137,51 @@ function controller($q,
     const vm = initialiseData(this, initialState);
 
     const flowId = $stateParams.id;
-    const ref = {
-        kind: 'PHYSICAL_FLOW',
-        id: flowId
+
+    // -- INTERACT ---
+    vm.selectEntity = (entity) => {
+        const incoming = _.filter(
+            vm.lineage,
+            f => f.targetEntity.id === entity.id && f.targetEntity.kind === entity.kind);
+
+        const outgoing =  _.filter(
+            vm.lineage,
+            f => f.sourceEntity.id === entity.id && f.sourceEntity.kind === entity.kind);
+
+        vm.selected = {
+            entity,
+            incoming,
+            outgoing
+        };
     };
+
+    vm.preparePopover = (d) => {
+        return `
+            <div class="small">
+                <table class="table small table-condensed">
+                    <tr>
+                        <th>Format</th>
+                        <td><span>${d.specification.format}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Transport</th>
+                        <td><span>${d.flow.transport}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Frequency</th>
+                        <td><span>${d.flow.frequency}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Basis Offset</th>
+                        <td><span>${d.flow.basisOffset}</span></td>
+                    </tr>
+                </table>
+                <div class="text-muted">
+                    ${d.description || ""}
+                </div>
+            </div>
+        `;
+    }
 
     // -- LOAD ---
 
@@ -134,10 +194,6 @@ function controller($q,
         .then(spec => vm.specification = spec);
 
     specPromise
-        .then(spec => applicationStore.getById(spec.owningEntity.id))
-        .then(app => vm.owningEntity = app)
-        .then(app => orgUnitStore.getById(app.organisationalUnitId))
-        .then(ou => vm.organisationalUnit = ou)
         .then(() =>  {
             const specRef = {
                 kind: 'PHYSICAL_SPECIFICATION',
@@ -154,11 +210,18 @@ function controller($q,
 
     $q.all([specPromise, lineagePromise])
         .then(() => {
-            vm.graphTweakers = setupGraphTweakers(vm.specification.owningEntity, vm.physicalFlow.target);
-
             const fullLineage = mkFullLineage(vm.lineage, vm.physicalFlow, vm.specification);
-            vm.lineageFlows = mkLineageFlows(fullLineage);
-            vm.lineageEntities = mkLineageEntities(fullLineage);
+
+            vm.graph = {
+                data: {
+                    entities: mkLineageEntities(fullLineage),
+                    flows: mkLineageFlows(fullLineage)
+                },
+                tweakers: setupGraphTweakers(
+                    vm.specification.owningEntity,
+                    vm.physicalFlow.target,
+                    (d) => $scope.$applyAsync(() => vm.selectEntity(d)))
+            };
         });
 
     physicalFlowLineageStore
@@ -187,10 +250,9 @@ function controller($q,
 
 controller.$inject = [
     '$q',
+    '$scope',
     '$stateParams',
-    'ApplicationStore',
     'BookmarkStore',
-    'OrgUnitStore',
     'PhysicalFlowLineageStore',
     'PhysicalSpecificationStore',
     'PhysicalFlowStore'
