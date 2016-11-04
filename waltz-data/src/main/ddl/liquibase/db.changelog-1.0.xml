@@ -3268,4 +3268,17 @@
         </insert>
     </changeSet>
 
+
+    <!-- 906 - Physical flow delete - delete lineage -->
+    <changeSet author="rovats"
+               id="20161104-906-1">
+        <addForeignKeyConstraint baseColumnNames="described_flow_id"
+                                 baseTableName="physical_flow_lineage"
+                                 constraintName="pfl_described_flow_id_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="physical_flow"/>
+    </changeSet>
+
+
 </databaseChangeLog>
