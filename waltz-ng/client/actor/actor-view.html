@@ -49,6 +49,14 @@
     </waltz-section>
 
 
+    <!-- BOOKMARKS -->
+    <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
+                             entity-id="{{ ctrl.actor.id }}"
+                             kind="ACTOR"
+                             parent-name="{{ ctrl.actor.name }}">
+    </waltz-bookmarks-section>
+
+
     <!-- CHANGE LOG -->
     <waltz-change-log-section entries="ctrl.log"
                               entity-reference="ctrl.entityRef">
