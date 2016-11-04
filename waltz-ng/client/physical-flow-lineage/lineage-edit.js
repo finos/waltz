@@ -1,16 +1,106 @@
 import {initialiseData} from '../common';
 import _ from 'lodash';
 
+import {green, grey, blue, actor} from "../common/colors";
+
+
+function determineFillColor(d, owningEntity, targetEntity) {
+    switch (d.id) {
+        case (owningEntity.id): return blue;
+        case (targetEntity.id):
+            return targetEntity.kind === 'APPLICATION'
+                ? green
+                : actor;
+        default: return grey;
+    }
+}
+
+
+function determineRadius(d, owningEntity, targetEntity) {
+    switch (d.id) {
+        case (owningEntity.id): return 8;
+        case (targetEntity.id): return 10;
+        default: return 6;
+    }
+}
+
+
+function determineStrokeColor(d, owningEntity, targetEntity) {
+    switch (d.id) {
+        case (owningEntity.id): return blue.darker();
+        case (targetEntity.id):
+            return targetEntity.kind === 'APPLICATION'
+                ? green.darker()
+                : actor.darker();
+        default: return grey;
+    }
+}
+
+
+function setupGraphTweakers(owningEntity, targetEntity, onClick) {
+    return {
+        node: {
+            update: (selection) => {
+                selection
+                    .select('circle')
+                    .attr({
+                        'fill': d => determineFillColor(d, owningEntity, targetEntity),
+                        'stroke': d => determineStrokeColor(d, owningEntity, targetEntity),
+                        'r': d => determineRadius(d, owningEntity, targetEntity)
+                    });
+            },
+            exit: () => {},
+            enter: (selection) => {
+                selection.on('click.edit', onClick);
+            }
+        }
+    };
+}
+
+
+function mkLineageFlows(lineage = []) {
+    return _.map(
+        lineage,
+        (x) => {
+            return {
+                id: x.flow.id,
+                source: x.sourceEntity,
+                target: x.targetEntity
+            };
+        });
+}
+
+
+function mkLineageEntities(lineage = []) {
+    return _.chain(lineage)
+        .flatMap(
+            x => [
+                x.sourceEntity,
+                x.targetEntity])
+        .uniqBy('id')
+        .value();
+}
+
+
+function mkFullLineage(lineage = [], flow, spec) {
+    if (!flow || !spec) { return lineage; }
+    const finalEntry = {
+        flow,
+        specification: spec,
+        sourceEntity: spec.owningEntity,
+        targetEntity: flow.target
+    };
+    return _.concat(lineage, [finalEntry]);
+}
+
 
 const template = require('./lineage-edit.html');
 
 
 const initialState = {
-    selectedApp: { app: null },
     contributors : [],
     searchResults: {
-        selectedApp : null,
-        logicalFlows: [],
+        entityRef: null,
         physicalFlows: [],
         specifications: [],
         loading: false
@@ -20,18 +110,32 @@ const initialState = {
             nameEditor: false,
             descriptionEditor: false
         },
-    }
+    },
+    graph: {
+        data: {
+            flows: [],
+            entities: []
+        },
+        tweakers: {}
+    },
 };
+
+
+function mergeEntities(originals = [], updates = []) {
+    const originalsById = _.keyBy(originals, 'id');
+
+    return _.map(updates, u => {
+        const existing = originalsById[u.id];
+        return existing ? existing : u;
+    });
+}
 
 
 function controller($q,
                     $scope,
                     $stateParams,
-                    applicationStore,
                     physicalFlowLineageStore,
-                    logicalDataFlowStore,
                     notification,
-                    orgUnitStore,
                     physicalSpecificationStore,
                     physicalFlowStore) {
 
@@ -41,79 +145,64 @@ function controller($q,
 
     const loadLineage = () => physicalFlowLineageStore
         .findByPhysicalFlowId(physicalFlowId)
-        .then(lineage => vm.lineage = lineage);
+        .then(lineage => vm.lineage = lineage)
+        .then(() => {
+            const fullLineage = mkFullLineage(vm.lineage, vm.describedFlow, vm.describedSpecification);
+            const graphEntities = mkLineageEntities(fullLineage);
+            const graphFlows = mkLineageFlows(fullLineage);
+            vm.graph = {
+                data: {
+                    flows: graphFlows,
+                    entities: mergeEntities(vm.graph.data.entities, graphEntities),
+                },
+                tweakers: setupGraphTweakers(
+                    vm.describedSpecification.owningEntity,
+                    vm.describedFlow.target,
+                    (d) => $scope.$applyAsync(() => vm.doSearch(d)))
+            }
+        });
 
-    loadLineage();
 
     physicalFlowStore.getById(physicalFlowId)
         .then(flow => vm.describedFlow = flow)
         .then(flow => physicalSpecificationStore.getById(flow.specificationId))
-        .then(spec => vm.describedSpecification = spec)
-        .then(spec => applicationStore.getById(spec.owningEntity.id))
-        .then(app => vm.owningApplication = app)
-        .then(app => orgUnitStore.getById(app.organisationalUnitId))
-        .then(ou => vm.owningOrgUnit = ou)
-        .then(app => vm.selectedApp = { app: vm.owningApplication });
+        .then(spec => {
+            vm.describedSpecification = spec;
+            loadLineage();
+            vm.doSearch(vm.describedSpecification.owningEntity);
+        });
 
-
-    $scope.$watch('ctrl.selectedApp.app', () =>
-        searchViaQuery(vm.selectedApp));
 
     function resetSearch() {
-        vm.searchResults.app = null;
         vm.searchResults.loading = false;
-        vm.searchResults.logicalFlows = [];
         vm.searchResults.physicalFlows = [];
         vm.searchResults.specifications = [];
-        vm.searchResults.relatedApps = [];
     }
 
-    function searchViaQuery(holder = { app : null }) {
-        const app = holder.app;
-        if (! app) return;
-        return searchForCandidateSpecifications(app.id);
-    }
 
-    function searchForCandidateSpecifications( appId ) {
+    function searchForCandidateSpecifications( ref ) {
         resetSearch();
 
         vm.searchResults.loading = true;
-
-        const appRef = {
-            kind: 'APPLICATION',
-            id: appId
-        };
+        vm.searchResults.entityRef = ref;
 
         const promises = [
-            applicationStore.getById(appId)
-                .then(app => vm.searchResults.app = app),
             physicalSpecificationStore
-                .findByEntityReference(appRef)
+                .findByEntityReference(ref)
                 .then(xs => vm.searchResults.specifications = xs),
             physicalFlowStore
-                .findByEntityReference(appRef)
-                .then(xs => vm.searchResults.physicalFlows = xs),
-            logicalDataFlowStore
-                .findByEntityReference(appRef)
-                .then(xs => vm.searchResults.logicalFlows = xs)
+                .findByEntityReference(ref)
+                .then(xs => vm.searchResults.physicalFlows = xs)
         ];
 
         $q.all(promises)
-            .then(() => {
-                const logicalFlowApps = _.flatMap(vm.searchResults.logicalFlows, lf => [lf.source, lf.target]);
-
-                vm.searchResults.relatedApps = _.chain(logicalFlowApps)
-                    .uniqBy("id")
-                    .value();
-            })
             .then(() => vm.searchResults.loading = false);
     }
 
-
-
     // -- INTERACTION
 
-    vm.doSearch = (appRef) => searchForCandidateSpecifications(appRef.id);
+    vm.doSearch = (ref) => searchForCandidateSpecifications(ref);
+
 
     vm.addPhysicalFlow = (physicalFlowId) => {
         physicalFlowLineageStore
@@ -132,16 +221,12 @@ function controller($q,
 }
 
 
-
 controller.$inject = [
     '$q',
     '$scope',
     '$stateParams',
-    'ApplicationStore',
     'PhysicalFlowLineageStore',
-    'DataFlowDataStore', // LogicalDataFlowStore
     'Notification',
-    'OrgUnitStore',
     'PhysicalSpecificationStore',
     'PhysicalFlowStore'
 ];
