@@ -44,13 +44,13 @@ function controller($stateParams,
     vm.onPhysicalFlowsInitialise = (e) => {
         vm.physicalFlowProducesExportFn = e.exportProducesFn;
         vm.physicalFlowConsumesExportFn = e.exportConsumesFn;
-        vm.physicalFlowUnusedSpecificationsExportFn = e.exportUnusedSpecificationsFn;
+        vm.physicalFlowUnusedExportFn = e.exportUnusedSpecificationsFn;
     };
 
     vm.onPhysicalFlowsChange = (e) => {
         vm.physicalFlowsProducesCount = e.producesCount;
         vm.physicalFlowsConsumesCount = e.consumesCount;
-        vm.physicalFlowsUnusedSpecificationsCount = e.unusedSpecificationsCount;
+        vm.physicalFlowsUnusedCount = e.unusedSpecificationsCount;
     };
 
     vm.exportPhysicalFlowProduces = () => {
@@ -61,7 +61,7 @@ function controller($stateParams,
         vm.physicalFlowConsumesExportFn();
     };
 
-    vm.exportPhysicalFlowUnusedSpecifications = () => {
+    vm.exportPhysicalFlowUnused = () => {
         vm.physicalFlowUnusedSpecificationsExportFn();
     };
 

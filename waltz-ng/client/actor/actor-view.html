@@ -20,7 +20,8 @@
     <br>
 
 
-    <waltz-section name="Physical Flows">
+    <waltz-section name="Physical Flows"
+                   id="physical-flows-section">
 
         <waltz-section-actions>
             <a class="btn btn-xs btn-primary"
@@ -29,50 +30,13 @@
                 Register
             </a>
 
-            <div class="btn-group"
-                 uib-dropdown>
-
-                <button type="button"
-                        ng-disabled="ctrl.physicalFlowsProducesCount == 0
-                                        && ctrl.physicalFlowsConsumesCount == 0
-                                        && ctrl.physicalFlowsUnusedSpecificationsCount == 0"
-                        class="btn btn-xs btn-primary"
-                        uib-dropdown-toggle>
-                    Export <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu"
-                    uib-dropdown-menu
-                    style="min-width: 50px;"
-                    role="menu">
-                    <li role="menuitem">
-                        <a href=""
-                           ng-click="ctrl.exportPhysicalFlowProduces()"
-                           ng-hide="ctrl.physicalFlowsProducesCount == 0"
-                           class="small">
-                            <waltz-icon name="download"></waltz-icon>
-                            Produces
-                        </a>
-                    </li>
-                    <li role="menuitem">
-                        <a href=""
-                           ng-click="ctrl.exportPhysicalFlowConsumes()"
-                           ng-hide="ctrl.physicalFlowsConsumesCount == 0"
-                           class="small">
-                            <waltz-icon name="download"></waltz-icon>
-                            Consumes
-                        </a>
-                    </li>
-                    <li role="menuitem">
-                        <a href=""
-                           ng-click="ctrl.exportPhysicalFlowUnusedSpecifications()"
-                           ng-hide="ctrl.physicalFlowsUnusedSpecificationsCount == 0"
-                           class="small">
-                            <waltz-icon name="download"></waltz-icon>
-                            Unused
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <waltz-physical-flow-export-buttons unused-count="ctrl.physicalFlowsUnusedCount"
+                                                consumes-count="ctrl.physicalFlowsConsumesCount"
+                                                produces-count="ctrl.physicalFlowsProducesCount"
+                                                export-consumes="ctrl.exportPhysicalFlowConsumes"
+                                                export-produces="ctrl.exportPhysicalFlowProduces"
+                                                export-unused="exportPhysicalFlowUnused">
+            </waltz-physical-flow-export-buttons>
 
         </waltz-section-actions>
 
