@@ -1,4 +1,4 @@
-import {initialiseData} from '../common';
+import {initialiseData} from "../common";
 
 const template = require('./actor-view.html');
 
@@ -15,6 +15,7 @@ const initialState = {
 
 function controller($stateParams,
                     actorStore,
+                    bookmarkStore,
                     changeLogStore,
                     physicalFlowStore,
                     physicalSpecificationStore) {
@@ -36,6 +37,9 @@ function controller($stateParams,
     physicalSpecificationStore
         .findByEntityReference(entityRef)
         .then(specs => vm.physicalSpecifications = specs);
+
+    bookmarkStore.findByParent(entityRef)
+        .then(bookmarks => vm.bookmarks = bookmarks);
 
     changeLogStore
         .findByEntityReference('ACTOR', id)
@@ -72,6 +76,7 @@ function controller($stateParams,
 controller.$inject = [
     '$stateParams',
     'ActorStore',
+    'BookmarkStore',
     'ChangeLogDataService',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore'
