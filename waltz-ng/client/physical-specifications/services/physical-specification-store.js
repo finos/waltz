@@ -26,10 +26,16 @@ function store($http, baseApiUrl) {
         .then(r => r.data);
 
 
+    const deleteById = (id) => $http
+            .delete(`${base}/${id}`)
+            .then(r => r.data);
+
+
     return {
         findByEntityReference,
         findBySelector,
-        getById
+        getById,
+        deleteById
     };
 }
 

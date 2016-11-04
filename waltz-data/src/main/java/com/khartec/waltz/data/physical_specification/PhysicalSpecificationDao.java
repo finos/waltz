@@ -172,4 +172,13 @@ public class PhysicalSpecificationDao {
         return record.getId();
     }
 
+
+    public int delete(long specId) {
+        return dsl.deleteFrom(PHYSICAL_SPECIFICATION)
+                .where(PHYSICAL_SPECIFICATION.ID.eq(specId))
+                .and(notExists(selectFrom(PHYSICAL_FLOW)
+                                .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specId))))
+                .execute();
+    }
+
 }

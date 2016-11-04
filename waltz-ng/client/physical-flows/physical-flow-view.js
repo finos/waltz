@@ -126,10 +126,23 @@ function loadBookmarks(bookmarkStore, entityRef) {
 }
 
 
+function navigateToLastView($state, historyStore) {
+    const lastHistoryItem = historyStore.all[0];
+    if (lastHistoryItem) {
+        $state.go(lastHistoryItem.state, lastHistoryItem.stateParams);
+    } else {
+        $state.go('main.home');
+    }
+}
+
+
 function controller($q,
                     $scope,
+                    $state,
                     $stateParams,
                     bookmarkStore,
+                    historyStore,
+                    notification,
                     physicalFlowLineageStore,
                     physicalSpecificationStore,
                     physicalFlowStore)
@@ -245,14 +258,51 @@ function controller($q,
         vm.mentionsExportFn();
     };
 
+    const deleteSpecification = () => {
+        physicalSpecificationStore.deleteById(vm.specification.id)
+            .then(r => {
+                if (r.outcome === 'SUCCESS') {
+                    notification.success(`Specification ${vm.specification.name} deleted`);
+                } else {
+                    notification.error(r.message);
+                }
+                navigateToLastView($state, historyStore);
+            })
+    };
+
+    const handleDeleteFlowResponse = (response) => {
+        if (response.outcome === 'SUCCESS') {
+            notification.success('Physical flow deleted');
+            const deleteSpecText = `The specification ${vm.specification.name} is no longer referenced by any physical flow. Do you want to delete the specification?`;
+            if (response.isSpecificationUnused && confirm(deleteSpecText)) {
+                deleteSpecification();
+            } else {
+                navigateToLastView($state, historyStore);
+            }
+        } else {
+            notification.error(response.message);
+        }
+    };
+
+    vm.deleteFlow = () => {
+        if (confirm('Are you sure you want to delete this flow ?')) {
+            physicalFlowStore
+                .deleteById(flowId)
+                .then(r => handleDeleteFlowResponse(r));
+        }
+    };
+
 }
 
 
 controller.$inject = [
     '$q',
     '$scope',
+    '$state',
     '$stateParams',
     'BookmarkStore',
+    'HistoryStore',
+    'Notification',
     'PhysicalFlowLineageStore',
     'PhysicalSpecificationStore',
     'PhysicalFlowStore'
