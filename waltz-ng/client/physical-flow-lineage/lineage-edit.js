@@ -157,7 +157,16 @@ function controller($q,
                 tweakers: setupGraphTweakers(
                     vm.describedSpecification.owningEntity,
                     vm.describedFlow.target,
-                    (d) => $scope.$applyAsync(() => vm.doSearch(d)))
+                    (d) => {
+                        return $scope.$applyAsync(() => {
+                            if(vm.describedFlow.target === d) {
+                                resetSearch();
+                                vm.searchResults.entityRef = d;
+                            } else {
+                                vm.doSearch(d);
+                            }
+                        });
+                    })
             }
         });
 
