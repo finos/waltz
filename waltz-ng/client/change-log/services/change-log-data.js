@@ -14,7 +14,6 @@ export default [
             $http.get(`${BASE}/user/${userName}`)
                 .then(r => r.data);
 
-
         return {
             findByEntityReference,
             findForUserName

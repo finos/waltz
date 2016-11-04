@@ -20,6 +20,9 @@ function setup(module) {
             'waltzPhysicalFlowEditTargetEntity',
             require('./components/edit-target-entity/physical-flow-edit-target-entity'))
         .component(
+            'waltzPhysicalFlowExportButtons',
+            require('./components/export-buttons/physical-flow-export-buttons'))
+        .component(
             'waltzPhysicalFlowAttributeEditor',
             require('./components/attribute-editor/physical-flow-attribute-editor'));
 }

@@ -20,7 +20,8 @@
     <br>
 
 
-    <waltz-section name="Physical Flows">
+    <waltz-section name="Physical Flows"
+                   id="physical-flows-section">
 
         <waltz-section-actions>
             <a class="btn btn-xs btn-primary"
@@ -28,6 +29,15 @@
                waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
                 Register
             </a>
+
+            <waltz-physical-flow-export-buttons unused-count="ctrl.physicalFlowsUnusedCount"
+                                                consumes-count="ctrl.physicalFlowsConsumesCount"
+                                                produces-count="ctrl.physicalFlowsProducesCount"
+                                                export-consumes="ctrl.exportPhysicalFlowConsumes"
+                                                export-produces="ctrl.exportPhysicalFlowProduces"
+                                                export-unused="exportPhysicalFlowUnused">
+            </waltz-physical-flow-export-buttons>
+
         </waltz-section-actions>
 
         <waltz-physical-data-section specifications="ctrl.physicalSpecifications"
