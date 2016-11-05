@@ -3,9 +3,9 @@
            class="table table-condensed small">
         <thead>
         <tr>
-            <th>Specification Name</th>
-            <th>Source</th>
-            <th>Action</th>
+            <th style="width: 45%">Specification Name</th>
+            <th style="width: 45%">Source</th>
+            <th style="width: 10%">Action</th>
         </tr>
         </thead>
         <tbody>
@@ -17,20 +17,22 @@
             popover-trigger="mouseenter"
             popover-placement="left"
             class="waltz-visibility-parent">
-            <td><span ng-bind="c.specification.name"></span></td>
-            <td>
+            <td class="force-wrap">
+                <span ng-bind="c.specification.name"></span>
+            </td>
+            <td class="force-wrap">
                 <waltz-entity-icon-label ng-click="$ctrl.onRefocus(c.sourceRef)"
                                          class="clickable waltz-action-link"
                                          entity-ref="c.sourceRef">
                 </waltz-entity-icon-label>
             </td>
             <td>
-            <span class="waltz-visibility-child-30">
-                <button ng-click='$ctrl.onAdd(c.physicalFlow.id)'
-                        class="btn btn-xs btn-primary">
-                    Add
-                </button>
-            </span>
+                <span class="waltz-visibility-child-30">
+                    <button ng-click='$ctrl.onAdd(c.physicalFlow.id)'
+                            class="btn btn-xs btn-primary">
+                        Add
+                    </button>
+                </span>
             </td>
         </tr>
         </tbody>
@@ -38,7 +40,6 @@
 
     <div ng-show="$ctrl.candidates.length == 0"
          ng-transclude="empty">
-
     </div>
 
 </div>
