@@ -86,8 +86,8 @@
                         <table class="table table-condensed small table-hover">
                             <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Source</th>
+                                <th style="width: 60%">Name</th>
+                                <th style="width: 40%">Source</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -95,10 +95,10 @@
                                 uib-popover-html="ctrl.preparePopover(r)"
                                 popover-trigger="mouseenter"
                                 popover-placement="left">
-                                <td>
+                                <td class="force-wrap">
                                     <span ng-bind="r.specification.name"></span>
                                 </td>
-                                <td>
+                                <td class="force-wrap">
                                     <waltz-entity-icon-label ng-click="ctrl.selectEntity(r.sourceEntity)"
                                                              class="waltz-action-link"
                                                              entity-ref="r.sourceEntity">
@@ -114,8 +114,8 @@
                         <table class="table table-condensed small table-hover">
                             <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Target</th>
+                                <th style="width: 60%">Name</th>
+                                <th style="width: 40%">Target</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -123,10 +123,10 @@
                                 uib-popover-html="ctrl.preparePopover(r)"
                                 popover-trigger="mouseenter"
                                 popover-placement="left">
-                                <td>
+                                <td class="force-wrap">
                                     <span ng-bind="r.specification.name"></span>
                                 </td>
-                                <td>
+                                <td class="force-wrap">
                                     <waltz-entity-icon-label ng-click="ctrl.selectEntity(r.targetEntity)"
                                                              class="waltz-action-link"
                                                              entity-ref="r.targetEntity">
