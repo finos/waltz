@@ -62,7 +62,10 @@ controller.$inject = [];
 const component = {
     template,
     bindings,
-    controller
+    controller,
+    transclude: {
+        'empty': 'empty'
+    }
 };
 
 export default component;

@@ -1,39 +1,45 @@
-<table class="table table-condensed small">
-    <thead>
-    <tr>
-        <th>Specification Name</th>
-        <th>Source</th>
-        <th>Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr ng-repeat="c in $ctrl.candidates"
-        uib-popover="
-            {{ c.specification.format | toDisplayName:'dataFormatKind' }} /
-            {{ c.physicalFlow.transport | toDisplayName:'transportKind' }} /
-            {{ c.physicalFlow.frequency | toDisplayName:'frequencyKind' }} "
-        popover-trigger="mouseenter"
-        popover-placement="left"
-        class="waltz-visibility-parent">
-        <td><span ng-bind="c.specification.name"></span></td>
-        <td>
-            <waltz-entity-icon-label ng-click="$ctrl.onRefocus(c.sourceRef)"
-                                     class="clickable waltz-action-link"
-                                     entity-ref="c.sourceRef">
-            </waltz-entity-icon-label>
-        </td>
-        <td>
+<div>
+    <table ng-show="$ctrl.candidates.length > 0"
+           class="table table-condensed small">
+        <thead>
+        <tr>
+            <th>Specification Name</th>
+            <th>Source</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="c in $ctrl.candidates"
+            uib-popover="
+                {{ c.specification.format | toDisplayName:'dataFormatKind' }} /
+                {{ c.physicalFlow.transport | toDisplayName:'transportKind' }} /
+                {{ c.physicalFlow.frequency | toDisplayName:'frequencyKind' }} "
+            popover-trigger="mouseenter"
+            popover-placement="left"
+            class="waltz-visibility-parent">
+            <td><span ng-bind="c.specification.name"></span></td>
+            <td>
+                <waltz-entity-icon-label ng-click="$ctrl.onRefocus(c.sourceRef)"
+                                         class="clickable waltz-action-link"
+                                         entity-ref="c.sourceRef">
+                </waltz-entity-icon-label>
+            </td>
+            <td>
             <span class="waltz-visibility-child-30">
                 <button ng-click='$ctrl.onAdd(c.physicalFlow.id)'
                         class="btn btn-xs btn-primary">
                     Add
                 </button>
             </span>
-        </td>
-    </tr>
-    </tbody>
-</table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
+    <div ng-show="$ctrl.candidates.length == 0"
+         ng-transclude="empty">
 
-<td><span class='text-muted' ng-bind=""></span></td>
-<td><span class='text-muted' ng-bind="c.physicalFlow.transport"></span></td>
+    </div>
+
+</div>
+
