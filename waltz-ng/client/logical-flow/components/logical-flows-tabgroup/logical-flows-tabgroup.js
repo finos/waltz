@@ -37,10 +37,10 @@ const initialState = {
     enrichedDataTypeCounts: [],
     flowData: null,
     filterOptions: defaultFilterOptions,
-    onLoadDetail: () => console.log("No onLoadDetail provided for data-flows-tabgroup"),
+    onLoadDetail: () => console.log("No onLoadDetail provided for logical-flows-tabgroup"),
     options: defaultOptions,
     optionsVisible: false,
-    onTabChange: () => console.log("No onTabChange provided for data-flows-tabgroup"),
+    onTabChange: () => console.log("No onTabChange provided for logical-flows-tabgroup"),
 };
 
 
