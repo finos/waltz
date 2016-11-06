@@ -15,9 +15,13 @@ export default (module) => {
 
     require('./directives')(module);
 
-    module.service('AppCapabilityStore', require('./services/app-capability-store'));
-
-
-    module.config(require('./routes.js'));
+    module
+        .config(require('./routes.js'))
+        .service(
+            'AppCapabilityStore',
+            require('./services/app-capability-store'))
+        .component(
+            'waltzAppFunctionTabgroupSection',
+            require('./components/app-function-tabgroup-section/app-function-tabgroup-section'));
 
 };
