@@ -122,13 +122,13 @@ function getDataTypeIds(decorators = []) {
 }
 
 
-function prepareGraphTweakers(logicalDataFlowUtilityService,
+function prepareGraphTweakers(logicalFlowUtilityService,
                               applications = [],
                               decorators = [],
                               appSelectFn = (d) => console.log("dftg: no appSelectFn given", d))
 {
     const appIds = _.map(applications, 'id');
-    const tweakers = logicalDataFlowUtilityService.buildGraphTweakers(appIds, decorators);
+    const tweakers = logicalFlowUtilityService.buildGraphTweakers(appIds, decorators);
 
     const dfltNodeEnter = tweakers.node.enter;
     const nodeEnter = selection => selection
@@ -141,7 +141,7 @@ function prepareGraphTweakers(logicalDataFlowUtilityService,
 
 
 function controller($scope,
-                    logicalDataFlowUtilityService,
+                    logicalFlowUtilityService,
                     displayNameService) {
 
     const vm = _.defaultsDeep(this, initialState);
@@ -151,7 +151,7 @@ function controller($scope,
             vm.dataTypes = getDataTypeIds(vm.flowData.decorators);
         }
         if (vm.flowData && vm.flowData.stats) {
-            vm.enrichedDataTypeCounts = logicalDataFlowUtilityService.enrichDataTypeCounts(
+            vm.enrichedDataTypeCounts = logicalFlowUtilityService.enrichDataTypeCounts(
                 vm.flowData.stats.dataTypeCounts,
                 displayNameService);
         }
@@ -170,7 +170,7 @@ function controller($scope,
             filterOptions);
 
         vm.graphTweakers = prepareGraphTweakers(
-            logicalDataFlowUtilityService,
+            logicalFlowUtilityService,
             vm.applications,
             vm.filteredFlowData.decorators,
             app => $scope.$applyAsync(() => vm.selectedApplication = app));
@@ -199,7 +199,7 @@ function controller($scope,
 
 controller.$inject = [
     '$scope',
-    'LogicalDataFlowUtilityService',
+    'LogicalFlowUtilityService',
     'WaltzDisplayNameService'
 ];
 

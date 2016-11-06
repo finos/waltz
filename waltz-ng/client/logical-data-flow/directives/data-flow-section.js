@@ -12,7 +12,7 @@
 import _ from 'lodash';
 
 export default [
-    'LogicalDataFlowUtilityService',
+    'LogicalFlowUtilityService',
     (flowUtils) => ({
         restrict: 'E',
         replace: true,

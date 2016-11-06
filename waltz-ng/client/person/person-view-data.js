@@ -79,7 +79,7 @@ function service($q,
                  complexityStore,
                  entityStatisticStore,
                  involvementStore,
-                 logicalDataFlowViewService,
+                 logicalFlowViewService,
                  personStore,
                  physicalFlowLineageStore,
                  sourceDataRatingStore,
@@ -203,7 +203,7 @@ function service($q,
 
 
     function loadFlows(personId) {
-        return logicalDataFlowViewService
+        return logicalFlowViewService
             .initialise(personId, 'PERSON', 'CHILDREN')
             .then(flows => state.model.dataFlows = flows);
     }
@@ -296,7 +296,7 @@ function service($q,
 
 
     function loadFlowDetail() {
-        return logicalDataFlowViewService
+        return logicalFlowViewService
             .loadDetail()
             .then(flowData => state.model.dataFlows = flowData);
     }
@@ -317,7 +317,7 @@ service.$inject = [
     'ComplexityStore',
     'EntityStatisticStore',
     'InvolvementStore',
-    'LogicalDataFlowViewService',
+    'LogicalFlowViewService',
     'PersonStore',
     'PhysicalFlowLineageStore',
     'SourceDataRatingStore',

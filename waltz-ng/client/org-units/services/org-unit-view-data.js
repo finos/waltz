@@ -183,7 +183,7 @@ function service($q,
                  endUserAppStore,
                  entityStatisticStore,
                  involvementStore,
-                 logicalDataFlowViewService,
+                 logicalFlowViewService,
                  orgUnitStore,
                  physicalFlowLineageStore,
                  ratingStore,
@@ -227,7 +227,7 @@ function service($q,
         const selector = mkSelector(orgUnitId);
 
         return $q.all([
-            initialiseDataFlows(logicalDataFlowViewService, orgUnitId, rawData),
+            initialiseDataFlows(logicalFlowViewService, orgUnitId, rawData),
             loadInvolvement(involvementStore, orgUnitId, rawData),
             loadCapabilityRatings(ratingStore, selector, rawData),
             loadAppCapabilities(appCapabilityStore, selector, rawData),
@@ -267,7 +267,7 @@ function service($q,
 
 
     function loadFlowDetail() {
-        return logicalDataFlowViewService
+        return logicalFlowViewService
             .loadDetail()
             .then(dataFlows => rawData.dataFlows = dataFlows);
     }
@@ -304,7 +304,7 @@ service.$inject = [
     'EndUserAppStore',
     'EntityStatisticStore',
     'InvolvementStore',
-    'LogicalDataFlowViewService',
+    'LogicalFlowViewService',
     'OrgUnitStore',
     'PhysicalFlowLineageStore',
     'RatingStore',

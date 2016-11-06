@@ -109,7 +109,7 @@ function controller($scope,
                     complexityStore,
                     entityStatisticStore,
                     historyStore,
-                    logicalDataFlowViewService,
+                    logicalFlowViewService,
                     physicalFlowLineageStore,
                     ratingStore,
                     sourceDataRatingStore,
@@ -135,7 +135,7 @@ function controller($scope,
             member.role === 'OWNER'
             && member.userId === vm.user.userName;
 
-    logicalDataFlowViewService
+    logicalFlowViewService
         .initialise(id, 'APP_GROUP', 'EXACT')
         .then(flows => vm.dataFlows = flows);
 
@@ -205,7 +205,7 @@ function controller($scope,
         })
     };
 
-    vm.loadFlowDetail = () => logicalDataFlowViewService
+    vm.loadFlowDetail = () => logicalFlowViewService
         .loadDetail()
         .then(flowData => vm.dataFlows = flowData);
 
@@ -239,7 +239,7 @@ controller.$inject = [
     'ComplexityStore',
     'EntityStatisticStore',
     'HistoryStore',
-    'LogicalDataFlowViewService',
+    'LogicalFlowViewService',
     'PhysicalFlowLineageStore',
     'RatingStore',
     'SourceDataRatingStore',

@@ -77,7 +77,7 @@ controller.$inject = [
     'dataType',
     'DataTypeViewDataService',
     'HistoryStore',
-    'LogicalDataFlowViewService',
+    'LogicalFlowViewService',
     'TourService'
 ];
 
