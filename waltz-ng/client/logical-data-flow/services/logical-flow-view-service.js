@@ -9,9 +9,10 @@ const initData = {
 
 
 function service($q,
-                 dataFlowStore,
                  dataFlowDecoratorStore,
-                 dataTypeUsageStore) {
+                 dataTypeUsageStore,
+                 logicalFlowStore)
+{
     let data = initData;
 
     function initialise(id, kind, scope = 'CHILDREN') {
@@ -24,7 +25,7 @@ function service($q,
 
         const statStore = data.options.entityReference.kind === 'DATA_TYPE'
             ? dataTypeUsageStore
-            : dataFlowStore;
+            : logicalFlowStore;
 
         return statStore
             .calculateStats(data.options)
@@ -43,7 +44,7 @@ function service($q,
 
         data.loadingFlows = true;
 
-        const flowPromise = dataFlowStore
+        const flowPromise = logicalFlowStore
             .findBySelector(data.options)
             .then(flows => data.flows = flows);
 
@@ -73,9 +74,9 @@ function service($q,
 
 service.$inject = [
     '$q',
-    'DataFlowDataStore',
     'DataFlowDecoratorStore',
-    'DataTypeUsageStore'
+    'DataTypeUsageStore',
+    'LogicalFlowStore'
 ];
 
 

@@ -81,7 +81,9 @@ function mkInfoCell(selection, flowData, apps = []) {
 }
 
 
-function controller(dataTypeService, dataFlowDecoratorStore) {
+function controller(dataTypeService,
+                    dataFlowDecoratorStore)
+{
     const vm = _.defaultsDeep(this, initialState);
 
     const childSelector = {
@@ -120,8 +122,7 @@ function controller(dataTypeService, dataFlowDecoratorStore) {
 
 controller.$inject = [
     'DataTypeService',
-    'DataFlowDecoratorStore',
-    'DataFlowDataStore'
+    'DataFlowDecoratorStore'
 ];
 
 

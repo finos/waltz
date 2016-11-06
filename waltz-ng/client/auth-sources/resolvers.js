@@ -35,7 +35,7 @@ export function flowResolver(flowStore, params) {
     return flowStore.findBySelector(mkSelector(params));
 }
 
-flowResolver.$inject = ['DataFlowDataStore', '$stateParams'];
+flowResolver.$inject = ['LogicalFlowStore', '$stateParams'];
 
 
 export function idResolver(params) {

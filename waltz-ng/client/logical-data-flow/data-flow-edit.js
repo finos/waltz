@@ -89,10 +89,10 @@ function addFlow(flows, flow) {
 function controller($scope,
                     application,
                     authSourceStore,
-                    dataFlowStore,
                     dataFlowDecoratorStore,
                     dataTypeService,
                     dataTypeUsageStore,
+                    logicalFlowStore,
                     notification) {
     const primaryAppId = application.id;
 
@@ -106,7 +106,7 @@ function controller($scope,
     };
 
     const reload = () => {
-        loadDataFlows(dataFlowStore, primaryAppId, vm);
+        loadDataFlows(logicalFlowStore, primaryAppId, vm);
         loadDataFlowDecorators(dataFlowDecoratorStore, primaryAppId, vm);
         loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm);
         vm.cancel();
@@ -162,7 +162,7 @@ function controller($scope,
 
     vm.updateFlow = (command) => {
         if (! command.flowId) {
-            return dataFlowStore.addFlow(vm.selectedFlow)
+            return logicalFlowStore.addFlow(vm.selectedFlow)
                 .then(flow => Object.assign(command, { flowId: flow.id }))
                 .then(updateDecorators);
 
@@ -172,7 +172,7 @@ function controller($scope,
     };
 
     vm.deleteFlow = (flow) => {
-        dataFlowStore
+        logicalFlowStore
             .removeFlow(flow.id)
             .then(reload)
             .then(() => notification.warning('Data flow removed'));
@@ -219,10 +219,10 @@ controller.$inject = [
     '$scope',
     'application',
     'AuthSourcesStore',
-    'DataFlowDataStore',
     'DataFlowDecoratorStore',
     'DataTypeService',
     'DataTypeUsageStore',
+    'LogicalFlowStore',
     'Notification'
 ];
 
