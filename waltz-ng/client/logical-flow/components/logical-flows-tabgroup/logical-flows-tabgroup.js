@@ -207,7 +207,7 @@ controller.$inject = [
 const component = {
     controller,
     bindings,
-    template: require('./data-flows-tabgroup.html')
+    template: require('./logical-flows-tabgroup.html')
 };
 
 
