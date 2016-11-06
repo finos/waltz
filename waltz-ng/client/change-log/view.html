@@ -4,6 +4,7 @@
     </waltz-page-header>
 
     <waltz-section name="Entries">
+
         <waltz-section-actions>
             <button ng-click="ctrl.exportChangeLog()"
                     class="btn btn-xs btn-primary"
@@ -19,7 +20,9 @@
         </div>
 
         <div ng-if="ctrl.entries.length == 0">
-            <i class="text-muted"> No changes yet </i>
+            <i class="text-muted">
+                No changes yet
+            </i>
         </div>
     </waltz-section>
 

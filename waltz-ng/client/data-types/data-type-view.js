@@ -24,8 +24,8 @@ const initialState = {
 function controller($scope,
                     dataType,
                     viewDataService,
-                    dataFlowService,
                     historyStore,
+                    logicalDataFlowService,
                     tourService) {
 
     const vm = initialiseData(this, initialState);
@@ -63,10 +63,10 @@ function controller($scope,
         .then(tour => vm.tour = tour);
 
 
-    dataFlowService
+    logicalDataFlowService
         .initialise(selector)
         .then(flowData => vm.flowData = flowData)
-        .then(() => dataFlowService.loadDetail())
+        .then(() => logicalDataFlowService.loadDetail())
         .then(flowData => vm.flowData = flowData);
 
 }
@@ -76,8 +76,8 @@ controller.$inject = [
     '$scope',
     'dataType',
     'DataTypeViewDataService',
-    'DataFlowViewService',
     'HistoryStore',
+    'LogicalFlowViewService',
     'TourService'
 ];
 

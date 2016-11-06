@@ -1,4 +1,4 @@
-<div class="row waltz-data-flows-tabgroup">
+<div class="row waltz-logical-flows-tabgroup">
     <div class="col-md-6 col-md-offset-6">
         <waltz-flow-filter-options-overlay visible="$ctrl.optionsVisible"
                                            on-change="$ctrl.filterChanged"
@@ -93,9 +93,9 @@
 
                 <div ng-if="$ctrl.boingyEverShown && $ctrl.filteredFlowData.flows.length > 0">
                     <div ng-if="$ctrl.filteredFlowData.entities.length < 200  || $ctrl.visibility.ignoreLimits">
-                        <waltz-data-flow-diagram data="$ctrl.filteredFlowData"
-                                                 tweakers="$ctrl.graphTweakers">
-                        </waltz-data-flow-diagram>
+                        <waltz-logical-flow-diagram data="$ctrl.filteredFlowData"
+                                                    tweakers="$ctrl.graphTweakers">
+                        </waltz-logical-flow-diagram>
 
                         <div class="wdftg-info-box"
                              ng-show="$ctrl.selectedApplication != null">
@@ -136,10 +136,10 @@
                 </waltz-loading-notification>
                 <div ng-if="$ctrl.filteredFlowData.flows.length > 0 && $ctrl.currentTabIndex == 2"
                      style="height: 300px">
-                    <waltz-data-flow-table flows="$ctrl.filteredFlowData.flows"
+                    <waltz-logical-flow-table flows="$ctrl.filteredFlowData.flows"
                                            decorators="$ctrl.filteredFlowData.decorators">
 
-                    </waltz-data-flow-table>
+                    </waltz-logical-flow-table>
                 </div>
 
                 <div ng-if="$ctrl.filteredFlowData.flows.length == 0 && $ctrl.flowData.flows.length > 0">

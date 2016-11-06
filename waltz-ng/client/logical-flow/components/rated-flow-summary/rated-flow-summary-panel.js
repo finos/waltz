@@ -81,7 +81,9 @@ function mkInfoCell(selection, flowData, apps = []) {
 }
 
 
-function controller(dataTypeService, dataFlowDecoratorStore) {
+function controller(dataTypeService,
+                    LogicalFlowDecoratorStore)
+{
     const vm = _.defaultsDeep(this, initialState);
 
     const childSelector = {
@@ -94,11 +96,11 @@ function controller(dataTypeService, dataFlowDecoratorStore) {
         scope: 'EXACT'
     };
 
-    dataFlowDecoratorStore
+    LogicalFlowDecoratorStore
         .summarizeBySelector(childSelector)
         .then(r => vm.childSummaries = r);
 
-    dataFlowDecoratorStore
+    LogicalFlowDecoratorStore
         .summarizeBySelector(exactSelector)
         .then(r => vm.exactSummaries = r);
 
@@ -120,8 +122,7 @@ function controller(dataTypeService, dataFlowDecoratorStore) {
 
 controller.$inject = [
     'DataTypeService',
-    'DataFlowDecoratorStore',
-    'DataFlowDataStore'
+    'LogicalFlowDecoratorStore'
 ];
 
 

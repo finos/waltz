@@ -12,11 +12,11 @@
 import _ from 'lodash';
 
 export default [
-    'DataFlowUtilityService',
+    'LogicalFlowUtilityService',
     (flowUtils) => ({
         restrict: 'E',
         replace: true,
-        template: require('./data-flow-section.html'),
+        template: require('./logical-flow-section.html'),
         scope: {
             flows: '=',
             selfId: '@'

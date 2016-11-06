@@ -45,8 +45,8 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
-    const findOrphanLogicalDataFlows = () => $http
-        .get(`${BASE}/logical-data-flow`)
+    const findOrphanLogicalFlows = () => $http
+        .get(`${BASE}/logical-flow`)
         .then(result => result.data);
 
 
@@ -57,7 +57,7 @@ function service($http, BaseApiUrl) {
         findOrphanAuthoritativeSourcesByOrgUnit,
         findOrphanAuthoritativeSourcesByDataType,
         findOrphanChangeInitiatives,
-        findOrphanLogicalDataFlows
+        findOrphanLogicalFlows
     };
 
 }

@@ -37,10 +37,10 @@ const initialState = {
     enrichedDataTypeCounts: [],
     flowData: null,
     filterOptions: defaultFilterOptions,
-    onLoadDetail: () => console.log("No onLoadDetail provided for data-flows-tabgroup"),
+    onLoadDetail: () => console.log("No onLoadDetail provided for logical-flows-tabgroup"),
     options: defaultOptions,
     optionsVisible: false,
-    onTabChange: () => console.log("No onTabChange provided for data-flows-tabgroup"),
+    onTabChange: () => console.log("No onTabChange provided for logical-flows-tabgroup"),
 };
 
 
@@ -122,13 +122,13 @@ function getDataTypeIds(decorators = []) {
 }
 
 
-function prepareGraphTweakers(dataFlowUtilityService,
+function prepareGraphTweakers(logicalFlowUtilityService,
                               applications = [],
                               decorators = [],
                               appSelectFn = (d) => console.log("dftg: no appSelectFn given", d))
 {
     const appIds = _.map(applications, 'id');
-    const tweakers = dataFlowUtilityService.buildGraphTweakers(appIds, decorators);
+    const tweakers = logicalFlowUtilityService.buildGraphTweakers(appIds, decorators);
 
     const dfltNodeEnter = tweakers.node.enter;
     const nodeEnter = selection => selection
@@ -141,7 +141,7 @@ function prepareGraphTweakers(dataFlowUtilityService,
 
 
 function controller($scope,
-                    dataFlowUtilityService,
+                    logicalFlowUtilityService,
                     displayNameService) {
 
     const vm = _.defaultsDeep(this, initialState);
@@ -151,7 +151,7 @@ function controller($scope,
             vm.dataTypes = getDataTypeIds(vm.flowData.decorators);
         }
         if (vm.flowData && vm.flowData.stats) {
-            vm.enrichedDataTypeCounts = dataFlowUtilityService.enrichDataTypeCounts(
+            vm.enrichedDataTypeCounts = logicalFlowUtilityService.enrichDataTypeCounts(
                 vm.flowData.stats.dataTypeCounts,
                 displayNameService);
         }
@@ -170,7 +170,7 @@ function controller($scope,
             filterOptions);
 
         vm.graphTweakers = prepareGraphTweakers(
-            dataFlowUtilityService,
+            logicalFlowUtilityService,
             vm.applications,
             vm.filteredFlowData.decorators,
             app => $scope.$applyAsync(() => vm.selectedApplication = app));
@@ -199,7 +199,7 @@ function controller($scope,
 
 controller.$inject = [
     '$scope',
-    'DataFlowUtilityService',
+    'LogicalFlowUtilityService',
     'WaltzDisplayNameService'
 ];
 
@@ -207,7 +207,7 @@ controller.$inject = [
 const component = {
     controller,
     bindings,
-    template: require('./data-flows-tabgroup.html')
+    template: require('./logical-flows-tabgroup.html')
 };
 
 

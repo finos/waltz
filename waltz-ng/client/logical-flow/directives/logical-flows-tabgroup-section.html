@@ -1,7 +1,7 @@
-<div id="dataflows-section">
+<div>
     <waltz-section name="Logical Data Flows"
                    icon="random"
-                   id="data-flows-section">
+                   id="logical-flows-section">
 
         <waltz-section-actions>
             <a ng-click='ctrl.visibility.flowConfigOverlay = !ctrl.visibility.flowConfigOverlay'
@@ -21,12 +21,12 @@
                                    entities="['LOGICAL_DATA_FLOW']">
         </waltz-source-data-overlay>
 
-        <waltz-data-flows-tabgroup flow-data="ctrl.flowData"
-                                   on-load-detail="ctrl.onLoadDetail"
-                                   applications="ctrl.applications"
-                                   options="ctrl.flowOptions"
-                                   options-visible="ctrl.visibility.flowConfigOverlay"
-                                   on-tab-change="ctrl.tabChanged">
-        </waltz-data-flows-tabgroup>
+        <waltz-logical-flows-tabgroup flow-data="ctrl.flowData"
+                                      on-load-detail="ctrl.onLoadDetail"
+                                      applications="ctrl.applications"
+                                      options="ctrl.flowOptions"
+                                      options-visible="ctrl.visibility.flowConfigOverlay"
+                                      on-tab-change="ctrl.tabChanged">
+        </waltz-logical-flows-tabgroup>
     </waltz-section>
 </div>

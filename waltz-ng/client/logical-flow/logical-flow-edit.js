@@ -89,10 +89,10 @@ function addFlow(flows, flow) {
 function controller($scope,
                     application,
                     authSourceStore,
-                    dataFlowStore,
-                    dataFlowDecoratorStore,
                     dataTypeService,
                     dataTypeUsageStore,
+                    logicalFlowDecoratorStore,
+                    logicalFlowStore,
                     notification) {
     const primaryAppId = application.id;
 
@@ -106,8 +106,8 @@ function controller($scope,
     };
 
     const reload = () => {
-        loadDataFlows(dataFlowStore, primaryAppId, vm);
-        loadDataFlowDecorators(dataFlowDecoratorStore, primaryAppId, vm);
+        loadDataFlows(logicalFlowStore, primaryAppId, vm);
+        loadDataFlowDecorators(logicalFlowDecoratorStore, primaryAppId, vm);
         loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm);
         vm.cancel();
     };
@@ -140,7 +140,7 @@ function controller($scope,
     };
 
     const updateDecorators = (command) => {
-        return dataFlowDecoratorStore
+        return logicalFlowDecoratorStore
             .updateDecorators(command)
             .then(reload)
             .then(() => notification.success('Data flow updated'));
@@ -162,7 +162,7 @@ function controller($scope,
 
     vm.updateFlow = (command) => {
         if (! command.flowId) {
-            return dataFlowStore.addFlow(vm.selectedFlow)
+            return logicalFlowStore.addFlow(vm.selectedFlow)
                 .then(flow => Object.assign(command, { flowId: flow.id }))
                 .then(updateDecorators);
 
@@ -172,7 +172,7 @@ function controller($scope,
     };
 
     vm.deleteFlow = (flow) => {
-        dataFlowStore
+        logicalFlowStore
             .removeFlow(flow.id)
             .then(reload)
             .then(() => notification.warning('Data flow removed'));
@@ -219,16 +219,16 @@ controller.$inject = [
     '$scope',
     'application',
     'AuthSourcesStore',
-    'DataFlowDataStore',
-    'DataFlowDecoratorStore',
     'DataTypeService',
     'DataTypeUsageStore',
+    'LogicalFlowDecoratorStore',
+    'LogicalFlowStore',
     'Notification'
 ];
 
 
 export default {
-    template: require('./data-flow-edit.html'),
+    template: require('./logical-flow-edit.html'),
     controller,
     controllerAs: 'ctrl'
 };

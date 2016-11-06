@@ -12,7 +12,7 @@ const bindings = {
 };
 
 
-const template = require('./data-flow-type-editor.html');
+const template = require('./logical-flow-type-editor.html');
 
 
 const initialState = {
@@ -24,10 +24,10 @@ const initialState = {
     expandedItemIds: [],
     originalSelectedItemIds: [],
     saving: false,
-    onSave: (x) => console.log('dfte: default onSave()', x),
-    onDelete: (x) => console.log('dfte: default onDelete()', x),
-    onCancel: (x) => console.log('dfte: default onCancel()', x),
-    onDirty: (x) => console.log('dfte: default onDirty()', x)
+    onSave: (x) => console.log('lfte: default onSave()', x),
+    onDelete: (x) => console.log('lfte: default onDelete()', x),
+    onCancel: (x) => console.log('lfte: default onCancel()', x),
+    onDirty: (x) => console.log('lfte: default onDirty()', x)
 };
 
 

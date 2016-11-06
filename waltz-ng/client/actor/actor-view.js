@@ -77,7 +77,7 @@ controller.$inject = [
     '$stateParams',
     'ActorStore',
     'BookmarkStore',
-    'ChangeLogDataService',
+    'ChangeLogStore',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore'
 ];

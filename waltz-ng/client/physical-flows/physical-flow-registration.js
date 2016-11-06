@@ -57,7 +57,6 @@ function controller(
     $stateParams,
     actorStore,
     applicationStore,
-    logicalFlowStore,  // DataFlowDataStore
     notification,
     physicalFlowStore,
     specificationStore) {
@@ -142,7 +141,6 @@ controller.$inject = [
     '$stateParams',
     'ActorStore',
     'ApplicationStore',
-    'DataFlowDataStore',  // LogicalFlowStore
     'Notification',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore',

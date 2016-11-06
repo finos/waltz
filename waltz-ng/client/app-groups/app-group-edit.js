@@ -49,7 +49,7 @@ function controller($q,
                     appGroupStore,
                     appStore,
                     changeInitiativeStore,
-                    dataFlowStore,
+                    logicalFlowStore,
                     notification) {
 
     const { id }  = $stateParams;
@@ -106,7 +106,7 @@ function controller($q,
                 focusApp.app = fullApp;
                 const promises = [
                     appStore.findRelatedById(fullApp.id),
-                    dataFlowStore.findByEntityReference('APPLICATION', fullApp.id),
+                    logicalFlowStore.findByEntityReference('APPLICATION', fullApp.id),
                     appStore.findBySelector({ entityReference: { id: fullApp.organisationalUnitId, kind: 'ORG_UNIT'}, scope: 'EXACT'})
                 ];
                 return $q.all(promises);
@@ -169,7 +169,7 @@ controller.$inject = [
     'AppGroupStore',
     'ApplicationStore',
     'ChangeInitiativeStore',
-    'DataFlowDataStore',
+    'LogicalFlowStore',
     'Notification'
 ];
 

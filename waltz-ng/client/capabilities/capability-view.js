@@ -129,10 +129,10 @@ function controller($q,
                     bookmarkStore,
                     capabilities,
                     complexityStore,
-                    dataFlowDecoratorStore,
-                    dataFlowViewService,
                     entityStatisticStore,
                     historyStore,
+                    logicalFlowDecoratorStore,
+                    logicalFlowViewService,
                     perspectiveStore,
                     processStore,
                     physicalFlowLineageStore,
@@ -194,7 +194,7 @@ function controller($q,
             $q.all([
                 perspectiveStore.findByCode('BUSINESS'),
                 ratingStore.findByAppIdSelector(appIdSelector),
-                dataFlowViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN'),
+                logicalFlowViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN'),
                 complexityStore.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
                 assetCostViewService.initialise(appIdSelector, 2016),
                 techStatsService.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
@@ -220,7 +220,7 @@ function controller($q,
                 vm.sourceDataRatings = sourceDataRatings;
             });
         })
-        .then(() => dataFlowDecoratorStore.findBySelectorAndKind(appIdSelector, 'DATA_TYPE'))
+        .then(() => logicalFlowDecoratorStore.findBySelectorAndKind(appIdSelector, 'DATA_TYPE'))
         .then((flowDecorators => vm.dataFlowDecorators = flowDecorators))
         .then(() => tourService.initialiseForKey('main.capability.view', true))
         .then(tour => vm.tour = tour);
@@ -271,7 +271,7 @@ function controller($q,
         vm.exportLineageReports = api.export;
     };
 
-    vm.loadFlowDetail = () => dataFlowViewService
+    vm.loadFlowDetail = () => logicalFlowViewService
         .loadDetail()
         .then(flowData => vm.dataFlows = flowData);
 
@@ -300,10 +300,10 @@ controller.$inject = [
     'BookmarkStore',
     'capabilities',
     'ComplexityStore',
-    'DataFlowDecoratorStore',
-    'DataFlowViewService',
     'EntityStatisticStore',
     'HistoryStore',
+    'LogicalFlowDecoratorStore',
+    'LogicalFlowViewService',
     'PerspectiveStore',
     'ProcessStore',
     'PhysicalFlowLineageStore',

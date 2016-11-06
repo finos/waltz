@@ -52,7 +52,7 @@ public class DataFlowService {
     private final DataFlowDecoratorService dataFlowDecoratorService;
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
     private final LogicalDataFlowIdSelectorFactory logicalFlowIdSelectorFactory;
-    private DataTypeUsageService dataTypeUsageService;
+    private final DataTypeUsageService dataTypeUsageService;
 
 
     @Autowired
@@ -132,11 +132,7 @@ public class DataFlowService {
 
 
     /**
-     * Calculate Stats by selector. Supported desiredKinds:
-     * <ul>
-     *     <li>DATA_TYPE</li>
-     *     <li>APPLICATION</li>
-     * </ul>
+     * Calculate Stats by selector
      * @param options
      * @return
      */

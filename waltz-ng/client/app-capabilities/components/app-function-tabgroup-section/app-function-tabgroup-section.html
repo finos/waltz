@@ -1,0 +1,66 @@
+<!-- FUNCTIONS and RATINGS -->
+<waltz-section name="Functions and Ratings"
+               icon="puzzle-piece"
+               id="functions-ratings-section">
+
+    <waltz-section-actions>
+        <a waltz-has-role="RATING_EDITOR"
+           ui-sref='main.app-capability.edit ({id: $ctrl.app.id})'
+           ng-if="$ctrl.activeTab == 0"
+           class="btn btn-xs btn-primary">
+            Edit
+        </a>
+        <a waltz-has-role="RATING_EDITOR"
+           ui-sref='main.ratings.editor ({kind : "APPLICATION", entityId: $ctrl.app.id, perspectiveCode: "BUSINESS"})'
+           ng-if="$ctrl.activeTab == 1"
+           class="btn btn-xs btn-primary">
+            Edit
+        </a>
+        <button class="btn btn-xs waltz-btn-transparent"
+                ng-click="$ctrl.visibility.overlay = ! $ctrl.visibility.overlay">
+            <waltz-icon name="map-signs"></waltz-icon>
+        </button>
+    </waltz-section-actions>
+
+    <waltz-source-data-overlay visible="$ctrl.visibility.overlay"
+                               ratings="$ctrl.sourceDataRatings"
+                               entities="['APP_CAPABILITY']">
+    </waltz-source-data-overlay>
+
+
+    <uib-tabset active="active">
+
+        <!-- CAPABILITIES -->
+        <uib-tab index="0"
+                 select="$ctrl.activeTab = 0"
+                 heading="Functions">
+            <waltz-app-capability-section app-capabilities="$ctrl.appCapabilities"
+                                          capabilities="$ctrl.capabilities">
+            </waltz-app-capability-section>
+        </uib-tab>
+
+        <!-- RATINGS -->
+        <uib-tab index="1"
+                 select="$ctrl.activeTab = 1"
+                 heading="Ratings">
+            <div class="row"
+                 ng-if="$ctrl.activeTab == 1">
+                <div class="col-md-12">
+                    <div ng-if="$ctrl.appCapabilities.length > 0">
+                        <waltz-rating-group-header measurables="$ctrl.ratings.group.measurables">
+                        </waltz-rating-group-header>
+
+                        <waltz-rating-group tweakers="$ctrl.ratings.tweakers"
+                                            highest-rating-count="$ctrl.ratings.highestRatingCount"
+                                            data="$ctrl.ratings.group"></waltz-rating-group>
+                    </div>
+                    <div ng-if="$ctrl.appCapabilities.length == 0"
+                         class="alert alert-warning">
+                        <strong>No ratings</strong> - no ratings to show, as the application has not
+                        declared it's functions.
+                    </div>
+                </div>
+            </div>
+        </uib-tab>
+    </uib-tabset>
+</waltz-section>

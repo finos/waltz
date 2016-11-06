@@ -9,32 +9,33 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+@import "breadcrumbs";
+@import "bootstrap-styles";
+@import "grid";
 @import "waltz-scroll-region";
 @import "waltz-visibility";
-@import "breadcrumbs";
-@import "grid";
-@import "bootstrap-styles";
 
-@import "../client/data-flow/components/rated-flow-summary/rated-summary-table";
 @import "../client/auth-sources/auth-sources";
 @import "../client/common/common";
-@import "../client/org-units/list-view";
 @import "../client/bookmarks/bookmarks";
-@import "../client/widgets/styles";
-@import "../client/data-flow/components/app-centric-flow-table/app-centric-flow-table";
-@import "../client/data-flow/components/source-and-target-graph/source-and-target-graph";
-@import "../client/data-flow/components/source-and-target-panel/source-and-target-panel";
-@import "../client/data-flow/components/data-flows-tabgroup/data-flows-tabgroup";
-@import "../client/data-flow/directives/slope-graph/slope-graph";
-@import "../client/data-flow/components/boingy-graph/boingy-graph";
+@import "../client/complexity/directives/complexity-bar-chart";
 @import "../client/data-type-usage/components/editor/app-data-type-usage-editor";
 @import "../client/entity/components/immediate-hierarchy-navigator/immediate-hierarchy-navigator";
 @import "../client/entity-statistics/directives/entity-statistic";
 @import "../client/entity-statistics/components/entity-statistic-summary-card";
 @import "../client/entity-statistics/components/history-chart/entity-statistic-history-chart";
+@import "../client/logical-flow/components/app-centric-flow-table/app-centric-flow-table";
+@import "../client/logical-flow/components/boingy-graph/boingy-graph";
+@import "../client/logical-flow/components/logical-flows-tabgroup/logical-flows-tabgroup";
+@import "../client/logical-flow/components/rated-flow-summary/rated-summary-table";
+@import "../client/logical-flow/components/source-and-target-graph/source-and-target-graph";
+@import "../client/logical-flow/components/source-and-target-panel/source-and-target-panel";
+@import "../client/logical-flow/components/slope-graph/slope-graph";
+@import "../client/logical-flow/directives/flow-filter-options-overlay";
 @import "../client/navbar/styles";
-@import "../client/ratings/directives/rating-group/rating-group";
+@import "../client/org-units/list-view";
 @import "../client/playpen/playpen";
+@import "../client/playpen/3/asset-cost-graph";
 @import "../client/physical-flow-lineage/lineage-edit";
 @import "../client/physical-flows/components/attribute-editor/physical-flow-attribute-editor";
 @import "../client/physical-flows/components/edit-target-entity/physical-flow-edit-target-entity";
@@ -42,13 +43,13 @@
 @import "../client/physical-flows/components/register/physical-flow-edit-overview";
 @import "../client/physical-flows/components/register/physical-flow-edit-specification";
 @import "../client/ratings/directives/rating-brush-select/style";
+@import "../client/ratings/directives/rating-group/rating-group";
 @import "../client/traits/directives/trait-indicator";
 @import "../client/ratings/directives/viewer/app-rating-table";
 @import "../client/static-panel/directives/static-panel";
 @import "../client/software-catalog/directives/simple-software-usage-list";
-@import "../client/data-flow/directives/flow-filter-options-overlay";
-@import "../client/complexity/directives/complexity-bar-chart";
-@import "../client/playpen/3/asset-cost-graph";
+@import "../client/widgets/styles";
+
 
 html {
   overflow-y: scroll;
@@ -78,22 +79,25 @@ body {
 }
 
 
-
 textarea {
   padding: 10px;
 }
+
 
 .padding-0 {
     padding: 0 !important;
 }
 
+
 .padding-sm {
     padding: 2px !important;
 }
 
+
 .padding-md {
     padding: 5px !important;
 }
+
 
 .clickable:hover {
   cursor: pointer;
@@ -201,12 +205,14 @@ textarea {
   padding: 0 3px 0 3px;
 }
 
+
 .waltz-app-tally-count {
     @extend .waltz-tally-count;
     background: #e2ecfb;
     color: #144d66;
     border-color: #88c1cc;
 }
+
 
 .waltz-end-user-app-tally-count {
     @extend .waltz-tally-count;
@@ -241,12 +247,12 @@ textarea {
     @include waltz-box-shadow();
 }
 
+
 .waltz-page-summary-attach {
     margin-top: -14px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
-
 
 
 .waltz-side-nav-help {
@@ -279,6 +285,7 @@ textarea {
     margin-top: 4px;
     margin-bottom: 4px;
 }
+
 
 .italics {
     font-style: italic;

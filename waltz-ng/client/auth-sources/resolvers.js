@@ -35,7 +35,7 @@ export function flowResolver(flowStore, params) {
     return flowStore.findBySelector(mkSelector(params));
 }
 
-flowResolver.$inject = ['DataFlowDataStore', '$stateParams'];
+flowResolver.$inject = ['LogicalFlowStore', '$stateParams'];
 
 
 export function idResolver(params) {
@@ -59,9 +59,9 @@ export function dataTypesResolver(dataTypeService) {
 dataTypesResolver.$inject = ['DataTypeService'];
 
 
-export function flowDecoratorsResolver(dataFlowDecoratorStore, params) {
-    return dataFlowDecoratorStore
-        .findBySelectorAndKind(mkSelector(params), 'DATA_TYPE');
+export function flowDecoratorsResolver(logicalFlowDecoratorStore, $stateParams) {
+    return logicalFlowDecoratorStore
+        .findBySelectorAndKind(mkSelector($stateParams), 'DATA_TYPE');
 }
 
-flowDecoratorsResolver.$inject = ['DataFlowDecoratorStore', '$stateParams'];
+flowDecoratorsResolver.$inject = ['LogicalFlowDecoratorStore', '$stateParams'];

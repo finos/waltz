@@ -25,7 +25,7 @@ function controller($q,
                 orphanStore.findOrphanAuthoritativeSourcesByApp(),
                 orphanStore.findOrphanAuthoritativeSourcesByDataType(),
                 orphanStore.findOrphanChangeInitiatives(),
-                orphanStore.findOrphanLogicalDataFlows()
+                orphanStore.findOrphanLogicalFlows()
             ])
             .then( ([apps,
                 appCaps,
@@ -33,7 +33,7 @@ function controller($q,
                 authSourcesByApp,
                 authSourcesByDataType,
                 changeInitiatives,
-                logicalDataFlows
+                logicalFlows
             ]) => {
                 const orphans = [
                     {description: 'Applications referencing non-existent Org Units', values: apps},
@@ -42,7 +42,7 @@ function controller($q,
                     {description: 'Authoritative Sources with non-existent Application', values: authSourcesByApp},
                     {description: 'Authoritative Sources with non-existent Data Type', values: authSourcesByDataType},
                     {description: 'Change Initiatives with non-existent parent', values: changeInitiatives},
-                    {description: 'Logical Data Flows referencing non-existent applications', values: logicalDataFlows}
+                    {description: 'Logical Flows referencing non-existent applications', values: logicalFlows}
                 ];
                 vm.orphans = orphans;
             });

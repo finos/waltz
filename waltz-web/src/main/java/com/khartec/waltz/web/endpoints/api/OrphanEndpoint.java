@@ -44,7 +44,7 @@ public class OrphanEndpoint implements Endpoint {
         String findOrphanAuthoritativeSourcesByOrgUnitPath = mkPath(BASE_URL, "authoritative-source", "org-unit");
         String findOrphanAuthoritativeSourcesByDataTypePath = mkPath(BASE_URL, "authoritative-source", "data-type");
         String findOrphanChangeInitiativesPath = mkPath(BASE_URL, "change-initiative");
-        String findOrphanLogicalDataFlowsPath = mkPath(BASE_URL, "logical-data-flow");
+        String findOrphanLogicalDataFlowsPath = mkPath(BASE_URL, "logical-flow");
 
 
         ListRoute<OrphanRelationship> findApplicationsWithNonExistingOrgUnitRoute = (request, response) -> {
