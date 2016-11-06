@@ -100,9 +100,9 @@
             <div ng-if="$ctrl.flowData.flows.length > 0">
                 <div ng-if="$ctrl.flowData.entities.length < 200  || $ctrl.visibility.ignoreLimits"
                      style="border: 1px solid #ccc">
-                    <waltz-data-flow-diagram data="$ctrl.flowData"
-                                             tweakers="$ctrl.graphTweakers">
-                    </waltz-data-flow-diagram>
+                    <waltz-logical-flow-diagram data="$ctrl.flowData"
+                                                tweakers="$ctrl.graphTweakers">
+                    </waltz-logical-flow-diagram>
                     <div class="small text-muted">
                         Dragging nodes will pin them.  Double click to unpin.
                     </div>
