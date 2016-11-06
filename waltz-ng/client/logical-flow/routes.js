@@ -1,4 +1,4 @@
-import EditView from "./data-flow-edit";
+import EditView from "./logical-flow-edit";
 
 
 function applicationResolver(ApplicationStore, $stateParams) {
@@ -12,7 +12,7 @@ applicationResolver.$inject = [
 ];
 
 const base = {
-    url: 'data-flow'
+    url: 'logical-flow'
 };
 
 
@@ -28,8 +28,8 @@ const editState = {
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.data-flow', base)
-        .state('main.data-flow.edit', editState);
+        .state('main.logical-flow', base)
+        .state('main.logical-flow.edit', editState);
 }
 
 

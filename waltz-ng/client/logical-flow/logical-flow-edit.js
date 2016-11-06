@@ -89,9 +89,9 @@ function addFlow(flows, flow) {
 function controller($scope,
                     application,
                     authSourceStore,
-                    dataFlowDecoratorStore,
                     dataTypeService,
                     dataTypeUsageStore,
+                    logicalFlowDecoratorStore,
                     logicalFlowStore,
                     notification) {
     const primaryAppId = application.id;
@@ -107,7 +107,7 @@ function controller($scope,
 
     const reload = () => {
         loadDataFlows(logicalFlowStore, primaryAppId, vm);
-        loadDataFlowDecorators(dataFlowDecoratorStore, primaryAppId, vm);
+        loadDataFlowDecorators(logicalFlowDecoratorStore, primaryAppId, vm);
         loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm);
         vm.cancel();
     };
@@ -140,7 +140,7 @@ function controller($scope,
     };
 
     const updateDecorators = (command) => {
-        return dataFlowDecoratorStore
+        return logicalFlowDecoratorStore
             .updateDecorators(command)
             .then(reload)
             .then(() => notification.success('Data flow updated'));
@@ -219,16 +219,16 @@ controller.$inject = [
     '$scope',
     'application',
     'AuthSourcesStore',
-    'DataFlowDecoratorStore',
     'DataTypeService',
     'DataTypeUsageStore',
+    'LogicalFlowDecoratorStore',
     'LogicalFlowStore',
     'Notification'
 ];
 
 
 export default {
-    template: require('./data-flow-edit.html'),
+    template: require('./logical-flow-edit.html'),
     controller,
     controllerAs: 'ctrl'
 };

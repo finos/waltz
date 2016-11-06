@@ -9,8 +9,8 @@ const initData = {
 
 
 function service($q,
-                 dataFlowDecoratorStore,
                  dataTypeUsageStore,
+                 logicalFlowDecoratorStore,
                  logicalFlowStore)
 {
     let data = initData;
@@ -48,7 +48,7 @@ function service($q,
             .findBySelector(data.options)
             .then(flows => data.flows = flows);
 
-        const decoratorPromise = dataFlowDecoratorStore
+        const decoratorPromise = logicalFlowDecoratorStore
             .findBySelector(data.options)
             .then(decorators => data.decorators = decorators);
 
@@ -74,8 +74,8 @@ function service($q,
 
 service.$inject = [
     '$q',
-    'DataFlowDecoratorStore',
     'DataTypeUsageStore',
+    'LogicalFlowDecoratorStore',
     'LogicalFlowStore'
 ];
 

@@ -3,7 +3,7 @@
 
 
         <waltz-section-actions>
-            <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: selfId})' class="btn btn-xs btn-primary">Edit</a>
+            <a ui-sref='main.logical-flow.edit ({kind:"APPLICATION", id: selfId})' class="btn btn-xs btn-primary">Edit</a>
         </waltz-section-actions>
 
 
@@ -13,7 +13,7 @@
                 No Data Flows
             </strong>
             registered for this application.  Add one
-            <a ui-sref='main.data-flow.edit ({kind: "APPLICATION", id: selfId})'>here</a>.
+            <a ui-sref='main.logical-flow.edit ({kind: "APPLICATION", id: selfId})'>here</a>.
         </div>
 
         <div  ng-if="flows.length > 0">

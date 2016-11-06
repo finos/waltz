@@ -129,9 +129,9 @@ function controller($q,
                     bookmarkStore,
                     capabilities,
                     complexityStore,
-                    dataFlowDecoratorStore,
                     entityStatisticStore,
                     historyStore,
+                    logicalFlowDecoratorStore,
                     logicalFlowViewService,
                     perspectiveStore,
                     processStore,
@@ -220,7 +220,7 @@ function controller($q,
                 vm.sourceDataRatings = sourceDataRatings;
             });
         })
-        .then(() => dataFlowDecoratorStore.findBySelectorAndKind(appIdSelector, 'DATA_TYPE'))
+        .then(() => logicalFlowDecoratorStore.findBySelectorAndKind(appIdSelector, 'DATA_TYPE'))
         .then((flowDecorators => vm.dataFlowDecorators = flowDecorators))
         .then(() => tourService.initialiseForKey('main.capability.view', true))
         .then(tour => vm.tour = tour);
@@ -300,9 +300,9 @@ controller.$inject = [
     'BookmarkStore',
     'capabilities',
     'ComplexityStore',
-    'DataFlowDecoratorStore',
     'EntityStatisticStore',
     'HistoryStore',
+    'LogicalFlowDecoratorStore',
     'LogicalFlowViewService',
     'PerspectiveStore',
     'ProcessStore',

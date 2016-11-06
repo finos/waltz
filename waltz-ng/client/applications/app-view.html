@@ -121,7 +121,7 @@
         <waltz-section-actions>
             <a waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
                ng-if="ctrl.dataTab == 0"
-               ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'
+               ui-sref='main.logical-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'
                class="btn btn-xs btn-primary">
                 Edit
             </a>
@@ -166,7 +166,7 @@
                             No flows or types
                         </strong>
                         registered for this application.  Add them
-                        <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>
+                        <a ui-sref='main.logical-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>
                             here.
                         </a>
                     </div>
@@ -182,7 +182,7 @@
                                     No Types
                                 </strong>
                                 registered for this application.  Add them
-                                <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>
+                                <a ui-sref='main.logical-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>
                                     here.
                                 </a>
                             </div>
@@ -203,7 +203,7 @@
                                     No Data Flows
                                 </strong>
                                 registered for this application.  Add one
-                                <a ui-sref='main.data-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>here</a>.
+                                <a ui-sref='main.logical-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>here</a>.
                             </div>
 
                             <div ng-if="ctrl.flows.length > 0">
