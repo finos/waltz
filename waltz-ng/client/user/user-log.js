@@ -11,7 +11,9 @@
  *
  */
 
-function controller(accessLogStore, changeLogStore, $state) {
+function controller(accessLogStore,
+                    changeLogStore,
+                    $state) {
 
     const vm = this;
 
@@ -45,7 +47,11 @@ function controller(accessLogStore, changeLogStore, $state) {
 
 
 
-controller.$inject = [ 'AccessLogStore', 'ChangeLogDataService', '$state' ];
+controller.$inject = [
+    'AccessLogStore',
+    'ChangeLogStore',
+    '$state'
+];
 
 
 // ---

@@ -32,7 +32,7 @@ function controller($stateParams,
 
 controller.$inject = [
     '$stateParams',
-    'ChangeLogDataService'
+    'ChangeLogStore'
 ];
 
 

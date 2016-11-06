@@ -15,7 +15,7 @@ const initialState = {
 
 controller.$inject = [
     '$stateParams',
-    'ChangeLogDataService',
+    'ChangeLogStore',
     'PersonStore',
     'UserContributionStore',
     'UserStore'

@@ -2,7 +2,7 @@
 export default (module) => {
     module
         .config(require('./routes'))
-        .service('ChangeLogDataService', require('./services/change-log-data'));
+        .service('ChangeLogStore', require('./services/change-log-store'));
 
     module
         .component('waltzChangeLogSection', require('./components/change-log-section'))

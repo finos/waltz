@@ -262,7 +262,7 @@ controller.$inject = [
     'AuthSourcesStore',
     'BookmarkStore',
     'CapabilityStore',
-    'ChangeLogDataService',
+    'ChangeLogStore',
     'DatabaseStore',
     'DataFlowDataStore',
     'DataFlowDecoratorStore',

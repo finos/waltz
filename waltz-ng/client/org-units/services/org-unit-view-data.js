@@ -299,7 +299,7 @@ service.$inject = [
     'AuthSourcesCalculator',
     'BookmarkStore',
     'CapabilityStore',
-    'ChangeLogDataService',
+    'ChangeLogStore',
     'ComplexityStore',
     'DataFlowViewService',
     'EndUserAppStore',

@@ -146,7 +146,7 @@ service.$inject = [
     '$q',
     'ApplicationStore',
     'AppCapabilityStore',
-    'ChangeLogDataService',
+    'ChangeLogStore',
     'DataTypeUsageStore',
     'RatingStore',
     'DataTypeService',
