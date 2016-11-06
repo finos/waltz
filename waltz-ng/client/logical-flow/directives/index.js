@@ -11,8 +11,6 @@
  */
 
 export default (module) => {
-    module
-        .component('waltzAppDataFlowDiagram', require('./slope-graph/slope-graph-directive'));
 
     module
         .directive('waltzSummaryRatedFlowChart', require('./rated-flow-chart/summary-rated-flow-chart'))

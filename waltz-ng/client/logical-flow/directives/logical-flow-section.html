@@ -17,12 +17,14 @@
 
         <div  ng-if="flows.length > 0">
 
-            <waltz-app-data-flow-diagram incoming="ctrl.incoming"
-                                         outgoing="ctrl.outgoing"
-                                         sources="ctrl.sources"
-                                         targets="ctrl.targets"
-                                         tweakers="ctrl.tweakers"
-                                         types="ctrl.flowTypes"></waltz-app-data-flow-diagram>
+            <waltz-app-logical-flow-diagram incoming="ctrl.incoming"
+                                            outgoing="ctrl.outgoing"
+                                            sources="ctrl.sources"
+                                            targets="ctrl.targets"
+                                            tweakers="ctrl.tweakers"
+                                            types="ctrl.flowTypes">
+            </waltz-app-logical-flow-diagram>
+
         </div>
 
         <p class="text-muted small">

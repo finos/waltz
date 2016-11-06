@@ -1,6 +1,7 @@
 function setup(module) {
 
     module
+        .component('waltzAppLogicalFlowDiagram', require('./slope-graph/slope-graph-directive'))
         .component('waltzRatedFlowSummaryPanel', require('./rated-flow-summary/rated-flow-summary-panel'))
         .component('waltzRatedFlowSummaryInfoCell', require('./rated-flow-summary/rated-flow-summary-info-cell'))
         .component('waltzRatedSummaryTable', require('./rated-flow-summary/rated-summary-table'))
