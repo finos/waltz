@@ -155,21 +155,6 @@ export default (module) => {
                         }]
                     }}
                 })
-                .state('main.examples.directive-data-flow-table', {
-                    url: '/directive-data-flow-table',
-                    views: { 'content@': {
-                        template: require('./demo-directive-data-flow-table.html'),
-                        controller: ['$scope', function($scope) {
-                            $scope.flows = [
-                                {
-                                    sourceEntity: { name: 'producer', id: 1},
-                                    targetEntity: { name: 'consumer', id: 2},
-                                    dataType: 'PARTY'
-                                }
-                            ];
-                        }]
-                    }}
-                })
                 .state('main.examples.directive-keyword-list', {
                     url: '/directive-keyword-list',
                     views: { 'content@': {

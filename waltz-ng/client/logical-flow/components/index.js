@@ -10,7 +10,7 @@ function setup(module) {
         .component('waltzDataFlowTypeEditor', require('./edit/data-flow-type-editor'))
         .component('waltzDataFlowDiagram', require('./boingy-graph/boingy-graph'))
         .component('waltzDataFlowsTabgroup', require('./data-flows-tabgroup/data-flows-tabgroup'))
-        .component('waltzDataFlowTable', require('./../components/data-flow-table/data-flow-table'))
+        .component('waltzLogicalFlowTable', require('./../components/logical-flow-table/logical-flow-table'))
 
 
 }

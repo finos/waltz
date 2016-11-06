@@ -13,7 +13,7 @@ const initialState = {
     ratings: [],
     flowData: null,
     applications: [],
-    onLoadDetail: () => console.log('onLoadDetail not provided to data flows tabgroup section'),
+    onLoadDetail: () => console.log('onLoadDetail not provided to logical flows tabgroup section'),
     visibility: {
         flowConfigOverlay: false,
         flowConfigButton: false,
@@ -43,7 +43,7 @@ const directive = {
     bindToController: BINDINGS,
     controllerAs: 'ctrl',
     scope: {},
-    template: require('./data-flows-tabgroup-section.html')
+    template: require('./logical-flows-tabgroup-section.html')
 };
 
 

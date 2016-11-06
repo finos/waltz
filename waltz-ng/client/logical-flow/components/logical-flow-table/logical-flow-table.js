@@ -74,14 +74,13 @@ function prepareGridData(flows = [], decorators = [], displayNameService) {
     return _.flatMap(flows,
         flow => _.map(groupedDecorators[flow.id],
             dc => _.assign({
-                    dataType: dc.dataType,
-                    authSourceRating: dc.authSourceRating,
-                    rowStyle: {
-                        'background-color': authoritativeRatingBackgroundColorScale(dc.authSourceRating).toString()
-                    }
-                },
-                flow
-            )));
+                dataType: dc.dataType,
+                authSourceRating: dc.authSourceRating,
+                rowStyle: {
+                    'background-color': authoritativeRatingBackgroundColorScale(dc.authSourceRating).toString()
+                }
+            },
+            flow)));
 }
 
 

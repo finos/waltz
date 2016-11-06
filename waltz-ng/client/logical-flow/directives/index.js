@@ -15,12 +15,11 @@ export default (module) => {
         .component('waltzAppDataFlowDiagram', require('./slope-graph/slope-graph-directive'));
 
     module
-        .directive('waltzDataFlowSection', require('./data-flow-section'))
         .directive('waltzSummaryRatedFlowChart', require('./rated-flow-chart/summary-rated-flow-chart'))
         .directive('waltzRatedFlowDetail', require('./rated-flow-chart/rated-flow-detail'))
         .directive('waltzRatedFlowSummaryDetail', require('./rated-flow-chart/rated-flow-summary-detail'))
         .directive('waltzFlowCloudDiagram', require('./flow-cloud-diagram'))
-        .directive('waltzDataFlowsTabgroupSection', require('./data-flows-tabgroup-section'))
+        .directive('waltzLogicalFlowsTabgroupSection', require('./logical-flows-tabgroup-section'))
         .directive('waltzFlowFilterOptionsOverlay', require('./flow-filter-options-overlay'));
 
 

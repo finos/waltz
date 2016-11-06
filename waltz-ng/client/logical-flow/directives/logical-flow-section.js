@@ -16,7 +16,7 @@ export default [
     (flowUtils) => ({
         restrict: 'E',
         replace: true,
-        template: require('./data-flow-section.html'),
+        template: require('./logical-flow-section.html'),
         scope: {
             flows: '=',
             selfId: '@'
