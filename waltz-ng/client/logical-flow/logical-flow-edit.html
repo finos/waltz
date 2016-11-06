@@ -127,14 +127,14 @@
                     </div>
 
                     <div ng-if="ctrl.mode === 'editCounterpart'">
-                        <waltz-data-flow-type-editor flow="ctrl.selectedFlow"
-                                                     decorators="ctrl.selectedDecorators"
-                                                     all-data-types="ctrl.dataTypes"
-                                                     on-cancel="ctrl.cancel"
-                                                     on-save="ctrl.updateFlow"
-                                                     on-delete="ctrl.deleteFlow"
-                                                     on-dirty="ctrl.setDirtyChange">
-                        </waltz-data-flow-type-editor>
+                        <waltz-logical-flow-type-editor flow="ctrl.selectedFlow"
+                                                        decorators="ctrl.selectedDecorators"
+                                                        all-data-types="ctrl.dataTypes"
+                                                        on-cancel="ctrl.cancel"
+                                                        on-save="ctrl.updateFlow"
+                                                        on-delete="ctrl.deleteFlow"
+                                                        on-dirty="ctrl.setDirtyChange">
+                        </waltz-logical-flow-type-editor>
                     </div>
 
                     <div ng-if="ctrl.mode === 'editDataTypeUsage'">
