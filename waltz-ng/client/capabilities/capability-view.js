@@ -130,9 +130,9 @@ function controller($q,
                     capabilities,
                     complexityStore,
                     dataFlowDecoratorStore,
-                    dataFlowViewService,
                     entityStatisticStore,
                     historyStore,
+                    logicalDataFlowViewService,
                     perspectiveStore,
                     processStore,
                     physicalFlowLineageStore,
@@ -194,7 +194,7 @@ function controller($q,
             $q.all([
                 perspectiveStore.findByCode('BUSINESS'),
                 ratingStore.findByAppIdSelector(appIdSelector),
-                dataFlowViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN'),
+                logicalDataFlowViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN'),
                 complexityStore.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
                 assetCostViewService.initialise(appIdSelector, 2016),
                 techStatsService.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
@@ -271,7 +271,7 @@ function controller($q,
         vm.exportLineageReports = api.export;
     };
 
-    vm.loadFlowDetail = () => dataFlowViewService
+    vm.loadFlowDetail = () => logicalDataFlowViewService
         .loadDetail()
         .then(flowData => vm.dataFlows = flowData);
 
@@ -301,9 +301,9 @@ controller.$inject = [
     'capabilities',
     'ComplexityStore',
     'DataFlowDecoratorStore',
-    'DataFlowViewService',
     'EntityStatisticStore',
     'HistoryStore',
+    'LogicalDataFlowViewService',
     'PerspectiveStore',
     'ProcessStore',
     'PhysicalFlowLineageStore',

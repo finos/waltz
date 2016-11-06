@@ -69,8 +69,8 @@ function controller($scope,
                     assetCostViewService,
                     bookmarkStore,
                     capabilityStore,
-                    dataFlowViewService,
                     historyStore,
+                    logicalDataFlowViewService,
                     processStore,
                     sourceDataRatingStore) {
 
@@ -127,7 +127,7 @@ function controller($scope,
         .findAll()
         .then(rs => vm.sourceDataRatings = rs);
 
-    dataFlowViewService
+    logicalDataFlowViewService
         .initialise(processId, 'PROCESS', 'EXACT')
         .then(data => vm.dataFlows = data);
 
@@ -189,7 +189,7 @@ function controller($scope,
     };
 
     vm.loadFlowDetail = () => {
-        dataFlowViewService
+        logicalDataFlowViewService
             .loadDetail()
             .then(flowData => vm.dataFlows = flowData);
     };
@@ -205,8 +205,8 @@ controller.$inject = [
     'AssetCostViewService',
     'BookmarkStore',
     'CapabilityStore',
-    'DataFlowViewService',
     'HistoryStore',
+    'LogicalDataFlowViewService',
     'ProcessStore',
     'SourceDataRatingStore'
 ];

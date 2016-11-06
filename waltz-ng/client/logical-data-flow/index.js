@@ -17,9 +17,10 @@ export default (module) => {
     require('./directives')(module);
     require('./components')(module);
 
-    module.service('DataFlowDataStore', require('./services/data-flow-store'));
-    module.service('DataFlowViewService', require('./services/data-flow-view-service'));
-    module.service('DataFlowUtilityService', require('./services/data-flow-utility'));
+    module
+        .service('DataFlowDataStore', require('./services/logical-data-flow-store'))
+        .service('LogicalDataFlowViewService', require('./services/logical-data-flow-view-service'))
+        .service('LogicalDataFlowUtilityService', require('./services/logical-data-flow-utility'));
 
 
     module.config(require('./routes'));
