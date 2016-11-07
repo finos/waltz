@@ -15,7 +15,7 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.dataflow;
+package com.khartec.waltz.model.logical_flow;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -26,9 +26,9 @@ import org.immutables.value.Value;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableDataFlow.class)
-@JsonDeserialize(as = ImmutableDataFlow.class)
-public abstract class DataFlow implements IdProvider, ProvenanceProvider {
+@JsonSerialize(as = ImmutableLogicalFlow.class)
+@JsonDeserialize(as = ImmutableLogicalFlow.class)
+public abstract class LogicalFlow implements IdProvider, ProvenanceProvider {
 
     public abstract EntityReference source();
     public abstract EntityReference target();

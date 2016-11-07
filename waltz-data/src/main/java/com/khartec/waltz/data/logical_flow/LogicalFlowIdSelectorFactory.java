@@ -1,4 +1,4 @@
-package com.khartec.waltz.data.data_flow;
+package com.khartec.waltz.data.logical_flow;
 
 import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
@@ -13,12 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 
 
 @Service
-public class LogicalDataFlowIdSelectorFactory implements IdSelectorFactory {
+public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
 
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
@@ -26,8 +26,8 @@ public class LogicalDataFlowIdSelectorFactory implements IdSelectorFactory {
 
 
     @Autowired
-    public LogicalDataFlowIdSelectorFactory(ApplicationIdSelectorFactory applicationIdSelectorFactory,
-                                            DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
+    public LogicalFlowIdSelectorFactory(ApplicationIdSelectorFactory applicationIdSelectorFactory,
+                                        DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
         checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
 
@@ -69,14 +69,14 @@ public class LogicalDataFlowIdSelectorFactory implements IdSelectorFactory {
     private Select<Record1<Long>> wrapAppIdSelector(IdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
 
-        Condition sourceCondition = DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector)
-                .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+        Condition sourceCondition = LOGICAL_FLOW.SOURCE_ENTITY_ID.in(appIdSelector)
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
-        Condition targetCondition = DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector)
-                .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+        Condition targetCondition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(appIdSelector)
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
-        return DSL.select(DATA_FLOW.ID)
-                .from(DATA_FLOW)
+        return DSL.select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
                 .where(sourceCondition.or(targetCondition));
     }
 
@@ -84,12 +84,12 @@ public class LogicalDataFlowIdSelectorFactory implements IdSelectorFactory {
     private Select<Record1<Long>> mkForApplication(IdSelectionOptions options) {
         ensureScopeIsExact(options);
         long appId = options.entityReference().id();
-        return DSL.select(DATA_FLOW.ID)
-                .from(DATA_FLOW)
-                .where(DATA_FLOW.SOURCE_ENTITY_ID.eq(appId)
-                        .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .or(DATA_FLOW.TARGET_ENTITY_ID.eq(appId)
-                        .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+        return DSL.select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(appId)
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(appId)
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
     }
 
 

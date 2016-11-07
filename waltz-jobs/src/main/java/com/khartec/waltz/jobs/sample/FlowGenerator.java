@@ -19,18 +19,18 @@ package com.khartec.waltz.jobs.sample;
 
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
-import com.khartec.waltz.data.data_flow.DataFlowDao;
+import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
-import com.khartec.waltz.model.dataflow.DataFlow;
-import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
+import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.schema.tables.records.DataFlowRecord;
+import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;
-import com.khartec.waltz.service.data_flow.DataFlowService;
+import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -42,7 +42,7 @@ import java.util.Set;
 import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.ListUtilities.randomPick;
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -57,7 +57,7 @@ public class FlowGenerator {
 
         AuthoritativeSourceDao authSourceDao = ctx.getBean(AuthoritativeSourceDao.class);
         ApplicationService applicationDao = ctx.getBean(ApplicationService.class);
-        DataFlowService dataFlowDao = ctx.getBean(DataFlowService.class);
+        LogicalFlowService dataFlowDao = ctx.getBean(LogicalFlowService.class);
         OrganisationalUnitService orgUnitDao = ctx.getBean(OrganisationalUnitService.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
@@ -66,12 +66,12 @@ public class FlowGenerator {
         List<OrganisationalUnit> orgUnits = orgUnitDao.findAll();
 
 
-        Set<DataFlow> expectedFlows = authSources.stream()
+        Set<LogicalFlow> expectedFlows = authSources.stream()
                 .flatMap(a -> {
                     long orgUnitId = a.parentReference().id();
 
                     return IntStream.range(0, rnd.nextInt(40))
-                            .mapToObj(i -> ImmutableDataFlow.builder()
+                            .mapToObj(i -> ImmutableLogicalFlow.builder()
                                     .source(a.applicationReference())
                                     .target(randomAppPick(apps, orgUnitId))
                                     .build());
@@ -79,21 +79,21 @@ public class FlowGenerator {
                 .collect(toSet());
 
 
-        Set<DataFlow> probableFlows = authSources.stream()
+        Set<LogicalFlow> probableFlows = authSources.stream()
                 .flatMap(a -> IntStream.range(0, rnd.nextInt(30))
-                        .mapToObj(i -> ImmutableDataFlow.builder()
+                        .mapToObj(i -> ImmutableLogicalFlow.builder()
                                 .source(a.applicationReference())
                                 .target(randomAppPick(apps, randomPick(orgUnits).id().get()))
                                 .build()))
                 .collect(toSet());
 
 
-        Set<DataFlow> randomFlows = apps.stream()
+        Set<LogicalFlow> randomFlows = apps.stream()
                 .flatMap(a -> IntStream
                         .range(0, rnd.nextInt(5))
                         .mapToObj(i -> {
                             EntityReference target = randomAppPick(apps, randomPick(orgUnits).id().get());
-                            return ImmutableDataFlow.builder()
+                            return ImmutableLogicalFlow.builder()
                                     .source(a.toEntityReference())
                                     .target(target)
                                     .build();
@@ -101,16 +101,16 @@ public class FlowGenerator {
                 .collect(toSet());
 
 
-        dsl.deleteFrom(DATA_FLOW).execute();
+        dsl.deleteFrom(LOGICAL_FLOW).execute();
 
-        Set<DataFlow> all = new HashSet<>();
+        Set<LogicalFlow> all = new HashSet<>();
         all.addAll(randomFlows);
         all.addAll(expectedFlows);
         all.addAll(probableFlows);
 
         System.out.println("--- saving: " + all.size());
 
-        Set<DataFlowRecord> records = SetUtilities.map(all, df -> DataFlowDao.TO_RECORD_MAPPER.apply(df, dsl));
+        Set<LogicalFlowRecord> records = SetUtilities.map(all, df -> LogicalFlowDao.TO_RECORD_MAPPER.apply(df, dsl));
         dsl.batchStore(records).execute();
 
         System.out.println("--- done");

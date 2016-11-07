@@ -13,7 +13,7 @@ import _ from 'lodash';
 import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks'
 
 function service($http, BaseApiUrl) {
-    const BASE = `${BaseApiUrl}/data-flows`;
+    const BASE = `${BaseApiUrl}/logical-flow`;
 
     // --- FINDERS ---
     const findBySelector = (options) => {

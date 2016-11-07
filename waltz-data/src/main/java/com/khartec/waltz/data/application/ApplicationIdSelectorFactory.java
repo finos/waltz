@@ -21,11 +21,11 @@ import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 import static com.khartec.waltz.schema.tables.Process.PROCESS;
@@ -237,12 +237,12 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
         Field appId = DSL.field("app_id", Long.class);
 
         SelectConditionStep<Record1<Long>> sources = selectLogicalFlowAppsByDataType(
-                DATA_FLOW.SOURCE_ENTITY_ID.as(appId),
-                condition.and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+                LOGICAL_FLOW.SOURCE_ENTITY_ID.as(appId),
+                condition.and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
 
         SelectConditionStep<Record1<Long>> targets = selectLogicalFlowAppsByDataType(
-                DATA_FLOW.TARGET_ENTITY_ID.as(appId),
-                condition.and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+                LOGICAL_FLOW.TARGET_ENTITY_ID.as(appId),
+                condition.and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
 
         return dsl.selectDistinct(appId)
                 .from(sources)
@@ -255,9 +255,9 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     private SelectConditionStep<Record1<Long>> selectLogicalFlowAppsByDataType(Field<Long> appField, Condition condition) {
         return dsl
                 .select(appField)
-                .from(DATA_FLOW)
+                .from(LOGICAL_FLOW)
                 .innerJoin(DATA_FLOW_DECORATOR)
-                .on(DATA_FLOW_DECORATOR.DATA_FLOW_ID.eq(DATA_FLOW.ID))
+                .on(DATA_FLOW_DECORATOR.DATA_FLOW_ID.eq(LOGICAL_FLOW.ID))
                 .where(dsl.renderInlined(condition));
     }
 

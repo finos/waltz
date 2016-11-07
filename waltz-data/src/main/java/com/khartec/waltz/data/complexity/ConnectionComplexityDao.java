@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 
 @Repository
 public class ConnectionComplexityDao {
@@ -20,31 +20,31 @@ public class ConnectionComplexityDao {
     private static final Field<Integer> CONNECTION_COUNT_ALIAS = DSL.field("connection_count", Integer.class);
     private static final Field<Long> APP_ID_ALIAS = DSL.field("app_id", Long.class);
     private static final Field<Integer> TOTAL_CONNECTIONS_FIELD = DSL.field("total_connections", Integer.class);
-    private static final Field<Long> SOURCE_APP_FIELD = DATA_FLOW.SOURCE_ENTITY_ID.as(APP_ID_ALIAS);
-    private static final Field<Long> TARGET_APP_FIELD = DATA_FLOW.TARGET_ENTITY_ID.as(APP_ID_ALIAS);
-    private static final Field<Integer> TARGET_COUNT_FIELD = DSL.countDistinct(DATA_FLOW.TARGET_ENTITY_ID).as(CONNECTION_COUNT_ALIAS);
-    private static final Field<Integer> SOURCE_COUNT_FIELD = DSL.countDistinct(DATA_FLOW.SOURCE_ENTITY_ID).as(CONNECTION_COUNT_ALIAS);
+    private static final Field<Long> SOURCE_APP_FIELD = LOGICAL_FLOW.SOURCE_ENTITY_ID.as(APP_ID_ALIAS);
+    private static final Field<Long> TARGET_APP_FIELD = LOGICAL_FLOW.TARGET_ENTITY_ID.as(APP_ID_ALIAS);
+    private static final Field<Integer> TARGET_COUNT_FIELD = DSL.countDistinct(LOGICAL_FLOW.TARGET_ENTITY_ID).as(CONNECTION_COUNT_ALIAS);
+    private static final Field<Integer> SOURCE_COUNT_FIELD = DSL.countDistinct(LOGICAL_FLOW.SOURCE_ENTITY_ID).as(CONNECTION_COUNT_ALIAS);
 
 
     private static final String APPLICATION_KIND = EntityKind.APPLICATION.name();
 
     private static final Condition BOTH_ARE_APPLICATIONS =
-            DATA_FLOW.SOURCE_ENTITY_KIND
+            LOGICAL_FLOW.SOURCE_ENTITY_KIND
                     .eq(APPLICATION_KIND)
-                    .and(DATA_FLOW.TARGET_ENTITY_KIND
+                    .and(LOGICAL_FLOW.TARGET_ENTITY_KIND
                             .eq(APPLICATION_KIND));
 
     private static final SelectHavingStep<Record2<Long, Integer>> OUTBOUND_FLOWS =
             DSL.select(SOURCE_APP_FIELD, TARGET_COUNT_FIELD)
-                    .from(DATA_FLOW)
+                    .from(LOGICAL_FLOW)
                     .where(BOTH_ARE_APPLICATIONS)
-                    .groupBy(DATA_FLOW.SOURCE_ENTITY_ID);
+                    .groupBy(LOGICAL_FLOW.SOURCE_ENTITY_ID);
 
     private static final SelectHavingStep<Record2<Long, Integer>> INBOUND_FLOWS =
             DSL.select(TARGET_APP_FIELD, SOURCE_COUNT_FIELD)
-                    .from(DATA_FLOW)
+                    .from(LOGICAL_FLOW)
                     .where(BOTH_ARE_APPLICATIONS)
-                    .groupBy(DATA_FLOW.TARGET_ENTITY_ID);
+                    .groupBy(LOGICAL_FLOW.TARGET_ENTITY_ID);
 
     private static final SelectHavingStep<Record2<Long, BigDecimal>> TOTAL_FLOW_COUNTS =
             DSL.select(APP_ID_ALIAS, DSL.sum(CONNECTION_COUNT_ALIAS).as(TOTAL_CONNECTIONS_FIELD))

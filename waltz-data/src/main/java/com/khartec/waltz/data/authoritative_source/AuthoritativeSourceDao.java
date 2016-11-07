@@ -41,17 +41,17 @@ import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 
 @Repository
 public class AuthoritativeSourceDao {
 
-    private static DataFlow df = DATA_FLOW.as("df");
+    private static LogicalFlow lf = LOGICAL_FLOW.as("lf");
     private static DataType dt = DATA_TYPE.as("dt");
     private static DataFlowDecorator dfd = DATA_FLOW_DECORATOR.as("dfd");
     private static EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
@@ -244,16 +244,16 @@ public class AuthoritativeSourceDao {
                 .from(dt)
                 .where(dt.ID.in(selector));
 
-        Condition appJoin = app.ID.eq(df.TARGET_ENTITY_ID)
+        Condition appJoin = app.ID.eq(lf.TARGET_ENTITY_ID)
                 .and(app.ORGANISATIONAL_UNIT_ID.eq(eh.ID));
 
         Condition hierarchyJoin = eh.ANCESTOR_ID.eq(au.PARENT_ID)
                 .and(eh.KIND.eq(EntityKind.ORG_UNIT.name()));
 
-        Condition authSourceJoin = au.APPLICATION_ID.eq(df.SOURCE_ENTITY_ID)
-                .and(df.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+        Condition authSourceJoin = au.APPLICATION_ID.eq(lf.SOURCE_ENTITY_ID)
+                .and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
-        Condition dataFlowDecoratorJoin = dfd.DATA_FLOW_ID.eq(df.ID);
+        Condition dataFlowDecoratorJoin = dfd.DATA_FLOW_ID.eq(lf.ID);
 
         Condition condition = dfd.DECORATOR_ENTITY_ID.in(selector)
                 .and(dfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
@@ -267,7 +267,7 @@ public class AuthoritativeSourceDao {
                 .select(authSourceIdField,
                         applicationIdField,
                         applicationNameField)
-                .from(df)
+                .from(lf)
                 .innerJoin(dfd).on(dataFlowDecoratorJoin)
                 .innerJoin(au).on(authSourceJoin)
                 .innerJoin(eh).on(hierarchyJoin)

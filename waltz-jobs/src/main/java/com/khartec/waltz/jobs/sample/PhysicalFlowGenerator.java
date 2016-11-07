@@ -23,7 +23,7 @@ import static com.khartec.waltz.common.CollectionUtilities.randomPick;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
@@ -43,12 +43,12 @@ public class PhysicalFlowGenerator {
                 .from(PHYSICAL_SPECIFICATION)
                 .fetch(PhysicalSpecificationDao.TO_DOMAIN_MAPPER);
 
-        List<Tuple3<Long, Long, Long>> allLogicalFLows = dsl.select(DATA_FLOW.ID, DATA_FLOW.SOURCE_ENTITY_ID, DATA_FLOW.TARGET_ENTITY_ID)
-                .from(DATA_FLOW)
+        List<Tuple3<Long, Long, Long>> allLogicalFLows = dsl.select(LOGICAL_FLOW.ID, LOGICAL_FLOW.SOURCE_ENTITY_ID, LOGICAL_FLOW.TARGET_ENTITY_ID)
+                .from(LOGICAL_FLOW)
                 .fetch(r -> Tuple.tuple(
-                        r.getValue(DATA_FLOW.ID),
-                        r.getValue(DATA_FLOW.SOURCE_ENTITY_ID),
-                        r.getValue(DATA_FLOW.TARGET_ENTITY_ID)));
+                        r.getValue(LOGICAL_FLOW.ID),
+                        r.getValue(LOGICAL_FLOW.SOURCE_ENTITY_ID),
+                        r.getValue(LOGICAL_FLOW.TARGET_ENTITY_ID)));
 
         Map<Long, Collection<Long>> targetsBySourceApp = groupBy(
                 t -> t.v2(),

@@ -15,19 +15,19 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.service.data_flow;
+package com.khartec.waltz.service.logical_flow;
 
 import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.data_flow.DataFlowDao;
-import com.khartec.waltz.data.data_flow.DataFlowStatsDao;
-import com.khartec.waltz.data.data_flow.LogicalDataFlowIdSelectorFactory;
+import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
+import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.dataflow.DataFlow;
-import com.khartec.waltz.model.dataflow.DataFlowMeasures;
-import com.khartec.waltz.model.dataflow.DataFlowStatistics;
-import com.khartec.waltz.model.dataflow.ImmutableDataFlowStatistics;
+import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowStatistics;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
+import com.khartec.waltz.model.logical_flow.LogicalFlowMeasures;
+import com.khartec.waltz.model.logical_flow.LogicalFlowStatistics;
 import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
@@ -45,46 +45,46 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 
 
 @Service
-public class DataFlowService {
+public class LogicalFlowService {
 
-    private final DataFlowDao dataFlowDao;
-    private final DataFlowStatsDao dataFlowStatsDao;
+    private final LogicalFlowDao logicalFlowDao;
+    private final LogicalFlowStatsDao logicalFlowStatsDao;
     private final DataFlowDecoratorService dataFlowDecoratorService;
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
-    private final LogicalDataFlowIdSelectorFactory logicalFlowIdSelectorFactory;
+    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
     private final DataTypeUsageService dataTypeUsageService;
 
 
     @Autowired
-    public DataFlowService(DataFlowDao dataFlowDao,
-                           DataFlowStatsDao dataFlowStatsDao,
-                           DataFlowDecoratorService dataFlowDecoratorService,
-                           ApplicationIdSelectorFactory appIdSelectorFactory,
-                           LogicalDataFlowIdSelectorFactory logicalFlowIdSelectorFactory,
-                           DataTypeUsageService dataTypeUsageService) {
-        checkNotNull(dataFlowDao, "dataFlowDao must not be null");
-        checkNotNull(dataFlowStatsDao, "dataFlowStatsDao cannot be null");
+    public LogicalFlowService(LogicalFlowDao logicalFlowDao,
+                              LogicalFlowStatsDao logicalFlowStatsDao,
+                              DataFlowDecoratorService dataFlowDecoratorService,
+                              ApplicationIdSelectorFactory appIdSelectorFactory,
+                              LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory,
+                              DataTypeUsageService dataTypeUsageService) {
+        checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
+        checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
         checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
         checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(logicalFlowIdSelectorFactory, "logicalFlowIdSelectorFactory cannot be null");
 
         this.appIdSelectorFactory = appIdSelectorFactory;
-        this.dataFlowStatsDao = dataFlowStatsDao;
-        this.dataFlowDao = dataFlowDao;
+        this.logicalFlowStatsDao = logicalFlowStatsDao;
+        this.logicalFlowDao = logicalFlowDao;
         this.dataFlowDecoratorService = dataFlowDecoratorService;
         this.dataTypeUsageService = dataTypeUsageService;
         this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
     }
 
 
-    public List<DataFlow> findByEntityReference(EntityReference ref) {
-        return dataFlowDao.findByEntityReference(ref);
+    public List<LogicalFlow> findByEntityReference(EntityReference ref) {
+        return logicalFlowDao.findByEntityReference(ref);
     }
 
 
-    public DataFlow getById(long flowId) {
-        return dataFlowDao.findByFlowId(flowId);
+    public LogicalFlow getById(long flowId) {
+        return logicalFlowDao.findByFlowId(flowId);
     }
 
 
@@ -97,31 +97,31 @@ public class DataFlowService {
      * @param options
      * @return
      */
-    public List<DataFlow> findBySelector(IdSelectionOptions options) {
-        return dataFlowDao.findBySelector(logicalFlowIdSelectorFactory.apply(options));
+    public List<LogicalFlow> findBySelector(IdSelectionOptions options) {
+        return logicalFlowDao.findBySelector(logicalFlowIdSelectorFactory.apply(options));
     }
 
 
-    public DataFlow findBySourceAndTarget(EntityReference source, EntityReference target) {
-        return dataFlowDao.findBySourceAndTarget(source, target);
+    public LogicalFlow findBySourceAndTarget(EntityReference source, EntityReference target) {
+        return logicalFlowDao.findBySourceAndTarget(source, target);
     }
 
 
-    public DataFlow addFlow(DataFlow flow) {
+    public LogicalFlow addFlow(LogicalFlow flow) {
         if (flow.source().equals(flow.target())) {
             throw new IllegalArgumentException("Cannot have a flow with same source and target");
         }
 
-        return dataFlowDao.addFlow(flow);
+        return logicalFlowDao.addFlow(flow);
     }
 
 
     public int removeFlows(List<Long> flowIds) {
-        List<DataFlow> dataFlows = dataFlowDao.findByFlowIds(flowIds);
-        int deleted = dataFlowDao.removeFlows(flowIds);
+        List<LogicalFlow> logicalFlows = logicalFlowDao.findByFlowIds(flowIds);
+        int deleted = logicalFlowDao.removeFlows(flowIds);
         dataFlowDecoratorService.deleteAllDecoratorsForFlowIds(flowIds);
 
-        Set<EntityReference> affectedEntityRefs = dataFlows.stream()
+        Set<EntityReference> affectedEntityRefs = logicalFlows.stream()
                 .flatMap(df -> Stream.of(df.source(), df.target()))
                 .collect(Collectors.toSet());
 
@@ -136,7 +136,7 @@ public class DataFlowService {
      * @param options
      * @return
      */
-    public DataFlowStatistics calculateStats(IdSelectionOptions options) {
+    public LogicalFlowStatistics calculateStats(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
             case APP_GROUP:
             case CAPABILITY:
@@ -150,20 +150,20 @@ public class DataFlowService {
     }
 
 
-    private DataFlowStatistics calculateStatsForAppIdSelector(IdSelectionOptions options) {
+    private LogicalFlowStatistics calculateStatsForAppIdSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
 
         Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);
         List<TallyPack<String>> dataTypeCounts = FunctionUtilities.time("DFS.dataTypes",
-                () -> dataFlowStatsDao.tallyDataTypesByAppIdSelector(appIdSelector));
+                () -> logicalFlowStatsDao.tallyDataTypesByAppIdSelector(appIdSelector));
 
-        DataFlowMeasures appCounts = FunctionUtilities.time("DFS.appCounts",
-                () -> dataFlowStatsDao.countDistinctAppInvolvementByAppIdSelector(appIdSelector));
+        LogicalFlowMeasures appCounts = FunctionUtilities.time("DFS.appCounts",
+                () -> logicalFlowStatsDao.countDistinctAppInvolvementByAppIdSelector(appIdSelector));
 
-        DataFlowMeasures flowCounts = FunctionUtilities.time("DFS.flowCounts",
-                () -> dataFlowStatsDao.countDistinctFlowInvolvementByAppIdSelector(appIdSelector));
+        LogicalFlowMeasures flowCounts = FunctionUtilities.time("DFS.flowCounts",
+                () -> logicalFlowStatsDao.countDistinctFlowInvolvementByAppIdSelector(appIdSelector));
 
-        return ImmutableDataFlowStatistics.builder()
+        return ImmutableLogicalFlowStatistics.builder()
                 .dataTypeCounts(dataTypeCounts)
                 .appCounts(appCounts)
                 .flowCounts(flowCounts)

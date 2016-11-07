@@ -15,14 +15,14 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.data.data_flow;
+package com.khartec.waltz.data.logical_flow;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.dataflow.DataFlow;
-import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
-import com.khartec.waltz.schema.tables.records.DataFlowRecord;
+import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
+import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -33,18 +33,18 @@ import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 
 
 @Repository
-public class DataFlowDao {
+public class LogicalFlowDao {
 
     public static final com.khartec.waltz.schema.tables.Application sourceAppAlias = APPLICATION.as("sourceAppAlias");
     public static final com.khartec.waltz.schema.tables.Application targetAppAlias = APPLICATION.as("targetAppAlias");
 
-    public static final RecordMapper<Record, DataFlow> TO_DOMAIN_MAPPER = r -> {
-        DataFlowRecord record = r.into(DataFlowRecord.class);
-        return ImmutableDataFlow.builder()
+    public static final RecordMapper<Record, LogicalFlow> TO_DOMAIN_MAPPER = r -> {
+        LogicalFlowRecord record = r.into(LogicalFlowRecord.class);
+        return ImmutableLogicalFlow.builder()
                 .id(record.getId())
                 .source(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(record.getSourceEntityKind()))
@@ -61,8 +61,8 @@ public class DataFlowDao {
     };
 
 
-    public static final BiFunction<DataFlow, DSLContext, DataFlowRecord> TO_RECORD_MAPPER = (flow, dsl) -> {
-        DataFlowRecord record = dsl.newRecord(DATA_FLOW);
+    public static final BiFunction<LogicalFlow, DSLContext, LogicalFlowRecord> TO_RECORD_MAPPER = (flow, dsl) -> {
+        LogicalFlowRecord record = dsl.newRecord(LOGICAL_FLOW);
         record.setProvenance(flow.provenance());
         record.setSourceEntityId(flow.source().id());
         record.setSourceEntityKind(flow.source().kind().name());
@@ -76,65 +76,65 @@ public class DataFlowDao {
 
 
     @Autowired
-    public DataFlowDao(DSLContext dsl) {
+    public LogicalFlowDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl must not be null");
         this.dsl = dsl;
     }
 
 
-    public List<DataFlow> findByEntityReference(EntityReference ref) {
+    public List<LogicalFlow> findByEntityReference(EntityReference ref) {
         return baseQuery()
-                .where(DATA_FLOW.SOURCE_ENTITY_ID.eq(ref.id()))
-                .or(DATA_FLOW.TARGET_ENTITY_ID.eq(ref.id()))
+                .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(ref.id()))
+                .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public DataFlow findBySourceAndTarget(EntityReference source, EntityReference target) {
+    public LogicalFlow findBySourceAndTarget(EntityReference source, EntityReference target) {
         return baseQuery()
-                .where(DATA_FLOW.SOURCE_ENTITY_ID.eq(source.id()))
-                .and(DATA_FLOW.TARGET_ENTITY_ID.eq(target.id()))
+                .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(source.id()))
+                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(target.id()))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     public int removeFlows(List<Long> flowIds) {
-        return dsl.deleteFrom(DATA_FLOW)
-                .where(DATA_FLOW.ID.in(flowIds))
+        return dsl.deleteFrom(LOGICAL_FLOW)
+                .where(LOGICAL_FLOW.ID.in(flowIds))
                 .execute();
     }
 
 
-    public DataFlow addFlow(DataFlow flow) {
-        DataFlowRecord record = TO_RECORD_MAPPER.apply(flow, dsl);
+    public LogicalFlow addFlow(LogicalFlow flow) {
+        LogicalFlowRecord record = TO_RECORD_MAPPER.apply(flow, dsl);
 
         record.store();
 
-        return ImmutableDataFlow
+        return ImmutableLogicalFlow
                 .copyOf(flow)
                 .withId(record.getId());
     }
 
 
-    public DataFlow findByFlowId(long dataFlowId) {
+    public LogicalFlow findByFlowId(long dataFlowId) {
         return baseQuery()
-                .where(DATA_FLOW.ID.eq(dataFlowId))
+                .where(LOGICAL_FLOW.ID.eq(dataFlowId))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     @Deprecated
-    public List<DataFlow> findByFlowIds(Collection<Long> dataFlowIds) {
+    public List<LogicalFlow> findByFlowIds(Collection<Long> dataFlowIds) {
         return baseQuery()
-                .where(DATA_FLOW.ID.in(dataFlowIds))
+                .where(LOGICAL_FLOW.ID.in(dataFlowIds))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
 
-    public List<DataFlow> findBySelector(Select<Record1<Long>> flowIdSelector) {
+    public List<LogicalFlow> findBySelector(Select<Record1<Long>> flowIdSelector) {
         return baseQuery()
-                .where(DATA_FLOW.ID.in(flowIdSelector))
+                .where(LOGICAL_FLOW.ID.in(flowIdSelector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -143,15 +143,15 @@ public class DataFlowDao {
 
     private SelectOnConditionStep<Record> baseQuery() {
         return dsl
-                .select(DATA_FLOW.fields())
+                .select(LOGICAL_FLOW.fields())
                 .select(sourceAppAlias.NAME, targetAppAlias.NAME)
-                .from(DATA_FLOW)
+                .from(LOGICAL_FLOW)
                 .innerJoin(sourceAppAlias)
-                .on(DATA_FLOW.SOURCE_ENTITY_ID.eq(sourceAppAlias.ID)
-                        .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(sourceAppAlias.ID)
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .innerJoin(targetAppAlias)
-                .on(DATA_FLOW.TARGET_ENTITY_ID.eq(targetAppAlias.ID)
-                        .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+                .on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(targetAppAlias.ID)
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
     }
 
 }

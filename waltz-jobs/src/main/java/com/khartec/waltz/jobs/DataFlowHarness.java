@@ -17,15 +17,15 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.data.data_flow.DataFlowDao;
-import com.khartec.waltz.data.data_flow.LogicalDataFlowIdSelectorFactory;
+import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.dataflow.DataFlow;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.data_flow.DataFlowService;
+import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -42,9 +42,9 @@ public class DataFlowHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
-        DataFlowService service = ctx.getBean(DataFlowService.class);
-        DataFlowDao dao = ctx.getBean(DataFlowDao.class);
-        LogicalDataFlowIdSelectorFactory factory = ctx.getBean(LogicalDataFlowIdSelectorFactory.class);
+        LogicalFlowService service = ctx.getBean(LogicalFlowService.class);
+        LogicalFlowDao dao = ctx.getBean(LogicalFlowDao.class);
+        LogicalFlowIdSelectorFactory factory = ctx.getBean(LogicalFlowIdSelectorFactory.class);
 
         IdSelectionOptions options = IdSelectionOptions.mkOpts(
                 EntityReference.mkRef(EntityKind.CAPABILITY, 5000),
@@ -55,14 +55,14 @@ public class DataFlowHarness {
         System.out.println(selector);
 
 
-        List<DataFlow> flows = dao.findBySelector(selector);
+        List<LogicalFlow> flows = dao.findBySelector(selector);
         flows.forEach(System.out::println);
 
 
         // by data type
         EntityReference dataType = EntityReference.mkRef(EntityKind.DATA_TYPE, 6000);
         IdSelectionOptions dataTypeOptions = IdSelectionOptions.mkOpts(dataType, HierarchyQueryScope.CHILDREN);
-        List<DataFlow> byDataTypeFlows = service.findBySelector(dataTypeOptions);
+        List<LogicalFlow> byDataTypeFlows = service.findBySelector(dataTypeOptions);
         byDataTypeFlows.forEach(System.out::println);
         System.out.println(byDataTypeFlows.size());
 

@@ -27,10 +27,10 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.limit;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
 import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static org.jooq.impl.DSL.*;
 
 @Repository
@@ -38,16 +38,16 @@ public class DataTypeUsageDao {
 
     private final com.khartec.waltz.schema.tables.DataType dt = DATA_TYPE.as("dt");
     private final com.khartec.waltz.schema.tables.DataTypeUsage dtu = DATA_TYPE_USAGE.as("dtu");
-    private final com.khartec.waltz.schema.tables.DataFlow df = DATA_FLOW.as("df");
+    private final com.khartec.waltz.schema.tables.LogicalFlow lf = LOGICAL_FLOW.as("lf");
     private final com.khartec.waltz.schema.tables.DataFlowDecorator dfd = DATA_FLOW_DECORATOR.as("dfd");
     private final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
 
-    private final Condition bothApps = df.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-            .and(df.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+    private final Condition bothApps = lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+            .and(lf.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
     private final Field<String> originatorUsageKindField = val(UsageKind.ORIGINATOR.name());
     private final Field<String> consumerDistributorCaseField = DSL
-            .when(df.SOURCE_ENTITY_ID.eq(app.ID),
+            .when(lf.SOURCE_ENTITY_ID.eq(app.ID),
                     UsageKind.DISTRIBUTOR.name())
             .otherwise(UsageKind.CONSUMER.name());
 
@@ -346,13 +346,13 @@ public class DataTypeUsageDao {
                     app.ID.as(appIdInner),
                     dt.CODE.as(dataTypeCodeInner),
                     consumerDistributorCaseField.as(usageKindInner))
-                .from(df)
+                .from(lf)
                 .innerJoin(app)
-                .on(app.ID.eq(df.SOURCE_ENTITY_ID)
-                        .or(app.ID.eq(df.TARGET_ENTITY_ID))
+                .on(app.ID.eq(lf.SOURCE_ENTITY_ID)
+                        .or(app.ID.eq(lf.TARGET_ENTITY_ID))
                         .and(bothApps))
                 .innerJoin(dfd)
-                .on(dfd.DATA_FLOW_ID.eq(df.ID))
+                .on(dfd.DATA_FLOW_ID.eq(lf.ID))
                 .and(dfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
                 .innerJoin(dt)
                 .on(dt.ID.eq(dfd.DECORATOR_ENTITY_ID))
