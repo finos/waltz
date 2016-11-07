@@ -23,9 +23,9 @@ public class FlowDecorationGenerator {
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
         List<Long> flowIds = dsl
-                .select(DATA_FLOW.ID)
-                .from(DATA_FLOW)
-                .fetch(DATA_FLOW.ID);
+                .select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .fetch(LOGICAL_FLOW.ID);
 
         List<Long> typeIds = dsl
                 .select(DATA_TYPE.ID)

@@ -15,20 +15,20 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.data.data_flow;
+package com.khartec.waltz.data.logical_flow;
 
 import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.dataflow.DataFlowMeasures;
-import com.khartec.waltz.model.dataflow.ImmutableDataFlowMeasures;
+import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowMeasures;
+import com.khartec.waltz.model.logical_flow.LogicalFlowMeasures;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.ImmutableTallyPack;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.tally.TallyPack;
-import com.khartec.waltz.schema.tables.DataFlow;
 import com.khartec.waltz.schema.tables.DataFlowDecorator;
 import com.khartec.waltz.schema.tables.DataType;
+import com.khartec.waltz.schema.tables.LogicalFlow;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,49 +41,49 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.stream.Collectors.*;
 import static org.jooq.impl.DSL.*;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
-public class DataFlowStatsDao {
+public class LogicalFlowStatsDao {
 
     private final DSLContext dsl;
 
-    private static final DataFlow df = DATA_FLOW.as("df");
+    private static final LogicalFlow lf = LOGICAL_FLOW.as("lf");
     private static final com.khartec.waltz.schema.tables.DataType dt = DataType.DATA_TYPE.as("dt");
     private static final com.khartec.waltz.schema.tables.DataFlowDecorator dfd = DataFlowDecorator.DATA_FLOW_DECORATOR.as("dfd");
 
 
     private static final Condition BOTH_APPS =
-            df.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                .and(df.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+            lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                .and(lf.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
 
     @Autowired
-    public DataFlowStatsDao(DSLContext dsl) {
+    public LogicalFlowStatsDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl must not be null");
 
         this.dsl = dsl;
     }
 
 
-    public DataFlowMeasures countDistinctAppInvolvementByAppIdSelector(Select<Record1<Long>> appIdSelector) {
+    public LogicalFlowMeasures countDistinctAppInvolvementByAppIdSelector(Select<Record1<Long>> appIdSelector) {
 
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
         Select<Record1<Integer>> inAppCounter = countDistinctApps(
                     appIdSelector,
-                    df.TARGET_ENTITY_ID,
-                    df.SOURCE_ENTITY_ID
+                    lf.TARGET_ENTITY_ID,
+                    lf.SOURCE_ENTITY_ID
         );
 
         Select<Record1<Integer>> outAppCounter = countDistinctApps(
                     appIdSelector,
-                    df.SOURCE_ENTITY_ID,
-                    df.TARGET_ENTITY_ID
+                    lf.SOURCE_ENTITY_ID,
+                    lf.TARGET_ENTITY_ID
         );
 
         Select<Record1<Integer>> intraAppCounter = dsl
@@ -98,7 +98,7 @@ public class DataFlowStatsDao {
         List<Integer> results = FunctionUtilities.time("DFSD.executeUnionAppCounters", ()
                 -> query.fetch(0, Integer.class));
 
-        return ImmutableDataFlowMeasures
+        return ImmutableLogicalFlowMeasures
                 .builder()
                 .inbound(results.get(0))
                 .outbound(results.get(1))
@@ -110,8 +110,8 @@ public class DataFlowStatsDao {
     public List<TallyPack<String>> tallyDataTypesByAppIdSelector(Select<Record1<Long>> appIdSelector) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
-        Condition condition = df.TARGET_ENTITY_ID.in(appIdSelector)
-                .or(df.SOURCE_ENTITY_ID.in(appIdSelector))
+        Condition condition = lf.TARGET_ENTITY_ID.in(appIdSelector)
+                .or(lf.SOURCE_ENTITY_ID.in(appIdSelector))
                 .and(BOTH_APPS);
 
         Table<Record1<Long>> sourceApp = appIdSelector.asTable("source_app");
@@ -130,14 +130,14 @@ public class DataFlowStatsDao {
                     dfd.DECORATOR_ENTITY_ID,
                     flowTypeCase.as(flowType),
                     count().as(flowCount))
-                .from(df)
+                .from(lf)
                 .innerJoin(dfd)
-                    .on(df.ID.eq(dfd.DATA_FLOW_ID)
+                    .on(lf.ID.eq(dfd.DATA_FLOW_ID)
                         .and(dfd.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name())))
                 .leftJoin(sourceApp)
-                    .on(sourceAppId.eq(df.SOURCE_ENTITY_ID))
+                    .on(sourceAppId.eq(lf.SOURCE_ENTITY_ID))
                 .leftJoin(targetApp)
-                    .on(targetAppId.eq(df.TARGET_ENTITY_ID))
+                    .on(targetAppId.eq(lf.TARGET_ENTITY_ID))
                 .where(condition)
                 .groupBy(dfd.DECORATOR_ENTITY_ID, flowTypeCase)
                 .fetch();
@@ -163,13 +163,13 @@ public class DataFlowStatsDao {
     }
 
 
-    public DataFlowMeasures countDistinctFlowInvolvementByAppIdSelector(Select<Record1<Long>> appIdSelector) {
+    public LogicalFlowMeasures countDistinctFlowInvolvementByAppIdSelector(Select<Record1<Long>> appIdSelector) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
 
         SelectJoinStep<Record2<Long, Long>> flows = dsl
-                .selectDistinct(df.SOURCE_ENTITY_ID, df.TARGET_ENTITY_ID)
-                .from(df);
+                .selectDistinct(lf.SOURCE_ENTITY_ID, lf.TARGET_ENTITY_ID)
+                .from(lf);
 
         Condition inboundCondition = DSL
                 .field("SOURCE_ENTITY_ID").notIn(appIdSelector)
@@ -206,7 +206,7 @@ public class DataFlowStatsDao {
         List<Integer> results = query.fetch(0, Integer.class);
 
 
-        return ImmutableDataFlowMeasures.builder()
+        return ImmutableLogicalFlowMeasures.builder()
                 .inbound(results.get(0))
                 .outbound(results.get(1))
                 .intra(results.get(2))
@@ -225,7 +225,7 @@ public class DataFlowStatsDao {
                 .and(BOTH_APPS);
 
         return dsl.select(DSL.countDistinct(fieldToCount))
-                .from(df)
+                .from(lf)
                 .where(dsl.renderInlined(condition));
 
     }

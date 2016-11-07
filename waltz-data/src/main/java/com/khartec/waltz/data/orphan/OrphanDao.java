@@ -161,15 +161,15 @@ public class OrphanDao {
 
     public List<OrphanRelationship> findOrphanLogicalDataFlows() {
         BiFunction<Field<String>, Field<Long>, Select<Record2<Long, Long>>> queryFactory = (kindField, idField) ->
-                DSL.select(DATA_FLOW.ID, idField)
-                        .from(DATA_FLOW)
+                DSL.select(LOGICAL_FLOW.ID, idField)
+                        .from(LOGICAL_FLOW)
                         .where(idField.notIn(
                                 select(APPLICATION.ID)
                                         .from(APPLICATION)))
                         .and(kindField.eq(EntityKind.APPLICATION.name()));
 
-        return dsl.selectFrom(queryFactory.apply(DATA_FLOW.SOURCE_ENTITY_KIND, DATA_FLOW.SOURCE_ENTITY_ID).asTable())
-                .unionAll(queryFactory.apply(DATA_FLOW.TARGET_ENTITY_KIND, DATA_FLOW.TARGET_ENTITY_ID))
+        return dsl.selectFrom(queryFactory.apply(LOGICAL_FLOW.SOURCE_ENTITY_KIND, LOGICAL_FLOW.SOURCE_ENTITY_ID).asTable())
+                .unionAll(queryFactory.apply(LOGICAL_FLOW.TARGET_ENTITY_KIND, LOGICAL_FLOW.TARGET_ENTITY_ID))
                 .fetch(r -> ImmutableOrphanRelationship.builder()
                         .entityA(mkRef(EntityKind.LOGICAL_DATA_FLOW, r.value1()))
                         .entityB(mkRef(EntityKind.APPLICATION, r.value2()))

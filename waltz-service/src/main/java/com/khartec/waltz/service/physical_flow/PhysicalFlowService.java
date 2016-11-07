@@ -9,13 +9,13 @@ import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.command.CommandOutcome;
-import com.khartec.waltz.model.dataflow.DataFlow;
-import com.khartec.waltz.model.dataflow.ImmutableDataFlow;
+import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.data_flow.DataFlowService;
+import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.data_type.DataTypeService;
 import com.khartec.waltz.service.settings.SettingsService;
@@ -35,7 +35,7 @@ public class PhysicalFlowService {
     private final PhysicalFlowDao physicalFlowDao;
     private final PhysicalSpecificationDao physicalSpecificationDao;
     private final ChangeLogService changeLogService;
-    private final DataFlowService dataFlowService;
+    private final LogicalFlowService dataFlowService;
     private final DataFlowDecoratorService dataFlowDecoratorService;
     private final DataTypeService dataTypeService;
     private final SettingsService settingsService;
@@ -45,7 +45,7 @@ public class PhysicalFlowService {
 
     @Autowired
     public PhysicalFlowService(ChangeLogService changeLogService,
-                               DataFlowService dataFlowService,
+                               LogicalFlowService dataFlowService,
                                DataFlowDecoratorService dataFlowDecoratorService,
                                DataTypeService dataTypeService,
                                PhysicalFlowDao physicalDataFlowDao,
@@ -201,15 +201,15 @@ public class PhysicalFlowService {
                 && target.kind().equals(EntityKind.APPLICATION))) {
             return;
         } else {
-            DataFlow dataFlow = dataFlowService.findBySourceAndTarget(source, target);
-            if(dataFlow == null) {
+            LogicalFlow logicalFlow = dataFlowService.findBySourceAndTarget(source, target);
+            if(logicalFlow == null) {
                 Optional<String> defaultDataTypeCode = settingsService.getValue(DEFAULT_DATATYPE_CODE_SETTING_NAME);
                 if(!defaultDataTypeCode.isPresent()) {
                     throw new IllegalStateException("No default datatype code  (" + DEFAULT_DATATYPE_CODE_SETTING_NAME + ") in settings table");
                 }
 
                 // we need to create a flow with an unknown data type
-                DataFlow createdFlow = dataFlowService.addFlow(ImmutableDataFlow.builder()
+                LogicalFlow createdFlow = dataFlowService.addFlow(ImmutableLogicalFlow.builder()
                         .source(source)
                         .target(target)
                         .build());

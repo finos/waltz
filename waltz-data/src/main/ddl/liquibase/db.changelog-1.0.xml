@@ -3281,4 +3281,53 @@
     </changeSet>
 
 
+    <!-- 750 - Rename DataFlow / DataFlowDecorator to LogicalFlow LogicalFlowDecorator -->
+    <changeSet author="dwatkins"
+               id="20161107-750-1"
+               dbms="mssql">
+        <dropPrimaryKey constraintName="data_flow_pkey"
+                        tableName="data_flow"/>
+
+        <renameTable oldTableName="data_flow"
+                     newTableName="logical_flow"/>
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="logical_flow_pkey"
+                       tableName="logical_flow"/>
+
+    </changeSet>
+
+    <changeSet author="kamransaleem"
+               id="20161107-750-1"
+               dbms="mysql">
+        <renameTable oldTableName="data_flow"
+                     newTableName="logical_flow"/>
+
+        <sql>
+            ALTER TABLE logical_flow
+            DROP PRIMARY KEY,
+            CHANGE id id bigint(20);
+        </sql>
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="logical_flow_pkey"
+                       tableName="logical_flow"/>
+
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20161107-750-2">
+        <dropUniqueConstraint tableName="logical_flow"
+                              constraintName="unique_data_flow"/>
+
+        <addUniqueConstraint tableName="logical_flow"
+                             constraintName="unique_logical_flow"
+                             columnNames="source_entity_kind, source_entity_id, target_entity_kind, target_entity_id"/>
+    </changeSet>
+
+
+
+
+
+
 </databaseChangeLog>

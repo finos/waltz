@@ -38,6 +38,14 @@
             </a>
         </h4>
 
+
+        <a ui-sref="main.app.view ({ id: $ctrl.selected.app.id })">
+            &raquo; More about
+            <span ng-bind='$ctrl.selected.app.name'></span>
+        </a>
+
+        <hr>
+
         <strong>Data Types</strong>
         <div ng-if="$ctrl.selected.types.length > 0" class="wsatp-data-types">
             <ul class="list-inline">
@@ -98,11 +106,6 @@
             </div>
         </div>
 
-        <hr>
 
-        <a ui-sref="main.app.view ({ id: $ctrl.selected.app.id })">
-            &raquo; More about
-            <span ng-bind='$ctrl.selected.app.name'></span>
-        </a>
     </div>
 </div>

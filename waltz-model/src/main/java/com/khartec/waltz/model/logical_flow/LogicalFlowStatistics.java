@@ -1,4 +1,4 @@
-package com.khartec.waltz.model.dataflow;
+package com.khartec.waltz.model.logical_flow;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -9,12 +9,12 @@ import org.immutables.value.Value;
 import java.util.List;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableDataFlowStatistics.class)
-@JsonDeserialize(as = ImmutableDataFlowStatistics.class)
-public abstract class DataFlowStatistics implements SummaryStatistics {
+@JsonSerialize(as = ImmutableLogicalFlowStatistics.class)
+@JsonDeserialize(as = ImmutableLogicalFlowStatistics.class)
+public abstract class LogicalFlowStatistics implements SummaryStatistics {
 
-    public abstract DataFlowMeasures appCounts();
-    public abstract DataFlowMeasures flowCounts();
+    public abstract LogicalFlowMeasures appCounts();
+    public abstract LogicalFlowMeasures flowCounts();
 
     public abstract List<TallyPack<String>> dataTypeCounts();
 }

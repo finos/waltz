@@ -17,10 +17,10 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.dataflow.DataFlow;
-import com.khartec.waltz.model.dataflow.DataFlowStatistics;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
+import com.khartec.waltz.model.logical_flow.LogicalFlowStatistics;
 import com.khartec.waltz.model.user.Role;
-import com.khartec.waltz.service.data_flow.DataFlowService;
+import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -41,22 +41,22 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
-public class DataFlowsEndpoint implements Endpoint {
+public class LogicalFlowEndpoint implements Endpoint {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataFlowsEndpoint.class);
-    private static final String BASE_URL = mkPath("api", "data-flows");
+    private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowEndpoint.class);
+    private static final String BASE_URL = mkPath("api", "logical-flow");
 
-    private final DataFlowService dataFlowService;
+    private final LogicalFlowService logicalFlowService;
     private final UserRoleService userRoleService;
 
 
     @Autowired
-    public DataFlowsEndpoint(DataFlowService dataFlowService,
-                             UserRoleService userRoleService) {
-        checkNotNull(dataFlowService, "dataFlowService must not be null");
+    public LogicalFlowEndpoint(LogicalFlowService logicalFlowService,
+                               UserRoleService userRoleService) {
+        checkNotNull(logicalFlowService, "logicalFlowService must not be null");
         checkNotNull(userRoleService, "userRoleService must not be null");
 
-        this.dataFlowService = dataFlowService;
+        this.logicalFlowService = logicalFlowService;
         this.userRoleService = userRoleService;
     }
 
@@ -70,14 +70,14 @@ public class DataFlowsEndpoint implements Endpoint {
         String removeFlowPath = mkPath(BASE_URL, ":id");
         String addFlowPath = mkPath(BASE_URL);
 
-        ListRoute<DataFlow> getByEntityRef = (request, response)
-                -> dataFlowService.findByEntityReference(getEntityReference(request));
+        ListRoute<LogicalFlow> getByEntityRef = (request, response)
+                -> logicalFlowService.findByEntityReference(getEntityReference(request));
 
-        ListRoute<DataFlow> findBySelectorRoute = (request, response)
-                -> dataFlowService.findBySelector(readIdSelectionOptionsFromBody(request));
+        ListRoute<LogicalFlow> findBySelectorRoute = (request, response)
+                -> logicalFlowService.findBySelector(readIdSelectionOptionsFromBody(request));
 
-        DatumRoute<DataFlowStatistics> findStatsRoute = (request, response)
-                -> dataFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
+        DatumRoute<LogicalFlowStatistics> findStatsRoute = (request, response)
+                -> logicalFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
 
 
         getForList(findByEntityPath, getByEntityRef);
@@ -90,19 +90,19 @@ public class DataFlowsEndpoint implements Endpoint {
     }
 
 
-    private DataFlow addFlowRoute(Request request, Response response) throws IOException {
+    private LogicalFlow addFlowRoute(Request request, Response response) throws IOException {
         ensureUserHasEditRights(request);
 
-        DataFlow dataFlow = readBody(request, DataFlow.class);
+        LogicalFlow logicalFlow = readBody(request, LogicalFlow.class);
         String username = getUsername(request);
 
-        if (dataFlow.id().isPresent()) {
-            LOG.warn("User: {}, ignoring attempt to add duplicate flow: {}", username, dataFlow);
-            return dataFlow;
+        if (logicalFlow.id().isPresent()) {
+            LOG.warn("User: {}, ignoring attempt to add duplicate logical flow: {}", username, logicalFlow);
+            return logicalFlow;
         }
 
-        LOG.info("User: {}, adding new flow: {}", username, dataFlow);
-        DataFlow savedFlow = dataFlowService.addFlow(dataFlow);
+        LOG.info("User: {}, adding new logical flow: {}", username, logicalFlow);
+        LogicalFlow savedFlow = logicalFlowService.addFlow(logicalFlow);
         return savedFlow;
     }
 
@@ -115,13 +115,12 @@ public class DataFlowsEndpoint implements Endpoint {
 
         LOG.info("User: {} removing logical flow: {}", username, flowId);
 
-        return dataFlowService.removeFlows(newArrayList(flowId));
+        return logicalFlowService.removeFlows(newArrayList(flowId));
     }
 
 
     private void ensureUserHasEditRights(Request request) {
         requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
     }
-
 
 }

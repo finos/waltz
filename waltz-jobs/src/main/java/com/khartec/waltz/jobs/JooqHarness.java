@@ -22,7 +22,7 @@ import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.bookmark.BookmarkDao;
 import com.khartec.waltz.data.capability.CapabilityDao;
 import com.khartec.waltz.data.capability_rating.CapabilityRatingDao;
-import com.khartec.waltz.data.data_flow.DataFlowDao;
+import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.capabilityrating.CapabilityRating;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
@@ -45,7 +45,7 @@ public class JooqHarness {
 
         ApplicationDao appDao = ctx.getBean(ApplicationDao.class);
         ApplicationService appSvc = ctx.getBean(ApplicationService.class);
-        DataFlowDao dfDao = ctx.getBean(DataFlowDao.class);
+        LogicalFlowDao dfDao = ctx.getBean(LogicalFlowDao.class);
         CapabilityRatingDao capRatDao = ctx.getBean(CapabilityRatingDao.class);
         OrganisationalUnitDao orgDao = ctx.getBean(OrganisationalUnitDao.class);
         AppCapabilityDao appCapDao = ctx.getBean(AppCapabilityDao.class);

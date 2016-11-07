@@ -22,10 +22,10 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.data.data_flow.DataFlowDao.sourceAppAlias;
-import static com.khartec.waltz.data.data_flow.DataFlowDao.targetAppAlias;
-import static com.khartec.waltz.schema.tables.DataFlow.DATA_FLOW;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.sourceAppAlias;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.targetAppAlias;
 import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.stream.Collectors.toList;
 
 
@@ -76,17 +76,17 @@ public class DataFlowDecoratorDao {
         return dsl
                 .select(DATA_FLOW_DECORATOR.fields())
                 .from(DATA_FLOW_DECORATOR)
-                .innerJoin(DATA_FLOW)
-                .on(DATA_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID)) // join on application to prevent orphan flows
+                .innerJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID)) // join on application to prevent orphan flows
                 .innerJoin(sourceAppAlias)                             // being returned
-                .on(sourceAppAlias.ID.eq(DATA_FLOW.SOURCE_ENTITY_ID))
+                .on(sourceAppAlias.ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID))
                 .innerJoin(targetAppAlias)
-                .on(targetAppAlias.ID.eq(DATA_FLOW.TARGET_ENTITY_ID))
-                .where(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector)
-                                .or(DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector)))
+                .on(targetAppAlias.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID))
+                .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.in(appIdSelector)
+                                .or(LOGICAL_FLOW.TARGET_ENTITY_ID.in(appIdSelector)))
                 .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorEntityKind.name()))
-                .and(DATA_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(DATA_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .fetch(TO_DECORATOR_MAPPER);
     }
 
@@ -129,13 +129,13 @@ public class DataFlowDecoratorDao {
 
 
     public Collection<DataFlowDecorator> findByAppIdSelector(Select<Record1<Long>> appIdSelector) {
-        Condition condition = DATA_FLOW.TARGET_ENTITY_ID.in(appIdSelector)
-                .or(DATA_FLOW.SOURCE_ENTITY_ID.in(appIdSelector));
+        Condition condition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(appIdSelector)
+                .or(LOGICAL_FLOW.SOURCE_ENTITY_ID.in(appIdSelector));
 
         return dsl.select(DATA_FLOW_DECORATOR.fields())
                 .from(DATA_FLOW_DECORATOR)
-                .innerJoin(DATA_FLOW)
-                .on(DATA_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID))
+                .innerJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID))
                 .where(dsl.renderInlined(condition))
                 .fetch(TO_DECORATOR_MAPPER);
     }
@@ -145,9 +145,9 @@ public class DataFlowDecoratorDao {
 
     public List<DecoratorRatingSummary> summarizeForSelector(Select<Record1<Long>> selector) {
         // this is intentionally TARGET only as we use to calculate auth source stats
-        Condition condition = DATA_FLOW.TARGET_ENTITY_ID.in(selector);
+        Condition condition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(selector);
 
-        Condition dataFlowJoinCondition = DATA_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID);
+        Condition dataFlowJoinCondition = LOGICAL_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID);
 
         Collection<Field<?>> groupingFields = newArrayList(
                 DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND,
@@ -159,7 +159,7 @@ public class DataFlowDecoratorDao {
         return dsl.select(groupingFields)
                 .select(countField)
                 .from(DATA_FLOW_DECORATOR)
-                .innerJoin(DATA_FLOW)
+                .innerJoin(LOGICAL_FLOW)
                 .on(dsl.renderInlined(dataFlowJoinCondition))
                 .where(dsl.renderInlined(condition))
                 .groupBy(groupingFields)

@@ -3,7 +3,7 @@ package com.khartec.waltz.service.data_flow_decorator;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
-import com.khartec.waltz.data.data_flow.DataFlowDao;
+import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.data_flow_decorator.DataFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.model.*;
@@ -12,7 +12,7 @@ import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoi
 import com.khartec.waltz.model.authoritativesource.Rating;
 import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableDataFlowDecorator;
-import com.khartec.waltz.model.dataflow.DataFlow;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceResolver;
@@ -41,7 +41,7 @@ public class DataFlowDecoratorRatingsService {
 
     private final ApplicationService applicationService;
     private final AuthoritativeSourceDao authoritativeSourceDao;
-    private final DataFlowDao dataFlowDao;
+    private final LogicalFlowDao dataFlowDao;
     private final DataTypeDao dataTypeDao;
     private final DataFlowDecoratorDao dataFlowDecoratorDao;
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
@@ -51,7 +51,7 @@ public class DataFlowDecoratorRatingsService {
     public DataFlowDecoratorRatingsService(ApplicationService applicationService,
                                            ApplicationIdSelectorFactory selectorFactory,
                                            AuthoritativeSourceDao authoritativeSourceDao,
-                                           DataFlowDao dataFlowDao,
+                                           LogicalFlowDao dataFlowDao,
                                            DataTypeDao dataTypeDao,
                                            DataFlowDecoratorDao dataFlowDecoratorDao) {
         checkNotNull(applicationService, "applicationService cannot be null");
@@ -116,12 +116,12 @@ public class DataFlowDecoratorRatingsService {
 
     public Collection<DataFlowDecorator> calculateRatings(Collection<DataFlowDecorator> decorators) {
 
-        List<DataFlow> flows = loadFlows(decorators);
+        List<LogicalFlow> flows = loadFlows(decorators);
         List<Application> targetApps = loadTargetApplications(flows);
         List<DataType> dataTypes = dataTypeDao.getAll();
 
         Map<Long, DataType> typesById = indexById(dataTypes);
-        Map<Long, DataFlow> flowsById = indexById(flows);
+        Map<Long, LogicalFlow> flowsById = indexById(flows);
         Map<Long, Application> targetAppsById = indexById(targetApps);
 
         AuthoritativeSourceResolver resolver = createResolver(targetApps);
@@ -147,11 +147,11 @@ public class DataFlowDecoratorRatingsService {
 
 
     private Rating lookupRating(Map<Long, DataType> typesById,
-                                Map<Long, DataFlow> flowsById,
+                                Map<Long, LogicalFlow> flowsById,
                                 Map<Long, Application> targetAppsById,
                                 AuthoritativeSourceResolver resolver,
                                 DataFlowDecorator decorator) {
-        DataFlow flow = flowsById.get(decorator.dataFlowId());
+        LogicalFlow flow = flowsById.get(decorator.dataFlowId());
 
         EntityReference vantagePoint = lookupVantagePoint(targetAppsById, flow);
         EntityReference source = flow.source();
@@ -161,7 +161,7 @@ public class DataFlowDecoratorRatingsService {
     }
 
 
-    private EntityReference lookupVantagePoint(Map<Long, Application> targetAppsById, DataFlow flow) {
+    private EntityReference lookupVantagePoint(Map<Long, Application> targetAppsById, LogicalFlow flow) {
         long targetOrgUnitId = targetAppsById.get(flow.target().id()).organisationalUnitId();
 
         return EntityReference.mkRef(
@@ -176,7 +176,7 @@ public class DataFlowDecoratorRatingsService {
     }
 
 
-    private List<Application> loadTargetApplications(List<DataFlow> flows) {
+    private List<Application> loadTargetApplications(List<LogicalFlow> flows) {
         Set<Long> targetApplicationIds = map(
                 flows,
                 df -> df.target().id());
@@ -186,7 +186,7 @@ public class DataFlowDecoratorRatingsService {
     }
 
 
-    private List<DataFlow> loadFlows(Collection<DataFlowDecorator> decorators) {
+    private List<LogicalFlow> loadFlows(Collection<DataFlowDecorator> decorators) {
         Set<Long> dataFlowIds = map(decorators, d -> d.dataFlowId());
         return dataFlowDao.findByFlowIds(dataFlowIds);
     }
