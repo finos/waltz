@@ -143,19 +143,6 @@ function prepareGraph(svg) {
         .append("g")
         .classed("wsat-inbound", true);
 
-    svg.append('defs')
-        .append('marker')
-        .attr({
-            id: 'wsat-arrowhead',
-            refX: 10,
-            refY: 4,
-            markerWidth: 8,
-            markerHeight: 8,
-            orient: 'auto'
-        })
-        .append('path')
-        .attr('d', 'M 0,0 V 8 L9,4 Z'); // arrowhead shape
-
     return {
         header,
         inbound,
@@ -407,7 +394,7 @@ function drawArcs(section, model, layoutFn) {
         .classed('wsat-arc', true)
         .attr({
             opacity: 0,
-            'marker-end': 'url(#wsat-arrowhead)',
+            'marker-end': d => `url(#arrowhead-${d.rating})`,
             stroke: d => authoritativeRatingColorScale(d.rating)
         });
 

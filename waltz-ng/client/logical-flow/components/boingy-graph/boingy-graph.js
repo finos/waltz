@@ -16,6 +16,7 @@ import _ from "lodash";
 
 const template = require('./boingy-graph.html');
 
+
 const bindings = {
     data: '<',
     tweakers: '<'
@@ -45,34 +46,6 @@ const force = d3.layout.force()
 function setup(vizElem) {
     const svg = vizElem
         .append('svg');
-
-
-    const defs = svg.append('defs');
-
-    const markers = [
-        { name: 'arrowhead' , color: '#333' },
-        { name: 'arrowhead-PRIMARY' , color: 'green' },
-        { name: 'arrowhead-SECONDARY' , color: 'orange' },
-        { name: 'arrowhead-DISCOURAGED' , color: 'red' },
-        { name: 'arrowhead-NO_OPINION' , color: '#333' }
-    ];
-
-    defs.selectAll('marker')
-        .data(markers, m => m.name)
-        .enter()
-        .append('marker')
-        .attr({
-            id: d => d.name,
-            refX: 20,
-            refY: 4,
-            markerWidth: 8,
-            markerHeight: 8,
-            orient: 'auto',
-            stroke: d => d3.rgb(d.color).hsl().darker(0.5),
-            fill: d => d3.rgb(d.color).hsl().brighter(1.5),
-        })
-        .append('path')
-        .attr('d', 'M 0,0 V 8 L8,4 Z'); // this is actual shape for arrowhead
 
     return { svg, vizElem };
 }
@@ -121,7 +94,7 @@ function drawLinks(flows = [], nodes = [], svg, linkTweakers = DEFAULT_TWEAKER) 
 
     link.enter()
         .append('svg:line')
-        .attr('marker-end', 'url(#arrowhead)')
+        .attr('marker-end', 'url(#arrowhead)') // defined in common-svg-defs
         .attr({ 'stroke' : '#333' })
         .classed('wdfd-link', true)
         .call(linkTweakers.enter);
