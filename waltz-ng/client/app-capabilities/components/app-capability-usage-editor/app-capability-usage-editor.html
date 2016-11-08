@@ -1,0 +1,83 @@
+<div>
+    <div class="row">
+        <div class="col-md-7">
+            <div ng-if="$ctrl.usedCapabilities.length == 0" class="alert alert-warning">
+                <waltz-icon name="warning"></waltz-icon>
+                <strong>No functions</strong> have been registered.
+            </div>
+
+            <div class="row" ng-if="$ctrl.usedCapabilities.length > 0">
+                <div class="col-md-12">
+                    <table class="table table-condensed table-striped">
+                        <colgroup>
+                            <col width="40%"/>
+                            <col width="60%"/>
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Comments</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr class="waltz-visibility-parent clickable"
+                            ng-repeat="usage in $ctrl.usedCapabilities | orderBy:'capability.name'"
+                            ng-click="$ctrl.edit(usage)"
+                            ng-class="{'info' : usage.editMode}">
+                            <td>
+                                <span class='wce-name'
+                                      uib-popover="{{ usage.capability.description }}"
+                                      popover-trigger="mouseenter"
+                                      popover-placement="right"
+                                      ng-bind="usage.capability.name">
+                                </span>
+                                <waltz-rag-indicator name="{{ usage.rating | toDisplayName:'capabilityRating' }}"
+                                                     rag-rating="usage.rating">
+                                </waltz-rag-indicator>
+                            </td>
+                            <td>
+                                <span class='small'
+                                      ng-bind="usage.capability.description">
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td align="right">
+                                <button class="btn btn-sm btn-success"
+                                        ng-disabled="$ctrl.saving"
+                                        ng-click="$ctrl.addNew()">
+                                    <waltz-icon name=plus"></waltz-icon>
+                                    Add
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div ng-if="$ctrl.mode === 'EDIT'">
+
+                <waltz-app-capability-editor selected="$ctrl.selected"
+                                             on-save="$ctrl.updateRating"
+                                             on-cancel="$ctrl.cancelEdit">
+                </waltz-app-capability-editor>
+            </div>
+
+            <div ng-if="$ctrl.mode === 'ADD'">
+
+                <waltz-app-capability-picker capabilities="$ctrl.availableCapabilities"
+                                             on-save="$ctrl.addCapability"
+                                             on-cancel="$ctrl.cancelEdit">
+                </waltz-app-capability-picker>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
