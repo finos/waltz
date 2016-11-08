@@ -17,11 +17,12 @@ export default (module) => {
 
     module
         .config(require('./routes.js'))
-        .service(
-            'AppCapabilityStore',
-            require('./services/app-capability-store'))
-        .component(
-            'waltzAppFunctionTabgroupSection',
-            require('./components/app-function-tabgroup-section/app-function-tabgroup-section'));
+        .service('AppCapabilityStore', require('./services/app-capability-store'));
+
+    module
+        .component('waltzAppFunctionTabgroupSection',
+            require('./components/app-function-tabgroup-section/app-function-tabgroup-section'))
+        .component('waltzAppCapabilityEditor', require('./components/app-capability-editor/app-capability-editor'))
+        .component('waltzAppCapabilityPicker', require('./components/app-capability-picker/app-capability-picker'));
 
 };

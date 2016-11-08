@@ -16,26 +16,36 @@
  *
  */
 
-const BINDINGS = {
-    usages: '=',
-    capabilities: '=',
-    capabilityTraits: '=?',
-    traitUsages: '=?',
-    add: '=',
-    remove: '=',
-    togglePrimary: '='
+import _ from "lodash";
+
+
+const bindings = {
+    usages: '<',
+    capabilities: '<',
+    capabilityTraits: '<',
+    traitUsages: '<',
+    add: '<',
+    remove: '<',
+    update: '<',
+    togglePrimary: '<'
 };
 
+
+const template = require('./app-capability-usage-editor.html');
+
+const initialState = {
+    mode: 'NONE' // NONE, EDIT, ADD
+}
 
 function controller($scope) {
 
     const vm = this;
 
     const watchExpressions = [
-        'ctrl.usages',
-        'ctrl.capabilities',
-        'ctrl.traitUsages',
-        'ctrl.capabilityTraits'
+        '$ctrl.usages',
+        '$ctrl.capabilities',
+        '$ctrl.traitUsages',
+        '$ctrl.capabilityTraits'
     ];
 
     $scope.$watchGroup(watchExpressions, ([usages, capabilities, traitUsages = [], capabilityTraits = []]) => {
@@ -52,7 +62,7 @@ function controller($scope) {
             .map('entityReference.id')
             .value();
 
-        vm.usedCapabilities = _.map(usages, u => ({ ...u, capability: capabilitiesById[u.capabilityId] }));
+        vm.usedCapabilities = _.map(usages, u => ({ ...u, capability: capabilitiesById[u.capabilityId] , rating: 'Z'} ));
 
         vm.availableCapabilities = _.chain(capabilities)
             .reject(t => _.includes(usedCapabilityIds, t.id))
@@ -63,25 +73,62 @@ function controller($scope) {
 
     });
 
+
     vm.addCapability = (c) => {
-        vm.add(c).then(vm.selectedNode = null);
+        vm.add(c.capability).then(vm.selected = null);
+        console.log('TODO: add rating for cap: ', c);
+        vm.changeMode('NONE');
+    };
+
+
+    vm.updateRating = (c) => {
+        console.log("TODO: update rating for capability: ", c)
+        vm.changeMode('NONE');
+    };
+
+
+    vm.changeMode = (mode) => {
+        vm.mode = mode;
     }
+
+    vm.edit = (usage) => {
+        if(vm.selected) {
+            vm.selected.editMode = false;
+        }
+        vm.changeMode('EDIT');
+        vm.selected = usage;
+        vm.selected.editMode = true;
+    };
+
+
+    vm.cancelEdit = () => {
+        vm.changeMode('NONE');
+        if(vm.selected) {
+            vm.selected.editMode = false;
+        }
+    };
+
+
+    vm.addNew = () => {
+        if(vm.selected) {
+            vm.selected.editMode = false;
+            vm.selected = null;
+        }
+        vm.changeMode('ADD');
+    };
+
 }
+
 
 
 controller.$inject = ['$scope'];
 
 
-function directive() {
-    return {
-        restrict: 'E',
-        replace: 'true',
-        bindToController: BINDINGS,
-        scope: {},
-        template: require('./app-capability-usage-editor.html'),
-        controller,
-        controllerAs: 'ctrl'
-    };
+const component = {
+    bindings,
+    template,
+    controller
 }
 
-export default directive;
+
+export default component;

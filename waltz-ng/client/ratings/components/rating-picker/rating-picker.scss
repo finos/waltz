@@ -1,0 +1,63 @@
+.waltz-rating-picker {
+
+    input {
+        display:none
+    }
+
+    input:focus {
+        background-color: #00acee;
+    }
+
+    label {
+        @extend .btn;
+        -webkit-appearance: button;
+        /* WebKit */
+        -moz-appearance: button;
+        /* Mozilla */
+        -o-appearance: button;
+        /* Opera */
+        -ms-appearance: button;
+        /* Internet Explorer */
+        appearance: button;
+        /* CSS3 */
+    }
+
+    label {
+        opacity: 0.6;
+    }
+
+
+    label.selected {
+        opacity: 0.9;
+        border-color: $waltz-border-color;
+    }
+
+
+    label.rating-strategic {
+        background-color: $waltz-green;
+        color: #fff;
+    }
+
+
+    label.rating-with-issues {
+        background-color: $waltz-amber;
+        color: #fff;
+    }
+
+
+    label.rating-non-strategic {
+        background-color: $waltz-red;
+        color: #fff;
+    }
+
+
+    label.rating-none {
+        background-color: $waltz-grey;
+        color: $waltz-font-color;
+    }
+
+
+}
+
+
+

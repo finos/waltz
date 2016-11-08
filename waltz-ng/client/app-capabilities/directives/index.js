@@ -11,8 +11,11 @@
  */
 
 export default (module) => {
-    module.directive('waltzAppCapabilitySection', require('./app-capability-section'));
-    module.directive('waltzAppCapabilityTable', require('./app-capability-table'));
-    module.directive('waltzAppCapabilityUsageEditor', require('./app-capability-usage-editor'));
+    module
+        .directive('waltzAppCapabilitySection', require('./app-capability-section'))
+        .directive('waltzAppCapabilityTable', require('./app-capability-table'));
+
+    module
+        .component('waltzAppCapabilityUsageEditor', require('./../components/app-capability-usage-editor/app-capability-usage-editor'));
 
 };
