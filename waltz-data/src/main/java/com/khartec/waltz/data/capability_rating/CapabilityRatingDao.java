@@ -36,6 +36,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.PerspectiveRating.PERSPECTIVE_RATING;
 
 
+@Deprecated
 @Repository
 public class CapabilityRatingDao {
 

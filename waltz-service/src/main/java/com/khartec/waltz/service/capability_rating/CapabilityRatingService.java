@@ -33,6 +33,7 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
 
+@Deprecated
 @Service
 public class CapabilityRatingService {
 

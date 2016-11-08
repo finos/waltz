@@ -42,6 +42,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
 
 
+@Deprecated
 @Service
 public class AppCapabilityService {
 

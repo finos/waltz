@@ -21,6 +21,8 @@ import com.khartec.waltz.data.perpective.PerspectiveDao;
 import com.khartec.waltz.model.perspective.Perspective;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,12 +30,13 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 
-
+@Deprecated
 @Service
 public class PerspectiveEndpoint implements Endpoint {
 
     private static final String BASE_URL = mkPath("api", "perspective");
     private final PerspectiveDao dao;
+    private static final Logger LOG = LoggerFactory.getLogger(PerspectiveEndpoint.class);
 
 
     @Autowired
@@ -47,7 +50,10 @@ public class PerspectiveEndpoint implements Endpoint {
     public void register() {
         String byCodePath = mkPath(BASE_URL, "code", ":code");
 
-        DatumRoute<Perspective> byCodeRoute = (request, response) -> dao.getPerspective(request.params("code"));
+        DatumRoute<Perspective> byCodeRoute = (request, response) -> {
+            LOG.warn("Deprecated: byCodeRoute");
+            return dao.getPerspective(request.params("code"));
+        };
 
         getForDatum(byCodePath, byCodeRoute);
     }

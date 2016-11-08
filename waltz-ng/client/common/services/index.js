@@ -14,6 +14,7 @@ import _ from "lodash";
 import BaseLookupService from "./BaseLookupService";
 import {
     applicationKindDisplayNames,
+    applicationRatingNames,
     assetCostKindNames,
     authSourceRatingNames,
     bookmarkNames,
@@ -55,6 +56,7 @@ export default (module) => {
         .service('WaltzDescriptionService', () => descriptionService);
 
     displayNameService.register('applicationKind', applicationKindDisplayNames);
+    displayNameService.register('applicationRating', applicationRatingNames);
     displayNameService.register('assetCost', assetCostKindNames);
     displayNameService.register('bookmark', bookmarkNames);
     displayNameService.register('capabilityRating', capabilityRatingNames);

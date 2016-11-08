@@ -21,7 +21,7 @@ export default (module) => {
             'AppCapabilityStore',
             require('./services/app-capability-store'))
         .component(
-            'waltzAppFunctionTabgroupSection',
-            require('./components/app-function-tabgroup-section/app-function-tabgroup-section'));
+            'waltzAppRatingTabgroupSection',
+            require('./components/app-rating-tabgroup-section/app-rating-tabgroup-section'));
 
 };

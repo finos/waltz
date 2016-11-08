@@ -4,6 +4,7 @@ import {initialiseData} from "../../../common";
 const bindings = {
     columnDefs: '<',
     rowData: '<',
+    rowTemplate: '<',
     onInitialise: '<'
 };
 
@@ -18,6 +19,7 @@ const initialState = {
     columnDefs: [],
     rowData: [],
     minRowsToShow: 10,
+    rowTemplate: null,
     onInitialise: (e) => {}
 };
 
@@ -56,7 +58,8 @@ function controller(uiGridExporterConstants,
         minRowsToShow: vm.minRowsToShow,
         onRegisterApi: function(gridApi){
             vm.gridApi = gridApi;
-        }
+        },
+        rowTemplate: vm.rowTemplate
     };
 
     // callback

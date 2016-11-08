@@ -38,6 +38,14 @@ export const capabilityRatingNames = {
 };
 
 
+export const applicationRatingNames = {
+    R: 'Poor Fit',
+    A: 'Partial Fit',
+    G: 'Good Fit',
+    Z: 'Unknown'
+};
+
+
 export const investmentRatingNames = {
     R: 'Disinvest',
     A: 'Invest',

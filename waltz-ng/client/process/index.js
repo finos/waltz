@@ -6,10 +6,7 @@ export default (module) => {
     module
         .directive(
             'waltzProcessList',
-             require('./directives/process-list'))
-        .directive(
-            'waltzProcessSection',
-             require('./directives/process-section'));
+             require('./directives/process-list'));
 
     module.service(
         'ProcessStore',

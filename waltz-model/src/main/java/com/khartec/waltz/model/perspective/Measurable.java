@@ -24,7 +24,7 @@ import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.NameProvider;
 import org.immutables.value.Value;
 
-
+@Deprecated
 @Value.Immutable
 @JsonSerialize(as = ImmutableMeasurable.class)
 @JsonDeserialize(as = ImmutableMeasurable.class)

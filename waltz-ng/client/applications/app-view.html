@@ -23,12 +23,12 @@
     <br>
 
 
-    <waltz-app-function-tabgroup-section app="ctrl.app"
-                                         app-capabilities="ctrl.appCapabilities"
-                                         capabilities="ctrl.capabilities"
-                                         ratings="ctrl.ratings"
-                                         source-data-ratings="ctrl.sourceDataRatings">
-    </waltz-app-function-tabgroup-section>
+    <waltz-app-rating-tabgroup-section app="ctrl.app"
+                                       app-capabilities="ctrl.appCapabilities"
+                                       capabilities="ctrl.capabilities"
+                                       processes="ctrl.processes"
+                                       source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-app-rating-tabgroup-section>
 
 
     <!-- BOOKMARKS -->
@@ -37,12 +37,6 @@
                              kind="APPLICATION"
                              parent-name="{{ ctrl.app.name }}">
     </waltz-bookmarks-section>
-
-
-    <!-- PROCESSES -->
-    <waltz-process-section processes="ctrl.processes"
-                           source-data-ratings="ctrl.sourceDataRatings">
-    </waltz-process-section>
 
 
     <!-- INVOLVED PEOPLE -->

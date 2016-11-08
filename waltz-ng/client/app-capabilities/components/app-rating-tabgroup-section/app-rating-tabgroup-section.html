@@ -1,0 +1,76 @@
+<waltz-section name="Functions and Processes"
+               icon="puzzle-piece"
+               id="functions-processes-section">
+
+    <waltz-section-actions>
+        <a waltz-has-role="RATING_EDITOR"
+           ui-sref='main.app-capability.edit ({id: $ctrl.app.id})'
+           ng-if="$ctrl.activeTab == 0"
+           class="btn btn-xs btn-primary">
+            Edit
+        </a>
+        <button class="btn btn-xs waltz-btn-transparent"
+                ng-click="$ctrl.visibility.overlay = ! $ctrl.visibility.overlay">
+            <waltz-icon name="map-signs"></waltz-icon>
+        </button>
+    </waltz-section-actions>
+
+    <waltz-source-data-overlay visible="$ctrl.visibility.overlay"
+                               ratings="$ctrl.sourceDataRatings"
+                               entities="['APP_CAPABILITY', 'PROCESS']">
+    </waltz-source-data-overlay>
+
+
+    <uib-tabset active="active">
+
+        <!-- CAPABILITIES -->
+        <uib-tab index="0"
+                 select="$ctrl.activeTab = 0"
+                 heading="Functions">
+            <waltz-app-capability-section app-capabilities="$ctrl.appCapabilities"
+                                          capabilities="$ctrl.capabilities">
+            </waltz-app-capability-section>
+        </uib-tab>
+
+        <!-- PROCESSES -->
+        <uib-tab index="1"
+                 select="$ctrl.activeTab = 1"
+                 heading="Processes">
+            <div class="row"
+                 ng-if="$ctrl.activeTab == 1">
+                <div class="col-md-12">
+
+                    <div ng-if="$ctrl.processes.length > 0">
+                        <table class="table table-condensed small">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="process in $ctrl.processes">
+                                <td>
+                                    <a ui-sref="main.process.view ({ id: process.id })">
+                                        <span ng-bind="process.name"></span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <span ng-bind="process.description"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div ng-if="$ctrl.processes.length == 0">
+                        <div class="alert alert-warning">
+                            <strong>No associated processes</strong>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </uib-tab>
+    </uib-tabset>
+</waltz-section>

@@ -33,6 +33,7 @@ import static com.khartec.waltz.schema.tables.PerspectiveMeasurable.PERSPECTIVE_
 
 
 @Repository
+@Deprecated
 public class PerspectiveDao {
 
 

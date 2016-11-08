@@ -11,7 +11,6 @@
  *
  */
 
-import ratingsEditor from "./ratings-editor";
 
 
 export default (module) => {
@@ -28,20 +27,8 @@ export default (module) => {
 
     module.directive('waltzRagLine', require('./directives/rating-explorer/rag-line'));
     module.directive('waltzRatingExplorerSection', require('./directives/rating-explorer/rating-explorer-section'));
-    
+
 
     module.service('RatingStore', require('./services/ratings-store'));
 
-    module.config([
-        '$stateProvider',
-        ($stateProvider) => {
-            $stateProvider
-                .state('main.ratings', {
-                })
-                .state('main.ratings.editor', {
-                    url: 'ratings/{kind}/{entityId:int}/{perspectiveCode}/edit',
-                    views: {'content@': ratingsEditor }
-                });
-        }
-    ]);
 };

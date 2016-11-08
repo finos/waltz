@@ -28,6 +28,7 @@ import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 
+@Deprecated
 @Service
 public class CapabilityUsageEndpoint implements Endpoint {
 

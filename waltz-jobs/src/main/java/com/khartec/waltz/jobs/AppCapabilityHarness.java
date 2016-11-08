@@ -25,7 +25,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.List;
 
-
+@Deprecated
 public class AppCapabilityHarness {
 
     private static final IdSelectionOptions selector = ImmutableIdSelectionOptions

@@ -18,7 +18,6 @@
 package com.khartec.waltz.jobs.sample;
 
 import com.khartec.waltz.model.capability.Capability;
-import com.khartec.waltz.schema.tables.AppCapability;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.app_capability.AppCapabilityService;
 import com.khartec.waltz.service.application.ApplicationService;
@@ -36,7 +35,7 @@ import java.util.stream.IntStream;
 import static com.khartec.waltz.common.ListUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 
-
+@Deprecated
 public class AppCapabilityGenerator {
 
     private static final Random rnd = new Random();

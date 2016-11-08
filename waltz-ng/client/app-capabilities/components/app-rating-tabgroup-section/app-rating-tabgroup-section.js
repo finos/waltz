@@ -5,12 +5,12 @@ const bindings = {
     app: '<',
     appCapabilities: '<',
     capabilities: '<',
-    ratings: '<',
+    processes: '<',
     sourceDataRatings: '<'
 };
 
 
-const template = require('./app-function-tabgroup-section.html');
+const template = require('./app-rating-tabgroup-section.html');
 
 
 const initialState = {
@@ -18,7 +18,7 @@ const initialState = {
     app: null,
     appCapabilities: [],
     capabilities: [],
-    ratings: null,
+    processes: [],
     visibility: {
         overlay: false
     }
@@ -27,8 +27,6 @@ const initialState = {
 
 function controller() {
     const vm = initialiseData(this, initialState);
-    vm.$onChanges = () =>
-        console.log(vm.appCapabilities.length, vm.capabilities.length);
 }
 
 

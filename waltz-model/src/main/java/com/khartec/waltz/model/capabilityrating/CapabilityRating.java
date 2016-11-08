@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityReference;
 import org.immutables.value.Value;
 
-
+@Deprecated
 @Value.Immutable
 @JsonSerialize(as = ImmutableCapabilityRating.class)
 @JsonDeserialize(as = ImmutableCapabilityRating.class)

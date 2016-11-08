@@ -3,11 +3,10 @@ import d3 from "d3";
 import {buildHierarchies} from "../../../common";
 
 const BINDINGS = {
-    applications: '=',
-    capabilities: '=',
-    appCapabilities: '=',
-    ratings: '=',
-    sourceDataRatings: '='
+    applications: '<',
+    capabilities: '<',
+    appCapabilities: '<',
+    sourceDataRatings: '<'
 };
 
 
@@ -27,7 +26,6 @@ const initData = {
         data: []
     },
     appCapabilities: [],
-    ratings: [],
     visibility: {}
 };
 
@@ -190,14 +188,14 @@ function calculateAppCountRange(capabilities = []) {
 }
 
 
-function calculateScores(appCapabilities = [], ratings = [], calcScoreFn) {
+function calculateScores(appCapabilities = []) {
 
     const viaRatings = d3
         .nest()
-        .key(r => r.capabilityId)
-        .key(r => r.parent.id)
-        .rollup(calcScoreFn)
-        .map(ratings);  // cId -> appId -> { values: [ratings] }
+        .key(ac => ac.capabilityId)
+        .key(ac => ac.applicationId)
+        .rollup(acs => acs[0].rating)
+        .map(appCapabilities);
 
     const unknown = d3
         .nest()
@@ -211,30 +209,24 @@ function calculateScores(appCapabilities = [], ratings = [], calcScoreFn) {
 
 
 function prepareCapabilities(allCapabilities = [],
-                             appCapabilities = [],
-                             ratings = [],
-                             calcScoreFn = scoreByBestRating) {
+                             appCapabilities = []) {
 
     const directCapabilities = calculateDirectCapabilities(allCapabilities, appCapabilities);
     const requiredCapabilities = calculateRequiredCapabilities(directCapabilities, allCapabilities);
     const capabilityDecorator = mkCapabilityDecorator(appCapabilities, directCapabilities, requiredCapabilities);
     const capNodes = _.map(requiredCapabilities, capabilityDecorator);
-    const scores = calculateScores(appCapabilities, ratings, calcScoreFn);
+    const scores = calculateScores(appCapabilities);
 
     return enrichCapabilitiesWithScores(capNodes, scores);
 }
 
 
 function build(allCapabilities = [],
-               appCapabilities = [],
-               ratings = [],
-               calcScoreFn = scoreByBestRating) {
+               appCapabilities = []) {
 
     const capabilities = prepareCapabilities(
         allCapabilities,
-        appCapabilities,
-        ratings,
-        calcScoreFn);
+        appCapabilities);
 
     const treeData = buildHierarchies(capabilities);
 
@@ -267,10 +259,10 @@ function controller($scope) {
 
 
     $scope.$watchGroup(
-        ['ctrl.appCapabilities', 'ctrl.capabilities', 'ctrl.ratings'],
-        ([ appCapabilities, capabilities, ratings ]) => {
-            if (appCapabilities && capabilities && ratings) {
-                const data = build(capabilities, appCapabilities, ratings);
+        ['ctrl.appCapabilities', 'ctrl.capabilities'],
+        ([ appCapabilities, capabilities ]) => {
+            if (appCapabilities && capabilities) {
+                const data = build(capabilities, appCapabilities);
                 vm.capabilityTree.data = data.treeData;
                 vm.capabilityTree.appCountRange = data.appCountRange;
             }

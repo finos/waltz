@@ -26,6 +26,7 @@ import org.immutables.value.Value;
 import java.util.List;
 
 
+@Deprecated
 @Value.Immutable
 @JsonSerialize(as = ImmutableCapabilityUsage.class)
 @JsonDeserialize(as = ImmutableCapabilityUsage.class)

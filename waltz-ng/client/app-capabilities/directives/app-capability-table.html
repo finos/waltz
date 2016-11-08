@@ -1,11 +1,13 @@
 <table class="table table-condensed table-hover">
     <colgroup>
         <col width="30%">
-        <col width="70%">
+        <col width="10%">
+        <col width="60%">
     </colgroup>
     <thead>
     <tr>
         <th>Name</th>
+        <th>Rating</th>
         <th>Description</th>
     </tr>
     </thead>
@@ -25,7 +27,10 @@
             </a>
         </td>
         <td>
-            {{ ac.capability.description }}
+            <span ng-bind="ac.rating"></span>
+        </td>
+        <td>
+            <span ng-bind="ac.capability.description"></span>
         </td>
     </tr>
     </tbody>

@@ -49,6 +49,7 @@ import static java.lang.String.format;
 import static spark.Spark.delete;
 
 
+@Deprecated
 @Service
 public class AppCapabilityEndpoint implements Endpoint {
 
