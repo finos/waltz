@@ -44,7 +44,7 @@ export const entityIconNames = {
     ORG_UNIT: 'sitemap',
     PERSON: 'user',
     PHYSICAL_SPECIFICATION: 'qrcode',
-    PHYSICAL_FLOW: 'square',
+    PHYSICAL_FLOW: 'qrcode',
     PROCESS: 'code-fork',
     SERVER: 'server',
     SOFTWARE: 'gift',

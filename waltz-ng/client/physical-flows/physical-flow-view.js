@@ -29,6 +29,42 @@ const initialState = {
 };
 
 
+function mkHistoryObj(flow, spec) {
+    return {
+        name: spec.name,
+        kind: 'PHYSICAL_FLOW',
+        state: 'main.physical-flow.view',
+        stateParams: { id: flow.id }
+    };
+}
+
+
+function addToHistory(historyStore, flow, spec) {
+    if (! flow || !spec) { return; }
+
+    const historyObj = mkHistoryObj(flow, spec);
+
+    historyStore.put(
+        historyObj.name,
+        historyObj.kind,
+        historyObj.state,
+        historyObj.stateParams);
+}
+
+
+function removeFromHistory(historyStore, flow, spec) {
+    if (! flow || !spec) { return; }
+
+    const historyObj = mkHistoryObj(flow, spec);
+
+    historyStore.remove(
+        historyObj.name,
+        historyObj.kind,
+        historyObj.state,
+        historyObj.stateParams);
+}
+
+
 function determineFillColor(d, owningEntity, targetEntity) {
     switch (d.id) {
         case (owningEntity.id): return blue;
@@ -127,7 +163,7 @@ function loadBookmarks(bookmarkStore, entityRef) {
 
 
 function navigateToLastView($state, historyStore) {
-    const lastHistoryItem = historyStore.all[0];
+    const lastHistoryItem = historyStore.getAll()[0];
     if (lastHistoryItem) {
         $state.go(lastHistoryItem.state, lastHistoryItem.stateParams);
     } else {
@@ -194,7 +230,7 @@ function controller($q,
                 </div>
             </div>
         `;
-    }
+    };
 
     // -- LOAD ---
 
@@ -235,7 +271,8 @@ function controller($q,
                     vm.physicalFlow.target,
                     (d) => $scope.$applyAsync(() => vm.selectEntity(d)))
             };
-        });
+        })
+        .then(() => addToHistory(historyStore, vm.physicalFlow, vm.specification));
 
     physicalFlowLineageStore
         .findContributionsByPhysicalFlowId(flowId)
@@ -273,6 +310,8 @@ function controller($q,
     const handleDeleteFlowResponse = (response) => {
         if (response.outcome === 'SUCCESS') {
             notification.success('Physical flow deleted');
+            removeFromHistory(historyStore, vm.physicalFlow, vm.specification);
+
             const deleteSpecText = `The specification ${vm.specification.name} is no longer referenced by any physical flow. Do you want to delete the specification?`;
             if (response.isSpecificationUnused && confirm(deleteSpecText)) {
                 deleteSpecification();

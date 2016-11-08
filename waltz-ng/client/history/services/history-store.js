@@ -31,9 +31,25 @@ function store(storage) {
         all = newHistory;
     }
 
+    function remove(name, kind, state, stateParams) {
+        const history = storage.get(key) || [];
+        const item = { name, state, kind, stateParams };
+        const itemStr = JSON.stringify(item);
+
+        const newHistory = _.filter(history, h => JSON.stringify(h) !== itemStr);
+
+        storage.set(key, newHistory);
+        all = newHistory;
+    }
+
+    function getAll() {
+        return all || [];
+    }
+
     return {
         put,
-        all
+        remove,
+        getAll
     };
 }
 
