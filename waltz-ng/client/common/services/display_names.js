@@ -32,9 +32,10 @@ export const bookmarkNames = {
 
 
 export const capabilityRatingNames = {
-    R: 'Non-Strategic',
-    A: 'Strategic with Issues',
-    G: 'Strategic'
+    R: 'Poor fit',
+    A: 'Partial fit',
+    G: 'Good fit',
+    Z: 'Unknown'
 };
 
 

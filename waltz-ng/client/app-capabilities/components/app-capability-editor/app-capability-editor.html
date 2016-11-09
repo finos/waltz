@@ -1,0 +1,57 @@
+<div>
+    <h4>
+        Edit rating for <span ng-bind="$ctrl.selected.capability.name"></span>
+    </h4>
+
+
+    <hr>
+
+    <div class="row">
+        <div class="col-md-2">
+            Rating:
+        </div>
+        <div class="col-md-10">
+            <waltz-rating-picker selected="$ctrl.rating"
+                                 on-select="$ctrl.selectRating">
+
+            </waltz-rating-picker>
+        </div>
+    </div>
+
+
+    <hr>
+
+
+    <div class="row">
+        <div class="col-md-2">
+            Comments:
+        </div>
+        <div class="col-md-10">
+            <textarea rows="5"
+                      style="width: 100%"
+                      ng-model="$ctrl.comments">
+            </textarea>
+        </div>
+    </div>
+
+
+    <hr>
+
+
+    <div class="row">
+        <div class="col-md-offset-8 col-md-4">
+            <button class="btn btn-primary"
+                    ng-disabled="!$ctrl.canSave()"
+                    type="button"
+                    ng-click="$ctrl.save()">
+                Save
+            </button>
+            <a class="clickable"
+               ng-click="$ctrl.cancel()">
+                Cancel
+            </a>
+        </div>
+    </div>
+
+
+</div>

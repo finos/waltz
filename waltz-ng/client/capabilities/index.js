@@ -25,6 +25,4 @@ export default (module) => {
     module.directive('waltzCapabilityTree', require('./directives/capability-tree'));
 
     module.service('CapabilityStore', require('./services/capability-store'));
-
-    module.component('waltzCapabilityRatingsSection', require('./components/capability-ratings-section'));
 };
