@@ -30,41 +30,16 @@ const initialState = {
     processes: [],
     sourceDataRatings: [],
     techStats: null,
-    traitInfo: null,
     visibility: {}
 };
 
 
-function loadTraitInfo(traitStore, traitUsageStore, capabilityId) {
-    const result = {
-        usages: [],
-        traits: []
-    };
-
-    return traitUsageStore
-        .findByEntityReference('CAPABILITY', capabilityId)
-        .then(usages => {
-            if (! usages) { return result; } // shortcut
-
-            result.usages = usages;
-            const traitIds = _.chain(usages)
-                .map('traitId')
-                .uniq()
-                .value();
-
-            return traitStore.findByIds(traitIds)
-                .then(traits => result.traits = traits)
-                .then(() => result);
-        });
-}
-
-
 function logHistory(capability, historyStore) {
-    historyStore.put(
-        capability.name,
-        'CAPABILITY',
-        'main.capability.view',
-        { id: capability.id });
+    return historyStore
+        .put(capability.name,
+            'CAPABILITY',
+            'main.capability.view',
+            { id: capability.id });
 }
 
 
@@ -78,7 +53,6 @@ function processApps(groupedApps = { primaryApps: [], secondaryApps: []}) {
 
 function controller($q,
                     $scope,
-                    $state,
                     $stateParams,
                     appCapabilityStore,
                     applicationStore,
@@ -94,99 +68,133 @@ function controller($q,
                     physicalFlowLineageStore,
                     sourceDataRatingStore,
                     techStatsService,
-                    tourService,
-                    traitStore,
-                    traitUsageStore) {
+                    tourService) {
 
     const vm = Object.assign(this, initialState);
 
     const capId = $stateParams.id;
     const capability = _.find(populateParents(capabilities), { id: capId });
 
-    const capabilitiesById = _.keyBy(capabilities, 'id');
-
-    const assetCosts = {
-        stats: {},
-        costs: [],
-        loading: false
+    const entityReference = {
+        kind: 'CAPABILITY',
+        id: capId
     };
 
     const appIdSelector = {
-        entityReference: {
-            kind: 'CAPABILITY',
-            id: capId
-        },
+        entityReference,
         scope: 'CHILDREN'
     };
 
-    vm.entityRef = appIdSelector.entityReference;
-
-    processStore
-        .findForCapability(capId)
-        .then(ps => vm.processes = ps);
-
-    appCapabilityStore.findApplicationsByCapabilityId(capability.id)
-        .then(processApps)
-        .then(apps => {
-            $q.all([
-                appCapabilityStore.findByCapabilityIds([capId]),
-                logicalFlowViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN'),
-                complexityStore.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
-                assetCostViewService.initialise(appIdSelector, 2016),
-                techStatsService.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
-                sourceDataRatingStore.findAll()
-            ]).then(([
-                appCapabilities,
-                dataFlows,
-                complexity,
-                assetCostData,
-                techStats,
-                sourceDataRatings
-            ]) => {
-                vm.apps = apps;
-                vm.appCapabilities = appCapabilities;
-                vm.dataFlows = dataFlows;
-                vm.complexity = complexity;
-                vm.assetCostData = assetCostData;
-                vm.techStats = techStats;
-                vm.sourceDataRatings = sourceDataRatings;
-            });
-        })
-        .then(() => logicalFlowDecoratorStore.findBySelectorAndKind(appIdSelector, 'DATA_TYPE'))
-        .then((flowDecorators => vm.dataFlowDecorators = flowDecorators))
-        .then(() => tourService.initialiseForKey('main.capability.view', true))
-        .then(tour => vm.tour = tour);
-
-
-    appCapabilityStore.findAssociatedApplicationCapabilitiesByCapabilityId(capability.id)
-        .then(assocAppCaps => {
-            const associatedAppIds = _.map(assocAppCaps, 'applicationId');
-            applicationStore
-                .findByIds(associatedAppIds)
-                .then((assocApps) => {
-                    const appsById = _.keyBy(assocApps, 'id');
-                    return _.chain(assocAppCaps)
-                        .groupBy('capabilityId')
-                        .map((associations, capabilityId) => {
-                            return {
-                                capability: capabilitiesById[capabilityId],
-                                apps: _.map(associations, assoc => appsById[assoc.applicationId])
-                            }
-                        })
-                        .value()
-                })
-                .then(associatedCapabilities => vm.associatedCapabilities = associatedCapabilities);
-        });
-
-    bookmarkStore
-        .findByParent({ id: capId, kind: 'CAPABILITY'})
-        .then(bookmarks => vm.bookmarks = bookmarks);
-
-    logHistory(capability, historyStore);
-
+    const capabilitiesById = _.keyBy(capabilities, 'id');
 
     vm.capability = capability;
-    vm.assetCosts = assetCosts;
+    vm.entityRef = entityReference;
+
+    // -- LOADERS --
+
+    const wave1 = () => {
+        const appPromise = appCapabilityStore
+            .findApplicationsByCapabilityId(capId)
+            .then(processApps)
+            .then(apps => vm.apps = apps);
+
+        const appCapPromise = appCapabilityStore
+            .findByCapabilityIds([capId])
+            .then(appCaps => vm.appCapabilities = appCaps);
+
+        const costPromise = assetCostViewService
+            .initialise(appIdSelector, 2016)
+            .then(costs => vm.assetCostData = costs);
+
+        const complexityPromise = complexityStore
+            .findBySelector(capability.id, 'CAPABILITY', 'CHILDREN')
+            .then(complexity => vm.complexity = complexity);
+
+        return $q.all([appPromise, appCapPromise, costPromise, complexityPromise]);
+    };
+
+
+    const wave2 = () => {
+        const flowPromise = logicalFlowViewService
+            .initialise(capability.id, 'CAPABILITY', 'CHILDREN')
+            .then(dataFlows => vm.dataFlows = dataFlows);
+
+        const techPromise = techStatsService
+            .findBySelector(capability.id, 'CAPABILITY', 'CHILDREN')
+            .then(techStats => vm.techStats = techStats);
+
+
+        return $q.all([flowPromise, techPromise]);
+    };
+
+
+    const wave3 = () => {
+        const statPromise = entityStatisticStore
+            .findAllActiveDefinitions()
+            .then(statDefinitions => vm.entityStatisticDefinitions = statDefinitions);
+
+        const physFlowPromise = physicalFlowLineageStore
+            .findLineageReportsBySelector(appIdSelector)
+            .then(lineageReports => vm.lineageReports = lineageReports);
+
+        return $q.all([statPromise, physFlowPromise]);
+
+    };
+
+    const wave4 = () => {
+
+        appCapabilityStore.findAssociatedApplicationCapabilitiesByCapabilityId(capability.id)
+            .then(assocAppCaps => {
+                const associatedAppIds = _.map(assocAppCaps, 'applicationId');
+                applicationStore
+                    .findByIds(associatedAppIds)
+                    .then((assocApps) => {
+                        const appsById = _.keyBy(assocApps, 'id');
+                        return _.chain(assocAppCaps)
+                            .groupBy('capabilityId')
+                            .map((associations, capabilityId) => {
+                                return {
+                                    capability: capabilitiesById[capabilityId],
+                                    apps: _.map(associations, assoc => appsById[assoc.applicationId])
+                                }
+                            })
+                            .value()
+                    })
+                    .then(associatedCapabilities => vm.associatedCapabilities = associatedCapabilities);
+            });
+
+        bookmarkStore
+            .findByParent({ id: capId, kind: 'CAPABILITY'})
+            .then(bookmarks => vm.bookmarks = bookmarks);
+
+        tourService
+            .initialiseForKey('main.capability.view', true)
+            .then(tour => vm.tour = tour);
+
+        sourceDataRatingStore
+            .findAll()
+            .then(sourceDataRatings => vm.sourceDataRatings = sourceDataRatings);
+
+        processStore
+            .findForCapability(capId)
+            .then(ps => vm.processes = ps);
+    };
+
+
+    const postLoad = () => {
+        return logHistory(capability, historyStore);
+    };
+
+
+    wave1()
+        .then(wave2)
+        .then(wave3)
+        .then(wave4)
+        .then(postLoad);
+
+
+
+    // -- INTERACT ---
 
     vm.onAssetBucketSelect = bucket => {
         $scope.$applyAsync(() => {
@@ -205,23 +213,12 @@ function controller($q,
         .then(flowData => vm.dataFlows = flowData);
 
 
-    loadTraitInfo(traitStore, traitUsageStore, capability.id)
-        .then(r => vm.traitInfo = r);
-
-    entityStatisticStore
-        .findAllActiveDefinitions()
-        .then(defns => vm.entityStatisticDefinitions = defns);
-
-    physicalFlowLineageStore
-        .findLineageReportsBySelector(appIdSelector)
-        .then(lineageReports => vm.lineageReports = lineageReports);
 }
 
 
 controller.$inject = [
     '$q',
     '$scope',
-    '$state',
     '$stateParams',
     'AppCapabilityStore',
     'ApplicationStore',
@@ -237,9 +234,7 @@ controller.$inject = [
     'PhysicalFlowLineageStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService',
-    'TourService',
-    'TraitStore',
-    'TraitUsageStore'
+    'TourService'
 ];
 
 
