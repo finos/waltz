@@ -1,3 +1,6 @@
+@import "../../../../style/variables";
+
+
 .waltz-rating-picker {
 
     input {
@@ -10,25 +13,16 @@
 
     label {
         @extend .btn;
-        -webkit-appearance: button;
-        /* WebKit */
-        -moz-appearance: button;
-        /* Mozilla */
-        -o-appearance: button;
-        /* Opera */
-        -ms-appearance: button;
-        /* Internet Explorer */
-        appearance: button;
-        /* CSS3 */
     }
 
     label {
-        opacity: 0.6;
+        opacity: 0.4;
+        margin-left: 4px;
     }
 
 
     label.selected {
-        opacity: 0.9;
+        opacity: 1;
         border-color: $waltz-border-color;
     }
 
@@ -55,7 +49,6 @@
         background-color: $waltz-grey;
         color: $waltz-font-color;
     }
-
 
 }
 

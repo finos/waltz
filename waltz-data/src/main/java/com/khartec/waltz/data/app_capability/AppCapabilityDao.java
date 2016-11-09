@@ -21,10 +21,10 @@ package com.khartec.waltz.data.app_capability;
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
-import com.khartec.waltz.model.applicationcapability.GroupedApplications;
-import com.khartec.waltz.model.applicationcapability.ImmutableApplicationCapability;
-import com.khartec.waltz.model.applicationcapability.ImmutableGroupedApplications;
+import com.khartec.waltz.model.application_capability.ApplicationCapability;
+import com.khartec.waltz.model.application_capability.GroupedApplications;
+import com.khartec.waltz.model.application_capability.ImmutableApplicationCapability;
+import com.khartec.waltz.model.application_capability.ImmutableGroupedApplications;
 import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.Tally;
@@ -33,9 +33,11 @@ import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -66,6 +68,23 @@ public class AppCapabilityDao {
                 .provenance(record.getProvenance())
                 .build();
     };
+
+    private final BiFunction<DSLContext, ApplicationCapability, AppCapabilityRecord> TO_RECORD_MAPPER =
+            (dsl, applicationCapability) -> {
+                AppCapabilityRecord record = dsl.newRecord(APP_CAPABILITY);
+
+                record.setApplicationId(applicationCapability.applicationId());
+                record.setCapabilityId(applicationCapability.capabilityId());
+                record.setRating(applicationCapability.rating().name());
+                record.setDescription(applicationCapability.description());
+                record.setIsPrimary(applicationCapability.isPrimary());
+
+                record.setProvenance(applicationCapability.provenance());
+                record.setLastUpdatedAt(Timestamp.valueOf(applicationCapability.lastUpdatedAt()));
+                record.setLastUpdatedBy(applicationCapability.lastUpdatedBy());
+
+                return record;
+            };
 
 
     @Autowired
@@ -148,16 +167,6 @@ public class AppCapabilityDao {
     }
 
 
-    public int setIsPrimary(long id, long capabilityId, boolean isPrimary) {
-        return dsl.update(APP_CAPABILITY)
-                .set(APP_CAPABILITY.IS_PRIMARY, isPrimary)
-                .where(APP_CAPABILITY.APPLICATION_ID.eq(id))
-                .and(APP_CAPABILITY.CAPABILITY_ID.eq(capabilityId))
-                .execute();
-
-    }
-
-
     public int[] removeCapabilitiesFromApp(long appId, List<Long> capabilityIds) {
         List<DeleteConditionStep<AppCapabilityRecord>> deletes = capabilityIds
                 .stream()
@@ -191,4 +200,19 @@ public class AppCapabilityDao {
                 .from(APP_CAPABILITY);
     }
 
+
+    public Integer insert(ImmutableApplicationCapability applicationCapability) {
+        AppCapabilityRecord record = TO_RECORD_MAPPER.apply(dsl, applicationCapability);
+        return record.insert();
+    }
+
+
+    public Integer update(ImmutableApplicationCapability applicationCapability) {
+        AppCapabilityRecord record = TO_RECORD_MAPPER.apply(dsl, applicationCapability);
+
+        Condition condition = APP_CAPABILITY.APPLICATION_ID.eq(applicationCapability.applicationId())
+                .and(APP_CAPABILITY.CAPABILITY_ID.eq(applicationCapability.capabilityId()));
+
+        return dsl.executeUpdate(record, condition);
+    }
 }

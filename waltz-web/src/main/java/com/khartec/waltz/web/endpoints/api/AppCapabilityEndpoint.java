@@ -18,10 +18,10 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
-import com.khartec.waltz.model.applicationcapability.GroupedApplications;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.IdGroup;
+import com.khartec.waltz.model.application_capability.ApplicationCapability;
+import com.khartec.waltz.model.application_capability.GroupedApplications;
+import com.khartec.waltz.model.application_capability.SaveAppCapabilityCommand;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.app_capability.AppCapabilityService;
@@ -29,8 +29,6 @@ import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.WebUtilities;
-import com.khartec.waltz.web.action.UpdateAppCapabilitiesAction;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,13 +37,11 @@ import org.springframework.stereotype.Service;
 import spark.Route;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.*;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
-import static java.lang.String.format;
 import static spark.Spark.delete;
 
 
@@ -58,7 +54,7 @@ public class AppCapabilityEndpoint implements Endpoint {
     private static final Logger LOG = LoggerFactory.getLogger(AppCapabilityEndpoint.class);
 
 
-    private final AppCapabilityService appCapabilityDao;
+    private final AppCapabilityService appCapabilityService;
     private final ChangeLogService changeLogDao;
     private final UserRoleService userRoleService;
 
@@ -72,7 +68,7 @@ public class AppCapabilityEndpoint implements Endpoint {
         checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.changeLogDao = changeLogDao;
-        this.appCapabilityDao = appCapabilityService;
+        this.appCapabilityService = appCapabilityService;
         this.userRoleService = userRoleService;
     }
 
@@ -80,45 +76,25 @@ public class AppCapabilityEndpoint implements Endpoint {
     @Override
     public void register() {
         DatumRoute<GroupedApplications> findGroupedAppsForCapabilityRoute  = (request, response)
-                -> appCapabilityDao.findGroupedApplicationsByCapability(getLong(request, "capabilityId"));
+                -> appCapabilityService.findGroupedApplicationsByCapability(getLong(request, "capabilityId"));
 
         ListRoute<ApplicationCapability> findCapabilitiesForAppRoute = (request, response)
-                -> appCapabilityDao.findCapabilitiesForApp(getLong(request, "applicationId"));
+                -> appCapabilityService.findCapabilitiesForApp(getLong(request, "applicationId"));
 
         ListRoute<Tally<Long>> tallyByCapabilityRoute = (request, response)
-                -> appCapabilityDao.tallyByCapabilityId();
+                -> appCapabilityService.tallyByCapabilityId();
 
         ListRoute<ApplicationCapability> findAssociatedAppCapabilitiesRoute  = (request, response)
-                -> appCapabilityDao.findAssociatedApplicationCapabilities(getLong(request, "capabilityId"));
+                -> appCapabilityService.findAssociatedApplicationCapabilities(getLong(request, "capabilityId"));
 
         ListRoute<IdGroup> findAssociatedCapabilitiesByApplicationRoute =
-                (request, response) -> appCapabilityDao.findAssociatedCapabilitiesByApplication(getId(request));
+                (request, response) -> appCapabilityService.findAssociatedCapabilitiesByApplication(getId(request));
 
         ListRoute<ApplicationCapability> findAppCapabilitiesForAppIdSelectorRoute  = (request, response)
-                -> appCapabilityDao.findByAppIdSelector(readIdSelectionOptionsFromBody(request));
+                -> appCapabilityService.findByAppIdSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<ApplicationCapability> findByCapabilityIdsRoute  = (request, response)
-                -> appCapabilityDao.findByCapabilityIds(readIdsFromBody(request));
-
-        DatumRoute<Integer> updateRoute = (request, response) -> {
-            requireRole(userRoleService, request, Role.RATING_EDITOR);
-
-            UpdateAppCapabilitiesAction action = readBody(request, UpdateAppCapabilitiesAction.class);
-
-            LOG.info("Updating application capabilities: " + action);
-            EntityReference appRef = ImmutableEntityReference.builder()
-                    .kind(EntityKind.APPLICATION)
-                    .id(getId(request))
-                    .name(Optional.empty())
-                    .build();
-
-            int[] additions = appCapabilityDao.addCapabilitiesToApp(appRef.id(), map(action.additions(), a -> a.id()));
-            int[] removals = appCapabilityDao.removeCapabilitiesFromApp(appRef.id(), map(action.removals(), a -> a.id()));
-
-            logChanges(action, appRef, getUsername(request));
-
-            return additions.length + removals.length;
-        };
+                -> appCapabilityService.findByCapabilityIds(readIdsFromBody(request));
 
         Route deleteRoute = (req, res) -> {
             requireRole(userRoleService, req, Role.RATING_EDITOR);
@@ -128,28 +104,17 @@ public class AppCapabilityEndpoint implements Endpoint {
             List<Long> capabilityIds = newArrayList(getLong(req, "capabilityId"));
 
             LOG.info("Removing application capabilities: " + capabilityIds + " for application: " + id);
-            return appCapabilityDao.removeCapabilitiesFromApp(id, capabilityIds)[0];
+            return appCapabilityService.removeCapabilitiesFromApp(id, capabilityIds)[0];
         };
 
-        DatumRoute<Integer> mkPrimaryRoute = (req, res) -> {
+        DatumRoute<Integer> saveRoute = (req, res) -> {
             requireRole(userRoleService, req, Role.RATING_EDITOR);
+            String username = getUsername(req);
 
             long appId = getId(req);
-            long capabilityId = getLong(req, "capabilityId");
-            boolean isPrimary = WebUtilities.readBody(req, Boolean.class);
-
-            LOG.info("Setting application capability: " + capabilityId + " primary flag to:  " + isPrimary + " for application: " + appId);
-
-            return appCapabilityDao.setIsPrimary(appId, capabilityId, isPrimary);
-        };
-
-        DatumRoute<Integer> additionRoute = (req, res) -> {
-            requireRole(userRoleService, req, Role.RATING_EDITOR);
-
-            long id = getId(req);
-            List<Long> capabilityIds = newArrayList(getLong(req, "capabilityId"));
-            LOG.info("Adding application capabilities: " + capabilityIds + " for application: " + id);
-            return appCapabilityDao.addCapabilitiesToApp(id, capabilityIds)[0];
+            SaveAppCapabilityCommand saveCmd = readBody(req, SaveAppCapabilityCommand.class);
+            LOG.info("Saving " + saveCmd + " for application: " + appId);
+            return appCapabilityService.save(appId, saveCmd, username);
         };
 
         getForDatum(mkPath(BASE_URL, "capability", ":capabilityId"), findGroupedAppsForCapabilityRoute);
@@ -159,33 +124,11 @@ public class AppCapabilityEndpoint implements Endpoint {
         getForList(mkPath(BASE_URL, "application", ":id", "associated"), findAssociatedCapabilitiesByApplicationRoute);
         postForList(mkPath(BASE_URL, "selector"), findAppCapabilitiesForAppIdSelectorRoute);
         postForList(mkPath(BASE_URL, "capability"), findByCapabilityIdsRoute);
-        postForDatum(mkPath(BASE_URL, "application", ":id"), updateRoute);
         delete(mkPath(BASE_URL, "application", ":id", ":capabilityId"), deleteRoute);
-        postForDatum(mkPath(BASE_URL, "application", ":id", ":capabilityId"), additionRoute);
-        postForDatum(mkPath(BASE_URL, "application", ":id", ":capabilityId", "primary"), mkPrimaryRoute);
+        postForDatum(mkPath(BASE_URL, "application", ":id"), saveRoute);
     }
 
 
-    private void logChanges(UpdateAppCapabilitiesAction action, EntityReference appRef, String user) {
-        List<String> additionMessages = map(
-                action.additions(),
-                ref -> format("Added capability [%s]", ref.name().orElse("[unknown]")));
 
-        List<String> removalMessages = map(
-                action.removals(),
-                ref -> format("Removed capability [%s]", ref.name().orElse("[unknown]")));
-
-        List<String> messages = concat(
-                additionMessages,
-                removalMessages);
-
-        messages.forEach(
-                message -> changeLogDao.write(ImmutableChangeLog.builder()
-                        .parentReference(appRef)
-                        .userId(user)
-                        .severity(Severity.INFORMATION)
-                        .message(message)
-                        .build()));
-    }
 }
 

@@ -63,29 +63,14 @@ const service = (http, root) => {
             .then(result => result.data);
 
 
-    const update = (id, request) => {
-        const cleanedRequest = {
-            additions: _.map(request.additions, toEntityRef),
-            removals: _.map(request.removals, toEntityRef)
-        };
-        return http.post(`${BASE}/application/${id}`, cleanedRequest);
-    };
-
-
     const removeCapability = (applicationId, capabilityId) => {
         return http.delete(`${BASE}/application/${applicationId}/${capabilityId}`)
             .then(result => result.data);
     };
 
 
-    const addCapability = (applicationId, capabilityId) => {
-        return http.post(`${BASE}/application/${applicationId}/${capabilityId}`)
-            .then(result => result.data);
-    };
-
-
-    const setIsPrimary = (applicationId, capabilityId, isPrimary) => {
-        return http.post(`${BASE}/application/${applicationId}/${capabilityId}/primary`, isPrimary)
+    const save = (applicationId, command) => {
+        return http.post(`${BASE}/application/${applicationId}`, command)
             .then(result => result.data);
     };
 
@@ -99,9 +84,7 @@ const service = (http, root) => {
         findByCapabilityIds,
         countByCapabilityId,
         removeCapability,
-        addCapability,
-        setIsPrimary,
-        update
+        save
     };
 
 };

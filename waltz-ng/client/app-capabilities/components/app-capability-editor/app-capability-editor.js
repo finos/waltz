@@ -1,4 +1,3 @@
-
 /*
  *  This file is part of Waltz.
  *
@@ -16,62 +15,96 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-import {initialiseData, invokeFunction} from "../../../common";
 
+import _ from "lodash";
+import {initialiseData} from '../../../common';
 
 const bindings = {
-    selected: '<',
-    onSave: '<',
-    onCancel: '<'
-};
-
-
-const initialState = {
-    onSave: (d) => 'No onSave handler defined for app-capability-editor: ' + d,
-    onCancel: () => 'No onCancel handler defined for app-capability-editor: '
+    application: '<',
+    usages: '<',
+    capabilities: '<',
+    save: '<',
+    remove: '<',
+    update: '<'
 };
 
 
 const template = require('./app-capability-editor.html');
 
 
-function validate(rating, comments) {
-    return rating != null;
+const initialState = {
+    mode: 'NONE', // NONE, EDIT, ADD
+    capabilities: [],  // all
+    usages: []
+};
+
+
+function refresh(capabilities = [], usages = []) {
+
+    const capabilitiesById = _.keyBy(capabilities, 'id');
+
+    return _.map(usages, u => Object.assign(
+        {} ,
+        u,
+        { capability: capabilitiesById[u.capabilityId]}));
 }
 
 
 function controller() {
+
     const vm = initialiseData(this, initialState);
 
-    vm.selectRating = (rating) => {
-        vm.rating = rating;
+    vm.$onChanges = () => {
+        vm.currentUsage = refresh(vm.capabilities, vm.usages);
+        console.log(vm.currentUsage);
     };
 
 
-    vm.save = () => {
-        if(vm.canSave()) {
-            invokeFunction(vm.onSave, {
-                capability: vm.selectedCapability,
-                rating: vm.rating,
-                comments: vm.comments
-            });
+    vm.showAddNew = () => {
+        vm.selected = {
+            capabilityId: null,
+            comment: "",
+            rating: vm.application.overallRating
+        };
+        vm.changeMode('ADD');
+    };
+
+
+    vm.changeMode = (mode) => {
+        vm.mode = mode;
+    };
+
+
+    vm.showEdit = (usage) => {
+        vm.selected = usage;
+        vm.changeMode('EDIT');
+    };
+
+    vm.cancelEdit = () => {
+        vm.changeMode('NONE');
+        vm.selected = null;
+    };
+
+    vm.onSave = (obj) => {
+        return vm.save(obj)
+            .then(() => vm.changeMode('NONE'))
+            .then(() => vm.selected = null);
+    };
+
+
+    vm.onRemove = (usage) => {
+        if (confirm(`Remove ${usage.capability.name} ?`)) {
+            vm.selected = null;
+            vm.changeMode('NONE');
+            return vm.remove(usage.capability);
         }
-    };
-
-
-    vm.cancel = () => {
-        return invokeFunction(vm.onCancel);
-    };
-
-
-    vm.canSave = () => {
-        return validate(vm.rating, vm.comments);
     };
 
 }
 
 
-controller.$inject = [];
+
+controller.$inject = ['$scope'];
 
 
 const component = {

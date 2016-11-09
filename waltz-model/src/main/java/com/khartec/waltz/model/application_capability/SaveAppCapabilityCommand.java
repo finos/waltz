@@ -1,7 +1,20 @@
 package com.khartec.waltz.model.application_capability;
 
-/**
- * Created by dwatkins on 09/11/2016.
- */
-public class SaveAppCapabilityCommand {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.capabilityrating.RagRating;
+import com.khartec.waltz.model.command.Command;
+import org.immutables.value.Value;
+
+
+@Value.Immutable
+@JsonSerialize(as = ImmutableSaveAppCapabilityCommand.class)
+@JsonDeserialize(as = ImmutableSaveAppCapabilityCommand.class)
+public abstract class SaveAppCapabilityCommand implements Command, DescriptionProvider {
+
+    public abstract boolean isNew();
+    public abstract long capabilityId();
+    public abstract RagRating rating();
+
 }

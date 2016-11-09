@@ -1,56 +1,99 @@
 <div>
-    <h4>
-        Edit rating for <span ng-bind="$ctrl.selected.capability.name"></span>
-    </h4>
-
-
-    <hr>
-
     <div class="row">
-        <div class="col-md-2">
-            Rating:
+        <div class="col-md-7">
+            <div ng-if="$ctrl.usedCapabilities.length == 0" class="alert alert-warning">
+                <waltz-icon name="warning"></waltz-icon>
+                <strong>No functions</strong>
+                have been registered.
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-condensed">
+                        <thead>
+                        <tr>
+                            <th width="25%">
+                                Function
+                            </th>
+                            <th width="20%">
+                                Rating</th>
+                            <th width="35%">
+                                Usage Comment
+                            </th>
+                            <th width="20%">
+                                Action
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody ng-if="$ctrl.currentUsage.length === 0">
+                        <tr>
+                            <td colspan="4">
+                                <waltz-icon name="warning"></waltz-icon>
+                                No functions registered against this application
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tbody>
+                        <tr class="waltz-visibility-parent"
+                            ng-repeat="usage in $ctrl.currentUsage | orderBy:'capability.name'">
+                            <td>
+                                <span class='wce-name'
+                                      uib-popover="{{ usage.capability.description }}"
+                                      popover-trigger="mouseenter"
+                                      popover-placement="right"
+                                      ng-bind="usage.capability.name">
+                                </span>
+                            </td>
+                            <td>
+                                <waltz-rating-indicator-cell label="usage.rating | toDisplayName:'applicationRating'"
+                                                             rating="usage.rating">
+                                </waltz-rating-indicator-cell>
+                            </td>
+                            <td>
+                                <span class='small'
+                                      ng-bind="usage.description">
+                                </span>
+                            </td>
+                            <td class="waltz-visibility-child-30">
+                                <a class="waltz-action-link"
+                                   ng-click="$ctrl.showEdit(usage)">
+                                    Edit
+                                </a>
+                                |
+                                <a class="waltz-action-link"
+                                   ng-click="$ctrl.onRemove(usage)">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                        <tr ng-hide="$ctrl.saving || $ctrl.mode === 'ADD'">
+                            <td colspan="3">
+                            </td>
+                            <td>
+                                <a class="clickable"
+                                   ng-click="$ctrl.showAddNew()">
+                                    <waltz-icon name="plus"></waltz-icon>
+                                    Add
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div class="col-md-10">
-            <waltz-rating-picker selected="$ctrl.rating"
-                                 on-select="$ctrl.selectRating">
 
-            </waltz-rating-picker>
+        <div class="col-md-5">
+            <div ng-if="$ctrl.selected != null">
+                <waltz-app-capability-usage-editor app-capability="$ctrl.selected"
+                                                   capabilities="$ctrl.capabilities"
+                                                   current-usage="$ctrl.currentUsage"
+                                                   on-save="$ctrl.onSave"
+                                                   on-cancel="$ctrl.cancelEdit">
+                </waltz-app-capability-usage-editor>
+            </div>
         </div>
-    </div>
 
-
-    <hr>
-
-
-    <div class="row">
-        <div class="col-md-2">
-            Comments:
-        </div>
-        <div class="col-md-10">
-            <textarea rows="5"
-                      style="width: 100%"
-                      ng-model="$ctrl.comments">
-            </textarea>
-        </div>
-    </div>
-
-
-    <hr>
-
-
-    <div class="row">
-        <div class="col-md-offset-8 col-md-4">
-            <button class="btn btn-primary"
-                    ng-disabled="!$ctrl.canSave()"
-                    type="button"
-                    ng-click="$ctrl.save()">
-                Save
-            </button>
-            <a class="clickable"
-               ng-click="$ctrl.cancel()">
-                Cancel
-            </a>
-        </div>
     </div>
 
 

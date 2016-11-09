@@ -1,0 +1,33 @@
+@import '../../../../style/variables';
+
+
+.wric-cell {
+    display: inline-block;
+    position: relative;
+    top: 3px;
+    width: 16px;
+    height: 16px;
+    border: 1px solid;
+    border-radius: 6px;
+}
+
+.wric-R {
+    background: $waltz-red;
+    border-color: darken($waltz-red, 20%);
+}
+
+.wric-A {
+    background: $waltz-amber;
+    border-color: darken($waltz-amber, 20%);
+}
+
+.wric-G {
+    background: $waltz-green;
+    border-color: darken($waltz-green, 20%);
+}
+
+.wric-Z {
+    background: $waltz-grey;
+    border-color: darken($waltz-grey, 20%);
+}
+

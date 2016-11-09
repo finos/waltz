@@ -17,18 +17,19 @@
 
 package com.khartec.waltz.jobs.sample;
 
+import com.khartec.waltz.common.ArrayUtilities;
+import com.khartec.waltz.data.app_capability.AppCapabilityDao;
+import com.khartec.waltz.model.application_capability.ImmutableApplicationCapability;
 import com.khartec.waltz.model.capability.Capability;
+import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.app_capability.AppCapabilityService;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.capability.CapabilityService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -45,26 +46,37 @@ public class AppCapabilityGenerator {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         CapabilityService capabilityDao = ctx.getBean(CapabilityService.class);
         ApplicationService applicationDao = ctx.getBean(ApplicationService.class);
-        AppCapabilityService appCapabilityDao = ctx.getBean(AppCapabilityService.class);
+        AppCapabilityDao appCapabilityDao = ctx.getBean(AppCapabilityDao.class);
 
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        dsl.delete(APP_CAPABILITY).execute();
+        dsl.delete(APP_CAPABILITY)
+                .where(APP_CAPABILITY.PROVENANCE.eq("test"))
+                .execute();
 
         List<Capability> capabilities = capabilityDao.findAll();
 
-        applicationDao.findAll().forEach(app -> {
-            int count = rnd.nextInt(4) + 1;
-
-            Set<Long> ids = IntStream
-                    .range(0, count)
-                    .mapToObj(i -> randomPick(capabilities))
-                    .map(c -> c.id().get())
-                    .collect(Collectors.toSet());
-
-            appCapabilityDao.addCapabilitiesToApp(app.id().get(), new ArrayList<>(ids));
-
-        });
+        applicationDao
+                .findAll()
+                .forEach(app -> {
+                    int count = rnd.nextInt(4) + 1;
+                    IntStream
+                            .range(0, count)
+                            .mapToObj(i -> randomPick(capabilities))
+                            .map(c -> c.id().get())
+                            .collect(Collectors.toSet())
+                            .stream()
+                            .map(cid -> ImmutableApplicationCapability.builder()
+                                    .applicationId(app.id().get())
+                                    .capabilityId(cid)
+                                    .rating(ArrayUtilities.randomPick(RagRating.values()))
+                                    .description("sample data")
+                                    .provenance("test")
+                                    .lastUpdatedBy("admin")
+                                    .isPrimary(false)
+                                    .build())
+                            .forEach(appCapabilityDao::insert);
+                });
 
     }
 }

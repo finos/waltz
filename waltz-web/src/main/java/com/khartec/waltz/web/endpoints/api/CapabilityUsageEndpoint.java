@@ -17,7 +17,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.applicationcapability.CapabilityUsage;
+import com.khartec.waltz.model.application_capability.CapabilityUsage;
 import com.khartec.waltz.service.capability_usage.CapabilityUsageService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;

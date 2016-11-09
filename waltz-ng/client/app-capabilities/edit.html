@@ -9,20 +9,18 @@
     </waltz-page-header>
 
 
-    <waltz-section name="Functions" icon="puzzle-piece">
+    <div class="waltz-page-summary waltz-page-summary-attach">
         <div class="row">
             <div class="col-md-12">
-                <waltz-app-capability-usage-editor usages="ctrl.capabilities.usages"
-                                                   capabilities="ctrl.capabilities.all"
-                                                   capability-traits="ctrl.capabilities.capabilityTraits"
-                                                   trait-usages="ctrl.traits.usages"
-                                                   add="ctrl.addCapability"
-                                                   remove="ctrl.removeCapability"
-                                                   toggle-primary="ctrl.togglePrimary">
-                </waltz-app-capability-usage-editor>
+                <waltz-app-capability-editor application='ctrl.application'
+                                             usages="ctrl.usages"
+                                             capabilities="ctrl.capabilities"
+                                             save="ctrl.onSave"
+                                             remove="ctrl.onRemove">
+                </waltz-app-capability-editor>
             </div>
         </div>
 
-    </waltz-section>
+    </div>
 
 </div>

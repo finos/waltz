@@ -1,3 +1,4 @@
+
 /*
  *  This file is part of Waltz.
  *
@@ -15,110 +16,83 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-import _ from "lodash";
+import _ from 'lodash';
+import {initialiseData, invokeFunction} from "../../../common";
 
 
 const bindings = {
-    usages: '<',
+    appCapability: '<',
     capabilities: '<',
-    capabilityTraits: '<',
-    traitUsages: '<',
-    add: '<',
-    remove: '<',
-    update: '<',
-    togglePrimary: '<'
+    onSave: '<',
+    onCancel: '<',
+    currentUsage: '<'
+};
+
+
+const initialState = {
+    appCapability: null,
+    workingCopy: null,
+    selectedCapability: null,
+    onSave: (d) => console.log('No onSave handler defined for app-capability-editor: ', d),
+    onCancel: () => console.log('No onCancel handler defined for app-capability-editor: '),
+    visibility: {
+        capabilitySelector: true
+    }
 };
 
 
 const template = require('./app-capability-usage-editor.html');
 
-const initialState = {
-    mode: 'NONE' // NONE, EDIT, ADD
+
+function validate(working = {}, original = {}) {
+    return working.capabilityId && working.rating;
 }
+
 
 function controller($scope) {
+    const vm = initialiseData(this, initialState);
 
-    const vm = this;
-
-    const watchExpressions = [
-        '$ctrl.usages',
-        '$ctrl.capabilities',
-        '$ctrl.traitUsages',
-        '$ctrl.capabilityTraits'
-    ];
-
-    $scope.$watchGroup(watchExpressions, ([usages, capabilities, traitUsages = [], capabilityTraits = []]) => {
-        if (! usages || ! capabilities) { return; }
-
-        const capabilitiesById = _.keyBy(capabilities, 'id');
-        const usedCapabilityIds = _.map(usages, usage => usage.capabilityId);
-
-        const exhibitedTraits = _.map(traitUsages, 'traitId');
-
-        const capabilityIdsToRemove = _.chain(capabilityTraits)
-            .filter({ relationship: 'REQUIRES' })
-            .reject(ct => _.includes(exhibitedTraits, ct.traitId))
-            .map('entityReference.id')
-            .value();
-
-        vm.usedCapabilities = _.map(usages, u => ({ ...u, capability: capabilitiesById[u.capabilityId] , rating: 'Z'} ));
-
-        vm.availableCapabilities = _.chain(capabilities)
-            .reject(t => _.includes(usedCapabilityIds, t.id))
-            .reject(t => _.includes(capabilityIdsToRemove, t.id))
-            .value();
-
-        vm.hasHiddenCapabilities = capabilityIdsToRemove.length > 0;
-
-    });
-
-
-    vm.addCapability = (c) => {
-        vm.add(c.capability).then(vm.selected = null);
-        console.log('TODO: add rating for cap: ', c);
-        vm.changeMode('NONE');
+    vm.$onChanges = () => {
+        if (vm.appCapability) vm.workingCopy = _.clone(vm.appCapability);
+        if (vm.currentUsage) vm.usedCapabilityIds = _.map(vm.currentUsage, 'capabilityId');
     };
 
-
-    vm.updateRating = (c) => {
-        console.log("TODO: update rating for capability: ", c)
-        vm.changeMode('NONE');
+    vm.selectRating = (rating) => {
+        vm.workingCopy.rating = rating;
     };
 
+    vm.save = () => {
+        if(vm.canSave()) {
+            const saveParams = {
+                isNew: ! vm.appCapability.capabilityId,
+                capabilityId: vm.workingCopy.capabilityId,
+                rating: vm.workingCopy.rating,
+                description: vm.workingCopy.description
+            };
 
-    vm.changeMode = (mode) => {
-        vm.mode = mode;
-    }
-
-    vm.edit = (usage) => {
-        if(vm.selected) {
-            vm.selected.editMode = false;
-        }
-        vm.changeMode('EDIT');
-        vm.selected = usage;
-        vm.selected.editMode = true;
-    };
-
-
-    vm.cancelEdit = () => {
-        vm.changeMode('NONE');
-        if(vm.selected) {
-            vm.selected.editMode = false;
+            invokeFunction(vm.onSave, saveParams);
         }
     };
 
-
-    vm.addNew = () => {
-        if(vm.selected) {
-            vm.selected.editMode = false;
-            vm.selected = null;
-        }
-        vm.changeMode('ADD');
+    vm.cancel = () => {
+        return invokeFunction(vm.onCancel);
     };
+
+    vm.canSave = () => {
+        return validate(vm.workingCopy);
+    };
+
+    const updateCapability = (c) => {
+        if (! c) return;
+        vm.workingCopy.capability = c;
+        vm.workingCopy.capabilityId = c ? c.id : 0;
+        vm.selectedCapability = c;
+        vm.visibility.capabilitySelector = false;
+    };
+
+    vm.onNodeSelect = updateCapability;
 
 }
-
 
 
 controller.$inject = ['$scope'];
@@ -128,7 +102,7 @@ const component = {
     bindings,
     template,
     controller
-}
+};
 
 
 export default component;
