@@ -44,7 +44,6 @@ const initialState = {
     organisationalUnit: null,
     peopleInvolvements: [],
     processes: [],
-    ratings: null,
     servers: [],
     softwareCatalog: [],
     sourceDataRatings: [],
@@ -88,11 +87,9 @@ function controller($q,
                     logicalFlowDecoratorStore,
                     logicalFlowStore,
                     orgUnitStore,
-                    perspectiveStore,
                     physicalSpecificationStore,
                     physicalFlowStore,
                     processStore,
-                    ratingStore,
                     serverInfoStore,
                     softwareCatalogStore,
                     sourceDataRatingStore) {
@@ -111,7 +108,6 @@ function controller($q,
         }
     };
     vm.entityRef = entityRef;
-    const perspectiveCode = 'BUSINESS';
 
     vm.saveAliases = (aliases) => {
         const aliasValues = _.map(aliases, 'text');
@@ -149,7 +145,6 @@ function controller($q,
         loadFirstWave()
             .then(() => loadSecondWave())
             .then(() => loadThirdWave())
-            .then(() => loadFourthWave())
             .then(() => postLoadActions());
     }
 
@@ -217,31 +212,6 @@ function controller($q,
             .then(() => loadSourceDataRatings(sourceDataRatingStore, vm))
     }
 
-
-    function loadFourthWave() {
-        return $q.all([
-            perspectiveStore.findByCode(perspectiveCode),
-            ratingStore.findByParent('APPLICATION', id)
-        ]).then(([perspective, ratings]) => {
-            const appRef = { id: id, kind: 'APPLICATION', name: vm.app.name};
-            const group = mkAppRatingsGroup(appRef, perspective.measurables, vm.capabilities, ratings);
-
-            vm.ratings = {
-                highestRatingCount: calculateHighestRatingCount([group]),
-                tweakers: {
-                    subjectLabel: {
-                        enter: (selection) => selection.on(
-                            'click',
-                            (d) => $state.go('main.capability.view', { id: d.subject.id }))
-                    }
-                },
-                group
-            };
-        });
-
-    }
-
-
     function postLoadActions() {
         addToHistory(historyStore, vm.app);
     }
@@ -271,11 +241,9 @@ controller.$inject = [
     'LogicalFlowDecoratorStore',
     'LogicalFlowStore',
     'OrgUnitStore',
-    'PerspectiveStore',
     'PhysicalSpecificationStore',
     'PhysicalFlowStore',
     'ProcessStore',
-    'RatingStore',
     'ServerInfoStore',
     'SoftwareCatalogStore',
     'SourceDataRatingStore'

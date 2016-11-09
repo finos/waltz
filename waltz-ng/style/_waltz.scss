@@ -16,8 +16,9 @@
 @import "waltz-visibility";
 
 @import "../client/auth-sources/auth-sources";
-@import "../client/common/common";
 @import "../client/bookmarks/bookmarks";
+@import "../client/capabilities/capability-view";
+@import "../client/common/common";
 @import "../client/complexity/directives/complexity-bar-chart";
 @import "../client/data-type-usage/components/editor/app-data-type-usage-editor";
 @import "../client/entity/components/immediate-hierarchy-navigator/immediate-hierarchy-navigator";
@@ -47,6 +48,7 @@
 @import "../client/ratings/directives/rating-group/rating-group";
 @import "../client/traits/directives/trait-indicator";
 @import "../client/ratings/directives/viewer/app-rating-table";
+@import "../client/ratings/directives/rating-explorer/rating-explorer-section";
 @import "../client/static-panel/directives/static-panel";
 @import "../client/software-catalog/directives/simple-software-usage-list";
 @import "../client/widgets/styles";

@@ -18,12 +18,14 @@
 package com.khartec.waltz.data.app_capability;
 
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
 import com.khartec.waltz.model.applicationcapability.GroupedApplications;
 import com.khartec.waltz.model.applicationcapability.ImmutableApplicationCapability;
 import com.khartec.waltz.model.applicationcapability.ImmutableGroupedApplications;
+import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.AppCapabilityRecord;
@@ -44,18 +46,27 @@ import static org.jooq.impl.DSL.count;
 import static org.jooq.impl.DSL.select;
 
 
+@Deprecated
 @Repository
 public class AppCapabilityDao {
 
     private final DSLContext dsl;
 
 
-    private final RecordMapper<Record, ApplicationCapability> TO_DOMAIN_MAPPER =
-            r -> ImmutableApplicationCapability.builder()
-                    .isPrimary(r.getValue(APP_CAPABILITY.IS_PRIMARY))
-                    .capabilityId(r.getValue(APP_CAPABILITY.CAPABILITY_ID))
-                    .applicationId(r.getValue(APP_CAPABILITY.APPLICATION_ID))
-                    .build();
+    private final RecordMapper<Record, ApplicationCapability> TO_DOMAIN_MAPPER = r -> {
+        AppCapabilityRecord record = r.into(APP_CAPABILITY);
+        return ImmutableApplicationCapability.builder()
+                .isPrimary(record.getIsPrimary())
+                .capabilityId(record.getCapabilityId())
+                .applicationId(record.getApplicationId())
+                .rating(RagRating.valueOf(record.getRating()))
+                .description(record.getDescription())
+                .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(record.getLastUpdatedAt()))
+                .lastUpdatedBy(record.getLastUpdatedBy())
+                .provenance(record.getProvenance())
+                .build();
+    };
+
 
     @Autowired
     public AppCapabilityDao(DSLContext dsl) {
@@ -162,10 +173,7 @@ public class AppCapabilityDao {
 
     public List<ApplicationCapability> findByCapabilityIds(List<Long> capabilityIds) {
         return prepareSelect()
-                .where(APP_CAPABILITY.APPLICATION_ID.in(
-                        select(APP_CAPABILITY.APPLICATION_ID)
-                                .from(APP_CAPABILITY)
-                                .where(APP_CAPABILITY.CAPABILITY_ID.in(capabilityIds))))
+                .where(APP_CAPABILITY.CAPABILITY_ID.in(capabilityIds))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -179,7 +187,7 @@ public class AppCapabilityDao {
 
     private SelectJoinStep<Record> prepareSelect() {
         return dsl
-                .select(APP_CAPABILITY.fields())
+                .select()
                 .from(APP_CAPABILITY);
     }
 

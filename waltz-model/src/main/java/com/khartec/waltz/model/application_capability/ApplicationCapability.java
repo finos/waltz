@@ -19,17 +19,25 @@ package com.khartec.waltz.model.applicationcapability;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.LastUpdatedProvider;
 import com.khartec.waltz.model.ProvenanceProvider;
+import com.khartec.waltz.model.capabilityrating.RagRating;
 import org.immutables.value.Value;
 
-
+@Deprecated
 @Value.Immutable
 @JsonSerialize(as = ImmutableApplicationCapability.class)
 @JsonDeserialize(as = ImmutableApplicationCapability.class)
-public abstract class ApplicationCapability implements ProvenanceProvider {
+public abstract class ApplicationCapability implements
+        ProvenanceProvider,
+        DescriptionProvider,
+        LastUpdatedProvider
+{
 
     public abstract long capabilityId();
     public abstract long applicationId();
     public abstract boolean isPrimary();
+    public abstract RagRating rating();
 
 }

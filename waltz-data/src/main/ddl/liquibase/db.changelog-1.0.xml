@@ -54,6 +54,8 @@
     <property name="id.type" value="${long.type}"></property>
     <property name="name.type" value="VARCHAR(255)"></property>
     <property name="provenance.type" value="VARCHAR(64)"></property>
+    <property name="rag.type" value="CHAR(1)"></property>
+    <property name="weight.type" value="${int.type}"></property>
 
 
     <!-- TABLES -->
@@ -340,7 +342,7 @@
             <column name="measure_code" type="VARCHAR(32)">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValue="Z" name="rating" type="CHAR(1)">
+            <column defaultValue="Z" name="rating" type="${rag.type}">
                 <constraints nullable="false"/>
             </column>
             <column defaultValue="APPLICATION" name="parent_kind" type="VARCHAR(128)">
@@ -762,7 +764,7 @@
     <!-- issue: 1 -->
     <changeSet author="dwatkins" id="20160122-issue-1">
         <addColumn tableName="application">
-            <column defaultValue="Z" name="overall_rating" type="CHAR(1)">
+            <column defaultValue="Z" name="overall_rating" type="${rag.type}">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
@@ -3326,8 +3328,111 @@
     </changeSet>
 
 
+    <!-- 925: App Rating Table -->
+    <changeSet id="20161108-925-1"
+               author="dwatkins">
+        <createTable tableName="application_rating">
+            <column name="application_id"
+                    type="${id.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="capability_id"
+                    type="${id.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="process_id"
+                    type="${id.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="region_id"
+                    type="${id.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="business_line_id"
+                    type="${id.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="product_id"
+                    type="${id.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="rating"
+                    defaultValue="Z"
+                    type="${rag.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="weight"
+                    defaultValueNumeric="1"
+                    type="${weight.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
 
+    </changeSet>
 
+    <changeSet id="20161108-925-2"
+               author="dwatkins">
+        <sql>
+            INSERT INTO application_rating (application_id, capability_id, rating, description, provenance, last_updated_by)
+            SELECT a.id, ac.capability_id, a.overall_rating, 'Derived from overall rating', 'waltz', 'admin'
+            FROM app_capability ac
+            INNER JOIN application a ON a.id = ac.application_id;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20161108-925-3"
+               author="dwatkins">
+        <addColumn tableName="app_capability">
+            <column name="rating"
+                    defaultValue="Z"
+                    type="${rag.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}"
+                    defaultValue="admin">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20161108-925-4"
+               author="dwatkins">
+        <sql>
+            UPDATE app_capability SET
+                rating = (SELECT overall_rating
+                            FROM application
+                            WHERE id = app_capability.application_id),
+                description = 'Derived from overall rating',
+                last_updated_by = 'admin';
+        </sql>
+    </changeSet>
 
 
 </databaseChangeLog>

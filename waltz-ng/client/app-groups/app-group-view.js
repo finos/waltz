@@ -16,7 +16,6 @@
  *
  */
 import _ from "lodash";
-import {selectBest} from "../ratings/directives/viewer/coloring-strategies";
 
 
 /**
@@ -79,8 +78,6 @@ const initialState = {
     flowOptions: null,
     groupDetail: null,
     initiallySelectedIds: [],
-    ratingColorStrategy: selectBest,
-    ratings: [],
     sourceDataRatings: [],
     techStats: null,
     user: null,
@@ -111,7 +108,6 @@ function controller($scope,
                     historyStore,
                     logicalFlowViewService,
                     physicalFlowLineageStore,
-                    ratingStore,
                     sourceDataRatingStore,
                     technologyStatsService,
                     userService) {
@@ -164,7 +160,6 @@ function controller($scope,
             complexityStore.findBySelector(id, 'APP_GROUP', 'EXACT'),
             capabilityStore.findAll(),
             appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(appIdSelector),
-            ratingStore.findByAppIdSelector(appIdSelector),
             technologyStatsService.findBySelector(id, 'APP_GROUP', 'EXACT')
         ]))
         .then(([
@@ -172,20 +167,18 @@ function controller($scope,
             complexity,
             allCapabilities,
             appCapabilities,
-            ratings,
             techStats
         ]) => {
             vm.applications = _.map(apps, a => _.assign(a, {management: 'IT'}));
             vm.complexity = complexity;
             vm.allCapabilities = allCapabilities;
             vm.appCapabilities = appCapabilities;
-            vm.ratings = ratings;
             vm.techStats = techStats;
         })
         .then(() => calculateCapabilities(vm.allCapabilities, vm.appCapabilities))
         .then(result => Object.assign(vm, result))
         .then(() => sourceDataRatingStore.findAll())
-        .then((ratings) => vm.sourceDataRatings = ratings);
+        .then((sourceDataRatings) => vm.sourceDataRatings = sourceDataRatings);
 
     userService
         .whoami()
@@ -216,7 +209,7 @@ function controller($scope,
 
     vm.lineageTableInitialised = (api) => {
         vm.exportLineageReports = api.export;
-    }
+    };
 
     physicalFlowLineageStore
         .findLineageReportsBySelector(appIdSelector)
@@ -241,7 +234,6 @@ controller.$inject = [
     'HistoryStore',
     'LogicalFlowViewService',
     'PhysicalFlowLineageStore',
-    'RatingStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService',
     'UserService'

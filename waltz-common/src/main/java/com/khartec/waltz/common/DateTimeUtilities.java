@@ -31,4 +31,12 @@ public class DateTimeUtilities {
         return Instant.ofEpochMilli(date.getTime()).atZone(UTC).toLocalDate();
     }
 
+
+    public static LocalDateTime toLocalDateTime(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return Instant.ofEpochMilli(date.getTime()).atZone(UTC).toLocalDateTime();
+    }
+
 }

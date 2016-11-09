@@ -16,6 +16,7 @@ function store($http, BaseApiUrl) {
     const base = BaseApiUrl + '/capability-rating';
 
     function findByParent(kind, id) {
+        console.log("DEPRECATED: use app-capability-store instead");
         return $http
             .get(`${base}/parent/${kind}/${id}`)
             .then(result => result.data);
@@ -23,6 +24,7 @@ function store($http, BaseApiUrl) {
 
 
     function update(action) {
+        console.log("DEPRECATED: use app-capability-store instead");
         return $http
             .post(`${base}`, action);
     }
@@ -37,6 +39,7 @@ function store($http, BaseApiUrl) {
 
 
     function findByAppIdSelector(selector) {
+        console.log("DEPRECATED: use app-capability-store instead");
         return $http
             .post(`${base}/app-selector`, selector)
             .then(result => result.data);

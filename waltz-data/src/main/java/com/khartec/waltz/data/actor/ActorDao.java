@@ -20,6 +20,7 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkOptionalIsPresent;
+import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 
@@ -35,7 +36,7 @@ public class ActorDao {
                 .id(record.getId())
                 .name(record.getName())
                 .description(record.getDescription())
-                .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
+                .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .build();
     };

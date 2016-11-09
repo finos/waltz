@@ -32,7 +32,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
-
+@Deprecated
 @Service
 public class CapabilityRatingEndpoint implements Endpoint {
 

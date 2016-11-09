@@ -11,39 +11,24 @@
  *
  */
 
-import ratingsEditor from "./ratings-editor";
 
 
 export default (module) => {
-    module
-        .directive('waltzRatingGroup', require('./directives/rating-group/directive'))
-        .directive('waltzRatingGroups', require('./directives/rating-groups/directive'))
-        .directive('waltzRatingGroupHeader', require('./directives/rating-group-header/directive'))
-        .directive('waltzAppRatingTable', require('./directives/viewer/app-rating-table'))
-        .directive('waltzRatingBrushSelect', require('./directives/rating-brush-select/directive'))
-        .directive('waltzCapabilityMultiSelector', require('./directives/viewer/capability-multi-selector'))
-        .directive('waltzMultiAppRatingViewer', require('./directives/viewer/multi-app-rating-viewer'))
-        .directive('waltzRatingColorStrategyOptions', require('./directives/viewer/rating-color-strategy-options'))
-        .directive('waltzRagLine', require('./directives/rating-explorer/rag-line'))
-        .directive('waltzRatingExplorerSection', require('./directives/rating-explorer/rating-explorer-section'));
-
-    module
-        .component('waltzRatingPicker', require('./components/rating-picker/rating-picker'));
+    module.directive('waltzRatingGroup', require('./directives/rating-group/directive'));
+    module.directive('waltzRatingGroups', require('./directives/rating-groups/directive'));
+    module.directive('waltzRatingGroupHeader', require('./directives/rating-group-header/directive'));
+    module.directive('waltzRatingBrushSelect', require('./directives/rating-brush-select/directive'));
 
 
-    module
-        .service('RatingStore', require('./services/ratings-store'));
+    module.directive('waltzAppRatingTable', require('./directives/viewer/app-rating-table'));
+    module.directive('waltzCapabilityMultiSelector', require('./directives/viewer/capability-multi-selector'));
+    module.directive('waltzMultiAppRatingViewer', require('./directives/viewer/multi-app-rating-viewer'));
+    module.directive('waltzRatingColorStrategyOptions', require('./directives/viewer/rating-color-strategy-options'));
 
-    module.config([
-        '$stateProvider',
-        ($stateProvider) => {
-            $stateProvider
-                .state('main.ratings', {
-                })
-                .state('main.ratings.editor', {
-                    url: 'ratings/{kind}/{entityId:int}/{perspectiveCode}/edit',
-                    views: {'content@': ratingsEditor }
-                });
-        }
-    ]);
+    module.directive('waltzRagLine', require('./directives/rating-explorer/rag-line'));
+    module.directive('waltzRatingExplorerSection', require('./directives/rating-explorer/rating-explorer-section'));
+
+
+    module.service('RatingStore', require('./services/ratings-store'));
+
 };

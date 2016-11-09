@@ -28,8 +28,6 @@ const initialState = {
     entityStatisticDefinitions: [],
     groupedApps: null,
     processes: [],
-    ratings: null,
-    rawRatings: [],
     sourceDataRatings: [],
     techStats: null,
     traitInfo: null,
@@ -70,52 +68,11 @@ function logHistory(capability, historyStore) {
 }
 
 
-function nestBySubjectThenMeasurable(ratings) {
-    return d3.nest()
-        .key(r => r.parent.id)
-        .key(r => r.measurableCode)
-        .map(ratings);
-}
+function processApps(groupedApps = { primaryApps: [], secondaryApps: []}) {
+    const primaryApps = _.map(groupedApps.primaryApps, a => _.assign(a, {management: 'IT'}));
+    const secondaryApps = _.map(groupedApps.secondaryApps, a => _.assign(a, {management: 'IT'}));
 
-function prepareRawData(apps, measurables, bySubjectThenMeasurable) {
-    return _.chain(apps)
-        .map(s => ({
-            ratings: _.map(
-                measurables,
-                m => {
-                    const ragRating = perhaps(() => bySubjectThenMeasurable[s.id][m.code][0].ragRating, 'Z');
-                    return { original: ragRating, current: ragRating, measurable: m.code || m.id };
-                }),
-            subject: s
-        }))
-        .sortBy('subject.name')
-        .value();
-}
-
-
-function prepareGroupData(capability, apps, perspective, ratings) {
-
-    const measurables = perspective.measurables;
-    const bySubjectThenMeasurable = nestBySubjectThenMeasurable(ratings);
-
-    const raw = prepareRawData(
-        apps,
-        measurables,
-        bySubjectThenMeasurable);
-
-    const groupRef = { id: capability.id, name: capability.name, kind: 'CAPABILITY' };
-
-    const summaries = calculateGroupSummary(raw);
-
-    const group = {
-        groupRef,
-        measurables,
-        raw,
-        summaries,
-        collapsed: false
-    };
-
-    return group;
+    return _.union(primaryApps, secondaryApps);
 }
 
 
@@ -133,10 +90,8 @@ function controller($q,
                     historyStore,
                     logicalFlowDecoratorStore,
                     logicalFlowViewService,
-                    perspectiveStore,
                     processStore,
                     physicalFlowLineageStore,
-                    ratingStore,
                     sourceDataRatingStore,
                     techStatsService,
                     tourService,
@@ -156,24 +111,6 @@ function controller($q,
         loading: false
     };
 
-    const tweakers = {
-        subjectLabel: {
-            enter: selection =>
-                selection.on('click.go', d => $state.go('main.app.view', { id: d.subject.id }))
-        }
-    };
-
-
-    const processApps = (groupedApps) => {
-        groupedApps.primaryApps = _.map(groupedApps.primaryApps, a => _.assign(a, {management: 'IT'}));
-        groupedApps.secondaryApps = _.map(groupedApps.secondaryApps, a => _.assign(a, {management: 'IT'}));
-
-        const apps = _.union(groupedApps.primaryApps, groupedApps.secondaryApps);
-        vm.groupedApps = groupedApps;
-        vm.apps = apps;
-        return _.map(apps, 'id');
-    };
-
     const appIdSelector = {
         entityReference: {
             kind: 'CAPABILITY',
@@ -190,29 +127,24 @@ function controller($q,
 
     appCapabilityStore.findApplicationsByCapabilityId(capability.id)
         .then(processApps)
-        .then(() => {
+        .then(apps => {
             $q.all([
-                perspectiveStore.findByCode('BUSINESS'),
-                ratingStore.findByAppIdSelector(appIdSelector),
+                appCapabilityStore.findByCapabilityIds([capId]),
                 logicalFlowViewService.initialise(capability.id, 'CAPABILITY', 'CHILDREN'),
                 complexityStore.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
                 assetCostViewService.initialise(appIdSelector, 2016),
                 techStatsService.findBySelector(capability.id, 'CAPABILITY', 'CHILDREN'),
                 sourceDataRatingStore.findAll()
             ]).then(([
-                perspective,
-                ratings,
+                appCapabilities,
                 dataFlows,
                 complexity,
                 assetCostData,
                 techStats,
                 sourceDataRatings
             ]) => {
-                vm.rawRatings = ratings;
-                vm.ratings = {
-                    group: prepareGroupData(capability, vm.apps, perspective, ratings),
-                    tweakers
-                };
+                vm.apps = apps;
+                vm.appCapabilities = appCapabilities;
                 vm.dataFlows = dataFlows;
                 vm.complexity = complexity;
                 vm.assetCostData = assetCostData;
@@ -226,12 +158,9 @@ function controller($q,
         .then(tour => vm.tour = tour);
 
 
-
     appCapabilityStore.findAssociatedApplicationCapabilitiesByCapabilityId(capability.id)
         .then(assocAppCaps => {
             const associatedAppIds = _.map(assocAppCaps, 'applicationId');
-
-
             applicationStore
                 .findByIds(associatedAppIds)
                 .then((assocApps) => {
@@ -304,10 +233,8 @@ controller.$inject = [
     'HistoryStore',
     'LogicalFlowDecoratorStore',
     'LogicalFlowViewService',
-    'PerspectiveStore',
     'ProcessStore',
     'PhysicalFlowLineageStore',
-    'RatingStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService',
     'TourService',

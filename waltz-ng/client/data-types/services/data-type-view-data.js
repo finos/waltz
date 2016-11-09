@@ -15,12 +15,9 @@ import _ from "lodash";
 
 function service($q,
                  appStore,
-                 appCapabilityStore,
                  changeLogStore,
                  dataTypeUsageStore,
-                 ratingStore,
                  dataTypeService,
-                 capabilityStore,
                  bookmarkStore,
                  sourceDataRatingStore,
                  authSourcesStore,
@@ -83,9 +80,6 @@ function service($q,
         };
 
         const bulkPromise = $q.all([
-            ratingStore.findByAppIdSelector(selector),
-            appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(selector),
-            capabilityStore.findAll(),
             bookmarkStore.findByParent({id: dataTypeId, kind: 'DATA_TYPE'}),
             sourceDataRatingStore.findAll(),
             dataTypeUsageStore.findForUsageKindByDataTypeIdSelector('ORIGINATOR', selector),
@@ -94,9 +88,6 @@ function service($q,
 
         const prepareRawDataPromise = bulkPromise
             .then(([
-                capabilityRatings,
-                rawAppCapabilities,
-                capabilities,
                 bookmarks,
                 sourceDataRatings,
                 flowOriginators,
@@ -105,9 +96,6 @@ function service($q,
 
                 const r = {
                     dataTypeId,
-                    capabilityRatings,
-                    rawAppCapabilities,
-                    capabilities,
                     bookmarks,
                     sourceDataRatings,
                     flowOriginators,
@@ -132,7 +120,7 @@ function service($q,
             .calculateConsumersForDataTypeIdSelector(selector)
             .then(d => rawData.authSourceConsumers = d);
 
-       return prepareRawDataPromise;
+        return prepareRawDataPromise;
     }
 
 
@@ -145,12 +133,9 @@ function service($q,
 service.$inject = [
     '$q',
     'ApplicationStore',
-    'AppCapabilityStore',
     'ChangeLogStore',
     'DataTypeUsageStore',
-    'RatingStore',
     'DataTypeService',
-    'CapabilityStore',
     'BookmarkStore',
     'SourceDataRatingStore',
     'AuthSourcesStore',

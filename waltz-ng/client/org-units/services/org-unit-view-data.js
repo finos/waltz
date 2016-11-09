@@ -77,13 +77,6 @@ function initialiseAssetCosts(service, selector, holder) {
 }
 
 
-function loadCapabilityRatings(store, selector, holder) {
-    return store
-        .findByAppIdSelector(selector)
-        .then(r => holder.capabilityRatings = r);
-}
-
-
 function loadAppCapabilities(store, selector, holder) {
     return store
         .findApplicationCapabilitiesByAppIdSelector(selector)
@@ -186,7 +179,6 @@ function service($q,
                  logicalFlowViewService,
                  orgUnitStore,
                  physicalFlowLineageStore,
-                 ratingStore,
                  sourceDataRatingStore,
                  techStatsService) {
 
@@ -229,7 +221,6 @@ function service($q,
         return $q.all([
             initialiseDataFlows(logicalFlowViewService, orgUnitId, rawData),
             loadInvolvement(involvementStore, orgUnitId, rawData),
-            loadCapabilityRatings(ratingStore, selector, rawData),
             loadAppCapabilities(appCapabilityStore, selector, rawData),
             loadAllCapabilities(capabilityStore, rawData),
             loadAuthSources(authSourceCalculator, orgUnitId, rawData),
@@ -307,7 +298,6 @@ service.$inject = [
     'LogicalFlowViewService',
     'OrgUnitStore',
     'PhysicalFlowLineageStore',
-    'RatingStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService',
 ];
