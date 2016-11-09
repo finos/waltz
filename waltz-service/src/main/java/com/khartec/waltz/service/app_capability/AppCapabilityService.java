@@ -25,8 +25,10 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.IdGroup;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableIdGroup;
-import com.khartec.waltz.model.applicationcapability.ApplicationCapability;
-import com.khartec.waltz.model.applicationcapability.GroupedApplications;
+import com.khartec.waltz.model.application_capability.ApplicationCapability;
+import com.khartec.waltz.model.application_capability.GroupedApplications;
+import com.khartec.waltz.model.application_capability.ImmutableApplicationCapability;
+import com.khartec.waltz.model.application_capability.SaveAppCapabilityCommand;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -116,18 +118,9 @@ public class AppCapabilityService {
     }
 
 
-    public int[] addCapabilitiesToApp(Long appId, List<Long> capabilityIds) {
-        return dao.addCapabilitiesToApp(appId, capabilityIds);
-    }
-
 
     public int[] removeCapabilitiesFromApp(long appId, List<Long> capabilityIds) {
         return dao.removeCapabilitiesFromApp(appId, capabilityIds);
-    }
-
-
-    public int setIsPrimary(long id, long capabilityId, boolean isPrimary) {
-        return dao.setIsPrimary(id, capabilityId, isPrimary);
     }
 
 
@@ -144,5 +137,23 @@ public class AppCapabilityService {
         return time(
                 "ACS.findByAppIdSelector",
                 () -> dao.findApplicationCapabilitiesForAppIdSelector(selector));
+    }
+
+    public Integer save(long appId, SaveAppCapabilityCommand saveCmd, String username) {
+        ImmutableApplicationCapability applicationCapability = ImmutableApplicationCapability.builder()
+                .applicationId(appId)
+                .capabilityId(saveCmd.capabilityId())
+                .rating(saveCmd.rating())
+                .description(saveCmd.description())
+                .isPrimary(false)
+                .lastUpdatedBy(username)
+                .provenance("waltz")
+                .build();
+
+        if (saveCmd.isNew()) {
+            return dao.insert(applicationCapability);
+        } else {
+            return dao.update(applicationCapability);
+        }
     }
 }

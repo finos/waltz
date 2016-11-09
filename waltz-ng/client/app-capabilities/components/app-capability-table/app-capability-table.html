@@ -1,11 +1,6 @@
 <div>
     <style>
-        .wact-rating-cell {
-            display: inline-block;
-            width: 16px;
-            border: 1px solid;
-            border-radius: 5px;
-        }
+
     </style>
     <table class="table table-condensed table-hover">
         <colgroup>
@@ -21,11 +16,12 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="ac in ctrl.items | orderBy:'capability.name'">
+        <tr ng-repeat="ac in $ctrl.items | orderBy:'capability.name'">
             <td>
                 <waltz-icon name="star"
                             style="color: goldenrod"
-                            ng-if="ac.primary"></waltz-icon>
+                            ng-if="ac.primary">
+                </waltz-icon>
                 <a ui-sref="main.capability.view ({id: ac.capability.id})">
                 <span ng-if="ac.primary"
                       style="font-weight: bolder"
@@ -37,11 +33,9 @@
                 </a>
             </td>
             <td>
-                <span class='wact-rating-cell'
-                      ng-class="'wact-rating-cell-{{ ac.rating }}'"
-                      style="background-color: red">
-                </span>
-                <span ng-bind="ac.rating | toDisplayName:'applicationRating'"></span>
+               <waltz-rating-indicator-cell rating="ac.rating"
+                                            label="ac.rating | toDisplayName:'applicationRating'">
+               </waltz-rating-indicator-cell>
             </td>
             <td>
                 <span ng-bind="ac.capability.description"></span>

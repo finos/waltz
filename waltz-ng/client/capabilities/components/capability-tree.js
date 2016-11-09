@@ -17,13 +17,17 @@
  *
  */
 
-import {buildHierarchies} from "../../common";
+import {buildHierarchies, invokeFunction} from "../../common";
+import _ from 'lodash';
 
-const BINDINGS = {
-    capabilities: '=',
-    options: '=',
+
+const bindings = {
+    capabilities: '<',
+    options: '<',
     filterExpression: '@',
-    selectedNode: '='
+    selectedNode: '<',
+    nodeSelect: '<',
+    disabledNodeIds: '<'
 };
 
 
@@ -39,7 +43,37 @@ function switchToParentIds(treeData = []) {
 }
 
 
-function controller($scope, $filter) {
+function prepareTreeData(capabilities = [], disabledNodeIds = []) {
+    const enrichedCapabilities = _.map(
+        capabilities,
+        c => Object.assign(
+            {},
+            c ,
+            { disabled: _.includes(disabledNodeIds, c.id ) }));
+
+    const treeData = buildHierarchies(enrichedCapabilities);
+    return switchToParentIds(treeData);
+}
+
+
+function expandSelection(capabilities = [], selected) {
+    if (! selected) return [];
+
+    const byId = _.keyBy(capabilities, 'id');
+
+    const nodesToExpand = [
+        byId[selected.level1],
+        byId[selected.level2],
+        byId[selected.level3],
+        byId[selected.level4],
+        byId[selected.level5],
+    ].filter(n => n != null);
+
+    return nodesToExpand;
+}
+
+
+function controller() {
 
     const vm = this;
 
@@ -57,22 +91,16 @@ function controller($scope, $filter) {
 
     vm.treeData = [];
     vm.expandedNodes = [];
-    vm.nodesById = {};
 
-    $scope.$watch('ctrl.capabilities', (capabilities = []) => {
-        const treeData = buildHierarchies(capabilities);
-        vm.treeData = switchToParentIds(treeData);
-
-        const nodeIndexer = (nodes = [], acc = {}) => {
-            return _.reduce(nodes, (acc, n) => {
-                acc[n.id] = n;
-                if (n.children) { nodeIndexer(n.children, acc); }
-                return acc;
-            }, acc);
-        };
-
-        vm.nodesById = nodeIndexer(vm.treeData);
-    });
+    vm.$onChanges = (changes) => {
+        vm.treeData = prepareTreeData(vm.capabilities, vm.disabledNodeIds);
+        if (changes.selectedNode) {
+            vm.expandedNodes = _.union(vm.expandedNodes, expandSelection(vm.capabilities, vm.selectedNode));
+        }
+        if (vm.disabledNodeIds) {
+            vm.treeOptions.isSelectable = (n) => ! _.includes(vm.disabledNodeIds, n.id);
+        }
+    };
 
     vm.toggleExpansion = (node) => {
         // tree expansion state is in shared structure 'expandedNodes'
@@ -90,26 +118,17 @@ function controller($scope, $filter) {
         vm.expandedNodes.length = 0;
     };
 
-    vm.expandFiltered = () => {
-        // apply the same filter as given to the tree control widget
-        const results = $filter('filter')(_.values(vm.nodesById), vm.filterExpression);
-
-        vm.expandedNodes.push(...results);
-    }
-
+    vm.onNodeSelect = (n) => invokeFunction(vm.nodeSelect, n);
 }
 
-controller.$inject = ['$scope', '$filter'];
+controller.$inject = [];
 
 
-export default () => {
-    return {
-        restrict: 'E',
-        replace: true,
-        template: require('./capability-tree.html'),
-        scope: {},
-        bindToController: BINDINGS,
-        controllerAs: 'ctrl',
-        controller
-    };
+const component = {
+    template: require('./capability-tree.html'),
+    bindings,
+    controller
 };
+
+
+export default component;

@@ -10,15 +10,10 @@
  *
  */
 
-import _ from 'lodash';
-
-
 const controller = function(appCapabilityStore,
                             appStore,
                             capabilityStore,
                             notification,
-                            traitStore,
-                            traitUsageStore,
                             $stateParams,
                             $state,
                             $q) {
@@ -26,71 +21,53 @@ const controller = function(appCapabilityStore,
     const vm = this;
     const id = $stateParams.id;
 
-    const promises = [
-        appStore.getById(id),
-        appCapabilityStore.findCapabilitiesByApplicationId(id),
-        capabilityStore.findAll(),
-        traitStore.findApplicationDeclarableTraits(),
-        traitUsageStore.findByEntityReference('APPLICATION', id),
-        traitUsageStore.findByEntityKind('CAPABILITY')
-    ];
+
+    const refresh = () => appCapabilityStore
+        .findCapabilitiesByApplicationId(id)
+        .then(usages =>  vm.usages = usages);
 
 
-    $q.all(promises)
-        .then(([app, capabilityUsages, allCapabilities, allTraits, traitUsages, capabilityTraits ]) => {
+    const boot = () => {
+        const promises = [
+            appStore.getById(id),
+            capabilityStore.findAll(),
+        ];
 
-            vm.traits = {
-                all: allTraits,
-                usages: traitUsages
-            };
+        $q.all(promises)
+            .then(([app, capabilities ]) => {
+                vm.capabilities = capabilities;
+                vm.application = app;
+            });
 
-            vm.capabilities = {
-                all: allCapabilities,
-                usages: capabilityUsages,
-                capabilityTraits
-            };
-
-            vm.application = app;
-        });
+        refresh();
+    };
 
 
-    vm.togglePrimary = (c, primary) => appCapabilityStore
-        .setIsPrimary(id, c.id, primary)
-        .then(() => notification.success(`${c.name} ${primary ? '' : ' not '}  marked as primary`))
-        .then(() => appCapabilityStore.findCapabilitiesByApplicationId(id))
-        .then(usages => vm.capabilities.usages = usages);
+    // -- INTERACT ---
 
-    vm.addCapability = (c) => appCapabilityStore
-        .addCapability(id, c.id)
-        .then(() => notification.success(`Added function: ${c.name}`))
-        .then(() => appCapabilityStore.findCapabilitiesByApplicationId(id))
-        .then(usages => vm.capabilities.usages = usages);
+    vm.onSave = (cmd) => appCapabilityStore
+        .save(vm.application.id, cmd)
+        .then(() => notification.success(`Function ${ cmd.isNew ? 'Added' : 'Updated' }`))
+        .then(refresh);
 
-    vm.removeCapability = (c) => appCapabilityStore
+    vm.onRemove = (c) => appCapabilityStore
         .removeCapability(id, c.id)
         .then(() => notification.success(`Removed function: ${c.name}`))
-        .then(() => appCapabilityStore.findCapabilitiesByApplicationId(id))
-        .then(usages => vm.capabilities.usages = usages);
+        .then(refresh);
 
-    vm.addTrait = (t) => traitUsageStore
-        .addUsage({ kind: 'APPLICATION', id}, t.id)
-        .then(usages => vm.traits.usages = usages)
-        .then(() => notification.success('Trait registered'));
 
-    vm.removeTrait = (t) => traitUsageStore
-        .removeUsage({ kind: 'APPLICATION', id}, t.id)
-        .then(usages => vm.traits.usages = usages)
-        .then(() => notification.warning('Trait registration removed'));
+    // -- BOOT ---
+
+    boot();
 
 };
+
 
 controller.$inject = [
     'AppCapabilityStore',
     'ApplicationStore',
     'CapabilityStore',
     'Notification',
-    'TraitStore',
-    'TraitUsageStore',
     '$stateParams',
     '$state',
     '$q'

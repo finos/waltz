@@ -10,42 +10,45 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import _ from 'lodash';
 
 
+const bindings = {
+    appCapabilities: '<',
+    capabilities: '<'
+};
 
-function controller($scope) {
-    const vm = this;
 
-    const refresh = ([appCapabilities, capabilities]) => {
-        if (!appCapabilities || !capabilities) return;
+const template = require('./app-capability-table.html');
 
-        const capabilitiesById = _.keyBy(capabilities, 'id');
 
-        vm.items = _.map(appCapabilities, ac => {
-            return {
-                ...ac,
-                capability: capabilitiesById[ac.capabilityId]
-            }
-        });
-    };
+function refresh(appCapabilities = [], capabilities= []) {
+    const capabilitiesById = _.keyBy(capabilities, 'id');
 
-    $scope.$watchGroup(['ctrl.appCapabilities', 'ctrl.capabilities'], refresh)
+    console.log(appCapabilities, capabilities);
+    return _.map(appCapabilities, ac => {
+        return Object.assign(
+            {},
+            ac,
+            { capability: capabilitiesById[ac.capabilityId] });
+    });
 }
 
-controller.$inject = ['$scope'];
 
+function controller() {
+    const vm = this;
 
-export default () => {
-    return {
-        restrict: 'E',
-        replace: true,
-        template: require('./app-capability-table.html'),
-        scope: {},
-        controller,
-        controllerAs: 'ctrl',
-        bindToController: {
-            appCapabilities: '=',
-            capabilities: '='
-        }
+    vm.$onChanges = () => {
+        vm.items = refresh(vm.appCapabilities, vm.capabilities);
     };
+}
+
+
+const component =  {
+    template,
+    controller,
+    bindings
 };
+
+
+export default component;

@@ -1,22 +1,23 @@
 <div>
     <div class="waltz-scroll-region"
-         ng-style="{ 'max-height': ctrl.options.maxHeight || '300px' }">
+         ng-style="{ 'max-height': $ctrl.options.maxHeight || '300px' }">
         <treecontrol class="tree-light"
-                     tree-model="ctrl.treeData"
-                     options="ctrl.treeOptions"
+                     tree-model="$ctrl.treeData"
+                     options="$ctrl.treeOptions"
                      order-by="'-name'"
-                     expanded-nodes="ctrl.expandedNodes"
-                     on-selection="ctrl.showSelected(node)"
-                     filter-expression="ctrl.filterExpression"
-                     selected-node="ctrl.selectedNode">
+                     expanded-nodes="$ctrl.expandedNodes"
+                     on-selection="$ctrl.onNodeSelect(node)"
+                     filter-expression="$ctrl.filterExpression"
+                     selected-node="$ctrl.selectedNode">
 
             <span title="{{ node.description }}"
-                  ng-dblclick="ctrl.toggleExpansion(node)"
+                  ng-dblclick="$ctrl.toggleExpansion(node)"
                   class="no-overflow">
-                {{ node.name }}
+                <span ng-bind="node.name"></span>
 
-                <span class="small text-muted" ng-if="ctrl.options.showDescriptions">
-                    {{ node.description }}
+                <span class="small text-muted"
+                      ng-if="$ctrl.options.showDescriptions"
+                      ng-bind="node.description">
                 </span>
             </span>
 
@@ -24,13 +25,9 @@
     </div>
 
     <p class="waltz-paragraph small text-muted">
-        <a class="clickable" ng-click="ctrl.collapseAll()">
+        <a class="clickable" ng-click="$ctrl.collapseAll()">
             Collapse all</a>
         nodes.
-
-        <a class="clickable" ng-click="ctrl.expandFiltered()">
-            Expand</a>
-        filter results.
     </p>
 
 </div>

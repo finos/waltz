@@ -20,8 +20,9 @@ export default (module) => {
         .service(
             'AppCapabilityStore',
             require('./services/app-capability-store'))
-        .component(
-            'waltzAppFunctionTabgroupSection',
-            require('./components/app-function-tabgroup-section/app-function-tabgroup-section'));
+        .component('waltzAppRatingTabgroupSection', require('./components/app-rating-tabgroup-section/app-rating-tabgroup-section'))
+        .component('waltzAppCapabilityEditor', require('./components/app-capability-editor/app-capability-editor'))
+        .component('waltzAppCapabilityPicker', require('./components/app-capability-picker/app-capability-picker'))
+        .component('waltzAppCapabilityTable', require('./components/app-capability-table/app-capability-table'));
 
 };
