@@ -62,7 +62,6 @@ function controller($q,
                     complexityStore,
                     entityStatisticStore,
                     historyStore,
-                    logicalFlowDecoratorStore,
                     logicalFlowViewService,
                     processStore,
                     physicalFlowLineageStore,
@@ -85,10 +84,10 @@ function controller($q,
         scope: 'CHILDREN'
     };
 
-    const capabilitiesById = _.keyBy(capabilities, 'id');
 
     vm.capability = capability;
     vm.entityRef = entityReference;
+
 
     // -- LOADERS --
 
@@ -145,6 +144,7 @@ function controller($q,
 
         appCapabilityStore.findAssociatedApplicationCapabilitiesByCapabilityId(capability.id)
             .then(assocAppCaps => {
+                const capabilitiesById = _.keyBy(capabilities, 'id');
                 const associatedAppIds = _.map(assocAppCaps, 'applicationId');
                 applicationStore
                     .findByIds(associatedAppIds)
@@ -185,6 +185,8 @@ function controller($q,
         return logHistory(capability, historyStore);
     };
 
+
+    // -- BOOT ---
 
     wave1()
         .then(wave2)
@@ -228,7 +230,6 @@ controller.$inject = [
     'ComplexityStore',
     'EntityStatisticStore',
     'HistoryStore',
-    'LogicalFlowDecoratorStore',
     'LogicalFlowViewService',
     'ProcessStore',
     'PhysicalFlowLineageStore',
