@@ -27,6 +27,7 @@
             </div>
 
             <waltz-pie-segment-table data="$ctrl.pie.data"
+                                     selected-segment-key="$ctrl.pie.selectedSegmentKey"
                                      config="$ctrl.pie.config">
             </waltz-pie-segment-table>
 
@@ -41,7 +42,6 @@
                                         on-initialise="$ctrl.onGridInitialise">
                 </waltz-grid-with-search>
             </div>
-
 
         </div>
 

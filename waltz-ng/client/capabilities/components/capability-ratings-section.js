@@ -17,6 +17,7 @@ const initialState = {
     },
     query: '',
     pie: {
+        selectedSegmentKey: null,
         data: [],
         config: null
     },
@@ -52,10 +53,11 @@ function prepareAppCapabilities(appCapabilities = [], apps = []) {
 }
 
 
-function preparePie(appCapabilities = [], displayNameService) {
+function preparePie(appCapabilities = [], displayNameService, onSelect = () => null) {
     const config = {
         colorProvider: (d) => ragColorScale(d.data.key),
-        labelProvider: (d) => displayNameService.lookup('applicationRating', d.key)
+        labelProvider: (d) => displayNameService.lookup('applicationRating', d.key),
+        onSelect
     };
     const counts = _.countBy(appCapabilities, "rating");
     const data =  [
@@ -73,11 +75,23 @@ function preparePie(appCapabilities = [], displayNameService) {
 
 
 function controller(displayNameService) {
+    let rawTableData = [];
+
     const vm = initialiseData(this, initialState);
 
+    const onSelect = (d) => {
+        vm.pie.selectedSegmentKey = d ? d.key : null;
+
+        vm.tableData = d
+            ? _.filter(rawTableData, r => r.rating === d.key)
+            : rawTableData;
+    };
+
     vm.$onChanges = () => {
-        vm.tableData = prepareAppCapabilities(vm.appCapabilities, vm.apps);
-        vm.pie = preparePie(vm.appCapabilities, displayNameService);
+        rawTableData = prepareAppCapabilities(vm.appCapabilities, vm.apps);
+        vm.tableData = rawTableData;
+
+        vm.pie = preparePie(vm.appCapabilities, displayNameService, onSelect);
     };
 
     vm.onGridInitialise = (d) => vm.exportData = d.export;
