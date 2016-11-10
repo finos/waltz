@@ -2,6 +2,11 @@
                id="app-ratings-section">
 
     <waltz-section-actions>
+        <button class="btn btn-xs btn-primary"
+                ng-disabled="$ctrl.tableData.length == 0 "
+                ng-click="$ctrl.exportData()">
+            Export
+        </button>
         <button class="btn btn-xs waltz-btn-transparent"
                 ng-click="$ctrl.visibility.ratingOverlay = ! $ctrl.visibility.ratingOverlay">
             <waltz-icon name="map-signs"></waltz-icon>
@@ -22,40 +27,22 @@
             </div>
 
             <waltz-pie-segment-table data="$ctrl.pie.data"
+                                     selected-segment-key="$ctrl.pie.selectedSegmentKey"
                                      config="$ctrl.pie.config">
             </waltz-pie-segment-table>
 
         </div>
         <div class="col-sm-8">
-            <div ng-if="$ctrl.tableData.length > 10">
-                <input ng-model="$ctrl.query"
-                       placeholder="Search..."
-                       type="search"
-                       class="form-control">
+
+            <div ng-if="$ctrl.tableData.length > 0">
+                <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                                        entries="$ctrl.tableData"
+                                        searchPlaceholderText="Search"
+                                        exportFilename="apps-capability.csv"
+                                        on-initialise="$ctrl.onGridInitialise">
+                </waltz-grid-with-search>
             </div>
-            <div ng-class="{'waltz-scroll-region-300': $ctrl.tableData.length > 15}">
-                <table class="table table-condensed small">
-                    <thead>
-                    <tr>
-                        <th>Application</th>
-                        <th>Rating</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="ac in $ctrl.tableData | orderBy:'app.name' | filter:$ctrl.query"
-                        ng-class="'wcv-application-rating-{{ ac.rating }}'">
-                        <td>
-                            <a ui-sref="main.app.view ({id: ac.app.id })"
-                               ng-bind="ac.app.name">
-                            </a>
-                        </td>
-                        <td>
-                            <span ng-bind="ac.rating | toDisplayName:'applicationRating'" ></span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+
         </div>
 
     </div>

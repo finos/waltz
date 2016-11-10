@@ -1,11 +1,12 @@
 import _ from "lodash";
 
 const BINDINGS = {
-    data: '=',
-    config: '=',
+    data: '<',
+    config: '<',
     title: '@',
     subTitle: '@',
-    icon: '@'
+    icon: '@',
+    selectedSegmentKey: '<'
 };
 
 const MAX_PIE_SEGMENTS = 5;
