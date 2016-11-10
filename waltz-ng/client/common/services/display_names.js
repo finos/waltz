@@ -32,17 +32,17 @@ export const bookmarkNames = {
 
 
 export const capabilityRatingNames = {
-    R: 'Poor fit',
-    A: 'Partial fit',
-    G: 'Good fit',
+    R: 'Poor',
+    A: 'Adequate',
+    G: 'Good',
     Z: 'Unknown'
 };
 
 
 export const applicationRatingNames = {
-    R: 'Poor Fit',
-    A: 'Partial Fit',
-    G: 'Good Fit',
+    R: 'Poor',
+    A: 'Adequate',
+    G: 'Good',
     Z: 'Unknown'
 };
 
