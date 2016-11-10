@@ -43,7 +43,7 @@ function getOutcomeIds(data = []) {
 
 function prepareStyles(data = []) {
     const reducer = (acc, outcomeId) => {
-        acc[outcomeId] = { color: variableScale(outcomeId) };
+        acc[outcomeId] = { color: variableScale(outcomeId).toString() };
         return acc;
     };
     return _.reduce(
@@ -54,7 +54,9 @@ function prepareStyles(data = []) {
 
 
 function findRelevantStats(history = [], d) {
-    const soughtTime = new Date(d).getTime();
+    if (! d) return null;
+
+    const soughtTime = d.getTime();
     return _.find(
         history,
         t => soughtTime === new Date(t.lastUpdatedAt).getTime());
