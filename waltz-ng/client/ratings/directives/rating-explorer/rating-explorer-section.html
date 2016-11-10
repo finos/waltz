@@ -75,8 +75,12 @@
             <div class="col-md-7">
                 <div ng-show="ctrl.visibility.appList">
                     <strong ng-bind="ctrl.focusedCapability.name"></strong>
-                    <p class="waltz-paragraph small text-muted"
-                       ng-bind="ctrl.focusedCapability.description">
+                    <p class="waltz-paragraph small text-muted">
+                        <span ng-bind="ctrl.focusedCapability.description"></span>
+                        <a class="pull-right"
+                           ui-sref="main.capability.view ({id: ctrl.focusedCapability.id})">
+                            &raquo; More
+                        </a>
                     </p>
                     <div class="waltz-scroll-region"
                          style="height: 350px">
