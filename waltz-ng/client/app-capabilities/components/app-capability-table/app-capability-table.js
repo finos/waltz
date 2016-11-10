@@ -25,7 +25,6 @@ const template = require('./app-capability-table.html');
 function refresh(appCapabilities = [], capabilities= []) {
     const capabilitiesById = _.keyBy(capabilities, 'id');
 
-    console.log(appCapabilities, capabilities);
     return _.map(appCapabilities, ac => {
         return Object.assign(
             {},

@@ -202,22 +202,24 @@ function drawBands(section,
 
     const dates = _.chain(points)
         .map('date')
-        .uniq()
+        .uniqBy(d => d.getTime())
         .value();
 
     const bands = section
-        .selectAll('band')
-        .data(dates);
+        .selectAll('rect.band')
+        .data(dates, d => d.getTime());
 
-    bands.enter()
+    bands
+        .enter()
         .append('rect')
-        .classed(".band", true)
+        .classed("band", true)
+        .attr({
+            'pointer-events': 'all',
+        })
+        .style('visibility', 'hidden')
         .on('mouseenter.band-hover', d => { tryInvoke(options.onHover, d); })
         .on('mouseleave.band-hover', () => { tryInvoke(options.onHover, null); })
-        .attr({
-            'pointer-events': 'all'
-        })
-        .style('visibility', 'hidden');
+       ;
 
     bands
         .attr({
@@ -296,10 +298,10 @@ function draw(sections, width, points = [], options = {}) {
     const scales = mkScales(points, dimensions);
 
     adjustSections(sections, dimensions);
-    drawBands(sections.chart, points, scales, options);
     drawAxes(sections, points, scales);
     drawLines(sections.chart, points, scales);
     drawPoints(sections.chart, points, scales, options);
+    drawBands(sections.chart, points, scales, options);
 }
 
 

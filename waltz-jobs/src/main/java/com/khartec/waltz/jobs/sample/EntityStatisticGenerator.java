@@ -17,12 +17,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.ArrayUtilities.randomPick;
@@ -33,6 +35,9 @@ import static java.util.stream.Collectors.toList;
 public class EntityStatisticGenerator implements SampleDataGenerator {
 
     private static final String PROVENANCE = "DEMO";
+    private static final List<LocalDateTime> DATES = IntStream.range(0, 10)
+                .mapToObj(i -> LocalDateTime.now().minusDays(i))
+                .collect(toList());
 
 
     private static final BiFunction<StatisticValueState, Integer, String> failIfPositiveFn = (s, v)
@@ -234,19 +239,23 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
                                         EntityStatisticValueDao valueDao) {
 
         List<EntityStatisticValue> values = streamAppRefs(applications)
-                .map(appRef -> {
-                    String result = randomPick("COMPLIANT", "PARTIALLY_COMPLIANT", "NON_COMPLIANT");
-                    return ImmutableEntityStatisticValue
-                            .builder()
-                            .entity(appRef)
-                            .current(true)
-                            .state(StatisticValueState.PROVIDED)
-                            .outcome(result)
-                            .value(result)
-                            .statisticId(defn.id().get())
-                            .createdAt(LocalDateTime.now())
-                            .provenance(PROVENANCE)
-                            .build();
+                .flatMap(appRef -> {
+                    return DATES.stream()
+                            .map(d -> {
+                                String result = randomPick("COMPLIANT", "PARTIALLY_COMPLIANT", "NON_COMPLIANT");
+                                return ImmutableEntityStatisticValue
+                                        .builder()
+                                        .entity(appRef)
+                                        .current(d.toLocalDate().equals(LocalDate.now()))
+                                        .state(StatisticValueState.PROVIDED)
+                                        .outcome(result)
+                                        .value(result)
+                                        .statisticId(defn.id().get())
+                                        .createdAt(d)
+                                        .provenance(PROVENANCE)
+                                        .build();
+                            });
+
                 })
                 .collect(Collectors.toList());
 
