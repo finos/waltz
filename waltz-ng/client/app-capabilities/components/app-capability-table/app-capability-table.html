@@ -1,18 +1,17 @@
 <div>
-    <style>
-
-    </style>
-    <table class="table table-condensed table-hover">
+    <table class="table table-condensed table-striped table-hover">
         <colgroup>
-            <col width="30%">
+            <col width="20%">
             <col width="10%">
-            <col width="60%">
+            <col width="35%">
+            <col width="35%">
         </colgroup>
         <thead>
         <tr>
             <th>Name</th>
             <th>Rating</th>
             <th>Description</th>
+            <th>Comment</th>
         </tr>
         </thead>
         <tbody>
@@ -39,6 +38,9 @@
             </td>
             <td>
                 <span ng-bind="ac.capability.description"></span>
+            </td>
+            <td>
+                <span ng-bind="ac.description"></span>
             </td>
         </tr>
         </tbody>

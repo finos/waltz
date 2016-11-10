@@ -19,7 +19,24 @@ const initialState = {
     pie: {
         data: [],
         config: null
-    }
+    },
+    columnDefs: [
+        {
+            field: 'app.name',
+            name: 'Name',
+            cellTemplate: '<div class="ui-grid-cell-contents"><a ui-sref="main.app.view ({ id: row.entity[\'app\'].id })"><span ng-bind="COL_FIELD"></span></a></div>'
+        }, {
+            field: 'app.assetCode',
+            name: 'Asset Code'
+        }, {
+            field: 'rating',
+            name: 'Rating',
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-rating-indicator-cell rating="COL_FIELD" label="COL_FIELD | toDisplayName:\'applicationRating\'"></waltz-rating-indicator-cell></div>'
+        }, {
+            field: 'description',
+            name: 'Comment'
+        },
+    ]
 };
 
 
@@ -61,7 +78,9 @@ function controller(displayNameService) {
     vm.$onChanges = () => {
         vm.tableData = prepareAppCapabilities(vm.appCapabilities, vm.apps);
         vm.pie = preparePie(vm.appCapabilities, displayNameService);
-    }
+    };
+
+    vm.onGridInitialise = (d) => vm.exportData = d.export;
 }
 
 

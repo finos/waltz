@@ -20,7 +20,7 @@ const initialState = {
     searchFields: [],
     searchPlaceholderText: 'Search...',
     exportFilename: 'export.csv',
-    onInitialise: (gridApi) => console.log('Default onOnitialise handler for grid-search: ', gridApi),
+    onInitialise: (gridApi) => console.log('Default onInitialise handler for grid-search: ', gridApi),
     onChange: (gridApi) => {}
 };
 
