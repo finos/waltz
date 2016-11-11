@@ -31,28 +31,18 @@ export const bookmarkNames = {
 };
 
 
-export const capabilityRatingNames = {
-    R: 'Poor',
-    A: 'Adequate',
-    G: 'Good',
-    Z: 'Unknown'
-};
-
-
-export const applicationRatingNames = {
-    R: 'Poor',
-    A: 'Adequate',
-    G: 'Good',
-    Z: 'Unknown'
-};
-
-
 export const investmentRatingNames = {
     R: 'Disinvest',
-    A: 'Invest',
-    G: 'Hold',
+    A: 'Maintain',
+    G: 'Invest',
     Z: 'Unknown'
 };
+
+
+export const capabilityRatingNames = investmentRatingNames;
+
+
+export const applicationRatingNames = investmentRatingNames;
 
 
 export const lifecyclePhaseDisplayNames = {
