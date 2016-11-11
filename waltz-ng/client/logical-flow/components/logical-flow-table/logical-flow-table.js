@@ -21,20 +21,18 @@ const bindings = {
 
 
 function controller($animate,
-                    $scope,
                     displayNameService,
                     uiGridConstants) {
     const vm = this;
 
     vm.$onChanges = (change) => {
-        vm.gridOptions = setupGrid($animate, displayNameService, uiGridConstants, vm.flows, vm.decorators, $scope);
+        vm.gridOptions = setupGrid($animate, displayNameService, uiGridConstants, vm.flows, vm.decorators);
     };
 }
 
 
 controller.$inject = [
     '$animate',
-    '$scope',
     'WaltzDisplayNameService',
     'uiGridConstants'
 ];
@@ -44,8 +42,7 @@ const template = `<div style="font-size: smaller; height: 300px"
                        ui-grid-exporter
                        ui-grid-resize-columns
                        ui-grid="$ctrl.gridOptions">
-                  </div>
-                   <span class="custom-csv-link-location"></span>`;
+                  </div>`;
 
 
 const component = {
