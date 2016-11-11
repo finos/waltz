@@ -17,7 +17,9 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
@@ -338,13 +340,6 @@ public class EntityStatisticSummaryDao {
             return DSL.trueCondition();
         }
         return esv.CREATED_AT.gt(currentTimestamp().minus(duration.numDays()));
-    }
-
-
-    private LocalDateTime getMaxCreatedAt(Map<Long, Optional<Timestamp>> statIdToMaxCreatedAt, Long statisticId) {
-        return statIdToMaxCreatedAt.get(statisticId)
-                        .map(t -> t.toLocalDateTime())
-                        .orElse(nowUtc());
     }
 
 }
