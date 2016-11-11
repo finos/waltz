@@ -3,13 +3,13 @@ package com.khartec.waltz.data.entity_statistic;
 import com.khartec.waltz.model.Duration;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.ImmutableTallyPack;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.tally.TallyPack;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -18,11 +18,13 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.data.JooqUtilities.DB_EXECUTOR_POOL;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 import static java.util.stream.Collectors.*;
 import static org.jooq.impl.DSL.*;
@@ -106,41 +108,21 @@ public class EntityStatisticSummaryDao {
     public List<TallyPack<String>> generateWithNoRollup(Collection<Long> statisticIds,
                                                         EntityReference entityReference) {
 
-        Condition condition = mkNoRollupCondition(
-                statisticIds,
-                entityReference,
-                esv.CURRENT.eq(true));
+        checkNotNull(statisticIds, "statisticIds cannot be null");
+        checkNotNull(entityReference, "entityReference cannot be null");
 
-        Result<Record4<Long, String, String, Timestamp>> values = dsl
-                .select(esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE, max(esv.CREATED_AT).as(maxCreatedAtField))
-                .from(esv)
-                .where(dsl.renderInlined(condition))
-                .groupBy(esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE)
-                .fetch();
+        if (statisticIds.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-        Map<Long, Optional<Timestamp>> statIdToMaxCreatedAt = values.stream()
-                .map(r -> tuple(r.getValue(esv.STATISTIC_ID), r.getValue(maxCreatedAtField)))
-                .collect(groupingBy(t -> t.v1(),
-                            mapping(t -> t.v2(),
-                                    maxBy(Timestamp::compareTo))));
+        List<Future<TallyPack<String>>> summaryFutures = statisticIds.stream()
+                .map(statId -> DB_EXECUTOR_POOL.submit(() ->
+                        generateWithNoRollup(statId, entityReference)))
+                .collect(toList());
 
-        return values.stream()
-                .collect(groupingBy(r -> r.getValue(esv.STATISTIC_ID),
-                             mapping(r -> ImmutableTally.<String>builder()
-                                        .count(Double.parseDouble(r.getValue(esv.VALUE)))
-                                        .id(r.getValue(esv.OUTCOME))
-                                        .build(),
-                                     toList())))
-                .entrySet()
-                .stream()
-                .map(entry -> ImmutableTallyPack.<String>builder()
-                        .entityReference(ImmutableEntityReference.builder()
-                                .kind(EntityKind.ENTITY_STATISTIC)
-                                .id(entry.getKey())
-                                .build())
-                        .tallies(entry.getValue())
-                        .lastUpdatedAt(getMaxCreatedAt(statIdToMaxCreatedAt, entry.getKey()))
-                        .build())
+        return summaryFutures.stream()
+                .map(f -> Unchecked.supplier(() -> f.get())
+                        .get())
                 .collect(toList());
     }
 
@@ -271,41 +253,14 @@ public class EntityStatisticSummaryDao {
             return Collections.emptyList();
         }
 
-        Condition condition = mkSummaryCondition(
-                statisticIds,
-                appIdSelector,
-                esv.CURRENT.eq(true));
+        List<Future<TallyPack<String>>> summaryFutures = statisticIds.stream()
+                .map(statId -> DB_EXECUTOR_POOL.submit(() ->
+                        generateSummary(statId, appIdSelector, aggregateField, toTally)))
+                .collect(toList());
 
-        Result<Record4<Long, String, T, Timestamp>> aggregates = dsl
-                .select(esv.STATISTIC_ID, esv.OUTCOME, aggregateField, max(esv.CREATED_AT).as(maxCreatedAtField))
-                .from(esv)
-                .where(dsl.renderInlined(condition))
-                .groupBy(esv.STATISTIC_ID, esv.OUTCOME)
-                .fetch();
-
-        Map<Long, Optional<Timestamp>> statIdToMaxCreatedAt = aggregates.stream()
-                .map(r -> tuple(r.getValue(esv.STATISTIC_ID), r.getValue(maxCreatedAtField)))
-                .collect(groupingBy(t -> t.v1(),
-                         mapping(t -> t.v2(),
-                                 maxBy(Timestamp::compareTo))));
-
-        return aggregates.stream()
-                .collect(groupingBy(r -> r.getValue(esv.STATISTIC_ID),
-                             mapping(r -> ImmutableTally.<String>builder()
-                                        .count(toTally.apply(r.getValue(aggregateField)))
-                                        .id(r.getValue(esv.OUTCOME))
-                                        .build(),
-                                     toList())))
-                .entrySet()
-                .stream()
-                .map(entry -> ImmutableTallyPack.<String>builder()
-                        .entityReference(ImmutableEntityReference.builder()
-                                .kind(EntityKind.ENTITY_STATISTIC)
-                                .id(entry.getKey())
-                                .build())
-                        .tallies(entry.getValue())
-                        .lastUpdatedAt(getMaxCreatedAt(statIdToMaxCreatedAt, entry.getKey()))
-                        .build())
+        return summaryFutures.stream()
+                .map(f -> Unchecked.supplier(() -> f.get())
+                        .get())
                 .collect(toList());
     }
 
