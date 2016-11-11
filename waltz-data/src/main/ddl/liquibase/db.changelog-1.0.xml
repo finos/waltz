@@ -3287,8 +3287,7 @@
     <changeSet author="dwatkins"
                id="20161107-750-1"
                dbms="mssql">
-        <dropPrimaryKey constraintName="data_flow_pkey"
-                        tableName="data_flow"/>
+        <dropPrimaryKey tableName="data_flow"/>
 
         <renameTable oldTableName="data_flow"
                      newTableName="logical_flow"/>
