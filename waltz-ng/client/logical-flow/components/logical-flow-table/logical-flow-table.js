@@ -21,18 +21,20 @@ const bindings = {
 
 
 function controller($animate,
+                    $scope,
                     displayNameService,
                     uiGridConstants) {
     const vm = this;
 
     vm.$onChanges = (change) => {
-        vm.gridOptions = setupGrid($animate, displayNameService, uiGridConstants, vm.flows, vm.decorators);
+        vm.gridOptions = setupGrid($animate, displayNameService, uiGridConstants, vm.flows, vm.decorators, $scope);
     };
 }
 
 
 controller.$inject = [
     '$animate',
+    '$scope',
     'WaltzDisplayNameService',
     'uiGridConstants'
 ];
@@ -42,7 +44,8 @@ const template = `<div style="font-size: smaller; height: 300px"
                        ui-grid-exporter
                        ui-grid-resize-columns
                        ui-grid="$ctrl.gridOptions">
-                  </div>`;
+                  </div>
+                   <span class="custom-csv-link-location"></span>`;
 
 
 const component = {
@@ -99,10 +102,11 @@ function setupGrid($animate, displayNameService, uiGridConstants, flows = [], de
         data: gridData,
         enableGridMenu: true,
         enableFiltering: true,
+        enableSelectAll: true,
+        exporterMenuPdf: false,
+        exporterCsvFilename: "flows.csv",
         enableHorizontalScrollbar: uiGridConstants.scrollbars.NEVER,
         enableSorting: true,
-        exporterCsvFilename: "flows.csv",
-        exporterMenuPdf: false,
         rowTemplate: '<div ng-style="row.entity.rowStyle"><div ng-repeat="col in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ui-grid-cell></div></div>',
         onRegisterApi: (gridApi) => {
             $animate.enabled(gridApi.grid.element, false);
