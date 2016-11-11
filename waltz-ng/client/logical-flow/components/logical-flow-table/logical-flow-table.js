@@ -99,10 +99,11 @@ function setupGrid($animate, displayNameService, uiGridConstants, flows = [], de
         data: gridData,
         enableGridMenu: true,
         enableFiltering: true,
+        enableSelectAll: true,
+        exporterMenuPdf: false,
+        exporterCsvFilename: "flows.csv",
         enableHorizontalScrollbar: uiGridConstants.scrollbars.NEVER,
         enableSorting: true,
-        exporterCsvFilename: "flows.csv",
-        exporterMenuPdf: false,
         rowTemplate: '<div ng-style="row.entity.rowStyle"><div ng-repeat="col in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ui-grid-cell></div></div>',
         onRegisterApi: (gridApi) => {
             $animate.enabled(gridApi.grid.element, false);
