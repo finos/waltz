@@ -70,6 +70,11 @@ function lookupStatColumnName(displayNameService, definition) {
 }
 
 
+function calcTotal(stats = { tallies: [] }) {
+    return _.sumBy(stats.tallies, 'count');
+}
+
+
 function controller($scope, displayNameService) {
     const vm = this;
 
@@ -79,6 +84,7 @@ function controller($scope, displayNameService) {
         if (relevantStats) {
             vm.selected = relevantStats;
             vm.selected.dateString = dateFormatter(d);
+            vm.total = calcTotal(relevantStats);
         }
     };
 
