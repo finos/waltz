@@ -1,20 +1,11 @@
-function directiveController() {
-}
-
-
-export default  () => ({
-    restrict: 'E',
-    replace: true,
+export default  {
     template: require('./basic-info-tile.html'),
-    scope: {},
     transclude: true,
-    bindToController: {
+    bindings: {
         name: '@',
         subName: '@',
         icon: '@',
         description: '@'
     },
-    controllerAs: 'ctrl',
-    controller: directiveController
-});
+};
 

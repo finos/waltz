@@ -11,7 +11,7 @@
  */
 
 export default (module) => {
-    module.directive('waltzBasicInfoTile', require('./basic-info-tile'));
+
     module.directive('waltzChangeTimeline', require('./change-timeline'));
     module.directive('waltzDataExtractLink', require('./data-extract-link'));
     module.directive('waltzInlineEditArea', require('./inline-edit-area'));
@@ -33,6 +33,7 @@ export default (module) => {
     module.directive('waltzYqSelect', require('./yq-select'));
 
     module
+        .component('waltzBasicInfoTile', require('./basic-info-tile'))
         .component('waltzIcon', require('./icon'))
         .component('waltzEditableField', require('./editable-field'))
         .component('waltzPageHeader', require('./page-header'))
