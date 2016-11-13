@@ -26,6 +26,7 @@ const initialState = {
         outgoing: []
     },
     specification: null,
+    tour: []
 };
 
 
@@ -172,6 +173,35 @@ function navigateToLastView($state, historyStore) {
 }
 
 
+function preparePopover(flowAndSpec) {
+    return `
+            <div class="small">
+                <table class="table small table-condensed">
+                    <tr>
+                        <th>Format</th>
+                        <td><span>${flowAndSpec.specification.format}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Transport</th>
+                        <td><span>${flowAndSpec.flow.transport}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Frequency</th>
+                        <td><span>${flowAndSpec.flow.frequency}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Basis Offset</th>
+                        <td><span>${flowAndSpec.flow.basisOffset}</span></td>
+                    </tr>
+                </table>
+                <div class="text-muted">
+                    ${flowAndSpec.description || ""}
+                </div>
+            </div>
+        `;
+}
+
+
 function controller($q,
                     $scope,
                     $state,
@@ -181,7 +211,8 @@ function controller($q,
                     notification,
                     physicalFlowLineageStore,
                     physicalSpecificationStore,
-                    physicalFlowStore)
+                    physicalFlowStore,
+                    tourService)
 {
     const vm = initialiseData(this, initialState);
 
@@ -204,33 +235,7 @@ function controller($q,
         };
     };
 
-    vm.preparePopover = (d) => {
-        return `
-            <div class="small">
-                <table class="table small table-condensed">
-                    <tr>
-                        <th>Format</th>
-                        <td><span>${d.specification.format}</span></td>
-                    </tr>
-                    <tr>
-                        <th>Transport</th>
-                        <td><span>${d.flow.transport}</span></td>
-                    </tr>
-                    <tr>
-                        <th>Frequency</th>
-                        <td><span>${d.flow.frequency}</span></td>
-                    </tr>
-                    <tr>
-                        <th>Basis Offset</th>
-                        <td><span>${d.flow.basisOffset}</span></td>
-                    </tr>
-                </table>
-                <div class="text-muted">
-                    ${d.description || ""}
-                </div>
-            </div>
-        `;
-    };
+    vm.preparePopover = preparePopover;
 
     // -- LOAD ---
 
@@ -272,6 +277,8 @@ function controller($q,
                     (d) => $scope.$applyAsync(() => vm.selectEntity(d)))
             };
         })
+        .then(() => tourService.initialiseForKey('main.physical-flow.view', true))
+        .then(tour => vm.tour = tour)
         .then(() => addToHistory(historyStore, vm.physicalFlow, vm.specification));
 
     physicalFlowLineageStore
@@ -344,7 +351,8 @@ controller.$inject = [
     'Notification',
     'PhysicalFlowLineageStore',
     'PhysicalSpecificationStore',
-    'PhysicalFlowStore'
+    'PhysicalFlowStore',
+    'TourService'
 ];
 
 
