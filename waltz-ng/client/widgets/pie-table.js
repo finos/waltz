@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-const BINDINGS = {
+const bindings = {
     data: '<',
     config: '<',
     title: '@',
@@ -11,12 +11,11 @@ const BINDINGS = {
 
 const MAX_PIE_SEGMENTS = 5;
 
-function controller($scope) {
+function controller() {
 
     const vm = this;
 
-    const dataChanged = (data) => {
-        if (!data) return;
+    const dataChanged = (data = []) => {
         vm.total = _.sumBy(data, 'count');
 
         if (data.length > MAX_PIE_SEGMENTS) {
@@ -36,26 +35,20 @@ function controller($scope) {
 
     };
 
-    $scope.$watch(
-        'ctrl.data',
-        dataChanged);
+    vm.$onChanges = () => dataChanged(vm.data);
 
     vm.toDisplayName = (k) => vm.config.labelProvider
         ? vm.config.labelProvider(k)
         : k;
 }
 
-controller.$inject = ['$scope'];
 
 
-export default () => {
-    return {
-        restrict: 'E',
-        replace: true,
-        template: require('./pie-table.html'),
-        scope: {},
-        bindToController: BINDINGS,
-        controllerAs: 'ctrl',
-        controller
-    };
+const component = {
+    template: require('./pie-table.html'),
+    bindings,
+    controller
 };
+
+
+export default component;
