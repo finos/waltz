@@ -43,14 +43,6 @@ function logHistory(capability, historyStore) {
 }
 
 
-function processApps(groupedApps = { primaryApps: [], secondaryApps: []}) {
-    const primaryApps = _.map(groupedApps.primaryApps, a => _.assign(a, {management: 'IT'}));
-    const secondaryApps = _.map(groupedApps.secondaryApps, a => _.assign(a, {management: 'IT'}));
-
-    return _.union(primaryApps, secondaryApps);
-}
-
-
 function controller($q,
                     $scope,
                     $stateParams,
@@ -92,9 +84,9 @@ function controller($q,
     // -- LOADERS --
 
     const wave1 = () => {
-        const appPromise = appCapabilityStore
-            .findApplicationsByCapabilityId(capId)
-            .then(processApps)
+
+        const appPromise = applicationStore
+            .findBySelector(appIdSelector)
             .then(apps => vm.apps = apps);
 
         const appCapPromise = appCapabilityStore
@@ -109,7 +101,14 @@ function controller($q,
             .findBySelector(capability.id, 'CAPABILITY', 'CHILDREN')
             .then(complexity => vm.complexity = complexity);
 
-        return $q.all([appPromise, appCapPromise, costPromise, complexityPromise]);
+        const promises = [
+            appPromise,
+            appCapPromise,
+            costPromise,
+            complexityPromise
+        ];
+
+        return $q.all(promises);
     };
 
 
@@ -123,7 +122,12 @@ function controller($q,
             .then(techStats => vm.techStats = techStats);
 
 
-        return $q.all([flowPromise, techPromise]);
+        const promises = [
+            flowPromise,
+            techPromise
+        ];
+
+        return $q.all(promises);
     };
 
 
@@ -136,13 +140,19 @@ function controller($q,
             .findLineageReportsBySelector(appIdSelector)
             .then(lineageReports => vm.lineageReports = lineageReports);
 
-        return $q.all([statPromise, physFlowPromise]);
+        const promises = [
+            statPromise,
+            physFlowPromise
+        ];
+
+        return $q.all(promises);
 
     };
 
     const wave4 = () => {
 
-        appCapabilityStore.findAssociatedApplicationCapabilitiesByCapabilityId(capability.id)
+        const associatedCapabilitiesPromise = appCapabilityStore
+            .findAssociatedApplicationCapabilitiesByCapabilityId(capability.id)
             .then(assocAppCaps => {
                 const capabilitiesById = _.keyBy(capabilities, 'id');
                 const associatedAppIds = _.map(assocAppCaps, 'applicationId');
@@ -163,21 +173,31 @@ function controller($q,
                     .then(associatedCapabilities => vm.associatedCapabilities = associatedCapabilities);
             });
 
-        bookmarkStore
+        const bookmarkPromise = bookmarkStore
             .findByParent({ id: capId, kind: 'CAPABILITY'})
             .then(bookmarks => vm.bookmarks = bookmarks);
 
-        tourService
+        const tourPromise = tourService
             .initialiseForKey('main.capability.view', true)
             .then(tour => vm.tour = tour);
 
-        sourceDataRatingStore
+        const sourceDataRatingsPromise = sourceDataRatingStore
             .findAll()
             .then(sourceDataRatings => vm.sourceDataRatings = sourceDataRatings);
 
-        processStore
+        const processPromise = processStore
             .findForCapability(capId)
             .then(ps => vm.processes = ps);
+
+        const promises = [
+            bookmarkPromise,
+            tourPromise,
+            sourceDataRatingsPromise,
+            processPromise,
+            associatedCapabilitiesPromise
+        ];
+
+        return $q.all(promises);
     };
 
 
