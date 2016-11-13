@@ -36,7 +36,7 @@
         <logback.version>1.1.7</logback.version>
         <pcollections.version>2.1.2</pcollections.version>
         <slf4j.version>1.7.20</slf4j.version>
-        <spark.version>2.5</spark.version>
+        <spark.version>2.5.2</spark.version>
         <spring.version>4.2.5.RELEASE</spring.version>
         <super-csv.version>2.3.1</super-csv.version>
         <maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
