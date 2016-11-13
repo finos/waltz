@@ -3,6 +3,7 @@
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.specification.name }}"
                        small="{{ ctrl.specification.owningEntity.name }} &rarr; {{ ctrl.physicalFlow.target.name }}"
+                       tour="ctrl.tour"
                        icon="qrcode">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
@@ -65,7 +66,6 @@
         <div ng-if="ctrl.lineage.length > 0">
 
             <!-- BOINGY -->
-
             <div class="row" >
                 <div class="col-sm-8"
                      style="border-right: 1px solid #eee;">
@@ -142,7 +142,6 @@
             <hr>
 
             <!-- TABLE -->
-
             <div class="row" >
                 <div class="col-sm-12">
                     <waltz-physical-flow-lineage-panel lineage="ctrl.lineage"
@@ -163,7 +162,6 @@
             </div>
         </div>
     </waltz-section>
-
 
 
     <!-- MENTIONS -->
