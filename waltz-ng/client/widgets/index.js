@@ -24,7 +24,6 @@ export default (module) => {
     module.directive('waltzMailTo', require('./mail-to'));
     module.directive('waltzOverlayPanel', require('./overlay-panel'));
     module.directive('waltzPhoneLink', require('./phone-link'));
-    module.directive('waltzPieTable', require('./pie-table'));
     module.directive('waltzRagIndicator', require('./rag-indicator'));
     module.directive('waltzSearch', require('./search'));
     module.directive('waltzSectionActions', require('./section-actions'));
@@ -38,6 +37,7 @@ export default (module) => {
         .component('waltzEditableField', require('./editable-field'))
         .component('waltzPageHeader', require('./page-header'))
         .component('waltzPie', require('./pie'))
+        .component('waltzPieTable', require('./pie-table'))
         .component('waltzPieSegmentTable', require('./pie-segment-table'))
         .component('waltzSimpleStackChart', require('./simple-stack-chart'))
         .component('waltzSection', require('./section'));

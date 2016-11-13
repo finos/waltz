@@ -1,15 +1,18 @@
 <div class="pie-table">
-    <waltz-basic-info-tile name="{{ ctrl.title }}"
-                           sub-name="{{ctrl.subTitle}}"
+    <waltz-basic-info-tile name="{{ $ctrl.title }}"
+                           sub-name="{{ $ctrl.subTitle }}"
                            description=""
-                           icon="{{ ctrl.icon }}">
-        <waltz-pie data="ctrl.pieData"
-                   config="ctrl.config">
+                           icon="{{ $ctrl.icon }}">
+
+        <waltz-pie data="$ctrl.pieData"
+                   style="display: inline-block; vertical-align: top; padding-right: 24px;"
+                   config="$ctrl.config">
         </waltz-pie>
 
-        <waltz-pie-segment-table data="ctrl.pieData"
-                                 selected-segment-key="ctrl.selectedSegmentKey"
-                                 config="ctrl.config">
+        <waltz-pie-segment-table data="$ctrl.pieData"
+                                 style="display: inline-block"
+                                 selected-segment-key="$ctrl.selectedSegmentKey"
+                                 config="$ctrl.config">
         </waltz-pie-segment-table>
 
     </waltz-basic-info-tile>
