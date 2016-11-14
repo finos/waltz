@@ -2,11 +2,11 @@ var path = require('path');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var Visualizer = require('webpack-visualizer-plugin');
-var GitRevisionPlugin = require('git-revision-webpack-plugin');
+var git = require('git-rev-sync');
+
 
 var basePath = path.resolve(__dirname);
 
-var gitRevisionPlugin = new GitRevisionPlugin();
 module.exports = {
     entry: './client/main.js',
     devtool: 'cheap-source-map',
@@ -23,7 +23,7 @@ module.exports = {
         }),
         new webpack.DefinePlugin({
             '__ENV__': JSON.stringify(process.env.BUILD_ENV || 'dev'),
-            '__REVISION__': JSON.stringify(gitRevisionPlugin.commithash()),
+            '__REVISION__': JSON.stringify(git.long()),
         }),
         new Visualizer()
     ],
