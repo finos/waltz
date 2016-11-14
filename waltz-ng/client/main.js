@@ -76,7 +76,3 @@ waltzApp.run([
     'UserAgentInfoStore',
     (userAgentStore) =>   userAgentStore.save()
 ]);
-
-console.log('REVISION?', __REVISION__);
-
-
