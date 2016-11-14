@@ -10,15 +10,15 @@
                     toggle-expansion="$ctrl.expand">
                 </waltz-twistie>
 
+                <span ng-click="$ctrl.expand(!$ctrl.collapsed)"
+                      class="clickable">
+                    <waltz-icon name="{{ $ctrl.icon }}"></waltz-icon>
+                    <span ng-bind="$ctrl.name"></span>
 
-
-                <waltz-icon name="{{ $ctrl.icon }}"></waltz-icon>
-                <span ng-bind="$ctrl.name"></span>
-
-                <small>
-                    <span ng-bind="$ctrl.small"></span>
-                </small>
-
+                    <small>
+                        <span ng-bind="$ctrl.small"></span>
+                    </small>
+                </span>
             </div>
 
         </div>
