@@ -1,3 +1,6 @@
+import _ from 'lodash';
+
+
 const BINDINGS = {
     clear: '=',
     search: '='
@@ -18,6 +21,7 @@ function controller() {
         vm.qry = '';
     };
 }
+
 
 controller.$inject = [];
 

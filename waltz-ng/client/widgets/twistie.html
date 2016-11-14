@@ -1,4 +1,4 @@
 <span class="small clickable text-muted">
-    <i class="fa fa-fw fa-{{ ctrl.collapsed == true ? 'chevron-right' : 'chevron-down'}}"
-                ng-click="ctrl.onClick()"/>
+    <i ng-class="$ctrl.clazz"
+       ng-click="$ctrl.onClick()"></i>
 </span>
