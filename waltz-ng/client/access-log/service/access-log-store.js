@@ -11,17 +11,27 @@
  *
  */
 
+import _ from 'lodash';
+
+
 function accessLogStore($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/access-log`;
 
     const write = (state, params) => {
-        const paramStr = _.isObject(params) ? JSON.stringify(params) : params;
+        const paramStr = _.isObject(params)
+            ? JSON.stringify(params)
+            : params;
 
-        $http.post(`${BASE}/${state}/${paramStr}`, null);
-
+        return $http
+            .post(`${BASE}/${state}/${paramStr}`, null)
+            .then(r => r.data);
     };
 
-    const findForUserName = (userName) => $http.get(`${BASE}/user/${userName}`).then(r => r.data);
+
+    const findForUserName = (userName) => $http
+        .get(`${BASE}/user/${userName}`)
+        .then(r => r.data);
+
 
     return {
         findForUserName,
@@ -29,6 +39,11 @@ function accessLogStore($http, BaseApiUrl) {
     };
 }
 
-accessLogStore.$inject = ['$http', 'BaseApiUrl'];
+
+accessLogStore.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
+
 
 export default accessLogStore;

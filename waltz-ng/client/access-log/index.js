@@ -18,14 +18,4 @@ export default (module) => {
 
     module.service('AccessLogStore', AccessLogStore);
 
-    module.run( ['$rootScope', 'AccessLogStore', ($rootScope, store) => {
-        $rootScope.$on(
-            '$stateChangeSuccess',
-            (event, toState, toParams /* fromState, fromParams */ ) => {
-                const { name } = toState;
-                store.write(name, toParams);
-            }
-        );
-    }]);
-
 };

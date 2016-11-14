@@ -76,5 +76,3 @@ waltzApp.run([
     'UserAgentInfoStore',
     (userAgentStore) =>   userAgentStore.save()
 ]);
-
-

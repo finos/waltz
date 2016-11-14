@@ -17,6 +17,8 @@
 
 package com.khartec.waltz.service;
 
+import com.khartec.waltz.model.ImmutableWaltzVersionInfo;
+import com.khartec.waltz.model.WaltzVersionInfo;
 import com.khartec.waltz.service.capability.CapabilityService;
 import com.khartec.waltz.service.jmx.CapabilitiesMaintenance;
 import com.khartec.waltz.service.jmx.PersonMaintenance;
@@ -40,7 +42,10 @@ import javax.sql.DataSource;
 @ComponentScan(value={"com.khartec.waltz"})
 @PropertySource(value = "classpath:waltz.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "file:${user.home}/.waltz/waltz.properties", ignoreResourceNotFound = true)
+@PropertySource(value = "classpath:version.properties", ignoreResourceNotFound = false)
 public class DIConfiguration {
+
+    // -- DATABASE ---
 
     private static final String JOOQ_DEBUG_PROPERTY = "jooq.debug.enabled";
 
@@ -66,6 +71,18 @@ public class DIConfiguration {
     private String dialect;
 
 
+    // -- BUILD ---
+
+    @Value("${build.pom}")
+    private String buildPom;
+
+    @Value("${build.date}")
+    private String buildDate;
+
+    @Value("${build.revision}")
+    private String buildRevision;
+
+
     @Bean
     public DataSource dataSource() {
 
@@ -77,6 +94,16 @@ public class DIConfiguration {
         dsConfig.setMaximumPoolSize(dbPoolMax);
         dsConfig.setMinimumIdle(dbPoolMin);
         return new HikariDataSource(dsConfig);
+    }
+
+
+    @Bean
+    public WaltzVersionInfo waltzBuildInfo() {
+        return ImmutableWaltzVersionInfo.builder()
+                .timestamp(buildDate)
+                .pomVersion(buildPom)
+                .revision(buildRevision)
+                .build();
     }
 
 
