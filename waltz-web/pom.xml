@@ -141,7 +141,7 @@
                             <outputDirectory>${basedir}/target/classes</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>src/main/resources</directory>
+                                    <directory>build</directory>
                                     <filtering>true</filtering>
                                 </resource>
                             </resources>

@@ -2,10 +2,11 @@ var path = require('path');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var Visualizer = require('webpack-visualizer-plugin');
+var GitRevisionPlugin = require('git-revision-webpack-plugin');
 
 var basePath = path.resolve(__dirname);
-var nodeModulesDir = path.resolve(__dirname, 'node_modules');
 
+var gitRevisionPlugin = new GitRevisionPlugin();
 module.exports = {
     entry: './client/main.js',
     devtool: 'cheap-source-map',
@@ -21,7 +22,8 @@ module.exports = {
             favicon: path.join(basePath, 'images', 'favicon.ico')
         }),
         new webpack.DefinePlugin({
-            __ENV__: JSON.stringify(process.env.BUILD_ENV || 'dev')
+            '__ENV__': JSON.stringify(process.env.BUILD_ENV || 'dev'),
+            '__REVISION__': JSON.stringify(gitRevisionPlugin.commithash()),
         }),
         new Visualizer()
     ],

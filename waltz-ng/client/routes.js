@@ -1,3 +1,5 @@
+// -- BASIC ROUTES ---
+
 function configureRoutes($stateProvider, $urlRouterProvider) {
 
     $urlRouterProvider.when('', '/home');
@@ -24,6 +26,8 @@ configureRoutes.$inject = [
 ];
 
 
+// -- SCROLLER ---
+
 function configureScrollToTopOnChange($rootScope, $doc) {
     $rootScope.$on('$stateChangeSuccess', () => {
         $doc[0].body.scrollTop = 0;
@@ -37,6 +41,8 @@ configureScrollToTopOnChange.$inject = [
     '$document'
 ];
 
+
+// -- NAG ---
 
 function configureBetaNagMessageNotification($rootScope,
                                              nagMessageService,
@@ -59,13 +65,50 @@ configureBetaNagMessageNotification.$inject = [
 ];
 
 
-function setup(module) {
-    module.config(configureRoutes);
-    module
-        .run(configureScrollToTopOnChange)
-        .run(configureBetaNagMessageNotification);
+// -- STATE CHANGE ---
+
+function configureStateChangeListener($rootScope, $window, accessLogStore) {
+    $rootScope.$on(
+        '$stateChangeSuccess',
+        (event, toState, toParams /* fromState, fromParams */ ) => {
+            const {name} = toState;
+            const infoPromise = accessLogStore.write(name, toParams);
+
+            if (__ENV__ === 'prod') {
+                infoPromise.then(info => {
+                    if (info.revision != __REVISION__) {
+                        console.log(
+                            'Waltz reloading as server reported version does not match client. Server:',
+                            info,
+                            "client: ",
+                            __REVISION__);
+                        $window.location.reload()
+                    }
+                })
+
+            }
+        }
+    );
 }
 
+
+configureStateChangeListener.$inject = [
+    '$rootScope',
+    '$window',
+    'AccessLogStore'
+];
+
+
+// -- SETUP ---
+
+function setup(module) {
+    module
+        .config(configureRoutes)
+        .run(configureScrollToTopOnChange)
+        .run(configureBetaNagMessageNotification)
+        .run(configureStateChangeListener);
+
+}
 
 
 export default setup;
