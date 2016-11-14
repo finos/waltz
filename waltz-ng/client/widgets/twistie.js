@@ -27,26 +27,43 @@ const initialState = {
 };
 
 
+function calcClassNames(collapsed = false) {
+    const iconName = collapsed
+        ? 'chevron-right'
+        : 'chevron-down';
+
+    return [
+        'fa',
+        'fa-fw',
+        `fa-${ iconName }`
+    ];
+}
+
+
 function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.onClick = () => {
         vm.collapsed = ! vm.collapsed;
-        if(vm.toggleExpansion) {
+        if (vm.toggleExpansion) {
             vm.toggleExpansion(vm.collapsed);
         }
     };
+
+    vm.$onChanges = () => {
+        vm.clazz = calcClassNames(vm.collapsed);
+    };
+
 }
 
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
-    scope: {},
-    bindToController: bindings,
-    controllerAs: 'ctrl',
+const component = {
+    bindings,
     controller,
     template
-});
+};
+
+
+export default component;
 
 
