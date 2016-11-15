@@ -55,12 +55,17 @@
                     Select the relevant flows to describe lineage
                 </p>
 
+                <waltz-loading-notification show="ctrl.searchResults.loading"
+                                            name="Loading Flows">
+                </waltz-loading-notification>
+
                 <waltz-lineage-candidate-editor logical-flows="ctrl.searchResults.logicalFlows"
                                                 physical-flows="ctrl.searchResults.physicalFlows"
                                                 specifications="ctrl.searchResults.specifications"
                                                 current-lineage="ctrl.lineage"
                                                 on-add="ctrl.addPhysicalFlow"
-                                                on-refocus="ctrl.doSearch">
+                                                on-refocus="ctrl.doSearch"
+                                                ng-if="! ctrl.searchResults.loading">
                     <empty><h5>Nothing available</h5></empty>
                 </waltz-lineage-candidate-editor>
 
