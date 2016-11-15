@@ -13,7 +13,6 @@
 export default (module) => {
 
     module.directive('waltzChangeTimeline', require('./change-timeline'));
-    module.directive('waltzDataExtractLink', require('./data-extract-link'));
     module.directive('waltzInlineEditArea', require('./inline-edit-area'));
     module.directive('waltzErrorAlert', require('./error-alert'));
     module.directive('waltzExternalLink', require('./external-link'));
@@ -32,14 +31,15 @@ export default (module) => {
     module.directive('waltzYqSelect', require('./yq-select'));
     module
         .component('waltzBasicInfoTile', require('./basic-info-tile'))
-        .component('waltzIcon', require('./icon'))
+        .component('waltzDataExtractLink', require('./data-extract-link'))
         .component('waltzEditableField', require('./editable-field'))
+        .component('waltzIcon', require('./icon'))
         .component('waltzPageHeader', require('./page-header'))
         .component('waltzPie', require('./pie'))
-        .component('waltzPieTable', require('./pie-table'))
         .component('waltzPieSegmentTable', require('./pie-segment-table'))
-        .component('waltzSimpleStackChart', require('./simple-stack-chart'))
+        .component('waltzPieTable', require('./pie-table'))
         .component('waltzSection', require('./section'))
+        .component('waltzSimpleStackChart', require('./simple-stack-chart'))
         .component('waltzTwistie', require('./twistie'));
 
 

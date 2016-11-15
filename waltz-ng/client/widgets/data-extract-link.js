@@ -10,19 +10,34 @@
  *
  */
 
+const template = require('./data-extract-link.html');
 
-export default [
-    'BaseExtractUrl',
-    (BaseExtractUrl) => ({
-        restrict: 'E',
-        replace: true,
-        scope: {
-            name: '@',
-            extract: '@'
-        },
-        template: require('./data-extract-link.html'),
-        link: (scope) => {
-            scope.url = `${BaseExtractUrl}/${scope.extract}`;
-        }
-    })
+
+const bindings = {
+    name: '@',
+    extract: '@'
+};
+
+
+function controller(BaseExtractUrl) {
+    const vm = this;
+
+    vm.$onChanges = () => {
+        vm.url = `${BaseExtractUrl}/${vm.extract}`;
+    };
+}
+
+
+controller.$inject = [
+    'BaseExtractUrl'
 ];
+
+
+const component = {
+    bindings,
+    controller,
+    template
+};
+
+
+export default component;
