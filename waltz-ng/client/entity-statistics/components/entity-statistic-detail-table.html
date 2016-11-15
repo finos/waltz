@@ -1,0 +1,22 @@
+<div>
+    <div style="font-size: smaller; height: 300px"
+         ui-grid-exporter
+         ui-grid-resize-columns
+         ui-grid="$ctrl.gridOptions">
+    </div>
+
+    <div style="padding-top:6px;">
+        <a ng-click="$ctrl.exportData()"
+           class="small clickable pull-right"
+           style="text-decoration: none;"
+           role="button">
+            <waltz-icon name="download"></waltz-icon>
+            Export
+        </a>
+        <span class="small text-muted pull-right">
+            <strong>Updated:</strong>
+            <waltz-from-now timestamp="$ctrl.lastUpdatedAt"></waltz-from-now>,
+            &nbsp;
+        </span>
+    </div>
+</div>

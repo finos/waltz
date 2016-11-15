@@ -16,15 +16,9 @@
     </div>
     <div class="row"
          style="padding-bottom: 12px">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <span class="small text-muted"
                  ng-bind="$ctrl.definition.description">
-            </span>
-        </div>
-        <div class="col-md-3 col-md-offset-1">
-            <span class="small text-muted">
-                <strong>Updated:</strong>
-                <waltz-from-now timestamp="$ctrl.lastUpdatedAt"></waltz-from-now>
             </span>
         </div>
     </div>
@@ -33,6 +27,7 @@
                                          statistic-definition='$ctrl.definition'
                                          filter-outcome="$ctrl.selectedPieSegment.key"
                                          applications="$ctrl.applications"
+                                         last-updated-at="$ctrl.lastUpdatedAt"
                                          ng-if="$ctrl.values.length > 0">
     </waltz-entity-statistic-detail-table>
 </div>
