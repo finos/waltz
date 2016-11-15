@@ -6,7 +6,8 @@
                        small="{{ ctrl.app.assetCode }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li>Waltz</li>
+            <li>Applications</li>
+            <li><span ng-bind="ctrl.app.name"></span></li>
         </ol>
     </waltz-page-header>
 
@@ -54,7 +55,7 @@
         <waltz-section-actions>
             <a waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
                ng-if="ctrl.dataTab == 0"
-               ui-sref='main.logical-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'
+               ui-sref='main.logical-flow.edit ({ kind:"APPLICATION", id: ctrl.app.id })'
                class="btn btn-xs btn-primary">
                 Edit
             </a>
@@ -99,7 +100,7 @@
                             No flows or types
                         </strong>
                         registered for this application.  Add them
-                        <a ui-sref='main.logical-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>
+                        <a ui-sref='main.logical-flow.edit ({ kind:"APPLICATION", id: ctrl.app.id })'>
                             here.
                         </a>
                     </div>
@@ -115,7 +116,7 @@
                                     No Types
                                 </strong>
                                 registered for this application.  Add them
-                                <a ui-sref='main.logical-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>
+                                <a ui-sref='main.logical-flow.edit ({ kind:"APPLICATION", id: ctrl.app.id })'>
                                     here.
                                 </a>
                             </div>
@@ -136,7 +137,9 @@
                                     No Logical Data Flows
                                 </strong>
                                 registered for this application.  Add one
-                                <a ui-sref='main.logical-flow.edit ({kind:"APPLICATION", id: ctrl.app.id})'>here</a>.
+                                <a ui-sref='main.logical-flow.edit ({ kind:"APPLICATION", id: ctrl.app.id })'>
+                                    here
+                                </a>.
                             </div>
 
                             <div ng-if="ctrl.flows.length > 0">
@@ -213,7 +216,7 @@
                         <ul class="list-inline"
                             style="display: inline-block">
                             <li ng-repeat="source in sources">
-                                <a ui-sref="main.org-unit.view({id: source.parentReference.id})"
+                                <a ui-sref="main.org-unit.view({ id: source.parentReference.id })"
                                    ng-bind="ctrl.orgUnitsById[source.parentReference.id].name">
                                 </a>
                             </li>
