@@ -13,6 +13,7 @@ function setup(module) {
         .component('waltzLogicalFlowTypeEditor', require('./edit/logical-flow-type-editor'))
         .component('waltzLogicalFlowsTabgroup', require('./logical-flows-tabgroup/logical-flows-tabgroup'))
         .component('waltzLogicalFlowTable', require('./../components/logical-flow-table/logical-flow-table'))
+        .component('waltzFlowFilterOptionsOverlay', require('./filter-options-overlay/flow-filter-options-overlay'));
 
 }
 
