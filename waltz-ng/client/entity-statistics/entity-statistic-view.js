@@ -17,6 +17,7 @@ const initData = {
     selectedNavItem: null,
     parentStateRef: '.',
     history: [],
+    duration: 'MONTH',
     visibility: {
         related: false
     }
@@ -78,6 +79,18 @@ function controller($q,
         vm.history = [];
     }
 
+    function loadHistory() {
+        const selector = {
+            scope: 'CHILDREN',
+            entityReference: vm.parentRef
+        };
+
+        entityStatisticStore
+            .calculateHistoricStatTally(vm.statistic.definition, selector, vm.duration)
+            .then(h => vm.history = mkHistory(h, vm.statistic.summary));
+    }
+
+
     vm.onSelectNavItem = (navItem) => {
         resetValueData();
 
@@ -119,9 +132,7 @@ function controller($q,
             .findBySelector(selector)
             .then(apps => vm.applications = apps);
 
-        entityStatisticStore
-            .calculateHistoricStatTally(vm.statistic.definition, selector)
-            .then(h => vm.history = mkHistory(h, vm.statistic.summary));
+        loadHistory();
 
         updateUrlWithoutReload($state, navItem);
     };
@@ -135,6 +146,11 @@ function controller($q,
         const navId = vm.selectedNavItem.id;
         $state.go(stateName, { id: navId });
     };
+
+    vm.onChangeDuration = (d) => {
+        vm.duration = d;
+        loadHistory();
+    }
 }
 
 

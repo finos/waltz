@@ -4,6 +4,14 @@
         <waltz-entity-statistic-history-chart options='$ctrl.options'
                                               points="$ctrl.points">
         </waltz-entity-statistic-history-chart>
+
+
+        <div style="text-align: center">
+            Period:
+            <waltz-duration-selector duration="$ctrl.duration"
+                                     on-change="$ctrl.onChangeDuration">
+            </waltz-duration-selector>
+        </div>
     </div>
     <div class="col-sm-5">
         <div ng-if="$ctrl.selected">
@@ -20,7 +28,8 @@
                 <tr ng-repeat="row in $ctrl.selected.tallies | orderBy:'id'">
                     <td>
                         <waltz-icon name="square"
-                                    ng-style="$ctrl.styles[row.id]"></waltz-icon>
+                                    ng-style="$ctrl.styles[row.id]">
+                        </waltz-icon>
                     </td>
                     <td>
                         <span ng-bind="row.id"></span>

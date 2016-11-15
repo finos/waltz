@@ -13,30 +13,30 @@ import {checkIsEntityRef} from "../../common/checks";
 
 
 function store($http, BaseApiUrl) {
-    const BASE = `${BaseApiUrl}/entity-statistic`;
+    const BASE = `${ BaseApiUrl }/entity-statistic`;
 
     const findAllActiveDefinitions = (options) => $http
-        .get(`${BASE}/definition`)
+        .get(`${ BASE }/definition`)
         .then(r => r.data);
 
     const findStatDefinition = (id) => $http
-        .get(`${BASE}/definition/${id}`)
+        .get(`${ BASE }/definition/${ id }`)
         .then(r => r.data);
 
     const findStatsForEntity = (entityRef) => {
         checkIsEntityRef(entityRef);
 
         return $http
-            .get(`${BASE}/${entityRef.kind}/${entityRef.id}`)
+            .get(`${ BASE }/${ entityRef.kind }/${ entityRef.id }`)
             .then(r => r.data);
     };
 
     const findStatValuesByIdSelector = (statId, options) => $http
-        .post(`${BASE}/value/${statId}`, options)
+        .post(`${ BASE }/value/${ statId }`, options)
         .then(r => r.data);
 
     const findRelatedStatDefinitions = (statId) => $http
-        .get(`${BASE}/definition/${statId}/related`)
+        .get(`${ BASE }/definition/${ statId }/related`)
         .then(r => r.data);
 
     const findStatTallies = (statisticIds = [], selector) => {
@@ -46,22 +46,22 @@ function store($http, BaseApiUrl) {
         };
 
         return $http
-            .post(`${BASE}/tally`, options)
+            .post(`${ BASE }/tally`, options)
             .then(r => r.data);
     };
 
     const calculateStatTally = (definition, selector) => {
         return $http
-            .post(`${BASE}/tally/${definition.id}/${definition.rollupKind}`, selector)
+            .post(`${ BASE }/tally/${ definition.id }/${ definition.rollupKind }`, selector)
             .then(r => r.data);
     };
 
-    const calculateHistoricStatTally = (definition, selector) => {
+    const calculateHistoricStatTally = (definition, selector, duration = 'MONTH') => {
         return $http
             .post(
-                `${BASE}/tally/historic/${definition.id}/${definition.rollupKind}`,
+                `${ BASE }/tally/historic/${ definition.id }/${ definition.rollupKind }`,
                 selector,
-                { params: { duration:'MONTH' } })
+                { params: { duration } })
             .then(r => r.data);
     };
 
