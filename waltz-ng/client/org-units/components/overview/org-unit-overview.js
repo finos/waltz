@@ -24,7 +24,7 @@ const bindings = {
     costs: '<',
     immediateHierarchy: '<',
     flows: '<',
-    ratings: '<',
+    appCapabilities: '<',
     serverStats: '<',
     orgUnit: '<',
     loadOrgUnitDescendants: '<'
@@ -35,13 +35,13 @@ const template = require('./org-unit-overview.html');
 
 
 
-function calcCapabilityStats(ratings = []) {
-    const caps = _.chain(ratings)
+function calcCapabilityStats(appCapabilities = []) {
+    const caps = _.chain(appCapabilities)
         .uniqBy(c => c.capabilityId)
         .value();
 
-    const appCount = _.chain(ratings)
-        .map('parent.id')
+    const appCount = _.chain(appCapabilities)
+        .map('applicationId')
         .uniq()
         .value()
         .length;
@@ -84,7 +84,7 @@ function controller() {
         vm.portfolioCostStr = calcPortfolioCost(vm.costs);
         vm.enrichedServerStats = enrichServerStats(vm.serverStats);
         vm.descendantsTree = buildTree(vm.orgUnitDescendants, vm.orgUnit);
-        vm.capabilityStats = calcCapabilityStats(vm.ratings);
+        vm.capabilityStats = calcCapabilityStats(vm.appCapabilities);
     };
 }
 
