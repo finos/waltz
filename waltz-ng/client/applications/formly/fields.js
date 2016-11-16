@@ -1,3 +1,7 @@
+import {
+    applicationKindDisplayNames,
+    lifecyclePhaseDisplayNames,
+    toOptions} from  '../../common/services/display_names';
 
 export const nameField = {
     type: 'input',
@@ -63,7 +67,7 @@ export const typeField = {
     templateOptions: {
         valueProp: 'code',
         labelProp: 'name',
-        options: [],
+        options: toOptions(applicationKindDisplayNames),
         label: 'Type',
         placeholder: 'Type of application',
         required: true
@@ -77,7 +81,7 @@ export const lifecyclePhaseField = {
     templateOptions: {
         valueProp: 'code',
         labelProp: 'name',
-        options: [],
+        options: toOptions(lifecyclePhaseDisplayNames),
         label: 'Current Lifecycle Phase',
         placeholder: '',
         required: true

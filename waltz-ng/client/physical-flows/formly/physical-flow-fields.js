@@ -1,10 +1,16 @@
+import {
+    toOptions,
+    frequencyKindNames,
+    transportKindNames} from '../../common/services/display_names';
+
+
 export const transportField = {
     type: 'select',
     key: 'transport',
     templateOptions: {
         valueProp: 'code',
         labelProp: 'name',
-        options: [],
+        options: toOptions(transportKindNames, true),
         label: 'Transport',
         placeholder: '',
         required: true
@@ -18,7 +24,7 @@ export const frequencyField = {
     templateOptions: {
         valueProp: 'code',
         labelProp: 'name',
-        options: [],
+        options: toOptions(frequencyKindNames, true),
         label: 'Frequency',
         placeholder: '',
         required: true

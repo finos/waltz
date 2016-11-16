@@ -47,6 +47,7 @@ export default class BaseLookupService {
     }
 
 
+    // @deprecated
     toOptions(type) {
         return _.chain(this.lookupsByType[type])
             .map((v, k) => ({ name: v, code: k}))
@@ -54,6 +55,7 @@ export default class BaseLookupService {
             .value();
     }
 
+    // @deprecated
     toGridOptions(type) {
         return _.map(this.lookupsByType[type], (v, k) => ({ label: v, value: k}));
     }

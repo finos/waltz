@@ -22,10 +22,8 @@ function setupTagAutoComplete(appStore) {
 }
 
 
-function setupDropDowns(orgUnits, displayNameService) {
+function setupDropDowns(orgUnits) {
     fields.orgUnitField.templateOptions.options = _.map(orgUnits, (u) => ({ name: u.name, code: u.id}));
-    fields.typeField.templateOptions.options = displayNameService.toOptions('applicationKind');
-    fields.lifecyclePhaseField.templateOptions.options = displayNameService.toOptions('lifecyclePhase');
 }
 
 
@@ -76,12 +74,11 @@ function controller(app,
                     tags,
                     aliases,
                     orgUnits,
-                    displayNameService,
                     appStore,
                     notification,
                     $state) {
 
-    setupDropDowns(orgUnits, displayNameService);
+    setupDropDowns(orgUnits);
     setupTagAutoComplete(appStore);
 
     const formModel = {
@@ -144,7 +141,6 @@ controller.$inject = [
     'tags',
     'aliases',
     'orgUnits',
-    'WaltzDisplayNameService',
     'ApplicationStore',
     'Notification',
     '$state'
