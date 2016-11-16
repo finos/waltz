@@ -31,8 +31,7 @@ import {
 
 const controller = function(applicationStore,
                             notification,
-                            orgUnitStore,
-                            waltzDisplayNameService ) {
+                            orgUnitStore) {
 
     let allOrgUnits = [];
 
@@ -42,10 +41,6 @@ const controller = function(applicationStore,
             allOrgUnits = units;
             orgUnitField.templateOptions.options = _.map(units, (u) => ({ name: u.name, code: u.id}));
         });
-
-
-    typeField.templateOptions.options = waltzDisplayNameService.toOptions('applicationKind');
-    lifecyclePhaseField.templateOptions.options = waltzDisplayNameService.toOptions('lifecyclePhase');
 
 
     const model = {
@@ -127,8 +122,7 @@ const controller = function(applicationStore,
 controller.$inject = [
     'ApplicationStore',
     'Notification',
-    'OrgUnitStore',
-    'WaltzDisplayNameService',
+    'OrgUnitStore'
 ];
 
 export default {

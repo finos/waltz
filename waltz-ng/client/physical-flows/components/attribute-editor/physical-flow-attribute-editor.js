@@ -41,11 +41,8 @@ function getBasisOffset(basisOffsetSelect, basisOffsetInput) {
 }
 
 
-function controller(waltzDisplayNameService) {
+function controller() {
     const vm = initialiseData(this, initialState);
-
-    transportField.templateOptions.options = waltzDisplayNameService.toOptions('transportKind');
-    frequencyField.templateOptions.options = waltzDisplayNameService.toOptions('frequencyKind');
 
     const fields = [
         {
@@ -96,9 +93,7 @@ function controller(waltzDisplayNameService) {
 }
 
 
-controller.$inject = [
-    'WaltzDisplayNameService'
-];
+controller.$inject = [];
 
 
 const component = {

@@ -1,3 +1,6 @@
+import _ from 'lodash';
+
+
 export const applicationKindDisplayNames = {
     CUSTOMISED: 'Customised',
     EUC: 'End User Computing',
@@ -151,14 +154,15 @@ export const endOfLifeStatusNames = {
 
 
 export const transportKindNames  = {
-    WEB: "Web",
     DATABASE_CONNECTION: "Database Connection",
-    MESSAGING: "Messaging",
-    RPC: "Remote Procedure Call",
+    EMAIL: "Email",
     FILE_TRANSPORT: "File Transport",
     FILE_SHARE: "File Share",
-    EMAIL: "Email",
-    OTHER: "Other"
+    MESSAGING: "Messaging",
+    OTHER: "Other",
+    RPC: "Remote Procedure Call",
+    WEB: "Web",
+    UNKNOWN: 'Unknown'
 };
 
 
@@ -171,16 +175,34 @@ export const frequencyKindNames  = {
     MONTHLY: "Monthly",
     QUARTERLY: "Quarterly",
     BIANUALLY: "Biannually",
-    YEARLY: "Yearly"
+    YEARLY: "Yearly",
+    UNKNOWN: 'Unknown'
 };
 
 
 export const dataFormatKindNames  = {
     BINARY: "Binary",
+    DATABASE: "Database",
     FLAT_FILE: "Flat File",
     JSON: "JSON",
+    OTHER: "Other",
+    UNKNOWN: 'Unknown',
     UNSTRUCTURED: "Unstructured",
-    DATABASE: "Database",
     XML: "XML",
-    OTHER: "Other"
 };
+
+
+export function toOptions(lookups = {}, excludeUnknown = false) {
+    return _.chain(lookups)
+        .map((v, k) => ({ name: v, code: k}))
+        .sortBy(o => o.name)
+        .reject(o => o.code === 'UNKNOWN' && excludeUnknown)
+        .value();
+}
+
+
+export function toGridOptions(lookups = {}) {
+    return _.map(
+        lookups,
+        (v, k) => ({ label: v, value: k}));
+}
