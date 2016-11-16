@@ -28,14 +28,14 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.serverStats.operatingSystemEndOfLifeStatus"
                                  config="$ctrl.pieConfig.endOfLifeStatus"
                                  title="By Operating System EOL Status">
                 </waltz-pie-table>
             </div>
 
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.serverStats.hardwareEndOfLifeStatus"
                                  config="$ctrl.pieConfig.endOfLifeStatus"
                                  title="By Hardware EOL Status">
@@ -43,54 +43,62 @@
             </div>
         </div>
     </div>
-    <div class="row"
-         ng-if="$ctrl.visibility.databases">
-        <h4 class="text-center">
-            <waltz-icon name="database">
-            </waltz-icon>
-            Databases
-        </h4>
-        <div class="col-sm-4">
-            <waltz-pie-table data="$ctrl.databaseStats.vendor"
-                             config="$ctrl.pieConfig.vendor"
-                             title="By Vendor">
-            </waltz-pie-table>
-        </div>
 
-        <div class="col-sm-4">
-            <waltz-pie-table data="$ctrl.databaseStats.environment"
-                             config="$ctrl.pieConfig.environment"
-                             title="By Environment">
-            </waltz-pie-table>
-        </div>
+    <div ng-if="$ctrl.visibility.databases"
+         style="border-top: 2px dotted #ddd;">
+        <div class="row"
+             style="padding-top: 8px;">
+            <h4 class="text-center">
+                <waltz-icon name="database">
+                </waltz-icon>
+                Databases
+            </h4>
+            <div class="col-sm-4">
+                <waltz-pie-table data="$ctrl.databaseStats.vendor"
+                                 config="$ctrl.pieConfig.vendor"
+                                 title="By Vendor">
+                </waltz-pie-table>
+            </div>
 
-        <div class="col-sm-4">
-            <waltz-pie-table data="$ctrl.databaseStats.endOfLifeStatus"
-                             config="$ctrl.pieConfig.endOfLifeStatus"
-                             title="By EOL Status">
-            </waltz-pie-table>
+            <div class="col-sm-4">
+                <waltz-pie-table data="$ctrl.databaseStats.environment"
+                                 config="$ctrl.pieConfig.environment"
+                                 title="By Environment">
+                </waltz-pie-table>
+            </div>
+
+            <div class="col-sm-4">
+                <waltz-pie-table data="$ctrl.databaseStats.endOfLifeStatus"
+                                 config="$ctrl.pieConfig.endOfLifeStatus"
+                                 title="By EOL Status">
+                </waltz-pie-table>
+            </div>
         </div>
     </div>
 
-    <div class="row"
-         ng-if="$ctrl.visibility.software">
-        <h4 class="text-center">
-            <waltz-icon name="leaf">
-            </waltz-icon>
-            Software
-        </h4>
-        <div class="col-sm-6">
-            <waltz-pie-table data="$ctrl.softwareStats.vendor"
-                             config="$ctrl.pieConfig.vendor"
-                             title="By Vendor">
-            </waltz-pie-table>
-        </div>
+    <div ng-if="$ctrl.visibility.databases"
+         style="border-top: 2px dotted #ddd;">
+        <div class="row"
+             style="padding-top: 8px;"
+             ng-if="$ctrl.visibility.software">
+            <h4 class="text-center">
+                <waltz-icon name="leaf">
+                </waltz-icon>
+                Software
+            </h4>
+            <div class="col-sm-6">
+                <waltz-pie-table data="$ctrl.softwareStats.vendor"
+                                 config="$ctrl.pieConfig.vendor"
+                                 title="By Vendor">
+                </waltz-pie-table>
+            </div>
 
-        <div class="col-sm-6">
-            <waltz-pie-table data="$ctrl.softwareStats.maturity"
-                             config="$ctrl.pieConfig.maturity"
-                             title="By Maturity">
-            </waltz-pie-table>
+            <div class="col-sm-6">
+                <waltz-pie-table data="$ctrl.softwareStats.maturity"
+                                 config="$ctrl.pieConfig.maturity"
+                                 title="By Maturity">
+                </waltz-pie-table>
+            </div>
         </div>
     </div>
 </div>

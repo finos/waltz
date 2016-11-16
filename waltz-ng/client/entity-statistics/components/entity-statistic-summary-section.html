@@ -6,16 +6,18 @@
         <div class="row"
              ng-if="$ctrl.definitions.length > 0">
             <div class="col-md-4">
-                <waltz-entity-statistic-tree definitions="$ctrl.definitions"
-                                             on-selection="$ctrl.onDefinitionSelection">
-                </waltz-entity-statistic-tree>
+                <div style="border-right: 2px solid #f9f9f9;">
+                    <waltz-entity-statistic-tree definitions="$ctrl.definitions"
+                                                 on-selection="$ctrl.onDefinitionSelection">
+                    </waltz-entity-statistic-tree>
 
-                <hr>
+                    <hr>
 
-                <div class="small text-muted waltz-paragraph">
-                    Various indicators are collected for applications.
-                    Use the tree control above to select one.  Click on it's
-                    'explore' link to see more about that indicator.
+                    <div class="small text-muted waltz-paragraph">
+                        Various indicators are collected for applications.
+                        Use the tree control above to select one.  Click on it's
+                        'explore' link to see more about that indicator.
+                    </div>
                 </div>
             </div>
 

@@ -18,14 +18,13 @@ import {
 } from "../../common/services/display_names";
 
 
-const BINDINGS = {
-    applications: '=',
+const bindings = {
+    applications: '<',
     csvName: '@?'
-
 };
 
 
-function controller(uiGridConstants, $scope, $animate) {
+function controller(uiGridConstants, $animate) {
 
     const vm = this;
 
@@ -50,17 +49,13 @@ function controller(uiGridConstants, $scope, $animate) {
                 enableColumnMenu: false,
                 enableFiltering: false,
                 width: 40,
-                cellTemplate: '<div class="ui-grid-cell-contents text-center"> <a class="clickable" ng-click="grid.appScope.ctrl.onAppSelect(row.entity)"> <waltz-icon name="info-circle" size="lg"></waltz-icon></a></div>'
-            },
-            {
+                cellTemplate: '<div class="ui-grid-cell-contents text-center"> \n    <a class="clickable" \n       ng-click="grid.appScope.$ctrl.onAppSelect(row.entity)"> \n        <waltz-icon name="info-circle" \n                    size="lg">\n        </waltz-icon>\n    </a>\n</div>'
+            }, {
                 field: 'name',
-                cellTemplate: '<div class="ui-grid-cell-contents">\n    <a ng-if="row.entity[\'management\'] == \'IT\'"\n       ui-sref="main.app.view ({ id: row.entity[\'id\'] })" ng-bind="COL_FIELD">\n    </a>\n    <span ng-if="row.entity[\'management\'] == \'End User\'" ng-bind="COL_FIELD"></span>\n</div>'
-            },
-            {
-                field: 'assetCode',
-                cellTemplatae: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD"></span></div>'
-            },
-            {
+                cellTemplate: '<div class="ui-grid-cell-contents" ng-switch="row.entity[\'management\']">\n    <span ng-switch-when="row.entity[\'management\'] == \'End User\'" \n          ng-bind="COL_FIELD">\n    </span>\n    <a ng-switch-default\n       ui-sref="main.app.view ({ id: row.entity[\'id\'] })" \n       ng-bind="COL_FIELD">\n    </a>\n</div>'
+            }, {
+                field: 'assetCode'
+            }, {
                 field: 'kind',
                 cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:\'applicationKind\'"></span></div>',
                 filter: {
@@ -74,8 +69,7 @@ function controller(uiGridConstants, $scope, $animate) {
                     type: uiGridConstants.filter.SELECT,
                     selectOptions: _.map(investmentRatingNames, (label, value) => ({ label, value }))
                 }
-            },
-            {
+            }, {
                 field: 'lifecyclePhase',
                 cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:\'lifecyclePhase\'"></span></span></div>',
                 filter: {
@@ -91,20 +85,21 @@ function controller(uiGridConstants, $scope, $animate) {
         vm.selectedApp = app;
     };
 
-    $scope.$watch('ctrl.applications', (apps) => vm.gridOptions.data = apps);
+    vm.$onChanges= () => vm.gridOptions.data = vm.applications || [];
 }
 
-controller.$inject = ['uiGridConstants', '$scope', '$animate'];
+
+controller.$inject = [
+    'uiGridConstants',
+    '$animate'
+];
 
 
-export default () => {
-    return {
-        restrict: 'E',
-        replace: true,
-        template: require('./app-table.html'),
-        scope: {},
-        bindToController: BINDINGS,
-        controllerAs: 'ctrl',
-        controller
-    };
+const component = {
+    template: require('./app-table.html'),
+    bindings,
+    controller
 };
+
+
+export default component;

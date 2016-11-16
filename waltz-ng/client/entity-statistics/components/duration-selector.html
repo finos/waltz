@@ -1,0 +1,10 @@
+<div class="btn-group btn-group-xs"
+     role="group"
+     aria-label="Duration Selector">
+    <button ng-repeat="option in $ctrl.options"
+            class="btn btn-default"
+            ng-class="{ 'active' : option.active }"
+            ng-click="$ctrl.onClick(option)"
+            ng-bind="option.name">
+    </button>
+</div>

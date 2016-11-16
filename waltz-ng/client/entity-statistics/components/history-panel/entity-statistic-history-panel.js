@@ -1,15 +1,23 @@
 import _ from 'lodash';
 import d3 from 'd3';
 import {variableScale} from '../../../common/colors';
+import {initialiseData} from '../../../common';
 
 
 const bindings = {
     history: '<',
-    definition: '<'
+    definition: '<',
+    duration: '<',
+    onChangeDuration: '<'
 };
 
 
 const template = require('./entity-statistic-history-panel.html');
+
+
+const initialState = {
+    duration: 'MONTH'
+};
 
 
 const dateFormatter = d3
@@ -76,10 +84,13 @@ function calcTotal(stats = { tallies: [] }) {
 
 
 function controller($scope, displayNameService) {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     const highlight = (d) => {
-        vm.options = Object.assign({}, vm.options, { highlightedDate: d });
+        vm.options = Object.assign(
+            {},
+            vm.options,
+            { highlightedDate: d });
         const relevantStats = findRelevantStats(vm.history, d);
         if (relevantStats) {
             vm.selected = relevantStats;
@@ -99,6 +110,7 @@ function controller($scope, displayNameService) {
         vm.styles = prepareStyles(vm.history);
         vm.statColumnName = lookupStatColumnName(displayNameService, vm.definition);
     };
+
 }
 
 

@@ -1,4 +1,5 @@
 import _ from "lodash";
+import moment from "moment";
 
 
 /**
@@ -13,51 +14,13 @@ import _ from "lodash";
 const bindings = {
     applications: '<',
     filterOutcome: '<',
+    lastUpdatedAt: '<',
     statisticDefinition: '<',
     statisticValues: '<'
 };
 
 
-function controller($animate, uiGridConstants) {
-    const vm = this;
-
-    vm.$onChanges = (change) => {
-        vm.gridOptions = setupGrid($animate, uiGridConstants, vm.statisticDefinition);
-
-        if (change.statisticValues) {
-            vm.gridOptions.data = vm.statisticValues || [];
-        }
-
-        if(change.filterOutcome) {
-            const tableOutcomeCell = vm.gridOptions.columnDefs[2];
-            tableOutcomeCell.filter.term = vm.filterOutcome;
-        }
-
-        if(change.applications) {
-            vm.appsById = _.keyBy(vm.applications, 'id');
-        }
-
-        if (vm.appsById && vm.statisticValues) {
-            _.each(vm.statisticValues, sv => sv.application = vm.appsById[sv.entity.id]);
-        }
-    };
-}
-
-
-controller.$inject = [
-    '$animate',
-    'uiGridConstants'
-];
-
-
-const template = "<div style=\"font-size: smaller; height: 300px\"\n     ui-grid-exporter\n     ui-grid-resize-columns\n     ui-grid=\"$ctrl.gridOptions\">\n</div>";
-
-
-const component = {
-    controller,
-    bindings,
-    template
-};
+const exportTimestampFormat = 'YYYY-MM-DD_HHmmss';
 
 
 const appNameCell = {
@@ -113,27 +76,91 @@ const dateCell = {
 };
 
 
-function setupGrid($animate, uiGridConstants, statisticDefinition) {
-    return {
-        enableGridMenu: true,
-        exporterCsvFilename: "stats.csv",
-        exporterMenuPdf: false,
-        enableSorting: true,
-        enableFiltering: true,
-        enableHorizontalScrollbar: uiGridConstants.scrollbars.NEVER,
-        onRegisterApi: (gridApi) => {
-            $animate.enabled(gridApi.grid.element, false);
-        },
-        columnDefs: [
-            appNameCell,
-            assetCodeCell,
-            outcomeCell(uiGridConstants),
-            valueCell(uiGridConstants, statisticDefinition),
-            reasonCell,
-            dateCell
-        ]
+function controller($animate,
+                    uiGridConstants,
+                    uiGridExporterConstants,
+                    uiGridExporterService) {
+    const vm = this;
+
+    vm.$onChanges = (change) => {
+        vm.gridOptions = setupGrid();
+
+        if (change.statisticValues) {
+            vm.gridOptions.data = vm.statisticValues || [];
+        }
+
+        if(change.filterOutcome) {
+            const tableOutcomeCell = vm.gridOptions.columnDefs[2];
+            tableOutcomeCell.filter.term = vm.filterOutcome;
+        }
+
+        if(change.applications) {
+            vm.appsById = _.keyBy(vm.applications, 'id');
+        }
+
+        if (vm.appsById && vm.statisticValues) {
+            _.each(vm.statisticValues, sv => sv.application = vm.appsById[sv.entity.id]);
+        }
+    };
+
+    const setupGrid = () => {
+        return {
+            enableGridMenu: false,
+            enableSorting: true,
+            enableFiltering: true,
+            enableHorizontalScrollbar: uiGridConstants.scrollbars.NEVER,
+            onRegisterApi: (gridApi) => {
+                $animate.enabled(gridApi.grid.element, false);
+                vm.gridApi = gridApi;
+            },
+            columnDefs: [
+                appNameCell,
+                assetCodeCell,
+                outcomeCell(uiGridConstants),
+                valueCell(uiGridConstants, vm.statisticDefinition),
+                reasonCell,
+                dateCell
+            ]
+        };
+    };
+
+    vm.exportData = () => {
+        const grid = vm.gridApi.grid;
+        const rowVisibility = uiGridExporterConstants.ALL;
+        const colVisibility = uiGridExporterConstants.ALL;
+        const exportDataSeparator = ',';
+        const fileName = vm.statisticDefinition.name + '_' + moment().format(exportTimestampFormat) + '.csv';
+
+        uiGridExporterService.loadAllDataIfNeeded(grid, rowVisibility, colVisibility)
+            .then(() => {
+                // prepare data
+                const exportColumnHeaders = uiGridExporterService.getColumnHeaders(grid, colVisibility);
+                const exportData = uiGridExporterService.getData(grid, rowVisibility, colVisibility);
+                const csvContent = uiGridExporterService.formatAsCsv(exportColumnHeaders, exportData, exportDataSeparator);
+
+                // trigger file download
+                uiGridExporterService.downloadFile(fileName, csvContent, false);
+            });
     };
 }
+
+
+controller.$inject = [
+    '$animate',
+    'uiGridConstants',
+    'uiGridExporterConstants',
+    'uiGridExporterService'
+];
+
+
+const template = require('./entity-statistic-detail-table.html');
+
+
+const component = {
+    controller,
+    bindings,
+    template
+};
 
 
 export default component;

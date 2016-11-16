@@ -28,7 +28,8 @@
                     Functions matrices can be useful in identifying hotspots of functionality within an organisation and the potential for application consolidation.
                 </blockquote>
 
-                <waltz-svg-diagrams diagrams="ctrl.diagrams" block-processor="ctrl.blockProcessor">
+                <waltz-svg-diagrams diagrams="ctrl.diagrams"
+                                    block-processor="ctrl.blockProcessor">
                 </waltz-svg-diagrams>
             </div>
 
@@ -43,6 +44,10 @@
                    small="All"
                    id="functions-section">
 
+        <waltz-section-actions>
+            <waltz-data-extract-link extract="capabilities">
+            </waltz-data-extract-link>
+        </waltz-section-actions>
 
         <ul class="list-unstyled"
             ng-show="ctrl.capabilityHierarchy.length > 0">
@@ -54,15 +59,10 @@
 
         <div class="alert alert-warning"
              ng-show="ctrl.capabilityHierarchy.length == 0">
-            <strong>No Functions</strong> have been defined within this system.
+            <strong>No Functions</strong>
+            have been defined within this system.
         </div>
 
-        <hr/>
-
-        <div class="alert alert-info">
-            <waltz-data-extract-link name="Download All"
-                                     extract="capabilities"></waltz-data-extract-link>
-        </div>
     </waltz-section>
 
 
