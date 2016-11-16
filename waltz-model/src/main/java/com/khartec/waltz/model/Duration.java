@@ -5,7 +5,9 @@ public enum Duration {
     DAY(1),
     WEEK(7),
     MONTH(31),
-    YEAR(365),
+    QUARTER(MONTH.numDays * 3),
+    HALF_YEAR(MONTH.numDays * 6),
+    YEAR(MONTH.numDays * 12),
     ALL(Integer.MAX_VALUE);
 
 
