@@ -350,7 +350,7 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
             'text-anchor': anchor,
             dx: textAdjustment
         })
-        .text(app => _.truncate(app.name, 26));
+        .text(app => _.truncate(app.name, { length: 26 }));
 
     labels
         .classed('wsat-hover', (d) => highlighted === d.id)

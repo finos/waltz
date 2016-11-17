@@ -29,7 +29,7 @@ export default class RatingRowLabels {
             .classed('no-text-select', true)
             .attr('transform', `translate(${width}, ${height / 1.6})`)
             .attr('text-anchor', 'end')
-            .text(d => _.truncate(d.subject.name, 26))
+            .text(d => _.truncate(d.subject.name, { length: 26 }))
             .call(this.tweaker.enter.bind(this.tweaker.enter));
     }
 }

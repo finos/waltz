@@ -99,7 +99,7 @@ function renderSummaries(container, data, dimensions, scales) {
     rowLabels
         .text((d) => {
             const arrow = data.collapsed ? RIGHT_ARROW : DOWN_ARROW;
-            return arrow + ' ' + _.truncate(d.name, 20);
+            return arrow + ' ' + _.truncate(d.name, { length: 20 });
         });
 
     const groupSummaryCells = container
