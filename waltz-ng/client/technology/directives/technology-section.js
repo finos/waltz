@@ -21,6 +21,9 @@ const FIELDS_TO_SEARCH = {
 const EOL_CELL_TEMPLATE = '<div class="ui-grid-cell-contents"> <waltz-icon ng-if="COL_FIELD" name="power-off"></waltz-icon></div>';
 
 
+const LIFECYCLE_STATUS_CELL_TEMPLATE = `<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:'lifecycleStatus'"></span></div>`;
+
+
 function mkBooleanColumnFilter(uiGridConstants) {
     return {
         type: uiGridConstants.filter.SELECT,
@@ -66,7 +69,7 @@ function prepareServerGridOptions($animate, uiGridConstants) {
             filter: mkBooleanColumnFilter(uiGridConstants),
             cellTemplate: '<div class="ui-grid-cell-contents"> <waltz-icon ng-if="COL_FIELD" name="check"></waltz-icon></div>'
         },
-        { field: 'operatingSystem' },
+        { field: 'operatingSystem', displayName: 'OS' },
         { field: 'operatingSystemVersion', displayName: 'Version' },
         { field: 'location' },
         { field: 'country' },
@@ -85,7 +88,12 @@ function prepareServerGridOptions($animate, uiGridConstants) {
             filter: mkBooleanColumnFilter(uiGridConstants),
             cellTemplate: EOL_CELL_TEMPLATE
         },
-        { field: 'operatingSystemEndOfLifeDate', displayName: 'OS EOL On' }
+        { field: 'operatingSystemEndOfLifeDate', displayName: 'OS EOL On' },
+        {
+            field: 'lifecycleStatus',
+            displayName: 'Lifecycle',
+            cellTemplate: LIFECYCLE_STATUS_CELL_TEMPLATE
+        }
     ];
 
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "server.csv");
@@ -112,7 +120,12 @@ function prepareDatabaseGridOptions($animate, uiGridConstants) {
             filter: mkBooleanColumnFilter(uiGridConstants),
             cellTemplate: EOL_CELL_TEMPLATE
         },
-        { field: 'endOfLifeDate', displayName: 'EOL On' }
+        { field: 'endOfLifeDate', displayName: 'EOL On' },
+        {
+            field: 'lifecycleStatus',
+            displayName: 'Lifecycle',
+            cellTemplate: LIFECYCLE_STATUS_CELL_TEMPLATE
+        }
     ];
 
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "database.csv");

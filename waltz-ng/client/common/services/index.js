@@ -26,6 +26,7 @@ import {
     entityStatisticCategoryDisplayNames,
     investmentRatingNames,
     lifecyclePhaseDisplayNames,
+    lifecycleStatusNames,
     orgUnitKindNames,
     rollupKindNames,
     severityNames,
@@ -67,6 +68,7 @@ export default (module) => {
     displayNameService.register('entityStatistic', entityStatisticCategoryDisplayNames);
     displayNameService.register('investmentRating', investmentRatingNames);
     displayNameService.register('lifecyclePhase', lifecyclePhaseDisplayNames);
+    displayNameService.register('lifecycleStatus', lifecycleStatusNames);
     displayNameService.register('orgUnitKind', orgUnitKindNames);
     displayNameService.register('rating', authSourceRatingNames);
     displayNameService.register('rollupKind', rollupKindNames);

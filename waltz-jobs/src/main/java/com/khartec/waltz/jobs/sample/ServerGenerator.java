@@ -19,6 +19,7 @@ package com.khartec.waltz.jobs.sample;
 
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.server_information.ServerInformationDao;
+import com.khartec.waltz.model.LifecycleStatus;
 import com.khartec.waltz.model.server_information.ImmutableServerInformation;
 import com.khartec.waltz.model.server_information.ServerInformation;
 import com.khartec.waltz.service.DIConfiguration;
@@ -80,6 +81,7 @@ public class ServerGenerator {
                                                 : null)
                                 .virtual(isCommonHost || rnd.nextInt(10) > 7)
                                 .provenance("RANDOM_GENERATOR")
+                                .lifecycleStatus(randomPick(LifecycleStatus.values()))
                                 .build());
                 });
 

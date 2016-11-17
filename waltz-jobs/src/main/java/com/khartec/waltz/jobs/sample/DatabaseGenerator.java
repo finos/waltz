@@ -2,6 +2,7 @@ package com.khartec.waltz.jobs.sample;
 
 import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.jobs.sample.software_packages.DatabaseSoftwarePackages;
+import com.khartec.waltz.model.LifecycleStatus;
 import com.khartec.waltz.model.software_catalog.SoftwarePackage;
 import com.khartec.waltz.schema.tables.records.DatabaseInformationRecord;
 import com.khartec.waltz.service.DIConfiguration;
@@ -50,6 +51,7 @@ public class DatabaseGenerator {
                 databaseRecord.setExternalId("ext_" + i + "_" +j);
                 databaseRecord.setProvenance("RANDOM_GENERATOR");
                 databaseRecord.setAssetCode(randomPick(codes));
+                databaseRecord.setLifecycleStatus(ArrayUtilities.randomPick(LifecycleStatus.values()).toString());
                 databaseRecord.setEndOfLifeDate(
                         rnd.nextInt(10) > 5
                             ? Date.valueOf(LocalDate.now().plusMonths(rnd.nextInt(12 * 6) - (12 * 3)))
@@ -76,6 +78,7 @@ public class DatabaseGenerator {
             databaseRecord.setExternalId("ext_ref_data");
             databaseRecord.setProvenance("RANDOM_GENERATOR");
             databaseRecord.setAssetCode(randomPick(codes));
+            databaseRecord.setLifecycleStatus(ArrayUtilities.randomPick(LifecycleStatus.values()).toString());
             databaseRecord.setEndOfLifeDate(
                     dupDbEolDate);
 

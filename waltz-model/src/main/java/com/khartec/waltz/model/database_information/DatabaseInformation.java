@@ -20,10 +20,10 @@ public abstract class DatabaseInformation implements
     public abstract String databaseName();
     public abstract String instanceName();
     public abstract String environment();
-
     public abstract String dbmsName();
     public abstract String dbmsVersion();
     public abstract String dbmsVendor();
+    public abstract LifecycleStatus lifecycleStatus();
 
 
     @Nullable
