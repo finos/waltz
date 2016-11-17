@@ -21,9 +21,6 @@ const FIELDS_TO_SEARCH = {
 const EOL_CELL_TEMPLATE = '<div class="ui-grid-cell-contents"> <waltz-icon ng-if="COL_FIELD" name="power-off"></waltz-icon></div>';
 
 
-const LIFECYCLE_STATUS_CELL_TEMPLATE = `<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:'lifecycleStatus'"></span></div>`;
-
-
 function mkBooleanColumnFilter(uiGridConstants) {
     return {
         type: uiGridConstants.filter.SELECT,
@@ -92,7 +89,7 @@ function prepareServerGridOptions($animate, uiGridConstants) {
         {
             field: 'lifecycleStatus',
             displayName: 'Lifecycle',
-            cellTemplate: LIFECYCLE_STATUS_CELL_TEMPLATE
+            cellFilter: "toDisplayName:'lifecycleStatus'"
         }
     ];
 
@@ -124,7 +121,7 @@ function prepareDatabaseGridOptions($animate, uiGridConstants) {
         {
             field: 'lifecycleStatus',
             displayName: 'Lifecycle',
-            cellTemplate: LIFECYCLE_STATUS_CELL_TEMPLATE
+            cellFilter: "toDisplayName:'lifecycleStatus'"
         }
     ];
 
