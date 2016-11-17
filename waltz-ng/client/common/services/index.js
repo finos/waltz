@@ -88,7 +88,7 @@ export default (module) => {
 
 
     function runner(dataTypeService,
-                    actorService) {
+                    involvementKindService) {
         dataTypeService
             .loadDataTypes()
             .then(results => {
@@ -102,8 +102,8 @@ export default (module) => {
                 descriptionService.register('dataType', _.mapValues(indexedById, 'description'));
             });
 
-        actorService
-            .loadActors()
+        involvementKindService
+            .loadInvolvementKinds()
             .then(results => {
                 const indexedById = _.keyBy(results, 'id');
                 displayNameService.register('involvementKind', _.mapValues(indexedById, 'name'));
@@ -113,7 +113,7 @@ export default (module) => {
 
     runner.$inject = [
         'DataTypeService',
-        'ActorService'
+        'InvolvementKindService'
     ];
 
     module.run(runner);

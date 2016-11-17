@@ -41,6 +41,12 @@ const actorsState = {
 };
 
 
+const involvementKindsState = {
+    url: '/involvement-kinds',
+    views: { 'content@': require('./involvement-kinds-view') }
+};
+
+
 function setupRoutes($stateProvider) {
     $stateProvider
         .state('main.system', baseState)
@@ -49,8 +55,10 @@ function setupRoutes($stateProvider) {
         .state('main.system.hierarchies', hierarchiesState)
         .state('main.system.orphans', orphansState)
         .state('main.system.actors', actorsState)
+        .state('main.system.involvementKinds', involvementKindsState)
         .state('main.system.recalculate', recalculateState);
 }
+
 
 setupRoutes.$inject = ['$stateProvider'];
 

@@ -3458,9 +3458,25 @@
     </changeSet>
 
 
-    <!-- 924: Split Actor into Involvement Kind and Actor -->
-    <changeSet id="20161111-924-1"
-               author="kamransaleem">
+    <!-- 942: Split Actor into Involvement Kind and Actor -->
+    <changeSet id="20161111-942-1"
+               author="kamransaleem"
+               dbms="mysql">
+
+        <dropColumn columnName="last_updated_at"
+                    tableName="actor" />
+
+        <addColumn tableName="actor">
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}"/>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20161111-942-1"
+               author="kamransaleem"
+               dbms="mssql">
 
         <dropDefaultValue columnName="last_updated_at"
                           tableName="actor" />
@@ -3469,6 +3485,11 @@
                          columnName="last_updated_at"
                          defaultValueComputed="${now.value}"
                          tableName="actor" />
+    </changeSet>
+
+
+    <changeSet id="20161111-942-2"
+               author="kamransaleem">
 
         <createTable tableName="involvement_kind">
             <column name="id"
@@ -3497,7 +3518,8 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="20161111-924-2"
+
+    <changeSet id="20161111-942-3"
                author="kamransaleem">
         <insert tableName="involvement_kind">
             <column name="name" value="IT Architect"/>
@@ -3571,7 +3593,8 @@
         </insert>
     </changeSet>
 
-    <changeSet id="20161111-924-3"
+
+    <changeSet id="20161111-942-4"
                author="kamransaleem">
         <sql>
             update involvement set
@@ -3581,14 +3604,16 @@
         </sql>
     </changeSet>
 
-    <changeSet id="20161111-924-4"
+
+    <changeSet id="20161111-942-5"
                author="kamransaleem">
         <sql>
            delete from actor
         </sql>
     </changeSet>
 
-    <changeSet id="20161111-924-5"
+
+    <changeSet id="20161111-942-6"
                author="kamransaleem">
         <insert tableName="actor">
             <column name="name" value="Regulator"/>
