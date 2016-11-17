@@ -17,51 +17,68 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.WaltzVersionInfo;
 import com.khartec.waltz.model.accesslog.AccessLog;
 import com.khartec.waltz.model.accesslog.ImmutableAccessLog;
 import com.khartec.waltz.service.access_log.AccessLogService;
-import com.khartec.waltz.web.WebUtilities;
+import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jooq.tools.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.getUsername;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 
 @Service
 public class AccessLogEndpoint implements Endpoint {
 
-
-    private static final Logger LOG = LoggerFactory.getLogger(AccessLogEndpoint.class);
     private static final String BASE_URL = mkPath("api", "access-log");
 
     private final AccessLogService accessLogService;
+    private final WaltzVersionInfo waltzVersionInfo;
 
 
     @Autowired
-    public AccessLogEndpoint(AccessLogService accessLogService) {
+    public AccessLogEndpoint(AccessLogService accessLogService,
+                             WaltzVersionInfo waltzVersionInfo) {
+        checkNotNull(accessLogService, "accessLogService cannot be null");
+        checkNotNull(waltzVersionInfo, "waltzVersionInfo cannot be null");
+
         this.accessLogService = accessLogService;
+        this.waltzVersionInfo = waltzVersionInfo;
     }
 
 
     @Override
     public void register() {
 
-        EndpointUtilities.getForList(mkPath(BASE_URL, "user", ":userId"),
-                (request, response) -> accessLogService.findForUserId(request.params("userId")));
+        String findForUserPath = mkPath(BASE_URL, "user", ":userId");
+        String writePath = mkPath(BASE_URL, ":state", ":params");
 
+        ListRoute<AccessLog> findForUserRoute = (request, response) -> accessLogService.findForUserId(request.params("userId"));
 
-        EndpointUtilities.post(mkPath(BASE_URL, ":state", ":params"), (request, response) -> {
-            AccessLog accessLog = ImmutableAccessLog.builder()
-                    .userId(WebUtilities.getUsername(request))
-                    .state(request.params("state"))
-                    .params(request.params("params"))
-                    .build();
-
-            return accessLogService.write(accessLog) == 1;
-        });
+        getForList(findForUserPath, findForUserRoute);
+        postForDatum(writePath, this::writeRoute);
     }
+
+
+    private WaltzVersionInfo writeRoute(Request request, Response response) throws ParseException {
+        AccessLog accessLog = ImmutableAccessLog.builder()
+                .userId(getUsername(request))
+                .state(request.params("state"))
+                .params(request.params("params"))
+                .build();
+
+        accessLogService.write(accessLog);
+
+        return waltzVersionInfo;
+    }
+
 }

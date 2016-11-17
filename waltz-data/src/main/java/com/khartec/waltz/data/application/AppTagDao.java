@@ -86,7 +86,8 @@ public class AppTagDao {
                 .where(APPLICATION_TAG.APPLICATION_ID.eq(id))
                 .execute();
 
-        List<ApplicationTagRecord> records = tags.stream()
+        List<ApplicationTagRecord> records = tags
+                .stream()
                 .map(t -> new ApplicationTagRecord(id, t))
                 .collect(Collectors.toList());
 

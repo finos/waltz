@@ -1,5 +1,5 @@
 import _ from "lodash";
-
+import {toGridOptions, assetCostKindNames} from './../../common/services/display_names';
 
 const DEFAULT_OPTIONS = {
     showAssetCode: true,
@@ -16,14 +16,14 @@ const BINDINGS = {
 };
 
 
-function prepareColumns(displayNameService, uiGridConstants) {
+function prepareColumns(uiGridConstants) {
     const kindCol = {
         field: 'cost.kind',
         displayName: 'Cost Type',
         cellFilter: 'toDisplayName:"assetCost"',
         filter: {
             type: uiGridConstants.filter.SELECT,
-            selectOptions: displayNameService.toGridOptions('assetCost')
+            selectOptions: toGridOptions(assetCostKindNames)
         }
     };
 
@@ -141,13 +141,13 @@ function setupOrgFilter(costs, uiGridConstants) {
 }
 
 
-function controller(displayNameService, uiGridConstants, $scope, $animate) {
+function controller(uiGridConstants, $scope, $animate) {
 
     const vm = this;
 
     const options = _.defaults(vm.options || {}, DEFAULT_OPTIONS);
 
-    const colDefinitions = prepareColumns(displayNameService, uiGridConstants);
+    const colDefinitions = prepareColumns(uiGridConstants);
     const gridOptions = prepareGridOptions(colDefinitions, options, uiGridConstants, $animate);
 
     setupExportOptions(gridOptions, vm.csvName);
@@ -191,7 +191,6 @@ function controller(displayNameService, uiGridConstants, $scope, $animate) {
 }
 
 controller.$inject = [
-    'WaltzDisplayNameService',
     'uiGridConstants',
     '$scope',
     '$animate'

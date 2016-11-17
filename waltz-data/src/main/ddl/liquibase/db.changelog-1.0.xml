@@ -3434,6 +3434,30 @@
     </changeSet>
 
 
+    <!-- 411: Lifecycle Status -->
+    <changeSet id="20161117-411-1"
+               author="rovats">
+        <addColumn tableName="server_information">
+            <column name="lifecycle_status"
+                    defaultValue="UNKNOWN"
+                    type="${enum.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20161117-411-2"
+               author="rovats">
+        <addColumn tableName="database_information">
+            <column name="lifecycle_status"
+                    defaultValue="UNKNOWN"
+                    type="${enum.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
     <!-- 924: Split Actor into Involvement Kind and Actor -->
     <changeSet id="20161111-924-1"
                author="kamransaleem">

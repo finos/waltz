@@ -1,7 +1,23 @@
 .waltz-pie-segment-table {
     text-align: left;
+    min-width: 100%;
+
+    td {
+        border: 0px;
+        padding: 4px;
+    }
+
+    .wpst-total-row {
+        border-top: 1px solid #ccc;
+    }
+
+    .wpst-number-col {
+        text-align: right;
+    }
 
     .wpst-indicator-cell {
+        position: relative;
+        top: -2px;
         width: 16px;
         border: 1px solid;
         border-radius: 5px;

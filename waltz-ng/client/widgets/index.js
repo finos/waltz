@@ -11,9 +11,8 @@
  */
 
 export default (module) => {
-    module.directive('waltzBasicInfoTile', require('./basic-info-tile'));
+
     module.directive('waltzChangeTimeline', require('./change-timeline'));
-    module.directive('waltzDataExtractLink', require('./data-extract-link'));
     module.directive('waltzInlineEditArea', require('./inline-edit-area'));
     module.directive('waltzErrorAlert', require('./error-alert'));
     module.directive('waltzExternalLink', require('./external-link'));
@@ -24,23 +23,25 @@ export default (module) => {
     module.directive('waltzMailTo', require('./mail-to'));
     module.directive('waltzOverlayPanel', require('./overlay-panel'));
     module.directive('waltzPhoneLink', require('./phone-link'));
-    module.directive('waltzPieTable', require('./pie-table'));
     module.directive('waltzRagIndicator', require('./rag-indicator'));
     module.directive('waltzSearch', require('./search'));
     module.directive('waltzSectionActions', require('./section-actions'));
     module.directive('waltzStepCount', require('./step-count'));
     module.directive('waltzToggle', require('./toggle'));
-    module.directive('waltzTwistie', require('./twistie'));
     module.directive('waltzYqSelect', require('./yq-select'));
-
     module
-        .component('waltzIcon', require('./icon'))
+        .component('waltzBasicInfoTile', require('./basic-info-tile'))
+        .component('waltzDataExtractLink', require('./data-extract-link'))
         .component('waltzEditableField', require('./editable-field'))
+        .component('waltzIcon', require('./icon'))
         .component('waltzPageHeader', require('./page-header'))
         .component('waltzPie', require('./pie'))
         .component('waltzPieSegmentTable', require('./pie-segment-table'))
+        .component('waltzPieTable', require('./pie-table'))
+        .component('waltzSection', require('./section'))
         .component('waltzSimpleStackChart', require('./simple-stack-chart'))
-        .component('waltzSection', require('./section'));
+        .component('waltzTwistie', require('./twistie'));
+
 
 
 };

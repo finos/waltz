@@ -1,10 +1,12 @@
-<table class="table table-condensed small waltz-pie-segment-table">
+<table class="waltz-pie-segment-table">
     <thead>
     <tr ng-if="$ctrl.headings.length > 0">
         <th></th>
         <th ng-bind="$ctrl.headings[0]"></th>
-        <th ng-bind="$ctrl.headings[1]"></th>
-        <th ng-bind="$ctrl.headings[2]"></th>
+        <th ng-bind="$ctrl.headings[1]"
+            class="wpst-number-col"></th>
+        <th ng-bind="$ctrl.headings[2]"
+            class="wpst-number-col"></th>
         <th></th>
     </tr>
     </thead>
@@ -30,10 +32,10 @@
             <span ng-bind="$ctrl.config.labelProvider(r)"></span>
         </td>
 
-        <td>
+        <td class="wpst-number-col">
             <span ng-bind="r.count"></span>
         </td>
-        <td>
+        <td class="wpst-number-col">
             <span class="small"
                   ng-bind="$ctrl.asPercentage(r)">
             </span>
@@ -52,14 +54,15 @@
             </span>
         </td>
     </tr>
-    <tr class="small clickable"
+    <tr class="small wpst-total-row"
         ng-click="$ctrl.rowSelected(null, $event)">
-        <td></td>
-        <th>
-            Total
-        </th>
-
         <td>
+        </td>
+        <td>
+            Total
+        </td>
+
+        <td class="wpst-number-col">
             <strong ng-bind="$ctrl.total"></strong>
         </td>
         <td></td>

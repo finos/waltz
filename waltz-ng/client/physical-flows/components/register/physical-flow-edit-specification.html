@@ -65,12 +65,10 @@
                     <select ng-model="$ctrl.form.format"
                             ng-change="$ctrl.validateForm()"
                             name="format">
-                        <option value="BINARY">Binary</option>
-                        <option value="DATABASE">Database</option>
-                        <option value="FLAT_FILE">Flat File</option>
-                        <option value="JSON">JSON</option>
-                        <option value="UNSTRUCTURED">Unstructured</option>
-                        <option value="XML">XML</option>
+                        <option ng-repeat="format in $ctrl.formatOptions"
+                                value="format.code"
+                                ng-bind="format.name">
+                        </option>
                     </select>
                 </div>
                 <div class="col-md-5">

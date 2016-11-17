@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import {initialiseData, toEntityRef} from '../../../common';
+import {toOptions, dataFormatKindNames} from '../../../common/services/display_names';
 
 
 const bindings = {
@@ -28,8 +29,8 @@ const initialState = {
     validation: {
         canSubmit: false,
         message: null
-    }
-
+    },
+    formatOptions: toOptions(dataFormatKindNames, true)
 };
 
 

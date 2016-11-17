@@ -14,6 +14,7 @@ const initData = {
     bookmarks: [],
     summaries: [],
     directs: [],
+    duration: 'MONTH',
     managers: [],
     peers: [],
     person: null,
@@ -25,6 +26,14 @@ const initData = {
 
 
 const template = require('./person-entity-statistic-view.html');
+
+
+
+function mkHistory(history = [], current) {
+    if (!current) return history;
+
+    return _.concat([current], history);
+}
 
 
 function controller($q,
@@ -74,6 +83,17 @@ function controller($q,
         vm.history = [];
     }
 
+    function loadHistory() {
+        const selector = {
+            scope: 'CHILDREN',
+            entityReference: vm.parentRef
+        };
+
+        entityStatisticStore
+            .calculateHistoricStatTally(vm.statistic.definition, selector, vm.duration)
+            .then(h => vm.history = mkHistory(h, vm.statistic.summary));
+    }
+
     vm.onSelectPerson = (person) => {
         resetValueData();
         vm.person = person;
@@ -121,13 +141,11 @@ function controller($q,
             .then(peers => _.reject(peers, p => p.id === person.id))
             .then(peers => vm.peers = peers);
 
-        entityStatisticStore
-            .calculateHistoricStatTally(vm.statistic.definition, selector)
-            .then(h => vm.history = h);
-
         applicationStore
             .findBySelector(selector)
             .then(apps => vm.applications = apps);
+
+        loadHistory();
 
         updateUrlWithoutReload($state, person);
     };
@@ -135,6 +153,12 @@ function controller($q,
     vm.onSelectDefinition = (node) => {
         navigateToStatistic($state, node.id, vm.parentRef);
     };
+
+
+    vm.onChangeDuration = (d) => {
+        vm.duration = d;
+        loadHistory();
+    }
 }
 
 

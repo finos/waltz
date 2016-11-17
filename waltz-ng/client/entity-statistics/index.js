@@ -28,6 +28,7 @@ export default (module) => {
         .directive('waltzEntityStatisticNumericRenderer', require('./directives/entity-statistic-numeric-renderer'));
 
     module
+        .component('waltzDurationSelector', require('./components/duration-selector'))
         .component('waltzEntityStatisticDetailTable', require('./components/entity-statistic-detail-table'))
         .component('waltzEntityStatisticDetailPanel', require('./components/entity-statistic-detail-panel'))
         .component('waltzEntityStatisticSummaryCard', require('./components/entity-statistic-summary-card'))

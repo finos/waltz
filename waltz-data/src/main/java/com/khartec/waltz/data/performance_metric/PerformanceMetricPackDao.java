@@ -158,6 +158,7 @@ public class PerformanceMetricPackDao {
 
         return dsl.select(pack.NAME, pack.ID)
                 .from(pack)
+                .fetch()
                 .stream()
                 .map(p -> ImmutableEntityReference.builder()
                         .name(p.value1())

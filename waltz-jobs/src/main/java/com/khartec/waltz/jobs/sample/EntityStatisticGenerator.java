@@ -35,7 +35,7 @@ import static java.util.stream.Collectors.toList;
 public class EntityStatisticGenerator implements SampleDataGenerator {
 
     private static final String PROVENANCE = "DEMO";
-    private static final List<LocalDateTime> DATES = IntStream.range(0, 10)
+    private static final List<LocalDateTime> DATES = IntStream.range(0, 60)
                 .mapToObj(i -> LocalDateTime.now().minusDays(i))
                 .collect(toList());
 

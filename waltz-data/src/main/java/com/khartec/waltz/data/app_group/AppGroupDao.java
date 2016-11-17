@@ -102,6 +102,7 @@ public class AppGroupDao {
                 .where(APPLICATION_GROUP.ID.in(ids))
                 .and(APPLICATION_GROUP_MEMBER.USER_ID.eq(user)
                         .or(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())))
+                .fetch()
                 .stream()
                 .map(r -> TO_DOMAIN.map(r))
                 .collect(Collectors.toSet());

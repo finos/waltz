@@ -1,4 +1,5 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,6 +22,17 @@
     <name>waltz</name>
     <url>http://khartec.com</url>
 
+    <issueManagement>
+        <url>https://github.com/khartec/waltz/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <scm>
+        <url>https://github.com/khartec/waltz</url>
+        <connection>scm:git:git://github.com/khartec/waltz.git</connection>
+        <developerConnection>scm:git:git@github.com:davidwatkins73/waltz.git</developerConnection>
+    </scm>
+
     <properties>
         <plugin.maven-compiler.version>3.3</plugin.maven-compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -36,12 +48,13 @@
         <logback.version>1.1.7</logback.version>
         <pcollections.version>2.1.2</pcollections.version>
         <slf4j.version>1.7.20</slf4j.version>
-        <spark.version>2.5</spark.version>
+        <spark.version>2.5.2</spark.version>
         <spring.version>4.2.5.RELEASE</spring.version>
         <super-csv.version>2.3.1</super-csv.version>
         <maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
     </properties>
-
 
 
     <dependencyManagement>
@@ -179,6 +192,23 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <useIncrementalCompilation>false</useIncrementalCompilation>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <doCheck>false</doCheck>
+                    <doUpdate>false</doUpdate>
                 </configuration>
             </plugin>
         </plugins>

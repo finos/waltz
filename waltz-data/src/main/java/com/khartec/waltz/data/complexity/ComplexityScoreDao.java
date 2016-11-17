@@ -63,6 +63,7 @@ public class ComplexityScoreDao {
                 .from(COMPLEXITY_SCORE)
                 .where(COMPLEXITY_SCORE.ENTITY_ID.eq(appId))
                 .and(COMPLEXITY_SCORE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .fetch()
                 .stream()
                 .map(TO_COMPLEXITY_SCORE_MAPPER)
                 .collect(Collectors.groupingBy(s -> s.id()));
@@ -77,6 +78,7 @@ public class ComplexityScoreDao {
                 .from(COMPLEXITY_SCORE)
                 .where(COMPLEXITY_SCORE.ENTITY_ID.in(appIdSelector))
                 .and(COMPLEXITY_SCORE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .fetch()
                 .stream()
                 .map(TO_COMPLEXITY_SCORE_MAPPER)
                 .collect(Collectors.groupingBy(s -> s.id()));

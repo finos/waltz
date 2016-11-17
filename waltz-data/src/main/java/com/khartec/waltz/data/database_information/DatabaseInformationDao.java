@@ -1,6 +1,7 @@
 package com.khartec.waltz.data.database_information;
 
 import com.khartec.waltz.common.ArrayBuilder;
+import com.khartec.waltz.model.LifecycleStatus;
 import com.khartec.waltz.model.database_information.DatabaseInformation;
 import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
 import com.khartec.waltz.model.database_information.ImmutableDatabaseInformation;
@@ -44,6 +45,7 @@ public class DatabaseInformationDao {
                 .provenance(record.getProvenance())
                 .assetCode(record.getAssetCode())
                 .endOfLifeDate(record.getEndOfLifeDate())
+                .lifecycleStatus(LifecycleStatus.valueOf(record.getLifecycleStatus()))
                 .build();
     };
 
