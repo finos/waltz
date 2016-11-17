@@ -1,7 +1,4 @@
-import {
-    applicationKindDisplayNames,
-    lifecyclePhaseDisplayNames,
-    toOptions} from  '../../common/services/display_names';
+import {applicationKindDisplayNames, lifecyclePhaseDisplayNames, toOptions} from "../../common/services/display_names";
 
 export const nameField = {
     type: 'input',

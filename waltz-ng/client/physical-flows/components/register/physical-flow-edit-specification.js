@@ -1,6 +1,6 @@
-import _ from 'lodash';
-import {initialiseData, toEntityRef} from '../../../common';
-import {toOptions, dataFormatKindNames} from '../../../common/services/display_names';
+import _ from "lodash";
+import {initialiseData, toEntityRef} from "../../../common";
+import {toOptions, dataFormatKindNames} from "../../../common/services/display_names";
 
 
 const bindings = {
