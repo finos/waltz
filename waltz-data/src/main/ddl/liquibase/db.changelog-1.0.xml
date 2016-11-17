@@ -3604,14 +3604,7 @@
         </sql>
     </changeSet>
 
-
-    <changeSet id="20161111-942-5"
-               author="kamransaleem">
-        <sql>
-           delete from actor
-        </sql>
-    </changeSet>
-
+    <!--20161111-942-5 was deleted before deployment-->
 
     <changeSet id="20161111-942-6"
                author="kamransaleem">
