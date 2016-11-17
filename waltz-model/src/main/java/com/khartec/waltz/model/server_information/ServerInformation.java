@@ -41,6 +41,7 @@ public abstract class ServerInformation implements
     public abstract String environment();
     public abstract String location();
     public abstract String country();
+    public abstract LifecycleStatus lifecycleStatus();
 
     @Nullable
     public abstract Date hardwareEndOfLifeDate();

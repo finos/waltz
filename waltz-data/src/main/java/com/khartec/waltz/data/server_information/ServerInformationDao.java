@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.data.server_information;
 
+import com.khartec.waltz.model.LifecycleStatus;
 import com.khartec.waltz.model.server_information.ImmutableServerInformation;
 import com.khartec.waltz.model.server_information.ImmutableServerSummaryStatistics;
 import com.khartec.waltz.model.server_information.ServerInformation;
@@ -69,6 +70,7 @@ public class ServerInformationDao {
                 .provenance(row.getProvenance())
                 .hardwareEndOfLifeDate(row.getHwEndOfLifeDate())
                 .operatingSystemEndOfLifeDate(row.getOsEndOfLifeDate())
+                .lifecycleStatus(LifecycleStatus.valueOf(row.getLifecycleStatus()))
                 .build();
     };
 
@@ -114,6 +116,7 @@ public class ServerInformationDao {
                                     SERVER_INFORMATION.ASSET_CODE,
                                     SERVER_INFORMATION.HW_END_OF_LIFE_DATE,
                                     SERVER_INFORMATION.OS_END_OF_LIFE_DATE,
+                                    SERVER_INFORMATION.LIFECYCLE_STATUS,
                                     SERVER_INFORMATION.PROVENANCE)
                             .values(
                                     s.hostname(),
@@ -126,6 +129,7 @@ public class ServerInformationDao {
                                     s.assetCode(),
                                     toSqlDate(s.hardwareEndOfLifeDate()),
                                     toSqlDate(s.operatingSystemEndOfLifeDate()),
+                                    s.lifecycleStatus().name(),
                                     s.provenance()))
                     .collect(Collectors.toList()))
                 .execute();

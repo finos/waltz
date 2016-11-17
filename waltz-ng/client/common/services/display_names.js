@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from "lodash";
 
 
 export const applicationKindDisplayNames = {
@@ -189,6 +189,15 @@ export const dataFormatKindNames  = {
     UNKNOWN: 'Unknown',
     UNSTRUCTURED: "Unstructured",
     XML: "XML",
+};
+
+
+export const lifecycleStatusNames = {
+    'ACTIVE': 'Active',
+    'BUILDING': 'Building',
+    'INACTIVE': 'Inactive',
+    'RETIRING': 'Retiring',
+    'UNKNOWN': 'Unknown'
 };
 
 

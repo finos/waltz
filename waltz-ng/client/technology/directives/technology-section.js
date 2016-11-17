@@ -66,7 +66,7 @@ function prepareServerGridOptions($animate, uiGridConstants) {
             filter: mkBooleanColumnFilter(uiGridConstants),
             cellTemplate: '<div class="ui-grid-cell-contents"> <waltz-icon ng-if="COL_FIELD" name="check"></waltz-icon></div>'
         },
-        { field: 'operatingSystem' },
+        { field: 'operatingSystem', displayName: 'OS' },
         { field: 'operatingSystemVersion', displayName: 'Version' },
         { field: 'location' },
         { field: 'country' },
@@ -85,7 +85,12 @@ function prepareServerGridOptions($animate, uiGridConstants) {
             filter: mkBooleanColumnFilter(uiGridConstants),
             cellTemplate: EOL_CELL_TEMPLATE
         },
-        { field: 'operatingSystemEndOfLifeDate', displayName: 'OS EOL On' }
+        { field: 'operatingSystemEndOfLifeDate', displayName: 'OS EOL On' },
+        {
+            field: 'lifecycleStatus',
+            displayName: 'Lifecycle',
+            cellFilter: "toDisplayName:'lifecycleStatus'"
+        }
     ];
 
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "server.csv");
@@ -112,7 +117,12 @@ function prepareDatabaseGridOptions($animate, uiGridConstants) {
             filter: mkBooleanColumnFilter(uiGridConstants),
             cellTemplate: EOL_CELL_TEMPLATE
         },
-        { field: 'endOfLifeDate', displayName: 'EOL On' }
+        { field: 'endOfLifeDate', displayName: 'EOL On' },
+        {
+            field: 'lifecycleStatus',
+            displayName: 'Lifecycle',
+            cellFilter: "toDisplayName:'lifecycleStatus'"
+        }
     ];
 
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "database.csv");
