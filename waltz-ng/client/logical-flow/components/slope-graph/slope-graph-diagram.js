@@ -67,7 +67,7 @@ function drawTypesColumn(svg, dimensions, types, typeScale, tweaker) {
         .call(onHighlight, 'code')
         .append('text')
         .attr('text-anchor', 'middle')
-        .text(type => _.truncate(type.name, 16));
+        .text(type => _.truncate(type.name, { length: 16 }));
 
     typesSelection.exit().remove();
 
@@ -108,7 +108,7 @@ function drawSourcesColumn(svg, dimensions, sources, scale, tweaker) {
         .classed('wafd-source', true)
         .append('text')
         .attr('text-anchor', 'end')
-        .text(app => _.truncate(app.name, 26));
+        .text(app => _.truncate(app.name, { length: 26 }));
 
     sourcesSelection.exit().remove();
 
@@ -146,7 +146,7 @@ function drawTargetsColumn(svg, dimensions, targets, scale, tweaker) {
         .call(onHighlight, 'id')
         .append('text')
         .attr('text-anchor', 'start')
-        .text(app => _.truncate(app.name, 26));
+        .text(app => _.truncate(app.name, { length: 26 }));
 
     targetsSelection.exit().remove();
 
