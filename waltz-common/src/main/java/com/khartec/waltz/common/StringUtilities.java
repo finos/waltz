@@ -105,4 +105,11 @@ public class StringUtilities {
                 .filter(s -> s.length() > 2)
                 .collect(Collectors.toList());
     }
+
+
+    public static int length(String str) {
+        return str == null
+                ? 0
+                : str.length();
+    }
 }

@@ -1,3 +1,7 @@
+import _ from 'lodash';
+import {initialiseData} from '../../common';
+
+
 const bindings = {
 };
 
@@ -18,33 +22,39 @@ const template = require('./navbar-search-form.html');
 
 
 function controller($timeout,
+                    actorStore,
                     applicationStore,
                     capabilityStore,
                     personStore,
+                    physicalFlowStore,
                     orgUnitStore) {
     const searchResults = {
         show: false
     };
 
-    const vm = _.defaultsDeep(this, initialState);
+    const vm = initialiseData(this, initialState);
+
+    // helper fn, to reduce boilerplate
+    const handleSearch = (query, store, resultKey) => {
+        return store
+            .search(query)
+            .then(r => searchResults[resultKey] = r || []);
+    };
 
     const doSearch = (query) => {
         if (_.isEmpty(query)) {
             searchResults.show = false;
         } else {
             searchResults.show = true;
-            applicationStore
-                .search(query)
-                .then(r => searchResults.apps = r);
-            personStore
-                .search(query)
-                .then(r => searchResults.people = r);
-            capabilityStore
-                .search(query)
-                .then(r => searchResults.capabilities = r);
-            orgUnitStore
-                .search(query)
-                .then(r => searchResults.orgUnits = r);
+            handleSearch(query, applicationStore, 'apps');
+            handleSearch(query, personStore, 'people');
+            handleSearch(query, capabilityStore, 'capabilities');
+            handleSearch(query, orgUnitStore, 'orgUnits');
+            handleSearch(query, actorStore, 'actors');
+
+            physicalFlowStore
+                .searchReports(query)
+                .then(xs => searchResults.reports = xs || []);
         }
     };
 
@@ -56,11 +66,14 @@ function controller($timeout,
     vm.dismissResults = dismissResults;
 }
 
+
 controller.$inject = [
     '$timeout',
+    'ActorStore',
     'ApplicationStore',
     'CapabilityStore',
     'PersonStore',
+    'PhysicalFlowStore',
     'OrgUnitStore'
 ];
 

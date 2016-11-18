@@ -1,12 +1,14 @@
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.actor.Actor;
 import com.khartec.waltz.model.actor.ActorChangeCommand;
-import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.actor.ActorCreateCommand;
+import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.actor.ActorService;
 import com.khartec.waltz.service.user.UserRoleService;
+import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
@@ -45,7 +47,13 @@ public class ActorEndpoint implements Endpoint {
     @Override
     public void register() {
 
+        String searchPath = mkPath(BASE_URL, "search", ":query");
+
+        ListRoute<EntityReference> searchRoute = (request, response) -> service.search(request.params("query"));
+
+
         // read
+        getForList(searchPath, searchRoute);
         getForList(BASE_URL, (request, response) -> service.findAll());
         getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute );
 
