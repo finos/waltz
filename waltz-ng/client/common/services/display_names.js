@@ -174,7 +174,7 @@ export const frequencyKindNames  = {
     WEEKLY: "Weekly",
     MONTHLY: "Monthly",
     QUARTERLY: "Quarterly",
-    BIANUALLY: "Biannually",
+    BIANNUALLY: "Biannually",
     YEARLY: "Yearly",
     UNKNOWN: 'Unknown'
 };

@@ -16,7 +16,7 @@ public enum FrequencyKind {
     WEEKLY,
     MONTHLY,
     QUARTERLY,
-    BIANUALLY,
+    BIANNUALLY,
     YEARLY,
     UNKNOWN
 }
