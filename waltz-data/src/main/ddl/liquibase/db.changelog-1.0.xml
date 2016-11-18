@@ -3616,6 +3616,19 @@
     </changeSet>
 
 
+    <!-- 1004 - Logical flow id column should be auto increment on MariaDb -->
+    <changeSet id="20161118-1004-1"
+               author="kamransaleem"
+               dbms="mysql">
+        <sql>
+            ALTER TABLE waltz.logical_flow
+            MODIFY COLUMN id BIGINT(20) AUTO_INCREMENT
+        </sql>
+    </changeSet>
+
+
+
+
     <!-- 1015 - is_external flag on actor  -->
     <changeSet id="20161118-1015-1"
                author="kamransaleem">
