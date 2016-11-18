@@ -13,10 +13,34 @@ const initialState = {
 };
 
 
+function mkHistoryObj(actor) {
+    return {
+        name: actor.name,
+        kind: 'ACTOR',
+        state: 'main.actor.view',
+        stateParams: { id: actor.id }
+    };
+}
+
+
+function addToHistory(historyStore, actor) {
+    if (! actor) { return; }
+
+    const historyObj = mkHistoryObj(actor);
+
+    historyStore.put(
+        historyObj.name,
+        historyObj.kind,
+        historyObj.state,
+        historyObj.stateParams);
+}
+
+
 function controller($stateParams,
                     actorStore,
                     bookmarkStore,
                     changeLogStore,
+                    historyStore,
                     physicalFlowStore,
                     physicalSpecificationStore) {
 
@@ -28,7 +52,8 @@ function controller($stateParams,
 
     actorStore
         .getById(id)
-        .then(a => vm.actor = a);
+        .then(a => vm.actor = a)
+        .then(() => addToHistory(historyStore, vm.actor));
 
     physicalFlowStore
         .findByEntityReference(entityRef)
@@ -40,6 +65,7 @@ function controller($stateParams,
 
     bookmarkStore.findByParent(entityRef)
         .then(bookmarks => vm.bookmarks = bookmarks);
+
 
     changeLogStore
         .findByEntityReference('ACTOR', id)
@@ -78,6 +104,7 @@ controller.$inject = [
     'ActorStore',
     'BookmarkStore',
     'ChangeLogStore',
+    'HistoryStore',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore'
 ];
