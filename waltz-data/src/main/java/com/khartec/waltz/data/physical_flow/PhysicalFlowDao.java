@@ -64,7 +64,6 @@ public class PhysicalFlowDao {
 
 
     public List<PhysicalFlow> findByEntityReference(EntityReference ref) {
-
         checkNotNull(ref, "ref cannot be null");
 
         Condition isTarget = PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name())
@@ -103,7 +102,6 @@ public class PhysicalFlowDao {
 
 
     public int delete(long flowId) {
-
         return dsl.delete(PHYSICAL_FLOW)
                 .where(PHYSICAL_FLOW.ID.eq(flowId))
                 .and(notExists(selectFrom(PHYSICAL_FLOW_LINEAGE)
@@ -113,7 +111,6 @@ public class PhysicalFlowDao {
 
 
     private List<PhysicalFlow> findByCondition(Condition condition) {
-
         return dsl
                 .select(PHYSICAL_FLOW.fields())
                 .select(targetEntityNameField)
@@ -124,7 +121,6 @@ public class PhysicalFlowDao {
 
 
     public long create(PhysicalFlow flow) {
-
         checkNotNull(flow, "flow cannot be null");
         checkFalse(flow.id().isPresent(), "flow must not have an id");
 
@@ -143,6 +139,6 @@ public class PhysicalFlowDao {
 
         record.store();
         return record.getId();
-
     }
+
 }

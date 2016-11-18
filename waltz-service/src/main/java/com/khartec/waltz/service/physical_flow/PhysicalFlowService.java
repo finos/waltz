@@ -2,6 +2,7 @@ package com.khartec.waltz.service.physical_flow;
 
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
+import com.khartec.waltz.data.physical_flow.PhysicalFlowSearchDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -9,19 +10,20 @@ import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.command.CommandOutcome;
+import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.data_type.DataTypeService;
+import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.settings.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +41,7 @@ public class PhysicalFlowService {
     private final DataFlowDecoratorService dataFlowDecoratorService;
     private final DataTypeService dataTypeService;
     private final SettingsService settingsService;
+    private final PhysicalFlowSearchDao searchDao;
 
     private final static String DEFAULT_DATATYPE_CODE_SETTING_NAME = "settings.data-type.default-code";
 
@@ -50,7 +53,8 @@ public class PhysicalFlowService {
                                DataTypeService dataTypeService,
                                PhysicalFlowDao physicalDataFlowDao,
                                PhysicalSpecificationDao physicalSpecificationDao,
-                               SettingsService settingsService) {
+                               SettingsService settingsService, PhysicalFlowSearchDao searchDao) {
+        
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dataFlowService, "dataFlowService cannot be null");
         checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
@@ -58,6 +62,7 @@ public class PhysicalFlowService {
         checkNotNull(physicalDataFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
         checkNotNull(settingsService, "settingsService cannot be null");
+        checkNotNull(searchDao, "searchDao cannot be null");
 
         this.changeLogService = changeLogService;
         this.dataFlowService = dataFlowService;
@@ -66,6 +71,7 @@ public class PhysicalFlowService {
         this.physicalFlowDao = physicalDataFlowDao;
         this.physicalSpecificationDao = physicalSpecificationDao;
         this.settingsService = settingsService;
+        this.searchDao = searchDao;
     }
 
 
@@ -238,4 +244,7 @@ public class PhysicalFlowService {
     }
 
 
+    public Collection<EntityReference> searchReports(String query) {
+        return searchDao.searchReports(query);
+    }
 }
