@@ -2,9 +2,10 @@ package com.khartec.waltz.data.actor;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.LastUpdate;
-import com.khartec.waltz.model.actor.*;
-import com.khartec.waltz.model.actor.ImmutableActor;
 import com.khartec.waltz.model.actor.Actor;
+import com.khartec.waltz.model.actor.ActorChangeCommand;
+import com.khartec.waltz.model.actor.ActorCreateCommand;
+import com.khartec.waltz.model.actor.ImmutableActor;
 import com.khartec.waltz.schema.tables.records.ActorRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -38,6 +39,7 @@ public class ActorDao {
                 .description(record.getDescription())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
+                .isExternal(record.getIsExternal())
                 .build();
     };
 
@@ -49,6 +51,7 @@ public class ActorDao {
         record.setDescription(ik.description());
         record.setLastUpdatedAt(Timestamp.valueOf(ik.lastUpdatedAt()));
         record.setLastUpdatedBy(ik.lastUpdatedBy());
+        record.setIsExternal(ik.isExternal());
 
         ik.id().ifPresent(record::setId);
 
@@ -94,6 +97,7 @@ public class ActorDao {
         ActorRecord record = dsl.newRecord(ACTOR);
         record.setName(command.name());
         record.setDescription(command.description());
+        record.setIsExternal(command.isExternal());
         record.setLastUpdatedBy(username);
         record.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
         record.store();
@@ -112,6 +116,7 @@ public class ActorDao {
 
         command.name().ifPresent(change -> record.setName(change.newVal()));
         command.description().ifPresent(change -> record.setDescription(change.newVal()));
+        command.isExternal().ifPresent(change -> record.setIsExternal(change.newVal()));
 
         LastUpdate lastUpdate = command.lastUpdate().get();
         record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));

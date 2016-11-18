@@ -3628,4 +3628,18 @@
 
 
 
+
+    <!-- 1015 - is_external flag on actor  -->
+    <changeSet id="20161118-1015-1"
+               author="kamransaleem">
+        <addColumn tableName="actor">
+            <column name="is_external"
+                    type="BOOLEAN"
+                    defaultValueBoolean="false">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+
 </databaseChangeLog>

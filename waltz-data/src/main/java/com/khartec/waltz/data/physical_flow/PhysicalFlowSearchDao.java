@@ -36,7 +36,6 @@ public class PhysicalFlowSearchDao {
     /**
      * A report is a physical flow which goes to an
      * actor
-     * TODO: refine to only external actors when field available
      * @param query
      * @return
      */
@@ -63,7 +62,7 @@ public class PhysicalFlowSearchDao {
                 .innerJoin(PHYSICAL_SPECIFICATION)
                 .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
                 .innerJoin(ACTOR)
-                .on(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(ACTOR.ID))
+                .on(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(ACTOR.ID).and(ACTOR.IS_EXTERNAL.eq(true)))
                 .where(PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
                 .and(termMatcher)
                 .fetch()

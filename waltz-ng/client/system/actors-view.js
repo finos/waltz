@@ -4,7 +4,7 @@ import {initialiseData} from "../common";
 const initialState = {
     actors: [],
     creatingActor: false,
-    newActor: {}
+    newActor: { isExternal: false }
 };
 
 
@@ -30,6 +30,12 @@ function controller($q,
         if(change.newVal === "") return $q.reject("Too short");
         return update(id, { description: change })
             .then(() => _.find(vm.actors, {'id': id}).description = change.newVal);
+    };
+
+    vm.updateIsExternal = (id, change) => {
+        if(change.newVal === null) return $q.reject("No value provided");
+        return update(id, { isExternal: change })
+            .then(() => _.find(vm.actors, {'id': id}).isExternal = change.newVal);
     };
 
 
