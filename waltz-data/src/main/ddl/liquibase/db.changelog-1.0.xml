@@ -3592,7 +3592,18 @@
             <column name="last_updated_by" value="admin"/>
         </insert>
     </changeSet>
-
+  
+    <changeSet id="20161111-942-3.5"
+               author="kamransaleem">
+        <sql>
+            insert into involvement_kind
+            (name, description, last_updated_at, last_updated_by)
+            select name, description, last_updated_at, last_updated_by
+            from actor
+            where name not in (select name from involvement_kind)
+        </sql>
+    </changeSet>
+  
     <changeSet id="20161111-942-4"
                author="kamransaleem">
         <sql>
