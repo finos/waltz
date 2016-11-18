@@ -3604,27 +3604,4 @@
         </sql>
     </changeSet>
 
-    <!--20161111-942-5 was deleted before deployment-->
-
-    <changeSet id="20161111-942-6"
-               author="kamransaleem">
-        <insert tableName="actor">
-            <column name="name" value="Regulator"/>
-            <column name="description" value="Regulator"/>
-            <column name="last_updated_by" value="admin"/>
-        </insert>
-        <insert tableName="actor">
-            <column name="name" value="Customer"/>
-            <column name="description" value="Customer"/>
-            <column name="last_updated_by" value="admin"/>
-        </insert>
-        <insert tableName="actor">
-            <column name="name" value="Market"/>
-            <column name="description" value="Market"/>
-            <column name="last_updated_by" value="admin"/>
-        </insert>
-    </changeSet>
-
-
-
 </databaseChangeLog>
