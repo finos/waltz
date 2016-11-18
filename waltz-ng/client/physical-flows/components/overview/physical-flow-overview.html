@@ -21,14 +21,14 @@
                     <div class="row small">
                         <div class="col-sm-6">
                             <label class="text-muted">Format:</label>
-                            <span ng-bind="$ctrl.specification.format"></span>
+                            <span ng-bind="$ctrl.specification.format | toDisplayName:'dataFormatKind'"></span>
                             <br>
                             <label class="text-muted">Transport:</label>
-                            <span ng-bind="$ctrl.physicalFlow.transport"></span>
+                            <span ng-bind="$ctrl.physicalFlow.transport | toDisplayName:'transportKind'"></span>
                     </div>
                     <div class="col-sm-6">
                             <label class="text-muted">Frequency:</label>
-                            <span ng-bind="$ctrl.physicalFlow.frequency"></span>
+                            <span ng-bind="$ctrl.physicalFlow.frequency | toDisplayName:'frequencyKind'"></span>
                             <br>
                             <label class="text-muted">Basis Offset:</label>
                             <span ng-bind="$ctrl.physicalFlow.basisOffset | toBasisOffset"></span>

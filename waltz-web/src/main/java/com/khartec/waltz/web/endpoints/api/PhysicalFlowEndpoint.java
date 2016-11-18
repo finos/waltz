@@ -1,9 +1,9 @@
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
-import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -26,20 +26,16 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
     private final PhysicalFlowService physicalFlowService;
-    private final PhysicalSpecificationService physicalSpecificationService;
     private final UserRoleService userRoleService;
 
 
     @Autowired
     public PhysicalFlowEndpoint(PhysicalFlowService physicalFlowService,
-                                PhysicalSpecificationService physicalSpecificationService,
                                 UserRoleService userRoleService) {
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
-        checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.physicalFlowService = physicalFlowService;
-        this.physicalSpecificationService = physicalSpecificationService;
         this.userRoleService = userRoleService;
     }
 
@@ -62,9 +58,15 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 "id",
                 ":id");
 
-        String deletePath = mkPath(BASE_URL,
+        String deletePath = mkPath(
+                BASE_URL,
                 ":id"
                 );
+
+        String searchReportsPath = mkPath(
+                BASE_URL,
+                "search-reports",
+                ":query");
 
         String createPath = BASE_URL;
 
@@ -79,6 +81,11 @@ public class PhysicalFlowEndpoint implements Endpoint {
                         .findBySpecificationId(
                                 getId(request));
 
+        ListRoute<EntityReference> searchReportsRoute =
+                (request, response) -> physicalFlowService
+                        .searchReports(
+                                request.params("query"));
+
         DatumRoute<PhysicalFlow> getByIdRoute =
                 (request, response) -> physicalFlowService
                         .getById(getId(request));
@@ -86,6 +93,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findBySpecificationIdPath, findBySpecificationIdRoute);
+        getForList(searchReportsPath, searchReportsRoute);
         postForDatum(createPath, this::createFlow);
 
         deleteForDatum(deletePath, this::deleteFlow);

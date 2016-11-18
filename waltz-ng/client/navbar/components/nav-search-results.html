@@ -1,90 +1,161 @@
 <div class="wns-results">
-    <div class="row">
-        <div class="col-md-12">
-            <h3 style="border-bottom: 1px solid #ccc">
-                Search Results: <span ng-bind="$ctrl.query"></span>
-                <small class="pull-right">
-                    <a class="clickable" ng-click="$ctrl.dismiss()">
-                        <waltz-icon name="close"></waltz-icon>
-                    </a>
-                </small>
-            </h3>
-        </div>
-    </div>
+    <h4>
+        Search Results:
+        <span ng-bind="$ctrl.query"></span>
+        <small class="pull-right">
+            <a class="clickable"
+               ng-click="$ctrl.dismiss()">
+                <waltz-icon name="close"></waltz-icon>
+            </a>
+        </small>
+    </h4>
+
+    <hr>
 
     <div class="row">
 
         <div class="col-md-6">
-            <h4><waltz-icon name="desktop"></waltz-icon> Applications</h4>
-            <ul class="list-unstyled">
-                <li ng-repeat="app in $ctrl.results.apps">
-                    <a ui-sref="main.app.view ({id: app.id})">
-                        <span ng-bind="app.name"></span>
+            <!-- APPS -->
+            <h5>
+                <waltz-icon name="desktop"></waltz-icon>
+                Applications
+            </h5>
+            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.apps.length > 10 }">
+                <ul class="list-unstyled">
+                    <li ng-repeat="app in $ctrl.results.apps">
+                        <a ui-sref="main.app.view ({id: app.id})">
+                            <span ng-bind="app.name"></span>
+                            <small>
+                                ( <span ng-bind="app.assetCode"></span> )
+                            </small>
+                        </a>
+                    </li>
+                    <li ng-show="$ctrl.results.apps.length == 0"
+                        class="text-muted">
+                        No results...
+                    </li>
+                </ul>
+            </div>
+
+            <hr>
+
+            <!-- CAPABILITIES -->
+            <h5>
+                <waltz-icon name="puzzle-piece"></waltz-icon>
+                Capabilities
+            </h5>
+            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.capabilities.length > 10 }">
+                <ul class="list-unstyled">
+                    <li ng-repeat="capability in $ctrl.results.capabilities">
+                        <a ui-sref="main.capability.view ({id: capability.id})">
+                            <span ng-bind="capability.name"></span>
+                        </a>
                         <small>
-                            ( <span ng-bind="app.assetCode"></span> )
+                            <span ng-bind="capability.description | limitTo:60"></span>
+                            <span ng-if="capability.description.length > 60">...</span>
                         </small>
-                    </a>
-                </li>
-                <li ng-show="$ctrl.results.apps.length == 0"
-                    class="text-muted">
-                    No results...
-                </li>
-            </ul>
+                    </li>
+                    <li ng-show="$ctrl.results.capabilities.length == 0"
+                        class="text-muted">
+                        No results...
+                    </li>
+                </ul>
+            </div>
+
+            <hr>
+
+            <!-- ACTORS -->
+            <h5>
+                <waltz-icon name="user-circle"></waltz-icon>
+                Actors
+            </h5>
+            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.actors.length > 10 }">
+                <ul class="list-unstyled">
+                    <li ng-repeat="actor in $ctrl.results.actors">
+                        <a ui-sref="main.actor.view ({id: actor.id})">
+                            <span ng-bind="actor.name"></span>
+                        </a>
+                        <small>
+                            <span ng-bind="actor.description | limitTo:60"></span>
+                            <span ng-if="actor.description.length > 60">...</span>
+                        </small>
+                    </li>
+                    <li ng-show="$ctrl.results.actors.length == 0"
+                        class="text-muted">
+                        No results...
+                    </li>
+                </ul>
+            </div>
+
+
         </div>
 
+
         <div class="col-md-6">
-            <h4><waltz-icon name="users"></waltz-icon> People</h4>
-            <ul class="list-unstyled">
-                <li ng-repeat="person in $ctrl.results.people">
-                    <a ui-sref="main.person.view ({empId: person.employeeId})">
-                        <span ng-bind="person.displayName"></span>
-                    </a>
-                    <small><span ng-bind="person.title"></span></small>
-                </li>
-                <li ng-show="$ctrl.results.people.length == 0" class="text-muted">No results...</li>
-            </ul>
+            <!-- PEOPLE -->
+            <h5>
+                <waltz-icon name="users"></waltz-icon>
+                People
+            </h5>
+            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.people.length > 10 }">
+                <ul class="list-unstyled">
+                    <li ng-repeat="person in $ctrl.results.people">
+                        <a ui-sref="main.person.view ({empId: person.employeeId})">
+                            <span ng-bind="person.displayName"></span>
+                        </a>
+                        <small><span ng-bind="person.title"></span></small>
+                    </li>
+                    <li ng-show="$ctrl.results.people.length == 0" class="text-muted">No results...</li>
+                </ul>
+            </div>
+
+            <hr>
+
+            <!-- ORG UNITS -->
+            <h5>
+                <waltz-icon name="sitemap"></waltz-icon>
+                Organisational Units
+            </h5>
+            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.orgUnits.length > 10 }">
+                <ul class="list-unstyled">
+                    <li ng-repeat="orgUnit in $ctrl.results.orgUnits">
+                        <a ui-sref="main.org-unit.view ({id: orgUnit.id})">
+                            <span ng-bind="orgUnit.name"></span>
+                        </a>
+                        <small>
+                            <span ng-bind="orgUnit.description | limitTo:60"></span>
+                            <span ng-if="orgUnit.description.length > 60">...</span>
+                        </small>
+                    </li>
+                    <li ng-show="$ctrl.results.orgUnits.length == 0"
+                        class="text-muted">
+                        No results...
+                    </li>
+                </ul>
+            </div>
+
+
+            <hr>
+
+            <!-- REPORTS -->
+            <h5>
+                <waltz-icon name="sitemap"></waltz-icon>
+                Reports
+            </h5>
+            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.reports.length > 10 }">
+                <ul class="list-unstyled">
+                    <li ng-repeat="result in $ctrl.results.reports">
+                        <a ui-sref="main.physical-flow.view ({id: result.id})">
+                            <span ng-bind="result.name"></span>
+                        </a>
+                    </li>
+                    <li ng-show="$ctrl.results.reports.length == 0"
+                        class="text-muted">
+                        No results...
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <hr/>
-
-    <div class="row">
-        <div class="col-md-6">
-            <h4><waltz-icon name="puzzle-piece"></waltz-icon> Capabilities</h4>
-            <ul class="list-unstyled">
-                <li ng-repeat="capability in $ctrl.results.capabilities">
-                    <a ui-sref="main.capability.view ({id: capability.id})">
-                        <span ng-bind="capability.name"></span>
-                    </a>
-                    <small>
-                        <span ng-bind="capability.description | limitTo:60"></span>
-                        <span ng-if="capability.description.length > 60">...</span>
-                    </small>
-                </li>
-                <li ng-show="$ctrl.results.capabilities.length == 0"
-                    class="text-muted">
-                    No results...
-                </li>
-            </ul>
-        </div>
-        <div class="col-md-6">
-            <h4><waltz-icon name="sitemap"></waltz-icon> Organisational Units</h4>
-            <ul class="list-unstyled">
-                <li ng-repeat="orgUnit in $ctrl.results.orgUnits">
-                    <a ui-sref="main.org-unit.view ({id: orgUnit.id})">
-                        <span ng-bind="orgUnit.name"></span>
-                    </a>
-                    <small>
-                        <span ng-bind="orgUnit.description | limitTo:60"></span>
-                        <span ng-if="orgUnit.description.length > 60">...</span>
-                    </small>
-                </li>
-                <li ng-show="$ctrl.results.orgUnits.length == 0"
-                    class="text-muted">
-                    No results...
-                </li>
-            </ul>
-        </div>
-
-    </div>
 </div>

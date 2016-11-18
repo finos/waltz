@@ -57,12 +57,20 @@ function store($http, BaseApiUrl) {
     };
 
 
+    const search = (query) => {
+        return $http
+            .get(`${BASE}/search/${query}`)
+            .then(r => r.data || []);
+    };
+
+
     return {
         findAll,
         getById,
         create,
         update,
-        deleteById
+        deleteById,
+        search
     };
 }
 
