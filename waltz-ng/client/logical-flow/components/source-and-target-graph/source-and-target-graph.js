@@ -1,7 +1,7 @@
-import {initialiseData} from '../../../common';
-import {authoritativeRatingColorScale} from '../../../common/colors';
-import _ from 'lodash';
-import d3 from 'd3';
+import {initialiseData} from "../../../common";
+import {authoritativeRatingColorScale} from "../../../common/colors";
+import _ from "lodash";
+import d3 from "d3";
 
 
 const template = require('./source-and-target-graph.html');

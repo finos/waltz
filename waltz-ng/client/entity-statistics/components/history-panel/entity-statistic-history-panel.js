@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import d3 from 'd3';
-import {variableScale} from '../../../common/colors';
-import {initialiseData} from '../../../common';
+import _ from "lodash";
+import d3 from "d3";
+import {variableScale} from "../../../common/colors";
+import {initialiseData} from "../../../common";
 
 
 const bindings = {

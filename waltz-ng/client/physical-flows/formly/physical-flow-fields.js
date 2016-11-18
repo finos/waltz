@@ -1,7 +1,4 @@
-import {
-    toOptions,
-    frequencyKindNames,
-    transportKindNames} from '../../common/services/display_names';
+import {toOptions, frequencyKindNames, transportKindNames} from "../../common/services/display_names";
 
 
 export const transportField = {

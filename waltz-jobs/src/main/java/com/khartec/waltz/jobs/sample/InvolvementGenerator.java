@@ -35,9 +35,9 @@ import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.ListUtilities.concat;
 import static com.khartec.waltz.common.ListUtilities.randomPick;
-import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static java.util.stream.Collectors.toMap;
@@ -66,11 +66,11 @@ public class InvolvementGenerator {
                 .from(ORGANISATIONAL_UNIT)
                 .fetch(ORGANISATIONAL_UNIT.ID);
 
-        Map<String, Long> involvementKindMap = dsl.select(ACTOR.NAME, ACTOR.ID)
-                .from(ACTOR)
+        Map<String, Long> involvementKindMap = dsl.select(INVOLVEMENT_KIND.NAME, INVOLVEMENT_KIND.ID)
+                .from(INVOLVEMENT_KIND)
                 .fetch()
                 .stream()
-                .collect(toMap(r -> r.getValue(ACTOR.NAME), r -> r.getValue(ACTOR.ID)));
+                .collect(toMap(r -> r.getValue(INVOLVEMENT_KIND.NAME), r -> r.getValue(INVOLVEMENT_KIND.ID)));
 
         List<Long> inHouseApps = getAppIdsByKind(dsl, ApplicationKind.IN_HOUSE);
         List<Long> hostedApps = getAppIdsByKind(dsl, ApplicationKind.INTERNALLY_HOSTED);

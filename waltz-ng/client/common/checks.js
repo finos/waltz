@@ -37,6 +37,13 @@ const createActorCommandShape = {
     description: apiCheck.string
 };
 
+
+const createInvolvementKindCommandShape = {
+    name: apiCheck.string,
+    description: apiCheck.string
+};
+
+
 const createPhysicalFlowCommandShape = {
     specification: myApiCheck.shape(specificationShape),
     flowAttributes: myApiCheck.shape(flowAttributesShape),
@@ -59,6 +66,10 @@ export const checkIsCreatePhysicalFlowCommand = cmd =>
 
 export const checkIsCreateActorCommand = cmd =>
     check(myApiCheck.shape(createActorCommandShape), cmd);
+
+
+export const checkIsCreateInvolvementKindCommand = ref =>
+    check(myApiCheck.shape(createInvolvementKindCommandShape), ref);
 
 
 export const checkIsStringList = xs =>

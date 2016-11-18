@@ -12,7 +12,6 @@
 
 import "../style/style.scss";
 import angular from "angular";
-
 import "angular-animate";
 import "angular-loading-bar";
 import "angular-local-storage";

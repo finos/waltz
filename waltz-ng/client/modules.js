@@ -30,6 +30,7 @@ function setup(module) {
         require('./formly'),
         require('./history'),
         require('./involvement'),
+        require('./involvement-kind'),
         require('./logical-flow'),
         require('./logical-flow-decorator'),
         require('./navbar'),

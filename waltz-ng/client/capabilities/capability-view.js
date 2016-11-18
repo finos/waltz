@@ -11,9 +11,7 @@
  */
 
 import _ from "lodash";
-import d3 from "d3";
-import {perhaps, populateParents} from "../common";
-import {calculateGroupSummary} from "../ratings/directives/common";
+import {populateParents} from "../common";
 
 
 const initialState = {

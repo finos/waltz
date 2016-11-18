@@ -12,7 +12,7 @@
  *
  */
 
-import AccessLogStore from './service/access-log-store';
+import AccessLogStore from "./service/access-log-store";
 
 export default (module) => {
 

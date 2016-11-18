@@ -11,7 +11,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
 function accessLogStore($http, BaseApiUrl) {

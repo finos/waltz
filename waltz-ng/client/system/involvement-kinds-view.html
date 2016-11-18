@@ -1,6 +1,6 @@
 <div>
 
-    <waltz-page-header icon="diamond" name="Actors">
+    <waltz-page-header icon="id-badge" name="Involvement Kinds">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>System</li>
@@ -27,20 +27,20 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="actor in ctrl.actors | orderBy:'name' | filter:userQuery"
+                <tr ng-repeat="involvementKind in ctrl.involvementKinds | orderBy:'name' | filter:userQuery"
                     class="waltz-visibility-parent">
                     <td>
                         <waltz-editable-field on-save="ctrl.updateName"
                                               field-type="text"
-                                              initial-val="actor.name"
-                                              item-id="actor.id">
+                                              initial-val="involvementKind.name"
+                                              item-id="involvementKind.id">
                         </waltz-editable-field>
                     </td>
                     <td align="left">
                         <waltz-editable-field on-save="ctrl.updateDescription"
                                               field-type="text"
-                                              initial-val="actor.description"
-                                              item-id="actor.id">
+                                              initial-val="involvementKind.description"
+                                              item-id="involvementKind.id">
                         </waltz-editable-field>
                     </td>
                     <td>
@@ -49,32 +49,32 @@
                 <tr>
                     <td>
                         <button class="btn btn-primary btn-sm"
-                                ng-if="ctrl.creatingActor === false"
-                                ng-click="ctrl.startNewActor()">
+                                ng-if="ctrl.creatinginvolvementKind === false"
+                                ng-click="ctrl.startNewinvolvementKind()">
                             Add
                         </button>
-                        <div ng-if="ctrl.creatingActor === true">
+                        <div ng-if="ctrl.creatinginvolvementKind === true">
                             <input type="text"
-                                   ng-model="ctrl.newActor.name"
+                                   ng-model="ctrl.newinvolvementKind.name"
                                    class="form-control input-sm">
                         </div>
                     </td>
                     <td>
-                        <div ng-if="ctrl.creatingActor === true">
+                        <div ng-if="ctrl.creatinginvolvementKind === true">
                             <input type="text"
-                                   ng-model="ctrl.newActor.description"
+                                   ng-model="ctrl.newinvolvementKind.description"
                                    class="form-control input-sm">
                         </div>
                     </td>
                     <td>
                         <button class="btn btn-success btn-sm"
-                                ng-if="ctrl.creatingActor === true"
-                                ng-click="ctrl.saveNewActor()">
+                                ng-if="ctrl.creatinginvolvementKind === true"
+                                ng-click="ctrl.saveNewinvolvementKind()">
                             Save
                         </button>
                         <button class="btn btn-default btn-sm"
-                                ng-if="ctrl.creatingActor === true"
-                                ng-click="ctrl.cancelNewActor()">
+                                ng-if="ctrl.creatinginvolvementKind === true"
+                                ng-click="ctrl.cancelNewinvolvementKind()">
                             Cancel
                         </button>
                     </td>
@@ -85,8 +85,8 @@
         <hr>
         <blockquote>
             <p>
-                Deletion of Actors is not supported in the user interface because an actor could be in used in
-                Physical Flows.  Please check these before removing an actor from the system.
+                Deletion of Involvement Kinds is not supported in the user interface because it can be in used in Person
+                Involvements.  Please check these before removing an involvement kind from the system.
             </p>
         </blockquote>
     </div>

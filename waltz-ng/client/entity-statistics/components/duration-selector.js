@@ -1,5 +1,5 @@
-import _ from 'lodash';
-import {initialiseData} from '../../common';
+import _ from "lodash";
+import {initialiseData} from "../../common";
 
 
 const bindings = {

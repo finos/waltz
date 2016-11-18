@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {toGridOptions, assetCostKindNames} from './../../common/services/display_names';
+import {toGridOptions, assetCostKindNames} from "./../../common/services/display_names";
 
 const DEFAULT_OPTIONS = {
     showAssetCode: true,
