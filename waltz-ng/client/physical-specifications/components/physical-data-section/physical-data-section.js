@@ -53,9 +53,9 @@ function controller() {
         Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
         { field: 'specification.externalId', displayName: 'Ext. Id', width: "8%" },
         Object.assign(mkEntityLinkGridCell('Receiver(s)', 'targetRef', 'left'), { width: "15%" }),
-        { field: 'specification.format', displayName: 'Format', width: "8%" },
-        { field: 'physicalFlow.transport', displayName: 'Transport', width: "10%" },
-        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "9%" },
+        { field: 'specification.format', displayName: 'Format', width: "8%", cellFilter: 'toDisplayName:"dataFormatKind"' },
+        { field: 'physicalFlow.transport', displayName: 'Transport', width: "10%", cellFilter: 'toDisplayName:"transportKind"' },
+        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "9%", cellFilter: 'toDisplayName:"frequencyKind"' },
         { field: 'specification.description', displayName: 'Description', width: "30%" }
     ];
 
@@ -63,15 +63,15 @@ function controller() {
         Object.assign(mkEntityLinkGridCell('Source Application', 'sourceRef', 'none'), { width: "15%"} ),
         Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
         { field: 'specification.externalId', displayName: 'Ext. Id', width: "10%" },
-        { field: 'specification.format', displayName: 'Format', width: "8%" },
-        { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%" },
-        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "10%" },
+        { field: 'specification.format', displayName: 'Format', width: "8%", cellFilter: 'toDisplayName:"dataFormatKind"' },
+        { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%", cellFilter: 'toDisplayName:"transportKind"' },
+        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "10%", cellFilter: 'toDisplayName:"frequencyKind"' },
         { field: 'specification.description', displayName: 'Description', width: "23%" }
     ];
 
     vm.unusedSpecificationsColumnDefs = [
         { field: 'name', displayName: 'Name' },
-        { field: 'format', displayName: 'Format' },
+        { field: 'format', displayName: 'Format', cellFilter: 'toDisplayName:"dataFormatKind"' },
         { field: 'description', displayName: 'Description' }
     ];
 
@@ -79,7 +79,7 @@ function controller() {
 
     const consumeFields = _.map(vm.consumeColumnDefs, 'field');
 
-    vm.$onChanges = (changes) => {
+    vm.$onChanges = () => {
         Object.assign(vm, mkData(vm.specifications, vm.physicalFlows));
         vm.filterProduces("");
         vm.filterConsumes("");

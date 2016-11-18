@@ -6,7 +6,7 @@ const bindings = {
 };
 
 
-const template = require('./flow-table.html');
+const template = require('./physical-flow-table.html');
 
 
 const initialState = {
@@ -60,6 +60,7 @@ function controller() {
         {
             field: 'specification.format',
             name: 'Format',
+            cellFilter: 'toDisplayName:"dataFormatKind"'
         }
     ];
 

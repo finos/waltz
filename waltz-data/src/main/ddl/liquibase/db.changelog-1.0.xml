@@ -3593,7 +3593,6 @@
         </insert>
     </changeSet>
 
-
     <changeSet id="20161111-942-4"
                author="kamransaleem">
         <sql>
@@ -3601,6 +3600,18 @@
             kind_id = (select involvement_kind.id
             from involvement_kind
             where involvement_kind.name = (select actor.name from actor where actor.id = involvement.kind_id))
+        </sql>
+    </changeSet>
+
+
+    <!-- 1017: Typo -->
+
+    <changeSet id="20161118-1017-1"
+               author="dwatkins">
+        <sql>
+            update physical_flow
+            set frequency = 'BIANNUALLY'
+            where frequency = 'BIANUALLY'
         </sql>
     </changeSet>
 
