@@ -34,6 +34,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -110,10 +111,6 @@ public class LogicalFlowStatsDao {
     public List<TallyPack<String>> tallyDataTypesByAppIdSelector(Select<Record1<Long>> appIdSelector) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
-        Condition condition = lf.TARGET_ENTITY_ID.in(appIdSelector)
-                .or(lf.SOURCE_ENTITY_ID.in(appIdSelector))
-                .and(BOTH_APPS);
-
         Table<Record1<Long>> sourceApp = appIdSelector.asTable("source_app");
         Table<Record1<Long>> targetApp = appIdSelector.asTable("target_app");
         Field<Long> sourceAppId = sourceApp.field(0, Long.class);
@@ -125,6 +122,10 @@ public class LogicalFlowStatsDao {
                 .when(sourceAppId.isNotNull(), inline("OUTBOUND"))
                 .otherwise(inline("INBOUND"));
         Field<String> flowType = DSL.field("flow_type", String.class);
+
+        Condition condition = sourceAppId.isNotNull()
+                .or(targetAppId.isNotNull())
+                .and(BOTH_APPS);
 
         Result<Record3<Long, String, Integer>> records = dsl.select(
                     dfd.DECORATOR_ENTITY_ID,
@@ -166,50 +167,45 @@ public class LogicalFlowStatsDao {
     public LogicalFlowMeasures countDistinctFlowInvolvementByAppIdSelector(Select<Record1<Long>> appIdSelector) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
+        Table<Record1<Long>> sourceApp = appIdSelector.asTable("source_app");
+        Table<Record1<Long>> targetApp = appIdSelector.asTable("target_app");
+        Field<Long> sourceAppId = sourceApp.field(0, Long.class);
+        Field<Long> targetAppId = targetApp.field(0, Long.class);
 
-        SelectJoinStep<Record2<Long, Long>> flows = dsl
-                .selectDistinct(lf.SOURCE_ENTITY_ID, lf.TARGET_ENTITY_ID)
-                .from(lf);
+        Field<BigDecimal> inboundCount = DSL.sum(
+                DSL.when(sourceAppId.isNull()
+                        .and(targetAppId.isNotNull()), 1)
+                    .otherwise(0))
+                .as("inbound_count");
 
-        Condition inboundCondition = DSL
-                .field("SOURCE_ENTITY_ID").notIn(appIdSelector)
-                .and(DSL.field("TARGET_ENTITY_ID").in(appIdSelector));
+        Field<BigDecimal> outboundCount = DSL.sum(
+                DSL.when(sourceAppId.isNotNull()
+                        .and(targetAppId.isNull()), 1)
+                    .otherwise(0))
+                .as("outbound_count");
 
-        Condition outboundCondition = DSL
-                .field("SOURCE_ENTITY_ID").in(appIdSelector)
-                .and(DSL.field("TARGET_ENTITY_ID").notIn(appIdSelector));
+        Field<BigDecimal> intraCount = DSL.sum(
+                DSL.when(sourceAppId.isNotNull()
+                        .and(targetAppId.isNotNull()), 1)
+                    .otherwise(0))
+                .as("intra_count");
 
-        Condition intraCondition = DSL
-                .field("SOURCE_ENTITY_ID").in(appIdSelector)
-                .and(DSL.field("TARGET_ENTITY_ID").in(appIdSelector));
-
-        Select<Record1<Integer>> outCounter = dsl
-                .selectCount()
-                .from(flows)
-                .where(dsl.renderInlined(outboundCondition));
-
-        Select<Record1<Integer>> intraCounter = dsl
-                .selectCount()
-                .from(flows)
-                .where(dsl.renderInlined(intraCondition));
-
-        Select<Record1<Integer>> inCounter = dsl
-                .selectCount()
-                .from(flows)
-                .where(dsl.renderInlined(inboundCondition));
-
-        Select<Record1<Integer>> query = inCounter
-                .unionAll(outCounter)
-                .unionAll(intraCounter);
-
-
-        List<Integer> results = query.fetch(0, Integer.class);
-
+        Record3<BigDecimal, BigDecimal, BigDecimal> counts = dsl.select(
+                    inboundCount,
+                    outboundCount,
+                    intraCount)
+                .from(lf)
+                .leftJoin(sourceApp)
+                    .on(sourceAppId.eq(lf.SOURCE_ENTITY_ID))
+                .leftJoin(targetApp)
+                    .on(targetAppId.eq(lf.TARGET_ENTITY_ID))
+                .where(BOTH_APPS)
+                .fetchAny();
 
         return ImmutableLogicalFlowMeasures.builder()
-                .inbound(results.get(0))
-                .outbound(results.get(1))
-                .intra(results.get(2))
+                .inbound(counts.getValue(inboundCount).doubleValue())
+                .outbound(counts.getValue(outboundCount).doubleValue())
+                .intra(counts.getValue(intraCount).doubleValue())
                 .build();
     }
 
