@@ -23,6 +23,13 @@
             </textarea>
         </div>
 
+        <div ng-if="$ctrl.fieldType == 'boolean'">
+            <input type="checkbox"
+                   ng-model="$ctrl.newVal"
+                   class="input-sm"
+                   style="height: auto">
+        </div>
+
         <div style="margin-top: 4px">
             <button class="btn btn-xs btn-success"
                     ng-disabled="$ctrl.saving"

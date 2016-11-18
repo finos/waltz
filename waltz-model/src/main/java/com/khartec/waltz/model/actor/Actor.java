@@ -16,4 +16,6 @@ public abstract class Actor implements
         NameProvider,
         DescriptionProvider,
         LastUpdatedProvider {
+
+    public abstract boolean isExternal();
 }

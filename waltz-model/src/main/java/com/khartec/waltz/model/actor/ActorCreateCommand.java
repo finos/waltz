@@ -12,4 +12,5 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableActorCreateCommand.class)
 public abstract class ActorCreateCommand implements NameProvider, DescriptionProvider {
 
+    public abstract boolean isExternal();
 }

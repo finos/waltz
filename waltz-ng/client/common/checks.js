@@ -34,7 +34,8 @@ const flowAttributesShape = {
 
 const createActorCommandShape = {
     name: apiCheck.string,
-    description: apiCheck.string
+    description: apiCheck.string,
+    isExternal: apiCheck.bool
 };
 
 

@@ -23,6 +23,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Description</th>
+                    <th>External?</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -40,6 +41,13 @@
                         <waltz-editable-field on-save="ctrl.updateDescription"
                                               field-type="text"
                                               initial-val="actor.description"
+                                              item-id="actor.id">
+                        </waltz-editable-field>
+                    </td>
+                    <td align="left">
+                        <waltz-editable-field on-save="ctrl.updateIsExternal"
+                                              field-type="boolean"
+                                              initial-val="actor.isExternal"
                                               item-id="actor.id">
                         </waltz-editable-field>
                     </td>
@@ -63,6 +71,13 @@
                         <div ng-if="ctrl.creatingActor === true">
                             <input type="text"
                                    ng-model="ctrl.newActor.description"
+                                   class="form-control input-sm">
+                        </div>
+                    </td>
+                    <td>
+                        <div ng-if="ctrl.creatingActor === true">
+                            <input type="checkbox"
+                                   ng-model="ctrl.newActor.isExternal"
                                    class="form-control input-sm">
                         </div>
                     </td>
