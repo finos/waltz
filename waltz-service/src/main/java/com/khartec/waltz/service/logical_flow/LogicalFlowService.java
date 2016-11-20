@@ -20,8 +20,8 @@ package com.khartec.waltz.service.logical_flow;
 import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
-import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
+import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowStatistics;
@@ -33,15 +33,19 @@ import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.JooqUtilities.DB_EXECUTOR_POOL;
 
 
 @Service
@@ -154,20 +158,27 @@ public class LogicalFlowService {
         checkNotNull(options, "options cannot be null");
 
         Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);
-        List<TallyPack<String>> dataTypeCounts = FunctionUtilities.time("DFS.dataTypes",
-                () -> logicalFlowStatsDao.tallyDataTypesByAppIdSelector(appIdSelector));
 
-        LogicalFlowMeasures appCounts = FunctionUtilities.time("DFS.appCounts",
-                () -> logicalFlowStatsDao.countDistinctAppInvolvementByAppIdSelector(appIdSelector));
+        Future<List<TallyPack<String>>> dataTypeCounts = DB_EXECUTOR_POOL.submit(() ->
+                FunctionUtilities.time("DFS.dataTypes",
+                    () -> logicalFlowStatsDao.tallyDataTypesByAppIdSelector(appIdSelector)));
 
-        LogicalFlowMeasures flowCounts = FunctionUtilities.time("DFS.flowCounts",
-                () -> logicalFlowStatsDao.countDistinctFlowInvolvementByAppIdSelector(appIdSelector));
+        Future<LogicalFlowMeasures> appCounts = DB_EXECUTOR_POOL.submit(() ->
+                FunctionUtilities.time("DFS.appCounts",
+                    () -> logicalFlowStatsDao.countDistinctAppInvolvementByAppIdSelector(appIdSelector)));
 
-        return ImmutableLogicalFlowStatistics.builder()
-                .dataTypeCounts(dataTypeCounts)
-                .appCounts(appCounts)
-                .flowCounts(flowCounts)
-                .build();
+        Future<LogicalFlowMeasures> flowCounts = DB_EXECUTOR_POOL.submit(() ->
+                FunctionUtilities.time("DFS.flowCounts",
+                    () -> logicalFlowStatsDao.countDistinctFlowInvolvementByAppIdSelector(appIdSelector)));
+
+        Supplier<ImmutableLogicalFlowStatistics> mkStat = Unchecked.supplier(() -> ImmutableLogicalFlowStatistics.builder()
+                .dataTypeCounts(dataTypeCounts.get())
+                .appCounts(appCounts.get())
+                .flowCounts(flowCounts.get())
+                .build());
+
+        return mkStat.get();
+
     }
 
 }

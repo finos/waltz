@@ -59,8 +59,8 @@ public class LogicalFlowStatsDao {
 
 
     private static final Condition BOTH_APPS =
-            lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                .and(lf.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+            lf.SOURCE_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name()))
+                .and(lf.TARGET_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name())));
 
 
     @Autowired
@@ -134,12 +134,12 @@ public class LogicalFlowStatsDao {
                 .from(lf)
                 .innerJoin(dfd)
                     .on(lf.ID.eq(dfd.DATA_FLOW_ID)
-                        .and(dfd.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name())))
+                        .and(dfd.DECORATOR_ENTITY_KIND.eq(inline(DATA_TYPE.name()))))
                 .leftJoin(sourceApp)
                     .on(sourceAppId.eq(lf.SOURCE_ENTITY_ID))
                 .leftJoin(targetApp)
                     .on(targetAppId.eq(lf.TARGET_ENTITY_ID))
-                .where(condition)
+                .where(dsl.renderInlined(condition))
                 .groupBy(dfd.DECORATOR_ENTITY_ID, flowTypeCase)
                 .fetch();
 
@@ -174,20 +174,20 @@ public class LogicalFlowStatsDao {
 
         Field<BigDecimal> inboundCount = DSL.sum(
                 DSL.when(sourceAppId.isNull()
-                        .and(targetAppId.isNotNull()), 1)
-                    .otherwise(0))
+                        .and(targetAppId.isNotNull()), inline(1))
+                    .otherwise(inline(0)))
                 .as("inbound_count");
 
         Field<BigDecimal> outboundCount = DSL.sum(
                 DSL.when(sourceAppId.isNotNull()
-                        .and(targetAppId.isNull()), 1)
-                    .otherwise(0))
+                        .and(targetAppId.isNull()), inline(1))
+                    .otherwise(inline(0)))
                 .as("outbound_count");
 
         Field<BigDecimal> intraCount = DSL.sum(
                 DSL.when(sourceAppId.isNotNull()
-                        .and(targetAppId.isNotNull()), 1)
-                    .otherwise(0))
+                        .and(targetAppId.isNotNull()), inline(1))
+                    .otherwise(inline(0)))
                 .as("intra_count");
 
         Record3<BigDecimal, BigDecimal, BigDecimal> counts = dsl.select(

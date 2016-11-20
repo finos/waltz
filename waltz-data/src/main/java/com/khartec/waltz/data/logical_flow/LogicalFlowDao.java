@@ -34,6 +34,7 @@ import java.util.function.BiFunction;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.jooq.impl.DSL.inline;
 
 
 @Repository
@@ -148,10 +149,10 @@ public class LogicalFlowDao {
                 .from(LOGICAL_FLOW)
                 .innerJoin(sourceAppAlias)
                 .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(sourceAppAlias.ID)
-                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name()))))
                 .innerJoin(targetAppAlias)
                 .on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(targetAppAlias.ID)
-                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name()))));
     }
 
 }
