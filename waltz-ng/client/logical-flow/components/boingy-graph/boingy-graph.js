@@ -10,7 +10,7 @@
  *
  */
 
-import d3 from "d3";
+import {forceSimulation, select} from "d3";
 import _ from "lodash";
 
 
@@ -36,11 +36,12 @@ function setupDimensions(vizElem) {
 }
 
 
-const force = d3.layout.force()
-    .distance(100)
-    .linkDistance(70)
-    .gravity(0.05)
-    .charge(-200);
+const force = forceSimulation()
+// TODO: d3-v4
+    // .distance(100)
+    // .linkDistance(70)
+    // .gravity(0.05)
+    // .charge(-200);
 
 
 function setup(vizElem) {
@@ -167,8 +168,7 @@ function draw(data, parts, tweakers = { node: DEFAULT_TWEAKER, link: DEFAULT_TWE
 function controller($scope, $element) {
     const vm = this;
 
-    const vizElem = d3
-        .select($element[0])
+    const vizElem = select($element[0])
         .select('.viz');
 
     const parts = setup(vizElem);

@@ -44,7 +44,7 @@ function controller($scope) {
     vm.pieConfig = {
         maturity: {
             size: PIE_SIZE,
-            colorProvider: (d) => maturityColorScale(d.data.key)
+            colorProvider: (d) => { console.log(d); return maturityColorScale(d.data.key); }
         },
         vendor: {
             size: PIE_SIZE,

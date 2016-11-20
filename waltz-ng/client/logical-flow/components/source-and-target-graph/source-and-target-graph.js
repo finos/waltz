@@ -1,7 +1,9 @@
 import {initialiseData} from "../../../common";
 import {authoritativeRatingColorScale} from "../../../common/colors";
 import _ from "lodash";
-import d3 from "d3";
+import {scalePoint, scaleOrdinal} from "d3-scale";
+import {event, select} from "d3-selection";
+import "d3-selection-multi";
 
 
 const template = require('./source-and-target-graph.html');
@@ -83,19 +85,15 @@ function drawTitleBar(titleBar, dimensions) {
         .enter()
         .append('text')
         .text(d => d)
-        .attr({
-            'text-anchor': 'middle'
-        });
+        .attr('text-anchor', 'middle');
 
     textLabels
-        .attr({
-            'transform': (d, i) => {
-                switch (i) {
-                    case 0: return `translate(${dimensions.label.width}, ${dy})`;
-                    case 1: return `translate(${dimensions.graph.width / 2 - 20}, ${dy})`;
-                    case 2: return `translate(${dimensions.graph.width - dimensions.label.width}, ${dy})`;
-                }
-            },
+        .attr('transform', (d, i) => {
+            switch (i) {
+                case 0: return `translate(${dimensions.label.width}, ${dy})`;
+                case 1: return `translate(${dimensions.graph.width / 2 - 20}, ${dy})`;
+                case 2: return `translate(${dimensions.graph.width - dimensions.label.width}, ${dy})`;
+            }
         });
 
 
@@ -106,13 +104,11 @@ function drawTitleBar(titleBar, dimensions) {
     line.enter()
         .append('line');
 
-    line.attr({
-        x1: 0,
-        y1: dy + 10,
-        x2: dimensions.graph.width - 40,
-        y2: dimensions.margin.top / 2 + 10,
-        stroke: '#ccc'
-    });
+    line.attr('x1', 0)
+        .attr('y1', dy + 10)
+        .attr('x2', dimensions.graph.width - 40)
+        .attr('y2', dimensions.margin.top / 2 + 10)
+        .attr('stroke', '#ccc');
 }
 
 
@@ -245,10 +241,9 @@ function translate(elem, dx = 0, dy = 0) {
 
 
 function setupSizing(sections, dimensions) {
-    sections.svg.attr({
-        width : dimensions.graph.width,
-        height: dimensions.graph.height
-    });
+    sections.svg
+        .attr('width', dimensions.graph.width)
+        .attr('height', dimensions.graph.height);
 
     const sdx = dimensions.margin.left + dimensions.label.width;
     const sdy = dimensions.margin.top;
@@ -267,20 +262,20 @@ function setupSizing(sections, dimensions) {
 function getColumnScaleRange(dimensions) {
     return [
         dimensions.margin.top,
-        dimensions.graph.height - dimensions.margin.bottom
+        dimensions.graph.height - dimensions.margin.bottom,
     ];
 }
 
 
 function mkScale(items, dimensions) {
-    return d3
-        .scale
-        .ordinal()
+    const range = getColumnScaleRange(dimensions);
+
+    return scalePoint()
         .domain(_.chain(items)
             .sortBy(a => a.name.toLowerCase())
             .map('id')
             .value())
-        .rangePoints(getColumnScaleRange(dimensions));
+        .range(range);
 }
 
 
@@ -326,18 +321,17 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
         .selectAll('.wsat-label')
         .data(items, d => d.id);
 
+
     const newLabels = labels
         .enter()
         .append('g')
         .classed('clickable', true)
         .classed('wsat-label', true)
-        .attr({
-            'transform':  (d, i) => `translate(0, ${ scale(d.id) })`,
-            opacity: 0
-        })
+        .attr('transform',  (d, i) => `translate(0, ${ scale(d.id) })`)
+        .attr('opacity', 0)
         .on('mouseenter.highlight', d => { highlighted = d.id; redraw(); })
         .on('mouseleave.highlight', d => { highlighted = null; redraw(); })
-        .on('click.tweaker', (d) => tweakers.onSelect(d, d3.event))
+        .on('click.tweaker', (d) => tweakers.onSelect(d, event))
         .on('mouseenter.tweaker', tweakers.onEnter)
         .on('mouseleave.tweaker', tweakers.onLeave);
 
@@ -346,34 +340,31 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
 
     newLabels
         .append("text")
-        .attr({
-            'text-anchor': anchor,
-            dx: textAdjustment
-        })
+        .attr('text-anchor', anchor)
+        .attr('dx', textAdjustment)
         .text(app => _.truncate(app.name, { length: 26 }));
-
-    labels
-        .classed('wsat-hover', (d) => highlighted === d.id)
-        .transition()
-        .duration(animationDuration)
-        .attr({
-            'transform':  (d, i) => `translate(0, ${ scale(d.id) })`,
-            opacity: 1
-        });
-
 
     newLabels
         .append('text')
         .classed('wsat-icon',true)
-        .attr({
+        .attrs({
             'dx': iconAdjustment,
             "font-family": "FontAwesome"
         });
 
+
+    labels
+        .merge(newLabels)
+        .classed('wsat-hover', (d) => highlighted === d.id)
+        .transition()
+        .duration(animationDuration)
+        .attr('transform',  (d, i) => `translate(0, ${ scale(d.id) })`)
+        .attr('opacity', 1);
+
     if (tweakers.icon) {
         labels
             .selectAll('.wsat-icon')
-            .attr({ fill: d => tweakers.icon(d).color })
+            .attr("fill", d => tweakers.icon(d).color)
             .text((d) => tweakers.icon(d).code || '');
     }
 
@@ -388,17 +379,18 @@ function drawArcs(section, model, layoutFn) {
         .selectAll('.wsat-arc')
         .data(model, d => d.from + '-' + d.to);
 
-    arcs
+    const newArcs = arcs
         .enter()
         .append('line')
         .classed('wsat-arc', true)
-        .attr({
+        .attrs({
             opacity: 0,
             'marker-end': d => `url(#arrowhead-${d.rating})`,
             stroke: d => authoritativeRatingColorScale(d.rating)
         });
 
     arcs
+        .merge(newArcs)
         .classed('wsat-hover', d => d.to === highlighted || d.from === highlighted)
         .transition()
         .duration(animationDuration)
@@ -447,11 +439,11 @@ function drawTypeBoxes(section, model, scale, dimensions, tweakers) {
     const hasIncoming = (type) => _.some(model.sourceToType, f => f.to === type);
     const hasOutgoing = (type) => _.some(model.typeToTarget, f => f.from === type);
 
-    boxes
+    const newBoxes = boxes
         .enter()
         .append('rect')
         .classed('wsat-type-box', true)
-        .attr({
+        .attrs({
             fill: '#fafafa',
             stroke: '#ccc',
             y: d => scale(d.id) - dimensions.height - 2,
@@ -461,9 +453,10 @@ function drawTypeBoxes(section, model, scale, dimensions, tweakers) {
 
 
     boxes
+        .merge(newBoxes)
         .transition()
         .duration(animationDuration)
-        .attr({
+        .attrs({
             x: (d) => {
                 const x = dimensions.width / 2 * -1 + 2;
                 return hasIncoming(d.id)
@@ -487,7 +480,7 @@ function drawTypeBoxes(section, model, scale, dimensions, tweakers) {
 
 function drawInbound(section, model, scales, dimensions) {
     const inboundLayout = (selection) => selection
-        .attr({
+        .attrs({
             x1: dimensions.margin.left + dimensions.label.width + 10,
             x2 : (dimensions.canvas.width / 2) - (dimensions.label.width / 2),
             y1: d => dimensions.margin.top + scales.source(d.from) - dimensions.label.height / 2,
@@ -499,7 +492,7 @@ function drawInbound(section, model, scales, dimensions) {
 
 function drawOutbound(section, model, scales, dimensions) {
     const outboundLayout = (selection) => selection
-        .attr({
+        .attrs({
             x1: (dimensions.canvas.width / 2) + (dimensions.label.width / 2),
             x2: dimensions.canvas.width - (dimensions.label.width + 10),
             y1: d => dimensions.margin.top + scales.type(d.from) - dimensions.label.height / 2,
@@ -515,22 +508,24 @@ function drawCenterBox(section, dimensions) {
         .selectAll('.center-box')
         .data([1], _.identity);
 
-    centerBox
+    const newCenterBox = centerBox
         .enter()
         .append('rect')
         .classed('center-box', true)
-        .attr({
+        .attrs({
             fill: '#f5f5f5',
             stroke: '#ddd'
         });
 
     centerBox
-        .attr({
+        .merge(newCenterBox)
+        .attrs({
             x: -90,
             y: 15,
             width: 180,
             height: dimensions.graph.height - dimensions.margin.bottom - 6
         });
+
 }
 
 
@@ -538,6 +533,7 @@ function update(sections,
                 model,
                 tweakers) {
     redraw = () => update(sections, model, tweakers);
+
 
     const dimensions = calculateDimensions(model);
 
@@ -547,6 +543,10 @@ function update(sections,
     drawCenterBox(sections.types, dimensions);
 
     const scales = setupScales(model, dimensions);
+
+    window.scales =scales;
+    window.model = model;
+
     drawLabels(sections.sources, model.sources, scales.source, 'end', tweakers.source, redraw);
     drawLabels(sections.targets, model.targets, scales.target, 'start', tweakers.target, redraw);
 
@@ -569,7 +569,7 @@ function update(sections,
 function controller($element, $window, dataTypeService) {
 
     const vm = initialiseData(this, initialState);
-    const svg = d3.select($element.find('svg')[0]);
+    const svg = select($element.find('svg')[0]);
 
     const svgSections = prepareGraph(svg);
 

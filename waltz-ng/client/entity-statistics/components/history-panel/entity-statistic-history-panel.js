@@ -1,5 +1,5 @@
 import _ from "lodash";
-import d3 from "d3";
+import {timeFormat} from "d3";
 import {variableScale} from "../../../common/colors";
 import {initialiseData} from "../../../common";
 
@@ -20,9 +20,7 @@ const initialState = {
 };
 
 
-const dateFormatter = d3
-    .time
-    .format('%a %d %b %Y');
+const dateFormatter = timeFormat('%a %d %b %Y');
 
 
 function prepareData(data = []) {

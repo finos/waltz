@@ -1,5 +1,6 @@
 import _ from "lodash";
-import d3 from "d3";
+import {nest} from 'd3-collection';
+
 
 import {checkIsEntityRef} from "./checks";
 
@@ -185,7 +186,7 @@ function toCountData(data) {
 
 export function toKeyCounts(items = [], fn = x => x) {
     if (! items) return [];
-    return toCountData(d3.nest()
+    return toCountData(nest()
         .key(fn)
         .rollup(d => d.length)
         .entries(items));

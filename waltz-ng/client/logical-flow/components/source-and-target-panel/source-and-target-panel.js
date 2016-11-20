@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import d3 from 'd3';
+import {nest} from 'd3-collection';
+import {event} from 'd3-selection';
 import {initialiseData} from '../../../common'
 
 
@@ -60,7 +61,7 @@ function controller($scope) {
             },
             type: {
                 onSelect: d => {
-                    d3.event.stopPropagation();
+                    event.stopPropagation();
                     $scope.$applyAsync(
                         () => vm.filteredFlowData = filterByType(
                             d.id,
@@ -70,7 +71,7 @@ function controller($scope) {
             },
             typeBlock: {
                 onSelect: () => {
-                    d3.event.stopPropagation();
+                    event.stopPropagation();
                     $scope.$applyAsync(
                         () => {
                             if (vm.filteredFlowData.selectedTypeId > 0) {
@@ -218,12 +219,12 @@ function mkTweakers(tweakers = {},
         };
     });
 
-    const flowsBySourceEntity = d3.nest()
+    const flowsBySourceEntity = nest()
         .key(f => f.source.kind)
         .key(f => f.source.id)
         .map(flows);
 
-    const flowsByTargetEntity = d3.nest()
+    const flowsByTargetEntity = nest()
         .key(f => f.target.kind)
         .key(f => f.target.id)
         .map(flows);

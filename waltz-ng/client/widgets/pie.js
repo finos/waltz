@@ -14,7 +14,11 @@
  *     You should have received a copy of the GNU General Public License
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
-import d3 from "d3";
+import {interpolate} from "d3-interpolate";
+import {select} from 'd3-selection';
+import {pie, arc} from 'd3-shape';
+import "d3-selection-multi";
+
 import _ from "lodash";
 
 
@@ -52,7 +56,7 @@ function renderArcs(holder, config, data, onSelect) {
 
     const radius = size / 2;
 
-    const arc = d3.svg.arc()
+    const pieArc = arc()
         .outerRadius(radius - 10)
         .innerRadius(0);
 
@@ -61,45 +65,51 @@ function renderArcs(holder, config, data, onSelect) {
             startAngle: 0,
             endAngle: 0
         };
-        const i = d3.interpolate(start, finish);
-        return (d) => arc(i(d));
+        const i = interpolate(start, finish);
+        return (d) => pieArc(i(d));
     }
 
-    const pie = d3.layout.pie()
-        .sort(null)
+    const pieLayout = pie()
+        //.sort(null)
         .value(valueProvider);
 
-    const pieData = pie(_.filter(data, r => r.count > 0));
+    const pieData = pieLayout(_.filter(data, r => r.count > 0));
 
     const arcs = holder
         .selectAll('.arc')
         .data(pieData, idProvider);
 
-    arcs.enter()
+    const newArcs = arcs
+        .enter()
         .append('path')
+        .attr('d', d => pieArc(d))
         .classed('arc clickable', true)
         .on('click', d => onSelect(d.data))
         .append('title')
         .text(d => `${d.data.key} - ${d.data.count}`);
 
-    arcs.attr({
-        fill: d => colorProvider(d).brighter(),
-        stroke: d => colorProvider(d)
-    });
+    arcs
+        .merge(newArcs)
+        .attrs({
+            fill: d => { const i = idProvider(d); const c = "#ffcccc";  console.log('c1', c); return c; }, //.brighter(),
+            stroke: d => { const i = idProvider(d); const c = "#ccffcc"; console.log('c2', c);  return c; }
+        });
 
     arcs.exit()
         .remove();
 
-    arcs.transition()
-        .duration(400)
-        .attrTween('d', tweenPie);
+    // arcs.transition()
+    //     .duration(400)
+    //     .attrTween('d', tweenPie);
 
-    const emptyPie = holder.selectAll('.empty-pie')
+    const emptyPie = holder
+        .selectAll('.empty-pie')
         .data(data.length ? [] : [1]);
 
-    emptyPie.enter()
+    emptyPie
+        .enter()
         .append('circle')
-        .attr({
+        .attrs({
             cx: 0,
             cy: 0,
             r: radius / 2,
@@ -109,7 +119,8 @@ function renderArcs(holder, config, data, onSelect) {
         })
         .classed('empty-pie', true);
 
-    emptyPie.exit()
+    emptyPie
+        .exit()
         .remove();
 }
 
@@ -119,17 +130,18 @@ function render(svg, config, data, onSelect) {
     const width = size;
     const height = size;
 
-    svg.attr( { width, height });
+    svg.attrs( { width, height });
 
     const mainGroup = svg.selectAll('.main-group')
         .data([1]);
 
-    mainGroup
+    const newMainGroup = mainGroup
         .enter()
         .append('g')
         .classed('main-group', true);
 
     mainGroup
+        .merge(newMainGroup)
         .attr('transform', `translate(${width / 2},${height / 2})`);
 
     renderArcs(mainGroup, config, data, onSelect);
@@ -139,7 +151,8 @@ function render(svg, config, data, onSelect) {
 function controller($element, $scope) {
     const vizElem = $element[0].querySelector('.waltz-pie');
 
-    const svg = d3.select(vizElem).append('svg');
+    const svg = select(vizElem)
+        .append('svg');
 
     const vm = this;
 
