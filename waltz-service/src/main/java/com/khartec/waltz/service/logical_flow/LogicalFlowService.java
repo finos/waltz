@@ -171,14 +171,13 @@ public class LogicalFlowService {
                 FunctionUtilities.time("DFS.flowCounts",
                     () -> logicalFlowStatsDao.countDistinctFlowInvolvementByAppIdSelector(appIdSelector)));
 
-        Supplier<ImmutableLogicalFlowStatistics> mkStat = Unchecked.supplier(() -> ImmutableLogicalFlowStatistics.builder()
+        Supplier<ImmutableLogicalFlowStatistics> statSupplier = Unchecked.supplier(() -> ImmutableLogicalFlowStatistics.builder()
                 .dataTypeCounts(dataTypeCounts.get())
                 .appCounts(appCounts.get())
                 .flowCounts(flowCounts.get())
                 .build());
 
-        return mkStat.get();
-
+        return statSupplier.get();
     }
 
 }
