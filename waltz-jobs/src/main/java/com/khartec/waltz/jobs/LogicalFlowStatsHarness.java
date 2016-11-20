@@ -24,7 +24,7 @@ public class LogicalFlowStatsHarness {
         ApplicationIdSelectorFactory factory = ctx.getBean(ApplicationIdSelectorFactory.class);
 
         IdSelectionOptions options = IdSelectionOptions.mkOpts(
-                EntityReference.mkRef(EntityKind.PERSON, 1),
+                EntityReference.mkRef(EntityKind.PERSON, 125613),
                 HierarchyQueryScope.CHILDREN);
 
         Select<Record1<Long>> selector = factory.apply(options);
