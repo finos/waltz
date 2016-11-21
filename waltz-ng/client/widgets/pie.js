@@ -14,7 +14,6 @@
  *     You should have received a copy of the GNU General Public License
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {interpolate} from "d3-interpolate";
 import {select} from 'd3-selection';
 import {pie, arc} from 'd3-shape';
 import "d3-selection-multi";
@@ -72,7 +71,6 @@ function renderArcs(holder, config, data, onSelect) {
     const newArcs = arcs
         .enter()
         .append('path')
-        .attr('d', d => pieArc(d))
         .classed('arc clickable', true)
         .on('click', d => onSelect(d.data));
 
@@ -82,10 +80,9 @@ function renderArcs(holder, config, data, onSelect) {
 
     arcs
         .merge(newArcs)
-        .attrs({
-            fill: d => colorProvider(d).brighter(),
-            stroke: d => colorProvider(d)
-        });
+        .attr('d', d => pieArc(d))
+        .attr("fill", d => colorProvider(d).brighter())
+        .attr("stroke", d => colorProvider(d));
 
     arcs.exit()
         .remove();
@@ -120,7 +117,8 @@ function render(svg, config, data, onSelect) {
 
     svg.attrs( { width, height });
 
-    const mainGroup = svg.selectAll('.main-group')
+    const mainGroup = svg
+        .selectAll('.main-group')
         .data([1]);
 
     const newMainGroup = mainGroup
@@ -128,11 +126,11 @@ function render(svg, config, data, onSelect) {
         .append('g')
         .classed('main-group', true);
 
-    mainGroup
-        .merge(newMainGroup)
+    const g = newMainGroup
+        .merge(mainGroup)
         .attr('transform', `translate(${width / 2},${height / 2})`);
 
-    renderArcs(mainGroup, config, data, onSelect);
+    renderArcs(g, config, data, onSelect);
 }
 
 
