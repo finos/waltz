@@ -154,7 +154,7 @@ public class PhysicalFlowService {
         checkNotNull(username, "username cannot be null");
 
         //check we have a logical data flow
-        ensureLogicalDataFlow(command.specification().owningEntity(), command.targetEntity());
+        ensureLogicalDataFlow(command.specification().owningEntity(), command.targetEntity(), username);
 
         long specId = command
                 .specification()
@@ -201,7 +201,7 @@ public class PhysicalFlowService {
     }
 
 
-    private void ensureLogicalDataFlow(EntityReference source, EntityReference target) {
+    private void ensureLogicalDataFlow(EntityReference source, EntityReference target, String username) {
         // only ensure logical flow if both entities are applications
         if(!(source.kind().equals(EntityKind.APPLICATION)
                 && target.kind().equals(EntityKind.APPLICATION))) {
@@ -215,15 +215,22 @@ public class PhysicalFlowService {
                 }
 
                 // we need to create a flow with an unknown data type
-                LogicalFlow createdFlow = dataFlowService.addFlow(ImmutableLogicalFlow.builder()
+                ImmutableLogicalFlow newFlow = ImmutableLogicalFlow.builder()
                         .source(source)
                         .target(target)
-                        .build());
+                        .build();
+                LogicalFlow createdFlow = dataFlowService.addFlow(newFlow, username);
 
                 // add decorators
                 DataType defaultDataType = dataTypeService.getByCode(defaultDataTypeCode.get());
-                EntityReference dataTypeRef = EntityReference.mkRef(EntityKind.DATA_TYPE, defaultDataType.id().get(), defaultDataType.name());
-                dataFlowDecoratorService.addDecorators(createdFlow.id().get(), SetUtilities.fromArray(dataTypeRef));
+                EntityReference dataTypeRef = EntityReference.mkRef(
+                        EntityKind.DATA_TYPE,
+                        defaultDataType.id().get(),
+                        defaultDataType.name());
+                dataFlowDecoratorService.addDecorators(
+                        createdFlow.id().get(),
+                        SetUtilities.fromArray(dataTypeRef),
+                        username);
             }
         }
     }

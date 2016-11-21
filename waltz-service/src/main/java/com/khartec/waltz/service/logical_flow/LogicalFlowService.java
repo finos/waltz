@@ -24,11 +24,14 @@ import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowStatistics;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlowMeasures;
 import com.khartec.waltz.model.logical_flow.LogicalFlowStatistics;
 import com.khartec.waltz.model.tally.TallyPack;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
@@ -57,6 +60,7 @@ public class LogicalFlowService {
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
     private final DataTypeUsageService dataTypeUsageService;
+    private final ChangeLogService changeLogService;
 
 
     @Autowired
@@ -65,13 +69,15 @@ public class LogicalFlowService {
                               DataFlowDecoratorService dataFlowDecoratorService,
                               ApplicationIdSelectorFactory appIdSelectorFactory,
                               LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory,
-                              DataTypeUsageService dataTypeUsageService) {
+                              DataTypeUsageService dataTypeUsageService, 
+                              ChangeLogService changeLogService) {
         checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
         checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
         checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(logicalFlowIdSelectorFactory, "logicalFlowIdSelectorFactory cannot be null");
+        checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.appIdSelectorFactory = appIdSelectorFactory;
         this.logicalFlowStatsDao = logicalFlowStatsDao;
@@ -79,6 +85,7 @@ public class LogicalFlowService {
         this.dataFlowDecoratorService = dataFlowDecoratorService;
         this.dataTypeUsageService = dataTypeUsageService;
         this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
+        this.changeLogService = changeLogService;
     }
 
 
@@ -111,16 +118,17 @@ public class LogicalFlowService {
     }
 
 
-    public LogicalFlow addFlow(LogicalFlow flow) {
+    public LogicalFlow addFlow(LogicalFlow flow, String username) {
         if (flow.source().equals(flow.target())) {
             throw new IllegalArgumentException("Cannot have a flow with same source and target");
         }
 
+        auditFlowChange("added", flow, username);
         return logicalFlowDao.addFlow(flow);
     }
 
 
-    public int removeFlows(List<Long> flowIds) {
+    public int removeFlows(List<Long> flowIds, String username) {
         List<LogicalFlow> logicalFlows = logicalFlowDao.findByFlowIds(flowIds);
         int deleted = logicalFlowDao.removeFlows(flowIds);
         dataFlowDecoratorService.deleteAllDecoratorsForFlowIds(flowIds);
@@ -129,9 +137,26 @@ public class LogicalFlowService {
                 .flatMap(df -> Stream.of(df.source(), df.target()))
                 .collect(Collectors.toSet());
 
+        logicalFlows.forEach(flow -> auditFlowChange("removed", flow, username));
         dataTypeUsageService.recalculateForApplications(affectedEntityRefs.toArray(new EntityReference[affectedEntityRefs.size()]));
 
         return deleted;
+    }
+
+    private void auditFlowChange(String verb, LogicalFlow flow, String username) {
+        ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
+                .parentReference(flow.source())
+                .severity(Severity.INFORMATION)
+                .userId(username)
+                .message(String.format(
+                        "Flow %s between: %s and %s",
+                        verb,
+                        flow.source().name().orElse(Long.toString(flow.source().id())),
+                        flow.target().name().orElse(Long.toString(flow.target().id()))))
+                .build();
+
+        changeLogService.write(logEntry);
+        changeLogService.write(logEntry.withParentReference(flow.target()));
     }
 
 
