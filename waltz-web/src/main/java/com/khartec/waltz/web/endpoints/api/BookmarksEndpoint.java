@@ -91,6 +91,16 @@ public class BookmarksEndpoint implements Endpoint {
                     LOG.info("Saving bookmark: "+bookmark);
                     boolean isUpdate = bookmark.id().isPresent();
 
+                    changeLogService.write(ImmutableChangeLog.builder()
+                            .message(String.format("%s bookmark: %s / %s",
+                                    isUpdate ? "Updated" : "Added",
+                                    bookmark.title().orElse("?"),
+                                    bookmark.kind()))
+                            .parentReference(bookmark.parent())
+                            .userId(WebUtilities.getUsername(request))
+                            .severity(Severity.INFORMATION)
+                            .build());
+
                     return isUpdate
                             ? bookmarkService.update(bookmark)
                             : bookmarkService.create(bookmark);
