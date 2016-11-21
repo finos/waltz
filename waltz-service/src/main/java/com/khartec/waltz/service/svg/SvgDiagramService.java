@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.service.svg;
 
+import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.common.SvgUtilities;
 import com.khartec.waltz.data.svg.SvgDiagramDao;
 import com.khartec.waltz.model.svg.ImmutableSvgDiagram;
@@ -63,14 +64,14 @@ public class SvgDiagramService {
 
 
     public List<SvgDiagram> findByKind(String kind) {
-        return svgDiagramDao.findByKind(kind)
+        return FunctionUtilities.time("SDS.findByKind", () -> svgDiagramDao.findByKind(kind)
                 .stream()
                 .map(Unchecked.function(diag -> {
-                        String updatedSvg = convertProductSpecificSvg(diag);
-                        return ImmutableSvgDiagram.copyOf(diag)
-                                .withSvg(updatedSvg);
+                    String updatedSvg = convertProductSpecificSvg(diag);
+                    return ImmutableSvgDiagram.copyOf(diag)
+                            .withSvg(updatedSvg);
                 }))
-                .collect(toList());
+                .collect(toList()));
     }
 
 }
