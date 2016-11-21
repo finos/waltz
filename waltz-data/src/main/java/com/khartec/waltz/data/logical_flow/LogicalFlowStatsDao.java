@@ -95,9 +95,9 @@ public class LogicalFlowStatsDao {
                     .from(APPLICATION)
                     .where(dsl.renderInlined(APPLICATION.ID.in(appIdSelector)));
 
-        Future<Integer> inAppCount = DB_EXECUTOR_POOL.submit(() -> inAppCounter.fetchAny().value1());
-        Future<Integer> outAppCount = DB_EXECUTOR_POOL.submit(() -> outAppCounter.fetchAny().value1());
-        Future<Integer> intraAppCount = DB_EXECUTOR_POOL.submit(() -> intraAppCounter.fetchAny().value1());
+        Future<Integer> inAppCount = DB_EXECUTOR_POOL.submit(() -> inAppCounter.fetchOne().value1());
+        Future<Integer> outAppCount = DB_EXECUTOR_POOL.submit(() -> outAppCounter.fetchOne().value1());
+        Future<Integer> intraAppCount = DB_EXECUTOR_POOL.submit(() -> intraAppCounter.fetchOne().value1());
 
         Supplier<ImmutableLogicalFlowMeasures> appCountSupplier = Unchecked.supplier(() -> ImmutableLogicalFlowMeasures.builder()
                 .inbound(inAppCount.get())
