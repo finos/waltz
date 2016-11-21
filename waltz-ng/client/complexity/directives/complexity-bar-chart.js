@@ -17,8 +17,12 @@
  */
 
 import _ from "lodash";
-import d3 from 'd3';
 import {green, red} from "../../common/colors";
+import {interpolateRgb} from 'd3-interpolate';
+import {axisBottom} from 'd3-axis';
+import {scaleBand, scaleLinear} from 'd3-scale';
+import {select} from 'd3-selection';
+import 'd3-selection-multi';
 
 
 const sizingDefaults = {
@@ -69,57 +73,75 @@ function prepareScales(buckets, sizing) {
 
     const verticalPadding = sizing.padding.top + sizing.padding.bottom;
 
-    return {
-        x: d3.scale.ordinal().domain(_.range(0, bucketCount)).rangeBands([0, sizing.w], 0.2),
-        y: d3.scale.linear().domain([0, biggestBucket]).range([0, sizing.h - verticalPadding]),
-        color: d3.scale.linear().domain([0, bucketCount]).range([green.brighter(1.2), red.brighter(1.2)])
+    const scales = {
+        x: scaleBand()
+            .domain(_.range(0, bucketCount))
+            .range([0, sizing.w], 0.2),
+        y: scaleLinear()
+            .domain([0, biggestBucket])
+            .range([0, sizing.h - verticalPadding]),
+        color: scaleLinear()
+            .domain([0, bucketCount])
+            .interpolate(interpolateRgb)
+            .range([green, red])
     };
+
+    return scales;
 }
 
 
 function drawXAxis(buckets, container, scale, sizing) {
 
-    var xAxis = d3.svg.axis()
+    const xAxis = axisBottom()
         .scale(scale)
-        .tickFormat(d => d % 4 == 0 ? d3.round(buckets[d].begin, 2) : "")
-        .orient('bottom');
+        .tickFormat(d => d % 4 == 0
+            ? Number(buckets[d].begin).toFixed(1)
+            : "");
 
-    const xAxisGroup = container.selectAll('.x-axis')
+    const xAxisGroup = container
+        .selectAll('.x-axis')
         .data([1], () => 1);
 
     xAxisGroup.enter()
         .append('g')
-        .attr('class', 'axis x-axis');
-
-    xAxisGroup.attr('transform', `translate(0, ${sizing.h - sizing.padding.bottom})`)
+        .attr('class', 'axis x-axis')
+        .merge(xAxisGroup)
+        .attr('transform', `translate(0, ${sizing.h - sizing.padding.bottom})`)
         .call(xAxis);
 }
 
 
 function drawBucketBars(buckets, container, scales, sizing, repaint, onSelect) {
 
-    const bucketBars = container.selectAll('.bucket-bar')
+    const bucketBars = container
+        .selectAll('.bucket-bar', d => `${d.begin}_${d.end}`)
         .data(buckets);
 
-    bucketBars
+    const newBars = bucketBars
         .enter()
         .append('rect')
         .classed('bucket-bar', true);
 
+    window.s = scales.color;
+    window.g = green;
+
     bucketBars
+        .merge(newBars)
         .classed('clickable', onSelect != null)
-        .attr({
-            fill: (d, i) => scales.color(i),
-            stroke: '#444',
-            x: (d, i) => scales.x(i),
-            width: scales.x.rangeBand(),
-            y:  d => (sizing.h - sizing.padding.bottom) - (scales.y(d.items.length)),
-            height: d => scales.y(d.items.length),
-            opacity: d => d.isMouseOver ? 1 : 0.7
-        })
+        .attr('stroke', '#444')
+        .attr('x', (d, i) => scales.x(i))
+        .attr('width', scales.x.bandwidth())
+        .attr('y', d => (sizing.h - sizing.padding.bottom) - (scales.y(d.items.length)))
+        .attr('height', d => scales.y(d.items.length))
+        .attr('opacity', d => d.isMouseOver
+            ? 1
+            : 0.7)
+        .attr('fill', (d, i) => scales.color(i)) //)
         .on('click', d => { if (onSelect) { onSelect(d); } })
         .on('mouseenter', d => { d.isMouseOver = true; repaint(); })
         .on('mouseleave', d => { d.isMouseOver = false; repaint(); });
+
+
 }
 
 
@@ -128,16 +150,18 @@ function drawBucketLabels(buckets, container, scales, sizing) {
     const bucketCountLabels = container.selectAll('.bucket-count-label')
         .data(buckets, (d, i) => i);
 
-    bucketCountLabels.enter()
+    const newLabels =bucketCountLabels
+        .enter()
         .append('text')
         .classed('bucket-count-label', true);
 
     bucketCountLabels
+        .merge(newLabels)
         .text(d => d.items.length)
-        .attr({
+        .attrs({
             'text-anchor': 'middle',
             y: d => (sizing.h - sizing.padding.bottom) - (scales.y(d.items.length)) - 4,
-            x: (d, i) => scales.x(i) + scales.x.rangeBand() / 2,
+            x: (d, i) => scales.x(i) + scales.x.bandwidth() / 2,
             opacity: d => d.isMouseOver ? 1 : 0
         });
 }
@@ -157,37 +181,40 @@ function render(config) {
     const buckets = config.buckets;
     const scales = prepareScales(buckets, sizing);
 
-    const svg = d3
-        .select(config.elem)
+    const svg = select(config.elem)
         .selectAll('svg')
         .data([1]);
 
-    svg.enter()
+    const newSvg = svg
+        .enter()
         .append('svg');
 
-    svg.attr({
-        width: sizing.w,
-        height: sizing.h
-    });
+    const mergedSvg = svg.merge(newSvg)
+        .attrs({
+            width: sizing.w,
+            height: sizing.h
+        });
 
-    drawXAxis(buckets, svg, scales.x, sizing);
-    drawBucketBars(buckets, svg, scales, sizing, repaint, config.onSelect);
-    drawBucketLabels(buckets, svg, scales, sizing);
+    drawXAxis(buckets, mergedSvg, scales.x, sizing);
+    drawBucketBars(buckets, mergedSvg, scales, sizing, repaint, config.onSelect);
+    drawBucketLabels(buckets, mergedSvg, scales, sizing);
 }
 
 
-function controller($scope) {
+function controller($scope, $element) {
     const vm = this;
 
-    const watcher = ([elem, complexity]) => {
-        if (!elem || !complexity) return;
+    const watcher = (complexity) => {
+        if (!complexity) return;
 
         const buckets = bucket(complexity);
 
-        const onSelect = vm.onSelect ? d => $scope.$apply(vm.onSelect(d)) : null;
+        const onSelect = vm.onSelect
+            ? d => $scope.$apply(vm.onSelect(d))
+            : null;
 
         const config = {
-            elem,
+            elem: $element[0],
             complexity,
             buckets,
             sizing: vm.sizing,
@@ -197,23 +224,21 @@ function controller($scope) {
         render(config);
     };
 
-    $scope.$watchGroup(
-        ['elem', 'ctrl.complexity'],
+    $scope.$watch(
+        'ctrl.complexity',
         watcher);
 }
 
-controller.$inject = ['$scope'];
 
-
-function link(scope, elem, attr) {
-    scope.elem = elem[0];
-}
+controller.$inject = [
+    '$scope',
+    '$element'
+];
 
 
 export default () => ({
     restrict: 'E',
     replace: true,
-    link,
     controller,
     controllerAs: 'ctrl',
     scope: {},

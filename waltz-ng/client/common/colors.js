@@ -10,7 +10,9 @@
  *
  */
 
-import {rgb, schemeCategory20c, scaleOrdinal} from "d3";
+import {rgb} from "d3-color";
+import {scaleOrdinal, schemeCategory20c} from 'd3-scale';
+
 import _ from "lodash";
 
 
