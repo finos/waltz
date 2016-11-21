@@ -96,12 +96,12 @@ public class DataFlowDecoratorEndpoint implements Endpoint {
 
         if (notEmpty(action.removedDecorators())) {
             LOG.info("User: {}, deleting decorators: {} for flow: {}", user, action.removedDecorators(), action.flowId());
-            dataFlowDecoratorService.deleteDecorators(action.flowId(), action.removedDecorators());
+            dataFlowDecoratorService.deleteDecorators(action.flowId(), action.removedDecorators(), user);
         }
 
         if (notEmpty(action.addedDecorators())) {
             LOG.info("User: {}, adding decorators: {} for flow: {}", user, action.addedDecorators(), action.flowId());
-            dataFlowDecoratorService.addDecorators(action.flowId(), action.addedDecorators());
+            dataFlowDecoratorService.addDecorators(action.flowId(), action.addedDecorators(), user);
         }
 
         return dataFlowDecoratorService.findByFlowIds(newArrayList(action.flowId()));
