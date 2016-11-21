@@ -161,8 +161,9 @@ export const transportKindNames  = {
     MESSAGING: "Messaging",
     OTHER: "Other",
     RPC: "Remote Procedure Call",
-    WEB: "Web",
-    UNKNOWN: 'Unknown'
+    UDP: 'UDP',
+    UNKNOWN: 'Unknown',
+    WEB: "Web"
 };
 
 
