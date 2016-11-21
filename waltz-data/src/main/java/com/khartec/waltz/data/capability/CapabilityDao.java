@@ -162,4 +162,14 @@ public class CapabilityDao implements FindEntityReferencesByIdSelector {
                 .where(c.ID.in(selector))
                 .fetch(TO_ENTITY_REFERENCE);
     }
+
+
+    public Capability getById(long id) {
+        return dsl
+                .select()
+                .from(CAPABILITY)
+                .where(CAPABILITY.ID.eq(id))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
 }

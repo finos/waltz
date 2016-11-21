@@ -25,7 +25,6 @@ import com.khartec.waltz.model.application_capability.SaveAppCapabilityCommand;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.app_capability.AppCapabilityService;
-import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -36,10 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Route;
 
-import java.util.List;
-
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static spark.Spark.delete;
@@ -55,19 +51,15 @@ public class AppCapabilityEndpoint implements Endpoint {
 
 
     private final AppCapabilityService appCapabilityService;
-    private final ChangeLogService changeLogDao;
     private final UserRoleService userRoleService;
 
 
     @Autowired
     public AppCapabilityEndpoint(AppCapabilityService appCapabilityService,
-                                 ChangeLogService changeLogDao,
                                  UserRoleService userRoleService) {
         checkNotNull(appCapabilityService, "appCapabilityService must not be null");
-        checkNotNull(changeLogDao, "changeLogDao must not be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
 
-        this.changeLogDao = changeLogDao;
         this.appCapabilityService = appCapabilityService;
         this.userRoleService = userRoleService;
     }
@@ -100,11 +92,10 @@ public class AppCapabilityEndpoint implements Endpoint {
             requireRole(userRoleService, req, Role.RATING_EDITOR);
 
             long id = getId(req);
+            Long capabilityId = getLong(req, "capabilityId");
+            LOG.info("Removing application capabilities: " + capabilityId + " for application: " + id);
 
-            List<Long> capabilityIds = newArrayList(getLong(req, "capabilityId"));
-
-            LOG.info("Removing application capabilities: " + capabilityIds + " for application: " + id);
-            return appCapabilityService.removeCapabilitiesFromApp(id, capabilityIds)[0];
+            return appCapabilityService.removeCapabilityFromApp(id, capabilityId, getUsername(req));
         };
 
         DatumRoute<Integer> saveRoute = (req, res) -> {
@@ -114,6 +105,7 @@ public class AppCapabilityEndpoint implements Endpoint {
             long appId = getId(req);
             SaveAppCapabilityCommand saveCmd = readBody(req, SaveAppCapabilityCommand.class);
             LOG.info("Saving " + saveCmd + " for application: " + appId);
+
             return appCapabilityService.save(appId, saveCmd, username);
         };
 

@@ -103,6 +103,7 @@ function controller($scope,
                     bookmarkStore,
                     capabilityStore,
                     changeInitiativeStore,
+                    changeLogStore,
                     complexityStore,
                     entityStatisticStore,
                     historyStore,
@@ -178,7 +179,9 @@ function controller($scope,
         .then(() => calculateCapabilities(vm.allCapabilities, vm.appCapabilities))
         .then(result => Object.assign(vm, result))
         .then(() => sourceDataRatingStore.findAll())
-        .then((sourceDataRatings) => vm.sourceDataRatings = sourceDataRatings);
+        .then((sourceDataRatings) => vm.sourceDataRatings = sourceDataRatings)
+        .then(() => changeLogStore.findByEntityReference('APP_GROUP', id))
+        .then(changeLogs => vm.changeLogs = changeLogs);
 
     userService
         .whoami()
@@ -215,6 +218,7 @@ function controller($scope,
         .findLineageReportsBySelector(appIdSelector)
         .then(lineageReports => vm.lineageReports = lineageReports);
 
+
 }
 
 
@@ -229,6 +233,7 @@ controller.$inject = [
     'BookmarkStore',
     'CapabilityStore',
     'ChangeInitiativeStore',
+    'ChangeLogStore',
     'ComplexityStore',
     'EntityStatisticStore',
     'HistoryStore',

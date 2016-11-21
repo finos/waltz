@@ -102,7 +102,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         }
 
         LOG.info("User: {}, adding new logical flow: {}", username, logicalFlow);
-        LogicalFlow savedFlow = logicalFlowService.addFlow(logicalFlow);
+        LogicalFlow savedFlow = logicalFlowService.addFlow(logicalFlow, username);
         return savedFlow;
     }
 
@@ -115,7 +115,7 @@ public class LogicalFlowEndpoint implements Endpoint {
 
         LOG.info("User: {} removing logical flow: {}", username, flowId);
 
-        return logicalFlowService.removeFlows(newArrayList(flowId));
+        return logicalFlowService.removeFlows(newArrayList(flowId), username);
     }
 
 

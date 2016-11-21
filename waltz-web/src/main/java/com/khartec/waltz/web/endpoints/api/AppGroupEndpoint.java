@@ -18,17 +18,13 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupDetail;
 import com.khartec.waltz.model.app_group.AppGroupMember;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.service.app_group.AppGroupService;
 import com.khartec.waltz.service.app_group.AppGroupSubscription;
-import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -47,14 +43,13 @@ public class AppGroupEndpoint implements Endpoint {
     private static final Logger LOG = LoggerFactory.getLogger(AppGroupEndpoint.class);
     private static final String BASE_URL = mkPath("api", "app-group");
 
+
     private final AppGroupService appGroupService;
-    private final ChangeLogService changeLogService;
 
 
     @Autowired
-    public AppGroupEndpoint(AppGroupService service, ChangeLogService changeLogService) {
+    public AppGroupEndpoint(AppGroupService service) {
         this.appGroupService = service;
-        this.changeLogService = changeLogService;
     }
 
 
@@ -83,21 +78,17 @@ public class AppGroupEndpoint implements Endpoint {
         String removeChangeInitiativePath = mkPath(idPath, "change-initiatives", ":changeInitiativeId");
 
 
-
         DatumRoute<AppGroupDetail> getDetailByIdRoute = (request, response) ->
                 appGroupService.getGroupDetailById(getId(request));
 
         ListRoute<AppGroup> findByIdsRoute = (request, response) ->
                 appGroupService.findByIds(getUsername(request), readIdsFromBody(request));
 
-
         ListRoute<AppGroupSubscription> findGroupSubscriptionsRoute = (request, response) ->
                 appGroupService.findGroupSubscriptionsForUser(getUsername(request));
 
-
         ListRoute<AppGroup> findPublicGroupsRoute = (request, response) ->
                 appGroupService.findPublicGroups();
-
 
         ListRoute<AppGroupSubscription> subscribeRoute = (request, response) -> {
             long groupId = getId(request);
@@ -105,11 +96,9 @@ public class AppGroupEndpoint implements Endpoint {
 
             LOG.info("Subscribing {} to group: {}", userId, groupId);
             appGroupService.subscribe(userId, groupId);
-            audit(groupId, userId, "Subscribed to group");
 
             return findGroupSubscriptionsRoute.apply(request, response);
         };
-
 
         ListRoute<AppGroupSubscription> unsubscribeRoute = (request, response) -> {
             long groupId = getId(request);
@@ -118,7 +107,6 @@ public class AppGroupEndpoint implements Endpoint {
             return findGroupSubscriptionsRoute.apply(request, response);
         };
 
-
         ListRoute<AppGroupMember> addOwnerRoute = (request, response) -> {
             String userId = getUsername(request);
             long groupId = getId(request);
@@ -126,11 +114,9 @@ public class AppGroupEndpoint implements Endpoint {
 
             LOG.info("Adding owner: {}, to group: {}", groupId, ownerId);
             appGroupService.addOwner(userId, groupId, ownerId);
-            audit(groupId, userId, String.format("Added owner %s to group %d", ownerId, groupId));
 
             return appGroupService.getMembers(groupId);
         };
-
 
         ListRoute<AppGroupSubscription> deleteGroupRoute = (request, response) -> {
             String userId = getUsername(request);
@@ -138,19 +124,17 @@ public class AppGroupEndpoint implements Endpoint {
 
             LOG.warn("Deleting group: {}", groupId);
             appGroupService.deleteGroup(userId, groupId);
-            audit(groupId, userId, String.format("Deleted group %d", groupId));
 
             return findGroupSubscriptionsRoute.apply(request, response);
         };
-
 
         ListRoute<EntityReference> addApplicationRoute = (request, response) -> {
             long groupId = getId(request);
             long applicationId = readBody(request, Long.class);
             LOG.info("Adding application: {}, to group: {} ", applicationId,  groupId);
+            String userId = getUsername(request);
             return appGroupService.addApplication(getUsername(request), groupId, applicationId);
         };
-
 
         ListRoute<EntityReference> removeApplicationRoute = (request, response) -> {
             long groupId = getId(request);
@@ -158,7 +142,6 @@ public class AppGroupEndpoint implements Endpoint {
             LOG.info("Removing application: {}, from group: {} ", applicationId,  groupId);
             return appGroupService.removeApplication(getUsername(request), groupId, applicationId);
         };
-
 
         DatumRoute<AppGroupDetail> updateGroupOverviewRoute = (request, response) -> {
             String userId = getUsername(request);
@@ -168,9 +151,9 @@ public class AppGroupEndpoint implements Endpoint {
 
         DatumRoute<Long> createNewGroupRoute = (request, response) -> {
             String userId = getUsername(request);
-            return appGroupService.createNewGroup(userId);
+            Long groupId = appGroupService.createNewGroup(userId);
+            return groupId;
         };
-
 
         ListRoute<ChangeInitiative> addChangeInitiativeRoute = (request, response) -> {
             long groupId = getId(request);
@@ -178,7 +161,6 @@ public class AppGroupEndpoint implements Endpoint {
             LOG.info("Adding Change Initiative: {}, to group: {} ", changeInitiativeId,  groupId);
             return appGroupService.addChangeInitiative(getUsername(request), groupId, changeInitiativeId);
         };
-
 
         ListRoute<ChangeInitiative> removeChangeInitiativeRoute = (request, response) -> {
             long groupId = getId(request);
@@ -210,12 +192,4 @@ public class AppGroupEndpoint implements Endpoint {
 
     }
 
-
-    private void audit(long groupId, String userId, String message) {
-        changeLogService.write(ImmutableChangeLog.builder()
-                .message(message)
-                .userId(userId)
-                .parentReference(ImmutableEntityReference.builder().id(groupId).kind(EntityKind.APP_GROUP).build())
-                .build());
-    }
 }

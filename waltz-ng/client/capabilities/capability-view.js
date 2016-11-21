@@ -49,6 +49,7 @@ function controller($q,
                     assetCostViewService,
                     bookmarkStore,
                     capabilities,
+                    changeLogStore,
                     complexityStore,
                     entityStatisticStore,
                     historyStore,
@@ -187,12 +188,17 @@ function controller($q,
             .findForCapability(capId)
             .then(ps => vm.processes = ps);
 
+        const changeLogPromise = changeLogStore
+            .findByEntityReference('CAPABILITY', capId)
+            .then(changeLogs => vm.changeLogs = changeLogs);
+
         const promises = [
             bookmarkPromise,
             tourPromise,
             sourceDataRatingsPromise,
             processPromise,
-            associatedCapabilitiesPromise
+            associatedCapabilitiesPromise,
+            changeLogPromise
         ];
 
         return $q.all(promises);
@@ -245,6 +251,7 @@ controller.$inject = [
     'AssetCostViewService',
     'BookmarkStore',
     'capabilities',
+    'ChangeLogStore',
     'ComplexityStore',
     'EntityStatisticStore',
     'HistoryStore',
