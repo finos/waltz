@@ -1,5 +1,6 @@
+import {scaleLinear} from 'd3-scale';
+import {max, min} from 'd3-array';
 
-import d3 from "d3";
 
 const BINDINGS = {
     stats: '='
@@ -22,12 +23,10 @@ function updateArrows(rootElem, apps) {
         apps.inbound,
         apps.outbound ];
 
-    const arrowScale = d3
-        .scale
-        .linear()
+    const arrowScale = scaleLinear()
         .domain([
-            d3.min(counts),
-            d3.max(counts)
+            min(counts),
+            max(counts)
         ])
         .range([0.85, 1.12]);
 

@@ -179,8 +179,13 @@ export function termSearch(items = [], searchStr = '', searchFields = []) {
  * @param data
  * @returns {Array|*}
  */
-function toCountData(data) {
-    return _.map(data, d => ({ key: d.key, count: d.values }));
+function toCountData(data = []) {
+    return _.map(
+        data,
+        d => ({
+            key: d.key,
+            count: d.value
+        }));
 }
 
 

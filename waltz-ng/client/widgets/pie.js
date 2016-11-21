@@ -60,17 +60,7 @@ function renderArcs(holder, config, data, onSelect) {
         .outerRadius(radius - 10)
         .innerRadius(0);
 
-    function tweenPie(finish) {
-        const start = {
-            startAngle: 0,
-            endAngle: 0
-        };
-        const i = interpolate(start, finish);
-        return (d) => pieArc(i(d));
-    }
-
     const pieLayout = pie()
-        //.sort(null)
         .value(valueProvider);
 
     const pieData = pieLayout(_.filter(data, r => r.count > 0));
@@ -84,23 +74,21 @@ function renderArcs(holder, config, data, onSelect) {
         .append('path')
         .attr('d', d => pieArc(d))
         .classed('arc clickable', true)
-        .on('click', d => onSelect(d.data))
+        .on('click', d => onSelect(d.data));
+
+    newArcs
         .append('title')
         .text(d => `${d.data.key} - ${d.data.count}`);
 
     arcs
         .merge(newArcs)
         .attrs({
-            fill: d => { const i = idProvider(d); const c = "#ffcccc";  console.log('c1', c); return c; }, //.brighter(),
-            stroke: d => { const i = idProvider(d); const c = "#ccffcc"; console.log('c2', c);  return c; }
+            fill: d => colorProvider(d).brighter(),
+            stroke: d => colorProvider(d)
         });
 
     arcs.exit()
         .remove();
-
-    // arcs.transition()
-    //     .duration(400)
-    //     .attrTween('d', tweenPie);
 
     const emptyPie = holder
         .selectAll('.empty-pie')

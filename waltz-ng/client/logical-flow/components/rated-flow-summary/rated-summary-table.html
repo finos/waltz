@@ -26,11 +26,11 @@
                 </span>
             </td>
             <td>
-                <span ng-if="$ctrl.totalCounts[decorator.id]['PRIMARY'] > 0">
-                    <waltz-rated-summary-cell direct-count="$ctrl.directCounts[decorator.id]['PRIMARY']"
-                                              total-count="$ctrl.totalCounts[decorator.id]['PRIMARY']"
+                <span ng-if="$ctrl.totalCounts.get(decorator.id).get('PRIMARY') > 0">
+                    <waltz-rated-summary-cell direct-count="$ctrl.directCounts.get(decorator.id).get('PRIMARY')"
+                                              total-count="$ctrl.totalCounts.get(decorator.id).get('PRIMARY')"
                                               rating="'PRIMARY'"
-                                              max-count="$ctrl.maxCounts[decorator.id]"
+                                              max-count="$ctrl.maxCounts.get(decorator.id)"
                                               decorator="decorator"
                                               ng-click="$ctrl.cellClick($event, decorator, 'PRIMARY')"
                                               class="wrst-primary clickable">
@@ -39,10 +39,10 @@
             </td>
             <td>
                 <span ng-if="$ctrl.totalCounts[decorator.id]['SECONDARY'] > 0">
-                    <waltz-rated-summary-cell direct-count="$ctrl.directCounts[decorator.id]['SECONDARY']"
-                                              total-count="$ctrl.totalCounts[decorator.id]['SECONDARY']"
+                    <waltz-rated-summary-cell direct-count="$ctrl.directCounts.get(decorator.id).get('SECONDARY')"
+                                              total-count="$ctrl.totalCounts.get(decorator.id).get('SECONDARY')"
                                               rating="'PRIMARY'"
-                                              max-count="$ctrl.maxCounts[decorator.id]"
+                                              max-count="$ctrl.maxCounts.get(decorator.id)"
                                               decorator="decorator"
                                               ng-click="$ctrl.cellClick($event, decorator, 'SECONDARY')"
                                               class="wrst-secondary clickable">
@@ -50,11 +50,11 @@
                 </span>
             </td>
             <td>
-                <span ng-if="$ctrl.totalCounts[decorator.id]['DISCOURAGED'] > 0">
-                    <waltz-rated-summary-cell direct-count="$ctrl.directCounts[decorator.id]['DISCOURAGED']"
-                                              total-count="$ctrl.totalCounts[decorator.id]['DISCOURAGED']"
+                <span ng-if="$ctrl.totalCounts.get(decorator.id).get('DISCOURAGED') > 0">
+                    <waltz-rated-summary-cell direct-count="$ctrl.directCounts.get(decorator.id).get('DISCOURAGED')"
+                                              total-count="$ctrl.totalCounts.get(decorator.id).get('DISCOURAGED')"
                                               rating="'PRIMARY'"
-                                              max-count="$ctrl.maxCounts[decorator.id]"
+                                              max-count="$ctrl.maxCounts.get(decorator.id)"
                                               decorator="decorator"
                                               ng-click="$ctrl.cellClick($event, decorator, 'DISCOURAGED')"
                                               class="wrst-discouraged clickable">
@@ -63,10 +63,10 @@
             </td>
             <td>
                 <span ng-if="$ctrl.totalCounts[decorator.id]['NO_OPINION'] > 0">
-                    <waltz-rated-summary-cell direct-count="$ctrl.directCounts[decorator.id]['NO_OPINION']"
-                                              total-count="$ctrl.totalCounts[decorator.id]['NO_OPINION']"
+                    <waltz-rated-summary-cell direct-count="$ctrl.directCounts.get(decorator.id).get('NO_OPINION')"
+                                              total-count="$ctrl.totalCounts.get(decorator.id).get('NO_OPINION')"
                                               rating="'PRIMARY'"
-                                              max-count="$ctrl.maxCounts[decorator.id]"
+                                              max-count="$ctrl.maxCounts.get(decorator.id)"
                                               decorator="decorator"
                                               ng-click="$ctrl.cellClick($event, decorator, 'NO_OPINION')"
                                               class="wrst-no-opinion clickable">
@@ -75,7 +75,7 @@
             </td>
             <td>
                 <span class='small text-muted'
-                      ng-bind="$ctrl.maxCounts[decorator.id]">
+                      ng-bind="$ctrl.maxCounts.get(decorator.id)">
                 </span>
             </td>
         </tr>

@@ -10,44 +10,9 @@
     </waltz-page-header>
 
     <waltz-section>
-        <waltz-physical-flow-edit-overview source-entity="ctrl.sourceEntity"
-                                           specification="ctrl.specification"
-                                           target-entity="ctrl.targetEntity"
-                                           flow-attributes="ctrl.flowAttributes"
-                                           on-specification-focus="ctrl.focusSpecification"
-                                           on-flow-attributes-focus="ctrl.focusFlowAttributes"
-                                           on-target-focus="ctrl.focusTarget">
-        </waltz-physical-flow-edit-overview>
+       <waltz-database-pies databases="ctrl.databases">
 
-        <hr>
-
-        <waltz-physical-flow-attribute-editor ng-if="ctrl.visibility.editor === 'FLOW-ATTRIBUTES'"
-                                              current="ctrl.flowAttributes"
-                                              on-change="ctrl.attributesChanged"
-                                              on-dismiss="ctrl.editorDismiss">
-
-        </waltz-physical-flow-attribute-editor>
-
-
-        <waltz-physical-flow-edit-target-entity ng-if="ctrl.visibility.editor === 'TARGET-ENTITY'"
-                                                current="ctrl.targetEntity"
-                                                owning-entity="ctrl.sourceEntity"
-                                                on-dismiss="ctrl.editorDismiss"
-                                                on-change="ctrl.targetChanged">
-        </waltz-physical-flow-edit-target-entity>
-
-
-        <waltz-physical-flow-edit-specification ng-if="ctrl.visibility.editor === 'SPECIFICATION'"
-                                                owning-entity="ctrl.sourceEntity"
-                                                candidates="ctrl.candidateSpecifications.produces"
-                                                current="ctrl.specification"
-                                                on-dismiss="ctrl.editorDismiss"
-                                                on-change="ctrl.changeSpecification">
-            <!--
-            Picker or add new, on-change cannot give a null spec, but can give a spec with
-            a null id (indicating new)
-            -->
-        </waltz-physical-flow-edit-specification>
+       </waltz-database-pies>
 
 
 
