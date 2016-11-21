@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.data.svg;
 
+import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.model.svg.ImmutableSvgDiagram;
 import com.khartec.waltz.model.svg.SvgDiagram;
 import com.khartec.waltz.schema.tables.records.SvgDiagramRecord;
@@ -59,11 +60,11 @@ public class SvgDiagramDao {
 
 
     public List<SvgDiagram> findByKind(String kind) {
-        return dsl.select()
+        return FunctionUtilities.time("SDD.findByKind", () -> dsl.select()
                 .from(SVG_DIAGRAM)
                 .where(SVG_DIAGRAM.KIND.eq(kind))
                 .orderBy(SVG_DIAGRAM.PRIORITY.asc())
-                .fetch(svgMapper);
+                .fetch(svgMapper));
     }
 
 }
