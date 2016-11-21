@@ -18,6 +18,7 @@ public enum TransportKind {
     OTHER,
     RPC,
     UNKNOWN,
+    UDP,
     WEB
 
 }
