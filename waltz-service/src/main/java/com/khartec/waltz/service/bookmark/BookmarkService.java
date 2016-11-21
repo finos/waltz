@@ -19,7 +19,10 @@ package com.khartec.waltz.service.bookmark;
 
 import com.khartec.waltz.data.bookmark.BookmarkDao;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.bookmark.Bookmark;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,12 +35,15 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class BookmarkService {
 
     private final BookmarkDao bookmarkDao;
-
+    private final ChangeLogService changeLogService;
 
     @Autowired
-    public BookmarkService(BookmarkDao bookmarkDao) {
+    public BookmarkService(BookmarkDao bookmarkDao,
+                           ChangeLogService changeLogService) {
         checkNotNull(bookmarkDao, "bookmarkDao must not be null");
+        checkNotNull(changeLogService, "changeLogService cannot be null");
         this.bookmarkDao = bookmarkDao;
+        this.changeLogService = changeLogService;
     }
 
 
@@ -46,27 +52,43 @@ public class BookmarkService {
     }
 
 
-    public Bookmark create(Bookmark bookmark) {
+
+    public Bookmark create(Bookmark bookmark, String username) {
+        logChange("Added", bookmark, username);
         return bookmarkDao.create(bookmark);
     }
 
 
-    public Bookmark update(Bookmark bookmark) {
+    public Bookmark update(Bookmark bookmark, String username) {
+        logChange("Updated", bookmark, username);
         return bookmarkDao.update(bookmark);
     }
 
 
     /**
-     *
-     * @param id
+     * @param bookmark
      * @return true if bookmark deleted
      */
-    public boolean deleteById(long id) {
-        return bookmarkDao.deleteById(id);
+    public boolean deleteById(Bookmark bookmark, String username) {
+        logChange("Deleted", bookmark, username);
+        return bookmarkDao.deleteById(bookmark.id().get());
     }
 
 
     public Bookmark getById(long bookmarkId) {
         return bookmarkDao.getById(bookmarkId);
+    }
+
+
+    private void logChange(String verb, Bookmark bookmark, String username) {
+        changeLogService.write(ImmutableChangeLog.builder()
+                .message(String.format("%s bookmark: %s / %s",
+                        verb,
+                        bookmark.title().orElse("?"),
+                        bookmark.kind()))
+                .parentReference(bookmark.parent())
+                .userId(username)
+                .severity(Severity.INFORMATION)
+                .build());
     }
 }

@@ -22,14 +22,16 @@ import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.data.app_capability.AppCapabilityDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.model.IdGroup;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.ImmutableIdGroup;
+import com.khartec.waltz.data.capability.CapabilityDao;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application_capability.ApplicationCapability;
 import com.khartec.waltz.model.application_capability.GroupedApplications;
 import com.khartec.waltz.model.application_capability.ImmutableApplicationCapability;
 import com.khartec.waltz.model.application_capability.SaveAppCapabilityCommand;
+import com.khartec.waltz.model.capability.Capability;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,36 +50,45 @@ import static com.khartec.waltz.common.FunctionUtilities.time;
 @Service
 public class AppCapabilityService {
 
-    private final AppCapabilityDao dao;
+    private final AppCapabilityDao appCapabilityDao;
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
+    private final CapabilityDao capabilityDao;
+    private final ChangeLogService changeLogService;
 
 
     @Autowired
-    public AppCapabilityService(AppCapabilityDao appCapabilityDao, ApplicationIdSelectorFactory appIdSelectorFactory) {
-        checkNotNull(appCapabilityDao, "dao must not be null");
-        Checks.checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
+    public AppCapabilityService(AppCapabilityDao appCapabilityDao,
+                                ApplicationIdSelectorFactory appIdSelectorFactory,
+                                CapabilityDao capabilityDao,
+                                ChangeLogService changeLogService) {
+        checkNotNull(appCapabilityDao, "appCapabilityDao must not be null");
+        checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
+        checkNotNull(capabilityDao, "capabilityDao cannot be null");
+        checkNotNull(changeLogService, "changeLogService cannot be null");
 
-        this.dao = appCapabilityDao;
+        this.appCapabilityDao = appCapabilityDao;
         this.appIdSelectorFactory = appIdSelectorFactory;
+        this.capabilityDao = capabilityDao;
+        this.changeLogService = changeLogService;
     }
 
 
     public List<ApplicationCapability> findCapabilitiesForApp(long appId) {
-        return dao.findCapabilitiesForApp(appId);
+        return appCapabilityDao.findCapabilitiesForApp(appId);
     }
 
 
     public GroupedApplications findGroupedApplicationsByCapability(long capabilityId) {
         return time(
                 "ACS.findGroupedApplicationsByCapability",
-                () -> dao.findGroupedApplicationsByCapability(capabilityId));
+                () -> appCapabilityDao.findGroupedApplicationsByCapability(capabilityId));
     }
 
 
     public List<ApplicationCapability> findAssociatedApplicationCapabilities(long capabilityId) {
         return time(
                 "ACS.findAssociatedApplicationCapabilities",
-                () -> dao.findAssociatedApplicationCapabilities(capabilityId));
+                () -> appCapabilityDao.findAssociatedApplicationCapabilities(capabilityId));
     }
 
 
@@ -114,13 +125,27 @@ public class AppCapabilityService {
 
         return time(
                 "ACS.tallyByCapabilityId",
-                () -> dao.tallyByCapabilityId());
+                () -> appCapabilityDao.tallyByCapabilityId());
     }
 
 
 
-    public int[] removeCapabilitiesFromApp(long appId, List<Long> capabilityIds) {
-        return dao.removeCapabilitiesFromApp(appId, capabilityIds);
+    public int removeCapabilityFromApp(long appId,
+                                         Long capabilityId,
+                                         String username) {
+        Capability capability = capabilityDao.getById(capabilityId);
+
+        changeLogService.write(ImmutableChangeLog.builder()
+                .message(String.format("Removed capability: %s",
+                        capability == null
+                            ? capabilityId.toString()
+                            : capability.name()))
+                .parentReference(EntityReference.mkRef(EntityKind.APPLICATION, appId))
+                .userId(username)
+                .severity(Severity.INFORMATION)
+                .build());
+
+        return appCapabilityDao.removeCapabilityFromApp(appId, capabilityId);
     }
 
 
@@ -128,7 +153,7 @@ public class AppCapabilityService {
         Checks.checkNotNull(capIds, "capIds cannot be null");
         return time(
                 "ACS.findByCapabilityIds",
-                () -> dao.findByCapabilityIds(capIds));
+                () -> appCapabilityDao.findByCapabilityIds(capIds));
     }
 
 
@@ -136,7 +161,7 @@ public class AppCapabilityService {
         Select<Record1<Long>> selector = appIdSelectorFactory.apply(options);
         return time(
                 "ACS.findByAppIdSelector",
-                () -> dao.findApplicationCapabilitiesForAppIdSelector(selector));
+                () -> appCapabilityDao.findApplicationCapabilitiesForAppIdSelector(selector));
     }
 
     public Integer save(long appId, SaveAppCapabilityCommand saveCmd, String username) {
@@ -150,10 +175,25 @@ public class AppCapabilityService {
                 .provenance("waltz")
                 .build();
 
+        Capability capability = capabilityDao.getById(saveCmd.capabilityId());
+        checkNotNull(capability, "associated capability cannot be null");
+
+        changeLogService.write(ImmutableChangeLog.builder()
+                .message(String.format("%s capability: %s, rating %s",
+                        saveCmd.isNew()
+                                ? "Adding"
+                                : "Updating",
+                        capability.name(),
+                        saveCmd.rating()))
+                .parentReference(EntityReference.mkRef(EntityKind.APPLICATION, appId))
+                .userId(username)
+                .severity(Severity.INFORMATION)
+                .build());
+
         if (saveCmd.isNew()) {
-            return dao.insert(applicationCapability);
+            return appCapabilityDao.insert(applicationCapability);
         } else {
-            return dao.update(applicationCapability);
+            return appCapabilityDao.update(applicationCapability);
         }
     }
 }

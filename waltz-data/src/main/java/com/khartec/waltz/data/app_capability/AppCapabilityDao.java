@@ -167,16 +167,13 @@ public class AppCapabilityDao {
     }
 
 
-    public int[] removeCapabilitiesFromApp(long appId, List<Long> capabilityIds) {
-        List<DeleteConditionStep<AppCapabilityRecord>> deletes = capabilityIds
-                .stream()
-                .map(capId -> dsl
-                        .deleteFrom(APP_CAPABILITY)
-                        .where(APP_CAPABILITY.APPLICATION_ID.eq(appId))
-                        .and(APP_CAPABILITY.CAPABILITY_ID.eq(capId)))
-                .collect(Collectors.toList());
+    public int removeCapabilityFromApp(long appId, Long capabilityId) {
+        return dsl
+                .deleteFrom(APP_CAPABILITY)
+                .where(APP_CAPABILITY.APPLICATION_ID.eq(appId))
+                .and(APP_CAPABILITY.CAPABILITY_ID.eq(capabilityId))
+                .execute();
 
-        return dsl.batch(deletes).execute();
     }
 
 

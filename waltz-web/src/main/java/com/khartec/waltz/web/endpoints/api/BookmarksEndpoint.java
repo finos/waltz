@@ -18,15 +18,12 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.bookmark.Bookmark;
 import com.khartec.waltz.model.bookmark.BookmarkKind;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.bookmark.BookmarkService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.user.UserRoleService;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,19 +88,9 @@ public class BookmarksEndpoint implements Endpoint {
                     LOG.info("Saving bookmark: "+bookmark);
                     boolean isUpdate = bookmark.id().isPresent();
 
-                    changeLogService.write(ImmutableChangeLog.builder()
-                            .message(String.format("%s bookmark: %s / %s",
-                                    isUpdate ? "Updated" : "Added",
-                                    bookmark.title().orElse("?"),
-                                    bookmark.kind()))
-                            .parentReference(bookmark.parent())
-                            .userId(WebUtilities.getUsername(request))
-                            .severity(Severity.INFORMATION)
-                            .build());
-
                     return isUpdate
-                            ? bookmarkService.update(bookmark)
-                            : bookmarkService.create(bookmark);
+                            ? bookmarkService.update(bookmark, getUsername(request))
+                            : bookmarkService.create(bookmark, getUsername(request));
                 },
                 transformer);
 
@@ -122,15 +109,7 @@ public class BookmarksEndpoint implements Endpoint {
             }
 
             LOG.info("Deleting bookmark: " + bookmark);
-
-            changeLogService.write(ImmutableChangeLog.builder()
-                    .message("Deleted bookmark: " + bookmark.title().orElse("?") + " / " +bookmark.kind())
-                    .parentReference(bookmark.parent())
-                    .userId(WebUtilities.getUsername(request))
-                    .severity(Severity.INFORMATION)
-                    .build());
-
-            return bookmarkService.deleteById(bookmarkId);
+            return bookmarkService.deleteById(bookmark, getUsername(request));
 
         }, transformer);
 
