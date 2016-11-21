@@ -27,7 +27,7 @@ public class JooqUtilities {
 
     public static final ExecutorService DB_EXECUTOR_POOL =
             Executors.newFixedThreadPool(
-                10, // TODO: ensure this matches the db conn pool size
+                20, // TODO: ensure this matches the db conn pool size
                 (runnable) -> {
                     Thread t = new Thread(runnable, "DB Executor");
                     t.setDaemon(true);

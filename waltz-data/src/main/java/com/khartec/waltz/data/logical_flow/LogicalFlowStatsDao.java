@@ -17,7 +17,6 @@
 
 package com.khartec.waltz.data.logical_flow;
 
-import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowMeasures;
@@ -31,14 +30,18 @@ import com.khartec.waltz.schema.tables.DataType;
 import com.khartec.waltz.schema.tables.LogicalFlow;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.JooqUtilities.DB_EXECUTOR_POOL;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -92,19 +95,17 @@ public class LogicalFlowStatsDao {
                     .from(APPLICATION)
                     .where(dsl.renderInlined(APPLICATION.ID.in(appIdSelector)));
 
-        Select<Record1<Integer>> query = inAppCounter
-                .unionAll(outAppCounter)
-                .unionAll(intraAppCounter);
+        Future<Integer> inAppCount = DB_EXECUTOR_POOL.submit(() -> inAppCounter.fetchOne().value1());
+        Future<Integer> outAppCount = DB_EXECUTOR_POOL.submit(() -> outAppCounter.fetchOne().value1());
+        Future<Integer> intraAppCount = DB_EXECUTOR_POOL.submit(() -> intraAppCounter.fetchOne().value1());
 
-        List<Integer> results = FunctionUtilities.time("DFSD.executeUnionAppCounters", ()
-                -> query.fetch(0, Integer.class));
+        Supplier<ImmutableLogicalFlowMeasures> appCountSupplier = Unchecked.supplier(() -> ImmutableLogicalFlowMeasures.builder()
+                .inbound(inAppCount.get())
+                .outbound(outAppCount.get())
+                .intra(intraAppCount.get())
+                .build());
 
-        return ImmutableLogicalFlowMeasures
-                .builder()
-                .inbound(results.get(0))
-                .outbound(results.get(1))
-                .intra(results.get(2))
-                .build();
+        return appCountSupplier.get();
     }
 
 

@@ -49,6 +49,14 @@ public class LogicalFlowStatsHarness {
             });
         }
 
+        //
+        // countDistinctFlowInvolvementByAppIdSelector
+        //
+        for (int i = 0; i < 5; i++) {
+            HarnessUtilities.time("parallel", () -> {
+                return dao.countDistinctAppInvolvementByAppIdSelector(selector);
+            });
+        }
 
     }
 }
