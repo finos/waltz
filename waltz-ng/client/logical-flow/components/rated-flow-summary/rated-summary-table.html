@@ -38,7 +38,7 @@
                 </span>
             </td>
             <td>
-                <span ng-if="$ctrl.totalCounts[decorator.id]['SECONDARY'] > 0">
+                <span ng-if="$ctrl.totalCounts.get(decorator.id).get('SECONDARY') > 0">
                     <waltz-rated-summary-cell direct-count="$ctrl.directCounts.get(decorator.id).get('SECONDARY')"
                                               total-count="$ctrl.totalCounts.get(decorator.id).get('SECONDARY')"
                                               rating="'PRIMARY'"
@@ -62,7 +62,7 @@
                 </span>
             </td>
             <td>
-                <span ng-if="$ctrl.totalCounts[decorator.id]['NO_OPINION'] > 0">
+                <span ng-if="$ctrl.totalCounts.get(decorator.id).get('NO_OPINION') > 0">
                     <waltz-rated-summary-cell direct-count="$ctrl.directCounts.get(decorator.id).get('NO_OPINION')"
                                               total-count="$ctrl.totalCounts.get(decorator.id).get('NO_OPINION')"
                                               rating="'PRIMARY'"
