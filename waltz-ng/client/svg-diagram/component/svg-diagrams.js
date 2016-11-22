@@ -1,10 +1,8 @@
 function controller() {
-
     const vm = this;
 
     vm.show = (diagram) => {
         diagram.visible = true;
-
     };
 
     vm.hide = (diagram) => {
@@ -13,15 +11,11 @@ function controller() {
 }
 
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
+export default {
     template: require('./svg-diagrams.html'),
-    scope: {},
-    bindToController: {
-        diagrams: '=',
-        blockProcessor: '='
+    bindings: {
+        diagrams: '<',
+        blockProcessor: '<'
     },
-    controllerAs: 'ctrl',
     controller
-});
+};
