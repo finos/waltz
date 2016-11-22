@@ -13,8 +13,7 @@
                 <li ng-repeat="target in $ctrl.existingTargets | orderBy:'name'">
                     <a ng-click="$ctrl.onChange(target)"
                        class="clickable">
-                        <waltz-icon name="{{ target.kind == 'APPLICATION' ? 'desktop' : 'user-circle' }}"></waltz-icon>
-                        <span ng-bind="target.name"></span>
+                        <waltz-entity-icon-label entity-ref="target"></waltz-entity-icon-label>
                     </a>
                 </li>
             </ul>
