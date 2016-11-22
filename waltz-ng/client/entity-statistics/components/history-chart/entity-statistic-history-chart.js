@@ -1,6 +1,15 @@
-import d3 from 'd3';
 import _ from 'lodash';
 import moment from 'moment';
+import {max,extent} from 'd3-array';
+import {axisBottom, axisLeft} from 'd3-axis';
+import {nest} from 'd3-collection';
+import {easeBounceIn} from 'd3-ease';
+import {scaleLinear} from 'd3-scale';
+import {select} from 'd3-selection';
+import {curveLinear ,line} from 'd3-shape';
+import {timeFormat} from 'd3-time-format';
+import 'd3-selection-multi';
+import {transition} from 'd3-transition';
 
 import {initialiseData} from '../../../common';
 import {variableScale} from '../../../common/colors';
@@ -19,7 +28,9 @@ const initialState = {
 };
 
 
-const animationDuration = 200;
+const anim = transition()
+    .duration(200)
+    .ease(easeBounceIn);
 
 
 function prepareSections(svg) {
@@ -65,18 +76,17 @@ function mkDimensions(width = 400) {
 
 
 function mkScales(points = [], dimensions) {
-    const countExtent = [0, d3.max(points, d => d.count)];
-    const dateExtent = d3.extent(points, d => d.date);
+    const countExtent = [0, max(points, d => d.count)];
+    const dateExtent = extent(points, d => d.date);
+
     const xRange = [0, dimensions.width - (dimensions.margins.left + dimensions.margins.right)];
     const yRange = [dimensions.height - (dimensions.margins.top + dimensions.margins.bottom), 0];
 
     return {
-        x: d3.scale
-            .linear()
+        x: scaleLinear()
             .domain(dateExtent)
             .range(xRange),
-        y: d3.scale
-            .linear()
+        y: scaleLinear()
             .domain(countExtent)
             .range(yRange)
     };
@@ -88,50 +98,38 @@ function drawPoints(section, points = [], scales, options) {
         .selectAll('.point')
         .data(points, p => p.date + '_' + p.series);
 
-    pointSelection
+    const newPoints = pointSelection
         .enter()
         .append('circle')
         .classed('point', true)
-        .attr({
+        .attrs({
             fill: d => variableScale(d.series),
             opacity: 0.7,
             r: 0
-        })
-        .attr();
+        });
 
     pointSelection
         .exit()
-        .transition()
-        .duration(animationDuration)
-        .attr({r: 0})
         .remove();
 
     pointSelection
-        .attr({
-            cx: p => scales.x(p.date),
-            cy: p => scales.y(p.count)
-        })
-        .transition()
-        .duration(50)
-        .attr({
-            r: p => {
-                return options.highlightedDate && p.date.getTime() === options.highlightedDate.getTime()
-                    ? 6
-                    : 3
-            }
-        });
+        .merge(newPoints)
+        .attr("cx", p => scales.x(p.date))
+        .attr("cy", p => scales.y(p.count))
+        .transition(anim)
+        .attr("r", p => options.highlightedDate && p.date.getTime() === options.highlightedDate.getTime()
+            ? 6
+            : 3);
 }
 
 
 function drawLines(section, points = [], scales) {
-    const lineFunction = d3.svg
-        .line()
+    const lineFunction = line()
         .x(d => scales.x(d.date))
         .y(d => scales.y(d.count))
-        .interpolate("linear");
+        .curve(curveLinear);
 
-    const bySeries = d3
-        .nest()
+    const bySeries = nest()
         .key(d => d.series)
         .entries(points);
 
@@ -139,11 +137,11 @@ function drawLines(section, points = [], scales) {
         .selectAll('.line')
         .data(bySeries, s => s.key);
 
-    pathSelector
+    const newLines = pathSelector
         .enter()
         .append("path")
         .classed('line', true)
-        .attr({
+        .attrs({
             stroke: d => variableScale(d.key),
             "stroke-width": 1,
             fill: 'none',
@@ -152,14 +150,10 @@ function drawLines(section, points = [], scales) {
 
     pathSelector
         .exit()
-        .transition()
-        .duration(animationDuration)
-        .attr({opacity: 0})
         .remove();
 
     pathSelector
-        .transition()
-        .duration(animationDuration)
+        .merge(newLines)
         .attr("d", d => lineFunction(d.values))
 }
 
@@ -167,22 +161,18 @@ function drawLines(section, points = [], scales) {
 function adjustSections(sections, dimensions) {
     sections
         .svg
-        .attr({
+        .attrs({
             width: dimensions.width,
             height: dimensions.height
         });
 
     sections
         .chart
-        .attr({
-            transform: `translate(${ dimensions.margins.left }, ${ dimensions.margins.top })`
-        });
+        .attr('transform', `translate(${ dimensions.margins.left }, ${ dimensions.margins.top })`);
 
     sections
         .xAxis
-        .attr({
-            transform: `translate(0, ${ dimensions.height - (dimensions.margins.top + dimensions.margins.bottom) })`
-        });
+        .attr('transform', `translate(0, ${ dimensions.height - (dimensions.margins.top + dimensions.margins.bottom) })`);
 }
 
 
@@ -197,7 +187,9 @@ function drawBands(section,
                    scales,
                    options) {
 
-    const bandWidth = 16;
+    const numDates = _.uniqBy(_.map(points, 'date'), d => d + "").length;
+    const width = scales.x.range()[1];
+    const bandWidth = width / numDates;
     const extraHeight = 30;
 
     const dates = _.chain(points)
@@ -209,20 +201,19 @@ function drawBands(section,
         .selectAll('rect.band')
         .data(dates, d => d.getTime());
 
-    bands
+    const newBands = bands
         .enter()
         .append('rect')
         .classed("band", true)
-        .attr({
-            'pointer-events': 'all',
-        })
+        .attr('pointer-events', 'all')
         .style('visibility', 'hidden')
         .on('mouseenter.band-hover', d => { tryInvoke(options.onHover, d); })
         .on('mouseleave.band-hover', () => { tryInvoke(options.onHover, null); })
        ;
 
     bands
-        .attr({
+        .merge(newBands)
+        .attrs({
             x: d => scales.x(d) - (bandWidth / 2),
             y: extraHeight / 2 * -1,
             width: bandWidth,
@@ -260,15 +251,13 @@ function drawXAxis(section, points = [], scale) {
     if (points.length == 0) return;
 
     const dates = pickDatesForXAxis(scale);
-    const dateFormat = d3.time.format("%d/%m");
+    const dateFormat = timeFormat("%d/%m");
 
-    const xAxis = d3.svg
-        .axis()
+    const xAxis = axisBottom()
         .tickValues(dates)
         .tickSize(6)
         .scale(scale)
-        .tickFormat(d => { return dateFormat(new Date(d)); })
-        .orient("bottom");
+        .tickFormat(d => { return dateFormat(new Date(d)); });
 
     section
         .call(xAxis);
@@ -276,11 +265,9 @@ function drawXAxis(section, points = [], scale) {
 
 
 function drawYAxis(section, scale) {
-    const yAxis = d3.svg
-        .axis()
+    const yAxis = axisLeft()
         .ticks(5)
-        .scale(scale)
-        .orient("left");
+        .scale(scale);
 
     section
         .call(yAxis);
@@ -316,7 +303,7 @@ function draw(sections, width, points = [], options = {}) {
 function controller($element, $window) {
 
     const vm = initialiseData(this, initialState);
-    const svg = d3.select($element.find('svg')[0]);
+    const svg = select($element.find('svg')[0]);
 
     const svgSections = prepareSections(svg);
 

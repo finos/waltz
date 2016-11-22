@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {timeFormat} from "d3";
+import {timeFormat} from "d3-time-format";
 import {variableScale} from "../../../common/colors";
 import {initialiseData} from "../../../common";
 

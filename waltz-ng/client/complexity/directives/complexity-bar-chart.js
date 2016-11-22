@@ -122,9 +122,6 @@ function drawBucketBars(buckets, container, scales, sizing, repaint, onSelect) {
         .append('rect')
         .classed('bucket-bar', true);
 
-    window.s = scales.color;
-    window.g = green;
-
     bucketBars
         .merge(newBars)
         .classed('clickable', onSelect != null)
