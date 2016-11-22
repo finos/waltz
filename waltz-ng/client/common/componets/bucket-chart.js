@@ -12,8 +12,11 @@
  */
 
 import _ from "lodash";
-import d3 from "d3";
 import angular from "angular";
+import {scaleLinear, scaleBand} from 'd3-scale';
+import {axisBottom} from 'd3-axis';
+import {select} from 'd3-selection';
+import 'd3-selection-multi';
 
 
 const bindings = {
@@ -26,7 +29,7 @@ function render(config, onBucketSelect) {
 
     const { svg, buckets, dimensions } = config;
 
-    svg.attr({
+    svg.attrs({
         width: dimensions.width,
         height: dimensions.height
     });
@@ -36,20 +39,15 @@ function render(config, onBucketSelect) {
         .max()
         .value();
 
-    const blobScale = d3
-        .scale
-        .linear()
+    const blobScale = scaleLinear()
         .domain([0, maxBucketSize])
         .range([0, ( dimensions.height / 1.6) / 2]);
 
-    const xScale = d3
-        .scale
-        .ordinal()
+    const xScale = scaleBand()
         .domain(_.map(buckets, 'name'))
-        .rangeBands([0, dimensions.width], 0.3);
+        .range([0, dimensions.width], 0.3);
 
-    const xAxis = d3.svg
-        .axis()
+    const xAxis = axisBottom()
         .scale(xScale)
         .tickSize(4);
 
@@ -60,8 +58,11 @@ function render(config, onBucketSelect) {
         .attr('transform', `translate(0, ${ dimensions.height - dimensions.margin.bottom } )`)
         .call(xAxis);
 
-    svg.selectAll('.bucket')
-        .data(buckets)
+    const bucketElems = svg.selectAll('.bucket')
+        .data(buckets);
+
+
+    const newBucketElems = bucketElems
         .enter()
         .append('circle')
         .classed('bucket', true)
@@ -69,20 +70,20 @@ function render(config, onBucketSelect) {
             if (onBucketSelect) {
                 onBucketSelect(d);
             }
-        })
-        .append('title');
+        });
 
-    svg.selectAll('.bucket')
-        .data(buckets)
-        .attr({
+    newBucketElems
+        .append('title')
+        .text(d => `# = ${d.size}`);
+
+    bucketElems
+        .merge(newBucketElems)
+        .attrs({
             r: d => blobScale(d.size),
-            cx: d => xScale(d.name) + xScale.rangeBand() / 2,
+            cx: d => xScale(d.name) + xScale.bandwidth() / 2,
             cy: dimensions.height / 2
         });
 
-    svg.selectAll('.bucket title')
-        .data(buckets)
-        .text(d => `# = ${d.size}`);
 }
 
 
@@ -94,8 +95,7 @@ function controller($window, $element) {
         if (vm.buckets) {
 
             const config = {
-                svg: d3
-                    .select(vizElem)
+                svg: select(vizElem)
                     .select('svg'),
                 buckets: vm.buckets,
                 dimensions: {
