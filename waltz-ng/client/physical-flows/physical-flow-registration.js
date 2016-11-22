@@ -6,18 +6,19 @@ const template = require('./physical-flow-registration.html');
 
 
 const initialState = {
-    sourceEntity: null,
+    cancelLink: '#/',
     candidateSpecifications: [],
-    specification: null,
     flowAttributes: null,
+    sourceEntity: null,
+    specification: null,
     targetEntity: null,
-    cancelLink: '#/flibber',
-    visibility: {
-        editor: ""
-    },
+    existingTargets: [],
     validation: {
         messages: [],
         canSave: false
+    },
+    visibility: {
+        editor: ""
     }
 };
 
@@ -53,10 +54,12 @@ function validate(specification, flowAttributes, targetEntity) {
 
 
 function controller(
+    $q,
     $state,
     $stateParams,
     actorStore,
     applicationStore,
+    logicalFlowStore,
     notification,
     physicalFlowStore,
     specificationStore) {
@@ -133,14 +136,39 @@ function controller(
     specificationStore
         .findByEntityReference(sourceEntityRef)
         .then(specs => vm.candidateSpecifications = specs);
+
+
+    const existingLogicalTargetPromise = logicalFlowStore
+        .findByEntityReference(sourceEntityRef.kind, sourceEntityRef.id)
+        .then(flows => _.chain(flows)
+            .map('target')
+            .uniqBy(r => r.kind + r.id)
+            .value());
+
+    const existingPhysicalTargetPromise = physicalFlowStore
+        .findByEntityReference(sourceEntityRef)
+        .then(flows => _.chain(flows)
+            .map('target')
+            .uniqBy(r => r.kind + r.id)
+            .value());
+
+    $q.all([existingLogicalTargetPromise, existingPhysicalTargetPromise])
+        .then(([logical = [], physical = []]) =>
+            _.chain(logical)
+                .concat(physical)
+                .uniqBy(r => r.kind + r.id).value())
+        .then(targets => vm.existingTargets = targets);
+
 }
 
 
 controller.$inject = [
+    '$q',
     '$state',
     '$stateParams',
     'ActorStore',
     'ApplicationStore',
+    'LogicalFlowStore',
     'Notification',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore',

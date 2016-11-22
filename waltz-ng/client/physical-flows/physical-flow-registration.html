@@ -38,6 +38,7 @@
 
         <waltz-physical-flow-edit-target-entity ng-if="ctrl.visibility.editor === 'TARGET-ENTITY'"
                                                 current="ctrl.targetEntity"
+                                                existing-targets="ctrl.existingTargets"
                                                 owning-entity="ctrl.sourceEntity"
                                                 on-dismiss="ctrl.editorDismiss"
                                                 on-change="ctrl.targetChanged">
