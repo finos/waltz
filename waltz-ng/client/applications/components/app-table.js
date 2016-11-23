@@ -49,29 +49,42 @@ function controller(uiGridConstants, $animate) {
                 enableColumnMenu: false,
                 enableFiltering: false,
                 width: 40,
-                cellTemplate: '<div class="ui-grid-cell-contents text-center"> \n    <a class="clickable" \n       ng-click="grid.appScope.$ctrl.onAppSelect(row.entity)"> \n        <waltz-icon name="info-circle" \n                    size="lg">\n        </waltz-icon>\n    </a>\n</div>'
+                cellTemplate: `<div class="ui-grid-cell-contents text-center"> 
+                                 <a class="clickable" 
+                                     ng-click="grid.appScope.$ctrl.onAppSelect(row.entity)"> 
+                                    <waltz-icon name="info-circle" 
+                                                size="lg"></waltz-icon>
+                                 </a>
+                               </div>`
             }, {
                 field: 'name',
-                cellTemplate: '<div class="ui-grid-cell-contents" ng-switch="row.entity[\'management\']">\n    <span ng-switch-when="row.entity[\'management\'] == \'End User\'" \n          ng-bind="COL_FIELD">\n    </span>\n    <a ng-switch-default\n       ui-sref="main.app.view ({ id: row.entity[\'id\'] })" \n       ng-bind="COL_FIELD">\n    </a>\n</div>'
+                cellTemplate: `<div class="ui-grid-cell-contents" ng-switch="row.entity['management']">
+                                 <span ng-switch-when="row.entity['management'] == 'End User'" 
+                                      ng-bind="COL_FIELD"></span>
+                                 <a ng-switch-default
+                                    ui-sref="main.app.view ({ id: row.entity['id'] })" 
+                                    ng-bind="COL_FIELD">
+                                 </a>
+                               </div>`
             }, {
                 field: 'assetCode'
             }, {
                 field: 'kind',
-                cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:\'applicationKind\'"></span></div>',
+                cellFilter: "toDisplayName:'applicationKind'",
                 filter: {
                     type: uiGridConstants.filter.SELECT,
                     selectOptions: _.map(applicationKindDisplayNames, (label, value) => ({ label, value }))
                 }
             }, {
                 field: 'overallRating',
-                cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:\'investmentRating\'"></span></div>',
+                cellFilter: "toDisplayName:'investmentRating'",
                 filter: {
                     type: uiGridConstants.filter.SELECT,
                     selectOptions: _.map(investmentRatingNames, (label, value) => ({ label, value }))
                 }
             }, {
                 field: 'lifecyclePhase',
-                cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:\'lifecyclePhase\'"></span></span></div>',
+                cellFilter: "toDisplayName:'lifecyclePhase'",
                 filter: {
                     type: uiGridConstants.filter.SELECT,
                     selectOptions: _.map(lifecyclePhaseDisplayNames, (label, value) => ({ label, value }))

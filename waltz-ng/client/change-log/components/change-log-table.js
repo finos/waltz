@@ -20,7 +20,7 @@ function controller() {
             field: 'severity',
             name: 'Severity',
             width: '10%',
-            cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD | toDisplayName:\'severity\'"></div>'
+            cellFilter: "toDisplayName:'severity'"
         },
         {
             field: 'message',
