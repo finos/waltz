@@ -13,7 +13,6 @@
 export default (module) => {
     module
         .component('waltzBucketChart', require('./bucket-chart'))
-        .component('waltzBucketChart2', require('./bucket-chart2'))
         .component('waltzMultiSelectTreeControl', require('./multi-select-tree-control/multi-select-treecontrol'))
         .component('waltzSearchControl', require('./search-control/search-control'))
         .component('waltzEntityIconLabel', require('./entity-link/entity-icon-label'))
