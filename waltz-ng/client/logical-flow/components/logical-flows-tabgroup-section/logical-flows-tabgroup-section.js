@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 
-const BINDINGS = {
+const bindings = {
     ratings: '<',
     flowData: '<',
     applications: '<',
@@ -10,6 +10,7 @@ const BINDINGS = {
 
 
 const initialState = {
+    export: () => console.log('lfts: default do-nothing export function'),
     ratings: [],
     flowData: null,
     applications: [],
@@ -28,7 +29,11 @@ function controller() {
     vm.tabChanged = (name, index) => {
         vm.visibility.flowConfigButton = index > 0;
         if(index === 0) vm.visibility.flowConfigOverlay = false;
-    }
+    };
+
+    vm.tableInitialised = (cfg) =>
+        vm.export = () => cfg.exportFn('logical-flows.csv');
+
 }
 
 
@@ -36,15 +41,11 @@ controller.$inject = [
 ];
 
 
-const directive = {
-    restrict: 'E',
-    replace: true,
+const component = {
     controller,
-    bindToController: BINDINGS,
-    controllerAs: 'ctrl',
-    scope: {},
+    bindings,
     template: require('./logical-flows-tabgroup-section.html')
 };
 
 
-export default () => directive;
+export default component;

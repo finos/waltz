@@ -94,7 +94,7 @@ function controller(displayNameService) {
         vm.pie = preparePie(vm.appCapabilities, displayNameService, onSelect);
     };
 
-    vm.onGridInitialise = (d) => vm.exportData = d.export;
+    vm.onGridInitialise = (cfg) => vm.exportData = () => cfg.exportFn("apps-capability.csv");
 }
 
 
