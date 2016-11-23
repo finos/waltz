@@ -3,9 +3,12 @@ import {toKeyCounts} from "../../common";
 import {endOfLifeStatusNames} from "../../common/services/display_names";
 
 
-const BINDINGS = {
-    databases: '='
+const bindings = {
+    databases: '<'
 };
+
+
+const template = require('./database-pies.html');
 
 
 const PIE_SIZE = 70;
@@ -51,22 +54,23 @@ function controller($scope) {
         }
     };
 
-    $scope.$watch(
-        'ctrl.databases',
-        (databases = []) => recalcPieData(databases)
-    );
+
+    vm.$onChanges = () => {
+        if(vm.databases) {
+            recalcPieData(vm.databases);
+        }
+    };
 
 }
 
 controller.$inject = [ '$scope' ];
 
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
-    scope: {},
-    template: require('./database-pies.html'),
-    bindToController: BINDINGS,
-    controllerAs: 'ctrl',
+const component = {
+    bindings,
+    template,
     controller
-});
+};
+
+
+export default component;
