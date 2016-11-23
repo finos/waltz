@@ -69,8 +69,8 @@ export const authoritativeRatingBackgroundColorScale = d3.scale.ordinal()
 
 
 export const environmentColorScale = d3.scale.ordinal()
-    .domain(['DEV', 'PREPROD', 'PROD', 'QA', 'UAT'])
-    .range([green, amber, blue, grey, red]);
+    .domain(['DEV', 'PREPROD', 'PROD', 'PRD', 'QA', 'UAT'])
+    .range([green, amber, blue, blue, grey, red]);
 
 
 export const operatingSystemColorScale = d3.scale.ordinal()

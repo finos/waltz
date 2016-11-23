@@ -2,9 +2,6 @@ const BINDINGS = {
     softwareCatalog: '=',
     servers: '=',
     databases: '=',
-    // hasSoftware: '=',
-    // hasDatabases: '=',
-    // hasServers: '='
 };
 
 
