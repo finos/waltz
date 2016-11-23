@@ -11,8 +11,8 @@
  */
 
 export default [
-    'WaltzIconNameService',
-    (WaltzIconNameService) => (value, type) => WaltzIconNameService.lookup(type, value)
+    'IconNameService',
+    (iconNameService) => (value, type) => iconNameService.lookup(type, value)
 ];
 
 

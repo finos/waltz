@@ -52,9 +52,9 @@ const descriptionService = new BaseLookupService();
 
 export default (module) => {
     module
-        .service('WaltzDisplayNameService', () => displayNameService)
-        .service('WaltzIconNameService', () => iconNameService)
-        .service('WaltzDescriptionService', () => descriptionService);
+        .service('DisplayNameService', () => displayNameService)
+        .service('IconNameService', () => iconNameService)
+        .service('DescriptionService', () => descriptionService);
 
     displayNameService.register('applicationKind', applicationKindDisplayNames);
     displayNameService.register('applicationRating', applicationRatingNames);

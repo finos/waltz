@@ -201,7 +201,7 @@ function controller($scope,
 controller.$inject = [
     '$scope',
     'LogicalFlowUtilityService',
-    'WaltzDisplayNameService'
+    'DisplayNameService'
 ];
 
 

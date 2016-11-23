@@ -11,8 +11,8 @@
  */
 
 export default [
-    'WaltzDescriptionService',
-    (WaltzDescriptionService) => (value, type) => WaltzDescriptionService.lookup(type, value)
+    'DescriptionService',
+    (descriptionService) => (value, type) => descriptionService.lookup(type, value)
 ];
 
 

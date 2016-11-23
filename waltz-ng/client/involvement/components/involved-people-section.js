@@ -78,7 +78,7 @@ function controller(displayNameService) {
 
 
 controller.$inject = [
-    'WaltzDisplayNameService'
+    'DisplayNameService'
 ];
 
 
