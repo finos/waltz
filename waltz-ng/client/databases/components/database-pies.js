@@ -14,7 +14,7 @@ const template = require('./database-pies.html');
 const PIE_SIZE = 70;
 
 
-function prepareStats(databases) {
+function prepareStats(databases = []) {
 
     const environment = toKeyCounts(databases, d => d.environment);
     const vendor = toKeyCounts(databases, d => d.dbmsVendor);
