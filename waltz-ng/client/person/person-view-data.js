@@ -9,7 +9,6 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-
 import _ from "lodash";
 
 
@@ -245,6 +244,10 @@ function service($q,
 
     function loadSecondWave(employeeId) {
         const personId = state.model.person.id;
+
+        // load flows in parallel to avoid delays
+        loadFlows(personId);
+
         return $q
             .all([
                 loadRelatedPeople(employeeId),
@@ -259,7 +262,6 @@ function service($q,
         const personId = state.model.person.id;
         return $q
             .all([
-                loadFlows(personId),
                 loadTechStats(personId),
                 loadComplexity(personId),
                 loadChangeInitiatives(employeeId),
