@@ -116,7 +116,7 @@ function controller($scope, displayNameService) {
 
 controller.$inject = [
     '$scope',
-    'WaltzDisplayNameService'
+    'DisplayNameService'
 ];
 
 

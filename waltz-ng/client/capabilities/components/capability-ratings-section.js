@@ -98,7 +98,7 @@ function controller(displayNameService) {
 }
 
 
-controller.$inject = ['WaltzDisplayNameService'];
+controller.$inject = ['DisplayNameService'];
 
 
 const component = {

@@ -14,7 +14,7 @@ function filter(displayNameService) {
     return (value, type) => displayNameService.lookup(type, value);
 }
 
-filter.$inject = ['WaltzDisplayNameService'];
+filter.$inject = ['DisplayNameService'];
 
 
 export default filter;
