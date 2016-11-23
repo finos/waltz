@@ -3,9 +3,13 @@ import {toKeyCounts} from "../../common";
 import {endOfLifeStatusNames} from "../../common/services/display_names";
 
 
-const BINDINGS = {
-    servers : '='
+const bindings = {
+    servers : '<'
 };
+
+
+const template = require('./server-pies.html');
+
 
 const PIE_SIZE = 70;
 
@@ -15,7 +19,8 @@ const EOL_STATUS_CONFIG = {
     labelProvider: (d) => endOfLifeStatusNames[d.key] || "Unknown"
 };
 
-function controller($scope) {
+
+function controller() {
     const vm = this;
 
 
@@ -46,6 +51,7 @@ function controller($scope) {
         }
     };
 
+
     function update(servers) {
         if (!servers) return;
 
@@ -56,18 +62,21 @@ function controller($scope) {
         vm.pie.hardwareEndOfLifeStatus.data = toKeyCounts(servers, d => d.hardwareEndOfLifeStatus);
     }
 
-    $scope.$watch('ctrl.servers', (servers) => update(servers), true);
+
+    vm.$onChanges = () => {
+        if(vm.servers) update(vm.servers);
+    };
 }
 
 
-controller.$inject = [ '$scope' ];
+controller.$inject = [ ];
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
-    scope: {},
-    template: require('./server-pies.html'),
-    bindToController: BINDINGS,
-    controllerAs: 'ctrl',
+
+const component = {
+    bindings,
+    template,
     controller
-});
+};
+
+
+export default component;
