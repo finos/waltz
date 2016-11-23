@@ -14,7 +14,7 @@ function controller() {
     const vm = initialiseData(this);
 
     vm.changeLogTableInitialised = (api) => {
-        vm.exportChangeLog = api.export;
+        vm.exportChangeLog = () => api.exportFn("change-log.csv");
     };
 }
 

@@ -7,7 +7,8 @@ const bindings = {
     onLoadDetail: '<',
     options: '<',  // { graphTweakers ... }
     optionsVisible: '<',
-    onTabChange: '<'
+    onTabChange: '<',
+    onTableInitialise: '<'
 };
 
 

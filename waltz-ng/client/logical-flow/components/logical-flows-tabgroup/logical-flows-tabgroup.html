@@ -137,8 +137,8 @@
                 <div ng-if="$ctrl.filteredFlowData.flows.length > 0 && $ctrl.currentTabIndex == 2"
                      style="height: 300px">
                     <waltz-logical-flow-table flows="$ctrl.filteredFlowData.flows"
-                                           decorators="$ctrl.filteredFlowData.decorators">
-
+                                              decorators="$ctrl.filteredFlowData.decorators"
+                                              on-initialise="$ctrl.onTableInitialise">
                     </waltz-logical-flow-table>
                 </div>
 
