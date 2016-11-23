@@ -331,9 +331,13 @@ function controller($element, $window) {
 
     vm.$onChanges = (changes) => debouncedRender();
 
-    angular
+    vm.$onInit = () => angular
         .element($window)
-        .on('resize', () => debouncedRender());
+        .on('resize', debouncedRender);
+
+    vm.$onDestroy = () => angular
+        .element($window)
+        .off('resize', debouncedRender);
 }
 
 

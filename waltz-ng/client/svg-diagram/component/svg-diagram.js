@@ -12,10 +12,13 @@ function resize(elem) {
 function controller($element, $window) {
     const vm = this;
 
-    angular
+    vm.$onInit = () => angular
         .element($window)
         .on('resize', () => resize($element));
 
+    vm.$onDestroy = () => angular
+        .element($window)
+        .off('resize', () => resize($element));
 
     vm.$onChanges = () => {
         if (!vm.diagram) return;
