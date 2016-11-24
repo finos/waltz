@@ -7,10 +7,11 @@
             <waltz-source-data-info ratings="ctrl.filteredRatings">
             </waltz-source-data-info>
         </div>
-        <div ng-if="ctrl.filteredRatings.length == 0"
-             class="alert alert-warning">
-            <strong>No data source ratings</strong>
-        </div>
+        <waltz-no-data ng-if="ctrl.filteredRatings.length == 0">
+            <message>
+                <strong>No data source ratings</strong>
+            </message>
+        </waltz-no-data>
         <small class="text-muted small pull-right">
             Source Data Ratings are used to indicate confidence levels across aspects of the data sets being
             presented.

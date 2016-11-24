@@ -30,16 +30,14 @@
             </div>
         </div>
 
-        <div class="alert alert-warning"
-             ng-if="ctrl.bookmarks.length == 0">
-            <strong>
-                No bookmarks
-            </strong>
-            for this
-            <span ng-bind="ctrl.kind | toDisplayName:'entity'">
-            </span>
-            .
-        </div>
+        <waltz-no-data ng-if="ctrl.bookmarks.length == 0">
+            <message>
+                <strong>No bookmarks</strong>
+                for this
+                <span ng-bind="ctrl.kind | toDisplayName:'entity'">
+                </span>
+            </message>
+        </waltz-no-data>
     </waltz-section>
 </div>
 

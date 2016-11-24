@@ -62,10 +62,11 @@
     </div>
 
 
-    <div ng-if="$ctrl.produces.length == 0 && $ctrl.consumes.length == 0"
-         class="alert alert-warning">
-        <strong>No Physical Flow</strong> detail available for this application
-    </div>
+    <waltz-no-data ng-if="$ctrl.produces.length == 0 && $ctrl.consumes.length == 0">
+        <message>
+            <strong>No Physical Flow</strong> detail available for this application
+        </message>
+    </waltz-no-data>
 
 
     <div class="row"

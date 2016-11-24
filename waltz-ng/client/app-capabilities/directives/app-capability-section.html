@@ -8,12 +8,12 @@
             </waltz-app-capability-table>
         </div>
 
-        <div ng-if="ctrl.appCapabilities.length == 0">
-            <div class="alert alert-warning">
+        <waltz-no-data ng-if="ctrl.appCapabilities.length == 0">
+            <message>
                 <strong>No functions</strong>
                 have been registered against this application yet.
-            </div>
-        </div>
+            </message>
+        </waltz-no-data>
 
         <div class="small text-muted">
             Functions are used to describe what an application does.

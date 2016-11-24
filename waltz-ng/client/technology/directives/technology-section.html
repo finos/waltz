@@ -69,11 +69,11 @@
 
         </div>
 
-        <div ng-if="! ctrl.hasAnyData()">
-            <div class="alert alert-warning">
+        <waltz-no-data ng-if="! ctrl.hasAnyData()">
+            <message>
                 <strong>No associated technology found</strong>
-            </div>
-        </div>
+            </message>
+        </waltz-no-data>
 
     </waltz-section>
 </div>

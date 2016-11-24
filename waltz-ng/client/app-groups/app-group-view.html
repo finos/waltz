@@ -65,9 +65,11 @@
                                        list="ctrl.changeInitiatives">
         </waltz-change-initiative-table>
 
-        <div class="alert alert-warning" ng-if="ctrl.changeInitiatives.length == 0">
-            <strong>This group has not been associated to any Change Initiatives</strong>
-        </div>
+        <waltz-no-data ng-if="ctrl.changeInitiatives.length == 0">
+            <message>
+                This group has not been associated to any Change Initiatives
+            </message>
+        </waltz-no-data>
 
     </waltz-section>
 
@@ -90,7 +92,8 @@
 
 
     <!--LINEAGE REPORTS-->
-    <waltz-section name="Lineage Reports">
+    <waltz-section name="Lineage Reports"
+                   id="lineage-reports-section">
         <waltz-section-actions>
             <button ng-click="ctrl.exportLineageReports()"
                     class="btn btn-xs btn-primary"
@@ -104,25 +107,28 @@
                                    ng-if="ctrl.lineageReports.length > 0">
         </waltz-physical-flow-table>
 
-        <div ng-if="ctrl.lineageReports.length == 0"
-             class="alert alert-warning">
-            <strong>No Lineage Reports</strong> have been defined
-        </div>
+        <waltz-no-data ng-if="ctrl.lineageReports.length == 0">
+            <message>
+                <strong>No Lineage Reports</strong> have been defined
+            </message>
+        </waltz-no-data>
     </waltz-section>
 
 
     <!-- AUTH SOURCES -->
-    <waltz-section name="Authoritative Sources">
+    <waltz-section name="Authoritative Sources"
+                   id="auth-flows-section">
         <waltz-rated-flow-summary-panel apps="ctrl.applications"
                                         entity-reference="ctrl.entityRef"
                                         flow-data="ctrl.dataFlows"
                                         on-load-detail="ctrl.loadFlowDetail">
         </waltz-rated-flow-summary-panel>
 
-        <div ng-if="ctrl.dataFlows.stats.flowCounts.inbound == 0"
-             class="alert alert-warning">
-            No inbound data flows registered for this organisational unit
-        </div>
+        <waltz-no-data ng-if="ctrl.dataFlows.stats.flowCounts.inbound == 0">
+            <message>
+                No inbound data flows registered for this organisational unit
+            </message>
+        </waltz-no-data>
 
         <div class="row" style="padding-top: 12px;">
             <div class="col-md-12">

@@ -87,9 +87,11 @@
             </table>
         </div>
 
-        <div ng-if="ctrl.bookmarks.length == 0" class="alert alert-warning">
-            <strong>No bookmarks</strong> have been registered yet
-        </div>
+        <waltz-no-data ng-if="ctrl.bookmarks.length == 0">
+            <message>
+                <strong>No bookmarks</strong> have been registered yet
+            </message>
+        </waltz-no-data>
 
         <div ng-init="ctrl.createShowing = false">
             <div ng-show="!ctrl.createShowing">

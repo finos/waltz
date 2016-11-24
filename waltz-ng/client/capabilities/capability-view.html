@@ -58,10 +58,11 @@
                                    ng-if="ctrl.lineageReports.length > 0">
         </waltz-physical-flow-table>
 
-        <div ng-if="ctrl.lineageReports.length == 0"
-             class="alert alert-warning">
-            <strong>No Lineage Reports</strong> have been defined
-        </div>
+        <waltz-no-data ng-if="ctrl.lineageReports.length == 0">
+            <message>
+                <strong>No Lineage Reports</strong> have been defined
+            </message>
+        </waltz-no-data>
     </waltz-section>
 
 
@@ -74,10 +75,11 @@
                                         on-load-detail="ctrl.loadFlowDetail">
         </waltz-rated-flow-summary-panel>
 
-        <div ng-if="ctrl.dataFlows.stats.flowCounts.inbound == 0"
-             class="alert alert-warning">
-            No inbound data flows registered for this organisational unit
-        </div>
+        <waltz-no-data ng-if="ctrl.dataFlows.stats.flowCounts.inbound == 0">
+            <message>
+                No inbound data flows registered for this organisational unit
+            </message>
+        </waltz-no-data>
 
         <div class="row" style="padding-top: 12px;">
             <div class="col-md-12">

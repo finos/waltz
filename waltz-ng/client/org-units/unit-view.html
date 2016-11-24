@@ -78,10 +78,11 @@
                                    ng-if="ctrl.viewData.lineageReports.length > 0">
         </waltz-physical-flow-table>
 
-        <div ng-if="ctrl.viewData.lineageReports.length == 0"
-             class="alert alert-warning">
-            <strong>No Lineage Reports</strong> have been defined
-        </div>
+        <waltz-no-data ng-if="ctrl.viewData.lineageReports.length == 0">
+            <message>
+                <strong>No Lineage Reports</strong> have been defined
+            </message>
+        </waltz-no-data>
     </waltz-section>
 
 
@@ -121,10 +122,11 @@
                                                 on-load-detail="ctrl.loadFlowDetail">
                 </waltz-rated-flow-summary-panel>
 
-                <div ng-if="ctrl.viewData.dataFlows.length == 0"
-                     class="alert alert-warning">
-                    No inbound data flows registered for this organisational unit
-                </div>
+                <waltz-no-data ng-if="ctrl.viewData.dataFlows.length == 0">
+                    <message>
+                        No inbound data flows registered for this organisational unit
+                    </message>
+                </waltz-no-data>
 
                 <div class="row" style="padding-top: 12px;">
                     <div class="col-md-12">
@@ -152,11 +154,12 @@
                     </waltz-auth-sources-table>
                 </div>
 
-                <div ng-show="ctrl.viewData.authSources | isEmpty"
-                     class="alert alert-warning">
-                    <strong>No Authoritative Sources</strong>
-                    have been defined for this Organisational Unit.
-                </div>
+                <waltz-no-data ng-show="ctrl.viewData.authSources | isEmpty">
+                    <message>
+                        <strong>No Authoritative Sources</strong>
+                        have been defined for this Organisational Unit.
+                    </message>
+                </waltz-no-data>
 
                 <div class="small text-muted">
                     This section shows the authoritative sources for data types.  A source can be declared locally to this

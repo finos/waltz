@@ -40,10 +40,11 @@
         </uib-tab>
     </uib-tabset>
 
-    <div class="alert-warning alert"
-         ng-if="$ctrl.combinedApps.length == 0">
-        There are <strong>no application </strong>
-        associations.
-    </div>
+    <waltz-no-data ng-if="$ctrl.combinedApps.length == 0">
+        <message>
+            There are <strong>no application </strong>
+            associations.
+        </message>
+    </waltz-no-data>
 </waltz-section>
 
