@@ -185,49 +185,10 @@
 
 
     <!-- APPS -->
-    <waltz-section name="Applications"
-                   id="apps-section"
-                   small="({{ ctrl.viewData.combinedApps.length }})"
-                   icon="desktop">
-
-        <waltz-section-actions>
-            <button class="btn btn-xs waltz-btn-transparent"
-                    ng-click="ctrl.visibility.appOverlay = ! ctrl.visibility.appOverlay">
-                <waltz-icon name="map-signs"></waltz-icon>
-            </button>
-        </waltz-section-actions>
-
-        <waltz-source-data-overlay visible="ctrl.visibility.appOverlay"
-                                   ratings="ctrl.viewData.sourceDataRatings"
-                                   entities="['APPLICATION', 'END_USER_APPLICATION']">
-        </waltz-source-data-overlay>
-
-        <uib-tabset ng-if="ctrl.viewData.combinedApps.length">
-            <uib-tab heading="Summary">
-                <waltz-app-summary apps="ctrl.viewData.apps"
-                                   end-user-apps="ctrl.viewData.endUserApps">
-                </waltz-app-summary>
-            </uib-tab>
-
-            <uib-tab select="showTableTab = true"
-                     heading="Applications"
-                     ng-if="ctrl.viewData.combinedApps.length">
-                <br>
-                <div ng-if="showTableTab">
-                    <waltz-app-table filter="appQuery"
-                                     applications="ctrl.viewData.combinedApps"></waltz-app-table>
-                </div>
-            </uib-tab>
-
-        </uib-tabset>
-
-        <div class="alert-warning alert"
-             ng-if="ctrl.viewData.combinedApps.length == 0">
-            <strong>No application </strong>
-            have yet been registered against unit:
-            <span ng-bind="ctrl.unit.name"></span>.
-        </div>
-    </waltz-section>
+    <waltz-apps-section apps="ctrl.viewData.apps"
+                        end-user-apps="ctrl.viewData.endUserApps"
+                        source-data-ratings="ctrl.viewData.sourceDataRatings">
+    </waltz-apps-section>
 
 
     <!-- INDICATORS -->
