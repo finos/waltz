@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from "lodash";
 
 
 /**
@@ -63,9 +63,11 @@ export function enrichConsumes(specifications = [],
     if (specifications.length === 0 || physicalFlows.length === 0) {
         return [];
     } else {
+        const physicalFlowsBySpecId = _.keyBy(physicalFlows, 'specificationId');
+
         return _.chain(specifications)
             .map(specification => {
-                const physicalFlow = _.find(physicalFlows, {specificationId: specification.id});
+                const physicalFlow = physicalFlowsBySpecId[specification.id];
                 const sourceRef = specification.owningEntity;
                 const targetRef = physicalFlow.target.id;
 
