@@ -10,8 +10,11 @@
  *
  */
 
-import {select} from 'd3-selection';
+import {event, select} from 'd3-selection';
 import {forceSimulation, forceLink, forceManyBody, forceCenter} from 'd3-force';
+import {drag} from 'd3-drag';
+import {zoom} from 'd3-zoom';
+
 import 'd3-selection-multi';
 
 import _ from "lodash";
@@ -47,34 +50,8 @@ const force = forceSimulation()
     // .charge(-200);
 
 
-function setup(vizElem) {
-    const svg = vizElem
-        .append('svg');
 
-    return { svg, vizElem };
-}
-
-
-function addNodeCircle(selection) {
-    selection
-        .append('circle')
-        .attrs({
-            cx: 0,
-            cy: 0,
-            r: 8
-        });
-}
-
-
-function addNodeLabel(selection) {
-    selection
-        .append('text')
-        .attrs({ dx: 10, dy: '.35em' })
-        .text(d => d.name);
-}
-
-
-function drawLinks(flows = [], nodes = [], svg, linkTweakers = DEFAULT_TWEAKER) {
+function drawLinksOld(flows = [], nodes = [], svg, linkTweakers = DEFAULT_TWEAKER) {
     const nodeIds = _.map(nodes, 'id');
 
     const links = _.map(
@@ -114,7 +91,7 @@ function drawLinks(flows = [], nodes = [], svg, linkTweakers = DEFAULT_TWEAKER) 
 }
 
 
-function drawNodes(entities = [], svg, nodeTweakers = DEFAULT_TWEAKER) {
+function drawNodesOld(entities = [], svg, nodeTweakers = DEFAULT_TWEAKER) {
     const node = svg
         .selectAll('.wdfd-node')
         .data(entities, n => n.id);
@@ -154,7 +131,124 @@ function animateLinks(linkSelection, nodeSelection, linkTweakers = DEFAULT_TWEAK
             .attrs('transform', d => { return `translate(${d.x}, ${d.y})`; });
     });
 }
+
+
 // --- NEW v /  OLD ^ ---
+
+function drawLinks(links = [], holder) {
+    return holder
+        .selectAll("links")
+        .data(links)
+        .enter()
+        .append("line")
+        .classed('wdfd-link', true)
+        //.attr('marker-end', 'url(#arrowhead)') // defined in common-svg-defs
+        .attr('stroke', '#333')
+        // .call(linkTweakers.enter);
+        .attr('stroke', 'pink')
+        .attr('stroke-width', 4);
+}
+
+
+function addNodeLabel(selection) {
+    selection
+        .append('text')
+        .attrs({ dx: 10, dy: '.35em' })
+        .text(d => d.name);
+}
+
+
+function addNodeCircle(selection) {
+    selection
+        .append('circle')
+        .attr("r", 8)
+        .append("title")
+        .text(d => d.name);
+}
+
+
+function drawNodes(nodes = [], holder, simulation, tweakers = DEFAULT_TWEAKER) {
+
+    function dragStarted(d) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+    }
+
+    function dragged(d) {
+        d.fx = event.x;
+        d.fy = event.y;
+    }
+
+    function dragEnded(d) {
+        if (!event.active) simulation.alphaTarget(0);
+        // d.fx = null;
+        // d.fy = null;
+
+        d.fx = event.x;
+        d.fy = event.y;
+    }
+
+    const nodeSelection = holder
+        .selectAll("g.node")
+        .data(nodes);
+
+    const newNodes = nodeSelection
+        .enter()
+        .append('g')
+        .classed('wdfd-node', true)
+        .on('dblclick.unfix', d => {
+            console.log('unfix')
+            d.fx = null;
+            d.fy = null;
+        })
+        .call(tweakers.enter)
+        .call(drag()
+            .on("start", dragStarted)
+            .on("drag", dragged)
+            .on("end", dragEnded));
+
+    newNodes
+        .call(addNodeLabel);
+
+    newNodes
+        .call(addNodeCircle);
+
+
+    nodeSelection
+        .exit()
+        .remove();
+
+    return nodeSelection.merge(newNodes);
+}
+
+
+function setup(vizElem) {
+    const svg = vizElem
+        .append('svg');
+
+    const nG = svg.append("g")
+        .attr("class", "nodes");
+
+    const lG = svg.append("g")
+        .attr("class", "links");
+
+    const myZoom = zoom()
+        .scaleExtent([1 / 4, 2])
+        .on("zoom", zoomed);
+
+    svg.call(myZoom)
+        .on("dblclick.zoom", null);
+
+    function zoomed() {
+        const t = event.transform;
+        nG.attr("transform", t);
+        lG.attr("transform", t);
+    }
+
+    return { svg, vizElem };
+}
+
 
 
 function mkLinks(flows = [], nodes = []) {
@@ -168,45 +262,50 @@ function mkLinks(flows = [], nodes = []) {
 }
 
 
-function draw(data, parts, tweakers = { node: DEFAULT_TWEAKER, link: DEFAULT_TWEAKER }) {
+function draw(data,
+              parts,
+              tweakers = { node: DEFAULT_TWEAKER, link: DEFAULT_TWEAKER },
+              simulation) {
+
+    const links = mkLinks(data.flows, data.entities);
+
     const dimensions = setupDimensions(parts.vizElem);
     parts.svg.attrs({
         width: dimensions.width,
         height: dimensions.height
     });
 
-    const links = mkLinks(data.flows, data.entities)
-    console.log(links);
-
-    const simulation = forceSimulation()
-        .force("link", forceLink().id(d => d.id))
-        .force("charge", forceManyBody())
+    simulation
         .force("center", forceCenter(dimensions.width / 2, dimensions.height / 2));
 
-    const link = parts
-        .svg
-        .append("g")
-        .attr("class", "links")
-        .selectAll("line")
-        .data(links)
-        .enter()
-        .append("line")
-        .attr("stroke-width", 2);
+    const link = drawLinks(
+        links,
+        parts.svg.select('g.links'));
 
+    const node = drawNodes(
+        data.entities,
+        parts.svg.select('g.nodes'),
+        simulation,
+        tweakers.node);
 
-    const node = parts
-        .svg
-        .append("g")
-        .attr("class", "nodes")
-        .selectAll("circle")
-        .data(graph.nodes)
-        .enter().append("circle")
-        .attr("r", 5)
-        .attr("fill", 'red')
-        .call(d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended));
+    simulation
+        .nodes(data.entities)
+        .on("tick", ticked);
+
+    simulation.force("link")
+        .links(links);
+
+    function ticked() {
+        link
+            .attr("x1", function(d) { return d.source.x; })
+            .attr("y1", function(d) { return d.source.y; })
+            .attr("x2", function(d) { return d.target.x; })
+            .attr("y2", function(d) { return d.target.y; })
+            .call(tweakers.link.update);
+
+        node
+            .attr('transform', d => `translate(${d.x}, ${d.y})`);
+    }
     //
     //
     // const linkSelection = drawLinks(data.flows, data.entities, parts.svg, tweakers.link);
@@ -226,9 +325,18 @@ function controller($scope, $element) {
     vm.$onChanges = () => {
         if (vm.data) {
             // we draw using async to prevent clientWidth reporting '0'
-            $scope.$applyAsync(() => draw(vm.data, parts, vm.tweakers));
+            $scope.$applyAsync(() => draw(vm.data, parts, vm.tweakers, simulation));
         }
     };
+
+
+    const simulation = forceSimulation()
+        .force("link", forceLink().id(d => d.id).distance(60))
+        .force("charge", forceManyBody().strength(-40));
+
+    vm.$onDestroy = () => {
+        simulation.stop();
+    }
 }
 
 

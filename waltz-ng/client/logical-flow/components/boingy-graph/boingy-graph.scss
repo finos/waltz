@@ -11,28 +11,28 @@
  */
 
 .wdfd-node {
-  circle {
-    fill-opacity: 0.5;
-  }
-  text {
-    fill: #777;
-  }
+    circle {
+        fill-opacity: 0.5;
+    }
+    text {
+        fill: #777;
+    }
+
+    &:hover {
+        cursor: pointer;
+
+        circle {
+            fill-opacity: 0.9;
+        }
+
+        text {
+            stroke-opacity: 0.9;
+            font-weight: 700;
+            fill: #111;
+            font-size: larger;
+        }
+    }
 }
-
-
-.wdfd-node:hover {
-  circle {
-    fill-opacity: 0.9;
-  }
-
-  text {
-    stroke-opacity: 0.9;
-    font-weight: 700;
-    fill: #111;
-    font-size: larger;
-  }
-}
-
 
 .wdfd-link {
   stroke-opacity: 0.6;
