@@ -1,44 +1,77 @@
-<div ng-class="{'waltz-scroll-region-500': $ctrl.candidates.length > 10}">
-    <table ng-show="$ctrl.candidates.length > 0"
+<div ng-class="{'waltz-scroll-region-500': $ctrl.sources.length > 10}">
+    <table ng-show="$ctrl.sources.length > 0 && $ctrl.selectedSource === null"
            class="table table-condensed small">
         <thead>
-        <tr>
-            <th style="width: 45%">Specification Name</th>
-            <th style="width: 45%">Source</th>
-            <th style="width: 10%">Action</th>
-        </tr>
+            <tr>
+                <th style="width: 90%">Source</th>
+                <th style="width: 10%">Count</th>
+            </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="c in $ctrl.candidates"
-            uib-popover="
-                {{ c.specification.format | toDisplayName:'dataFormatKind' }} /
-                {{ c.physicalFlow.transport | toDisplayName:'transportKind' }} /
-                {{ c.physicalFlow.frequency | toDisplayName:'frequencyKind' }} "
-            popover-trigger="mouseenter"
-            popover-placement="left"
-            class="waltz-visibility-parent">
-            <td class="force-wrap">
-                <span ng-bind="c.specification.name"></span>
-            </td>
-            <td class="force-wrap">
-                <waltz-entity-icon-label ng-click="$ctrl.onRefocus(c.sourceRef)"
-                                         class="clickable waltz-action-link"
-                                         entity-ref="c.sourceRef">
-                </waltz-entity-icon-label>
-            </td>
-            <td>
-                <span class="waltz-visibility-child-30">
-                    <button ng-click='$ctrl.onAdd(c.physicalFlow.id)'
-                            class="btn btn-xs btn-primary">
-                        Add
-                    </button>
-                </span>
-            </td>
-        </tr>
+            <tr ng-repeat="s in $ctrl.sources"
+                class="waltz-visibility-parent">
+                <td class="force-wrap">
+                    <waltz-entity-icon-label ng-click="$ctrl.selectSource(s.source)"
+                                             class="clickable waltz-action-link"
+                                             entity-ref="s.source">
+                    </waltz-entity-icon-label>
+                </td>
+                <td>
+                    <span class="waltz-visibility-child-30 badge"
+                          ng-bind="s.count">
+                    </span>
+                </td>
+            </tr>
         </tbody>
     </table>
 
-    <div ng-show="$ctrl.candidates.length == 0"
+
+    <div ng-show="$ctrl.selectedSource">
+        <h5>
+            <span class="small">Flows from</span>
+            <waltz-entity-icon-label ng-click="$ctrl.onRefocus($ctrl.selectedSource)"
+                                     class="clickable waltz-action-link"
+                                     entity-ref="$ctrl.selectedSource">
+            </waltz-entity-icon-label>
+        </h5>
+        <a ng-click="$ctrl.selectSource(null)"
+           class="clickable small">
+            <waltz-icon name="caret-left"></waltz-icon>
+            Back to sources
+        </a>
+        <table class="table table-condensed small"
+               ng-show="$ctrl.candidateSelections.length > 0">
+            <thead>
+                <tr>
+                    <th style="width: 90%">Specification Name</th>
+                    <th style="width: 10%">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="c in $ctrl.candidateSelections"
+                    class="waltz-visibility-parent">
+                    <td class="force-wrap">
+                        <span ng-bind="c.specification.name"></span>
+                        <div class="text-muted small">
+                            <span ng-bind="c.specification.format | toDisplayName:'dataFormatKind'"></span> /
+                            <span ng-bind="c.physicalFlow.transport | toDisplayName:'transportKind'"></span> /
+                            <span ng-bind="c.physicalFlow.frequency | toDisplayName:'frequencyKind'"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="waltz-visibility-child-30">
+                            <button ng-click='$ctrl.onAdd(c.physicalFlow.id)'
+                                    class="btn btn-xs btn-primary">
+                                Add
+                            </button>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div ng-show="$ctrl.sources.length == 0"
          ng-transclude="empty">
     </div>
 

@@ -1,5 +1,6 @@
-import _ from 'lodash';
-import {enrichConsumes} from '../../../physical-specifications/utilities';
+import _ from "lodash";
+import {initialiseData} from "../../../common";
+import {enrichConsumes} from "../../../physical-specifications/utilities";
 
 
 const bindings = {
@@ -16,6 +17,11 @@ const bindings = {
 
 const template = require('./lineage-candidate-editor.html');
 
+const initialState = {
+    selectedSource: null,
+    candidateSelections: []
+}
+
 
 function removeCandidatesWithNoPhysicalFlows(candidates = []) {
     return _.filter(candidates, c => c.physicalFlow != null);
@@ -29,14 +35,26 @@ function removeUsedCandidates(candidates = [], currentLineage = []) {
 }
 
 
-function mkCandidates(flowData = [], currentLineage = []) {
+function mkCandidateGroups(flowData = [], currentLineage = []) {
     const candidates = removeCandidatesWithNoPhysicalFlows(flowData);
-    return removeUsedCandidates(candidates, currentLineage);
+    const validCandidates = removeUsedCandidates(candidates, currentLineage);
+
+    const groupedBySource = _.groupBy(validCandidates, c => c.sourceRef.kind + '_' + c.sourceRef.id);
+    const sourcesAndCounts = _.chain(validCandidates)
+        .map(c => c.sourceRef)
+        .keyBy(c => c.kind + '_' + c.id)
+        .map((v, k) => ({source: v, count: groupedBySource[k].length}))
+        .value();
+
+    return {
+        sources: sourcesAndCounts,
+        candidatesBySource: groupedBySource,
+    };
 }
 
 
 function controller() {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
         const specOwners = _.map(vm.specifications, "owningEntity");
@@ -46,13 +64,32 @@ function controller() {
             .uniqBy("id")
             .value();
 
+
         const flowData = enrichConsumes(
             vm.specifications.consumes,
             vm.physicalFlows,
             endpointReferences);
 
-        vm.candidates = mkCandidates(flowData, vm.currentLineage);
+
+        const candidateGroups = mkCandidateGroups(flowData, vm.currentLineage);
+        vm.sources = candidateGroups.sources;
+        vm.candidatesBySource = candidateGroups.candidatesBySource;
+
+        mkCandidateSelections(vm.selectedSource);
     };
+
+
+    const mkCandidateSelections = (entityRef) => {
+        vm.candidateSelections = entityRef
+            ? vm.candidatesBySource[entityRef.kind + "_" + entityRef.id]
+            : [];
+    };
+
+
+    vm.selectSource = (entityRef) => {
+        vm.selectedSource = entityRef;
+        mkCandidateSelections(entityRef);
+    }
 }
 
 
