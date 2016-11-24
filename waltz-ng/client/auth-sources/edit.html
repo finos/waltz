@@ -54,12 +54,12 @@
                 </table>
             </div>
         </div>
-        <div ng-if="ctrl.authSources.length == 0">
-            <div class="alert alert-warning">
+        <waltz-no-data ng-if="ctrl.authSources.length == 0">
+            <message>
                 <strong>No Authoritative Sources</strong> have been defined for
                 <span ng-bind="ctrl.orgUnit.name"></span>.
-            </div>
-        </div>
+            </message>
+        </waltz-no-data>
     </waltz-section>
 
 

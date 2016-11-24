@@ -155,9 +155,11 @@
         <div ng-if="ctrl.lineage.length == 0">
             <div class="row" >
                 <div class="col-sm-12">
-                    <div class="alert alert-warning">
-                        <strong>No lineage</strong> defined for this flow.
-                    </div>
+                    <waltz-no-data>
+                        <message>
+                            <strong>No lineage</strong> defined for this flow.
+                        </message>
+                    </waltz-no-data>
                 </div>
             </div>
         </div>
@@ -184,10 +186,11 @@
                                                            on-initialise="ctrl.onMentionsPanelInitialise">
                     </waltz-physical-specification-mentions>
                 </div>
-                <div class="alert alert-warning"
-                     ng-if="ctrl.mentions.length == 0">
-                    <strong>No mentions.</strong> This flow has not been mentioned as a contributor to any other flow.
-                </div>
+                <waltz-no-data ng-if="ctrl.mentions.length == 0">
+                    <message>
+                        <strong>No mentions.</strong> This flow has not been mentioned as a contributor to any other flow.
+                    </message>
+                </waltz-no-data>
 
             </div>
         </div>

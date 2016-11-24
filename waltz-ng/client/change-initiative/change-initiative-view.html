@@ -130,10 +130,11 @@
                         </tbody>
                     </table>
                 </div>
-                <div ng-if="ctrl.related.appGroups.length == 0"
-                     class="alert alert-warning">
-                    <strong>No Groups have been associated with this change initiative</strong>
-                </div>
+                <waltz-no-data ng-if="ctrl.related.appGroups.length == 0">
+                    <message>
+                        <strong>No Groups have been associated with this change initiative</strong>
+                    </message>
+                </waltz-no-data>
 
             </div>
         </div>

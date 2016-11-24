@@ -40,11 +40,11 @@
                         <waltz-traits-table traits="ctrl.traits">
                         </waltz-traits-table>
                     </div>
-                    <div ng-if="ctrl.traits.length == 0">
-                        <div class="alert alert-warning">
+                    <waltz-no-data ng-if="ctrl.traits.length == 0">
+                        <message>
                             <strong>No traits</strong> have been defined yet.
-                        </div>
-                    </div>
+                        </message>
+                    </waltz-no-data>
                 </div>
 
             </waltz-section>

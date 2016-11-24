@@ -4,13 +4,13 @@
                                      entities="['ASSET_COST']">
     </waltz-source-data-section-addon>
 
-    <div ng-if="$ctrl.costs.length == 0">
-        <div class="alert alert-warning">
+    <waltz-no-data ng-if="$ctrl.costs.length == 0">
+        <message>
             <strong>
                 No costs registered
             </strong> against this application
-        </div>
-    </div>
+        </message>
+    </waltz-no-data>
 
     <div ng-if="$ctrl.costs.length > 0">
             <uib-tabset>

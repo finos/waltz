@@ -57,11 +57,12 @@
             </li>
         </ul>
 
-        <div class="alert alert-warning"
-             ng-show="ctrl.capabilityHierarchy.length == 0">
-            <strong>No Functions</strong>
-            have been defined within this system.
-        </div>
+        <waltz-no-data ng-show="ctrl.capabilityHierarchy.length == 0">
+            <message>
+                <strong>No Functions</strong>
+                have been defined within this system.
+            </message>
+        </waltz-no-data>
 
     </waltz-section>
 

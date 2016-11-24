@@ -31,12 +31,13 @@
                                  ng-if="ctrl.viewData.authSources.length > 0">
         </waltz-auth-sources-list>
 
-        <div class="alert alert-warning"
-             ng-if="ctrl.viewData.authSources.length === 0">
-            <strong>
-                No Authoritative Sources declared by any Organisational Units
-            </strong>
-        </div>
+        <waltz-no-data ng-if="ctrl.viewData.authSources.length === 0">
+            <message>
+                <strong>
+                    No Authoritative Sources declared by any Organisational Units
+                </strong>
+            </message>
+        </waltz-no-data>
     </waltz-section>
 
 
@@ -57,12 +58,13 @@
                                      ng-if="!(ctrl.viewData.flowDistributors | isEmpty)">
         </waltz-non-auth-sources-list>
 
-        <div class="alert alert-warning"
-             ng-if="ctrl.viewData.flowDistributors | isEmpty">
-            <strong>
-                No Non-Authoritative Sources distributing data
-            </strong>
-        </div>
+        <waltz-no-data ng-if="ctrl.viewData.flowDistributors | isEmpty">
+            <message>
+                <strong>
+                    No Non-Authoritative Sources distributing data
+                </strong>
+            </message>
+        </waltz-no-data>
     </waltz-section>
 
 
@@ -82,7 +84,7 @@
 
 
     <!-- CHANGE_LOG -->
-    <waltz-change-log-section entries="ctrl.viewData.logEntries">
+    <waltz-change-log-section entries="ctrl.viewData.changeLogs">
     </waltz-change-log-section>
 
 

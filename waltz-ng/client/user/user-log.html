@@ -85,9 +85,11 @@
                     </table>
                 </div>
 
-                <div ng-if="ctrl.changeLogs.length == 0" class="alert alert-warning">
-                    No audit logs
-                </div>
+                <waltz-no-data ng-if="ctrl.changeLogs.length == 0">
+                    <message>
+                        No audit logs
+                    </message>
+                </waltz-no-data>
             </div>
 
 
@@ -122,9 +124,11 @@
                         </tbody>
                     </table>
                 </div>
-                <div ng-if="ctrl.accesslogs.length == 0" class="alert alert-warning">
-                    No Access logs
-                </div>
+                <waltz-no-data ng-if="ctrl.accesslogs.length == 0">
+                    <message>
+                        No Access logs
+                    </message>
+                </waltz-no-data>
             </div>
         </div>
     </div>

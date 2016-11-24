@@ -76,9 +76,10 @@
         </div>
     </div>
 
-    <div ng-if="ctrl.usedTraits.length == 0 && ctrl.availableTraits.length > 0"
-         class="alert alert-warning">
-        <strong>No traits</strong> registered
-    </div>
+    <waltz-no-data ng-if="ctrl.usedTraits.length == 0 && ctrl.availableTraits.length > 0">
+        <message>
+            <strong>No traits</strong> registered
+        </message>
+    </waltz-no-data>
 
 </div>

@@ -94,32 +94,34 @@
                      select="ctrl.dataTab = 0"
                      heading="Summary">
                 <div ng-if="ctrl.dataTypeUsages.length == 0 && ctrl.flows.length == 0">
-                    <div class="alert alert-warning"
-                         ng-if="ctrl.dataTypeUsages.length == 0">
-                        <strong>
-                            No flows or types
-                        </strong>
-                        registered for this application.  Add them
-                        <a ui-sref='main.logical-flow.edit ({ kind:"APPLICATION", id: ctrl.app.id })'>
-                            here.
-                        </a>
-                    </div>
+                    <waltz-no-data ng-if="ctrl.dataTypeUsages.length == 0">
+                        <message>
+                            <strong>
+                                No flows or types
+                            </strong>
+                            registered for this application.  Add them
+                            <a ui-sref='main.logical-flow.edit ({ kind:"APPLICATION", id: ctrl.app.id })'>
+                                here.
+                            </a>
+                        </message>
+                    </waltz-no-data>
                 </div>
 
                 <div ng-if="ctrl.dataTypeUsages.length > 0 || ctrl.flows.length > 0">
                     <div class='row'>
                         <div class="col-md-12">
                             <h5>Data Types</h5>
-                            <div class="alert alert-warning"
-                                 ng-if="ctrl.dataTypeUsages.length == 0">
-                                <strong>
-                                    No Types
-                                </strong>
-                                registered for this application.  Add them
-                                <a ui-sref='main.logical-flow.edit ({ kind:"APPLICATION", id: ctrl.app.id })'>
-                                    here.
-                                </a>
-                            </div>
+                            <waltz-no-data ng-if="ctrl.dataTypeUsages.length == 0">
+                                <message>
+                                    <strong>
+                                        No Types
+                                    </strong>
+                                    registered for this application.  Add them
+                                    <a ui-sref='main.logical-flow.edit ({ kind:"APPLICATION", id: ctrl.app.id })'>
+                                        here.
+                                    </a>
+                                </message>
+                            </waltz-no-data>
 
                             <waltz-app-data-type-usage-list usages="ctrl.dataTypeUsages"
                                                             ng-if="ctrl.dataTypeUsages.length > 0">
@@ -131,16 +133,17 @@
                     <div class="row">
                         <div class="col-md-12">
                             <h5>Logical Flows</h5>
-                            <div class="alert alert-warning"
-                                 ng-if="ctrl.flows.length == 0">
-                                <strong>
-                                    No Logical Data Flows
-                                </strong>
-                                registered for this application.  Add one
-                                <a ui-sref='main.logical-flow.edit ({ kind:"APPLICATION", id: ctrl.app.id })'>
-                                    here
-                                </a>.
-                            </div>
+                            <waltz-no-data ng-if="ctrl.flows.length == 0">
+                                <message>
+                                    <strong>
+                                        No Logical Data Flows
+                                    </strong>
+                                    registered for this application.  Add one
+                                    <a ui-sref='main.logical-flow.edit ({ kind:"APPLICATION", id: ctrl.app.id })'>
+                                        here
+                                    </a>.
+                                </message>
+                            </waltz-no-data>
 
                             <div ng-if="ctrl.flows.length > 0">
 

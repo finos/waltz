@@ -1,8 +1,9 @@
 <div>
-    <div ng-if="ctrl.pies.byLifecyclePhase.data.length == 0"
-         class="alert alert-warning">
-        <strong>No associated end user applications</strong>
-    </div>
+    <waltz-no-data ng-if="ctrl.pies.byLifecyclePhase.data.length == 0">
+        <message>
+            <strong>No associated end user applications</strong>
+        </message>
+    </waltz-no-data>
 
     <uib-tabset ng-if="ctrl.pies.byLifecyclePhase.data.length > 0">
         <uib-tab  heading="Summary">

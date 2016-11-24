@@ -100,11 +100,11 @@
             </table>
         </div>
 
-        <div ng-if="$ctrl.selected.physicalFlows.length == 0">
-            <div class="alert alert-warning">
+        <waltz-no-data ng-if="$ctrl.selected.physicalFlows.length == 0">
+            <message>
                 No records of physical data flows found.
-            </div>
-        </div>
+            </message>
+        </waltz-no-data>
 
 
     </div>
