@@ -90,7 +90,8 @@
 
 
     <!--LINEAGE REPORTS-->
-    <waltz-section name="Lineage Reports">
+    <waltz-section name="Lineage Reports"
+                   id="lineage-reports-section">
         <waltz-section-actions>
             <button ng-click="ctrl.exportLineageReports()"
                     class="btn btn-xs btn-primary"
@@ -112,7 +113,8 @@
 
 
     <!-- AUTH SOURCES -->
-    <waltz-section name="Authoritative Sources">
+    <waltz-section name="Authoritative Sources"
+                   id="auth-flows-section">
         <waltz-rated-flow-summary-panel apps="ctrl.applications"
                                         entity-reference="ctrl.entityRef"
                                         flow-data="ctrl.dataFlows"
