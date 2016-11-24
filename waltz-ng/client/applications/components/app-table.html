@@ -1,75 +1,10 @@
 <div>
     <div class="row">
-        <div class="col-md-9">
-            <div style="font-size: smaller; height: 300px"
-                 ui-grid-exporter
-                 ui-grid="$ctrl.gridOptions">
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div ng-if="$ctrl.selectedApp"
-                 class="panel panel-warning small">
-                <div class="panel-heading">
-                    <h5 class="panel-title">
-                        <strong>
-                            Details
-                        </strong>
-                    </h5>
-                </div>
-                <div class="panel-body">
-                    <p>
-                        <span ng-bind="$ctrl.selectedApp.description"></span>
-                    </p>
-                    <h6 ng-if="$ctrl.selectedApp.roles"
-                        uib-tooltip="This persons role(s) on the application">
-                        <strong>
-                            Role(s):
-                        </strong>
-                        <span ng-repeat="role in $ctrl.selectedApp.roles">
-                            <span ng-bind="role"></span>
-                            <span ng-if="!$last">, </span>
-                        </span>
-                    </h6>
-                    <h6 ng-if="$ctrl.selectedApp.assetCode">
-                        <strong>Asset code: </strong>
-                        <span ng-bind="$ctrl.selectedApp.assetCode"></span>
-                    </h6>
-                    <h6 ng-if="$ctrl.selectedApp.platform">
-                        <strong>Platform: </strong>
-                        <span ng-bind="$ctrl.selectedApp.platform"></span>
-                    </h6>
-                    <h6 ng-if="$ctrl.selectedApp.riskRating">
-                        <strong>Risk Rating: </strong>
-                        <span ng-bind="$ctrl.selectedApp.riskRating | toDisplayName:'criticality'"></span>
-                    </h6>
-                    <h6 ng-if="$ctrl.selectedApp.criticality">
-                        <strong>Criticality: </strong>
-                        <span ng-bind="$ctrl.selectedApp.criticality | toDisplayName:'criticality'"></span>
-                    </h6>
-                    <h6>
-                        <strong>Managed by: </strong>
-                        <span ng-bind="$ctrl.selectedApp.management || 'IT'"></span>
-                    </h6>
-                    <div ng-switch="$ctrl.selectedApp.management">
-                        <small ng-switch-when="'End User'">
-                            <waltz-icon name="exclamation-triangle"
-                                        size="lg">
-                            </waltz-icon>
-                            This is an end user application and has limited information presently.
-                        </small>
-                        <strong ng-switch-default>
-                            <a class="pull-right"
-                               ui-sref="main.app.view ({ id: $ctrl.selectedApp.id })">
-                                more &raquo;
-                            </a>
-                        </strong>
-                    </div>
-                </div>
-            </div>
-            <div class="alert alert-warning"
-                 ng-if="!$ctrl.selectedApp">
-                Select an application to view further details
-            </div>
+        <div class="col-md-12">
+            <waltz-grid-with-search entries="$ctrl.gridData"
+                                    column-defs="$ctrl.columnDefs"
+                                    on-initialise="$ctrl.onInitialise">
+            </waltz-grid-with-search>
         </div>
     </div>
 </div>
