@@ -10,62 +10,78 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import {authoritativeRatingBackgroundColorScale} from "../../../common/colors";
+import _ from 'lodash';
 import {mkEntityLinkGridCell} from "../../../common";
 
 
 const bindings = {
+    decorators: '<',
     flows: '<',
-    decorators: '<'
+    onInitialise: '<'
 };
 
 
-function controller($animate,
-                    displayNameService,
-                    uiGridConstants) {
-    const vm = this;
-
-    vm.$onChanges = (change) => {
-        vm.gridOptions = setupGrid($animate, displayNameService, uiGridConstants, vm.flows, vm.decorators);
-    };
-}
-
-
-controller.$inject = [
-    '$animate',
-    'WaltzDisplayNameService',
-    'uiGridConstants'
-];
-
-
-const template = `<div style="font-size: smaller; height: 300px"
-                       ui-grid-exporter
-                       ui-grid-resize-columns
-                       ui-grid="$ctrl.gridOptions">
+const template = `<div class="row">
+                    <div class="col-md-12">
+                        <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                                                entries="$ctrl.gridData"
+                                                on-initialise="$ctrl.onInitialise">
+                        </waltz-grid-with-search>
+                    </div>
                   </div>`;
 
 
-const component = {
-    bindings,
-    template,
-    controller
+const ratingColumn = {
+    field: 'authSourceRating',
+    displayName: 'Source Rating',
+    cellTemplate: `<span>
+                     <waltz-rating-indicator-cell rating="row.entity.ragRating"></waltz-rating-indicator-cell>
+                     <span class="ui-grid-cell-contents" 
+                           ng-bind="COL_FIELD | toDisplayName:'rating'"></span>
+                   </span>`,
 };
 
 
+const columnDefs = [
+    mkEntityLinkGridCell('Source', 'source', 'none'),
+    mkEntityLinkGridCell('Target', 'target', 'none'),
+    mkEntityLinkGridCell('Data Type', 'dataType', 'none'),
+    ratingColumn
+];
+
+
 function groupDecoratorsByFlowId(decorators = [], displayNameService) {
+    const resolveName = id => displayNameService.lookup('dataType', id);
+
     return _.chain(decorators)
         .filter(dc => dc.decoratorEntity.kind === 'DATA_TYPE')
         .map(dc => _.assign({}, {
             dataFlowId: dc.dataFlowId,
             dataType: {
                 id: dc.decoratorEntity.id,
-                name: displayNameService.lookup('dataType', dc.decoratorEntity.id),
+                name: resolveName(dc.decoratorEntity.id),
                 kind: 'DATA_TYPE'
             },
             authSourceRating: dc.rating
         }))
         .groupBy('dataFlowId')
         .value();
+}
+
+
+function toRag(authRating) {
+    switch (authRating) {
+        case "PRIMARY":
+            return 'G';
+        case "SECONDARY":
+            return 'A';
+        case "DISCOURAGED":
+            return 'R';
+        case "NO_OPINION":
+            return 'Z';
+        default:
+            return ''
+    }
 }
 
 
@@ -76,40 +92,33 @@ function prepareGridData(flows = [], decorators = [], displayNameService) {
             dc => _.assign({
                 dataType: dc.dataType,
                 authSourceRating: dc.authSourceRating,
-                rowStyle: {
-                    'background-color': authoritativeRatingBackgroundColorScale(dc.authSourceRating).toString()
-                }
+                ragRating: toRag(dc.authSourceRating)
             },
             flow)));
 }
 
 
-function setupGrid($animate, displayNameService, uiGridConstants, flows = [], decorators = []) {
-    const gridData = prepareGridData(flows, decorators, displayNameService);
+function controller(displayNameService) {
+    const vm = this;
 
-    const columnDefs = [
-        mkEntityLinkGridCell('Source', 'source', 'none'),
-        mkEntityLinkGridCell('Target', 'target', 'none'),
-        mkEntityLinkGridCell('Data Type', 'dataType', 'none'),
-        { field: 'authSourceRating', displayName: 'Source Rating', cellFilter: 'toDisplayName:"rating"' }
-    ];
-
-    return {
-        columnDefs,
-        data: gridData,
-        enableGridMenu: true,
-        enableFiltering: true,
-        enableSelectAll: true,
-        exporterMenuPdf: false,
-        exporterCsvFilename: "flows.csv",
-        enableHorizontalScrollbar: uiGridConstants.scrollbars.NEVER,
-        enableSorting: true,
-        rowTemplate: '<div ng-style="row.entity.rowStyle"><div ng-repeat="col in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ui-grid-cell></div></div>',
-        onRegisterApi: (gridApi) => {
-            $animate.enabled(gridApi.grid.element, false);
-        }
+    vm.$onChanges = () => {
+        const gridData = prepareGridData(vm.flows, vm.decorators, displayNameService);
+        vm.columnDefs = columnDefs;
+        vm.gridData = gridData;
     };
 }
+
+
+controller.$inject = [
+    'DisplayNameService',
+];
+
+
+const component = {
+    bindings,
+    template,
+    controller
+};
 
 
 export default component;

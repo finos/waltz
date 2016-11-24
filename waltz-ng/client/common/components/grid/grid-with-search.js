@@ -19,7 +19,6 @@ const initialState = {
     filteredEntries: [],
     searchFields: [],
     searchPlaceholderText: 'Search...',
-    exportFilename: 'export.csv',
     onInitialise: (gridApi) => console.log('Default onInitialise handler for grid-search: ', gridApi),
     onChange: (gridApi) => {}
 };
@@ -45,18 +44,6 @@ function controller() {
         invokeFunction(vm.onChange, { entriesCount: _.size(vm.filteredEntries) });
     };
 
-
-    vm.onGridInitialise = (api) => {
-        vm.gridApi = api;
-    };
-
-
-    vm.exportGrid = () => {
-        vm.gridApi.exportFn(vm.exportFilename);
-    };
-
-
-    invokeFunction(vm.onInitialise, {export: vm.exportGrid });
 }
 
 

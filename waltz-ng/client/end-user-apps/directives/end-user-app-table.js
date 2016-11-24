@@ -16,7 +16,7 @@ function controller(uiGridConstants, $scope) {
             { field: 'riskRating' },
             {
                 field: 'lifecyclePhase',
-                cellTemplate: '<div class="ui-grid-cell-contents" ng-bind="COL_FIELD | toDisplayName:\'lifecyclePhase\'"></div>',
+                cellFilter: "toDisplayName:\'lifecyclePhase'",
                 filter: {
                     type: uiGridConstants.filter.SELECT,
                     selectOptions: _.map(lifecyclePhaseDisplayNames, (label, value) => ({ label, value }))

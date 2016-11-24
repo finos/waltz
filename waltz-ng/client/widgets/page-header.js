@@ -40,12 +40,23 @@ function controller($document,
         $document[0].title = `Waltz: ${vm.name}`;
     };
 
-    angular
-        .element($window)
-        .bind("scroll", () => {
-            vm.sticky = $window.pageYOffset > 60;
-            $scope.$apply();
+    const scrollListener = () => {
+        $scope.$apply(() => {
+            vm.sticky = $window.pageYOffset > 60
         });
+    };
+
+    vm.$onInit = () => {
+        angular
+            .element($window)
+            .on("scroll", scrollListener);
+    };
+
+    vm.$onDestroy = () => {
+        angular
+            .element($window)
+            .off("scroll", scrollListener);
+    };
 
     vm.startTour = () => {
         if (vm.tour) {

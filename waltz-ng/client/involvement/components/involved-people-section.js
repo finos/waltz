@@ -68,7 +68,7 @@ function controller(displayNameService) {
     ];
 
     vm.onGridInitialise = (e) => {
-      vm.exportGrid = e.export;
+        vm.exportGrid = () => e.exportFn("people.csv");
     };
 
     vm.onGridChange = (e) => {
@@ -78,7 +78,7 @@ function controller(displayNameService) {
 
 
 controller.$inject = [
-    'WaltzDisplayNameService'
+    'DisplayNameService'
 ];
 
 

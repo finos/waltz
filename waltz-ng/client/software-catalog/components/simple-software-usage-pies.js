@@ -2,10 +2,13 @@ import _ from "lodash";
 import {maturityColorScale, variableScale} from "../../common/colors";
 
 
-const BINDINGS = {
-    usages: '=',
-    packages: '='
+const bindings = {
+    usages: '<',
+    packages: '<'
 };
+
+
+const template = require('./simple-software-usage-pies.html');
 
 
 const PIE_SIZE = 70;
@@ -37,7 +40,7 @@ function prepareStats(items = [], usages = []) {
 }
 
 
-function controller($scope) {
+function controller() {
 
     const vm = this;
 
@@ -58,21 +61,23 @@ function controller($scope) {
     };
 
 
-    $scope.$watchGroup(
-        ['ctrl.packages', 'ctrl.usages'],
-        () => recalcPieData()
-    );
+    vm.$onChanges = () => {
+        if(vm.packages && vm.usages) {
+            recalcPieData();
+        }
+    }
 
 }
 
-controller.$inject = [ '$scope' ];
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
-    scope: {},
-    template: require('./simple-software-usage-pies.html'),
-    bindToController: BINDINGS,
-    controllerAs: 'ctrl',
+controller.$inject = [ ];
+
+
+const component = {
+    bindings,
+    template,
     controller
-});
+};
+
+
+export default component;

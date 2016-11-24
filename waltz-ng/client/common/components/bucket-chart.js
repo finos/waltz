@@ -110,13 +110,17 @@ function controller($window, $element) {
         }
     };
 
-    const debouncedDraw = _.debounce(draw, 200);
+    const debouncedDraw = _.debounce(draw, 100);
 
     vm.$onChanges = debouncedDraw;
 
-    angular
+    vm.$onInit = () => angular
         .element($window)
-        .on('resize', () => debouncedDraw());
+        .on('resize', debouncedDraw);
+
+    vm.$onDestroy = () => angular
+        .element($window)
+        .off('resize', debouncedDraw);
 }
 
 

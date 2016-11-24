@@ -13,11 +13,9 @@
 export default (module) => {
 
     module
-        .directive('waltzSummaryRatedFlowChart', require('./rated-flow-chart/summary-rated-flow-chart'))
         .directive('waltzRatedFlowDetail', require('./rated-flow-chart/rated-flow-detail'))
         .directive('waltzRatedFlowSummaryDetail', require('./rated-flow-chart/rated-flow-summary-detail'))
-        .directive('waltzFlowCloudDiagram', require('./flow-cloud-diagram'))
-        .directive('waltzLogicalFlowsTabgroupSection', require('./logical-flows-tabgroup-section'));
+        .directive('waltzFlowCloudDiagram', require('./flow-cloud-diagram'));
 
 
 

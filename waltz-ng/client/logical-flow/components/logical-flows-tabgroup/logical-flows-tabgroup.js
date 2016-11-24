@@ -7,7 +7,8 @@ const bindings = {
     onLoadDetail: '<',
     options: '<',  // { graphTweakers ... }
     optionsVisible: '<',
-    onTabChange: '<'
+    onTabChange: '<',
+    onTableInitialise: '<'
 };
 
 
@@ -200,7 +201,7 @@ function controller($scope,
 controller.$inject = [
     '$scope',
     'LogicalFlowUtilityService',
-    'WaltzDisplayNameService'
+    'DisplayNameService'
 ];
 
 

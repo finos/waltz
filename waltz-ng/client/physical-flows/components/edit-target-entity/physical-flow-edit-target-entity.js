@@ -3,6 +3,7 @@ import {initialiseData, invokeFunction} from "../../../common";
 
 const bindings = {
     current: '<',
+    existingTargets: '<',  // [ <entityRef>... ]
     owningEntity: '<',
     onDismiss: '<',
     onChange: '<'
@@ -13,7 +14,8 @@ const template = require('./physical-flow-edit-target-entity.html');
 
 
 const initialState = {
-    entityKind: 'APPLICATION'
+    searchEntityKind: null,
+    existingTargets: []
 };
 
 
@@ -36,21 +38,14 @@ function controller(actorStore) {
 
     vm.$onChanges = (changes) => {
         if(vm.current && vm.current.kind) {
-            vm.entityKind = vm.current.kind === 'ACTOR' ? vm.current.kind : 'APPLICATION';
-        }
-    }
-
-
-    vm.addApp = (app) => {
-        const appWithKind = Object.assign({}, app, {kind: 'APPLICATION'});
-        vm.appDuplicate = sameApp(appWithKind, vm.owningEntity);
-        if(!vm.appDuplicate) {
-            invokeFunction(vm.onChange, appWithKind);
+            vm.searchEntityKind = vm.current.kind === 'ACTOR' ? vm.current.kind : 'APPLICATION';
         }
     };
 
-    vm.cancelApp = () => {
+    vm.cancel = () => {
+        vm.actorDuplicate = false;
         vm.appDuplicate = false;
+        vm.searchEntityKind = null;
         invokeFunction(vm.onDismiss);
     };
 
@@ -65,10 +60,14 @@ function controller(actorStore) {
         }
     };
 
-    vm.cancelActor = () => {
-        vm.actorDuplicate = false;
-        invokeFunction(vm.onDismiss);
+    vm.addApp = (app) => {
+        const appWithKind = Object.assign({}, app, {kind: 'APPLICATION'});
+        vm.appDuplicate = sameApp(appWithKind, vm.owningEntity);
+        if(!vm.appDuplicate) {
+            invokeFunction(vm.onChange, appWithKind);
+        }
     };
+
 
     vm.selectActor = (actor) => {
         vm.actorDuplicate = sameActor(actor, vm.owningEntity);
