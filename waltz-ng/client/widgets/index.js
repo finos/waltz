@@ -34,7 +34,7 @@ export default (module) => {
         .component('waltzDataExtractLink', require('./data-extract-link'))
         .component('waltzEditableField', require('./editable-field'))
         .component('waltzIcon', require('./icon'))
-        .component('waltzNoDataMessage', require('./no-data-message'))
+        .component('waltzNoData', require('./no-data'))
         .component('waltzPageHeader', require('./page-header'))
         .component('waltzPie', require('./pie'))
         .component('waltzPieSegmentTable', require('./pie-segment-table'))

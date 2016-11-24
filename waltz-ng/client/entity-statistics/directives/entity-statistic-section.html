@@ -72,13 +72,14 @@
             </table>
 
         </div>
-        <div class="alert alert-warning"
-             ng-if="ctrl.entityStatisticsGrouped.length == 0">
-            <strong>
-                No Indicators
-            </strong>
-            for this application.
-        </div>
+        <waltz-no-data ng-if="ctrl.entityStatisticsGrouped.length == 0">
+            <message>
+                <strong>
+                    No Indicators
+                </strong>
+                for this application.
+            </message>
+        </waltz-no-data>
 
     </waltz-section>
 </div>

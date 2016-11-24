@@ -79,11 +79,10 @@
 
         <div class="row">
             <div class="col-md-6">
-                <div ng-if="ctrl.changeInitiatives.length == 0">
-                    <div class="alert alert-warning">
-                        <strong>No associated Change Initiatives.</strong>
-                    </div>
-                </div>
+                <waltz-no-data ng-if="ctrl.changeInitiatives.length == 0">
+                    <message>No associated Change Initiatives</message>
+                </waltz-no-data>
+
                 <div ng-if="ctrl.changeInitiatives.length > 0">
                     <table class="table table-condensed table-striped small">
                         <thead>
@@ -169,14 +168,14 @@
                     </div>
                 </div>
 
-                <div ng-if="ctrl.applications.length ==0">
-                    <div class="alert alert-warning">
+                <waltz-no-data ng-if="ctrl.applications.length ==0">
+                    <message>
                         <waltz-icon name="warning"></waltz-icon>
                         <strong>No applications</strong> have been registered to this
                         group yet.  Use the search field on the right to start adding
                         applications.
-                    </div>
-                </div>
+                    </message>
+                </waltz-no-data>
 
             </div>
             <div class="col-md-6">

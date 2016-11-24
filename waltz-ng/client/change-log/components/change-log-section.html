@@ -26,9 +26,11 @@
             </div>
 
         </div>
-        <waltz-no-data-message ng-if="$ctrl.entries.length == 0"
-                               message="No changes yet">
-        </waltz-no-data-message>
+        <waltz-no-data ng-if="$ctrl.entries.length == 0">
+            <message>
+                <strong>No changes yet</strong>
+            </message>
+        </waltz-no-data>
 
     </waltz-section>
 </div>

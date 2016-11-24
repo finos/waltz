@@ -53,11 +53,13 @@
         <div class="row"
              ng-if="$ctrl.definitions.length == 0">
             <div class="col-md-12">
-                <div class="alert alert-warning">
-                    <strong>
-                        No Indicators
-                    </strong>
-                </div>
+                <waltz-no-data>
+                    <message>
+                        <strong>
+                            No Indicators
+                        </strong>
+                    </message>
+                </waltz-no-data>
             </div>
         </div>
     </waltz-section>

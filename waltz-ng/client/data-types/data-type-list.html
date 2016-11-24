@@ -72,10 +72,11 @@
                                            ng-if="ctrl.lineageReports.length > 0">
                 </waltz-physical-flow-table>
 
-                <div ng-if="ctrl.lineageReports.length == 0"
-                     class="alert alert-warning">
-                    <strong>No Lineage Reports</strong> have been defined
-                </div>
+                <waltz-no-data ng-if="ctrl.lineageReports.length == 0">
+                    <message>
+                        <strong>No Lineage Reports</strong> have been defined
+                    </message>
+                </waltz-no-data>
             </waltz-section>
         </div>
 
