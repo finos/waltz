@@ -116,7 +116,7 @@ public class EntityStatisticEndpoint implements Endpoint {
         String calculateHistoricStatTallyPath = mkPath(BASE_URL, "tally", "historic", ":id", ":rollupKind");
 
         ListRoute<EntityStatisticDefinition> findAllActiveDefinitionsRoute = (request, response)
-                -> entityStatisticService.findAllActiveDefinitions();
+                -> entityStatisticService.findAllActiveDefinitions(true);
 
         DatumRoute<EntityStatisticDefinition> findDefinitionRoute = (request, response)
                 -> entityStatisticService.getDefinitionById(getId(request));
@@ -128,7 +128,7 @@ public class EntityStatisticEndpoint implements Endpoint {
                 -> entityStatisticService.getStatisticValuesForAppIdSelector(getLong(request, "statId"), readIdSelectionOptionsFromBody(request));
 
         DatumRoute<ImmediateHierarchy<EntityStatisticDefinition>> findRelatedStatDefinitionsRoute = (request, response)
-                -> entityStatisticService.findRelatedStatDefinitions(getLong(request, "statId"));
+                -> entityStatisticService.findRelatedStatDefinitions(getLong(request, "statId"), true);
 
         getForList(findAllActiveDefinitionsPath, findAllActiveDefinitionsRoute);
         getForList(findStatsForEntityPath, findStatsForEntityRoute);

@@ -1,9 +1,9 @@
 package com.khartec.waltz.data.entity_statistic;
 
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.entity_statistic.*;
 import com.khartec.waltz.schema.tables.records.EntityStatisticDefinitionRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -13,13 +13,11 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
-import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 
 @Repository
 public class EntityStatisticDefinitionDao {
 
     private static final com.khartec.waltz.schema.tables.EntityStatisticDefinition esd = ENTITY_STATISTIC_DEFINITION.as("esd");
-    private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
 
     public static final RecordMapper<? super Record, EntityStatisticDefinition> TO_DEFINITION_MAPPER = r -> {
         EntityStatisticDefinitionRecord record = r.into(ENTITY_STATISTIC_DEFINITION);
@@ -79,30 +77,16 @@ public class EntityStatisticDefinitionDao {
     }
 
 
-    public List<EntityStatisticDefinition> getAllDefinitions() {
-        return dsl.select(esd.fields())
-                .from(esd)
-                .fetch(TO_DEFINITION_MAPPER);
-    }
-
-    public List<EntityStatisticDefinition> findAllActiveDefinitions() {
+    public List<EntityStatisticDefinition> findAllActiveDefinitions(boolean rollupOnly) {
         return dsl.select(esd.fields())
                 .from(esd)
                 .where(esd.ACTIVE.eq(true))
+                .and(mkRollupOnlyCondition(rollupOnly))
                 .fetch(TO_DEFINITION_MAPPER);
     }
 
 
-    public List<EntityStatisticDefinition> findTopLevelDefinitions() {
-        return dsl.select(esd.fields())
-                .from(esd)
-                .where(esd.PARENT_ID.isNull())
-                .and(esd.ACTIVE.eq(Boolean.TRUE))
-                .fetch(TO_DEFINITION_MAPPER);
-    }
-
-
-    public List<EntityStatisticDefinition> findRelated(long id) {
+    public List<EntityStatisticDefinition> findRelated(long id, boolean rollupOnly) {
         Condition findSelf = esd.ID.eq(id);
         Condition findChildren = esd.PARENT_ID.eq(id);
 
@@ -120,30 +104,10 @@ public class EntityStatisticDefinitionDao {
                         .or(findParent)
                 )
                 .and(esd.ACTIVE.eq(Boolean.TRUE))
+                .and(mkRollupOnlyCondition(rollupOnly))
                 .fetch(TO_DEFINITION_MAPPER);
     }
 
-
-    private List<EntityStatisticDefinition> find(SelectConditionStep<Record1<Long>> statSelector,
-                                              Select<Record1<Long>> appIdSelector) {
-        checkNotNull(appIdSelector, "appIdSelector cannot be null");
-
-        // aggregate query
-        Condition condition = esd.ACTIVE.eq(true)
-                .and(esd.ID.in(statSelector))
-                .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(esv.ENTITY_ID.in(appIdSelector))
-                .and(esv.CURRENT.eq(true));
-
-
-        // combine with definitions
-        return dsl.selectDistinct(esd.fields())
-                .from(esd)
-                .join(esv)
-                .on(esd.ID.eq(esv.STATISTIC_ID))
-                .where(dsl.renderInlined(condition))
-                .fetch(TO_DEFINITION_MAPPER);
-    }
 
     public EntityStatisticDefinition getById(long id) {
         return dsl.select(esd.fields())
@@ -152,10 +116,18 @@ public class EntityStatisticDefinitionDao {
                 .fetchOne(TO_DEFINITION_MAPPER);
     }
 
+
     public List<EntityStatisticDefinition> findByIds(List<Long> ids) {
         return dsl.select(esd.fields())
                 .from(esd)
                 .where(esd.ID.in(ids))
                 .fetch(TO_DEFINITION_MAPPER);
+    }
+
+
+    private Condition mkRollupOnlyCondition(boolean rollupOnly) {
+        return  rollupOnly
+                ? esd.ROLLUP_VISIBILITY.eq(true)
+                : DSL.trueCondition();
     }
 }
