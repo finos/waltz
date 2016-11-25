@@ -3661,8 +3661,10 @@
         <createIndex indexName="idx_owning_entity"
                      tableName="physical_specification"
                      unique="false">
-            <column name="owning_entity_id" type="${id.type}"/>
-            <column name="owning_entity_kind" type="${enum.type}"/>
+            <column name="owning_entity_id"
+                    type="${id.type}"/>
+            <column name="owning_entity_kind"
+                    type="${enum.type}"/>
         </createIndex>
 
     </changeSet>
@@ -3673,8 +3675,10 @@
         <createIndex indexName="idx_target_entity"
                      tableName="physical_flow"
                      unique="false">
-            <column name="target_entity_id" type="${id.type}"/>
-            <column name="target_entity_kind" type="${enum.type}"/>
+            <column name="target_entity_id"
+                    type="${id.type}"/>
+            <column name="target_entity_kind"
+                    type="${enum.type}"/>
         </createIndex>
 
     </changeSet>
