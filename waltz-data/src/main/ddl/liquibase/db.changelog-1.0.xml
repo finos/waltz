@@ -3638,8 +3638,6 @@
     </changeSet>
 
 
-
-
     <!-- 1015 - is_external flag on actor  -->
     <changeSet id="20161118-1015-1"
                author="kamransaleem">
@@ -3650,6 +3648,35 @@
                 <constraints nullable="false" />
             </column>
         </addColumn>
+    </changeSet>
+
+
+    <!-- 1075: Adding indexes to Physical Data tables -->
+    <changeSet author="kamransaleem"
+               id="20161125-1075-1">
+
+        <dropIndex tableName="physical_specification"
+                   indexName="idx_owning_application_id" />
+
+        <createIndex indexName="idx_owning_entity"
+                     tableName="physical_specification"
+                     unique="false">
+            <column name="owning_entity_id" type="${id.type}"/>
+            <column name="owning_entity_kind" type="${enum.type}"/>
+        </createIndex>
+
+    </changeSet>
+
+    <changeSet author="kamransaleem"
+               id="20161125-1075-2">
+
+        <createIndex indexName="idx_target_entity"
+                     tableName="physical_flow"
+                     unique="false">
+            <column name="target_entity_id" type="${id.type}"/>
+            <column name="target_entity_kind" type="${enum.type}"/>
+        </createIndex>
+
     </changeSet>
 
 
