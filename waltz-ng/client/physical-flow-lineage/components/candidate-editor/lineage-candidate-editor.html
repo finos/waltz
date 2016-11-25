@@ -8,19 +8,19 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="s in $ctrl.sources"
-                class="waltz-visibility-parent">
-                <td class="force-wrap">
-                    <waltz-entity-icon-label ng-click="$ctrl.selectSource(s.source)"
-                                             class="clickable waltz-action-link"
-                                             entity-ref="s.source">
-                    </waltz-entity-icon-label>
-                </td>
-                <td>
-                    <span class="waltz-visibility-child-30 badge"
-                          ng-bind="s.count">
-                    </span>
-                </td>
+            <tr ng-repeat="s in $ctrl.sources | orderBy:'source.name'"
+                ng-click="$ctrl.selectSource(s.source)"
+                class="waltz-visibility-parent clickable">
+                    <td class="force-wrap">
+                        <waltz-entity-icon-label class="waltz-action-link"
+                                                 entity-ref="s.source">
+                        </waltz-entity-icon-label>
+                    </td>
+                    <td>
+                        <span class="waltz-visibility-child-30 badge"
+                              ng-bind="s.count">
+                        </span>
+                    </td>
             </tr>
         </tbody>
     </table>
@@ -48,7 +48,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="c in $ctrl.candidateSelections"
+                <tr ng-repeat="c in $ctrl.candidateSelections | orderBy:'specification.name'"
                     class="waltz-visibility-parent">
                     <td class="force-wrap">
                         <span ng-bind="c.specification.name"></span>
