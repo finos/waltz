@@ -1,5 +1,6 @@
 import _ from "lodash";
 import {toGridOptions, assetCostKindNames} from "./../../common/services/display_names";
+import {mkEntityLinkGridCell} from "../../common";
 
 const DEFAULT_OPTIONS = {
     showAssetCode: true,
@@ -48,11 +49,7 @@ function prepareColumns(uiGridConstants) {
         displayName: 'Year'
     };
 
-    const appCol = {
-        field: 'application.name',
-        cellTemplate: '<div class="ui-grid-cell-contents"> <a ui-sref="main.app.view ({ id: row.entity[\'application\'][\'id\'] })" ng-bind="COL_FIELD"></a></div>',
-        displayName: 'Application'
-    };
+    const appCol = mkEntityLinkGridCell('Application', 'application', 'none');
 
     const orgCol = {
         field: 'orgUnit.name',

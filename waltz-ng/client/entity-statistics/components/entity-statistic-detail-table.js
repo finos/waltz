@@ -1,5 +1,6 @@
 import _ from "lodash";
 import moment from "moment";
+import {mkEntityLinkGridCell} from "../../common";
 
 
 /**
@@ -23,12 +24,10 @@ const bindings = {
 const exportTimestampFormat = 'YYYY-MM-DD_HHmmss';
 
 
-const appNameCell = {
-    field: 'entity.name',
-    displayName: 'Application',
-    sort: { direction: 'asc' },
-    cellTemplate: '<div class="ui-grid-cell-contents">\n    <a ui-sref="main.app.view ({ id: row.entity[\'entity\'][\'id\']})" ng-bind="COL_FIELD">\n    </a>\n</div>'
-};
+const appNameCell = Object.assign(
+    mkEntityLinkGridCell('Application', 'entity', 'none'),
+    { sort: { direction: 'asc' } }
+);
 
 
 const outcomeCell = (uiGridConstants) => {

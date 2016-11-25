@@ -1,4 +1,4 @@
-import {initialiseData, termSearch, invokeFunction} from "../../../common";
+import {initialiseData, mkEntityLinkGridCell, mkLinkGridCell, termSearch, invokeFunction} from "../../../common";
 
 const bindings = {
     lineage: '<',
@@ -42,21 +42,9 @@ function controller() {
 
 
     vm.columnDefs = [
-        {
-            field: 'specification.name',
-            name: 'Name',
-            cellTemplate: '<div class="ui-grid-cell-contents"><a ui-sref="main.physical-flow.view ({ id: row.entity[\'flow\'].id })"><span ng-bind="COL_FIELD"></span></a></div>'
-        },
-        {
-            field: 'specification.owningEntity.name',
-            name: 'Source',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-entity-link entity-ref="row.entity[\'specification\'].owningEntity"></waltz-entity-link></div>'
-        },
-        {
-            field: 'targetEntity.name',
-            name: 'Target',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-entity-link entity-ref="row.entity[\'targetEntity\']"></waltz-entity-link></div>'
-        },
+        mkLinkGridCell('Name', 'specification.name', 'flow.id', 'main.physical-flow.view'),
+        mkEntityLinkGridCell('Source', 'sourceEntity', 'left'),
+        mkEntityLinkGridCell('Target', 'targetEntity', 'left'),
         {
             field: 'specification.format',
             name: 'Format',

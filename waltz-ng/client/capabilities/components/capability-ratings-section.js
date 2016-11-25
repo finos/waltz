@@ -1,5 +1,5 @@
-import {initialiseData} from '../../common';
-import {ragColorScale} from '../../common/colors';
+import {initialiseData, mkLinkGridCell} from "../../common";
+import {ragColorScale} from "../../common/colors";
 
 
 const bindings = {
@@ -22,11 +22,8 @@ const initialState = {
         config: null
     },
     columnDefs: [
+        mkLinkGridCell('Name', 'app.name', 'app.id', 'main.app.view'),
         {
-            field: 'app.name',
-            name: 'Name',
-            cellTemplate: '<div class="ui-grid-cell-contents"><a ui-sref="main.app.view ({ id: row.entity[\'app\'].id })"><span ng-bind="COL_FIELD"></span></a></div>'
-        }, {
             field: 'app.assetCode',
             name: 'Asset Code'
         }, {
