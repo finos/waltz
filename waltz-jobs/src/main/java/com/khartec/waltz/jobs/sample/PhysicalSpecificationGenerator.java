@@ -90,7 +90,7 @@ public class PhysicalSpecificationGenerator {
                         .range(0, rnd.nextInt(8))
                         .mapToObj(i -> tuple(appId, i)))
                 .map(t -> {
-                    String name = mkName();
+                    String name = mkName(t.v2);
                     PhysicalSpecificationRecord record = dsl.newRecord(PHYSICAL_SPECIFICATION);
                     record.setOwningEntityId(t.v1);
                     record.setOwningEntityKind(EntityKind.APPLICATION.name());
@@ -114,12 +114,14 @@ public class PhysicalSpecificationGenerator {
 
     }
 
-    private static String mkName() {
+    private static String mkName(Integer i) {
 
         return new StringBuilder()
                 .append(randomPick(names))
                 .append("-")
                 .append(randomPick(names))
+                .append("-")
+                .append(i)
                 .append(".")
                 .append(randomPick(extensions))
                 .toString();
