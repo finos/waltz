@@ -55,42 +55,49 @@ public class PhysicalFlowGenerator {
                 t -> t.v3(),
                 allLogicalFLows);
 
-        List<PhysicalFlowRecord> records = specifications.stream()
-                .map(a -> {
-                    Collection<Long> targetIds = targetsBySourceApp.get(a.owningEntity().id());
-                    if (isEmpty(targetIds)) return null;
-                    return Tuple.tuple(a.id().get(), targetIds);
-                })
-                .filter(t -> t != null)
-                .flatMap(t -> {
-                    List<Long> targetIds = new LinkedList(t.v2);
-                    return IntStream.range(0, t.v2.size() - 1)
-                        .mapToObj(i -> {
-
-                            PhysicalFlowRecord record = dsl.newRecord(PHYSICAL_FLOW);
-                            record.setSpecificationId(t.v1);
-                            record.setTargetEntityId(targetIds.remove(rnd.nextInt(targetIds.size() - 1)));
-                            record.setTargetEntityKind(EntityKind.APPLICATION.name());
-                            record.setDescription("Description: " + t.v1 + " - " + t.v2);
-                            record.setProvenance("DEMO");
-                            record.setBasisOffset(randomPick(newArrayList(0, 0, 0, 0, 1, 1, 2, -1)));
-                            record.setTransport(ArrayUtilities.randomPick(TransportKind.values()).name());
-                            record.setFrequency(ArrayUtilities.randomPick(FrequencyKind.values()).name());
-                            return record;
-                        });
-                })
-                .collect(Collectors.toList());
-
         System.out.println("---removing demo records");
         dsl.deleteFrom(PHYSICAL_FLOW)
                 .where(PHYSICAL_FLOW.PROVENANCE.eq("DEMO"))
                 .execute();
 
-        System.out.println("---saving record: "+records.size());
-        dsl.batchInsert(records).execute();
+        final int flowBatchSize = 100000;
+        List<PhysicalFlowRecord> flowBatch = new ArrayList<PhysicalFlowRecord>((int) (flowBatchSize * 1.2));
 
+        for (PhysicalSpecification spec : specifications) {
+            Collection<Long> targetIds = targetsBySourceApp.get(spec.owningEntity().id());
+            if (!isEmpty(targetIds)) {
+                List<PhysicalFlowRecord> physicalFlowRecords = mkPhysicalFlowRecords(spec, new LinkedList<>(targetIds));
+                flowBatch.addAll(physicalFlowRecords);
+            }
+
+            if(flowBatch.size() >= flowBatchSize) {
+                System.out.println(String.format("--- saving records: count: %s", flowBatch.size()));
+                dsl.batchInsert(flowBatch).execute();
+                flowBatch.clear();
+            }
+        }
         System.out.println("---done");
-
-
     }
+
+
+    private static List<PhysicalFlowRecord> mkPhysicalFlowRecords(PhysicalSpecification spec, List<Long> targetIds) {
+
+        return IntStream.range(0, targetIds.size() - 1)
+                .mapToObj(i -> {
+                    Long targetId = targetIds.remove(rnd.nextInt(targetIds.size() - 1));
+
+                    PhysicalFlowRecord record = new PhysicalFlowRecord();
+                    record.setSpecificationId(spec.id().get());
+                    record.setTargetEntityId(targetId);
+                    record.setTargetEntityKind(EntityKind.APPLICATION.name());
+                    record.setDescription("Description: " + spec + " - " + targetId.toString());
+                    record.setProvenance("DEMO");
+                    record.setBasisOffset(randomPick(newArrayList(0, 0, 0, 0, 1, 1, 2, -1)));
+                    record.setTransport(ArrayUtilities.randomPick(TransportKind.values()).name());
+                    record.setFrequency(ArrayUtilities.randomPick(FrequencyKind.values()).name());
+                    return record;
+                })
+                .collect(Collectors.toList());
+    }
+
 }

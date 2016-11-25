@@ -56,22 +56,23 @@ export function combineFlowData(specifications = [],
 
 
 export function enrichConsumes(specifications = [],
-                        physicalFlows = [])
+                               physicalFlows = [])
 {
     const visitedRefs = [];
 
     if (specifications.length === 0 || physicalFlows.length === 0) {
         return [];
     } else {
-        const physicalFlowsBySpecId = _.keyBy(physicalFlows, 'specificationId');
+        const physicalFlowsBySpecId = _.groupBy(physicalFlows, 'specificationId');
 
         return _.chain(specifications)
-            .map(specification => {
-                const physicalFlow = physicalFlowsBySpecId[specification.id];
+            .uniqBy('id')
+            .flatMap(specification => {
+                const physicalFlowsForSpec = physicalFlowsBySpecId[specification.id];
                 const sourceRef = specification.owningEntity;
-                const targetRef = physicalFlow.target.id;
 
-                if (!physicalFlow || !sourceRef || !targetRef) {
+
+                if (!physicalFlowsForSpec || physicalFlowsForSpec.length === 0 || !sourceRef) {
                     return null;
                 } else {
                     const firstSource = !_.includes(
@@ -82,13 +83,19 @@ export function enrichConsumes(specifications = [],
                         visitedRefs.push(sourceRef);
                     }
 
-                    return {
-                        specification,
-                        physicalFlow,
-                        firstSource,
-                        sourceRef,
-                        targetRef
-                    };
+                    return _.map(physicalFlowsForSpec, (physicalFlow) => {
+                        const targetRef = physicalFlow.target.id;
+                        if(!targetRef) return null;
+
+                        return {
+                            specification,
+                            physicalFlow,
+                            firstSource,
+                            sourceRef,
+                            targetRef
+                        };
+                    });
+
                 }
             })
             .filter(r => r != null)

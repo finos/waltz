@@ -46,9 +46,11 @@ public class EntityStatisticDao implements FindEntityReferencesByIdSelector {
     public List<EntityStatistic> findStatisticsForEntity(EntityReference ref, boolean active) {
         checkNotNull(ref, "ref cannot be null");
         Condition condition = es.ACTIVE.eq(active)
+                .and(es.ENTITY_VISIBILITY.eq(true))
                 .and(esv.ENTITY_KIND.eq(ref.kind().name()))
                 .and(esv.ENTITY_ID.eq(ref.id()))
                 .and(esv.CURRENT.eq(true));
+
         return dsl.select(es.fields())
                 .select(esv.fields())
                 .from(es)
