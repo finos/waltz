@@ -53,7 +53,7 @@ function setupDimensions(vizElem) {
 }
 
 
-function drawLinks(links = [], holder) {
+function drawLinks(links = [], holder, tweakers) {
     const linkSelection = holder
         .selectAll(".wdfd-link")
         .data(links, d => d.data.id);
@@ -62,10 +62,17 @@ function drawLinks(links = [], holder) {
         .enter()
         .append("line")
         .classed('wdfd-link', true)
-        .attr('stroke', '#666');
+        .attr('stroke', '#666')
+        .call(tweakers.enter);
+
+    linkSelection
+        .exit()
+        .call(tweakers.exit)
+        .remove();
 
     return linkSelection
-        .merge(newLinks);
+        .merge(newLinks)
+        .call(tweakers.update);
 }
 
 
@@ -116,11 +123,6 @@ function drawNodes(nodes = [], holder, simulation, tweakers = DEFAULT_TWEAKER) {
         .enter()
         .append('g')
         .classed('wdfd-node', true)
-        .on('dblclick.unfix', d => {
-            console.log('unfix')
-            d.fx = null;
-            d.fy = null;
-        })
         .call(tweakers.enter)
         .call(drag()
             .on("start", dragStarted)
@@ -128,16 +130,18 @@ function drawNodes(nodes = [], holder, simulation, tweakers = DEFAULT_TWEAKER) {
             .on("end", dragEnded));
 
     newNodes
-        .call(addNodeLabel);
-
-    newNodes
+        .call(addNodeLabel)
         .call(addNodeCircle);
 
     nodeSelection
         .exit()
+        .call(tweakers.exit)
         .remove();
 
-    return nodeSelection.merge(newNodes);
+    return nodeSelection
+        .merge(newNodes)
+        .call(tweakers.update);
+
 }
 
 
@@ -152,14 +156,16 @@ function setup(vizElem) {
         .attr("class", "links");
 
     const myZoom = zoom()
-        .scaleExtent([1 / 4, 2])
+        .scaleExtent([1 / 4, 1.5])
         .on("zoom", zoomed);
 
-    svg.call(myZoom)
-        .on("dblclick.zoom", null);
+    svg.call(myZoom);
+
+    //svg.on(".zoom", null);
 
     function zoomed() {
         const t = event.transform;
+
         nG.attr("transform", t);
         lG.attr("transform", t);
     }
@@ -171,8 +177,11 @@ function setup(vizElem) {
 
 function draw(data,
               parts,
-              tweakers = { node: DEFAULT_TWEAKER, link: DEFAULT_TWEAKER },
+              tweakers = {},
               simulation) {
+
+    const linkTweakers = _.defaults(tweakers.link, DEFAULT_TWEAKER);
+    const nodeTweakers = _.defaults(tweakers.node, DEFAULT_TWEAKER);
 
     const links = mkLinkData(data.flows);
 
@@ -187,20 +196,27 @@ function draw(data,
 
     const linkSelection = drawLinks(
         links,
-        parts.svg.select('g.links'));
+        parts.svg.select('g.links'),
+        linkTweakers);
 
     const nodeSelection = drawNodes(
         data.entities,
         parts.svg.select('g.nodes'),
         simulation,
-        tweakers.node);
+        nodeTweakers);
 
     simulation
         .nodes(data.entities)
         .on("tick", ticked);
 
-    simulation.force("link")
+    simulation
+        .force("link")
         .links(links);
+
+    // kick the simulation so new nodes are drawn/moved
+    simulation
+        .alpha(0.2)
+        .restart();
 
     function ticked() {
         linkSelection
@@ -208,10 +224,11 @@ function draw(data,
             .attr("y1", function(d) { return d.source.y; })
             .attr("x2", function(d) { return d.target.x; })
             .attr("y2", function(d) { return d.target.y; })
-            .call(tweakers.link.update);
+            .call(linkTweakers.update);
 
         nodeSelection
             .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
     }
 
 }

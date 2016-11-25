@@ -25,14 +25,8 @@ function determineRadius(d, owningEntity, targetEntity) {
 
 
 function determineStrokeColor(d, owningEntity, targetEntity) {
-    switch (d.id) {
-        case (owningEntity.id): return blue.darker();
-        case (targetEntity.id):
-            return targetEntity.kind === 'APPLICATION'
-                ? green.darker()
-                : actor.darker();
-        default: return grey;
-    }
+    return determineFillColor(d, owningEntity, targetEntity)
+        .darker();
 }
 
 
@@ -41,12 +35,17 @@ function setupGraphTweakers(owningEntity, targetEntity, onClick) {
         node: {
             update: (selection) => {
                 selection
-                    .select('circle')
-                    .attr({
+                    .selectAll('circle')
+                    .attrs({
                         'fill': d => determineFillColor(d, owningEntity, targetEntity),
                         'stroke': d => determineStrokeColor(d, owningEntity, targetEntity),
                         'r': d => determineRadius(d, owningEntity, targetEntity)
                     });
+
+                selection
+                    .selectAll('text')
+                    // note we use styles to override the css
+                    .styles({'fill': d => determineStrokeColor(d, owningEntity, targetEntity),})
             },
             exit: () => {},
             enter: (selection) => {
@@ -149,6 +148,15 @@ function controller($q,
             const fullLineage = mkFullLineage(vm.lineage, vm.describedFlow, vm.describedSpecification);
             const graphEntities = mkLineageEntities(fullLineage);
             const graphFlows = mkLineageFlows(fullLineage);
+            const nodeClickHandler = (d) => $scope.$applyAsync(() => {
+                if(vm.describedFlow.target === d) {
+                    resetSearch();
+                    vm.searchResults.entityRef = d;
+                } else {
+                    vm.doSearch(d);
+                }
+            });
+
             vm.graph = {
                 data: {
                     flows: graphFlows,
@@ -157,16 +165,7 @@ function controller($q,
                 tweakers: setupGraphTweakers(
                     vm.describedSpecification.owningEntity,
                     vm.describedFlow.target,
-                    (d) => {
-                        return $scope.$applyAsync(() => {
-                            if(vm.describedFlow.target === d) {
-                                resetSearch();
-                                vm.searchResults.entityRef = d;
-                            } else {
-                                vm.doSearch(d);
-                            }
-                        });
-                    })
+                    nodeClickHandler)
             }
         });
 
