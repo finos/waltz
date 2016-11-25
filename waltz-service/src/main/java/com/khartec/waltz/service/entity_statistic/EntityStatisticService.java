@@ -62,8 +62,8 @@ public class EntityStatisticService {
     }
 
 
-    public ImmediateHierarchy<EntityStatisticDefinition> findRelatedStatDefinitions(long id) {
-        List<EntityStatisticDefinition> defs = definitionDao.findRelated(id);
+    public ImmediateHierarchy<EntityStatisticDefinition> findRelatedStatDefinitions(long id, boolean rollupOnly) {
+        List<EntityStatisticDefinition> defs = definitionDao.findRelated(id, rollupOnly);
         ImmediateHierarchy<EntityStatisticDefinition> relations = ImmediateHierarchyUtilities.build(id, defs);
         return relations;
     }
@@ -165,7 +165,7 @@ public class EntityStatisticService {
     }
 
 
-    public List<EntityStatisticDefinition> findAllActiveDefinitions() {
-        return definitionDao.findAllActiveDefinitions();
+    public List<EntityStatisticDefinition> findAllActiveDefinitions(boolean rollupOnly) {
+        return definitionDao.findAllActiveDefinitions(rollupOnly);
     }
 }

@@ -3,6 +3,7 @@ package com.khartec.waltz.data.entity_statistic;
 import com.khartec.waltz.model.entity_statistic.*;
 import com.khartec.waltz.schema.tables.records.EntityStatisticDefinitionRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -76,16 +77,16 @@ public class EntityStatisticDefinitionDao {
     }
 
 
-    public List<EntityStatisticDefinition> findAllActiveDefinitions() {
+    public List<EntityStatisticDefinition> findAllActiveDefinitions(boolean rollupOnly) {
         return dsl.select(esd.fields())
                 .from(esd)
                 .where(esd.ACTIVE.eq(true))
-                .and(esd.ROLLUP_VISIBILITY.eq(true))
+                .and(mkRollupOnlyCondition(rollupOnly))
                 .fetch(TO_DEFINITION_MAPPER);
     }
 
 
-    public List<EntityStatisticDefinition> findRelated(long id) {
+    public List<EntityStatisticDefinition> findRelated(long id, boolean rollupOnly) {
         Condition findSelf = esd.ID.eq(id);
         Condition findChildren = esd.PARENT_ID.eq(id);
 
@@ -103,7 +104,7 @@ public class EntityStatisticDefinitionDao {
                         .or(findParent)
                 )
                 .and(esd.ACTIVE.eq(Boolean.TRUE))
-                .and(esd.ROLLUP_VISIBILITY.eq(true))
+                .and(mkRollupOnlyCondition(rollupOnly))
                 .fetch(TO_DEFINITION_MAPPER);
     }
 
@@ -121,5 +122,12 @@ public class EntityStatisticDefinitionDao {
                 .from(esd)
                 .where(esd.ID.in(ids))
                 .fetch(TO_DEFINITION_MAPPER);
+    }
+
+
+    private Condition mkRollupOnlyCondition(boolean rollupOnly) {
+        return  rollupOnly
+                ? esd.ROLLUP_VISIBILITY.eq(true)
+                : DSL.trueCondition();
     }
 }
