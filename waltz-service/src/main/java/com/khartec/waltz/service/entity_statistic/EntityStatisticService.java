@@ -62,11 +62,6 @@ public class EntityStatisticService {
     }
 
 
-    public List<EntityStatisticDefinition> findTopLevelDefinitions() {
-        return definitionDao.findTopLevelDefinitions();
-    }
-
-
     public ImmediateHierarchy<EntityStatisticDefinition> findRelatedStatDefinitions(long id) {
         List<EntityStatisticDefinition> defs = definitionDao.findRelated(id);
         ImmediateHierarchy<EntityStatisticDefinition> relations = ImmediateHierarchyUtilities.build(id, defs);
