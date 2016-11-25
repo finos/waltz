@@ -14,6 +14,22 @@ function store($http, baseApiUrl) {
     };
 
 
+    const findByProducerEntityReference = (ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${base}/entity/${ref.kind}/${ref.id}/produces`)
+            .then(r => r.data);
+    };
+
+
+    const findByConsumerEntityReference = (ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${base}/entity/${ref.kind}/${ref.id}/consumes`)
+            .then(r => r.data);
+    };
+
+
     const findBySpecificationId = (id) => {
         return $http
             .get(`${base}/specification/${id}`)
@@ -58,6 +74,8 @@ function store($http, baseApiUrl) {
     return {
         findBySpecificationId,
         findByEntityReference,
+        findByProducerEntityReference,
+        findByConsumerEntityReference,
         findBySelector,
         getById,
         searchReports,

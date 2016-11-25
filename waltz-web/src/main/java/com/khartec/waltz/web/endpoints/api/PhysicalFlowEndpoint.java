@@ -48,6 +48,20 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 ":kind",
                 ":id");
 
+        String findByProducerEntityRefPath = mkPath(
+                BASE_URL,
+                "entity",
+                ":kind",
+                ":id",
+                "produces");
+
+        String findByConsumerEntityRefPath = mkPath(
+                BASE_URL,
+                "entity",
+                ":kind",
+                ":id",
+                "consumes");
+
         String findBySpecificationIdPath = mkPath(
                 BASE_URL,
                 "specification",
@@ -72,9 +86,13 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
         ListRoute<PhysicalFlow> findByEntityRefRoute =
-                (request, response) -> physicalFlowService
-                        .findByEntityReference(
-                            getEntityReference(request));
+                (request, response) -> physicalFlowService.findByEntityReference(getEntityReference(request));
+
+        ListRoute<PhysicalFlow> findByProducerEntityRefRoute =
+                (request, response) -> physicalFlowService.findByProducerEntityReference(getEntityReference(request));
+
+        ListRoute<PhysicalFlow> findByConsumerEntityRefRoute =
+                (request, response) -> physicalFlowService.findByConsumerEntityReference(getEntityReference(request));
 
         ListRoute<PhysicalFlow> findBySpecificationIdRoute =
                 (request, response) -> physicalFlowService
@@ -92,6 +110,8 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
+        getForList(findByProducerEntityRefPath, findByProducerEntityRefRoute);
+        getForList(findByConsumerEntityRefPath, findByConsumerEntityRefRoute);
         getForList(findBySpecificationIdPath, findBySpecificationIdRoute);
         getForList(searchReportsPath, searchReportsRoute);
         postForDatum(createPath, this::createFlow);
