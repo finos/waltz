@@ -72,13 +72,22 @@ public class PhysicalFlowDao {
         Condition isSource = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(ref.id())
                 .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(ref.kind().name()));
 
-        return dsl
+        Select<Record> targets = dsl
+                .select(PHYSICAL_FLOW.fields())
+                .select(targetEntityNameField)
+                .from(PHYSICAL_FLOW)
+                .where(dsl.renderInlined(isTarget));
+
+        Select<Record> sources = dsl
                 .select(PHYSICAL_FLOW.fields())
                 .select(targetEntityNameField)
                 .from(PHYSICAL_FLOW)
                 .innerJoin(PHYSICAL_SPECIFICATION)
                 .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
-                .where(isTarget.or(isSource))
+                .where(dsl.renderInlined(isSource));
+
+        return targets
+                .unionAll(sources)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
