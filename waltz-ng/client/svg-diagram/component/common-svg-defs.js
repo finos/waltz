@@ -1,4 +1,5 @@
-import {select, rgb} from 'd3';
+import {select} from 'd3-selection';
+import {rgb} from 'd3-color';
 
 const bindings = {};
 

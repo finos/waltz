@@ -10,7 +10,8 @@
  *
  */
 import _ from "lodash";
-import {ascending, nest} from "d3";
+import {ascending} from "d3-array";
+import {nest} from "d3-collection";
 
 const BINDINGS = {
     name: '@',

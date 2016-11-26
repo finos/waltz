@@ -14,7 +14,7 @@
 
 import _ from 'lodash';
 import angular from 'angular';
-import d3 from 'd3';
+import {select} from 'd3-selection';
 
 import { defaultDimensions, setupCellScale } from '../common';
 
@@ -24,7 +24,8 @@ function render(measurables, svg, width) {
 
     svg.attr('width', width);
 
-    const titleBar = svg.selectAll('.measure-titles')
+    const titleBar = svg
+        .selectAll('.measure-titles')
         .data([measurables]);
 
     titleBar.enter()
@@ -46,9 +47,9 @@ function render(measurables, svg, width) {
 }
 
 function init(vizElem) {
-    const svg = d3.select(vizElem)
+    const svg = select(vizElem)
         .append('svg')
-        .attr({ height: 80 });
+        .attr("height", 80);
 
     return svg;
 }

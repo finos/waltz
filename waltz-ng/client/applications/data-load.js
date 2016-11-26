@@ -11,7 +11,7 @@
  *
  */
 
-import {nest} from "d3";
+import {nest} from "d3-collection";
 import _ from "lodash";
 import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
 

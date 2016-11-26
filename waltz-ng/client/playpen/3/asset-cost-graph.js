@@ -1,6 +1,8 @@
 import {initialiseData} from '../../common';
 import _ from 'lodash';
-import {scaleLinear, scaleLog, select, format} from 'd3';
+import {scaleLinear, scaleLog} from 'd3-scale';
+import {select} from 'd3-selection';
+import {format} from 'd3-format';
 
 
 const template = "<div class='waltz-asset-cost-graph'><svg></svg></div>";
@@ -48,7 +50,7 @@ const numberFormat = format(",d");
 
 
 function currencyLogFormat(d) {
-    var x = Math.log(d) / Math.log(10) + 1e-6;
+    const x = Math.log(d) / Math.log(10) + 1e-6;
     return Math.abs(x - Math.floor(x)) < .5
         ? '€ ' + numberFormat(d)
         : "";
@@ -66,6 +68,7 @@ function calculateOpacity(size = 1) {
         0.1
     ]);
 }
+
 
 function getAppId(a) {
     return a.v1;

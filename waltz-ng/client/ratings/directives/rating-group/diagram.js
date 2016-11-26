@@ -13,7 +13,9 @@
  */
 
 import _ from "lodash";
-import d3 from "d3";
+import {select} from "d3-selection";
+import 'd3-selection-multi';
+
 import {RIGHT_ARROW, DOWN_ARROW} from "../../../common/arrows";
 import {defaultDimensions, setupSummaryBarScales, setupCellScale} from "../common.js";
 import {capabilityColorScale} from "../../../common/colors";
@@ -28,7 +30,7 @@ const GroupSummaryCellBars = {
         .attr('width', 0),
 
     update: (selection, barScale) => selection
-        .attr({
+        .attrs({
             fill: ({rating}) => capabilityColorScale(rating).brighter(),
             stroke: ({rating}) => capabilityColorScale(rating),
             transform: ({rating}) => `translate(0, ${barScale.y(rating)})`,
@@ -89,7 +91,7 @@ function renderSummaries(container, data, dimensions, scales) {
         .append('text')
         .classed('group-name', true)
         .classed('no-text-select', true)
-        .attr({
+        .attrs({
             'transform': `translate(${dimensions.label.width}, ${ rowHeight / 1.6})`,
             'text-anchor': 'end',
             'font-size': 'larger',
@@ -160,7 +162,7 @@ export function draw(data, width, svg, tweakers, highestRatingCount) {
 
     const scales = setupScales(dimensions, data, highestRatingCount);
 
-    svg.attr({width: dimensions.viz.width, height: dimensions.viz.height});
+    svg.attrs({width: dimensions.viz.width, height: dimensions.viz.height});
 
     const summaryGroup = svg.select('.summary')
         .attr('transform', `translate(${dimensions.margin.left}, ${dimensions.margin.top})`)
@@ -175,7 +177,7 @@ export function draw(data, width, svg, tweakers, highestRatingCount) {
 
 
 export function init(vizElem) {
-    const svg = d3.select(vizElem)
+    const svg = select(vizElem)
         .append('svg');
 
     const grid = svg.append('g').classed('grid', true);
