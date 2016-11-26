@@ -85,10 +85,7 @@ function controller($scope, displayNameService) {
     const vm = initialiseData(this, initialState);
 
     const highlight = (d) => {
-        vm.options = Object.assign(
-            {},
-            vm.options,
-            { highlightedDate: d });
+        vm.highlightedDate = d;
         const relevantStats = findRelevantStats(vm.history, d);
         if (relevantStats) {
             vm.selected = relevantStats;
@@ -97,10 +94,7 @@ function controller($scope, displayNameService) {
         }
     };
 
-    vm.options = {
-        highlightedDate: null,
-        onHover: (d) => $scope.$applyAsync(() => highlight(d))
-    };
+    vm.onHover = (d) => $scope.$applyAsync(() => highlight(d));
 
     vm.$onChanges = () => {
         vm.selected  = null;

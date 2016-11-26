@@ -3,13 +3,11 @@ import moment from 'moment';
 import {max,extent} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
 import {nest} from 'd3-collection';
-import {easeBounceIn} from 'd3-ease';
 import {scaleLinear} from 'd3-scale';
 import {select} from 'd3-selection';
 import {curveLinear ,line} from 'd3-shape';
 import {timeFormat} from 'd3-time-format';
 import 'd3-selection-multi';
-import {transition} from 'd3-transition';
 
 import {initialiseData} from '../../../common';
 import {variableScale} from '../../../common/colors';
@@ -17,7 +15,8 @@ import {variableScale} from '../../../common/colors';
 
 const bindings = {
     points: '<',
-    options: '<'
+    onHover: '<',
+    highlightedDate: '<'
 };
 
 
@@ -26,11 +25,6 @@ const template = require('./entity-statistic-history-chart.html');
 
 const initialState = {
 };
-
-
-const anim = transition()
-    .duration(200)
-    .ease(easeBounceIn);
 
 
 function prepareSections(svg) {
@@ -93,7 +87,7 @@ function mkScales(points = [], dimensions) {
 }
 
 
-function drawPoints(section, points = [], scales, options) {
+function drawPoints(section, points = [], scales) {
     const pointSelection = section
         .selectAll('.point')
         .data(points, p => p.date + '_' + p.series);
@@ -116,10 +110,8 @@ function drawPoints(section, points = [], scales, options) {
         .merge(newPoints)
         .attr("cx", p => scales.x(p.date))
         .attr("cy", p => scales.y(p.count))
-        .transition(anim)
-        .attr("r", p => options.highlightedDate && p.date.getTime() === options.highlightedDate.getTime()
-            ? 6
-            : 3);
+        .attr('r', 3);
+
 }
 
 
@@ -185,7 +177,7 @@ function tryInvoke(callback, arg) {
 function drawBands(section,
                    points,
                    scales,
-                   options) {
+                   onHover) {
 
     const numDates = _.uniqBy(_.map(points, 'date'), d => d + "").length;
     const width = scales.x.range()[1];
@@ -207,8 +199,12 @@ function drawBands(section,
         .classed("band", true)
         .attr('pointer-events', 'all')
         .style('visibility', 'hidden')
-        .on('mouseenter.band-hover', d => { tryInvoke(options.onHover, d); })
-        .on('mouseleave.band-hover', () => { tryInvoke(options.onHover, null); })
+        .on('mouseenter.band-hover', d => {
+            tryInvoke(onHover, d);
+        })
+        .on('mouseleave.band-hover', () => {
+            tryInvoke(onHover, null);
+        })
        ;
 
     bands
@@ -280,15 +276,18 @@ function drawAxes(sections, points = [], scales) {
 }
 
 
-function draw(sections, width, points = [], options = {}) {
+function draw(sections,
+              width,
+              points = [],
+              onHover = () => console.log('weshc: no onHover provided')) {
     const dimensions = mkDimensions(width);
     const scales = mkScales(points, dimensions);
 
     adjustSections(sections, dimensions);
     drawAxes(sections, points, scales);
     drawLines(sections.chart, points, scales);
-    drawPoints(sections.chart, points, scales, options);
-    drawBands(sections.chart, points, scales, options);
+    drawPoints(sections.chart, points, scales);
+    drawBands(sections.chart, points, scales, onHover);
 }
 
 
@@ -311,12 +310,21 @@ function controller($element, $window) {
         const elemWidth = $element
             .parent()[0]
             .clientWidth;
-        draw(svgSections, elemWidth, vm.points, vm.options);
+        draw(svgSections, elemWidth, vm.points, vm.onHover);
     };
 
     const debouncedRender = _.debounce(render, 100);
 
-    vm.$onChanges = (changes) => debouncedRender();
+    const isHighlighted = p => vm.highlightedDate && p.date.getTime() === vm.highlightedDate.getTime();
+
+    vm.$onChanges = (changes) => {
+        if (changes.highlightedDate) {
+            svg.selectAll(".point")
+                .attr("r", p => isHighlighted(p) ? 6 : 3);
+        } else {
+            debouncedRender();
+        }
+    };
 
     vm.$onInit = () => angular
         .element($window)
