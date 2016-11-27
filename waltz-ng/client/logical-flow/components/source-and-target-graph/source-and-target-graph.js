@@ -81,13 +81,14 @@ function drawTitleBar(titleBar, dimensions) {
     const textLabels = titleBar.selectAll("text")
         .data(labels);
 
-    textLabels
+    const newTextLabels = textLabels
         .enter()
         .append('text')
         .text(d => d)
         .attr('text-anchor', 'middle');
 
     textLabels
+        .merge(newTextLabels)
         .attr('transform', (d, i) => {
             switch (i) {
                 case 0: return `translate(${dimensions.label.width}, ${dy})`;
@@ -96,15 +97,16 @@ function drawTitleBar(titleBar, dimensions) {
             }
         });
 
-
     const line = titleBar
         .selectAll("line")
         .data([true]);
 
-    line.enter()
+    const newLine = line
+        .enter()
         .append('line');
 
-    line.attr('x1', 0)
+    line.merge(newLine)
+        .attr('x1', 0)
         .attr('y1', dy + 10)
         .attr('x2', dimensions.graph.width - 40)
         .attr('y2', dimensions.margin.top / 2 + 10)
@@ -352,7 +354,6 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
             "font-family": "FontAwesome"
         });
 
-
     labels
         .merge(newLabels)
         .classed('wsat-hover', (d) => highlighted === d.id)
@@ -363,6 +364,7 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
 
     if (tweakers.icon) {
         labels
+            .merge(newLabels)
             .selectAll('.wsat-icon')
             .attr("fill", d => tweakers.icon(d).color)
             .text((d) => tweakers.icon(d).code || '');
@@ -521,9 +523,6 @@ function update(sections,
     drawCenterBox(sections.types, dimensions);
 
     const scales = setupScales(model, dimensions);
-
-    window.scales =scales;
-    window.model = model;
 
     drawLabels(sections.sources, model.sources, scales.source, 'end', tweakers.source, redraw);
     drawLabels(sections.targets, model.targets, scales.target, 'start', tweakers.target, redraw);

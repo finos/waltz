@@ -222,12 +222,12 @@ function mkTweakers(tweakers = {},
     const flowsBySourceEntity = nest()
         .key(f => f.source.kind)
         .key(f => f.source.id)
-        .map(flows);
+        .object(flows);
 
     const flowsByTargetEntity = nest()
         .key(f => f.target.kind)
         .key(f => f.target.id)
-        .map(flows);
+        .object(flows);
 
     const getSourceCount = (ref) => {
         const possibleFlows = _.get(flowsBySourceEntity, `${ref.kind}.${ref.id}`, []);

@@ -55,7 +55,7 @@ function setupGraphTweakers(owningEntity, targetEntity, onClick) {
         link : {
             update: (selection) => {
                 selection
-                    .attr('marker-end', 'url(/#arrowhead)');
+                    .attr('marker-end', 'url(#arrowhead)');
             },
             enter: _.identity,
             exit: _.identity
