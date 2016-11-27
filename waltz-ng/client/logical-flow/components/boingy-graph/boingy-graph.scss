@@ -12,10 +12,12 @@
 
 .wdfd-node {
     circle {
-        fill-opacity: 0.5;
+        fill-opacity: 0.4;
     }
     text {
-        fill: #777;
+        fill: #555;
+        font-size: smaller;
+        stroke-opacity: 0.4;
     }
 
     &:hover {
@@ -28,20 +30,22 @@
         text {
             stroke-opacity: 0.9;
             font-weight: 700;
-            fill: #111;
+            fill: #333;
+            stroke: 1px solid white;
             font-size: larger;
         }
     }
 }
 
 .wdfd-link {
-  stroke-opacity: 0.6;
+    stroke-opacity: 0.6;
+    opacity: 0.4;
 }
 
 
 .wdfd-intra-node circle{
-  fill: green;
-  stroke: #004d00;
+    fill: green;
+    stroke: #004d00;
 }
 
 

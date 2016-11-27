@@ -10,10 +10,11 @@
  *
  */
 
+import {initialiseData} from '../../../common';
 import {event, select} from 'd3-selection';
 import {forceSimulation, forceLink, forceManyBody, forceCenter} from 'd3-force';
 import {drag} from 'd3-drag';
-import {zoom} from 'd3-zoom';
+import {zoom, zoomIdentity} from 'd3-zoom';
 
 import 'd3-selection-multi';
 
@@ -29,6 +30,11 @@ const bindings = {
 };
 
 
+const initialState = {
+    zoomEnabled: false
+};
+
+
 const DEFAULT_TWEAKER = {
     enter: (selection) => selection,
     exit: (selection) => selection,
@@ -40,6 +46,7 @@ function mkLinkData(flows = []) {
     return _.map(
         flows,
         f => ({
+            id: `${ f.source.id }_${ f.target.id }`,
             source: f.source.id,
             target: f.target.id,
             data: f
@@ -56,7 +63,7 @@ function setupDimensions(vizElem) {
 function drawLinks(links = [], holder, tweakers) {
     const linkSelection = holder
         .selectAll(".wdfd-link")
-        .data(links, d => d.data.id);
+        .data(links, d => d.id);
 
     const newLinks = linkSelection
         .enter()
@@ -96,7 +103,9 @@ function addNodeCircle(selection) {
 function drawNodes(nodes = [], holder, simulation, tweakers = DEFAULT_TWEAKER) {
 
     function dragStarted(d) {
-        if (!event.active) simulation.alphaTarget(0.3).restart();
+        if (!event.active) {
+            simulation.alphaTarget(0.3).restart();
+        }
         d.fx = d.x;
         d.fy = d.y;
     }
@@ -107,10 +116,9 @@ function drawNodes(nodes = [], holder, simulation, tweakers = DEFAULT_TWEAKER) {
     }
 
     function dragEnded(d) {
-        if (!event.active) simulation.alphaTarget(0);
-        // d.fx = null;
-        // d.fy = null;
-
+        if (!event.active) {
+            simulation.alphaTarget(0);
+        }
         d.fx = event.x;
         d.fy = event.y;
     }
@@ -149,50 +157,46 @@ function setup(vizElem) {
     const svg = vizElem
         .append('svg');
 
-    const nG = svg.append("g")
-        .attr("class", "nodes");
-
-    const lG = svg.append("g")
+    svg.append("g")
         .attr("class", "links");
 
-    const myZoom = zoom()
-        .scaleExtent([1 / 4, 1.5])
-        .on("zoom", zoomed);
-
-    svg.call(myZoom);
-
-    //svg.on(".zoom", null);
-
-    function zoomed() {
-        const t = event.transform;
-
-        nG.attr("transform", t);
-        lG.attr("transform", t);
-    }
+    svg.append("g")
+        .attr("class", "nodes");
 
     return { svg, vizElem };
 }
 
 
-
-function draw(data,
+function draw(data = [],
               parts,
-              tweakers = {},
-              simulation) {
+              tweakers = {}) {
 
     const linkTweakers = _.defaults(tweakers.link, DEFAULT_TWEAKER);
     const nodeTweakers = _.defaults(tweakers.node, DEFAULT_TWEAKER);
 
-    const links = mkLinkData(data.flows);
-
     const dimensions = setupDimensions(parts.vizElem);
-    parts.svg.attrs({
-        width: dimensions.width,
-        height: dimensions.height
-    });
+    parts
+        .svg
+        .attrs({
+            width: dimensions.width,
+            height: dimensions.height
+        });
+
+    const links = mkLinkData(data.flows);
+    const nodes = data.entities;
+
+    const simulation = forceSimulation()
+        .force("charge", forceManyBody().strength(-30))//.distanceMin(40).distanceMax(1000))
+        .force("link", forceLink().id(d => d.id).distance(45).strength(0.2))
+        .force("center", forceCenter(dimensions.width / 2, dimensions.height / 2));
 
     simulation
-        .force("center", forceCenter(dimensions.width / 2, dimensions.height / 2));
+        .nodes(nodes)
+        .on("tick", ticked);
+
+    simulation
+        .force("link")
+        .links(links);
 
     const linkSelection = drawLinks(
         links,
@@ -200,23 +204,10 @@ function draw(data,
         linkTweakers);
 
     const nodeSelection = drawNodes(
-        data.entities,
+        nodes,
         parts.svg.select('g.nodes'),
         simulation,
         nodeTweakers);
-
-    simulation
-        .nodes(data.entities)
-        .on("tick", ticked);
-
-    simulation
-        .force("link")
-        .links(links);
-
-    // kick the simulation so new nodes are drawn/moved
-    simulation
-        .alpha(0.2)
-        .restart();
 
     function ticked() {
         linkSelection
@@ -228,34 +219,78 @@ function draw(data,
 
         nodeSelection
             .attr('transform', d => `translate(${d.x}, ${d.y})`);
-
     }
 
+    return simulation;
 }
 
 
 function controller($scope, $element) {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     const vizElem = select($element[0])
         .select('.viz');
 
     const parts = setup(vizElem);
 
-    const simulation = forceSimulation()
-        .force("link", forceLink().id(d => d.id).distance(60))
-        .force("charge", forceManyBody().strength(-40));
-
-    vm.$onChanges = () => {
-        if (vm.data) {
+    vm.$onChanges = (changes) => {
+        if (changes.data) {
             // we draw using async to prevent clientWidth reporting '0'
-            $scope.$applyAsync(() => draw(vm.data, parts, vm.tweakers, simulation));
+            $scope.$applyAsync(() => {
+                vm.simulation = draw(vm.data, parts, vm.tweakers);
+            });
         }
     };
 
     vm.$onDestroy = () => {
-        simulation.stop();
+        if (vm.simulation) {
+            vm.simulation.stop();
+        }
     };
+
+    function zoomed() {
+        const svg = vizElem
+            .select("svg");
+
+        const t = event.transform;
+
+        svg.select('.nodes')
+            .attr("transform", t);
+        svg.select('.links')
+            .attr("transform", t);
+    }
+
+    const myZoom = zoom()
+        .scaleExtent([1 / 4, 1.5])
+        .on("zoom", zoomed);
+
+    vm.enableZoom = () => {
+        vizElem
+            .select("svg")
+            .call(myZoom);
+        vm.zoomEnabled = true;
+    };
+
+    vm.disableZoom = () => {
+        vizElem
+            .select("svg")
+            .on('.zoom', null);
+
+        vm.zoomEnabled = false;
+    };
+
+    vm.resetSimulation = () => {
+        _.forEach(vm.data.entities, d => {
+            d.x = null;
+            d.y = null;
+            d.fx = null;
+            d.fy = null;
+        });
+
+        vizElem.select('svg').transition().duration(750).call(myZoom.transform, zoomIdentity);
+
+        draw(vm.data, parts, vm.tweakers);
+    }
 }
 
 
