@@ -330,3 +330,30 @@ export function toEntityRef(obj) {
 
     return ref;
 }
+
+
+/**
+ * Works round an IE problem where markers cause lines
+ * to vanish on svg diagrams.  Workaround is to
+ * re-add relevant elements.
+ *
+ * @param selection
+ */
+export function markerFix(selection, timeout = 0) {
+    if(/*@cc_on!@*/false)  {
+        // IE only
+        const fixer = () => selection.each(
+            function() {
+                if (this.parentNode) {
+                    this.parentNode.insertBefore(this, this);
+                }
+            });
+
+        if (timeout > 0) {
+            setTimeout(fixer, timeout);
+        } else {
+            fixer();
+        }
+    }
+
+}

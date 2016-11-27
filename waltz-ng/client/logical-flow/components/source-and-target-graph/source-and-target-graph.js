@@ -1,7 +1,7 @@
-import {initialiseData} from "../../../common";
+import {initialiseData, markerFix} from "../../../common";
 import {authoritativeRatingColorScale} from "../../../common/colors";
 import _ from "lodash";
-import {scalePoint, scaleOrdinal} from "d3-scale";
+import {scalePoint} from "d3-scale";
 import {event, select} from "d3-selection";
 import "d3-selection-multi";
 
@@ -396,7 +396,7 @@ function drawArcs(section, model, layoutFn) {
         .duration(animationDuration)
         .call(layoutFn)
         .attr('opacity', 1)
-        .call(internetExplorerFix);
+        .on('end', function() { select(this).call(markerFix) });
 
     arcs
         .exit()
@@ -404,28 +404,6 @@ function drawArcs(section, model, layoutFn) {
 }
 
 
-
-/*
- * This works round a bug with IE8+ where using markers with
- * svg causes elements not to be rendered/updated unless a
- * redrawn is forced.  In this case we force by re-adding
- * (non-duplicative)
- */
-function internetExplorerFix(selection) {
-    const fixFn = () => {
-        if (selection) {
-            selection.each(
-                function() {
-                    if (this.parentNode) {
-                        this.parentNode.insertBefore(this, this);
-                    }
-                });
-        }
-
-    };
-
-    setTimeout(fixFn, 200);
-}
 
 
 function drawTypeBoxes(section, model, scale, dimensions, tweakers) {

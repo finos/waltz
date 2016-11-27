@@ -16,6 +16,9 @@ import {forceSimulation, forceLink, forceManyBody, forceCenter} from 'd3-force';
 import {drag} from 'd3-drag';
 import {zoom, zoomIdentity} from 'd3-zoom';
 
+import {markerFix} from '../../../common';
+
+
 import 'd3-selection-multi';
 
 import _ from "lodash";
@@ -69,7 +72,7 @@ function drawLinks(links = [], holder, tweakers) {
         .enter()
         .append("line")
         .classed('wdfd-link', true)
-        .attr('stroke', '#666')
+        .attr('stroke', '#444')
         .call(tweakers.enter);
 
     linkSelection
@@ -80,6 +83,7 @@ function drawLinks(links = [], holder, tweakers) {
     return linkSelection
         .merge(newLinks)
         .call(tweakers.update);
+
 }
 
 
@@ -216,7 +220,8 @@ function draw(data = [],
             .attr("y1", function(d) { return d.source.y; })
             .attr("x2", function(d) { return d.target.x; })
             .attr("y2", function(d) { return d.target.y; })
-            .call(linkTweakers.update);
+            .call(linkTweakers.update)
+            .call(markerFix);
 
         nodeSelection
             .attr('transform', d => `translate(${d.x}, ${d.y})`);
