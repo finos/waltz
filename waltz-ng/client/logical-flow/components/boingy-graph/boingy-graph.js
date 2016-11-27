@@ -131,6 +131,7 @@ function drawNodes(nodes = [], holder, simulation, tweakers = DEFAULT_TWEAKER) {
         .enter()
         .append('g')
         .classed('wdfd-node', true)
+        .on('dblclick', d => { d.fx = null; d.fy = null })
         .call(tweakers.enter)
         .call(drag()
             .on("start", dragStarted)

@@ -88,14 +88,7 @@ function determineRadius(d, owningEntity, targetEntity) {
 
 
 function determineStrokeColor(d, owningEntity, targetEntity) {
-    switch (d.id) {
-        case (owningEntity.id): return blue.darker();
-        case (targetEntity.id):
-            return targetEntity.kind === 'APPLICATION'
-                ? green.darker()
-                : actor.darker();
-        default: return grey;
-    }
+    return determineFillColor(d, owningEntity, targetEntity).darker();
 }
 
 
@@ -105,7 +98,7 @@ function setupGraphTweakers(owningEntity, targetEntity, onClick) {
             update: (selection) => {
                 selection
                     .select('circle')
-                    .attr({
+                    .attrs({
                         'fill': d => determineFillColor(d, owningEntity, targetEntity),
                         'stroke': d => determineStrokeColor(d, owningEntity, targetEntity),
                         'r': d => determineRadius(d, owningEntity, targetEntity)
@@ -115,6 +108,14 @@ function setupGraphTweakers(owningEntity, targetEntity, onClick) {
             enter: (selection) => {
                 selection.on('click.view', onClick);
             }
+        },
+        link : {
+            update: (selection) => {
+                selection
+                    .attr('marker-end', 'url(#arrowhead)');
+            },
+            enter: _.identity,
+            exit: _.identity
         }
     };
 }
