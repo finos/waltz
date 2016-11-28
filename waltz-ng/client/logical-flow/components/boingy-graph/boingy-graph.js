@@ -46,14 +46,15 @@ const DEFAULT_TWEAKER = {
 
 
 function mkLinkData(flows = []) {
-    return _.map(
-        flows,
-        f => ({
+    return _.chain(flows)
+        .map(f => ({
             id: `${ f.source.id }_${ f.target.id }`,
             source: f.source.id,
             target: f.target.id,
             data: f
-        }));
+        }))
+        .uniqBy('id')
+        .value();
 }
 
 
@@ -77,7 +78,6 @@ function drawLinks(links = [], holder, tweakers) {
 
     linkSelection
         .exit()
-        .call(tweakers.exit)
         .remove();
 
     return linkSelection
@@ -135,7 +135,7 @@ function drawNodes(nodes = [], holder, simulation, tweakers = DEFAULT_TWEAKER) {
         .enter()
         .append('g')
         .classed('wdfd-node', true)
-        .on('dblclick', d => { d.fx = null; d.fy = null })
+        .on('dblclick.unfix', d => { d.fx = null; d.fy = null })
         .call(tweakers.enter)
         .call(drag()
             .on("start", dragStarted)
@@ -172,6 +172,9 @@ function setup(vizElem) {
 }
 
 
+const simulation = forceSimulation();
+
+
 function draw(data = [],
               parts,
               tweakers = {}) {
@@ -190,7 +193,18 @@ function draw(data = [],
     const links = mkLinkData(data.flows);
     const nodes = data.entities;
 
-    const simulation = forceSimulation()
+    const linkSelection = drawLinks(
+        links,
+        parts.svg.select('.links'),
+        linkTweakers);
+
+    const nodeSelection = drawNodes(
+        nodes,
+        parts.svg.select('.nodes'),
+        simulation,
+        nodeTweakers);
+
+    simulation
         .force("charge", forceManyBody().strength(-30))//.distanceMin(40).distanceMax(1000))
         .force("link", forceLink().id(d => d.id).distance(45).strength(0.2))
         .force("center", forceCenter(dimensions.width / 2, dimensions.height / 2));
@@ -203,28 +217,17 @@ function draw(data = [],
         .force("link")
         .links(links);
 
-    const linkSelection = drawLinks(
-        links,
-        parts.svg.select('g.links'),
-        linkTweakers);
-
-    const nodeSelection = drawNodes(
-        nodes,
-        parts.svg.select('g.nodes'),
-        simulation,
-        nodeTweakers);
-
     function ticked() {
-        linkSelection
-            .attr("x1", function(d) { return d.source.x; })
-            .attr("y1", function(d) { return d.source.y; })
-            .attr("x2", function(d) { return d.target.x; })
-            .attr("y2", function(d) { return d.target.y; })
-            .call(linkTweakers.update)
-            .call(markerFix);
-
         nodeSelection
             .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+        linkSelection
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y)
+            .call(linkTweakers.update)
+            .call(markerFix);
     }
 
     return simulation;
@@ -239,18 +242,25 @@ function controller($scope, $element) {
 
     const parts = setup(vizElem);
 
+    const debouncedDraw = _.debounce(() => {
+        draw(vm.data, parts, vm.tweakers);
+        simulation.alpha(0.4).restart();
+    }, 250);
+
     vm.$onChanges = (changes) => {
         if (changes.data) {
             // we draw using async to prevent clientWidth reporting '0'
-            $scope.$applyAsync(() => {
-                vm.simulation = draw(vm.data, parts, vm.tweakers);
-            });
+            $scope.$applyAsync(debouncedDraw);
         }
     };
 
+    vm.$onInit = () => {
+        simulation.restart();
+    };
+
     vm.$onDestroy = () => {
-        if (vm.simulation) {
-            vm.simulation.stop();
+        if (simulation) {
+            simulation.stop();
         }
     };
 
@@ -293,7 +303,11 @@ function controller($scope, $element) {
             d.fy = null;
         });
 
-        vizElem.select('svg').transition().duration(750).call(myZoom.transform, zoomIdentity);
+        vizElem
+            .select('svg')
+            .transition()
+            .duration(750)
+            .call(myZoom.transform, zoomIdentity);
 
         draw(vm.data, parts, vm.tweakers);
     }
