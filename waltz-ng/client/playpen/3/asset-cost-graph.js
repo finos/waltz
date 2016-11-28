@@ -2,7 +2,10 @@ import {initialiseData} from '../../common';
 import _ from 'lodash';
 import {scaleLinear, scaleLog} from 'd3-scale';
 import {select} from 'd3-selection';
+import {extent} from 'd3-array';
+import {axisLeft} from 'd3-axis';
 import {format} from 'd3-format';
+import 'd3-selection-multi';
 
 
 const template = "<div class='waltz-asset-cost-graph'><svg></svg></div>";
@@ -90,7 +93,7 @@ function mkSvgAttrs() {
 
 
 function prepareGraph(svg) {
-    svg.attr(mkSvgAttrs());
+    svg.attrs(mkSvgAttrs());
 
     const axis = svg
         .append("g")
@@ -106,7 +109,7 @@ function prepareGraph(svg) {
 
 
 function mkScales(amounts = [], scaleType = 'log') {
-    const [minAmount, maxAmount] = d3.extent(amounts, getAmount);
+    const [minAmount, maxAmount] = extent(amounts, getAmount);
 
     const baseYScale = scaleType === 'log'
             ? scaleLog()
@@ -124,9 +127,8 @@ function mkScales(amounts = [], scaleType = 'log') {
 
 
 function mkAxis(scale, scaleType = 'log') {
-    const axis = d3.svg.axis()
-        .scale(scale)
-        .orient("left");
+    const axis = axisLeft()
+        .scale(scale);
 
     if (scaleType === 'log') {
         axis.ticks(5)
@@ -168,7 +170,7 @@ function update(
         .enter()
         .append('circle')
         .classed('wacg-amount', true)
-        .attr({
+        .attrs({
             cy: 0, //() => _.random(0, 10) > 5 ? 0 : dimensions.graph.height,
             cx: (d, idx) => scales.x(idx) + _.random(-100, 100),
             r: 0,
@@ -191,7 +193,7 @@ function update(
         .exit()
         .transition()
         .duration(animationDuration / 1.5)
-        .attr({
+        .attrs({
             opacity: 0,
             r: 0
         })
@@ -203,7 +205,7 @@ function update(
         .classed('wacg-selected', (d) => getAppId(d) === selected)
         .transition()
         .duration(animationDuration / 2)
-        .attr({
+        .attrs({
             opacity,
             r: d => getAppId(d) === selected ? radius * 1.5 : radius,
             cx: (d, idx) => scales.x(idx),

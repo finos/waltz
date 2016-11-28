@@ -3,53 +3,52 @@
 
 .waltz-rating-picker {
 
-    input {
-        display:none
+    .wrp-option {
+        margin-bottom: 6px;
+        label {
+            min-width: 200px;
+            border-radius: 3px;
+            padding: 6px 6px 6px 12px;
+            opacity: 0.6;
+            border: 1px solid;
+        }
+
+        input {
+            display: none
+        }
+
+        input:checked + label {
+            opacity: 1;
+        }
+
+        input:checked + label::after {
+            padding-left: 10px;
+            padding-right: 10px;
+            content: '\f00c';
+            font-family: 'FontAwesome';
+        }
+
     }
 
-    input:focus {
-        background-color: #00acee;
-    }
-
-    label {
-        @extend .btn;
-    }
-
-    label {
-        opacity: 0.4;
-        margin-left: 4px;
-    }
-
-
-    label.selected {
-        opacity: 1;
-        border-color: $waltz-border-color;
-    }
-
-
-    label.rating-strategic {
+    .rating-G {
         background-color: $waltz-green;
         color: #fff;
     }
 
-
-    label.rating-with-issues {
+    .rating-A {
         background-color: $waltz-amber;
         color: #fff;
     }
 
-
-    label.rating-non-strategic {
+    .rating-R {
         background-color: $waltz-red;
         color: #fff;
     }
 
-
-    label.rating-none {
+    .rating-Z {
         background-color: $waltz-grey;
         color: $waltz-font-color;
     }
-
 }
 
 
