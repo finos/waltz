@@ -309,7 +309,7 @@ function controller($scope, $element) {
             .duration(750)
             .call(myZoom.transform, zoomIdentity);
 
-        draw(vm.data, parts, vm.tweakers);
+        debouncedDraw();
     }
 }
 
