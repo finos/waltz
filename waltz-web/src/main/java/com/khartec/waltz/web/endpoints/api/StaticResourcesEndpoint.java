@@ -46,6 +46,7 @@ public class StaticResourcesEndpoint implements Endpoint {
         Spark.get("/*", (request, response) -> {
 
             String resolvedPath = resolvePath(request);
+
             if (resolvedPath == null) {
                 return null;
             }
@@ -60,6 +61,7 @@ public class StaticResourcesEndpoint implements Endpoint {
                     LOG.info(message);
 
                     response.type(getMimeType(resolvedPath));
+                    response.header("Cache-Control", "max-age=2592000"); //30 day cache
                     OutputStream out = response
                             .raw()
                             .getOutputStream();
