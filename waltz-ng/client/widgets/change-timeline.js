@@ -9,7 +9,11 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import d3 from "d3";
+import {axisBottom} from "d3-axis";
+import {select} from 'd3-selection';
+import {scaleLinear, scaleBand} from 'd3-scale';
+import 'd3-selection-multi';
+
 import _ from "lodash";
 import angular from "angular";
 
@@ -38,13 +42,10 @@ function prepareYearQuarters(years) {
 
 function renderAxis(container, scale) {
 
-    const yearAxis = d3.svg.axis()
-        .scale(scale)
-        .tickFormat(d=> d % 10 === 1 ? Math.round(d / 10) : '')  // only show for Q1's
-        .orient('bottom');
+    const yearAxis = axisBottom(scale)
+        .tickFormat(d=> d % 10 === 1 ? Math.round(d / 10) : '');  // only show for Q1's
 
-    const quarterAxis = d3.svg.axis()
-        .scale(scale)
+    const quarterAxis = axisBottom(scale)
         .tickFormat(d => 'Q' + d % 10)
         .tickSize(4)
         .orient('bottom');
@@ -71,7 +72,7 @@ function renderChanges(container, yqScale, barScale, changes, selected) {
         .classed('applied', d=> selected && yqToVal(selected) > yqToVal(d))
         .classed('pending', d=> !selected || yqToVal(selected) < yqToVal(d))
         .classed('selected', d => selected && selected.year === d.year && selected.quarter === d.quarter)
-        .attr({
+        .attrs({
             x: d => yqScale(yqToVal(d)),
             y: d=> barScale(d.size),
             width: barWidth,
@@ -90,11 +91,11 @@ function render(svg, data) {
     const years = prepareYears(data.start, data.end);
     const yqs = prepareYearQuarters(years);
 
-    const yqScale = d3.scale.ordinal()
+    const yqScale = scaleBand()
         .domain(_.map(yqs, 'id'))
-        .rangeBands([0, width], 0.2);
+        .range([0, width], 0.2);
 
-    const barScale = d3.scale.linear()
+    const barScale = scaleLinear()
         .domain([0, _.maxBy(data.changes, 'size').size])
         .range([height - (axisHeight + 10), 4]);
 
@@ -116,7 +117,7 @@ function render(svg, data) {
         .enter()
         .append('rect')
         .classed('click-handler', true)
-        .attr({
+        .attrs({
             fill: 'none',
             'pointer-events': 'visible', // allows clicking on fill:'none'
             x: d => yqScale(d),
@@ -164,7 +165,7 @@ controller.$inject = ['$scope', '$window'];
 
 function link(scope, elem) {
     scope.vizElem = elem[0].querySelector('.viz');
-    scope.svg = d3.select(scope.vizElem).append('svg');
+    scope.svg = select(scope.vizElem).append('svg');
 }
 
 

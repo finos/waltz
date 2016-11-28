@@ -1,4 +1,4 @@
-import d3 from "d3";
+import {nest} from "d3-collection";
 
 
 const BINDINGS = {
@@ -22,11 +22,11 @@ const BINDINGS = {
  * @returns {*}
  */
 function perpareRatingData(ratings) {
-    return d3.nest()
+    return nest()
         .key(d => d.parent.id)
         .key(d => d.capability.id)
         .key(d => d.measurable.code)
-        .map(ratings);
+        .object(ratings);
 }
 
 

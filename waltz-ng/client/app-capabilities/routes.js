@@ -16,6 +16,7 @@ const baseState = {
     url: 'app-capability'
 };
 
+
 const editState = {
     views: {'content@': editView },
     url: '/{id:int}/edit'

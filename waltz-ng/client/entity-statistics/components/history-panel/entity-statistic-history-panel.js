@@ -1,5 +1,5 @@
 import _ from "lodash";
-import d3 from "d3";
+import {timeFormat} from "d3-time-format";
 import {variableScale} from "../../../common/colors";
 import {initialiseData} from "../../../common";
 
@@ -20,9 +20,7 @@ const initialState = {
 };
 
 
-const dateFormatter = d3
-    .time
-    .format('%a %d %b %Y');
+const dateFormatter = timeFormat('%a %d %b %Y');
 
 
 function prepareData(data = []) {
@@ -87,10 +85,7 @@ function controller($scope, displayNameService) {
     const vm = initialiseData(this, initialState);
 
     const highlight = (d) => {
-        vm.options = Object.assign(
-            {},
-            vm.options,
-            { highlightedDate: d });
+        vm.highlightedDate = d;
         const relevantStats = findRelevantStats(vm.history, d);
         if (relevantStats) {
             vm.selected = relevantStats;
@@ -99,10 +94,7 @@ function controller($scope, displayNameService) {
         }
     };
 
-    vm.options = {
-        highlightedDate: null,
-        onHover: (d) => $scope.$applyAsync(() => highlight(d))
-    };
+    vm.onHover = (d) => $scope.$applyAsync(() => highlight(d));
 
     vm.$onChanges = () => {
         vm.selected  = null;

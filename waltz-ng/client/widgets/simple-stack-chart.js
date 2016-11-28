@@ -1,6 +1,7 @@
 import _ from "lodash";
-import d3 from "d3";
-
+import {scaleLinear} from 'd3-scale';
+import {select} from 'd3-selection';
+import "d3-selection-multi";
 
 const bindings = {
     values: '=',
@@ -23,8 +24,7 @@ function calculateLayoutData(values = [], xScale) {
 
 function controller($element) {
 
-    const holder = d3
-        .select($element[0])
+    const holder = select($element[0])
         .select('.waltz-simple-stack-chart')
 
     const svg = holder
@@ -39,14 +39,13 @@ function controller($element) {
     const update = (values = [], max) => {
 
         const height = 24;
-        const width = holder[0][0].clientWidth;
+        // TODO: 1026: d3v4 - can't work out client width...
+        const width = $element[0].clientWidth || 150;
 
         svg
-            .attr({ width: `${width}`, height: `${height}` });
+            .attrs({ width: `${width}`, height: `${height}` });
 
-        const xScale = d3
-            .scale
-            .linear()
+        const xScale = scaleLinear()
             .domain([0, max])
             .range([
                 10,
@@ -61,7 +60,7 @@ function controller($element) {
             .append('rect')
             .classed('wssc-stack', true)
             .attr("class", (d, idx) => `wssc-stack-${idx}`)
-            .attr({
+            .attrs({
                 y: 3,
                 height: height - 6
             })
@@ -69,7 +68,7 @@ function controller($element) {
             .attr("width", (d, idx) => coords[idx].width);
 
         ambient
-            .attr({
+            .attrs({
                 width,
                 height,
                 x: 0,

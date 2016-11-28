@@ -11,7 +11,7 @@
  *
  */
 
-import d3 from "d3";
+import {nest} from "d3-collection";
 import _ from "lodash";
 import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
 
@@ -90,7 +90,7 @@ export function loadAuthSources(authSourceStore, orgUnitStore, appId, ouId, vm) 
     ouAuthSourcesPromise.then(ouas => vm.ouAuthSources = ouas);
     appAuthSourcePromise.then(aas => vm.appAuthSources = aas);
 
-    appAuthSourcePromise.then(authSources => d3.nest()
+    appAuthSourcePromise.then(authSources => nest()
         .key(a => a.dataType)
         .key(a => a.rating)
         .map(authSources))

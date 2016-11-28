@@ -1,4 +1,5 @@
-import d3 from 'd3';
+import {select} from 'd3-selection';
+import {rgb} from 'd3-color';
 
 const bindings = {};
 
@@ -8,8 +9,7 @@ const template = require('./common-svg-defs.html');
 
 function controller($element) {
 
-    const defs = d3
-        .select($element[0])
+    const defs = select($element[0])
         .select('svg')
         .append('defs');
 
@@ -25,16 +25,15 @@ function controller($element) {
         .data(markers, m => m.name)
         .enter()
         .append('marker')
-        .attr({
-            id: d => d.name,
-            refX: 20,
-            refY: 4,
-            markerWidth: 8,
-            markerHeight: 8,
-            orient: 'auto',
-            stroke: d => d3.rgb(d.color).hsl().darker(0.5),
-            fill: d => d3.rgb(d.color).hsl().brighter(1.5),
-        })
+        .attr('id', d => d.name)
+        .attr('refX', 20)
+        .attr('refY', 4)
+        .attr('markerUnits', "strokeWidth")
+        .attr('markerWidth', 8)
+        .attr('markerHeight', 8)
+        .attr('orient', 'auto')
+        .attr('stroke', d => rgb(d.color).darker(0.5).toString())
+        .attr('fill', d => rgb(d.color).brighter(1.5).toString())
         .append('path')
         .attr('d', 'M 0,0 V 8 L8,4 Z'); // this is actual shape for arrowhead
 }

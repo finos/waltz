@@ -10,7 +10,17 @@
  *
  */
 
-import d3 from "d3";
+import {initialiseData} from '../../../common';
+import {event, select} from 'd3-selection';
+import {forceSimulation, forceLink, forceManyBody, forceCenter} from 'd3-force';
+import {drag} from 'd3-drag';
+import {zoom, zoomIdentity} from 'd3-zoom';
+
+import {markerFix} from '../../../common';
+
+
+import 'd3-selection-multi';
+
 import _ from "lodash";
 
 
@@ -23,11 +33,28 @@ const bindings = {
 };
 
 
+const initialState = {
+    zoomEnabled: false
+};
+
+
 const DEFAULT_TWEAKER = {
     enter: (selection) => selection,
     exit: (selection) => selection,
     update: (selection) => selection
 };
+
+
+function mkLinkData(flows = []) {
+    return _.map(
+        flows,
+        f => ({
+            id: `${ f.source.id }_${ f.target.id }`,
+            source: f.source.id,
+            target: f.target.id,
+            data: f
+        }));
+}
 
 
 function setupDimensions(vizElem) {
@@ -36,149 +63,240 @@ function setupDimensions(vizElem) {
 }
 
 
-const force = d3.layout.force()
-    .distance(100)
-    .linkDistance(70)
-    .gravity(0.05)
-    .charge(-200);
+function drawLinks(links = [], holder, tweakers) {
+    const linkSelection = holder
+        .selectAll(".wdfd-link")
+        .data(links, d => d.id);
 
+    const newLinks = linkSelection
+        .enter()
+        .append("line")
+        .classed('wdfd-link', true)
+        .attr('stroke', '#444')
+        .call(tweakers.enter);
 
-function setup(vizElem) {
-    const svg = vizElem
-        .append('svg');
+    linkSelection
+        .exit()
+        .call(tweakers.exit)
+        .remove();
 
-    return { svg, vizElem };
-}
+    return linkSelection
+        .merge(newLinks)
+        .call(tweakers.update);
 
-
-function addNodeCircle(selection) {
-    selection
-        .append('circle')
-        .attr({
-            cx: 0,
-            cy: 0,
-            r: 8
-        });
 }
 
 
 function addNodeLabel(selection) {
     selection
         .append('text')
-        .attr({ dx: 10, dy: '.35em' })
+        .attrs({ dx: 10, dy: '.35em' })
         .text(d => d.name);
 }
 
 
-function drawLinks(flows = [], nodes = [], svg, linkTweakers = DEFAULT_TWEAKER) {
-    const nodeIds = _.map(nodes, 'id');
+function addNodeCircle(selection) {
+    selection
+        .append('circle')
+        .attr("r", 8)
+        .append("title")
+        .text(d => d.name);
+}
 
-    const links = _.map(
-        flows,
-        f => ({
-            source: _.indexOf(nodeIds, f.source.id),
-            target: _.indexOf(nodeIds, f.target.id),
-            data: f
-        }));
 
-    if (links.length > 0) {
-        force
-            .links(links)
-            .nodes(nodes)
-            .start();
+function drawNodes(nodes = [], holder, simulation, tweakers = DEFAULT_TWEAKER) {
+
+    function dragStarted(d) {
+        if (!event.active) {
+            simulation.alphaTarget(0.3).restart();
+        }
+        d.fx = d.x;
+        d.fy = d.y;
     }
 
-    const link = svg
-        .selectAll('.wdfd-link')
-        .data(links, f => f.data.id);
+    function dragged(d) {
+        d.fx = event.x;
+        d.fy = event.y;
+    }
 
-    link.enter()
-        .append('svg:line')
-        .attr('marker-end', 'url(#arrowhead)') // defined in common-svg-defs
-        .attr({ 'stroke' : '#333' })
-        .classed('wdfd-link', true)
-        .call(linkTweakers.enter);
+    function dragEnded(d) {
+        if (!event.active) {
+            simulation.alphaTarget(0);
+        }
+        d.fx = event.x;
+        d.fy = event.y;
+    }
 
-    link
-        .call(linkTweakers.update);
+    const nodeSelection = holder
+        .selectAll(".wdfd-node")
+        .data(nodes, d => d.id);
 
-    link.exit()
-        .call(linkTweakers.exit)
-        .remove();
-
-    return link;
-}
-
-
-function drawNodes(entities = [], svg, nodeTweakers = DEFAULT_TWEAKER) {
-    const node = svg
-        .selectAll('.wdfd-node')
-        .data(entities, n => n.id);
-
-    node.enter()
+    const newNodes = nodeSelection
+        .enter()
         .append('g')
         .classed('wdfd-node', true)
-        .on('click.fix', d => d.fixed = true)
-        .on('dblclick.unfix', d => d.fixed = false)
-        .call(force.drag)
-        .call(addNodeCircle)
-        .call(addNodeLabel)
-        .call(nodeTweakers.enter);
+        .on('dblclick', d => { d.fx = null; d.fy = null })
+        .call(tweakers.enter)
+        .call(drag()
+            .on("start", dragStarted)
+            .on("drag", dragged)
+            .on("end", dragEnded));
 
-    node.exit()
+    newNodes
+        .call(addNodeLabel)
+        .call(addNodeCircle);
+
+    nodeSelection
+        .exit()
+        .call(tweakers.exit)
         .remove();
 
-    node.call(nodeTweakers.update);
+    return nodeSelection
+        .merge(newNodes)
+        .call(tweakers.update);
 
-    return node;
 }
 
-function animateLinks(linkSelection, nodeSelection, linkTweakers = DEFAULT_TWEAKER) {
 
-    force.on('tick', () => {
-        linkSelection
-            .each(function () {this.parentNode.insertBefore(this, this); });
+function setup(vizElem) {
+    const svg = vizElem
+        .append('svg');
 
+    svg.append("g")
+        .attr("class", "links");
+
+    svg.append("g")
+        .attr("class", "nodes");
+
+    return { svg, vizElem };
+}
+
+
+function draw(data = [],
+              parts,
+              tweakers = {}) {
+
+    const linkTweakers = _.defaults(tweakers.link, DEFAULT_TWEAKER);
+    const nodeTweakers = _.defaults(tweakers.node, DEFAULT_TWEAKER);
+
+    const dimensions = setupDimensions(parts.vizElem);
+    parts
+        .svg
+        .attrs({
+            width: dimensions.width,
+            height: dimensions.height
+        });
+
+    const links = mkLinkData(data.flows);
+    const nodes = data.entities;
+
+    const simulation = forceSimulation()
+        .force("charge", forceManyBody().strength(-30))//.distanceMin(40).distanceMax(1000))
+        .force("link", forceLink().id(d => d.id).distance(45).strength(0.2))
+        .force("center", forceCenter(dimensions.width / 2, dimensions.height / 2));
+
+    simulation
+        .nodes(nodes)
+        .on("tick", ticked);
+
+    simulation
+        .force("link")
+        .links(links);
+
+    const linkSelection = drawLinks(
+        links,
+        parts.svg.select('g.links'),
+        linkTweakers);
+
+    const nodeSelection = drawNodes(
+        nodes,
+        parts.svg.select('g.nodes'),
+        simulation,
+        nodeTweakers);
+
+    function ticked() {
         linkSelection
-            .attr('x1', d => d.source.x)
-            .attr('y1', d => d.source.y)
-            .attr('x2', d => d.target.x)
-            .attr('y2', d => d.target.y)
-            .call(linkTweakers.update);
+            .attr("x1", function(d) { return d.source.x; })
+            .attr("y1", function(d) { return d.source.y; })
+            .attr("x2", function(d) { return d.target.x; })
+            .attr("y2", function(d) { return d.target.y; })
+            .call(linkTweakers.update)
+            .call(markerFix);
 
         nodeSelection
-            .attr('transform', d => { return `translate(${d.x}, ${d.y})`; });
-    });
-}
+            .attr('transform', d => `translate(${d.x}, ${d.y})`);
+    }
 
-
-function draw(data, parts, tweakers = { node: DEFAULT_TWEAKER, link: DEFAULT_TWEAKER }) {
-    const dimensions = setupDimensions(parts.vizElem);
-
-    force.size([dimensions.width, dimensions.height]);
-    parts.svg.attr({ width: dimensions.width, height: dimensions.height });
-
-    const linkSelection = drawLinks(data.flows, data.entities, parts.svg, tweakers.link);
-    const nodeSelection = drawNodes(data.entities, parts.svg, tweakers.node);
-    animateLinks(linkSelection, nodeSelection, tweakers.link);
+    return simulation;
 }
 
 
 function controller($scope, $element) {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
-    const vizElem = d3
-        .select($element[0])
+    const vizElem = select($element[0])
         .select('.viz');
 
     const parts = setup(vizElem);
 
-    vm.$onChanges = () => {
-        if (vm.data) {
+    vm.$onChanges = (changes) => {
+        if (changes.data) {
             // we draw using async to prevent clientWidth reporting '0'
-            $scope.$applyAsync(() => draw(vm.data, parts, vm.tweakers));
+            $scope.$applyAsync(() => {
+                vm.simulation = draw(vm.data, parts, vm.tweakers);
+            });
         }
     };
+
+    vm.$onDestroy = () => {
+        if (vm.simulation) {
+            vm.simulation.stop();
+        }
+    };
+
+    function zoomed() {
+        const svg = vizElem
+            .select("svg");
+
+        const t = event.transform;
+
+        svg.select('.nodes')
+            .attr("transform", t);
+        svg.select('.links')
+            .attr("transform", t);
+    }
+
+    const myZoom = zoom()
+        .scaleExtent([1 / 4, 1.5])
+        .on("zoom", zoomed);
+
+    vm.enableZoom = () => {
+        vizElem
+            .select("svg")
+            .call(myZoom);
+        vm.zoomEnabled = true;
+    };
+
+    vm.disableZoom = () => {
+        vizElem
+            .select("svg")
+            .on('.zoom', null);
+
+        vm.zoomEnabled = false;
+    };
+
+    vm.resetSimulation = () => {
+        _.forEach(vm.data.entities, d => {
+            d.x = null;
+            d.y = null;
+            d.fx = null;
+            d.fy = null;
+        });
+
+        vizElem.select('svg').transition().duration(750).call(myZoom.transform, zoomIdentity);
+
+        draw(vm.data, parts, vm.tweakers);
+    }
 }
 
 

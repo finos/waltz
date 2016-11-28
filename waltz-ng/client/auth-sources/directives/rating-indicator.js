@@ -1,6 +1,8 @@
-import d3 from 'd3';
+import {select} from 'd3-selection';
+import 'd3-selection-multi';
 
 import { authoritativeSourceColorScale } from '../../common/colors';
+
 
 const radius = 8;
 const padding = 3;
@@ -8,13 +10,13 @@ const padding = 3;
 function link(scope, elem) {
 
     const data = ['PRIMARY', 'SECONDARY'];
-    const svg = d3.select(elem[0]);
+    const svg = select(elem[0]);
 
     svg.selectAll('circle')
         .data(data)
         .enter()
         .append('circle')
-        .attr({
+        .attrs({
             cx: (d, i) => i * (radius * 2 + padding * 2) + radius + padding / 2,
             cy: radius + padding / 2,
             r: radius
@@ -23,9 +25,9 @@ function link(scope, elem) {
     scope.$watch('value', (value) => {
         svg.selectAll('circle')
             .data(data)
-            .attr({
-                fill: (d) => ( d === value) ? authoritativeSourceColorScale(d).brighter() : '#eee',
-                stroke: (d) => ( d === value) ? authoritativeSourceColorScale(d) : '#ddd'
+            .attrs({
+                fill: (d) => ( d === value) ? authoritativeSourceColorScale(d) : '#eee',
+                stroke: (d) => ( d === value) ? authoritativeSourceColorScale(d).darker() : '#ddd'
             });
     });
 }

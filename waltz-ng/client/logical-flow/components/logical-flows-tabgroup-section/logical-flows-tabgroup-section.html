@@ -6,18 +6,18 @@
         <waltz-section-actions>
             <a class="btn btn-xs btn-primary"
                ng-click="$ctrl.export()"
-               ng-if="$ctrl.flowData.flows.length > 0">
+               ng-if="$ctrl.visibility.exportButton">
                 <waltz-icon name="cloud-download"></waltz-icon>
                 Export
             </a>
-            <a ng-click='ctrl.visibility.flowConfigOverlay = !ctrl.visibility.flowConfigOverlay'
-               ng-show='ctrl.visibility.flowConfigButton'
+            <a ng-click='$ctrl.visibility.flowConfigOverlay = !$ctrl.visibility.flowConfigOverlay'
+               ng-show='$ctrl.visibility.flowConfigButton'
                class="btn btn-xs btn-primary">
                 <waltz-icon name="cogs"></waltz-icon>
                 Configure
             </a>
             <button class="btn btn-xs waltz-btn-transparent"
-                    ng-click="$ctrl.visibility.sourcesOverlay = ! ctrl.visibility.sourcesOverlay">
+                    ng-click="$ctrl.visibility.sourcesOverlay = ! $ctrl.visibility.sourcesOverlay">
                 <waltz-icon name="map-signs"></waltz-icon>
             </button>
         </waltz-section-actions>

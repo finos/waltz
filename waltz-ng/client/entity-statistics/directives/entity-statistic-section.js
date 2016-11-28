@@ -10,7 +10,8 @@
  *
  */
 import _ from "lodash";
-import d3 from "d3";
+import {ascending} from "d3-array";
+import {nest} from "d3-collection";
 
 const BINDINGS = {
     name: '@',
@@ -30,11 +31,11 @@ function controller($scope) {
     $scope.$watch('ctrl.entityStatistics', (entityStats = []) => {
         if(!_.isEmpty(entityStats)) {
 
-            vm.entityStatisticsGrouped = d3.nest()
+            vm.entityStatisticsGrouped = nest()
                 .key(x => x.definition.category)
-                .sortKeys(d3.ascending)
+                .sortKeys(ascending)
                 .key(x => x.definition.name)
-                .sortKeys(d3.ascending)
+                .sortKeys(ascending)
                 .sortValues((a, b) => a.value.outcome < b.value.outcome)
                 .entries(entityStats);
         }

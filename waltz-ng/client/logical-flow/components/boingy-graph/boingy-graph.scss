@@ -11,37 +11,41 @@
  */
 
 .wdfd-node {
-  circle {
-    fill-opacity: 0.5;
-  }
-  text {
-    fill: #777;
-  }
+    circle {
+        fill-opacity: 0.4;
+    }
+    text {
+        fill: #555;
+        font-size: smaller;
+        stroke-opacity: 0.4;
+    }
+
+    &:hover {
+        cursor: pointer;
+
+        circle {
+            fill-opacity: 0.9;
+        }
+
+        text {
+            stroke-opacity: 0.9;
+            font-weight: 700;
+            fill: #333;
+            stroke: 1px solid white;
+            font-size: larger;
+        }
+    }
 }
-
-
-.wdfd-node:hover {
-  circle {
-    fill-opacity: 0.9;
-  }
-
-  text {
-    stroke-opacity: 0.9;
-    font-weight: 700;
-    fill: #111;
-    font-size: larger;
-  }
-}
-
 
 .wdfd-link {
-  stroke-opacity: 0.6;
+    stroke-opacity: 0.6;
+    opacity: 0.6;
 }
 
 
 .wdfd-intra-node circle{
-  fill: green;
-  stroke: #004d00;
+    fill: green;
+    stroke: #004d00;
 }
 
 

@@ -1,5 +1,6 @@
 import _ from "lodash";
-import d3 from "d3";
+import {nest} from 'd3-collection';
+
 
 import {checkIsEntityRef} from "./checks";
 
@@ -178,14 +179,19 @@ export function termSearch(items = [], searchStr = '', searchFields = []) {
  * @param data
  * @returns {Array|*}
  */
-function toCountData(data) {
-    return _.map(data, d => ({ key: d.key, count: d.values }));
+function toCountData(data = []) {
+    return _.map(
+        data,
+        d => ({
+            key: d.key,
+            count: d.value
+        }));
 }
 
 
 export function toKeyCounts(items = [], fn = x => x) {
     if (! items) return [];
-    return toCountData(d3.nest()
+    return toCountData(nest()
         .key(fn)
         .rollup(d => d.length)
         .entries(items));
@@ -323,4 +329,31 @@ export function toEntityRef(obj) {
     checkIsEntityRef(ref);
 
     return ref;
+}
+
+
+/**
+ * Works round an IE problem where markers cause lines
+ * to vanish on svg diagrams.  Workaround is to
+ * re-add relevant elements.
+ *
+ * @param selection
+ */
+export function markerFix(selection, timeout = 0) {
+    if(/*@cc_on!@*/false)  {
+        // IE only
+        const fixer = () => selection.each(
+            function() {
+                if (this.parentNode) {
+                    this.parentNode.insertBefore(this, this);
+                }
+            });
+
+        if (timeout > 0) {
+            setTimeout(fixer, timeout);
+        } else {
+            fixer();
+        }
+    }
+
 }

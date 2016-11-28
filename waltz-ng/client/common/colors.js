@@ -10,25 +10,27 @@
  *
  */
 
-import d3 from "d3";
+import {rgb} from "d3-color";
+import {scaleOrdinal, schemeCategory20c} from 'd3-scale';
+
 import _ from "lodash";
 
 
-export const amber = d3.rgb('#D9923F');
-export const green = d3.rgb('#5BB65D');
-export const red = d3.rgb('#DA524B');
-export const grey = d3.rgb('#939393');
-export const blue = d3.rgb('#5271CC');
-export const actor = d3.rgb('#d7bbdb');
+export const amber = rgb('#D9923F');
+export const green = rgb('#5BB65D');
+export const red = rgb('#DA524B');
+export const grey = rgb('#939393');
+export const blue = rgb('#5271CC');
+export const actor = rgb('#d7bbdb');
 
-export const amberBg = d3.rgb('#FCF2D7');
-export const greenBg = d3.rgb('#DFF1D2');
-export const redBg = d3.rgb('#F2D7D7');
-export const greyBg = d3.rgb('#F5F5F5');
-export const actorBg = d3.rgb('#ede5ee');
+export const amberBg = rgb('#FCF2D7');
+export const greenBg = rgb('#DFF1D2');
+export const redBg = rgb('#F2D7D7');
+export const greyBg = rgb('#F5F5F5');
+export const actorBg = rgb('#ede5ee');
 
 
-export const ragColorScale = d3.scale.ordinal()
+export const ragColorScale = scaleOrdinal()
     .domain(['R', 'A', 'G', 'Z'])
     .range([red, amber, green, grey]);
 
@@ -39,56 +41,60 @@ export const capabilityColorScale = ragColorScale;
 export const investmentRatingColorScale = ragColorScale;
 
 
-export const maturityColorScale = d3.scale.ordinal()
+export const maturityColorScale = scaleOrdinal()
     .domain([
         'PLANNED',
         'INVEST',
         'HOLD',
-        'DISINVEST', 'UNSUPPORTED', 'RESTRICTED'
+        'DISINVEST',
+        'UNSUPPORTED',
+        'RESTRICTED'
     ])
     .range([
         blue,
         green,
         amber,
-        red, red, red]);
+        red,
+        red,
+        red]);
 
 
-export const authoritativeSourceColorScale = d3.scale.ordinal()
+export const authoritativeSourceColorScale = scaleOrdinal()
     .domain(['NON_STRATEGIC', 'SECONDARY', 'PRIMARY', 'NOT_APPLICABLE'])
     .range([red, amber, green, grey]);
 
 
-export const authoritativeRatingColorScale = d3.scale.ordinal()
+export const authoritativeRatingColorScale = scaleOrdinal()
     .domain(['DISCOURAGED', 'SECONDARY', 'PRIMARY', 'NO_OPINION'])
     .range([red, amber, green, grey.darker()]);
 
 
-export const authoritativeRatingBackgroundColorScale = d3.scale.ordinal()
+export const authoritativeRatingBackgroundColorScale = scaleOrdinal()
     .domain(['DISCOURAGED', 'SECONDARY', 'PRIMARY', 'NO_OPINION'])
     .range([redBg, amberBg, greenBg, greyBg]);
 
 
-export const environmentColorScale = d3.scale.ordinal()
-    .domain(['DEV', 'PREPROD', 'PROD', 'PRD', 'QA', 'UAT'])
-    .range([green, amber, blue, blue, grey, red]);
+export const environmentColorScale = scaleOrdinal()
+    .domain(['DEV', 'PREPROD', 'PROD', 'QA', 'UAT'])
+    .range([green, amber, blue, grey, red]);
 
 
-export const operatingSystemColorScale = d3.scale.ordinal()
+export const operatingSystemColorScale = scaleOrdinal()
     .domain(['Windows', 'Linux', 'AS/400', 'OS/390', 'AIX', 'Solaris'])
-    .range([blue, green, d3.rgb('#777'), d3.rgb('#555'), d3.rgb('#473'), amber]);
+    .range([blue, green, rgb('#777'), rgb('#555'), rgb('#473'), amber]);
 
 
-export const lifecyclePhaseColorScale = d3.scale.ordinal()
+export const lifecyclePhaseColorScale = scaleOrdinal()
     .domain(['PRODUCTION', 'CONCEPTUAL', 'DEVELOPMENT', 'RETIRED'])
     .range([blue, amber, green, grey]);
 
 
-export const criticalityColorScale = d3.scale.ordinal()
+export const criticalityColorScale = scaleOrdinal()
     .domain(['LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH', 'NONE', 'UNKNOWN'])
     .range([green, amber, red, red.darker(), grey, grey.darker()]);
 
 
-export const flowDirectionColorScale = d3.scale.ordinal()
+export const flowDirectionColorScale = scaleOrdinal()
     .domain(['Inbound', 'Outbound', 'Intra', 'UNKNOWN'])
     .range([green, amber, blue, grey]);
 
@@ -183,13 +189,13 @@ const variableScaleMap = _.reduce(
     },
     {});
 
-const randomColorScale = d3.scale.category20();
+const randomColorScale = scaleOrdinal(schemeCategory20c);
 
 
 export const variableScale = (x) => {
-    var key = x.toUpperCase();
-    var foundColor = variableScaleMap[key];
-    return foundColor || d3.rgb(randomColorScale(x));
+    const key = x.toUpperCase();
+    const foundColor = variableScaleMap[key];
+    return foundColor || rgb(randomColorScale(x));
 };
 
 

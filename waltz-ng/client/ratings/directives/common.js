@@ -11,7 +11,7 @@
  *
  */
 
-import d3 from "d3";
+import {scaleBand, scaleLinear} from "d3-scale";
 import _ from "lodash";
 import {noop, perhaps} from "../../common";
 
@@ -42,22 +42,20 @@ export function setupCellScale(labelWidth, vizWidth, measurables) {
 
     const domain = _.map(measurables, m => m.id || m.code);
 
-    return d3.scale
-        .ordinal()
+    return scaleBand()
         .domain(domain)
-        .rangeBands([cellsStart, cellsEnd], 0.2);
+        .range([cellsStart, cellsEnd], 0.2);
 }
 
 export function setupSummaryBarScales(dimensions, cellScale, highestRatingCount) {
     return {
-        x: d3.scale
-            .linear()
+        x: scaleLinear()
             .domain([0, highestRatingCount])
-            .range([0, cellScale.rangeBand()]),
-        y: d3.scale
+            .range([0, cellScale.bandwidth()]),
+        y: scaleBand
             .ordinal()
             .domain(['G', 'A', 'R', 'Z'])
-            .rangeBands([0, dimensions.ratingCell.height], 0.2)
+            .range([0, dimensions.ratingCell.height], 0.2)
     };
 }
 

@@ -1,6 +1,8 @@
 import {initialiseData} from '../../common';
 import _ from 'lodash';
-import d3 from 'd3';
+import {scaleLinear, scaleLog} from 'd3-scale';
+import {select} from 'd3-selection';
+import {format} from 'd3-format';
 
 
 const template = "<div class='waltz-asset-cost-graph'><svg></svg></div>";
@@ -44,11 +46,11 @@ const dimensions = {
 };
 
 
-const numberFormat = d3.format(",d");
+const numberFormat = format(",d");
 
 
 function currencyLogFormat(d) {
-    var x = Math.log(d) / Math.log(10) + 1e-6;
+    const x = Math.log(d) / Math.log(10) + 1e-6;
     return Math.abs(x - Math.floor(x)) < .5
         ? '€ ' + numberFormat(d)
         : "";
@@ -66,6 +68,7 @@ function calculateOpacity(size = 1) {
         0.1
     ]);
 }
+
 
 function getAppId(a) {
     return a.v1;
@@ -106,12 +109,11 @@ function mkScales(amounts = [], scaleType = 'log') {
     const [minAmount, maxAmount] = d3.extent(amounts, getAmount);
 
     const baseYScale = scaleType === 'log'
-            ? d3.scale.log()
-            : d3.scale.linear();
+            ? scaleLog()
+            : scaleLinear();
 
     return {
-        x: d3.scale
-            .linear()
+        x: scaleLinear()
             .domain([0, amounts.length])
             .range([0, dimensions.graph.width]),
         y: baseYScale
@@ -173,12 +175,12 @@ function update(
             opacity: 0
         })
         .on("mouseover.tweak", function(d) {
-            d3.select(this)
+            select(this)
                 .classed('wacg-hover', true)
                 .attr('r', dimensions.circleSize / 2 * 1.33);
         })
         .on("mouseleave.tweak", function(d) {
-            d3.select(this)
+            select(this)
                 .classed('wacg-hover', false)
                 .attr('r', dimensions.circleSize / 2);
         })
@@ -213,7 +215,7 @@ function update(
 function controller($element) {
 
     const vm = initialiseData(this, initialState);
-    const svg = d3.select($element.find('svg')[0]);
+    const svg = select($element.find('svg')[0]);
     const svgSections = prepareGraph(svg);
 
 

@@ -57,7 +57,7 @@ const buildGraphTweakers = (decorators = [],
         link : {
             enter: (selection) => {
                 selection
-                    .attr({
+                    .attrs({
                         stroke: (d) => {
                             const rating = getRatingForLink(d);
                             return authoritativeRatingColorScale(rating);

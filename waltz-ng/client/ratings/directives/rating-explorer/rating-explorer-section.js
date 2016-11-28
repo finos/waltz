@@ -1,6 +1,7 @@
 import _ from "lodash";
-import d3 from "d3";
 import {buildHierarchies} from "../../../common";
+import {nest} from 'd3-collection';
+
 
 const BINDINGS = {
     applications: '<',
@@ -190,19 +191,17 @@ function calculateAppCountRange(capabilities = []) {
 
 function calculateScores(appCapabilities = []) {
 
-    const viaRatings = d3
-        .nest()
+    const viaRatings = nest()
         .key(ac => ac.capabilityId)
         .key(ac => ac.applicationId)
         .rollup(acs => acs[0].rating)
-        .map(appCapabilities);
+        .object(appCapabilities);
 
-    const unknown = d3
-        .nest()
+    const unknown = nest()
         .key(ac => ac.capabilityId)
         .key(ac => ac.applicationId)
         .rollup(() => "Z")
-        .map(appCapabilities);
+        .object(appCapabilities);
 
     return _.defaultsDeep(viaRatings, unknown);
 }

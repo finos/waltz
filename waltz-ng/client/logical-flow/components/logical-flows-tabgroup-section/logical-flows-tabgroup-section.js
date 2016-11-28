@@ -18,6 +18,7 @@ const initialState = {
     visibility: {
         flowConfigOverlay: false,
         flowConfigButton: false,
+        exportButton: false,
         sourcesOverlay: false
     }
 };
@@ -28,6 +29,7 @@ function controller() {
 
     vm.tabChanged = (name, index) => {
         vm.visibility.flowConfigButton = index > 0;
+        vm.visibility.exportButton = index == 2;
         if(index === 0) vm.visibility.flowConfigOverlay = false;
     };
 

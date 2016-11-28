@@ -1,5 +1,5 @@
-import d3 from 'd3';
 import _ from 'lodash';
+import {nest} from 'd3-collection';
 
 const bindings = {
     exactSummaries: '<',
@@ -13,7 +13,7 @@ const template = require('./rated-summary-table.html');
 
 
 function nestByDecoratorThenRating(summaries = []) {
-    return d3.nest()
+    return nest()
         .key(d => d.decoratorEntityReference.id)
         .key(d => d.rating)
         .rollup(ds => ds.length > 0
@@ -36,7 +36,7 @@ function getRelevantDecorators(allDecorators = [], summaries = []) {
 
 
 function setup(decoratorEntities = [], exactSummaries = [], childSummaries = []) {
-    const maxCounts = d3.nest()
+    const maxCounts = nest()
         .key(d => d.decoratorEntityReference.id)
         .rollup(ds => _.sumBy(ds, "count"))
         .map(childSummaries);
@@ -44,12 +44,14 @@ function setup(decoratorEntities = [], exactSummaries = [], childSummaries = [])
     const totalCounts = nestByDecoratorThenRating(childSummaries);
     const directCounts = nestByDecoratorThenRating(exactSummaries);
 
-    return {
+    const result = {
         maxCounts,
         directCounts,
         totalCounts,
         decorators: getRelevantDecorators(decoratorEntities, childSummaries)
     };
+
+    return result;
 }
 
 
