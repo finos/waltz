@@ -7,25 +7,50 @@ var git = require('git-rev-sync');
 
 var basePath = path.resolve(__dirname);
 
+
+function isExternal(module) {
+    // this inspects the userRequest field of the require request
+    // e.g. require('lodash') will like have a userRequest like the following:
+    // node_modules/lodash/lib...
+    var userRequest = module.userRequest;
+
+    if (typeof userRequest !== 'string') {
+        return false;
+    }
+
+    return userRequest.indexOf('node_modules') >= 0;
+}
+
+
 module.exports = {
-    entry: './client/main.js',
+    entry: {
+        app: './client/main.js',
+        vendor: []
+    },
     devtool: 'cheap-source-map',
     output: {
         path: path.join(basePath, '/dist'),
-        filename: 'bundle.js'
+        filename: '[name].js'
     },
     plugins: [
         new HtmlWebpackPlugin({
             title: 'Waltz',
             filename: 'index.html',
             template: 'index.template.html',
-            favicon: path.join(basePath, 'images', 'favicon.ico')
+            favicon: path.join(basePath, 'images', 'favicon.ico'),
+            hash: true,
         }),
         new webpack.DefinePlugin({
             '__ENV__': JSON.stringify(process.env.BUILD_ENV || 'dev'),
             '__REVISION__': JSON.stringify(git.long()),
         }),
-        new Visualizer()
+        new Visualizer(),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: "vendor",
+            minChunks: function(module) {
+                return isExternal(module);
+            }
+        })
     ],
     module: {
         loaders: [
