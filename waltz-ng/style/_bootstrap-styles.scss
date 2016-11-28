@@ -20,25 +20,11 @@
 }
 
 
-// Text
-@mixin waltz-text-muted($percent) {
-    .waltz-text-muted-#{$percent} {
-        @extend .text-muted;
-        opacity: #{$percent / 100};
-    }
-}
-
-@include waltz-text-muted(10);
-@include waltz-text-muted(20);
-@include waltz-text-muted(30);
-@include waltz-text-muted(40);
-@include waltz-text-muted(50);
-@include waltz-text-muted(60);
-@include waltz-text-muted(70);
-@include waltz-text-muted(80);
-
-
 .tab-pane {
     border-left: 1px solid #ddd;
     padding-left: 12px;
+}
+
+.nav-item {
+    cursor: pointer;
 }
