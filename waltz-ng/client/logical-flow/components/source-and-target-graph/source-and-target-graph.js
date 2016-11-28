@@ -264,7 +264,7 @@ function setupSizing(sections, dimensions) {
 function getColumnScaleRange(dimensions) {
     return [
         dimensions.margin.top,
-        dimensions.graph.height - dimensions.margin.bottom,
+        dimensions.graph.height - dimensions.margin.bottom
     ];
 }
 
