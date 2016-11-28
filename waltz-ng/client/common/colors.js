@@ -21,6 +21,8 @@ export const green = rgb('#5BB65D');
 export const red = rgb('#DA524B');
 export const grey = rgb('#939393');
 export const blue = rgb('#5271CC');
+export const purple= rgb('#B687CC');
+export const gold = rgb('#b7b04e');
 export const actor = rgb('#d7bbdb');
 
 export const amberBg = rgb('#FCF2D7');
@@ -75,8 +77,8 @@ export const authoritativeRatingBackgroundColorScale = scaleOrdinal()
 
 
 export const environmentColorScale = scaleOrdinal()
-    .domain(['DEV', 'PREPROD', 'PROD', 'QA', 'UAT'])
-    .range([green, amber, blue, grey, red]);
+    .domain(['DEV', 'PREPROD', 'PROD', 'QA', 'UAT', 'DR'])
+    .range([green, amber, gold, purple, red, blue]);
 
 
 export const operatingSystemColorScale = scaleOrdinal()
@@ -86,7 +88,7 @@ export const operatingSystemColorScale = scaleOrdinal()
 
 export const lifecyclePhaseColorScale = scaleOrdinal()
     .domain(['PRODUCTION', 'CONCEPTUAL', 'DEVELOPMENT', 'RETIRED'])
-    .range([blue, amber, green, grey]);
+    .range([gold, blue, green, grey]);
 
 
 export const criticalityColorScale = scaleOrdinal()
@@ -97,8 +99,6 @@ export const criticalityColorScale = scaleOrdinal()
 export const flowDirectionColorScale = scaleOrdinal()
     .domain(['Inbound', 'Outbound', 'Intra', 'UNKNOWN'])
     .range([green, amber, blue, grey]);
-
-
 
 
 const variableColorList = [
@@ -134,6 +134,7 @@ const variableColorList = [
             'ENCOURAGED',
             'STRATEGIC',
             'G',
+            'DEV',
             'GREEN',
             'GOOD',
             'NOT_END_OF_LIFE'
@@ -160,9 +161,20 @@ const variableColorList = [
             'PLANNED',
             'OTHER',
             'CONCEPTUAL',
+            'DR',
             'B',
             'NOT_STARTED',
             'BLUE'
+        ]
+    },{
+        color: purple,
+        keys: ['OTHER']
+    }, {
+    },{
+        color: gold,
+        keys: [
+            'PROD',
+            'PRD'
         ]
     }, {
         color: grey,
