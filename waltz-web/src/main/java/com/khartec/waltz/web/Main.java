@@ -21,6 +21,7 @@ import com.khartec.waltz.common.LoggingUtilities;
 import com.khartec.waltz.common.exception.DuplicateKeyException;
 import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.settings.SettingsService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.api.StaticResourcesEndpoint;
 import org.slf4j.Logger;
@@ -38,6 +39,8 @@ import static spark.Spark.*;
 public class Main {
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+    private final static String GZIP_ENABLED_NAME = "server.gzip.enabled";
+    private final static String GZIP_MIN_SIZE_NAME = "server.gzip.minimum-size";
 
     private static AnnotationConfigApplicationContext ctx;
 
@@ -102,7 +105,7 @@ public class Main {
         LOG.info("Completed endpoint registration");
 
         registerExceptionHandlers();
-        // enableGZIP();
+        enableGZIP();
         enableCORS();
 
     }
@@ -149,8 +152,34 @@ public class Main {
 
 
     private void enableGZIP() {
-        after(((request, response) -> response.header("Content-Encoding", "gzip")));
-        LOG.info("Enabled GZIP");
+        SettingsService settingsService = ctx.getBean(SettingsService.class);
+
+        Boolean gzipEnabled = settingsService
+                .getValue(GZIP_ENABLED_NAME)
+                .map(x -> x.equalsIgnoreCase("true"))
+                .orElse(false);
+
+        if(gzipEnabled) {
+
+            //now fetch the minimum size
+            int minimumLength = settingsService
+                    .getValue(GZIP_MIN_SIZE_NAME)
+                    .map(Integer::parseInt)
+                    .orElse(8192);
+
+            after(((request, response) -> {
+                if(response.body().length() >= minimumLength) {
+                    response.header("Content-Encoding", "gzip");
+                }
+            }));
+
+            LOG.info("Enabled GZIP (size: " + minimumLength + ")");
+
+        } else {
+            LOG.info("GZIP not enabled");
+        }
+
+
     }
 
     private void enableCORS() {

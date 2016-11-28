@@ -50,3 +50,7 @@ General default settings
 
 * ```server.data-type.default-code```
     * (```UNKNOWN```) UNKNOWN is the code for the default data type
+* ```server.gzip.enabled```
+    * (```true|false```) enable or disable gzipping of content
+* ```server.gzip.minimum-size```
+    * (```8192```) the size of the response before gzip is enabled
