@@ -12,6 +12,8 @@
  */
 
 import {scaleBand, scaleLinear} from "d3-scale";
+import {transpose} from "d3-array";
+import {nest} from "d3-collection";
 import _ from "lodash";
 import {noop, perhaps} from "../../common";
 
@@ -80,7 +82,7 @@ export const noopTweaker = { enter: noop, update: noop };
  */
 export function calculateGroupSummary(rawData) {
 
-    const transposed = d3.transpose(_.map(rawData, 'ratings'));
+    const transposed = transpose(_.map(rawData, 'ratings'));
     return _.map(transposed, measurableColumn => {
         const counts = _.countBy(measurableColumn, c => c.current);
         return { ...counts };
@@ -120,10 +122,10 @@ export function mkAppRatingsGroup(appRef,
                                   capabilities = [],
                                   ratings = []) {
 
-    const bySubjectThenMeasurable = d3.nest()
+    const bySubjectThenMeasurable = nest()
         .key(r => r.capabilityId)
         .key(r => r.measurableCode)
-        .map(ratings);
+        .object(ratings);
 
 
     const raw = _.chain(capabilities)
