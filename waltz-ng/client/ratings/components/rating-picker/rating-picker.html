@@ -1,43 +1,14 @@
 <div class="waltz-rating-picker">
-    <div class="input-group">
-        <label class="rating-strategic"
-               ng-class="{'selected': $ctrl.selected === 'G'}">
-            <input type="radio"
-                   name="rating"
-                   value="G"
-                   ng-model="$ctrl.selected"
-                   ng-change="$ctrl.select($ctrl.selected)">
-            Good
-        </label>
-
-        <label class="rating-with-issues"
-               ng-class="{'selected': $ctrl.selected === 'A'}">
-            <input type="radio"
-                   name="rating"
-                   value="A"
-                   ng-model="$ctrl.selected"
-                   ng-change="$ctrl.select($ctrl.selected)">
-            Adequate
-        </label>
-
-        <label class="rating-non-strategic"
-               ng-class="{'selected': $ctrl.selected === 'R'}">
-            <input type="radio"
-                   name="rating"
-                   value="R"
-                   ng-model="$ctrl.selected"
-                   ng-change="$ctrl.select($ctrl.selected)">
-            Poor
-        </label>
-
-        <label class="rating-none"
-               ng-class="{'selected': $ctrl.selected === 'Z'}">
-            <input type="radio"
-                   name="rating"
-                   value="Z"
-                   ng-model="$ctrl.selected"
-                   ng-change="$ctrl.select($ctrl.selected)">
-            Unknown
+    <div ng-repeat="option in $ctrl.options"
+         class="wrp-option">
+        <input type="radio"
+               value="{{ option.value }}"
+               ng-model='$ctrl.selected'
+               ng-change="$ctrl.onSelect(option.value)"
+               id="wrp-inp-{{ option.value }}">
+        <label for="wrp-inp-{{ option.value }}"
+               ng-class="option.clazz"
+               ng-bind="option.label">
         </label>
     </div>
 </div>

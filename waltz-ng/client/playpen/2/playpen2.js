@@ -1,11 +1,5 @@
 const initData = {
-    gridData: [],
-    filteredGriData: [],
-    flowAttributeEditorVisible: false,
-    targetEntityPickerVisible: false,
-    visibility: {
-        editor: '' // FLOW-ATTRIBUTES, TARGET-ENTITY, SPECIFICATION
-    }
+    rating: 'R'
 };
 
 
@@ -14,14 +8,12 @@ function controller(notification,
 
     const vm = Object.assign(this, initData);
 
+    vm.onSelect = (r) => {
+        console.log("r'", r);
+        vm.rating = r;
+    };
 
-    store
-        .findByAppId(67672)
-        .then(x => {
-            console.log(x);
-            return x;
-        })
-        .then(r => vm.databases = r);
+
 }
 
 
