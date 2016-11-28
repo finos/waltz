@@ -1,6 +1,6 @@
 <div>
     <div ng-if="$ctrl.visibility.servers">
-        <h4 class="text-center">
+        <h4 style="padding-left:32px">
             <waltz-icon name="server">
             </waltz-icon>
             Servers
@@ -46,13 +46,14 @@
 
     <div ng-if="$ctrl.visibility.databases"
          style="border-top: 2px dotted #ddd;">
+        <h4 style="padding-left:32px; padding-top: 16px;">
+            <waltz-icon name="database">
+            </waltz-icon>
+            Databases
+        </h4>
         <div class="row"
              style="padding-top: 8px;">
-            <h4 class="text-center">
-                <waltz-icon name="database">
-                </waltz-icon>
-                Databases
-            </h4>
+
             <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.databaseStats.vendor"
                                  config="$ctrl.pieConfig.vendor"
@@ -76,24 +77,24 @@
         </div>
     </div>
 
-    <div ng-if="$ctrl.visibility.databases"
+    <div ng-if="$ctrl.visibility.software"
          style="border-top: 2px dotted #ddd;">
+        <h4 style="padding-left:32px; padding-top: 16px;">
+            <waltz-icon name="leaf">
+            </waltz-icon>
+            Software
+        </h4>
         <div class="row"
              style="padding-top: 8px;"
              ng-if="$ctrl.visibility.software">
-            <h4 class="text-center">
-                <waltz-icon name="leaf">
-                </waltz-icon>
-                Software
-            </h4>
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.softwareStats.vendor"
                                  config="$ctrl.pieConfig.vendor"
                                  title="By Vendor">
                 </waltz-pie-table>
             </div>
 
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.softwareStats.maturity"
                                  config="$ctrl.pieConfig.maturity"
                                  title="By Maturity">
