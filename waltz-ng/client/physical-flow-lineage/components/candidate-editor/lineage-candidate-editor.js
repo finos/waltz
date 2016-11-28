@@ -66,10 +66,9 @@ function controller() {
 
 
         const flowData = enrichConsumes(
-            vm.specifications.consumes,
+            vm.specifications,
             vm.physicalFlows,
             endpointReferences);
-
 
         const candidateGroups = mkCandidateGroups(flowData, vm.currentLineage);
         vm.sources = candidateGroups.sources;

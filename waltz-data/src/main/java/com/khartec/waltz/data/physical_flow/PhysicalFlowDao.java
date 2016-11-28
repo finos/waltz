@@ -66,28 +66,23 @@ public class PhysicalFlowDao {
     public List<PhysicalFlow> findByEntityReference(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
 
-        Condition isTarget = PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name())
-                .and(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id()));
+        Select<Record> consumedFlows = findByConsumerEntityReferenceQuery(ref);
+        Select<Record> producedFlows = findByProducerEntityReferenceQuery(ref);
 
-        Condition isSource = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(ref.id())
-                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(ref.kind().name()));
+        return consumedFlows
+                .unionAll(producedFlows)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 
-        Select<Record> targets = dsl
-                .select(PHYSICAL_FLOW.fields())
-                .select(targetEntityNameField)
-                .from(PHYSICAL_FLOW)
-                .where(dsl.renderInlined(isTarget));
 
-        Select<Record> sources = dsl
-                .select(PHYSICAL_FLOW.fields())
-                .select(targetEntityNameField)
-                .from(PHYSICAL_FLOW)
-                .innerJoin(PHYSICAL_SPECIFICATION)
-                .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
-                .where(dsl.renderInlined(isSource));
+    public List<PhysicalFlow> findByProducer(EntityReference ref) {
+        return findByProducerEntityReferenceQuery(ref)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 
-        return targets
-                .unionAll(sources)
+
+    public List<PhysicalFlow> findByConsumer(EntityReference ref) {
+        return findByConsumerEntityReferenceQuery(ref)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -148,6 +143,35 @@ public class PhysicalFlowDao {
 
         record.store();
         return record.getId();
+    }
+
+
+    private Select<Record> findByProducerEntityReferenceQuery(EntityReference ref) {
+
+        Condition isSource = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(ref.id())
+                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(ref.kind().name()));
+
+
+        return dsl
+                .select(PHYSICAL_FLOW.fields())
+                .select(targetEntityNameField)
+                .from(PHYSICAL_FLOW)
+                .innerJoin(PHYSICAL_SPECIFICATION)
+                .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
+                .where(dsl.renderInlined(isSource));
+    }
+
+
+    private Select<Record> findByConsumerEntityReferenceQuery(EntityReference ref) {
+
+        Condition isTarget = PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name())
+                .and(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id()));
+
+        return dsl
+                .select(PHYSICAL_FLOW.fields())
+                .select(targetEntityNameField)
+                .from(PHYSICAL_FLOW)
+                .where(dsl.renderInlined(isTarget));
     }
 
 }

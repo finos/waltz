@@ -203,10 +203,10 @@ function controller($q,
 
         const promises = [
             physicalSpecificationStore
-                .findByEntityReference(ref)
+                .findByConsumerEntityReference(ref)
                 .then(xs => vm.searchResults.specifications = xs),
             physicalFlowStore
-                .findByEntityReference(ref)
+                .findByConsumerEntityReference(ref)
                 .then(xs => vm.searchResults.physicalFlows = xs)
         ];
 
