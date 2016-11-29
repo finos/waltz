@@ -53,26 +53,33 @@ export default [
                         selection
                             .classed('wdfd-intra-node', d => _.includes(appIds, d.id))
                             .classed('wdfd-extra-node', d => ! _.includes(appIds, d.id))
-                            .on('click.fix', app => app.fixed = true)
-                            .on('dblclick.unfix', app => app.fixed = false)
+                            .on('dblclick.unfix', d => { d.fx = null; d.fy = null; })
                     },
                     update: _.identity,
                     exit: _.identity
                 },
                 link : {
                     update: (selection) => {
-                        selection
+                        return selection
                             .attr('stroke', d => {
                                 const rating = calcRating(d);
                                 return authoritativeRatingColorScale(rating);
                             })
-                            .attr('stroke-width', 1.5)
-                            .attr('marker-end', d => {
+                            .attr('fill', d => {
                                 const rating = calcRating(d);
-                                return `url(#arrowhead-${rating})`;
-                            })
+                                return authoritativeRatingColorScale(rating).brighter();
+                            });
+                            //
+                            // .attr('marker-end', d => {
+                            //     const rating = calcRating(d);
+                            //     return `url(#arrowhead-${rating})`;
+                            // })
                     },
-                    enter: _.identity,
+                    enter: (selection) => {
+                        return selection
+                            .attr('stroke-width', 1.5);
+
+                    },
                     exit: _.identity
                 }
             };

@@ -45,6 +45,12 @@ const DEFAULT_TWEAKER = {
 };
 
 
+const simulation = forceSimulation()
+    .velocityDecay(0.5)
+    .force("charge", forceManyBody().strength(-50))
+    .force("link", forceLink().id(d => d.id).iterations(2).distance(100)); //.strength(0.2));
+
+
 function mkLinkData(flows = []) {
     return _.chain(flows)
         .map(f => ({
@@ -71,9 +77,10 @@ function drawLinks(links = [], holder, tweakers) {
 
     const newLinks = linkSelection
         .enter()
-        .append("line")
+        .append("path")
         .classed('wdfd-link', true)
         .attr('stroke', '#444')
+        .attr('stroke-opacity', 0.6)
         .call(tweakers.enter);
 
     linkSelection
@@ -104,11 +111,13 @@ function addNodeCircle(selection) {
 }
 
 
-function drawNodes(nodes = [], holder, simulation, tweakers = DEFAULT_TWEAKER) {
+function drawNodes(nodes = [], holder, tweakers = DEFAULT_TWEAKER) {
 
     function dragStarted(d) {
         if (!event.active) {
-            simulation.alphaTarget(0.3).restart();
+            simulation
+               .alphaTarget(0.1)
+               .restart();
         }
         d.fx = d.x;
         d.fy = d.y;
@@ -121,7 +130,9 @@ function drawNodes(nodes = [], holder, simulation, tweakers = DEFAULT_TWEAKER) {
 
     function dragEnded(d) {
         if (!event.active) {
-            simulation.alphaTarget(0);
+            simulation
+                .alphaTarget(0)
+                .restart();
         }
         d.fx = event.x;
         d.fy = event.y;
@@ -152,8 +163,7 @@ function drawNodes(nodes = [], holder, simulation, tweakers = DEFAULT_TWEAKER) {
         .remove();
 
     return nodeSelection
-        .merge(newNodes)
-        .call(tweakers.update);
+        .merge(newNodes);
 
 }
 
@@ -170,10 +180,6 @@ function setup(vizElem) {
 
     return { svg, vizElem };
 }
-
-
-const simulation = forceSimulation();
-
 
 function draw(data = [],
               parts,
@@ -201,12 +207,9 @@ function draw(data = [],
     const nodeSelection = drawNodes(
         nodes,
         parts.svg.select('.nodes'),
-        simulation,
         nodeTweakers);
 
     simulation
-        .force("charge", forceManyBody().strength(-30))//.distanceMin(40).distanceMax(1000))
-        .force("link", forceLink().id(d => d.id).distance(45).strength(0.2))
         .force("center", forceCenter(dimensions.width / 2, dimensions.height / 2));
 
     simulation
@@ -222,12 +225,24 @@ function draw(data = [],
             .attr('transform', d => `translate(${d.x}, ${d.y})`);
 
         linkSelection
-            .attr("x1", d => d.source.x)
-            .attr("y1", d => d.source.y)
-            .attr("x2", d => d.target.x)
-            .attr("y2", d => d.target.y)
-            .call(linkTweakers.update)
-            .call(markerFix);
+            .attr("d", function(d) {
+                const dx = d.target.x - d.source.x;
+                const dy = d.target.y - d.source.y;
+                const dr = Math.sqrt(dx * dx + dy * dy);
+                const theta = Math.atan2(dy, dx); //+ Math.PI / 7.85,  // (rotate marker)
+                const d90 = Math.PI / 2;
+                const dtxs = d.target.x - 16 * Math.cos(theta);  // val is how far 'back'
+                const dtys = d.target.y - 16 * Math.sin(theta);
+                return `M${d.source.x},${d.source.y} 
+                        l${dx} ${dy}
+                        M${dtxs},${dtys}
+                        l${(3.5 * Math.cos(d90 - theta) - 10 * Math.cos(theta))}
+                            ,${(-3.5 * Math.sin(d90 - theta) - 10 * Math.sin(theta))}
+                        L${(dtxs - 3.5 * Math.cos(d90 - theta) - 10 * Math.cos(theta))}
+                            ,${(dtys + 3.5 * Math.sin(d90 - theta) - 10 * Math.sin(theta))}
+                        z`;
+            });
+
     }
 
     return simulation;
