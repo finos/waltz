@@ -168,7 +168,7 @@ public class Main {
                     .orElse(8192);
 
             after(((request, response) -> {
-                if(response.body().length() >= minimumLength) {
+                if(response.body() != null && response.body().length() >= minimumLength) {
                     response.header("Content-Encoding", "gzip");
                 }
             }));
