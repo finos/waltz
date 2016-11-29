@@ -95,7 +95,8 @@ function determineStrokeColor(d, owningEntity, targetEntity) {
 function setupGraphTweakers(owningEntity, targetEntity, onClick) {
     return {
         node: {
-            update: (selection) => {
+            enter: (selection) => {
+                selection.on('click.view', onClick);
                 selection
                     .select('circle')
                     .attrs({
@@ -104,16 +105,11 @@ function setupGraphTweakers(owningEntity, targetEntity, onClick) {
                         'r': d => determineRadius(d, owningEntity, targetEntity)
                     });
             },
-            exit: () => {},
-            enter: (selection) => {
-                selection.on('click.view', onClick);
-            }
+            exit: _.identity,
+            update: _.identity
         },
         link : {
-            update: (selection) => {
-                selection
-                    .attr('marker-end', 'url(#arrowhead)');
-            },
+            update: _.identity,
             enter: _.identity,
             exit: _.identity
         }
@@ -286,7 +282,6 @@ function controller($q,
         .findContributionsByPhysicalFlowId(flowId)
         .then(mentions => vm.mentions = mentions);
 
-
     vm.onLineagePanelInitialise = (e) => {
         vm.lineageExportFn = e.exportFn;
     };
@@ -338,7 +333,6 @@ function controller($q,
                 .then(r => handleDeleteFlowResponse(r));
         }
     };
-
 }
 
 

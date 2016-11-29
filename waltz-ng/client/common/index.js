@@ -1,8 +1,8 @@
 import _ from "lodash";
 import {nest} from 'd3-collection';
 
-
 import {checkIsEntityRef} from "./checks";
+
 
 /**
  * Given data that looks like:
@@ -152,7 +152,6 @@ export function switchToParentIds(treeData = []) {
  * @param searchFields - fields in the items to consider when searching
  * @returns {Array}
  */
-
 export function termSearch(items = [], searchStr = '', searchFields = []) {
     const terms = searchStr.toLowerCase().split(/\W/);
 
@@ -171,6 +170,7 @@ export function termSearch(items = [], searchStr = '', searchFields = []) {
         return _.every(terms, term => targetStr.includes(term));
     });
 }
+
 
 /**
  * the d3 nest function aggregates using the property name 'values', this
@@ -329,31 +329,4 @@ export function toEntityRef(obj) {
     checkIsEntityRef(ref);
 
     return ref;
-}
-
-
-/**
- * Works round an IE problem where markers cause lines
- * to vanish on svg diagrams.  Workaround is to
- * re-add relevant elements.
- *
- * @param selection
- */
-export function markerFix(selection, timeout = 0) {
-    if(/*@cc_on!@*/false)  {
-        // IE only
-        const fixer = () => selection.each(
-            function() {
-                if (this.parentNode) {
-                    this.parentNode.insertBefore(this, this);
-                }
-            });
-
-        if (timeout > 0) {
-            setTimeout(fixer, timeout);
-        } else {
-            fixer();
-        }
-    }
-
 }

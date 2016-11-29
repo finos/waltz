@@ -1,4 +1,5 @@
-import {initialiseData, markerFix} from "../../../common";
+import {initialiseData} from "../../../common";
+import {mkLineWithArrowPath} from "../../../common/d3-utils";
 import {authoritativeRatingColorScale} from "../../../common/colors";
 import _ from "lodash";
 import {scalePoint} from "d3-scale";
@@ -323,7 +324,6 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
         .selectAll('.wsat-label')
         .data(items, d => d.id);
 
-
     const newLabels = labels
         .enter()
         .append('g')
@@ -372,6 +372,9 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
 
     labels
         .exit()
+        .transition()
+        .duration(500)
+        .attr('opacity', 0)
         .remove();
 }
 
@@ -383,12 +386,12 @@ function drawArcs(section, model, layoutFn) {
 
     const newArcs = arcs
         .enter()
-        .append('line')
+        .append('path')
         .classed('wsat-arc', true)
         .attrs({
             opacity: 0,
-            'marker-end': d => `url(#arrowhead-${d.rating})`,
-            stroke: d => authoritativeRatingColorScale(d.rating)
+            stroke: d => authoritativeRatingColorScale(d.rating),
+            fill: d => authoritativeRatingColorScale(d.rating).brighter()
         });
 
     arcs
@@ -397,8 +400,7 @@ function drawArcs(section, model, layoutFn) {
         .transition()
         .duration(animationDuration)
         .call(layoutFn)
-        .attr('opacity', 1)
-        .on('end', function() { select(this).call(markerFix) });
+        .attr('opacity', 1);
 
     arcs
         .exit()
@@ -431,7 +433,6 @@ function drawTypeBoxes(section, model, scale, dimensions, tweakers) {
             opacity: 0
         });
 
-
     boxes
         .merge(newBoxes)
         .transition()
@@ -460,24 +461,25 @@ function drawTypeBoxes(section, model, scale, dimensions, tweakers) {
 
 function drawInbound(section, model, scales, dimensions) {
     const inboundLayout = (selection) => selection
-        .attrs({
-            x1: dimensions.margin.left + dimensions.label.width + 10,
-            x2 : (dimensions.canvas.width / 2) - (dimensions.label.width / 2),
-            y1: d => dimensions.margin.top + scales.source(d.from) - dimensions.label.height / 2,
-            y2: d => dimensions.margin.top + scales.type(d.to) - dimensions.label.height / 2,
-        });
+        .attr("d", d =>
+            mkLineWithArrowPath(
+                dimensions.margin.left + dimensions.label.width + 10,
+                dimensions.margin.top + scales.source(d.from) - dimensions.label.height / 2,
+                (dimensions.canvas.width / 2) - (dimensions.label.width / 2),
+                dimensions.margin.top + scales.type(d.to) - dimensions.label.height / 2));
+
     drawArcs(section, model, inboundLayout);
 }
 
 
 function drawOutbound(section, model, scales, dimensions) {
     const outboundLayout = (selection) => selection
-        .attrs({
-            x1: (dimensions.canvas.width / 2) + (dimensions.label.width / 2),
-            x2: dimensions.canvas.width - (dimensions.label.width + 10),
-            y1: d => dimensions.margin.top + scales.type(d.from) - dimensions.label.height / 2,
-            y2: d => dimensions.margin.top + scales.target(d.to) - dimensions.label.height / 2,
-        });
+        .attr("d", d =>
+            mkLineWithArrowPath(
+                (dimensions.canvas.width / 2) + (dimensions.label.width / 2),
+                dimensions.margin.top + scales.type(d.from) - dimensions.label.height / 2,
+                dimensions.canvas.width - (dimensions.label.width + 10),
+                dimensions.margin.top + scales.target(d.to) - dimensions.label.height / 2));
 
     drawArcs(section, model, outboundLayout);
 }
@@ -505,7 +507,6 @@ function drawCenterBox(section, dimensions) {
             width: 180,
             height: dimensions.graph.height - dimensions.margin.bottom - 6
         });
-
 }
 
 
@@ -513,7 +514,6 @@ function update(sections,
                 model,
                 tweakers) {
     redraw = () => update(sections, model, tweakers);
-
 
     const dimensions = calculateDimensions(model);
 
