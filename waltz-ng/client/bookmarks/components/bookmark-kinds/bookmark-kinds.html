@@ -1,0 +1,32 @@
+<div class="waltz-bookmark-kinds">
+
+    <div ng-repeat="kind in $ctrl.kinds" >
+
+        <span ng-click="$ctrl.select(kind)"
+             ng-class="{
+                'wbk-no-bookmarks': kind.count === 0,
+                'clickable': kind.count > 0
+             }">
+
+            <waltz-icon name="{{kind.icon}}"
+                        size="lg"
+                        ng-class="{
+                            'wbk-has-bookmarks': kind.count > 0,
+                        }">
+            </waltz-icon>
+
+            <span ng-bind="kind.name"
+                  class="small">
+            </span>
+
+        </span>
+
+        <waltz-icon name="times"
+                    ng-if="kind.selected"
+                    class="clickable pull-right"
+                    ng-click="$ctrl.clearSelection()">
+        </waltz-icon>
+
+    </div>
+
+</div>

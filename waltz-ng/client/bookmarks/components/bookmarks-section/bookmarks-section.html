@@ -1,0 +1,86 @@
+<div>
+    <waltz-section icon="bookmark-o"
+                   name="Bookmarks"
+                   small="( {{$ctrl.bookmarks.length}} )"
+                   id="bookmarks-section"
+                   class="waltz-bookmark-section">
+        <waltz-section-actions>
+            <a waltz-has-role="BOOKMARK_EDITOR"
+               ui-sref="main.bookmarks.edit ({ entityId: $ctrl.entityId, kind: $ctrl.kind, parentName:$ctrl.parentName })"
+               class="btn btn-xs btn-primary">
+                Edit
+            </a>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="$ctrl.sourceDataOverlay = ! $ctrl.sourceDataOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="$ctrl.sourceDataOverlay"
+                                   ratings="$ctrl.sourceDataRatings"
+                                   entities="['BOOKMARK']">
+        </waltz-source-data-overlay>
+
+        <div class="row"
+             ng-if="$ctrl.bookmarks.length > 0">
+
+            <div class="col-md-3">
+                <waltz-bookmark-kinds bookmarks="$ctrl.bookmarks"
+                                      on-select="$ctrl.selectBookmarkKind">
+                </waltz-bookmark-kinds>
+            </div>
+
+            <div class="col-md-9">
+                    <table class="table table-condensed wbs-bookmark-table">
+
+                    <tbody ng-repeat="(kind, bookmarks) in $ctrl.filteredBookmarks">
+                        <tr ng-repeat="bookmark in bookmarks">
+                            <td style="vertical-align:middle; text-align: center;">
+                                <waltz-icon name="{{ kind | toIconName:'bookmark' }}"
+                                            size="lg"
+                                            xxng-if="$first">
+                                </waltz-icon>
+                            </td>
+                            <td>
+                                <waltz-icon ng-if='bookmark.isPrimary'
+                                            name="star">
+                                </waltz-icon>
+                                <waltz-icon ng-if='!bookmark.isPrimary'
+                                            class="text-muted"
+                                            name="star-o">
+                                </waltz-icon>
+                                <waltz-external-link title="{{ bookmark.title }}"
+                                                     url="{{ bookmark.url }}"
+                                                     show-url="true">
+                                </waltz-external-link>
+                                <div>
+
+                                    <div ng-if="bookmark.description"
+                                         class="text-muted small">
+                                        <span ng-bind="bookmark.description">
+                                        </span>
+                                    </div>
+
+                                    <div ng-if="!bookmark.description"
+                                         class="text-muted small">
+                                        <i>No description provided</i>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <waltz-no-data ng-if="$ctrl.bookmarks.length == 0">
+            <message>
+                <strong>No bookmarks</strong>
+                for this
+                <span ng-bind="$ctrl.kind | toDisplayName:'entity'">
+                </span>
+            </message>
+        </waltz-no-data>
+    </waltz-section>
+</div>
+
