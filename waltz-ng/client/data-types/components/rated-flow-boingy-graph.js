@@ -47,9 +47,8 @@ const buildGraphTweakers = (decorators = [],
         node : {
             enter: (selection) => {
                 selection
-                    .on('click.fixer', app => app.fixed = true)
                     .on('click.appSelect', onAppSelect)
-                    .on('dblclick.fixer', app => app.fixed = false)
+                    .on('dblclick.unfix', d => { d.fx = null; d.fy = null; })
             },
             exit: _.identity,
             update: _.identity
@@ -62,11 +61,10 @@ const buildGraphTweakers = (decorators = [],
                             const rating = getRatingForLink(d);
                             return authoritativeRatingColorScale(rating);
                         },
-                        'marker-end': d => {
+                        fill: (d) => {
                             const rating = getRatingForLink(d);
-                            return `url(#arrowhead-${rating})`;
+                            return authoritativeRatingColorScale(rating).brighter();
                         }
-
                     });
             },
             exit: _.identity,

@@ -33,30 +33,25 @@ function determineStrokeColor(d, owningEntity, targetEntity) {
 function setupGraphTweakers(owningEntity, targetEntity, onClick) {
     return {
         node: {
-            update: (selection) => {
+            update: _.identity,
+            enter: (selection) => {
+                selection
+                    .on('click.edit', onClick);
+
                 selection
                     .selectAll('circle')
-                    .attrs({
-                        'fill': d => determineFillColor(d, owningEntity, targetEntity),
-                        'stroke': d => determineStrokeColor(d, owningEntity, targetEntity),
-                        'r': d => determineRadius(d, owningEntity, targetEntity)
-                    });
+                    .attr('fill', d => determineFillColor(d, owningEntity, targetEntity))
+                    .attr('stroke', d => determineStrokeColor(d, owningEntity, targetEntity))
+                    .attr('r', d => determineRadius(d, owningEntity, targetEntity));
 
                 selection
                     .selectAll('text')
-                    // note we use styles to override the css
-                    .styles({'fill': d => determineStrokeColor(d, owningEntity, targetEntity),})
+                    .style('fill', d => determineStrokeColor(d, owningEntity, targetEntity));
             },
-            exit: () => {},
-            enter: (selection) => {
-                selection.on('click.edit', onClick);
-            }
+            exit: _.identity
         },
         link : {
-            update: (selection) => {
-                selection
-                    .attr('marker-end', 'url(#arrowhead)');
-            },
+            update: _.identity,
             enter: _.identity,
             exit: _.identity
         }
