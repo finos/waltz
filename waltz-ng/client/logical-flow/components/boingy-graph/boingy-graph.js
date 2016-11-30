@@ -49,8 +49,8 @@ const DEFAULT_TWEAKER = {
 const simulation = forceSimulation()
     .velocityDecay(0.5)
     .force("center", forceCenter(width / 2, height / 2))
-    .force("charge", forceManyBody().strength(-80))
-    .force("link", forceLink().id(d => d.id).iterations(2).distance(60)); //.strength(0.2));
+    .force("charge", forceManyBody().strength(-70))
+    .force("link", forceLink().id(d => d.id).iterations(2).distance(55)); //.strength(0.2));
 
 
 function mkLinkData(flows = []) {
@@ -267,7 +267,7 @@ function controller($timeout, $element) {
     }
 
     const myZoom = zoom()
-        .scaleExtent([1 / 4, 1.5])
+        .scaleExtent([1 / 4, 2])
         .on("zoom", zoomed);
 
     vm.enableZoom = () => {
