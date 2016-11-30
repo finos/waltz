@@ -13,7 +13,7 @@
 import {initialiseData} from '../../../common';
 import {lineWithArrowPath, responsivefy} from '../../../common/d3-utils';
 import {event, select} from 'd3-selection';
-import {forceSimulation, forceLink, forceManyBody, forceCenter} from 'd3-force';
+import {forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter} from 'd3-force';
 import {drag} from 'd3-drag';
 import {zoom, zoomIdentity} from 'd3-zoom';
 
@@ -25,8 +25,9 @@ import _ from "lodash";
 
 const template = require('./boingy-graph.html');
 
-const width = 1000;
-const height = 400;
+const width = 800;
+const height = 500;
+
 
 const bindings = {
     data: '<',
@@ -49,7 +50,8 @@ const DEFAULT_TWEAKER = {
 const simulation = forceSimulation()
     .velocityDecay(0.5)
     .force("center", forceCenter(width / 2, height / 2))
-    .force("charge", forceManyBody().strength(-70))
+    .force("charge", forceManyBody().strength(-110).distanceMin(1).distanceMax(400))
+    .force("collide", forceCollide())
     .force("link", forceLink().id(d => d.id).iterations(2).distance(55)); //.strength(0.2));
 
 

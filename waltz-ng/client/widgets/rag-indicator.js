@@ -10,10 +10,13 @@ function controller() {
     vm.ragToTextColor = (rag) => {
         switch (rag) {
             case 'G':
+            case 'PRIMARY':
                 return "text-success";
             case 'A':
+            case 'SECONDARY':
                 return "text-warning";
             case 'R':
+            case 'DISCOURAGED':
                 return "text-danger";
             default:
                 return "text-info";

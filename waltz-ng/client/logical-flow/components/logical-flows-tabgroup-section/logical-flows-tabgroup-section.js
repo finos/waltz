@@ -16,8 +16,6 @@ const initialState = {
     applications: [],
     onLoadDetail: () => console.log('onLoadDetail not provided to logical flows tabgroup section'),
     visibility: {
-        flowConfigOverlay: false,
-        flowConfigButton: false,
         exportButton: false,
         sourcesOverlay: false
     }

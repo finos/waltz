@@ -1,5 +1,4 @@
 function setup(module) {
-
     module
         .component('waltzRatedFlowSummaryPanel', require('./rated-flow-summary/rated-flow-summary-panel'))
         .component('waltzRatedFlowSummaryInfoCell', require('./rated-flow-summary/rated-flow-summary-info-cell'))
@@ -13,8 +12,7 @@ function setup(module) {
         .component('waltzLogicalFlowsTabgroup', require('./logical-flows-tabgroup/logical-flows-tabgroup'))
         .component('waltzLogicalFlowsTabgroupSection', require('./logical-flows-tabgroup-section/logical-flows-tabgroup-section'))
         .component('waltzLogicalFlowTable', require('./../components/logical-flow-table/logical-flow-table'))
-        .component('waltzFlowFilterOptionsOverlay', require('./filter-options-overlay/flow-filter-options-overlay'));
-
+        .component('waltzFlowFilterOptions', require('./flow-filter-options/flow-filter-options'));
 }
 
 
