@@ -1,0 +1,22 @@
+.waltz-bookmark-kinds {
+    border: 1px solid #ddd;
+
+    > div:not(:first-child) {
+        border-top: 1px dotted #ddd;
+    }
+
+    > div {
+        padding: 10px;
+        vertical-align: middle;
+        text-align: left
+    }
+
+    .wbk-no-bookmarks {
+        color: #ddd;
+    }
+
+    .wbk-has-bookmarks {
+        color: #5BB65D;
+    }
+
+}

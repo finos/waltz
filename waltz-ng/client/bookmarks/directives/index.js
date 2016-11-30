@@ -11,8 +11,8 @@
  */
 
 export default (module) => {
-    module.directive('waltzBookmarkCard', require('./bookmark-card'));
-    module.directive('waltzBookmarksSection', require('./bookmarks-section'));
-    module.directive('waltzBookmarkKindSelect', require('./bookmark-kind-select'));
-    module.directive('waltzBookmarkForm', require('./bookmark-form'));
+    module
+        .directive('waltzBookmarkCard', require('./bookmark-card'))
+        .directive('waltzBookmarkKindSelect', require('./bookmark-kind-select'))
+        .directive('waltzBookmarkForm', require('./bookmark-form'));
 };

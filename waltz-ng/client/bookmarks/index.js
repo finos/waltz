@@ -14,6 +14,13 @@
 export default (module) => {
     require('./directives')(module);
 
-    module.config(require('./routes'));
-    module.service('BookmarkStore', require('./services/bookmark-store'))
+    module
+        .config(require('./routes'));
+
+    module
+        .service('BookmarkStore', require('./services/bookmark-store'));
+
+    module
+        .component('waltzBookmarkKinds', require('./components/bookmark-kinds/bookmark-kinds'))
+        .component('waltzBookmarksSection', require('./components/bookmarks-section/bookmarks-section'));
 };

@@ -9,6 +9,7 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import {toDomain} from "../common";
 
 const BINDINGS = {
     url: '@',
@@ -18,7 +19,7 @@ const BINDINGS = {
 
 
 function toPrettyUrl(url = "") {
-    return _.truncate(url, { length: 60 });
+    return _.truncate( toDomain(url), { length: 60 });
 }
 
 

@@ -16,6 +16,7 @@ export default (module) => {
         .filter('merge', require('./merge-filter'))
         .filter('toBasisOffset', require('./to-basis-offset-filter'))
         .filter('toDisplayName', require('./display-name-filter'))
+        .filter('toDomain', require('./to-domain-filter'))
         .filter('toDescription', require('./description-filter'))
         .filter('toFixed', require('./fixed-filter'))
         .filter('toIconName', require('./icon-name-filter'));
