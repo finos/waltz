@@ -5,7 +5,6 @@ const bindings = {
     app: '<',
     flows: '<',
     decorators: '<',
-    dataTypes: '<',
     onSelect: '<'
 };
 
@@ -18,18 +17,14 @@ const initialState = {
 const template = require('./app-centric-flow-table.html');
 
 
-function enrichAndGroupFlows(app, flows = [], decorators = [], dataTypes = []) {
+function enrichAndGroupFlows(app, flows = [], decorators = []) {
     if(!app) return {};
-
-    const dataTypesById = _.keyBy(dataTypes, 'id');
 
     const dataTypeDecoratorsByFlowId = _.chain(decorators)
         .filter(d => d.decoratorEntity.kind === "DATA_TYPE")
         .map(d => ({
             dataFlowId: d.dataFlowId,
             id: d.decoratorEntity.id,
-            name: dataTypesById[d.decoratorEntity.id] ? dataTypesById[d.decoratorEntity.id].name : "",
-            code: dataTypesById[d.decoratorEntity.id] ? dataTypesById[d.decoratorEntity.id].code : "",
             rating: d.rating
         }))
         .keyBy('dataFlowId')
@@ -52,9 +47,8 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = changes => {
-        vm.groupedFlows = enrichAndGroupFlows(vm.app, vm.flows, vm.decorators, vm.dataTypes);
+        vm.groupedFlows = enrichAndGroupFlows(vm.app, vm.flows, vm.decorators);
     };
-
 }
 
 

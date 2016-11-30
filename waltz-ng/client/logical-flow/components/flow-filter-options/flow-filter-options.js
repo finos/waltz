@@ -32,7 +32,6 @@ function controller() {
     // -- BOOT ---
 
     vm.notifyChanges();
-
 }
 
 
@@ -42,7 +41,7 @@ controller.$inject = [];
 const component = {
     controller,
     bindings,
-    template: require('./flow-filter-options-overlay.html')
+    template: require('./flow-filter-options.html')
 };
 
 

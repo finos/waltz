@@ -78,12 +78,21 @@ function mkTypeFilterFn(decorators = []) {
 }
 
 
+function mkIsolatedAppFilterFn(isolatedApp) {
+    return isolatedApp
+        ? f => f.source.id === isolatedApp.id || f.target.id === isolatedApp.id
+        : f => true;
+}
+
+
 function buildFlowFilter(filterOptions = defaultFilterOptions,
+                         isolatedApp,
                          appIds = [],
                          flowDecorators = []) {
     const typeFilterFn = mkTypeFilterFn(flowDecorators);
     const scopeFilterFn = mkScopeFilterFn(appIds, filterOptions.scope);
-    return f => typeFilterFn(f) && scopeFilterFn(f);
+    const isolatedAppFilterFn = mkIsolatedAppFilterFn(isolatedApp);
+    return f => typeFilterFn(f) && scopeFilterFn(f) && isolatedAppFilterFn(f);
 }
 
 
@@ -99,13 +108,14 @@ function buildDecoratorFilter(options = defaultFilterOptions) {
 function calculateFlowData(allFlows = [],
                            applications = [],
                            allDecorators = [],
-                           filterOptions = defaultFilterOptions) {
+                           filterOptions = defaultFilterOptions,
+                           isolatedApp) {
     // note order is important.  We need to find decorators first
     const decoratorFilterFn = buildDecoratorFilter(filterOptions);
     const decorators = _.filter(allDecorators, decoratorFilterFn);
 
     const appIds = _.map(applications, "id");
-    const flowFilterFn = buildFlowFilter(filterOptions, appIds, decorators);
+    const flowFilterFn = buildFlowFilter(filterOptions, isolatedApp, appIds, decorators);
     const flows = _.filter(allFlows, flowFilterFn);
 
     const entities = calculateEntities(flows);
@@ -147,6 +157,12 @@ function controller($scope,
 
     const vm = _.defaultsDeep(this, initialState);
 
+    function unpinAll() {
+        _.forEach(
+            vm.filteredFlowData.entities,
+            d => { d.fx = null; d.fy = null; });
+    }
+
     vm.$onChanges = () => {
         if (vm.flowData) {
             vm.dataTypes = getDataTypeIds(vm.flowData.decorators);
@@ -168,7 +184,8 @@ function controller($scope,
             vm.flowData.flows,
             vm.applications,
             vm.flowData.decorators,
-            filterOptions);
+            filterOptions,
+            vm.isolatedApplication);
 
         vm.graphTweakers = prepareGraphTweakers(
             logicalFlowUtilityService,
@@ -195,6 +212,25 @@ function controller($scope,
         vm.currentTabIndex = index;
         vm.onTabChange(tabName, index);
     };
+
+    vm.isolate = (app) => {
+        unpinAll();
+        vm.isolatedApplication = app;
+        vm.filterChanged();
+    };
+
+    vm.dismissSelectedApplication = () => {
+        unpinAll();
+        vm.isolatedApplication = null;
+        vm.selectedApplication = null;
+        vm.filterChanged();
+    };
+
+    vm.refocusApp = app => {
+        vm.selectedApplication = app;
+        vm.isolate(app);
+    }
+
 }
 
 

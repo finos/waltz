@@ -4,14 +4,21 @@ const initData = {
 
 
 function controller(notification,
-                    store) {
+                    applicationStore,
+                    logicalFlowViewService) {
 
     const vm = Object.assign(this, initData);
 
-    vm.onSelect = (r) => {
-        console.log("r'", r);
-        vm.rating = r;
-    };
+    const id = 1
+
+    applicationStore
+        .findBySelector({ entityReference: { id, kind: 'APP_GROUP' }, scope: 'EXACT' })
+        .then(apps => vm.applications = apps);
+
+    logicalFlowViewService
+        .initialise(id, 'APP_GROUP', 'EXACT')
+        .then(logicalFlowViewService.loadDetail())
+        .then(flowData => vm.dataFlows = flowData);
 
 
 }
@@ -19,7 +26,8 @@ function controller(notification,
 
 controller.$inject = [
     'Notification',
-    'DatabaseStore'
+    'ApplicationStore',
+    'LogicalFlowViewService',
 ];
 
 
