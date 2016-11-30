@@ -48,13 +48,14 @@ function controller() {
 
     const resetCurrentSelection = () => {
         if(vm.currentSelection) vm.currentSelection.selected = false;
+        vm.currentSelection = null;
     };
 
 
     vm.select = (kind) => {
         if(!kind.count) return;
 
-        if(vm.currentSeelction != kind) resetCurrentSelection();
+        if(vm.currentSelection != kind) resetCurrentSelection();
 
         kind.selected = !kind.selected;
         invokeFunction(vm.onSelect, kind.selected ? kind.code : null);
@@ -66,7 +67,6 @@ function controller() {
     vm.clearSelection = () => {
         invokeFunction(vm.onSelect, null);
         resetCurrentSelection();
-        vm.currentSelection = null;
     };
 }
 
