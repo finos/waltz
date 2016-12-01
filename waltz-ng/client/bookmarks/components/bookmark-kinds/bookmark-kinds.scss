@@ -12,7 +12,10 @@
     }
 
     .wbk-no-bookmarks {
+        @extend .small;
         color: #ddd;
+        padding-top: 5px;
+        padding-bottom: 5px;
     }
 
     .wbk-has-bookmarks {
