@@ -1,12 +1,13 @@
 <div class="waltz-bookmark-kinds">
 
-    <div ng-repeat="kind in $ctrl.kinds" >
-
-        <span ng-click="$ctrl.select(kind)"
-             ng-class="{
+    <div ng-repeat="kind in $ctrl.kinds"
+         ng-click="$ctrl.select(kind)"
+         ng-class="{
                 'wbk-no-bookmarks': kind.count === 0,
                 'clickable': kind.count > 0
              }">
+
+        <span>
 
             <waltz-icon name="{{kind.icon}}"
                         size="lg"
@@ -23,10 +24,8 @@
 
         <waltz-icon name="times"
                     ng-if="kind.selected"
-                    class="clickable pull-right"
-                    ng-click="$ctrl.clearSelection()">
+                    class="clickable pull-right">
         </waltz-icon>
 
     </div>
-
 </div>
