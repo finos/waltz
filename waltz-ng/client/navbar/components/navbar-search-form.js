@@ -1,5 +1,5 @@
-import _ from 'lodash';
-import {initialiseData} from '../../common';
+import _ from "lodash";
+import {initialiseData} from "../../common";
 
 
 const bindings = {
@@ -58,7 +58,7 @@ function controller($timeout,
         }
     };
 
-    const dismissResults = () => $timeout(() => { searchResults.show = false; }, 400);
+    const dismissResults = (e) => $timeout(() => { searchResults.show = false; }, 200);
 
     vm.searchResults = searchResults;
     vm.doSearch = () => doSearch(vm.query);

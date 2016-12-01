@@ -23,7 +23,8 @@
             <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.apps.length > 10 }">
                 <ul class="list-unstyled">
                     <li ng-repeat="app in $ctrl.results.apps">
-                        <a ui-sref="main.app.view ({id: app.id})">
+                        <a ui-sref="main.app.view ({id: app.id})"
+                           ng-click="$ctrl.dismiss()">
                             <span ng-bind="app.name"></span>
                             <small>
                                 ( <span ng-bind="app.assetCode"></span> )
@@ -47,7 +48,8 @@
             <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.capabilities.length > 10 }">
                 <ul class="list-unstyled">
                     <li ng-repeat="capability in $ctrl.results.capabilities">
-                        <a ui-sref="main.capability.view ({id: capability.id})">
+                        <a ui-sref="main.capability.view ({id: capability.id})"
+                           ng-click="$ctrl.dismiss()">
                             <span ng-bind="capability.name"></span>
                         </a>
                         <small>
@@ -72,7 +74,8 @@
             <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.actors.length > 10 }">
                 <ul class="list-unstyled">
                     <li ng-repeat="actor in $ctrl.results.actors">
-                        <a ui-sref="main.actor.view ({id: actor.id})">
+                        <a ui-sref="main.actor.view ({id: actor.id})"
+                           ng-click="$ctrl.dismiss()">
                             <span ng-bind="actor.name"></span>
                         </a>
                         <small>
@@ -100,7 +103,8 @@
             <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.people.length > 10 }">
                 <ul class="list-unstyled">
                     <li ng-repeat="person in $ctrl.results.people">
-                        <a ui-sref="main.person.view ({empId: person.employeeId})">
+                        <a ui-sref="main.person.view ({empId: person.employeeId})"
+                           ng-click="$ctrl.dismiss()">
                             <span ng-bind="person.displayName"></span>
                         </a>
                         <small><span ng-bind="person.title"></span></small>
@@ -119,7 +123,8 @@
             <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.orgUnits.length > 10 }">
                 <ul class="list-unstyled">
                     <li ng-repeat="orgUnit in $ctrl.results.orgUnits">
-                        <a ui-sref="main.org-unit.view ({id: orgUnit.id})">
+                        <a ui-sref="main.org-unit.view ({id: orgUnit.id})"
+                           ng-click="$ctrl.dismiss()">
                             <span ng-bind="orgUnit.name"></span>
                         </a>
                         <small>
@@ -145,7 +150,8 @@
             <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.reports.length > 10 }">
                 <ul class="list-unstyled">
                     <li ng-repeat="result in $ctrl.results.reports">
-                        <a ui-sref="main.physical-flow.view ({id: result.id})">
+                        <a ui-sref="main.physical-flow.view ({id: result.id})"
+                           ng-click="$ctrl.dismiss()">
                             <span ng-bind="result.name"></span>
                         </a>
                     </li>

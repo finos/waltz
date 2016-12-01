@@ -19,7 +19,20 @@ const bindings = {
 const template = require('./nav-search-results.html');
 
 
-function controller() {
+function isDescendant(parent, child) {
+    let node = child.parentNode;
+    while (node != null) {
+        if (node == parent) {
+            return true;
+        }
+        node = node.parentNode;
+    }
+    return false;
+}
+
+
+function controller($element,
+                    $document) {
     const vm = this;
 
     vm.dismiss = () => {
@@ -30,7 +43,26 @@ function controller() {
         }
     }
 
+    const onClick = (e) => {
+        const element = $element[0];
+        if(!isDescendant(element, e.target)) vm.dismiss();
+    }
+
+    vm.$onInit = () => {
+        $document.on('click', onClick);
+    };
+
+    vm.$onDestroy = () => {
+        $document.off('click', onClick);
+    };
+
 }
+
+
+controller.$inject = [
+    '$element',
+    '$document'
+];
 
 
 const component = {
