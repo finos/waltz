@@ -42,7 +42,8 @@ function controller($stateParams,
                     changeLogStore,
                     historyStore,
                     physicalFlowStore,
-                    physicalSpecificationStore) {
+                    physicalSpecificationStore,
+                    sourceDataRatingStore) {
 
     const vm = initialiseData(this, initialState);
 
@@ -66,6 +67,9 @@ function controller($stateParams,
     bookmarkStore.findByParent(entityRef)
         .then(bookmarks => vm.bookmarks = bookmarks);
 
+    sourceDataRatingStore
+        .findAll()
+        .then(sdrs => vm.sourceDataRatings = sdrs);
 
     changeLogStore
         .findByEntityReference('ACTOR', id)
@@ -106,7 +110,8 @@ controller.$inject = [
     'ChangeLogStore',
     'HistoryStore',
     'PhysicalFlowStore',
-    'PhysicalSpecificationStore'
+    'PhysicalSpecificationStore',
+    'SourceDataRatingStore'
 ];
 
 
