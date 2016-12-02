@@ -9,7 +9,6 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-
 import _ from "lodash";
 import {populateParents} from "../common";
 
@@ -238,6 +237,9 @@ function controller($q,
         .loadDetail()
         .then(flowData => vm.dataFlows = flowData);
 
+    vm.dismissTechSourceDataOverlay = () => {
+        vm.visibility.techOverlay = false;
+    }
 
 }
 

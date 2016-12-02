@@ -92,6 +92,10 @@ function controller(displayNameService) {
     };
 
     vm.onGridInitialise = (cfg) => vm.exportData = () => cfg.exportFn("apps-capability.csv");
+
+    vm.dismissSourceDataOverlay = () => {
+        vm.visibility.ratingOverlay = false;
+    };
 }
 
 

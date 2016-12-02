@@ -1,5 +1,5 @@
-import _ from 'lodash';
-import {initialiseData} from '../../../common';
+import _ from "lodash";
+import {initialiseData} from "../../../common";
 
 
 const bindings = {
@@ -33,6 +33,10 @@ function controller() {
 
     vm.onInitialise = (cfg) => {
         vm.export = () => cfg.exportFn(`apps.csv`);
+    };
+
+    vm.dismissSourceDataOverlay = () => {
+        vm.visibility.appOverlay = false;
     };
 }
 

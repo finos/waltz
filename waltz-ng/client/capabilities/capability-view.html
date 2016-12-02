@@ -131,7 +131,8 @@
 
         <waltz-source-data-overlay visible="ctrl.visibility.techOverlay"
                                    ratings="ctrl.sourceDataRatings"
-                                   entities="['SERVER', 'DATABASE', 'SOFTWARE']">
+                                   entities="['SERVER', 'DATABASE', 'SOFTWARE']"
+                                   on-dismiss="ctrl.dismissTechSourceDataOverlay">
         </waltz-source-data-overlay>
 
         <waltz-group-technology-summary stats="ctrl.techStats">

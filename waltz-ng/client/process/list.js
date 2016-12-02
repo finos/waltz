@@ -42,6 +42,11 @@ function controller($scope,
         ([q, ps]) => vm.filteredProcesses = termSearch(ps, q)
     );
 
+
+    vm.dismissSourceDataOverlay = () => {
+        vm.visibility.sourceDataRatings = false;
+    };
+
 }
 
 
