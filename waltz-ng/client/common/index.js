@@ -355,3 +355,20 @@ export function toDomain(url) {
     return domain;
 }
 
+
+/**
+ * Given a two elements, returns true is the second is a html descendent of the first
+ * @param parent
+ * @param child
+ * @returns {*}
+ */
+export function isDescendant(parent, child) {
+    let node = child.parentNode;
+    while (node != null) {
+        if (node == parent) {
+            return true;
+        }
+        node = node.parentNode;
+    }
+    return false;
+}

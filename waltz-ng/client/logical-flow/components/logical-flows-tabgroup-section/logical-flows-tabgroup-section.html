@@ -18,7 +18,8 @@
 
         <waltz-source-data-overlay visible="$ctrl.visibility.sourcesOverlay"
                                    ratings="$ctrl.ratings"
-                                   entities="['LOGICAL_DATA_FLOW']">
+                                   entities="['LOGICAL_DATA_FLOW']"
+                                   on-dismiss="$ctrl.dismissSourceDataOverlay">
         </waltz-source-data-overlay>
 
         <waltz-logical-flows-tabgroup flow-data="$ctrl.flowData"

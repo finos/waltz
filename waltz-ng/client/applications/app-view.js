@@ -9,7 +9,6 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-
 import _ from "lodash";
 import {
     loadAuthSources,
@@ -23,7 +22,6 @@ import {
     loadSoftwareCatalog,
     loadSourceDataRatings
 } from "./data-load";
-import {mkAppRatingsGroup, calculateHighestRatingCount} from "../ratings/directives/common";
 
 
 const initialState = {
@@ -139,6 +137,10 @@ function controller($q,
     vm.exportPhysicalFlowUnusedSpecifications = () => {
         vm.physicalFlowUnusedSpecificationsExportFn();
     };
+
+    vm.dismissLogicalSourceDataOverlay = () => {
+        vm.visibility.logicalFlows = false;
+    }
 
 
     function loadAll() {

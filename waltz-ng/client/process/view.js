@@ -194,6 +194,10 @@ function controller($scope,
             .then(flowData => vm.dataFlows = flowData);
     };
 
+    vm.dismissAppsSourceDataOverlay = () => {
+        vm.visibility.appOverlay = false;
+    };
+
 }
 
 

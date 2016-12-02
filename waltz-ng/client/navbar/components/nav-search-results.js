@@ -9,6 +9,8 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import {isDescendant} from "../../common";
+
 
 const bindings = {
     query: '@',
@@ -19,16 +21,7 @@ const bindings = {
 const template = require('./nav-search-results.html');
 
 
-function isDescendant(parent, child) {
-    let node = child.parentNode;
-    while (node != null) {
-        if (node == parent) {
-            return true;
-        }
-        node = node.parentNode;
-    }
-    return false;
-}
+
 
 
 function controller($element,

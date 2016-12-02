@@ -48,7 +48,8 @@
 
         <waltz-source-data-overlay visible="ctrl.visibility.sourceDataRatings"
                                    ratings="ctrl.sourceDataRatings"
-                                   entities="['PROCESS']">
+                                   entities="['PROCESS']"
+                                   on-dismiss="ctrl.dismissSourceDataOverlay">
         </waltz-source-data-overlay>
 
         <waltz-process-list processes="ctrl.filteredProcesses">

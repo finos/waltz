@@ -21,7 +21,7 @@ export default (module) => {
     module.directive('waltzKeywordList', require('./keyword-list'));
     module.directive('waltzLoadingNotification', require('./loading-notification'));
     module.directive('waltzMailTo', require('./mail-to'));
-    module.directive('waltzOverlayPanel', require('./overlay-panel'));
+
     module.directive('waltzPhoneLink', require('./phone-link'));
     module.directive('waltzRagIndicator', require('./rag-indicator'));
     module.directive('waltzSearch', require('./search'));
@@ -35,6 +35,7 @@ export default (module) => {
         .component('waltzEditableField', require('./editable-field'))
         .component('waltzIcon', require('./icon'))
         .component('waltzNoData', require('./no-data'))
+        .component('waltzOverlayPanel', require('./overlay-panel'))
         .component('waltzPageHeader', require('./page-header'))
         .component('waltzPie', require('./pie'))
         .component('waltzPieSegmentTable', require('./pie-segment-table'))

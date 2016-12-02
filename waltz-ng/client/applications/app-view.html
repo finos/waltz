@@ -86,7 +86,8 @@
 
         <waltz-source-data-overlay visible="ctrl.visibility.logicalFlows"
                                    ratings="ctrl.sourceDataRatings"
-                                   entities="['LOGICAL_DATA_FLOW', 'PHYSICAL_SPECIFICATION', 'PHYSICAL_FLOW']">
+                                   entities="['LOGICAL_DATA_FLOW', 'PHYSICAL_SPECIFICATION', 'PHYSICAL_FLOW']"
+                                   on-dismiss="ctrl.dismissLogicalSourceDataOverlay">
         </waltz-source-data-overlay>
 
         <uib-tabset active="active" ng-init="ctrl.dataTab = 0">

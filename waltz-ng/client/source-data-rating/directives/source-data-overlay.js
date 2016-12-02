@@ -1,7 +1,8 @@
 const BINDINGS = {
-    ratings: '=',
-    entities: '=',
-    visible: '='
+    ratings: '<',
+    entities: '<',
+    visible: '<',
+    onDismiss: '<'
 };
 
 function filterRatings(ratings,

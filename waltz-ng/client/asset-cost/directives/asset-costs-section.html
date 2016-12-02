@@ -10,7 +10,8 @@
 
         <waltz-source-data-overlay visible="ctrl.sourceDataOverlay"
                                    ratings="ctrl.sourceDataRatings"
-                                   entities="['ASSET_COST']">
+                                   entities="['ASSET_COST']"
+                                   on-dismiss="ctrl.dismissSourceDataOverlay">
         </waltz-source-data-overlay>
 
         <waltz-loading-notification show="ctrl.assetCostBuckets.length == 0"

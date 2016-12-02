@@ -19,7 +19,8 @@
 
     <waltz-source-data-overlay visible="$ctrl.visibility.appOverlay"
                                ratings="$ctrl.sourceDataRatings"
-                               entities="['APPLICATION', 'END_USER_APPLICATION']">
+                               entities="['APPLICATION', 'END_USER_APPLICATION']"
+                               on-dismiss="$ctrl.dismissSourceDataOverlay">
     </waltz-source-data-overlay>
 
     <uib-tabset ng-if="$ctrl.combinedApps.length > 0">

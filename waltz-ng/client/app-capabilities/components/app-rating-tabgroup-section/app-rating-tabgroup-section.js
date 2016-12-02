@@ -1,4 +1,4 @@
-import {initialiseData} from '../../../common';
+import {initialiseData} from "../../../common";
 
 
 const bindings = {
@@ -27,6 +27,11 @@ const initialState = {
 
 function controller() {
     const vm = initialiseData(this, initialState);
+
+
+    vm.dismissSourceDataOverlay = () => {
+        vm.visibility.overlay = false;
+    }
 }
 
 

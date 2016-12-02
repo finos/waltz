@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from "lodash";
 
 
 const bindings = {
@@ -34,6 +34,9 @@ function controller() {
     vm.tableInitialised = (cfg) =>
         vm.export = () => cfg.exportFn('logical-flows.csv');
 
+    vm.dismissSourceDataOverlay = () => {
+        vm.visibility.sourcesOverlay = false;
+    }
 }
 
 

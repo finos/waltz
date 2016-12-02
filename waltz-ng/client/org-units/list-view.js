@@ -102,6 +102,10 @@ function controller(orgUnits,
     };
 
     vm.clearSearch = (q) => vm.filteredOrgUnits = [];
+
+    vm.dismissSourceDataOverlay = () => {
+        vm.visibility.sourceDataRatings = false;
+    }
 }
 
 controller.$inject = [

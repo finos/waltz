@@ -1,6 +1,6 @@
 import _ from "lodash";
 import {buildHierarchies} from "../../../common";
-import {nest} from 'd3-collection';
+import {nest} from "d3-collection";
 
 
 const BINDINGS = {
@@ -255,6 +255,11 @@ function controller($scope) {
         vm.focusedCapability = cap;
         vm.visibility.appList = true;
     };
+
+
+    vm.dismissSourceDataOverlay = () => {
+        vm.visibility.sourceDataRatings = false;
+    }
 
 
     $scope.$watchGroup(
