@@ -15,7 +15,6 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 import numeral from "numeral";
 import EventDispatcher from "../../common/EventDispatcher";
 
@@ -50,6 +49,10 @@ function controller($scope) {
     const vm = this;
 
     vm.eventDispatcher = new EventDispatcher();
+
+    vm.dismissSourceDataOverlay = () => {
+        vm.sourceDataOverlay = false;
+    };
 
     $scope.$watch(
         'ctrl.data.stats',

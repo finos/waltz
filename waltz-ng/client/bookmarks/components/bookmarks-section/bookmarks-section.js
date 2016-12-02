@@ -60,6 +60,10 @@ function controller() {
         }
 
     };
+
+    vm.dismissSourceDataOverlay = () => {
+        vm.sourceDataOverlay = false;
+    }
 }
 
 

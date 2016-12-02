@@ -4,10 +4,19 @@ const BINDINGS = {
 };
 
 
+function controller() {
+    const vm = this;
+
+    vm.dismissSourceDataOverlay = () => {
+        vm.visible = false;
+    }
+}
+
+
 const directive = {
     restrict: 'E',
     replace: true,
-    controller: () => {},
+    controller,
     bindToController: BINDINGS,
     controllerAs: 'ctrl',
     scope: {},

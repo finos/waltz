@@ -1,20 +1,20 @@
 <div class="row">
     <div class="col-md-12">
-        <div ng-show="ctrl.visible == true"
+        <div ng-show="$ctrl.visible == true"
              class="waltz-overlay-panel"
              style="">
             <div>
                 <h4>
-                    <waltz-icon name="{{ ctrl.icon }}">
+                    <waltz-icon name="{{ $ctrl.icon }}">
                     </waltz-icon>
-                    <span ng-bind="ctrl.name"></span>
+                    <span ng-bind="$ctrl.name"></span>
                     <small>
-                        <span ng-bind="ctrl.small"></span>
+                        <span ng-bind="$ctrl.small"></span>
                     </small>
 
                     <a href
                        class="small pull-right"
-                       ng-click="ctrl.visible = false">
+                       ng-click="$ctrl.onDismiss()">
                         <waltz-icon size="lg"
                                     name="times-circle">
                         </waltz-icon>

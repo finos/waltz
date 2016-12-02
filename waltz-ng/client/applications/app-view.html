@@ -36,7 +36,8 @@
     <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
                              entity-id="{{ ctrl.app.id }}"
                              kind="APPLICATION"
-                             parent-name="{{ ctrl.app.name }}">
+                             parent-name="{{ ctrl.app.name }}"
+                             source-data-ratings="ctrl.sourceDataRatings">
     </waltz-bookmarks-section>
 
 
@@ -86,7 +87,8 @@
 
         <waltz-source-data-overlay visible="ctrl.visibility.logicalFlows"
                                    ratings="ctrl.sourceDataRatings"
-                                   entities="['LOGICAL_DATA_FLOW', 'PHYSICAL_SPECIFICATION', 'PHYSICAL_FLOW']">
+                                   entities="['LOGICAL_DATA_FLOW', 'PHYSICAL_SPECIFICATION', 'PHYSICAL_FLOW']"
+                                   on-dismiss="ctrl.dismissLogicalSourceDataOverlay">
         </waltz-source-data-overlay>
 
         <uib-tabset active="active" ng-init="ctrl.dataTab = 0">

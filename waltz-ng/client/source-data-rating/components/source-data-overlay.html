@@ -2,12 +2,13 @@
     <waltz-overlay-panel name="Source Data"
                          small="Ratings & Freshness"
                          icon="map-signs"
-                         visible="ctrl.visible">
-        <div ng-if="ctrl.filteredRatings.length > 0">
-            <waltz-source-data-info ratings="ctrl.filteredRatings">
+                         visible="$ctrl.visible"
+                         on-dismiss="$ctrl.onDismiss">
+        <div ng-if="$ctrl.filteredRatings.length > 0">
+            <waltz-source-data-info ratings="$ctrl.filteredRatings">
             </waltz-source-data-info>
         </div>
-        <waltz-no-data ng-if="ctrl.filteredRatings.length == 0">
+        <waltz-no-data ng-if="$ctrl.filteredRatings.length == 0">
             <message>
                 <strong>No data source ratings</strong>
             </message>

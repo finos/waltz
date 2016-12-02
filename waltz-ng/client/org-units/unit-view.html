@@ -105,7 +105,8 @@
 
         <waltz-source-data-overlay visible="ctrl.visibility.authOverlay"
                                    ratings="ctrl.viewData.sourceDataRatings"
-                                   entities="['AUTHORITATIVE_SOURCE']">
+                                   entities="['AUTHORITATIVE_SOURCE']"
+                                   on-dismiss="ctrl.dismissAuthSourceSourceDataOverlay">
         </waltz-source-data-overlay>
 
         <uib-tabset>
@@ -215,7 +216,8 @@
 
         <waltz-source-data-overlay visible="ctrl.visibility.techOverlay"
                                    ratings="ctrl.viewData.sourceDataRatings"
-                                   entities="['SERVER', 'DATABASE', 'SOFTWARE']">
+                                   entities="['SERVER', 'DATABASE', 'SOFTWARE']"
+                                   on-dismiss="ctrl.dismissTechSourceDataOverlay">
         </waltz-source-data-overlay>
 
         <waltz-group-technology-summary stats="ctrl.viewData.techStats">

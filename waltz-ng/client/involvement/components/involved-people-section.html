@@ -18,7 +18,8 @@
 
         <waltz-source-data-overlay visible="$ctrl.sourceDataOverlay"
                                    ratings="$ctrl.sourceDataRatings"
-                                   entities="['INVOLVEMENT']">
+                                   entities="['INVOLVEMENT']"
+                                   on-dismiss="$ctrl.dismissSourceDataOverlay">
         </waltz-source-data-overlay>
 
         <div ng-if="$ctrl.gridData.length > 0">

@@ -9,7 +9,6 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-
 import _ from "lodash";
 import {initialiseData} from "../../common";
 
@@ -74,6 +73,10 @@ function controller(displayNameService) {
     vm.onGridChange = (e) => {
         vm.gridDataCount = e.entriesCount;
     };
+
+    vm.dismissSourceDataOverlay = () => {
+        vm.sourceDataOverlay = false;
+    }
 }
 
 

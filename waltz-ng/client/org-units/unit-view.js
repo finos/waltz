@@ -62,6 +62,14 @@ function controller($stateParams,
         vm.exportLineageReports = api.export;
     };
 
+    vm.dismissAuthSourceSourceDataOverlay = () => {
+        vm.visibility.authOverlay = false;
+    };
+
+    vm.dismissTechSourceDataOverlay = () => {
+        vm.visibility.techOverlay = false;
+    };
+
 }
 
 
