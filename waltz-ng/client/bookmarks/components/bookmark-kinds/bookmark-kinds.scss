@@ -8,7 +8,8 @@
     > div {
         padding: 10px;
         vertical-align: middle;
-        text-align: left
+        text-align: left;
+        transition: background-color 300ms;
     }
 
     .wbk-no-bookmarks {
@@ -20,6 +21,10 @@
 
     .wbk-has-bookmarks {
         color: #5BB65D;
+    }
+
+    .wbk-selected {
+        background-color: #e2ffd9;
     }
 
 }
