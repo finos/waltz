@@ -11,6 +11,7 @@
  *
  */
 import _ from "lodash";
+import {notEmpty, isEmpty} from "../../../common";
 
 
 const bindings = {
@@ -25,7 +26,7 @@ const bindings = {
  * @returns {Array}
  */
 function expandTree(tree = []) {
-    if (! tree || tree.length === 0) return;
+    if (isEmpty(tree)) return;
     const expandedNodes =  _.concat(tree, tree[0].children);
     return expandedNodes;
 }
@@ -46,7 +47,7 @@ function controller() {
     vm.treeOptions = treeOptions;
 
     vm.onNodeSelect = (node) => {
-        if (node.children && node.children.length > 0) {
+        if (notEmpty(node.children)) {
             const idx = _.findIndex(vm.expandedNodes, n => n.id === node.id);
             if (idx === -1) {
                 vm.expandedNodes.push(node);

@@ -10,15 +10,16 @@ package com.khartec.waltz.model.physical_flow;
  */
 public enum TransportKind {
 
-    DATABASE_CONNECTION,
-    EMAIL,
-    FILE_SHARE,
-    FILE_TRANSPORT,
-    MESSAGING,
+    DATABASE_CONNECTION,  // TCP
+    EMAIL,  // TCP
+    FILE_SHARE,  // TCP / NETBIOS
+    FILE_TRANSPORT,  // TCP
+    MESSAGING, // TCP / UDP
     OTHER,
-    RPC,
+    RPC, // TCP
     UNKNOWN,
     UDP,
-    WEB
+//    RAW_SOCKETS,
+    WEB // TCP
 
 }

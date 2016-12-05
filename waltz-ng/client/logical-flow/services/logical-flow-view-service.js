@@ -1,3 +1,7 @@
+import _ from 'lodash';
+import {notEmpty} from "../../common";
+
+
 const initData = {
     loadingStats: false,
     loadingFlows: false,
@@ -38,7 +42,7 @@ function service($q,
 
 
     function loadDetail() {
-        if (data.flows.length > 0) {
+        if (notEmpty(data.flows)) {
             return $q.when(data);
         }
 

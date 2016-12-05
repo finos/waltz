@@ -1,4 +1,5 @@
 import _ from "lodash";
+import {notEmpty} from "../../../common";
 
 
 const bindings = {
@@ -37,7 +38,7 @@ function isDirty(selectedIds = [], originalSelectedIds = []) {
 
 
 function anySelected(selectedIds = []) {
-    return selectedIds.length > 0;
+    return notEmpty(selectedIds);
 }
 
 

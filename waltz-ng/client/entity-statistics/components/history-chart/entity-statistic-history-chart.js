@@ -9,7 +9,7 @@ import {curveLinear ,line} from 'd3-shape';
 import {timeFormat} from 'd3-time-format';
 import 'd3-selection-multi';
 
-import {initialiseData} from '../../../common';
+import {initialiseData, isEmpty} from '../../../common';
 import {variableScale} from '../../../common/colors';
 
 
@@ -244,7 +244,7 @@ function pickDatesForXAxis(scale) {
 
 
 function drawXAxis(section, points = [], scale) {
-    if (points.length == 0) return;
+    if (isEmpty(points)) return;
 
     const dates = pickDatesForXAxis(scale);
     const dateFormat = timeFormat("%d/%m");

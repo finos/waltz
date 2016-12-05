@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import {nest} from 'd3-collection';
+import {notEmpty} from "../../../common";
+
 
 const bindings = {
     exactSummaries: '<',
@@ -16,7 +18,7 @@ function nestByDecoratorThenRating(summaries = []) {
     return nest()
         .key(d => d.decoratorEntityReference.id)
         .key(d => d.rating)
-        .rollup(ds => ds.length > 0
+        .rollup(ds => notEmpty(ds)
             ? ds[0].count
             : 0)
         .map(summaries);

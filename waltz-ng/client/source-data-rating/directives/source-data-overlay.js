@@ -1,3 +1,7 @@
+import _ from "lodash";
+import {isEmpty} from "../../common";
+
+
 const BINDINGS = {
     ratings: '=',
     entities: '=',
@@ -6,7 +10,7 @@ const BINDINGS = {
 
 function filterRatings(ratings,
                        entities = []) {
-    return entities.length == 0
+    return isEmpty(entities)
         ? ratings
         : _.filter(ratings, r => _.includes(entities, r.entityKind));
 }

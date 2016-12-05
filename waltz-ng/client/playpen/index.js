@@ -13,12 +13,14 @@
 import playpenView1 from "./1/playpen1";
 import playpenView2 from "./2/playpen2";
 import playpenView3 from "./3/playpen3";
+import playpenView4 from "./4/playpen4";
 
 
 export default (module) => {
 
     module
-        .component('waltzAssetCostGraph', require('./3/asset-cost-graph.js'));
+        .component('waltzAssetCostGraph', require('./3/asset-cost-graph.js'))
+        .component('waltzSvgManipulator', require('./4/svg-manipulator'));
 
     module.config([
         '$stateProvider',
@@ -41,6 +43,10 @@ export default (module) => {
                 .state('main.playpen.3', {
                     url: '/3',
                     views: { 'content@': playpenView3 }
+                })
+                .state('main.playpen.4', {
+                    url: '/4',
+                    views: { 'content@': playpenView4 }
                 })
         }
     ]);

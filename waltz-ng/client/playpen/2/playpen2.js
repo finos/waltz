@@ -1,33 +1,79 @@
-const initData = {
-    rating: 'R'
-};
+import {event, selectAll, select} from 'd3-selection'
+
+const svg = `
+     
+`;
+
+
+function calculateBoundingRect(clientRect, referenceElement) {
+    const hPosX = referenceElement.getBoundingClientRect().left;
+    const hPosY = referenceElement.getBoundingClientRect().top;
+
+    return {
+        x: clientRect.left - hPosX,
+        y: clientRect.top - hPosY,
+        width: clientRect.width,
+        height: clientRect.height
+    };
+}
 
 
 function controller(notification,
-                    applicationStore,
-                    logicalFlowViewService) {
+                    $element) {
 
-    const vm = Object.assign(this, initData);
+    const vm = Object.assign(this, {});
 
-    const id = 1
+    const highlight = (elem) => {
 
-    applicationStore
-        .findBySelector({ entityReference: { id, kind: 'APP_GROUP' }, scope: 'EXACT' })
-        .then(apps => vm.applications = apps);
+        const dimensions = calculateBoundingRect(
+            elem.getBoundingClientRect(),
+            document.getElementById('graphic'));
 
-    logicalFlowViewService
-        .initialise(id, 'APP_GROUP', 'EXACT')
-        .then(logicalFlowViewService.loadDetail())
-        .then(flowData => vm.dataFlows = flowData);
+        select('#highlighter')
+            .attr('x', dimensions.x)
+            .attr('y', dimensions.y)
+            .attr('width', dimensions.width)
+            .attr('height', dimensions.height);
+    };
+
+    vm.annotate = () => {
+
+        selectAll('g')
+            .each(function(g) {
+                const dimensions = calculateBoundingRect(
+                    select(this)
+                        .node()
+                        .getBoundingClientRect(),
+                    document
+                        .getElementById('graphic'));
+
+                select(this)
+                    .insert('rect', ":first-child")
+                    .attr('visibility', 'hidden')
+                    .style('pointer-events', 'fill')
+                    .attr('x', dimensions.x)
+                    .attr('y', dimensions.y)
+                    .attr('width', dimensions.width)
+                    .attr('height', dimensions.height);
+            });
+
+        document.getElementById('graphic').onmousemove =
+            e => {
+                const mx = e.clientX;
+                const my = e.clientY;
+                const elementMouseIsOver = document.elementFromPoint(mx, my);
+                highlight(elementMouseIsOver);
+            };
+    }
 
 
 }
 
 
+
 controller.$inject = [
     'Notification',
-    'ApplicationStore',
-    'LogicalFlowViewService',
+    '$element'
 ];
 
 

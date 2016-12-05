@@ -9,6 +9,13 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import _ from 'lodash';
+import {
+    criticalityDisplayNames,
+    investmentRatingNames,
+    lifecyclePhaseDisplayNames,
+    applicationKindDisplayNames}
+        from '../../common/services/display_names'
 
 
 const bindings = {
@@ -17,19 +24,24 @@ const bindings = {
 };
 
 
+function processApps(apps = []) {
+    return _.chain(apps || [])
+        .map(a => Object.assign(
+            {},
+            a,
+            {
+                kind: applicationKindDisplayNames[a.kind] || a.kind,
+                overallRating: investmentRatingNames[a.overallRating] || a.overallRating,
+                businessCriticality: criticalityDisplayNames[a.businessCriticality] || a.businessCriticality,
+                riskRating: criticalityDisplayNames[a.riskRating] || a.riskRating,
+                lifecyclePhase: criticalityDisplayNames[a.lifecyclePhase] || a.lifecyclePhase
+            }))
+        .value();
+}
+
+
 const columnDefs = [
     {
-        width: 40,
-        field: 'info',
-        displayName: '',
-        cellTemplate: `<div class="ui-grid-cell-contents text-center"> 
-                         <a class="clickable" 
-                            ng-click="grid.appScope.$ctrl.onAppSelect(row.entity)"> 
-                            <waltz-icon name="info-circle" 
-                                        size="lg"></waltz-icon>
-                         </a>
-                       </div>`
-    }, {
         field: 'name',
         cellTemplate: `<div class="ui-grid-cell-contents" 
                             ng-switch="row.entity['management']">
@@ -40,30 +52,13 @@ const columnDefs = [
                             ng-bind="COL_FIELD">
                          </a>
                        </div>`
-    }, {
-        field: 'assetCode'
-    },{
-        field: 'name',
-        cellTemplate: `<div class="ui-grid-cell-contents">
-                          <span ng-bind="row.entity['management'] "></span>
-                          <span ng-bind="COL_FIELD"></span>
-                       </div>`
-    }, {
-        field: 'kind',
-        cellFilter: "toDisplayName:'applicationKind'",
-    }, {
-        field: 'overallRating',
-        cellFilter: "toDisplayName:'investmentRating'",
-    }, {
-        field: 'riskRating',
-        cellFilter: "toDisplayName:'criticality'",
-    }, {
-        field: 'businessCriticality',
-        cellFilter: "toDisplayName:'criticality'",
-    }, {
-        field: 'lifecyclePhase',
-        cellFilter: "toDisplayName:'lifecyclePhase'",
-    }
+    },
+    { field: 'assetCode'},
+    { field: 'kind'},
+    { field: 'overallRating'},
+    { field: 'riskRating'},
+    { field: 'businessCriticality'},
+    { field: 'lifecyclePhase'}
 ];
 
 
@@ -73,7 +68,7 @@ function controller() {
 
     vm.columnDefs = columnDefs;
 
-    vm.$onChanges= () => vm.gridData = vm.applications || [];
+    vm.$onChanges= () => vm.gridData = processApps(vm.applications);
 }
 
 
