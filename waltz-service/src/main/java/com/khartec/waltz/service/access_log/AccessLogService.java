@@ -19,14 +19,18 @@ package com.khartec.waltz.service.access_log;
 
 import com.khartec.waltz.data.access_log.AccessLogDao;
 import com.khartec.waltz.model.accesslog.AccessLog;
+import com.khartec.waltz.model.accesslog.AccessTime;
 import org.jooq.tools.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotEmptyString;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 
 
 @Service
@@ -49,6 +53,12 @@ public class AccessLogService {
     public List<AccessLog> findForUserId(String userId) {
         checkNotEmptyString(userId, "UserId must not be empty");
         return accessLogDao.findForUserId(userId);
+    }
+
+
+    public List<AccessTime> findActiveUsersSince(Duration duration) {
+        LocalDateTime sinceTime = nowUtc().minus(duration);
+        return accessLogDao.findActiveUsersSince(sinceTime);
     }
 
 }

@@ -1,4 +1,3 @@
-
 /*
  *  Waltz
  * Copyright (c) David Watkins. All rights reserved.
@@ -10,7 +9,6 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-
 import _ from "lodash";
 
 
@@ -28,12 +26,18 @@ function accessLogStore($http, BaseApiUrl) {
     };
 
 
+    const findActiveUsers = (minutes) => $http
+        .get(`${BASE}/active/${minutes}`)
+        .then(r => r.data);
+
+
     const findForUserName = (userName) => $http
         .get(`${BASE}/user/${userName}`)
         .then(r => r.data);
 
 
     return {
+        findActiveUsers,
         findForUserName,
         write
     };

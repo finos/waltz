@@ -19,6 +19,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.WaltzVersionInfo;
 import com.khartec.waltz.model.accesslog.AccessLog;
+import com.khartec.waltz.model.accesslog.AccessTime;
 import com.khartec.waltz.model.accesslog.ImmutableAccessLog;
 import com.khartec.waltz.service.access_log.AccessLogService;
 import com.khartec.waltz.web.ListRoute;
@@ -60,11 +61,17 @@ public class AccessLogEndpoint implements Endpoint {
     public void register() {
 
         String findForUserPath = mkPath(BASE_URL, "user", ":userId");
+        String findActiveUsersPath = mkPath(BASE_URL, "active", ":minutes");
         String writePath = mkPath(BASE_URL, ":state", ":params");
 
         ListRoute<AccessLog> findForUserRoute = (request, response) -> accessLogService.findForUserId(request.params("userId"));
+        ListRoute<AccessTime> findActiveUsersRoute = (request, response) -> {
+            java.time.Duration minutes = java.time.Duration.ofMinutes(Integer.parseInt(request.params("minutes")));
+            return accessLogService.findActiveUsersSince(minutes);
+        };
 
         getForList(findForUserPath, findForUserRoute);
+        getForList(findActiveUsersPath, findActiveUsersRoute);
         postForDatum(writePath, this::writeRoute);
     }
 
