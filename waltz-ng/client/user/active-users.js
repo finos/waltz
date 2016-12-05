@@ -22,20 +22,16 @@ function controller($window,
 
     const vm =  initialiseData(this, initialState);
 
-    vm.activeUsers = [];
-
     vm.onDurationChange = (minutes) => {
         accessLogStore
                 .findActiveUsers(minutes)
-                .then(activeUsers => {
-                    vm.activeUsers = activeUsers
-                });
+                .then(activeUsers => vm.activeUsers = activeUsers );
     };
 
     vm.emailUsers = () => {
         const users = _.map(vm.activeUsers, 'userId');
         $window.open('mailto:?bcc=' + users.join(', '));
-    }
+    };
 
     vm.columnDefs = [
         {
