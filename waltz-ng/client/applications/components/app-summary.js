@@ -1,5 +1,6 @@
 import _ from "lodash";
 import {tallyBy} from "../../common/tally-utils";
+import {notEmpty} from "../../common";
 import {lifecyclePhaseColorScale, criticalityColorScale, variableScale} from "../../common/colors";
 import {
     criticalityDisplayNames,
@@ -15,6 +16,8 @@ const bindings = {
 
 
 const initialState = {
+    apps: [],
+    endUserApps: [],
     visibility: {
         apps: false,
         endUserApps: false
@@ -91,8 +94,8 @@ function mkCharts(apps = [], endUserApps = []) {
 
 function calcVisibility(apps = [], endUserApps = []) {
     return {
-        apps: apps.length > 0,
-        endUserApps: endUserApps.length > 0
+        apps: notEmpty(apps),
+        endUserApps: notEmpty(endUserApps)
     };
 }
 

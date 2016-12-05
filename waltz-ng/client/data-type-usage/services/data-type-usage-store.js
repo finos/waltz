@@ -1,4 +1,5 @@
 import {checkIsIdSelector, checkIsEntityRef} from "../../common/checks";
+import {isEmpty} from "../../common";
 
 
 function service($http,
@@ -50,7 +51,7 @@ function service($http,
 
     const save = (ref, dataTypeCode, usages = []) => {
         checkIsEntityRef(ref);
-        if (usages.length == 0) return;
+        if (isEmpty(usages)) return;
         return $http
             .post(`${BASE}/entity/${ref.kind}/${ref.id}/${dataTypeCode}`, usages)
             .then(r => r.data);

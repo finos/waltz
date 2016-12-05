@@ -372,9 +372,6 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
 
     labels
         .exit()
-        .transition()
-        .duration(500)
-        .attr('opacity', 0)
         .remove();
 }
 

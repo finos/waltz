@@ -1,4 +1,5 @@
 import _ from "lodash";
+import {isEmpty} from "../common";
 
 
 /**
@@ -16,7 +17,7 @@ import _ from "lodash";
 export function combineFlowData(specifications = [],
                                 physicalFlows = [])
 {
-    if (specifications.length === 0 || physicalFlows.length === 0) {
+    if (isEmpty(specifications) || isEmpty(physicalFlows)) {
         return [];
     } else {
         return _.chain(specifications)
@@ -27,7 +28,7 @@ export function combineFlowData(specifications = [],
                 if (sourceRef == null) {
                     return null;
                 }
-                if (relevantPhysicalFlows.length === 0) {
+                if (isEmpty(relevantPhysicalFlows)) {
                     return {
                         sourceRef,
                         specification: s,
@@ -60,7 +61,7 @@ export function enrichConsumes(specifications = [],
 {
     const visitedRefs = [];
 
-    if (specifications.length === 0 || physicalFlows.length === 0) {
+    if (isEmpty(specifications) || isEmpty(physicalFlows)) {
         return [];
     } else {
         const physicalFlowsBySpecId = _.groupBy(physicalFlows, 'specificationId');
@@ -72,7 +73,7 @@ export function enrichConsumes(specifications = [],
                 const sourceRef = specification.owningEntity;
 
 
-                if (!physicalFlowsForSpec || physicalFlowsForSpec.length === 0 || !sourceRef) {
+                if (isEmpty(physicalFlowsForSpec) || !sourceRef) {
                     return null;
                 } else {
                     const firstSource = !_.includes(

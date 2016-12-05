@@ -1,4 +1,5 @@
 import _ from "lodash";
+import {isEmpty} from "../../../common";
 
 
 const bindings = {
@@ -68,7 +69,7 @@ function findPotentialFlows(flows = [], apps =[]) {
 
 function mkInfoCell(selection, flowData, apps = []) {
     if (! selection) return null;
-    if (flowData.flows.length == 0) return null;
+    if (isEmpty(flowData.flows)) return null;
 
     const potentialFlows = findPotentialFlows(flowData.flows, apps);
 

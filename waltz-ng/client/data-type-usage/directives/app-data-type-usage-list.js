@@ -1,5 +1,6 @@
 import _ from "lodash";
 import allUsageKinds from "../usage-kinds";
+import {notEmpty} from "../../common";
 
 const BINDINGS = {
     usages: "<"
@@ -18,7 +19,7 @@ function consolidateUsages(usages = []) {
         .groupBy('dataTypeCode')
         .mapValues(xs => _.chain(xs)
             .map('usage')
-            .filter(u => u.isSelected || u.description.length > 0)
+            .filter(u => u.isSelected || notEmpty(u.description))
             .value())
         .value();
 }

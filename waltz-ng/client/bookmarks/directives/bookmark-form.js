@@ -10,6 +10,8 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import {isEmpty} from "../../common";
+
 
 function controller($scope) {
 
@@ -42,7 +44,7 @@ function controller($scope) {
 
     const recalcFormStatus = () => {
         const { url } = this.bookmark;
-        this.submitDisabled = url === undefined || url.length === 0;
+        this.submitDisabled = isEmpty(url);
     };
 
     $scope.$watch('ctrl.bookmark', recalcFormStatus, true);

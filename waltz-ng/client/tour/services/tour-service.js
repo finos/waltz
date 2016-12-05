@@ -1,5 +1,6 @@
 import {introJs} from 'intro.js'
 import _ from 'lodash';
+import {isEmpty, notEmpty} from "../../common";
 
 
 const defaultCompletionCallback = () => console.log('tourService: completionCallback missing');
@@ -7,7 +8,7 @@ const defaultCompletionCallback = () => console.log('tourService: completionCall
 
 function initialiseIntroJs(tourSteps = [],
                            completionCallback = defaultCompletionCallback) {
-    if (tourSteps.length < 0) return null;
+    if (isEmpty(tourSteps)) return null;
 
     const introSteps = _.map(tourSteps, s => {
         return {
@@ -91,7 +92,7 @@ function service($q,
 
                 const seen = hasSeen(key, preferences);
 
-                if (! seen && autoPlay && steps.length > 0) {
+                if (! seen && autoPlay && notEmpty(steps)) {
                     intro.start();
                 };
 
@@ -100,7 +101,7 @@ function service($q,
                     start: intro
                         ? () => intro.start()
                         : () => {},
-                    stepCount: steps.length
+                    stepCount: _.size(steps)
                 };
             });
     };

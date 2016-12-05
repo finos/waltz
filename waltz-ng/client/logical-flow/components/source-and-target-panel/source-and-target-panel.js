@@ -22,80 +22,6 @@ const initialState = {
 };
 
 
-function controller($scope) {
-    const vm = initialiseData(this, initialState);
-
-    vm.showAll = () => vm.filteredFlowData = filterByType(0, vm.logicalFlows, vm.decorators);
-    vm.$onChanges = (changes) => {
-
-        if (changes.logicalFlows || changes.decorators) vm.filteredFlowData = vm.showAll();
-
-        const keyedLogicalFlows = calculateSourceAndTargetFlowsByAppId(
-            vm.entityRef,
-            vm.logicalFlows);
-
-        function select(app, type, flowId, evt) {
-            const typeInfoByFlowId = mkTypeInfo(vm.decorators);
-            const types = typeInfoByFlowId[flowId] || [];
-            return {
-                type,
-                types,
-                physicalFlows: calcPhysicalFlows(vm.physicalFlows, vm.physicalSpecifications, app, type, vm.entityRef),
-                app,
-                y: evt.layerY
-            };
-        }
-
-        const baseTweakers = {
-            source: {
-                onSelect: (app, evt) => $scope.$applyAsync(() => {
-                    const flowId = keyedLogicalFlows.sourceFlowsByAppId[app.id];
-                    vm.selected = select(app, 'source', flowId, evt);
-                })
-            },
-            target: {
-                onSelect: (app, evt) => $scope.$applyAsync(() => {
-                    const flowId = keyedLogicalFlows.targetFlowsByAppId[app.id];
-                    vm.selected = select(app, 'target', flowId, evt);
-                })
-            },
-            type: {
-                onSelect: d => {
-                    event.stopPropagation();
-                    $scope.$applyAsync(
-                        () => vm.filteredFlowData = filterByType(
-                            d.id,
-                            vm.logicalFlows,
-                            vm.decorators));
-                }
-            },
-            typeBlock: {
-                onSelect: () => {
-                    event.stopPropagation();
-                    $scope.$applyAsync(
-                        () => {
-                            if (vm.filteredFlowData.selectedTypeId > 0) {
-                                vm.showAll();
-                            }
-                        });
-                }
-            }
-        };
-
-        vm.tweakers = mkTweakers(
-            baseTweakers,
-            vm.entityRef,
-            vm.physicalFlows,
-            vm.physicalSpecifications);
-    };
-}
-
-
-controller.$inject = [
-    '$scope'
-];
-
-
 const template = require('./source-and-target-panel.html');
 
 
@@ -246,6 +172,79 @@ function mkTweakers(tweakers = {},
 
     return Object.assign({} , tweakers);
 }
+
+
+function controller($timeout) {
+    const vm = initialiseData(this, initialState);
+
+    vm.showAll = () => vm.filteredFlowData = filterByType(0, vm.logicalFlows, vm.decorators);
+    vm.$onChanges = (changes) => {
+
+        if (changes.logicalFlows || changes.decorators) vm.filteredFlowData = vm.showAll();
+
+        const keyedLogicalFlows = calculateSourceAndTargetFlowsByAppId(
+            vm.entityRef,
+            vm.logicalFlows);
+
+        function select(app, type, flowId, evt) {
+            const typeInfoByFlowId = mkTypeInfo(vm.decorators);
+            const types = typeInfoByFlowId[flowId] || [];
+            return {
+                type,
+                types,
+                physicalFlows: calcPhysicalFlows(vm.physicalFlows, vm.physicalSpecifications, app, type, vm.entityRef),
+                app,
+                y: evt.layerY
+            };
+        }
+
+        const baseTweakers = {
+            source: {
+                onSelect: (app, evt) => $timeout(() => {
+                    const flowId = keyedLogicalFlows.sourceFlowsByAppId[app.id];
+                    vm.selected = select(app, 'source', flowId, evt);
+                })
+            },
+            target: {
+                onSelect: (app, evt) => $timeout(() => {
+                    const flowId = keyedLogicalFlows.targetFlowsByAppId[app.id];
+                    vm.selected = select(app, 'target', flowId, evt);
+                })
+            },
+            type: {
+                onSelect: d => {
+                    event.stopPropagation();
+                    $timeout(() => vm.filteredFlowData = filterByType(
+                        d.id,
+                        vm.logicalFlows,
+                        vm.decorators));
+
+                }
+            },
+            typeBlock: {
+                onSelect: () => {
+                    event.stopPropagation();
+                    $timeout(() => {
+                        if (vm.filteredFlowData.selectedTypeId > 0) {
+                            vm.showAll();
+                        }
+                    });
+                }
+            }
+        };
+
+        vm.tweakers = mkTweakers(
+            baseTweakers,
+            vm.entityRef,
+            vm.physicalFlows,
+            vm.physicalSpecifications);
+    };
+}
+
+
+controller.$inject = [
+    '$timeout'
+];
 
 
 const component = {

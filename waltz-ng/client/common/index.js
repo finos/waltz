@@ -3,6 +3,21 @@ import {nest} from "d3-collection";
 import {checkIsEntityRef} from "./checks";
 
 
+export function notEmpty(xs) {
+    return ! _.isEmpty(xs);
+}
+
+
+export function isEmpty(xs) {
+    return _.isEmpty(xs);
+}
+
+
+export function mkSafe(xs = []) {
+    return _.isEmpty(xs) ? [] : xs;
+}
+
+
 /**
  * Given data that looks like:
  *

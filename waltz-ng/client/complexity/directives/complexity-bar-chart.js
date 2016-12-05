@@ -18,6 +18,7 @@
 
 import _ from "lodash";
 import {green, red} from "../../common/colors";
+import {notEmpty} from "../../common";
 import {interpolateRgb} from 'd3-interpolate';
 import {axisBottom} from 'd3-axis';
 import {scaleBand, scaleLinear} from 'd3-scale';
@@ -40,7 +41,7 @@ function bucket(complexityData) {
         complexityData,
         d => ({ score: d.overallScore, id: d.id }));
 
-    const maxScore = scores.length > 0
+    const maxScore = notEmpty(scores)
         ? _.maxBy(scores, 'score').score
         : 0;
 

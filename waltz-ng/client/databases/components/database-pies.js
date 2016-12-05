@@ -1,5 +1,5 @@
 import {environmentColorScale, variableScale} from "../../common/colors";
-import {toKeyCounts} from "../../common";
+import {toKeyCounts, notEmpty} from "../../common";
 import {endOfLifeStatusNames} from "../../common/services/display_names";
 
 
@@ -49,7 +49,7 @@ function controller($scope) {
     };
 
     const recalcPieData = (databases = []) => {
-        if (databases.length > 0) {
+        if (notEmpty(databases)) {
             vm.pieData = prepareStats(databases);
         }
     };

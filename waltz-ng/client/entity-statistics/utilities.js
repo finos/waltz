@@ -1,4 +1,6 @@
 import {rollupKindNames} from "../common/services/display_names";
+import {notEmpty} from "../common";
+
 
 export function updateUrlWithoutReload($state, navItem) {
     $state.go('.', {id: navItem.id}, {notify: false});
@@ -12,7 +14,7 @@ const defaultDefinitions = {
 
 
 export function hasRelatedDefinitions(definitions = defaultDefinitions) {
-    return definitions.children.length > 0;
+    return notEmpty(definitions.children);
 }
 
 

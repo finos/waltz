@@ -9,10 +9,11 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import {notEmpty} from "../common";
 
 
 function hasInvolvements(involvements) {
-    return involvements.all.length > 0;
+    return notEmpty(involvements.all);
 }
 
 

@@ -1,4 +1,5 @@
-import { checkIsApplicationIdSelector } from '../../common/checks';
+import {checkIsApplicationIdSelector} from '../../common/checks';
+import {notEmpty} from '../../common'
 
 const initData = {
     loadingStats: false,
@@ -31,7 +32,7 @@ function service($q,
 
 
     function loadDetail() {
-        if (data.costs.length > 0) {
+        if (notEmpty(data.costs)) {
             return $q.when(data);
         }
 
