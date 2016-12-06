@@ -93,7 +93,7 @@ export function loadAuthSources(authSourceStore, orgUnitStore, appId, ouId, vm) 
     appAuthSourcePromise.then(authSources => nest()
         .key(a => a.dataType)
         .key(a => a.rating)
-        .map(authSources))
+        .object(authSources))
         .then(nested => vm.authSources = nested)
         .then(nested => addDataTypes(_.keys(nested), vm));
 
