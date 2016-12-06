@@ -91,7 +91,6 @@ function controller(orgUnits,
     vm.filteredOrgUnits = [];
     vm.trees = prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies);
     vm.orgUnits = orgUnits;
-    vm.nodeSelected = (node) => vm.selectedNode = node;
 
     vm.doSearch = (q) => {
         if (!q || q.length < 3) {
