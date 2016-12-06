@@ -5,7 +5,7 @@
 
         <div class="row"
              ng-if="$ctrl.definitions.length > 0">
-            <div class="col-md-4">
+            <div class="col-md-5">
                 <div style="border-right: 2px solid #f9f9f9;">
                     <waltz-entity-statistic-tree definitions="$ctrl.definitions"
                                                  on-selection="$ctrl.onDefinitionSelection">
@@ -21,7 +21,7 @@
                 </div>
             </div>
 
-            <div class="col-md-8">
+            <div class="col-md-7">
                 <div ng-if="$ctrl.activeSummary == null && ! $ctrl.loading">
                     <div class="alert alert-info">
                         <waltz-icon size="lg"
