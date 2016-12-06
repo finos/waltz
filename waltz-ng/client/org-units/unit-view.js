@@ -10,6 +10,8 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import _ from 'lodash';
+
 const addToHistory = (historyStore, orgUnit) => {
     if (! orgUnit) { return; }
     historyStore.put(
@@ -25,10 +27,25 @@ function initTour(tourService, holder = {}) {
         .then(tour => holder.tour = tour);
 }
 
+function processCosts(costs = []) {
+    return _.chain(costs)
+        .reduce((acc, x) => {
+            const bucket = acc[x.application.id] || {total: 0, entityRef: x.application, costs: {}};
+            bucket.costs[x.cost.kind] = x.cost.amount;
+            bucket.total += x.cost.amount;
+
+            acc[x.application.id] = bucket;
+            return acc;
+        }, {})
+        .values()
+        .orderBy('total', 'desc')
+        .value();
+}
 
 function controller($stateParams,
                     $scope,
                     viewDataService,
+                    assetCostStore,
                     historyStore,
                     tourService) {
 
@@ -62,6 +79,13 @@ function controller($stateParams,
         vm.exportLineageReports = api.export;
     };
 
+    assetCostStore
+        .findTopAppCostsByAppIdSelector({
+            entityReference: vm.entityRef,
+            scope: 'CHILDREN'
+        })
+        .then(costs => processCosts(costs))
+        .then(costs => vm.viewData.topAssetCosts = costs);
 }
 
 
@@ -69,6 +93,7 @@ controller.$inject = [
     '$stateParams',
     '$scope',
     'OrgUnitViewDataService',
+    'AssetCostStore',
     'HistoryStore',
     'TourService'
 ];

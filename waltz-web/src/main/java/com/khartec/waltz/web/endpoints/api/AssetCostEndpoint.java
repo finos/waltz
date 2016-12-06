@@ -40,12 +40,14 @@ public class AssetCostEndpoint implements Endpoint {
         String findByAssetCodePath = mkPath(BASE_URL, "code", ":code");
         String findByAppIdPath = mkPath(BASE_URL, "app-cost", ":id");
         String findAppCostsByAppIdsPath = mkPath(BASE_URL, "app-cost", "apps");
+        String findTopAppCostsByAppIdsPath = mkPath(BASE_URL, "app-cost", "top-apps");
         String calcStatisticsByAppIdsPath = mkPath(BASE_URL, "app-cost", "apps", "stats");
         String calcCombinedAmountsForSelectorPath = mkPath(BASE_URL, "amount", "app-selector");
 
         getForList(findByAssetCodePath, this::findByAssetCodeRoute);
         getForList(findByAppIdPath, this::findByAppIdRoute);
         postForList(findAppCostsByAppIdsPath, this::findAppCostsByAppIds);
+        postForList(findTopAppCostsByAppIdsPath, this::findTopAppCostsByAppIds);
         postForDatum(calcStatisticsByAppIdsPath, this::calcStatisticsByAppIdsRoute);
         postForList(calcCombinedAmountsForSelectorPath, this::calcCombinedAmountsForSelectorRoute);
 
@@ -77,6 +79,12 @@ public class AssetCostEndpoint implements Endpoint {
     private List<ApplicationCost> findAppCostsByAppIds(Request request, Response response) throws IOException {
         IdSelectionOptions selectorOptions = readIdSelectionOptionsFromBody(request);
         return assetCostService.findAppCostsByAppIds(selectorOptions);
+    }
+
+
+    private List<ApplicationCost> findTopAppCostsByAppIds(Request request, Response response) throws IOException {
+        IdSelectionOptions selectorOptions = readIdSelectionOptionsFromBody(request);
+        return assetCostService.findTopAppCostsByAppIds(selectorOptions, getLimit(request).orElse(10));
     }
 
 }
