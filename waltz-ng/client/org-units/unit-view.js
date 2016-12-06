@@ -27,20 +27,6 @@ function initTour(tourService, holder = {}) {
         .then(tour => holder.tour = tour);
 }
 
-function processCosts(costs = []) {
-    return _.chain(costs)
-        .reduce((acc, x) => {
-            const bucket = acc[x.application.id] || {total: 0, entityRef: x.application, costs: {}};
-            bucket.costs[x.cost.kind] = x.cost.amount;
-            bucket.total += x.cost.amount;
-
-            acc[x.application.id] = bucket;
-            return acc;
-        }, {})
-        .values()
-        .orderBy('total', 'desc')
-        .value();
-}
 
 function controller($stateParams,
                     $scope,
@@ -63,8 +49,8 @@ function controller($stateParams,
 
     // -- INTERACTIONS ---
 
-    vm.onAssetBucketSelect = (bucket) => {
-        $scope.$applyAsync(() => viewDataService.selectAssetBucket(bucket));
+    vm.loadAllCosts = () => {
+        $scope.$applyAsync(() => viewDataService.loadAllCosts());
     };
 
     vm.loadFlowDetail = () => viewDataService
@@ -79,13 +65,6 @@ function controller($stateParams,
         vm.exportLineageReports = api.export;
     };
 
-    assetCostStore
-        .findTopAppCostsByAppIdSelector({
-            entityReference: vm.entityRef,
-            scope: 'CHILDREN'
-        })
-        .then(costs => processCosts(costs))
-        .then(costs => vm.viewData.topAssetCosts = costs);
 }
 
 

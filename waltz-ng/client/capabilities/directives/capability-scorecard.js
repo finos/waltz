@@ -24,7 +24,7 @@ import {calcComplexitySummary} from "../../complexity/services/complexity-utilit
 const BINDINGS = {
     capability: '=',
     applications: '=',
-    assetCosts: '=',
+    totalCost: '=',
     complexity: '=',
     serverStats: '=',
     flows: '=',
@@ -37,7 +37,7 @@ function controller($scope, $state) {
 
     const vm = this;
 
-    $scope.$watch('ctrl.assetCosts', cs => vm.portfolioCostStr = calcPortfolioCost(cs));
+    $scope.$watch('ctrl.totalCost', cs => vm.portfolioCostStr = calcPortfolioCost(cs));
     $scope.$watch('ctrl.complexity', cs => vm.complexitySummary = calcComplexitySummary(cs));
     $scope.$watch('ctrl.serverStats', stats => vm.enrichedServerStats = enrichServerStats(stats));
 

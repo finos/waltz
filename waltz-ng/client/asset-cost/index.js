@@ -6,10 +6,10 @@ export default (module) => {
         .service('AssetCostViewService', require('./services/asset-cost-view-service'));
 
     module
-        .directive('waltzAssetCostTable', require('./directives/asset-cost-table'))
-        .directive('waltzAssetCostsSection', require('./directives/asset-costs-section'));
+        .component('waltzAssetCostsGraph', require('./components/asset-costs-graph'))
+        .component('waltzAssetCostsSection', require('./components/asset-costs-section'));
 
     module
-        .component('waltzAssetCostsGraph', require('./components/asset-costs-graph'));
+        .directive('waltzAssetCostTable', require('./directives/asset-cost-table'))
 
 }

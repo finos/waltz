@@ -50,9 +50,9 @@ const service = ($http, root) => {
     };
 
 
-    const findStatsByAppIds = (options, year) => {
+    const findTotalCostForAppSelector = (options, year) => {
         checkIsIdSelector(options);
-        var path = `${BASE}/app-cost/apps/stats`;
+        var path = `${BASE}/app-cost/apps/total`;
         const params = year
             ? { params: { year } }
             : {};
@@ -76,7 +76,7 @@ const service = ($http, root) => {
         findByAppId,
         findAppCostsByAppIdSelector,
         findTopAppCostsByAppIdSelector,
-        findStatsByAppIds,
+        findTotalCostForAppSelector,
         calculateCombinedAmountsForSelector
     };
 };

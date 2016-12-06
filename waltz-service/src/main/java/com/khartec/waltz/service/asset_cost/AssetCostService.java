@@ -22,7 +22,6 @@ import com.khartec.waltz.data.asset_cost.AssetCostDao;
 import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.cost.*;
-import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.lambda.tuple.Tuple2;
@@ -103,27 +102,16 @@ public class AssetCostService {
     }
 
 
-    public AssetCostStatistics calculateStatisticsByAppIds(IdSelectionOptions options) {
+    public Cost calculateTotalCostForAppSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
 
         Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);
 
         return assetCostDao
                 .findLatestYear()
-                .map(year -> {
-                    List<Tally<CostBand>> costBandCounts = assetCostStatsDao
-                            .calculateCostBandStatisticsByAppIdSelector(year, appIdSelector);
-
-                    Cost totalCost = assetCostStatsDao
-                            .calculateTotalCostByAppIdSelector(year, appIdSelector);
-
-                    return ImmutableAssetCostStatistics.builder()
-                            .costBandCounts(costBandCounts)
-                            .totalCost(totalCost)
-                            .build();
-                })
+                .map(year -> assetCostStatsDao
+                            .calculateTotalCostByAppIdSelector(year, appIdSelector))
                 .orElse(null);
-
     }
 
 }

@@ -250,8 +250,7 @@ function service($q,
     }
 
 
-    function selectAssetBucket(bucket) {
-        assetCostViewService.selectBucket(bucket);
+    function loadAllCosts() {
         assetCostViewService.loadDetail()
             .then(data => rawData.assetCostData = data);
     }
@@ -274,7 +273,7 @@ function service($q,
     return {
         data: rawData,
         loadAll,
-        selectAssetBucket,
+        loadAllCosts,
         loadFlowDetail,
         loadOrgUnitDescendants
     };

@@ -193,9 +193,8 @@ function controller($scope,
         return _.some(vm.groupDetail.members, isUserAnOwner );
     };
 
-    vm.onAssetBucketSelect = bucket => {
+    vm.loadAllCosts = () => {
         $scope.$applyAsync(() => {
-            assetCostViewService.selectBucket(bucket);
             assetCostViewService.loadDetail()
                 .then(data => vm.assetCostData = data);
         })
@@ -209,7 +208,6 @@ function controller($scope,
         .findAllActiveDefinitions()
         .then(definitions => vm.entityStatisticDefinitions = definitions);
 
-
     vm.lineageTableInitialised = (api) => {
         vm.exportLineageReports = api.export;
     };
@@ -217,7 +215,6 @@ function controller($scope,
     physicalFlowLineageStore
         .findLineageReportsBySelector(appIdSelector)
         .then(lineageReports => vm.lineageReports = lineageReports);
-
 
 }
 

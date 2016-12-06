@@ -3,7 +3,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.cost.ApplicationCost;
 import com.khartec.waltz.model.cost.AssetCost;
-import com.khartec.waltz.model.cost.AssetCostStatistics;
+import com.khartec.waltz.model.cost.Cost;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.jooq.lambda.tuple.Tuple2;
@@ -41,14 +41,14 @@ public class AssetCostEndpoint implements Endpoint {
         String findByAppIdPath = mkPath(BASE_URL, "app-cost", ":id");
         String findAppCostsByAppIdsPath = mkPath(BASE_URL, "app-cost", "apps");
         String findTopAppCostsByAppIdsPath = mkPath(BASE_URL, "app-cost", "top-apps");
-        String calcStatisticsByAppIdsPath = mkPath(BASE_URL, "app-cost", "apps", "stats");
+        String calculateTotalCostForAppSelectorPath = mkPath(BASE_URL, "app-cost", "apps", "total");
         String calcCombinedAmountsForSelectorPath = mkPath(BASE_URL, "amount", "app-selector");
 
         getForList(findByAssetCodePath, this::findByAssetCodeRoute);
         getForList(findByAppIdPath, this::findByAppIdRoute);
         postForList(findAppCostsByAppIdsPath, this::findAppCostsByAppIds);
         postForList(findTopAppCostsByAppIdsPath, this::findTopAppCostsByAppIds);
-        postForDatum(calcStatisticsByAppIdsPath, this::calcStatisticsByAppIdsRoute);
+        postForDatum(calculateTotalCostForAppSelectorPath, this::calculateTotalCostForAppSelectorRoute);
         postForList(calcCombinedAmountsForSelectorPath, this::calcCombinedAmountsForSelectorRoute);
 
     }
@@ -70,9 +70,9 @@ public class AssetCostEndpoint implements Endpoint {
     }
 
 
-    private AssetCostStatistics calcStatisticsByAppIdsRoute(Request request, Response response) throws IOException {
+    private Cost calculateTotalCostForAppSelectorRoute(Request request, Response response) throws IOException {
         IdSelectionOptions selectorOptions = readIdSelectionOptionsFromBody(request);
-        return assetCostService.calculateStatisticsByAppIds(selectorOptions);
+        return assetCostService.calculateTotalCostForAppSelector(selectorOptions);
     }
 
 

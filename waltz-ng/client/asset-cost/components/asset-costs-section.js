@@ -16,13 +16,31 @@
  *
  */
 
-import {numberFormatter} from "../../common";
+
+const bindings = {
+    costView: '<',
+    loadAll: '<',
+    csvName: '@?',
+    sourceDataRatings: '<'
+};
 
 
-/**
- * returns a formatted total cost for the portfolio
- * @param costs
- */
-export function calcPortfolioCost(total = { amount: 0 }) {
-    return '€ ' + numberFormatter(total.amount, 1);
+function controller() {
+    const vm = this;
+
+    vm.onSummarySelect = (d) => vm.summarySelection = d;
 }
+
+
+controller.$inject = [
+];
+
+
+const component = {
+    template: require('./asset-costs-section.html'),
+    bindings,
+    controller
+};
+
+
+export default component;

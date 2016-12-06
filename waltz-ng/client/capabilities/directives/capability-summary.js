@@ -20,7 +20,7 @@
 const BINDINGS = {
     capability: '=',
     applications: '=',
-    assetCosts: '=',
+    totalCost: '=',
     complexity: '=',
     serverStats: '=',
     flows: '=',
