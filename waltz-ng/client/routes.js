@@ -99,6 +99,52 @@ configureStateChangeListener.$inject = [
 ];
 
 
+// -- INACTIVITY TIMER ---
+
+function configureInactivityTimer($rootScope, $timeout, $window, settingsService) {
+    const uiInactivityTimeoutSettingKey = 'ui.inactivity-timeout';
+
+    const reloadPage = () => {
+        console.log("Reloading page due to inactivity");
+        $window.location.reload();
+    };
+
+    settingsService
+        .findOrDefault(uiInactivityTimeoutSettingKey, null)
+        .then(inactivityTime  => {
+
+            if(inactivityTime) {
+                console.log('Configuring inactivity timer for ' + inactivityTime + " ms");
+                let timeoutPromise = $timeout(reloadPage, inactivityTime);
+
+                $rootScope.$on(
+                    '$stateChangeSuccess',
+                    (event, toState, toParams /* fromState, fromParams */) => {
+
+                        //if existing timeout promise, then cancel
+                        if (timeoutPromise) {
+                            $timeout.cancel(timeoutPromise);
+                        };
+
+                        // set a new countdown
+                        timeoutPromise = $timeout(reloadPage, inactivityTime);
+                    }
+                );
+            }
+
+        });
+
+}
+
+
+configureInactivityTimer.$inject = [
+    '$rootScope',
+    '$timeout',
+    '$window',
+    'SettingsService'
+];
+
+
 // -- SETUP ---
 
 function setup(module) {
@@ -106,7 +152,8 @@ function setup(module) {
         .config(configureRoutes)
         .run(configureScrollToTopOnChange)
         .run(configureBetaNagMessageNotification)
-        .run(configureStateChangeListener);
+        .run(configureStateChangeListener)
+        .run(configureInactivityTimer);
 
 }
 

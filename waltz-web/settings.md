@@ -5,6 +5,7 @@
 
 * ```ui.logo.overlay.text``` - optional text to overlay on the logo, keep it short
 * ```ui.logo.overlay.color``` - colour used to render the optional overlay on the logo
+* ```ui.inactivity-timeout``` - time in miliseconds of inactivity before the UI triggers a page refresh, disabled if not provided
 
 Use these settings to let users know if they are on a beta instance. 
 
