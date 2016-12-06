@@ -9,10 +9,8 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-
 import {rgb} from "d3-color";
-import {scaleOrdinal, schemeCategory20c} from 'd3-scale';
-
+import {scaleOrdinal, schemeCategory20c} from "d3-scale";
 import _ from "lodash";
 
 
@@ -164,9 +162,16 @@ const variableColorList = [
             'DR',
             'B',
             'NOT_STARTED',
-            'BLUE'
+            'BLUE',
+            'MEDIUM'
         ]
-    },{
+    }, {
+        color: blue.darker(),
+        keys: ['HIGH']
+    }, {
+        color: blue.brighter(),
+        keys: ['LOW']
+    }, {
         color: purple,
         keys: ['OTHER']
     }, {
