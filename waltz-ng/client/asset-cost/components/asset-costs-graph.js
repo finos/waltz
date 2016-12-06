@@ -9,8 +9,7 @@ import {format} from 'd3-format';
 import 'd3-selection-multi';
 
 
-const template = "<div class='waltz-asset-costs-graph'></div>";
-
+const template = `<div class='waltz-asset-costs-graph'></div>`;
 
 const bindings = {
     costs: '<',
@@ -137,17 +136,21 @@ function draw(svg, costs = [],
 function controller($element, $scope) {
     const vm = initialiseData(this, initialState);
 
-    const holder = $element.find("div")[0];
+    const holder = $element.find('div')[0];
     const svg = select(holder)
         .append('svg')
+        .attr('id', 'waltz-asset-costs-graph')
         .attr('width', dimensions.graph.width)
         .attr('height', dimensions.graph.height)
         .attr('viewbox', `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
 
     let unregisterResponsivefy = () => {};
 
-    vm.$onDestroy = () => unregisterResponsivefy;
-    vm.$onInit = () => unregisterResponsivefy = responsivefy(svg);
+    vm.$onDestroy = () => unregisterResponsivefy();
+
+    vm.$onInit = () => {
+        unregisterResponsivefy = responsivefy(svg);
+    };
 
     vm.$onChanges = () => {
         if (isEmpty(vm.costs)) {

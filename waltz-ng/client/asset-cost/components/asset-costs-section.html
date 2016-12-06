@@ -16,7 +16,7 @@
         <uib-tabset>
 
             <!-- TOP 10 -->
-            <uib-tab>
+            <uib-tab select="$ctrl.showSummary()">
                 <uib-tab-heading>
                     Top 10
                 </uib-tab-heading>
@@ -25,9 +25,11 @@
 
                 <div class="row">
                     <div class="col-sm-8">
-                        <waltz-asset-costs-graph costs="$ctrl.costView.summary"
-                                                 on-select="$ctrl.onSummarySelect">
-                        </waltz-asset-costs-graph>
+                        <div ng-if="$ctrl.visibility.summary">
+                            <waltz-asset-costs-graph costs="$ctrl.costView.summary"
+                                                     on-select="$ctrl.onSummarySelect">
+                            </waltz-asset-costs-graph>
+                        </div>
                     </div>
 
                     <div class="col-sm-4">
@@ -69,22 +71,24 @@
             </uib-tab>
 
             <!-- ALL -->
-            <uib-tab select="$ctrl.loadAll()">
+            <uib-tab select="$ctrl.showDetail()">
                 <uib-tab-heading>
                     All Data
                 </uib-tab-heading>
 
                 <br>
-                <div ng-if="$ctrl.costView.costs.length > 0">
-                    <waltz-asset-cost-table options='{
-                                            showOrgUnit: false,
-                                            showAppName: true,
-                                            showAssetCode: false
-                                        }'
-                                            selected-bucket="$ctrl.data.selectedBucket"
-                                            csv-name='{{ $ctrl.csvName }}'
-                                            costs='$ctrl.costView.costs'>
-                    </waltz-asset-cost-table>
+                <div ng-if="$ctrl.visibility.detail">
+                    <div ng-if="$ctrl.costView.costs.length > 0">
+                        <waltz-asset-cost-table options='{
+                                                    showOrgUnit: false,
+                                                    showAppName: true,
+                                                    showAssetCode: false
+                                                }'
+                                                selected-bucket="$ctrl.data.selectedBucket"
+                                                csv-name='{{ $ctrl.csvName }}'
+                                                costs='$ctrl.costView.costs'>
+                        </waltz-asset-cost-table>
+                    </div>
                 </div>
             </uib-tab>
         </uib-tabset>

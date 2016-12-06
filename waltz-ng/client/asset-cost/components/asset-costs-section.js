@@ -16,12 +16,22 @@
  *
  */
 import {assetCostKindNames} from '../../common/services/display_names';
+import {initialiseData} from '../../common';
+
 
 const bindings = {
     costView: '<',
     loadAll: '<',
     csvName: '@?',
     sourceDataRatings: '<'
+};
+
+
+const initialState = {
+    visibility: {
+        summary: true,
+        detail: false
+    }
 };
 
 
@@ -34,11 +44,20 @@ function processSelection(d) {
 
 
 function controller() {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
-    vm.onSummarySelect = (d) => {
-        vm.summarySelection = processSelection(d);
-    }
+    vm.onSummarySelect = (d) => vm.summarySelection = processSelection(d);
+
+    vm.showSummary = () => {
+        vm.visibility.summary = true;
+        vm.visibility.detail = false;
+    };
+
+    vm.showDetail = () => {
+        vm.visibility.summary = false;
+        vm.visibility.detail = true;
+        vm.loadAll();
+    };
 }
 
 

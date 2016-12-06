@@ -9,47 +9,6 @@
     </waltz-asset-costs-section>
 
 
-    <waltz-section name="Costs"
-                   id="costs-section">
-        <h4>Top 10 App Costs</h4>
-        <div class="row">
-            <div class="col-sm-8">
-                <waltz-asset-costs-graph costs="ctrl.costs"
-                                         on-hover="ctrl.onHover"
-                                         on-select="ctrl.onSelect">
-                </waltz-asset-costs-graph>
-            </div>
-
-            <div class="col-sm-4">
-                <div ng-if="ctrl.selected">
-                    <a ui-sref="main.app.view ({ id: ctrl.selected.entityRef.id })">
-                        <h5 ng-bind="ctrl.selected.entityRef.name"></h5>
-                    </a>
-                    <table class="table table-condensed table-striped small">
-                        <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Amount</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="(type, amount) in ctrl.selected.costs">
-                            <td><span ng-bind="type"></span></td>
-                            <td><span ng-bind="amount"></span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Total</strong></td>
-                            <td><span ng-bind="ctrl.selected.total"></span></td>
-                        </tr>
-                        </tbody>
-
-                    </table>
-                </div>
-
-            </div>
-        </div>
-
-    </waltz-section>
 
 
 </div>

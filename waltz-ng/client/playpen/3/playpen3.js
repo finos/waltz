@@ -18,15 +18,10 @@ function controller($scope, assetCostStore, appStore, assetCostViewService) {
         .then(costView => vm.costView = costView);
 
     vm.loadAll = () => {
-        console.log('loadAll!!')
         assetCostViewService
             .loadDetail()
-            .then(x => {
-                console.log(x);
-                return x;
-            })
             .then(costView => vm.costView = costView);
-    }
+    };
 
     vm.onHover = (d) => vm.hovered = d;
     vm.onSelect = (d) => vm.selected = d;
