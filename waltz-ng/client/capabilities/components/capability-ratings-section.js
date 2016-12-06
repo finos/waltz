@@ -1,6 +1,6 @@
 import {initialiseData, mkLinkGridCell} from "../../common";
 import {ragColorScale} from "../../common/colors";
-
+import {applicationRatingNames} from "../../common/services/display_names";
 
 const bindings = {
     appCapabilities: '<',
@@ -27,9 +27,9 @@ const initialState = {
             field: 'app.assetCode',
             name: 'Asset Code'
         }, {
-            field: 'rating',
+            field: 'ratingName',
             name: 'Rating',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-rating-indicator-cell rating="COL_FIELD" label="COL_FIELD | toDisplayName:\'applicationRating\'"></waltz-rating-indicator-cell></div>'
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-rating-indicator-cell rating="row.entity.rating" label="COL_FIELD"></waltz-rating-indicator-cell></div>'
         }, {
             field: 'description',
             name: 'Comment'
@@ -46,7 +46,11 @@ function prepareAppCapabilities(appCapabilities = [], apps = []) {
 
     return _.map(
         appCapabilities,
-        ac => Object.assign({}, ac, { app: appsById[ac.applicationId] }));
+        ac => Object.assign({},
+            ac,
+            { app: appsById[ac.applicationId] },
+            { ratingName: applicationRatingNames[ac.rating] || ac.rating }
+        ));
 }
 
 

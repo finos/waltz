@@ -9,13 +9,13 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-import _ from 'lodash';
+import _ from "lodash";
 import {
     criticalityDisplayNames,
     investmentRatingNames,
     lifecyclePhaseDisplayNames,
-    applicationKindDisplayNames}
-        from '../../common/services/display_names'
+    applicationKindDisplayNames
+} from "../../common/services/display_names";
 
 
 const bindings = {
@@ -34,7 +34,7 @@ function processApps(apps = []) {
                 overallRating: investmentRatingNames[a.overallRating] || a.overallRating,
                 businessCriticality: criticalityDisplayNames[a.businessCriticality] || a.businessCriticality,
                 riskRating: criticalityDisplayNames[a.riskRating] || a.riskRating,
-                lifecyclePhase: criticalityDisplayNames[a.lifecyclePhase] || a.lifecyclePhase
+                lifecyclePhase: lifecyclePhaseDisplayNames[a.lifecyclePhase] || a.lifecyclePhase
             }))
         .value();
 }
