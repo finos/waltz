@@ -15,9 +15,8 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 import _ from "lodash";
-import {initialiseData} from '../../../common';
+import {initialiseData} from "../../../common";
 
 const bindings = {
     application: '<',
@@ -56,7 +55,6 @@ function controller() {
 
     vm.$onChanges = () => {
         vm.currentUsage = refresh(vm.capabilities, vm.usages);
-        console.log(vm.currentUsage);
     };
 
 
