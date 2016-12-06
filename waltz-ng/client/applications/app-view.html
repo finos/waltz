@@ -94,6 +94,8 @@
             <uib-tab index="0"
                      select="ctrl.dataTab = 0"
                      heading="Summary">
+                <br>
+
                 <div ng-if="ctrl.dataTypeUsages.length == 0 && ctrl.flows.length == 0">
                     <waltz-no-data ng-if="ctrl.dataTypeUsages.length == 0">
                         <message>
@@ -178,63 +180,76 @@
                                              physical-flows="ctrl.physicalFlows">
                 </waltz-physical-data-section>
             </uib-tab>
+            <uib-tab index="2"
+                     select="ctrl.dataTab = 2"
+                     heading="Authority">
+
+                <div ng-if="ctrl.dataTab == 2">
+                    <br>
+
+                    <div ng-if="!(ctrl.authSources|isEmpty)">
+                        <p>
+                            This application has been declared as an authoritative source for some of the datatypes
+                            it deals with.
+                        </p>
+
+                        <div ng-repeat="(dataType, data) in ctrl.authSources"
+                             style="padding-top: 5px;">
+                            <h4 ng-bind="dataType | toDisplayName:'dataType'">
+                            </h4>
+                            <p class="text-muted"
+                               ng-bind="dataType | toDescription:'dataType'">
+                            </p>
+
+                            <table class="table table-condensed">
+                                <colgroup>
+                                    <col width="15%"/>
+                                    <col width="15%"/>
+                                    <col/>
+                                </colgroup>
+                                <tr ng-repeat="(rating, sources) in data">
+                                    <td>
+                                        <waltz-rating-indicator value="{{ rating }}">
+                                        </waltz-rating-indicator>
+                                    </td>
+                                    <td>
+                                        <span ng-bind="rating | toDisplayName:'rating'"></span>
+                                    </td>
+                                    <td>
+                                        Organisational Units:
+                                        <ul class="list-inline"
+                                            style="display: inline-block">
+                                            <li ng-repeat="source in sources">
+                                                <a ui-sref="main.org-unit.view({ id: source.parentReference.id })"
+                                                   ng-bind="ctrl.orgUnitsById[source.parentReference.id].name">
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <hr/>
+                        <small class="text-muted">
+                            The above table shows the datatypes this application is considered to be an authoritative source for.
+                            The classification of authoritativeness is from the viewpoint of an organisational unit (and its sub units)
+                            therefore you may see multiple declarations from different areas in the organisation.
+                        </small>
+                    </div>
+
+
+                    <waltz-no-data ng-if="(ctrl.authSources|isEmpty)">
+                        <message>
+                            This application has not been declared an
+                            <strong>Authoritative Source</strong>
+                            for any datatypes
+                        </message>
+                    </waltz-no-data>
+                </div>
+
+
+            </uib-tab>
         </uib-tabset>
-
-    </waltz-section>
-
-
-    <!-- AUTH SOURCES -->
-    <waltz-section name="Authoritative Flow Source"
-                   ng-if="!(ctrl.authSources|isEmpty)"
-                   id="authoritative-source-section">
-
-        <p>
-            This application has been declared as an authoritative source for some of the datatypes
-            it deals with.
-        </p>
-
-        <div ng-repeat="(dataType, data) in ctrl.authSources"
-             style="padding-top: 5px;">
-            <h4 ng-bind="dataType | toDisplayName:'dataType'">
-            </h4>
-            <p class="text-muted"
-               ng-bind="dataType | toDescription:'dataType'">
-            </p>
-
-            <table class="table table-condensed">
-                <colgroup>
-                    <col width="15%"/>
-                    <col width="15%"/>
-                    <col/>
-                </colgroup>
-                <tr ng-repeat="(rating, sources) in data">
-                    <td>
-                        <waltz-rating-indicator value="{{ rating }}">
-                        </waltz-rating-indicator>
-                    </td>
-                    <td>
-                        <span ng-bind="rating | toDisplayName:'rating'"></span>
-                    </td>
-                    <td>
-                        Organisational Units:
-                        <ul class="list-inline"
-                            style="display: inline-block">
-                            <li ng-repeat="source in sources">
-                                <a ui-sref="main.org-unit.view({ id: source.parentReference.id })"
-                                   ng-bind="ctrl.orgUnitsById[source.parentReference.id].name">
-                                </a>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <hr/>
-        <small class="text-muted">
-            The above table shows the datatypes this application is considered to be an authoritative source for.
-            The classification of authoritativeness is from the viewpoint of an organisational unit (and its sub units)
-            therefore you may see multiple declarations from different areas in the organisation.
-        </small>
 
     </waltz-section>
 
