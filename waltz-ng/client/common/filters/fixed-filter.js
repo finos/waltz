@@ -10,6 +10,11 @@
  *
  */
 
-export default () => (d, precision) => _.isNumber(d) ? Number(d).toFixed(precision || 2) : '';
+import _ from 'lodash';
+
+
+export default () => (d, precision) => _.isNumber(d)
+    ? Number(d).toFixed(precision || 2)
+    : '';
 
 

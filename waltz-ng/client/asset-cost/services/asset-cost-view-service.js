@@ -2,11 +2,11 @@ import {checkIsApplicationIdSelector} from '../../common/checks';
 import {notEmpty} from '../../common'
 
 const initData = {
-    loadingStats: false,
+    loadingSummary: false,
     loadingCosts: false,
     costs: [],
     appIds: [],
-    stats: {}
+    summary: []
 };
 
 function service($q,
@@ -15,17 +15,24 @@ function service($q,
 
     let data = initData;
 
-    function initialise(selector, year) {
+    function initialise(selector) {
         checkIsApplicationIdSelector(selector);
 
         data = { ...initData };
-        data.loadingStats = true;
+        data.loadingSummary = true;
         data.options = selector;
-        return assetCostStore
-            .findStatsByAppIds(data.options, year)
-            .then(stats => {
-                data.loadingStats = false;
-                data.stats = stats;
+
+        const topCostsPromise = assetCostStore
+            .findTopAppCostsByAppIdSelector(selector);
+        const totalCostPromise = assetCostStore
+            .findTotalCostForAppSelector(selector);
+
+        return $q
+            .all([topCostsPromise, totalCostPromise])
+            .then(([topCosts = [], total]) => {
+                data.loadingSummary = false;
+                data.summary = topCosts;
+                data.total = total;
                 return data;
             });
     }
@@ -42,21 +49,15 @@ function service($q,
             .then(costs => {
                 data.loadingDetail = false;
                 data.costs = costs;
-                return data;
+                return Object.assign({}, data);
             });
     }
 
-
-    function selectBucket(bucket) {
-        data.selectedBucket = bucket;
-        return $q.when(data);
-    }
 
 
     return {
         initialise,
         loadDetail,
-        selectBucket
     };
 }
 

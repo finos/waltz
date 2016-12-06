@@ -1,0 +1,131 @@
+<div>
+    <waltz-section name="Costs"
+                   id="costs-section">
+        <waltz-section-actions>
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="$ctrl.sourceDataOverlay = ! $ctrl.sourceDataOverlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
+
+        <waltz-source-data-overlay visible="$ctrl.sourceDataOverlay"
+                                   ratings="$ctrl.sourceDataRatings"
+                                   entities="['ASSET_COST']">
+        </waltz-source-data-overlay>
+
+        <uib-tabset>
+
+            <!-- TOP 10 -->
+            <uib-tab select="$ctrl.showSummary()">
+                <uib-tab-heading>
+                    Top 10
+                </uib-tab-heading>
+
+                <br>
+
+                <div class="row">
+                    <div class="col-sm-8">
+                        <div ng-if="$ctrl.visibility.summary">
+                            <waltz-asset-costs-graph costs="$ctrl.costView.summary"
+                                                     on-select="$ctrl.onSummarySelect">
+                            </waltz-asset-costs-graph>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <div ng-if="$ctrl.summarySelection">
+                            <a ui-sref="main.app.view ({ id: $ctrl.summarySelection.entityRef.id })">
+                                <h5 ng-bind="$ctrl.summarySelection.entityRef.name"></h5>
+                            </a>
+                            <table class="table table-condensed table-striped small">
+                                <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="row in $ctrl.summarySelection.costTable | orderBy:'type'">
+                                    <td>
+                                        <span ng-bind="row.type"></span>
+                                    </td>
+                                    <td align="right">
+                                        € <span ng-bind="row.amount | toFixed:2"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Total</strong>
+                                    </td>
+                                    <td align="right">
+                                        € <span ng-bind="$ctrl.summarySelection.total | toFixed:2"></span>
+                                    </td>
+                                </tr>
+                                </tbody>
+
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </uib-tab>
+
+            <!-- ALL -->
+            <uib-tab select="$ctrl.showDetail()">
+                <uib-tab-heading>
+                    All Data
+                </uib-tab-heading>
+
+                <br>
+                <div ng-if="$ctrl.visibility.detail">
+                    <div ng-if="$ctrl.costView.costs.length > 0">
+                        <waltz-asset-cost-table options='{
+                                                    showOrgUnit: false,
+                                                    showAppName: true,
+                                                    showAssetCode: false
+                                                }'
+                                                selected-bucket="$ctrl.data.selectedBucket"
+                                                csv-name='{{ $ctrl.csvName }}'
+                                                costs='$ctrl.costView.costs'>
+                        </waltz-asset-cost-table>
+                    </div>
+                </div>
+            </uib-tab>
+        </uib-tabset>
+
+        <waltz-loading-notification show="$ctrl.viewData.loadingSummary"
+                                    name="Loading summary....">
+        </waltz-loading-notification>
+
+        <div ng-if="$ctrl.assetCostBuckets.length > 0">
+            <div class="row">
+                <div class="col-md-12" class="myChart">
+                    <waltz-bucket-chart buckets="$ctrl.assetCostBuckets"
+                                        on-bucket-select="$ctrl.onBucketSelect">
+                    </waltz-bucket-chart>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <br>
+                    <div class="small text-muted pull-right">
+                        Each circle is sized according to the <i>number</i> of applications whose costs
+                        fall within the stated range.  Click on a circle for more details.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <waltz-loading-notification show="$ctrl.data.loading"
+                                    name="Loading detail....">
+        </waltz-loading-notification>
+
+        <div class="row"
+             ng-if="$ctrl.data.costs.length > 0"
+             style="margin-top: 12px">
+            <div class="col-md-12">
+
+            </div>
+        </div>
+    </waltz-section>
+</div>

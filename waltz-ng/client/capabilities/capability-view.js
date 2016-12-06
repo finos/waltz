@@ -222,9 +222,8 @@ function controller($q,
 
     // -- INTERACT ---
 
-    vm.onAssetBucketSelect = bucket => {
+    vm.loadAllCosts = () => {
         $scope.$applyAsync(() => {
-            assetCostViewService.selectBucket(bucket);
             assetCostViewService.loadDetail()
                 .then(data => vm.assetCostData = data);
         })

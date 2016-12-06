@@ -38,7 +38,7 @@
                              apps="ctrl.viewData.apps"
                              flows="ctrl.viewData.dataFlows.stats"
                              app-capabilities="ctrl.viewData.appCapabilities"
-                             costs="ctrl.viewData.assetCostData.stats"
+                             total-cost="ctrl.viewData.assetCostData.total"
                              server-stats="ctrl.viewData.techStats.serverStats"
                              immediate-hierarchy="ctrl.viewData.immediateHierarchy"
                              complexity="ctrl.viewData.complexity"
@@ -225,15 +225,12 @@
 
 
     <!-- COSTS -->
-    <waltz-section name="Costs"
-                   id="costs-section">
-        <div class="row">
-            <div class="col-md-8">
-                <waltz-asset-costs-graph costs="ctrl.viewData.topAssetCosts">
-                </waltz-asset-costs-graph>
-            </div>
-        </div>
-    </waltz-section>
+    <waltz-asset-costs-section cost-view="ctrl.viewData.assetCostData"
+                               id="costs-section"
+                               load-all="ctrl.loadAllCosts"
+                               csv-name="{{ ctrl.viewData.orgUnit.name }}_asset_costs.csv"
+                               source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-asset-costs-section>
 
 
     <!-- BOOKMARKS -->

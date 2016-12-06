@@ -14,7 +14,7 @@
 
     <!-- SUMMARY -->
     <waltz-person-summary person="ctrl.person"
-                          asset-costs="ctrl.assetCostData.stats"
+                          total-cost="ctrl.assetCostData.total"
                           managers="ctrl.managers"
                           complexity="ctrl.complexity"
                           server-stats="ctrl.techStats.serverStats"
@@ -208,9 +208,9 @@
 
 
     <!-- COSTS -->
-    <waltz-asset-costs-section data="ctrl.assetCostData"
+    <waltz-asset-costs-section cost-view="ctrl.assetCostData"
                                ng-if="ctrl.hasInvolvements"
-                               on-bucket-select="ctrl.onAssetBucketSelect"
+                               load-all="ctrl.loadAllCosts"
                                source-data-ratings="ctrl.sourceDataRatings">
     </waltz-asset-costs-section>
 

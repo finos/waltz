@@ -23,8 +23,6 @@ import {numberFormatter} from "../../common";
  * returns a formatted total cost for the portfolio
  * @param costs
  */
-export function calcPortfolioCost(costs) {
-    if (!costs || !costs.totalCost) return;
-
-    return '€ ' + numberFormatter(costs.totalCost.amount, 1);
+export function calcPortfolioCost(total = { amount: 0 }) {
+    return '€ ' + numberFormatter(total.amount, 1);
 }

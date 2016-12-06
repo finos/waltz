@@ -1,4 +1,5 @@
 import {select} from 'd3-selection';
+import _ from 'lodash';
 
 
 /**
@@ -17,6 +18,7 @@ export function responsivefy(svg) {
 
     const resize = () => {
         const targetWidth = parseInt(container.style("width"));
+        if (_.isNaN(targetWidth)) return;
         svg
             .attr("width", targetWidth)
             .attr("height", Math.round(targetWidth / aspect));

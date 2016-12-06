@@ -290,9 +290,9 @@ function service($q,
 
     // -- INTERACTION ---
 
-    function selectAssetBucket(bucket) {
-        assetCostViewService.selectBucket(bucket);
-        assetCostViewService.loadDetail()
+    function loadAllCosts() {
+        assetCostViewService
+            .loadDetail()
             .then(data => state.model.assetCostData = data);
     }
 
@@ -307,10 +307,11 @@ function service($q,
     return {
         load,
         state,
-        selectAssetBucket,
+        loadAllCosts,
         loadFlowDetail
     };
 }
+
 
 service.$inject = [
     '$q',

@@ -46,9 +46,9 @@ function controller($scope,
     }, true);
 
 
-    vm.onAssetBucketSelect = bucket => {
+    vm.loadAllCosts = () => {
         $scope.$applyAsync(() => {
-            viewService.selectAssetBucket(bucket);
+            viewService.loadAllCosts();
         });
     };
 

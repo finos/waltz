@@ -21,7 +21,7 @@ const bindings = {
     orgUnitDescendants: '<',
     apps: '<',
     complexity: '<',
-    costs: '<',
+    totalCost: '<',
     immediateHierarchy: '<',
     flows: '<',
     appCapabilities: '<',
@@ -81,7 +81,7 @@ function controller() {
     vm.$onChanges = () => {
         Object.assign(vm, calcParentsAndChildren(vm.immediateHierarchy, vm.orgUnit));
         vm.complexitySummary = calcComplexitySummary(vm.complexity);
-        vm.portfolioCostStr = calcPortfolioCost(vm.costs);
+        vm.portfolioCostStr = calcPortfolioCost(vm.totalCost);
         vm.enrichedServerStats = enrichServerStats(vm.serverStats);
         vm.descendantsTree = buildTree(vm.orgUnitDescendants, vm.orgUnit);
         vm.capabilityStats = calcCapabilityStats(vm.appCapabilities);

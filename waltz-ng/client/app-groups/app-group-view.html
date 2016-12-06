@@ -34,7 +34,7 @@
     <!-- SUMMARY -->
     <waltz-app-group-summary class='waltz-page-summary-attach'
                              applications="ctrl.applications"
-                             asset-costs="ctrl.assetCostData.stats"
+                             total-cost="ctrl.assetCostData.total"
                              complexity="ctrl.complexity"
                              server-stats="ctrl.techStats.serverStats"
                              app-group="ctrl.groupDetail.appGroup"
@@ -177,9 +177,9 @@
 
 
     <!-- COSTS -->
-    <waltz-asset-costs-section data='ctrl.assetCostData'
+    <waltz-asset-costs-section cost-view='ctrl.assetCostData'
                                source-data-ratings="ctrl.sourceDataRatings"
-                               on-bucket-select="ctrl.onAssetBucketSelect">
+                               load-all="ctrl.loadAllCosts">
     </waltz-asset-costs-section>
 
 
