@@ -15,15 +15,14 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 import _ from "lodash";
 import {green, red} from "../../common/colors";
 import {notEmpty} from "../../common";
-import {interpolateRgb} from 'd3-interpolate';
-import {axisBottom} from 'd3-axis';
-import {scaleBand, scaleLinear} from 'd3-scale';
-import {select} from 'd3-selection';
-import 'd3-selection-multi';
+import {interpolateRgb} from "d3-interpolate";
+import {axisBottom} from "d3-axis";
+import {scaleBand, scaleLinear} from "d3-scale";
+import {select} from "d3-selection";
+import "d3-selection-multi";
 
 
 const sizingDefaults = {
@@ -77,7 +76,8 @@ function prepareScales(buckets, sizing) {
     const scales = {
         x: scaleBand()
             .domain(_.range(0, bucketCount))
-            .range([0, sizing.w], 0.2),
+            .range([0, sizing.w])
+            .padding(0.2),
         y: scaleLinear()
             .domain([0, biggestBucket])
             .range([0, sizing.h - verticalPadding]),
@@ -114,30 +114,37 @@ function drawXAxis(buckets, container, scale, sizing) {
 
 function drawBucketBars(buckets, container, scales, sizing, repaint, onSelect) {
 
-    const bucketBars = container
+    const groups = container
         .selectAll('.bucket-bar', d => `${d.begin}_${d.end}`)
         .data(buckets);
 
-    const newBars = bucketBars
+    const newGroups = groups
         .enter()
-        .append('rect')
+        .append('g')
         .classed('bucket-bar', true);
 
-    bucketBars
-        .merge(newBars)
-        .classed('clickable', onSelect != null)
+    const newBars = newGroups
+        .append('rect')
         .attr('stroke', '#444')
         .attr('x', (d, i) => scales.x(i))
         .attr('width', scales.x.bandwidth())
         .attr('y', d => (sizing.h - sizing.padding.bottom) - (scales.y(d.items.length)))
         .attr('height', d => scales.y(d.items.length))
-        .attr('opacity', d => d.isMouseOver
-            ? 1
-            : 0.7)
-        .attr('fill', (d, i) => scales.color(i)) //)
+        .attr('fill', (d, i) => scales.color(i));
+
+
+    newGroups
+        .append('rect')
+        .classed('clickable', true)
+        .style('visibility', 'hidden')
+        .attr('pointer-events', 'all')
+        .attr('x', (d, i) => scales.x(i))
+        .attr('width', scales.x.bandwidth())
+        .attr('y', 0)
+        .attr('height', sizing.h)
         .on('click', d => { if (onSelect) { onSelect(d); } })
-        .on('mouseenter', d => { d.isMouseOver = true; repaint(); })
-        .on('mouseleave', d => { d.isMouseOver = false; repaint(); });
+        .on('mouseenter.hover', d => { d.isMouseOver = true; repaint(); })
+        .on('mouseleave.hover', d => { d.isMouseOver = false; repaint(); });
 
 
 }
