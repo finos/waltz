@@ -42,6 +42,14 @@ const service = ($http, root) => {
     };
 
 
+    const findTopAppCostsByAppIdSelector = (options) => {
+        checkIsIdSelector(options);
+        return $http
+            .post(`${BASE}/app-cost/top-apps`, options)
+            .then(result => result.data);
+    };
+
+
     const findStatsByAppIds = (options, year) => {
         checkIsIdSelector(options);
         var path = `${BASE}/app-cost/apps/stats`;
@@ -67,6 +75,7 @@ const service = ($http, root) => {
         findByCode,
         findByAppId,
         findAppCostsByAppIdSelector,
+        findTopAppCostsByAppIdSelector,
         findStatsByAppIds,
         calculateCombinedAmountsForSelector
     };

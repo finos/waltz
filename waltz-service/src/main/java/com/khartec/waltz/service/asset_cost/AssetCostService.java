@@ -80,6 +80,17 @@ public class AssetCostService {
     }
 
 
+    public List<ApplicationCost> findTopAppCostsByAppIds(IdSelectionOptions options, int limit) {
+        checkNotNull(options, "options cannot be null");
+        Select<Record1<Long>> selector = idSelectorFactory.apply(options);
+
+        return assetCostDao
+                .findLatestYear()
+                .map(year -> assetCostDao.findTopAppCostsByAppIdSelector(year, selector, limit))
+                .orElse(Collections.emptyList());
+    }
+
+
     public List<Tuple2<Long, BigDecimal>> calculateCombinedAmountsForSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
 

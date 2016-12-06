@@ -224,11 +224,15 @@
 
 
     <!-- COSTS -->
-    <waltz-asset-costs-section data="ctrl.viewData.assetCostData"
-                               source-data-ratings="ctrl.viewData.sourceDataRatings"
-                               on-bucket-select="ctrl.onAssetBucketSelect"
-                               csv-name="asset_costs.csv">
-    </waltz-asset-costs-section>
+    <waltz-section name="Costs"
+                   id="costs-section">
+        <div class="row">
+            <div class="col-md-8">
+                <waltz-asset-costs-graph costs="ctrl.viewData.topAssetCosts">
+                </waltz-asset-costs-graph>
+            </div>
+        </div>
+    </waltz-section>
 
 
     <!-- BOOKMARKS -->
