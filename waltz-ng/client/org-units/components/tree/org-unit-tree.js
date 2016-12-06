@@ -11,12 +11,11 @@
  *
  */
 import _ from "lodash";
-import {notEmpty, isEmpty} from "../../../common";
+import {isEmpty} from "../../../common";
 
 
 const bindings = {
-    tree: '<',
-    onSelection: '<'
+    tree: '<'
 };
 
 
@@ -34,7 +33,6 @@ function expandTree(tree = []) {
 
 const treeOptions =  {
     nodeChildren: "children",
-    dirSelectable: true,
     equality: (a, b) => a && b && a.id === b.id
 };
 
@@ -45,18 +43,6 @@ function controller() {
     vm.expandedNodes = [];
 
     vm.treeOptions = treeOptions;
-
-    vm.onNodeSelect = (node) => {
-        if (notEmpty(node.children)) {
-            const idx = _.findIndex(vm.expandedNodes, n => n.id === node.id);
-            if (idx === -1) {
-                vm.expandedNodes.push(node);
-            } else {
-                vm.expandedNodes.splice(idx, 1);
-            }
-        }
-        if (_.isFunction(vm.onSelection)) vm.onSelection(node);
-    };
 
     vm.hasOwnApps = (node) => node.appCount && node.appCount > 0;
     vm.hasAnyApps = (node) => node.totalAppCount && node.totalAppCount > 0;

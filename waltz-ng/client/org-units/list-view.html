@@ -66,110 +66,49 @@
 
         <!-- TREE -->
         <div class="row">
+
             <div class="col-sm-8">
-                <waltz-org-unit-tree tree="ctrl.trees"
-                                     on-selection="ctrl.nodeSelected">
+
+                <waltz-org-unit-tree tree="ctrl.trees">
                 </waltz-org-unit-tree>
+                <br>
+                <p class="text-muted">
+                    The tree below describes the organisational structure.  Each unit
+                    in the tree may show a count of the number of applications (blue)
+                    and end user applications (green) owned by the unit.  The two numbers
+                    show the direct ownership count and the indirect (inherited)
+                    count (in parentheses).
+                </p>
             </div>
+
             <div class="col-sm-4">
-                <div ng-if="ctrl.selectedNode"
-                     style="border: 1px solid #ccc; border-radius: 3px; padding: 12px;">
-
-                    <h4>
-                        <span ng-bind="ctrl.selectedNode.name"></span>
-                        <small class="pull-right clickable">
-                            <waltz-icon name="times"
-                                        ng-click="ctrl.selectedNode = null">
-                            </waltz-icon>
-                        </small>
-                    </h4>
-
-                    <div class="small waltz-paragraph"
-                         ng-bind="ctrl.selectedNode.description">
-                    </div>
-
-                    <a ui-sref="main.org-unit.view ({ id: ctrl.selectedNode.id })">
-                        Show &raquo;
-                    </a>
-
-
-
-                    <hr>
-
-                    <h5 ng-if="ctrl.selectedNode.appCount > 0">
-                        <span ng-bind="ctrl.selectedNode.appCount"></span>
-                        Application/s
-                    </h5>
-
-                    <div class='small'
-                         ng-if="ctrl.selectedNode.childAppCount > 0">
-                        <span ng-bind="ctrl.selectedNode.totalAppCount">
-                        </span>
-                        (incl. sub-units)
-                    </div>
-
-                    <hr>
-
-                    <h5 ng-if="ctrl.selectedNode.endUserAppCount > 0">
-                        <span ng-bind="ctrl.selectedNode.endUserAppCount"></span>
-                        End User Application/s
-                    </h5>
-
-                    <div class="small"
-                         ng-if="ctrl.selectedNode.childEndUserAppCount > 0">
-                        <span ng-bind="ctrl.selectedNode.totalEndUserAppCount">
-                        </span>
-                        (incl. sub-units)
-                    </h5>
-
-                    <br>
-                </div>
-            </div>
-        </div>
-
-        </div>
-
-        <hr>
-
-        <!-- SEARCH -->
-        <div class="row">
-            <div class="col-md-6">
                 <waltz-search clear="ctrl.clearSearch"
                               search="ctrl.doSearch"></waltz-search>
-            </div>
-        </div>
-
-        <br>
-
-        <!-- SEARCH RESULTS -->
-        <div class="row">
-                <div class="col-md-12">
-                    <div ng-if="ctrl.filteredOrgUnits.length > 0">
-                        <table class="table table-condensed table-striped small">
-                            <colgroup>
-                                <col width="30%">
-                                <col width="70%">
-                            </colgroup>
-                            <tbody>
-                            <tr ng-repeat="node in ctrl.filteredOrgUnits">
-                                <td>
-                                    <a ui-sref="main.org-unit.view ({ id: node.id })"
-                                       class="waltz-org-unit-name"
-                                       ng-bind="node.name">
-                                    </a>
-                                </td>
-                                <td>
-                                    <span class="small"
-                                          ng-bind="node.description">
-                                    </span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div ng-if="ctrl.filteredOrgUnits.length > 0">
+                    <table class="table table-condensed table-striped small">
+                        <colgroup>
+                            <col width="30%">
+                            <col width="70%">
+                        </colgroup>
+                        <tbody>
+                        <tr ng-repeat="node in ctrl.filteredOrgUnits">
+                            <td>
+                                <a ui-sref="main.org-unit.view ({ id: node.id })"
+                                   class="waltz-org-unit-name"
+                                   ng-bind="node.name">
+                                </a>
+                            </td>
+                            <td>
+                                <span class="small"
+                                      ng-bind="node.description">
+                                </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
+        </div>
 
     </waltz-section>
 
