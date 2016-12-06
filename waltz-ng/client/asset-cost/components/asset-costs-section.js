@@ -15,7 +15,7 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
+import {assetCostKindNames} from '../../common/services/display_names';
 
 const bindings = {
     costView: '<',
@@ -25,10 +25,20 @@ const bindings = {
 };
 
 
+function processSelection(d) {
+    if (!d) return null;
+
+    const costTable = _.map(d.costs, (v, k) => ({ type: assetCostKindNames[k] || k, amount: v }));
+    return Object.assign({}, d, { costTable });
+}
+
+
 function controller() {
     const vm = this;
 
-    vm.onSummarySelect = (d) => vm.summarySelection = d;
+    vm.onSummarySelect = (d) => {
+        vm.summarySelection = processSelection(d);
+    }
 }
 
 

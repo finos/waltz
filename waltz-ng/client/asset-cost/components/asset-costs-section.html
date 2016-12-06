@@ -43,13 +43,21 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr ng-repeat="(type, amount) in $ctrl.summarySelection.costs">
-                                    <td><span ng-bind="type"></span></td>
-                                    <td><span ng-bind="amount"></span></td>
+                                <tr ng-repeat="row in $ctrl.summarySelection.costTable | orderBy:'type'">
+                                    <td>
+                                        <span ng-bind="row.type"></span>
+                                    </td>
+                                    <td align="right">
+                                        € <span ng-bind="row.amount | toFixed:2"></span>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Total</strong></td>
-                                    <td><span ng-bind="$ctrl.summarySelection.total"></span></td>
+                                    <td>
+                                        <strong>Total</strong>
+                                    </td>
+                                    <td align="right">
+                                        € <span ng-bind="$ctrl.summarySelection.total | toFixed:2"></span>
+                                    </td>
                                 </tr>
                                 </tbody>
 

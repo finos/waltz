@@ -27,6 +27,8 @@ const initialState = {
 
 
 const numberFormat = format(",d");
+const currencyFormat = d => `€${numberFormat(d)}`;
+
 const startColor = "#5DADE2";
 const endColor = "#21618C";
 
@@ -64,6 +66,7 @@ function processCosts(costs = []) {
 
 function drawXAxis(xScale, container) {
     const xAxis = axisBottom(xScale)
+        .tickFormat(currencyFormat)
         .ticks(5);
 
     container.append('g')
@@ -124,7 +127,7 @@ function draw(svg, costs = [],
     bars.append('text')
         .attr("x", 10)
         .attr("y", yScale.bandwidth() / 2 + 3)  // middle of the bar
-        .text(d => numberFormat(d.total));
+        .text(d => currencyFormat(d.total));
 
     drawXAxis(xScale, g);
     drawYAxis(yScale, svg);

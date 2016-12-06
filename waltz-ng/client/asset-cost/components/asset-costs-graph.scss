@@ -1,18 +1,25 @@
 .waltz-asset-costs-graph {
     .wacg-bar {
-        opacity: 0.8;
+        rect {
+            opacity: 0.8;
+            cursor: pointer;
+        }
 
         text {
-            fill: #fff327;
-            opacity: 0.7;
+            fill: #efe80c;
+            opacity: 0.8;
             font-size: 0.75em;
         }
     }
 
     .wacg-bar:hover {
-        opacity: 1;
+        rect {
+            opacity: 1;
+        }
 
-        text { opacity: 1; }
+        text {
+            opacity: 1;
+        }
     }
 }
 
