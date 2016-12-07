@@ -32,21 +32,6 @@ function controller($window,
         const users = _.map(vm.activeUsers, 'userId');
         $window.open('mailto:?bcc=' + users.join(', '));
     };
-
-    vm.columnDefs = [
-        {
-            field: 'userId',
-            name: 'User',
-            width: '30%',
-            cellTemplate: '<div class="ui-grid-cell-contents"><a ui-sref="main.profile.view ({userId: COL_FIELD})"><span ng-bind="COL_FIELD"></span></a></div>'
-        },
-        {
-            field: 'createdAt',
-            name: 'Timestamp',
-            width: '30%',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>'
-        }
-    ];
 }
 
 
