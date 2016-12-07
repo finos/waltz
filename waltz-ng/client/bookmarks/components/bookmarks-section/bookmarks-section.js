@@ -15,27 +15,31 @@ import {initialiseData,isEmpty} from "../../../common";
 const bindings = {
     bookmarks: '<',
     entityId: '@',
-    kind: '@',
+    kind: '@', // entity-kind - not bookmark kind !
     parentName: '@',
     sourceDataRatings: '<'
 };
 
 
 const initialState = {
-    bookmarksByKind: {},
     filteredBookmarks: [],
-    kindFilter: null
-}
+    bookmarkKind: null
+};
 
 
 const template = require('./bookmarks-section.html');
 
 
-function filterBookmarks(bookmarks = {}, kind = null) {
+function filterBookmarks(bookmarks = [], kind = null) {
     if (isEmpty(bookmarks)) return [];
 
-    const filterBookmarksMap = (kind)? {kind : bookmarks[kind]} : bookmarks;
-    return _.map(filterBookmarksMap, (v, k) => ({ kind: k, bookmarks: v }));
+    const byKind = _.groupBy(bookmarks, 'kind');
+
+    const groupsToShow = kind
+        ? { kind : byKind[kind] }
+        : byKind;
+
+    return _.map(groupsToShow, (v, k) => ({ kind: k, bookmarks: v }));
 }
 
 
@@ -44,19 +48,13 @@ function controller() {
 
     vm.$onChanges = () => {
         if(vm.bookmarks) {
-            vm.bookmarksByKind = _.groupBy(vm.bookmarks, 'kind');
-            vm.filteredBookmarks = filterBookmarks(vm.bookmarksByKind, vm.kindFilter);
+            vm.filteredBookmarks = filterBookmarks(vm.bookmarks, vm.bookmarkKind);
         }
     };
 
-
     vm.selectBookmarkKind = (kind) => {
-        const filteredBookmarks = filterBookmarks(vm.bookmarksByKind, kind);
-        if(kind === null || filteredBookmarks[kind]) {
-            vm.kindFilter = kind;
-            vm.filteredBookmarks = filterBookmarks(vm.bookmarksByKind, vm.kindFilter);
-        }
-
+        vm.bookmarkKind = kind;
+        vm.filteredBookmarks = filterBookmarks(vm.bookmarks, vm.bookmarkKind);
     };
 }
 
