@@ -182,6 +182,7 @@
             </uib-tab>
             <uib-tab index="2"
                      select="ctrl.dataTab = 2"
+                     disable="ctrl.authSources|isEmpty"
                      heading="Authority">
 
                 <div ng-if="ctrl.dataTab == 2">
