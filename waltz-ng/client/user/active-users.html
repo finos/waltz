@@ -75,10 +75,29 @@
 
                 <div ng-if="ctrl.activeUsers.length > 0" class="waltz-user-log-scroll">
 
-                    <waltz-grid column-defs="ctrl.columnDefs"
-                                row-data="ctrl.activeUsers"
-                                class="small">
-                    </waltz-grid>
+                    <table class="table small">
+                        <thead>
+                        <tr>
+                            <th width="30%">User</th>
+                            <th width="30%">Timestamp</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="log in ctrl.activeUsers">
+                            <td>
+                                <a ui-sref="main.profile.view ({userId: log.userId})">
+                                    <span ng-bind="log.userId">
+                                    </span>
+                                </a>
+                            </td>
+                            <td>
+                                <waltz-from-now timestamp="log.createdAt">
+                                </waltz-from-now>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
                 </div>
                 <waltz-no-data ng-if="ctrl.activeUsers.length == 0">
                     <message>
