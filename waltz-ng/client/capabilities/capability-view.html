@@ -44,6 +44,7 @@
 
     <!--LINEAGE REPORTS-->
     <waltz-section name="Lineage Reports"
+                   icon="exchange"
                    id="lineage-reports-section">
         <waltz-section-actions>
             <button ng-click="ctrl.exportLineageReports()"
@@ -69,6 +70,7 @@
 
     <!-- AUTH SOURCES -->
     <waltz-section name="Authoritative Sources"
+                   icon="shield"
                    id="authoritative-sources-section">
         <waltz-rated-flow-summary-panel apps="ctrl.apps"
                                         entity-reference="ctrl.entityRef"
@@ -121,6 +123,7 @@
 
     <!-- TECHNOLOGIES -->
     <waltz-section name="Technologies"
+                   icon="server"
                    id="technologies-section">
 
         <waltz-section-actions>
@@ -160,6 +163,7 @@
 
     <!-- ASSOCIATED CAPABILITIES -->
     <waltz-section name="Associated Functions"
+                   icon="puzzle-piece"
                    id="associated-functions-section">
         <ul>
             <li ng-repeat="assoc in ctrl.associatedCapabilities | orderBy:'capability.name'">

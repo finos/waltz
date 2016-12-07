@@ -27,6 +27,7 @@
 
 
     <waltz-section id='hierarchy-section'
+                   icon="address-book-o"
                    name="Hierarchy">
 
         <div ng-if="ctrl.managers.length > 0">
@@ -134,6 +135,7 @@
 
     <!--LINEAGE REPORTS-->
     <waltz-section name="Lineage Reports"
+                   icon="exchange"
                    id="lineage-reports-section">
         <waltz-section-actions>
             <button ng-click="ctrl.exportLineageReports()"
@@ -159,6 +161,7 @@
 
     <!-- AUTH SOURCES -->
     <waltz-section name="Authoritative Sources"
+                   icon="shield"
                    ng-if="ctrl.hasInvolvements"
                    id="authoritative-sources-section">
         <waltz-rated-flow-summary-panel ng-if='ctrl.entityRef'
@@ -195,6 +198,7 @@
 
     <!-- TECHNOLOGIES -->
     <waltz-section name="Technologies"
+                   icon="server"
                    ng-if="ctrl.hasInvolvements"
                    id="technologies-section">
 
