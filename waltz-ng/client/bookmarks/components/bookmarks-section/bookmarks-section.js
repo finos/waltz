@@ -10,7 +10,7 @@
  *
  */
 import _ from "lodash";
-import {initialiseData} from "../../../common";
+import {initialiseData,isEmpty} from "../../../common";
 
 const bindings = {
     bookmarks: '<',
@@ -23,7 +23,7 @@ const bindings = {
 
 const initialState = {
     bookmarksByKind: {},
-    filteredBookmarks: {},
+    filteredBookmarks: [],
     kindFilter: null
 }
 
@@ -32,12 +32,10 @@ const template = require('./bookmarks-section.html');
 
 
 function filterBookmarks(bookmarks = {}, kind = null) {
-    if(kind) {
-        const obj = {};
-        obj[kind] = bookmarks[kind];
-        return obj;
-    }
-    return bookmarks;
+    if (isEmpty(bookmarks)) return [];
+
+    const filterBookmarksMap = (kind)? {kind : bookmarks[kind]} : bookmarks;
+    return _.map(filterBookmarksMap, (v, k) => ({ kind: k, bookmarks: v }));
 }
 
 

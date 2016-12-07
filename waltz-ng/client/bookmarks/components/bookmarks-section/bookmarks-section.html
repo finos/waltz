@@ -33,12 +33,11 @@
             <div class="col-md-9">
                     <table class="table table-condensed wbs-bookmark-table">
 
-                    <tbody ng-repeat="(kind, bookmarks) in $ctrl.filteredBookmarks">
-                        <tr ng-repeat="bookmark in bookmarks">
+                    <tbody ng-repeat="bookmarksByKind in $ctrl.filteredBookmarks | orderBy:'kind' ">
+                        <tr ng-repeat="bookmark in bookmarksByKind.bookmarks">
                             <td style="vertical-align:middle; text-align: center; width: 10%">
-                                <waltz-icon name="{{ kind | toIconName:'bookmark' }}"
-                                            size="lg"
-                                            xxng-if="$first">
+                                <waltz-icon name="{{ bookmark.kind | toIconName:'bookmark' }}"
+                                            size="lg">
                                 </waltz-icon>
                             </td>
                             <td>
