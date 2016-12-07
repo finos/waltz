@@ -201,8 +201,8 @@ function render(config) {
         });
 
     drawXAxis(buckets, mergedSvg, scales.x, sizing);
-    drawBucketBars(buckets, mergedSvg, scales, sizing, repaint, config.onSelect);
     drawBucketLabels(buckets, mergedSvg, scales, sizing);
+    drawBucketBars(buckets, mergedSvg, scales, sizing, repaint, config.onSelect);
 }
 
 
