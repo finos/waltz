@@ -13,11 +13,16 @@ const bindings = {
 function calculateLayoutData(values = [], xScale) {
     let last = xScale(0);
     return _.map(values, v => {
+        const width = v
+            ? xScale(v)
+            : 0;
+
         const d = {
             x: last,
-            width: v ? xScale(v) : 0
+            width
         };
-        last += d.width;
+
+        last += width;
         return d;
     });
 }
@@ -92,8 +97,7 @@ function controller($element) {
 
 
 controller.$inject = [
-    '$element',
-    '$scope'
+    '$element'
 ];
 
 

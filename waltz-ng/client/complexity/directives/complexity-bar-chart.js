@@ -115,37 +115,47 @@ function drawXAxis(buckets, container, scale, sizing) {
 function drawBucketBars(buckets, container, scales, sizing, repaint, onSelect) {
 
     const groups = container
-        .selectAll('.bucket-bar', d => `${d.begin}_${d.end}`)
-        .data(buckets);
+        .selectAll('.bucket-g')
+        .data(buckets, d => `${d.begin}_${d.end}`);
 
     const newGroups = groups
         .enter()
         .append('g')
-        .classed('bucket-bar', true);
+        .classed('bucket-g', true)
+        .attr('transform', (d, i) => `translate(${ scales.x(i) }, 0)`);
 
-    const newBars = newGroups
+    newGroups
         .append('rect')
+        .classed('bucket-bar', true)
         .attr('stroke', '#444')
-        .attr('x', (d, i) => scales.x(i))
         .attr('width', scales.x.bandwidth())
-        .attr('y', d => (sizing.h - sizing.padding.bottom) - (scales.y(d.items.length)))
-        .attr('height', d => scales.y(d.items.length))
         .attr('fill', (d, i) => scales.color(i));
-
 
     newGroups
         .append('rect')
         .classed('clickable', true)
+        .classed('bucket-band', true)
         .style('visibility', 'hidden')
         .attr('pointer-events', 'all')
-        .attr('x', (d, i) => scales.x(i))
         .attr('width', scales.x.bandwidth())
         .attr('y', 0)
-        .attr('height', sizing.h)
+        .attr('height', sizing.h);
+
+    const allGroups = groups
+        .merge(newGroups);
+
+    allGroups
+        .selectAll('.bucket-bar')
+        .data(d => [d])
+        .attr('y', d => (sizing.h - sizing.padding.bottom) - (scales.y(d.items.length)))
+        .attr('height', d => scales.y(d.items.length));
+
+    allGroups
+        .selectAll('.bucket-band')
+        .data(d => [d])
         .on('click', d => { if (onSelect) { onSelect(d); } })
         .on('mouseenter.hover', d => { d.isMouseOver = true; repaint(); })
         .on('mouseleave.hover', d => { d.isMouseOver = false; repaint(); });
-
 
 }
 
@@ -194,7 +204,8 @@ function render(config) {
         .enter()
         .append('svg');
 
-    const mergedSvg = svg.merge(newSvg)
+    const mergedSvg = svg
+        .merge(newSvg)
         .attrs({
             width: sizing.w,
             height: sizing.h
@@ -231,7 +242,8 @@ function controller($scope, $element) {
 
     $scope.$watch(
         'ctrl.complexity',
-        watcher);
+        watcher,
+        true);
 }
 
 

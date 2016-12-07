@@ -49,7 +49,7 @@ function controller($document,
     vm.$onInit = () => {
         angular
             .element($window)
-            .on("scroll", scrollListener);
+            .on("scroll", _.throttle(scrollListener, 100));
     };
 
     vm.$onDestroy = () => {
