@@ -149,7 +149,9 @@ function controller($element, $scope) {
     vm.$onDestroy = () => unregisterResponsivefy();
 
     vm.$onInit = () => {
-        unregisterResponsivefy = responsivefy(svg);
+        $scope.$applyAsync(() => {
+            unregisterResponsivefy = responsivefy(svg)
+        });
     };
 
     vm.$onChanges = () => {
