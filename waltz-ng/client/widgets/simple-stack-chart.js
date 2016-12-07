@@ -2,6 +2,7 @@ import _ from "lodash";
 import {scaleLinear} from 'd3-scale';
 import {select} from 'd3-selection';
 import "d3-selection-multi";
+import{perhaps} from '../common';
 
 const bindings = {
     values: '=',
@@ -39,11 +40,13 @@ function controller($element) {
     const update = (values = [], max) => {
 
         const height = 24;
-        // TODO: 1026: d3v4 - can't work out client width...
-        const width = $element[0].clientWidth || 150;
+        const width = perhaps(
+            () => $element[0].parentElement.clientWidth,
+            150);
 
         svg
-            .attrs({ width: `${width}`, height: `${height}` });
+            .attr('width', `${width}`)
+            .attr('height', `${height}`);
 
         const xScale = scaleLinear()
             .domain([0, max])
@@ -54,32 +57,33 @@ function controller($element) {
 
         const coords = calculateLayoutData(values, xScale);
 
-        svg.selectAll('.wssc-stack')
-            .data(values)
+        const stacks = svg.selectAll('.wssc-stack')
+            .data(values);
+
+        const newStacks = stacks
             .enter()
             .append('rect')
             .classed('wssc-stack', true)
-            .attr("class", (d, idx) => `wssc-stack-${idx}`)
-            .attrs({
-                y: 3,
-                height: height - 6
-            })
+            .attr("class", (d, idx) => `wssc-stack-${idx}`);
+
+        stacks
+            .merge(newStacks)
+            .attr('y', 3)
+            .attr('height', height - 6)
             .attr("x", (d, idx) => coords[idx].x)
             .attr("width", (d, idx) => coords[idx].width);
 
         ambient
-            .attrs({
-                width,
-                height,
-                x: 0,
-                y: 0
-            });
+            .attr('width', width)
+            .attr('height', height)
+            .attr('x', 0)
+            .attr('y', 0);
     };
 
 
     const vm = this;
 
-    vm.$onChanges = changes => {
+    vm.$onChanges = () => {
         if (vm.values) {
             update(vm.values, vm.max);
         }

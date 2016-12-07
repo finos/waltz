@@ -117,6 +117,15 @@ export function randomPick(xs) {
 }
 
 
+/**
+ * Attempts to return the result of the given function.
+ * If the function throws an exception the default value
+ * will be returned
+ *
+ * @param fn
+ * @param dflt
+ * @returns {*}
+ */
 export function perhaps(fn, dflt) {
     try {
         return fn();
