@@ -32,12 +32,8 @@ const template = require('./bookmarks-section.html');
 
 
 function filterBookmarks(bookmarks = {}, kind = null) {
-    if(kind) {
-        const obj = {};
-        obj[kind] = bookmarks[kind];
-        return obj;
-    }
-    return bookmarks;
+    const filterBookmarksMap = (kind)? {kind : bookmarks[kind]} : bookmarks;
+    return _.map(filterBookmarksMap, (v, k) => ({ kind: k, bookmarks: v }));
 }
 
 
