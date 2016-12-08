@@ -43,6 +43,7 @@ function controller() {
         dataChanged(vm.data);
 
         if (changes.config) {
+            // only assign the default onSelect if it's undefined in the config
             vm.config = _.defaults(_.cloneDeep(vm.config), { onSelect: defaultOnSelect });
         }
     };
