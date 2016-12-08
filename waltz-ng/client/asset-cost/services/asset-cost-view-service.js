@@ -2,8 +2,6 @@ import {checkIsApplicationIdSelector} from '../../common/checks';
 import {notEmpty} from '../../common'
 
 const initData = {
-    loadingSummary: false,
-    loadingCosts: false,
     costs: [],
     appIds: [],
     summary: []
@@ -19,7 +17,6 @@ function service($q,
         checkIsApplicationIdSelector(selector);
 
         data = { ...initData };
-        data.loadingSummary = true;
         data.options = selector;
 
         const topCostsPromise = assetCostStore
@@ -30,10 +27,9 @@ function service($q,
         return $q
             .all([topCostsPromise, totalCostPromise])
             .then(([topCosts = [], total]) => {
-                data.loadingSummary = false;
                 data.summary = topCosts;
                 data.total = total;
-                return data;
+                return Object.assign({}, data);
             });
     }
 
@@ -43,11 +39,9 @@ function service($q,
             return $q.when(data);
         }
 
-        data.loadingDetail = true;
         return assetCostStore
             .findAppCostsByAppIdSelector(data.options)
             .then(costs => {
-                data.loadingDetail = false;
                 data.costs = costs;
                 return Object.assign({}, data);
             });
