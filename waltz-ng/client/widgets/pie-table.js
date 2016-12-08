@@ -43,7 +43,7 @@ function controller() {
         dataChanged(vm.data);
 
         if (changes.config) {
-            _.defaults(vm.config, { onSelect: defaultOnSelect });
+            vm.config = _.defaults(_.cloneDeep(vm.config), { onSelect: defaultOnSelect });
         }
     };
 
