@@ -1,14 +1,10 @@
 package com.khartec.waltz.data.complexity;
 
 import com.khartec.waltz.common.Checks;
-import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.complexity.*;
 import com.khartec.waltz.schema.tables.records.ComplexityScoreRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.Record1;
-import org.jooq.Select;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -19,9 +15,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.ListUtilities.ensureNotNull;
 import static com.khartec.waltz.schema.tables.ComplexityScore.COMPLEXITY_SCORE;
-import static java.util.Optional.ofNullable;
 
 @Repository
 public class ComplexityScoreDao {
@@ -38,13 +32,25 @@ public class ComplexityScoreDao {
 
     private static final BiFunction<Long, Collection<ComplexityScore>, ComplexityRating> TO_COMPLEXITY_RATING =
         (id, scores) -> {
-            Map<ComplexityKind, ComplexityScore> scoresByKind = MapUtilities.indexBy(score -> score.kind(), ensureNotNull(scores));
-            return ImmutableComplexityRating.builder()
-                    .id(id)
-                    .serverComplexity(ofNullable(scoresByKind.get(ComplexityKind.SERVER)))
-                    .capabilityComplexity(ofNullable(scoresByKind.get(ComplexityKind.CAPABILITY)))
-                    .connectionComplexity(ofNullable(scoresByKind.get(ComplexityKind.CONNECTION)))
-                    .build();
+
+            ImmutableComplexityRating.Builder builder = ImmutableComplexityRating.builder()
+                    .id(id);
+
+            for (ComplexityScore score : scores) {
+                switch (score.kind()) {
+                    case CAPABILITY:
+                        builder.capabilityComplexity(score);
+                        break;
+                    case CONNECTION:
+                        builder.connectionComplexity(score);
+                        break;
+                    case SERVER:
+                        builder.serverComplexity(score);
+                        break;
+                }
+            }
+
+            return builder.build();
     };
 
 
@@ -73,12 +79,15 @@ public class ComplexityScoreDao {
 
 
     public List<ComplexityRating> findForAppIdSelector(Select<Record1<Long>> appIdSelector) {
+
+        Condition condition = COMPLEXITY_SCORE.ENTITY_ID.in(appIdSelector)
+                .and(COMPLEXITY_SCORE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+
+
         Map<Long, List<ComplexityScore>> scoresForApp = dsl
                 .select(COMPLEXITY_SCORE.fields())
                 .from(COMPLEXITY_SCORE)
-                .where(COMPLEXITY_SCORE.ENTITY_ID.in(appIdSelector))
-                .and(COMPLEXITY_SCORE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .fetch()
+                .where(dsl.renderInlined(condition)).fetch()
                 .stream()
                 .map(TO_COMPLEXITY_SCORE_MAPPER)
                 .collect(Collectors.groupingBy(s -> s.id()));

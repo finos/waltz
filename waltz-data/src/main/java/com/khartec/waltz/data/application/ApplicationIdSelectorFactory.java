@@ -173,14 +173,17 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
 
     private Select<Record1<Long>> mkForPersonReportees(EntityReference ref) {
-        String employeeId = findEmployeeId(ref);
+
+        Select<Record1<String>> emp = dsl.select(person.EMPLOYEE_ID)
+                .from(person)
+                .where(person.ID.eq(ref.id()));
 
         SelectConditionStep<Record1<String>> reporteeIds = DSL.selectDistinct(personHierarchy.EMPLOYEE_ID)
                 .from(personHierarchy)
-                .where(personHierarchy.MANAGER_ID.eq(employeeId));
+                .where(personHierarchy.MANAGER_ID.eq(emp));
 
         Condition condition = involvement.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                .and(involvement.EMPLOYEE_ID.eq(employeeId)
+                .and(involvement.EMPLOYEE_ID.eq(emp)
                         .or(involvement.EMPLOYEE_ID.in(reporteeIds)));
 
         return dsl
@@ -190,20 +193,12 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private String findEmployeeId(EntityReference ref) {
-        return dsl.select(person.EMPLOYEE_ID)
-                .from(person)
-                .where(person.ID.eq(ref.id()))
-                .fetchOne(person.EMPLOYEE_ID);
-    }
-
-
     private Select<Record1<Long>> mkForSinglePerson(EntityReference ref) {
 
-        String employeeId = dsl.select(person.EMPLOYEE_ID)
+        Select<Record1<String>> employeeId = dsl.select(person.EMPLOYEE_ID)
                 .from(person)
-                .where(person.ID.eq(ref.id()))
-                .fetchOne(person.EMPLOYEE_ID);
+                .where(person.ID.eq(ref.id()));
+
         return dsl
                 .selectDistinct(involvement.ENTITY_ID)
                 .from(involvement)
