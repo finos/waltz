@@ -15,10 +15,6 @@ function controller() {
 
     const vm = this;
 
-    const defaultOnSelect = (d) => {
-        vm.selectedSegmentKey = d ? d.key : null;
-    };
-
     const dataChanged = (data = []) => {
         vm.total = _.sumBy(data, 'count');
 
@@ -39,13 +35,7 @@ function controller() {
 
     };
 
-    vm.$onChanges = (changes) => {
-        dataChanged(vm.data);
-
-        if (changes.config) {
-            _.defaults(vm.config, { onSelect: defaultOnSelect });
-        }
-    };
+    vm.$onChanges = () => dataChanged(vm.data);
 
     vm.toDisplayName = (k) => vm.config.labelProvider
         ? vm.config.labelProvider(k)
