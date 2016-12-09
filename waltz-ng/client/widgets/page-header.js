@@ -47,15 +47,15 @@ function controller($document,
     };
 
     vm.$onInit = () => {
-        angular
-            .element($window)
-            .on("scroll", _.throttle(scrollListener, 100));
+        // angular
+        //     .element($window)
+        //     .on("scroll", _.throttle(scrollListener, 100));
     };
 
     vm.$onDestroy = () => {
-        angular
-            .element($window)
-            .off("scroll", scrollListener);
+        // angular
+        //     .element($window)
+        //     .off("scroll", scrollListener);
     };
 
     vm.startTour = () => {
