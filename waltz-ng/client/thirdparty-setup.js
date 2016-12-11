@@ -1,7 +1,3 @@
-import thunk from "redux-thunk";
-import rootReducer from "./reports/reducers";
-
-
 function setup(module) {
 
     module.config([
@@ -32,13 +28,6 @@ function setup(module) {
                 clientId: 'LinkedIn Client ID'
             });
 
-        }
-    ]);
-
-    module.config([
-        '$ngReduxProvider',
-        ($ngReduxProvider) => {
-            $ngReduxProvider.createStoreWith(rootReducer, [thunk], []);
         }
     ]);
 

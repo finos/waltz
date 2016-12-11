@@ -87,7 +87,6 @@ const dependencies = [
     require('./user-contribution')(),
     require('./welcome')(),
     require('./widgets')(),
-    require('./reports')(),
 ];
 
 
