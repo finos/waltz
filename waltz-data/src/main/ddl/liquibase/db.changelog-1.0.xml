@@ -3684,4 +3684,17 @@
     </changeSet>
 
 
+    <!-- 1.1.10 -->
+
+
+    <!-- 1080: remove perf metric stuff-->
+    <changeSet author="dwatkins"
+               id="20161211-1080-1">
+        <dropTable tableName="perf_metric_definition" />
+        <dropTable tableName="perf_metric_pack_checkpoint" />
+        <dropTable tableName="perf_metric_pack_item_goal" />
+        <dropTable tableName="perf_metric_pack_item" />
+        <dropTable tableName="perf_metric_pack" />
+    </changeSet>
+
 </databaseChangeLog>

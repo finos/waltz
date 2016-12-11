@@ -64,7 +64,6 @@ const dependencies = [
     require('./navbar')(),
     require('./org-units')(),
     require('./orphan')(),
-    require('./performance-metrics')(),
     require('./perspectives')(),
     require('./person')(),
     require('./physical-flow-lineage')(),

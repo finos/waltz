@@ -20,7 +20,6 @@ import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
-import static com.khartec.waltz.schema.tables.PerfMetricPack.PERF_METRIC_PACK;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.schema.tables.Process.PROCESS;
@@ -51,7 +50,6 @@ public class EntityNameUtilities {
         MAPPINGS.put(EntityKind.END_USER_APPLICATION, tuple(END_USER_APPLICATION, END_USER_APPLICATION.ID, END_USER_APPLICATION.NAME));
         MAPPINGS.put(EntityKind.ENTITY_STATISTIC, tuple(ENTITY_STATISTIC_DEFINITION, ENTITY_STATISTIC_DEFINITION.ID, ENTITY_STATISTIC_DEFINITION.NAME));
         MAPPINGS.put(EntityKind.ORG_UNIT, tuple(ORGANISATIONAL_UNIT, ORGANISATIONAL_UNIT.ID, ORGANISATIONAL_UNIT.NAME));
-        MAPPINGS.put(EntityKind.PERFORMANCE_METRIC_PACK, tuple(PERF_METRIC_PACK, PERF_METRIC_PACK.ID, PERF_METRIC_PACK.NAME));
         MAPPINGS.put(EntityKind.PERSON, tuple(PERSON, PERSON.ID, PERSON.DISPLAY_NAME));
         MAPPINGS.put(EntityKind.PHYSICAL_SPECIFICATION, tuple(PHYSICAL_SPECIFICATION, PHYSICAL_SPECIFICATION.ID, PHYSICAL_SPECIFICATION.NAME));
         MAPPINGS.put(EntityKind.PROCESS, tuple(PROCESS, PROCESS.ID, PROCESS.NAME));
