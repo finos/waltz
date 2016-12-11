@@ -3697,4 +3697,11 @@
         <dropTable tableName="perf_metric_pack" />
     </changeSet>
 
+
+    <!-- 1212: remove perf metric stuff-->
+    <changeSet author="dwatkins"
+               id="20161211-1212-1">
+        <dropTable tableName="application_rating" />
+    </changeSet>
+
 </databaseChangeLog>
