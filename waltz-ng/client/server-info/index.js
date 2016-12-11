@@ -10,8 +10,13 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
-export default (module) => {
+
+export default () => {
+
+    const module = angular.module('waltz.server.info', []);
+
     module
         .service('ServerInfoStore', require('./services/server-info-store'));
 
@@ -20,4 +25,6 @@ export default (module) => {
 
     module
         .directive('waltzServerList', require('./directives/server-list'));
+
+    return module.name;
 };

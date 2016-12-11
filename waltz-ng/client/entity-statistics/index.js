@@ -10,9 +10,12 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
 
-export default (module) => {
+export default () => {
+
+    const module = angular.module('waltz.entity.statistics', []);
 
     module
         .config(require('./routes'));
@@ -37,4 +40,6 @@ export default (module) => {
         .component('waltzEntityStatisticHistoryPanel', require('./components/history-panel/entity-statistic-history-panel'))
         .component('waltzEntityStatisticTree', require('./components/entity-statistic-tree'))
         .component('waltzRelatedEntityStatisticsSummaries', require('./components/related-entity-statistics-summaries'));
+
+    return module.name;
 };

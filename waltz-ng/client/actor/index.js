@@ -1,4 +1,6 @@
-export default (module) => {
+export default () => {
+
+    const module = angular.module('waltz.actor', []);
 
     module
         .config(require('./routes'))
@@ -10,4 +12,5 @@ export default (module) => {
         .component('waltzActorSelector', require('./components/actor-selector'))
         .component('waltzBasicActorSelector', require('./components/basic-actor-selector'));
 
+    return module.name;
 };

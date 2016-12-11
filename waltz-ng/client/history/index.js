@@ -9,7 +9,14 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
-export default (module) => {
-    module.service('HistoryStore', require('./services/history-store'));
+
+export default () => {
+    const module = angular.module('waltz.history', []);
+
+    module
+        .service('HistoryStore', require('./services/history-store'));
+
+    return module.name;
 };

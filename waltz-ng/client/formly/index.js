@@ -10,7 +10,12 @@
  *
  */
 
-export default (module) => {
+import angular from 'angular';
+
+
+export default () => {
+    const module = angular.module('waltz.formly', []);
+
     module.run([
         'formlyConfig',
         (formlyConfig) => {
@@ -27,4 +32,6 @@ export default (module) => {
             });
         }
     ]);
+
+    return module.name;
 };

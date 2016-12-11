@@ -11,7 +11,9 @@
  */
 
 
-export default (module) => {
+export default () => {
+
+    const module = angular.module('waltz.applications', []);
 
     require('./services')(module);
 
@@ -32,4 +34,6 @@ export default (module) => {
         .component('waltzAppSummary', require('./components/app-summary'))
         .component('waltzAppTable', require('./components/app-table'))
         .component('waltzAppCostsSection', require('./components/app-costs-section/app-costs-section'));
+
+    return module.name;
 };

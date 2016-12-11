@@ -11,9 +11,11 @@
  *
  */
 
+import angular from 'angular';
 
+export default () => {
+    const module = angular.module('waltz.ratings', []);
 
-export default (module) => {
     module
         .directive('waltzRatingGroup', require('./directives/rating-group/directive'))
         .directive('waltzRatingGroups', require('./directives/rating-groups/directive'))
@@ -32,4 +34,6 @@ export default (module) => {
 
     module
         .service('RatingStore', require('./services/ratings-store'));
+
+    return module.name;
 };

@@ -17,15 +17,23 @@
  *
  */
 
+import angular from 'angular';
 
-export default (module) => {
+export default () => {
 
-    module.service('AppGroupStore', require('./services/app-group-store'));
- 
-    module.directive('waltzAppGroupList', require('./directives/app-group-list'));
-    module.directive('waltzAppGroupListSection', require('./directives/app-group-list-section'));
-    module.directive('waltzAppGroupAppSelectionList', require('./directives/app-group-app-selection-list'));
-    module.directive('waltzAppGroupSummary', require('./directives/app-group-summary'));
+    const module = angular.module('waltz.app.group', []);
 
-    module.config(require('./routes'));
+    module
+        .config(require('./routes'));
+
+    module
+        .service('AppGroupStore', require('./services/app-group-store'));
+
+    module
+        .directive('waltzAppGroupList', require('./directives/app-group-list'))
+        .directive('waltzAppGroupListSection', require('./directives/app-group-list-section'))
+        .directive('waltzAppGroupAppSelectionList', require('./directives/app-group-app-selection-list'))
+        .directive('waltzAppGroupSummary', require('./directives/app-group-summary'));
+
+    return module.name;
 }

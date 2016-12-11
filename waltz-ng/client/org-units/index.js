@@ -9,22 +9,24 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
+export default () => {
 
-export default (module) => {
+    const module = angular.module('waltz.org.units', []);
+
+    module
+        .config(require('./routes'));
 
     require('./directives')(module);
 
     module
-        .config(require('./routes'))
         .service('OrgUnitStore', require('./services/org-unit-store'))
         .service('OrgUnitViewDataService', require('./services/org-unit-view-data'));
 
     module
-        .component(
-            'waltzOrgUnitOverview',
-            require('./components/overview/org-unit-overview'))
-        .component(
-            'waltzOrgUnitTree',
-            require('./components/tree/org-unit-tree'));
+        .component('waltzOrgUnitOverview', require('./components/overview/org-unit-overview'))
+        .component('waltzOrgUnitTree', require('./components/tree/org-unit-tree'));
+
+    return module.name;
 };

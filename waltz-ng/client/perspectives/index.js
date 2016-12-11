@@ -10,7 +10,15 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
-export default (module) => {
-    module.service('PerspectiveStore', require('./services/perspective-store'));
+
+export default () => {
+
+    const module = angular.module('waltz.perspectives', []);
+
+    module
+        .service('PerspectiveStore', require('./services/perspective-store'));
+
+    return module.name;
 }

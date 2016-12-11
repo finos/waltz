@@ -9,8 +9,12 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
-export default (module) => {
+
+export default () => {
+
+    const module = angular.module('waltz.navbar', []);
 
     module
         .directive('waltzNavbar', require('./directives/navbar'))
@@ -20,4 +24,6 @@ export default (module) => {
     module
         .component('waltzNavbarSearchForm', require('./components/navbar-search-form'))
         .component('waltzNavSearchResults', require('./components/nav-search-results'));
+
+    return module.name;
 };

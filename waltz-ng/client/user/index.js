@@ -10,17 +10,26 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
 
-export default (module) => {
+export default () => {
+    const module = angular.module('waltz.user', []);
+
     module
-        .directive('waltzHasRole', require('./directives/has-role'))
-        .directive('waltzUnlessRole', require('./directives/unless-role'))
-        .directive('waltzIfAnonymous', require('./directives/if-anonymous'))
+        .config(require('./routes'));
+
+    module
         .service('UserAgentInfoStore', require('./services/user-agent-info-store'))
         .service('UserService', require('./services/user-service'))
         .service('UserStore', require('./services/user-store'))
         .service('UserPreferenceStore', require('./services/user-preference-store'))
-        .service('UserPreferenceService', require('./services/user-preference-service'))
-        .config(require('./routes'));
+        .service('UserPreferenceService', require('./services/user-preference-service'));
+
+    module
+        .directive('waltzHasRole', require('./directives/has-role'))
+        .directive('waltzUnlessRole', require('./directives/unless-role'))
+        .directive('waltzIfAnonymous', require('./directives/if-anonymous'));
+
+    return module.name;
 };

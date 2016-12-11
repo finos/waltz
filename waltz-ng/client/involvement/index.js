@@ -9,9 +9,17 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
 
-export default (module) => {
-    module.component('waltzInvolvedPeopleSection', require('./components/involved-people-section'));
-    module.service('InvolvementStore', require('./services/involvement-store'));
+export default () => {
+    const module = angular.module('waltz.involvement', []);
+
+    module
+        .component('waltzInvolvedPeopleSection', require('./components/involved-people-section'));
+
+    module
+        .service('InvolvementStore', require('./services/involvement-store'));
+
+    return module.name;
 };

@@ -1,7 +1,8 @@
+import angular from 'angular';
 
 
-
-export default (module) => {
+export default () => {
+    const module = angular.module('waltz.data.types', []);
 
     module.config(require('./routes'));
 
@@ -15,4 +16,6 @@ export default (module) => {
         .component('waltzRatedFlowBoingyGraph', require('./components/rated-flow-boingy-graph'))
         .component('waltzDataTypeTree', require('./components/data-type-tree'))
         .component('waltzDataTypeOriginators', require('./components/data-type-originators'));
+
+    return module.name;
 };

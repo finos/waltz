@@ -11,11 +11,15 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-
+import angular from 'angular';
 import AccessLogStore from "./service/access-log-store";
 
-export default (module) => {
+
+export default () => {
+
+    const module = angular.module('waltz.access-log', []);
 
     module.service('AccessLogStore', AccessLogStore);
 
+    return module.name;
 };
