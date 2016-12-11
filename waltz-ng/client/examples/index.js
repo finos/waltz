@@ -11,8 +11,12 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
-export default (module) => {
+
+export default () => {
+
+    const module = angular.module('waltz.examples', []);
 
     module.config([
         '$stateProvider',
@@ -222,8 +226,9 @@ export default (module) => {
                     url: '/waltz-prerequisites',
                     views: { 'content@': {template: require('./waltz-prerequisites.html') } }
                 });
-
         }
     ]);
+
+    return module.name;
 
 };

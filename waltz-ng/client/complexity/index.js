@@ -11,9 +11,18 @@
  *
  */
 
-export default (module) => {
-    module.service('ComplexityStore', require('./services/complexity-store'));
+import angular from 'angular';
 
-    module.directive("waltzComplexityBarChart", require('./directives/complexity-bar-chart'));
-    module.directive("waltzComplexitySection", require('./directives/complexity-section'));
+
+export default () => {
+    const module = angular.module('waltz.complexity', []);
+
+    module
+        .service('ComplexityStore', require('./services/complexity-store'));
+
+    module
+        .directive("waltzComplexityBarChart", require('./directives/complexity-bar-chart'))
+        .directive("waltzComplexitySection", require('./directives/complexity-section'));
+
+    return module.name;
 };

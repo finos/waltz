@@ -10,46 +10,13 @@
  *
  */
 
-import "../style/style.scss";
 import angular from "angular";
-import "angular-animate";
-import "angular-loading-bar";
-import "angular-local-storage";
-import "angular-sanitize";
-import "angular-tree-control";
-import "angular-ui-notification";
-import "angular-ui-grid/ui-grid";
-import "angular-ui-router";
-import "angular-ui-bootstrap";
-import "babel-core/polyfill";
-import "ng-redux";
-import "ng-tags-input";
-import "satellizer";
-import "ui-select";
 
-const dependencies = [
-    'ui.bootstrap',
-    'ui.router',
-    'ui.select',
-    'ui.grid',
-    'ui.grid.exporter',
-    'ui.grid.resizeColumns',
-    'ui.grid.selection',
-    'ui-notification',
-    'ngAnimate',
-    'ngSanitize',
-    'ngTagsInput',
-    'satellizer',
-    'LocalStorageModule',
-    'ngRedux',
-    require('angular-formly'),
-    require('angular-formly-templates-bootstrap'),
-    'treeControl',
-    'angular-loading-bar'
-];
+import "../style/style.scss";
 
 
-const waltzApp = angular.module('waltz-app', dependencies);
+const waltzApp = angular.module('waltz.app', require('./modules'));
+
 
 if (__ENV__ === 'prod') {
     waltzApp.config(['$compileProvider', function ($compileProvider) {
@@ -58,20 +25,22 @@ if (__ENV__ === 'prod') {
     }]);
 }
 
-
-require('./modules')(waltzApp);
+require('./routes')(waltzApp);
+require('./networking')(waltzApp);
 require('./thirdparty-setup')(waltzApp);
 
 
-waltzApp.config( [
-    '$compileProvider',
-    $compileProvider => {
-        $compileProvider.aHrefSanitizationWhitelist(/^\s*(mailto|https?|sip|chrome-extension):/);
-    }
-]);
+function hrefSanitizer($compileProvider) {
+    $compileProvider.aHrefSanitizationWhitelist(/^\s*(mailto|https?|sip|chrome-extension):/);
+}
+
+hrefSanitizer.$inject = ['$compileProvider'];
+
+
+waltzApp.config(hrefSanitizer);
 
 
 waltzApp.run([
     'UserAgentInfoStore',
-    (userAgentStore) =>   userAgentStore.save()
+    (userAgentStore) => userAgentStore.save()
 ]);

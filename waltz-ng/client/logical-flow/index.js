@@ -10,9 +10,15 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
 
-export default (module) => {
+export default () => {
+
+    const module = angular.module('waltz.logical.flow', []);
+
+    module
+        .config(require('./routes'));
 
     require('./directives')(module);
     require('./components')(module);
@@ -22,7 +28,5 @@ export default (module) => {
         .service('LogicalFlowViewService', require('./services/logical-flow-view-service'))
         .service('LogicalFlowUtilityService', require('./services/logical-flow-utility'));
 
-
-    module.config(require('./routes'));
-
+    return module.name;
 };

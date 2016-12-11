@@ -11,6 +11,8 @@
  *
  */
 
+import angular from 'angular';
+
 import {
     authSourcesResolver,
     flowResolver,
@@ -22,7 +24,9 @@ import {
 import editView from "./edit";
 
 
-export default (module) => {
+export default () => {
+
+    const module = angular.module('waltz.auth.sources', []);
 
     require('./directives')(module);
 
@@ -56,4 +60,6 @@ export default (module) => {
                 });
         }
     ]);
+
+    return module.name;
 };

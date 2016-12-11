@@ -1,12 +1,15 @@
 import personPortfolioActions from './actions/person-portfolio-actions';
 import personActions from './actions/person-actions';
 import orgServerStatsActions from './actions/org-server-stats-actions';
+import angular from 'angular';
 
+export default () => {
+    const module = angular.module('waltz.reports', []);
 
-export default (module) => {
-    module.service('PersonPortfolioActions', personPortfolioActions);
-    module.service('PersonActions', personActions);
-    module.service('OrgServerStatsActions', orgServerStatsActions);
+    module
+        .service('PersonPortfolioActions', personPortfolioActions)
+        .service('PersonActions', personActions)
+        .service('OrgServerStatsActions', orgServerStatsActions);
 
 
     module.config([
@@ -25,8 +28,11 @@ export default (module) => {
         }
     ]);
 
-    module.directive('waltzPersonPortfolio', require('./containers/person-portfolio'));
-    module.directive('waltzPortfolioSection', require('./components/portfolio-section'));
-    module.directive('waltzPortfolioSummarySection', require('./components/portfolio-summary-section'));
+    module
+        .directive('waltzPersonPortfolio', require('./containers/person-portfolio'))
+        .directive('waltzPortfolioSection', require('./components/portfolio-section'))
+        .directive('waltzPortfolioSummarySection', require('./components/portfolio-summary-section'));
+
+    return module.name;
 };
 

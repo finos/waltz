@@ -1,4 +1,8 @@
-export default (module) => {
+import angular from 'angular';
+
+export default () => {
+    const module = angular.module('waltz.data.type.usage', []);
+
     module
         .directive('waltzAppDataTypeUsageList', require("./directives/app-data-type-usage-list"))
 
@@ -8,4 +12,6 @@ export default (module) => {
 
     module
         .service('DataTypeUsageStore', require('./services/data-type-usage-store'));
+
+    return module.name;
 };

@@ -16,11 +16,19 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+import angular from 'angular';
 
-export default (module) => {
-    module.service('StaticPanelStore', require('./services/static-panel-store'));
+
+export default () => {
+
+    const module = angular.module('waltz.static.panel', []);
+
+    module
+        .service('StaticPanelStore', require('./services/static-panel-store'));
 
     module
         .component('waltzStaticPanels', require('./directives/static-panels'))
         .component('waltzStaticPanel', require('./directives/static-panel'));
+
+    return module.name;
 };

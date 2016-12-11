@@ -10,19 +10,29 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
-export default (module) => {
 
-    require('./directives')(module);
+export default () => {
+
+    const module = angular.module('waltz.app.capabilities', []);
+
 
     module
-        .config(require('./routes.js'))
-        .service(
-            'AppCapabilityStore',
-            require('./services/app-capability-store'))
+        .config(require('./routes.js'));
+
+    module
+        .service('AppCapabilityStore', require('./services/app-capability-store'));
+
+    module
         .component('waltzAppRatingTabgroupSection', require('./components/app-rating-tabgroup-section/app-rating-tabgroup-section'))
         .component('waltzAppCapabilityEditor', require('./components/app-capability-editor/app-capability-editor'))
         .component('waltzAppCapabilityPicker', require('./components/app-capability-picker/app-capability-picker'))
-        .component('waltzAppCapabilityTable', require('./components/app-capability-table/app-capability-table'));
+        .component('waltzAppCapabilityTable', require('./components/app-capability-table/app-capability-table'))
+        .component('waltzAppCapabilityUsageEditor', require('./components/app-capability-usage-editor/app-capability-usage-editor'));
 
+    require('./directives')(module);
+
+
+    return module.name;
 };

@@ -16,9 +16,11 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+import angular from 'angular';
 
 import traitListView from './trait-list';
 import traitView from './trait-view';
+
 
 const traitListState = {
     url: 'traits',
@@ -40,12 +42,21 @@ function configureStates(stateProvider) {
 configureStates.$inject = ['$stateProvider'];
 
 
-export default (module) => {
+export default () => {
+
+    const module = angular.module('waltz.traits', []);
+
+    module
+        .config(configureStates);
+
     module
         .service('TraitStore', require('./services/trait-store'))
-        .service('TraitUsageStore', require('./services/trait-usage-store'))
+        .service('TraitUsageStore', require('./services/trait-usage-store'));
+
+    module
         .directive('waltzTraitsIndicator', require('./directives/traits-indicator'))
         .directive('waltzTraitsTable', require('./directives/traits-table'))
-        .directive('waltzTraitUsageEditor', require('./directives/trait-usage-editor'))
-        .config(configureStates);
+        .directive('waltzTraitUsageEditor', require('./directives/trait-usage-editor'));
+
+    return module.name;
 };

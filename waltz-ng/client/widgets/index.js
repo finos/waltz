@@ -9,8 +9,10 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
-export default (module) => {
+export default () => {
+    const module = angular.module('waltz.widgets', []);
 
     module.directive('waltzChangeTimeline', require('./change-timeline'));
     module.directive('waltzInlineEditArea', require('./inline-edit-area'));
@@ -43,6 +45,5 @@ export default (module) => {
         .component('waltzSimpleStackChart', require('./simple-stack-chart'))
         .component('waltzTwistie', require('./twistie'));
 
-
-
+    return module.name;
 };

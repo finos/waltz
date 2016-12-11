@@ -1,5 +1,8 @@
+import angular from 'angular';
 
-export default (module) => {
+export default () => {
+
+    const module = angular.module('waltz.asset.cost', []);
 
     module
         .service('AssetCostStore', require('./services/asset-cost-store'))
@@ -10,6 +13,8 @@ export default (module) => {
         .component('waltzAssetCostsSection', require('./components/asset-costs-section'));
 
     module
-        .directive('waltzAssetCostTable', require('./directives/asset-cost-table'))
+        .directive('waltzAssetCostTable', require('./directives/asset-cost-table'));
+
+    return module.name;
 
 }

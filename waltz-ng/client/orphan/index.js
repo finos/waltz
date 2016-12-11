@@ -9,11 +9,14 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
+export default () => {
 
-export default (module) => {
+    const module = angular.module('waltz.orphan', []);
 
     module
         .service('OrphanStore', require('./services/orphan-store'));
 
+    return module.name;
 };

@@ -10,8 +10,12 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
-export default (module) => {
+export default () => {
+
+    const module = angular.module('waltz.bookmarks', []);
+
     require('./directives')(module);
 
     module
@@ -23,4 +27,6 @@ export default (module) => {
     module
         .component('waltzBookmarkKinds', require('./components/bookmark-kinds/bookmark-kinds'))
         .component('waltzBookmarksSection', require('./components/bookmarks-section/bookmarks-section'));
+
+    return module.name;
 };

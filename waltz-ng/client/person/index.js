@@ -9,20 +9,25 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
+export default () => {
 
-export default (module) => {
+    const module = angular.module('waltz.person', []);
 
-    require('./services')(module);
+    module
+        .config(require('./routes'))
 
-    module.config(require('./routes'))
+    module
+        .directive('waltzPersonSelector', require('./directives/person-selector'))
+        .directive('waltzPersonLink', require('./directives/person-link'))
+        .directive('waltzManagerList', require('./directives/manager-list'))
+        .directive('waltzPersonDirectsList', require('./directives/person-directs-list'))
+        .directive('waltzPersonSummary', require('./directives/person-summary'));
 
-    module.directive('waltzPersonSelector', require('./directives/person-selector'));
-    module.directive('waltzPersonLink', require('./directives/person-link'));
-    module.directive('waltzManagerList', require('./directives/manager-list'));
-    module.directive('waltzPersonDirectsList', require('./directives/person-directs-list'));
-    module.directive('waltzPersonSummary', require('./directives/person-summary'));
+    module
+        .service('PersonViewDataService', require('./person-view-data'))
+        .service('PersonStore', require('./services/person-store'));
 
-    module.service('PersonViewDataService', require('./person-view-data'));
-
+    return module.name;
 };

@@ -1,14 +1,17 @@
+import angular from 'angular';
 
-export default (module) => {
 
-    module.config(require('./routes'));
+export default () => {
+    const module = angular.module('waltz.process', []);
 
     module
-        .directive(
-            'waltzProcessList',
-             require('./directives/process-list'));
+        .config(require('./routes'));
 
-    module.service(
-        'ProcessStore',
-        require('./services/process-store'));
+    module
+        .directive('waltzProcessList', require('./directives/process-list'));
+
+    module
+        .service('ProcessStore', require('./services/process-store'));
+
+    return module.name;
 }

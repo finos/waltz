@@ -9,6 +9,7 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
+import angular from 'angular';
 
 import playpenView1 from "./1/playpen1";
 import playpenView2 from "./2/playpen2";
@@ -16,8 +17,9 @@ import playpenView3 from "./3/playpen3";
 import playpenView4 from "./4/playpen4";
 
 
-export default (module) => {
+export default () => {
 
+    const module = angular.module('waltz.playpen', []);
     module
         .component('waltzAssetCostGraph', require('./3/asset-cost-graph.js'))
         .component('waltzSvgManipulator', require('./4/svg-manipulator'));
@@ -50,5 +52,7 @@ export default (module) => {
                 })
         }
     ]);
+
+    return module.name;
 
 };

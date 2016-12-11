@@ -1,4 +1,9 @@
-export default (module) => {
+import angular from 'angular';
+
+
+export default () => {
+    const module = angular.module('waltz.technology', []);
+
     module
         .directive('waltzTechnologySection', require('./directives/technology-section'));
 
@@ -8,4 +13,6 @@ export default (module) => {
 
     module
         .service('TechnologyStatisticsService', require('./services/technology-statistics-service'));
+
+    return module.name;
 };
