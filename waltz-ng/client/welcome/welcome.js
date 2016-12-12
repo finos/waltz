@@ -22,7 +22,8 @@ const initialState = {
 };
 
 
-function controller(appGroupStore,
+function controller($document,
+                    appGroupStore,
                     localStorageService,
                     staticPanelStore,
                     tourService) {
@@ -42,9 +43,12 @@ function controller(appGroupStore,
     vm.history = localStorageService
             .get('history_2') || [];
 
+    $document[0].title = `Waltz`;
+
 }
 
 controller.$inject = [
+    '$document',
     'AppGroupStore',
     'localStorageService',
     'StaticPanelStore',
