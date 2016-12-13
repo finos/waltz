@@ -3704,4 +3704,119 @@
         <dropTable tableName="application_rating" />
     </changeSet>
 
+    <!-- 1214: measurable -->
+    <changeSet author="dwatkins"
+               id="20161213-1214-1">
+        <createTable tableName="measurable">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="measurable_pkey"/>
+            </column>
+            <column name="parent_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="measurable_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="concrete"
+                    type="boolean"
+                    defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}"/>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20161213-1214-2"
+               dbms="mysql">
+        <sql>
+            INSERT INTO measurable (name,
+                measurable_kind,
+                concrete,
+                description,
+                external_id,
+                last_updated_at,
+                last_updated_by,
+                provenance)
+            SELECT c.name,
+                'CAPABILITY',
+                1,
+                c.id,
+                c.parent_id,
+                now(),
+                'admin',
+                c.provenance
+            FROM capability c;
+        </sql>
+        <sql>
+            UPDATE measurable m
+            LEFT JOIN measurable mp
+                ON mp.description = m.external_id
+            INNER JOIN capability c
+                ON c.id = m.description
+            SET m.parent_id = mp.id, m.description = c.description, m.external_id = c.id;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20161213-1214-2"
+               dbms="mssql">
+        <sql>
+            INSERT INTO measurable (name,
+                measurable_kind,
+                concrete,
+                description,
+                external_id,
+                last_updated_at,
+                last_updated_by,
+                provenance)
+            SELECT c.name,
+                'CAPABILITY',
+                1,
+                c.id,
+                c.parent_id,
+                getutcdate(),
+                'admin',
+                c.provenance
+            FROM capability c;
+        </sql>
+        <sql>
+            UPDATE m
+            SET parent_id = mp.id, m.description = c.description, m.external_id = c.id
+            FROM measurable m
+            LEFT JOIN measurable mp
+                ON mp.description = m.external_id
+            INNER JOIN capability c
+                ON c.id = m.description;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
