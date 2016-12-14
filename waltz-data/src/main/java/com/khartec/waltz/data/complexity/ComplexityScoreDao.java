@@ -16,6 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.schema.tables.ComplexityScore.COMPLEXITY_SCORE;
+import static java.util.Collections.emptyList;
 
 @Repository
 public class ComplexityScoreDao {
@@ -36,7 +37,7 @@ public class ComplexityScoreDao {
             ImmutableComplexityRating.Builder builder = ImmutableComplexityRating.builder()
                     .id(id);
 
-            for (ComplexityScore score : scores) {
+            scores.forEach(score -> {
                 switch (score.kind()) {
                     case CAPABILITY:
                         builder.capabilityComplexity(score);
@@ -48,7 +49,7 @@ public class ComplexityScoreDao {
                         builder.serverComplexity(score);
                         break;
                 }
-            }
+            });
 
             return builder.build();
     };
@@ -72,9 +73,9 @@ public class ComplexityScoreDao {
                 .fetch()
                 .stream()
                 .map(TO_COMPLEXITY_SCORE_MAPPER)
-                .collect(Collectors.groupingBy(s -> s.id()));
+                .collect(Collectors.groupingBy(ComplexityScore::id));
 
-        return TO_COMPLEXITY_RATING.apply(appId, scoresForApp.get(appId));
+        return TO_COMPLEXITY_RATING.apply(appId, scoresForApp.getOrDefault(appId, emptyList()));
     }
 
 
@@ -90,7 +91,7 @@ public class ComplexityScoreDao {
                 .where(dsl.renderInlined(condition)).fetch()
                 .stream()
                 .map(TO_COMPLEXITY_SCORE_MAPPER)
-                .collect(Collectors.groupingBy(s -> s.id()));
+                .collect(Collectors.groupingBy(ComplexityScore::id));
 
         return scoresForApp
                 .entrySet()
