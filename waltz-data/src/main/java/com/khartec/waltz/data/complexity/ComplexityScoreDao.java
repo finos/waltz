@@ -36,18 +36,20 @@ public class ComplexityScoreDao {
             ImmutableComplexityRating.Builder builder = ImmutableComplexityRating.builder()
                     .id(id);
 
-            for (ComplexityScore score : scores) {
-                switch (score.kind()) {
-                    case CAPABILITY:
-                        builder.capabilityComplexity(score);
-                        break;
-                    case CONNECTION:
-                        builder.connectionComplexity(score);
-                        break;
-                    case SERVER:
-                        builder.serverComplexity(score);
-                        break;
-                }
+            if (scores != null) {
+                scores.forEach(score -> {
+                    switch (score.kind()) {
+                        case CAPABILITY:
+                            builder.capabilityComplexity(score);
+                            break;
+                        case CONNECTION:
+                            builder.connectionComplexity(score);
+                            break;
+                        case SERVER:
+                            builder.serverComplexity(score);
+                            break;
+                    }
+                });
             }
 
             return builder.build();
@@ -72,7 +74,7 @@ public class ComplexityScoreDao {
                 .fetch()
                 .stream()
                 .map(TO_COMPLEXITY_SCORE_MAPPER)
-                .collect(Collectors.groupingBy(s -> s.id()));
+                .collect(Collectors.groupingBy(ComplexityScore::id));
 
         return TO_COMPLEXITY_RATING.apply(appId, scoresForApp.get(appId));
     }
@@ -90,7 +92,7 @@ public class ComplexityScoreDao {
                 .where(dsl.renderInlined(condition)).fetch()
                 .stream()
                 .map(TO_COMPLEXITY_SCORE_MAPPER)
-                .collect(Collectors.groupingBy(s -> s.id()));
+                .collect(Collectors.groupingBy(ComplexityScore::id));
 
         return scoresForApp
                 .entrySet()
