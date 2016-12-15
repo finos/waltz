@@ -107,7 +107,9 @@
                                 <waltz-from-now timestamp="log.createdAt">
                                 </waltz-from-now>
                             </td>
-                            <td><a href ng-click="ctrl.visit(log)">Visit</a></td>
+                            <td>
+                                <a ui-sref="{{log.state}} ({{log.params}})"> Visit </a>
+                            </td>
                         </tr>
                         </tbody>
                     </table>
