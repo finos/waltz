@@ -52,7 +52,6 @@
     "lodash": "4.13.1",
     "moment": "2.13.0",
     "ng-tags-input": "3.1.1",
-    "numeral": "~1.5.3",
     "satellizer": "^0.12.5",
     "ui-select": "0.18.0"
   },
