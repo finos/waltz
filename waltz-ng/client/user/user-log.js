@@ -41,14 +41,6 @@ function controller(accessLogStore,
 
     };
 
-
-    vm.visit = (log) => {
-        try {
-            $state.go(log.state, JSON.parse(log.params));
-        } catch (e) {
-            console.error('failed to get to state', log, e);
-        }
-    };
 }
 
 
