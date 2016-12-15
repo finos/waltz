@@ -1,6 +1,5 @@
 package com.khartec.waltz.data.database_information;
 
-import com.khartec.waltz.common.ArrayBuilder;
 import com.khartec.waltz.model.LifecycleStatus;
 import com.khartec.waltz.model.database_information.DatabaseInformation;
 import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
@@ -9,6 +8,7 @@ import com.khartec.waltz.model.database_information.ImmutableDatabaseSummaryStat
 import com.khartec.waltz.schema.tables.records.DatabaseInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -67,12 +67,9 @@ public class DatabaseInformationDao {
 
 
     public Map<Long, List<DatabaseInformation>> findByAppSelector(Select<Record1<Long>> appIdSelector) {
-        SelectField[] selectFields = new ArrayBuilder<SelectField>()
-                .add(ENTITY_RELATIONSHIP.ID_A, ENTITY_RELATIONSHIP.KIND_A)
-                .add(DATABASE_INFORMATION.fields())
-                .build(new SelectField[]{});
-
-        return dsl.select(selectFields)
+        return dsl
+                .select(ENTITY_RELATIONSHIP.ID_A, ENTITY_RELATIONSHIP.KIND_A)
+                .select(DATABASE_INFORMATION.fields())
                 .from(DATABASE_INFORMATION)
                 .innerJoin(APPLICATION)
                 .on(APPLICATION.ASSET_CODE.eq(DATABASE_INFORMATION.ASSET_CODE))
@@ -83,8 +80,8 @@ public class DatabaseInformationDao {
                         r.getValue(ENTITY_RELATIONSHIP.ID_A),
                         DATABASE_RECORD_MAPPER.map(r)))
                 .collect(groupingBy(
-                        t -> t.v1(),
-                        mapping(t -> t.v2(), Collectors.toList())
+                        Tuple2::v1,
+                        mapping(Tuple2::v2, Collectors.toList())
                 ));
     }
 
