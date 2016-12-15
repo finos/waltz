@@ -8,8 +8,8 @@
         text {
             fill: #efe80c;
             opacity: 0.8;
-            font-size: 0.75em;
         }
+
     }
 
     .wacg-bar:hover {
@@ -20,6 +20,10 @@
         text {
             opacity: 1;
         }
+    }
+
+    g {
+        font-size: 0.8em;
     }
 }
 
