@@ -10,6 +10,7 @@ import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.entity_hierarchy.EntityHierarchyDao;
 import com.khartec.waltz.data.entity_hierarchy.EntityRootsSelectorFactory;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
+import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.data.process.ProcessDao;
 import com.khartec.waltz.model.EntityKind;
@@ -44,6 +45,7 @@ public class EntityHierarchyService {
     private final EntityHierarchyDao entityHierarchyDao;
     private final EntityRootsSelectorFactory entityRootsSelectorFactory;
     private final EntityStatisticDao entityStatisticDao;
+    private final MeasurableDao measurableDao;
     private final OrganisationalUnitDao organisationalUnitDao;
     private final ProcessDao processDao;
     private final PersonHierarchyService personHierarchyService;
@@ -56,6 +58,7 @@ public class EntityHierarchyService {
                                   EntityHierarchyDao entityHierarchyDao,
                                   EntityRootsSelectorFactory entityRootsSelectorFactory,
                                   EntityStatisticDao entityStatisticDao,
+                                  MeasurableDao measurableDao, 
                                   OrganisationalUnitDao organisationalUnitDao,
                                   PersonHierarchyService personHierarchyService,
                                   ProcessDao processDao) {
@@ -67,6 +70,7 @@ public class EntityHierarchyService {
         checkNotNull(entityHierarchyDao, "entityHierarchyDao cannot be null");
         checkNotNull(entityRootsSelectorFactory, "entityRootsSelectorFactory cannot be null");
         checkNotNull(entityStatisticDao, "entityStatisticDao cannot be null");
+        checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(organisationalUnitDao, "organisationalUnitDao cannot be null");
         checkNotNull(personHierarchyService, "personHierarchyService cannot be null");
         checkNotNull(processDao, "processDao cannot be null");
@@ -78,6 +82,7 @@ public class EntityHierarchyService {
         this.entityHierarchyDao = entityHierarchyDao;
         this.entityRootsSelectorFactory = entityRootsSelectorFactory;
         this.entityStatisticDao = entityStatisticDao;
+        this.measurableDao = measurableDao;
         this.organisationalUnitDao = organisationalUnitDao;
         this.personHierarchyService = personHierarchyService;
         this.processDao = processDao;
@@ -116,6 +121,8 @@ public class EntityHierarchyService {
                 return dataTypeDao.findByIdSelectorAsEntityReference(selector);
             case ENTITY_STATISTIC:
                 return entityStatisticDao.findByIdSelectorAsEntityReference(selector);
+            case MEASURABLE:
+                return measurableDao.findByIdSelectorAsEntityReference(selector);
             case ORG_UNIT:
                 return organisationalUnitDao.findByIdSelectorAsEntityReference(selector);
             case PROCESS:
@@ -219,6 +226,8 @@ public class EntityHierarchyService {
                 return Tables.DATA_TYPE;
             case ENTITY_STATISTIC:
                 return Tables.ENTITY_STATISTIC_DEFINITION;
+            case MEASURABLE:
+                return Tables.MEASURABLE;
             case ORG_UNIT:
                 return Tables.ORGANISATIONAL_UNIT;
             case PROCESS:

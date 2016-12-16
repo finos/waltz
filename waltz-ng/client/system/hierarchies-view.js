@@ -27,6 +27,7 @@ const initialState = {
         'DATA_TYPE',
         'ENTITY_STATISTIC',
         'ORG_UNIT',
+        'MEASURABLE',
         'PROCESS',
         'PERSON'
     ]
