@@ -118,24 +118,9 @@
 
 
     <!-- TECHNOLOGIES -->
-    <waltz-section name="Technologies"
-                   id="technologies-section">
-
-        <waltz-section-actions>
-            <button class="btn btn-xs waltz-btn-transparent"
-                    ng-click="ctrl.visibility.techOverlay = ! ctrl.visibility.techOverlay">
-                <waltz-icon name="map-signs"></waltz-icon>
-            </button>
-        </waltz-section-actions>
-
-        <waltz-source-data-overlay visible="ctrl.visibility.techOverlay"
-                                   ratings="ctrl.sourceDataRatings"
-                                   entities="['SERVER', 'DATABASE', 'SOFTWARE']">
-        </waltz-source-data-overlay>
-
-        <waltz-group-technology-summary stats="ctrl.techStats">
-        </waltz-group-technology-summary>
-    </waltz-section>
+    <waltz-technology-summary-section stats="ctrl.techStats"
+                                      source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-technology-summary-section>
 
 
     <!-- COSTS -->
