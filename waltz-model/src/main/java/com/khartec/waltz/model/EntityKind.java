@@ -37,6 +37,7 @@ public enum EntityKind {
     INVOLVEMENT_KIND,
     ACTOR,
     LOGICAL_DATA_FLOW,
+    MEASURABLE,
     ORG_UNIT,
     PERFORMANCE_METRIC_PACK,
     PERSON,

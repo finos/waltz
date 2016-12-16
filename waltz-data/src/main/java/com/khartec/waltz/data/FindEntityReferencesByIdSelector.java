@@ -8,6 +8,11 @@ import java.util.List;
 
 public interface FindEntityReferencesByIdSelector {
 
+    /**
+     * Using the given selector, prepare a list of entity references
+     * @param selector
+     * @return
+     */
     List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector);
 
 }

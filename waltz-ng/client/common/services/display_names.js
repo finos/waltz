@@ -106,6 +106,7 @@ export const entityNames = {
     INVOLVEMENT: 'Involvement',
     LOGICAL_DATA_FLOW: "Logical Data Flow",
     ORG_UNIT: 'Org Unit',
+    MEASURABLE: 'Measurable',
     PERSON: 'Person',
     PHYSICAL_SPECIFICATION: 'Physical Specification',
     PHYSICAL_FLOW: 'Physical Flow',
