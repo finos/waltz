@@ -197,18 +197,10 @@
 
 
     <!-- TECHNOLOGIES -->
-    <waltz-section name="Technologies"
-                   icon="server"
-                   ng-if="ctrl.hasInvolvements"
-                   id="technologies-section">
-
-        <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
-                                         entities="['SERVER', 'DATABASE', 'SOFTWARE']">
-        </waltz-source-data-section-addon>
-
-        <waltz-group-technology-summary stats="ctrl.techStats">
-        </waltz-group-technology-summary>
-    </waltz-section>
+    <waltz-technology-summary-section stats="ctrl.techStats"
+                                      source-data-ratings="ctrl.sourceDataRatings"
+                                      ng-if="ctrl.hasInvolvements">
+    </waltz-technology-summary-section>
 
 
     <!-- COSTS -->

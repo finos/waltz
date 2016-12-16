@@ -15,22 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import angular from "angular";
 
-
-export default () => {
-    const module = angular.module('waltz.technology', []);
-
-    module
-        .directive('waltzTechnologySection', require('./directives/technology-section'));
-
-    module
-        .component('waltzGroupTechnologySummary', require('./components/group-technology-summary'))
-        .component('waltzTechnologySummaryPies', require('./components/technology-summary-pies'))
-        .component('waltzTechnologySummarySection', require('./components/technology-summary-section'));
-
-    module
-        .service('TechnologyStatisticsService', require('./services/technology-statistics-service'));
-
-    return module.name;
+const bindings = {
+    stats: '<',
+    sourceDataRatings: '<'
 };
+
+
+const template = require('./technology-summary-section.html');
+
+
+function controller() {
+
+}
+
+
+controller.$inject = [];
+
+
+const component = {
+    bindings,
+    template,
+    controller
+};
+
+
+export default component;
