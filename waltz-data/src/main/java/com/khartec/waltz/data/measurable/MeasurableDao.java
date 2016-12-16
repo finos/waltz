@@ -37,6 +37,7 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static java.util.Optional.ofNullable;
 
 
 @Repository
@@ -47,12 +48,12 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
 
         return ImmutableMeasurable.builder()
                 .id(r.getId())
-                .parentId(r.getParentId())
+                .parentId(ofNullable(r.getParentId()))
                 .name(r.getName())
                 .kind(MeasurableKind.valueOf(r.getMeasurableKind()))
                 .concrete(r.getConcrete())
                 .description(r.getDescription())
-                .externalId(r.getExternalId())
+                .externalId(ofNullable(r.getExternalId()))
                 .provenance(r.getProvenance())
                 .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(r.getLastUpdatedAt()))
                 .lastUpdatedBy(r.getLastUpdatedBy())
