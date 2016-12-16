@@ -74,28 +74,8 @@
 
 
     <!--LINEAGE REPORTS-->
-    <waltz-section name="Lineage Reports"
-                   id="lineage-reports-section">
-        <waltz-section-actions>
-            <button ng-click="ctrl.exportLineageReports()"
-                    class="btn btn-xs btn-primary"
-                    ng-if="ctrl.lineageReports.length > 0">
-                <waltz-icon name="cloud-download"></waltz-icon>
-                Export
-            </button>
-        </waltz-section-actions>
-
-        <waltz-physical-flow-table lineage="ctrl.lineageReports"
-                                   on-initialise="ctrl.lineageTableInitialised"
-                                   ng-if="ctrl.lineageReports.length > 0">
-        </waltz-physical-flow-table>
-
-        <waltz-no-data ng-if="ctrl.lineageReports.length == 0">
-            <message>
-                <strong>No Lineage Reports</strong> have been defined
-            </message>
-        </waltz-no-data>
-    </waltz-section>
+    <waltz-lineage-reports-section lineage-reports="ctrl.lineageReports">
+    </waltz-lineage-reports-section>
 
 
     <!-- AUTH SOURCES -->
