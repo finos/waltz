@@ -62,6 +62,8 @@ const dependencies = [
     require('./lineage')(),
     require('./logical-flow')(),
     require('./logical-flow-decorator')(),
+    require('./measurable')(),
+    require('./measurable-rating')(),
     require('./navbar')(),
     require('./org-units')(),
     require('./orphan')(),

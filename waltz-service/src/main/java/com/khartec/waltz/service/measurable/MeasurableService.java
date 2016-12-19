@@ -19,6 +19,7 @@
 package com.khartec.waltz.service.measurable;
 
 import com.khartec.waltz.data.measurable.MeasurableDao;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.measurable.Measurable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,17 @@ public class MeasurableService {
 
     public List<Measurable> findAll() {
         return measurableDao.findAll();
+    }
+
+
+    /**
+     * Includes parents
+     * @param ref
+     * @return
+     */
+    public List<Measurable> findMeasuresRelatedToEntity(EntityReference ref) {
+        checkNotNull(ref, "ref cannot be null");
+        return measurableDao.findMeasuresRelatedToEntity(ref);
     }
 
 }

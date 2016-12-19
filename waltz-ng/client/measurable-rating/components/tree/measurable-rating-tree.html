@@ -1,0 +1,24 @@
+<div>
+    <treecontrol class="tree-light"
+                 tree-model="$ctrl.treeData"
+                 expanded-nodes="$ctrl.expandedNodes"
+                 options="$ctrl.treeOptions"
+                 on-selection="$ctrl.onSelect(node)"
+                 order-by="'-name'">
+
+    <span ng-if="node.rating">
+        <waltz-rating-indicator-cell rating="node.rating.rating">
+        </waltz-rating-indicator-cell>
+    </span>
+
+    <span title="{{ node.description }}"
+          ng-class="{ 'text-muted': node.rating == null }"
+          class="no-overflow">
+        <span ng-bind="node.name">
+        </span>
+        <span class="small text-muted"
+              ng-bind="node.rating.description">
+        </span>
+    </span>
+</treecontrol>
+</div>

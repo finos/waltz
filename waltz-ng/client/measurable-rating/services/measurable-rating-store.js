@@ -15,49 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import { checkIsEntityRef } from '../../common/checks';
 
 
+function store($http, baseApiUrl) {
+    const baseUrl = `${baseApiUrl}/measurable-rating`;
 
-
-
-const initialState = {
-
-};
-
-
-function controller(measurableStore, measurableRatingStore) {
-
-    const vm = Object.assign(this, initialState);
-
-    const entityReference = {
-        id: 40,
-        kind: 'APPLICATION'
+    const findForEntityReference = (ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${baseUrl}/entity/${ref.kind}/${ref.id}`)
+            .then(d => d.data);
     };
 
-    const ratingPromise = measurableRatingStore
-        .findForEntityReference(entityReference)
-        .then(rs => vm.ratings = rs);
-
-    const measurePromise = measurableStore
-        .findMeasurablesRelatedToPath(entityReference)
-        .then(ms => vm.measurables = ms);
+    return {
+        findForEntityReference
+    };
 
 }
 
+store.$inject = ['$http', 'BaseApiUrl'];
 
-controller.$inject = [
-    'MeasurableStore',
-    'MeasurableRatingStore'
-];
-
-
-const view = {
-    template: require('./playpen4.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;
+export default store;

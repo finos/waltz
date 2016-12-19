@@ -75,6 +75,15 @@ export function buildHierarchies(nodes) {
 }
 
 
+export function flattenHiearchies(roots = [], acc) {
+    roots.forEach(r => {
+        acc.push(r);
+        flattenHiearchies(r.children, acc);
+    });
+    return acc;
+}
+
+
 export function findNode(nodes = [], id) {
     const found = _.find(nodes, { id });
     if (found) return found;

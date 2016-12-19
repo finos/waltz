@@ -10,19 +10,11 @@
     </waltz-page-header>
 
 
-    <waltz-section name="foo">
-
-
-        <waltz-svg-manipulator svg="ctrl.svg">
-
-        </waltz-svg-manipulator>
-        <hr>
-
-        <button class='btn btn-success'
-                ng-click="ctrl.swap()">
-            Swap!
-        </button>
-
+    <waltz-section>
+        <waltz-measurable-rating-panel ratings="ctrl.ratings"
+                                       measurables="ctrl.measurables">
+        </waltz-measurable-rating-panel>
     </waltz-section>
+
 
 </div>
