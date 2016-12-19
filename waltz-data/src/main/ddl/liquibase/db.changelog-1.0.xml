@@ -2151,7 +2151,8 @@
     <!-- 293 User preferences -->
     <changeSet author="kamransaleem"
                id="20160715-293-1"
-               failOnError="false">
+               failOnError="false"
+               dbms="mssql">
         <createTable tableName="user_preference">
             <column name="key"
                     type="VARCHAR(512)">
@@ -2335,7 +2336,8 @@
 
     <!-- 405 User preference 767 primary key limit on mariadb when UTF8 -->
     <changeSet author="kamransaleem"
-               id="20160808-405-1">
+               id="20160808-405-1"
+               dbms="mssql">
         <dropTable tableName="user_preference"/>
     </changeSet>
 
