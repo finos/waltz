@@ -15,49 +15,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import {initialiseData} from '../../../common';
 
 
+const template = require('./measurable-rating-panel.html');
 
+
+const bindings = {
+    ratings: '<',
+    measurables: '<',
+};
 
 
 const initialState = {
-
+    measurables: [],
+    ratings: [],
+    selected: null
 };
 
 
-function controller(measurableStore, measurableRatingStore) {
-
-    const vm = Object.assign(this, initialState);
-
-    const entityReference = {
-        id: 40,
-        kind: 'APPLICATION'
-    };
-
-    const ratingPromise = measurableRatingStore
-        .findForEntityReference(entityReference)
-        .then(rs => vm.ratings = rs);
-
-    const measurePromise = measurableStore
-        .findMeasurablesRelatedToPath(entityReference)
-        .then(ms => vm.measurables = ms);
-
+function controller() {
+    const vm = initialiseData(this, initialState);
+    vm.onSelect = d => vm.selected = d;
 }
 
 
-controller.$inject = [
-    'MeasurableStore',
-    'MeasurableRatingStore'
-];
+controller.$inject = [];
 
 
-const view = {
-    template: require('./playpen4.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
+const component = {
+    template,
+    bindings,
+    controller
 };
 
-
-export default view;
+export default component;

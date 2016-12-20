@@ -25,6 +25,7 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
@@ -47,11 +48,16 @@ public class MeasurableEndpoint implements Endpoint {
     public void register() {
 
         String findAllPath = mkPath(BASE_URL, "all");
+        String findMeasuresRelatedToPath = mkPath(BASE_URL, "entity", ":kind", ":id");
 
         ListRoute<Measurable> findAllRoute = (request, response)
                 -> measurableService.findAll();
 
+        ListRoute<Measurable> findMeasuresRelatedToEntityRoute = (request, response)
+                -> measurableService.findMeasuresRelatedToEntity(getEntityReference(request));
+
         getForList(findAllPath, findAllRoute);
+        getForList(findMeasuresRelatedToPath, findMeasuresRelatedToEntityRoute);
     }
 
 }

@@ -1,0 +1,51 @@
+<div class="row">
+    <div class="col-sm-6">
+        <waltz-measurable-rating-tree ratings="$ctrl.ratings"
+                                      on-select="$ctrl.onSelect"
+                                      measurables="$ctrl.measurables">
+        </waltz-measurable-rating-tree>
+    </div>
+    <div class="col-sm-6"
+         style="border-left: 1px solid #eee">
+        <div ng-if="$ctrl.selected != null">
+
+            <div>
+                <h4 ng-bind="$ctrl.selected.name"></h4>
+                <div class="small"
+                     ng-bind="$ctrl.selected.description">
+                </div>
+                <div class="pull-right small clickable">
+                    <a ui-sref="main.measure.view ({ id: $ctrl.selected.id })">
+                        More &raquo;
+                    </a>
+                </div>
+
+            <div ng-if="$ctrl.selected.rating != null">
+                <hr>
+                <h4>
+                    Rating
+                </h4>
+                <div>
+                    <waltz-rating-indicator-cell rating="$ctrl.selected.rating.rating"
+                                                 label="$ctrl.selected.rating.rating | toDisplayName:'investmentRating'">
+                    </waltz-rating-indicator-cell>
+                    -
+                    <span class="small"
+                          ng-bind="$ctrl.selected.rating.description">
+                    </span>
+                </div>
+                <div class="pull-right small">
+                    <span class="text-muted">
+                        Last Modified:
+                    </span>
+                    <span ng-bind="$ctrl.selected.rating.lastUpdatedBy">
+                    </span>,
+                    <waltz-from-now class='text-muted'
+                                    timestamp="$ctrl.selected.rating.lastUpdatedAt">
+                    </waltz-from-now>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

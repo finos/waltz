@@ -36,7 +36,9 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
+import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static java.util.Optional.ofNullable;
 
 
@@ -78,6 +80,18 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
     }
 
 
+    public List<Measurable> findMeasuresRelatedToEntity(EntityReference ref) {
+        checkNotNull(ref, "ref cannot be null");
+        return dsl.selectDistinct(MEASURABLE.fields())
+                .from(ENTITY_HIERARCHY)
+                .innerJoin(MEASURABLE_RATING).on(MEASURABLE_RATING.MEASURABLE_ID.eq(ENTITY_HIERARCHY.ID))
+                .innerJoin(MEASURABLE).on(MEASURABLE.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID))
+                .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
+                .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
+                .fetch(TO_DOMAIN);
+    }
+
+
     @Override
     public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
         checkNotNull(selector, "selector cannot be null");
@@ -86,5 +100,6 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .where(MEASURABLE.ID.in(selector))
                 .fetch(TO_ENTITY_REFERENCE);
     }
+
 
 }
