@@ -29,15 +29,12 @@ import {
     loadSoftwareCatalog,
     loadSourceDataRatings
 } from "./data-load";
-import {mkAppRatingsGroup, calculateHighestRatingCount} from "../ratings/directives/common";
 
 
 const initialState = {
     app: {},
     aliases: [],
     appAuthSources: [],
-    appCapabilities: [],
-    capabilities: [],
     complexity: [],
     databases: [],
     specifications: [],
@@ -49,7 +46,6 @@ const initialState = {
     ouAuthSources: [],
     organisationalUnit: null,
     peopleInvolvements: [],
-    processes: [],
     servers: [],
     softwareCatalog: [],
     sourceDataRatings: [],
@@ -78,12 +74,10 @@ function controller($q,
                     $state,
                     $stateParams,
                     appViewStore,
-                    appCapabilityStore,
                     assetCostStore,
                     aliasStore,
                     authSourcesStore,
                     bookmarkStore,
-                    capabilityStore,
                     changeLogStore,
                     databaseStore,
                     dataTypeUsageStore,
@@ -92,10 +86,11 @@ function controller($q,
                     involvementStore,
                     logicalFlowDecoratorStore,
                     logicalFlowStore,
+                    measurableStore,
+                    measurableRatingStore,
                     orgUnitStore,
                     physicalSpecificationStore,
                     physicalFlowStore,
-                    processStore,
                     serverInfoStore,
                     softwareCatalogStore,
                     sourceDataRatingStore) {
@@ -167,14 +162,16 @@ function controller($q,
 
     function loadSecondWave() {
         const promises = [
-            appCapabilityStore.findCapabilitiesByApplicationId(id)
-                .then(appCapabilities => vm.appCapabilities = appCapabilities),
-
-            capabilityStore.findByAppIds([id])
-                .then(capabilities => vm.capabilities = capabilities),
-
             bookmarkStore.findByParent(entityRef)
-                .then(bookmarks => vm.bookmarks = bookmarks)
+                .then(bookmarks => vm.bookmarks = bookmarks),
+
+            measurableRatingStore
+                .findForEntityReference(entityRef)
+                .then(rs => vm.ratings = rs),
+
+            measurableStore
+                .findMeasurablesRelatedToPath(entityRef)
+                .then(ms => vm.measurables = ms)
         ];
 
         return $q.all(promises);
@@ -191,10 +188,6 @@ function controller($q,
             loadDatabases(databaseStore, id, vm),
             loadDataTypeUsages(dataTypeUsageStore, id, vm),
             loadDataFlowDecorators(logicalFlowDecoratorStore, id, vm),
-
-            processStore
-                .findForApplication(id)
-                .then(ps => vm.processes = ps),
 
             physicalSpecificationStore
                 .findByEntityReference(entityRef)
@@ -232,12 +225,10 @@ controller.$inject = [
     '$state',
     '$stateParams',
     'ApplicationViewStore',
-    'AppCapabilityStore',
     'AssetCostStore',
     'AliasStore',
     'AuthSourcesStore',
     'BookmarkStore',
-    'CapabilityStore',
     'ChangeLogStore',
     'DatabaseStore',
     'DataTypeUsageStore',
@@ -246,10 +237,11 @@ controller.$inject = [
     'InvolvementStore',
     'LogicalFlowDecoratorStore',
     'LogicalFlowStore',
+    'MeasurableStore',
+    'MeasurableRatingStore',
     'OrgUnitStore',
     'PhysicalSpecificationStore',
     'PhysicalFlowStore',
-    'ProcessStore',
     'ServerInfoStore',
     'SoftwareCatalogStore',
     'SourceDataRatingStore'

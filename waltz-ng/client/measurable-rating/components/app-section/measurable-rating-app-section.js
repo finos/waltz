@@ -16,19 +16,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+import {initialiseData} from '../../../common';
 
 
-export default () => {
-    const module = angular.module('waltz.measurable.rating', []);
-
-    module
-        .service('MeasurableRatingStore', require('./services/measurable-rating-store'));
-
-    module
-        .component('waltzMeasurableRatingAppSection', require('./components/app-section/measurable-rating-app-section'))
-        .component('waltzMeasurableRatingPanel', require('./components/panel/measurable-rating-panel'))
-        .component('waltzMeasurableRatingTree', require('./components/tree/measurable-rating-tree'));
-
-    return module.name;
+const bindings = {
+    ratings: '<',
+    measurables: '<',
+    sourceDataRatings: '<'
 };
+
+
+const template = require('./measurable-rating-app-section.html');
+
+
+const initialState = {
+    ratings: [],
+    measurables: [],
+    visibility: {
+        overlay: false
+    }
+};
+
+
+function controller() {
+    initialiseData(this, initialState);
+}
+
+
+controller.$inject = [];
+
+
+const component = {
+    template,
+    bindings,
+    controller
+};
+
+
+export default component;
