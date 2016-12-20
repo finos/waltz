@@ -3812,7 +3812,7 @@
         </sql>
         <sql>
             UPDATE m
-            SET parent_id = mp.id, m.description = c.description, m.external_id = c.id
+                SET parent_id = mp.id, m.description = c.description, m.external_id = c.id
             FROM measurable m
             LEFT JOIN measurable mp
                 ON mp.description = m.external_id
@@ -3895,5 +3895,138 @@
         </sql>
     </changeSet>
 
+    <!-- PROCESS -->
+
+    <!-- 1263: Process to Measurable -->
+    <changeSet author="dwatkins"
+               id="20161220-1263-1a"
+               dbms="mysql">
+        <sql>
+            INSERT INTO measurable (name,
+                                    measurable_kind,
+                                    concrete,
+                                    description,
+                                    external_id,
+                                    last_updated_at,
+                                    last_updated_by,
+                                    provenance)
+            SELECT p.name,
+                  'PROCESS',
+                   1,
+                   p.id,
+                   p.parent_id,
+                   now(),
+                   'admin',
+                   'waltz'
+            FROM process p;
+        </sql>
+        <sql>
+            UPDATE measurable m
+                LEFT JOIN measurable mp
+                    ON mp.description = m.external_id
+                INNER JOIN process p
+                    ON p.id = m.description
+            SET m.parent_id = mp.id,
+                m.description = p.description,
+                m.external_id = p.id
+            WHERE m.measurable_kind = 'PROCESS';
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20161220-1263-1b"
+               dbms="mssql">
+        <sql>
+            INSERT INTO measurable (name,
+                                    measurable_kind,
+                                    concrete,
+                                    description,
+                                    external_id,
+                                    last_updated_at,
+                                    last_updated_by,
+                                    provenance)
+            SELECT p.name,
+                  'PROCESS',
+                   1,
+                   p.id,
+                   p.parent_id,
+                   getutcdate(),
+                   'admin',
+                   'waltz'
+            FROM process p;
+        </sql>
+        <sql>
+            UPDATE m
+            SET parent_id = mp.id, m.description = p.description, m.external_id = p.id
+            FROM measurable m
+                LEFT JOIN measurable mp
+                    ON mp.description = m.external_id
+                INNER JOIN process p
+                    ON p.id = m.description
+            WHERE m.measurable_kind = 'PROCESS';
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20161220-1263-2a"
+               dbms="mysql">
+        <sql>
+            INSERT INTO measurable_rating (entity_id,
+                                           entity_kind,
+                                           measurable_id,
+                                           rating,
+                                           description,
+                                           last_updated_at,
+                                           last_updated_by,
+                                           provenance)
+                SELECT app.id,
+                       'APPLICATION',
+                       m.id,
+                       app.overall_rating,
+                       'Derived from overall rating',
+                       now(),
+                       'admin',
+                       'WALTZ'
+                FROM entity_relationship er
+                    INNER JOIN measurable m
+                        ON m.external_id = er.id_b
+                    INNER JOIN application app
+                        ON app.id = er.id_a
+            WHERE er.relationship = 'PARTICIPATES_IN'
+                AND er.kind_b = 'PROCESS'
+                AND er.kind_a = 'APPLICATION';
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20161220-1263-2b"
+               dbms="mssql">
+        <sql>
+            INSERT INTO measurable_rating (entity_id,
+                                           entity_kind,
+                                           measurable_id,
+                                           rating,
+                                           description,
+                                           last_updated_at,
+                                           last_updated_by,
+                                           provenance)
+                SELECT app.id,
+                       'APPLICATION',
+                       m.id,
+                       app.overall_rating,
+                       'Derived from overall rating',
+                       getutcdate(),
+                       'admin',
+                       'WALTZ'
+                FROM entity_relationship er
+                    INNER JOIN measurable m
+                        ON m.external_id = er.id_b
+                    INNER JOIN application app
+                        ON app.id = er.id_a
+            WHERE er.relationship = 'PARTICIPATES_IN'
+                AND er.kind_b = 'PROCESS'
+                AND er.kind_a = 'APPLICATION';
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>
