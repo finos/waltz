@@ -35,10 +35,11 @@ const initialState = {
     measurables: [],
     visibility: {
         overlay: false,
-        tab: 0
+        tab: null
     },
     byKind: {}
 };
+
 
 const descriptions = {
     BUSINESS_LINE: 'Which business lines this application supports',
@@ -49,14 +50,17 @@ const descriptions = {
     SERVICE: 'Which services this application performs'
 };
 
-
 function groupByKind(measurables = [], ratings = []) {
+    const allMeasurableKinds = _.keys(measurableKindNames);
+
     const measurablesByKind = _.groupBy(
         measurables,
         d => d.kind);
 
-    const grouped = _.map(measurablesByKind, (v, k) => {
-        const measurableIds = _.map(v, 'id');
+    const grouped = _.map(allMeasurableKinds, k => {
+        const usedMeasurables = measurablesByKind[k] || [];
+
+        const measurableIds = _.map(usedMeasurables, 'id');
         const ratingsForMeasure = _.filter(
             ratings,
             r => _.includes(measurableIds, r.measurableId));
@@ -67,7 +71,7 @@ function groupByKind(measurables = [], ratings = []) {
                 name: measurableKindNames[k],
                 description: descriptions[k]
             },
-            measurables: v,
+            measurables: usedMeasurables,
             ratings: ratingsForMeasure
         };
     });
@@ -84,6 +88,8 @@ function controller() {
     vm.$onChanges = (c) => {
         if (c.measurables || c.ratings) {
             vm.tabs = groupByKind(vm.measurables, vm.ratings);
+            const firstNonEmptyTab = _.find(vm.tabs, t => t.ratings.length > 0);
+            vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.kind.code : null;
         }
     };
 }
