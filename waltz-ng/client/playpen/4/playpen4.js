@@ -30,7 +30,7 @@ function controller(measurableStore, measurableRatingStore) {
     const vm = Object.assign(this, initialState);
 
     const entityReference = {
-        id: 40,
+        id: 69,
         kind: 'APPLICATION'
     };
 

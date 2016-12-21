@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+import _ from 'lodash';
 import {initialiseData} from '../../../common';
+import {measurableKindNames} from  '../../../common/services/display-names';
 
 
 const bindings = {
@@ -33,13 +34,58 @@ const initialState = {
     ratings: [],
     measurables: [],
     visibility: {
-        overlay: false
-    }
+        overlay: false,
+        tab: 0
+    },
+    byKind: {}
+};
+
+const descriptions = {
+    BUSINESS_LINE: 'Which business lines this application supports',
+    CAPABILITY: 'Which functions this application performs',
+    PROCESS: 'Which processes this application supports',
+    PRODUCT: 'Which products this application supports',
+    REGION: 'Which region this application services',
+    SERVICE: 'Which services this application performs'
 };
 
 
+function groupByKind(measurables = [], ratings = []) {
+    const measurablesByKind = _.groupBy(
+        measurables,
+        d => d.kind);
+
+    const grouped = _.map(measurablesByKind, (v, k) => {
+        const measurableIds = _.map(v, 'id');
+        const ratingsForMeasure = _.filter(
+            ratings,
+            r => _.includes(measurableIds, r.measurableId));
+
+        return {
+            kind: {
+                code: k,
+                name: measurableKindNames[k],
+                description: descriptions[k]
+            },
+            measurables: v,
+            ratings: ratingsForMeasure
+        };
+    });
+
+    return _.sortBy(
+        grouped,
+        g => g.kind.name);
+}
+
+
 function controller() {
-    initialiseData(this, initialState);
+    const vm = initialiseData(this, initialState);
+
+    vm.$onChanges = (c) => {
+        if (c.measurables || c.ratings) {
+            vm.tabs = groupByKind(vm.measurables, vm.ratings);
+        }
+    };
 }
 
 
