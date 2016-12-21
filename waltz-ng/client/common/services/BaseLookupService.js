@@ -35,6 +35,8 @@ export default class BaseLookupService {
         const existing = this.lookupsByType[type] || {};
 
         this.lookupsByType[type] = {...existing, ...lookupMap};
+
+        return this;
     }
 
 

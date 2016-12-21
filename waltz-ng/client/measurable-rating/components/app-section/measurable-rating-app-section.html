@@ -20,7 +20,22 @@
                                entities="['APP_CAPABILITY', 'PROCESS']">
     </waltz-source-data-overlay>
 
-    <waltz-measurable-rating-panel ratings="$ctrl.ratings"
-                                   measurables="$ctrl.measurables">
-    </waltz-measurable-rating-panel>
+
+    <uib-tabset active="$ctrl.tabs[0].kind.code">
+        <uib-tab ng-repeat='tab in $ctrl.tabs'
+                 index="tab.kind.code"
+                 heading="{{ tab.kind.name }}"
+                 select="$ctrl.visibility.tab = tab.kind.code">
+
+            <br>
+            <waltz-measurable-rating-panel ratings="tab.ratings"
+                                           measurables="tab.measurables">
+            </waltz-measurable-rating-panel>
+
+            <br>
+            <p class="text-muted small"
+               ng-bind="tab.kind.description"></p>
+        </uib-tab>
+    </uib-tabset>
+
 </waltz-section>

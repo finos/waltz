@@ -39,7 +39,8 @@ import {
     usageKindDisplayNames,
     transportKindNames,
     frequencyKindNames,
-    dataFormatKindNames
+    dataFormatKindNames,
+    measurableKindNames
 } from "./display-names";
 import {
     bookmarkIconNames,
@@ -56,72 +57,84 @@ const displayNameService = new BaseLookupService();
 const iconNameService = new BaseLookupService();
 const descriptionService = new BaseLookupService();
 
+
+function loadFromServer(dataTypeService,
+                        involvementKindService) {
+    dataTypeService
+        .loadDataTypes()
+        .then(results => {
+            // DEPRECATED, should be byId
+            const indexedByCode = _.keyBy(results, 'code');
+            const indexedById = _.keyBy(results, 'id');
+
+            displayNameService
+                .register('dataType', _.mapValues(indexedByCode, 'name'))
+                .register('dataType', _.mapValues(indexedById, 'name'))
+                ;
+
+            descriptionService
+                .register('dataType', _.mapValues(indexedByCode, 'description'))
+                .register('dataType', _.mapValues(indexedById, 'description'))
+                ;
+        });
+
+    involvementKindService
+        .loadInvolvementKinds()
+        .then(results => {
+            const indexedById = _.keyBy(results, 'id');
+            displayNameService.register('involvementKind', _.mapValues(indexedById, 'name'));
+            descriptionService.register('involvementKind', _.mapValues(indexedById, 'description'));
+        });
+}
+
+
 export default (module) => {
     module
         .service('DisplayNameService', () => displayNameService)
         .service('IconNameService', () => iconNameService)
-        .service('DescriptionService', () => descriptionService);
+        .service('DescriptionService', () => descriptionService)
+        ;
 
-    displayNameService.register('applicationKind', applicationKindDisplayNames);
-    displayNameService.register('applicationRating', applicationRatingNames);
-    displayNameService.register('assetCost', assetCostKindNames);
-    displayNameService.register('bookmark', bookmarkNames);
-    displayNameService.register('capabilityRating', capabilityRatingNames);
-    displayNameService.register('changeInitiative', changeInitiativeNames);
-    displayNameService.register('criticality', criticalityDisplayNames);
-    displayNameService.register('endOfLifeStatus', endOfLifeStatusNames);
-    displayNameService.register('entity', entityNames);
-    displayNameService.register('entityStatistic', entityStatisticCategoryDisplayNames);
-    displayNameService.register('investmentRating', investmentRatingNames);
-    displayNameService.register('lifecyclePhase', lifecyclePhaseDisplayNames);
-    displayNameService.register('lifecycleStatus', lifecycleStatusNames);
-    displayNameService.register('orgUnitKind', orgUnitKindNames);
-    displayNameService.register('rating', authSourceRatingNames);
-    displayNameService.register('rollupKind', rollupKindNames);
-    displayNameService.register('severity', severityNames);
-    displayNameService.register('usageKind', usageKindDisplayNames);
-    displayNameService.register('transportKind', transportKindNames);
-    displayNameService.register('frequencyKind', frequencyKindNames);
-    displayNameService.register('dataFormatKind', dataFormatKindNames);
+    displayNameService
+        .register('applicationKind', applicationKindDisplayNames)
+        .register('applicationRating', applicationRatingNames)
+        .register('assetCost', assetCostKindNames)
+        .register('bookmark', bookmarkNames)
+        .register('capabilityRating', capabilityRatingNames)
+        .register('changeInitiative', changeInitiativeNames)
+        .register('criticality', criticalityDisplayNames)
+        .register('dataFormatKind', dataFormatKindNames)
+        .register('endOfLifeStatus', endOfLifeStatusNames)
+        .register('entity', entityNames)
+        .register('entityStatistic', entityStatisticCategoryDisplayNames)
+        .register('frequencyKind', frequencyKindNames)
+        .register('investmentRating', investmentRatingNames)
+        .register('lifecyclePhase', lifecyclePhaseDisplayNames)
+        .register('lifecycleStatus', lifecycleStatusNames)
+        .register('measurableKind', measurableKindNames)
+        .register('orgUnitKind', orgUnitKindNames)
+        .register('rating', authSourceRatingNames)
+        .register('rollupKind', rollupKindNames)
+        .register('severity', severityNames)
+        .register('usageKind', usageKindDisplayNames)
+        .register('transportKind', transportKindNames)
+        ;
 
-    iconNameService.register('bookmark', bookmarkIconNames);
-    iconNameService.register('BOOLEAN', booleanTypeIconNames);
-    iconNameService.register('entity', entityIconNames);
-    iconNameService.register('entityStatistic', entityStatisticCategoryIconNames);
-    iconNameService.register('severity', severityIconNames);
-    iconNameService.register('rag', ragIconNames);
-    iconNameService.register('usageKind', usageKindIconNames);
+    iconNameService
+        .register('bookmark', bookmarkIconNames)
+        .register('BOOLEAN', booleanTypeIconNames)
+        .register('entity', entityIconNames)
+        .register('entityStatistic', entityStatisticCategoryIconNames)
+        .register('severity', severityIconNames)
+        .register('rag', ragIconNames)
+        .register('usageKind', usageKindIconNames)
+        ;
 
 
-    function runner(dataTypeService,
-                    involvementKindService) {
-        dataTypeService
-            .loadDataTypes()
-            .then(results => {
-                // DEPRECATED, should be byId
-                const indexedByCode = _.keyBy(results, 'code');
-                displayNameService.register('dataType', _.mapValues(indexedByCode, 'name'));
-                descriptionService.register('dataType', _.mapValues(indexedByCode, 'description'));
-
-                const indexedById = _.keyBy(results, 'id');
-                displayNameService.register('dataType', _.mapValues(indexedById, 'name'));
-                descriptionService.register('dataType', _.mapValues(indexedById, 'description'));
-            });
-
-        involvementKindService
-            .loadInvolvementKinds()
-            .then(results => {
-                const indexedById = _.keyBy(results, 'id');
-                displayNameService.register('involvementKind', _.mapValues(indexedById, 'name'));
-                descriptionService.register('involvementKind', _.mapValues(indexedById, 'description'));
-            });
-    }
-
-    runner.$inject = [
+    loadFromServer.$inject = [
         'DataTypeService',
         'InvolvementKindService'
     ];
 
-    module.run(runner);
-
+    module.run(loadFromServer);
 };

@@ -221,6 +221,21 @@ export const lifecycleStatusNames = {
 };
 
 
+export const measurableKindNames = {
+    BUSINESS_LINE: 'Business Line',
+    CAPABILITY: 'Function',
+    PROCESS: 'Process',
+    PRODUCT: 'Product',
+    REGION: 'Region',
+    SERVICE: 'Service'
+};
+
+
+/**
+ * Used to convert a map of ( { code -> displayName }
+ * @param lookups
+ * @param excludeUnknown
+ */
 export function toOptions(lookups = {}, excludeUnknown = false) {
     return _.chain(lookups)
         .map((v, k) => ({ name: v, code: k}))
@@ -230,6 +245,11 @@ export function toOptions(lookups = {}, excludeUnknown = false) {
 }
 
 
+/**
+ * Used to convert a map of { code->displayName } into
+ * a format suitable for use by ui-grid.
+ * @param lookups
+ */
 export function toGridOptions(lookups = {}) {
     return _.map(
         lookups,
