@@ -18,8 +18,8 @@
 
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
-import {bookmarkNames} from "../../../common/services/display_names";
-import {bookmarkIconNames} from "../../../common/services/icon_names";
+import {bookmarkNames} from "../../../common/services/display-names";
+import {bookmarkIconNames} from "../../../common/services/icon-names";
 
 
 const bindings = {

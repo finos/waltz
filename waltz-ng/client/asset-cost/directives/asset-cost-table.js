@@ -17,7 +17,7 @@
  */
 
 import _ from "lodash";
-import {toGridOptions, assetCostKindNames} from "./../../common/services/display_names";
+import {toGridOptions, assetCostKindNames} from "./../../common/services/display-names";
 import {mkEntityLinkGridCell} from "../../common";
 
 const DEFAULT_OPTIONS = {

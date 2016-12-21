@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {rollupKindNames} from "../common/services/display_names";
+import {rollupKindNames} from "../common/services/display-names";
 import {notEmpty} from "../common";
 
 

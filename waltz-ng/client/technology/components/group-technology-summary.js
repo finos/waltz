@@ -18,7 +18,7 @@
 
 import _ from "lodash";
 import {environmentColorScale, operatingSystemColorScale, maturityColorScale, variableScale} from "../../common/colors";
-import {endOfLifeStatusNames} from "../../common/services/display_names";
+import {endOfLifeStatusNames} from "../../common/services/display-names";
 
 
 const bindings = {

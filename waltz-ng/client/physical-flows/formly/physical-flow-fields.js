@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {toOptions, frequencyKindNames, transportKindNames} from "../../common/services/display_names";
+import {toOptions, frequencyKindNames, transportKindNames} from "../../common/services/display-names";
 
 
 export const transportField = {

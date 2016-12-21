@@ -40,7 +40,7 @@ import {
     transportKindNames,
     frequencyKindNames,
     dataFormatKindNames
-} from "./display_names";
+} from "./display-names";
 import {
     bookmarkIconNames,
     booleanTypeIconNames,
@@ -49,7 +49,7 @@ import {
     severityIconNames,
     ragIconNames,
     usageKindIconNames
-} from "./icon_names";
+} from "./icon-names";
 
 
 const displayNameService = new BaseLookupService();

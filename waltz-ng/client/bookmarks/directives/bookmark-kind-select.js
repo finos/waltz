@@ -17,8 +17,8 @@
  */
 
 import _ from "lodash";
-import {bookmarkNames} from "../../common/services/display_names.js";
-import {bookmarkIconNames} from "../../common/services/icon_names.js";
+import {bookmarkNames} from "../../common/services/display-names.js";
+import {bookmarkIconNames} from "../../common/services/icon-names.js";
 
 
 function createKinds() {
