@@ -18,7 +18,7 @@
 
 import {initialiseData, mkLinkGridCell} from "../../common";
 import {ragColorScale} from "../../common/colors";
-import {applicationRatingNames} from "../../common/services/display_names";
+import {applicationRatingNames} from "../../common/services/display-names";
 
 const bindings = {
     appCapabilities: '<',

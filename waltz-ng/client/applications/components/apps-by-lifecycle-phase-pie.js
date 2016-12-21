@@ -18,7 +18,7 @@
  */
 
 import {lifecyclePhaseColorScale} from "../../common/colors";
-import {lifecyclePhaseDisplayNames} from '../../common/services/display_names';
+import {lifecyclePhaseDisplayNames} from '../../common/services/display-names';
 import {toKeyCounts} from "../../common";
 
 

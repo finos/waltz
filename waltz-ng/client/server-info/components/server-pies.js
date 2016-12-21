@@ -18,7 +18,7 @@
 
 import {environmentColorScale, operatingSystemColorScale, variableScale} from "../../common/colors";
 import {toKeyCounts} from "../../common";
-import {endOfLifeStatusNames} from "../../common/services/display_names";
+import {endOfLifeStatusNames} from "../../common/services/display-names";
 
 
 const bindings = {

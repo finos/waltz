@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {assetCostKindNames} from '../../common/services/display_names';
+import {assetCostKindNames} from '../../common/services/display-names';
 import {initialiseData} from '../../common';
 
 

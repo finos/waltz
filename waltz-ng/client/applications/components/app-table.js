@@ -22,7 +22,7 @@ import {
     investmentRatingNames,
     lifecyclePhaseDisplayNames,
     applicationKindDisplayNames
-} from "../../common/services/display_names";
+} from "../../common/services/display-names";
 
 
 const bindings = {

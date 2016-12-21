@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {applicationKindDisplayNames, lifecyclePhaseDisplayNames, toOptions} from "../../common/services/display_names";
+import {applicationKindDisplayNames, lifecyclePhaseDisplayNames, toOptions} from "../../common/services/display-names";
 
 export const nameField = {
     type: 'input',

@@ -26,7 +26,6 @@ export const bookmarkIconNames = {
     QUALITY_CONTROL: 'sliders',
     SOURCE_CODE_CONTROL: 'code',
     TECHNICAL_SPECIFICATION: 'tty',
-
 };
 
 
