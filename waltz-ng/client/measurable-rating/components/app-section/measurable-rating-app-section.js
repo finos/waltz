@@ -45,7 +45,7 @@ const descriptions = {
     CAPABILITY: 'Which functions this application performs',
     PROCESS: 'Which processes this application supports',
     PRODUCT: 'Which products this application supports',
-    REGION: 'Which region this application services',
+    REGION: 'Which regions this application services',
     SERVICE: 'Which services this application performs'
 };
 
