@@ -21,21 +21,36 @@
     </waltz-source-data-overlay>
 
 
-    <uib-tabset active="$ctrl.tabs[0].kind.code">
-        <uib-tab ng-repeat='tab in $ctrl.tabs'
-                 index="tab.kind.code"
-                 heading="{{ tab.kind.name }}"
-                 select="$ctrl.visibility.tab = tab.kind.code">
+    <!-- TABS -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="waltz-tabs">
+                <input type="radio"
+                       ng-repeat-start="tab in $ctrl.tabs"
+                       ng-model="$ctrl.visibility.tab"
+                       ng-value="tab.kind.code"
+                       ng-disabled="tab.ratings.length === 0"
+                       name="tab"
+                       id="{{ tab.kind.code + $id}}">
+                <label for="{{ tab.kind.code + $id}}"
+                       ng-repeat-end
+                       ng-bind="tab.kind.name">
+                </label>
 
-            <br>
-            <waltz-measurable-rating-panel ratings="tab.ratings"
-                                           measurables="tab.measurables">
-            </waltz-measurable-rating-panel>
+                <div ng-repeat="tab in $ctrl.tabs"
+                     ng-class="{ 'wt-active': tab.kind.code == $ctrl.visibility.tab }"
+                     class="wt-tab">
+                    <br>
+                    <waltz-measurable-rating-panel ratings="tab.ratings"
+                                                   measurables="tab.measurables">
+                    </waltz-measurable-rating-panel>
 
-            <br>
-            <p class="text-muted small"
-               ng-bind="tab.kind.description"></p>
-        </uib-tab>
-    </uib-tabset>
+                    <br>
+                    <p class="text-muted small"
+                       ng-bind="tab.kind.description"></p>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </waltz-section>
