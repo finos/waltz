@@ -25,7 +25,9 @@ import com.khartec.waltz.model.measurable_rating.ImmutableMeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
 import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -73,4 +75,12 @@ public class MeasurableRatingDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
+    public List<MeasurableRating> findByMeasurableIdSelector(Select<Record1<Long>> selector) {
+        checkNotNull(selector, "selector cannot be null");
+        return dsl
+                .selectFrom(MEASURABLE_RATING)
+                .where(MEASURABLE_RATING.MEASURABLE_ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }

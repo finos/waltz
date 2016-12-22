@@ -18,9 +18,13 @@
 
 package com.khartec.waltz.service.measurable_rating;
 
+import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,12 +36,16 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class MeasurableRatingService {
 
     private final MeasurableRatingDao measurableRatingDao;
-
+    private final MeasurableIdSelectorFactory measurableIdSelectorFactory;
 
     @Autowired
-    public MeasurableRatingService(MeasurableRatingDao measurableRatingDao) {
+    public MeasurableRatingService(MeasurableRatingDao measurableRatingDao,
+                                   MeasurableIdSelectorFactory measurableIdSelectorFactory) {
         checkNotNull(measurableRatingDao, "measurableRatingDao cannot be null");
+        checkNotNull(measurableIdSelectorFactory, "measurableIdSelectorFactory cannot be null");
+
         this.measurableRatingDao = measurableRatingDao;
+        this.measurableIdSelectorFactory = measurableIdSelectorFactory;
     }
 
 
@@ -46,4 +54,9 @@ public class MeasurableRatingService {
         return measurableRatingDao.findForEntity(ref);
     }
 
+    public List<MeasurableRating> findByMeasurableIdSelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        Select<Record1<Long>> selector = measurableIdSelectorFactory.apply(options);
+        return measurableRatingDao.findByMeasurableIdSelector(selector);
+    }
 }
