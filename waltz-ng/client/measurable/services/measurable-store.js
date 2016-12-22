@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {checkIsEntityRef} from '../../common/checks'
+import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks'
+
 
 function store($http, baseApiUrl) {
     const baseUrl = `${baseApiUrl}/measurable`;
@@ -31,9 +32,17 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
+    const findMeasurablesBySelector = (options) => {
+        checkIsIdSelector(options);
+        return $http
+            .post(`${baseUrl}/measurable-selector`, options)
+            .then(d => d.data);
+    };
+
     return {
         findAll,
-        findMeasurablesRelatedToPath
+        findMeasurablesRelatedToPath,
+        findMeasurablesBySelector
     };
 
 }

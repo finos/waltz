@@ -15,23 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from 'lodash';
 
-function service(http, baseUrl) {
+
+function service($http, baseUrl) {
 
     const BASE = `${baseUrl}/server-info`;
 
     const findByAssetCode = (assetCode) =>
-        http.get(`${BASE}/asset-code/${assetCode}`)
+        $http
             .then(result => result.data);
 
     const findByAppId = (appId) =>
-        http.get(`${BASE}/app-id/${appId}`)
+        $http.get(`${BASE}/app-id/${appId}`)
             .then(result => result.data);
 
 
-    const findStatsForSelector = (id, kind, scope = 'EXACT') =>
-        http.post(`${BASE}/apps/stats`, { scope, entityReference: { id, kind }})
+    const findStatsForSelector = (id, kind, scope = 'EXACT') => {
+        const options = _.isObject(id)
+            ? id
+            : {scope, entityReference: {id, kind}};
+        return $http
+            .post(`${BASE}/apps/stats`, options)
             .then(result => result.data);
+    };
 
     return {
         findByAssetCode,
