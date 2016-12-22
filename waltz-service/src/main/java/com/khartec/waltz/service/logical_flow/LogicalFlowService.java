@@ -169,6 +169,7 @@ public class LogicalFlowService {
         switch (options.entityReference().kind()) {
             case APP_GROUP:
             case CAPABILITY:
+            case MEASURABLE:
             case ORG_UNIT:
             case PERSON:
             case PROCESS:

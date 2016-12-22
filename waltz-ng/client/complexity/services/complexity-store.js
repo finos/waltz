@@ -16,6 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from 'lodash';
+
 
 export default [
     '$http',
@@ -31,10 +33,15 @@ export default [
                 .then(result => result.data);
 
 
-        const findBySelector = (id, kind, scope = 'CHILDREN') =>
-            $http
-                .post(BASE, { scope, entityReference: { id, kind }})
+        const findBySelector = (id, kind, scope = 'CHILDREN') => {
+            const options = _.isObject(id)
+                ? id
+                : {scope, entityReference: {id, kind}};
+
+            return $http
+                .post(BASE, options)
                 .then(result => result.data);
+        }
 
 
         const recalculateAll = () =>

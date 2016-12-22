@@ -15,17 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from 'lodash';
 
-function service(http, base) {
+
+function service($http, base) {
     const baseUrl = `${base}/software-catalog`;
 
     const findByAppIds = (ids = []) =>
-        http.post(`${baseUrl}/apps`, ids)
+        $http.post(`${baseUrl}/apps`, ids)
             .then(r => r.data);
 
-    const findStatsForSelector = (id, kind, scope = 'CHILDREN') =>
-        http.post(`${baseUrl}/stats`, { scope, entityReference : { id, kind } })
+    const findStatsForSelector = (id, kind, scope = 'CHILDREN') => {
+        const options = _.isObject(id)
+            ? id
+            : {scope, entityReference: {id, kind}};
+
+        return $http.post(`${baseUrl}/stats`, options)
             .then(result => result.data);
+    };
 
     return {
         findByAppIds,

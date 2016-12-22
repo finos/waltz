@@ -16,21 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+import UnitView from "./measurable-view";
 
 
-export default () => {
+const baseState = {};
 
-    const module = angular.module('waltz.measurable', []);
-
-    module
-        .component('waltzMeasurableSummary', require('./components/summary/measurable-summary'));
-
-    module
-        .service('MeasurableStore', require('./services/measurable-store'));
-
-    module
-        .config(require('./routes'));
-
-    return module.name;
+const viewState = {
+    url: 'measurable/{id:int}',
+    views: {
+        'content@': UnitView
+    }
 };
+
+
+function setup($stateProvider) {
+    $stateProvider
+        .state('main.measurable', baseState)
+        .state('main.measurable.view', viewState);
+}
+
+setup.$inject = ['$stateProvider'];
+
+
+export default setup;

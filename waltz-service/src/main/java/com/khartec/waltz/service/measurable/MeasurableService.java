@@ -60,7 +60,7 @@ public class MeasurableService {
      * @param ref
      * @return
      */
-    public List<Measurable> findMeasuresRelatedToEntity(EntityReference ref) {
+    public List<Measurable> findMeasurablesRelatedToEntity(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
         return measurableDao.findMeasuresRelatedToEntity(ref);
     }

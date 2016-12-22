@@ -1,0 +1,44 @@
+<div>
+
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.measurable.name }}"
+                       icon="puzzle-piece"
+                       tour="ctrl.tour"
+                       small="{{ ctrl.measurable.kind | toDisplayName:'measurableKind' }}">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.measurable.list ({kind: ctrl.measurable.kind })">Measurable</a></li>
+            <li><span ng-bind="ctrl.measurable.name"></span></li>
+        </ol>
+    </waltz-page-header>
+
+
+    <waltz-measurable-summary applications="ctrl.applications"
+                              children="ctrl.children"
+                              complexity="ctrl.complexity"
+                              logical-flows="ctrl.logicalFlowView.stats"
+                              measurable="ctrl.measurable"
+                              parents="ctrl.parents"
+                              server-stats="ctrl.techStats.serverStats"
+                              total-cost="ctrl.assetCostData.total">
+    </waltz-measurable-summary>
+
+    <br>
+
+    <waltz-section>
+        <div class="row">
+            <div class="col-md-3">
+                <pre>{{ ctrl.measurable | json }}</pre>
+            </div>
+            <div class="col-md-3">
+                <pre>{{ ctrl.parents | json }}</pre>
+            </div>
+            <div class="col-md-3">
+                <pre>{{ ctrl.children | json }}</pre>
+            </div>
+            <div class="col-md-3">
+                <pre>{{}}</pre>
+            </div>
+        </div>
+    </waltz-section>
+</div>

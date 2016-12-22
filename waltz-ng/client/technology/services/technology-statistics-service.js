@@ -15,12 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-const NOTHING = {
-    serverStats: [],
-    databaseStats: [],
-    softwareStats: []
-};
+import _ from 'lodash';
 
 
 function service($q,
@@ -29,11 +24,14 @@ function service($q,
                  softwareCatalogStore) {
 
     const findBySelector = (id, kind, scope = 'CHILDREN') => {
+        const options = _.isObject(id)
+            ? id
+            : {scope, entityReference: {id, kind}};
 
         const promises = [
-            serverInfoStore.findStatsForSelector(id, kind, scope),
-            databaseStore.findStatsForSelector(id, kind, scope),
-            softwareCatalogStore.findStatsForSelector(id, kind, scope)
+            serverInfoStore.findStatsForSelector(options),
+            databaseStore.findStatsForSelector(options),
+            softwareCatalogStore.findStatsForSelector(options)
         ];
 
         return $q
