@@ -36,7 +36,6 @@ public abstract class AbstractIdSelectorFactory implements IdSelectorFactory {
         } else {
             return mkForOptions(options);
         }
-
     }
 
 

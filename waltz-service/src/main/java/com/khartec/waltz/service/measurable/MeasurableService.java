@@ -19,8 +19,12 @@
 package com.khartec.waltz.service.measurable;
 
 import com.khartec.waltz.data.measurable.MeasurableDao;
+import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.measurable.Measurable;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,12 +37,16 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class MeasurableService {
     
     private final MeasurableDao measurableDao;
+    private final MeasurableIdSelectorFactory measurableIdSelectorFactory;
 
 
     @Autowired
-    public MeasurableService(MeasurableDao measurableDao) {
+    public MeasurableService(MeasurableDao measurableDao,
+                             MeasurableIdSelectorFactory measurableIdSelectorFactory) {
         checkNotNull(measurableDao, "measurableDao cannot be null");
+        checkNotNull(measurableIdSelectorFactory, "measurableIdSelectorFactory cannot be null");
         this.measurableDao = measurableDao;
+        this.measurableIdSelectorFactory = measurableIdSelectorFactory;
     }
 
 
@@ -48,13 +56,20 @@ public class MeasurableService {
 
 
     /**
-     * Includes parents
+     * Includes parents, this should probably be deprecated and rolled into findByMeasureableIdSelector
      * @param ref
      * @return
      */
     public List<Measurable> findMeasuresRelatedToEntity(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
         return measurableDao.findMeasuresRelatedToEntity(ref);
+    }
+
+
+    public List<Measurable> findByMeasurableIdSelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        Select<Record1<Long>> selector = measurableIdSelectorFactory.apply(options);
+        return measurableDao.findByMeasurableIdSelector(selector);
     }
 
 }

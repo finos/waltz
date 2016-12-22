@@ -82,7 +82,8 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
 
     public List<Measurable> findMeasuresRelatedToEntity(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
-        return dsl.selectDistinct(MEASURABLE.fields())
+        return dsl
+                .selectDistinct(MEASURABLE.fields())
                 .from(ENTITY_HIERARCHY)
                 .innerJoin(MEASURABLE_RATING).on(MEASURABLE_RATING.MEASURABLE_ID.eq(ENTITY_HIERARCHY.ID))
                 .innerJoin(MEASURABLE).on(MEASURABLE.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID))
@@ -95,11 +96,19 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
     @Override
     public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
         checkNotNull(selector, "selector cannot be null");
-        return dsl.select(MEASURABLE.ID, MEASURABLE.NAME, DSL.val(EntityKind.MEASURABLE.name()))
+        return dsl
+                .select(MEASURABLE.ID, MEASURABLE.NAME, DSL.val(EntityKind.MEASURABLE.name()))
                 .from(MEASURABLE)
                 .where(MEASURABLE.ID.in(selector))
                 .fetch(TO_ENTITY_REFERENCE);
     }
 
 
+    public List<Measurable> findByMeasurableIdSelector(Select<Record1<Long>> selector) {
+        checkNotNull(selector, "selector cannot be null");
+        return dsl
+                .selectFrom(MEASURABLE)
+                .where(MEASURABLE.ID.in(selector))
+                .fetch(TO_DOMAIN);
+    }
 }

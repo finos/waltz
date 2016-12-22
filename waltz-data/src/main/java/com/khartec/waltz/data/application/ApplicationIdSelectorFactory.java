@@ -3,11 +3,11 @@ package com.khartec.waltz.data.application;
 import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.capability.CapabilityIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
+import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
 import com.khartec.waltz.schema.tables.*;
-import com.khartec.waltz.schema.tables.DataType;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -22,10 +22,9 @@ import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
-import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
-import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 import static com.khartec.waltz.schema.tables.Process.PROCESS;
@@ -38,15 +37,15 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     private final DSLContext dsl;
     private final CapabilityIdSelectorFactory capabilityIdSelectorFactory;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
+    private final MeasurableIdSelectorFactory measurableIdSelectorFactory;
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
 
     private final Application app = APPLICATION.as("app");
     private final AppCapability appCapability = APP_CAPABILITY.as("appcap");
     private final ApplicationGroupEntry appGroup = APPLICATION_GROUP_ENTRY.as("appgrp");
-    private final DataTypeUsage dataTypeUsage = DATA_TYPE_USAGE.as("dtu");
-    private final DataType dataType = DATA_TYPE.as("dt");
     private final EntityRelationship relationship = EntityRelationship.ENTITY_RELATIONSHIP.as("relationship");
     private final Involvement involvement = INVOLVEMENT.as("involvement");
+    private final MeasurableRating measurableRating = MEASURABLE_RATING.as("m_rating");
     private final Person person = PERSON.as("per");
     private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("phier");
 
@@ -55,15 +54,18 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     public ApplicationIdSelectorFactory(DSLContext dsl,
                                         CapabilityIdSelectorFactory capabilityIdSelectorFactory,
                                         DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
+                                        MeasurableIdSelectorFactory measurableIdSelectorFactory, 
                                         OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
         checkNotNull(dsl, "dsl cannot be null");
         checkNotNull(capabilityIdSelectorFactory, "capabilityIdSelectorFactory cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
+        checkNotNull(measurableIdSelectorFactory, "measurableIdSelectorFactory cannot be null");
         checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
 
         this.dsl = dsl;
         this.capabilityIdSelectorFactory = capabilityIdSelectorFactory;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
+        this.measurableIdSelectorFactory = measurableIdSelectorFactory;
         this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
     }
 
@@ -81,6 +83,8 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 return mkForCapability(ref, options.scope());
             case DATA_TYPE:
                 return mkForDataType(options);
+            case MEASURABLE:
+                return mkForMeasurable(options);
             case ORG_UNIT:
                 return mkForOrgUnit(ref, options.scope());
             case PERSON:
@@ -90,6 +94,15 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
+    }
+
+
+    private Select<Record1<Long>> mkForMeasurable(IdSelectionOptions options) {
+        Select<Record1<Long>> measurableSelector = measurableIdSelectorFactory.apply(options);
+        return dsl.select(measurableRating.ENTITY_ID)
+                .from(measurableRating)
+                .where(measurableRating.ENTITY_KIND.eq(DSL.val(EntityKind.APPLICATION.name())))
+                .and(measurableRating.MEASURABLE_ID.in(measurableSelector));
     }
 
 
