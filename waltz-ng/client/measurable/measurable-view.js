@@ -31,6 +31,8 @@ function controller($stateParams,
                     complexityStore,
                     logicalFlowViewService,
                     measurableStore,
+                    measurableRatingStore,
+                    sourceDataRatingStore,
                     technologyStatsService) {
 
     const id = $stateParams.id;
@@ -55,6 +57,10 @@ function controller($stateParams,
         .findMeasurablesBySelector(childrenSelector)
         .then(cs => vm.children = cs);
 
+    measurableRatingStore
+        .findByMeasurableSelector(childrenSelector)
+        .then(rs => vm.ratings = rs);
+
     logicalFlowViewService
         .initialise(childrenSelector)
         .then(flowView => vm.logicalFlowView = flowView);
@@ -71,8 +77,9 @@ function controller($stateParams,
         .findBySelector(childrenSelector)
         .then(techStats => vm.techStats = techStats);
 
-
-
+    sourceDataRatingStore
+        .findAll()
+        .then(sourceDataRatings => vm.sourceDataRatings = sourceDataRatings);
 
 }
 
@@ -84,6 +91,8 @@ controller.$inject = [
     'ComplexityStore',
     'LogicalFlowViewService',
     'MeasurableStore',
+    'MeasurableRatingStore',
+    'SourceDataRatingStore',
     'TechnologyStatisticsService'
 
 ];
