@@ -27,8 +27,10 @@ export default () => {
 
     module
         .component('waltzMeasurableRatingAppSection', require('./components/app-section/measurable-rating-app-section'))
+        .component('waltzMeasurableRatingExplorerSection', require('./components/explorer-section/measurable-rating-explorer-section'))
         .component('waltzMeasurableRatingPanel', require('./components/panel/measurable-rating-panel'))
-        .component('waltzMeasurableRatingTree', require('./components/tree/measurable-rating-tree'));
+        .component('waltzMeasurableRatingTree', require('./components/tree/measurable-rating-tree'))
+        ;
 
     return module.name;
 };

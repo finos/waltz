@@ -20,6 +20,16 @@ import _ from 'lodash';
 import {initialiseData, buildHierarchies, switchToParentIds} from '../../../common';
 
 
+/**
+ * @name waltz-measurable-rating-tree
+ *
+ * @description
+ * Tree control used to show measurables and their ratings.
+ *
+ * Intended only for use with a single application and a single  measurable kind.
+ */
+
+
 const bindings = {
     ratings: '<',
     measurables: '<',

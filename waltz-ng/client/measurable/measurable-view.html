@@ -23,7 +23,18 @@
                               total-cost="ctrl.assetCostData.total">
     </waltz-measurable-summary>
 
+
     <br>
+
+
+    <!-- RATINGS -->
+    <waltz-measurable-rating-explorer-section ratings="ctrl.ratings"
+                                              measurables="ctrl.children"
+                                              applications="ctrl.applications"
+                                              measurable-kind="ctrl.measurable.kind"
+                                              source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-measurable-rating-explorer-section>
+
 
     <waltz-section>
         <div class="row">
@@ -41,4 +52,6 @@
             </div>
         </div>
     </waltz-section>
+
+
 </div>

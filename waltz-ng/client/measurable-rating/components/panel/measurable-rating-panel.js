@@ -18,6 +18,18 @@
 import {initialiseData} from '../../../common';
 
 
+/**
+ * @name waltz-measurable-rating-panel
+ *
+ * @description
+ * This component wraps a <code>measurable-rating-tree</code>
+ * and provides a detail view when a node is clicked on.
+ *
+ * It is intended to be used when viewing a single application
+ * and a single 'kind' of measurables.
+ */
+
+
 const template = require('./measurable-rating-panel.html');
 
 

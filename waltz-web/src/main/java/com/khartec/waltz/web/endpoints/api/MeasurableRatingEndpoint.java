@@ -27,7 +27,9 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 @Service
 public class MeasurableRatingEndpoint implements Endpoint {
@@ -47,11 +49,16 @@ public class MeasurableRatingEndpoint implements Endpoint {
     @Override
     public void register() {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String findByMeasurableSelectorPath = mkPath(BASE_URL, "measurable-selector");
 
         ListRoute<MeasurableRating> findForEntityRoute = (request, response)
                 -> measurableRatingService.findForEntity(getEntityReference(request));
 
+        ListRoute<MeasurableRating> findByMeasurableSelectorRoute = (request, response)
+                -> measurableRatingService.findByMeasurableIdSelector(readIdSelectionOptionsFromBody(request));
+
         getForList(findForEntityPath, findForEntityRoute);
+        postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);
     }
 
 

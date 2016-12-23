@@ -20,6 +20,17 @@ import {initialiseData} from '../../../common';
 import {measurableKindNames} from  '../../../common/services/display-names';
 
 
+/**
+ * @name waltz-measurable-rating-panel
+ *
+ * @description
+ * This component render multiple <code>measurable-rating-panel</code> components
+ * within a tab group.
+ *
+ * It is intended to be used to show measurables and ratings for a single application.
+ */
+
+
 const bindings = {
     ratings: '<',
     measurables: '<',
