@@ -23,6 +23,9 @@ export default () => {
     const module = angular.module('waltz.measurable.rating', []);
 
     module
+        .config(require('./routes'));
+
+    module
         .service('MeasurableRatingStore', require('./services/measurable-rating-store'));
 
     module

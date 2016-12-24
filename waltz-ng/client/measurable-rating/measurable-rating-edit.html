@@ -1,0 +1,53 @@
+<div>
+
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.application.name }}"
+                       icon="puzzle-piece"
+                       tour="ctrl.tour"
+                       small="Ratings Editor">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.app.view ({id: ctrl.application.id })" ng-bind="ctrl.application.name"></a></li>
+            <li><span>Ratings Editor</span></li>
+        </ol>
+    </waltz-page-header>
+
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="waltz-tabs">
+                    <input type="radio"
+                           ng-repeat-start="tab in ctrl.tabs"
+                           ng-model="ctrl.visibility.tab"
+                           ng-value="tab.kind.code"
+                           name="tab"
+                           id="{{ tab.kind.code + $id}}">
+                    <label for="{{ tab.kind.code + $id}}"
+                           ng-repeat-end>
+                        <span ng-bind="tab.kind.name"></span>
+                        <span ng-show='tab.ratings.length > 0'
+                              class="small text-muted">
+                            -
+                            <span ng-bind="tab.ratings.length"></span>
+                        </span>
+                    </label>
+
+                    <div ng-repeat="tab in ctrl.tabs"
+                         ng-class="{ 'wt-active': tab.kind.code == ctrl.visibility.tab }"
+                         class="wt-tab">
+                        <br>
+                        <waltz-measurable-rating-panel ratings="tab.ratings"
+                                                       measurables="tab.measurables">
+                        </waltz-measurable-rating-panel>
+
+                        <br>
+                        <p class="text-muted small"
+                           ng-bind="tab.kind.description"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

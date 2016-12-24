@@ -66,13 +66,34 @@ function enrichNodes(ratings = [], measurables = []) {
 }
 
 
+// expand nodes with a rating (incl. parents)
+function calculateExpandedNodes(nodes = []) {
+    const byId = _.keyBy(nodes, 'id');
+    const startingNodes = _.filter(nodes, n => n.rating);
+
+    const requiredIds = [];
+    _.each(startingNodes, n => {
+        requiredIds.push(n.id);
+        while (n.parentId) {
+            requiredIds.push(n.parentId);
+            n = byId[n.parentId];
+        }
+    });
+
+    // de-dupe and resolve
+    return _.map(
+        _.uniq(requiredIds),
+        id => byId[id]);
+}
+
+
 function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
         const nodes = enrichNodes(vm.ratings, vm.measurables);
         vm.treeData = switchToParentIds(buildHierarchies(nodes));
-        vm.expandedNodes = nodes;  // expand all
+        vm.expandedNodes = calculateExpandedNodes(nodes);
     };
 }
 
