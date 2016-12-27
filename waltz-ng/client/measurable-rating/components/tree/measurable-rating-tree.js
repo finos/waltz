@@ -60,9 +60,12 @@ const template = require('./measurable-rating-tree.html');
 
 function enrichNodes(ratings = [], measurables = []) {
     const ratingsByMeasurableId = _.keyBy(ratings, 'measurableId');
-    return _.map(measurables, m =>
-        Object.assign(
-            {}, m, { rating: ratingsByMeasurableId[m.id] }));
+    return _.map(measurables, m => ({
+        id: m.id,
+        parentId: m.parentId,
+        measurable: m,
+        rating: ratingsByMeasurableId[m.id]
+    }));
 }
 
 

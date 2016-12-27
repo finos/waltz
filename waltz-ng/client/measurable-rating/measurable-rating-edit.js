@@ -53,6 +53,17 @@ function prepareTabs(ratings = [], measurables = []) {
 }
 
 
+function changeRating(ratings = [], newRating) {
+    const ratingsByMeasurableId = _.keyBy(ratings, 'measurableId');
+    const existingRating = ratingsByMeasurableId[newRating.measurableId];
+
+    ratingsByMeasurableId[newRating.measurableId] = existingRating
+        ? Object.assign({}, existingRating, newRating)
+        : newRating;
+
+    return _.values(ratingsByMeasurableId);
+}
+
 function controller($q,
                     $stateParams,
                     applicationStore,
@@ -80,6 +91,28 @@ function controller($q,
 
     $q.all([ratingsPromise, measurablesPromise])
         .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables));
+
+    const change = (c) => {
+        vm.ratings = changeRating(
+            vm.ratings,
+            {
+                measurableId: vm.selected.measurable.id,
+                rating: c
+            });
+        vm.tabs = prepareTabs(vm.ratings, vm.measurables);
+    };
+
+    vm.goGreen = () => change('G');
+    vm.goRed = () => change('R');
+    vm.goAmber = () => change('A');
+
+    vm.onMeasurableSelect = (d) => {
+        vm.selected = {
+            rating: d.rating,
+            hasRating: ! _.isEmpty(d.rating),
+            measurable: d.measurable
+        };
+    };
 
 }
 

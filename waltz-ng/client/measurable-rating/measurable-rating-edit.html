@@ -15,17 +15,47 @@
 
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div class="row">
-            <div class="col-sm-12">
+
+            <div class="col-sm-4">
+
+                <div ng-if="ctrl.selected">
+                    <h4 ng-bind="ctrl.selected.measurable.name"></h4>
+                    <p class="small"
+                       ng-bind="ctrl.selected.measurable.description">
+                    </p>
+                    <div ng-if="ctrl.selected.hasRating">
+                        Current rating is:
+                        <span ng-bind="ctrl.selected.rating.rating"></span>
+                    </div>
+                    <div ng-if="!ctrl.selected.hasRating">
+                        This application does not perform this thing
+                    </div>
+
+                    <hr>
+                    <waltz-rating-picker selected="ctrl.selected.rating"
+                                         on-select="ctrl.updateRating">
+                    </waltz-rating-picker>
+
+
+                </div>
+            </div>
+
+
+            <!-- TABS & TREES -->
+            <div class="col-sm-8"/>
                 <div class="waltz-tabs">
+                    <!-- TAB HEADERS -->
                     <input type="radio"
                            ng-repeat-start="tab in ctrl.tabs"
                            ng-model="ctrl.visibility.tab"
                            ng-value="tab.kind.code"
+                           ng-disabled="! tab.measurables"
                            name="tab"
                            id="{{ tab.kind.code + $id}}">
                     <label for="{{ tab.kind.code + $id}}"
                            ng-repeat-end>
-                        <span ng-bind="tab.kind.name"></span>
+                        <span ng-bind="tab.kind.name"
+                              ng-class="{ italics: tab.ratings.length == 0 }"></span>
                         <span ng-show='tab.ratings.length > 0'
                               class="small text-muted">
                             -
@@ -33,13 +63,15 @@
                         </span>
                     </label>
 
+                    <!-- TAB CONTENT -->
                     <div ng-repeat="tab in ctrl.tabs"
                          ng-class="{ 'wt-active': tab.kind.code == ctrl.visibility.tab }"
                          class="wt-tab">
                         <br>
-                        <waltz-measurable-rating-panel ratings="tab.ratings"
-                                                       measurables="tab.measurables">
-                        </waltz-measurable-rating-panel>
+                        <waltz-measurable-rating-tree ratings="tab.ratings"
+                                                      measurables="tab.measurables"
+                                                      on-select="ctrl.onMeasurableSelect">
+                        </waltz-measurable-rating-tree>
 
                         <br>
                         <p class="text-muted small"
