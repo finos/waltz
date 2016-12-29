@@ -19,6 +19,7 @@ import { checkIsEntityRef, checkIsIdSelector } from '../../common/checks';
 
 
 function store($http, baseApiUrl) {
+
     const baseUrl = `${baseApiUrl}/measurable-rating`;
 
     const findForEntityReference = (ref) => {
@@ -35,9 +36,33 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
+    const create = (ref, measurableId, rating = 'Z', description = '') => {
+        checkIsEntityRef(ref);
+        return $http
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description })
+            .then(d => d.data);
+    };
+
+    const update = (ref, measurableId, rating = 'Z', description = '') => {
+        checkIsEntityRef(ref);
+        return $http
+            .put(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description })
+            .then(d => d.data);
+    };
+
+    const remove = (ref, measurableId) => {
+        checkIsEntityRef(ref);
+        return $http
+            .delete(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`)
+            .then(d => d.data);
+    };
+
     return {
         findByMeasurableSelector,
-        findForEntityReference
+        findForEntityReference,
+        create,
+        update,
+        remove
     };
 
 }

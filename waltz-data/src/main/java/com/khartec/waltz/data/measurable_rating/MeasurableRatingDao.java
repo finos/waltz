@@ -23,6 +23,8 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.measurable_rating.ImmutableMeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
+import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
+import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
 import com.khartec.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -31,7 +33,9 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
@@ -55,6 +59,17 @@ public class MeasurableRatingDao {
                 .build();
     };
 
+    private final Function<SaveMeasurableRatingCommand, MeasurableRatingRecord> TO_RECORD_MAPPER = command -> {
+        MeasurableRatingRecord record = new MeasurableRatingRecord();
+        record.setEntityId(command.entityReference().id());
+        record.setEntityKind(command.entityReference().kind().name());
+        record.setMeasurableId(command.measurableId());
+        record.setRating(command.rating().name());
+        record.setDescription(command.description());
+        record.setLastUpdatedAt(Timestamp.valueOf(command.lastUpdate().at()));
+        record.setLastUpdatedBy(command.lastUpdate().by());
+        return record;
+    };
 
     private final DSLContext dsl;
 
@@ -82,5 +97,26 @@ public class MeasurableRatingDao {
                 .selectFrom(MEASURABLE_RATING)
                 .where(MEASURABLE_RATING.MEASURABLE_ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public boolean create(SaveMeasurableRatingCommand command) {
+        MeasurableRatingRecord record = TO_RECORD_MAPPER.apply(command);
+        return dsl.executeInsert(record) == 1;
+    }
+
+
+    public boolean update(SaveMeasurableRatingCommand command) {
+        MeasurableRatingRecord record = TO_RECORD_MAPPER.apply(command);
+        return dsl.executeUpdate(record) == 1;
+    }
+
+    public boolean remove(RemoveMeasurableRatingCommand command) {
+        EntityReference ref = command.entityReference();
+        return dsl.deleteFrom(MEASURABLE_RATING)
+                .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
+                .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
+                .and(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))
+                .execute() == 1;
     }
 }

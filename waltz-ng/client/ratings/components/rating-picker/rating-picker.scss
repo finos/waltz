@@ -6,6 +6,7 @@
     .wrp-option {
         margin-bottom: 6px;
         label {
+            transition: opacity 300ms;
             min-width: 200px;
             border-radius: 3px;
             padding: 6px 6px 6px 12px;
@@ -14,18 +15,18 @@
         }
 
         input {
-            display: none
-        }
+            display: none;
 
-        input:checked + label {
-            opacity: 1;
-        }
+            &:checked + label {
+                opacity: 1;
 
-        input:checked + label::after {
-            padding-left: 10px;
-            padding-right: 10px;
-            content: '\f00c';
-            font-family: 'FontAwesome';
+                &::before {
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    content: '\f00c';
+                    font-family: 'FontAwesome';
+                }
+            }
         }
 
     }

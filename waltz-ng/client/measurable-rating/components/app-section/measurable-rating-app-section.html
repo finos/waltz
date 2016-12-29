@@ -2,12 +2,17 @@
                icon="puzzle-piece"
                id="ratings-section">
 
+
     <waltz-section-actions>
         <a waltz-has-role="RATING_EDITOR"
-           ui-sref='main.app-capability.edit ({id: $ctrl.app.id})'
-           ng-if="$ctrl.activeTab == 0"
+           ui-sref='main.measurable-rating.edit ({kind: "APPLICATION", id: $ctrl.application.id})'
            class="btn btn-xs btn-primary">
             Edit
+        </a>
+        <a waltz-has-role="RATING_EDITOR"
+           ui-sref='main.app-capability.edit ({id: $ctrl.application.id})'
+           class="btn btn-xs btn-primary">
+            Edit Old
         </a>
         <button class="btn btn-xs waltz-btn-transparent"
                 ng-click="$ctrl.visibility.overlay = ! $ctrl.visibility.overlay">

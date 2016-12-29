@@ -18,6 +18,7 @@
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
 import {measurableKindNames} from  '../../../common/services/display-names';
+import {measurableKindDescriptions} from  '../../../common/services/descriptions';
 
 
 /**
@@ -32,8 +33,9 @@ import {measurableKindNames} from  '../../../common/services/display-names';
 
 
 const bindings = {
-    ratings: '<',
+    application: '<',
     measurables: '<',
+    ratings: '<',
     sourceDataRatings: '<'
 };
 
@@ -52,14 +54,7 @@ const initialState = {
 };
 
 
-const descriptions = {
-    BUSINESS_LINE: 'Which business lines this application supports',
-    CAPABILITY: 'Which functions this application performs',
-    PROCESS: 'Which processes this application supports',
-    PRODUCT: 'Which products this application supports',
-    REGION: 'Which regions this application services',
-    SERVICE: 'Which services this application performs'
-};
+
 
 function groupByKind(measurables = [], ratings = []) {
     const allMeasurableKinds = _.keys(measurableKindNames);
@@ -80,7 +75,7 @@ function groupByKind(measurables = [], ratings = []) {
             kind: {
                 code: k,
                 name: measurableKindNames[k],
-                description: descriptions[k]
+                description: measurableKindDescriptions[k]
             },
             measurables: usedMeasurables,
             ratings: ratingsForMeasure

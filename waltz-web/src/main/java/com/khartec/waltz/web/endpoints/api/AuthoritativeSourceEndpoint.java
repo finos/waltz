@@ -108,7 +108,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         getForList(mkPath(BASE_URL, "app", ":id"), (request, response)
                 -> authoritativeSourceService.findByApplicationId(getId(request)));
 
-        post(mkPath(BASE_URL, "id", ":id"), (request, response) -> {
+        postForDatum(mkPath(BASE_URL, "id", ":id"), (request, response) -> {
             requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
             String ratingStr = request.body();
             Rating rating = Rating.valueOf(ratingStr);
@@ -143,7 +143,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
             return "done";
         });
 
-        post(mkPath(BASE_URL, "kind", ":kind", ":id", ":dataType", ":appId"), (request, response) -> {
+        postForDatum(mkPath(BASE_URL, "kind", ":kind", ":id", ":dataType", ":appId"), (request, response) -> {
             requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
             EntityReference parentRef = getEntityReference(request);
             String dataType = request.params("dataType");

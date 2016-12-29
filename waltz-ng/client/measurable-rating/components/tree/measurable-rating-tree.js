@@ -26,7 +26,7 @@ import {initialiseData, buildHierarchies, switchToParentIds} from '../../../comm
  * @description
  * Tree control used to show measurables and their ratings.
  *
- * Intended only for use with a single application and a single  measurable kind.
+ * Intended only for use with a single application and a single measurable kind.
  */
 
 
@@ -60,19 +60,47 @@ const template = require('./measurable-rating-tree.html');
 
 function enrichNodes(ratings = [], measurables = []) {
     const ratingsByMeasurableId = _.keyBy(ratings, 'measurableId');
-    return _.map(measurables, m =>
-        Object.assign(
-            {}, m, { rating: ratingsByMeasurableId[m.id] }));
+    return _.map(measurables, m => ({
+        id: m.id,
+        parentId: m.parentId,
+        measurable: m,
+        rating: ratingsByMeasurableId[m.id]
+    }));
+}
+
+
+// expand nodes with a rating (incl. parents)
+function calculateExpandedNodes(nodes = []) {
+    const byId = _.keyBy(nodes, 'id');
+    const startingNodes = _.filter(nodes, n => n.rating);
+
+    const requiredIds = [];
+    _.each(startingNodes, n => {
+        requiredIds.push(n.id);
+        while (n.parentId) {
+            requiredIds.push(n.parentId);
+            n = byId[n.parentId];
+        }
+    });
+
+    // de-dupe and resolve
+    return _.map(
+        _.uniq(requiredIds),
+        id => byId[id]);
 }
 
 
 function controller() {
-    const vm = initialiseData(this, initialState);
+    const vm = this;
+
+    vm.$onInit = () => initialiseData(vm, initialState);
 
     vm.$onChanges = () => {
         const nodes = enrichNodes(vm.ratings, vm.measurables);
         vm.treeData = switchToParentIds(buildHierarchies(nodes));
-        vm.expandedNodes = nodes;  // expand all
+        if (_.isEmpty(vm.expandedNodes)) {
+            vm.expandedNodes = calculateExpandedNodes(nodes);
+        }
     };
 }
 

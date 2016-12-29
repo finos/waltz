@@ -18,18 +18,26 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.measurable_rating.MeasurableRating;
+import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.capabilityrating.RagRating;
+import com.khartec.waltz.model.measurable_rating.*;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
 
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
+
+import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class MeasurableRatingEndpoint implements Endpoint {
@@ -38,17 +46,24 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
 
     private final MeasurableRatingService measurableRatingService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public MeasurableRatingEndpoint(MeasurableRatingService measurableRatingService) {
+    public MeasurableRatingEndpoint(MeasurableRatingService measurableRatingService,
+                                    UserRoleService userRoleService) {
+        checkNotNull(measurableRatingService, "measurableRatingService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
+
         this.measurableRatingService = measurableRatingService;
+        this.userRoleService = userRoleService;
     }
 
 
     @Override
     public void register() {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":measurableId");
         String findByMeasurableSelectorPath = mkPath(BASE_URL, "measurable-selector");
 
         ListRoute<MeasurableRating> findForEntityRoute = (request, response)
@@ -59,7 +74,50 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
         getForList(findForEntityPath, findForEntityRoute);
         postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);
+        postForList(modifyPath, this::createRoute);
+        putForList(modifyPath, this::updateRoute);
+        deleteForList(modifyPath, this::removeRoute);
     }
 
+
+    private Collection<MeasurableRating> updateRoute(Request request, Response z) throws IOException {
+        requireRole(userRoleService, request, Role.RATING_EDITOR);
+        SaveMeasurableRatingCommand command = mkCommand(request);
+        return measurableRatingService.update(command);
+    }
+
+
+    private Collection<MeasurableRating> removeRoute(Request request, Response z) throws IOException {
+        requireRole(userRoleService, request, Role.RATING_EDITOR);
+        String username = getUsername(request);
+        RemoveMeasurableRatingCommand command = ImmutableRemoveMeasurableRatingCommand.builder()
+                .entityReference(getEntityReference(request))
+                .measurableId(getLong(request, "measurableId"))
+                .lastUpdate(LastUpdate.mkForUser(username))
+                .build();
+        return measurableRatingService.remove(command);
+    }
+
+
+    private Collection<MeasurableRating> createRoute(Request request, Response z) throws IOException {
+        requireRole(userRoleService, request, Role.RATING_EDITOR);
+        SaveMeasurableRatingCommand command = mkCommand(request);
+        return measurableRatingService.create(command);
+    }
+
+
+    private SaveMeasurableRatingCommand mkCommand(Request request) throws IOException {
+        String username = getUsername(request);
+
+        Map<String, String> body = readBody(request, Map.class);
+
+        return ImmutableSaveMeasurableRatingCommand.builder()
+                .entityReference(getEntityReference(request))
+                .measurableId(getLong(request, "measurableId"))
+                .rating(RagRating.valueOf(body.getOrDefault("rating", "Z")))
+                .description(body.getOrDefault("description", ""))
+                .lastUpdate(LastUpdate.mkForUser(username))
+                .build();
+    }
 
 }

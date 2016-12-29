@@ -63,7 +63,7 @@ public class CapabilityRatingEndpoint implements Endpoint {
         getForList(byParentPath, (request, response) -> ratingService.findByParent(getEntityReference(request)));
 
 
-        post(mkPath(BASE_URL), (request, response) -> {
+        postForDatum(mkPath(BASE_URL), (request, response) -> {
             requireRole(userRoleService, request, Role.RATING_EDITOR);
             AppRatingChangesAction appRatingChangesAction = readBody(request, AppRatingChangesAction.class);
 
