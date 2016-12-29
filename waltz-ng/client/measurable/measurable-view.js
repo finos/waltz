@@ -25,9 +25,11 @@ const initialState = {
 };
 
 
-function controller($stateParams,
+function controller($scope,
+                    $stateParams,
                     applicationStore,
                     assetCostViewService,
+                    bookmarkStore,
                     complexityStore,
                     logicalFlowViewService,
                     measurableStore,
@@ -41,6 +43,9 @@ function controller($stateParams,
     const childrenSelector = { entityReference: ref, scope: 'CHILDREN' }
 
     const vm = initialiseData(this, initialState);
+
+
+    // -- LOAD ---
 
     measurableStore
         .findMeasurablesBySelector(parentsSelector)
@@ -81,13 +86,30 @@ function controller($stateParams,
         .findAll()
         .then(sourceDataRatings => vm.sourceDataRatings = sourceDataRatings);
 
+    bookmarkStore
+        .findByParent(ref)
+        .then(bookmarks => vm.bookmarks = bookmarks);
+
+
+    // -- INTERACTION ---
+
+    vm.loadAllCosts = () => $scope
+        .$applyAsync(() => {
+            assetCostViewService
+                .loadDetail()
+                .then(data => vm.assetCostData = data);
+        });
+
+
 }
 
 
 controller.$inject = [
+    '$scope',
     '$stateParams',
     'ApplicationStore',
     'AssetCostViewService',
+    'BookmarkStore',
     'ComplexityStore',
     'LogicalFlowViewService',
     'MeasurableStore',
