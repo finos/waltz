@@ -16,28 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import EditView from "./measurable-rating-edit";
+package com.khartec.waltz.model.measurable_rating;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.capabilityrating.RagRating;
+import org.immutables.value.Value;
 
-const baseState = {};
+@Value.Immutable
+@JsonSerialize(as = ImmutableSaveMeasurableRatingCommand.class)
+@JsonDeserialize(as = ImmutableSaveMeasurableRatingCommand.class)
+public abstract class SaveMeasurableRatingCommand extends MeasurableRatingCommand implements DescriptionProvider {
 
+    public abstract RagRating rating();
 
-const editState = {
-    url: 'measurable-rating/edit/{kind:string}/{id:int}',
-    views: {
-        'content@': EditView
-    }
-};
-
-
-function setup($stateProvider) {
-    $stateProvider
-        .state('main.measurable-rating', baseState)
-        .state('main.measurable-rating.edit', editState);
 }
 
-
-setup.$inject = ['$stateProvider'];
-
-
-export default setup;

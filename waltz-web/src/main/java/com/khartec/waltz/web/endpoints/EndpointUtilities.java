@@ -56,11 +56,9 @@ public class EndpointUtilities {
         Spark.get(path, wrapDatumHandler(handler), transformer);
     }
 
-
-    public static <T> void post(String path, Route handler) {
-        Spark.post(path, handler, transformer);
+    public static <T> void postForDatum(String path, DatumRoute<T> handler) {
+        Spark.post(path, wrapDatumHandler(handler), transformer);
     }
-
 
     public static <T> void postForList(String path, ListRoute<T> handler) {
         Spark.post(path, wrapListHandler(handler), transformer);
@@ -74,13 +72,14 @@ public class EndpointUtilities {
         Spark.delete(path, wrapDatumHandler(handler), transformer);
     }
 
-    public static <T> void postForDatum(String path, DatumRoute<T> handler) {
-        Spark.post(path, wrapDatumHandler(handler), transformer);
-    }
-
     public static <T> void putForDatum(String path, DatumRoute<T> handler) {
         Spark.put(path, wrapDatumHandler(handler), transformer);
     }
+
+    public static <T> void putForList(String path, ListRoute<T> handler) {
+        Spark.put(path, wrapListHandler(handler), transformer);
+    }
+
 
 
 

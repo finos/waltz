@@ -18,45 +18,138 @@
 
 package com.khartec.waltz.service.measurable_rating;
 
+import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
+import com.khartec.waltz.model.measurable_rating.MeasurableRatingCommand;
+import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
+import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static java.lang.String.format;
 
 @Service
 public class MeasurableRatingService {
 
     private final MeasurableRatingDao measurableRatingDao;
+    private final MeasurableDao measurableDao;
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory;
+    private final ChangeLogService changeLogService;
+
 
     @Autowired
     public MeasurableRatingService(MeasurableRatingDao measurableRatingDao,
-                                   MeasurableIdSelectorFactory measurableIdSelectorFactory) {
+                                   MeasurableDao measurableDao,
+                                   MeasurableIdSelectorFactory measurableIdSelectorFactory,
+                                   ChangeLogService changeLogService) {
         checkNotNull(measurableRatingDao, "measurableRatingDao cannot be null");
+        checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(measurableIdSelectorFactory, "measurableIdSelectorFactory cannot be null");
+        checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.measurableRatingDao = measurableRatingDao;
+        this.measurableDao = measurableDao;
         this.measurableIdSelectorFactory = measurableIdSelectorFactory;
+        this.changeLogService = changeLogService;
     }
 
+    // -- READ
 
     public List<MeasurableRating> findForEntity(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
         return measurableRatingDao.findForEntity(ref);
     }
 
+
     public List<MeasurableRating> findByMeasurableIdSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = measurableIdSelectorFactory.apply(options);
         return measurableRatingDao.findByMeasurableIdSelector(selector);
     }
+
+
+    // -- WRITE
+
+    public Collection<MeasurableRating> update(SaveMeasurableRatingCommand command) {
+        return save(
+                command,
+                measurableRatingDao::update,
+                "Updated: %s with a rating of: %s");
+    }
+
+
+    public Collection<MeasurableRating> create(SaveMeasurableRatingCommand command) {
+        return save(
+                command,
+                measurableRatingDao::create,
+                "Added: %s with a rating of: %s");
+    }
+
+
+    public Collection<MeasurableRating> remove(RemoveMeasurableRatingCommand command) {
+        checkNotNull(command, "command cannot be null");
+        Measurable measurable = measurableDao.getById(command.measurableId());
+
+        boolean success = measurableRatingDao.remove(command);
+
+        if (success && measurable != null) {
+            writeChangeLogEntry(
+                    command,
+                    format("Removed: %s",
+                            measurable.name()));
+
+        }
+        return findForEntity(command.entityReference());
+    }
+
+
+    // -- HELPERS --
+
+    private Collection<MeasurableRating> save(SaveMeasurableRatingCommand command,
+                                              Function<SaveMeasurableRatingCommand, Boolean> action,
+                                              String messageTemplate) {
+        checkNotNull(command, "command cannot be null");
+
+        Measurable measurable = measurableDao.getById(command.measurableId());
+        checkNotNull(measurable, format("Unknown measurable with id: %d", command.measurableId()));
+
+        boolean success = action.apply(command);
+
+        if (success) {
+            writeChangeLogEntry(
+                    command,
+                    format(messageTemplate,
+                            measurable.name(),
+                            command.rating()));
+        }
+
+        return findForEntity(command.entityReference());
+    }
+
+
+    private void writeChangeLogEntry(MeasurableRatingCommand command, String message) {
+        changeLogService.write(ImmutableChangeLog.builder()
+                .message(message)
+                .parentReference(command.entityReference())
+                .userId(command.lastUpdate().by())
+                .createdAt(command.lastUpdate().at())
+                .severity(Severity.INFORMATION)
+                .build());
+    }
+
 }

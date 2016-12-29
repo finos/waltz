@@ -26,7 +26,7 @@ import {initialiseData, buildHierarchies, switchToParentIds} from '../../../comm
  * @description
  * Tree control used to show measurables and their ratings.
  *
- * Intended only for use with a single application and a single  measurable kind.
+ * Intended only for use with a single application and a single measurable kind.
  */
 
 
@@ -91,12 +91,16 @@ function calculateExpandedNodes(nodes = []) {
 
 
 function controller() {
-    const vm = initialiseData(this, initialState);
+    const vm = this;
+
+    vm.$onInit = () => initialiseData(vm, initialState);
 
     vm.$onChanges = () => {
         const nodes = enrichNodes(vm.ratings, vm.measurables);
         vm.treeData = switchToParentIds(buildHierarchies(nodes));
-        vm.expandedNodes = calculateExpandedNodes(nodes);
+        if (_.isEmpty(vm.expandedNodes)) {
+            vm.expandedNodes = calculateExpandedNodes(nodes);
+        }
     };
 }
 

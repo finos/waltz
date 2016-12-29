@@ -33,7 +33,7 @@ const initialState = {
         { value: 'G', label: 'Good', clazz: 'rating-G' },
         { value: 'A', label: 'Adequate', clazz: 'rating-A' },
         { value: 'R', label: 'Poor', clazz: 'rating-R' },
-        { value: 'Z', label: 'Unknown', clazz: 'rating-Z' }
+        // { value: 'Z', label: 'Unknown', clazz: 'rating-Z' }
     ]
 };
 

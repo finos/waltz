@@ -41,7 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import spark.Route;
 
 import java.util.Collections;
 import java.util.List;
@@ -93,7 +92,7 @@ public class ApplicationEndpoint implements Endpoint {
 
 
     private void registerAppUpdate() {
-        Route handleAppUpdateRequest = (req, res) -> {
+        DatumRoute<Boolean> handleAppUpdateRequest = (req, res) -> {
             res.type(WebUtilities.TYPE_JSON);
             AppChangeAction appChange = readBody(req, AppChangeAction.class);
             LOG.info("Updating application: " + appChange);
@@ -121,13 +120,13 @@ public class ApplicationEndpoint implements Endpoint {
             return true;
         };
 
-        post(mkPath(BASE_URL, ":id"), handleAppUpdateRequest);
+        postForDatum(mkPath(BASE_URL, ":id"), handleAppUpdateRequest);
 
     }
 
 
     private void registerAppRegistration() {
-        Route handleRegistrationRequest = (req, res) -> {
+        DatumRoute<AppRegistrationResponse> handleRegistrationRequest = (req, res) -> {
             res.type(WebUtilities.TYPE_JSON);
             AppRegistrationRequest registrationRequest = readBody(req, AppRegistrationRequest.class);
 
@@ -152,7 +151,7 @@ public class ApplicationEndpoint implements Endpoint {
             return registrationResponse;
         };
 
-        post(BASE_URL, handleRegistrationRequest);
+        postForDatum(BASE_URL, handleRegistrationRequest);
     }
 
 

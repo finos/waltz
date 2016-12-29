@@ -17,13 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash';
-import {initialiseData} from '../common';
+import {initialiseData, kindToViewState} from '../common';
 import {measurableKindNames} from  '../common/services/display-names';
 import {measurableKindDescriptions} from  '../common/services/descriptions';
 
+const BASE_EDITOR = {
+    canSave: false,
+    canRemove: false,
+    rating: null,
+    original: null,
+    measurable: null
+};
+
 
 const initialState = {
-
+    editor: null
 };
 
 
@@ -53,72 +61,99 @@ function prepareTabs(ratings = [], measurables = []) {
 }
 
 
-function changeRating(ratings = [], newRating) {
-    const ratingsByMeasurableId = _.keyBy(ratings, 'measurableId');
-    const existingRating = ratingsByMeasurableId[newRating.measurableId];
-
-    ratingsByMeasurableId[newRating.measurableId] = existingRating
-        ? Object.assign({}, existingRating, newRating)
-        : newRating;
-
-    return _.values(ratingsByMeasurableId);
+function calcCanSave(working, original) {
+    const ratingsDiffer = working.rating !== original.rating;
+    const descriptionsDiffer = working.description !== original.description;
+    return ratingsDiffer || descriptionsDiffer;
 }
 
+
 function controller($q,
+                    $state,
                     $stateParams,
                     applicationStore,
                     measurableStore,
                     measurableRatingStore) {
 
-    const appId = $stateParams.id;
-    const appRef = {
-        kind: 'APPLICATION',
-        id: appId
+    const entityRef = {
+        kind: $stateParams.kind,
+        id: $stateParams.id
     };
     const vm = initialiseData(this, initialState);
+
 
     const measurablesPromise = measurableStore
         .findAll()
         .then(ms => vm.measurables = ms);
 
     const ratingsPromise = measurableRatingStore
-        .findForEntityReference(appRef)
+        .findForEntityReference(entityRef)
         .then(rs => vm.ratings = rs);
 
     applicationStore
-        .getById(appId)
-        .then(app => vm.application = app);
+        .getById(entityRef.id)
+        .then(app => vm.entityRef = Object.assign(
+            entityRef,
+            { name: app.name, description: app.description }));
 
     $q.all([ratingsPromise, measurablesPromise])
         .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables));
 
-    const change = (c) => {
-        vm.ratings = changeRating(
-            vm.ratings,
-            {
-                measurableId: vm.selected.measurable.id,
-                rating: c
-            });
-        vm.tabs = prepareTabs(vm.ratings, vm.measurables);
-    };
-
-    vm.goGreen = () => change('G');
-    vm.goRed = () => change('R');
-    vm.goAmber = () => change('A');
+    vm.backUrl = $state.href(
+        kindToViewState(entityRef.kind),
+        { id: entityRef.id });
 
     vm.onMeasurableSelect = (d) => {
-        vm.selected = {
-            rating: d.rating,
-            hasRating: ! _.isEmpty(d.rating),
-            measurable: d.measurable
-        };
+        const original = d.rating
+            ? { rating: d.rating.rating, description: d.rating.description }
+            : {};
+
+        vm.editor = Object.assign(
+            {},
+            BASE_EDITOR,
+            {
+                original,
+                working:Object.assign({}, original),
+                canRemove: ! _.isEmpty(original),
+                measurable: d.measurable
+            });
     };
 
+    vm.onRatingSelect = r => {
+        vm.editor.working.rating = r;
+        vm.editor.canSave = calcCanSave(vm.editor.working, vm.editor.original);
+    };
+
+    vm.onCommentChange = () => {
+        vm.editor.canSave = calcCanSave(vm.editor.working, vm.editor.original);
+    };
+
+    vm.doCancel = () => vm.editor = null;
+
+    vm.doSave = () => {
+        const saveParams = [entityRef, vm.editor.measurable.id, vm.editor.working.rating, vm.editor.working.description];
+        const savePromise = _.isEmpty(vm.editor.original)
+            ? measurableRatingStore.create(...saveParams)
+            : measurableRatingStore.update(...saveParams);
+
+        savePromise
+            .then(rs => vm.ratings = rs)
+            .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables));
+
+    };
+
+    vm.doRemove = () => {
+        measurableRatingStore
+            .remove(entityRef, vm.editor.measurable.id)
+            .then(rs => vm.ratings = rs)
+            .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables));
+    };
 }
 
 
 controller.$inject = [
     '$q',
+    '$state',
     '$stateParams',
     'ApplicationStore',
     'MeasurableStore',

@@ -5,8 +5,8 @@
                value="{{ option.value }}"
                ng-model='$ctrl.selected'
                ng-change="$ctrl.onSelect(option.value)"
-               id="wrp-inp-{{ option.value }}">
-        <label for="wrp-inp-{{ option.value }}"
+               id="wrp-inp-{{ option.value }}-{{ $id }}">
+        <label for="wrp-inp-{{ option.value }}-{{ $id }}"
                ng-class="option.clazz"
                ng-bind="option.label">
         </label>

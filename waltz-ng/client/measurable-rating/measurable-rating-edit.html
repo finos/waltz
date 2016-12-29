@@ -1,13 +1,13 @@
 <div>
 
     <!-- HEADER -->
-    <waltz-page-header name="{{ ctrl.application.name }}"
+    <waltz-page-header name="{{ ctrl.entityRef.name }}"
                        icon="puzzle-piece"
                        tour="ctrl.tour"
                        small="Ratings Editor">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.app.view ({id: ctrl.application.id })" ng-bind="ctrl.application.name"></a></li>
+            <li><waltz-entity-link entity-ref="ctrl.entityRef"></waltz-entity-link></li>
             <li><span>Ratings Editor</span></li>
         </ol>
     </waltz-page-header>
@@ -15,38 +15,113 @@
 
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div class="row">
-
             <div class="col-sm-4">
 
-                <div ng-if="ctrl.selected">
-                    <h4 ng-bind="ctrl.selected.measurable.name"></h4>
-                    <p class="small"
-                       ng-bind="ctrl.selected.measurable.description">
-                    </p>
-                    <div ng-if="ctrl.selected.hasRating">
-                        Current rating is:
-                        <span ng-bind="ctrl.selected.rating.rating"></span>
+                <!-- INSTRUCTIONS -->
+                <div class="row"
+                     ng-if="!ctrl.editor">
+                    <div class="col-sm-12">
+                        <h4>Instructions</h4>
+                        <p>
+                            <b>First</b>
+                            select an item from the trees in the tabbed view which reflects
+                            a characteristic of
+                            <span ng-bind="ctrl.entityRef.name"></span>
+                            and
+                            <b>then</b>
+                            choose a rating and provide an optional comment.
+                        </p>
+                        <br>
+                        <a ng-href="{{ctrl.backUrl}}">
+                            &laquo;
+                            Go back to
+                            <span ng-bind="ctrl.entityRef.name"></span>
+                        </a>
                     </div>
-                    <div ng-if="!ctrl.selected.hasRating">
-                        This application does not perform this thing
+                </div>
+
+                <!-- EDITOR -->
+                <div class="row"
+                     ng-if="ctrl.editor">
+                    <div class="col-sm-12">
+                        <h4 ng-bind="ctrl.editor.measurable.name"></h4>
+                        <p class="text-muted"
+                           ng-bind="ctrl.editor.measurable.description">
+                        </p>
+
+                        <hr>
+
+                        <div ng-if="ctrl.editor.canRemove">
+                            <span ng-bind="ctrl.entityRef.name">
+                            </span>
+                            already exhibits this characteristic.  You may change
+                            the rating, comment or remove this characteristic.
+                        </div>
+
+                        <!-- NEW -->
+                        <div ng-if="! ctrl.editor.canRemove">
+                            This application does currently exhibit this characteristic.
+                            To add it, choose a rating and, optionally, provide a comment.
+                        </div>
+
+                        <br>
+
+                        <!-- RATING -->
+                        <div class="row">
+                            <div class="col-sm-2">
+                                Rating:
+                            </div>
+                            <div class="col-sm-10">
+                                <waltz-rating-picker selected="ctrl.editor.working.rating"
+                                                     on-select="ctrl.onRatingSelect">
+                                </waltz-rating-picker>
+                            </div>
+                        </div>
+
+                        <!-- COMMENT -->
+                        <div class="row">
+                            <div class="col-sm-2">
+                                Comments:
+                            </div>
+                            <div class="col-sm-10">
+                                <textarea rows="5"
+                                          style="width: 90%"
+                                          ng-change="ctrl.onCommentChange()"
+                                          ng-model="ctrl.editor.working.description">
+                                </textarea>
+                            </div>
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <hr>
+                                <button ng-click="ctrl.doSave()"
+                                        ng-disabled="!ctrl.editor.canSave"
+                                        class="btn btn-success">
+                                    Update
+                                </button>
+                                <button ng-click="ctrl.doRemove()"
+                                        ng-show="ctrl.editor.canRemove"
+                                        class="btn btn-danger">
+                                    Remove
+                                </button>
+                                <a class='clickable'
+                                   ng-click="ctrl.doCancel()">
+                                    Cancel
+                                </a>
+                            </div>
+                        </div>
                     </div>
-
-                    <hr>
-                    <waltz-rating-picker selected="ctrl.selected.rating"
-                                         on-select="ctrl.updateRating">
-                    </waltz-rating-picker>
-
-
                 </div>
             </div>
-
 
             <!-- TABS & TREES -->
             <div class="col-sm-8"/>
                 <div class="waltz-tabs">
                     <!-- TAB HEADERS -->
                     <input type="radio"
-                           ng-repeat-start="tab in ctrl.tabs"
+                           ng-repeat-start="tab in ctrl.tabs track by tab.kind.code"
                            ng-model="ctrl.visibility.tab"
                            ng-value="tab.kind.code"
                            ng-disabled="! tab.measurables"
@@ -64,7 +139,7 @@
                     </label>
 
                     <!-- TAB CONTENT -->
-                    <div ng-repeat="tab in ctrl.tabs"
+                    <div ng-repeat="tab in ctrl.tabs track by tab.kind.code"
                          ng-class="{ 'wt-active': tab.kind.code == ctrl.visibility.tab }"
                          class="wt-tab">
                         <br>
