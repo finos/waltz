@@ -36,6 +36,87 @@
     </waltz-measurable-rating-explorer-section>
 
 
+    <!-- FLOWS -->
+    <waltz-logical-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
+                                          flow-data="ctrl.logicalFlowView"
+                                          on-load-detail="ctrl.loadFlowDetail"
+                                          applications="ctrl.applications">
+    </waltz-logical-flows-tabgroup-section>
+
+
+    <!--LINEAGE REPORTS-->
+    <waltz-lineage-reports-section lineage-reports="ctrl.lineageReports">
+    </waltz-lineage-reports-section>
+
+
+    <!-- AUTH SOURCES -->
+    <waltz-section name="Authoritative Sources"
+                   icon="shield"
+                   id="authoritative-sources-section">
+        <waltz-rated-flow-summary-panel apps="ctrl.applications"
+                                        entity-reference="ctrl.entityReference"
+                                        flow-data="ctrl.logicalFlowView"
+                                        on-load-detail="ctrl.loadFlowDetail">
+        </waltz-rated-flow-summary-panel>
+
+        <waltz-no-data ng-if="ctrl.logicalFlowView.stats.flowCounts.inbound == 0">
+            <message>
+                No inbound data flows registered to this group.
+            </message>
+        </waltz-no-data>
+
+        <div class="row" style="padding-top: 12px;">
+            <div class="col-md-12">
+
+                <div class="small text-muted">
+                    This diagram summarises the data types sent to applications in this group.
+                </div>
+            </div>
+        </div>
+    </waltz-section>
+
+
+    <!-- COMPLEXITY -->
+    <waltz-complexity-section complexity="ctrl.complexity"
+                              apps="ctrl.applications">
+    </waltz-complexity-section>
+
+
+    <!-- APPS -->
+    <waltz-apps-section apps="ctrl.applications"
+                        source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-apps-section>
+
+
+    <!-- COSTS -->
+    <waltz-asset-costs-section cost-view="ctrl.assetCostData"
+                               load-all="ctrl.loadAllCosts"
+                               csv-name="{{ ctrl.measurable.name }}_asset_costs.csv"
+                               source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-asset-costs-section>
+
+
+    <!-- BOOKMARKS -->
+    <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
+                             entity-id="{{ ctrl.measurable.id }}"
+                             kind="MEASURABLE"
+                             parent-name="{{ ctrl.measurable.name }}"
+                             source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-bookmarks-section>
+
+
+
+    <!-- TECHNOLOGIES -->
+    <waltz-technology-summary-section stats="ctrl.techStats"
+                                      source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-technology-summary-section>
+
+
+    <!-- CHANGE_LOG -->
+    <waltz-change-log-section entries="ctrl.changeLogs">
+    </waltz-change-log-section>
+
+
     <waltz-section>
         <div class="row">
             <div class="col-md-3">
@@ -48,7 +129,7 @@
                 <pre>{{ ctrl.children | json }}</pre>
             </div>
             <div class="col-md-3">
-                <pre>{{}}</pre>
+                <pre>{{ctrl.applications|json}}</pre>
             </div>
         </div>
     </waltz-section>

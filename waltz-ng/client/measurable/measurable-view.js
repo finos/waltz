@@ -25,13 +25,17 @@ const initialState = {
 };
 
 
-function controller($stateParams,
+function controller($scope,
+                    $stateParams,
                     applicationStore,
                     assetCostViewService,
+                    bookmarkStore,
+                    changeLogStore,
                     complexityStore,
                     logicalFlowViewService,
                     measurableStore,
                     measurableRatingStore,
+                    physicalFlowLineageStore,
                     sourceDataRatingStore,
                     technologyStatsService) {
 
@@ -41,6 +45,10 @@ function controller($stateParams,
     const childrenSelector = { entityReference: ref, scope: 'CHILDREN' }
 
     const vm = initialiseData(this, initialState);
+    vm.entityReference = ref;
+
+
+    // -- LOAD ---
 
     measurableStore
         .findMeasurablesBySelector(parentsSelector)
@@ -81,20 +89,49 @@ function controller($stateParams,
         .findAll()
         .then(sourceDataRatings => vm.sourceDataRatings = sourceDataRatings);
 
+    bookmarkStore
+        .findByParent(ref)
+        .then(bookmarks => vm.bookmarks = bookmarks);
+
+    physicalFlowLineageStore
+        .findLineageReportsBySelector(childrenSelector)
+        .then(lineageReports => vm.lineageReports = lineageReports);
+
+    changeLogStore
+        .findByEntityReference(ref)
+        .then(changeLogs => vm.changeLogs = changeLogs);
+
+    // -- INTERACTION ---
+
+    vm.loadAllCosts = () => $scope
+        .$applyAsync(() => {
+            assetCostViewService
+                .loadDetail()
+                .then(data => vm.assetCostData = data);
+        });
+
+    vm.loadFlowDetail = () => logicalFlowViewService
+        .loadDetail()
+        .then(flowView => vm.logicalFlowView = flowView);
+
+
 }
 
 
 controller.$inject = [
+    '$scope',
     '$stateParams',
     'ApplicationStore',
     'AssetCostViewService',
+    'BookmarkStore',
+    'ChangeLogStore',
     'ComplexityStore',
     'LogicalFlowViewService',
     'MeasurableStore',
     'MeasurableRatingStore',
+    'PhysicalFlowLineageStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService'
-
 ];
 
 

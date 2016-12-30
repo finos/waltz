@@ -232,7 +232,7 @@ function controller($q,
         $scope.$applyAsync(() => {
             assetCostViewService.loadDetail()
                 .then(data => vm.assetCostData = data);
-        })
+        });
     };
 
     vm.lineageTableInitialised = (api) => {

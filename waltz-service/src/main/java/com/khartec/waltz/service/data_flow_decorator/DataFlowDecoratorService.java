@@ -97,11 +97,7 @@ public class DataFlowDecoratorService {
 
 
     /**
-     * Find decorators by selector. Supported desiredKinds:
-     * <ul>
-     *     <li>DATA_TYPE</li>
-     *     <li>APPLICATION</li>
-     * </ul>
+     * Find decorators by selector.
      * @param options
      * @return
      */
@@ -109,9 +105,10 @@ public class DataFlowDecoratorService {
         switch (options.entityReference().kind()) {
             case APP_GROUP:
             case CAPABILITY:
+            case MEASURABLE:
             case ORG_UNIT:
-            case PROCESS:
             case PERSON:
+            case PROCESS:
                 return findByAppIdSelector(options);
             case DATA_TYPE:
                 return findByDataTypeIdSelector(options);
