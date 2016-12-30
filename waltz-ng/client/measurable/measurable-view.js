@@ -25,6 +25,15 @@ const initialState = {
 };
 
 
+function logHistory(measurable, historyStore) {
+    return historyStore
+        .put(measurable.name,
+            'MEASURABLE',
+            'main.measurable.view',
+            { id: measurable.id });
+}
+
+
 function controller($scope,
                     $stateParams,
                     applicationStore,
@@ -32,6 +41,7 @@ function controller($scope,
                     bookmarkStore,
                     changeLogStore,
                     complexityStore,
+                    historyStore,
                     logicalFlowViewService,
                     measurableStore,
                     measurableRatingStore,
@@ -55,6 +65,7 @@ function controller($scope,
         .then(ps => {
             vm.parents = ps;
             vm.measurable = _.find(ps, { id });
+            logHistory(vm.measurable, historyStore);
         });
 
     applicationStore
@@ -101,6 +112,7 @@ function controller($scope,
         .findByEntityReference(ref)
         .then(changeLogs => vm.changeLogs = changeLogs);
 
+
     // -- INTERACTION ---
 
     vm.loadAllCosts = () => $scope
@@ -114,7 +126,6 @@ function controller($scope,
         .loadDetail()
         .then(flowView => vm.logicalFlowView = flowView);
 
-
 }
 
 
@@ -126,6 +137,7 @@ controller.$inject = [
     'BookmarkStore',
     'ChangeLogStore',
     'ComplexityStore',
+    'HistoryStore',
     'LogicalFlowViewService',
     'MeasurableStore',
     'MeasurableRatingStore',
