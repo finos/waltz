@@ -17,23 +17,50 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from 'lodash';
 
-function utils(appGroupStore, capabilityStore, orgUnitStore, processStore) {
 
-    const findAllForKind = (kind) => {
+/**
+ * Measures have their own kinds.  Returning everything would be too much
+ * @param all
+ * @param id
+ * @returns {*}
+ */
+function filterBySameMeasurableKind(all, id) {
+    const measurable = _.find(all, { id });
+    return measurable
+        ? _.filter(all, m => m.kind === measurable.kind)
+        : all;
+}
+
+
+function utils(appGroupStore,
+               capabilityStore,
+               measurableStore,
+               orgUnitStore,
+               processStore) {
+
+    const findAllForKind = (kind, id /* optional */) => {
         switch (kind) {
             case 'APP_GROUP':
                 return appGroupStore
                     .findMyGroupSubscriptions()
                     .then(gs => _.map(gs, 'appGroup'));
-            case 'ORG_UNIT':
-                return orgUnitStore.findAll();
             case 'CAPABILITY':
-                return capabilityStore.findAll();
+                return capabilityStore
+                    .findAll();
+            case 'MEASURABLE':
+                return measurableStore
+                    .findAll()
+                    .then(all => filterBySameMeasurableKind(all, id));
+            case 'ORG_UNIT':
+                return orgUnitStore
+                    .findAll();
             case 'PROCESS':
-                return processStore.findAll();
+                return processStore
+                    .findAll();
             default :
-                throw 'Cannot create hierarchy for kind: '+kind;
+                throw `esu: Cannot create hierarchy for kind - ${kind}`;
         }
     };
 
@@ -46,6 +73,7 @@ function utils(appGroupStore, capabilityStore, orgUnitStore, processStore) {
 utils.$inject = [
     'AppGroupStore',
     'CapabilityStore',
+    'MeasurableStore',
     'OrgUnitStore',
     'ProcessStore'
 ];
