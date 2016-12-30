@@ -46,6 +46,7 @@ export const entityIconNames = {
     ENTITY_STATISTIC: 'pie-chart',
     INVOLVEMENT: 'share-alt-square',
     LOGICAL_DATA_FLOW: "random",
+    MEASURABLE: 'puzzle-piece',
     ORG_UNIT: 'sitemap',
     PERSON: 'user',
     PHYSICAL_SPECIFICATION: 'qrcode',
