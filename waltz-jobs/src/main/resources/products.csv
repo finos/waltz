@@ -1,0 +1,37 @@
+id	parent	Name	kind				
+5000		Credit	PRODUCT				
+5100		Interest Rates	PRODUCT				
+5200		Commodity	PRODUCT				
+5300		FX	PRODUCT				
+5400		Equity	PRODUCT				
+5000	5001	ABS	PRODUCT				
+5000	5002	Corporate	PRODUCT				
+5000	5003	CDS	PRODUCT				
+5000	5004	Loans	PRODUCT				
+5000	5005	Muni	PRODUCT				
+5000	5006	Sovereign	PRODUCT				
+5100	5101	IR Swap	PRODUCT				
+5100	5102	FRA	PRODUCT				
+5100	5103	CapFloor	PRODUCT				
+5100	5104	Cross Currency	PRODUCT				
+5100	5105	Option	PRODUCT				
+5100	5106	Forward	PRODUCT				
+5100	5107	Exotic	PRODUCT				
+5200	5201	Metals	PRODUCT				
+5200	5202	Energy	PRODUCT				
+5200	5203	Agricultural	PRODUCT				
+5200	5203	Environmental	PRODUCT				
+5200	5204	Freight	PRODUCT				
+5200	5205	Multi Commodity Exotic	PRODUCT				
+5300	5301	Spot	PRODUCT				
+5300	5302	NDF	PRODUCT				
+5300	5303	NDO	PRODUCT				
+5300	5304	Forward	PRODUCT				
+5300	5305	Vanilla Option	PRODUCT				
+5300	5306	Simple Exotic	PRODUCT				
+5300	5307	Complex Exotic	PRODUCT				
+5400	5401	Swap	PRODUCT				
+5400	5402	Portfolio Swap	PRODUCT				
+5400	5403	Contract For Difference	PRODUCT				
+5400	5405	Option	PRODUCT				
+5400	5406	Forward	PRODUCT				
