@@ -78,7 +78,7 @@ function controller($q,
         .then(() => vm.visibility.related = hasRelatedDefinitions(vm.relatedDefinitions));
 
     const navItemPromise = entityStatisticUtilities
-        .findAllForKind(entityKind)
+        .findAllForKind(entityKind, entityId)
         .then(xs => vm.navItems = xs);
 
     const allDefinitionsPromise = entityStatisticStore

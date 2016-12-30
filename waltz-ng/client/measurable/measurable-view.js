@@ -41,6 +41,7 @@ function controller($scope,
                     bookmarkStore,
                     changeLogStore,
                     complexityStore,
+                    entityStatisticStore,
                     historyStore,
                     logicalFlowViewService,
                     measurableStore,
@@ -108,6 +109,10 @@ function controller($scope,
         .findLineageReportsBySelector(childrenSelector)
         .then(lineageReports => vm.lineageReports = lineageReports);
 
+    entityStatisticStore
+        .findAllActiveDefinitions()
+        .then(statDefinitions => vm.entityStatisticDefinitions = statDefinitions);
+
     changeLogStore
         .findByEntityReference(ref)
         .then(changeLogs => vm.changeLogs = changeLogs);
@@ -137,6 +142,7 @@ controller.$inject = [
     'BookmarkStore',
     'ChangeLogStore',
     'ComplexityStore',
+    'EntityStatisticStore',
     'HistoryStore',
     'LogicalFlowViewService',
     'MeasurableStore',
