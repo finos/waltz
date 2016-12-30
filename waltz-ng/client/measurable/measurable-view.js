@@ -30,6 +30,7 @@ function controller($scope,
                     applicationStore,
                     assetCostViewService,
                     bookmarkStore,
+                    changeLogStore,
                     complexityStore,
                     logicalFlowViewService,
                     measurableStore,
@@ -96,6 +97,9 @@ function controller($scope,
         .findLineageReportsBySelector(childrenSelector)
         .then(lineageReports => vm.lineageReports = lineageReports);
 
+    changeLogStore
+        .findByEntityReference('CAPABILITY', capId)
+        .then(changeLogs => vm.changeLogs = changeLogs);
 
     // -- INTERACTION ---
 
@@ -120,6 +124,7 @@ controller.$inject = [
     'ApplicationStore',
     'AssetCostViewService',
     'BookmarkStore',
+    'ChangeLogStore',
     'ComplexityStore',
     'LogicalFlowViewService',
     'MeasurableStore',
@@ -127,7 +132,6 @@ controller.$inject = [
     'PhysicalFlowLineageStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService'
-
 ];
 
 
