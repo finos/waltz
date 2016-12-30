@@ -100,6 +100,9 @@ function controller($scope,
                 .then(data => vm.assetCostData = data);
         });
 
+    vm.loadFlowDetail = () => logicalFlowViewService
+        .loadDetail()
+        .then(flowView => vm.logicalFlowView = flowView);
 
 }
 

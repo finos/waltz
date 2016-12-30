@@ -42,23 +42,19 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
         switch (options.entityReference().kind()) {
             case APPLICATION:
                 return mkForApplication(options);
-
-            case ORG_UNIT:
+            case APP_GROUP:
                 return wrapAppIdSelector(options);
-
             case CAPABILITY:
                 return wrapAppIdSelector(options);
-
             case DATA_TYPE:
                 return mkForDataType(options);
-
-            case PROCESS:
+            case MEASURABLE:
                 return wrapAppIdSelector(options);
-
+            case ORG_UNIT:
+                return wrapAppIdSelector(options);
             case PERSON:
                 return wrapAppIdSelector(options);
-
-            case APP_GROUP:
+            case PROCESS:
                 return wrapAppIdSelector(options);
 
             default:

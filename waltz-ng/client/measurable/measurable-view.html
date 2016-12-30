@@ -36,6 +36,14 @@
     </waltz-measurable-rating-explorer-section>
 
 
+    <!-- FLOWS -->
+    <waltz-logical-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
+                                          flow-data="ctrl.logicalFlowView"
+                                          on-load-detail="ctrl.loadFlowDetail"
+                                          applications="ctrl.applications">
+    </waltz-logical-flows-tabgroup-section>
+
+
     <!-- APPS -->
     <waltz-apps-section apps="ctrl.applications"
                         source-data-ratings="ctrl.sourceDataRatings">
