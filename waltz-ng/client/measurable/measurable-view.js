@@ -34,6 +34,7 @@ function controller($scope,
                     logicalFlowViewService,
                     measurableStore,
                     measurableRatingStore,
+                    physicalFlowLineageStore,
                     sourceDataRatingStore,
                     technologyStatsService) {
 
@@ -43,6 +44,7 @@ function controller($scope,
     const childrenSelector = { entityReference: ref, scope: 'CHILDREN' }
 
     const vm = initialiseData(this, initialState);
+    vm.entityReference = ref;
 
 
     // -- LOAD ---
@@ -90,6 +92,10 @@ function controller($scope,
         .findByParent(ref)
         .then(bookmarks => vm.bookmarks = bookmarks);
 
+    physicalFlowLineageStore
+        .findLineageReportsBySelector(childrenSelector)
+        .then(lineageReports => vm.lineageReports = lineageReports);
+
 
     // -- INTERACTION ---
 
@@ -104,6 +110,7 @@ function controller($scope,
         .loadDetail()
         .then(flowView => vm.logicalFlowView = flowView);
 
+
 }
 
 
@@ -117,6 +124,7 @@ controller.$inject = [
     'LogicalFlowViewService',
     'MeasurableStore',
     'MeasurableRatingStore',
+    'PhysicalFlowLineageStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService'
 

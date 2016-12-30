@@ -44,6 +44,38 @@
     </waltz-logical-flows-tabgroup-section>
 
 
+    <!--LINEAGE REPORTS-->
+    <waltz-lineage-reports-section lineage-reports="ctrl.lineageReports">
+    </waltz-lineage-reports-section>
+
+
+    <!-- AUTH SOURCES -->
+    <waltz-section name="Authoritative Sources"
+                   icon="shield"
+                   id="authoritative-sources-section">
+        <waltz-rated-flow-summary-panel apps="ctrl.applications"
+                                        entity-reference="ctrl.entityReference"
+                                        flow-data="ctrl.logicalFlowView"
+                                        on-load-detail="ctrl.loadFlowDetail">
+        </waltz-rated-flow-summary-panel>
+
+        <waltz-no-data ng-if="ctrl.logicalFlowView.stats.flowCounts.inbound == 0">
+            <message>
+                No inbound data flows registered to this group.
+            </message>
+        </waltz-no-data>
+
+        <div class="row" style="padding-top: 12px;">
+            <div class="col-md-12">
+
+                <div class="small text-muted">
+                    This diagram summarises the data types sent to applications in this group.
+                </div>
+            </div>
+        </div>
+    </waltz-section>
+
+
     <!-- APPS -->
     <waltz-apps-section apps="ctrl.applications"
                         source-data-ratings="ctrl.sourceDataRatings">
@@ -56,7 +88,6 @@
                                csv-name="{{ ctrl.measurable.name }}_asset_costs.csv"
                                source-data-ratings="ctrl.sourceDataRatings">
     </waltz-asset-costs-section>
-
 
 
     <!-- BOOKMARKS -->
