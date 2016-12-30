@@ -16,6 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from 'lodash';
+
 
 export default [
     '$http',
@@ -24,9 +26,20 @@ export default [
 
         const BASE = `${BaseApiUrl}/change-log`;
 
-        const findByEntityReference = (kind, id, limit = 30) =>
-            $http.get(`${BASE}/${kind}/${id}`, { params: { limit }})
+        const findByEntityReference = (kind, id, limit = 30) => {
+            let ref = null;
+            if (_.isObject(kind)) {
+                ref = kind;
+                limit = id || 30;
+            } else {
+                console.log('DEPRECATED:change-log-store: use entity-ref not kind and id (#1290)');
+                ref = { kind, id };
+            }
+
+            return $http
+                .get(`${BASE}/${ref.kind}/${ref.id}`, {params: {limit}})
                 .then(result => result.data);
+        };
 
         const findForUserName = (userName) =>
             $http.get(`${BASE}/user/${userName}`)

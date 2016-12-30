@@ -98,7 +98,7 @@ function controller($scope,
         .then(lineageReports => vm.lineageReports = lineageReports);
 
     changeLogStore
-        .findByEntityReference('CAPABILITY', capId)
+        .findByEntityReference(ref)
         .then(changeLogs => vm.changeLogs = changeLogs);
 
     // -- INTERACTION ---
