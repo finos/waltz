@@ -43,7 +43,17 @@
                 <!-- EDITOR -->
                 <div class="row"
                      ng-if="ctrl.editor">
-                    <div class="col-sm-12">
+                    <div class="col-sm-12"
+                         ng-if="! ctrl.editor.measurable.concrete">
+                        <h4 ng-bind="ctrl.editor.measurable.name"></h4>
+                        <p>
+                            <waltz-icon name="info-circle"></waltz-icon>
+                            This node is abstract and cannot be given a direct
+                            rating.
+                        </p>
+                    </div>
+                    <div class="col-sm-12"
+                         ng-if="ctrl.editor.measurable.concrete">
                         <h4 ng-bind="ctrl.editor.measurable.name"></h4>
                         <p class="text-muted"
                            ng-bind="ctrl.editor.measurable.description">

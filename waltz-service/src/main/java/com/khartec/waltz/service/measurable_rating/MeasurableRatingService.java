@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkTrue;
 import static java.lang.String.format;
 
 @Service
@@ -127,6 +128,7 @@ public class MeasurableRatingService {
 
         Measurable measurable = measurableDao.getById(command.measurableId());
         checkNotNull(measurable, format("Unknown measurable with id: %d", command.measurableId()));
+        checkTrue(measurable.concrete(), "Cannot rate against an abstract measurable");
 
         boolean success = action.apply(command);
 
