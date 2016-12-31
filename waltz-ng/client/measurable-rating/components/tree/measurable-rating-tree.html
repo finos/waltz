@@ -6,13 +6,18 @@
                  on-selection="$ctrl.onSelect(node)"
                  order-by="'-name'">
 
-        <waltz-rating-indicator-cell rating="node.rating.rating">
-        </waltz-rating-indicator-cell>
+        <span ng-if="node.measurable.concrete">
+            <waltz-rating-indicator-cell rating="node.rating.rating">
+            </waltz-rating-indicator-cell>
+        </span>
+        <span ng-if="! node.measurable.concrete">
+            <waltz-icon name='genderless'></waltz-icon>
+        </span>
 
         <span title="{{ node.measurable.description }}"
               ng-class="{ 'text-muted': node.rating == null }"
               class="no-overflow">
-            <span ng-bind="node.measurable.name">
+            <span ng-bind="node.measurable.name" ng-class="{ 'italics' : ! node.measurable.concrete }">
             </span>
         </span>
     </treecontrol>
