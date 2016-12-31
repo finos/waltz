@@ -142,11 +142,13 @@
                     <div ng-repeat="tab in ctrl.tabs track by tab.kind.code"
                          ng-class="{ 'wt-active': tab.kind.code == ctrl.visibility.tab }"
                          class="wt-tab">
-                        <br>
-                        <waltz-measurable-rating-tree ratings="tab.ratings"
-                                                      measurables="tab.measurables"
-                                                      on-select="ctrl.onMeasurableSelect">
-                        </waltz-measurable-rating-tree>
+                        <div class="waltz-scroll-region-600"
+                             style="padding-top: 6px">
+                            <waltz-measurable-rating-tree ratings="tab.ratings"
+                                                          measurables="tab.measurables"
+                                                          on-select="ctrl.onMeasurableSelect">
+                            </waltz-measurable-rating-tree>
+                        </div>
 
                         <br>
                         <p class="text-muted small"

@@ -1,9 +1,12 @@
+@import "variables";
+
+
 .waltz-scroll-region {
     width: 100%;
     overflow: auto;
-    border: 1px solid lighten($waltz-border-color, 10);
-    border-radius: 3px;
-    padding: 8px;
+    border: 1px solid lighten($waltz-border-color, 25);
+    border-radius: 2px;
+    padding: 6px;
 }
 
 
@@ -22,3 +25,5 @@
 @include waltz-scroll-region(350);
 @include waltz-scroll-region(400);
 @include waltz-scroll-region(500);
+@include waltz-scroll-region(600);
+@include waltz-scroll-region(700);
