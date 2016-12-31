@@ -21,17 +21,24 @@ import {initialiseData, kindToViewState} from '../common';
 import {measurableKindNames} from  '../common/services/display-names';
 import {measurableKindDescriptions} from  '../common/services/descriptions';
 
+
 const BASE_EDITOR = {
     canSave: false,
     canRemove: false,
-    rating: null,
     original: null,
-    measurable: null
+    measurable: null,
+    working: null
 };
 
 
 const initialState = {
-    editor: null
+    backUrl: null,
+    defaultRating: null,
+    editor: null,
+    entityRef: null,
+    measurables: [],
+    ratings: [],
+    tabs: []
 };
 
 
@@ -79,8 +86,11 @@ function controller($q,
         kind: $stateParams.kind,
         id: $stateParams.id
     };
+
     const vm = initialiseData(this, initialState);
 
+
+    // -- LOAD ---
 
     const measurablesPromise = measurableStore
         .findAll()
@@ -92,29 +102,37 @@ function controller($q,
 
     applicationStore
         .getById(entityRef.id)
-        .then(app => vm.entityRef = Object.assign(
-            entityRef,
-            { name: app.name, description: app.description }));
+        .then(app => {
+            vm.defaultRating = app.overallRating;
+            vm.entityRef = Object.assign(
+                entityRef,
+                { name: app.name, description: app.description })
+        });
 
     $q.all([ratingsPromise, measurablesPromise])
         .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables));
 
-    vm.backUrl = $state.href(
-        kindToViewState(entityRef.kind),
-        { id: entityRef.id });
+
+    // -- INTERACT ---
+
+    vm.backUrl = $state
+        .href(
+            kindToViewState(entityRef.kind),
+            { id: entityRef.id });
 
     vm.onMeasurableSelect = (d) => {
         const original = d.rating
             ? { rating: d.rating.rating, description: d.rating.description }
-            : {};
+            : { };
 
         vm.editor = Object.assign(
             {},
             BASE_EDITOR,
             {
                 original,
-                working:Object.assign({}, original),
+                working: Object.assign({ rating: vm.defaultRating }, original),
                 canRemove: ! _.isEmpty(original),
+                canSave: _.isEmpty(original),
                 measurable: d.measurable
             });
     };
