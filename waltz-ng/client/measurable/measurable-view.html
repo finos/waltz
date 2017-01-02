@@ -7,7 +7,10 @@
                        small="{{ ctrl.measurable.kind | toDisplayName:'measurableKind' }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.measurable.list ({kind: ctrl.measurable.kind })">Measurable</a></li>
+            <li><a ui-sref="main.measurable.list ({kind: ctrl.measurable.kind })"
+                   ng-bind="ctrl.measurable.kind | toDisplayName:'measurableKind'">
+                </a>
+            </li>
             <li><span ng-bind="ctrl.measurable.name"></span></li>
         </ol>
     </waltz-page-header>
@@ -122,24 +125,5 @@
     <!-- CHANGE_LOG -->
     <waltz-change-log-section entries="ctrl.changeLogs">
     </waltz-change-log-section>
-
-
-    <waltz-section>
-        <div class="row">
-            <div class="col-md-3">
-                <pre>{{ ctrl.measurable | json }}</pre>
-            </div>
-            <div class="col-md-3">
-                <pre>{{ ctrl.parents | json }}</pre>
-            </div>
-            <div class="col-md-3">
-                <pre>{{ ctrl.children | json }}</pre>
-            </div>
-            <div class="col-md-3">
-                <pre>{{ctrl.applications|json}}</pre>
-            </div>
-        </div>
-    </waltz-section>
-
 
 </div>

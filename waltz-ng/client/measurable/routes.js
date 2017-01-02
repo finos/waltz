@@ -17,9 +17,11 @@
  */
 
 import UnitView from "./measurable-view";
+import ListView from "./measurable-list";
 
 
 const baseState = {};
+
 
 const viewState = {
     url: 'measurable/{id:int}',
@@ -29,9 +31,18 @@ const viewState = {
 };
 
 
+const listState = {
+    url: 'measurable?kind',
+    views: {
+        'content@': ListView
+    }
+};
+
+
 function setup($stateProvider) {
     $stateProvider
         .state('main.measurable', baseState)
+        .state('main.measurable.list', listState)
         .state('main.measurable.view', viewState);
 }
 

@@ -1,0 +1,70 @@
+<div>
+    <waltz-page-header name="Characteristics"
+                       icon="puzzle-piece">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><span ng-bind="ctrl.visibility.tab | toDisplayName:'measurableKind'"></span></li>
+        </ol>
+    </waltz-page-header>
+
+    <div class='waltz-page-summary-attach waltz-page-summary'>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="waltz-tabs">
+                    <!-- TAB HEADERS -->
+                    <input type="radio"
+                           ng-repeat-start="tab in ctrl.tabs track by tab.kind.code"
+                           ng-model="ctrl.visibility.tab"
+                           ng-value="tab.kind.code"
+                           ng-disabled="! tab.measurables"
+                           name="tab"
+                           id="{{ tab.kind.code + $id }}">
+                    <label for="{{ tab.kind.code + $id }}"
+                           ng-repeat-end>
+                        <span ng-bind="tab.kind.name"
+                              ng-class="{ italics: tab.ratings.length == 0 }">
+                        </span>
+                    </label>
+
+                    <!-- TAB CONTENT -->
+                    <div ng-repeat="tab in ctrl.tabs track by tab.kind.code"
+                         ng-class="{ 'wt-active': tab.kind.code == ctrl.visibility.tab }"
+                         class="wt-tab">
+
+                        <br>
+
+                        <waltz-svg-diagrams diagrams="tab.diagrams"
+                                            block-processor="ctrl.blockProcessor">
+                        </waltz-svg-diagrams>
+
+                        <br>
+
+                        <div>
+                            <treecontrol class="tree-light"
+                                         tree-model="tab.treeData"
+                                         options="ctrl.treeOptions"
+                                         expanded-nodes="tab.expandedNodes"
+                                         order-by="'-name'">
+
+                                <span title="{{ node.description }}"
+                                      ng-class="{ 'text-muted': node.rating == null }"
+                                      class="no-overflow">
+                                    <a ui-sref='main.measurable.view ({id: node.id })'
+                                       ng-bind="node.name"
+                                       ng-class="{ 'italics' : ! node.concrete }">
+                                    </a>
+                                </span>
+                            </treecontrol>
+                        </div>
+
+                        <br>
+
+                        <p class="text-muted small"
+                           ng-bind="tab.kind.description"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
