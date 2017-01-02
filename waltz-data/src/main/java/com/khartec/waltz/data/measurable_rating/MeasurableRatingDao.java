@@ -25,11 +25,13 @@ import com.khartec.waltz.model.measurable_rating.ImmutableMeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.RecordMapper;
 import org.jooq.Select;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -39,6 +41,7 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static com.khartec.waltz.data.JooqUtilities.calculateLongTallies;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 
 @Repository
@@ -111,6 +114,7 @@ public class MeasurableRatingDao {
         return dsl.executeUpdate(record) == 1;
     }
 
+
     public boolean remove(RemoveMeasurableRatingCommand command) {
         EntityReference ref = command.entityReference();
         return dsl.deleteFrom(MEASURABLE_RATING)
@@ -119,4 +123,14 @@ public class MeasurableRatingDao {
                 .and(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))
                 .execute() == 1;
     }
+
+
+    public List<Tally<Long>> tallyByMeasurableId() {
+        return calculateLongTallies(
+                dsl,
+                MEASURABLE_RATING,
+                MEASURABLE_RATING.MEASURABLE_ID,
+                DSL.trueCondition());
+    }
+
 }

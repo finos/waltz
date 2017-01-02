@@ -36,6 +36,12 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
+    const countByMeasurable = () => {
+        return $http
+            .get(`${baseUrl}/count-by/measurable`)
+            .then(d => d.data);
+    };
+
     const create = (ref, measurableId, rating = 'Z', description = '') => {
         checkIsEntityRef(ref);
         return $http
@@ -60,6 +66,7 @@ function store($http, baseApiUrl) {
     return {
         findByMeasurableSelector,
         findForEntityReference,
+        countByMeasurable,
         create,
         update,
         remove

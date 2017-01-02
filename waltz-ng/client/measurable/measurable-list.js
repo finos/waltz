@@ -40,11 +40,19 @@ const initialState = {
 };
 
 
-function prepareTabs(measurables = []) {
-    const allMeasurableKinds = _.keys(measurableKindNames);
-    const measurablesByKind = _.groupBy(measurables, 'kind');
+function prepareTabs(measurables = [], counts = []) {
+    const countsById = _.keyBy(counts, 'id');
 
-    const tabs = _.map(allMeasurableKinds, k => {
+    const kinds = _.keys(measurableKindNames);
+    const measurablesByKind = _.chain(measurables)
+        .map(m => {
+            const directCount = (countsById[m.id] || { count: 0 }).count;
+            return Object.assign({}, m, { directCount })
+        })
+        .groupBy('kind')
+        .value();
+
+    const tabs = _.map(kinds, k => {
         const kind = {
             code: k,
             name: measurableKindNames[k],
@@ -76,18 +84,25 @@ function findFirstNonEmptyTab(tabs = []) {
 }
 
 
-function controller($state,
+function controller($q,
+                    $state,
                     $stateParams,
                     measurableStore,
+                    measurableRatingStore,
                     staticPanelStore,
                     svgStore) {
 
     const vm = initialiseData(this, initialState);
 
-    measurableStore
-        .findAll()
-        .then(ms => {
-            vm.tabs = prepareTabs(ms);
+    const measurablePromise = measurableStore
+        .findAll();
+
+    const countPromise = measurableRatingStore
+        .countByMeasurable();
+
+    $q.all([measurablePromise, countPromise])
+        .then(([measurables = [], counts = []]) => {
+            vm.tabs = prepareTabs(measurables, counts);
             vm.visibility.tab = $stateParams.kind || findFirstNonEmptyTab(vm.tabs);
         });
 
@@ -104,14 +119,15 @@ function controller($state,
         angular.element(b.block).addClass('clickable');
     };
 
-
 }
 
 
 controller.$inject = [
+    '$q',
     '$state',
     '$stateParams',
     'MeasurableStore',
+    'MeasurableRatingStore',
     'StaticPanelStore',
     'SvgDiagramStore'
 ];

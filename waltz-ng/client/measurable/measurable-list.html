@@ -54,6 +54,8 @@
                                        ng-class="{ 'italics' : ! node.concrete }">
                                     </a>
                                 </span>
+                                <span ng-if='node.directCount > 0'
+                                      ng-bind="node.directCount"></span>
                             </treecontrol>
                         </div>
 
