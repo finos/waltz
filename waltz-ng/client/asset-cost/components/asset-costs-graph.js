@@ -52,8 +52,7 @@ const endColor = "#21618C";
 
 const dimensions = {
     graph: {
-        width: 600,
-        height: 250,
+        width: 600
     },
     margin: {
         top: 0,
@@ -157,10 +156,7 @@ function controller($element, $scope) {
     const holder = $element.find('div')[0];
     const svg = select(holder)
         .append('svg')
-        .attr('id', 'waltz-asset-costs-graph')
-        .attr('width', dimensions.graph.width)
-        .attr('height', dimensions.graph.height)
-        .attr('viewbox', `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
+        .attr('id', 'waltz-asset-costs-graph');
 
     let unregisterResponsivefy = () => {};
 
@@ -168,7 +164,7 @@ function controller($element, $scope) {
 
     vm.$onInit = () => {
         $scope.$applyAsync(() => {
-            unregisterResponsivefy = responsivefy(svg)
+
         });
     };
 
@@ -178,11 +174,21 @@ function controller($element, $scope) {
         }
 
         const aggCosts = processCosts(vm.costs);
+
+        dimensions.graph.height = 100 + (aggCosts.length * 20);
+
+        svg.attr('width', dimensions.graph.width)
+            .attr('height', dimensions.graph.height)
+            .attr('viewbox', `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
+
+
         draw(
             svg,
             aggCosts,
             x => $scope.$applyAsync(() => vm.onHover(x)),
             x => $scope.$applyAsync(() => vm.onSelect(x)));
+
+        unregisterResponsivefy = responsivefy(svg, 'width-only');
     };
 }
 

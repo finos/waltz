@@ -26,7 +26,7 @@ import _ from 'lodash';
  * @param svg
  * @returns {function()} to deregister the resize listener
  */
-export function responsivefy(svg) {
+export function responsivefy(svg, type = 'both') {
     // get container + svg aspect ratio
     const container = select(svg.node().parentNode);
     const id = "resize." + container.attr("id");
@@ -37,16 +37,20 @@ export function responsivefy(svg) {
     const resize = () => {
         const targetWidth = parseInt(container.style("width"));
         if (_.isNaN(targetWidth)) return;
-        svg
-            .attr("width", targetWidth)
-            .attr("height", Math.round(targetWidth / aspect));
+        svg.attr("width", targetWidth);
+
+        if (type === 'both') {
+            svg.attr("height", Math.round(targetWidth / aspect));
+        }
     };
 
     // add viewBox and preserveAspectRatio properties,
     // and call resize so that svg resizes on inital page load
-    svg.attr("viewBox", `0 0 ${width} ${height}`)
-        .attr("perserveAspectRatio", "xMinYMid")
-        .call(resize);
+    svg.attr("viewBox", `0 0 ${width} ${height}`);
+    if (type === 'both') {
+        svg.attr("perserveAspectRatio", "xMinYMid");
+    }
+    svg.call(resize);
 
     select(window)
         .on(id, resize);
