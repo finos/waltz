@@ -28,8 +28,8 @@ export default () => {
         .service('StaticPanelStore', require('./services/static-panel-store'));
 
     module
-        .component('waltzStaticPanels', require('./directives/static-panels'))
-        .component('waltzStaticPanel', require('./directives/static-panel'));
+        .component('waltzStaticPanels', require('./components/static-panels'))
+        .component('waltzStaticPanel', require('./components/static-panel'));
 
     return module.name;
 };

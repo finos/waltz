@@ -4,11 +4,11 @@ import com.khartec.waltz.model.staticpanel.StaticPanel;
 import com.khartec.waltz.service.static_panel.StaticPanelService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
 
 @Service
@@ -30,7 +30,6 @@ public class StaticPanelEndpoint implements Endpoint {
         ListRoute<StaticPanel> findByGroupRoute = (request, response) ->
                 service.findByGroup(request.params("group"));
 
-
-        EndpointUtilities.getForList(findByGroupPath, findByGroupRoute);
+        getForList(findByGroupPath, findByGroupRoute);
     }
 }

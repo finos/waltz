@@ -373,4 +373,14 @@
                       newColumnName="group"/>
     </changeSet>
 
+
+    <!-- 1316: Change kind to encoding in static panel -->
+    <changeSet author="dwatkins"
+               id="20161216-1316-1">
+        <renameColumn tableName="static_panel"
+                      oldColumnName="kind"
+                      columnDataType="${enum.type}"
+                      newColumnName="encoding"/>
+    </changeSet>
+
 </databaseChangeLog>
