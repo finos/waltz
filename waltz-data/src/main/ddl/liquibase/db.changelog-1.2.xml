@@ -383,4 +383,21 @@
                       newColumnName="encoding"/>
     </changeSet>
 
+
+    <!-- 1310: Add indexes to measurable_rating -->
+    <changeSet author="dwatkins"
+               id="20170103-1310-1">
+        <createIndex indexName="idx_m_rating_entity"
+                     tableName="measurable_rating"
+                     unique="false">
+            <column name="entity_id" type="${id.type}"/>
+            <column name="entity_kind" type="${enum.type}"/>
+        </createIndex>
+        <createIndex indexName="idx_m_rating_measurable"
+                     tableName="measurable_rating"
+                     unique="false">
+            <column name="measurable_id" type="${long.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
