@@ -39,7 +39,7 @@ function setupBlockProcessor($state) {
 function loadDiagrams(svgStore, vm, $state) {
 
     svgStore
-        .findByKind('ORG_UNIT')
+        .findByGroup('ORG_UNIT')
         .then(xs => vm.diagrams = xs);
 
     vm.blockProcessor = setupBlockProcessor($state);

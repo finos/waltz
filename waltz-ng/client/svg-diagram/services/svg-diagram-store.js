@@ -19,12 +19,12 @@
 
 function service(http, base) {
 
-    const findByKind = (kind) =>
-        http.get(`${base}/svg-diagram/kind/${kind}`)
+    const findByGroup = (group) =>
+        http.get(`${base}/svg-diagram/group/${group}`)
             .then(r => r.data);
 
     return {
-        findByKind
+        findByGroup
     };
 }
 

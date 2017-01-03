@@ -123,7 +123,7 @@ function controller($q,
         .then(panels => vm.panels = panels);
 
     svgStore
-        .findByKind('MEASURABLE')
+        .findByGroup('MEASURABLE')
         .then(xs => vm.diagrams = xs);
 
     vm.blockProcessor = b => {

@@ -44,11 +44,11 @@ public class SvgDiagramEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findByKindPath = mkPath(BASE_URL, "kind", ":kind");
+        String findByGroupPath = mkPath(BASE_URL, "group", ":group");
 
-        ListRoute<SvgDiagram> findByKindRoute = (request, response) ->
-                svgDiagramService.findByKind(request.params("kind"));
+        ListRoute<SvgDiagram> findByGroupRoute = (request, response) ->
+                svgDiagramService.findByGroup(request.params("group"));
 
-        getForList(findByKindPath, findByKindRoute);
+        getForList(findByGroupPath, findByGroupRoute);
     }
 }

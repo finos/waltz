@@ -43,7 +43,7 @@ function controller($scope,
         .then(sdrs => vm.sourceDataRatings = sdrs);
 
     svgStore
-        .findByKind('PROCESS')
+        .findByGroup('PROCESS')
         .then(xs => vm.diagrams = xs);
 
     staticPanelStore
