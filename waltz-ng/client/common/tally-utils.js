@@ -44,13 +44,16 @@ export function tallyBy(data = [], groupingSelector = 'key') {
 
 
 /**
- * Given a node with a @countKey, adds total and child counts for the node
+ * Given a node with a @countKey, adds total and child counts for the node.
+ * Then recurses down children doing the same.
  * @param countKey
  * @param totalKey
  * @param childKey
  * @returns {function(*)}
  */
-export function buildPropertySummer (countKey, totalKey, childKey) {
+export function buildPropertySummer (countKey = 'directCount',
+                                     totalKey = 'totalCount',
+                                     childKey = 'indirectCount') {
     const summer = (node) => {
         if (node == null) {
             return 0;

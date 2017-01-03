@@ -20,6 +20,8 @@ import _ from 'lodash';
 import {buildHierarchies, initialiseData, switchToParentIds} from '../common';
 import {measurableKindNames} from '../common/services/display-names';
 import {measurableKindDescriptions} from '../common/services/descriptions';
+import {buildPropertySummer} from '../common/tally-utils';
+import {scaleLinear} from 'd3-scale';
 
 
 const initialState = {
@@ -38,6 +40,8 @@ const initialState = {
         }
     }
 };
+
+const totalSummer = buildPropertySummer();
 
 
 function prepareTabs(measurables = [], counts = []) {
@@ -60,15 +64,23 @@ function prepareTabs(measurables = [], counts = []) {
         };
         const measurablesForKind = measurablesByKind[k];
         const treeData = switchToParentIds(buildHierarchies(measurablesForKind));
+        _.each(treeData, root => totalSummer(root));
+        const maxCount = _.get(
+            _.maxBy(treeData, 'totalCount'),
+            'totalCount') || 0;
+
+        const xScale = scaleLinear().range([0, 100]).domain([0, maxCount]);
+
         const expandedNodes = treeData.length < 6  // pre-expand small trees
-            ? treeData
+            ? _.clone(treeData)
             : [];
 
         return {
             kind,
             measurables: measurablesForKind,
             treeData,
-            expandedNodes
+            expandedNodes,
+            xScale
         };
     });
 
