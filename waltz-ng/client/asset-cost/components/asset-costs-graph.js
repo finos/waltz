@@ -162,12 +162,6 @@ function controller($element, $scope) {
 
     vm.$onDestroy = () => unregisterResponsivefy();
 
-    vm.$onInit = () => {
-        $scope.$applyAsync(() => {
-
-        });
-    };
-
     vm.$onChanges = () => {
         if (isEmpty(vm.costs)) {
             return;
@@ -181,13 +175,13 @@ function controller($element, $scope) {
             .attr('height', dimensions.graph.height)
             .attr('viewbox', `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
 
-
         draw(
             svg,
             aggCosts,
             x => $scope.$applyAsync(() => vm.onHover(x)),
             x => $scope.$applyAsync(() => vm.onSelect(x)));
 
+        unregisterResponsivefy();
         unregisterResponsivefy = responsivefy(svg, 'width-only');
     };
 }
