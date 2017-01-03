@@ -32,7 +32,7 @@ public abstract class SvgDiagram implements IdProvider,
         DescriptionProvider,
         NameProvider {
 
-    public abstract String kind();
+    public abstract String group();
     public abstract String svg();
     public abstract int priority();
     public abstract String keyProperty();

@@ -46,7 +46,7 @@ public class SvgDiagramDao {
                 .keyProperty(record.getKeyProperty())
                 .name(record.getName())
                 .priority(record.getPriority())
-                .kind(record.getKind())
+                .group(record.getGroup())
                 .svg(record.getSvg())
                 .product(record.getProduct())
                 .build();
@@ -59,10 +59,10 @@ public class SvgDiagramDao {
     }
 
 
-    public List<SvgDiagram> findByKind(String kind) {
-        return FunctionUtilities.time("SDD.findByKind", () -> dsl.select()
+    public List<SvgDiagram> findByGroup(String group) {
+        return FunctionUtilities.time("SDD.findByGroup", () -> dsl.select()
                 .from(SVG_DIAGRAM)
-                .where(SVG_DIAGRAM.KIND.eq(kind))
+                .where(SVG_DIAGRAM.GROUP.eq(group))
                 .orderBy(SVG_DIAGRAM.PRIORITY.asc())
                 .fetch(svgMapper));
     }

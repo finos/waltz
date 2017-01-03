@@ -363,4 +363,14 @@
         </sql>
     </changeSet>
 
+
+    <!-- 1315: Change kind to group in svg diagram -->
+    <changeSet author="dwatkins"
+               id="20161216-1315-1">
+        <renameColumn tableName="svg_diagram"
+                      oldColumnName="kind"
+                      columnDataType="${group.type}"
+                      newColumnName="group"/>
+    </changeSet>
+
 </databaseChangeLog>

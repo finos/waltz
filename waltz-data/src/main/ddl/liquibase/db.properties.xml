@@ -53,6 +53,7 @@
     <property name="description.type" value="${longvarchar.type}"></property>
     <property name="enum.type" value="VARCHAR(64)"></property>
     <property name="external-id.type" value="VARCHAR(200)"></property>
+    <property name="group.type" value="VARCHAR(128)"></property>
     <property name="id.type" value="${long.type}"></property>
     <property name="name.type" value="VARCHAR(255)"></property>
     <property name="provenance.type" value="VARCHAR(64)"></property>

@@ -39,7 +39,7 @@ function controller($state,
     vm.nodeSelected = (node) => vm.selectedNode = node;
 
     svgStore
-        .findByKind('DATA_TYPE')
+        .findByGroup('DATA_TYPE')
         .then(xs => vm.diagrams = xs);
 
     staticPanelStore

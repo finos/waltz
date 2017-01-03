@@ -39,7 +39,7 @@ function controller($scope,
     });
 
     svgStore
-        .findByKind('ORG_TREE')
+        .findByGroup('ORG_TREE')
         .then(xs => vm.diagrams = xs);
 
     staticPanelStore

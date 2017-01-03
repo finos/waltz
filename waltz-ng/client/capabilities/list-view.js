@@ -39,7 +39,7 @@ function controller(appCapabilityStore,
         .then(panels => vm.panels = panels);
 
     svgStore
-        .findByKind('CAPABILITY')
+        .findByGroup('CAPABILITY')
         .then(xs => vm.diagrams = xs);
 
     vm.blockProcessor = b => {

@@ -63,8 +63,8 @@ public class SvgDiagramService {
     }
 
 
-    public List<SvgDiagram> findByKind(String kind) {
-        return FunctionUtilities.time("SDS.findByKind", () -> svgDiagramDao.findByKind(kind)
+    public List<SvgDiagram> findByGroup(String group) {
+        return FunctionUtilities.time("SDS.findByGroup", () -> svgDiagramDao.findByGroup(group)
                 .stream()
                 .map(Unchecked.function(diag -> {
                     String updatedSvg = convertProductSpecificSvg(diag);
