@@ -38,7 +38,10 @@ const initialState = {
     entityRef: null,
     measurables: [],
     ratings: [],
-    tabs: []
+    tabs: [],
+    visibility: {
+        tab: null
+    }
 };
 
 
@@ -72,6 +75,13 @@ function calcCanSave(working, original) {
     const ratingsDiffer = working.rating !== original.rating;
     const descriptionsDiffer = working.description !== original.description;
     return ratingsDiffer || descriptionsDiffer;
+}
+
+
+function determineSelectedTab(tabs = []) {
+    // first with ratings, or simply first if no ratings
+    const tab = _.find(tabs, t => t.ratings.length > 0 ) || tabs[0];
+    return _.get(tab, 'kind.code');
 }
 
 
@@ -110,7 +120,11 @@ function controller($q,
         });
 
     $q.all([ratingsPromise, measurablesPromise])
-        .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables));
+        .then(() => {
+            vm.tabs = prepareTabs(vm.ratings, vm.measurables);
+            vm.visibility.tab = determineSelectedTab(vm.tabs);
+
+        });
 
 
     // -- INTERACT ---
