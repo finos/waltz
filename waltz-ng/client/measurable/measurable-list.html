@@ -50,8 +50,15 @@
                                       ng-class="{ 'text-muted': node.rating == null }"
                                       class="no-overflow">
                                     <a ui-sref='main.measurable.view ({id: node.id })'
-                                       ng-bind="node.name"
                                        ng-class="{ 'italics' : ! node.concrete }">
+                                        <span ng-bind="node.name"></span>
+                                        <span class="wml-bar-chart"
+                                              ng-style="{width: tab.xScale(node.totalCount) + 'px'}"
+                                              uib-popover="{{ node.totalCount }} applications"
+                                              popover-append-to-body="true"
+                                              popover-placement="right"
+                                              popover-trigger="mouseenter">
+                                        </span>
                                     </a>
                                 </span>
                             </treecontrol>

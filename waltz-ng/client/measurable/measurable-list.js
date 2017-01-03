@@ -20,6 +20,8 @@ import _ from 'lodash';
 import {buildHierarchies, initialiseData, switchToParentIds} from '../common';
 import {measurableKindNames} from '../common/services/display-names';
 import {measurableKindDescriptions} from '../common/services/descriptions';
+import {buildPropertySummer} from '../common/tally-utils';
+import {scaleLinear} from 'd3-scale';
 
 
 const initialState = {
@@ -39,12 +41,22 @@ const initialState = {
     }
 };
 
+const totalSummer = buildPropertySummer();
 
-function prepareTabs(measurables = []) {
-    const allMeasurableKinds = _.keys(measurableKindNames);
-    const measurablesByKind = _.groupBy(measurables, 'kind');
 
-    const tabs = _.map(allMeasurableKinds, k => {
+function prepareTabs(measurables = [], counts = []) {
+    const countsById = _.keyBy(counts, 'id');
+
+    const kinds = _.keys(measurableKindNames);
+    const measurablesByKind = _.chain(measurables)
+        .map(m => {
+            const directCount = (countsById[m.id] || { count: 0 }).count;
+            return Object.assign({}, m, { directCount })
+        })
+        .groupBy('kind')
+        .value();
+
+    const tabs = _.map(kinds, k => {
         const kind = {
             code: k,
             name: measurableKindNames[k],
@@ -52,15 +64,23 @@ function prepareTabs(measurables = []) {
         };
         const measurablesForKind = measurablesByKind[k];
         const treeData = switchToParentIds(buildHierarchies(measurablesForKind));
+        _.each(treeData, root => totalSummer(root));
+        const maxCount = _.get(
+            _.maxBy(treeData, 'totalCount'),
+            'totalCount') || 0;
+
+        const xScale = scaleLinear().range([0, 100]).domain([0, maxCount]);
+
         const expandedNodes = treeData.length < 6  // pre-expand small trees
-            ? treeData
+            ? _.clone(treeData)
             : [];
 
         return {
             kind,
             measurables: measurablesForKind,
             treeData,
-            expandedNodes
+            expandedNodes,
+            xScale
         };
     });
 
@@ -76,18 +96,25 @@ function findFirstNonEmptyTab(tabs = []) {
 }
 
 
-function controller($state,
+function controller($q,
+                    $state,
                     $stateParams,
                     measurableStore,
+                    measurableRatingStore,
                     staticPanelStore,
                     svgStore) {
 
     const vm = initialiseData(this, initialState);
 
-    measurableStore
-        .findAll()
-        .then(ms => {
-            vm.tabs = prepareTabs(ms);
+    const measurablePromise = measurableStore
+        .findAll();
+
+    const countPromise = measurableRatingStore
+        .countByMeasurable();
+
+    $q.all([measurablePromise, countPromise])
+        .then(([measurables = [], counts = []]) => {
+            vm.tabs = prepareTabs(measurables, counts);
             vm.visibility.tab = $stateParams.kind || findFirstNonEmptyTab(vm.tabs);
         });
 
@@ -104,14 +131,15 @@ function controller($state,
         angular.element(b.block).addClass('clickable');
     };
 
-
 }
 
 
 controller.$inject = [
+    '$q',
     '$state',
     '$stateParams',
     'MeasurableStore',
+    'MeasurableRatingStore',
     'StaticPanelStore',
     'SvgDiagramStore'
 ];

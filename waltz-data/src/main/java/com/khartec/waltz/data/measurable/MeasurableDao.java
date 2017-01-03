@@ -118,4 +118,5 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .where(MEASURABLE.ID.eq(id))
                 .fetchOne(TO_DOMAIN);
     }
+
 }

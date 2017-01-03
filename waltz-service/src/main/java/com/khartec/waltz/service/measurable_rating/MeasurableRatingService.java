@@ -30,6 +30,7 @@ import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -116,6 +117,11 @@ public class MeasurableRatingService {
 
         }
         return findForEntity(command.entityReference());
+    }
+
+
+    public List<Tally<Long>> tallyByMeasurableId() {
+        return measurableRatingDao.tallyByMeasurableId();
     }
 
 
