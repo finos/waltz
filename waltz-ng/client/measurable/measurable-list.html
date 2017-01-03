@@ -53,6 +53,7 @@
                                        ng-class="{ 'italics' : ! node.concrete }">
                                         <span ng-bind="node.name"></span>
                                         <span class="wml-bar-chart"
+                                              ng-if="node.totalCount > 0"
                                               ng-style="{width: tab.xScale(node.totalCount) + 'px'}"
                                               uib-popover="{{ node.totalCount }} applications"
                                               popover-append-to-body="true"
