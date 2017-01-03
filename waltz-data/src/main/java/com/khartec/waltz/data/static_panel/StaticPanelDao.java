@@ -25,7 +25,7 @@ public class StaticPanelDao {
                 .content(record.getContent())
                 .group(record.getGroup())
                 .icon(record.getIcon())
-                .kind(ContentKind.valueOf(record.getKind()))
+                .encoding(ContentKind.valueOf(record.getEncoding()))
                 .title(record.getTitle())
                 .priority(record.getPriority())
                 .width(record.getWidth())

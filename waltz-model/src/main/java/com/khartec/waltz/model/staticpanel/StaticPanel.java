@@ -41,7 +41,7 @@ public abstract class StaticPanel implements IdProvider {
     }
 
     @Value.Default
-    public ContentKind kind() {
+    public ContentKind encoding() {
         return ContentKind.HTML;
     }
 
