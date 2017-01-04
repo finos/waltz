@@ -65,9 +65,12 @@ public class ArrayUtilities {
 
 
     public static <T> T randomPick(T... ts) {
+        Checks.checkNotEmpty(ts, "Cannot take random pick from an empty array");
         int idx = rnd.nextInt(ts.length);
         return ts[idx];
     }
+
+
 
 
     public static <T> T[] of(T[] ts, T... moreTs) {
@@ -81,4 +84,10 @@ public class ArrayUtilities {
         return (T[]) res.toArray();
     }
 
+
+    public static <T> boolean isEmpty(T[] arr) {
+        if (arr == null) return true;
+        if (arr.length == 0) return true;
+        return false;
+    }
 }

@@ -17,18 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function service(http, base) {
+function service($http, base) {
 
-    const findByGroup = (group) =>
-        http.get(`${base}/svg-diagram/group/${group}`)
+    const findByGroups = (groups = []) =>
+        $http
+            .get(`${base}/svg-diagram/group`, { params : { group: groups } })
             .then(r => r.data);
 
+    const findByGroup = (group) => findByGroups([group]);
+
     return {
-        findByGroup
+        findByGroup,
+        findByGroups
     };
 }
 
 
-service.$inject = ['$http', 'BaseApiUrl'];
+service.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
+
 
 export default service;

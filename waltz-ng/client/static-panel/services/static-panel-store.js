@@ -16,19 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function service(http, base) {
+function service($http, base) {
     const baseUrl = `${base}/static-panel`;
 
-    const findByGroup = (group) =>
-        http.get(`${baseUrl}/group/${group}`)
+    const findByGroups = (groups = []) => {
+        return $http
+            .get(`${baseUrl}/group`, {params: {group: groups}})
             .then(r => r.data);
+    }
+
+    const findByGroup = (group) => findByGroups([group]);
 
     return {
-        findByGroup
+        findByGroup,
+        findByGroups
     };
 }
 
-service.$inject = ['$http', 'BaseApiUrl'];
+
+service.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
 
 
 export default service;

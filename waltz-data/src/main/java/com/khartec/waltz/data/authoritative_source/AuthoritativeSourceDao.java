@@ -17,6 +17,7 @@
 
 package com.khartec.waltz.data.authoritative_source;
 
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
@@ -168,7 +169,7 @@ public class AuthoritativeSourceDao {
 
     public int insert(EntityReference parentRef, String dataType, Long appId, Rating rating) {
         checkNotNull(parentRef, "parentRef must not be null");
-        checkNotEmptyString(dataType, "dataType cannot be empty");
+        Checks.checkNotEmpty(dataType, "dataType cannot be empty");
         checkNotNull(rating, "rating must not be null");
 
         return dsl.insertInto(AUTHORITATIVE_SOURCE)

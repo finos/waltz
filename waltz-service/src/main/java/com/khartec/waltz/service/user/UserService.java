@@ -106,7 +106,7 @@ public class UserService {
      * @return
      */
     public boolean ensureExists(String username) {
-        Checks.checkNotEmptyString(username, "Cannot ensure an empty username exists");
+        Checks.checkNotEmpty(username, "Cannot ensure an empty username exists");
         int rc = userDao.create(username, passwordService.hashPassword("temp4321"));
         boolean isNewUser = (rc == 1);
 
@@ -118,7 +118,7 @@ public class UserService {
     }
 
     private void assignDefaultRoles(String username) {
-        Checks.checkNotEmptyString(username, "username cannot be empty");
+        Checks.checkNotEmpty(username, "username cannot be empty");
         Setting setting = settingsService.getByName(SettingsService.DEFAULT_ROLES_KEY);
         if (setting != null ) {
             setting.value()

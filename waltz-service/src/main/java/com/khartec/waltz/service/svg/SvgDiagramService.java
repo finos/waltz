@@ -17,7 +17,6 @@
 
 package com.khartec.waltz.service.svg;
 
-import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.common.SvgUtilities;
 import com.khartec.waltz.data.svg.SvgDiagramDao;
 import com.khartec.waltz.model.svg.ImmutableSvgDiagram;
@@ -31,7 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 import static java.util.stream.Collectors.toList;
 
@@ -40,17 +39,31 @@ public class SvgDiagramService {
 
     private final SvgDiagramDao svgDiagramDao;
 
+
     @Autowired
     public SvgDiagramService(SvgDiagramDao svgDiagramDao) {
         this.svgDiagramDao = svgDiagramDao;
     }
 
 
+    public Collection<SvgDiagram> findByGroups(String... groups) {
+        return svgDiagramDao.findByGroups(groups)
+                .stream()
+                .map(Unchecked.function(diagram -> {
+                    String updatedSvg = convertProductSpecificSvg(diagram);
+                    return ImmutableSvgDiagram.copyOf(diagram)
+                            .withSvg(updatedSvg);
+                }))
+                .collect(toList());
+    }
+
+
     private String convertProductSpecificSvg(SvgDiagram diagram) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, TransformerException {
-        if (diagram.product().equals("visio")) {
-            return convertVisioSvg(diagram);
-        } else {
-            return diagram.svg();
+        switch (diagram.product()) {
+            case "visio":
+                return convertVisioSvg(diagram);
+            default:
+                return diagram.svg();
         }
     }
 
@@ -60,18 +73,6 @@ public class SvgDiagramService {
         String svgStr = diagram.svg();
 
         return SvgUtilities.convertVisioSvg(key, svgStr);
-    }
-
-
-    public List<SvgDiagram> findByGroup(String group) {
-        return FunctionUtilities.time("SDS.findByGroup", () -> svgDiagramDao.findByGroup(group)
-                .stream()
-                .map(Unchecked.function(diag -> {
-                    String updatedSvg = convertProductSpecificSvg(diag);
-                    return ImmutableSvgDiagram.copyOf(diag)
-                            .withSvg(updatedSvg);
-                }))
-                .collect(toList()));
     }
 
 }

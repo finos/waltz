@@ -16,20 +16,23 @@ public class StaticPanelEndpoint implements Endpoint {
 
     private static final String BASE_URL = mkPath("api", "static-panel");
 
+
     private final StaticPanelService service;
+
 
     @Autowired
     public StaticPanelEndpoint(StaticPanelService service) {
         this.service = service;
     }
 
+
     @Override
     public void register() {
-        String findByGroupPath = mkPath(BASE_URL, "group", ":group");
+        String findByGroupsPath = mkPath(BASE_URL, "group");
 
-        ListRoute<StaticPanel> findByGroupRoute = (request, response) ->
-                service.findByGroup(request.params("group"));
+        ListRoute<StaticPanel> findByGroupsRoute = (request, response) ->
+                service.findByGroups(request.queryParamsValues("group"));
 
-        getForList(findByGroupPath, findByGroupRoute);
+        getForList(findByGroupsPath, findByGroupsRoute);
     }
 }

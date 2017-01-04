@@ -37,6 +37,7 @@ public class Checks {
         return t;
     }
 
+
     /**
      * Verifies all elements of an array comply to a given predicate.
      * @param ts Array of elements
@@ -54,6 +55,7 @@ public class Checks {
         return ts;
     }
 
+
     /**
      * Verifies that the boolean <code>b</code> is true
      * @param b Boolean to check
@@ -66,14 +68,9 @@ public class Checks {
         }
     }
 
+
     public static void checkFalse(boolean b, String message) {
         checkTrue(! b, message);
-    }
-
-    public static String checkNotEmptyString(String str, String message) {
-        checkNotNull(str, message);
-        checkFalse(str.trim().equals(""), message);
-        return str;
     }
 
 
@@ -82,8 +79,22 @@ public class Checks {
                 .orElseThrow(() -> new IllegalArgumentException(message));
     }
 
+
     public static <T> void checkNotEmpty(Collection<T> ts, String message) {
         checkNotNull(ts, message);
         checkFalse(ts.isEmpty(), message);
+    }
+
+
+    public static <T> void checkNotEmpty(T[] ts, String message) {
+        checkNotNull(ts, message);
+        checkFalse(ArrayUtilities.isEmpty(ts), message);
+    }
+
+
+    public static String checkNotEmpty(String str, String message) {
+        checkNotNull(str, message);
+        checkFalse(str.trim().equals(""), message);
+        return str;
     }
 }
