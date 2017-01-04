@@ -45,7 +45,7 @@ import static java.util.Optional.ofNullable;
 @Repository
 public class MeasurableDao implements FindEntityReferencesByIdSelector {
 
-    public static RecordMapper<Record, Measurable> TO_DOMAIN = record -> {
+    public static RecordMapper<Record, Measurable> TO_DOMAIN_MAPPER = record -> {
         MeasurableRecord r = record.into(MEASURABLE);
 
         return ImmutableMeasurable.builder()
@@ -76,7 +76,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
     public List<Measurable> findAll() {
         return dsl
                 .selectFrom(MEASURABLE)
-                .fetch(TO_DOMAIN);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -89,7 +89,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .innerJoin(MEASURABLE).on(MEASURABLE.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID))
                 .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
                 .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
-                .fetch(TO_DOMAIN);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -109,14 +109,15 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
         return dsl
                 .selectFrom(MEASURABLE)
                 .where(MEASURABLE.ID.in(selector))
-                .fetch(TO_DOMAIN);
+                .fetch(TO_DOMAIN_MAPPER);
     }
+
 
     public Measurable getById(long id) {
         return dsl
                 .selectFrom(MEASURABLE)
                 .where(MEASURABLE.ID.eq(id))
-                .fetchOne(TO_DOMAIN);
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 }

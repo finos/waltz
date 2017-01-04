@@ -39,10 +39,15 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
+    const search = (query) => $http
+        .get(`${baseUrl}/search/${query}`)
+        .then(x => x.data);
+
     return {
         findAll,
         findMeasurablesRelatedToPath,
-        findMeasurablesBySelector
+        findMeasurablesBySelector,
+        search
     };
 
 }

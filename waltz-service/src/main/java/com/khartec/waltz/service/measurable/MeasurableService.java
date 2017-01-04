@@ -20,6 +20,7 @@ package com.khartec.waltz.service.measurable;
 
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
+import com.khartec.waltz.data.measurable.search.MeasurableSearchDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.measurable.Measurable;
@@ -28,6 +29,7 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -38,15 +40,20 @@ public class MeasurableService {
     
     private final MeasurableDao measurableDao;
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory;
+    private final MeasurableSearchDao measurableSearchDao;
 
 
     @Autowired
     public MeasurableService(MeasurableDao measurableDao,
-                             MeasurableIdSelectorFactory measurableIdSelectorFactory) {
+                             MeasurableIdSelectorFactory measurableIdSelectorFactory,
+                             MeasurableSearchDao measurableSearchDao) {
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(measurableIdSelectorFactory, "measurableIdSelectorFactory cannot be null");
+        checkNotNull(measurableSearchDao, "measurableSearchDao cannot be null");
+
         this.measurableDao = measurableDao;
         this.measurableIdSelectorFactory = measurableIdSelectorFactory;
+        this.measurableSearchDao = measurableSearchDao;
     }
 
 
@@ -72,4 +79,8 @@ public class MeasurableService {
         return measurableDao.findByMeasurableIdSelector(selector);
     }
 
+
+    public Collection<Measurable> search(String query) {
+        return measurableSearchDao.search(query);
+    }
 }

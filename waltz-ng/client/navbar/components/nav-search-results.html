@@ -40,24 +40,27 @@
 
             <hr>
 
-            <!-- CAPABILITIES -->
+            <!-- CHARACTERISTICS -->
             <h5>
                 <waltz-icon name="puzzle-piece"></waltz-icon>
-                Capabilities
+                Characteristics
             </h5>
-            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.capabilities.length > 10 }">
+            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.measurables.length > 10 }">
                 <ul class="list-unstyled">
-                    <li ng-repeat="capability in $ctrl.results.capabilities">
-                        <a ui-sref="main.capability.view ({id: capability.id})"
+                    <li ng-repeat="measurable in $ctrl.results.measurables">
+                        <span class='small text-muted'
+                              ng-bind="measurable.kind | toDisplayName:'measurableKind'">
+                        </span>
+                        <a ui-sref="main.measurable.view ({id: measurable.id})"
                            ng-click="$ctrl.dismiss()">
-                            <span ng-bind="capability.name"></span>
+                            <span ng-bind="measurable.name"></span>
                         </a>
                         <small>
-                            <span ng-bind="capability.description | limitTo:60"></span>
-                            <span ng-if="capability.description.length > 60">...</span>
+                            <span ng-bind="measurable.description | limitTo:60"></span>
+                            <span ng-if="measurable.description.length > 60">...</span>
                         </small>
                     </li>
-                    <li ng-show="$ctrl.results.capabilities.length == 0"
+                    <li ng-show="$ctrl.results.measurable.length == 0"
                         class="text-muted">
                         No results...
                     </li>

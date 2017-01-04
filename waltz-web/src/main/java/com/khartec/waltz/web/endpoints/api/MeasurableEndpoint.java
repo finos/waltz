@@ -25,9 +25,7 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
@@ -52,6 +50,7 @@ public class MeasurableEndpoint implements Endpoint {
         String findAllPath = mkPath(BASE_URL, "all");
         String findMeasurablesRelatedToPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByMeasurableIdSelectorPath = mkPath(BASE_URL, "measurable-selector");
+        String searchPath = mkPath(BASE_URL, "search", ":query");
 
         ListRoute<Measurable> findAllRoute = (request, response)
                 -> measurableService.findAll();
@@ -62,9 +61,13 @@ public class MeasurableEndpoint implements Endpoint {
         ListRoute<Measurable> findByMeasurableIdSelectorRoute = (request, response)
                 -> measurableService.findByMeasurableIdSelector(readIdSelectionOptionsFromBody(request));
 
+        ListRoute<Measurable> searchRoute = (request, response)
+                -> measurableService.search(request.params("query"));
+
         getForList(findAllPath, findAllRoute);
         getForList(findMeasurablesRelatedToPath, findMeasurablesRelatedToEntityRoute);
         postForList(findByMeasurableIdSelectorPath, findByMeasurableIdSelectorRoute);
+        getForList(searchPath, searchRoute);
     }
 
 }
