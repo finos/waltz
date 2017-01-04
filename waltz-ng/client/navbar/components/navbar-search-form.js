@@ -42,7 +42,7 @@ const template = require('./navbar-search-form.html');
 function controller($timeout,
                     actorStore,
                     applicationStore,
-                    capabilityStore,
+                    measurableStore,
                     personStore,
                     physicalFlowStore,
                     orgUnitStore) {
@@ -66,7 +66,7 @@ function controller($timeout,
             searchResults.show = true;
             handleSearch(query, applicationStore, 'apps');
             handleSearch(query, personStore, 'people');
-            handleSearch(query, capabilityStore, 'capabilities');
+            handleSearch(query, measurableStore, 'measurables');
             handleSearch(query, orgUnitStore, 'orgUnits');
             handleSearch(query, actorStore, 'actors');
 
@@ -76,7 +76,9 @@ function controller($timeout,
         }
     };
 
-    const dismissResults = (e) => $timeout(() => { searchResults.show = false; }, 200);
+    const dismissResults = (e) => $timeout(
+        () => searchResults.show = false,
+        200);
 
     vm.searchResults = searchResults;
     vm.doSearch = () => doSearch(vm.query);
@@ -89,7 +91,7 @@ controller.$inject = [
     '$timeout',
     'ActorStore',
     'ApplicationStore',
-    'CapabilityStore',
+    'MeasurableStore',
     'PersonStore',
     'PhysicalFlowStore',
     'OrgUnitStore'
