@@ -23,10 +23,9 @@ import {initialiseData} from "../../common";
 const navItems = [
     // { uiSref, icon, displayName, <role>, id }
     { uiSref: 'main.org-unit.list', icon: 'sitemap', displayName: 'Org Units', id: 'navbar-org-units' },
-    { uiSref: 'main.measurable.list', icon: 'puzzle-piece', displayName: 'Characteristics', id: 'navbar-characteristics' },
     { uiSref: 'main.person', icon: 'users', displayName: 'People', id: 'navbar-people' },
     { uiSref: 'main.data-type.list', icon: 'qrcode', displayName: 'Data', id: 'navbar-data-types' },
-    { uiSref: 'main.capability.list', icon: 'puzzle-piece', displayName: 'Functions', id: 'navbar-capabilities' },
+    { uiSref: 'main.measurable.list', icon: 'puzzle-piece', displayName: 'Other Viewpoints', id: 'navbar-measurables' },
 ];
 
 

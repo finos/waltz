@@ -83,20 +83,6 @@ function initialiseAssetCosts(service, selector, holder) {
 }
 
 
-function loadAppCapabilities(store, selector, holder) {
-    return store
-        .findApplicationCapabilitiesByAppIdSelector(selector)
-        .then(r => holder.appCapabilities = r);
-}
-
-
-function loadAllCapabilities(store, holder) {
-    return store
-        .findAll()
-        .then(r => holder.capabilities = r);
-}
-
-
 function loadAuthSources(store, id, holder) {
     return store
         .findByOrgUnit(id)  // use orgIds(ASC)
@@ -172,11 +158,9 @@ function loadLineageReports(store, selector, holder) {
 
 function service($q,
                  appStore,
-                 appCapabilityStore,
                  assetCostViewService,
                  authSourceCalculator,
                  bookmarkStore,
-                 capabilityStore,
                  changeLogStore,
                  complexityStore,
                  endUserAppStore,
@@ -227,8 +211,6 @@ function service($q,
         return $q.all([
             initialiseDataFlows(logicalFlowViewService, orgUnitId, rawData),
             loadInvolvement(involvementStore, orgUnitId, rawData),
-            loadAppCapabilities(appCapabilityStore, selector, rawData),
-            loadAllCapabilities(capabilityStore, rawData),
             loadAuthSources(authSourceCalculator, orgUnitId, rawData),
             loadComplexity(complexityStore, orgUnitId, rawData),
             loadEntityStatisticDefinitions(entityStatisticStore, selector, rawData),
@@ -290,11 +272,9 @@ function service($q,
 service.$inject = [
     '$q',
     'ApplicationStore',
-    'AppCapabilityStore',
     'AssetCostViewService',
     'AuthSourcesCalculator',
     'BookmarkStore',
-    'CapabilityStore',
     'ChangeLogStore',
     'ComplexityStore',
     'EndUserAppStore',
