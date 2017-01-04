@@ -1,5 +1,6 @@
 package com.khartec.waltz.service.user_agent_info;
 
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.user_agent_info.UserAgentInfoDao;
 import com.khartec.waltz.model.user_agent_info.UserAgentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class UserAgentInfoService {
 
 
     public List<UserAgentInfo> findLoginsForUser(String userName, int limit) {
-        checkNotEmptyString(userName, "username cannot be empty");
+        Checks.checkNotEmpty(userName, "username cannot be empty");
         checkTrue(limit > 0, "limit should be > 0");
         return userAgentInfoDao.findLoginsForUser(userName, limit);
     }

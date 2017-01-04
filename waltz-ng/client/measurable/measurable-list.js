@@ -115,20 +115,32 @@ function controller($q,
     $q.all([measurablePromise, countPromise])
         .then(([measurables = [], counts = []]) => {
             vm.tabs = prepareTabs(measurables, counts);
+            vm.measurablesByExternalId = _.keyBy(measurables, 'externalId');
             vm.visibility.tab = $stateParams.kind || findFirstNonEmptyTab(vm.tabs);
         });
 
     staticPanelStore
-        .findByGroup("HOME.MEASURABLE")
-        .then(panels => vm.panels = panels);
+        .findByGroups(_.chain(measurableKindNames)
+            .keys()
+            .map(kind => `HOME.${kind}`)
+            .value())
+        .then(panels => vm.panelsByKind = _.groupBy(
+            panels,
+            panel => panel.group.replace("HOME.", "")));
 
     svgStore
-        .findByGroup('MEASURABLE')
-        .then(xs => vm.diagrams = xs);
+        .findByGroups(_.keys(measurableKindNames))
+        .then(diagrams => vm.diagramsByKind = _.groupBy(diagrams, 'group'));
 
     vm.blockProcessor = b => {
-        b.block.onclick = () => $state.go('main.measurable.view', { id: b.value });
-        angular.element(b.block).addClass('clickable');
+        const extId = b.value;
+        const measurable = vm.measurablesByExternalId[extId];
+        if (measurable) {
+            b.block.onclick = () => $state.go('main.measurable.view', { id: measurable.id });
+            angular.element(b.block).addClass('clickable');
+        } else {
+            console.log(`MeasurableList: Could not find measurable with external id: ${extId}`, b)
+        }
     };
 
 }

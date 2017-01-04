@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotEmptyString;
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
 
@@ -60,13 +60,13 @@ public class InvolvementService {
 
 
     public List<Application> findDirectApplicationsByEmployeeId(String employeeId) {
-        checkNotEmptyString(employeeId, "employeeId cannot be empty");
+        checkNotEmpty(employeeId, "employeeId cannot be empty");
         return time("IS.findDirectApplicationsByEmployeeId", () -> dao.findDirectApplicationsByEmployeeId(employeeId));
     }
 
 
     public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
-        checkNotEmptyString(employeeId, "employeeId cannot be empty");
+        checkNotEmpty(employeeId, "employeeId cannot be empty");
         return time("IS.findAllApplicationsByEmployeeId", () -> dao.findAllApplicationsByEmployeeId(employeeId));
     }
 
@@ -79,7 +79,7 @@ public class InvolvementService {
 
 
     public List<Involvement> findByEmployeeId(String employeeId) {
-        checkNotEmptyString(employeeId, "employeeId cannot be empty");
+        checkNotEmpty(employeeId, "employeeId cannot be empty");
         return dao.findByEmployeeId(employeeId);
     }
 
@@ -91,7 +91,7 @@ public class InvolvementService {
 
 
     public Collection<ChangeInitiative> findDirectChangeInitiativesByEmployeeId(String employeeId) {
-        checkNotEmptyString(employeeId, "employeeId cannot be empty");
+        checkNotEmpty(employeeId, "employeeId cannot be empty");
         return time("IS.findDirectChangeInitiativesByEmployeeId", () -> dao.findDirectChangeInitiativesByEmployeeId(employeeId));
     }
 

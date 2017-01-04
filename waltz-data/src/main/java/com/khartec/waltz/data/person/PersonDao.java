@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkNotEmptyString;
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
@@ -72,7 +72,7 @@ public class PersonDao {
 
 
     public Person getByEmployeeId(String employeeId) {
-        checkNotEmptyString(employeeId, "Cannot find person without an employeeId");
+        checkNotEmpty(employeeId, "Cannot find person without an employeeId");
         return dsl.select()
                 .from(PERSON)
                 .where(PERSON.EMPLOYEE_ID.eq(employeeId))
@@ -88,7 +88,7 @@ public class PersonDao {
 
 
     public List<Person> findDirectsByEmployeeId(String employeeId) {
-        checkNotEmptyString(employeeId, "Cannot find directs without an employeeId");
+        checkNotEmpty(employeeId, "Cannot find directs without an employeeId");
         return dsl.select()
                 .from(PERSON)
                 .where(dsl.renderInlined(PERSON.MANAGER_EMPLOYEE_ID.eq(employeeId)))
@@ -100,7 +100,7 @@ public class PersonDao {
      * Returned in order, immediate manager first
      **/
     public List<Person> findAllManagersByEmployeeId(String employeeId) {
-        checkNotEmptyString(employeeId, "Cannot find directs without an employeeId");
+        checkNotEmpty(employeeId, "Cannot find directs without an employeeId");
         return dsl.select(PERSON.fields())
                 .from(PERSON)
                 .join(PERSON_HIERARCHY)

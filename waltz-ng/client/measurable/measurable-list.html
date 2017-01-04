@@ -33,18 +33,24 @@
 
                         <br>
 
-                        <waltz-svg-diagrams diagrams="tab.diagrams"
-                                            block-processor="ctrl.blockProcessor">
-                        </waltz-svg-diagrams>
+                        <!-- DIAGRAMS -->
+                        <div class="row" ng-if="ctrl.diagramsByKind[tab.kind.code].length > 0">
+                            <div class="col-sm-12">
+                                <waltz-svg-diagrams diagrams="ctrl.diagramsByKind[tab.kind.code]"
+                                                    block-processor="ctrl.blockProcessor">
+                                </waltz-svg-diagrams>
+                                <hr>
+                            </div>
+                        </div>
 
-                        <br>
-
-                        <div>
-                            <treecontrol class="tree-light"
-                                         tree-model="tab.treeData"
-                                         options="ctrl.treeOptions"
-                                         expanded-nodes="tab.expandedNodes"
-                                         order-by="'-name'">
+                        <div class="row">
+                            <!-- TREE -->
+                            <div class="col-sm-7">
+                                <treecontrol class="tree-light"
+                                             tree-model="tab.treeData"
+                                             options="ctrl.treeOptions"
+                                             expanded-nodes="tab.expandedNodes"
+                                             order-by="'-name'">
 
                                 <span title="{{ node.description }}"
                                       ng-class="{ 'text-muted': node.rating == null }"
@@ -62,17 +68,23 @@
                                         </span>
                                     </a>
                                 </span>
-                            </treecontrol>
+                                </treecontrol>
+                            </div>
+
+                            <!-- PANELS -->
+                            <div class="col-sm-5">
+                                <h5 ng-bind="tab.kind.description">
+                                </h5>
+
+                                <waltz-static-panels render-mode="chromeless"
+                                                     panels="ctrl.panelsByKind[tab.kind.code]">
+                                </waltz-static-panels>
+                            </div>
                         </div>
 
-                        <br>
-
-                        <p class="text-muted small"
-                           ng-bind="tab.kind.description"></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </div>

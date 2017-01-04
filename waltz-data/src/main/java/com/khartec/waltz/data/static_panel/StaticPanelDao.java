@@ -18,6 +18,8 @@ import static com.khartec.waltz.schema.tables.StaticPanel.STATIC_PANEL;
 public class StaticPanelDao {
 
     private final DSLContext dsl;
+
+
     private RecordMapper<Record, StaticPanel> panelMapper = r -> {
         StaticPanelRecord record = r.into(STATIC_PANEL);
         return ImmutableStaticPanel.builder()
@@ -39,10 +41,10 @@ public class StaticPanelDao {
     }
 
 
-    public List<StaticPanel> findByGroup(String group) {
+    public List<StaticPanel> findByGroups(String... groups) {
         return dsl.select(STATIC_PANEL.fields())
                 .from(STATIC_PANEL)
-                .where(STATIC_PANEL.GROUP.eq(group))
+                .where(STATIC_PANEL.GROUP.in(groups))
                 .orderBy(STATIC_PANEL.PRIORITY.asc())
                 .fetch(panelMapper);
     }

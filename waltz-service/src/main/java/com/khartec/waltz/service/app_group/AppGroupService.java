@@ -185,7 +185,7 @@ public class AppGroupService {
 
 
     public Collection<AppGroup> findByIds(String user, List<Long> ids) {
-        Checks.checkNotEmptyString(user, "user cannot be empty");
+        Checks.checkNotEmpty(user, "user cannot be empty");
         checkNotNull(ids, "ids cannot be null");
         return appGroupDao.findByIds(user, ids);
     }

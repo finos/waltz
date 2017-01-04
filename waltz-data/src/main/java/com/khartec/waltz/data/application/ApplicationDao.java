@@ -38,7 +38,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.Checks.checkNotEmptyString;
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -146,7 +146,7 @@ public class ApplicationDao {
 
     public AppRegistrationResponse registerApp(AppRegistrationRequest request) {
 
-        checkNotEmptyString(request.name(), "Cannot register app with no name");
+        checkNotEmpty(request.name(), "Cannot register app with no name");
 
         LOG.info("Registering new application: "+request);
 

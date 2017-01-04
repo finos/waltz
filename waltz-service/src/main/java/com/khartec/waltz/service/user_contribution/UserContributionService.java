@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotEmptyString;
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
@@ -48,7 +48,7 @@ public class UserContributionService {
 
 
     public List<Tally<String>> findScoresForDirectReports(String userId) {
-        checkNotEmptyString(userId, "userId cannot be empty");
+        checkNotEmpty(userId, "userId cannot be empty");
 
         Person person = personDao.findPersonByUserId(userId);
         if (person == null) {

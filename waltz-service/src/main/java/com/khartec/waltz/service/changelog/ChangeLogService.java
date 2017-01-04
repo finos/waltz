@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.Checks.checkNotEmptyString;
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
 
@@ -56,7 +56,7 @@ public class ChangeLogService {
 
 
     public List<ChangeLog> findByUser(String userName) {
-        checkNotEmptyString(userName, "Username cannot be empty");
+        checkNotEmpty(userName, "Username cannot be empty");
         return changeLogDao.findByUser(userName);
     }
 

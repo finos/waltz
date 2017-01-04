@@ -28,7 +28,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotEmptyString;
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 
@@ -51,7 +51,7 @@ public class AccessLogService {
 
 
     public List<AccessLog> findForUserId(String userId) {
-        checkNotEmptyString(userId, "UserId must not be empty");
+        checkNotEmpty(userId, "UserId must not be empty");
         return accessLogDao.findForUserId(userId);
     }
 

@@ -59,10 +59,10 @@ public class SvgDiagramDao {
     }
 
 
-    public List<SvgDiagram> findByGroup(String group) {
-        return FunctionUtilities.time("SDD.findByGroup", () -> dsl.select()
+    public List<SvgDiagram> findByGroups(String[] groups) {
+        return FunctionUtilities.time("SDD.findByGroups", () -> dsl.select()
                 .from(SVG_DIAGRAM)
-                .where(SVG_DIAGRAM.GROUP.eq(group))
+                .where(SVG_DIAGRAM.GROUP.in(groups))
                 .orderBy(SVG_DIAGRAM.PRIORITY.asc())
                 .fetch(svgMapper));
     }

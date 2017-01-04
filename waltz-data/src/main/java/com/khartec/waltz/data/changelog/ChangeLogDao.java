@@ -38,7 +38,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.Checks.checkNotEmptyString;
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.*;
 import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
@@ -90,7 +90,7 @@ public class ChangeLogDao {
 
 
     public List<ChangeLog> findByUser(String userName) {
-        checkNotEmptyString(userName, "Username cannot be empty");
+        checkNotEmpty(userName, "Username cannot be empty");
 
         return dsl.select()
                 .from(CHANGE_LOG)

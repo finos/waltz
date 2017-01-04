@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotEmptyString;
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
 
@@ -48,7 +48,7 @@ public class PersonService {
 
 
     public Person getByEmployeeId(String employeeId) {
-        checkNotEmptyString(employeeId, "Cannot find person without an employeeId");
+        checkNotEmpty(employeeId, "Cannot find person without an employeeId");
         return personDao.getByEmployeeId(employeeId);
     }
 
@@ -59,7 +59,7 @@ public class PersonService {
 
 
     public List<Person> findDirectsByEmployeeId(String employeeId) {
-        checkNotEmptyString(employeeId, "Cannot find directs without an employeeId");
+        checkNotEmpty(employeeId, "Cannot find directs without an employeeId");
         return time("PS.findDirectsByEmployeeId", () -> personDao.findDirectsByEmployeeId(employeeId));
     }
 
@@ -68,7 +68,7 @@ public class PersonService {
      * Returned in order, immediate manager first
      **/
     public List<Person> findAllManagersByEmployeeId(String employeeId) {
-        checkNotEmptyString(employeeId, "Cannot find directs without an employeeId");
+        checkNotEmpty(employeeId, "Cannot find directs without an employeeId");
         return time("PS.findAllManagersByEmployeeId", () -> personDao.findAllManagersByEmployeeId(employeeId));
     }
 

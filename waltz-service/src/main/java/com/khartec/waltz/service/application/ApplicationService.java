@@ -43,7 +43,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkNotEmptyString;
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static java.util.Collections.emptyMap;
 
@@ -111,7 +111,7 @@ public class ApplicationService {
 
 
     public AppRegistrationResponse registerApp(AppRegistrationRequest request) {
-        checkNotEmptyString(request.name(), "Cannot register app with no name");
+        checkNotEmpty(request.name(), "Cannot register app with no name");
         AppRegistrationResponse response = applicationDao.registerApp(request);
 
         if (response.registered()) {
