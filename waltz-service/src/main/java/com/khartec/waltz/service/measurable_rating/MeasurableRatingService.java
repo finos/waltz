@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.service.measurable_rating;
 
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
@@ -30,6 +31,7 @@ import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
+import com.khartec.waltz.model.tally.MeasurableRatingTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Record1;
@@ -51,6 +53,7 @@ public class MeasurableRatingService {
     private final MeasurableRatingDao measurableRatingDao;
     private final MeasurableDao measurableDao;
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory;
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
     private final ChangeLogService changeLogService;
 
 
@@ -58,15 +61,18 @@ public class MeasurableRatingService {
     public MeasurableRatingService(MeasurableRatingDao measurableRatingDao,
                                    MeasurableDao measurableDao,
                                    MeasurableIdSelectorFactory measurableIdSelectorFactory,
+                                   ApplicationIdSelectorFactory applicationIdSelectorFactory, 
                                    ChangeLogService changeLogService) {
         checkNotNull(measurableRatingDao, "measurableRatingDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(measurableIdSelectorFactory, "measurableIdSelectorFactory cannot be null");
+        checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.measurableRatingDao = measurableRatingDao;
         this.measurableDao = measurableDao;
         this.measurableIdSelectorFactory = measurableIdSelectorFactory;
+        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
         this.changeLogService = changeLogService;
     }
 
@@ -122,6 +128,13 @@ public class MeasurableRatingService {
 
     public List<Tally<Long>> tallyByMeasurableId() {
         return measurableRatingDao.tallyByMeasurableId();
+    }
+
+
+    public List<MeasurableRatingTally> statsByAppSelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
+        return measurableRatingDao.statsByAppSelector(selector);
     }
 
 

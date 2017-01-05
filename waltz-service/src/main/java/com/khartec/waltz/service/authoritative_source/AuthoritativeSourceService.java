@@ -23,7 +23,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
-import com.khartec.waltz.model.authoritativesource.Rating;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorRatingsService;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.data_type.DataTypeService;
@@ -93,7 +93,7 @@ public class AuthoritativeSourceService {
     }
 
 
-    public int update(long id, Rating rating) {
+    public int update(long id, AuthoritativenessRating rating) {
         int updateCount = authoritativeSourceDao.update(id, rating);
         AuthoritativeSource updatedAuthSource = getById(id);
         ratingService.updateRatingsForAuthSource(updatedAuthSource.dataType(), updatedAuthSource.parentReference());
@@ -101,7 +101,7 @@ public class AuthoritativeSourceService {
     }
 
 
-    public int insert(EntityReference parentRef, String dataTypeCode, Long appId, Rating rating) {
+    public int insert(EntityReference parentRef, String dataTypeCode, Long appId, AuthoritativenessRating rating) {
         int insertedCount = authoritativeSourceDao.insert(parentRef, dataTypeCode, appId, rating);
         ratingService.updateRatingsForAuthSource(dataTypeCode, parentRef);
         return insertedCount;

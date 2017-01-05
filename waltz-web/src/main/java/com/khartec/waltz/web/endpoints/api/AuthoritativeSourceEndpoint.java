@@ -23,7 +23,7 @@ import com.khartec.waltz.model.Entry;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
-import com.khartec.waltz.model.authoritativesource.Rating;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.user.Role;
@@ -111,7 +111,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         postForDatum(mkPath(BASE_URL, "id", ":id"), (request, response) -> {
             requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
             String ratingStr = request.body();
-            Rating rating = Rating.valueOf(ratingStr);
+            AuthoritativenessRating rating = AuthoritativenessRating.valueOf(ratingStr);
             authoritativeSourceService.update(getId(request), rating);
             return "done";
         });
@@ -150,7 +150,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
             Long appId = getLong(request, "appId");
 
             String ratingStr = request.body();
-            Rating rating = Rating.valueOf(ratingStr);
+            AuthoritativenessRating rating = AuthoritativenessRating.valueOf(ratingStr);
 
             authoritativeSourceService.insert(parentRef, dataType, appId, rating);
             return "done";

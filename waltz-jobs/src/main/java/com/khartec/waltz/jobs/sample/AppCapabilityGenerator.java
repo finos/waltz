@@ -21,7 +21,7 @@ import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.data.app_capability.AppCapabilityDao;
 import com.khartec.waltz.model.application_capability.ImmutableApplicationCapability;
 import com.khartec.waltz.model.capability.Capability;
-import com.khartec.waltz.model.capabilityrating.RagRating;
+import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.capability.CapabilityService;

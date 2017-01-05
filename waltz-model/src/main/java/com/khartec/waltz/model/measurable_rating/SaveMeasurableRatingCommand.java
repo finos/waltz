@@ -21,7 +21,7 @@ package com.khartec.waltz.model.measurable_rating;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
-import com.khartec.waltz.model.capabilityrating.RagRating;
+import com.khartec.waltz.model.rating.RagRating;
 import org.immutables.value.Value;
 
 @Value.Immutable

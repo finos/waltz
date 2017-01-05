@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.LastUpdatedProvider;
 import com.khartec.waltz.model.ProvenanceProvider;
-import com.khartec.waltz.model.capabilityrating.RagRating;
+import com.khartec.waltz.model.rating.RagRating;
 import org.immutables.value.Value;
 
 @Deprecated

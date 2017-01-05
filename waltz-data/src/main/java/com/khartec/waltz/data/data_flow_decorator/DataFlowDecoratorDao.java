@@ -4,7 +4,7 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.authoritativesource.Rating;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableDataFlowDecorator;
@@ -41,7 +41,7 @@ public class DataFlowDecoratorDao {
                         .id(record.getDecoratorEntityId())
                         .kind(EntityKind.valueOf(record.getDecoratorEntityKind()))
                         .build())
-                .rating(Rating.valueOf(record.getRating()))
+                .rating(AuthoritativenessRating.valueOf(record.getRating()))
                 .provenance(record.getProvenance())
                 .build();
     };
@@ -168,7 +168,7 @@ public class DataFlowDecoratorDao {
                     long decoratorEntityId = r.getValue(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID);
 
                     EntityReference decoratorRef = EntityReference.mkRef(decoratorEntityKind, decoratorEntityId);
-                    Rating rating = Rating.valueOf(r.getValue(DATA_FLOW_DECORATOR.RATING));
+                    AuthoritativenessRating rating = AuthoritativenessRating.valueOf(r.getValue(DATA_FLOW_DECORATOR.RATING));
                     Integer count = r.getValue(countField);
 
                     return ImmutableDecoratorRatingSummary.builder()

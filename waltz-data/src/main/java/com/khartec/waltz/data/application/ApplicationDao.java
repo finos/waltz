@@ -21,7 +21,7 @@ package com.khartec.waltz.data.application;
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.application.*;
-import com.khartec.waltz.model.capabilityrating.RagRating;
+import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ApplicationRecord;
 import org.jooq.*;

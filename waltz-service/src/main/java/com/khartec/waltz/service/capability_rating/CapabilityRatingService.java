@@ -22,7 +22,7 @@ import com.khartec.waltz.data.capability_rating.CapabilityRatingDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.capabilityrating.CapabilityRating;
-import com.khartec.waltz.model.capabilityrating.RagRating;
+import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.model.capabilityrating.RatingChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

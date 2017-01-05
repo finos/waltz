@@ -1,0 +1,37 @@
+<div>
+    <div class="waltz-tabs">
+        <input type="radio"
+               ng-repeat-start="tab in $ctrl.tabs"
+               ng-model="$ctrl.visibility.tab"
+               ng-value="tab.kind"
+               ng-disabled="tab.treeData.length === 0"
+               name="tab"
+               id="{{ tab.kind + $id}}">
+        <label for="{{ tab.kind + $id}}"
+               ng-repeat-end
+               ng-bind="tab.name">
+        </label>
+
+        <div ng-repeat="tab in $ctrl.tabs"
+             ng-class="{ 'wt-active': tab.kind == $ctrl.visibility.tab }"
+             class="wt-tab">
+            <br>
+            <treecontrol class="tree-light"
+                         tree-model="tab.treeData"
+                         expanded-nodes="[]"
+                         options="$ctrl.treeOptions"
+                         on-selection="$ctrl.onSelect(node)"
+                         order-by="'-name'">
+                <span title="{{ node.description }}"
+                      ng-class="{ 'text-muted': node.ratings.total == 0 }"
+                      class="no-overflow">
+                    <span ng-bind="node.name"
+                          ng-class="{ 'italics' : ! node.concrete }">
+                    </span>
+                    <code>{{ node.ratings | json }}</code>
+                </span>
+            </treecontrol>
+        </div>
+
+    </div>
+</div>

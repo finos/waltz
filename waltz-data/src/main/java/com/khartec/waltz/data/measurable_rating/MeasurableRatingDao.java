@@ -20,17 +20,16 @@ package com.khartec.waltz.data.measurable_rating;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.measurable_rating.ImmutableMeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
+import com.khartec.waltz.model.rating.RagRating;
+import com.khartec.waltz.model.tally.ImmutableMeasurableRatingTally;
+import com.khartec.waltz.model.tally.MeasurableRatingTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.MeasurableRatingRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.RecordMapper;
-import org.jooq.Select;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -62,6 +61,19 @@ public class MeasurableRatingDao {
                 .build();
     };
 
+
+    private static final RecordMapper<Record3<Long,String,Integer>, MeasurableRatingTally> TO_TALLY_MAPPER = record -> {
+        Long measurableId = record.value1();
+        RagRating rating = RagRating.valueOf(record.value2());
+        Integer count = record.value3();
+
+        return ImmutableMeasurableRatingTally.builder()
+                .id(measurableId)
+                .rating(rating)
+                .count(count)
+                .build();
+    };
+
     private final Function<SaveMeasurableRatingCommand, MeasurableRatingRecord> TO_RECORD_MAPPER = command -> {
         MeasurableRatingRecord record = new MeasurableRatingRecord();
         record.setEntityId(command.entityReference().id());
@@ -73,6 +85,7 @@ public class MeasurableRatingDao {
         record.setLastUpdatedBy(command.lastUpdate().by());
         return record;
     };
+
 
     private final DSLContext dsl;
 
@@ -131,6 +144,16 @@ public class MeasurableRatingDao {
                 MEASURABLE_RATING,
                 MEASURABLE_RATING.MEASURABLE_ID,
                 DSL.trueCondition());
+    }
+
+
+    public List<MeasurableRatingTally> statsByAppSelector(Select<Record1<Long>> selector) {
+        return dsl.select(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.RATING, DSL.count())
+                .from(MEASURABLE_RATING)
+                .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(MEASURABLE_RATING.ENTITY_ID.in(selector))
+                .groupBy(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.RATING)
+                .fetch(TO_TALLY_MAPPER);
     }
 
 }
