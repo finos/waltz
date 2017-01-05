@@ -423,4 +423,121 @@
         </sql>
     </changeSet>
 
+
+    <!-- 1327: Add CHILD_KIND and OPERATION to CHANGE_LOG -->
+    <changeSet id="20170105-1327-1"
+               author="rovats">
+        <addColumn tableName="change_log">
+            <column name="child_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20170105-1327-2"
+               author="rovats">
+        <addColumn tableName="change_log">
+            <column name="operation"
+                    defaultValue="UNKNOWN"
+                    type="${enum.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20170105-1327-3"
+               author="rovats">
+        <sql>
+            UPDATE change_log SET
+                child_kind = 'BOOKMARK',
+                operation = CASE
+                                WHEN message like 'Added%'
+                                    THEN 'ADD'
+                                WHEN message like 'Updated%'
+                                    THEN 'UPDATE'
+                                WHEN message LIKE 'Deleted%'
+                                    THEN 'REMOVE'
+                            END
+            WHERE message LIKE '%bookmark%';
+        </sql>
+        <sql>
+            UPDATE change_log SET
+                child_kind = 'PHYSICAL_FLOW',
+                operation = CASE
+                                WHEN message like 'Creating%'
+                                    THEN 'ADD'
+                                WHEN message LIKE '%deleted%'
+                                    THEN 'REMOVE'
+                                ELSE 'UPDATE'
+                            END
+            WHERE message LIKE 'Physical flow%'
+                    or message LIKE '%physical flow%'
+        </sql>
+        <sql>
+            UPDATE change_log SET
+                child_kind = 'PHYSICAL_SPECIFICATION',
+                operation = 'REMOVE'
+            WHERE message LIKE 'Specification%'
+        </sql>
+        <sql>
+            UPDATE change_log SET
+                child_kind = 'LOGICAL_DATA_FLOW',
+                operation = CASE
+                                WHEN message like 'Flow added%'
+                                    THEN 'ADD'
+                                WHEN message LIKE 'Flow removed%'
+                                    THEN 'REMOVE'
+                                ELSE 'UPDATE'
+                            END
+            WHERE message LIKE '%characteristics%for flow%'
+                    or message LIKE 'Flow%between%'
+        </sql>
+        <sql>
+            UPDATE change_log SET
+                child_kind = 'CAPABILITY',
+                operation = CASE
+                                WHEN message like 'Adding capability%'
+                                    THEN 'ADD'
+                                WHEN message LIKE 'Removed capability%'
+                                    THEN 'REMOVE'
+                                ELSE 'UPDATE'
+                            END
+            WHERE parent_kind = 'APPLICATION'
+                    and message LIKE '%capability%'
+        </sql>
+        <sql>
+            UPDATE change_log SET
+                operation = 'UPDATE'
+            WHERE parent_kind = 'APPLICATION'
+                    and child_kind IS NULL
+        </sql>
+        <sql>
+            UPDATE change_log SET
+                child_kind = CASE
+                                WHEN message LIKE 'Subscribed %'
+                                        or message LIKE 'Unsubscribed %'
+                                        or message LIKE 'Added owner %'
+                                    THEN 'PERSON'
+                                WHEN message LIKE '% application %'
+                                    THEN 'APPLICATION'
+                                WHEN message like '%change initiative%'
+                                    THEN 'CHANGE_INITIATIVE'
+                            END,
+                operation = CASE
+                                WHEN message like 'Subscribed %'
+                                        or message like 'Added %'
+                                        or message like 'Created %'
+                                        or message like 'Associated %'
+                                    THEN 'ADD'
+                                WHEN message LIKE 'Unsubscribed %'
+                                        or message LIKE 'Deleted group%'
+                                        or message LIKE 'Removed %'
+                                    THEN 'REMOVE'
+                                ELSE 'UPDATE'
+                            END
+            WHERE parent_kind = 'APP_GROUP'
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
