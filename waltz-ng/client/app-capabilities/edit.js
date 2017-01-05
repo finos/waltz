@@ -27,7 +27,6 @@ const controller = function(appCapabilityStore,
     const vm = this;
     const id = $stateParams.id;
 
-
     const refresh = () => appCapabilityStore
         .findCapabilitiesByApplicationId(id)
         .then(usages =>  vm.usages = usages);

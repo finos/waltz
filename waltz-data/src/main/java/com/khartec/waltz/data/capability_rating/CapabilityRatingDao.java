@@ -22,7 +22,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.capabilityrating.CapabilityRating;
 import com.khartec.waltz.model.capabilityrating.ImmutableCapabilityRating;
-import com.khartec.waltz.model.capabilityrating.RagRating;
+import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.model.capabilityrating.RatingChange;
 import com.khartec.waltz.schema.tables.records.PerspectiveRatingRecord;
 import org.jooq.*;

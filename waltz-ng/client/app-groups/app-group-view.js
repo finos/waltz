@@ -19,55 +19,7 @@
 import _ from "lodash";
 
 
-/**
- * Calculates the set of capabilities required to
- * fully describe a given set of app capabilities.
- * This may include parent capabilities of the
- * explicit capabilities.
- *
- * @param appCapabilities
- * @param allCapabilities
- * @returns {*}
- */
-function includeParentCapabilities(appCapabilities, allCapabilities) {
-    const capabilitiesById = _.keyBy(allCapabilities, 'id');
-
-    const toCapabilityId = appCap => appCap.capabilityId;
-    const lookupCapability = id => capabilitiesById[id];
-    const extractParentIds = c => ([c.level1, c.level2, c.level3, c.level4, c.level5]);
-
-    return _.chain(appCapabilities)
-        .map(toCapabilityId)
-        .map(lookupCapability)
-        .map(extractParentIds)
-        .flatten()
-        .compact()
-        .uniq()
-        .map(lookupCapability)
-        .compact()
-        .value();
-}
-
-
-function calculateCapabilities(allCapabilities, appCapabilities) {
-    const explicitCapabilityIds = _.chain(appCapabilities)
-            .map('capabilityId')
-            .uniq()
-            .value();
-
-    const capabilities = includeParentCapabilities(appCapabilities, allCapabilities);
-
-    return {
-        initiallySelectedIds: explicitCapabilityIds,
-        explicitCapabilityIds,
-        capabilities
-    };
-}
-
-
 const initialState = {
-    allCapabilities: [],
-    appCapabilities: [],
     applications: [],
     assetCostData: null,
     bookmarks: [],
@@ -97,29 +49,28 @@ const initialState = {
 function controller($scope,
                     $q,
                     $stateParams,
-                    appCapabilityStore,
                     appGroupStore,
                     appStore,
                     assetCostViewService,
                     bookmarkStore,
-                    capabilityStore,
                     changeInitiativeStore,
                     changeLogStore,
                     complexityStore,
                     entityStatisticStore,
                     historyStore,
                     logicalFlowViewService,
+                    measurableStore,
+                    measurableRatingStore,
                     physicalFlowLineageStore,
                     sourceDataRatingStore,
                     technologyStatsService,
                     userService) {
-    const { id }  = $stateParams;
 
+    const { id }  = $stateParams;
 
     const vm = Object.assign(this, initialState);
 
-
-    const appIdSelector = {
+    const idSelector = {
         entityReference: {
             kind: 'APP_GROUP',
             id: id
@@ -127,18 +78,25 @@ function controller($scope,
         scope: 'EXACT'
     };
 
-    vm.entityRef = appIdSelector.entityReference;
+    vm.entityRef = idSelector.entityReference;
 
-    const isUserAnOwner = member =>
-            member.role === 'OWNER'
-            && member.userId === vm.user.userName;
+
+    // -- LOAD ---
+
+    measurableStore
+        .findMeasurablesBySelector(idSelector)
+        .then(measurables => vm.measurables = measurables);
+
+    measurableRatingStore
+        .statsByAppSelector(idSelector)
+        .then(ratings => vm.measurableRatings = ratings);
 
     logicalFlowViewService
         .initialise(id, 'APP_GROUP', 'EXACT')
         .then(flows => vm.dataFlows = flows);
 
     assetCostViewService
-        .initialise(appIdSelector, 2016)
+        .initialise(idSelector, 2016)
         .then(costs => vm.assetCostData = costs);
 
     bookmarkStore
@@ -148,7 +106,6 @@ function controller($scope,
     changeInitiativeStore
         .findByRef("APP_GROUP", id)
         .then(list => vm.changeInitiatives = list);
-
 
     appGroupStore.getById(id)
         .then(groupDetail => vm.groupDetail = groupDetail)
@@ -160,24 +117,17 @@ function controller($scope,
         .then(appIds => $q.all([
             appStore.findByIds(appIds),
             complexityStore.findBySelector(id, 'APP_GROUP', 'EXACT'),
-            capabilityStore.findAll(),
-            appCapabilityStore.findApplicationCapabilitiesByAppIdSelector(appIdSelector),
             technologyStatsService.findBySelector(id, 'APP_GROUP', 'EXACT')
         ]))
         .then(([
             apps,
             complexity,
-            allCapabilities,
-            appCapabilities,
             techStats
         ]) => {
             vm.applications = _.map(apps, a => _.assign(a, {management: 'IT'}));
             vm.complexity = complexity;
-            vm.allCapabilities = allCapabilities;
-            vm.appCapabilities = appCapabilities;
             vm.techStats = techStats;
         })
-        .then(() => calculateCapabilities(vm.allCapabilities, vm.appCapabilities))
         .then(result => Object.assign(vm, result))
         .then(() => sourceDataRatingStore.findAll())
         .then((sourceDataRatings) => vm.sourceDataRatings = sourceDataRatings)
@@ -187,6 +137,17 @@ function controller($scope,
     userService
         .whoami()
         .then(u => vm.user = u);
+
+    physicalFlowLineageStore
+        .findLineageReportsBySelector(idSelector)
+        .then(lineageReports => vm.lineageReports = lineageReports);
+
+    entityStatisticStore
+        .findAllActiveDefinitions()
+        .then(definitions => vm.entityStatisticDefinitions = definitions);
+
+
+    // -- INTERACT ---
 
     vm.isGroupEditable = () => {
         if (!vm.groupDetail) return false;
@@ -205,17 +166,16 @@ function controller($scope,
         .loadDetail()
         .then(flowData => vm.dataFlows = flowData);
 
-    entityStatisticStore
-        .findAllActiveDefinitions()
-        .then(definitions => vm.entityStatisticDefinitions = definitions);
-
     vm.lineageTableInitialised = (api) => {
         vm.exportLineageReports = api.export;
     };
 
-    physicalFlowLineageStore
-        .findLineageReportsBySelector(appIdSelector)
-        .then(lineageReports => vm.lineageReports = lineageReports);
+
+    // -- HELPER ---
+
+    const isUserAnOwner = member =>
+        member.role === 'OWNER'
+        && member.userId === vm.user.userName;
 
 }
 
@@ -224,18 +184,18 @@ controller.$inject = [
     '$scope',
     '$q',
     '$stateParams',
-    'AppCapabilityStore',
     'AppGroupStore',
     'ApplicationStore',
     'AssetCostViewService',
     'BookmarkStore',
-    'CapabilityStore',
     'ChangeInitiativeStore',
     'ChangeLogStore',
     'ComplexityStore',
     'EntityStatisticStore',
     'HistoryStore',
     'LogicalFlowViewService',
+    'MeasurableStore',
+    'MeasurableRatingStore',
     'PhysicalFlowLineageStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService',

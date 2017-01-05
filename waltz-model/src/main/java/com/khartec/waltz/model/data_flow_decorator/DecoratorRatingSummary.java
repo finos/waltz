@@ -3,7 +3,7 @@ package com.khartec.waltz.model.data_flow_decorator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.authoritativesource.Rating;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import org.immutables.value.Value;
 
 
@@ -13,7 +13,7 @@ import org.immutables.value.Value;
 public abstract class DecoratorRatingSummary {
 
     public abstract EntityReference decoratorEntityReference();
-    public abstract Rating rating();
+    public abstract AuthoritativenessRating rating();
     public abstract int count();
 
 }

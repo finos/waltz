@@ -23,7 +23,7 @@ import com.khartec.waltz.model.application.AppRegistrationRequest;
 import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.application.ImmutableAppRegistrationRequest;
 import com.khartec.waltz.model.application.LifecyclePhase;
-import com.khartec.waltz.model.capabilityrating.RagRating;
+import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.CodedReference;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.rating.RagRating;
 import org.immutables.value.Value;
 
 

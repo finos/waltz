@@ -15,13 +15,13 @@
  *     along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.authoritativesource;
+package com.khartec.waltz.model.rating;
 
-public enum Rating {
+public enum RagRating {
 
-    PRIMARY,
-    SECONDARY,
-    NO_OPINION,
-    DISCOURAGED
+    R,
+    A,
+    G,
+    Z
 
 }

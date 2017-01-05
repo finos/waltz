@@ -3,6 +3,7 @@ package com.khartec.waltz.model.authoritativesource;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import org.immutables.value.Value;
 
 
@@ -15,6 +16,6 @@ public abstract class AuthoritativeRatingVantagePoint {
     public abstract int rank();
     public abstract String dataTypeCode();
     public abstract Long applicationId();
-    public abstract Rating rating();
+    public abstract AuthoritativenessRating rating();
 
 }

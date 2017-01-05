@@ -23,13 +23,9 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.measurable.MeasurableService;
-import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -47,29 +43,23 @@ public class MeasurableHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         MeasurableIdSelectorFactory factory = ctx.getBean(MeasurableIdSelectorFactory.class);
-        ApplicationService applicationService = ctx.getBean(ApplicationService.class);
-        MeasurableRatingService measurableRatingService = ctx.getBean(MeasurableRatingService.class);
         MeasurableService measurableService = ctx.getBean(MeasurableService.class);
 
         EntityReference ref = mkRef(
-                EntityKind.MEASURABLE,
-                481);
+                EntityKind.APP_GROUP,
+                3);
 
         IdSelectionOptions options = mkOpts(
                 ref,
-                HierarchyQueryScope.CHILDREN);
+                HierarchyQueryScope.EXACT);
 
         Select<Record1<Long>> selector = factory.apply(options);
 
+        System.out.println("--selector");
         System.out.println(selector);
+        System.out.println("---");
 
-        List<Application> apps = applicationService.findByAppIdSelector(options);
-        apps.forEach(System.out::println);
-
-        List<MeasurableRating> ratings = measurableRatingService.findByMeasurableIdSelector(options);
-        ratings.forEach(System.out::println);
-
-        List<Measurable> measurables = measurableService.findByMeasurableIdSelector(mkOpts(ref, HierarchyQueryScope.PARENTS));
+        List<Measurable> measurables = measurableService.findByMeasurableIdSelector(options);
         measurables.forEach(System.out::println);
 
 

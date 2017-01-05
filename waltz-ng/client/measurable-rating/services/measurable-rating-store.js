@@ -36,6 +36,14 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
+    const statsByAppSelector = (options) => {
+        checkIsIdSelector(options);
+        return $http
+            .post(`${baseUrl}/stats-by/app-selector`, options)
+            .then(d => d.data);
+    };
+
+
     const countByMeasurable = () => {
         return $http
             .get(`${baseUrl}/count-by/measurable`)
@@ -67,6 +75,7 @@ function store($http, baseApiUrl) {
         findByMeasurableSelector,
         findForEntityReference,
         countByMeasurable,
+        statsByAppSelector,
         create,
         update,
         remove

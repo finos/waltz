@@ -9,7 +9,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.authoritativesource.Rating;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
@@ -147,7 +147,7 @@ public class DataFlowDecoratorService {
         Collection<DataFlowDecorator> unrated = map(
                 decoratorReferences,
                 ref -> ImmutableDataFlowDecorator.builder()
-                        .rating(Rating.NO_OPINION)
+                        .rating(AuthoritativenessRating.NO_OPINION)
                         .provenance("waltz")
                         .dataFlowId(flowId)
                         .decoratorEntity(ref)

@@ -22,8 +22,8 @@ import {scaleLinear} from 'd3-scale';
 import 'd3-selection-multi';
 
 const BINDINGS = {
-    scores: '=',
-    range: '='
+    scores: '<',
+    range: '<'
 };
 
 

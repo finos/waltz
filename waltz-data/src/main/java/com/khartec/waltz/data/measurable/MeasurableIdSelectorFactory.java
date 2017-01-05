@@ -21,13 +21,18 @@ package com.khartec.waltz.data.measurable;
 
 import com.khartec.waltz.data.entity_hierarchy.AbstractIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Select;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
+import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static java.lang.String.format;
 
 @Service
@@ -41,8 +46,41 @@ public class MeasurableIdSelectorFactory extends AbstractIdSelectorFactory {
 
     @Override
     protected Select<Record1<Long>> mkForOptions(IdSelectionOptions options) {
-        throw new UnsupportedOperationException(format(
-                "Cannot create measurable selector from kind: %s",
-                options.entityReference().kind()));
+        switch (options.entityReference().kind()) {
+            case APP_GROUP:
+                return mkForAppGroup(options);
+            default:
+                throw new UnsupportedOperationException(format(
+                        "Cannot create measurable selector from kind: %s",
+                        options.entityReference().kind()));
+        }
     }
+
+
+    private Select<Record1<Long>> mkForAppGroup(IdSelectionOptions options) {
+        checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate app-group based selectors with exact scopes");
+        return mkBaseRatingBasedSelector()
+                .innerJoin(APPLICATION_GROUP_ENTRY)
+                .on(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(MEASURABLE_RATING.ENTITY_ID)
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(options.entityReference().id()));
+    }
+
+
+    /**
+     * Returns ID's of all measurables (and their parents) related to a base set
+     * of ids provided by joining to MEASURE_RATING.  Use this by adding on additional
+     * joins or restrictions over the MEASURE_RATING table.
+     */
+    private SelectOnConditionStep<Record1<Long>> mkBaseRatingBasedSelector() {
+        return DSL
+                .selectDistinct(MEASURABLE.ID)
+                .from(MEASURABLE)
+                .innerJoin(ENTITY_HIERARCHY)
+                .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(MEASURABLE.ID))
+                .innerJoin(MEASURABLE_RATING)
+                .on(MEASURABLE_RATING.MEASURABLE_ID.eq(ENTITY_HIERARCHY.ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())));
+    }
+
 }

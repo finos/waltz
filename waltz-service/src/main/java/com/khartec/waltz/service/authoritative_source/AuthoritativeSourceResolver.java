@@ -2,7 +2,7 @@ package com.khartec.waltz.service.authoritative_source;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
-import com.khartec.waltz.model.authoritativesource.Rating;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 
 import java.util.Collection;
 import java.util.List;
@@ -52,13 +52,13 @@ public class AuthoritativeSourceResolver {
      * @param dataTypeCode  the data type in question
      * @return  How this should be rated
      */
-    public Rating resolve(EntityReference vantagePoint, EntityReference source, String dataTypeCode) {
+    public AuthoritativenessRating resolve(EntityReference vantagePoint, EntityReference source, String dataTypeCode) {
 
         Map<String, Map<Long, Optional<AuthoritativeRatingVantagePoint>>> ouGroup = byOuThenDataTypeThenApp.get(vantagePoint);
-        if(isEmpty(ouGroup)) return Rating.NO_OPINION;
+        if(isEmpty(ouGroup)) return AuthoritativenessRating.NO_OPINION;
 
         Map<Long, Optional<AuthoritativeRatingVantagePoint>> dataTypeGroup = ouGroup.get(dataTypeCode);
-        if(isEmpty(dataTypeGroup)) return Rating.NO_OPINION;
+        if(isEmpty(dataTypeGroup)) return AuthoritativenessRating.NO_OPINION;
 
         Optional<AuthoritativeRatingVantagePoint> maybeRating = dataTypeGroup.getOrDefault(
                 source.id(),
@@ -66,7 +66,7 @@ public class AuthoritativeSourceResolver {
 
         return maybeRating
                 .map(r -> r.rating())
-                .orElse(Rating.DISCOURAGED);
+                .orElse(AuthoritativenessRating.DISCOURAGED);
     }
 
 

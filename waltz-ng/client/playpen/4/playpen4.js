@@ -18,8 +18,6 @@
 
 
 
-
-
 const initialState = {
 
 };
@@ -30,17 +28,22 @@ function controller(measurableStore, measurableRatingStore) {
     const vm = Object.assign(this, initialState);
 
     const entityReference = {
-        id: 69,
-        kind: 'APPLICATION'
+        id: 3,
+        kind: 'APP_GROUP'
     };
 
-    const ratingPromise = measurableRatingStore
-        .findForEntityReference(entityReference)
-        .then(rs => vm.ratings = rs);
+    const idSelector = {
+        entityReference,
+        scope: 'EXACT'
+    };
 
-    const measurePromise = measurableStore
-        .findMeasurablesRelatedToPath(entityReference)
-        .then(ms => vm.measurables = ms);
+    measurableStore
+        .findMeasurablesBySelector(idSelector)
+        .then(measurables => vm.measurables = measurables);
+
+    measurableRatingStore
+        .statsByAppSelector(idSelector)
+        .then(ratings => vm.measurableRatings = ratings);
 
 }
 

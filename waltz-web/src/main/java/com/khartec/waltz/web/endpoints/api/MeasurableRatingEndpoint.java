@@ -19,8 +19,9 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.LastUpdate;
-import com.khartec.waltz.model.capabilityrating.RagRating;
 import com.khartec.waltz.model.measurable_rating.*;
+import com.khartec.waltz.model.rating.RagRating;
+import com.khartec.waltz.model.tally.MeasurableRatingTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
@@ -67,6 +68,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":measurableId");
         String findByMeasurableSelectorPath = mkPath(BASE_URL, "measurable-selector");
         String countByMeasurablePath = mkPath(BASE_URL, "count-by", "measurable");
+        String statsByAppSelectorPath = mkPath(BASE_URL, "stats-by", "app-selector");
 
         ListRoute<MeasurableRating> findForEntityRoute = (request, response)
                 -> measurableRatingService.findForEntity(getEntityReference(request));
@@ -77,12 +79,16 @@ public class MeasurableRatingEndpoint implements Endpoint {
         ListRoute<Tally<Long>> countByMeasurableRoute = (request, response)
                 -> measurableRatingService.tallyByMeasurableId();
 
+        ListRoute<MeasurableRatingTally> statsByAppSelectorRoute = (request, response)
+                -> measurableRatingService.statsByAppSelector(readIdSelectionOptionsFromBody(request));
+
         getForList(findForEntityPath, findForEntityRoute);
         postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);
         postForList(modifyPath, this::createRoute);
         putForList(modifyPath, this::updateRoute);
         deleteForList(modifyPath, this::removeRoute);
         getForList(countByMeasurablePath, countByMeasurableRoute);
+        postForList(statsByAppSelectorPath, statsByAppSelectorRoute);
     }
 
 

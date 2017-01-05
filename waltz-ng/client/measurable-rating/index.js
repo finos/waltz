@@ -23,16 +23,19 @@ export default () => {
     const module = angular.module('waltz.measurable.rating', []);
 
     module
-        .config(require('./routes'));
+        .config(require('./routes'))
+        ;
 
     module
-        .service('MeasurableRatingStore', require('./services/measurable-rating-store'));
+        .service('MeasurableRatingStore', require('./services/measurable-rating-store'))
+        ;
 
     module
         .component('waltzMeasurableRatingAppSection', require('./components/app-section/measurable-rating-app-section'))
         .component('waltzMeasurableRatingExplorerSection', require('./components/explorer-section/measurable-rating-explorer-section'))
         .component('waltzMeasurableRatingPanel', require('./components/panel/measurable-rating-panel'))
         .component('waltzMeasurableRatingTree', require('./components/tree/measurable-rating-tree'))
+        .component('waltzMeasurableRatingsBrowser', require('./components/browser/measurable-ratings-browser'))
         ;
 
     return module.name;

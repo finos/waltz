@@ -9,7 +9,7 @@ import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
-import com.khartec.waltz.model.authoritativesource.Rating;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableDataFlowDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
@@ -132,7 +132,7 @@ public class DataFlowDecoratorRatingsService {
                     if (decorator.decoratorEntity().kind() != EntityKind.DATA_TYPE) {
                         return decorator;
                     } else {
-                        Rating rating = lookupRating(
+                        AuthoritativenessRating rating = lookupRating(
                                 typesById,
                                 flowsById,
                                 targetAppsById,
@@ -146,11 +146,11 @@ public class DataFlowDecoratorRatingsService {
     }
 
 
-    private Rating lookupRating(Map<Long, DataType> typesById,
-                                Map<Long, LogicalFlow> flowsById,
-                                Map<Long, Application> targetAppsById,
-                                AuthoritativeSourceResolver resolver,
-                                DataFlowDecorator decorator) {
+    private AuthoritativenessRating lookupRating(Map<Long, DataType> typesById,
+                                                 Map<Long, LogicalFlow> flowsById,
+                                                 Map<Long, Application> targetAppsById,
+                                                 AuthoritativeSourceResolver resolver,
+                                                 DataFlowDecorator decorator) {
         LogicalFlow flow = flowsById.get(decorator.dataFlowId());
 
         EntityReference vantagePoint = lookupVantagePoint(targetAppsById, flow);

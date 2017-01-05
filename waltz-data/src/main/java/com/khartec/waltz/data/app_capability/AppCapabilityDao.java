@@ -25,7 +25,7 @@ import com.khartec.waltz.model.application_capability.ApplicationCapability;
 import com.khartec.waltz.model.application_capability.GroupedApplications;
 import com.khartec.waltz.model.application_capability.ImmutableApplicationCapability;
 import com.khartec.waltz.model.application_capability.ImmutableGroupedApplications;
-import com.khartec.waltz.model.capabilityrating.RagRating;
+import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.AppCapabilityRecord;

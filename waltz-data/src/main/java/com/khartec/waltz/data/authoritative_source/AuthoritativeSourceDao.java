@@ -23,6 +23,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.authoritativesource.*;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.schema.tables.*;
 import com.khartec.waltz.schema.tables.DataType;
 import com.khartec.waltz.schema.tables.records.AuthoritativeSourceRecord;
@@ -87,7 +88,7 @@ public class AuthoritativeSourceDao {
                 .appOrgUnitReference(orgUnitRef)
                 .applicationReference(appRef)
                 .dataType(record.getDataType())
-                .rating(Rating.valueOf(record.getRating()))
+                .rating(AuthoritativenessRating.valueOf(record.getRating()))
                 .provenance(record.getProvenance())
                 .build();
     };
@@ -104,7 +105,7 @@ public class AuthoritativeSourceDao {
                         .build())
                 .rank(entityHierarchyRecord.getLevel())
                 .applicationId(authRecord.getApplicationId())
-                .rating(Rating.valueOf(authRecord.getRating()))
+                .rating(AuthoritativenessRating.valueOf(authRecord.getRating()))
                 .dataTypeCode(authRecord.getDataType())
                 .build();
     };
@@ -156,7 +157,7 @@ public class AuthoritativeSourceDao {
     }
 
 
-    public int update(long id, Rating rating) {
+    public int update(long id, AuthoritativenessRating rating) {
         checkTrue(id > -1, "id must be +ve");
         checkNotNull(rating, "rating must not be null");
 
@@ -167,7 +168,7 @@ public class AuthoritativeSourceDao {
     }
 
 
-    public int insert(EntityReference parentRef, String dataType, Long appId, Rating rating) {
+    public int insert(EntityReference parentRef, String dataType, Long appId, AuthoritativenessRating rating) {
         checkNotNull(parentRef, "parentRef must not be null");
         Checks.checkNotEmpty(dataType, "dataType cannot be empty");
         checkNotNull(rating, "rating must not be null");
