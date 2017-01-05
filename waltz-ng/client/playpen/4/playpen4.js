@@ -28,7 +28,7 @@ function controller(measurableStore, measurableRatingStore) {
     const vm = Object.assign(this, initialState);
 
     const entityReference = {
-        id: 3,
+        id: 2,
         kind: 'APP_GROUP'
     };
 

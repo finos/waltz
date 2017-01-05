@@ -1,4 +1,13 @@
 <div>
+    <style>
+        .wmrb-rag-line {
+            border: 0;
+            margin: 0;
+            padding-left: 24px;
+            display: block;
+            transition: opacity 0.3s ease-in-out;
+        }
+    </style>
     <div class="waltz-tabs">
         <input type="radio"
                ng-repeat-start="tab in $ctrl.tabs"
@@ -18,17 +27,21 @@
             <br>
             <treecontrol class="tree-light"
                          tree-model="tab.treeData"
-                         expanded-nodes="[]"
+                         expanded-nodes="tab.expandedNodes"
                          options="$ctrl.treeOptions"
                          on-selection="$ctrl.onSelect(node)"
                          order-by="'-name'">
                 <span title="{{ node.description }}"
                       ng-class="{ 'text-muted': node.ratings.total == 0 }"
-                      class="no-overflow">
+                      class="no-overflow waltz-visibility-parent">
                     <span ng-bind="node.name"
+                          class="waltz-visibility-child-90"
                           ng-class="{ 'italics' : ! node.concrete }">
                     </span>
-                    <code>{{ node.ratings | json }}</code>
+                    <waltz-rag-line class='wmrb-rag-line waltz-visibility-child-50'
+                                    scores="node.totalRatings || node.ratings"
+                                    range="[0, tab.maxSize]">
+                    </waltz-rag-line>
                 </span>
             </treecontrol>
         </div>

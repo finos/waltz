@@ -50,11 +50,28 @@ const initialState = {
             }
         }
     },
-    onSelect: (d) => console.log('wmrb: default on-select', d)
+    onSelect: (d) => console.log('wmrb: default on-select', d),
+    visibility: {
+        tab: null
+    }
 };
 
 
 const template = require('./measurable-ratings-browser.html');
+
+
+function addRatings(
+    r1 = { R:0, A:0, G:0, Z:0, total:0 },
+    r2 = { R:0, A:0, G:0, Z:0, total:0 }) {
+
+    return {
+        R: (r1.R || 0) + (r2.R || 0),
+        A: (r1.A || 0) + (r2.A || 0),
+        G: (r1.G || 0) + (r2.G || 0),
+        Z: (r1.Z || 0) + (r2.Z || 0),
+        total: (r1.total || 0) + (r2.total || 0)
+    };
+}
 
 
 function toRatingsObj(ratings = []) {
@@ -77,13 +94,34 @@ function toRatingsObj(ratings = []) {
 
 function enrichMeasurablesWithRatings(measurables = [], ratings = []) {
     const ratingsById = _.groupBy(ratings, 'id');
-    const enriched = _.map(measurables, m => Object.assign({}, m, { ratings: toRatingsObj(ratingsById[m.id]) }));
+    const enriched = _.map(
+        measurables,
+        m => {
+            const ratingsObj = toRatingsObj(ratingsById[m.id]);
+            return Object.assign(
+                {},
+                m,
+                { ratings: ratingsObj });
+        });
     return enriched;
 }
 
 
 function prepareTreeData(data = []) {
-    return switchToParentIds(buildHierarchies(data));
+    const treeData = switchToParentIds(buildHierarchies(data));
+
+    const reducer = (path, node) => {
+        _.each(
+            path,
+            parent => parent.totalRatings = addRatings(node.ratings, parent.totalRatings));
+        const newPath = _.concat(path, [node]);
+        _.reduce(node.children, reducer, newPath);
+        if (! node.totalRatings) node.totalRatings = node.ratings;
+        return path;
+    };
+
+    _.reduce(treeData, reducer, [])
+    return treeData;
 }
 
 
@@ -91,19 +129,32 @@ function prepareTabs(measurables = [], ratings = []) {
     const enrichedMeasurables = enrichMeasurablesWithRatings(measurables, ratings);
     const byKind = _.groupBy(enrichedMeasurables, 'kind');
 
+
     const tabs = _.map(measurableKindNames, (n,k) => {
         const treeData = prepareTreeData(byKind[k]);
+        const maxSize = _.chain(treeData)
+            .map('totalRatings.total')
+            .max()
+            .value();
+
         const tab = {
             kind: k,
             name: n,
-            treeData
+            treeData,
+            maxSize,
+            expandedNodes: _.clone(byKind[k] || [])
         };
+
         return tab;
     });
 
-    console.log('tabs', tabs);
+    return _.sortBy(tabs, 'name');
+}
 
-    return tabs;
+
+function findFirstNonEmptyTabKind(tabs = []) {
+    const firstNonEmptyTab = _.find(tabs, t => t.treeData.length > 0);
+    return _.get(firstNonEmptyTab || tabs[0], 'kind');
 }
 
 
@@ -113,8 +164,9 @@ function controller() {
     vm.$onChanges = (c) => {
         if (c.measurables || c.ratings) {
             vm.tabs = prepareTabs(vm.measurables, vm.ratings);
+            vm.visibility.tab = findFirstNonEmptyTabKind(vm.tabs);
         }
-    }
+    };
 }
 
 
