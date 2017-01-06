@@ -32,15 +32,15 @@
                          on-selection="$ctrl.onSelect(node)"
                          order-by="'-name'">
                 <span title="{{ node.description }}"
-                      ng-class="{ 'text-muted': node.ratings.total == 0 }"
+                      ng-class="{ 'text-muted': $ctrl.ratingsMap[node.id].total.total == 0 }"
                       class="no-overflow waltz-visibility-parent">
                     <span ng-bind="node.name"
                           class="waltz-visibility-child-90"
                           ng-class="{ 'italics' : ! node.concrete }">
                     </span>
                     <waltz-rag-line class='wmrb-rag-line waltz-visibility-child-50'
-                                    scores="node.totalRatings || node.ratings"
-                                    range="[0, tab.maxSize]">
+                                    scores="$ctrl.ratingsMap[node.id].total"
+                                    range="[0, 10]">
                     </waltz-rag-line>
                 </span>
             </treecontrol>

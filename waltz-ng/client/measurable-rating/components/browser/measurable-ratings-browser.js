@@ -60,9 +60,14 @@ const initialState = {
 const template = require('./measurable-ratings-browser.html');
 
 
+function mkEmptyRating() {
+    return { R: 0, A: 0, G: 0, Z: 0, total: 0};
+}
+
+
 function addRatings(
-    r1 = { R:0, A:0, G:0, Z:0, total:0 },
-    r2 = { R:0, A:0, G:0, Z:0, total:0 }) {
+    r1 = mkEmptyRating(),
+    r2 = mkEmptyRating()) {
 
     return {
         R: (r1.R || 0) + (r2.R || 0),
@@ -91,44 +96,13 @@ function toRatingsObj(ratings = []) {
     };
 }
 
-
-function enrichMeasurablesWithRatings(measurables = [], ratings = []) {
-    const ratingsById = _.groupBy(ratings, 'id');
-    const enriched = _.map(
-        measurables,
-        m => {
-            const ratingsObj = toRatingsObj(ratingsById[m.id]);
-            return Object.assign(
-                {},
-                m,
-                { ratings: ratingsObj });
-        });
-    return enriched;
-}
-
-
 function prepareTreeData(data = []) {
-    const treeData = switchToParentIds(buildHierarchies(data));
-
-    const reducer = (path, node) => {
-        _.each(
-            path,
-            parent => parent.totalRatings = addRatings(node.ratings, parent.totalRatings));
-        const newPath = _.concat(path, [node]);
-        _.reduce(node.children, reducer, newPath);
-        if (! node.totalRatings) node.totalRatings = node.ratings;
-        return path;
-    };
-
-    _.reduce(treeData, reducer, [])
-    return treeData;
+    return switchToParentIds(buildHierarchies(data));
 }
 
 
-function prepareTabs(measurables = [], ratings = []) {
-    const enrichedMeasurables = enrichMeasurablesWithRatings(measurables, ratings);
-    const byKind = _.groupBy(enrichedMeasurables, 'kind');
-
+function prepareTabs(measurables = []) {
+    const byKind = _.groupBy(measurables, 'kind');
 
     const tabs = _.map(measurableKindNames, (n,k) => {
         const treeData = prepareTreeData(byKind[k]);
@@ -137,15 +111,13 @@ function prepareTabs(measurables = [], ratings = []) {
             .max()
             .value();
 
-        const tab = {
+        return {
             kind: k,
             name: n,
             treeData,
             maxSize,
             expandedNodes: _.clone(byKind[k] || [])
         };
-
-        return tab;
     });
 
     return _.sortBy(tabs, 'name');
@@ -158,12 +130,50 @@ function findFirstNonEmptyTabKind(tabs = []) {
 }
 
 
+function initialiseRatingsMap(ratings, measurables) {
+    const ratingsById = _.groupBy(ratings, 'id');
+
+    const reducer = (acc, m) => {
+        const ratingsObj = ratingsById[m.id]
+            ? toRatingsObj(ratingsById[m.id])
+            : mkEmptyRating();
+
+        acc[m.id] = {
+            direct: _.clone(ratingsObj),
+            total: _.clone(ratingsObj),
+        };
+        return acc;
+    };
+    const ratingsMap = _.reduce(measurables, reducer, {});
+    return ratingsMap;
+}
+
+
+function mkRatingsMap(ratings = [], measurables = []) {
+    const measurablesById = _.keyBy(measurables, 'id');
+    const ratingsMap = initialiseRatingsMap(ratings, measurables);
+
+    _.each(measurables, m => {
+        const rs = ratingsMap[m.id];
+        while (m.parentId) {
+            const parent = measurablesById[m.parentId];
+            const parentRating = ratingsMap[m.parentId];
+            parentRating.total = addRatings(parentRating.total, rs.direct);
+            m = parent;
+        }
+    });
+
+    return ratingsMap;
+}
+
+
 function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (c) => {
         if (c.measurables || c.ratings) {
-            vm.tabs = prepareTabs(vm.measurables, vm.ratings);
+            vm.tabs = prepareTabs(vm.measurables);
+            vm.ratingsMap = mkRatingsMap(vm.ratings, vm.measurables);
             vm.visibility.tab = findFirstNonEmptyTabKind(vm.tabs);
         }
     };
