@@ -11,6 +11,7 @@ import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.app_group.*;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -102,13 +104,13 @@ public class AppGroupService {
 
 
     public void subscribe(String userId, long groupId) {
-        audit(groupId, userId, "Subscribed to group");
+        audit(groupId, userId, "Subscribed to group", EntityKind.PERSON, Operation.ADD);
         appGroupMemberDao.register(groupId, userId);
     }
 
 
     public void unsubscribe(String userId, long groupId) {
-        audit(groupId, userId, "Unsubscribed from group");
+        audit(groupId, userId, "Unsubscribed from group", EntityKind.PERSON, Operation.REMOVE);
         appGroupMemberDao.unregister(groupId, userId);
     }
 
@@ -116,7 +118,7 @@ public class AppGroupService {
     public List<AppGroupSubscription> deleteGroup(String userId, long groupId) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
         appGroupDao.deleteGroup(groupId);
-        audit(groupId, userId, String.format("Deleted group %d", groupId));
+        audit(groupId, userId, String.format("Removed group %d", groupId), null, Operation.REMOVE);
         return findGroupSubscriptionsForUser(userId);
     }
 
@@ -128,7 +130,7 @@ public class AppGroupService {
         Application app = applicationDao.getById(applicationId);
         if (app != null) {
             appGroupEntryDao.addApplication(groupId, applicationId);
-            audit(groupId, userId, String.format("Added application %s to group", app.name()));
+            audit(groupId, userId, String.format("Added application %s to group", app.name()), EntityKind.APPLICATION, Operation.ADD);
         }
 
         return appGroupEntryDao.getEntriesForGroup(groupId);
@@ -140,17 +142,19 @@ public class AppGroupService {
         appGroupEntryDao.removeApplication(groupId, applicationId);
         Application app = applicationDao.getById(applicationId);
         audit(groupId, userId, String.format(
-                "Added application %s to group",
-                app != null
-                    ? app.name()
-                    : app.id()));
+                    "Removed application %s from group",
+                    app != null
+                        ? app.name()
+                        : applicationId),
+                EntityKind.APPLICATION,
+                Operation.REMOVE);
         return appGroupEntryDao.getEntriesForGroup(groupId);
     }
 
 
     public int addOwner(String userId, long groupId, String ownerId) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
-        audit(groupId, userId, String.format("Added owner %s to group %d", ownerId, groupId));
+        audit(groupId, userId, String.format("Added owner %s to group %d", ownerId, groupId), EntityKind.PERSON, Operation.ADD);
         return appGroupMemberDao.register(groupId, ownerId, AppGroupMemberRole.OWNER);
     }
 
@@ -163,7 +167,7 @@ public class AppGroupService {
     public AppGroupDetail updateOverview(String userId, AppGroup appGroup) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, appGroup.id().get());
         appGroupDao.update(appGroup);
-        audit(appGroup.id().get(), userId, "Updated group overview");
+        audit(appGroup.id().get(), userId, "Updated group overview", null, Operation.UPDATE);
         return getGroupDetailById(appGroup.id().get());
     }
 
@@ -177,7 +181,7 @@ public class AppGroupService {
 
         appGroupMemberDao.register(groupId, userId, AppGroupMemberRole.OWNER);
 
-        audit(groupId, userId, "Created group");
+        audit(groupId, userId, "Created group", null, Operation.ADD);
 
 
         return groupId;
@@ -200,7 +204,12 @@ public class AppGroupService {
         EntityRelationship entityRelationship = buildChangeInitiativeRelationship(groupId, changeInitiativeId);
         entityRelationshipDao.save(entityRelationship);
 
-        audit(groupId, username, String.format("Associated change initiative: %d", changeInitiativeId));
+        audit(groupId,
+                username,
+                String.format("Associated change initiative: %d", changeInitiativeId),
+                EntityKind.CHANGE_INITIATIVE,
+                Operation.ADD);
+
         return getChangeInitiatives(groupId);
     }
 
@@ -213,7 +222,12 @@ public class AppGroupService {
 
         EntityRelationship entityRelationship = buildChangeInitiativeRelationship(groupId, changeInitiativeId);
         entityRelationshipDao.remove(entityRelationship);
-        audit(groupId, username, String.format("Removed associated change initiative: %d", changeInitiativeId));
+
+        audit(groupId,
+                username,
+                String.format("Removed associated change initiative: %d", changeInitiativeId),
+                EntityKind.CHANGE_INITIATIVE,
+                Operation.REMOVE);
 
         return getChangeInitiatives(groupId);
     }
@@ -254,11 +268,13 @@ public class AppGroupService {
     }
 
 
-    private void audit(long groupId, String userId, String message) {
+    private void audit(long groupId, String userId, String message, EntityKind childKind, Operation operation) {
         changeLogService.write(ImmutableChangeLog.builder()
                 .message(message)
                 .userId(userId)
                 .parentReference(ImmutableEntityReference.builder().id(groupId).kind(EntityKind.APP_GROUP).build())
+                .childKind(Optional.ofNullable(childKind))
+                .operation(operation)
                 .build());
     }
 

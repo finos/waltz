@@ -18,10 +18,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.AppRegistrationRequest;
 import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.Application;
@@ -111,6 +108,7 @@ public class ApplicationEndpoint implements Endpoint {
                                 .severity(Severity.INFORMATION)
                                 .userId(WebUtilities.getUsername(req))
                                 .parentReference(ref)
+                                .operation(Operation.UPDATE)
                                 .build()));
 
             appService.update(appChange.app());
@@ -144,6 +142,7 @@ public class ApplicationEndpoint implements Endpoint {
                                 .kind(EntityKind.APPLICATION)
                                 .id(registrationResponse.id().get())
                                 .build())
+                        .operation(Operation.ADD)
                         .build();
                 changeLogService.write(changeLogEntry);
             }

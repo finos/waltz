@@ -1,10 +1,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.common.CollectionUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
@@ -140,7 +137,7 @@ public class DataTypeUsageEndpoint implements Endpoint {
                             EntityReference ref,
                             String dataTypeCode,
                             Collection<UsageKind> deletes) {
-        String message = "Deleted usage kind/s: " + deletes + " for data type: " + dataTypeCode;
+        String message = "Removed usage kind/s: " + deletes + " for data type: " + dataTypeCode;
         logChange(user, ref, message);
     }
 
@@ -150,7 +147,7 @@ public class DataTypeUsageEndpoint implements Endpoint {
                             String dataTypeCode,
                             Collection<UsageInfo> inserts) {
         Collection<UsageKind> kinds = CollectionUtilities.map(inserts, u -> u.kind());
-        String message = "Inserted usage kind/s: " + kinds + " for data type: " + dataTypeCode;
+        String message = "Added usage kind/s: " + kinds + " for data type: " + dataTypeCode;
         logChange(user, ref, message);
     }
 
@@ -173,6 +170,8 @@ public class DataTypeUsageEndpoint implements Endpoint {
                 .message(message)
                 .severity(Severity.INFORMATION)
                 .userId(userId)
+                .childKind(EntityKind.LOGICAL_DATA_FLOW)
+                .operation(Operation.UPDATE)
                 .build();
 
         changeLogService.write(logEntry);

@@ -2,19 +2,16 @@ package com.khartec.waltz.service.data_flow_decorator;
 
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.data_flow_decorator.DataFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableDataFlowDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
@@ -202,6 +199,8 @@ public class DataFlowDecoratorService {
                         decorators.toString(),
                         flow.source().name().orElse(Long.toString(flow.source().id())),
                         flow.target().name().orElse(Long.toString(flow.target().id()))))
+                .childKind(EntityKind.LOGICAL_DATA_FLOW)
+                .operation(Operation.UPDATE)
                 .build();
 
         changeLogService.write(logEntry);

@@ -143,6 +143,8 @@ public class AppCapabilityService {
                 .parentReference(EntityReference.mkRef(EntityKind.APPLICATION, appId))
                 .userId(username)
                 .severity(Severity.INFORMATION)
+                .childKind(EntityKind.CAPABILITY)
+                .operation(Operation.REMOVE)
                 .build());
 
         return appCapabilityDao.removeCapabilityFromApp(appId, capabilityId);
@@ -181,13 +183,17 @@ public class AppCapabilityService {
         changeLogService.write(ImmutableChangeLog.builder()
                 .message(String.format("%s capability: %s, rating %s",
                         saveCmd.isNew()
-                                ? "Adding"
-                                : "Updating",
+                                ? "Added"
+                                : "Updated",
                         capability.name(),
                         saveCmd.rating()))
                 .parentReference(EntityReference.mkRef(EntityKind.APPLICATION, appId))
                 .userId(username)
                 .severity(Severity.INFORMATION)
+                .childKind(EntityKind.CAPABILITY)
+                .operation(saveCmd.isNew()
+                            ? Operation.ADD
+                            : Operation.UPDATE)
                 .build());
 
         if (saveCmd.isNew()) {
