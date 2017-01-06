@@ -540,4 +540,14 @@
         </sql>
     </changeSet>
 
+    <changeSet id="20170106-1327-4"
+               author="rovats">
+        <sql>
+            UPDATE change_log SET
+                child_kind = 'LOGICAL_DATA_FLOW',
+                operation = 'UPDATE'
+            WHERE message LIKE '% usage kind/s: %for data type:%'
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
