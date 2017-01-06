@@ -1,9 +1,6 @@
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdate;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.command.CommandResponse;
@@ -159,6 +156,8 @@ public class PhysicalFlowLineageEndpoint implements Endpoint {
                 .message(message)
                 .severity(Severity.INFORMATION)
                 .userId(userId)
+                .childKind(EntityKind.PHYSICAL_FLOW)
+                .operation(Operation.UPDATE)
                 .build();
 
         changeLogService.write(logEntry);

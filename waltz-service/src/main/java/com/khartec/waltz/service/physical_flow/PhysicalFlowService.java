@@ -6,6 +6,7 @@ import com.khartec.waltz.data.physical_flow.PhysicalFlowSearchDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
@@ -132,22 +133,25 @@ public class PhysicalFlowService {
 
             logChange(username,
                     specification.owningEntity(),
-                    String.format("Physical flow: %s, from: %s, to: %s deleted.",
+                    String.format("Physical flow: %s, from: %s, to: %s removed.",
                             specification.name(),
                             specification.owningEntity().safeName(),
-                            flow.target().safeName()));
+                            flow.target().safeName()),
+                    Operation.REMOVE);
 
             logChange(username,
                     flow.target(),
-                    String.format("Physical flow: %s, from: %s deleted.",
+                    String.format("Physical flow: %s, from: %s removed.",
                             specification.name(),
-                            specification.owningEntity().safeName()));
+                            specification.owningEntity().safeName()),
+                    Operation.REMOVE);
 
             logChange(username,
                     specification.owningEntity(),
-                    String.format("Physical flow: %s, to: %s deleted.",
+                    String.format("Physical flow: %s, to: %s removed.",
                             specification.name(),
-                            flow.target().safeName()));
+                            flow.target().safeName()),
+                    Operation.REMOVE);
         }
 
 
@@ -187,22 +191,25 @@ public class PhysicalFlowService {
 
         logChange(username,
                 command.specification().owningEntity(),
-                String.format("Creating physical flow (%s) to: %s",
+                String.format("Added physical flow (%s) to: %s",
                         command.specification().name(),
-                        command.targetEntity().safeName()));
+                        command.targetEntity().safeName()),
+                Operation.ADD);
 
         logChange(username,
                 command.targetEntity(),
-                String.format("Creating physical flow (%s) from: %s",
+                String.format("Added physical flow (%s) from: %s",
                         command.specification().name(),
-                        command.specification().owningEntity().safeName()));
+                        command.specification().owningEntity().safeName()),
+                Operation.ADD);
 
         logChange(username,
                 EntityReference.mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId),
-                String.format("Creating physical flow (%s) from: %s, to %s",
+                String.format("Added physical flow (%s) from: %s, to %s",
                         command.specification().name(),
                         command.specification().owningEntity().safeName(),
-                        command.targetEntity().safeName()));
+                        command.targetEntity().safeName()),
+                Operation.ADD);
 
 
         return ImmutablePhysicalFlowCreateCommandResponse.builder()
@@ -250,13 +257,16 @@ public class PhysicalFlowService {
 
     private void logChange(String userId,
                            EntityReference ref,
-                           String message) {
+                           String message,
+                           Operation operation) {
 
         ChangeLog logEntry = ImmutableChangeLog.builder()
                 .parentReference(ref)
                 .message(message)
                 .severity(Severity.INFORMATION)
                 .userId(userId)
+                .childKind(EntityKind.PHYSICAL_FLOW)
+                .operation(operation)
                 .build();
 
         changeLogService.write(logEntry);

@@ -18,14 +18,11 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Entry;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -135,6 +132,8 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
                     .severity(Severity.INFORMATION)
                     .userId(getUsername(request))
                     .parentReference(authSource.parentReference())
+                    .childKind(EntityKind.APPLICATION)
+                    .operation(Operation.REMOVE)
                     .build();
 
             changeLogService.write(log);

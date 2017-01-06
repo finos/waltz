@@ -1,6 +1,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.trait.Trait;
@@ -80,6 +81,7 @@ public class TraitUsageEndpoint implements Endpoint {
                     .parentReference(entityReference)
                     .userId(getUsername(request))
                     .message("Added trait: " + trait.name())
+                    .operation(Operation.UPDATE)
                     .build());
 
             return usages;
@@ -104,6 +106,7 @@ public class TraitUsageEndpoint implements Endpoint {
                     .parentReference(entityReference)
                     .userId(getUsername(request))
                     .message("Removed trait: "+ (trait == null ? traitId : trait.name()))
+                    .operation(Operation.UPDATE)
                     .build());
 
             return usages;

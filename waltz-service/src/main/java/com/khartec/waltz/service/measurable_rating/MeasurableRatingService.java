@@ -22,9 +22,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
@@ -97,7 +95,8 @@ public class MeasurableRatingService {
         return save(
                 command,
                 measurableRatingDao::update,
-                "Updated: %s with a rating of: %s");
+                "Updated: %s with a rating of: %s",
+                Operation.UPDATE);
     }
 
 
@@ -105,7 +104,8 @@ public class MeasurableRatingService {
         return save(
                 command,
                 measurableRatingDao::create,
-                "Added: %s with a rating of: %s");
+                "Added: %s with a rating of: %s",
+                Operation.ADD);
     }
 
 
@@ -119,7 +119,8 @@ public class MeasurableRatingService {
             writeChangeLogEntry(
                     command,
                     format("Removed: %s",
-                            measurable.name()));
+                            measurable.name()),
+                    Operation.REMOVE);
 
         }
         return findForEntity(command.entityReference());
@@ -142,7 +143,8 @@ public class MeasurableRatingService {
 
     private Collection<MeasurableRating> save(SaveMeasurableRatingCommand command,
                                               Function<SaveMeasurableRatingCommand, Boolean> action,
-                                              String messageTemplate) {
+                                              String messageTemplate,
+                                              Operation operation) {
         checkNotNull(command, "command cannot be null");
 
         Measurable measurable = measurableDao.getById(command.measurableId());
@@ -156,20 +158,23 @@ public class MeasurableRatingService {
                     command,
                     format(messageTemplate,
                             measurable.name(),
-                            command.rating()));
+                            command.rating()),
+                    operation);
         }
 
         return findForEntity(command.entityReference());
     }
 
 
-    private void writeChangeLogEntry(MeasurableRatingCommand command, String message) {
+    private void writeChangeLogEntry(MeasurableRatingCommand command, String message, Operation operation) {
         changeLogService.write(ImmutableChangeLog.builder()
                 .message(message)
                 .parentReference(command.entityReference())
                 .userId(command.lastUpdate().by())
                 .createdAt(command.lastUpdate().at())
                 .severity(Severity.INFORMATION)
+                .childKind(EntityKind.MEASURABLE)
+                .operation(operation)
                 .build());
     }
 
