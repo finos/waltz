@@ -28,13 +28,13 @@ function controller(measurableStore, measurableRatingStore) {
     const vm = Object.assign(this, initialState);
 
     const entityReference = {
-        id: 1,
-        kind: 'APP_GROUP'
+        id: 10,
+        kind: 'ORG_UNIT'
     };
 
     const idSelector = {
         entityReference,
-        scope: 'EXACT'
+        scope: 'CHILDREN'
     };
 
     measurableStore

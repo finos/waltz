@@ -20,6 +20,7 @@ package com.khartec.waltz.data.measurable;
 
 
 import com.khartec.waltz.data.entity_hierarchy.AbstractIdSelectorFactory;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -28,7 +29,9 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
@@ -38,9 +41,14 @@ import static java.lang.String.format;
 @Service
 public class MeasurableIdSelectorFactory extends AbstractIdSelectorFactory {
 
+    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
+    
     @Autowired
-    public MeasurableIdSelectorFactory(DSLContext dsl) {
+    public MeasurableIdSelectorFactory(DSLContext dsl, 
+                                       OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
         super(dsl, EntityKind.MEASURABLE);
+        checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
+        this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
     }
 
 
@@ -49,11 +57,22 @@ public class MeasurableIdSelectorFactory extends AbstractIdSelectorFactory {
         switch (options.entityReference().kind()) {
             case APP_GROUP:
                 return mkForAppGroup(options);
+            case ORG_UNIT:
+                return mkForOrgUnit(options);
             default:
                 throw new UnsupportedOperationException(format(
                         "Cannot create measurable selector from kind: %s",
                         options.entityReference().kind()));
         }
+    }
+
+    private Select<Record1<Long>> mkForOrgUnit(IdSelectionOptions options) {
+        Select<Record1<Long>> orgUnitSelector = orgUnitIdSelectorFactory.apply(options);
+        return mkBaseRatingBasedSelector()
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitSelector)
+                        .and(MEASURABLE_RATING.ENTITY_ID.eq(APPLICATION.ID))
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
     }
 
 

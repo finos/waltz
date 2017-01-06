@@ -175,6 +175,10 @@ function controller() {
             vm.tabs = prepareTabs(vm.measurables);
             vm.ratingsMap = mkRatingsMap(vm.ratings, vm.measurables);
             vm.visibility.tab = findFirstNonEmptyTabKind(vm.tabs);
+            vm.maxTotal = _.max(
+                _.map(
+                    _.values(vm.ratingsMap),
+                    r => _.get(r, 'total.total'), 0));
         }
     };
 }
