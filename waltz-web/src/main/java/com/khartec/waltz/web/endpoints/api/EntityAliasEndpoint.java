@@ -1,6 +1,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -71,6 +72,7 @@ public class EntityAliasEndpoint implements Endpoint {
                     .userId(user)
                     .message(auditMessage)
                     .severity(Severity.INFORMATION)
+                    .operation(Operation.UPDATE)
                     .build());
 
             return aliases;

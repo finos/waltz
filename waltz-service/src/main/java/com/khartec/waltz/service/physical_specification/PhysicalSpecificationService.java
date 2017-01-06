@@ -96,8 +96,9 @@ public class PhysicalSpecificationService {
         if (commandOutcome == CommandOutcome.SUCCESS) {
             logChange(username,
                     specification.owningEntity(),
-                    String.format("Specification: %s deleted",
-                            specification.name()));
+                    String.format("Specification: %s removed",
+                            specification.name()),
+                    Operation.REMOVE);
 
         }
 
@@ -112,13 +113,16 @@ public class PhysicalSpecificationService {
 
     private void logChange(String userId,
                            EntityReference ref,
-                           String message) {
+                           String message,
+                           Operation operation) {
 
         ChangeLog logEntry = ImmutableChangeLog.builder()
                 .parentReference(ref)
                 .message(message)
                 .severity(Severity.INFORMATION)
                 .userId(userId)
+                .childKind(EntityKind.PHYSICAL_SPECIFICATION)
+                .operation(operation)
                 .build();
 
         changeLogService.write(logEntry);

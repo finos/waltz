@@ -18,7 +18,9 @@
 package com.khartec.waltz.service.bookmark;
 
 import com.khartec.waltz.data.bookmark.BookmarkDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.bookmark.Bookmark;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
@@ -54,13 +56,13 @@ public class BookmarkService {
 
 
     public Bookmark create(Bookmark bookmark, String username) {
-        logChange("Added", bookmark, username);
+        logChange("Added", bookmark, username, Operation.ADD);
         return bookmarkDao.create(bookmark);
     }
 
 
     public Bookmark update(Bookmark bookmark, String username) {
-        logChange("Updated", bookmark, username);
+        logChange("Updated", bookmark, username, Operation.UPDATE);
         return bookmarkDao.update(bookmark);
     }
 
@@ -70,7 +72,7 @@ public class BookmarkService {
      * @return true if bookmark deleted
      */
     public boolean deleteById(Bookmark bookmark, String username) {
-        logChange("Deleted", bookmark, username);
+        logChange("Removed", bookmark, username, Operation.REMOVE);
         return bookmarkDao.deleteById(bookmark.id().get());
     }
 
@@ -80,7 +82,7 @@ public class BookmarkService {
     }
 
 
-    private void logChange(String verb, Bookmark bookmark, String username) {
+    private void logChange(String verb, Bookmark bookmark, String username, Operation operation) {
         changeLogService.write(ImmutableChangeLog.builder()
                 .message(String.format("%s bookmark: %s / %s",
                         verb,
@@ -89,6 +91,8 @@ public class BookmarkService {
                 .parentReference(bookmark.parent())
                 .userId(username)
                 .severity(Severity.INFORMATION)
+                .childKind(EntityKind.BOOKMARK)
+                .operation(operation)
                 .build());
     }
 }

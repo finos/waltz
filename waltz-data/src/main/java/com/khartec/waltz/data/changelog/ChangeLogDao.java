@@ -17,10 +17,7 @@
 
 package com.khartec.waltz.data.changelog;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.tally.Tally;
@@ -29,8 +26,6 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -47,9 +42,8 @@ import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 @Repository
 public class ChangeLogDao {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ChangeLogDao.class);
-
     private final DSLContext dsl;
+
     private RecordMapper<? super Record, ChangeLog> mapper = r -> {
         ChangeLogRecord record = r.into(ChangeLogRecord.class);
 
@@ -63,6 +57,8 @@ public class ChangeLogDao {
                 .message(record.getMessage())
                 .severity(Severity.valueOf(record.getSeverity()))
                 .parentReference(parentRef)
+                .childKind(Optional.ofNullable(record.getChildKind()).map(ck -> EntityKind.valueOf(ck)))
+                .operation(Operation.valueOf(record.getOperation()))
                 .createdAt(record.getCreatedAt().toLocalDateTime())
                 .build();
     };
@@ -130,6 +126,8 @@ public class ChangeLogDao {
                 .set(CHANGE_LOG.PARENT_KIND, changeLog.parentReference().kind().name())
                 .set(CHANGE_LOG.USER_ID, changeLog.userId())
                 .set(CHANGE_LOG.SEVERITY, changeLog.severity().name())
+                .set(CHANGE_LOG.CHILD_KIND, changeLog.childKind().map(ck -> ck.name()).orElse(null))
+                .set(CHANGE_LOG.OPERATION, changeLog.operation().name())
                 .set(CHANGE_LOG.CREATED_AT, Timestamp.valueOf(changeLog.createdAt()))
                 .execute();
     }

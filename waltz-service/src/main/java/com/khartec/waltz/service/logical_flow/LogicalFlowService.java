@@ -22,9 +22,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowStatistics;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
@@ -123,7 +121,7 @@ public class LogicalFlowService {
             throw new IllegalArgumentException("Cannot have a flow with same source and target");
         }
 
-        auditFlowChange("added", flow, username);
+        auditFlowChange("added", flow, username, Operation.ADD);
         return logicalFlowDao.addFlow(flow);
     }
 
@@ -137,13 +135,13 @@ public class LogicalFlowService {
                 .flatMap(df -> Stream.of(df.source(), df.target()))
                 .collect(Collectors.toSet());
 
-        logicalFlows.forEach(flow -> auditFlowChange("removed", flow, username));
+        logicalFlows.forEach(flow -> auditFlowChange("removed", flow, username, Operation.REMOVE));
         dataTypeUsageService.recalculateForApplications(affectedEntityRefs.toArray(new EntityReference[affectedEntityRefs.size()]));
 
         return deleted;
     }
 
-    private void auditFlowChange(String verb, LogicalFlow flow, String username) {
+    private void auditFlowChange(String verb, LogicalFlow flow, String username, Operation operation) {
         ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
                 .parentReference(flow.source())
                 .severity(Severity.INFORMATION)
@@ -153,6 +151,8 @@ public class LogicalFlowService {
                         verb,
                         flow.source().name().orElse(Long.toString(flow.source().id())),
                         flow.target().name().orElse(Long.toString(flow.target().id()))))
+                .childKind(EntityKind.LOGICAL_DATA_FLOW)
+                .operation(operation)
                 .build();
 
         changeLogService.write(logEntry);
