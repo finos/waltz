@@ -32,11 +32,13 @@ import {measurableKindNames} from '../../../common/services/display-names';
 const bindings = {
     measurables: '<',
     ratings: '<',
-    onSelect: '<'
+    onSelect: '<',
+    scrollHeight: '<'
 };
 
 
 const initialState = {
+    containerClass: [],
     measurables: [],
     ratings: [],
     treeOptions: {
@@ -95,6 +97,7 @@ function toRatingsObj(ratings = []) {
         total
     };
 }
+
 
 function prepareTreeData(data = []) {
     return switchToParentIds(buildHierarchies(data));
@@ -179,6 +182,12 @@ function controller() {
                 _.map(
                     _.values(vm.ratingsMap),
                     r => _.get(r, 'total.total'), 0));
+        }
+
+        if (c.scrollHeight) {
+            vm.containerClass = [
+                `waltz-scroll-region-${vm.scrollHeight}`
+            ];
         }
     };
 }

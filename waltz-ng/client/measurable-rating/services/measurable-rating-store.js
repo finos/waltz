@@ -36,6 +36,13 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
+    const findByAppSelector = (options) => {
+        checkIsIdSelector(options);
+        return $http
+            .post(`${baseUrl}/app-selector`, options)
+            .then(d => d.data);
+    };
+
     const statsByAppSelector = (options) => {
         checkIsIdSelector(options);
         return $http
@@ -73,6 +80,7 @@ function store($http, baseApiUrl) {
 
     return {
         findByMeasurableSelector,
+        findByAppSelector,
         findForEntityReference,
         countByMeasurable,
         statsByAppSelector,

@@ -92,7 +92,7 @@ function controller($q,
                     measurableStore,
                     measurableRatingStore) {
 
-    const entityRef = {
+    const entityReference = {
         kind: $stateParams.kind,
         id: $stateParams.id
     };
@@ -107,15 +107,15 @@ function controller($q,
         .then(ms => vm.measurables = ms);
 
     const ratingsPromise = measurableRatingStore
-        .findForEntityReference(entityRef)
+        .findByAppSelector( { entityReference, scope: 'EXACT' })
         .then(rs => vm.ratings = rs);
 
     applicationStore
-        .getById(entityRef.id)
+        .getById(entityReference.id)
         .then(app => {
             vm.defaultRating = app.overallRating;
             vm.entityRef = Object.assign(
-                entityRef,
+                entityReference,
                 { name: app.name, description: app.description })
         });
 
@@ -131,8 +131,8 @@ function controller($q,
 
     vm.backUrl = $state
         .href(
-            kindToViewState(entityRef.kind),
-            { id: entityRef.id });
+            kindToViewState(entityReference.kind),
+            { id: entityReference.id });
 
     vm.onMeasurableSelect = (d) => {
         const original = d.rating
@@ -163,7 +163,7 @@ function controller($q,
     vm.doCancel = () => vm.editor = null;
 
     vm.doSave = () => {
-        const saveParams = [entityRef, vm.editor.measurable.id, vm.editor.working.rating, vm.editor.working.description];
+        const saveParams = [entityReference, vm.editor.measurable.id, vm.editor.working.rating, vm.editor.working.description];
         const savePromise = _.isEmpty(vm.editor.original)
             ? measurableRatingStore.create(...saveParams)
             : measurableRatingStore.update(...saveParams);
@@ -176,7 +176,7 @@ function controller($q,
 
     vm.doRemove = () => {
         measurableRatingStore
-            .remove(entityRef, vm.editor.measurable.id)
+            .remove(entityReference, vm.editor.measurable.id)
             .then(rs => vm.ratings = rs)
             .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables));
     };

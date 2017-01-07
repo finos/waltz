@@ -96,7 +96,7 @@ function controller($q,
                     sourceDataRatingStore) {
 
     const id = $stateParams.id;
-    const entityRef = { id, kind: 'APPLICATION' };
+    const entityReference = { id, kind: 'APPLICATION' };
     const vm = Object.assign(this, initialState);
 
     const goToAppFn = d => $state.go('main.app.view', { id: d.id });
@@ -108,12 +108,12 @@ function controller($q,
             onSelect: goToAppFn,
         }
     };
-    vm.entityRef = entityRef;
+    vm.entityRef = entityReference;
 
     vm.saveAliases = (aliases) => {
         const aliasValues = _.map(aliases, 'text');
         return aliasStore
-            .update(entityRef, aliasValues)
+            .update(entityReference, aliasValues)
             .then(() => vm.aliases = aliasValues);
     };
 
@@ -162,15 +162,15 @@ function controller($q,
 
     function loadSecondWave() {
         const promises = [
-            bookmarkStore.findByParent(entityRef)
+            bookmarkStore.findByParent(entityReference)
                 .then(bookmarks => vm.bookmarks = bookmarks),
 
             measurableRatingStore
-                .findForEntityReference(entityRef)
+                .findByAppSelector({ entityReference, scope: 'EXACT' })
                 .then(rs => vm.ratings = rs),
 
             measurableStore
-                .findMeasurablesRelatedToPath(entityRef)
+                .findMeasurablesRelatedToPath(entityReference)
                 .then(ms => vm.measurables = ms)
         ];
 
@@ -190,15 +190,15 @@ function controller($q,
             loadDataFlowDecorators(logicalFlowDecoratorStore, id, vm),
 
             physicalSpecificationStore
-                .findByEntityReference(entityRef)
+                .findByEntityReference(entityReference)
                 .then(xs => vm.physicalSpecifications = xs),
 
             physicalFlowStore
-                .findByEntityReference(entityRef)
+                .findByEntityReference(entityReference)
                 .then(xs => vm.physicalFlows = xs),
 
             entityStatisticStore
-                .findStatsForEntity(entityRef)
+                .findStatsForEntity(entityReference)
                 .then(stats => vm.entityStatistics = stats),
 
             assetCostStore

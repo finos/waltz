@@ -57,13 +57,14 @@
 
 
     <!-- RATINGS -->
-    <waltz-section name="Viewpoint Explorer" small="WIP">
-        <waltz-measurable-ratings-browser ratings="ctrl.measurableRatings"
-                                          measurables="ctrl.measurables"
-                                          source-data-ratings="ctrl.sourceDataRatings"
-                                          id="ratings-explorer-section">
-        </waltz-measurable-ratings-browser>
-    </waltz-section>
+    <waltz-measurable-ratings-browser-section ratings="ctrl.measurableRatings"
+                                              measurables="ctrl.measurables"
+                                              applications="ctrl.applications"
+                                              on-load-detail="ctrl.loadRatingsDetail"
+                                              source-data-ratings="ctrl.sourceDataRatings"
+                                              id="ratings-explorer-section">
+    </waltz-measurable-ratings-browser-section>
+
 
 
     <!-- FLOWS -->

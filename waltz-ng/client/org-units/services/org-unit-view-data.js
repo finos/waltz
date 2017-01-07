@@ -156,6 +156,20 @@ function loadLineageReports(store, selector, holder) {
 }
 
 
+function loadMeasurables(store, selector, holder) {
+    return store
+        .findMeasurablesBySelector(selector)
+        .then(measurables => holder.measurables = measurables);
+}
+
+
+function loadMeasurableRatings(store, selector, holder) {
+    store
+        .statsByAppSelector(selector)
+        .then(ratings => holder.measurableRatings = ratings);
+}
+
+
 function service($q,
                  appStore,
                  assetCostViewService,
@@ -167,6 +181,8 @@ function service($q,
                  entityStatisticStore,
                  involvementStore,
                  logicalFlowViewService,
+                 measurableStore,
+                 measurableRatingStore,
                  orgUnitStore,
                  physicalFlowLineageStore,
                  sourceDataRatingStore,
@@ -200,6 +216,8 @@ function service($q,
             loadOrgUnit(orgUnitStore, orgUnitId, rawData),
             loadImmediateHierarchy(orgUnitStore, orgUnitId, rawData),
             loadApps(appStore, selector, rawData),
+            loadMeasurables(measurableStore, selector, rawData),
+            loadMeasurableRatings(measurableRatingStore, selector, rawData),
             initialiseAssetCosts(assetCostViewService, selector, rawData)
         ]);
     }
@@ -258,12 +276,21 @@ function service($q,
     }
 
 
+    function loadRatingsDetail(orgUnitId) {
+        return rawData.measurableRatingsDetail
+            ? $q.resolve(rawData.measurableRatingsDetail)
+            : measurableRatingStore
+                .findByAppSelector(mkSelector(orgUnitId))
+                .then(rs => rawData.measurableRatingsDetail = rs);
+    };
+
     return {
         data: rawData,
         loadAll,
         loadAllCosts,
         loadFlowDetail,
-        loadOrgUnitDescendants
+        loadOrgUnitDescendants,
+        loadRatingsDetail
     };
 
 }
@@ -281,6 +308,8 @@ service.$inject = [
     'EntityStatisticStore',
     'InvolvementStore',
     'LogicalFlowViewService',
+    'MeasurableStore',
+    'MeasurableRatingStore',
     'OrgUnitStore',
     'PhysicalFlowLineageStore',
     'SourceDataRatingStore',

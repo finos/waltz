@@ -67,6 +67,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":measurableId");
         String findByMeasurableSelectorPath = mkPath(BASE_URL, "measurable-selector");
+        String findByAppSelectorPath = mkPath(BASE_URL, "app-selector");
         String countByMeasurablePath = mkPath(BASE_URL, "count-by", "measurable");
         String statsByAppSelectorPath = mkPath(BASE_URL, "stats-by", "app-selector");
 
@@ -76,6 +77,9 @@ public class MeasurableRatingEndpoint implements Endpoint {
         ListRoute<MeasurableRating> findByMeasurableSelectorRoute = (request, response)
                 -> measurableRatingService.findByMeasurableIdSelector(readIdSelectionOptionsFromBody(request));
 
+        ListRoute<MeasurableRating> findByAppSelectorRoute = (request, response)
+                -> measurableRatingService.findByAppIdSelector(readIdSelectionOptionsFromBody(request));
+
         ListRoute<Tally<Long>> countByMeasurableRoute = (request, response)
                 -> measurableRatingService.tallyByMeasurableId();
 
@@ -84,6 +88,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
         getForList(findForEntityPath, findForEntityRoute);
         postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);
+        postForList(findByAppSelectorPath, findByAppSelectorRoute);
         postForList(modifyPath, this::createRoute);
         putForList(modifyPath, this::updateRoute);
         deleteForList(modifyPath, this::removeRoute);

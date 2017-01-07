@@ -28,15 +28,14 @@
     </waltz-org-unit-overview>
 
 
-
     <!-- RATINGS -->
-    <waltz-section name="Viewpoint Explorer" small="WIP">
-        <waltz-measurable-ratings-browser ratings="ctrl.viewData.measurableRatings"
-                                          measurables="ctrl.viewData.measurables"
-                                          source-data-ratings="ctrl.viewData.sourceDataRatings"
-                                          id="ratings-explorer-section">
-        </waltz-measurable-ratings-browser>
-    </waltz-section>
+    <waltz-measurable-ratings-browser-section ratings="ctrl.viewData.measurableRatings"
+                                              measurables="ctrl.viewData.measurables"
+                                              applications="ctrl.viewData.apps"
+                                              on-load-detail="ctrl.loadRatingsDetail"
+                                              source-data-ratings="ctrl.viewData.sourceDataRatings"
+                                              id="ratings-explorer-section">
+    </waltz-measurable-ratings-browser-section>
 
 
     <!-- FLOWS -->
