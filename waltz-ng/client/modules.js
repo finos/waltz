@@ -18,6 +18,7 @@ const dependencies = [
     'ui.router',
     'ui.select',
     'ui.grid',
+    'ui.grid.autoResize',
     'ui.grid.exporter',
     'ui.grid.resizeColumns',
     'ui.grid.selection',

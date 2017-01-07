@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
@@ -112,6 +113,17 @@ public class MeasurableRatingDao {
         return dsl
                 .selectFrom(MEASURABLE_RATING)
                 .where(MEASURABLE_RATING.MEASURABLE_ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Collection<MeasurableRating> findByApplicationIdSelector(Select<Record1<Long>> selector) {
+        checkNotNull(selector, "selector cannot be null");
+        Condition condition = MEASURABLE_RATING.ENTITY_ID.in(selector)
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(DSL.val(EntityKind.APPLICATION.name())));
+        return dsl
+                .selectFrom(MEASURABLE_RATING)
+                .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

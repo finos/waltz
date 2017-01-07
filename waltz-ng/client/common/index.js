@@ -95,15 +95,6 @@ export function buildHierarchies(nodes) {
 }
 
 
-export function flattenHiearchies(roots = [], acc) {
-    roots.forEach(r => {
-        acc.push(r);
-        flattenHiearchies(r.children, acc);
-    });
-    return acc;
-}
-
-
 export function findNode(nodes = [], id) {
     const found = _.find(nodes, { id });
     if (found) return found;
@@ -139,19 +130,6 @@ export function escapeRegexCharacters(str) {
 }
 
 
-export function shallowDiff(newObj, oldObj) {
-    const allKeys = _.union(_.keys(newObj), _.keys(oldObj));
-    return _.chain(allKeys)
-        .reject(k => _.isEqual(newObj[k], oldObj[k]))
-        .map(k => ({
-            field: k,
-            oldValue: _(oldObj[k]).toString(),
-            newValue: _(newObj[k]).toString()
-        }))
-        .value();
-}
-
-
 export function noop() {}
 
 
@@ -182,7 +160,18 @@ export function perhaps(fn, dflt) {
 }
 
 
-export function numberFormatter(num, digits) {
+/**
+ * Takes a number and limits it to the given number
+ * of digits.
+ * Examples:
+ *   numberFormatter(500_000, 0) :: 500k
+ *   numberFormatter(5_000_000, 0) :: 5M
+ *   numberFormatter(5_000_000_000, 0) :: 5B
+ * @param num
+ * @param digits
+ * @returns {*}
+ */
+export function numberFormatter(num, digits = 0) {
     const si = [
         { value: 1E12, symbol: "T" },
         { value: 1E9,  symbol: "B" },
@@ -201,6 +190,7 @@ export function numberFormatter(num, digits) {
 }
 
 
+window.numberFormatter = numberFormatter;
 /**
  The wix tree widget does deep comparisons.
  Having parents as refs therefore blows the callstack.

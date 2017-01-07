@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
 
 const addToHistory = (historyStore, orgUnit) => {
     if (! orgUnit) { return; }
@@ -72,6 +71,9 @@ function controller($stateParams,
         vm.exportLineageReports = api.export;
     };
 
+    vm.loadRatingsDetail = () => {
+        return viewDataService.loadRatingsDetail(id);
+    };
 }
 
 

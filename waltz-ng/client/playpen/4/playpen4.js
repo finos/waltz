@@ -23,18 +23,21 @@ const initialState = {
 };
 
 
-function controller(measurableStore, measurableRatingStore) {
+function controller($q,
+                    applicationStore,
+                    measurableStore,
+                    measurableRatingStore) {
 
     const vm = Object.assign(this, initialState);
 
     const entityReference = {
-        id: 3,
-        kind: 'APP_GROUP'
+        id: 10,
+        kind: 'ORG_UNIT'
     };
 
     const idSelector = {
         entityReference,
-        scope: 'EXACT'
+        scope: 'CHILDREN'
     };
 
     measurableStore
@@ -45,10 +48,24 @@ function controller(measurableStore, measurableRatingStore) {
         .statsByAppSelector(idSelector)
         .then(ratings => vm.measurableRatings = ratings);
 
+    vm.loadDetail = (d) => {
+        const measurableSelector = {
+            entityReference: { id: d.id, kind: 'MEASURABLE' },
+            scope: 'CHILDREN'
+        };
+
+        const ratingsPromise = measurableRatingStore.findByMeasurableSelector(measurableSelector);
+        const appPromise = applicationStore.findBySelector(measurableSelector);
+        return $q
+            .all([ratingsPromise, appPromise])
+            .then(([ratings, applications]) => ({ ratings, applications }));
+    };
 }
 
 
 controller.$inject = [
+    '$q',
+    'ApplicationStore',
     'MeasurableStore',
     'MeasurableRatingStore'
 ];

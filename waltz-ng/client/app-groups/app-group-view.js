@@ -159,7 +159,7 @@ function controller($scope,
         $scope.$applyAsync(() => {
             assetCostViewService.loadDetail()
                 .then(data => vm.assetCostData = data);
-        })
+        });
     };
 
     vm.loadFlowDetail = () => logicalFlowViewService
@@ -170,13 +170,20 @@ function controller($scope,
         vm.exportLineageReports = api.export;
     };
 
+    vm.loadRatingsDetail = () => {
+        return vm.measurableRatingsDetail
+            ? $q.resolve(vm.measurableRatingsDetail)
+            : measurableRatingStore
+                .findByAppSelector(idSelector)
+                .then(rs => vm.measurableRatingsDetail = rs);
+    };
+
 
     // -- HELPER ---
 
     const isUserAnOwner = member =>
         member.role === 'OWNER'
         && member.userId === vm.user.userName;
-
 }
 
 

@@ -89,6 +89,12 @@ public class MeasurableRatingService {
     }
 
 
+    public Collection<MeasurableRating> findByAppIdSelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
+        return measurableRatingDao.findByApplicationIdSelector(selector);
+    }
+
     // -- WRITE
 
     public Collection<MeasurableRating> update(SaveMeasurableRatingCommand command) {

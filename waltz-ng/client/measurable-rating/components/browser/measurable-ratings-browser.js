@@ -32,11 +32,13 @@ import {measurableKindNames} from '../../../common/services/display-names';
 const bindings = {
     measurables: '<',
     ratings: '<',
-    onSelect: '<'
+    onSelect: '<',
+    scrollHeight: '<'
 };
 
 
 const initialState = {
+    containerClass: [],
     measurables: [],
     ratings: [],
     treeOptions: {
@@ -50,11 +52,33 @@ const initialState = {
             }
         }
     },
-    onSelect: (d) => console.log('wmrb: default on-select', d)
+    onSelect: (d) => console.log('wmrb: default on-select', d),
+    visibility: {
+        tab: null
+    }
 };
 
 
 const template = require('./measurable-ratings-browser.html');
+
+
+function mkEmptyRating() {
+    return { R: 0, A: 0, G: 0, Z: 0, total: 0};
+}
+
+
+function addRatings(
+    r1 = mkEmptyRating(),
+    r2 = mkEmptyRating()) {
+
+    return {
+        R: (r1.R || 0) + (r2.R || 0),
+        A: (r1.A || 0) + (r2.A || 0),
+        G: (r1.G || 0) + (r2.G || 0),
+        Z: (r1.Z || 0) + (r2.Z || 0),
+        total: (r1.total || 0) + (r2.total || 0)
+    };
+}
 
 
 function toRatingsObj(ratings = []) {
@@ -75,35 +99,74 @@ function toRatingsObj(ratings = []) {
 }
 
 
-function enrichMeasurablesWithRatings(measurables = [], ratings = []) {
-    const ratingsById = _.groupBy(ratings, 'id');
-    const enriched = _.map(measurables, m => Object.assign({}, m, { ratings: toRatingsObj(ratingsById[m.id]) }));
-    return enriched;
-}
-
-
 function prepareTreeData(data = []) {
     return switchToParentIds(buildHierarchies(data));
 }
 
 
-function prepareTabs(measurables = [], ratings = []) {
-    const enrichedMeasurables = enrichMeasurablesWithRatings(measurables, ratings);
-    const byKind = _.groupBy(enrichedMeasurables, 'kind');
+function prepareTabs(measurables = []) {
+    const byKind = _.groupBy(measurables, 'kind');
 
     const tabs = _.map(measurableKindNames, (n,k) => {
         const treeData = prepareTreeData(byKind[k]);
-        const tab = {
+        const maxSize = _.chain(treeData)
+            .map('totalRatings.total')
+            .max()
+            .value();
+
+        return {
             kind: k,
             name: n,
-            treeData
+            treeData,
+            maxSize,
+            expandedNodes: _.clone(byKind[k] || [])
         };
-        return tab;
     });
 
-    console.log('tabs', tabs);
+    return _.sortBy(tabs, 'name');
+}
 
-    return tabs;
+
+function findFirstNonEmptyTabKind(tabs = []) {
+    const firstNonEmptyTab = _.find(tabs, t => t.treeData.length > 0);
+    return _.get(firstNonEmptyTab || tabs[0], 'kind');
+}
+
+
+function initialiseRatingsMap(ratings, measurables) {
+    const ratingsById = _.groupBy(ratings, 'id');
+
+    const reducer = (acc, m) => {
+        const ratingsObj = ratingsById[m.id]
+            ? toRatingsObj(ratingsById[m.id])
+            : mkEmptyRating();
+
+        acc[m.id] = {
+            direct: _.clone(ratingsObj),
+            total: _.clone(ratingsObj),
+        };
+        return acc;
+    };
+    const ratingsMap = _.reduce(measurables, reducer, {});
+    return ratingsMap;
+}
+
+
+function mkRatingsMap(ratings = [], measurables = []) {
+    const measurablesById = _.keyBy(measurables, 'id');
+    const ratingsMap = initialiseRatingsMap(ratings, measurables);
+
+    _.each(measurables, m => {
+        const rs = ratingsMap[m.id];
+        while (m.parentId) {
+            const parent = measurablesById[m.parentId];
+            const parentRating = ratingsMap[m.parentId];
+            parentRating.total = addRatings(parentRating.total, rs.direct);
+            m = parent;
+        }
+    });
+
+    return ratingsMap;
 }
 
 
@@ -112,9 +175,21 @@ function controller() {
 
     vm.$onChanges = (c) => {
         if (c.measurables || c.ratings) {
-            vm.tabs = prepareTabs(vm.measurables, vm.ratings);
+            vm.tabs = prepareTabs(vm.measurables);
+            vm.ratingsMap = mkRatingsMap(vm.ratings, vm.measurables);
+            vm.visibility.tab = findFirstNonEmptyTabKind(vm.tabs);
+            vm.maxTotal = _.max(
+                _.map(
+                    _.values(vm.ratingsMap),
+                    r => _.get(r, 'total.total'), 0));
         }
-    }
+
+        if (c.scrollHeight) {
+            vm.containerClass = [
+                `waltz-scroll-region-${vm.scrollHeight}`
+            ];
+        }
+    };
 }
 
 
