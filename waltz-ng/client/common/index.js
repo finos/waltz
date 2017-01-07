@@ -190,7 +190,6 @@ export function numberFormatter(num, digits = 0) {
 }
 
 
-window.numberFormatter = numberFormatter;
 /**
  The wix tree widget does deep comparisons.
  Having parents as refs therefore blows the callstack.
