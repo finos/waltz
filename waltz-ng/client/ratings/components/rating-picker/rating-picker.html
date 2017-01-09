@@ -1,9 +1,12 @@
-<div class="waltz-rating-picker">
+<div class="waltz-rating-picker"
+     ng-style="$ctrl.pickerStyle">
+
     <div ng-repeat="option in $ctrl.options"
          class="wrp-option">
         <input type="radio"
                value="{{ option.value }}"
                ng-model='$ctrl.selected'
+               ng-disabled="$ctrl.disabled"
                ng-change="$ctrl.onSelect(option.value)"
                id="wrp-inp-{{ option.value }}-{{ $id }}">
         <label for="wrp-inp-{{ option.value }}-{{ $id }}"

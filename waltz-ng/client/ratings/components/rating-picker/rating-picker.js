@@ -20,6 +20,7 @@ import {initialiseData, invokeFunction} from "../../../common";
 
 const bindings = {
     selected: '<',
+    disabled: '<',
     onSelect: '<'
 };
 
@@ -28,6 +29,7 @@ const template = require('./rating-picker.html');
 
 
 const initialState = {
+    pickerStyle: {},
     onSelect: (rating) => 'No onSelect handler defined for rating-picker: ' + rating,
     options: [
         { value: 'G', label: 'Good', clazz: 'rating-G' },
@@ -44,6 +46,14 @@ function controller() {
     vm.select = (rating) => {
         invokeFunction(vm.onSelect, rating);
     };
+
+    vm.$onChanges = (c) => {
+        if (c.disabled) {
+            vm.pickerStyle = vm.disabled
+                ? { opacity: 0.4 }
+                : [];
+        }
+    }
 
 }
 
