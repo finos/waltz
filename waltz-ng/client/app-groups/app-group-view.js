@@ -131,7 +131,7 @@ function controller($scope,
         .then(result => Object.assign(vm, result))
         .then(() => sourceDataRatingStore.findAll())
         .then((sourceDataRatings) => vm.sourceDataRatings = sourceDataRatings)
-        .then(() => changeLogStore.findByEntityReference('APP_GROUP', id))
+        .then(() => changeLogStore.findByEntityReference(vm.entityRef))
         .then(changeLogs => vm.changeLogs = changeLogs);
 
     userService

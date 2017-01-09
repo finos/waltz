@@ -207,7 +207,7 @@ function controller($q,
         ];
 
         return $q.all(promises)
-            .then(() => loadChangeLog(changeLogStore, id, vm))
+            .then(() => loadChangeLog(changeLogStore, entityReference, vm))
             .then(() => loadSourceDataRatings(sourceDataRatingStore, vm))
     }
 
