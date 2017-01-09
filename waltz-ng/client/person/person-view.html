@@ -120,7 +120,8 @@
     <!-- COMPLEXITY -->
     <waltz-complexity-section complexity="ctrl.complexity"
                               ng-if="ctrl.hasInvolvements"
-                              apps="ctrl.apps">
+                              apps="ctrl.apps"
+                              csv-name="{{ ctrl.person.displayName }}_application_complexity.csv">
     </waltz-complexity-section>
 
 
