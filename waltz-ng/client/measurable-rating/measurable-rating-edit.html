@@ -83,8 +83,15 @@
                             </div>
                             <div class="col-sm-10">
                                 <waltz-rating-picker selected="ctrl.editor.working.rating"
+                                                     disabled="ctrl.saveInProgress"
                                                      on-select="ctrl.onRatingSelect">
                                 </waltz-rating-picker>
+                                <div ng-if="ctrl.editor.working.rating !== ctrl.entityRating"
+                                     class="small text-muted">
+                                    <waltz-icon name="warning"></waltz-icon>
+                                    Note: this rating does not match the overall rating, which is
+                                    <span ng-bind="ctrl.entityRating | toDisplayName:'investmentRating'"></span>
+                                </div>
                             </div>
                         </div>
 
@@ -96,6 +103,7 @@
                             <div class="col-sm-10">
                                 <textarea rows="5"
                                           style="width: 90%"
+                                          ng-disabled="ctrl.saveInProgress"
                                           ng-change="ctrl.onCommentChange()"
                                           ng-model="ctrl.editor.working.description">
                                 </textarea>
@@ -107,19 +115,25 @@
                             <div class="col-sm-12">
                                 <hr>
                                 <button ng-click="ctrl.doSave()"
-                                        ng-disabled="!ctrl.editor.canSave"
+                                        ng-disabled="!ctrl.editor.canSave || ctrl.saveInProgress"
                                         class="btn btn-success">
                                     Update
                                 </button>
                                 <button ng-click="ctrl.doRemove()"
                                         ng-show="ctrl.editor.canRemove"
+                                        ng-disabled="ctrl.saveInProgress"
                                         class="btn btn-danger">
                                     Remove
                                 </button>
                                 <a class='clickable'
+                                   ng-disabled="ctrl.saveInProgress"
                                    ng-click="ctrl.doCancel()">
                                     Cancel
                                 </a>
+                                <waltz-loading-notification show="ctrl.saveInProgress"
+                                                            style="display: inline;"
+                                                            name="Saving">
+                                </waltz-loading-notification>
                             </div>
                         </div>
                     </div>

@@ -39,6 +39,7 @@ const initialState = {
     measurables: [],
     ratings: [],
     tabs: [],
+    saveInProgress: false,
     visibility: {
         tab: null
     }
@@ -114,6 +115,7 @@ function controller($q,
         .getById(entityReference.id)
         .then(app => {
             vm.defaultRating = app.overallRating;
+            vm.entityRating = app.overallRating;
             vm.entityRef = Object.assign(
                 entityReference,
                 { name: app.name, description: app.description })
@@ -123,7 +125,6 @@ function controller($q,
         .then(() => {
             vm.tabs = prepareTabs(vm.ratings, vm.measurables);
             vm.visibility.tab = determineSelectedTab(vm.tabs);
-
         });
 
 
@@ -153,6 +154,7 @@ function controller($q,
 
     vm.onRatingSelect = r => {
         vm.editor.working.rating = r;
+        vm.defaultRating = r;
         vm.editor.canSave = calcCanSave(vm.editor.working, vm.editor.original);
     };
 
@@ -170,15 +172,24 @@ function controller($q,
 
         savePromise
             .then(rs => vm.ratings = rs)
-            .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables));
+            .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables))
+            .then(() => {
+                vm.saveInProgress = false;
+                vm.editor = null;
+            });
 
     };
 
     vm.doRemove = () => {
+        vm.saveInProgress = true;
         measurableRatingStore
             .remove(entityReference, vm.editor.measurable.id)
             .then(rs => vm.ratings = rs)
-            .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables));
+            .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables))
+            .then(() => {
+                vm.saveInProgress = false;
+                vm.editor = null;
+            });
     };
 }
 
