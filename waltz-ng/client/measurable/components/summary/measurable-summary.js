@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from 'lodash';
 import {enrichServerStats} from "../../../server-info/services/server-utilities";
 import {calcPortfolioCost} from "../../../asset-cost/services/asset-cost-utilities";
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
@@ -34,6 +35,32 @@ const bindings = {
 
 const template = require('./measurable-summary.html');
 
+
+function enrichWithRefs(measurables = []) {
+    return _.map(
+        measurables,
+        d => Object.assign(
+            {},
+            d,
+            { entityReference: {kind: 'MEASURABLE', id: d.id, name: d.name, description: d.description }}));
+}
+
+
+function prepareChildRefs(children = [], measurable = {}) {
+    const cs = _.chain(children)
+        .filter(c => c.id != measurable.id)  // not self
+        .filter(c => c.parentId == measurable.id) // only immediate children
+        .value();
+    return enrichWithRefs(cs);
+}
+
+
+function prepareParentRefs(parents = [], measurable = {}) {
+    const ps = _.filter(parents, p => p.id != measurable.id)  // not self
+    return enrichWithRefs(ps);
+}
+
+
 function controller() {
     const vm = this;
 
@@ -41,6 +68,8 @@ function controller() {
         if (c.totalCost) vm.portfolioCostStr = calcPortfolioCost(vm.totalCost);
         if (c.complexity) vm.complexitySummary = calcComplexitySummary(vm.complexity);
         if (c.serverStats) vm.enrichedServerStats = enrichServerStats(vm.serverStats);
+        if (c.children || c.measurable) vm.childRefs = prepareChildRefs(vm.children, vm.measurable);
+        if (c.parents || c.measurable) vm.parentRefs = prepareParentRefs(vm.parents, vm.measurable);
     };
 }
 

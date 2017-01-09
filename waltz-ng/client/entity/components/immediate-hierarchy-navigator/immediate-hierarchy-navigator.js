@@ -58,8 +58,12 @@ function controller($state) {
     const vm = _.defaultsDeep(this, initialState);
 
     vm.$onChanges = ((changes) => {
-        vm.childLinks = prepareLinks(vm.children, $state);
-        vm.parentLinks = prepareLinks(vm.parents, $state);
+        if (changes.children) {
+            vm.childLinks = prepareLinks(vm.children, $state);
+        }
+        if (changes.parents) {
+            vm.parentLinks = prepareLinks(vm.parents, $state);
+        }
     });
 }
 
