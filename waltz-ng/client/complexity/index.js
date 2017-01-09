@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,8 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import angular from 'angular';
+import angular from "angular";
 
 
 export default () => {
@@ -27,8 +25,8 @@ export default () => {
         .service('ComplexityStore', require('./services/complexity-store'));
 
     module
-        .directive("waltzComplexityBarChart", require('./directives/complexity-bar-chart'))
-        .directive("waltzComplexitySection", require('./directives/complexity-section'));
+        .component("waltzComplexityBarChart", require('./components/complexity-bar-chart'))
+        .component("waltzComplexitySection", require('./components/complexity-section'));
 
     return module.name;
 };
