@@ -34,7 +34,8 @@ function logHistory(measurable, historyStore) {
 }
 
 
-function controller($scope,
+function controller($q,
+                    $scope,
                     $stateParams,
                     applicationStore,
                     assetCostViewService,
@@ -61,61 +62,74 @@ function controller($scope,
 
     // -- LOAD ---
 
-    measurableStore
-        .findMeasurablesBySelector(parentsSelector)
-        .then(ps => {
-            vm.parents = ps;
-            vm.measurable = _.find(ps, { id });
-            logHistory(vm.measurable, historyStore);
-        });
+    const loadWave1 = () =>
+        $q.all([
+            measurableStore
+                .findMeasurablesBySelector(parentsSelector)
+                .then(ps => {
+                    vm.parents = ps;
+                    vm.measurable = _.find(ps, { id });
+                }),
 
-    applicationStore
-        .findBySelector(childrenSelector)
-        .then(apps => vm.applications = apps);
+        ]);
 
-    measurableStore
-        .findMeasurablesBySelector(childrenSelector)
-        .then(cs => vm.children = cs);
+    const loadWave2 = () =>
+        $q.all([
+            measurableRatingStore
+                .findByMeasurableSelector(childrenSelector)
+                .then(rs => vm.ratings = rs),
+            measurableStore
+                .findMeasurablesBySelector(childrenSelector)
+                .then(cs => vm.children = cs),
+            applicationStore
+                .findBySelector(childrenSelector)
+                .then(apps => vm.applications = apps),
+            logicalFlowViewService
+                .initialise(childrenSelector)
+                .then(flowView => vm.logicalFlowView = flowView),
+            bookmarkStore
+                .findByParent(ref)
+                .then(bookmarks => vm.bookmarks = bookmarks)
+        ]);
 
-    measurableRatingStore
-        .findByMeasurableSelector(childrenSelector)
-        .then(rs => vm.ratings = rs);
+    const loadWave3 = () =>
+        $q.all([
+            physicalFlowLineageStore
+                .findLineageReportsBySelector(childrenSelector)
+                .then(lineageReports => vm.lineageReports = lineageReports),
+            entityStatisticStore
+                .findAllActiveDefinitions()
+                .then(statDefinitions => vm.entityStatisticDefinitions = statDefinitions),
+            complexityStore
+                .findBySelector(childrenSelector)
+                .then(complexity => vm.complexity = complexity),
+            assetCostViewService
+                .initialise(childrenSelector, 2016)
+                .then(costs => vm.assetCostData = costs),
+            technologyStatsService
+                .findBySelector(childrenSelector)
+                .then(techStats => vm.techStats = techStats)
+        ]);
 
-    logicalFlowViewService
-        .initialise(childrenSelector)
-        .then(flowView => vm.logicalFlowView = flowView);
+    const loadWave4 = () =>
+        $q.all([
+            sourceDataRatingStore
+                .findAll()
+                .then(sourceDataRatings => vm.sourceDataRatings = sourceDataRatings),
+            changeLogStore
+                .findByEntityReference(ref)
+                .then(changeLogs => vm.changeLogs = changeLogs),
+            logHistory(vm.measurable, historyStore)
+        ]);
 
-    complexityStore
-        .findBySelector(childrenSelector)
-        .then(complexity => vm.complexity = complexity);
 
-    assetCostViewService
-        .initialise(childrenSelector, 2016)
-        .then(costs => vm.assetCostData = costs);
+    // -- BOOT ---
 
-    technologyStatsService
-        .findBySelector(childrenSelector)
-        .then(techStats => vm.techStats = techStats);
+    loadWave1()
+        .then(loadWave2)
+        .then(loadWave3)
+        .then(loadWave4);
 
-    sourceDataRatingStore
-        .findAll()
-        .then(sourceDataRatings => vm.sourceDataRatings = sourceDataRatings);
-
-    bookmarkStore
-        .findByParent(ref)
-        .then(bookmarks => vm.bookmarks = bookmarks);
-
-    physicalFlowLineageStore
-        .findLineageReportsBySelector(childrenSelector)
-        .then(lineageReports => vm.lineageReports = lineageReports);
-
-    entityStatisticStore
-        .findAllActiveDefinitions()
-        .then(statDefinitions => vm.entityStatisticDefinitions = statDefinitions);
-
-    changeLogStore
-        .findByEntityReference(ref)
-        .then(changeLogs => vm.changeLogs = changeLogs);
 
 
     // -- INTERACTION ---
@@ -135,6 +149,7 @@ function controller($scope,
 
 
 controller.$inject = [
+    '$q',
     '$scope',
     '$stateParams',
     'ApplicationStore',

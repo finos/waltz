@@ -39,6 +39,15 @@
     </waltz-measurable-rating-explorer-section>
 
 
+    <!-- BOOKMARKS -->
+    <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
+                             entity-id="{{ ctrl.measurable.id }}"
+                             kind="MEASURABLE"
+                             parent-name="{{ ctrl.measurable.name }}"
+                             source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-bookmarks-section>
+
+
     <!-- FLOWS -->
     <waltz-logical-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
                                           flow-data="ctrl.logicalFlowView"
@@ -105,16 +114,6 @@
                                csv-name="{{ ctrl.measurable.name }}_asset_costs.csv"
                                source-data-ratings="ctrl.sourceDataRatings">
     </waltz-asset-costs-section>
-
-
-    <!-- BOOKMARKS -->
-    <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
-                             entity-id="{{ ctrl.measurable.id }}"
-                             kind="MEASURABLE"
-                             parent-name="{{ ctrl.measurable.name }}"
-                             source-data-ratings="ctrl.sourceDataRatings">
-    </waltz-bookmarks-section>
-
 
 
     <!-- TECHNOLOGIES -->
