@@ -47,9 +47,9 @@ export function loadDataFlows(dataFlowStore, id, vm) {
 }
 
 
-export function loadChangeLog(changeLogStore, id, vm) {
+export function loadChangeLog(changeLogStore, ref, vm) {
     changeLogStore
-        .findByEntityReference('APPLICATION', id, CHANGE_LOG_LIMIT)
+        .findByEntityReference(ref, CHANGE_LOG_LIMIT)
         .then(log => vm.log = log);
 }
 

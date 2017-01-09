@@ -20,12 +20,17 @@ import _ from "lodash";
 import {aggregatePeopleInvolvements} from "../../involvement/involvement-utils";
 
 
+function mkRef(orgUnitId) {
+    return {
+        kind: 'ORG_UNIT',
+        id: orgUnitId
+    };
+}
+
+
 function mkSelector(orgUnitId) {
     return {
-        entityReference: {
-            kind: 'ORG_UNIT',
-            id: orgUnitId
-        },
+        entityReference: mkRef(orgUnitId),
         scope: 'CHILDREN'
     };
 }
@@ -142,9 +147,9 @@ function loadEntityStatisticDefinitions(store, selector, holder) {
 }
 
 
-function loadChangeLogs(store, id, holder = {}) {
+function loadChangeLogs(store, ref, holder = {}) {
     return store
-        .findByEntityReference('ORG_UNIT', id)
+        .findByEntityReference(ref)
         .then(changeLogs => holder.changeLogs = changeLogs);
 }
 
@@ -249,9 +254,10 @@ function service($q,
 
 
     function loadFourthWave(orgUnitId) {
+        const ref = mkRef(orgUnitId);
         return $q.all([
             loadSourceDataRatings(sourceDataRatingStore, rawData),
-            loadChangeLogs(changeLogStore, orgUnitId, rawData)
+            loadChangeLogs(changeLogStore, ref, rawData)
         ]);
     }
 

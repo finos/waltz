@@ -32,15 +32,14 @@ function service($q,
 
     const rawData = {};
 
-
-
     function loadAll(dataTypeId) {
+        const entityReference = {
+            id: dataTypeId,
+            kind: 'DATA_TYPE'
+        };
 
         const dataTypeIdSelector = {
-            entityReference: {
-                id: dataTypeId,
-                kind: 'DATA_TYPE'
-            },
+            entityReference,
             scope: 'CHILDREN'
         };
 
@@ -65,13 +64,13 @@ function service($q,
                 Object.assign(rawData, r);
             })
             .then(() => loadAll2(dataTypeId))
-            .then(() => loadChangeLog(dataTypeId, rawData))
+            .then(() => loadChangeLog(entityReference, rawData))
             .then(() => rawData)
     }
 
-    function loadChangeLog(dataTypeId, holder = {}) {
+    function loadChangeLog(ref, holder = {}) {
         return changeLogStore
-            .findByEntityReference('DATA_TYPE', dataTypeId)
+            .findByEntityReference(ref)
             .then(changes => holder.changeLogs = changes);
     }
 
