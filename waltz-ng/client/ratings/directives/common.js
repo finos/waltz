@@ -121,38 +121,3 @@ export function determineChanges(group) {
         .flatten()
         .value();
 }
-
-
-export function mkAppRatingsGroup(appRef,
-                                  measurables = [],
-                                  capabilities = [],
-                                  ratings = []) {
-
-    const bySubjectThenMeasurable = nest()
-        .key(r => r.capabilityId)
-        .key(r => r.measurableCode)
-        .object(ratings);
-
-
-    const raw = _.chain(capabilities)
-        .map(s => ({
-            ratings: _.map(
-                measurables,
-                m => {
-                    const ragRating = perhaps(() => bySubjectThenMeasurable[s.id][m.code][0].ragRating, 'Z');
-                    return { original: ragRating, current: ragRating, measurable: m.code || m.id };
-                }),
-            subject: s
-        }))
-        .sortBy('subject.name')
-        .value();
-
-    return {
-        groupRef: appRef,
-        measurables,
-        capabilities,
-        raw: raw,
-        summaries: calculateGroupSummary(raw),
-        collapsed: false
-    };
-}
