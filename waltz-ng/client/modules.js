@@ -8,7 +8,6 @@ import "angular-ui-grid/ui-grid";
 import "angular-ui-router";
 import "angular-ui-bootstrap";
 import "babel-core/polyfill";
-import "ng-redux";
 import "ng-tags-input";
 import "satellizer";
 import "ui-select";
@@ -28,7 +27,6 @@ const dependencies = [
     'ngTagsInput',
     'satellizer',
     'LocalStorageModule',
-    'ngRedux',
     require('angular-formly'),
     require('angular-formly-templates-bootstrap'),
     'treeControl',
