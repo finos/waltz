@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import UnitView from "./measurable-view";
 import ListView from "./measurable-list";
 
@@ -39,12 +40,43 @@ const listState = {
 };
 
 
+function bouncer($state, $stateParams, measurableStore) {
+    measurableStore
+        .findByExternalId($stateParams.id)
+        .then(ms => {
+            const m = _.find(ms, {kind: 'CAPABILITY'});
+            if (m) {
+                $state.go('main.measurable.view', {id: m.id});
+            } else {
+                console.log(`Cannot find measure corresponding to old capability: ${$stateParams.id}`);
+            }
+        });
+}
+
+
+bouncer.$inject = [
+    '$state',
+    '$stateParams',
+    'MeasurableStore'
+];
+
+
+const bouncerState = {
+    url: 'capabilities/{id:int}',
+    resolve: {
+        bouncer
+    }
+};
+
+
 function setup($stateProvider) {
     $stateProvider
+        .state('main.capabilityBouncer', bouncerState)
         .state('main.measurable', baseState)
         .state('main.measurable.list', listState)
         .state('main.measurable.view', viewState);
 }
+
 
 setup.$inject = ['$stateProvider'];
 

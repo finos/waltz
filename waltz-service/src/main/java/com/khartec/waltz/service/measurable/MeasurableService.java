@@ -83,4 +83,8 @@ public class MeasurableService {
     public Collection<Measurable> search(String query) {
         return measurableSearchDao.search(query);
     }
+
+    public Collection<Measurable> findByExternalId(String extId) {
+        return measurableDao.findByExternalId(extId);
+    }
 }

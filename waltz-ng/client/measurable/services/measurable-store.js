@@ -32,6 +32,10 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
+    const findByExternalId = (extId) => $http
+        .get(`${baseUrl}/external-id/${extId}`)
+        .then(d => d.data);
+
     const findMeasurablesBySelector = (options) => {
         checkIsIdSelector(options);
         return $http
@@ -45,6 +49,7 @@ function store($http, baseApiUrl) {
 
     return {
         findAll,
+        findByExternalId,
         findMeasurablesRelatedToPath,
         findMeasurablesBySelector,
         search

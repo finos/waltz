@@ -32,6 +32,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -120,4 +121,11 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
+
+    public Collection<Measurable> findByExternalId(String extId) {
+        return dsl
+                .selectFrom(MEASURABLE)
+                .where(MEASURABLE.EXTERNAL_ID.eq(extId))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }
