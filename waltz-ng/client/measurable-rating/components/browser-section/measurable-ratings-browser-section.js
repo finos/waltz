@@ -44,6 +44,7 @@ const initialState = {
     visibility: {
         loading: false
     },
+    selectedMeasurable: null,
     onLoadDetail: () => log('onLoadDetail')
 };
 
@@ -128,6 +129,7 @@ function controller() {
     vm.onSelect = (measurable) => {
         vm.visibility.loading = true;
         vm.tableData = null;
+        vm.selectedMeasurable = measurable;
         const promise = vm.onLoadDetail(measurable);
 
         vm.columnDefs = prepareColumnDefs(measurable.kind);
