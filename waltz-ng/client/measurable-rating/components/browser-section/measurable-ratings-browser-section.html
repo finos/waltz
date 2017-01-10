@@ -13,7 +13,17 @@
                                         name="Loading">
             </waltz-loading-notification>
             <div ng-if="$ctrl.tableData"
-                 style="height: 400px;">
+                 style="padding-top: 54px;">
+                <h4>
+                    <span ng-bind="$ctrl.selectedMeasurable.name">
+                    </span>
+                    <a class="small small"
+                       ui-sref="main.measurable.view ({ id: $ctrl.selectedMeasurable.id })">
+                        ( more &raquo; )
+                    </a>
+                </h4>
+                <p class="small text-muted"
+                   ng-bind="$ctrl.selectedMeasurable.description"></p>
                 <waltz-grid-with-search column-defs="$ctrl.columnDefs"
                                         entries="$ctrl.tableData"
                                         searchPlaceholderText="Search"
