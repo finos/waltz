@@ -10,16 +10,16 @@
         <div ng-if="$ctrl.selected != null">
 
             <div>
-                <h4 ng-bind="$ctrl.selected.measurable.name"></h4>
+                <h4>
+                    <span ng-bind="$ctrl.selected.measurable.name"></span>
+                    <a class='small clickable'
+                       ui-sref="main.measurable.view ({ id: $ctrl.selected.measurable.id })">
+                        (more &raquo;)
+                    </a>
+                </h4>
                 <div class="small"
                      ng-bind="$ctrl.selected.measurable.description">
                 </div>
-                <div class="pull-right small clickable">
-                    <a ui-sref="main.measurable.view ({ id: $ctrl.selected.measurable.id })">
-                        More &raquo;
-                    </a>
-                </div>
-
             <div ng-if="$ctrl.selected.rating != null">
                 <hr>
                 <h4>
