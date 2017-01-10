@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData, isEmpty} from "../../common";
+import {redBg, greenBg} from "../../common/colors";
 import {responsivefy} from "../../common/d3-utils";
 import _ from "lodash";
 import {scaleLinear, scaleBand} from "d3-scale";
@@ -46,8 +47,8 @@ const initialState = {
 const numberFormat = format(".2f");
 const complexityFormat = d => `${numberFormat(d)}`;
 
-const startColor = "#DFF1D2";
-const endColor = "#F2D7D7";
+const startColor = greenBg.toString();
+const endColor = redBg.toString();
 
 
 const dimensions = {

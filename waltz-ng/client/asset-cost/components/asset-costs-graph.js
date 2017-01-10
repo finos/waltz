@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {initialiseData,isEmpty} from '../../common';
-import {responsivefy} from '../../common/d3-utils'
-import _ from 'lodash';
-import {scaleLinear, scaleBand} from 'd3-scale';
-import {select} from 'd3-selection';
-import {extent} from 'd3-array';
-import {axisLeft, axisBottom} from 'd3-axis';
-import {format} from 'd3-format';
-import 'd3-selection-multi';
+import {initialiseData, isEmpty} from "../../common";
+import {redBg, greenBg} from "../../common/colors";
+import {responsivefy} from "../../common/d3-utils";
+import _ from "lodash";
+import {scaleLinear, scaleBand} from "d3-scale";
+import {select} from "d3-selection";
+import {extent} from "d3-array";
+import {axisLeft, axisBottom} from "d3-axis";
+import {format} from "d3-format";
+import "d3-selection-multi";
 
 
 const template = `<div class='waltz-asset-costs-graph'></div>`;
@@ -46,8 +46,8 @@ const initialState = {
 const numberFormat = format(",d");
 const currencyFormat = d => `€${numberFormat(d)}`;
 
-const startColor = "#5DADE2";
-const endColor = "#21618C";
+const startColor = greenBg.toString();
+const endColor = redBg.toString();
 
 
 const dimensions = {
