@@ -35,7 +35,8 @@
 
                         <!-- DIAGRAMS -->
                         <div class="row" ng-if="ctrl.diagramsByKind[tab.kind.code].length > 0">
-                            <div class="col-sm-12">
+                            <div class="col-sm-12"
+                                 ng-if="tab.kind.code == ctrl.visibility.tab">
                                 <waltz-svg-diagrams diagrams="ctrl.diagramsByKind[tab.kind.code]"
                                                     block-processor="ctrl.blockProcessor">
                                 </waltz-svg-diagrams>

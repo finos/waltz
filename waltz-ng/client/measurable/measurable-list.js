@@ -90,7 +90,7 @@ function prepareTabs(measurables = [], counts = []) {
 
 
 function findFirstNonEmptyTab(tabs = []) {
-    const tab = _.find(tabs, t => t.measurables > 0);
+    const tab = _.find(tabs, t => (t.measurables || []).length > 0);
     return (tab || tabs[0]).kind.code;
 }
 
