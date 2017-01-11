@@ -134,6 +134,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 .rating(RagRating.valueOf(body.getOrDefault("rating", "Z")))
                 .description(body.getOrDefault("description", ""))
                 .lastUpdate(LastUpdate.mkForUser(username))
+                .provenance("waltz")
                 .build();
     }
 

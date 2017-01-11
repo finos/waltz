@@ -84,6 +84,7 @@ public class MeasurableRatingDao {
         record.setDescription(command.description());
         record.setLastUpdatedAt(Timestamp.valueOf(command.lastUpdate().at()));
         record.setLastUpdatedBy(command.lastUpdate().by());
+        record.setProvenance(command.provenance());
         return record;
     };
 
