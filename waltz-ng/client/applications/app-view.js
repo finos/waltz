@@ -40,7 +40,6 @@ const initialState = {
     specifications: [],
     dataTypes: [],
     dataTypeUsages: [],
-    explicitTraits: [],
     flows: [],
     log: [],
     ouAuthSources: [],

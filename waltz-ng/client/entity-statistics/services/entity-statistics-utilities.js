@@ -1,5 +1,3 @@
-
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -35,10 +33,8 @@ function filterBySameMeasurableKind(all, id) {
 
 
 function utils(appGroupStore,
-               capabilityStore,
                measurableStore,
-               orgUnitStore,
-               processStore) {
+               orgUnitStore) {
 
     const findAllForKind = (kind, id /* optional */) => {
         switch (kind) {
@@ -46,18 +42,12 @@ function utils(appGroupStore,
                 return appGroupStore
                     .findMyGroupSubscriptions()
                     .then(gs => _.map(gs, 'appGroup'));
-            case 'CAPABILITY':
-                return capabilityStore
-                    .findAll();
             case 'MEASURABLE':
                 return measurableStore
                     .findAll()
                     .then(all => filterBySameMeasurableKind(all, id));
             case 'ORG_UNIT':
                 return orgUnitStore
-                    .findAll();
-            case 'PROCESS':
-                return processStore
                     .findAll();
             default :
                 throw `esu: Cannot create hierarchy for kind - ${kind}`;
@@ -72,10 +62,8 @@ function utils(appGroupStore,
 
 utils.$inject = [
     'AppGroupStore',
-    'CapabilityStore',
     'MeasurableStore',
-    'OrgUnitStore',
-    'ProcessStore'
+    'OrgUnitStore'
 ];
 
 
