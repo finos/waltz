@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import _ from "lodash";
 import moment from "moment";
 import {mkEntityLinkGridCell} from "../../common";
@@ -125,6 +124,7 @@ function controller($animate,
             enableGridMenu: false,
             enableSorting: true,
             enableFiltering: true,
+            enableColumnMenus: false,
             enableHorizontalScrollbar: uiGridConstants.scrollbars.NEVER,
             onRegisterApi: (gridApi) => {
                 $animate.enabled(gridApi.grid.element, false);
