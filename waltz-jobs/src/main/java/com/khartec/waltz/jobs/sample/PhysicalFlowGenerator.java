@@ -94,6 +94,10 @@ public class PhysicalFlowGenerator {
                 flowBatch.clear();
             }
         }
+
+        System.out.println(String.format("--- saving records: count: %s", flowBatch.size()));
+        dsl.batchInsert(flowBatch).execute();
+        flowBatch.clear();
         System.out.println("---done");
     }
 
