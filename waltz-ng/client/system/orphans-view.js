@@ -38,7 +38,7 @@ function controller($q,
     const loadOrphans = () => {
         $q
             .all([orphanStore.findAppsWithNonExistentOrgUnits(),
-                orphanStore.findOrphanAppCaps(),
+                orphanStore.findOrphanMeasurableRatings(),
                 orphanStore.findOrphanAuthoritativeSourcesByOrgUnit(),
                 orphanStore.findOrphanAuthoritativeSourcesByApp(),
                 orphanStore.findOrphanAuthoritativeSourcesByDataType(),
@@ -46,7 +46,7 @@ function controller($q,
                 orphanStore.findOrphanLogicalFlows()
             ])
             .then( ([apps,
-                appCaps,
+                measurableRatings,
                 authSourcesByOrgUnit,
                 authSourcesByApp,
                 authSourcesByDataType,
@@ -55,7 +55,7 @@ function controller($q,
             ]) => {
                 const orphans = [
                     {description: 'Applications referencing non-existent Org Units', values: apps},
-                    {description: 'Application Capabilities mapping to non-existent Functions or Apps', values: appCaps},
+                    {description: 'Application Measurable Ratings mapping to non-existent Measurables or Apps', values: measurableRatings},
                     {description: 'Authoritative Sources with non-existent Org Unit', values: authSourcesByOrgUnit},
                     {description: 'Authoritative Sources with non-existent Application', values: authSourcesByApp},
                     {description: 'Authoritative Sources with non-existent Data Type', values: authSourcesByDataType},

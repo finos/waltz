@@ -65,39 +65,42 @@ public class OrphanDao {
     }
 
 
-    public List<OrphanRelationship> findOrphanApplicationCapabilities() {
-        Condition missingCapability = APP_CAPABILITY.CAPABILITY_ID
-                .notIn(select(CAPABILITY.ID)
-                        .from(CAPABILITY));
+    public List<OrphanRelationship> findOrphanMeasurableRatings() {
+        Condition missingCapability = MEASURABLE_RATING.MEASURABLE_ID
+                .notIn(select(MEASURABLE.ID)
+                        .from(MEASURABLE));
 
-        Condition missingApplication = APP_CAPABILITY.APPLICATION_ID
+        Condition missingApplication = MEASURABLE_RATING.ENTITY_ID
                 .notIn(select(APPLICATION.ID)
                         .from(APPLICATION));
 
+        Condition isApplicationCondition = MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name());
 
-        List<OrphanRelationship> missingCaps = dsl.select(APP_CAPABILITY.CAPABILITY_ID,
-                APP_CAPABILITY.APPLICATION_ID)
-                .from(APP_CAPABILITY)
+        List<OrphanRelationship> missingMeasurablesForApps = dsl.select(MEASURABLE_RATING.MEASURABLE_ID,
+                MEASURABLE_RATING.ENTITY_ID)
+                .from(MEASURABLE_RATING)
                 .where(missingCapability)
+                .and(isApplicationCondition)
                 .fetch(r -> ImmutableOrphanRelationship.builder()
-                        .entityA(mkRef(EntityKind.CAPABILITY, r.value1()))
+                        .entityA(mkRef(EntityKind.MEASURABLE, r.value1()))
                         .entityB(mkRef(EntityKind.APPLICATION, r.value2()))
                         .orphanSide(OrphanSide.B)
                         .build());
 
 
-        List<OrphanRelationship> missingApps = dsl.select(APP_CAPABILITY.CAPABILITY_ID,
-                APP_CAPABILITY.APPLICATION_ID)
-                .from(APP_CAPABILITY)
+        List<OrphanRelationship> missingAppsForMeasurables = dsl.select(MEASURABLE_RATING.MEASURABLE_ID,
+                MEASURABLE_RATING.ENTITY_ID)
+                .from(MEASURABLE_RATING)
                 .where(missingApplication)
+                .and(isApplicationCondition)
                 .fetch(r -> ImmutableOrphanRelationship.builder()
-                        .entityA(mkRef(EntityKind.CAPABILITY, r.value1()))
+                        .entityA(mkRef(EntityKind.MEASURABLE, r.value1()))
                         .entityB(mkRef(EntityKind.APPLICATION, r.value2()))
                         .orphanSide(OrphanSide.A)
                         .build());
 
 
-        return ListUtilities.concat(missingApps, missingCaps);
+        return ListUtilities.concat(missingAppsForMeasurables, missingMeasurablesForApps);
     }
 
 
