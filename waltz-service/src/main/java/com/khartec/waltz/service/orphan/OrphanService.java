@@ -46,8 +46,8 @@ public class OrphanService {
     }
 
 
-    public Collection<OrphanRelationship> findOrphanApplicationCapabilities() {
-        return orphanDao.findOrphanApplicationCapabilities();
+    public Collection<OrphanRelationship> findOrphanMeasurableRatings() {
+        return orphanDao.findOrphanMeasurableRatings();
     }
 
 
@@ -74,4 +74,5 @@ public class OrphanService {
     public List<OrphanRelationship> findOrphanLogicalDataFlows() {
         return orphanDao.findOrphanLogicalDataFlows();
     }
+
 }

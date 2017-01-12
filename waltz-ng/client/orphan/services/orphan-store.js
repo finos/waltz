@@ -26,8 +26,8 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
-    const findOrphanAppCaps = () => $http
-        .get(`${BASE}/application-capability`)
+    const findOrphanMeasurableRatings = () => $http
+        .get(`${BASE}/measurable-rating`)
         .then(result => result.data);
 
 
@@ -58,7 +58,7 @@ function service($http, BaseApiUrl) {
 
     return {
         findAppsWithNonExistentOrgUnits,
-        findOrphanAppCaps,
+        findOrphanMeasurableRatings,
         findOrphanAuthoritativeSourcesByApp,
         findOrphanAuthoritativeSourcesByOrgUnit,
         findOrphanAuthoritativeSourcesByDataType,

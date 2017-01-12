@@ -57,7 +57,7 @@ public class OrphanEndpoint implements Endpoint {
     @Override
     public void register() {
         String findApplicationsWithNonExistingOrgUnitPath = mkPath(BASE_URL, "application-non-existing-org-unit");
-        String findOrphanApplicationCapabilitiesPath = mkPath(BASE_URL, "application-capability");
+        String findOrphanMeasurableRatingsPath = mkPath(BASE_URL, "measurable-rating");
         String findOrphanAuthoritativeSourcesByAppPath = mkPath(BASE_URL, "authoritative-source", "application");
         String findOrphanAuthoritativeSourcesByOrgUnitPath = mkPath(BASE_URL, "authoritative-source", "org-unit");
         String findOrphanAuthoritativeSourcesByDataTypePath = mkPath(BASE_URL, "authoritative-source", "data-type");
@@ -71,9 +71,9 @@ public class OrphanEndpoint implements Endpoint {
         };
 
 
-        ListRoute<OrphanRelationship> findOrphanApplicationCapabilitiesRoute = (request, response) -> {
+        ListRoute<OrphanRelationship> findOrphanMeasurableRatingsRoute = (request, response) -> {
             requireRole(userRoleService, request, ADMIN);
-            return orphanService.findOrphanApplicationCapabilities();
+            return orphanService.findOrphanMeasurableRatings();
         };
 
 
@@ -108,7 +108,7 @@ public class OrphanEndpoint implements Endpoint {
 
 
         getForList(findApplicationsWithNonExistingOrgUnitPath, findApplicationsWithNonExistingOrgUnitRoute);
-        getForList(findOrphanApplicationCapabilitiesPath, findOrphanApplicationCapabilitiesRoute);
+        getForList(findOrphanMeasurableRatingsPath, findOrphanMeasurableRatingsRoute);
         getForList(findOrphanAuthoritativeSourcesByAppPath, findOrphanAuthoritativeSourcesByAppRoute);
         getForList(findOrphanAuthoritativeSourcesByOrgUnitPath, findOrphanAuthoritativeSourcesByOrgUnitRoute);
         getForList(findOrphanAuthoritativeSourcesByDataTypePath, findOrphanAuthoritativeSourcesByDataTypeRoute);
