@@ -150,22 +150,7 @@
                                         flow-data="ctrl.dataFlows"
                                         on-load-detail="ctrl.loadFlowDetail">
         </waltz-rated-flow-summary-panel>
-
-        <waltz-no-data ng-if="ctrl.dataFlows.stats.flowCounts.inbound == 0">
-            <message>
-                No inbound data flows registered for this person
-            </message>
-        </waltz-no-data>
-
-        <div class="row" style="padding-top: 12px;">
-            <div class="col-md-12">
-                <div class="small text-muted">
-                    This diagram summarises the data types sent to applications in this group.
-                </div>
-            </div>
-        </div>
     </waltz-section>
-
 
 
     <!-- INDICATORS -->

@@ -87,26 +87,10 @@
                                                 flow-data="ctrl.viewData.dataFlows"
                                                 on-load-detail="ctrl.loadFlowDetail">
                 </waltz-rated-flow-summary-panel>
-
-                <waltz-no-data ng-if="ctrl.viewData.dataFlows.length == 0">
-                    <message>
-                        No inbound data flows registered for this organisational unit
-                    </message>
-                </waltz-no-data>
-
-                <div class="row" style="padding-top: 12px;">
-                    <div class="col-md-12">
-
-                        <div class="small text-muted">
-                            This diagram summarises the data types sent to applications in this group.
-                        </div>
-                    </div>
-                </div>
             </uib-tab>
 
 
             <!-- AUTH SOURCES -->
-
             <uib-tab select="ctrl.showAuthSourceEditBtn = true"
                      deselect="ctrl.showAuthSourceEditBtn = false">
                 <uib-tab-heading>
