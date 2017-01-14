@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,8 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import _ from 'lodash';
+import _ from "lodash";
 import {mkEntityLinkGridCell} from "../../../common";
 
 
@@ -62,7 +60,7 @@ function groupDecoratorsByFlowId(decorators = [], displayNameService) {
 
     return _.chain(decorators)
         .filter(dc => dc.decoratorEntity.kind === 'DATA_TYPE')
-        .map(dc => _.assign({}, {
+        .map(dc => Object.assign({}, {
             dataFlowId: dc.dataFlowId,
             dataType: {
                 id: dc.decoratorEntity.id,
@@ -96,7 +94,7 @@ function prepareGridData(flows = [], decorators = [], displayNameService) {
     const groupedDecorators = groupDecoratorsByFlowId(decorators, displayNameService);
     return _.flatMap(flows,
         flow => _.map(groupedDecorators[flow.id],
-            dc => _.assign({
+            dc => Object.assign({
                 dataType: dc.dataType,
                 authSourceRating: dc.authSourceRating,
                 ragRating: toRag(dc.authSourceRating)
