@@ -16,23 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.rating;
+import angular from 'angular';
 
-public enum RagRating {
 
-    R("Red"),
-    A("Amber"),
-    G("Green"),
-    Z("Unknown"),
-    X("None");
+function setup() {
+    const module = angular.module('waltz.perspective', []);
 
-    private final String displayName;
+    module
+        .component('waltzPerspectiveGrid', require('./components/grid/perspective-grid'));
 
-    RagRating(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
+    return module.name;
 }
+
+export default setup;

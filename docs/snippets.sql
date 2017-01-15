@@ -1,11 +1,11 @@
 -- This file contains useful SQL snippets.
--- To add a snippet locate the correct -- SECTION ---
+-- To add a snippet locate the correct --[SECTION]---
 -- or add a new one if none of the existing sections
 -- are appropriate.
 
 
 
--- MEASURABLES ---
+--[MEASURABLES]---
 
 -- show all measurables (with ratings) for apps
 SELECT app.name, mr.rating, m.name, m.measurable_kind

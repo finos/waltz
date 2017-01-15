@@ -1,0 +1,34 @@
+<style>
+    .cell-inherited {
+        opacity: 0.4;
+    }
+
+    .cell-inherited:hover {
+        opacity: 0.8;
+    }
+
+    .col-titles, .row-titles {
+        font-size: smaller;
+    }
+
+    .cell-override {
+        opacity: 1;
+    }
+</style>
+
+<svg>
+    <defs>
+        <filter id="filter1" x="0" y="0">
+            <feOffset result="offOut"
+                      in="SourceAlpha"
+                      dx="-5"
+                      dy="-5" />
+            <feGaussianBlur result="blurOut"
+                            in="offOut"
+                            stdDeviation="3" />
+            <feBlend in="SourceGraphic"
+                     in2="blurOut"
+                     mode="normal" />
+        </filter>
+    </defs>
+</svg>
