@@ -15,12 +15,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {initialiseData, invokeFunction} from "../../../common";
+import {initialiseData} from "../../../common";
 
 const bindings = {
     selected: '<',
-    disabled: '<',
+    editDisabled: '<',
     onSelect: '<'
 };
 
@@ -42,10 +41,6 @@ const initialState = {
 
 function controller() {
     const vm = initialiseData(this, initialState);
-
-    vm.select = (rating) => {
-        invokeFunction(vm.onSelect, rating);
-    };
 
     vm.$onChanges = (c) => {
         if (c.disabled) {
