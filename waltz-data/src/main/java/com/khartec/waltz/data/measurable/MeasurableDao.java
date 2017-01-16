@@ -90,6 +90,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .innerJoin(MEASURABLE).on(MEASURABLE.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID))
                 .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
                 .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
+                .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
