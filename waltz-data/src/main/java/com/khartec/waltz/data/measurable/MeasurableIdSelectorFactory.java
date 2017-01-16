@@ -55,6 +55,8 @@ public class MeasurableIdSelectorFactory extends AbstractIdSelectorFactory {
     @Override
     protected Select<Record1<Long>> mkForOptions(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
+            case APPLICATION:
+                return mkForApplication(options);
             case APP_GROUP:
                 return mkForAppGroup(options);
             case ORG_UNIT:
@@ -83,6 +85,14 @@ public class MeasurableIdSelectorFactory extends AbstractIdSelectorFactory {
                 .on(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(MEASURABLE_RATING.ENTITY_ID)
                         .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(options.entityReference().id()));
+    }
+
+
+    private Select<Record1<Long>> mkForApplication(IdSelectionOptions options) {
+        checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate application based selectors with exact scopes");
+        return mkBaseRatingBasedSelector()
+                .where(MEASURABLE_RATING.ENTITY_ID.in(options.entityReference().id()))
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
     }
 
 

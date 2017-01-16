@@ -25,6 +25,7 @@ export const amber = rgb('#D9923F');
 export const green = rgb('#5BB65D');
 export const red = rgb('#DA524B');
 export const grey = rgb('#939393');
+export const lightGrey = rgb('#d1d1d1');
 export const blue = rgb('#5271CC');
 export const purple= rgb('#B687CC');
 export const gold = rgb('#b7b04e');
@@ -38,8 +39,8 @@ export const actorBg = rgb('#ede5ee');
 
 
 export const ragColorScale = scaleOrdinal()
-    .domain(['R', 'A', 'G', 'Z'])
-    .range([red, amber, green, grey]);
+    .domain(['R', 'A', 'G', 'Z', 'X'])
+    .range([red, amber, green, grey, lightGrey]);
 
 
 export const capabilityColorScale = ragColorScale;

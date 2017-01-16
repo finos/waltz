@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+import {mkPerspective} from '../../perspective/perpective-utilities';
+import {nest} from 'd3-collection'
 
 
 const initialState = {
@@ -24,6 +25,7 @@ const initialState = {
 
 
 function controller($q,
+                    $stateParams,
                     applicationStore,
                     measurableStore,
                     measurableRatingStore) {
@@ -31,40 +33,71 @@ function controller($q,
     const vm = Object.assign(this, initialState);
 
     const entityReference = {
-        id: 10,
-        kind: 'ORG_UNIT'
+        id: $stateParams.id,
+        kind: 'APPLICATION'
     };
 
     const idSelector = {
         entityReference,
-        scope: 'CHILDREN'
+        scope: 'EXACT'
     };
 
-    measurableStore
+    const perspectiveDefinition = {
+        id: 1,
+        name: 'Function - Process',
+        kindA: $stateParams.kindA || 'PROCESS',
+        kindB: $stateParams.kindB || 'CAPABILITY',
+        description: 'blah blah'
+    };
+
+    const perspectiveRatings = [
+        {
+            measurableA: 161,
+            measurableB: 434,
+            rating: 'R'
+        }, {
+            measurableA: 128,
+            measurableB: 428,
+            rating: 'G'
+        }, {
+            measurableA: 161,
+            measurableB: 428,
+            rating: 'Z'
+        }, {
+            measurableA: 163,
+            measurableB: 432,
+            rating: 'X'
+        }, {
+            measurableA: 145,
+            measurableB: 446,
+            rating: 'X'
+        }, {
+            measurableA: 149,
+            measurableB: 428,
+            rating: 'A'
+        }
+    ];
+
+    const measurablesPromise = measurableStore
         .findMeasurablesBySelector(idSelector)
         .then(measurables => vm.measurables = measurables);
 
-    measurableRatingStore
-        .statsByAppSelector(idSelector)
+    const ratingsPromise = measurableRatingStore
+        .findByAppSelector(idSelector)
         .then(ratings => vm.measurableRatings = ratings);
 
-    vm.loadDetail = (d) => {
-        const measurableSelector = {
-            entityReference: { id: d.id, kind: 'MEASURABLE' },
-            scope: 'CHILDREN'
-        };
-
-        const ratingsPromise = measurableRatingStore.findByMeasurableSelector(measurableSelector);
-        const appPromise = applicationStore.findBySelector(measurableSelector);
-        return $q
-            .all([ratingsPromise, appPromise])
-            .then(([ratings, applications]) => ({ ratings, applications }));
-    };
+    $q.all([measurablesPromise, ratingsPromise])
+        .then(() => vm.perspective = mkPerspective(
+            perspectiveDefinition,
+            vm.measurables,
+            vm.measurableRatings,
+            perspectiveRatings));
 }
 
 
 controller.$inject = [
     '$q',
+    '$stateParams',
     'ApplicationStore',
     'MeasurableStore',
     'MeasurableRatingStore'

@@ -1,7 +1,7 @@
 <div>
 
-    <waltz-page-header name="Playpen"
-                       small="4"
+    <waltz-page-header name="{{ ctrl.perspective.definition.name }}"
+                       small="Perspective"
                        icon="rocket">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
@@ -10,9 +10,27 @@
     </waltz-page-header>
 
 
-    <waltz-measurable-ratings-browser-section ratings="ctrl.measurableRatings"
-                                              measurables="ctrl.measurables"
-                                              on-load-detail="ctrl.loadDetail">
-    </waltz-measurable-ratings-browser-section>
+    <style>
+        .side-scroller {
+            overflow-y: hidden;
+            overflow-x: scroll;
+        }
+    </style>
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-sm-10"
+                 style="border-right: 1px solid #eee">
+                <div class="side-scroller">
+                    <waltz-perspective-grid perspective="ctrl.perspective">
+                    </waltz-perspective-grid>
+                </div>
+
+            </div>
+            <div class="col-sm-2">
+                <h4>Detail</h4>
+            </div>
+        </div>
+
+    </div>
 
 </div>

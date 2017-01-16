@@ -18,6 +18,7 @@
 
 import _ from "lodash";
 import apiCheck from "api-check";
+import {notEmpty} from './index';
 
 
 const myApiCheck = apiCheck({ verbose: false });
@@ -26,6 +27,31 @@ const myApiCheck = apiCheck({ verbose: false });
 const entityRefShape = {
     id: apiCheck.number,
     kind: apiCheck.string
+};
+
+
+const perspectiveDefinitionShape = {
+    id: apiCheck.number,
+    name: apiCheck.string,
+    description: apiCheck.string,
+    kindA: apiCheck.string,
+    kindB: apiCheck.string
+};
+
+
+const measurableRatingShape = {
+    entityReference: myApiCheck.shape(entityRefShape),
+    measurableId: apiCheck.number,
+    rating: apiCheck.string,
+    description: apiCheck.string
+};
+
+
+const measurableShape = {
+    id: apiCheck.number,
+    kind: apiCheck.string,
+    name: apiCheck.string,
+    description: apiCheck.string
 };
 
 
@@ -74,9 +100,27 @@ const createPhysicalFlowCommandShape = {
 
 const check = (test, x) => myApiCheck.throw(test, x);
 
+const assert = (b, msg) => { if (!b) throw msg; }
+
+
+export function checkNotEmpty(x, msg = 'is empty') {
+    assert(notEmpty(x), msg);
+}
 
 export const checkIsEntityRef = ref =>
     check(myApiCheck.shape(entityRefShape), ref);
+
+
+export const checkIsPerspectiveDefinition = ref =>
+    check(myApiCheck.shape(perspectiveDefinitionShape), ref);
+
+
+export const checkIsMeasurableRating = ref =>
+    check(myApiCheck.shape(measurableRatingShape), ref);
+
+
+export const checkIsMeasurable = ref =>
+    check(myApiCheck.shape(measurableShape), ref);
 
 
 export const checkIsCreatePhysicalFlowCommand = cmd =>
@@ -105,7 +149,12 @@ export const checkIsApplicationIdSelector = opt =>
 export const checkIsIdSelector = checkIsApplicationIdSelector;
 
 
-export function ensureIsArray(xs, message) {
+export function checkAll(xs, pred = x => true, msg = 'failed test') {
+    return assert(_.every(xs, pred), msg);
+}
+
+
+export function checkIsArray(xs, message) {
     if (!_.isArray(xs)) {
         throw new Error(message ? message : 'not an array', xs);
     } else {
