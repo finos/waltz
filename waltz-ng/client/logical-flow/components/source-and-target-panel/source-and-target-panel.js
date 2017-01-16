@@ -15,11 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import _ from 'lodash';
-import {nest} from 'd3-collection';
-import {event} from 'd3-selection';
-import {initialiseData} from '../../../common'
+import _ from "lodash";
+import {nest} from "d3-collection";
+import {event} from "d3-selection";
+import {initialiseData} from "../../../common";
 
 
 const bindings = {
@@ -192,7 +191,16 @@ function mkTweakers(tweakers = {},
 }
 
 
-function controller($timeout) {
+function scrollIntoView(element, $window) {
+    element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+    });
+    $window.scrollBy(0, -90);
+}
+
+
+function controller($element, $timeout, $window) {
     const vm = initialiseData(this, initialState);
 
     vm.showAll = () => vm.filteredFlowData = filterByType(0, vm.logicalFlows, vm.decorators);
@@ -232,10 +240,14 @@ function controller($timeout) {
             type: {
                 onSelect: d => {
                     event.stopPropagation();
-                    $timeout(() => vm.filteredFlowData = filterByType(
-                        d.id,
-                        vm.logicalFlows,
-                        vm.decorators));
+                    $timeout(() =>  {
+                        return vm.filteredFlowData = filterByType(
+                            d.id,
+                            vm.logicalFlows,
+                            vm.decorators)
+                    }).then(() => {
+                        scrollIntoView($element[0], $window);
+                    });
 
                 }
             },
@@ -261,7 +273,9 @@ function controller($timeout) {
 
 
 controller.$inject = [
-    '$timeout'
+    '$element',
+    '$timeout',
+    '$window'
 ];
 
 
