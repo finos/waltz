@@ -6,7 +6,7 @@
         <input type="radio"
                value="{{ option.value }}"
                ng-model='$ctrl.selected'
-               ng-disabled="$ctrl.disabled"
+               ng-disabled="$ctrl.editDisabled"
                ng-change="$ctrl.onSelect(option.value)"
                id="wrp-inp-{{ option.value }}-{{ $id }}">
         <label for="wrp-inp-{{ option.value }}-{{ $id }}"
