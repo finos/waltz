@@ -182,7 +182,7 @@ function drawOverrides(selection, perspective, scales) {
 
 
 function drawInherited(selection, scales) {
-    const cellPadding = 3;
+    const cellPadding = 6;
 
     const t = cellPadding;
     const l = cellPadding;
