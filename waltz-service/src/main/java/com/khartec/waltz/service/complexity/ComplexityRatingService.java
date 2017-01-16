@@ -49,7 +49,7 @@ public class ComplexityRatingService {
     private static final Logger LOG = LoggerFactory.getLogger(ComplexityRatingService.class);
 
     private final ComplexityScoreDao complexityScoreDao;
-    private final CapabilityComplexityService capabilityComplexityService;
+    private final MeasurableComplexityService measurableComplexityService;
     private final ConnectionComplexityService connectionComplexityService;
     private final ServerComplexityService serverComplexityService;
 
@@ -58,19 +58,19 @@ public class ComplexityRatingService {
 
     @Autowired
     public ComplexityRatingService(ComplexityScoreDao complexityScoreDao,
-                                   CapabilityComplexityService capabilityComplexityService,
+                                   MeasurableComplexityService measurableComplexityService,
                                    ConnectionComplexityService connectionComplexityService,
                                    ServerComplexityService serverComplexityService,
                                    ApplicationIdSelectorFactory appIdSelectorFactory) {
 
         checkNotNull(complexityScoreDao, "complexityScoreDao cannot be null");
-        checkNotNull(capabilityComplexityService, "capabilityComplexityService cannot be null");
+        checkNotNull(measurableComplexityService, "measurableComplexityService cannot be null");
         checkNotNull(connectionComplexityService, "connectionComplexityService cannot be null");
         checkNotNull(serverComplexityService, "serverComplexityService cannot be null");
         checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
 
         this.complexityScoreDao = complexityScoreDao;
-        this.capabilityComplexityService = capabilityComplexityService;
+        this.measurableComplexityService = measurableComplexityService;
         this.connectionComplexityService = connectionComplexityService;
         this.serverComplexityService = serverComplexityService;
         this.appIdSelectorFactory = appIdSelectorFactory;
@@ -104,13 +104,12 @@ public class ComplexityRatingService {
 
         List<ComplexityScore> connectionScores = connectionComplexityService.findByAppIdSelector(appIdSelector);
         List<ComplexityScore> serverScores = serverComplexityService.findByAppIdSelector(appIdSelector);
-        List<ComplexityScore> capabilityScores = capabilityComplexityService.findByAppIdSelector(appIdSelector);
-
+        List<ComplexityScore> measurableScores = measurableComplexityService.findByAppIdSelector(appIdSelector);
 
         List<ComplexityScoreRecord> records = ListUtilities.concat(
                 map(serverScores, r -> buildComplexityScoreRecord(r, ComplexityKind.SERVER)),
-                map(capabilityScores, r -> buildComplexityScoreRecord(r, ComplexityKind.CAPABILITY)),
-                map(connectionScores, r -> buildComplexityScoreRecord(r, ComplexityKind.CONNECTION)));
+                map(connectionScores, r -> buildComplexityScoreRecord(r, ComplexityKind.CONNECTION)),
+                map(measurableScores, r -> buildComplexityScoreRecord(r, ComplexityKind.MEASURABLE)));
 
         LOG.info("Scrubbing existing complexity score table");
         complexityScoreDao.deleteAll();
@@ -121,7 +120,6 @@ public class ComplexityRatingService {
         LOG.info("Completed insertion of new records, results: {}", results.length);
         return results.length;
     }
-
 
 
     private static ComplexityScoreRecord buildComplexityScoreRecord(ComplexityScore r, ComplexityKind kind) {

@@ -26,12 +26,12 @@ export default [
 
         const BASE = `${BaseApiUrl}/complexity`;
 
-
-        const findByApplication = id =>
-            $http
+        const findByApplication = id => {
+            console.log('DEPRECATED (1.2) - complexity-store:findByApplication');
+            return $http
                 .get(`${BASE}/application/${id}`)
                 .then(result => result.data);
-
+        };
 
         const findBySelector = (id, kind, scope = 'CHILDREN') => {
             const options = _.isObject(id)
@@ -41,8 +41,7 @@ export default [
             return $http
                 .post(BASE, options)
                 .then(result => result.data);
-        }
-
+        };
 
         const recalculateAll = () =>
             $http

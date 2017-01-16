@@ -32,7 +32,7 @@ public abstract class ComplexityRating {
     public abstract long id();
     public abstract Optional<ComplexityScore> serverComplexity();
     public abstract Optional<ComplexityScore> connectionComplexity();
-    public abstract Optional<ComplexityScore> capabilityComplexity();
+    public abstract Optional<ComplexityScore> measurableComplexity();
 
     @Value.Derived
     public double overallScore() {
@@ -50,9 +50,9 @@ public abstract class ComplexityRating {
             runningTotal += connectionComplexity().get().score();
         }
 
-        if (capabilityComplexity().isPresent()) {
+        if (measurableComplexity().isPresent()) {
             availableScores++;
-            runningTotal += capabilityComplexity().get().score();
+            runningTotal += measurableComplexity().get().score();
         }
 
         return availableScores > 0 ? runningTotal / availableScores : 0;

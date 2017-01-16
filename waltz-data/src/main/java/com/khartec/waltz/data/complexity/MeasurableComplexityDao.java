@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.complexity;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.*;
@@ -28,11 +29,11 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
-import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
+import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 
 @Repository
-public class CapabilityComplexityDao {
+public class MeasurableComplexityDao {
 
     private static final Field<BigDecimal> SCORE_ALIAS = DSL.field("score", BigDecimal.class);
 
@@ -40,7 +41,7 @@ public class CapabilityComplexityDao {
             DSL.sum(
                 DSL.coalesce(
                     DSL.value(1).div(
-                        DSL.nullif(CAPABILITY.LEVEL, 0)), 1));
+                        DSL.nullif(ENTITY_HIERARCHY.LEVEL, 0)), 1));
 
     private static final RecordMapper<Record2<Long, BigDecimal>, Tally<Long>> toScoreMapper =
             r -> ImmutableTally.<Long>builder()
@@ -53,28 +54,18 @@ public class CapabilityComplexityDao {
 
 
     @Autowired
-    public CapabilityComplexityDao(DSLContext dsl) {
+    public MeasurableComplexityDao(DSLContext dsl) {
         this.dsl = dsl;
     }
 
 
-    public List<Tally<Long>> findScores() {
-        return mkSelectQueryWhere(DSL.trueCondition())
-                .fetch(toScoreMapper);
-    }
-
-
     public List<Tally<Long>> findScoresForAppIdSelector(Select<Record1<Long>> appIds) {
-        return mkSelectQueryWhere(APP_CAPABILITY.APPLICATION_ID.in(appIds))
+        Condition condition = MEASURABLE_RATING.ENTITY_ID.in(appIds)
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+
+        return mkSelectQueryWhere(condition)
                 .fetch(toScoreMapper);
     }
-
-
-    public Tally<Long> findScoresForAppId(Long appId) {
-        return mkSelectQueryWhere(APP_CAPABILITY.APPLICATION_ID.eq(appId))
-                .fetchOne(toScoreMapper);
-    }
-
 
 
     public Double findBaseline() {
@@ -86,16 +77,15 @@ public class CapabilityComplexityDao {
     }
 
 
-
     // -- HELPER ---
 
     private SelectHavingStep<Record2<Long, BigDecimal>> mkSelectQueryWhere(Condition condition) {
-        return dsl.select(APP_CAPABILITY.APPLICATION_ID, SCORE_FIELD.as(SCORE_ALIAS))
-                .from(APP_CAPABILITY)
-                .innerJoin(CAPABILITY)
-                .on(CAPABILITY.ID.eq(APP_CAPABILITY.CAPABILITY_ID))
+        return dsl.select(MEASURABLE_RATING.ENTITY_ID, SCORE_FIELD.as(SCORE_ALIAS))
+                .from(MEASURABLE_RATING)
+                .innerJoin(ENTITY_HIERARCHY)
+                .on(ENTITY_HIERARCHY.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
                 .where(condition)
-                .groupBy(APP_CAPABILITY.APPLICATION_ID);
+                .groupBy(MEASURABLE_RATING.ENTITY_ID);
     }
 
 }
