@@ -4,7 +4,7 @@
                  expanded-nodes="$ctrl.expandedNodes"
                  options="$ctrl.treeOptions"
                  on-selection="$ctrl.onSelect(node)"
-                 order-by="'-name'">
+                 order-by="'-measurable.name'">
 
         <span ng-if="node.measurable.concrete">
             <waltz-rating-indicator-cell rating="node.rating.rating">
