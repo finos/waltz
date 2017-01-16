@@ -22,7 +22,8 @@
 
 
     <!-- TABS -->
-    <div class="row">
+    <div class="row"
+         ng-if="$ctrl.measurables.length > 0">
         <div class="col-sm-12">
             <div class="waltz-tabs">
                 <input type="radio"
@@ -52,5 +53,19 @@
             </div>
         </div>
     </div>
+
+    <!-- NO DATA -->
+    <div class="row"
+         ng-if="$ctrl.measurables.length == 0">
+        <div class="col-md-12">
+            <waltz-no-data>
+                <message>
+                    <strong>No data</strong>
+                    available for this application
+                </message>
+            </waltz-no-data>
+        </div>
+    </div>
+
 
 </waltz-section>
