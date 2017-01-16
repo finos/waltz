@@ -21,10 +21,8 @@ package com.khartec.waltz.service.complexity;
 import com.khartec.waltz.data.complexity.ServerComplexityDao;
 import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ComplexityScore;
-import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,24 +59,6 @@ public class ServerComplexityService {
                         baseline,
                         Math::log))
                 .collect(Collectors.toList());
-    }
-
-
-    public ComplexityScore getForApp(long appId) {
-        int baseline = serverComplexityDao.findBaseline();
-        return getForApp(appId, baseline);
-    }
-
-
-    public ComplexityScore getForApp(long appId, int baseline) {
-        List<Tally<Long>> tallies = serverComplexityDao.findCountsByAppIdSelector(DSL.select(DSL.value(appId)));
-        if (tallies.isEmpty()) { return null; }
-
-        return tallyToComplexityScore(
-                ComplexityKind.SERVER,
-                tallies.get(0),
-                baseline,
-                Math::log);
     }
 
 }

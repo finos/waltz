@@ -57,8 +57,8 @@ public class ComplexityScoreDao {
 
             scores.forEach(score -> {
                 switch (score.kind()) {
-                    case CAPABILITY:
-                        builder.capabilityComplexity(score);
+                    case MEASURABLE:
+                        builder.measurableComplexity(score);
                         break;
                     case CONNECTION:
                         builder.connectionComplexity(score);
@@ -102,7 +102,6 @@ public class ComplexityScoreDao {
         Condition condition = COMPLEXITY_SCORE.ENTITY_ID.in(appIdSelector)
                 .and(COMPLEXITY_SCORE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
-
         Map<Long, List<ComplexityScore>> scoresForApp = dsl
                 .select(COMPLEXITY_SCORE.fields())
                 .from(COMPLEXITY_SCORE)
@@ -117,6 +116,7 @@ public class ComplexityScoreDao {
                 .map(entry -> TO_COMPLEXITY_RATING.apply(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
+
 
     public int deleteAll() {
         return dsl.deleteFrom(COMPLEXITY_SCORE).execute();

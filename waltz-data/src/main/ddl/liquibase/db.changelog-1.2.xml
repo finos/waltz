@@ -550,4 +550,14 @@
         </sql>
     </changeSet>
 
+
+    <!-- 1354: Complexity -->
+    <changeSet id="20170116-1354-1"
+               author="dwatkins">
+        <sql>
+            DELETE FROM complexity_score
+            WHERE complexity_kind = 'CAPABILITY'
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
