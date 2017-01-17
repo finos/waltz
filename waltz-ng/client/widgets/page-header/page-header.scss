@@ -1,5 +1,5 @@
-@import "../../style/variables";
-@import "../../style/util";
+@import "../../../style/_variables";
+@import "../../../style/_util";
 
 
 .waltz-page-header {
@@ -19,10 +19,7 @@
     h2 {
         margin-top: 6px;
         margin-bottom: 4px;
-        @include transition(font-size 0.4s);
     }
-
-    @include transition(height 0.2s);
 }
 
 
@@ -35,6 +32,7 @@
     left: 0px;
     z-index: 999;
     border-bottom: 2px solid $waltz-border-color-lighter;
+    opacity: 0;
 
     h2 {
         margin: 4px;
@@ -42,8 +40,6 @@
         padding-left: 36px;
         font-size: medium;
         display: inline-block;
-
-        @include transition(font-size 0.4s);
     }
 
     ul {
@@ -51,6 +47,10 @@
         display: inline-block;
     }
 
-    @include transition(height 0.4s);
+    @include transition(opacity 0.2s);
 }
 
+.waltz-page-header.wph-sticky.wph-sticky-visible {
+    opacity: 1;
+    @include transition(opacity 0.2s);
+}
