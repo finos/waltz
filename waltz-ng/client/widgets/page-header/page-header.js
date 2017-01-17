@@ -15,9 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import angular from 'angular';
-import {initialiseData} from '../common';
+import angular from "angular";
+import {initialiseData} from "../../common";
 
 const bindings = {
     name: '@',
@@ -31,7 +30,7 @@ const transclude = true;
 
 
 const initialState = {
-
+    stickyVisible: false
 };
 
 
@@ -40,28 +39,26 @@ function controller($document,
                     $window) {
     const vm = initialiseData(this, initialState);
 
-    vm.sticky = false;
-
     vm.$onChanges = () => {
         $document[0].title = `Waltz: ${vm.name}`;
     };
 
     const scrollListener = () => {
         $scope.$apply(() => {
-            vm.sticky = $window.pageYOffset > 60
+            vm.stickyVisible = $window.pageYOffset > 60
         });
     };
 
     vm.$onInit = () => {
-        // angular
-        //     .element($window)
-        //     .on("scroll", _.throttle(scrollListener, 100));
+        angular
+            .element($window)
+            .on("scroll", _.throttle(scrollListener, 100));
     };
 
     vm.$onDestroy = () => {
-        // angular
-        //     .element($window)
-        //     .off("scroll", scrollListener);
+        angular
+            .element($window)
+            .off("scroll", scrollListener);
     };
 
     vm.startTour = () => {
