@@ -19,6 +19,7 @@
         <div class="row">
             <!-- SUMMARY -->
             <div class="col-sm-8"
+                 ng-if="!(ctrl.statistic.summary.tallies | isEmpty)"
                  style="border-right: 2px solid #eee">
                 <waltz-entity-statistic-detail-panel definition='ctrl.statistic.definition'
                                                      summary="ctrl.statistic.summary"
@@ -49,10 +50,20 @@
                     </waltz-related-entity-statistics-summaries>
                 </div>
             </div>
+            <div class="col-sm-8"
+                 ng-if="ctrl.statistic.summary.tallies | isEmpty">
+                <waltz-no-data ng-if="! ctrl.reloading">
+                    <message>
+                        <strong>No data points</strong> have been captured for
+                        <span ng-bind="ctrl.person.displayName"></span>.
+                    </message>
+                </waltz-no-data>
+            </div>
 
 
             <!-- NAV -->
-            <div class="col-sm-4" >
+            <div class="col-sm-4"
+                 ng-style="{'border-left': ctrl.statistic.summary.tallies.length == 0 ? '2px solid #eee' : 'none'}">
                 <h4>
                     <waltz-icon name="user" size="lg"></waltz-icon>
                     <span ng-bind="ctrl.person.displayName"></span>

@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import angular from 'angular';
+import angular from "angular";
 
 export default () => {
     const module = angular.module('waltz.widgets', []);
@@ -44,7 +43,7 @@ export default () => {
         .component('waltzEditableField', require('./editable-field'))
         .component('waltzIcon', require('./icon'))
         .component('waltzNoData', require('./no-data'))
-        .component('waltzPageHeader', require('./page-header'))
+        .component('waltzPageHeader', require('./page-header/page-header'))
         .component('waltzPie', require('./pie'))
         .component('waltzPieSegmentTable', require('./pie-segment-table'))
         .component('waltzPieTable', require('./pie-table'))

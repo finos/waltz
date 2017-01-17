@@ -19,6 +19,7 @@
 
         <div class="row">
             <div class="col-sm-8"
+                 ng-if="!(ctrl.statistic.summary.tallies | isEmpty)"
                  style="border-right: 2px solid #eee">
                 <!-- CURRENT -->
                 <div class="row">
@@ -58,15 +59,31 @@
                     </div>
                 </div>
             </div>
+            <div class="col-sm-8"
+                 ng-if="ctrl.statistic.summary.tallies | isEmpty">
+                <waltz-no-data ng-if="! ctrl.reloading">
+                    <message>
+                        <strong>No data points</strong> have been captured for
+                        <span ng-bind="ctrl.selectedNavItem.name"></span>.
+                    </message>
+                </waltz-no-data>
+            </div>
 
             <!-- NAV -->
-            <div class="col-sm-4">
+            <div class="col-sm-4"
+                 ng-style="{'border-left': ctrl.statistic.summary.tallies.length == 0 ? '2px solid #eee' : 'none'}">
                 <h4>
                     <waltz-icon fixed-width="true"
                                 size="lg"
                                 name="{{ ctrl.parentRef.kind | toIconName:'entity' }}">
                     </waltz-icon>
-                    <span ng-bind="ctrl.parentRef.kind | toDisplayName:'entity'"></span>
+
+                    <span ng-bind="ctrl.parentRef.kind | toDisplayName:'entity'"
+                          ng-if="ctrl.parentRef.kind !== 'MEASURABLE'"></span>
+
+                    <span ng-bind="ctrl.selectedNavItem.kind | toDisplayName:'measurableKind'"
+                          ng-if="ctrl.parentRef.kind === 'MEASURABLE'"></span>
+
                     <small>Selector</small>
                 </h4>
                 <waltz-entity-hierarchy-navigator model="ctrl.navItems"
