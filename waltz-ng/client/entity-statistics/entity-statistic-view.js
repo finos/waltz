@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import _ from "lodash";
 import {kindToViewState, resetData} from "../common";
 import {hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload} from "./utilities";
@@ -38,7 +37,8 @@ const initData = {
     duration: 'MONTH',
     visibility: {
         related: false
-    }
+    },
+    reloading: false
 };
 
 
@@ -110,6 +110,8 @@ function controller($q,
 
 
     vm.onSelectNavItem = (navItem) => {
+        vm.reloading = true;
+
         resetValueData();
 
         vm.selectedNavItem = navItem;
@@ -128,7 +130,10 @@ function controller($q,
 
         entityStatisticStore
             .calculateStatTally(vm.statistic.definition, selector)
-            .then(summary => vm.statistic.summary = summary)
+            .then(summary => {
+                vm.statistic.summary = summary;
+                vm.reloading = false;
+            })
             .then(() => vm.history = mkHistory(vm.history, vm.statistic.summary))
             .then(() => {
                 const related = vm.relatedDefinitions.children;
