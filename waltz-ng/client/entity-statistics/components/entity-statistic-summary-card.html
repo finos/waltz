@@ -1,35 +1,47 @@
 <div class="waltz-entity-statistic-summary-card">
-    <div class="row">
-        <div class="col-sm-offset-1 col-sm-5">
-            <h5>
-                <span ng-bind="$ctrl.definition.name">
-                </span>
-            </h5>
-            <div class='small'>
-                <span ng-bind="$ctrl.definition.category | toDisplayName:'entityStatistic'">
-                </span>
+    <div ng-if="!($ctrl.pie.data | isEmpty)">
+        <div class="row">
+            <div class="col-sm-offset-1 col-sm-5">
+                <h5>
+                    <span ng-bind="$ctrl.definition.name">
+                    </span>
+                </h5>
+                <div class='small'>
+                    <span ng-bind="$ctrl.definition.category | toDisplayName:'entityStatistic'">
+                    </span>
+                </div>
+                <a class='clickable small'
+                   title="Refocus on this statistic"
+                   ng-click="$ctrl.goToStatistic($ctrl.definition)">
+                    Explore &raquo;
+                </a>
             </div>
-            <a class='clickable small'
-               title="Refocus on this statistic"
-               ng-click="$ctrl.goToStatistic($ctrl.definition)">
-                Explore &raquo;
-            </a>
+            <div class="col-sm-6 text-center">
+                <waltz-pie data="$ctrl.pie.data"
+                           config="$ctrl.pie.config">
+                </waltz-pie>
+            </div>
         </div>
-        <div class="col-sm-6 text-center">
-            <waltz-pie data="$ctrl.pie.data"
-                       config="$ctrl.pie.config">
-            </waltz-pie>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <waltz-pie-segment-table data="$ctrl.pie.data"
-                                     config="$ctrl.pie.config"
-                                     headings="$ctrl.tableHeadings">
-            </waltz-pie-segment-table>
+        <div class="row">
+            <div class="col-md-12">
+                <waltz-pie-segment-table data="$ctrl.pie.data"
+                                         config="$ctrl.pie.config"
+                                         headings="$ctrl.tableHeadings">
+                </waltz-pie-segment-table>
+            </div>
         </div>
     </div>
 
-
+    <div ng-if="$ctrl.pie.data | isEmpty">
+        <div class="row">
+            <div class="col-sm-12">
+                <waltz-no-data>
+                    <message>
+                        <strong>No data points</strong> available.
+                    </message>
+                </waltz-no-data>
+            </div>
+        </div>
+    </div>
 </div>
