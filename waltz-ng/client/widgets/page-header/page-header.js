@@ -44,7 +44,7 @@ function controller($document,
     };
 
     const scrollListener = () => {
-        $scope.$apply(() => {
+        $scope.$applyAsync(() => {
             vm.stickyVisible = $window.pageYOffset > 60
         });
     };
