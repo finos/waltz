@@ -16,31 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash';
-import {buildHierarchies, initialiseData, switchToParentIds} from '../common';
+import {initialiseData} from '../common';
 import {measurableKindNames} from '../common/services/display-names';
 import {measurableKindDescriptions} from '../common/services/descriptions';
-import {buildPropertySummer} from '../common/tally-utils';
-import {scaleLinear} from 'd3-scale';
 
 
 const initialState = {
+    tabs: [],
     visibility: {
         tab: null
     },
-    treeOptions: {
-        nodeChildren: "children",
-        dirSelectable: true,
-        equality: function(node1, node2) {
-            if (node1 && node2) {
-                return node1.id === node2.id;
-            } else {
-                return false;
-            }
-        }
-    }
 };
-
-const totalSummer = buildPropertySummer();
 
 
 function prepareTabs(measurables = [], counts = []) {
@@ -61,25 +47,9 @@ function prepareTabs(measurables = [], counts = []) {
             name: measurableKindNames[k],
             description: measurableKindDescriptions[k]
         };
-        const measurablesForKind = measurablesByKind[k];
-        const treeData = switchToParentIds(buildHierarchies(measurablesForKind));
-        _.each(treeData, root => totalSummer(root));
-        const maxCount = _.get(
-            _.maxBy(treeData, 'totalCount'),
-            'totalCount') || 0;
-
-        const xScale = scaleLinear().range([0, 100]).domain([0, maxCount]);
-
-        const expandedNodes = treeData.length < 6  // pre-expand small trees
-            ? _.clone(treeData)
-            : [];
-
         return {
             kind,
-            measurables: measurablesForKind,
-            treeData,
-            expandedNodes,
-            xScale
+            measurables: measurablesByKind[k]
         };
     });
 

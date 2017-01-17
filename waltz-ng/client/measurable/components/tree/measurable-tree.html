@@ -1,0 +1,38 @@
+<div class="wmt-search-region">
+    <waltz-icon name="search"
+                ng-class="{
+                    'wmt-search-active' : $ctrl.searchTerms.length > 0,
+                    'wmt-search-inactive' : $ctrl.searchTerms.length == 0
+                }">
+    </waltz-icon>
+    <input type='search'
+           class="form-control"
+           name="searchTerms"
+           ng-model="$ctrl.searchTerms"
+           ng-change="$ctrl.searchTermsChanged($ctrl.searchTerms)"
+           ng-model-options="{ debounce: 200 }"
+           placeholder="Search">
+</div>
+
+<treecontrol class="tree-light"
+             tree-model="$ctrl.hierarchy"
+             options="$ctrl.treeOptions"
+             expanded-nodes="$ctrl.expandedNodes"
+             order-by="'-name'">
+    <span title="{{ node.description }}"
+                 ng-class="{ 'text-muted': node.rating == null }"
+                 class="no-overflow">
+        <a ui-sref='main.measurable.view ({id: node.id })'
+           ng-class="{ 'italics' : ! node.concrete }">
+            <span ng-bind="node.name"></span>
+            <span class="wml-bar-chart"
+                  ng-if="node.totalCount > 0"
+                  ng-style="{width: $ctrl.chartScale(node.totalCount) + 'px'}"
+                  uib-popover="{{ node.totalCount }} applications"
+                  popover-append-to-body="true"
+                  popover-placement="right"
+                  popover-trigger="mouseenter">
+            </span>
+        </a>
+    </span>
+</treecontrol>
