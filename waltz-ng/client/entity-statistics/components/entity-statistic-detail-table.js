@@ -125,7 +125,7 @@ function controller($animate,
         if (vm.appsById && vm.statisticValues) {
             _.each(vm.statisticValues, sv => {
                 sv.application = vm.appsById[sv.entity.id];
-                if (vm.orgUnitsById) {
+                if (vm.orgUnitsById && sv.application) {
                     sv.orgUnit = vm.orgUnitsById[sv.application.organisationalUnitId];
                 }
             });
