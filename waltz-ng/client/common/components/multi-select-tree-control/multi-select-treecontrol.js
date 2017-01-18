@@ -17,7 +17,8 @@
  */
 
 import _ from "lodash";
-import {initialiseData, buildHierarchies, switchToParentIds, invokeFunction} from "../../../common";
+import {initialiseData, invokeFunction} from "../../../common";
+import {buildHierarchies, switchToParentIds} from "../../../common/hierarchy-utils";
 
 
 const bindings = {

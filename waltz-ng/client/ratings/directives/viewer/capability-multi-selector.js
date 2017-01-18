@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {switchToParentIds, populateParents} from "../../../common";
+import {switchToParentIds, populateParents} from "../../../common/hierarchy-utils";
 
 
 const BINDINGS = {

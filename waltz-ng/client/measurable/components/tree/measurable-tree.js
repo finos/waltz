@@ -17,9 +17,10 @@
  */
 
 import _ from 'lodash';
-import {buildHierarchies, initialiseData, switchToParentIds} from '../../../common';
+import {initialiseData} from '../../../common';
 import {buildPropertySummer} from '../../../common/tally-utils';
 import {scaleLinear} from 'd3-scale';
+import {prepareSearchNodes, doSearch, buildHierarchies, switchToParentIds} from '../../../common/hierarchy-utils';
 
 
 /**
@@ -86,47 +87,16 @@ function prepareChartScale(hierarchy) {
 }
 
 
-function prepareSearchNodes(nodes = []) {
-    const nodesById = _.keyBy(nodes, 'id');
-
-    return _.map(nodes, n => {
-        let ptr = n;
-        let searchStr = '';
-        const nodePath = [];
-        while (ptr) {
-            nodePath.push(ptr);
-            searchStr += ptr.name + ' ';
-            ptr = nodesById[ptr.parentId];
-        }
-        return {
-            searchStr: searchStr.toLowerCase(),
-            nodePath
-        };
-    });
-}
-
-
-function doSearch(termStr = '', searchNodes = []) {
-    const terms = _.split(termStr.toLowerCase(), /\W+/);
-
-    return _
-        .chain(searchNodes)
-        .filter(sn => {
-            const noTerms = termStr.trim().length === 0;
-            const allMatch = _.every(terms, t => sn.searchStr.indexOf(t) >=0)
-            return noTerms || allMatch;
-        })
-        .flatMap('nodePath')
-        .uniqBy(n => n.id)
-        .value();
-}
-
-
 function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.searchTermsChanged = (termStr = '') => {
         vm.hierarchy = prepareTree(doSearch(termStr, vm.searchNodes));
+    };
+
+    vm.clearSearch = () => {
+        vm.searchTermsChanged('');
+        vm.searchTerms = '';
     };
 
     vm.$onChanges = (c) => {

@@ -12,6 +12,13 @@
            ng-change="$ctrl.searchTermsChanged($ctrl.searchTerms)"
            ng-model-options="{ debounce: 200 }"
            placeholder="Search">
+    &nbsp;
+    <waltz-icon name="close"
+                style="color: darkred"
+                ng-if="$ctrl.searchTerms.length > 0"
+                class="clickable"
+                ng-click="$ctrl.clearSearch()">
+    </waltz-icon>
 </div>
 
 <treecontrol class="tree-light"

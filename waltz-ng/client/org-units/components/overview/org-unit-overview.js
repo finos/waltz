@@ -21,7 +21,7 @@ import _ from "lodash";
 import {enrichServerStats} from "../../../server-info/services/server-utilities";
 import {calcPortfolioCost} from "../../../asset-cost/services/asset-cost-utilities";
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
-import {buildHierarchies} from "../../../common";
+import {buildHierarchies} from "../../../common/hierarchy-utils";
 
 
 const bindings = {

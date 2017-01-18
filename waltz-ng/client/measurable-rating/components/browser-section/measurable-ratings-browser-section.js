@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash';
-import {initialiseData, buildHierarchies, switchToParentIds, mkLinkGridCell} from '../../../common';
+import {initialiseData, mkLinkGridCell} from '../../../common';
 import {measurableKindNames, capabilityRatingNames} from '../../../common/services/display-names';
 
 /**

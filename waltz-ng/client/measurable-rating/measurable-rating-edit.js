@@ -135,10 +135,8 @@ function controller($q,
             kindToViewState(entityReference.kind),
             { id: entityReference.id });
 
-    vm.onMeasurableSelect = (d) => {
-        const original = d.rating
-            ? { rating: d.rating.rating, description: d.rating.description }
-            : { };
+    vm.onMeasurableSelect = (measurable, rating) => {
+        const original = Object.assign({}, rating);
 
         vm.editor = Object.assign(
             {},
@@ -148,7 +146,7 @@ function controller($q,
                 working: Object.assign({ rating: vm.defaultRating }, original),
                 canRemove: ! _.isEmpty(original),
                 canSave: _.isEmpty(original),
-                measurable: d.measurable
+                measurable
             });
     };
 

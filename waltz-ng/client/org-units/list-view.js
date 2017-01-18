@@ -18,7 +18,8 @@
 
 import _ from "lodash";
 import angular from "angular";
-import {buildHierarchies, termSearch} from "../common";
+import {termSearch} from "../common";
+import {buildHierarchies} from '../common/hierarchy-utils';
 import {buildPropertySummer} from "../common/tally-utils";
 
 

@@ -17,7 +17,9 @@
  */
 
 import angular from "angular";
-import {buildHierarchies, initialiseData} from "../common";
+import {initialiseData} from "../common";
+import {buildHierarchies} from "../common/hierarchy-utils";
+
 
 
 const initialState = {
@@ -54,7 +56,7 @@ function controller($state,
 
     vm.flowTableInitialised = (api) => {
         vm.exportLineageReports = api.export;
-    }
+    };
 
 
     lineageStore

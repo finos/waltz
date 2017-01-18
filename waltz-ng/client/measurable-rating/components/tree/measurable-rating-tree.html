@@ -1,24 +1,53 @@
-<div>
+<div class="wmt-search-region">
+    <waltz-icon name="search"
+                ng-class="{
+                    'wmt-search-active' : $ctrl.searchTerms.length > 0,
+                    'wmt-search-inactive' : $ctrl.searchTerms.length == 0
+                }">
+    </waltz-icon>
+    <input type='search'
+           class="form-control"
+           name="searchTerms"
+           ng-model="$ctrl.searchTerms"
+           ng-change="$ctrl.searchTermsChanged($ctrl.searchTerms)"
+           ng-model-options="{ debounce: 200 }"
+           placeholder="Search">
+    &nbsp;
+    <waltz-icon name="close"
+                style="color: darkred"
+                ng-if="$ctrl.searchTerms.length > 0"
+                class="clickable"
+                ng-click="$ctrl.clearSearch()">
+    </waltz-icon>
+
+</div>
+
+
+<div ng-class="$ctrl.containerClass">
     <treecontrol class="tree-light"
-                 tree-model="$ctrl.treeData"
+                 tree-model="$ctrl.hierarchy"
                  expanded-nodes="$ctrl.expandedNodes"
                  options="$ctrl.treeOptions"
-                 on-selection="$ctrl.onSelect(node)"
-                 order-by="'-measurable.name'">
+                 on-selection="$ctrl.onSelect(node, $ctrl.ratingsByMeasurable[node.id])"
+                 order-by="'-name'">
 
-        <span ng-if="node.measurable.concrete">
-            <waltz-rating-indicator-cell rating="node.rating.rating">
+        <span ng-if="node.concrete">
+            <waltz-rating-indicator-cell rating="$ctrl.ratingsByMeasurable[node.id].rating">
             </waltz-rating-indicator-cell>
         </span>
-        <span ng-if="! node.measurable.concrete">
-            <waltz-icon name='genderless'></waltz-icon>
+
+        <span ng-if="! node.concrete">
+            <waltz-icon name='genderless'>
+            </waltz-icon>
         </span>
 
-        <span title="{{ node.measurable.description }}"
-              ng-class="{ 'text-muted': node.rating == null }"
+        <span ng-attr-title="{{ node.description }}"
+              ng-class="{ 'text-muted': $ctrl.ratingsByMeasurable[node.id].rating == null }"
               class="no-overflow">
-            <span ng-bind="node.measurable.name" ng-class="{ 'italics' : ! node.measurable.concrete }">
+            <span ng-bind="node.name"
+                  ng-class="{ 'italics' : ! node.concrete }">
             </span>
         </span>
+
     </treecontrol>
 </div>

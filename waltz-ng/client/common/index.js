@@ -56,73 +56,6 @@ export function groupAndMap(coll = [], keyFn = d => d.id, valFn = d => d) {
         {});
 }
 
-/**
- * Given data that looks like:
- *
- *    [ { id: "",  parentId: ?, ... } , .. ]
- *
- * Gives back an array of top level objects which have children
- * nested in them, the result looks something like:
- *
- *    [ id: "", parentId : ?, parent : {}?, children : [ .. ], ... },  .. ]
- *
- * @param nodes
- * @returns {Array}
- */
-export function populateParents(nodes) {
-    const byId = _.chain(_.cloneDeep(nodes))
-        .map(u => _.merge(u, { children: [], parent: null }))
-        .keyBy('id')
-        .value();
-
-    _.each(_.values(byId), u => {
-        if (u.parentId) {
-            const parent = byId[u.parentId];
-            if (parent) {
-                parent.children.push(u);
-                u.parent = parent;
-            }
-        }
-    });
-
-    return _.values(byId);
-}
-
-
-export function buildHierarchies(nodes) {
-    // only give back root element/s
-    return _.reject(populateParents(nodes), n => n.parent);
-}
-
-
-export function findNode(nodes = [], id) {
-    const found = _.find(nodes, { id });
-    if (found) return found;
-
-    for(let i = 0; i < nodes.length; i++) {
-        const f = findNode(nodes[i].children, id);
-        if (f) return f;
-    }
-
-    return null;
-}
-
-
-export function getParents(node) {
-    if (! node) return [];
-
-    let ptr = node.parent;
-
-    const result = [];
-
-    while (ptr) {
-        result.push(ptr);
-        ptr = ptr.parent;
-    }
-
-    return result;
-}
-
 
 // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions#Using_Special_Characters
 export function escapeRegexCharacters(str) {
@@ -187,20 +120,6 @@ export function numberFormatter(num, digits = 0) {
         }
     }
     return num;
-}
-
-
-/**
- The wix tree widget does deep comparisons.
- Having parents as refs therefore blows the callstack.
- This method will replace refs with id's.
-*/
-export function switchToParentIds(treeData = []) {
-    _.each(treeData, td => {
-        td.parent = td.parent ? td.parent.id : null;
-        switchToParentIds(td.children);
-    });
-    return treeData;
 }
 
 
