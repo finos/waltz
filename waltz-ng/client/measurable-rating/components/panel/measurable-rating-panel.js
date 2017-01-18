@@ -48,7 +48,8 @@ const initialState = {
 
 function controller() {
     const vm = initialiseData(this, initialState);
-    vm.onSelect = d => vm.selected = d;
+    vm.onSelect = (measurable, rating) =>
+        vm.selected = { measurable, rating };
 }
 
 

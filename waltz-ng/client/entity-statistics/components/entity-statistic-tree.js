@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {buildHierarchies, findNode, switchToParentIds} from "../../common";
+import {buildHierarchies, findNode, switchToParentIds} from "../../common/hierarchy-utils";
 
 const bindings = {
     definitions: '<',

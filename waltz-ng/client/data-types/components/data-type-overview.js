@@ -19,7 +19,7 @@
 
 import {enrichServerStats} from "../../server-info/services/server-utilities";
 import {calcComplexitySummary} from "../../complexity/services/complexity-utilities";
-import {buildHierarchies, findNode, getParents} from "../../common";
+import {buildHierarchies, findNode, getParents} from "../../common/hierarchy-utils";
 
 const bindings = {
     dataTypeId: '<',

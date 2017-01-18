@@ -17,7 +17,8 @@
  */
 
 import _ from 'lodash';
-import {initialiseData, buildHierarchies, switchToParentIds} from '../../../common';
+import {initialiseData} from '../../../common';
+import {buildHierarchies, switchToParentIds} from '../../../common/hierarchy-utils';
 import {measurableKindNames} from '../../../common/services/display-names';
 
 /**

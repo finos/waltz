@@ -12,7 +12,7 @@
 
 
 import assert from 'assert';
-import { buildHierarchies } from '../../client/common/';
+import { buildHierarchies } from '../../client/common/hierarchy-utils';
 
 
 const ouA = {

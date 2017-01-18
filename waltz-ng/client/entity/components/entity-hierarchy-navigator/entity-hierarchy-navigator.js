@@ -17,7 +17,7 @@
  */
 
 import _ from "lodash";
-import {buildHierarchies, findNode, switchToParentIds} from "../../../common";
+import {buildHierarchies, findNode, switchToParentIds} from "../../../common/hierarchy-utils";
 
 const initialState = {
     model: [],

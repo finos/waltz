@@ -24,7 +24,8 @@ export default () => {
     const module = angular.module('waltz.measurable', []);
 
     module
-        .component('waltzMeasurableSummary', require('./components/summary/measurable-summary'));
+        .component('waltzMeasurableSummary', require('./components/summary/measurable-summary'))
+        .component('waltzMeasurableTree', require('./components/tree/measurable-tree'));
 
     module
         .service('MeasurableStore', require('./services/measurable-store'));

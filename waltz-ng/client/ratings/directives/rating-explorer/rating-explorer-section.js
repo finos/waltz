@@ -17,7 +17,7 @@
  */
 
 import _ from "lodash";
-import {buildHierarchies} from "../../../common";
+import {buildHierarchies} from "../../../common/hierarchy-utils";
 import {nest} from 'd3-collection';
 
 

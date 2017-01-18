@@ -60,7 +60,7 @@ export function buildPropertySummer (countKey = 'directCount',
         }
 
         const count = Number(node[countKey] || 0);
-        const sum = _.sumBy(node.children, summer);
+        const sum = _.sumBy(node.children, summer); // recursive step
 
         if (node.children) {
             node[totalKey] = sum + count;
