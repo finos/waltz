@@ -17,7 +17,7 @@
  */
 import _ from "lodash";
 import moment from "moment";
-import {mkEntityLinkGridCell, mkLinkGridCell} from "../../common";
+import {notEmpty, mkEntityLinkGridCell, mkLinkGridCell} from "../../common";
 
 
 /**
@@ -105,30 +105,24 @@ function controller($animate,
     vm.$onChanges = (change) => {
         vm.gridOptions = setupGrid();
 
-        if (change.statisticValues) {
-            vm.gridOptions.data = vm.statisticValues || [];
-        }
-
         if (change.filterOutcome) {
             const tableOutcomeCell = vm.gridOptions.columnDefs[2];
             tableOutcomeCell.filter.term = vm.filterOutcome;
         }
 
-        if (change.applications) {
-            vm.appsById = _.keyBy(vm.applications, 'id');
-        }
+        if (vm.statisticValues
+                && notEmpty(change.applications)
+                && notEmpty(change.orgUnits)) {
 
-        if (change.orgUnits) {
-            vm.orgUnitsById = _.keyBy(vm.orgUnits, 'id');
-        }
+            const appsById = _.keyBy(vm.applications, 'id');
+            const orgUnitsById = _.keyBy(vm.orgUnits, 'id');
 
-        if (vm.appsById && vm.statisticValues) {
             _.each(vm.statisticValues, sv => {
-                sv.application = vm.appsById[sv.entity.id];
-                if (vm.orgUnitsById && sv.application) {
-                    sv.orgUnit = vm.orgUnitsById[sv.application.organisationalUnitId];
-                }
+                sv.application = appsById[sv.entity.id];
+                sv.orgUnit = orgUnitsById[sv.application.organisationalUnitId];
             });
+
+            vm.gridOptions.data = vm.statisticValues;
         }
     };
 
