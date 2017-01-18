@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import _ from "lodash";
 import {variableScale} from "../../common/colors";
 import {mkSummaryTableHeadings} from "../utilities";
@@ -24,6 +23,7 @@ import {mkSummaryTableHeadings} from "../utilities";
 const bindings = {
     applications: '<',
     definition: '<',
+    orgUnits: '<',
     summary: '<',
     values: '<'
 };
