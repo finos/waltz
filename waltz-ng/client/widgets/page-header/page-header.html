@@ -31,7 +31,14 @@
          ng-class="{
             'wph-sticky-visible' : $ctrl.stickyVisible
             }">
-        <h2>
+
+        <h2 class="clickable"
+            ng-click="$ctrl.scrollToTop()"
+            uib-popover="Back to top"
+            popover-placement="bottom"
+            popover-append-to-body="true"
+            popover-trigger="mouseenter">
+
             <waltz-icon name="{{ $ctrl.icon || 'dot-circle-o' }}"
                         fixed="true"></waltz-icon>
 
@@ -39,6 +46,7 @@
 
             <small ng-bind="$ctrl.small"></small>
         </h2>
+
     </div>
 
 </div>
