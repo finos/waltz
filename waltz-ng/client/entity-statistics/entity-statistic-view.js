@@ -23,6 +23,7 @@ import {hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload} from
 const initData = {
     allDefinitions: [],
     applications: [],
+    orgUnits: [],
     statistic: {
         definition: null,
         summary: null,
@@ -55,7 +56,8 @@ function controller($q,
                     applicationStore,
                     bookmarkStore,
                     entityStatisticUtilities,
-                    entityStatisticStore) {
+                    entityStatisticStore,
+                    orgUnitStore) {
     const vm = resetData(this, initData);
 
     const statId = $stateParams.statId;
@@ -85,9 +87,14 @@ function controller($q,
         .findAllActiveDefinitions()
         .then(ds => vm.allDefinitions = ds);
 
+    const orgUnitsPromise = orgUnitStore
+        .findAll()
+        .then(os => vm.orgUnits = os);
+
     $q.all([navItemPromise, definitionPromise])
         .then(() => /* boot */ vm.onSelectNavItem(_.find(vm.navItems, { id: entityId })))
-        .then(allDefinitionsPromise);
+        .then(allDefinitionsPromise)
+        .then(orgUnitsPromise);
 
     function resetValueData() {
         const clearData = resetData({}, initData);
@@ -184,7 +191,8 @@ controller.$inject = [
     'ApplicationStore',
     'BookmarkStore',
     'EntityStatisticUtilities',
-    'EntityStatisticStore'
+    'EntityStatisticStore',
+    'OrgUnitStore'
 ];
 
 
