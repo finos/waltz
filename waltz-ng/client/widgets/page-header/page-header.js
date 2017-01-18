@@ -67,6 +67,10 @@ function controller($document,
         }
     };
 
+    vm.scrollToTop = () => {
+        $window.scroll(0, 0);
+    };
+
 }
 
 
