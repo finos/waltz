@@ -17,7 +17,7 @@
  */
 import _ from "lodash";
 import moment from "moment";
-import {mkEntityLinkGridCell} from "../../common";
+import {mkEntityLinkGridCell, mkLinkGridCell} from "../../common";
 
 
 /**
@@ -33,6 +33,7 @@ const bindings = {
     applications: '<',
     filterOutcome: '<',
     lastUpdatedAt: '<',
+    orgUnits: '<',
     statisticDefinition: '<',
     statisticValues: '<'
 };
@@ -83,6 +84,9 @@ const reasonCell = {
 };
 
 
+const orgUnitCell = mkLinkGridCell('Org Unit', 'orgUnit.name', 'orgUnit.id', 'main.org-unit.view');
+
+
 const dateCell = {
     field: 'createdAt',
     displayName: 'Last Updated',
@@ -105,17 +109,26 @@ function controller($animate,
             vm.gridOptions.data = vm.statisticValues || [];
         }
 
-        if(change.filterOutcome) {
+        if (change.filterOutcome) {
             const tableOutcomeCell = vm.gridOptions.columnDefs[2];
             tableOutcomeCell.filter.term = vm.filterOutcome;
         }
 
-        if(change.applications) {
+        if (change.applications) {
             vm.appsById = _.keyBy(vm.applications, 'id');
         }
 
+        if (change.orgUnits) {
+            vm.orgUnitsById = _.keyBy(vm.orgUnits, 'id');
+        }
+
         if (vm.appsById && vm.statisticValues) {
-            _.each(vm.statisticValues, sv => sv.application = vm.appsById[sv.entity.id]);
+            _.each(vm.statisticValues, sv => {
+                sv.application = vm.appsById[sv.entity.id];
+                if (vm.orgUnitsById) {
+                    sv.orgUnit = vm.orgUnitsById[sv.application.organisationalUnitId];
+                }
+            });
         }
     };
 
@@ -136,6 +149,7 @@ function controller($animate,
                 outcomeCell(uiGridConstants),
                 valueCell(uiGridConstants, vm.statisticDefinition),
                 reasonCell,
+                orgUnitCell,
                 dateCell
             ]
         };
