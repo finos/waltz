@@ -27,7 +27,6 @@ public class DBExecutorPool implements DBExecutorPoolInterface {
 
     @Override
     public <T> Future<T> submit(Callable<T> task) {
-        System.out.println("Submit task");
         return executorPool.submit(task);
     }
 
