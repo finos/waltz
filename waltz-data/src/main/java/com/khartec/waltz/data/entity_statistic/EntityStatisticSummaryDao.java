@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.entity_statistic;
 
+import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.model.Duration;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -44,7 +45,6 @@ import java.util.function.Function;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.data.JooqUtilities.DB_EXECUTOR_POOL;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 import static java.util.stream.Collectors.*;
 import static org.jooq.impl.DSL.*;
@@ -65,12 +65,15 @@ public class EntityStatisticSummaryDao {
     private static final Field<java.sql.Date> esvCreatedAtDateOnly = castDateField.as("esv_created_at_date_only");
 
     private final DSLContext dsl;
+    private final DBExecutorPoolInterface dbExecutorPool;
 
 
     @Autowired
-    public EntityStatisticSummaryDao(DSLContext dsl) {
+    public EntityStatisticSummaryDao(DSLContext dsl, DBExecutorPoolInterface dbExecutorPool) {
         checkNotNull(dsl, "dsl cannot be null");
+        checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         this.dsl = dsl;
+        this.dbExecutorPool = dbExecutorPool;
     }
 
 
@@ -136,7 +139,7 @@ public class EntityStatisticSummaryDao {
         }
 
         List<Future<TallyPack<String>>> summaryFutures = statisticIds.stream()
-                .map(statId -> DB_EXECUTOR_POOL.submit(() ->
+                .map(statId -> dbExecutorPool.submit(() ->
                         generateWithNoRollup(statId, entityReference)))
                 .collect(toList());
 
@@ -274,7 +277,7 @@ public class EntityStatisticSummaryDao {
         }
 
         List<Future<TallyPack<String>>> summaryFutures = statisticIds.stream()
-                .map(statId -> DB_EXECUTOR_POOL.submit(() ->
+                .map(statId -> dbExecutorPool.submit(() ->
                         generateSummary(statId, appIdSelector, aggregateField, toTally)))
                 .collect(toList());
 

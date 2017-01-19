@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.service.app_view;
 
+import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
@@ -39,7 +40,6 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.data.JooqUtilities.DB_EXECUTOR_POOL;
 
 
 @Service
@@ -50,6 +50,7 @@ public class AppViewService {
     private final ComplexityRatingService complexityRatingService;
     private final EntityAliasService entityAliasService;
     private final OrganisationalUnitService organisationalUnitService;
+    private final DBExecutorPoolInterface dbExecutorPool;
 
 
     @Autowired
@@ -57,17 +58,21 @@ public class AppViewService {
                           ApplicationService applicationService,
                           ComplexityRatingService complexityRatingService,
                           EntityAliasService entityAliasService,
+                          DBExecutorPoolInterface dbExecutorPool,
                           OrganisationalUnitService organisationalUnitService) {
+
         checkNotNull(appTagService, "appTagService cannot be null");
         checkNotNull(applicationService, "applicationService cannot be null");
         checkNotNull(complexityRatingService, "complexityRatingService cannot be null");
         checkNotNull(entityAliasService, "entityAliasService cannot be null");
+        checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(organisationalUnitService, "organisationalUnitService must not be null");
 
         this.appTagService = appTagService;
         this.applicationService = applicationService;
         this.complexityRatingService = complexityRatingService;
         this.entityAliasService = entityAliasService;
+        this.dbExecutorPool = dbExecutorPool;
         this.organisationalUnitService = organisationalUnitService;
     }
 
@@ -79,19 +84,19 @@ public class AppViewService {
                 .id(id)
                 .build();
 
-        Future<Application> application = DB_EXECUTOR_POOL.submit(() ->
+        Future<Application> application = dbExecutorPool.submit(() ->
                 applicationService.getById(id));
 
-        Future<OrganisationalUnit> orgUnit = DB_EXECUTOR_POOL.submit(() ->
+        Future<OrganisationalUnit> orgUnit = dbExecutorPool.submit(() ->
                 organisationalUnitService.getByAppId(id));
 
-        Future<List<String>> tags = DB_EXECUTOR_POOL.submit(() ->
+        Future<List<String>> tags = dbExecutorPool.submit(() ->
                 appTagService.findTagsForApplication(id));
 
-        Future<List<String>> aliases = DB_EXECUTOR_POOL.submit(() ->
+        Future<List<String>> aliases = dbExecutorPool.submit(() ->
                 entityAliasService.findAliasesForEntityReference(ref));
 
-        Future<ComplexityRating> complexity = DB_EXECUTOR_POOL.submit(() ->
+        Future<ComplexityRating> complexity = dbExecutorPool.submit(() ->
                 complexityRatingService.getForApp(id));
 
         return Unchecked.supplier(() -> ImmutableAppView.builder()

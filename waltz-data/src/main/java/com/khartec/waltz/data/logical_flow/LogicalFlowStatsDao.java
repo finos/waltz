@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.logical_flow;
 
+import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowMeasures;
@@ -42,7 +43,6 @@ import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.data.JooqUtilities.DB_EXECUTOR_POOL;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -66,12 +66,16 @@ public class LogicalFlowStatsDao {
             lf.SOURCE_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name()))
                 .and(lf.TARGET_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name())));
 
+    private final DBExecutorPoolInterface dbExecutorPool;
+
 
     @Autowired
-    public LogicalFlowStatsDao(DSLContext dsl) {
+    public LogicalFlowStatsDao(DSLContext dsl, DBExecutorPoolInterface dbExecutorPool) {
         checkNotNull(dsl, "dsl must not be null");
+        checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
 
         this.dsl = dsl;
+        this.dbExecutorPool = dbExecutorPool;
     }
 
 
@@ -96,9 +100,9 @@ public class LogicalFlowStatsDao {
                     .from(APPLICATION)
                     .where(dsl.renderInlined(APPLICATION.ID.in(appIdSelector)));
 
-        Future<Integer> inAppCount = DB_EXECUTOR_POOL.submit(() -> inAppCounter.fetchOne().value1());
-        Future<Integer> outAppCount = DB_EXECUTOR_POOL.submit(() -> outAppCounter.fetchOne().value1());
-        Future<Integer> intraAppCount = DB_EXECUTOR_POOL.submit(() -> intraAppCounter.fetchOne().value1());
+        Future<Integer> inAppCount = dbExecutorPool.submit(() -> inAppCounter.fetchOne().value1());
+        Future<Integer> outAppCount = dbExecutorPool.submit(() -> outAppCounter.fetchOne().value1());
+        Future<Integer> intraAppCount = dbExecutorPool.submit(() -> intraAppCounter.fetchOne().value1());
 
         Supplier<ImmutableLogicalFlowMeasures> appCountSupplier = Unchecked.supplier(() -> ImmutableLogicalFlowMeasures.builder()
                 .inbound(inAppCount.get())

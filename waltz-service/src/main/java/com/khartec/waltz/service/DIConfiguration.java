@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.service;
 
+import com.khartec.waltz.data.DBExecutorPool;
+import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.model.ImmutableWaltzVersionInfo;
 import com.khartec.waltz.model.WaltzVersionInfo;
 import com.khartec.waltz.service.capability.CapabilityService;
@@ -62,10 +64,10 @@ public class DIConfiguration {
     @Value("${database.driver}")
     private String dbDriver;
 
-    @Value("${database.pool.max?:10}")
+    @Value("${database.pool.max:10}")
     private int dbPoolMax;
 
-    @Value("${database.pool.min?:2}")
+    @Value("${database.pool.min:2}")
     private int dbPoolMin;
 
     @Value("${jooq.dialect}")
@@ -95,6 +97,11 @@ public class DIConfiguration {
         dsConfig.setMaximumPoolSize(dbPoolMax);
         dsConfig.setMinimumIdle(dbPoolMin);
         return new HikariDataSource(dsConfig);
+    }
+
+    @Bean
+    public DBExecutorPoolInterface dbExecutorPool() {
+        return new DBExecutorPool(dbPoolMin, dbPoolMax);
     }
 
 
