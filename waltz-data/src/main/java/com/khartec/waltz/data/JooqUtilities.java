@@ -32,8 +32,6 @@ import java.sql.Date;
 import java.util.Collection;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -42,16 +40,6 @@ import static org.jooq.impl.DSL.currentDate;
 import static org.jooq.impl.DSL.inline;
 
 public class JooqUtilities {
-
-    public static final ExecutorService DB_EXECUTOR_POOL =
-            Executors.newFixedThreadPool(
-                20, // TODO: ensure this matches the db conn pool size
-                (runnable) -> {
-                    Thread t = new Thread(runnable, "DB Executor");
-                    t.setDaemon(true);
-                    return t;
-                });
-
 
     public static final Field<Integer> TALLY_COUNT_FIELD = DSL.field("count", Integer.class);
 

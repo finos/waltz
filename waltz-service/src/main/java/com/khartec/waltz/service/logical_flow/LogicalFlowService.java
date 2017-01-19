@@ -19,6 +19,7 @@
 package com.khartec.waltz.service.logical_flow;
 
 import com.khartec.waltz.common.FunctionUtilities;
+import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
@@ -47,7 +48,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.data.JooqUtilities.DB_EXECUTOR_POOL;
 
 
 @Service
@@ -60,6 +60,7 @@ public class LogicalFlowService {
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
     private final DataTypeUsageService dataTypeUsageService;
     private final ChangeLogService changeLogService;
+    private final DBExecutorPoolInterface dbExecutorPool;
 
 
     @Autowired
@@ -68,8 +69,9 @@ public class LogicalFlowService {
                               DataFlowDecoratorService dataFlowDecoratorService,
                               ApplicationIdSelectorFactory appIdSelectorFactory,
                               LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory,
-                              DataTypeUsageService dataTypeUsageService, 
-                              ChangeLogService changeLogService) {
+                              DataTypeUsageService dataTypeUsageService,
+                              ChangeLogService changeLogService,
+                              DBExecutorPoolInterface dbExecutorPool) {
         checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
         checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
@@ -77,6 +79,7 @@ public class LogicalFlowService {
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(logicalFlowIdSelectorFactory, "logicalFlowIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
 
         this.appIdSelectorFactory = appIdSelectorFactory;
         this.logicalFlowStatsDao = logicalFlowStatsDao;
@@ -85,6 +88,7 @@ public class LogicalFlowService {
         this.dataTypeUsageService = dataTypeUsageService;
         this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
         this.changeLogService = changeLogService;
+        this.dbExecutorPool = dbExecutorPool;
     }
 
 
@@ -186,15 +190,15 @@ public class LogicalFlowService {
 
         Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);
 
-        Future<List<TallyPack<String>>> dataTypeCounts = DB_EXECUTOR_POOL.submit(() ->
+        Future<List<TallyPack<String>>> dataTypeCounts = dbExecutorPool.submit(() ->
                 FunctionUtilities.time("DFS.dataTypes",
                     () -> logicalFlowStatsDao.tallyDataTypesByAppIdSelector(appIdSelector)));
 
-        Future<LogicalFlowMeasures> appCounts = DB_EXECUTOR_POOL.submit(() ->
+        Future<LogicalFlowMeasures> appCounts = dbExecutorPool.submit(() ->
                 FunctionUtilities.time("DFS.appCounts",
                     () -> logicalFlowStatsDao.countDistinctAppInvolvementByAppIdSelector(appIdSelector)));
 
-        Future<LogicalFlowMeasures> flowCounts = DB_EXECUTOR_POOL.submit(() ->
+        Future<LogicalFlowMeasures> flowCounts = dbExecutorPool.submit(() ->
                 FunctionUtilities.time("DFS.flowCounts",
                     () -> logicalFlowStatsDao.countDistinctFlowInvolvementByAppIdSelector(appIdSelector)));
 
