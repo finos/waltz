@@ -134,7 +134,8 @@
                                 <div class="col-sm-9">
                                     <waltz-rating-picker selected="ctrl.selected.rating.rating"
                                                          edit-disabled="ctrl.saveInProgress"
-                                                         on-select="ctrl.onRatingSelect">
+                                                         on-select="ctrl.onRatingSelect"
+                                                         on-keypress="ctrl.onKeypress">
                                     </waltz-rating-picker>
                                     <div ng-if="ctrl.selected.rating !== ctrl.entityRating"
                                          class="small text-muted">

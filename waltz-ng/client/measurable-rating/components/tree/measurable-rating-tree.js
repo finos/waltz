@@ -56,7 +56,7 @@ const initialState = {
             }
         }
     },
-    onKeypress: (evt) => console.log('default on-keypress for measurable-rating-tree', evt),
+    onKeypress: null,
     onSelect: (m, r) => console.log('default on-select for measurable-rating-tree: ', m, r)
 };
 
