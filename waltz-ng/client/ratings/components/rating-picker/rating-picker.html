@@ -1,4 +1,6 @@
 <div class="waltz-rating-picker"
+     tabindex="1"
+     ng-keydown="$ctrl.onKeypress($event)"
      ng-style="$ctrl.pickerStyle">
 
     <div ng-repeat="option in $ctrl.options"

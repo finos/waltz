@@ -25,7 +25,7 @@
 
 <div ng-class="$ctrl.containerClass">
     <treecontrol class="tree-light"
-                 tabindex="1000"
+                 ng-attr-tabindex="{{$ctrl.onKeypress ? 1 : undefined}}"
                  ng-keydown="$ctrl.onKeypress($event)"
                  tree-model="$ctrl.hierarchy"
                  expanded-nodes="$ctrl.expandedNodes"

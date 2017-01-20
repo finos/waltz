@@ -134,11 +134,13 @@ function controller($q,
         return savePromise
             .then(rs => vm.ratings = rs)
             .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables))
-            .then(() =>
+            .then(() => {
+                vm.saveInProgress = false;
                 vm.selected = {
                     rating: { rating, description },
                     measurable: vm.selected.measurable
-                });
+                };
+            });
     };
 
     const reset = () => {
@@ -177,10 +179,13 @@ function controller($q,
 
         measurableRatingStore
             .remove(entityReference, vm.selected.measurable.id)
-            .then(rs => vm.ratings = rs)
-            .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables))
-            .then(() => vm.selected.rating = null)
-            .then(() => notification.success('Removed'));
+            .then(rs => {
+                vm.saveInProgress = false;
+                vm.ratings = rs;
+                vm.tabs = prepareTabs(vm.ratings, vm.measurables);
+                vm.selected.rating = null;
+                notification.success('Removed');
+            });
     };
 
 
@@ -188,7 +193,6 @@ function controller($q,
         const goRed = () => vm.onRatingSelect('R');
         const goGreen = () => vm.onRatingSelect('G');
         const goAmber = () => vm.onRatingSelect('A');
-        const goGrey = () => vm.onRatingSelect('Z');
         const remove = () => vm.doRemove();
         const cancel = () => vm.doCancel();
 
@@ -201,8 +205,6 @@ function controller($q,
             'Y': goAmber,
             'g': goGreen,
             'G': goGreen,
-            'z': goGrey,
-            'Z': goGrey,
             'x': remove,
             'X': remove,
             27: cancel,

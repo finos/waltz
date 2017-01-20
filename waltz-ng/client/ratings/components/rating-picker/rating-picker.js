@@ -20,7 +20,8 @@ import {initialiseData} from "../../../common";
 const bindings = {
     selected: '<',
     editDisabled: '<',
-    onSelect: '<'
+    onSelect: '<',
+    onKeypress: '<'
 };
 
 
@@ -33,8 +34,7 @@ const initialState = {
     options: [
         { value: 'G', label: 'Good', clazz: 'rating-G' },
         { value: 'A', label: 'Adequate', clazz: 'rating-A' },
-        { value: 'R', label: 'Poor', clazz: 'rating-R' },
-        // { value: 'Z', label: 'Unknown', clazz: 'rating-Z' }
+        { value: 'R', label: 'Poor', clazz: 'rating-R' }
     ]
 };
 
