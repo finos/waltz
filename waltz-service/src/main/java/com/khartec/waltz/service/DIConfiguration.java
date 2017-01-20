@@ -142,6 +142,10 @@ public class DIConfiguration {
 
 
     /* Required for property interpolation to work correctly */
+
+    /**
+     * @see <a href="http://stackoverflow.com/a/41760877/2311919">Explanation</a>
+     */
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer(ConfigurableEnvironment env) {
         PropertySourcesPlaceholderConfigurer placeholderConfigurer = new PropertySourcesPlaceholderConfigurer();
