@@ -19,7 +19,7 @@
 
                 <!-- INSTRUCTIONS -->
                 <div class="row"
-                     ng-if="!ctrl.editor">
+                     ng-if="!ctrl.selected.measurable">
                     <div class="col-sm-12">
                         <h4>Instructions</h4>
                         <p>
@@ -31,7 +31,58 @@
                             <b>then</b>
                             choose a rating and provide an optional comment.
                         </p>
-                        <br>
+                        <hr>
+                        <p>
+                            <b>Keyboard shortcuts</b>
+                            When the tree has focus the following keys are enabled:
+                            <table class="table table-condensed">
+                                <thead>
+                                <tr>
+                                    <th>Key</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <kbd>g</kbd>
+                                    </td>
+                                    <td>Green</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <kbd>a/y</kbd>
+                                    </td>
+                                    <td>Amber</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <kbd>r</kbd>
+                                    </td>
+                                    <td>Red</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <kbd>x</kbd>
+                                    </td>
+                                    <td>Remove</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <kbd>Esc</kbd>
+                                    </td>
+                                    <td>Cancel</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <kbd>ctrl+enter</kbd>
+                                    </td>
+                                    <td>Save comment</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </p>
+                        <hr>
                         <a ng-href="{{ctrl.backUrl}}">
                             &laquo;
                             Go back to
@@ -40,102 +91,97 @@
                     </div>
                 </div>
 
-                <!-- EDITOR -->
+                <!-- EDIT SECTION -->
                 <div class="row"
-                     ng-if="ctrl.editor">
-                    <div class="col-sm-12"
-                         ng-if="! ctrl.editor.measurable.concrete">
-                        <h4 ng-bind="ctrl.editor.measurable.name"></h4>
-                        <p>
-                            <waltz-icon name="info-circle"></waltz-icon>
-                            This node is abstract and cannot be given a direct
-                            rating.
-                        </p>
-                    </div>
-                    <div class="col-sm-12"
-                         ng-if="ctrl.editor.measurable.concrete">
-                        <h4 ng-bind="ctrl.editor.measurable.name"></h4>
+                     ng-if="ctrl.selected">
+                    <div class="col-sm-12">
+                        <h4 ng-bind="ctrl.selected.measurable.name"></h4>
                         <p class="text-muted"
-                           ng-bind="ctrl.editor.measurable.description">
+                           ng-bind="ctrl.selected.measurable.description">
                         </p>
-
-                        <hr>
-
-                        <div ng-if="ctrl.editor.canRemove">
-                            <span ng-bind="ctrl.entityRef.name">
-                            </span>
-                            already exhibits this characteristic.  You may change
-                            the rating, comment or remove this characteristic.
+                        <!-- ABSTRACT -->
+                        <div ng-if="! ctrl.selected.measurable.concrete">
+                            <p>
+                                <waltz-icon name="info-circle"></waltz-icon>
+                                This node is abstract and cannot be given a direct
+                                rating.
+                            </p>
                         </div>
+                        <!-- CONCRETE -->
+                        <div ng-if="ctrl.selected.measurable.concrete">
+                            <hr>
 
-                        <!-- NEW -->
-                        <div ng-if="! ctrl.editor.canRemove">
-                            This application does currently exhibit this characteristic.
-                            To add it, choose a rating and, optionally, provide a comment.
-                        </div>
-
-                        <br>
-
-                        <!-- RATING -->
-                        <div class="row">
-                            <div class="col-sm-2">
-                                Rating:
+                            <div ng-if="ctrl.selected.rating">
+                                <span ng-bind="ctrl.entityRef.name">
+                                </span>
+                                already exhibits this characteristic.  You may change
+                                the rating, comment or remove this characteristic.
                             </div>
-                            <div class="col-sm-10">
-                                <waltz-rating-picker selected="ctrl.editor.working.rating"
-                                                     edit-disabled="ctrl.saveInProgress"
-                                                     on-select="ctrl.onRatingSelect">
-                                </waltz-rating-picker>
-                                <div ng-if="ctrl.editor.working.rating !== ctrl.entityRating"
-                                     class="small text-muted">
-                                    <waltz-icon name="warning"></waltz-icon>
-                                    Note: this rating does not match the overall rating, which is
-                                    <span ng-bind="ctrl.entityRating | toDisplayName:'investmentRating'"></span>
+
+                            <!-- NEW -->
+                            <div ng-if="! ctrl.selected.rating">
+                                This application does not currently exhibit this characteristic.
+                                To add it, choose a rating and, optionally, provide a comment.
+                            </div>
+
+                            <br>
+
+                            <!-- RATING -->
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Rating:
+                                </div>
+                                <div class="col-sm-9">
+                                    <waltz-rating-picker selected="ctrl.selected.rating.rating"
+                                                         edit-disabled="ctrl.saveInProgress"
+                                                         on-select="ctrl.onRatingSelect">
+                                    </waltz-rating-picker>
+                                    <div ng-if="ctrl.selected.rating !== ctrl.entityRating"
+                                         class="small text-muted">
+                                        <waltz-icon name="warning">
+                                        </waltz-icon>
+                                        Note: this rating does not match the overall rating, which is
+                                        <span ng-bind="ctrl.entityRating | toDisplayName:'investmentRating'">
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- COMMENT -->
-                        <div class="row">
-                            <div class="col-sm-2">
-                                Comments:
-                            </div>
-                            <div class="col-sm-10">
-                                <textarea rows="5"
-                                          style="width: 90%"
-                                          ng-disabled="ctrl.saveInProgress"
-                                          ng-change="ctrl.onCommentChange()"
-                                          ng-model="ctrl.editor.working.description">
-                                </textarea>
-                            </div>
-                        </div>
 
-                        <!-- ACTIONS -->
-                        <div class="row">
-                            <div class="col-sm-12">
+                            <!-- COMMENT -->
+                            <div class="row" ng-if="ctrl.selected.rating">
                                 <hr>
-                                <button ng-click="ctrl.doSave()"
-                                        ng-disabled="!ctrl.editor.canSave || ctrl.saveInProgress"
-                                        class="btn btn-success">
-                                    Update
-                                </button>
-                                <button ng-click="ctrl.doRemove()"
-                                        ng-show="ctrl.editor.canRemove"
-                                        ng-disabled="ctrl.saveInProgress"
-                                        class="btn btn-danger">
-                                    Remove
-                                </button>
-                                <a class='clickable'
-                                   ng-disabled="ctrl.saveInProgress"
-                                   ng-click="ctrl.doCancel()">
-                                    Cancel
-                                </a>
-                                <waltz-loading-notification show="ctrl.saveInProgress"
-                                                            style="display: inline;"
-                                                            name="Saving">
-                                </waltz-loading-notification>
+                                <div class="col-sm-3">
+                                    Comments:
+                                </div>
+                                <div class="col-sm-9">
+                                    <waltz-inline-edit-area placeholder='None'
+                                                            disabled="ctrl.saveInProgress"
+                                                            on-save="ctrl.onSaveComment"
+                                                            value="ctrl.selected.rating.description">
+                                    </waltz-inline-edit-area>
+                                </div>
                             </div>
+
+                            <!-- REMOVE -->
+                            <div class="row"
+                                 ng-if="ctrl.selected.rating">
+                                <hr>
+                                <div class="col-sm-3">
+                                    Remove:
+                                </div>
+                                <div class="col-sm-9">
+                                    <button ng-click="ctrl.doRemove()"
+                                            ng-disabled="ctrl.saveInProgress"
+                                            class="btn btn-danger">
+                                        <waltz-icon name="trash" size="lg"></waltz-icon>
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -166,9 +212,11 @@
                     <div ng-repeat="tab in ctrl.tabs track by tab.kind.code"
                          ng-class="{ 'wt-active': tab.kind.code == ctrl.visibility.tab }"
                          class="wt-tab">
+
                         <div style="padding-top: 6px">
                             <waltz-measurable-rating-tree ratings="tab.ratings"
                                                           measurables="tab.measurables"
+                                                          on-keypress="ctrl.onKeypress"
                                                           scroll-height="600"
                                                           on-select="ctrl.onMeasurableSelect">
                             </waltz-measurable-rating-tree>

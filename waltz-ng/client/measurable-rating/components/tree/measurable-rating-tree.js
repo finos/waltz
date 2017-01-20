@@ -33,6 +33,7 @@ import {buildHierarchies, switchToParentIds, prepareSearchNodes, doSearch} from 
 const bindings = {
     ratings: '<',
     measurables: '<',
+    onKeypress: '<',
     onSelect: '<',
     scrollHeight: '@' // should correspond to numeric values in `waltz-scroll-region` classes
 };
@@ -55,6 +56,7 @@ const initialState = {
             }
         }
     },
+    onKeypress: (evt) => console.log('default on-keypress for measurable-rating-tree', evt),
     onSelect: (m, r) => console.log('default on-select for measurable-rating-tree: ', m, r)
 };
 

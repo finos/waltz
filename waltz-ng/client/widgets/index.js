@@ -21,7 +21,6 @@ export default () => {
     const module = angular.module('waltz.widgets', []);
 
     module.directive('waltzChangeTimeline', require('./change-timeline'));
-    module.directive('waltzInlineEditArea', require('./inline-edit-area'));
     module.directive('waltzErrorAlert', require('./error-alert'));
     module.directive('waltzExternalLink', require('./external-link'));
     module.directive('waltzFromNow', require('./from-now'));
@@ -42,6 +41,7 @@ export default () => {
         .component('waltzDataExtractLink', require('./data-extract-link'))
         .component('waltzEditableField', require('./editable-field'))
         .component('waltzIcon', require('./icon'))
+        .component('waltzInlineEditArea', require('./inline-edit-area'))
         .component('waltzNoData', require('./no-data'))
         .component('waltzPageHeader', require('./page-header/page-header'))
         .component('waltzPie', require('./pie'))
