@@ -36,6 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.jndi.JndiPropertySource;
 
 import javax.sql.DataSource;
 
@@ -141,8 +143,13 @@ public class DIConfiguration {
 
     /* Required for property interpolation to work correctly */
     @Bean
-    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer(ConfigurableEnvironment env) {
+        PropertySourcesPlaceholderConfigurer placeholderConfigurer = new PropertySourcesPlaceholderConfigurer();
+
+        JndiPropertySource jndiPropertySource = new JndiPropertySource("java:comp");
+        env.getPropertySources().addFirst(jndiPropertySource);
+
+        return placeholderConfigurer;
     }
 
     @Bean
