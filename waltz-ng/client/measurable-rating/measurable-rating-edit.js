@@ -22,19 +22,9 @@ import {measurableKindNames} from  '../common/services/display-names';
 import {measurableKindDescriptions} from  '../common/services/descriptions';
 
 
-const BASE_EDITOR = {
-    canSave: false,
-    canRemove: false,
-    original: null,
-    measurable: null,
-    working: null
-};
-
-
 const initialState = {
     backUrl: null,
-    defaultRating: null,
-    editor: null,
+    selected: null,
     entityRef: null,
     measurables: [],
     ratings: [],
@@ -72,13 +62,6 @@ function prepareTabs(ratings = [], measurables = []) {
 }
 
 
-function calcCanSave(working, original) {
-    const ratingsDiffer = working.rating !== original.rating;
-    const descriptionsDiffer = working.description !== original.description;
-    return ratingsDiffer || descriptionsDiffer;
-}
-
-
 function determineSelectedTab(tabs = []) {
     // first with ratings, or simply first if no ratings
     const tab = _.find(tabs, t => t.ratings.length > 0 ) || tabs[0];
@@ -91,7 +74,8 @@ function controller($q,
                     $stateParams,
                     applicationStore,
                     measurableStore,
-                    measurableRatingStore) {
+                    measurableRatingStore,
+                    notification) {
 
     const entityReference = {
         kind: $stateParams.kind,
@@ -99,7 +83,6 @@ function controller($q,
     };
 
     const vm = initialiseData(this, initialState);
-
 
     // -- LOAD ---
 
@@ -114,7 +97,6 @@ function controller($q,
     applicationStore
         .getById(entityReference.id)
         .then(app => {
-            vm.defaultRating = app.overallRating;
             vm.entityRating = app.overallRating;
             vm.entityRef = Object.assign(
                 entityReference,
@@ -130,64 +112,105 @@ function controller($q,
 
     // -- INTERACT ---
 
+    const getDescription = () => vm.selected.rating
+        ? vm.selected.rating.description
+        : null;
+
+    const getRating = () => vm.selected.rating
+        ? vm.selected.rating.rating
+        : null;
+
+    const doSave = (rating, description) => {
+        const saveFn = _.isEmpty(vm.selected.rating)
+            ? measurableRatingStore.create
+            : measurableRatingStore.update;
+
+        const savePromise = saveFn(
+            entityReference,
+            vm.selected.measurable.id,
+            rating,
+            description);
+
+        return savePromise
+            .then(rs => vm.ratings = rs)
+            .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables))
+            .then(() =>
+                vm.selected = {
+                    rating: { rating, description },
+                    measurable: vm.selected.measurable
+                });
+    };
+
+    const reset = () => {
+        vm.saveInProgress = false;
+        vm.selected = {};
+    };
+
     vm.backUrl = $state
         .href(
             kindToViewState(entityReference.kind),
             { id: entityReference.id });
 
     vm.onMeasurableSelect = (measurable, rating) => {
-        const original = Object.assign({}, rating);
-
-        vm.editor = Object.assign(
-            {},
-            BASE_EDITOR,
-            {
-                original,
-                working: Object.assign({ rating: vm.defaultRating }, original),
-                canRemove: ! _.isEmpty(original),
-                canSave: _.isEmpty(original),
-                measurable
-            });
+        vm.selected = { rating, measurable };
     };
 
     vm.onRatingSelect = r => {
-        vm.editor.working.rating = r;
-        vm.defaultRating = r;
-        vm.editor.canSave = calcCanSave(vm.editor.working, vm.editor.original);
+        if (! vm.selected.measurable) return; // nothing selected
+        if (r === getRating()) return; // rating not changed
+
+        return doSave(r, getDescription())
+            .then(() => notification.success('Saved'));
     };
 
-    vm.onCommentChange = () => {
-        vm.editor.canSave = calcCanSave(vm.editor.working, vm.editor.original);
+    vm.onSaveComment = (comment) => {
+        return doSave(getRating(), comment)
+            .then(() => notification.success('Saved Comment'))
     };
 
-    vm.doCancel = () => vm.editor = null;
-
-    vm.doSave = () => {
-        const saveParams = [entityReference, vm.editor.measurable.id, vm.editor.working.rating, vm.editor.working.description];
-        const savePromise = _.isEmpty(vm.editor.original)
-            ? measurableRatingStore.create(...saveParams)
-            : measurableRatingStore.update(...saveParams);
-
-        savePromise
-            .then(rs => vm.ratings = rs)
-            .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables))
-            .then(() => {
-                vm.saveInProgress = false;
-                vm.editor = null;
-            });
-
-    };
+    vm.doCancel = reset;
 
     vm.doRemove = () => {
+        if (! vm.selected.rating) return;
+
         vm.saveInProgress = true;
+
         measurableRatingStore
-            .remove(entityReference, vm.editor.measurable.id)
+            .remove(entityReference, vm.selected.measurable.id)
             .then(rs => vm.ratings = rs)
             .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables))
-            .then(() => {
-                vm.saveInProgress = false;
-                vm.editor = null;
-            });
+            .then(() => vm.selected.rating = null)
+            .then(() => notification.success('Removed'));
+    };
+
+
+    vm.onKeypress = (evt) => {
+        const goRed = () => vm.onRatingSelect('R');
+        const goGreen = () => vm.onRatingSelect('G');
+        const goAmber = () => vm.onRatingSelect('A');
+        const goGrey = () => vm.onRatingSelect('Z');
+        const remove = () => vm.doRemove();
+        const cancel = () => vm.doCancel();
+
+        const keyActions = {
+            'r': goRed,
+            'R': goRed,
+            'a': goAmber,
+            'A': goAmber,
+            'y': goAmber,
+            'Y': goAmber,
+            'g': goGreen,
+            'G': goGreen,
+            'z': goGrey,
+            'Z': goGrey,
+            'x': remove,
+            'X': remove,
+            27: cancel,
+        };
+
+        const action = keyActions[evt.keyCode] || keyActions[evt.key];
+
+        if (action) action();
     };
 }
 
@@ -199,6 +222,7 @@ controller.$inject = [
     'ApplicationStore',
     'MeasurableStore',
     'MeasurableRatingStore',
+    'Notification'
 ];
 
 

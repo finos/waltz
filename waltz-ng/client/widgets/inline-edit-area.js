@@ -21,45 +21,64 @@ import angular from 'angular';
 const Modes = {
     SAVING: Symbol(),
     VIEWING: Symbol(),
-    EDITING: Symbol(),
-    ERROR: Symbol()
+    EDITING: Symbol()
 };
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
-    scope: {
-        value: '=',
-        save: '&'
-    },
-    template: require('./inline-edit-area.html'),
-    link: (scope) => {
-        scope.mode = Modes.VIEWING;
-        scope.Modes = Modes;
 
-        scope.edit = () => {
-            scope.editor = {
-                modifiableValue: angular.copy(scope.value)
-            };
-            scope.mode = Modes.EDITING;
+function controller() {
+    const vm = this;
+
+    vm.mode = Modes.VIEWING;
+    vm.Modes = Modes;
+
+    vm.edit = () => {
+        vm.editor = {
+            modifiableValue: angular.copy(vm.value)
         };
+        vm.mode = Modes.EDITING;
+    };
 
-        scope.cancel = () => {
-            scope.mode = Modes.VIEWING;
-        };
+    vm.cancel = () => {
+        vm.mode = Modes.VIEWING;
+    };
 
-        scope.mySave = () => {
-            scope.mode = Modes.SAVING;
-            const valueToSave = scope.editor.modifiableValue;
-            scope.save()(valueToSave, scope.value)
-                .then(() => {
-                    scope.mode = Modes.VIEWING;
-                    scope.value = scope.editor.modifiableValue;
+    vm.mySave = () => {
+        vm.mode = Modes.SAVING;
+        const valueToSave = vm.editor.modifiableValue;
+        vm.onSave(valueToSave, vm.value)
+            .then((msg) => {
+                vm.mode = Modes.VIEWING;
+                vm.value = vm.editor.modifiableValue;
+            }, (msg) => {
+                console.log('Error', msg)
+            });
+    };
 
-                }, (e) => {
-                    scope.mode = Modes.ERROR;
-                    scope.editor.error = e;
-                });
-        };
+    vm.onKeydown = (evt) => {
+        if (evt.keyCode === 13 && (evt.metaKey || evt.ctrlKey)) {
+            vm.mySave();
+        }
     }
-});
+}
+
+
+controller.$inject = [];
+
+const bindings = {
+    placeholder: '@',
+    value: '<',
+    onSave: '<'
+};
+
+
+const template = require('./inline-edit-area.html');
+
+
+const component = {
+    template,
+    controller,
+    bindings
+};
+
+
+export default component;
