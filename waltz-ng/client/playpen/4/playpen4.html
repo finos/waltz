@@ -1,6 +1,6 @@
 <div>
 
-    <waltz-page-header name="{{ ctrl.perspective.definition.name }}"
+    <waltz-page-header name="{{ ctrl.perspective.definition.kindA }} x {{ ctrl.perspective.definition.kindB }} "
                        small="Perspective"
                        icon="rocket">
         <ol class="waltz-breadcrumbs">
@@ -18,16 +18,25 @@
     </style>
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div class="row">
-            <div class="col-sm-10"
+            <div class="col-sm-9"
                  style="border-right: 1px solid #eee">
                 <div class="side-scroller">
-                    <waltz-perspective-grid perspective="ctrl.perspective">
+                    <waltz-perspective-grid perspective="ctrl.perspective"
+                                            on-cell-click="ctrl.onCellClick">
                     </waltz-perspective-grid>
                 </div>
 
             </div>
-            <div class="col-sm-2">
-                <h4>Detail</h4>
+            <div class="col-sm-3">
+                <div ng-if="ctrl.selected">
+                    <waltz-rating-indicator-cell label="ctrl.selected.col.measurable.name"
+                                                 rating="ctrl.selected.col.rating.rating">
+                    </waltz-rating-indicator-cell>
+                    <br>
+                    <waltz-rating-indicator-cell label="ctrl.selected.row.measurable.name"
+                                                 rating="ctrl.selected.row.rating.rating">
+                    </waltz-rating-indicator-cell>
+                </div>
             </div>
         </div>
 

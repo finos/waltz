@@ -43,7 +43,6 @@ const measurableRatingShape = {
     entityReference: myApiCheck.shape(entityRefShape),
     measurableId: apiCheck.number,
     rating: apiCheck.string,
-    description: apiCheck.string
 };
 
 

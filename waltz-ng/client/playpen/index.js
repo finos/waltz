@@ -28,8 +28,8 @@ export default () => {
 
     const module = angular.module('waltz.playpen', []);
     module
-        .component('waltzAssetCostGraph', require('./3/asset-cost-graph.js'))
-        .component('waltzSvgManipulator', require('./4/svg-manipulator'));
+        .component('waltzSvgManipulator', require('./4/svg-manipulator'))
+        .component('waltzAbridged', require('./3/abridged'));
 
     module.config([
         '$stateProvider',
