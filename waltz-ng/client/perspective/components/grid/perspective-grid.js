@@ -34,26 +34,32 @@ import {ragColorScale} from '../../../common/colors';
 
 
 const bindings = {
-    perspective: '<'
+    perspective: '<',
+    onCellClick: '<'
 };
 
 
-const initialState = {};
+const initialState = {
+    onCellClick: d => console.log('perspective-grid:onCellClick', d)
+};
 
 
 const template = require('./perspective-grid.html');
 
 
-const width = 1000;
-const height = 300;
+let width = 1000;
+let height = 300;
+
 const margin = {
     top: 100, bottom: 50,
     left: 200, right: 50
 };
+
 const labelIndicatorSize = 10;
 const labelIndicatorPadding = 4;
 const labelPadding = labelIndicatorSize + labelIndicatorPadding * 2;
-
+const cellWidth = 40;
+const cellHeight = 35;
 
 function nestOverrides(overrides = []) {
     return nest()
@@ -64,7 +70,7 @@ function nestOverrides(overrides = []) {
 }
 
 
-function draw(elem, perspective) {
+function draw(elem, perspective, onCellClick) {
     if (! perspective) return;
 
     const scales = {
@@ -77,14 +83,14 @@ function draw(elem, perspective) {
     };
 
     elem
-        .call(drawGrid, perspective, scales)
+        .call(drawGrid, perspective, scales, onCellClick)
         .call(drawRowTitles, perspective.axes.b, scales)
         .call(drawColTitles, perspective.axes.a, scales)
         ;
 }
 
 
-function drawGrid(selection, perspective, scales) {
+function drawGrid(selection, perspective, scales, onCellClick) {
     const rowGroups = selection
         .selectAll('.row')
         .data(perspective.axes.b, d => d.measurable.id);
@@ -94,12 +100,12 @@ function drawGrid(selection, perspective, scales) {
         .append('g')
         .classed('row', true)
         .attr('transform', d => `translate( 0, ${scales.y(d.measurable.id)} )`)
-        .call(drawCells, perspective, scales)
+        .call(drawCells, perspective, scales, onCellClick)
         ;
 }
 
 
-function drawCells(selection, perspective, scales) {
+function drawCells(selection, perspective, scales, onCellClick) {
     const cellGroups = selection
         .selectAll('.cell')
         .data(row => _.map(
@@ -115,7 +121,7 @@ function drawCells(selection, perspective, scales) {
         .append('g')
         .classed('cell', true)
         .attr('transform', d => `translate( ${scales.x(d.col.measurable.id)}, 0 )`)
-        .on('click.col', d=> console.log(d.id))
+        .on('mouseover.cell', onCellClick)
         .call(drawInherited, scales)
         .call(drawOverrides, perspective, scales);
 }
@@ -301,8 +307,9 @@ function drawColTitles(elem, axis, scales) {
 }
 
 
-function initSvg(elem) {
+function initSvg(elem, width, height) {
     const svg = select(elem.find('svg')[0]);
+
     return svg
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
@@ -313,11 +320,19 @@ function initSvg(elem) {
 
 function controller($element) {
     const vm = initialiseData(this, initialState);
-    const svg = initSvg($element);
+
 
     vm.$onChanges = (c) => {
         if (c.perspective) {
-            draw(svg, vm.perspective);
+            console.log(vm.perspective)
+            if (vm.perspective) {
+                width = cellWidth * vm.perspective.axes.a.length;
+                height = cellHeight * vm.perspective.axes.b.length;
+
+                const svg = initSvg($element, width, height);
+
+                draw(svg, vm.perspective, vm.onCellClick);
+            }
         }
     };
 }

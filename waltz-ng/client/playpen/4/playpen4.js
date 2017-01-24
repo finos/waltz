@@ -26,6 +26,7 @@ const initialState = {
 
 function controller($q,
                     $stateParams,
+                    $timeout,
                     applicationStore,
                     measurableStore,
                     measurableRatingStore) {
@@ -92,12 +93,18 @@ function controller($q,
             vm.measurables,
             vm.measurableRatings,
             perspectiveRatings));
+
+    vm.onCellClick = d => {
+        console.log('oCC', d)
+        $timeout(() => vm.selected = d);
+    }
 }
 
 
 controller.$inject = [
     '$q',
     '$stateParams',
+    '$timeout',
     'ApplicationStore',
     'MeasurableStore',
     'MeasurableRatingStore'
