@@ -18,7 +18,7 @@
 
 import _ from 'lodash';
 import {scaleBand} from 'd3-scale';
-import {select, selectAll} from 'd3-selection';
+import {select, selectAll, event} from 'd3-selection';
 import {path} from 'd3-path';
 import {nest} from 'd3-collection';
 import {initialiseData} from '../../../common';
@@ -35,25 +35,29 @@ import {ragColorScale} from '../../../common/colors';
 
 const bindings = {
     perspective: '<',
-    onCellClick: '<'
+    handlers: '<'
 };
 
 
 const initialState = {
-    onCellClick: d => console.log('perspective-grid:onCellClick', d)
+    handlers: {
+        onCellClick: d => console.log('perspective-grid:onCellClick', d)
+    }
 };
 
 
 const template = require('./perspective-grid.html');
 
 
-let width = 1000;
+let width = 600;
 let height = 300;
+
 
 const margin = {
     top: 100, bottom: 50,
     left: 200, right: 50
 };
+
 
 const labelIndicatorSize = 10;
 const labelIndicatorPadding = 4;
@@ -61,6 +65,11 @@ const labelPadding = labelIndicatorSize + labelIndicatorPadding * 2;
 const cellWidth = 40;
 const cellHeight = 35;
 
+
+/**
+ * { mA -> mB -> { measurableA, measurableB, rating } }
+ * @param overrides
+ */
 function nestOverrides(overrides = []) {
     return nest()
         .key(d => d.measurableA)
@@ -70,7 +79,7 @@ function nestOverrides(overrides = []) {
 }
 
 
-function draw(elem, perspective, onCellClick) {
+function draw(elem, perspective, handlers) {
     if (! perspective) return;
 
     const scales = {
@@ -83,29 +92,32 @@ function draw(elem, perspective, onCellClick) {
     };
 
     elem
-        .call(drawGrid, perspective, scales, onCellClick)
+        .call(drawGrid, perspective, scales, handlers)
         .call(drawRowTitles, perspective.axes.b, scales)
         .call(drawColTitles, perspective.axes.a, scales)
         ;
 }
 
 
-function drawGrid(selection, perspective, scales, onCellClick) {
+function drawGrid(selection, perspective, scales, handlers) {
     const rowGroups = selection
         .selectAll('.row')
         .data(perspective.axes.b, d => d.measurable.id);
 
-    rowGroups
+    const newRows = rowGroups
         .enter()
         .append('g')
         .classed('row', true)
-        .attr('transform', d => `translate( 0, ${scales.y(d.measurable.id)} )`)
-        .call(drawCells, perspective, scales, onCellClick)
+        .attr('transform', d => `translate( 0, ${scales.y(d.measurable.id)} )`);
+
+    rowGroups
+        .merge(newRows)
+        .call(drawCells, perspective, scales, handlers)
         ;
 }
 
 
-function drawCells(selection, perspective, scales, onCellClick) {
+function drawCells(selection, perspective, scales, handlers) {
     const cellGroups = selection
         .selectAll('.cell')
         .data(row => _.map(
@@ -116,13 +128,30 @@ function drawCells(selection, perspective, scales, onCellClick) {
                 row})),
             d => d.id);
 
-    cellGroups
+
+    const maybeDrag = function(d) {
+        const evt = event;
+        if (evt.buttons > 0) {
+            _.invoke(handlers.custom, 'onCellDrag', d);
+        }
+
+    };
+
+    const newCellGroups = cellGroups
         .enter()
         .append('g')
         .classed('cell', true)
         .attr('transform', d => `translate( ${scales.x(d.col.measurable.id)}, 0 )`)
-        .on('mouseover.cell', onCellClick)
-        .call(drawInherited, scales)
+        .on('mouseover.custom', handlers.custom.onCellOver)
+        .on('mouseleave.custom', handlers.custom.onCellLeave)
+        .on('mouseover.base', handlers.base.onCellOver)
+        .on('mouseleave.base', handlers.base.onCellLeave)
+        .on('click.custom', handlers.custom.onCellClick)
+        .on('mouseover.drag', maybeDrag)
+        .call(drawInherited, scales);
+
+    cellGroups
+        .merge(newCellGroups)
         .call(drawOverrides, perspective, scales);
 }
 
@@ -139,12 +168,11 @@ function drawOverrides(selection, perspective, scales) {
     const h = scales.y.bandwidth() - (2 * cellPadding);
 
     const getOverride = (idA, idB) => {
-        const overridesForA = overrides[idA] || {};
-        return overridesForA[idB];
+        return _.get(overrides, `${idA}.${idB}`);
     };
 
     const getOverrideRating = (idA, idB) => {
-        return (getOverride(idA, idB) || {}).rating;
+        return _.get(overrides, `${idA}.${idB}.rating`);
     };
 
     const drawXShape = (selection) => {
@@ -239,13 +267,6 @@ function drawInherited(selection, scales) {
 
 
 function drawRowTitles(elem, axis, scales) {
-    const rowTitles = elem
-        .append('g')
-        .classed('row-titles', true)
-        .selectAll('row-title')
-        .data(axis, d => d.measurable.id)
-        ;
-
     const drawRect = (selection) => selection
         .append('rect')
         .attr('x', (labelIndicatorPadding + labelIndicatorSize) * -1)
@@ -264,19 +285,27 @@ function drawRowTitles(elem, axis, scales) {
         .attr('transform', d => `translate(-${labelPadding},  ${scales.y(d.measurable.id) + scales.y.bandwidth() / 2})`)
         ;
 
-    rowTitles
-        .enter()
-        .call(drawRect)
-        .call(drawText)
+    const rowTitles = elem
+            .selectAll('.row-titles')
+            .selectAll('.row-title')
+            .data(axis, d => d.measurable.id)
         ;
+
+    const newTitles = rowTitles
+        .enter()
+        .append('g')
+        .classed('row-title', true)
+        ;
+
+    newTitles.call(drawRect);
+    newTitles.call(drawText);
 }
 
 
 function drawColTitles(elem, axis, scales) {
     const colTitles = elem
-        .append('g')
-        .classed('col-titles', true)
-        .selectAll('col-title')
+        .selectAll('.col-titles')
+        .selectAll('.col-title')
         .data(axis, d => d.measurable.id)
         ;
 
@@ -307,32 +336,64 @@ function drawColTitles(elem, axis, scales) {
 }
 
 
+function findColTitle(svg, measurableId) {
+    return svg.selectAll('.col-title')
+        .filter(c => c.measurable.id === measurableId)
+}
+
+
+function findRowTitle(svg, measurableId) {
+    return svg.selectAll('.row-title')
+        .filter(c => c.measurable.id === measurableId)
+}
+
+
 function initSvg(elem, width, height) {
     const svg = select(elem.find('svg')[0]);
 
+    svg.attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom);
+
     return svg
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
-        .append('g')
+        .selectAll('.main')
         .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+}
+
+
+function initHandlers(svg, customHandlers) {
+    return {
+        base: {
+            onCellLeave: function(d) {
+                findColTitle(svg, d.col.measurable.id)
+                    .attr('text-decoration', 'none');
+                findRowTitle(svg, d.row.measurable.id)
+                    .attr('text-decoration', 'none');
+            },
+            onCellOver: function(d) {
+                findColTitle(svg, d.col.measurable.id)
+                    .attr('text-decoration', 'underline');
+                findRowTitle(svg, d.row.measurable.id)
+                    .attr('text-decoration', 'underline');
+            }
+        },
+        custom: customHandlers
+    };
 }
 
 
 function controller($element) {
     const vm = initialiseData(this, initialState);
 
-
     vm.$onChanges = (c) => {
-        if (c.perspective) {
-            console.log(vm.perspective)
-            if (vm.perspective) {
-                width = cellWidth * vm.perspective.axes.a.length;
-                height = cellHeight * vm.perspective.axes.b.length;
+        if (vm.perspective && vm.handlers) {
+            width = cellWidth * vm.perspective.axes.a.length;
+            height = cellHeight * vm.perspective.axes.b.length;
 
-                const svg = initSvg($element, width, height);
+            const svg = initSvg($element, width, height);
+            const handlers = initHandlers(svg, vm.handlers);
 
-                draw(svg, vm.perspective, vm.onCellClick);
-            }
+            draw(svg, vm.perspective, handlers);
         }
     };
 }

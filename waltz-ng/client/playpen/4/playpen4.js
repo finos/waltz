@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {mkPerspective} from '../../perspective/perpective-utilities';
-import {nest} from 'd3-collection'
+import {select} from 'd3-selection'
 
 
 const initialState = {
@@ -94,10 +94,34 @@ function controller($q,
             vm.measurableRatings,
             perspectiveRatings));
 
-    vm.onCellClick = d => {
-        console.log('oCC', d)
-        $timeout(() => vm.selected = d);
-    }
+
+    vm.handlers = {
+        onCellDrag: function(d) {
+            perspectiveRatings.push({
+                measurableA: d.col.measurable.id,
+                measurableB: d.row.measurable.id,
+                rating: 'X'
+            });
+
+            vm.perspective = mkPerspective(
+                perspectiveDefinition,
+                vm.measurables,
+                vm.measurableRatings,
+                perspectiveRatings);
+
+        },
+        onCellClick: function(d) {
+            $timeout(() => {
+                vm.selected = d
+            });
+        },
+        onCellOver: d => {
+            $timeout(() => vm.hovered = d);
+        },
+        onCellLeave: d => {
+            $timeout(() => vm.hovered = null);
+        }
+    };
 }
 
 
