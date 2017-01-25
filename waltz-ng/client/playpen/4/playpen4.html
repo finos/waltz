@@ -60,9 +60,21 @@
                                                  rating="ctrl.selected.row.rating.rating">
                     </waltz-rating-indicator-cell>
                 </div>
+
+                <hr>
+
+                <waltz-rating-picker selected="ctrl.activeRating"
+                                     on-select="ctrl.onRatingSelect">
+                </waltz-rating-picker>
+
+
+                <pre>{{ ctrl.activeRating }}</pre>
+
             </div>
         </div>
 
     </div>
+
+    <pre>{{ ctrl.perspectiveRatings | json }}</pre>
 
 </div>

@@ -114,7 +114,19 @@ function drawGrid(selection, perspective, scales, handlers) {
         .merge(newRows)
         .call(drawCells, perspective, scales, handlers)
         ;
+
+
+    selection
+        .call(drawOverrides, perspective, scales, handlers);
 }
+
+
+const maybeDrag = function(d, handler) {
+    const evt = event;
+    if (evt.buttons > 0) {
+        handler(d);
+    }
+};
 
 
 function drawCells(selection, perspective, scales, handlers) {
@@ -129,14 +141,6 @@ function drawCells(selection, perspective, scales, handlers) {
             d => d.id);
 
 
-    const maybeDrag = function(d) {
-        const evt = event;
-        if (evt.buttons > 0) {
-            _.invoke(handlers.custom, 'onCellDrag', d);
-        }
-
-    };
-
     const newCellGroups = cellGroups
         .enter()
         .append('g')
@@ -147,17 +151,15 @@ function drawCells(selection, perspective, scales, handlers) {
         .on('mouseover.base', handlers.base.onCellOver)
         .on('mouseleave.base', handlers.base.onCellLeave)
         .on('click.custom', handlers.custom.onCellClick)
-        .on('mouseover.drag', maybeDrag)
+        .on('mouseover.drag', d => maybeDrag(d, _.get(handlers, "custom.onCellDrag")))
         .call(drawInherited, scales);
 
     cellGroups
-        .merge(newCellGroups)
-        .call(drawOverrides, perspective, scales);
+        .merge(newCellGroups);
 }
 
 
-function drawOverrides(selection, perspective, scales) {
-    const overrides = nestOverrides(perspective.ratings);
+function drawOverrides(selection, perspective, scales, handlers) {
 
     const cellPadding = 2;
     const t = cellPadding;
@@ -166,14 +168,6 @@ function drawOverrides(selection, perspective, scales) {
     const r = scales.x.bandwidth() - cellPadding;
     const w = scales.x.bandwidth() - (2 * cellPadding);
     const h = scales.y.bandwidth() - (2 * cellPadding);
-
-    const getOverride = (idA, idB) => {
-        return _.get(overrides, `${idA}.${idB}`);
-    };
-
-    const getOverrideRating = (idA, idB) => {
-        return _.get(overrides, `${idA}.${idB}.rating`);
-    };
 
     const drawXShape = (selection) => {
         const d = path();
@@ -188,30 +182,42 @@ function drawOverrides(selection, perspective, scales) {
             .attr('stroke', '#ddd');
     };
 
-    const boxes = selection
-        .filter(d => getOverride(d.col.measurable.id, d.row.measurable.id))
-        .append('rect')
-        .classed('cell-override', true)
-        .attr('x', l)
-        .attr('y', t)
-        .attr('width', w)
-        .attr('height', h)
-        .attr('fill', d => {
-            const override = getOverride(d.col.measurable.id, d.row.measurable.id);
-            return ragColorScale(override.rating).brighter(1.3);
-        })
-        ;
+    const drawBoxes = selection => {
+        return selection
+            .append('rect')
+            .classed('cell-override', true)
+            .attr('x', l)
+            .attr('y', t)
+            .attr('width', w)
+            .attr('height', h)
+            .attr('fill', d => {
+                return ragColorScale(d.rating).brighter(1.3);
+            })
+            ;
+    };
 
-    boxes
-        .filter(d => getOverrideRating(d.col.measurable.id, d.row.measurable.id) !== 'X')
-        .attr('stroke', '#aaa')
-        .attr('stroke-width', 1.5)
-        ;
+    const overrides = selection
+        .selectAll('.override')
+        .data(
+            _.values(perspective.ratings),
+            d => `${d.measurableA}_${d.measurableB}_${d.rating}` );
 
-    selection
-        .filter(d => getOverrideRating(d.col.measurable.id, d.row.measurable.id) === 'X')
+    const newOverrides = overrides
+        .enter()
+        .append('g')
+        .classed('override', true)
+        .on('mouseover', c => console.log('c', c))
+        .on('mouseover.drag', d => maybeDrag(d, handlers))
+
+    overrides
+        .exit()
+        .remove();
+
+    newOverrides
+        .attr('transform', d => `translate(${ scales.x(d.measurableA) },${ scales.y(d.measurableB) })`)
+        .call(drawBoxes)
+        .filter(d => d.rating === 'X')
         .call(drawXShape);
-
 }
 
 
@@ -385,6 +391,8 @@ function initHandlers(svg, customHandlers) {
 function controller($element) {
     const vm = initialiseData(this, initialState);
 
+    const debouncedDraw = draw; // _.debounce(draw, 100);
+
     vm.$onChanges = (c) => {
         if (vm.perspective && vm.handlers) {
             width = cellWidth * vm.perspective.axes.a.length;
@@ -393,7 +401,7 @@ function controller($element) {
             const svg = initSvg($element, width, height);
             const handlers = initHandlers(svg, vm.handlers);
 
-            draw(svg, vm.perspective, handlers);
+            debouncedDraw(svg, vm.perspective, handlers);
         }
     };
 }

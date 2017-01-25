@@ -16,11 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {mkPerspective} from '../../perspective/perpective-utilities';
-import {select} from 'd3-selection'
+import {select, event} from 'd3-selection'
 
 
 const initialState = {
-
+    activeRating: 'G',
+    perspectiveRatings: {
+    }
 };
 
 
@@ -32,6 +34,10 @@ function controller($q,
                     measurableRatingStore) {
 
     const vm = Object.assign(this, initialState);
+
+    vm.$onChanges = () => {
+        Object.assign(this, initialState);
+    };
 
     const entityReference = {
         id: $stateParams.id,
@@ -51,33 +57,6 @@ function controller($q,
         description: 'blah blah'
     };
 
-    const perspectiveRatings = [
-        {
-            measurableA: 161,
-            measurableB: 434,
-            rating: 'R'
-        }, {
-            measurableA: 128,
-            measurableB: 428,
-            rating: 'G'
-        }, {
-            measurableA: 161,
-            measurableB: 428,
-            rating: 'Z'
-        }, {
-            measurableA: 163,
-            measurableB: 432,
-            rating: 'X'
-        }, {
-            measurableA: 145,
-            measurableB: 446,
-            rating: 'X'
-        }, {
-            measurableA: 149,
-            measurableB: 428,
-            rating: 'A'
-        }
-    ];
 
     const measurablesPromise = measurableStore
         .findMeasurablesBySelector(idSelector)
@@ -92,29 +71,33 @@ function controller($q,
             perspectiveDefinition,
             vm.measurables,
             vm.measurableRatings,
-            perspectiveRatings));
+            vm.perspectiveRatings));
 
+    const overrideCell = (d) => {
+        const key = `${d.col.measurable.id}_${d.row.measurable.id}`;
 
-    vm.handlers = {
-        onCellDrag: function(d) {
-            perspectiveRatings.push({
+        if (_.get(vm.perspectiveRatings, `${key}.rating`) !== vm.activeRating ) {
+            vm.perspectiveRatings[key] = {
                 measurableA: d.col.measurable.id,
                 measurableB: d.row.measurable.id,
-                rating: 'X'
-            });
-
+                rating: vm.activeRating
+            };
             vm.perspective = mkPerspective(
                 perspectiveDefinition,
                 vm.measurables,
                 vm.measurableRatings,
-                perspectiveRatings);
+                vm.perspectiveRatings);
 
-        },
-        onCellClick: function(d) {
-            $timeout(() => {
-                vm.selected = d
-            });
-        },
+            $timeout(() => {});  // kick angular to redraw
+        }
+
+
+    };
+
+    vm.handlers = {
+        onCellDrag: overrideCell,
+        onCellClick: overrideCell,
+        onCellDown: overrideCell,
         onCellOver: d => {
             $timeout(() => vm.hovered = d);
         },
@@ -122,6 +105,8 @@ function controller($q,
             $timeout(() => vm.hovered = null);
         }
     };
+
+    vm.onRatingSelect = r => vm.activeRating = r;
 }
 
 
