@@ -247,7 +247,6 @@ function drawExistingOverrides(selection, overrides = []) {
 
 
 function drawPendingOverrideShape(selection, cellDimensions) {
-
     const notchSizeX = cellDimensions.w / 1.5;
     const notchSizeY = cellDimensions.h / 1.5;
     const pathData = path();
@@ -257,8 +256,7 @@ function drawPendingOverrideShape(selection, cellDimensions) {
     pathData.lineTo(cellDimensions.r, cellDimensions.b);
     pathData.lineTo(cellDimensions.l + notchSizeX, cellDimensions.b);
     pathData.lineTo(cellDimensions.l, cellDimensions.b - notchSizeY);
-
-    pathData.closePath()
+    pathData.closePath();
 
     selection
         .append('path')
@@ -267,7 +265,6 @@ function drawPendingOverrideShape(selection, cellDimensions) {
         .attr('fill', d => {
             return ragColorScale(d.rating).brighter(1.3);
         });
-
 }
 
 

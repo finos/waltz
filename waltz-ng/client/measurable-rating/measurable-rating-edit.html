@@ -28,7 +28,7 @@
                             a characteristic of
                             <span ng-bind="ctrl.entityRef.name"></span>
                             and
-                            <b>then</b>
+                            <b>then</b> a
                             choose a rating and provide an optional comment.
                         </p>
                         <hr>
@@ -97,6 +97,7 @@
                     <div class="col-sm-12">
                         <h4 ng-bind="ctrl.selected.measurable.name"></h4>
                         <p class="text-muted"
+                           style="max-height: 160px; overflow-y: auto;"
                            ng-bind="ctrl.selected.measurable.description">
                         </p>
                         <!-- ABSTRACT -->
