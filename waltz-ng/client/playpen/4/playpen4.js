@@ -16,16 +16,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {mkPerspective} from '../../perspective/perpective-utilities';
-import {nest} from 'd3-collection'
+import {select, event} from 'd3-selection'
 
 
 const initialState = {
-
+    activeRating: 'G',
+    overrides: {
+    }
 };
 
 
-function controller($q,
-                    $stateParams,
+function updateOverrides(overrides = {}, d, rating) {
+    const key = `${d.col.measurable.id}_${d.row.measurable.id}`;
+
+    if (_.get(overrides, `${key}.rating`) !== rating ) {
+        const override = {
+            [key] : {
+                measurableA: d.col.measurable.id,
+                measurableB: d.row.measurable.id,
+                rating
+            }
+        };
+
+        return Object.assign(
+            {},
+            overrides,
+            override);
+    } else {
+        return overrides;
+    }
+}
+
+
+function controller($stateParams,
                     $timeout,
                     applicationStore,
                     measurableStore,
@@ -43,7 +66,7 @@ function controller($q,
         scope: 'EXACT'
     };
 
-    const perspectiveDefinition = {
+    vm.perspectiveDefinition = {
         id: 1,
         name: 'Function - Process',
         kindA: $stateParams.kindA || 'PROCESS',
@@ -51,58 +74,39 @@ function controller($q,
         description: 'blah blah'
     };
 
-    const perspectiveRatings = [
-        {
-            measurableA: 161,
-            measurableB: 434,
-            rating: 'R'
-        }, {
-            measurableA: 128,
-            measurableB: 428,
-            rating: 'G'
-        }, {
-            measurableA: 161,
-            measurableB: 428,
-            rating: 'Z'
-        }, {
-            measurableA: 163,
-            measurableB: 432,
-            rating: 'X'
-        }, {
-            measurableA: 145,
-            measurableB: 446,
-            rating: 'X'
-        }, {
-            measurableA: 149,
-            measurableB: 428,
-            rating: 'A'
-        }
-    ];
-
-    const measurablesPromise = measurableStore
+    measurableStore
         .findMeasurablesBySelector(idSelector)
         .then(measurables => vm.measurables = measurables);
 
-    const ratingsPromise = measurableRatingStore
+    measurableRatingStore
         .findByAppSelector(idSelector)
         .then(ratings => vm.measurableRatings = ratings);
 
-    $q.all([measurablesPromise, ratingsPromise])
-        .then(() => vm.perspective = mkPerspective(
-            perspectiveDefinition,
-            vm.measurables,
-            vm.measurableRatings,
-            perspectiveRatings));
+    const overrideCell = (d) => {
+        const updated = updateOverrides(vm.overrides, d, vm.activeRating);
+        if (updated != vm.overrides) {
+            vm.overrides = updated;
+            $timeout(() => {}); // kick angular
+        }
+    };
 
-    vm.onCellClick = d => {
-        console.log('oCC', d)
-        $timeout(() => vm.selected = d);
-    }
+    vm.handlers = {
+        onCellDrag: overrideCell,
+        onCellClick: overrideCell,
+        onCellDown: overrideCell,
+        onCellOver: d => {
+            $timeout(() => vm.hovered = d);
+        },
+        onCellLeave: d => {
+            $timeout(() => vm.hovered = null);
+        }
+    };
+
+    vm.onRatingSelect = r => vm.activeRating = r;
 }
 
 
 controller.$inject = [
-    '$q',
     '$stateParams',
     '$timeout',
     'ApplicationStore',
