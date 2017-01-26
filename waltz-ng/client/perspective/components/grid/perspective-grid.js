@@ -45,7 +45,7 @@ const bindings = {
     measurables: '<',
     measurableRatings: '<',
     existingOverrides: '<',
-    updatedOverrides: '<',
+    pendingOverrides: '<',
     handlers: '<'
 };
 
@@ -172,19 +172,25 @@ function drawCells(selection, perspective, handlers) {
 }
 
 
-function drawXShape(selection, cellDimensions) {
+function drawXShape(selection, cellDimensions, isPending = false) {
+
+    const strokeWidth = isPending ? 3 : 1;
+
     const pathData = path();
     pathData.moveTo(cellDimensions.l, cellDimensions.t);
     pathData.lineTo(cellDimensions.r, cellDimensions.b);
-    pathData.moveTo(cellDimensions.l, cellDimensions.b);
-    pathData.lineTo(cellDimensions.r, cellDimensions.t);
+
+    if (! isPending) {
+        pathData.moveTo(cellDimensions.l, cellDimensions.b);
+        pathData.lineTo(cellDimensions.r, cellDimensions.t);
+    }
 
     selection
         .append('path')
         .attr('d', pathData)
-        .attr('stroke', '#ddd');
+        .attr('stroke', '#ddd')
+        .attr('stroke-width', strokeWidth);
 };
-
 
 
 function calcOverrideCellDimensions(cellPadding) {
@@ -200,7 +206,7 @@ function calcOverrideCellDimensions(cellPadding) {
 
 
 function drawExistingOverrides(selection, overrides = []) {
-    const cellPadding = 6;
+    const cellPadding = 3;
     const cellDimensions = calcOverrideCellDimensions(cellPadding);
 
     const drawBoxes = selection => {
@@ -218,7 +224,7 @@ function drawExistingOverrides(selection, overrides = []) {
     };
 
     const overrideElems = selection
-        .selectAll('.override')
+        .selectAll('.existing-override')
         .data(
             _.values(overrides),
             d => `${d.measurableA}_${d.measurableB}_${d.rating}` );
@@ -226,7 +232,7 @@ function drawExistingOverrides(selection, overrides = []) {
     const newOverrides = overrideElems
         .enter()
         .append('g')
-        .classed('override', true);
+        .classed('existing-override', true);
 
     overrideElems
         .exit()
@@ -237,6 +243,58 @@ function drawExistingOverrides(selection, overrides = []) {
         .call(drawBoxes)
         .filter(d => d.rating === 'X')
         .call(drawXShape, cellDimensions);
+}
+
+
+function drawPendingOverrideShape(selection, cellDimensions) {
+
+    const notchSizeX = cellDimensions.w / 1.5;
+    const notchSizeY = cellDimensions.h / 1.5;
+    const pathData = path();
+    pathData.moveTo(cellDimensions.l, cellDimensions.t);
+    pathData.lineTo(cellDimensions.r - notchSizeX, cellDimensions.t);
+    pathData.lineTo(cellDimensions.r, cellDimensions.t + notchSizeY);
+    pathData.lineTo(cellDimensions.r, cellDimensions.b);
+    pathData.lineTo(cellDimensions.l + notchSizeX, cellDimensions.b);
+    pathData.lineTo(cellDimensions.l, cellDimensions.b - notchSizeY);
+
+    pathData.closePath()
+
+    selection
+        .append('path')
+        .classed('cell-override', true)
+        .attr('d', pathData)
+        .attr('fill', d => {
+            return ragColorScale(d.rating).brighter(1.3);
+        });
+
+}
+
+
+function drawPendingOverrides(selection, overrides) {
+    const cellPadding = 3;
+    const cellDimensions = calcOverrideCellDimensions(cellPadding);
+
+    const overrideElems = selection
+        .selectAll('.pending-override')
+        .data(
+            _.values(overrides),
+            d => `${d.measurableA}_${d.measurableB}_${d.rating}` );
+
+    const newOverrides = overrideElems
+        .enter()
+        .append('g')
+        .classed('pending-override', true);
+
+    overrideElems
+        .exit()
+        .remove();
+
+    newOverrides
+        .attr('transform', d => `translate(${ scales.x(d.measurableA) },${ scales.y(d.measurableB) })`)
+        .call(drawPendingOverrideShape, cellDimensions)
+        .filter(d => d.rating === 'X')
+        .call(drawXShape, cellDimensions, true);
 }
 
 
@@ -423,10 +481,12 @@ function controller($element) {
 
             draw(vm.svg, vm.perspective, handlers);
             vm.svg.call(drawExistingOverrides, vm.existingOverrides);
+            vm.svg.call(drawPendingOverrides, vm.pendingOverrides);
         }
 
-        if (vm.existingOverrides && vm.svg) {
+        if ((vm.existingOverrides || vm.pendingOverrides) && vm.svg) {
             vm.svg.call(drawExistingOverrides, vm.existingOverrides);
+            vm.svg.call(drawPendingOverrides, vm.pendingOverrides);
         }
     };
 }
