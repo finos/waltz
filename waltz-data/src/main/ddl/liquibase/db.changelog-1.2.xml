@@ -561,4 +561,155 @@
         </sql>
     </changeSet>
 
+
+    <!-- 1421: Survey -->
+    <changeSet author="rovats"
+               id="20170126-1421-1">
+        <createTable tableName="survey_template">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="survey_template_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="target_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="rovats"
+               id="20170126-1421-2">
+        <createTable tableName="survey_run">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="survey_run_pkey"/>
+            </column>
+            <column name="survey_template_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="selector_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="selector_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="selector_hierarchy_scope"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="involvement_kind_ids"
+                    type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="issued_on"
+                    type="DATE">
+                <constraints nullable="true"/>
+            </column>
+            <column name="due_date"
+                    type="DATE">
+                <constraints nullable="true"/>
+            </column>
+            <column name="issuance_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contact_email"
+                    type="${email.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="rovats"
+               id="20170126-1421-3">
+        <createTable tableName="survey_instance">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="survey_instance_pkey"/>
+            </column>
+            <column name="survey_run_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="rovats"
+               id="20170126-1421-4">
+        <createTable tableName="survey_instance_recipient">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="survey_instance_recipient_pkey"/>
+            </column>
+            <column name="survey_instance_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="person_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
