@@ -248,8 +248,8 @@ function drawExistingOverrides(selection, overrides = []) {
 
 function drawPendingOverrideShape(selection, cellDimensions) {
 
-    const notchSizeX = cellDimensions.w / 2;
-    const notchSizeY = cellDimensions.h / 2;
+    const notchSizeX = cellDimensions.w / 1.5;
+    const notchSizeY = cellDimensions.h / 1.5;
     const pathData = path();
     pathData.moveTo(cellDimensions.l, cellDimensions.t);
     pathData.lineTo(cellDimensions.r - notchSizeX, cellDimensions.t);
