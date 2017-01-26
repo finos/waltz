@@ -20,9 +20,12 @@ import {select, event} from 'd3-selection'
 
 
 const initialState = {
-    activeRating: 'G',
-    overrides: {
+    activeRating: 'X',
+    existingOverrides: {
+    },
+    pendingOverrides: {
     }
+
 };
 
 
@@ -83,9 +86,9 @@ function controller($stateParams,
         .then(ratings => vm.measurableRatings = ratings);
 
     const overrideCell = (d) => {
-        const updated = updateOverrides(vm.overrides, d, vm.activeRating);
-        if (updated != vm.overrides) {
-            vm.overrides = updated;
+        const updated = updateOverrides(vm.pendingOverrides, d, vm.activeRating);
+        if (updated != vm.pendingOverrides) {
+            vm.pendingOverrides = updated;
             $timeout(() => {}); // kick angular
         }
     };
@@ -100,6 +103,15 @@ function controller($stateParams,
         onCellLeave: d => {
             $timeout(() => vm.hovered = null);
         }
+    };
+
+    vm.apply = () => {
+        vm.existingOverrides = Object.assign({}, vm.existingOverrides, vm.pendingOverrides);
+        vm.pendingOverrides = {};
+    };
+
+    vm.undo = () => {
+        vm.pendingOverrides = {};
     };
 
     vm.onRatingSelect = r => vm.activeRating = r;

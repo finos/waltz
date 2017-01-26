@@ -21,7 +21,8 @@
             <div class="col-sm-9"
                  style="border-right: 1px solid #eee">
                 <div class="side-scroller">
-                    <waltz-perspective-grid existing-overrides="ctrl.overrides"
+                    <waltz-perspective-grid existing-overrides="ctrl.existingOverrides"
+                                            pending-overrides="ctrl.pendingOverrides"
                                             perspective-definition="ctrl.perspectiveDefinition"
                                             measurables="ctrl.measurables"
                                             measurable-ratings="ctrl.measurableRatings"
@@ -76,6 +77,23 @@
                     Remove
                 </button>
 
+                <hr>
+
+                <button class="btn btn-primary" ng-click="ctrl.apply();">
+                    Apply
+                </button>
+
+                <a class='clickable'
+                   ng-click="ctrl.undo()">
+                    Undo Changes
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+            </div>
+            <div class="col-md-6">
             </div>
         </div>
 
