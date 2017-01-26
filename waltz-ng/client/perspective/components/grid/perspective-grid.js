@@ -23,6 +23,7 @@ import {path} from 'd3-path';
 import {nest} from 'd3-collection';
 import {initialiseData} from '../../../common';
 import {ragColorScale} from '../../../common/colors';
+import {mkPerspective} from '../../perpective-utilities';
 
 
 /**
@@ -32,9 +33,19 @@ import {ragColorScale} from '../../../common/colors';
  * This component ...
  */
 
+/*
+ <waltz-perspective-grid perspective-definition="ctrl.perspectiveDefinition"
+ measurable-ratings="ctrl.measurableRatings"
+ overrides="ctrl.perspectiveOverrides"
+ handlers="ctrl.handlers">
+ </waltz-perspective-grid> */
 
 const bindings = {
-    perspective: '<',
+    perspectiveDefinition: '<',
+    measurables: '<',
+    measurableRatings: '<',
+    existingOverrides: '<',
+    updatedOverrides: '<',
     handlers: '<'
 };
 
@@ -52,6 +63,9 @@ const template = require('./perspective-grid.html');
 let width = 600;
 let height = 300;
 
+const scales = {
+
+};
 
 const margin = {
     top: 100, bottom: 50,
@@ -79,27 +93,28 @@ function nestOverrides(overrides = []) {
 }
 
 
+function setupScales(perspective) {
+    scales.x = scaleBand()
+        .domain(_.map(perspective.axes.a, 'measurable.id'))
+        .range([0, width]);
+    scales.y = scaleBand()
+        .domain(_.map(perspective.axes.b, 'measurable.id'))
+        .range([0, height]);
+}
+
+
 function draw(elem, perspective, handlers) {
     if (! perspective) return;
 
-    const scales = {
-        x: scaleBand()
-            .domain(_.map(perspective.axes.a, 'measurable.id'))
-            .range([0, width]),
-        y: scaleBand()
-            .domain(_.map(perspective.axes.b, 'measurable.id'))
-            .range([0, height])
-    };
-
     elem
-        .call(drawGrid, perspective, scales, handlers)
-        .call(drawRowTitles, perspective.axes.b, scales)
-        .call(drawColTitles, perspective.axes.a, scales)
+        .call(drawGrid, perspective, handlers)
+        .call(drawRowTitles, perspective.axes.b)
+        .call(drawColTitles, perspective.axes.a)
         ;
 }
 
 
-function drawGrid(selection, perspective, scales, handlers) {
+function drawGrid(selection, perspective, handlers) {
     const rowGroups = selection
         .selectAll('.row')
         .data(perspective.axes.b, d => d.measurable.id);
@@ -112,12 +127,10 @@ function drawGrid(selection, perspective, scales, handlers) {
 
     rowGroups
         .merge(newRows)
-        .call(drawCells, perspective, scales, handlers)
+        .call(drawCells, perspective, handlers)
         ;
 
 
-    selection
-        .call(drawOverrides, perspective, scales, handlers);
 }
 
 
@@ -129,7 +142,7 @@ const maybeDrag = function(d, handler) {
 };
 
 
-function drawCells(selection, perspective, scales, handlers) {
+function drawCells(selection, perspective, handlers) {
     const cellGroups = selection
         .selectAll('.cell')
         .data(row => _.map(
@@ -152,64 +165,70 @@ function drawCells(selection, perspective, scales, handlers) {
         .on('mouseleave.base', handlers.base.onCellLeave)
         .on('click.custom', handlers.custom.onCellClick)
         .on('mouseover.drag', d => maybeDrag(d, _.get(handlers, "custom.onCellDrag")))
-        .call(drawInherited, scales);
+        .call(drawInherited);
 
     cellGroups
         .merge(newCellGroups);
 }
 
 
-function drawOverrides(selection, perspective, scales, handlers) {
+function drawXShape(selection, cellDimensions) {
+    const pathData = path();
+    pathData.moveTo(cellDimensions.l, cellDimensions.t);
+    pathData.lineTo(cellDimensions.r, cellDimensions.b);
+    pathData.moveTo(cellDimensions.l, cellDimensions.b);
+    pathData.lineTo(cellDimensions.r, cellDimensions.t);
 
-    const cellPadding = 2;
-    const t = cellPadding;
-    const l = cellPadding;
-    const b = scales.y.bandwidth() - cellPadding;
-    const r = scales.x.bandwidth() - cellPadding;
-    const w = scales.x.bandwidth() - (2 * cellPadding);
-    const h = scales.y.bandwidth() - (2 * cellPadding);
+    selection
+        .append('path')
+        .attr('d', pathData)
+        .attr('stroke', '#ddd');
+};
 
-    const drawXShape = (selection) => {
-        const d = path();
-        d.moveTo(l, t);
-        d.lineTo(r, b);
-        d.moveTo(l, b);
-        d.lineTo(r, t);
 
-        selection
-            .append('path')
-            .attr('d', d)
-            .attr('stroke', '#ddd');
-    };
+
+function calcOverrideCellDimensions(cellPadding) {
+    return {
+        t: cellPadding,
+        l: cellPadding,
+        b: scales.y.bandwidth() - cellPadding,
+        r: scales.x.bandwidth() - cellPadding,
+        w: scales.x.bandwidth() - (2 * cellPadding),
+        h: scales.y.bandwidth() - (2 * cellPadding)
+    }
+}
+
+
+function drawExistingOverrides(selection, overrides = []) {
+    const cellPadding = 6;
+    const cellDimensions = calcOverrideCellDimensions(cellPadding);
 
     const drawBoxes = selection => {
         return selection
             .append('rect')
             .classed('cell-override', true)
-            .attr('x', l)
-            .attr('y', t)
-            .attr('width', w)
-            .attr('height', h)
+            .attr('x', cellDimensions.l)
+            .attr('y', cellDimensions.t)
+            .attr('width', cellDimensions.w)
+            .attr('height', cellDimensions.h)
             .attr('fill', d => {
                 return ragColorScale(d.rating).brighter(1.3);
             })
             ;
     };
 
-    const overrides = selection
+    const overrideElems = selection
         .selectAll('.override')
         .data(
-            _.values(perspective.ratings),
+            _.values(overrides),
             d => `${d.measurableA}_${d.measurableB}_${d.rating}` );
 
-    const newOverrides = overrides
+    const newOverrides = overrideElems
         .enter()
         .append('g')
-        .classed('override', true)
-        .on('mouseover', c => console.log('c', c))
-        .on('mouseover.drag', d => maybeDrag(d, handlers))
+        .classed('override', true);
 
-    overrides
+    overrideElems
         .exit()
         .remove();
 
@@ -217,11 +236,11 @@ function drawOverrides(selection, perspective, scales, handlers) {
         .attr('transform', d => `translate(${ scales.x(d.measurableA) },${ scales.y(d.measurableB) })`)
         .call(drawBoxes)
         .filter(d => d.rating === 'X')
-        .call(drawXShape);
+        .call(drawXShape, cellDimensions);
 }
 
 
-function drawInherited(selection, scales) {
+function drawInherited(selection) {
     const cellPadding = 6;
 
     const t = cellPadding;
@@ -272,7 +291,7 @@ function drawInherited(selection, scales) {
 }
 
 
-function drawRowTitles(elem, axis, scales) {
+function drawRowTitles(elem, axis) {
     const drawRect = (selection) => selection
         .append('rect')
         .attr('x', (labelIndicatorPadding + labelIndicatorSize) * -1)
@@ -308,7 +327,7 @@ function drawRowTitles(elem, axis, scales) {
 }
 
 
-function drawColTitles(elem, axis, scales) {
+function drawColTitles(elem, axis) {
     const colTitles = elem
         .selectAll('.col-titles')
         .selectAll('.col-title')
@@ -371,16 +390,8 @@ function initHandlers(svg, customHandlers) {
     return {
         base: {
             onCellLeave: function(d) {
-                findColTitle(svg, d.col.measurable.id)
-                    .attr('text-decoration', 'none');
-                findRowTitle(svg, d.row.measurable.id)
-                    .attr('text-decoration', 'none');
             },
             onCellOver: function(d) {
-                findColTitle(svg, d.col.measurable.id)
-                    .attr('text-decoration', 'underline');
-                findRowTitle(svg, d.row.measurable.id)
-                    .attr('text-decoration', 'underline');
             }
         },
         custom: customHandlers
@@ -388,20 +399,34 @@ function initHandlers(svg, customHandlers) {
 }
 
 
+function setupDimensions(perspective) {
+    width = cellWidth * perspective.axes.a.length;
+    height = cellHeight * perspective.axes.b.length;
+}
+
+
 function controller($element) {
     const vm = initialiseData(this, initialState);
 
-    const debouncedDraw = draw; // _.debounce(draw, 100);
-
     vm.$onChanges = (c) => {
-        if (vm.perspective && vm.handlers) {
-            width = cellWidth * vm.perspective.axes.a.length;
-            height = cellHeight * vm.perspective.axes.b.length;
+        if (vm.measurables && vm.measurableRatings && vm.perspectiveDefinition) {
+            vm.perspective = mkPerspective(
+                vm.perspectiveDefinition,
+                vm.measurables,
+                vm.measurableRatings);
 
-            const svg = initSvg($element, width, height);
-            const handlers = initHandlers(svg, vm.handlers);
+            setupDimensions(vm.perspective);
+            setupScales(vm.perspective);
 
-            debouncedDraw(svg, vm.perspective, handlers);
+            vm.svg = initSvg($element, width, height);
+            const handlers = initHandlers(vm.svg, vm.handlers);
+
+            draw(vm.svg, vm.perspective, handlers);
+            vm.svg.call(drawExistingOverrides, vm.existingOverrides);
+        }
+
+        if (vm.existingOverrides && vm.svg) {
+            vm.svg.call(drawExistingOverrides, vm.existingOverrides);
         }
     };
 }

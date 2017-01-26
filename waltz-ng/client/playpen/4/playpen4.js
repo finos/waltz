@@ -21,23 +21,40 @@ import {select, event} from 'd3-selection'
 
 const initialState = {
     activeRating: 'G',
-    perspectiveRatings: {
+    overrides: {
     }
 };
 
 
-function controller($q,
-                    $stateParams,
+function updateOverrides(overrides = {}, d, rating) {
+    const key = `${d.col.measurable.id}_${d.row.measurable.id}`;
+
+    if (_.get(overrides, `${key}.rating`) !== rating ) {
+        const override = {
+            [key] : {
+                measurableA: d.col.measurable.id,
+                measurableB: d.row.measurable.id,
+                rating
+            }
+        };
+
+        return Object.assign(
+            {},
+            overrides,
+            override);
+    } else {
+        return overrides;
+    }
+}
+
+
+function controller($stateParams,
                     $timeout,
                     applicationStore,
                     measurableStore,
                     measurableRatingStore) {
 
     const vm = Object.assign(this, initialState);
-
-    vm.$onChanges = () => {
-        Object.assign(this, initialState);
-    };
 
     const entityReference = {
         id: $stateParams.id,
@@ -49,7 +66,7 @@ function controller($q,
         scope: 'EXACT'
     };
 
-    const perspectiveDefinition = {
+    vm.perspectiveDefinition = {
         id: 1,
         name: 'Function - Process',
         kindA: $stateParams.kindA || 'PROCESS',
@@ -57,41 +74,20 @@ function controller($q,
         description: 'blah blah'
     };
 
-
-    const measurablesPromise = measurableStore
+    measurableStore
         .findMeasurablesBySelector(idSelector)
         .then(measurables => vm.measurables = measurables);
 
-    const ratingsPromise = measurableRatingStore
+    measurableRatingStore
         .findByAppSelector(idSelector)
         .then(ratings => vm.measurableRatings = ratings);
 
-    $q.all([measurablesPromise, ratingsPromise])
-        .then(() => vm.perspective = mkPerspective(
-            perspectiveDefinition,
-            vm.measurables,
-            vm.measurableRatings,
-            vm.perspectiveRatings));
-
     const overrideCell = (d) => {
-        const key = `${d.col.measurable.id}_${d.row.measurable.id}`;
-
-        if (_.get(vm.perspectiveRatings, `${key}.rating`) !== vm.activeRating ) {
-            vm.perspectiveRatings[key] = {
-                measurableA: d.col.measurable.id,
-                measurableB: d.row.measurable.id,
-                rating: vm.activeRating
-            };
-            vm.perspective = mkPerspective(
-                perspectiveDefinition,
-                vm.measurables,
-                vm.measurableRatings,
-                vm.perspectiveRatings);
-
-            $timeout(() => {});  // kick angular to redraw
+        const updated = updateOverrides(vm.overrides, d, vm.activeRating);
+        if (updated != vm.overrides) {
+            vm.overrides = updated;
+            $timeout(() => {}); // kick angular
         }
-
-
     };
 
     vm.handlers = {
@@ -111,7 +107,6 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
     '$stateParams',
     '$timeout',
     'ApplicationStore',

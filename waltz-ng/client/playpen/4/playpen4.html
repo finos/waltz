@@ -21,7 +21,10 @@
             <div class="col-sm-9"
                  style="border-right: 1px solid #eee">
                 <div class="side-scroller">
-                    <waltz-perspective-grid perspective="ctrl.perspective"
+                    <waltz-perspective-grid existing-overrides="ctrl.overrides"
+                                            perspective-definition="ctrl.perspectiveDefinition"
+                                            measurables="ctrl.measurables"
+                                            measurable-ratings="ctrl.measurableRatings"
                                             handlers="ctrl.handlers">
                     </waltz-perspective-grid>
                 </div>
@@ -37,7 +40,8 @@
                         opacity: 1;
                     }
                 </style>
-                <div style="min-height: 40px" class="small">
+                <div style="min-height: 40px"
+                     class="small">
                     <div class='hover-section'
                          ng-class="{hovered: ctrl.hovered}">
                         <waltz-rating-indicator-cell label="ctrl.hovered.col.measurable.name"
@@ -67,14 +71,14 @@
                                      on-select="ctrl.onRatingSelect">
                 </waltz-rating-picker>
 
-
-                <pre>{{ ctrl.activeRating }}</pre>
+                <button class="btn"
+                        ng-click="ctrl.activeRating = 'X'">
+                    Remove
+                </button>
 
             </div>
         </div>
 
     </div>
-
-    <pre>{{ ctrl.perspectiveRatings | json }}</pre>
 
 </div>

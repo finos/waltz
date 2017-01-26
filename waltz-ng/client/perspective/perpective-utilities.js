@@ -30,8 +30,7 @@ import {
 
 function mkPerspective(perspectiveDefinition,
                        measurables = [],
-                       ratings = [],
-                       perspectiveRatings = []) {
+                       ratings = []) {
     checkNotEmpty(perspectiveDefinition, "Must supply a perspective definition");
     checkIsPerspectiveDefinition(perspectiveDefinition);
     checkAll(measurables, checkIsMeasurable);
@@ -39,7 +38,7 @@ function mkPerspective(perspectiveDefinition,
 
     const measurablesById = _.keyBy(measurables, 'id');
 
-    const ratingFilterFn = measurableKind => ratings =>
+    const mkRatingFilterFn = measurableKind => ratings =>
         _.filter(ratings, r => {
             const measurable = measurablesById[r.measurableId];
             if (measurable) {
@@ -48,7 +47,8 @@ function mkPerspective(perspectiveDefinition,
         });
 
     const mkAxis = (measurableKind) => {
-        const axisRatings = ratingFilterFn(measurableKind) (ratings);
+        const ratingFilter = mkRatingFilterFn(measurableKind);
+        const axisRatings = ratingFilter(ratings);
         return _
             .chain(axisRatings)
             .map(r => ({ rating: r, measurable: measurablesById[r.measurableId] }))
@@ -61,8 +61,7 @@ function mkPerspective(perspectiveDefinition,
         axes: {
             a: mkAxis(perspectiveDefinition.kindA),
             b: mkAxis(perspectiveDefinition.kindB)
-        },
-        ratings: perspectiveRatings
+        }
     };
 }
 
