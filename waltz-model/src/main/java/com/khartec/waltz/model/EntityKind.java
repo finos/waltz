@@ -47,5 +47,7 @@ public enum EntityKind {
     PROCESS,
     SERVER,
     SOFTWARE,
+    SURVEY_RUN,
+    SURVEY_TEMPLATE,
     SYSTEM
 }

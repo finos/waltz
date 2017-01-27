@@ -80,10 +80,20 @@ public class PersonDao {
                 .fetchOne(personMapper);
     }
 
+
     public Person getById(long id) {
         return dsl.select()
                 .from(PERSON)
                 .where(PERSON.ID.eq(id))
+                .fetchOne(personMapper);
+    }
+
+
+    public Person getByUserName(String userName) {
+        checkNotEmpty(userName, "Cannot find person without a userName");
+        return dsl.select()
+                .from(PERSON)
+                .where(PERSON.EMAIL.eq(userName))
                 .fetchOne(personMapper);
     }
 
