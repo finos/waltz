@@ -18,10 +18,15 @@
 
 package com.khartec.waltz.common;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 
 public class StringUtilities {
@@ -104,7 +109,7 @@ public class StringUtilities {
         return Stream.of(safeQuery.split(" "))
                 .filter(StringUtilities::notEmpty)
                 .filter(s -> s.length() > 2)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
 
@@ -112,5 +117,20 @@ public class StringUtilities {
         return str == null
                 ? 0
                 : str.length();
+    }
+
+
+    public static String join(Collection<?> values, String separator) {
+        return values.stream()
+                .filter(v -> v != null)
+                .map(v -> v.toString())
+                .collect(Collectors.joining(separator));
+    }
+
+
+    public static <T> List<T> split(String value, String separator, Function<String, T> fromString) {
+        return Arrays.stream(value.split(separator))
+                .map(fromString)
+                .collect(toList());
     }
 }

@@ -39,14 +39,19 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static java.util.stream.Collectors.*;
 
 
 @Repository
@@ -145,6 +150,38 @@ public class InvolvementDao {
                 .and(INVOLVEMENT.ENTITY_KIND.eq(ref.kind().name()))
                 .where(PERSON.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
                 .fetch(PersonDao.personMapper);
+    }
+
+
+    public Map<EntityReference, List<Person>> findPeopleByEntitySelectorAndInvolvement(
+            EntityKind entityKind,
+            Select<Record1<Long>> entityIdSelector,
+            Set<Long> involvementKindIds) {
+
+        Field<String> entityName = mkEntityNameField(
+                    INVOLVEMENT.ENTITY_ID,
+                    INVOLVEMENT.ENTITY_KIND,
+                    newArrayList(entityKind))
+                .as("entity_name");
+
+        return dsl.selectDistinct()
+                .select(PERSON.fields())
+                .select(INVOLVEMENT.fields())
+                .select(entityName)
+                .from(PERSON)
+                .innerJoin(INVOLVEMENT)
+                .on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON.EMPLOYEE_ID))
+                .where(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name())
+                        .and(INVOLVEMENT.ENTITY_ID.in(entityIdSelector)
+                                .and(INVOLVEMENT.KIND_ID.in(involvementKindIds))))
+                .fetch()
+                .stream()
+                .collect(groupingBy(
+                            r -> EntityReference.mkRef(
+                                    entityKind,
+                                    r.getValue(INVOLVEMENT.ENTITY_ID),
+                                    r.getValue(entityName)),
+                            mapping(PersonDao.personMapper::map, toList())));
     }
 
 
