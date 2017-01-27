@@ -52,6 +52,8 @@ public class IdSelectorFactoryProvider {
 
 
     public IdSelectorFactory getForKind(EntityKind kind) {
+        checkNotNull(kind, "kind cannot be null");
+
         switch (kind) {
             case APPLICATION:
                 return applicationIdSelectorFactory;

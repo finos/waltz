@@ -25,6 +25,6 @@ public abstract class SurveyRun implements IdProvider, NameProvider, Description
     public abstract Optional<LocalDate> dueDate();
     public abstract SurveyIssuanceKind issuanceKind();
     public abstract Long ownerId();
-    public abstract Optional<String> contactEmail();
+    public abstract String contactEmail();
     public abstract SurveyRunStatus status();
 }

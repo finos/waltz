@@ -25,7 +25,7 @@ import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
 @Repository
 public class SurveyRunDao {
 
-    private static final String ID_SEPARATOR = ",";
+    private static final String ID_SEPARATOR = ";";
 
     private static final RecordMapper<Record, SurveyRun> TO_DOMAIN_MAPPER = r -> {
         SurveyRunRecord record = r.into(SURVEY_RUN);

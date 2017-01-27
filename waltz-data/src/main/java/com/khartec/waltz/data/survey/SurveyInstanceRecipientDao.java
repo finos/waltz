@@ -39,12 +39,13 @@ public class SurveyInstanceRecipientDao {
     }
 
 
-    public void deleteForSurveyRun(long surveyRunId) {
+    public int deleteForSurveyRun(long surveyRunId) {
         Select<Record1<Long>> surveyInstanceIdSelector = dsl.select(SURVEY_INSTANCE.ID)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId));
 
-        dsl.delete(SURVEY_INSTANCE_RECIPIENT)
-                .where(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.in(surveyInstanceIdSelector));
+        return dsl.delete(SURVEY_INSTANCE_RECIPIENT)
+                .where(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.in(surveyInstanceIdSelector))
+                .execute();
     }
 }

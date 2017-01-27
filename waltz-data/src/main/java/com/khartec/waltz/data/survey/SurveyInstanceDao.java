@@ -63,8 +63,9 @@ public class SurveyInstanceDao {
     }
 
 
-    public void deleteForSurveyRun(long surveyRunId) {
-        dsl.delete(SURVEY_INSTANCE)
-                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId));
+    public int deleteForSurveyRun(long surveyRunId) {
+        return dsl.delete(SURVEY_INSTANCE)
+                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+                .execute();
     }
 }
