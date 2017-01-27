@@ -716,4 +716,143 @@
         </createTable>
     </changeSet>
 
+
+    <!-- 1428: Measurable Definitions -->
+    <changeSet author="dwatkins"
+               id="20170127-1428-1">
+        <createTable tableName="measurable_category">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="measurable_category_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="rating_name_r"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating_name_a"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating_name_g"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating_name_z"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}"/>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20170127-1428-2">
+        <insert tableName="measurable_category">
+            <column name="name" value="Function"/>
+            <column name="description" value="Business Function"/>
+            <column name="external_id" value="CAPABILITY"/>
+            <column name="rating_name_r" value="Poor"/>
+            <column name="rating_name_a" value="Adequate"/>
+            <column name="rating_name_g" value="Good"/>
+            <column name="rating_name_z" value="Unknown"/>
+            <column name="last_updated_by" value="admin"/>
+        </insert>
+        <insert tableName="measurable_category">
+            <column name="name" value="Process"/>
+            <column name="description" value="Business Processes"/>
+            <column name="external_id" value="PROCESS"/>
+            <column name="rating_name_r" value="Poor"/>
+            <column name="rating_name_a" value="Adequate"/>
+            <column name="rating_name_g" value="Good"/>
+            <column name="rating_name_z" value="Unknown"/>
+            <column name="last_updated_by" value="admin"/>
+        </insert>
+        <insert tableName="measurable_category">
+            <column name="name" value="Service"/>
+            <column name="description" value="Business Services"/>
+            <column name="external_id" value="SERVICE"/>
+            <column name="rating_name_r" value="Poor"/>
+            <column name="rating_name_a" value="Adequate"/>
+            <column name="rating_name_g" value="Good"/>
+            <column name="rating_name_z" value="Unknown"/>
+            <column name="last_updated_by" value="admin"/>
+        </insert>
+        <insert tableName="measurable_category">
+            <column name="name" value="Product"/>
+            <column name="description" value="Product"/>
+            <column name="external_id" value="PRODUCT"/>
+            <column name="rating_name_r" value="Poor"/>
+            <column name="rating_name_a" value="Adequate"/>
+            <column name="rating_name_g" value="Good"/>
+            <column name="rating_name_z" value="Unknown"/>
+            <column name="last_updated_by" value="admin"/>
+        </insert>
+        <insert tableName="measurable_category">
+            <column name="name" value="Region"/>
+            <column name="description" value="Region"/>
+            <column name="external_id" value="REGION"/>
+            <column name="rating_name_r" value="Poor"/>
+            <column name="rating_name_a" value="Adequate"/>
+            <column name="rating_name_g" value="Good"/>
+            <column name="rating_name_z" value="Unknown"/>
+            <column name="last_updated_by" value="admin"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20170127-1428-3">
+        <addColumn tableName="measurable">
+            <column name="measurable_category_id"
+                    afterColumn="measurable_kind"
+                    type="${id.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               dbms="mysql"
+               id="20170127-1428-4a">
+        <sql>
+            UPDATE measurable m
+              INNER JOIN measurable_category mc
+                ON mc.external_id = m.measurable_kind
+            SET m.measurable_category_id = mc.id
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               dbms="mssql"
+               id="20170127-1428-4b">
+        <sql>
+            UPDATE m
+            SET m.measurable_category_id = mc.id
+            FROM measurable m
+                INNER JOIN measurable_category mc
+                    ON mc.external_id = m.measurable_kind
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

@@ -78,6 +78,7 @@ const dependencies = [
     require('./logical-flow')(),
     require('./logical-flow-decorator')(),
     require('./measurable')(),
+    require('./measurable-category')(),
     require('./measurable-rating')(),
     require('./navbar')(),
     require('./org-units')(),
