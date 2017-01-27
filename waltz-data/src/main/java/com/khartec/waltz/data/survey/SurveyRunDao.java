@@ -19,7 +19,7 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.join;
-import static com.khartec.waltz.common.StringUtilities.split;
+import static com.khartec.waltz.common.StringUtilities.splitThenMap;
 import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
 
 @Repository
@@ -39,7 +39,7 @@ public class SurveyRunDao {
                                 EntityKind.valueOf(record.getSelectorEntityKind()),
                                 record.getSelectorEntityId()),
                         HierarchyQueryScope.valueOf(record.getSelectorHierarchyScope())))
-                .involvementKindIds(split(
+                .involvementKindIds(splitThenMap(
                         record.getInvolvementKindIds(),
                         ID_SEPARATOR,
                         Long::valueOf))

@@ -84,6 +84,9 @@ public class SurveyHarness {
         // update survey run
         surveyRunService.updateSurveyRun(userName, surveyRunId, surveyRunChangeCommand);
 
+        List<SurveyInstanceRecipient> updatedSurveyInstanceRecipients = surveyRunService.generateSurveyInstanceRecipients(surveyRunId);
+        System.out.println("Updated Generated recipients count: " + updatedSurveyInstanceRecipients.size());
+
         // generate the instances and recipients again
         surveyRunService.createSurveyInstancesAndRecipients(surveyRunId, Collections.emptyList());
 

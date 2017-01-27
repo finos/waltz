@@ -18,10 +18,7 @@
 
 package com.khartec.waltz.common;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -128,9 +125,14 @@ public class StringUtilities {
     }
 
 
-    public static <T> List<T> split(String value, String separator, Function<String, T> fromString) {
-        return Arrays.stream(value.split(separator))
-                .map(fromString)
+    public static <T> List<T> splitThenMap(String str, String separator, Function<String, T> itemTransformer) {
+        if (str == null || separator == null) { return Collections.emptyList(); }
+        if (itemTransformer == null) {
+            itemTransformer = s -> (T) s;
+        }
+
+        return Arrays.stream(str.split(separator))
+                .map(itemTransformer)
                 .collect(toList());
     }
 }
