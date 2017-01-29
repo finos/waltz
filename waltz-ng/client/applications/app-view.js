@@ -86,6 +86,7 @@ function controller($q,
                     logicalFlowDecoratorStore,
                     logicalFlowStore,
                     measurableStore,
+                    measurableCategoryStore,
                     measurableRatingStore,
                     orgUnitStore,
                     physicalSpecificationStore,
@@ -164,6 +165,10 @@ function controller($q,
             bookmarkStore.findByParent(entityReference)
                 .then(bookmarks => vm.bookmarks = bookmarks),
 
+            measurableCategoryStore
+                .findAll()
+                .then(cs => vm.measurableCategories = cs),
+
             measurableRatingStore
                 .findByAppSelector({ entityReference, scope: 'EXACT' })
                 .then(rs => vm.ratings = rs),
@@ -237,6 +242,7 @@ controller.$inject = [
     'LogicalFlowDecoratorStore',
     'LogicalFlowStore',
     'MeasurableStore',
+    'MeasurableCategoryStore',
     'MeasurableRatingStore',
     'OrgUnitStore',
     'PhysicalSpecificationStore',

@@ -16,27 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.measurable;
+import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks'
 
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.*;
-import org.immutables.value.Value;
+function store($http, baseApiUrl) {
+    const baseUrl = `${baseApiUrl}/measurable-category`;
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableMeasurable.class)
-@JsonDeserialize(as = ImmutableMeasurable.class)
-public abstract class Measurable implements
-        IdProvider,
-        NameProvider,
-        DescriptionProvider,
-        ParentIdProvider,
-        ExternalIdProvider,
-        LastUpdatedProvider,
-        ProvenanceProvider {
+    const findAll = () => $http
+        .get(`${baseUrl}/all`)
+        .then(d => d.data);
 
-    public abstract MeasurableKind kind();
-    public abstract long categoryId();
-    public abstract boolean concrete();
+
+    const getById = (id) => $http
+        .get(`${baseUrl}/id/${id}`)
+        .then(x => x.data);
+
+    return {
+        findAll,
+        getById
+    };
+
 }
+
+store.$inject = ['$http', 'BaseApiUrl'];
+
+export default store;

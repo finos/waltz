@@ -21,7 +21,8 @@ const bindings = {
     selected: '<',
     editDisabled: '<',
     onSelect: '<',
-    onKeypress: '<'
+    onKeypress: '<',
+    ragNames: '<'
 };
 
 
@@ -31,10 +32,15 @@ const template = require('./rating-picker.html');
 const initialState = {
     pickerStyle: {},
     onSelect: (rating) => 'No onSelect handler defined for rating-picker: ' + rating,
+    ragNames: {
+        R: "Poor",
+        A: "Adequate",
+        G: "Good"
+    },
     options: [
-        { value: 'G', label: 'Good', clazz: 'rating-G' },
-        { value: 'A', label: 'Adequate', clazz: 'rating-A' },
-        { value: 'R', label: 'Poor', clazz: 'rating-R' }
+        { value: 'G', clazz: 'rating-G' },
+        { value: 'A', clazz: 'rating-A' },
+        { value: 'R', clazz: 'rating-R' }
     ]
 };
 

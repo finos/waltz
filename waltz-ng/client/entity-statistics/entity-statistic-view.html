@@ -73,6 +73,8 @@
             <!-- NAV -->
             <div class="col-sm-4"
                  ng-style="{'border-left': ctrl.statistic.summary.tallies.length == 0 ? '2px solid #eee' : 'none'}">
+
+                <!-- NAV TAXONOMY -->
                 <h4>
                     <waltz-icon fixed-width="true"
                                 size="lg"
@@ -82,7 +84,7 @@
                     <span ng-bind="ctrl.parentRef.kind | toDisplayName:'entity'"
                           ng-if="ctrl.parentRef.kind !== 'MEASURABLE'"></span>
 
-                    <span ng-bind="ctrl.selectedNavItem.kind | toDisplayName:'measurableKind'"
+                    <span ng-bind="ctrl.selectedNavItem.categoryId | toDisplayName:'measurableCategory'"
                           ng-if="ctrl.parentRef.kind === 'MEASURABLE'"></span>
 
                     <small>Selector</small>
@@ -100,6 +102,7 @@
 
                 <hr>
 
+                <!-- NAV REPORTS -->
                 <h4>
                     <waltz-icon fixed-width="true"
                                 size="lg"

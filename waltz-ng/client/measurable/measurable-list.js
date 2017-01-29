@@ -17,8 +17,6 @@
  */
 import _ from 'lodash';
 import {initialiseData} from '../common';
-import {measurableKindNames} from '../common/services/display-names';
-import {measurableKindDescriptions} from '../common/services/descriptions';
 
 
 const initialState = {
@@ -29,39 +27,33 @@ const initialState = {
 };
 
 
-function prepareTabs(measurables = [], counts = []) {
+function prepareTabs(categories = [], measurables = [], counts = []) {
     const countsById = _.keyBy(counts, 'id');
 
-    const kinds = _.keys(measurableKindNames);
-    const measurablesByKind = _.chain(measurables)
+    const measurablesByCategory = _.chain(measurables)
         .map(m => {
             const directCount = (countsById[m.id] || { count: 0 }).count;
             return Object.assign({}, m, { directCount })
         })
-        .groupBy('kind')
+        .groupBy('categoryId')
         .value();
 
-    const tabs = _.map(kinds, k => {
-        const kind = {
-            code: k,
-            name: measurableKindNames[k],
-            description: measurableKindDescriptions[k]
-        };
+    const tabs = _.map(categories, c => {
         return {
-            kind,
-            measurables: measurablesByKind[k]
+            category: c,
+            measurables: measurablesByCategory[c.id]
         };
     });
 
     return _.sortBy(
         tabs,
-        g => g.kind.name);
+        g => g.category.name);
 }
 
 
 function findFirstNonEmptyTab(tabs = []) {
     const tab = _.find(tabs, t => (t.measurables || []).length > 0);
-    return (tab || tabs[0]).kind.code;
+    return _.get(tab || tabs[0], 'category.id');
 }
 
 
@@ -69,6 +61,7 @@ function controller($q,
                     $state,
                     $stateParams,
                     measurableStore,
+                    measurableCategoryStore,
                     measurableRatingStore,
                     staticPanelStore,
                     svgStore) {
@@ -78,28 +71,30 @@ function controller($q,
     const measurablePromise = measurableStore
         .findAll();
 
+    const measurableCategoryPromise = measurableCategoryStore
+        .findAll()
+        .then(cs => vm.categories = cs);
+
     const countPromise = measurableRatingStore
         .countByMeasurable();
 
-    $q.all([measurablePromise, countPromise])
-        .then(([measurables = [], counts = []]) => {
-            vm.tabs = prepareTabs(measurables, counts);
+    $q.all([measurablePromise, measurableCategoryPromise, countPromise])
+        .then(([measurables = [], categories = [], counts = []]) => {
+            vm.tabs = prepareTabs(categories, measurables, counts);
             vm.measurablesByExternalId = _.keyBy(measurables, 'externalId');
-            vm.visibility.tab = $stateParams.kind || findFirstNonEmptyTab(vm.tabs);
+            vm.visibility.tab = $stateParams.category || findFirstNonEmptyTab(vm.tabs);
         });
 
-    staticPanelStore
-        .findByGroups(_.chain(measurableKindNames)
-            .keys()
-            .map(kind => `HOME.${kind}`)
-            .value())
-        .then(panels => vm.panelsByKind = _.groupBy(
-            panels,
-            panel => panel.group.replace("HOME.", "")));
+    measurableCategoryPromise
+        .then((cs) => staticPanelStore.findByGroups(_.map(cs, c => `HOME.MEASURABLE.${c.id}`)))
+        .then(panels => vm.panelsByCategory = _.groupBy(panels, d => d.group.replace('HOME.MEASURABLE.', '')));
 
-    svgStore
-        .findByGroups(_.keys(measurableKindNames))
-        .then(diagrams => vm.diagramsByKind = _.groupBy(diagrams, 'group'));
+    measurableCategoryPromise
+        .then((cs) => svgStore.findByGroups(_.map(cs, c => `NAVAID.MEASURABLE.${c.id}`)))
+        .then(diagrams => vm.diagramsByCategory = _.groupBy(diagrams, d => d.group.replace('NAVAID.MEASURABLE.', '')));
+
+    measurableCategoryPromise
+        .then(cs => vm.categoriesById = _.keyBy(cs, 'id'));
 
     vm.blockProcessor = b => {
         const extId = b.value;
@@ -120,6 +115,7 @@ controller.$inject = [
     '$state',
     '$stateParams',
     'MeasurableStore',
+    'MeasurableCategoryStore',
     'MeasurableRatingStore',
     'StaticPanelStore',
     'SvgDiagramStore'

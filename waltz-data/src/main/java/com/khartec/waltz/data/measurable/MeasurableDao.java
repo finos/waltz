@@ -54,6 +54,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .parentId(ofNullable(r.getParentId()))
                 .name(r.getName())
                 .kind(MeasurableKind.valueOf(r.getMeasurableKind()))
+                .categoryId(r.getMeasurableCategoryId())
                 .concrete(r.getConcrete())
                 .description(r.getDescription())
                 .externalId(ofNullable(r.getExternalId()))

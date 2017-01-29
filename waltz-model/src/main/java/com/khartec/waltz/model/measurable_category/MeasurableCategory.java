@@ -16,27 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.measurable;
-
+package com.khartec.waltz.model.measurable_category;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.rating.RagNames;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableMeasurable.class)
-@JsonDeserialize(as = ImmutableMeasurable.class)
-public abstract class Measurable implements
+@JsonSerialize(as = ImmutableMeasurableCategory.class)
+@JsonDeserialize(as = ImmutableMeasurableCategory.class)
+public abstract class MeasurableCategory implements
         IdProvider,
         NameProvider,
         DescriptionProvider,
-        ParentIdProvider,
         ExternalIdProvider,
-        LastUpdatedProvider,
-        ProvenanceProvider {
+        LastUpdatedProvider {
 
-    public abstract MeasurableKind kind();
-    public abstract long categoryId();
-    public abstract boolean concrete();
+    public abstract RagNames ragNames();
 }

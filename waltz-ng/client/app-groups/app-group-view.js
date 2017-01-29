@@ -60,6 +60,7 @@ function controller($scope,
                     historyStore,
                     logicalFlowViewService,
                     measurableStore,
+                    measurableCategoryStore,
                     measurableRatingStore,
                     physicalFlowLineageStore,
                     sourceDataRatingStore,
@@ -86,6 +87,10 @@ function controller($scope,
     measurableStore
         .findMeasurablesBySelector(idSelector)
         .then(measurables => vm.measurables = measurables);
+
+    measurableCategoryStore
+        .findAll()
+        .then(cs => vm.measurableCategories = cs);
 
     measurableRatingStore
         .statsByAppSelector(idSelector)
@@ -202,6 +207,7 @@ controller.$inject = [
     'HistoryStore',
     'LogicalFlowViewService',
     'MeasurableStore',
+    'MeasurableCategoryStore',
     'MeasurableRatingStore',
     'PhysicalFlowLineageStore',
     'SourceDataRatingStore',

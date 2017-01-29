@@ -33,7 +33,7 @@ const viewState = {
 
 
 const listState = {
-    url: 'measurable?kind',
+    url: 'measurable?{category:int}',
     views: {
         'content@': ListView
     }

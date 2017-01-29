@@ -13,7 +13,7 @@
                id="wrp-inp-{{ option.value }}-{{ $id }}">
         <label for="wrp-inp-{{ option.value }}-{{ $id }}"
                ng-class="option.clazz"
-               ng-bind="option.label">
+               ng-bind="$ctrl.ragNames[option.value]">
         </label>
     </div>
 </div>

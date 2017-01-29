@@ -39,8 +39,7 @@ import {
     usageKindDisplayNames,
     transportKindNames,
     frequencyKindNames,
-    dataFormatKindNames,
-    measurableKindNames
+    dataFormatKindNames
 } from "./display-names";
 import {
     bookmarkIconNames,
@@ -59,7 +58,8 @@ const descriptionService = new BaseLookupService();
 
 
 function loadFromServer(dataTypeService,
-                        involvementKindService) {
+                        involvementKindService,
+                        measurableCategoryStore) {
     dataTypeService
         .loadDataTypes()
         .then(results => {
@@ -85,6 +85,14 @@ function loadFromServer(dataTypeService,
             displayNameService.register('involvementKind', _.mapValues(indexedById, 'name'));
             descriptionService.register('involvementKind', _.mapValues(indexedById, 'description'));
         });
+
+    measurableCategoryStore
+        .findAll()
+        .then(results => {
+            const indexedById = _.keyBy(results, 'id');
+            displayNameService.register('measurableCategory', _.mapValues(indexedById, 'name'));
+            descriptionService.register('measurableCategory', _.mapValues(indexedById, 'description'));
+        })
 }
 
 
@@ -111,7 +119,6 @@ export default (module) => {
         .register('investmentRating', investmentRatingNames)
         .register('lifecyclePhase', lifecyclePhaseDisplayNames)
         .register('lifecycleStatus', lifecycleStatusNames)
-        .register('measurableKind', measurableKindNames)
         .register('orgUnitKind', orgUnitKindNames)
         .register('rating', authSourceRatingNames)
         .register('rollupKind', rollupKindNames)
@@ -133,7 +140,8 @@ export default (module) => {
 
     loadFromServer.$inject = [
         'DataTypeService',
-        'InvolvementKindService'
+        'InvolvementKindService',
+        'MeasurableCategoryStore'
     ];
 
     module.run(loadFromServer);

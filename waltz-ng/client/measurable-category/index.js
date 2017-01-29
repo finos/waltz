@@ -16,27 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.measurable;
+
+import angular from 'angular';
 
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.*;
-import org.immutables.value.Value;
+export default () => {
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableMeasurable.class)
-@JsonDeserialize(as = ImmutableMeasurable.class)
-public abstract class Measurable implements
-        IdProvider,
-        NameProvider,
-        DescriptionProvider,
-        ParentIdProvider,
-        ExternalIdProvider,
-        LastUpdatedProvider,
-        ProvenanceProvider {
+    const module = angular.module('waltz.measurable-category', []);
 
-    public abstract MeasurableKind kind();
-    public abstract long categoryId();
-    public abstract boolean concrete();
-}
+    module
+        .service('MeasurableCategoryStore', require('./services/measurable-category-store'));
+
+    return module.name;
+};
