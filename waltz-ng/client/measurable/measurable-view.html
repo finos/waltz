@@ -4,11 +4,11 @@
     <waltz-page-header name="{{ ctrl.measurable.name }}"
                        icon="puzzle-piece"
                        tour="ctrl.tour"
-                       small="{{ ctrl.measurable.kind | toDisplayName:'measurableKind' }}">
+                       small="{{ ctrl.measurableCategory.name }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.measurable.list ({kind: ctrl.measurable.kind })"
-                   ng-bind="ctrl.measurable.kind | toDisplayName:'measurableKind'">
+            <li><a ui-sref="main.measurable.list ({category: ctrl.measurableCategory.id })"
+                   ng-bind="ctrl.measurableCategory.name">
                 </a>
             </li>
             <li><span ng-bind="ctrl.measurable.name"></span></li>
@@ -32,9 +32,9 @@
 
     <!-- RATINGS -->
     <waltz-measurable-rating-explorer-section ratings="ctrl.ratings"
+                                              measurable-category="ctrl.measurableCategory"
                                               measurables="ctrl.children"
                                               applications="ctrl.applications"
-                                              measurable-kind="ctrl.measurable.kind"
                                               source-data-ratings="ctrl.sourceDataRatings">
     </waltz-measurable-rating-explorer-section>
 

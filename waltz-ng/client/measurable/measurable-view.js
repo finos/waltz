@@ -46,6 +46,7 @@ function controller($q,
                     historyStore,
                     logicalFlowViewService,
                     measurableStore,
+                    measurableCategoryStore,
                     measurableRatingStore,
                     physicalFlowLineageStore,
                     sourceDataRatingStore,
@@ -70,11 +71,13 @@ function controller($q,
                     vm.parents = ps;
                     vm.measurable = _.find(ps, { id });
                 }),
-
         ]);
 
     const loadWave2 = () =>
         $q.all([
+            measurableCategoryStore
+                .getById(vm.measurable.categoryId)
+                .then(c => vm.measurableCategory = c),
             measurableRatingStore
                 .findByMeasurableSelector(childrenSelector)
                 .then(rs => vm.ratings = rs),
@@ -131,7 +134,6 @@ function controller($q,
         .then(loadWave4);
 
 
-
     // -- INTERACTION ---
 
     vm.loadAllCosts = () => $scope
@@ -161,6 +163,7 @@ controller.$inject = [
     'HistoryStore',
     'LogicalFlowViewService',
     'MeasurableStore',
+    'MeasurableCategoryStore',
     'MeasurableRatingStore',
     'PhysicalFlowLineageStore',
     'SourceDataRatingStore',

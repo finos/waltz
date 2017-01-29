@@ -33,9 +33,10 @@ import {investmentRatingNames, measurableKindNames} from '../../../common/servic
 
 const bindings = {
     applications: '<',
-    measurableKind: '<',
+    measurableCategory: '<',
     measurables: '<',
     ratings: '<',
+    ragNames: '<',
     sourceDataRatings: '<'
 };
 
@@ -52,7 +53,9 @@ const initialState = {
 const template = require('./measurable-rating-explorer-section.html');
 
 
-function preparePie(ratings = [], onSelect) {
+function preparePie(ratings = [],
+                    ragNames = {},
+                    onSelect) {
     const counts = _.countBy(ratings, 'rating');
     const data = [
         { key: "R", count: counts['R'] || 0 },
@@ -67,7 +70,7 @@ function preparePie(ratings = [], onSelect) {
         config: {
             onSelect,
             colorProvider: (d) => ragColorScale(d.data.key),
-            labelProvider: (d) => investmentRatingNames[d.key] || d.key
+            labelProvider: (d) => ragNames[d.key] || d.key
         }
     };
 }
@@ -75,14 +78,15 @@ function preparePie(ratings = [], onSelect) {
 
 function prepareTableData(ratings = [],
                           applications = [],
-                          measurables = []) {
+                          measurables = [],
+                          ragNames = {}) {
     const measurablesById = _.keyBy(measurables, 'id');
     const applicationsById = _.keyBy(applications, 'id');
     return _.chain(ratings)
         .map(r => {
             return {
                 rating: r,
-                ratingName: investmentRatingNames[r.rating] || r.rating,
+                ratingName: ragNames[r.rating] || r.rating,
                 measurable: measurablesById[r.measurableId],
                 application: applicationsById[r.entityReference.id]
             };
@@ -91,7 +95,15 @@ function prepareTableData(ratings = [],
 }
 
 
-function prepareColumnDefs(measurableKind, measurables) {
+const ratingCellTemplate = `
+    <div class="ui-grid-cell-contents">
+        <waltz-rating-indicator-cell rating="row.entity.rating.rating" 
+                                     label="COL_FIELD">
+        </waltz-rating-indicator-cell>
+    </div>`;
+
+
+function prepareColumnDefs(measurableCategory, measurables) {
      // We only want to show the measurable column if there are multiple measurables to
      // differentiate between.
 
@@ -104,12 +116,12 @@ function prepareColumnDefs(measurableKind, measurables) {
         {
             field: 'ratingName',
             name: 'Rating',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-rating-indicator-cell rating="row.entity.rating.rating" label="COL_FIELD"></waltz-rating-indicator-cell></div>'
+            cellTemplate: ratingCellTemplate
         }
     ];
 
     const measurableCols = measurables.length > 1
-        ? [ { field: 'measurable.name', name: measurableKindNames[measurableKind] } ]
+        ? [ { field: 'measurable.name', name: measurableCategory.name } ]
         : [];
 
     const finalCols = [{
@@ -134,26 +146,35 @@ function controller() {
         vm.tableData = prepareTableData(
             ratings,
             vm.applications,
-            vm.measurables);
+            vm.measurables,
+            vm.measurableCategory.ragNames);
     };
 
     vm.$onChanges = (c) => {
-        if (vm.measurableKind && vm.measurables) {
-            vm.columnDefs = prepareColumnDefs(vm.measurableKind, vm.measurables);
+        if (vm.measurableCategory && vm.measurables) {
+            vm.columnDefs = prepareColumnDefs(
+                vm.measurableCategory,
+                vm.measurables);
         }
 
-        if (c.ratings) {
-            vm.pie = preparePie(vm.ratings, onSelect);
+        if (vm.ratings && vm.measurableCategory) {
+            vm.pie = preparePie(
+                vm.ratings,
+                vm.measurableCategory.ragNames,
+                onSelect);
         }
 
-        if (vm.ratings && vm.applications && vm.measurables) {
-            vm.tableData = prepareTableData(vm.ratings, vm.applications, vm.measurables);
+        if (vm.ratings && vm.applications && vm.measurables && vm.measurableCategory) {
+            vm.tableData = prepareTableData(
+                vm.ratings,
+                vm.applications,
+                vm.measurables,
+                vm.measurableCategory.ragNames);
         }
     };
 
     vm.onGridInitialise = (cfg) =>
         vm.exportData = () => cfg.exportFn("measurable-ratings.csv");
-
 }
 
 
