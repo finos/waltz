@@ -29,17 +29,17 @@
                 <input type="radio"
                        ng-repeat-start="tab in $ctrl.tabs"
                        ng-model="$ctrl.visibility.tab"
-                       ng-value="tab.kind.code"
+                       ng-value="tab.category.id"
                        ng-disabled="tab.ratings.length === 0"
                        name="tab"
-                       id="{{ tab.kind.code + $id}}">
-                <label for="{{ tab.kind.code + $id}}"
+                       id="{{ tab.category.id + '_' +$id}}">
+                <label for="{{ tab.category.id + '_' +$id}}"
                        ng-repeat-end
-                       ng-bind="tab.kind.name">
+                       ng-bind="tab.category.name">
                 </label>
 
                 <div ng-repeat="tab in $ctrl.tabs"
-                     ng-class="{ 'wt-active': tab.kind.code == $ctrl.visibility.tab }"
+                     ng-class="{ 'wt-active': tab.category.id == $ctrl.visibility.tab }"
                      class="wt-tab">
                     <br>
                     <waltz-measurable-rating-panel ratings="tab.ratings"
@@ -48,7 +48,7 @@
 
                     <br>
                     <p class="text-muted small"
-                       ng-bind="tab.kind.description"></p>
+                       ng-bind="tab.category.description"></p>
                 </div>
             </div>
         </div>

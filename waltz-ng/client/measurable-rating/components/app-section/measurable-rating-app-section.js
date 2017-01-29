@@ -17,9 +17,6 @@
  */
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
-import {measurableKindNames} from  '../../../common/services/display-names';
-import {measurableKindDescriptions} from  '../../../common/services/descriptions';
-
 
 /**
  * @name waltz-measurable-rating-panel
@@ -34,6 +31,7 @@ import {measurableKindDescriptions} from  '../../../common/services/descriptions
 
 const bindings = {
     application: '<',
+    categories: '<',
     measurables: '<',
     ratings: '<',
     sourceDataRatings: '<'
@@ -45,26 +43,26 @@ const template = require('./measurable-rating-app-section.html');
 
 const initialState = {
     ratings: [],
+    categories: [],
     measurables: [],
     visibility: {
         overlay: false,
         tab: null
     },
-    byKind: {}
+    byCategory: {}
 };
 
 
 
 
-function groupByKind(measurables = [], ratings = []) {
-    const allMeasurableKinds = _.keys(measurableKindNames);
+function groupByCategory(categories = [], measurables = [], ratings = []) {
 
-    const measurablesByKind = _.groupBy(
+    const measurablesByCategory = _.groupBy(
         measurables,
-        d => d.kind);
+        'categoryId');
 
-    const grouped = _.map(allMeasurableKinds, k => {
-        const usedMeasurables = measurablesByKind[k] || [];
+    const grouped = _.map(categories, category => {
+        const usedMeasurables = measurablesByCategory[category.id] || [];
 
         const measurableIds = _.map(usedMeasurables, 'id');
         const ratingsForMeasure = _.filter(
@@ -72,11 +70,7 @@ function groupByKind(measurables = [], ratings = []) {
             r => _.includes(measurableIds, r.measurableId));
 
         return {
-            kind: {
-                code: k,
-                name: measurableKindNames[k],
-                description: measurableKindDescriptions[k]
-            },
+            category,
             measurables: usedMeasurables,
             ratings: ratingsForMeasure
         };
@@ -84,7 +78,7 @@ function groupByKind(measurables = [], ratings = []) {
 
     return _.sortBy(
         grouped,
-        g => g.kind.name);
+        g => g.category.name);
 }
 
 
@@ -92,10 +86,10 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (c) => {
-        if (c.measurables || c.ratings) {
-            vm.tabs = groupByKind(vm.measurables, vm.ratings);
+        if (c.measurables || c.ratings || vm.categories) {
+            vm.tabs = groupByCategory(vm.categories, vm.measurables, vm.ratings);
             const firstNonEmptyTab = _.find(vm.tabs, t => t.ratings.length > 0);
-            vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.kind.code : null;
+            vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
         }
     };
 }
