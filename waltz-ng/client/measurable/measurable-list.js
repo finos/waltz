@@ -53,7 +53,7 @@ function prepareTabs(categories = [], measurables = [], counts = []) {
 
 function findFirstNonEmptyTab(tabs = []) {
     const tab = _.find(tabs, t => (t.measurables || []).length > 0);
-    return (tab || tabs[0]).category.id;
+    return _.get(tab || tabs[0], 'category.id');
 }
 
 

@@ -168,6 +168,13 @@ function loadMeasurables(store, selector, holder) {
 }
 
 
+function loadMeasurableCategories(store, holder) {
+    store
+        .findAll()
+        .then(cs => holder.measurableCategories = cs);
+}
+
+
 function loadMeasurableRatings(store, selector, holder) {
     store
         .statsByAppSelector(selector)
@@ -187,6 +194,7 @@ function service($q,
                  involvementStore,
                  logicalFlowViewService,
                  measurableStore,
+                 measurableCategoryStore,
                  measurableRatingStore,
                  orgUnitStore,
                  physicalFlowLineageStore,
@@ -222,6 +230,7 @@ function service($q,
             loadImmediateHierarchy(orgUnitStore, orgUnitId, rawData),
             loadApps(appStore, selector, rawData),
             loadMeasurables(measurableStore, selector, rawData),
+            loadMeasurableCategories(measurableCategoryStore, rawData),
             loadMeasurableRatings(measurableRatingStore, selector, rawData),
             initialiseAssetCosts(assetCostViewService, selector, rawData)
         ]);
@@ -315,6 +324,7 @@ service.$inject = [
     'InvolvementStore',
     'LogicalFlowViewService',
     'MeasurableStore',
+    'MeasurableCategoryStore',
     'MeasurableRatingStore',
     'OrgUnitStore',
     'PhysicalFlowLineageStore',

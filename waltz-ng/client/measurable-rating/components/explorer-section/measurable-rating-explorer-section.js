@@ -19,7 +19,6 @@
 import _ from 'lodash';
 import {initialiseData, mkLinkGridCell} from '../../../common';
 import {ragColorScale} from '../../../common/colors';
-import {investmentRatingNames, measurableKindNames} from '../../../common/services/display-names';
 
 /**
  * @name waltz-measurable-rating-explorer-section

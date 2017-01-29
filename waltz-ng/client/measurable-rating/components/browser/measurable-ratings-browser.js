@@ -19,7 +19,6 @@
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
 import {buildHierarchies, switchToParentIds} from '../../../common/hierarchy-utils';
-import {measurableKindNames} from '../../../common/services/display-names';
 
 /**
  * @name waltz-measurable-ratings-browser
@@ -31,6 +30,7 @@ import {measurableKindNames} from '../../../common/services/display-names';
 
 const bindings = {
     measurables: '<',
+    categories: '<',
     ratings: '<',
     onSelect: '<',
     scrollHeight: '<'
@@ -104,32 +104,31 @@ function prepareTreeData(data = []) {
 }
 
 
-function prepareTabs(measurables = []) {
-    const byKind = _.groupBy(measurables, 'kind');
+function prepareTabs(categories = [], measurables = []) {
+    const byCategory = _.groupBy(measurables, 'categoryId');
 
-    const tabs = _.map(measurableKindNames, (n,k) => {
-        const treeData = prepareTreeData(byKind[k]);
+    const tabs = _.map(categories, category => {
+        const treeData = prepareTreeData(byCategory[category.id]);
         const maxSize = _.chain(treeData)
             .map('totalRatings.total')
             .max()
             .value();
 
         return {
-            kind: k,
-            name: n,
+            category,
             treeData,
             maxSize,
-            expandedNodes: _.clone(byKind[k] || [])
+            expandedNodes: _.clone(byCategory[category.id] || [])
         };
     });
 
-    return _.sortBy(tabs, 'name');
+    return _.sortBy(tabs, 'category.name');
 }
 
 
-function findFirstNonEmptyTabKind(tabs = []) {
+function findFirstNonEmptyTab(tabs = []) {
     const firstNonEmptyTab = _.find(tabs, t => t.treeData.length > 0);
-    return _.get(firstNonEmptyTab || tabs[0], 'kind');
+    return _.get(firstNonEmptyTab || tabs[0], 'category.id');
 }
 
 
@@ -174,10 +173,10 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (c) => {
-        if (c.measurables || c.ratings) {
-            vm.tabs = prepareTabs(vm.measurables);
+        if (c.measurables || c.ratings || vm.categories) {
+            vm.tabs = prepareTabs(vm.categories, vm.measurables);
             vm.ratingsMap = mkRatingsMap(vm.ratings, vm.measurables);
-            vm.visibility.tab = findFirstNonEmptyTabKind(vm.tabs);
+            vm.visibility.tab = findFirstNonEmptyTab(vm.tabs);
             vm.maxTotal = _.max(
                 _.map(
                     _.values(vm.ratingsMap),

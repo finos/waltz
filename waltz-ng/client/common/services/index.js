@@ -39,8 +39,7 @@ import {
     usageKindDisplayNames,
     transportKindNames,
     frequencyKindNames,
-    dataFormatKindNames,
-    measurableKindNames
+    dataFormatKindNames
 } from "./display-names";
 import {
     bookmarkIconNames,

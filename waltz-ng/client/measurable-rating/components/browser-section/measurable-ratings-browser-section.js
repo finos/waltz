@@ -18,7 +18,6 @@
 
 import _ from 'lodash';
 import {initialiseData, mkLinkGridCell} from '../../../common';
-import {measurableKindNames, capabilityRatingNames} from '../../../common/services/display-names';
 
 /**
  * @name waltz-measurable-ratings-browser
@@ -31,6 +30,7 @@ import {measurableKindNames, capabilityRatingNames} from '../../../common/servic
 const bindings = {
     applications: '<',
     measurables: '<',
+    measurableCategories: '<',
     ratings: '<',
     onLoadDetail: '<'
 };
@@ -39,6 +39,7 @@ const bindings = {
 const initialState = {
     applications: [],
     measurables: [],
+    measurableCategories: [],
     ratings: [],
     detail: null,
     visibility: {
@@ -52,7 +53,7 @@ const initialState = {
 const template = require('./measurable-ratings-browser-section.html');
 
 
-function prepareColumnDefs(measurableKind) {
+function prepareColumnDefs(measurableCategory) {
     return [
         mkLinkGridCell('Name', 'application.name', 'application.id', 'main.app.view'),
         {
@@ -66,7 +67,7 @@ function prepareColumnDefs(measurableKind) {
         },
         {
             field: 'measurable.name',
-            name: measurableKindNames[measurableKind]
+            name: measurableCategory.name
         },
         {
             field: 'rating.description',
@@ -88,6 +89,7 @@ function findChildIds(measurable) {
 
 
 function prepareTableData(measurable,
+                          ragNames = {},
                           applications = [],
                           ratings = [],
                           measurablesById = {}) {
@@ -103,7 +105,7 @@ function prepareTableData(measurable,
                 application: appsById[r.entityReference.id],
                 rating: r,
                 measurable: measurablesById[r.measurableId],
-                ratingName: capabilityRatingNames[r.rating]
+                ratingName: ragNames[r.rating]
             };
         })
         .value();
@@ -120,6 +122,7 @@ function log() {
 function controller() {
     const vm = initialiseData(this, initialState);
 
+
     vm.$onChanges = (c) => {
         if (c.measurables) {
             vm.measurablesById = _.keyBy(vm.measurables, 'id');
@@ -131,12 +134,14 @@ function controller() {
         vm.tableData = null;
         vm.selectedMeasurable = measurable;
         const promise = vm.onLoadDetail(measurable);
+        const category = _.find(vm.measurableCategories, ({ id: measurable.categoryId }));
 
-        vm.columnDefs = prepareColumnDefs(measurable.kind);
+        vm.columnDefs = prepareColumnDefs(category);
         if (_.isFunction(_.get(promise, 'then'))) {
             promise
                 .then(ratings => vm.tableData = prepareTableData(
                     measurable,
+                    category.ragNames,
                     vm.applications,
                     ratings,
                     vm.measurablesById))
