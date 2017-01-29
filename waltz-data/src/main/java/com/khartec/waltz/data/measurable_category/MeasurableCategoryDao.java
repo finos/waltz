@@ -38,10 +38,10 @@ public class MeasurableCategoryDao {
 
     private static final RecordMapper<MeasurableCategoryRecord, MeasurableCategory> TO_DOMAIN_MAPPER = r -> {
         RagNames ragNames = ImmutableRagNames.builder()
-                .r(r.getRatingNameR())
-                .a(r.getRatingNameA())
-                .g(r.getRatingNameG())
-                .z(r.getRatingNameZ())
+                .R(r.getRatingNameR())
+                .A(r.getRatingNameA())
+                .G(r.getRatingNameG())
+                .Z(r.getRatingNameZ())
                 .build();
 
         return ImmutableMeasurableCategory.builder()

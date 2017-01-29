@@ -18,8 +18,6 @@
  */
 import _ from 'lodash';
 import {initialiseData, kindToViewState} from '../common';
-import {measurableKindNames} from  '../common/services/display-names';
-import {measurableKindDescriptions} from  '../common/services/descriptions';
 
 
 const initialState = {
@@ -27,6 +25,7 @@ const initialState = {
     selected: null,
     entityRef: null,
     measurables: [],
+    categories: [],
     ratings: [],
     tabs: [],
     saveInProgress: false,
@@ -36,36 +35,37 @@ const initialState = {
 };
 
 
-function prepareTabs(ratings = [], measurables = []) {
-    const allMeasurableKinds = _.keys(measurableKindNames);
-    const measurablesByKind = _.groupBy(measurables, 'kind');
+function prepareTabs(categories = [], measurables = [], ratings = []) {
+    const measurablesByCategory = _.groupBy(measurables, 'categoryId');
 
-
-    const tabs = _.map(allMeasurableKinds, k => {
-        const measurablesForKind = measurablesByKind[k];
-        const ids = _.map(measurablesForKind, 'id');
-        const ratingsForKind = _.filter(ratings, r => _.includes(ids, r.measurableId))
+    const tabs = _.map(categories, category => {
+        const measurablesForCategory = measurablesByCategory[category.id];
+        const ids = _.map(measurablesForCategory, 'id');
+        const ratingsForCategory = _.filter(ratings, r => _.includes(ids, r.measurableId))
         return {
-            kind: {
-                code: k,
-                name: measurableKindNames[k],
-                description: measurableKindDescriptions[k]
-            },
-            measurables: measurablesForKind,
-            ratings: ratingsForKind
+            category,
+            measurables: measurablesForCategory,
+            ratings: ratingsForCategory
         };
     });
 
     return _.sortBy(
         tabs,
-        g => g.kind.name);
+        g => g.category.name);
 }
 
 
 function determineSelectedTab(tabs = []) {
     // first with ratings, or simply first if no ratings
     const tab = _.find(tabs, t => t.ratings.length > 0 ) || tabs[0];
-    return _.get(tab, 'kind.code');
+    return _.get(tab, 'category.id');
+}
+
+
+function determineSaveFn(selected, store) {
+    return _.isEmpty(selected.rating)
+        ? store.create
+        : store.update;
 }
 
 
@@ -74,6 +74,7 @@ function controller($q,
                     $stateParams,
                     applicationStore,
                     measurableStore,
+                    measurableCategoryStore,
                     measurableRatingStore,
                     notification) {
 
@@ -85,6 +86,10 @@ function controller($q,
     const vm = initialiseData(this, initialState);
 
     // -- LOAD ---
+
+    const categoryPromise = measurableCategoryStore
+        .findAll()
+        .then(cs => vm.categories = cs);
 
     const measurablesPromise = measurableStore
         .findAll()
@@ -103,9 +108,9 @@ function controller($q,
                 { name: app.name, description: app.description })
         });
 
-    $q.all([ratingsPromise, measurablesPromise])
+    $q.all([ratingsPromise, measurablesPromise, categoryPromise])
         .then(() => {
-            vm.tabs = prepareTabs(vm.ratings, vm.measurables);
+            vm.tabs = prepareTabs(vm.categories, vm.measurables, vm.ratings);
             vm.visibility.tab = determineSelectedTab(vm.tabs);
         });
 
@@ -121,9 +126,7 @@ function controller($q,
         : null;
 
     const doSave = (rating, description) => {
-        const saveFn = _.isEmpty(vm.selected.rating)
-            ? measurableRatingStore.create
-            : measurableRatingStore.update;
+        const saveFn = determineSaveFn(vm.selected, measurableRatingStore);
 
         const savePromise = saveFn(
             entityReference,
@@ -133,13 +136,11 @@ function controller($q,
 
         return savePromise
             .then(rs => vm.ratings = rs)
-            .then(() => vm.tabs = prepareTabs(vm.ratings, vm.measurables))
+            .then(() => vm.tabs = prepareTabs(vm.categories, vm.measurables, vm.ratings))
             .then(() => {
                 vm.saveInProgress = false;
-                vm.selected = {
-                    rating: { rating, description },
-                    measurable: vm.selected.measurable
-                };
+                const newRating = { rating, description };
+                vm.selected = Object.assign({}, vm.selected, { rating: newRating });
             });
     };
 
@@ -148,13 +149,15 @@ function controller($q,
         vm.selected = {};
     };
 
+
     vm.backUrl = $state
         .href(
             kindToViewState(entityReference.kind),
             { id: entityReference.id });
 
     vm.onMeasurableSelect = (measurable, rating) => {
-        vm.selected = { rating, measurable };
+        const category = _.find(vm.categories, ({ id: measurable.categoryId }));
+        vm.selected = { rating, measurable, category };
     };
 
     vm.onRatingSelect = r => {
@@ -182,7 +185,7 @@ function controller($q,
             .then(rs => {
                 vm.saveInProgress = false;
                 vm.ratings = rs;
-                vm.tabs = prepareTabs(vm.ratings, vm.measurables);
+                vm.tabs = prepareTabs(vm.categories, vm.measurables, vm.ratings);
                 vm.selected.rating = null;
                 notification.success('Removed');
             });
@@ -223,6 +226,7 @@ controller.$inject = [
     '$stateParams',
     'ApplicationStore',
     'MeasurableStore',
+    'MeasurableCategoryStore',
     'MeasurableRatingStore',
     'Notification'
 ];

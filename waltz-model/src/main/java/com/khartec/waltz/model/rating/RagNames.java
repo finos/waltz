@@ -28,25 +28,25 @@ import org.immutables.value.Value;
 public abstract class RagNames {
 
     @Value.Default
-    public String r() {
+    public String R() {
         return "Poor";
     }
 
 
     @Value.Default
-    public String a() {
+    public String A() {
         return "Adequate";
     }
 
 
     @Value.Default
-    public String g() {
+    public String G() {
         return "Good";
     }
 
 
     @Value.Default
-    public String z() {
+    public String Z() {
         return "Unknown";
     }
 }
