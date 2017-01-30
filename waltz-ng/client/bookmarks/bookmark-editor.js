@@ -66,7 +66,10 @@ function controller($state,
     vm.showCreate = () => {
         vm.createShowing = true;
         vm.editShowing = false;
-        vm.newBookmark = { kind: 'DOCUMENTATION' };
+        vm.newBookmark = {
+            kind: 'DOCUMENTATION',
+            lastUpdatedBy: "ignored, server will set"
+        };
     };
 
     vm.edit = (b) => {

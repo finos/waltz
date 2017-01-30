@@ -18,7 +18,6 @@
 
 export default (module) => {
     module
-        .directive('waltzBookmarkCard', require('./bookmark-card'))
         .directive('waltzBookmarkKindSelect', require('./bookmark-kind-select'))
         .directive('waltzBookmarkForm', require('./bookmark-form'));
 };

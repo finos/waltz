@@ -32,9 +32,15 @@
 
             <div class="col-md-9">
                     <table class="table table-condensed wbs-bookmark-table">
+                        <colgroup>
+                            <col width="10%">
+                            <col width="70%">
+                            <col width="20%">
+                        </colgroup>
 
                     <tbody ng-repeat="bookmarksByKind in $ctrl.filteredBookmarks | orderBy:'kind' ">
-                        <tr ng-repeat="bookmark in bookmarksByKind.bookmarks">
+                        <tr ng-repeat="bookmark in bookmarksByKind.bookmarks"
+                            class="waltz-visibility-parent">
                             <td style="vertical-align:middle; text-align: center; width: 10%">
                                 <waltz-icon name="{{ bookmark.kind | toIconName:'bookmark' }}"
                                             size="lg">
@@ -63,6 +69,16 @@
                                     <div ng-if="!bookmark.description"
                                          class="text-muted small">
                                         <i>No description provided</i>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="small waltz-visibility-child-30">
+                                    Last updated:
+                                    <div>
+                                        <span ng-bind="bookmark.lastUpdatedBy"></span>
+                                        ,
+                                        <waltz-from-now timestamp="bookmark.lastUpdatedAt"></waltz-from-now>
                                     </div>
                                 </div>
                             </td>

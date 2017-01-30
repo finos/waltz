@@ -861,4 +861,32 @@
                     columnName="measurable_kind"/>
     </changeSet>
 
+
+    <!-- 1118: Add updated_by to bookmarks -->
+    <changeSet author="dwatkins"
+               id="20170130-1118-1">
+        <addColumn tableName="bookmark">
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20170130-1118-2">
+        <sql>
+            UPDATE bookmark
+            SET last_updated_by = 'unknown'
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20170130-1118-3">
+        <addNotNullConstraint columnDataType="${name.type}"
+                              columnName="last_updated_by"
+                              defaultNullValue="UNKNOWN"
+                              tableName="bookmark"/>
+    </changeSet>
+
 </databaseChangeLog>

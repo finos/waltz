@@ -44,7 +44,7 @@ public class BookmarkDao {
 
     private final DSLContext dsl;
 
-    private RecordMapper<? super Record, Bookmark> bookmarkMapper = r -> {
+    private RecordMapper<? super Record, Bookmark> TO_DOMAIN_MAPPER = r -> {
         BookmarkRecord record = r.into(BookmarkRecord.class);
 
         EntityReference parentRef = ImmutableEntityReference.builder()
@@ -61,8 +61,11 @@ public class BookmarkDao {
                 .kind(BookmarkKind.valueOf(record.getKind()))
                 .isPrimary(record.getIsPrimary())
                 .provenance(record.getProvenance())
+                .lastUpdatedBy(record.getLastUpdatedBy())
+                .lastUpdatedAt(record.getUpdatedAt().toLocalDateTime())
                 .build();
     };
+
 
     @Autowired
     public BookmarkDao(DSLContext dsl) {
@@ -77,7 +80,7 @@ public class BookmarkDao {
                 .where(BOOKMARK.PARENT_ID.eq(reference.id()))
                 .and(BOOKMARK.PARENT_KIND.eq(reference.kind().name()))
                 .orderBy(BOOKMARK.IS_PRIMARY.desc(), BOOKMARK.TITLE.asc())
-                .fetch(bookmarkMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -85,8 +88,9 @@ public class BookmarkDao {
         return dsl.select()
                 .from(BOOKMARK)
                 .where(BOOKMARK.ID.eq(bookmarkId))
-                .fetchOne(bookmarkMapper);
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
+
 
     /**
      * @param id
@@ -101,8 +105,9 @@ public class BookmarkDao {
     }
 
 
-    public Bookmark create(Bookmark bookmark) {
+    public Bookmark create(Bookmark bookmark, String username) {
         checkNotNull(bookmark, "bookmark must not be null");
+        checkNotEmpty(username, "username cannot be empty");
 
         BookmarkRecord insertedRecord = dsl.insertInto(BOOKMARK)
                 .set(BOOKMARK.DESCRIPTION, bookmark.description().orElse(""))
@@ -114,10 +119,10 @@ public class BookmarkDao {
                 .set(BOOKMARK.IS_PRIMARY, bookmark.isPrimary())
                 .set(BOOKMARK.CREATED_AT, DSL.currentTimestamp())
                 .set(BOOKMARK.UPDATED_AT, DSL.currentTimestamp())
+                .set(BOOKMARK.LAST_UPDATED_BY, username.trim())
                 .set(BOOKMARK.PROVENANCE, bookmark.provenance())
                 .returning(BOOKMARK.ID)
                 .fetchOne();
-
 
         return ImmutableBookmark.builder()
                 .from(bookmark)
@@ -126,9 +131,10 @@ public class BookmarkDao {
     }
 
 
-    public Bookmark update(Bookmark bookmark) {
+    public Bookmark update(Bookmark bookmark, String username) {
         checkNotNull(bookmark, "bookmark must not be null");
         checkOptionalIsPresent(bookmark.id(), "bookmark id is required for an update");
+        checkNotEmpty(username, "username cannot be empty");
 
         int rc = dsl.update(BOOKMARK)
                 .set(BOOKMARK.KIND, bookmark.kind().name())
@@ -137,6 +143,7 @@ public class BookmarkDao {
                 .set(BOOKMARK.TITLE, bookmark.title().orElse(""))
                 .set(BOOKMARK.IS_PRIMARY, bookmark.isPrimary())
                 .set(BOOKMARK.UPDATED_AT, DSL.currentTimestamp())
+                .set(BOOKMARK.LAST_UPDATED_BY, username.trim())
                 .set(BOOKMARK.PROVENANCE, bookmark.provenance())
                 .where(BOOKMARK.ID.eq(bookmark.id().get()))
                 .execute();
@@ -151,6 +158,5 @@ public class BookmarkDao {
         sb.append('}');
         return sb.toString();
     }
-
 
 }
