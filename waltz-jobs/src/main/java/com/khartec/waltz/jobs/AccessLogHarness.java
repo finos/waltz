@@ -36,7 +36,7 @@ public class AccessLogHarness {
 
         accessLogDao.write(ImmutableAccessLog.builder().params("{b:2}").state("my.state").userId("bob").build());
 
-        accessLogDao.findForUserId("bob").forEach(System.out::println);
+        accessLogDao.findForUserId("bob", null).forEach(System.out::println);
 
     }
 
