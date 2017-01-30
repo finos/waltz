@@ -96,6 +96,27 @@ const dateCell = {
 };
 
 
+function mkGridData(statisticValues = [],
+                    applications = [],
+                    orgUnits = []) {
+    const appsById = _.keyBy(applications, 'id');
+    const orgUnitsById = _.keyBy(orgUnits, 'id');
+
+    return _.map(statisticValues, sv => {
+        const app = appsById[sv.entity.id];
+        return app
+            ? Object.assign(
+                {},
+                sv,
+                {
+                    application: app,
+                    orgUnit: orgUnitsById[app.organisationalUnitId]
+                })
+            : sv;
+    });
+}
+
+
 function controller($animate,
                     uiGridConstants,
                     uiGridExporterConstants,
@@ -111,18 +132,13 @@ function controller($animate,
         }
 
         if (vm.statisticValues
-                && notEmpty(change.applications)
-                && notEmpty(change.orgUnits)) {
+                && notEmpty(vm.applications)
+                && notEmpty(vm.orgUnits)) {
 
-            const appsById = _.keyBy(vm.applications, 'id');
-            const orgUnitsById = _.keyBy(vm.orgUnits, 'id');
-
-            _.each(vm.statisticValues, sv => {
-                sv.application = appsById[sv.entity.id];
-                sv.orgUnit = orgUnitsById[sv.application.organisationalUnitId];
-            });
-
-            vm.gridOptions.data = vm.statisticValues;
+            vm.gridOptions.data = mkGridData(
+                vm.statisticValues,
+                vm.applications,
+                vm.orgUnits);
         }
     };
 
