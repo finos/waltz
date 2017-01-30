@@ -36,7 +36,6 @@ public abstract class Measurable implements
         LastUpdatedProvider,
         ProvenanceProvider {
 
-    public abstract MeasurableKind kind();
     public abstract long categoryId();
     public abstract boolean concrete();
 }

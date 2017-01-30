@@ -49,7 +49,7 @@
                 <ul class="list-unstyled">
                     <li ng-repeat="measurable in $ctrl.results.measurables">
                         <span class='small text-muted'
-                              ng-bind="measurable.kind | toDisplayName:'measurableKind'">
+                              ng-bind="measurable.categoryId | toDisplayName:'measurableCategory'">
                         </span>
                         <a ui-sref="main.measurable.view ({id: measurable.id})"
                            ng-click="$ctrl.dismiss()">

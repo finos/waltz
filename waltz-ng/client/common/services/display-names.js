@@ -221,16 +221,6 @@ export const lifecycleStatusNames = {
 };
 
 
-export const measurableKindNames = {
-    BUSINESS_LINE: 'Business Line',
-    CAPABILITY: 'Function',
-    PROCESS: 'Process',
-    PRODUCT: 'Product',
-    REGION: 'Region',
-    SERVICE: 'Service'
-};
-
-
 /**
  * Used to convert a map of ( { code -> displayName }
  * @param lookups

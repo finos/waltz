@@ -34,8 +34,8 @@ const perspectiveDefinitionShape = {
     id: apiCheck.number,
     name: apiCheck.string,
     description: apiCheck.string,
-    kindA: apiCheck.string,
-    kindB: apiCheck.string
+    categoryA: apiCheck.number,
+    categoryB: apiCheck.number
 };
 
 
@@ -48,7 +48,7 @@ const measurableRatingShape = {
 
 const measurableShape = {
     id: apiCheck.number,
-    kind: apiCheck.string,
+    categoryId: apiCheck.number,
     name: apiCheck.string,
     description: apiCheck.string
 };

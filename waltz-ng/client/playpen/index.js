@@ -54,7 +54,7 @@ export default () => {
                     views: { 'content@': playpenView3 }
                 })
                 .state('main.playpen.4', {
-                    url: '/4?{id:int}&{kindA:string}&{kindB:string}',
+                    url: '/4?{id:int}&{categoryA:int}&{categoryB:int}',
                     views: { 'content@': playpenView4 }
                 })
         }

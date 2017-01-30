@@ -38,16 +38,16 @@ function mkPerspective(perspectiveDefinition,
 
     const measurablesById = _.keyBy(measurables, 'id');
 
-    const mkRatingFilterFn = measurableKind => ratings =>
+    const mkRatingFilterFn = categoryId => ratings =>
         _.filter(ratings, r => {
             const measurable = measurablesById[r.measurableId];
             if (measurable) {
-                return measurable.kind === measurableKind;
+                return measurable.categoryId === categoryId;
             }
         });
 
-    const mkAxis = (measurableKind) => {
-        const ratingFilter = mkRatingFilterFn(measurableKind);
+    const mkAxis = (categoryId) => {
+        const ratingFilter = mkRatingFilterFn(categoryId);
         const axisRatings = ratingFilter(ratings);
         return _
             .chain(axisRatings)
@@ -59,8 +59,8 @@ function mkPerspective(perspectiveDefinition,
     return {
         definition: perspectiveDefinition,
         axes: {
-            a: mkAxis(perspectiveDefinition.kindA),
-            b: mkAxis(perspectiveDefinition.kindB)
+            a: mkAxis(perspectiveDefinition.categoryA),
+            b: mkAxis(perspectiveDefinition.categoryB)
         }
     };
 }
