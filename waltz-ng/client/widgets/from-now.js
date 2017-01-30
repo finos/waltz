@@ -20,8 +20,8 @@ import moment from "moment";
 
 
 const BINDINGS = {
-    timestamp: '=',
-    daysOnly: '=' // boolean
+    timestamp: '<',
+    daysOnly: '<' // boolean
 };
 
 
@@ -32,7 +32,7 @@ const formats = {
 };
 
 
-const template = '<span title="{{ ::ctrl.hoverValue }}" ng-bind="::ctrl.fromNow"></span>';
+const template = '<span title="{{ ctrl.hoverValue }}" ng-bind="ctrl.fromNow"></span>';
 
 
 function controller($scope) {

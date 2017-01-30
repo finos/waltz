@@ -56,9 +56,10 @@ public class ChangeLogService {
     }
 
 
-    public List<ChangeLog> findByUser(String userName) {
+    public List<ChangeLog> findByUser(String userName,
+                                      Optional<Integer> limit) {
         checkNotEmpty(userName, "Username cannot be empty");
-        return changeLogDao.findByUser(userName);
+        return changeLogDao.findByUser(userName, limit);
     }
 
 

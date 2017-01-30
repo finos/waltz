@@ -45,33 +45,11 @@
                     <small ng-bind="ctrl.userName"></small>
                 </h4>
 
-
-                <div ng-if="ctrl.changeLogs.length > 0" class="waltz-user-log-scroll">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>Message</th>
-                            <th>Entity</th>
-                            <th>Timestamp</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="log in ctrl.changeLogs">
-                            <td><span ng-bind="log.message"></span></td>
-                            <td>
-                                {{ log.parentReference.kind }} / {{ log.parentReference.id }}
-                                <span ng-if="log.parentReference.name">
-                            / {{ log.parentReference.name }}
-                        </span>
-                            </td>
-                            <td>
-                                <waltz-from-now timestamp="log.createdAt">
-                                </waltz-from-now>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <waltz-grid-with-search ng-if="ctrl.changeLogs.length > 0"
+                                        column-defs="ctrl.changeLogColumnDefs"
+                                        entries="ctrl.changeLogs"
+                                        search-placeholder-text="Search audit log...">
+                </waltz-grid-with-search>
 
                 <waltz-no-data ng-if="ctrl.changeLogs.length == 0">
                     <message>
@@ -89,31 +67,13 @@
                     <small ng-bind="ctrl.userName"></small>
                 </h4>
 
-                <div ng-if="ctrl.accesslogs.length > 0" class="waltz-user-log-scroll">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>State</th>
-                            <th>Params</th>
-                            <th>Timestamp</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="log in ctrl.accesslogs">
-                            <td>{{ log.state }}</td>
-                            <td>{{ log.params }}</td>
-                            <td>
-                                <waltz-from-now timestamp="log.createdAt">
-                                </waltz-from-now>
-                            </td>
-                            <td>
-                                <a ui-sref="{{log.state}} ({{log.params}})"> Visit </a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+
+                <waltz-grid-with-search ng-if="ctrl.accesslogs.length > 0"
+                                        column-defs="ctrl.accessLogColumnDefs"
+                                        entries="ctrl.accesslogs"
+                                        search-placeholder-text="Search access log...">
+                </waltz-grid-with-search>
+
                 <waltz-no-data ng-if="ctrl.accesslogs.length == 0">
                     <message>
                         No Access logs

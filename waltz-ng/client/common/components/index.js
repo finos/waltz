@@ -24,6 +24,7 @@ export default (module) => {
         .component('waltzEntityIconLabel', require('./entity-link/entity-icon-label'))
         .component('waltzEntityLink', require('./entity-link/entity-link'))
         .component('waltzGrid', require('./grid/grid'))
+        .component('waltzGridSref', require('./grid-sref/grid-sref'))
         .component('waltzGridWithSearch', require('./grid/grid-with-search'));
 
 };

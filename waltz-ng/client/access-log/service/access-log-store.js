@@ -38,8 +38,8 @@ function accessLogStore($http, BaseApiUrl) {
         .then(r => r.data);
 
 
-    const findForUserName = (userName) => $http
-        .get(`${BASE}/user/${userName}`)
+    const findForUserName = (userName, limit = null) => $http
+        .get(`${BASE}/user/${userName}`, {params: {limit}})
         .then(r => r.data);
 
 
