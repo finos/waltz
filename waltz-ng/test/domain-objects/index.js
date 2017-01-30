@@ -40,14 +40,14 @@ export const measurables = {
             id: 1,
             name: 'Europe',
             description: 'Region Definition',
-            kind: 'REGION'
+            category: 1
         },
         UK: {
             id: 10,
             parent: 1,
             name: 'UK',
             description: 'Region Definition',
-            kind: 'REGION'
+            category: 1
         }
     },
     processes: {
@@ -55,14 +55,14 @@ export const measurables = {
             id: 2,
             name: 'Trade',
             description: 'Process Definition',
-            kind: 'PROCESS'
+            category: 3
         },
         SELL: {
             id: 20,
             parent: 2,
             name: 'SELL',
             description: 'Process Definition',
-            kind: 'PROCESS'
+            category: 3
         }
     },
     products: {
@@ -70,14 +70,14 @@ export const measurables = {
             id: 3,
             name: 'Retail',
             description: 'Process Definition',
-            kind: 'PRODUCT'
+            category: 2
         },
         MORTGAGE: {
             id: 30,
             parent: 2,
             name: 'MORTGAGE',
             description: 'Product Definition',
-            kind: 'PRODUCT'
+            categoryId: 2
         }
     }
 };
@@ -110,8 +110,8 @@ export const perspectiveDefinitions = {
         id: 12,
         name: 'TestPerspective',
         description: 'TestPerspective Definition',
-        kindA: 'REGION',
-        kindB: 'PROCESS'
+        categoryA: 1,
+        categoryB: 2
     }
 };
 
