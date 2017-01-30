@@ -40,6 +40,7 @@ public class BookmarkService {
     private final BookmarkDao bookmarkDao;
     private final ChangeLogService changeLogService;
 
+
     @Autowired
     public BookmarkService(BookmarkDao bookmarkDao,
                            ChangeLogService changeLogService) {
@@ -58,13 +59,13 @@ public class BookmarkService {
 
     public Bookmark create(Bookmark bookmark, String username) {
         logChange("Added", bookmark, username, Operation.ADD);
-        return bookmarkDao.create(bookmark);
+        return bookmarkDao.create(bookmark, username);
     }
 
 
     public Bookmark update(Bookmark bookmark, String username) {
         logChange("Updated", bookmark, username, Operation.UPDATE);
-        return bookmarkDao.update(bookmark);
+        return bookmarkDao.update(bookmark, username);
     }
 
 

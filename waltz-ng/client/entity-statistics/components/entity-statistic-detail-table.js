@@ -84,7 +84,11 @@ const reasonCell = {
 };
 
 
-const orgUnitCell = mkLinkGridCell('Org Unit', 'orgUnit.name', 'orgUnit.id', 'main.org-unit.view');
+const orgUnitCell = mkLinkGridCell(
+    'Org Unit',
+    'orgUnit.name',
+    'orgUnit.id',
+    'main.org-unit.view');
 
 
 const dateCell = {
@@ -170,17 +174,30 @@ function controller($animate,
         const rowVisibility = uiGridExporterConstants.ALL;
         const colVisibility = uiGridExporterConstants.ALL;
         const exportDataSeparator = ',';
-        const fileName = vm.statisticDefinition.name + '_' + moment().format(exportTimestampFormat) + '.csv';
+        const statName = vm.statisticDefinition.name;
+        const timestamp = moment().format(exportTimestampFormat);
+        const fileName = `${statName}_${timestamp}.csv`;
 
         uiGridExporterService.loadAllDataIfNeeded(grid, rowVisibility, colVisibility)
             .then(() => {
                 // prepare data
-                const exportColumnHeaders = uiGridExporterService.getColumnHeaders(grid, colVisibility);
-                const exportData = uiGridExporterService.getData(grid, rowVisibility, colVisibility);
-                const csvContent = uiGridExporterService.formatAsCsv(exportColumnHeaders, exportData, exportDataSeparator);
+                const exportColumnHeaders = uiGridExporterService.getColumnHeaders(
+                    grid,
+                    colVisibility);
+                const exportData = uiGridExporterService.getData(
+                    grid,
+                    rowVisibility,
+                    colVisibility);
+                const csvContent = uiGridExporterService.formatAsCsv(
+                    exportColumnHeaders,
+                    exportData,
+                    exportDataSeparator);
 
                 // trigger file download
-                uiGridExporterService.downloadFile(fileName, csvContent, false);
+                uiGridExporterService.downloadFile(
+                    fileName,
+                    csvContent,
+                    false);
             });
     };
 }

@@ -47,17 +47,17 @@
                     </td>
                     <td>
                         <waltz-icon name="{{ bookmark.kind | toIconName:'bookmark' }}"></waltz-icon>
-                        {{ bookmark.kind|toDisplayName:'bookmark' }}
+                        <span ng-bind="bookmark.kind | toDisplayName:'bookmark'"></span>
                     </td>
 
                     <td>
-                        {{ bookmark.title }}
+                        <span ng-bind="bookmark.title"></span>
                     </td>
                     <td>
-                        {{ bookmark.url }}
+                        <span ng-bind="bookmark.url"></span>
                     </td>
                     <td>
-                        {{ bookmark.description }}
+                        <span ng-bind="bookmark.description"></span>
                     </td>
                     <td>
                         <span class="waltz-visibility-child-50">

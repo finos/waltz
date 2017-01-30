@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdProvider;
+import com.khartec.waltz.model.LastUpdatedProvider;
 import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
@@ -32,7 +33,7 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutableBookmark.class)
 @JsonDeserialize(as = ImmutableBookmark.class)
-public abstract class Bookmark implements IdProvider, ProvenanceProvider {
+public abstract class Bookmark implements IdProvider, ProvenanceProvider, LastUpdatedProvider {
 
     public abstract Optional<Long> id();
     public abstract EntityReference parent();
