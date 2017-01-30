@@ -88,7 +88,7 @@ function controller(accessLogStore,
             field: 'params',
             name: '',
             width: '10%',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-state-link state="row.entity.state" params="row.entity.params" link-text="Visit"></waltz-state-link></div>'
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-grid-sref state="row.entity.state" params="row.entity.params" link-text="Visit"></waltz-grid-sref></div>'
         },
 
     ];

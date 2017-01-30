@@ -27,7 +27,7 @@ const bindings = {
 };
 
 
-const template = require('./state-link.html');
+const template = require('./grid-sref.html');
 
 
 const initialState = {
@@ -40,7 +40,7 @@ function controller($state) {
 
     vm.$onChanges = (changes) => {
         if (vm.state && vm.params) {
-            const paramsObj = JSON.parse(vm.params);
+            const paramsObj = _.isString(vm.params) ? JSON.parse(vm.params) : vm.params;
             // console.log('state link: ', vm.state, paramsObj)
             // url needs to be re-computed when entityRef changes
             // eg: when used in a ui-grid cell template
