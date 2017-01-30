@@ -15,9 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {mkPerspective} from '../../perspective/perpective-utilities';
-import {select, event} from 'd3-selection'
-
 
 const initialState = {
     activeRating: 'X',
@@ -72,8 +69,8 @@ function controller($stateParams,
     vm.perspectiveDefinition = {
         id: 1,
         name: 'Function - Process',
-        kindA: $stateParams.kindA || 'PROCESS',
-        kindB: $stateParams.kindB || 'CAPABILITY',
+        categoryA: $stateParams.categoryA || 1,
+        categoryB: $stateParams.categoryB || 2,
         description: 'blah blah'
     };
 

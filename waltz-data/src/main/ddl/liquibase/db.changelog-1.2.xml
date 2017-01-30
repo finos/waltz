@@ -855,4 +855,10 @@
         </sql>
     </changeSet>
 
+    <changeSet author="dwatkins"
+               id="20170127-1428-5">
+        <dropColumn tableName="measurable"
+                    columnName="measurable_kind"/>
+    </changeSet>
+
 </databaseChangeLog>

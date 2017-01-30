@@ -24,10 +24,10 @@ import _ from 'lodash';
  * @param id
  * @returns {*}
  */
-function filterBySameMeasurableKind(all, id) {
+function filterBySameMeasurableCategory(all, id) {
     const measurable = _.find(all, { id });
     return measurable
-        ? _.filter(all, m => m.kind === measurable.kind)
+        ? _.filter(all, m => m.categoryId === measurable.categoryId)
         : all;
 }
 
@@ -45,7 +45,7 @@ function utils(appGroupStore,
             case 'MEASURABLE':
                 return measurableStore
                     .findAll()
-                    .then(all => filterBySameMeasurableKind(all, id));
+                    .then(all => filterBySameMeasurableCategory(all, id));
             case 'ORG_UNIT':
                 return orgUnitStore
                     .findAll();

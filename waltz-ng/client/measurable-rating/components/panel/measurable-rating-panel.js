@@ -34,6 +34,7 @@ const template = require('./measurable-rating-panel.html');
 
 
 const bindings = {
+    category: '<',
     ratings: '<',
     measurables: '<',
 };

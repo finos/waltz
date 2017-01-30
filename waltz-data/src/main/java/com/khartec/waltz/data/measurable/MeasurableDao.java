@@ -25,7 +25,6 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.measurable.ImmutableMeasurable;
 import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.model.measurable.MeasurableKind;
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -53,7 +52,6 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .id(r.getId())
                 .parentId(ofNullable(r.getParentId()))
                 .name(r.getName())
-                .kind(MeasurableKind.valueOf(r.getMeasurableKind()))
                 .categoryId(r.getMeasurableCategoryId())
                 .concrete(r.getConcrete())
                 .description(r.getDescription())
