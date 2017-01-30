@@ -48,7 +48,7 @@ public class ChangeLogEndpoint implements Endpoint {
     public void register() {
         getForList(
                 mkPath(BASE_URL, "user", ":userId"),
-                (request, response) -> service.findByUser(request.params("userId")));
+                (request, response) -> service.findByUser(request.params("userId"), getLimit(request)));
 
         getForList(
                 mkPath(BASE_URL, ":kind", ":id"),

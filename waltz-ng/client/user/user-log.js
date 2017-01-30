@@ -18,8 +18,7 @@
  */
 
 function controller(accessLogStore,
-                    changeLogStore,
-                    $state) {
+                    changeLogStore) {
 
     const vm = this;
 
@@ -30,17 +29,69 @@ function controller(accessLogStore,
         if (userName === null || userName === '') {
             vm.accessLogs = [];
             vm.changeLogs = [];
-        } else { accessLogStore
-                .findForUserName(userName)
+        } else {
+            accessLogStore
+                .findForUserName(userName, 500)
                 .then(logs => vm.accesslogs = logs);
 
             changeLogStore
-                .findForUserName(userName)
+                .findForUserName(userName, 500)
                 .then(logs => vm.changeLogs = logs);
         }
 
     };
 
+    vm.changeLogColumnDefs = [
+        {
+            field: 'severity',
+            name: 'Severity',
+            width: '10%',
+            cellFilter: "toDisplayName:'severity'"
+        },
+        {
+            field: 'message',
+            name: 'Message',
+            width: '50%'
+        },
+        {
+            field: 'parentReference',
+            name: 'Entity',
+            width: '30%',
+            cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD.kind"></span> / <span ng-bind="COL_FIELD.id"></span> <span ng-if="COL_FIELD.name"> <span ng-bind="COL_FIELD.name"></span></span></div>'
+        },
+        {
+            field: 'createdAt',
+            name: 'Timestamp',
+            width: '10%',
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>'
+        }
+    ];
+
+    vm.accessLogColumnDefs = [
+        {
+            field: 'state',
+            name: 'State',
+            width: '20%',
+        },
+        {
+            field: 'params',
+            name: 'Params',
+            width: '50%'
+        },
+        {
+            field: 'createdAt',
+            name: 'Timestamp',
+            width: '20%',
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>'
+        },
+        {
+            field: 'params',
+            name: '',
+            width: '10%',
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-state-link state="row.entity.state" params="row.entity.params" link-text="Visit"></waltz-state-link></div>'
+        },
+
+    ];
 }
 
 
@@ -48,7 +99,6 @@ function controller(accessLogStore,
 controller.$inject = [
     'AccessLogStore',
     'ChangeLogStore',
-    '$state'
 ];
 
 

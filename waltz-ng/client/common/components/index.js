@@ -23,6 +23,7 @@ export default (module) => {
         .component('waltzSearchControl', require('./search-control/search-control'))
         .component('waltzEntityIconLabel', require('./entity-link/entity-icon-label'))
         .component('waltzEntityLink', require('./entity-link/entity-link'))
+        .component('waltzStateLink', require('./state-link/state-link'))
         .component('waltzGrid', require('./grid/grid'))
         .component('waltzGridWithSearch', require('./grid/grid-with-search'));
 

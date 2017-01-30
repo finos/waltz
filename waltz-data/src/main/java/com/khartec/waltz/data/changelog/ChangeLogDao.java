@@ -86,13 +86,15 @@ public class ChangeLogDao {
     }
 
 
-    public List<ChangeLog> findByUser(String userName) {
+    public List<ChangeLog> findByUser(String userName,
+                                      Optional<Integer> limit) {
         checkNotEmpty(userName, "Username cannot be empty");
 
         return dsl.select()
                 .from(CHANGE_LOG)
                 .where(CHANGE_LOG.USER_ID.equalIgnoreCase(userName))
                 .orderBy(CHANGE_LOG.CREATED_AT.desc())
+                .limit(limit.orElse(Integer.MAX_VALUE))
                 .fetch(mapper);
     }
 

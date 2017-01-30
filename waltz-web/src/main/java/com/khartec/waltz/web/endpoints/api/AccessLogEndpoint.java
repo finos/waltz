@@ -32,6 +32,7 @@ import spark.Request;
 import spark.Response;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.getLimit;
 import static com.khartec.waltz.web.WebUtilities.getUsername;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
@@ -65,7 +66,8 @@ public class AccessLogEndpoint implements Endpoint {
         String findActiveUsersPath = mkPath(BASE_URL, "active", ":minutes");
         String writePath = mkPath(BASE_URL, ":state", ":params");
 
-        ListRoute<AccessLog> findForUserRoute = (request, response) -> accessLogService.findForUserId(request.params("userId"));
+        ListRoute<AccessLog> findForUserRoute = (request, response) ->
+                accessLogService.findForUserId(request.params("userId"), getLimit(request));
         ListRoute<AccessTime> findActiveUsersRoute = (request, response) -> {
             java.time.Duration minutes = java.time.Duration.ofMinutes(Integer.parseInt(request.params("minutes")));
             return accessLogService.findActiveUsersSince(minutes);

@@ -36,6 +36,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.schema.tables.AccessLog.ACCESS_LOG;
 
@@ -83,11 +84,13 @@ public class AccessLogDao {
     }
 
 
-    public List<AccessLog> findForUserId(String userId) {
+    public List<AccessLog> findForUserId(String userId,
+                                         Optional<Integer> limit) {
         return dsl.select(ACCESS_LOG.fields())
                 .from(ACCESS_LOG)
                 .where(ACCESS_LOG.USER_ID.equalIgnoreCase(userId))
                 .orderBy(ACCESS_LOG.CREATED_AT.desc())
+                .limit(limit.orElse(Integer.MAX_VALUE))
                 .fetch(TO_ACCESS_LOG);
     }
 

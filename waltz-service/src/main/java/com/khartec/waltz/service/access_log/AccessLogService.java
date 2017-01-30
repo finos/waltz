@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -51,9 +52,10 @@ public class AccessLogService {
     }
 
 
-    public List<AccessLog> findForUserId(String userId) {
+    public List<AccessLog> findForUserId(String userId,
+                                         Optional<Integer> limit) {
         checkNotEmpty(userId, "UserId must not be empty");
-        return accessLogDao.findForUserId(userId);
+        return accessLogDao.findForUserId(userId, limit);
     }
 
 
