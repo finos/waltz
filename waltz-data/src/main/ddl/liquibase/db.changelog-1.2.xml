@@ -889,4 +889,77 @@
                               tableName="bookmark"/>
     </changeSet>
 
+
+    <!-- 1445: Migrate Perspective Measurables -->
+    <changeSet author="dwatkins"
+               id="20170131-1445-1a"
+               dbms="mysql">
+        <sql>
+            INSERT INTO measurable_category
+              (name, description, external_id,
+              rating_name_r, rating_name_a, rating_name_g, rating_name_z,
+              last_updated_at, last_updated_by)
+            SELECT
+              p.name, p.description, p.code,
+              'Poor', 'Adequate', 'Good', 'Unknown',
+              curdate(), 'admin'
+            FROM perspective p;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20170131-1445-1b"
+               dbms="mssql">
+        <sql>
+            INSERT INTO measurable_category
+              (name, description, external_id,
+              rating_name_r, rating_name_a, rating_name_g, rating_name_z,
+              last_updated_at, last_updated_by)
+            SELECT
+              p.name, p.description, p.code,
+              'Poor', 'Adequate', 'Good', 'Unknown',
+              getutcdate(), 'admin'
+            FROM perspective p;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20170131-1445-2a"
+               dbms="mysql">
+        <sql>
+            INSERT INTO measurable
+              (parent_id, name, measurable_category_id,
+              concrete, description, external_id,
+              last_updated_at, last_updated_by, provenance)
+            SELECT
+              null, pm.name, mc.id,
+              1, pm.description, pm.code,
+              curdate(), 'admin', 'waltz'
+            FROM perspective_measurable pm
+              INNER JOIN measurable_category mc
+                ON mc.external_id = pm.perspective_code;
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20170131-1445-2b"
+               dbms="mssql">
+        <sql>
+            INSERT INTO measurable
+              (parent_id, name, measurable_category_id,
+              concrete, description, external_id,
+              last_updated_at, last_updated_by, provenance)
+            SELECT
+              null, pm.name, mc.id,
+              1, pm.description, pm.code,
+              getutcdate(), 'admin', 'waltz'
+            FROM perspective_measurable pm
+              INNER JOIN measurable_category mc
+                ON mc.external_id = pm.perspective_code;
+        </sql>
+    </changeSet>
+
+
+
+
 </databaseChangeLog>
