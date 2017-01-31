@@ -959,7 +959,30 @@
         </sql>
     </changeSet>
 
+    <changeSet author="dwatkins"
+               id="20170131-1445-3">
+        <renameTable newTableName="perspective_1_1"
+                     oldTableName="perspective"/>
 
+        <renameTable newTableName="perspective_measurable_1_1"
+                     oldTableName="perspective_measurable"/>
 
+        <renameTable newTableName="perspective_rating_1_1"
+                     oldTableName="perspective_rating"/>
+
+        <dropPrimaryKey constraintName="perspective_pkey"
+                        tableName="perspective_1_1"/>
+
+        <dropPrimaryKey constraintName="perspective_measure_pkey"
+                        tableName="perspective_measurable_1_1"/>
+
+        <addPrimaryKey columnNames="code"
+                       constraintName="perspective_1_1_pkey"
+                       tableName="perspective_1_1"/>
+
+        <addPrimaryKey columnNames="code"
+                       constraintName="perspective_measurable_1_1_pkey"
+                       tableName="perspective_measurable_1_1"/>
+    </changeSet>
 
 </databaseChangeLog>
