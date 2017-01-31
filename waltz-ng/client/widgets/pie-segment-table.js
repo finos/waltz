@@ -15,10 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import _ from "lodash";
 import {variableScale} from "../common/colors";
-
+import {numberFormatter} from "../common";
 
 const bindings = {
     config: '<',
@@ -48,7 +47,7 @@ function controller() {
 
     vm.$onChanges = (changes) => {
         if (changes.data) {
-            vm.total = _.sumBy(vm.data, 'count').toFixed(2);
+            vm.total = numberFormatter(_.sumBy(vm.data, 'count'), 2);
         }
 
         if (changes.config) {
