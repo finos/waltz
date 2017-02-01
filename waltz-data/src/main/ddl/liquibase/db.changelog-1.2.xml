@@ -1112,4 +1112,76 @@
         </createIndex>
     </changeSet>
 
+    <changeSet author="kamransaleem"
+               id="20170201-1366-3a"
+               dbms="mssql">
+        <sql>
+            INSERT INTO attestation
+            (entity_kind, entity_id, attestation_type, attested_by, attested_at, comments)
+            SELECT
+            'LOGICAL_DATA_FLOW', id, 'IMPLICIT', 'admin', getutcdate(), null
+            FROM logical_flow
+        </sql>
+    </changeSet>
+
+    <changeSet author="kamransaleem"
+               id="20170201-1366-3b"
+               dbms="mysql">
+        <sql>
+            INSERT INTO attestation
+            (entity_kind, entity_id, attestation_type, attested_by, attested_at, comments)
+            SELECT
+            'LOGICAL_DATA_FLOW', id, 'IMPLICIT', 'admin', curdate(), null
+            FROM logical_flow
+        </sql>
+    </changeSet>
+
+    <changeSet author="kamransaleem"
+               id="20170201-1366-4a"
+               dbms="mssql">
+        <sql>
+            INSERT INTO attestation
+            (entity_kind, entity_id, attestation_type, attested_by, attested_at, comments)
+            SELECT
+            'PHYSICAL_FLOW', id, 'IMPLICIT', 'admin', getutcdate(), null
+            FROM physical_flow
+        </sql>
+    </changeSet>
+
+    <changeSet author="kamransaleem"
+               id="20170201-1366-4b"
+               dbms="mysql">
+        <sql>
+            INSERT INTO attestation
+            (entity_kind, entity_id, attestation_type, attested_by, attested_at, comments)
+            SELECT
+            'PHYSICAL_FLOW', id, 'IMPLICIT', 'admin', curdate(), null
+            FROM physical_flow
+        </sql>
+    </changeSet>
+
+    <changeSet author="kamransaleem"
+               id="20170201-1366-5a"
+               dbms="mssql">
+        <sql>
+            INSERT INTO attestation
+            (entity_kind, entity_id, attestation_type, attested_by, attested_at, comments)
+            SELECT
+            'PHYSICAL_SPECIFICATION', id, 'IMPLICIT', 'admin', getutcdate(), null
+            FROM physical_specification
+        </sql>
+    </changeSet>
+
+    <changeSet author="kamransaleem"
+               id="20170201-1366-5b"
+               dbms="mysql">
+        <sql>
+            INSERT INTO attestation
+            (entity_kind, entity_id, attestation_type, attested_by, attested_at, comments)
+            SELECT
+            'PHYSICAL_SPECIFICATION', id, 'IMPLICIT', 'admin', curdate(), null
+            FROM physical_specification
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
