@@ -16,45 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from '../../../common';
+function store($http,
+               BaseApiUrl) {
+    const BASE = `${BaseApiUrl}/perspective-rating`;
 
+    const findForEntity = (categoryX, categoryY, ref) => $http
+        .get(`${BASE}/${categoryX}/${categoryY}/entity/${ref.kind}/${ref.id}`)
+        .then(result => result.data);
 
-const bindings = {
-    app: '<',
-    appCapabilities: '<',
-    capabilities: '<',
-    processes: '<',
-    sourceDataRatings: '<'
-};
-
-
-const template = require('./app-rating-tabgroup-section.html');
-
-
-const initialState = {
-    activeTab: 0,
-    app: null,
-    appCapabilities: [],
-    capabilities: [],
-    processes: [],
-    visibility: {
-        overlay: false
-    }
-};
-
-
-function controller() {
-    const vm = initialiseData(this, initialState);
+    return {
+        findForEntity
+    };
 }
 
 
-controller.$inject = [];
+store.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
 
 
-const component = {
-    template,
-    bindings,
-    controller
-};
-
-export default component;
+export default store;

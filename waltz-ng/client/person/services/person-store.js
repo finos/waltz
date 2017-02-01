@@ -16,49 +16,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default [
+function store($http,
+                 BaseApiUrl) {
+    const BASE = `${BaseApiUrl}/person`;
+
+
+    const getByEmployeeId = (empId) => $http
+        .get(`${BASE}/employee-id/${empId}`)
+        .then(result => result.data);
+
+
+    const findByUserId = (userId) => $http
+        .get(`${BASE}/user-id/${userId}`)
+        .then(result => result.data);
+
+    const getById = (id) => $http
+        .get(`${BASE}/id/${id}`)
+        .then(result => result.data);
+
+    const findDirects = (empId) => $http
+        .get(`${BASE}/employee-id/${empId}/directs`)
+        .then(result => result.data);
+
+
+    const findManagers = (empId) => $http
+        .get(`${BASE}/employee-id/${empId}/managers`)
+        .then(result => result.data);
+
+
+    const search = (query) => $http
+        .get(`${BASE}/search/${query}`)
+        .then(x => x.data);
+
+
+    return {
+        getByEmployeeId,
+        getById,
+        findByUserId,
+        findDirects,
+        findManagers,
+        search
+    };
+}
+
+
+store.$inject = [
     '$http',
-    'BaseApiUrl',
-    ($http, BaseApiUrl) => {
-
-        const BASE = `${BaseApiUrl}/person`;
-
-
-        const getByEmployeeId = (empId) => $http
-                .get(`${BASE}/employee-id/${empId}`)
-                .then(result => result.data);
-
-
-        const findByUserId = (userId) => $http
-                .get(`${BASE}/user-id/${userId}`)
-                .then(result => result.data);
-
-        const getById = (id) => $http
-                .get(`${BASE}/id/${id}`)
-                .then(result => result.data);
-
-        const findDirects = (empId) => $http
-                .get(`${BASE}/employee-id/${empId}/directs`)
-                .then(result => result.data);
-
-
-        const findManagers = (empId) => $http
-                .get(`${BASE}/employee-id/${empId}/managers`)
-                .then(result => result.data);
-
-
-        const search = (query) => $http
-                .get(`${BASE}/search/${query}`)
-                .then(x => x.data);
-
-
-        return {
-            getByEmployeeId,
-            getById,
-            findByUserId,
-            findDirects,
-            findManagers,
-            search
-        };
-    }
+    'BaseApiUrl'
 ];
+
+
+export default store;

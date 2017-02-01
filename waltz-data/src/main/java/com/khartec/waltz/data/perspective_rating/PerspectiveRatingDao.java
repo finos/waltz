@@ -23,9 +23,11 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.perspective.ImmutablePerspectiveRating;
 import com.khartec.waltz.model.perspective.PerspectiveRating;
 import com.khartec.waltz.model.rating.RagRating;
+import com.khartec.waltz.schema.tables.Measurable;
 import com.khartec.waltz.schema.tables.records.PerspectiveRatingRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -34,6 +36,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.PerspectiveRating.PERSPECTIVE_RATING;
 
 /**
@@ -42,19 +45,19 @@ import static com.khartec.waltz.schema.tables.PerspectiveRating.PERSPECTIVE_RATI
 @Repository
 public class PerspectiveRatingDao {
 
-    private static final RecordMapper<PerspectiveRatingRecord, PerspectiveRating> TO_DOMAIN_MAPPER = r ->
-            ImmutablePerspectiveRating.builder()
-                    .entityReference(mkRef(
-                            EntityKind.valueOf(r.getEntityKind()),
-                            r.getEntityId()))
-                    .categoryX(r.getCategoryX())
-                    .categoryY(r.getCategoryY())
-                    .measurableX(r.getMeasurableX())
-                    .measurableY(r.getMeasurableY())
-                    .rating(RagRating.valueOf(r.getRating()))
-                    .lastUpdatedBy(r.getLastUpdatedBy())
-                    .lastUpdatedAt(r.getLastUpdatedAt().toLocalDateTime())
-                    .build();
+    private static final RecordMapper<Record, PerspectiveRating> TO_DOMAIN_MAPPER = record -> {
+        PerspectiveRatingRecord r = record.into(PERSPECTIVE_RATING);
+        return ImmutablePerspectiveRating.builder()
+                .entityReference(mkRef(
+                        EntityKind.valueOf(r.getEntityKind()),
+                        r.getEntityId()))
+                .measurableX(r.getMeasurableX())
+                .measurableY(r.getMeasurableY())
+                .rating(RagRating.valueOf(r.getRating()))
+                .lastUpdatedBy(r.getLastUpdatedBy())
+                .lastUpdatedAt(r.getLastUpdatedAt().toLocalDateTime())
+                .build();
+    };
 
 
     private final DSLContext dsl;
@@ -72,13 +75,25 @@ public class PerspectiveRatingDao {
             long categoryY,
             EntityReference ref) {
 
-        Condition condition = PERSPECTIVE_RATING.CATEGORY_X.eq(categoryX)
-                .and(PERSPECTIVE_RATING.CATEGORY_Y.eq(categoryY))
-                .and(PERSPECTIVE_RATING.ENTITY_KIND.eq(ref.kind().name()))
+        Measurable mX = MEASURABLE.as("mX");
+        Measurable mY = MEASURABLE.as("mY");
+
+        Condition mXJoinCondition = mX.ID.eq(PERSPECTIVE_RATING.MEASURABLE_X);
+        Condition mYJoinCondition = mY.ID.eq(PERSPECTIVE_RATING.MEASURABLE_Y);
+
+        Condition categoriesMatch = mX.MEASURABLE_CATEGORY_ID.eq(categoryX)
+                .and(mY.MEASURABLE_CATEGORY_ID.eq(categoryY));
+
+        Condition entityMatches = PERSPECTIVE_RATING.ENTITY_KIND.eq(ref.kind().name())
                 .and(PERSPECTIVE_RATING.ENTITY_ID.eq(ref.id()));
 
-        return dsl.selectFrom(PERSPECTIVE_RATING)
-                .where(condition)
+        return dsl.select(PERSPECTIVE_RATING.fields())
+                .from(PERSPECTIVE_RATING)
+                .innerJoin(mX)
+                .on(mXJoinCondition)
+                .innerJoin(mY)
+                .on(mYJoinCondition)
+                .where(entityMatches.and(categoriesMatch))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

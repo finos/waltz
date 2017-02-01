@@ -59,8 +59,8 @@ function mkPerspective(perspectiveDefinition,
     return {
         definition: perspectiveDefinition,
         axes: {
-            a: mkAxis(perspectiveDefinition.categoryA),
-            b: mkAxis(perspectiveDefinition.categoryB)
+            x: mkAxis(perspectiveDefinition.categoryX),
+            y: mkAxis(perspectiveDefinition.categoryY)
         }
     };
 }

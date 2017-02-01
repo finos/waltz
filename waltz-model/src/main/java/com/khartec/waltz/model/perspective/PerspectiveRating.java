@@ -33,8 +33,6 @@ public abstract class PerspectiveRating implements
 
     public abstract RagRating rating();
     public abstract EntityReference entityReference();
-    public abstract long categoryX();
-    public abstract long categoryY();
     public abstract long measurableX();
     public abstract long measurableY();
 
