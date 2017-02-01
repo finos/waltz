@@ -16,48 +16,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.service.process;
+package com.khartec.waltz.service.perspective_definition;
 
-import com.khartec.waltz.data.process.ProcessDao;
-import com.khartec.waltz.model.process.Process;
-import org.jooq.DSLContext;
+import com.khartec.waltz.data.perspective_definition.PerspectiveDefinitionDao;
+import com.khartec.waltz.model.perspective.PerspectiveDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
+/**
+ * Created by dwatkins on 01/02/2017.
+ */
 @Service
-public class ProcessService {
-    
-    private final ProcessDao processDao;
-    private final DSLContext dsl;
+public class PerspectiveDefinitionService {
 
+    private final PerspectiveDefinitionDao perspectiveDefinitionDao;
 
     @Autowired
-    public ProcessService(ProcessDao processDao,
-                          DSLContext dsl) {
-        checkNotNull(processDao, "processDao cannot be null");
-        checkNotNull(dsl, "dsl cannot be null");
-
-        this.processDao = processDao;
-        this.dsl = dsl;
+    public PerspectiveDefinitionService(PerspectiveDefinitionDao perspectiveDefinitionDao) {
+        checkNotNull(perspectiveDefinitionDao, "perspectiveDefinitionDao cannot be null");
+        this.perspectiveDefinitionDao = perspectiveDefinitionDao;
     }
 
-
-    public Process getById(long id) {
-        return processDao.getById(id);
-    }
-
-
-    public List<Process> findAll() {
-        return processDao.findAll();
-    }
-
-
-    public Collection<Process> findForApplication(long id) {
-        return processDao.findForApplication(id);
+    public List<PerspectiveDefinition> findAll() {
+        return perspectiveDefinitionDao.findAll();
     }
 }

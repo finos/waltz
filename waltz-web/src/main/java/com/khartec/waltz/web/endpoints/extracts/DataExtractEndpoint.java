@@ -18,10 +18,9 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.service.capability.CapabilityService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
-import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.WebUtilities;
+import com.khartec.waltz.web.endpoints.Endpoint;
 import org.eclipse.jetty.http.MimeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,16 +43,13 @@ public class DataExtractEndpoint implements Endpoint {
 
 
     private final OrganisationalUnitService orgUnitService;
-    private final CapabilityService capabilityService;
 
 
     @Autowired
-    public DataExtractEndpoint(OrganisationalUnitService orgUnitService, CapabilityService capabilityService) {
+    public DataExtractEndpoint(OrganisationalUnitService orgUnitService) {
         checkNotNull(orgUnitService, "orgUnitService must not be null");
-        checkNotNull(capabilityService, "capabilityService must not be null");
 
         this.orgUnitService = orgUnitService;
-        this.capabilityService = capabilityService;
     }
 
 
@@ -71,20 +67,6 @@ public class DataExtractEndpoint implements Endpoint {
                     "parentId",
                     "name",
                     "description");
-
-            capabilityService.findAll()
-                    .forEach(ou -> {
-                        try {
-                            csvWriter.write(
-                                    ou.id().orElse(null),
-                                    ou.parentId().orElse(null),
-                                    ou.name(),
-                                    ou.description()
-                            );
-                        } catch (IOException ioe) {
-                            LOG.warn("Failed to write capabilities: " + ou, ioe);
-                        }
-                    });
         });
     }
 

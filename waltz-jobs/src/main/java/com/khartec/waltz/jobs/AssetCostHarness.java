@@ -52,7 +52,7 @@ public class AssetCostHarness {
                 .scope(HierarchyQueryScope.CHILDREN)
                 .entityReference(ImmutableEntityReference.builder()
                         .id(5600)
-                        .kind(EntityKind.CAPABILITY)
+                        .kind(EntityKind.ORG_UNIT)
                         .build())
                 .build();
 

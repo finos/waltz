@@ -58,12 +58,6 @@ public class EndUserAppIdSelectorFactory extends EntityIdSelectorFactory  {
 
 
     @Override
-    protected Select<Record1<Long>> mkForCapability(EntityReference ref, HierarchyQueryScope scope) {
-        throw new IllegalArgumentException("App Capability selectors not supported for End User Applications");
-    }
-
-
-    @Override
     protected Select<Record1<Long>> mkForOrgUnit(EntityReference ref, HierarchyQueryScope scope) {
 
         IdSelectionOptions ouSelectorOptions = ImmutableIdSelectionOptions.builder()

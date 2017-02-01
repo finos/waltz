@@ -62,8 +62,6 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForApplication(options);
             case APP_GROUP:
                 return wrapAppIdSelector(options);
-            case CAPABILITY:
-                return wrapAppIdSelector(options);
             case DATA_TYPE:
                 return mkForDataType(options);
             case MEASURABLE:

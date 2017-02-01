@@ -48,7 +48,7 @@ public class DataFlowHarness {
         LogicalFlowIdSelectorFactory factory = ctx.getBean(LogicalFlowIdSelectorFactory.class);
 
         IdSelectionOptions options = IdSelectionOptions.mkOpts(
-                EntityReference.mkRef(EntityKind.CAPABILITY, 5000),
+                EntityReference.mkRef(EntityKind.ORG_UNIT, 5000),
                 HierarchyQueryScope.CHILDREN);
 
         Select<Record1<Long>> selector = factory.apply(options);

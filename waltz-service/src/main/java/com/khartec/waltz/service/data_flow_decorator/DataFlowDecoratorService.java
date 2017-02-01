@@ -99,7 +99,6 @@ public class DataFlowDecoratorService {
         switch (options.entityReference().kind()) {
             case APPLICATION:
             case APP_GROUP:
-            case CAPABILITY:
             case ORG_UNIT:
             case PROCESS:
             case PERSON:
@@ -119,7 +118,6 @@ public class DataFlowDecoratorService {
     public Collection<DataFlowDecorator> findBySelector(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
             case APP_GROUP:
-            case CAPABILITY:
             case MEASURABLE:
             case ORG_UNIT:
             case PERSON:
