@@ -19,7 +19,6 @@
 package com.khartec.waltz.data.application;
 
 import com.khartec.waltz.data.IdSelectorFactory;
-import com.khartec.waltz.data.capability.CapabilityIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
@@ -53,7 +52,6 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationIdSelectorFactory.class);
 
     private final DSLContext dsl;
-    private final CapabilityIdSelectorFactory capabilityIdSelectorFactory;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory;
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
@@ -70,18 +68,15 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
     @Autowired
     public ApplicationIdSelectorFactory(DSLContext dsl,
-                                        CapabilityIdSelectorFactory capabilityIdSelectorFactory,
                                         DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
                                         MeasurableIdSelectorFactory measurableIdSelectorFactory, 
                                         OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
         checkNotNull(dsl, "dsl cannot be null");
-        checkNotNull(capabilityIdSelectorFactory, "capabilityIdSelectorFactory cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
         checkNotNull(measurableIdSelectorFactory, "measurableIdSelectorFactory cannot be null");
         checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
 
         this.dsl = dsl;
-        this.capabilityIdSelectorFactory = capabilityIdSelectorFactory;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
         this.measurableIdSelectorFactory = measurableIdSelectorFactory;
         this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
@@ -97,8 +92,6 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 return mkForAppGroup(ref, options.scope());
             case APPLICATION:
                 return mkForApplication(ref, options.scope());
-            case CAPABILITY:
-                return mkForCapability(ref, options.scope());
             case DATA_TYPE:
                 return mkForDataType(options);
             case MEASURABLE:
@@ -235,22 +228,6 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 .from(involvement)
                 .where(involvement.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(involvement.EMPLOYEE_ID.eq(employeeId));
-    }
-
-
-    private Select<Record1<Long>> mkForCapability(EntityReference ref, HierarchyQueryScope scope) {
-
-        ImmutableIdSelectionOptions capabilitySelectorOptions = ImmutableIdSelectionOptions.builder()
-                .entityReference(ref)
-                .scope(scope)
-                .build();
-
-        Select<Record1<Long>> capabilitySelector = capabilityIdSelectorFactory.apply(capabilitySelectorOptions);
-
-        return dsl
-                .selectDistinct(appCapability.APPLICATION_ID)
-                .from(appCapability)
-                .where(dsl.renderInlined(appCapability.CAPABILITY_ID.in(capabilitySelector)));
     }
 
 

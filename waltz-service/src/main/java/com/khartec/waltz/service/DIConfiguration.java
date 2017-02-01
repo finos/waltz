@@ -22,8 +22,6 @@ import com.khartec.waltz.data.DBExecutorPool;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.model.ImmutableWaltzVersionInfo;
 import com.khartec.waltz.model.WaltzVersionInfo;
-import com.khartec.waltz.service.capability.CapabilityService;
-import com.khartec.waltz.service.jmx.CapabilitiesMaintenance;
 import com.khartec.waltz.service.jmx.PersonMaintenance;
 import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import com.zaxxer.hikari.HikariConfig;
@@ -154,12 +152,6 @@ public class DIConfiguration {
         env.getPropertySources().addFirst(jndiPropertySource);
 
         return placeholderConfigurer;
-    }
-
-    @Bean
-    @Autowired
-    public CapabilitiesMaintenance capabilitiesMaintenance(CapabilityService capabilityService) {
-        return new CapabilitiesMaintenance(capabilityService);
     }
 
     @Bean

@@ -33,7 +33,6 @@ import static com.khartec.waltz.schema.Tables.MEASURABLE;
 import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
-import static com.khartec.waltz.schema.tables.Capability.CAPABILITY;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
@@ -63,7 +62,6 @@ public class EntityNameUtilities {
         MAPPINGS.put(EntityKind.ACTOR, tuple(ACTOR, ACTOR.ID, ACTOR.NAME));
         MAPPINGS.put(EntityKind.APPLICATION, tuple(APPLICATION, APPLICATION.ID, APPLICATION.NAME));
         MAPPINGS.put(EntityKind.APP_GROUP, tuple(APPLICATION_GROUP, APPLICATION_GROUP.ID, APPLICATION_GROUP.NAME));
-        MAPPINGS.put(EntityKind.CAPABILITY, tuple(CAPABILITY, CAPABILITY.ID, CAPABILITY.NAME));
         MAPPINGS.put(EntityKind.CHANGE_INITIATIVE, tuple(CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID, CHANGE_INITIATIVE.NAME));
         MAPPINGS.put(EntityKind.DATA_TYPE, tuple(DATA_TYPE, DATA_TYPE.ID, DATA_TYPE.NAME));
         MAPPINGS.put(EntityKind.END_USER_APPLICATION, tuple(END_USER_APPLICATION, END_USER_APPLICATION.ID, END_USER_APPLICATION.NAME));

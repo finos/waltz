@@ -33,7 +33,7 @@ public class EntityHierarchyHarness {
 
         EntityHierarchyService svc = ctx.getBean(EntityHierarchyService.class);
         svc.buildFor(EntityKind.ORG_UNIT);
-        svc.buildFor(EntityKind.CAPABILITY);
+        svc.buildFor(EntityKind.ORG_UNIT);
         svc.buildFor(EntityKind.PROCESS);
         svc.buildFor(EntityKind.ENTITY_STATISTIC);
     }

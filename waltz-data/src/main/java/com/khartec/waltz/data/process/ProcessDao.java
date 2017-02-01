@@ -88,19 +88,6 @@ public class ProcessDao implements FindEntityReferencesByIdSelector {
     }
 
 
-    public Collection<Process> findForCapability(long id) {
-        return dsl.select(p.fields())
-                .from(p)
-                .innerJoin(rel)
-                .on(rel.ID_B.eq(p.ID))
-                .where(rel.KIND_B.eq(EntityKind.PROCESS.name()))
-                .and(rel.KIND_A.eq(EntityKind.CAPABILITY.name()))
-                .and(rel.ID_A.eq(id))
-                .and(rel.RELATIONSHIP.eq(RelationshipKind.SUPPORTS.name()))
-                .fetch(TO_DOMAIN);
-    }
-
-
     public Collection<Process> findForApplication(long id) {
         return dsl.select(p.fields())
                 .from(p)

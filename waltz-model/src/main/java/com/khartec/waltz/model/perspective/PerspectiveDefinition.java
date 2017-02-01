@@ -16,24 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.capabilityrating;
+package com.khartec.waltz.model.perspective;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.CodedReference;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.rating.RagRating;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.IdProvider;
+import com.khartec.waltz.model.NameProvider;
 import org.immutables.value.Value;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableRatingChange.class)
-@JsonDeserialize(as = ImmutableRatingChange.class)
-public abstract class RatingChange {
+@JsonSerialize(as = ImmutablePerspectiveDefinition.class)
+@JsonDeserialize(as = ImmutablePerspectiveDefinition.class)
+public abstract class PerspectiveDefinition implements
+        IdProvider,
+        NameProvider,
+        DescriptionProvider {
 
-    public abstract RagRating original();
-    public abstract RagRating current();
-    public abstract CodedReference measurable();
-    public abstract EntityReference capability();
+    public abstract long categoryX();
+
+    public abstract long categoryY();
 
 }

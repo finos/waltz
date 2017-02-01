@@ -38,7 +38,6 @@ import com.khartec.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.service.capability.CapabilityService;
 import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,14 +49,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityKind.CAPABILITY;
 import static com.khartec.waltz.model.EntityKind.PERSON;
 
 @Service
 public class EntityHierarchyService {
 
     private final DSLContext dsl;
-    private final CapabilityService capabilityService;
     private final ChangeInitiativeDao changeInitiativeDao;
     private final DataTypeDao dataTypeDao;
     private final EntityHierarchyDao entityHierarchyDao;
@@ -70,7 +67,6 @@ public class EntityHierarchyService {
 
     @Autowired
     public EntityHierarchyService(DSLContext dsl,
-                                  CapabilityService capabilityService,
                                   ChangeInitiativeDao changeInitiativeDao,
                                   DataTypeDao dataTypeDao,
                                   EntityHierarchyDao entityHierarchyDao,
@@ -82,7 +78,6 @@ public class EntityHierarchyService {
                                   ProcessDao processDao) {
 
         checkNotNull(dsl, "dsl cannot be null");
-        checkNotNull(capabilityService, "capabilityService cannot be null");
         checkNotNull(changeInitiativeDao, "changeInitiativeDao cannot be null");
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
         checkNotNull(entityHierarchyDao, "entityHierarchyDao cannot be null");
@@ -94,7 +89,6 @@ public class EntityHierarchyService {
         checkNotNull(processDao, "processDao cannot be null");
 
         this.dsl = dsl;
-        this.capabilityService = capabilityService;
         this.changeInitiativeDao = changeInitiativeDao;
         this.dataTypeDao = dataTypeDao;
         this.entityHierarchyDao = entityHierarchyDao;
@@ -131,8 +125,6 @@ public class EntityHierarchyService {
         Select<Record1<Long>> selector = entityRootsSelectorFactory.apply(kind);
 
         switch (kind) {
-            case CAPABILITY:
-                return capabilityService.findByIdSelectorAsEntityReference(kind);
             case CHANGE_INITIATIVE:
                 return changeInitiativeDao.findByIdSelectorAsEntityReference(selector);
             case DATA_TYPE:
@@ -167,11 +159,6 @@ public class EntityHierarchyService {
     private int buildFor(Table table, EntityKind kind) {
         Collection<FlatNode<Long, Long>> flatNodes = fetchFlatNodes(table);
         List<EntityHierarchyItem> hierarchyItems = convertFlatNodesToHierarchyItems(kind, flatNodes);
-
-        //TODO: remove this once all code using the entity_hierarchy service and related fixes
-        if (kind == CAPABILITY) {
-            capabilityService.rebuildHierarchy();
-        }
 
         return entityHierarchyDao.replaceHierarchy(kind, hierarchyItems);
     }
@@ -236,8 +223,6 @@ public class EntityHierarchyService {
 
     private Table determineTableToRebuild(EntityKind kind) {
         switch (kind) {
-            case CAPABILITY:
-                return Tables.CAPABILITY;
             case CHANGE_INITIATIVE:
                 return Tables.CHANGE_INITIATIVE;
             case DATA_TYPE:

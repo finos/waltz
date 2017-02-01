@@ -47,9 +47,6 @@ import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static java.util.stream.Collectors.toList;
 
-/**
- * Created by dwatkins on 23/05/2016.
- */
 public class ChangeInitiativeGenerator {
 
     private static final Random rnd = new Random();

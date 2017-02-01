@@ -50,11 +50,9 @@ public abstract class EntityIdSelectorFactory implements Function<EntityIdSelect
     private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("phier");
 
 
-
     @Autowired
     public EntityIdSelectorFactory(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
-
         this.dsl = dsl;
     }
 
@@ -68,8 +66,6 @@ public abstract class EntityIdSelectorFactory implements Function<EntityIdSelect
         switch (ref.kind()) {
             case APP_GROUP:
                 return mkForAppGroup(ref, options.scope());
-            case CAPABILITY:
-                return mkForCapability(ref, options.scope());
             case PERSON:
                 return mkForPerson(desiredKind, ref, options.scope());
             case PROCESS:
@@ -84,9 +80,6 @@ public abstract class EntityIdSelectorFactory implements Function<EntityIdSelect
 
 
     protected abstract Select<Record1<Long>> mkForAppGroup(EntityReference ref, HierarchyQueryScope scope);
-
-
-    protected abstract Select<Record1<Long>> mkForCapability(EntityReference ref, HierarchyQueryScope scope);
 
 
     protected abstract Select<Record1<Long>> mkForOrgUnit(EntityReference ref, HierarchyQueryScope scope);
