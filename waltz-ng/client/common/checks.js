@@ -34,8 +34,8 @@ const perspectiveDefinitionShape = {
     id: apiCheck.number,
     name: apiCheck.string,
     description: apiCheck.string,
-    categoryA: apiCheck.number,
-    categoryB: apiCheck.number
+    categoryX: apiCheck.number,
+    categoryY: apiCheck.number
 };
 
 
