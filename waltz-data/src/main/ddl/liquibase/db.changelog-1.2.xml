@@ -1013,9 +1013,43 @@
                     type="${id.type}">
                 <constraints nullable="false"/>
             </column>
-
         </createTable>
+    </changeSet>
 
+
+    <!-- 1220: Perspective Rating -->
+
+    <changeSet author="dwatkins"
+               id="20170201-1220-1">
+        <createTable tableName="perspective_rating">
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_x"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_y"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating"
+                    type="${rag.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}"/>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
     </changeSet>
 
 </databaseChangeLog>
