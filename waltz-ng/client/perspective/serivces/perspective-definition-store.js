@@ -16,21 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const BINDINGS = {
-    appCapabilities: '=',
-    capabilities: '='
-};
+function store($http,
+               BaseApiUrl) {
+    const BASE = `${BaseApiUrl}/perspective-definition`;
+
+    const findAll = (empId) => $http
+        .get(`${BASE}`)
+        .then(result => result.data);
+
+    return {
+        findAll
+    };
+}
 
 
-const directive = {
-    restrict: 'E',
-    replace: true,
-    template: require('./app-capability-section.html'),
-    controller: () => {},
-    controllerAs: 'ctrl',
-    scope: {},
-    bindToController: BINDINGS
-};
+store.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
 
 
-export default () => directive;
+export default store;

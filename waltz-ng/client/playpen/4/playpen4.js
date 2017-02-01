@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from 'lodash';
+
 
 const initialState = {
     activeRating: 'X',
@@ -27,13 +29,15 @@ const initialState = {
 
 
 function updateOverrides(overrides = {}, d, rating) {
-    const key = `${d.col.measurable.id}_${d.row.measurable.id}`;
+    const x = d.col.measurable.id;
+    const y = d.row.measurable.id;
+    const key = `${x}_${y}`;
 
     if (_.get(overrides, `${key}.rating`) !== rating ) {
         const override = {
             [key] : {
-                measurableA: d.col.measurable.id,
-                measurableB: d.row.measurable.id,
+                measurableX: x,
+                measurableY: y,
                 rating
             }
         };
@@ -48,9 +52,20 @@ function updateOverrides(overrides = {}, d, rating) {
 }
 
 
+function prepareOverrides(ratings) {
+    const reducer = (acc, r) => {
+        const key = `${r.measurableX}_${r.measurableY}`;
+        acc[key] = r;
+        return acc;
+    };
+    return _.reduce(ratings, reducer, {});
+}
+
+
 function controller($stateParams,
                     $timeout,
-                    applicationStore,
+                    perspectiveDefinitionStore,
+                    perspectiveRatingStore,
                     measurableStore,
                     measurableRatingStore) {
 
@@ -66,13 +81,11 @@ function controller($stateParams,
         scope: 'EXACT'
     };
 
-    vm.perspectiveDefinition = {
-        id: 1,
-        name: 'Function - Process',
-        categoryA: $stateParams.categoryA || 1,
-        categoryB: $stateParams.categoryB || 2,
-        description: 'blah blah'
-    };
+    perspectiveDefinitionStore
+        .findAll()
+        .then(ps => vm.perspectiveDefinition = _.find(ps, { id: 1 }))
+        .then(p => perspectiveRatingStore.findForEntity(p.categoryX, p.categoryY, entityReference))
+        .then(rs => vm.existingOverrides = prepareOverrides(rs));
 
     measurableStore
         .findMeasurablesBySelector(idSelector)
@@ -118,7 +131,8 @@ function controller($stateParams,
 controller.$inject = [
     '$stateParams',
     '$timeout',
-    'ApplicationStore',
+    'PerspectiveDefinitionStore',
+    'PerspectiveRatingStore',
     'MeasurableStore',
     'MeasurableRatingStore'
 ];

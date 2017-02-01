@@ -33,12 +33,6 @@ import {mkPerspective} from '../../perpective-utilities';
  * This component ...
  */
 
-/*
- <waltz-perspective-grid perspective-definition="ctrl.perspectiveDefinition"
- measurable-ratings="ctrl.measurableRatings"
- overrides="ctrl.perspectiveOverrides"
- handlers="ctrl.handlers">
- </waltz-perspective-grid> */
 
 const bindings = {
     perspectiveDefinition: '<',
@@ -95,10 +89,10 @@ function nestOverrides(overrides = []) {
 
 function setupScales(perspective) {
     scales.x = scaleBand()
-        .domain(_.map(perspective.axes.a, 'measurable.id'))
+        .domain(_.map(perspective.axes.x, 'measurable.id'))
         .range([0, width]);
     scales.y = scaleBand()
-        .domain(_.map(perspective.axes.b, 'measurable.id'))
+        .domain(_.map(perspective.axes.y, 'measurable.id'))
         .range([0, height]);
 }
 
@@ -108,8 +102,8 @@ function draw(elem, perspective, handlers) {
 
     elem
         .call(drawGrid, perspective, handlers)
-        .call(drawRowTitles, perspective.axes.b)
-        .call(drawColTitles, perspective.axes.a)
+        .call(drawColTitles, perspective.axes.x)
+        .call(drawRowTitles, perspective.axes.y)
         ;
 }
 
@@ -117,7 +111,7 @@ function draw(elem, perspective, handlers) {
 function drawGrid(selection, perspective, handlers) {
     const rowGroups = selection
         .selectAll('.row')
-        .data(perspective.axes.b, d => d.measurable.id);
+        .data(perspective.axes.y, d => d.measurable.id);
 
     const newRows = rowGroups
         .enter()
@@ -129,8 +123,6 @@ function drawGrid(selection, perspective, handlers) {
         .merge(newRows)
         .call(drawCells, perspective, handlers)
         ;
-
-
 }
 
 
@@ -146,7 +138,7 @@ function drawCells(selection, perspective, handlers) {
     const cellGroups = selection
         .selectAll('.cell')
         .data(row => _.map(
-            perspective.axes.a,
+            perspective.axes.x,
             col => ({
                 id: col.measurable.id + "_" + row.measurable.id,
                 col,
@@ -205,6 +197,21 @@ function calcOverrideCellDimensions(cellPadding) {
 }
 
 
+function calculateCellTranslation(d) {
+    const translation = {
+        dx: scales.x(d.measurableX),
+        dy: scales.y(d.measurableY),
+    };
+
+    return `translate(${ translation.dx } ,${ translation.dy })`;
+}
+
+
+function toCellId(override) {
+    return `${override.measurableX}_${override.measurableY}_${override.rating}`;
+}
+
+
 function drawExistingOverrides(selection, overrides = []) {
     const cellPadding = 3;
     const cellDimensions = calcOverrideCellDimensions(cellPadding);
@@ -227,7 +234,7 @@ function drawExistingOverrides(selection, overrides = []) {
         .selectAll('.existing-override')
         .data(
             _.values(overrides),
-            d => `${d.measurableA}_${d.measurableB}_${d.rating}` );
+            toCellId);
 
     const newOverrides = overrideElems
         .enter()
@@ -239,7 +246,7 @@ function drawExistingOverrides(selection, overrides = []) {
         .remove();
 
     newOverrides
-        .attr('transform', d => `translate(${ scales.x(d.measurableA) },${ scales.y(d.measurableB) })`)
+        .attr('transform', calculateCellTranslation)
         .call(drawBoxes)
         .filter(d => d.rating === 'X')
         .call(drawXShape, cellDimensions);
@@ -276,7 +283,7 @@ function drawPendingOverrides(selection, overrides) {
         .selectAll('.pending-override')
         .data(
             _.values(overrides),
-            d => `${d.measurableA}_${d.measurableB}_${d.rating}` );
+            toCellId);
 
     const newOverrides = overrideElems
         .enter()
@@ -288,7 +295,7 @@ function drawPendingOverrides(selection, overrides) {
         .remove();
 
     newOverrides
-        .attr('transform', d => `translate(${ scales.x(d.measurableA) },${ scales.y(d.measurableB) })`)
+        .attr('transform', calculateCellTranslation)
         .call(drawPendingOverrideShape, cellDimensions)
         .filter(d => d.rating === 'X')
         .call(drawXShape, cellDimensions, true);
@@ -455,8 +462,8 @@ function initHandlers(svg, customHandlers) {
 
 
 function setupDimensions(perspective) {
-    width = cellWidth * perspective.axes.a.length;
-    height = cellHeight * perspective.axes.b.length;
+    width = cellWidth * perspective.axes.x.length;
+    height = cellHeight * perspective.axes.y.length;
 }
 
 

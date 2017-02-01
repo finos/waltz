@@ -23,7 +23,12 @@ function setup() {
     const module = angular.module('waltz.perspective', []);
 
     module
+        .service('PerspectiveDefinitionStore', require('./serivces/perspective-definition-store'))
+        .service('PerspectiveRatingStore', require('./serivces/perspective-rating-store'));
+    module
         .component('waltzPerspectiveGrid', require('./components/grid/perspective-grid'));
+
+
 
     return module.name;
 }

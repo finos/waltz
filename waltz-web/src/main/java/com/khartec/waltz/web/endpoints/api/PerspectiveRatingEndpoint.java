@@ -34,13 +34,11 @@ import static com.khartec.waltz.web.WebUtilities.getLong;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
-/**
- * Created by dwatkins on 01/02/2017.
- */
+
 @Service
 public class PerspectiveRatingEndpoint implements Endpoint {
 
-    private static final String BASE = mkPath("perspective-rating");
+    private static final String BASE = mkPath("api", "perspective-rating");
 
 
     private final PerspectiveRatingService perspectiveRatingService;
