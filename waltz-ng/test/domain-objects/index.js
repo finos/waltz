@@ -9,6 +9,7 @@ import _ from 'lodash';
 
 export const f = 'F'
 
+
 // -- ENTITY_REFS ---
 
 function mkRef(kind, id, name, description) {
@@ -28,8 +29,6 @@ export const applicationReferences = {
 };
 
 export const applicationReferencesList = _.values(applicationReferences);
-
-
 
 
 // -- MEASURABLES ---
@@ -102,7 +101,6 @@ export function mkMeasurableRating(measurableId, entityRef, rating = 'A', descri
 }
 
 
-
 // -- PERSPECTIVES ---
 
 export const perspectiveDefinitions = {
@@ -110,12 +108,7 @@ export const perspectiveDefinitions = {
         id: 12,
         name: 'TestPerspective',
         description: 'TestPerspective Definition',
-        categoryA: 1,
-        categoryB: 2
+        categoryX: 1,
+        categoryY: 2
     }
 };
-
-
-
-
-
