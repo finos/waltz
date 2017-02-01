@@ -985,4 +985,37 @@
                        tableName="perspective_measurable_1_1"/>
     </changeSet>
 
+
+    <!-- 1218: Perspective Definition -->
+    <changeSet author="dwatkins"
+               id="20170201-1218-1">
+        <createTable tableName="perspective_definition">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="perspective_definition_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_x"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_y"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+    </changeSet>
+
 </databaseChangeLog>
