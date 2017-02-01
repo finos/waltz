@@ -1051,6 +1051,19 @@
         </createTable>
     </changeSet>
 
+    <changeSet author="dwatkins" id="20170201-1220-2">
+        <addColumn tableName="perspective_rating">
+            <column name="measurable_x"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="measurable_y"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 
     <!-- 1366: Attestation -->
     <changeSet author="kamransaleem"
