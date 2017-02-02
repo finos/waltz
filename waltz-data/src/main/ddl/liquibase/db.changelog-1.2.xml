@@ -1209,11 +1209,11 @@
                     type="${id.type}">
                 <constraints nullable="false"/>
             </column>
-            <column name="text"
+            <column name="question_text"
                     type="${longvarchar.type}">
                 <constraints nullable="false"/>
             </column>
-            <column name="type"
+            <column name="field_type"
                     type="${enum.type}">
                 <constraints nullable="false"/>
             </column>
@@ -1221,7 +1221,7 @@
                     type="${name.type}">
                 <constraints nullable="true"/>
             </column>
-            <column name="order"
+            <column name="position"
                     type="${int.type}">
                 <constraints nullable="false"/>
             </column>
@@ -1229,7 +1229,7 @@
                     type="boolean">
                 <constraints nullable="false"/>
             </column>
-            <column name="enable_comment"
+            <column name="allow_comment"
                     type="boolean">
                 <constraints nullable="false"/>
             </column>
@@ -1238,13 +1238,13 @@
 
     <changeSet author="rovats"
                id="20170202-1467-2">
-        <createTable tableName="survey_response">
+        <createTable tableName="survey_question_response">
             <column name="id"
                     autoIncrement="true"
                     type="${id.type}">
                 <constraints nullable="false"
                              primaryKey="true"
-                             primaryKeyName="survey_response_pkey"/>
+                             primaryKeyName="survey_question_response_pkey"/>
             </column>
             <column name="survey_instance_id"
                     type="${id.type}">
