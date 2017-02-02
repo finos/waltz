@@ -46,13 +46,14 @@ function updateOverrides(overrides = {}, d, rating) {
             {},
             overrides,
             override);
+
     } else {
         return overrides;
     }
 }
 
 
-function prepareOverrides(ratings) {
+function mkOverrides(ratings) {
     const reducer = (acc, r) => {
         const key = `${r.measurableX}_${r.measurableY}`;
         acc[key] = r;
@@ -83,9 +84,9 @@ function controller($stateParams,
 
     perspectiveDefinitionStore
         .findAll()
-        .then(ps => vm.perspectiveDefinition = _.find(ps, { id: 1 }))
+        .then(ps => vm.perspectiveDefinition = _.find(ps, { id: $stateParams.perspective || 1 }))
         .then(p => perspectiveRatingStore.findForEntity(p.categoryX, p.categoryY, entityReference))
-        .then(rs => vm.existingOverrides = prepareOverrides(rs));
+        .then(rs => vm.existingOverrides = mkOverrides(rs));
 
     measurableStore
         .findMeasurablesBySelector(idSelector)
