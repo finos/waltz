@@ -19,52 +19,11 @@ import _ from 'lodash';
 
 
 const initialState = {
-    activeRating: 'X',
-    existingOverrides: {
-    },
-    pendingOverrides: {
-    }
 
 };
 
 
-function updateOverrides(overrides = {}, d, rating) {
-    const x = d.col.measurable.id;
-    const y = d.row.measurable.id;
-    const key = `${x}_${y}`;
-
-    if (_.get(overrides, `${key}.rating`) !== rating ) {
-        const override = {
-            [key] : {
-                measurableX: x,
-                measurableY: y,
-                rating
-            }
-        };
-
-        return Object.assign(
-            {},
-            overrides,
-            override);
-
-    } else {
-        return overrides;
-    }
-}
-
-
-function mkOverrides(ratings) {
-    const reducer = (acc, r) => {
-        const key = `${r.measurableX}_${r.measurableY}`;
-        acc[key] = r;
-        return acc;
-    };
-    return _.reduce(ratings, reducer, {});
-}
-
-
 function controller($stateParams,
-                    $timeout,
                     perspectiveDefinitionStore,
                     perspectiveRatingStore,
                     measurableStore,
@@ -86,7 +45,7 @@ function controller($stateParams,
         .findAll()
         .then(ps => vm.perspectiveDefinition = _.find(ps, { id: $stateParams.perspective || 1 }))
         .then(p => perspectiveRatingStore.findForEntity(p.categoryX, p.categoryY, entityReference))
-        .then(rs => vm.existingOverrides = mkOverrides(rs));
+        .then(rs => vm.perspectiveRatings = rs);
 
     measurableStore
         .findMeasurablesBySelector(idSelector)
@@ -96,42 +55,11 @@ function controller($stateParams,
         .findByAppSelector(idSelector)
         .then(ratings => vm.measurableRatings = ratings);
 
-    const overrideCell = (d) => {
-        const updated = updateOverrides(vm.pendingOverrides, d, vm.activeRating);
-        if (updated != vm.pendingOverrides) {
-            vm.pendingOverrides = updated;
-            $timeout(() => {}); // kick angular
-        }
-    };
-
-    vm.handlers = {
-        onCellDrag: overrideCell,
-        onCellClick: overrideCell,
-        onCellDown: overrideCell,
-        onCellOver: d => {
-            $timeout(() => vm.hovered = d);
-        },
-        onCellLeave: d => {
-            $timeout(() => vm.hovered = null);
-        }
-    };
-
-    vm.apply = () => {
-        vm.existingOverrides = Object.assign({}, vm.existingOverrides, vm.pendingOverrides);
-        vm.pendingOverrides = {};
-    };
-
-    vm.undo = () => {
-        vm.pendingOverrides = {};
-    };
-
-    vm.onRatingSelect = r => vm.activeRating = r;
 }
 
 
 controller.$inject = [
     '$stateParams',
-    '$timeout',
     'PerspectiveDefinitionStore',
     'PerspectiveRatingStore',
     'MeasurableStore',

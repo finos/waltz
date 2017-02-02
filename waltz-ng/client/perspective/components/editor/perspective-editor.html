@@ -1,0 +1,52 @@
+<div class="row">
+    <style>
+        .side-scroller {
+            overflow-y: hidden;
+            overflow-x: scroll;
+        }
+    </style>
+    <div class="col-md-9">
+        <div class="side-scroller">
+            <waltz-perspective-grid existing-overrides="$ctrl.existingOverrides"
+                                    pending-overrides="$ctrl.pendingOverrides"
+                                    perspective-definition="$ctrl.perspectiveDefinition"
+                                    measurables="$ctrl.measurables"
+                                    measurable-ratings="$ctrl.measurableRatings"
+                                    handlers="$ctrl.handlers">
+            </waltz-perspective-grid>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <br><br>
+        <waltz-rating-picker selected="$ctrl.activeRating"
+                             on-select="$ctrl.onRatingSelect">
+        </waltz-rating-picker>
+
+        <button class="btn"
+                ng-click="$ctrl.activeRating = 'X'">
+            Remove
+        </button>
+
+        <hr>
+
+        <button class="btn btn-primary"
+                ng-click="$ctrl.apply();">
+            Apply
+        </button>
+
+        <a class='clickable'
+           ng-hide="$ctrl.pendingOverrides | isEmpty"
+           ng-click="$ctrl.undo()">
+            Undo Changes
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <pre>{{ $ctrl.existingOverrides | json }}</pre>
+    </div>
+    <div class="col-md-6">
+        <pre>{{ $ctrl.pendingOverrides | json }}</pre>
+    </div>
+</div>
