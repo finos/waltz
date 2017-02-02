@@ -28,7 +28,8 @@ import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 
 
 @Value.Immutable
@@ -42,7 +43,7 @@ public abstract class Attestation implements IdProvider, ProvenanceProvider
 
     @Value.Default
     public LocalDateTime attestedAt() {
-        return LocalDateTime.now(ZoneId.of("UTC"));
+        return nowUtc();
     }
 
     @Nullable

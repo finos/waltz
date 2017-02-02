@@ -26,7 +26,6 @@ import com.khartec.waltz.model.attestation.AttestationType;
 import com.khartec.waltz.model.attestation.ImmutableAttestation;
 import com.khartec.waltz.schema.tables.records.AttestationRecord;
 import org.jooq.DSLContext;
-import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -45,9 +44,7 @@ public class AttestationDao {
     private final DSLContext dsl;
 
 
-    public static final RecordMapper<Record, Attestation> TO_ATTESTATION_MAPPER = r -> {
-        AttestationRecord record = r.into(ATTESTATION);
-
+    public static final RecordMapper<AttestationRecord, Attestation> TO_ATTESTATION_MAPPER = record -> {
         EntityKind entityKind = Enum.valueOf(EntityKind.class, record.getEntityKind());
 
         return ImmutableAttestation.builder()
@@ -88,8 +85,7 @@ public class AttestationDao {
     public List<Attestation> findForEntity(EntityReference reference) {
         checkNotNull(reference, "reference cannot be null");
 
-        return dsl.select(ATTESTATION.fields())
-                .from(ATTESTATION)
+        return dsl.selectFrom(ATTESTATION)
                 .where(ATTESTATION.ENTITY_KIND.eq(reference.kind().name())
                         .and(ATTESTATION.ENTITY_ID.eq(reference.id())))
                 .fetch(TO_ATTESTATION_MAPPER);

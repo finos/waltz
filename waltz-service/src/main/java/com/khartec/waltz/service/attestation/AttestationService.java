@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 
 
 @Service
@@ -63,6 +64,7 @@ public class AttestationService {
 
         ImmutableAttestation at = ImmutableAttestation
                 .copyOf(attestation)
+                .withAttestedAt(nowUtc())
                 .withAttestedBy(username);
 
         boolean success = attestationDao.create(at);
