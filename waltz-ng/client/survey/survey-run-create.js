@@ -57,6 +57,7 @@ function controller($location,
             + newLine
             + 'Please click the link to fill the survey: '
             + surveyLink
+            + newLine;
     };
 
     vm.onSaveGeneral = (surveyRun) => {
