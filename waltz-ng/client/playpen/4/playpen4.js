@@ -23,7 +23,8 @@ const initialState = {
 };
 
 
-function controller($stateParams,
+function controller($q,
+                    $stateParams,
                     perspectiveDefinitionStore,
                     perspectiveRatingStore,
                     measurableStore,
@@ -55,10 +56,20 @@ function controller($stateParams,
         .findByAppSelector(idSelector)
         .then(ratings => vm.measurableRatings = ratings);
 
+    vm.saveChanges = (changes) => {
+        vm.perspectiveRatings = _.unionBy(
+            changes,
+            vm.perspectiveRatings,
+            r => r.measurableX + '_' + r.measurableY);
+
+        return $q.resolve();
+    };
+
 }
 
 
 controller.$inject = [
+    '$q',
     '$stateParams',
     'PerspectiveDefinitionStore',
     'PerspectiveRatingStore',

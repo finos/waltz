@@ -32,7 +32,8 @@ const bindings = {
     perspectiveDefinition: '<',
     measurables: '<',
     measurableRatings: '<',
-    perspectiveRatings: '<'
+    perspectiveRatings: '<',
+    onSave: '<'
 };
 
 
@@ -86,8 +87,6 @@ function mkOverrides(ratings) {
 
 function controller($timeout) {
     const vm = initialiseData(this, initialState);
-    console.log('perspective-editor - init', vm);
-
 
     const overrideCell = (d) => {
         const updated = updateOverrides(vm.pendingOverrides, d, vm.activeRating);
@@ -98,7 +97,6 @@ function controller($timeout) {
     };
 
     vm.$onChanges = c => {
-        console.log('c', c, vm)
         if (c.perspectiveRatings) {
             vm.existingOverrides = mkOverrides(vm.perspectiveRatings);
         }
@@ -119,8 +117,13 @@ function controller($timeout) {
     vm.onRatingSelect = r => vm.activeRating = r;
 
     vm.apply = () => {
-        vm.existingOverrides = Object.assign({}, vm.existingOverrides, vm.pendingOverrides);
-        vm.pendingOverrides = {};
+        const changes = _.values(vm.pendingOverrides);
+        if (vm.onSave) {
+            vm.onSave(changes)
+                .then(() => vm.pendingOverrides = {});
+        } else {
+            console.log('wpe: no onSave listener provided', changes);
+        }
     };
 
     vm.undo = () => {
