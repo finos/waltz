@@ -1,0 +1,53 @@
+<div>
+    <h4><strong>Recipients</strong></h4>
+    <hr/>
+
+    <div ng-class="{'waltz-scroll-region-400': $ctrl.surveyRunRecipients.length > 15}">
+        <table class="table table-condensed table-hover small">
+            <thead>
+            <tr>
+                <th>Entity Name</th>
+                <th>Person Name</th>
+                <th>Email</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="recipient in $ctrl.surveyRunRecipients"
+                ng-class="{'danger': recipient.isExcluded}">
+                <td><span ng-bind="recipient.surveyInstance.surveyEntity.name"></span></td>
+                <td><span ng-bind="recipient.person.displayName"></span></td>
+                <td><span ng-bind="recipient.person.email"></span></td>
+                <td>
+                    <button class="btn btn-xs"
+                            ng-show="!recipient.isExcluded"
+                            ng-click="$ctrl.excludeRecipient(recipient)">
+                        <waltz-icon name="trash">
+                    </button>
+                    <button class="btn btn-xs"
+                            ng-show="recipient.isExcluded"
+                            ng-click="$ctrl.includeRecipient(recipient)">
+                        <waltz-icon name="plus">
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr/>
+    <div class="row">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="button"
+                    ng-click="$ctrl.onSubmit()"
+                    class="btn btn-success">
+                Next
+            </button>
+            <a ng-click="$ctrl.goBack()"
+               class="clickable">
+                Back
+            </a>
+        </div>
+    </div>
+
+</div>

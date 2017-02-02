@@ -73,7 +73,7 @@ public class SurveyRunService {
     }
 
 
-    public long createSurveyRun(String userName, SurveyRunCreateCommand command) {
+    public SurveyRunCreateResponse createSurveyRun(String userName, SurveyRunCreateCommand command) {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(command, "create command cannot be null");
 
@@ -90,7 +90,9 @@ public class SurveyRunService {
                         .message("Survey Run: " + command.name() + " added")
                         .build());
 
-        return surveyRunId;
+        return ImmutableSurveyRunCreateResponse.builder()
+                .id(surveyRunId)
+                .build();
     }
 
 
@@ -104,17 +106,15 @@ public class SurveyRunService {
     }
 
 
-    public void updateSurveyRunStatus(String userName, long surveyRunId, SurveyRunStatus newStatus) {
+    public int updateSurveyRunStatus(String userName, long surveyRunId, SurveyRunStatus newStatus) {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(newStatus, "newStatus cannot be null");
 
         validateSurveyRunUpdate(userName, surveyRunId);
 
-        if (newStatus == SurveyRunStatus.ISSUED) {
-            surveyRunDao.issue(surveyRunId);
-        } else {
-            surveyRunDao.updateStatus(surveyRunId, newStatus);
-        }
+        int result = (newStatus == SurveyRunStatus.ISSUED)
+                ? surveyRunDao.issue(surveyRunId)
+                : surveyRunDao.updateStatus(surveyRunId, newStatus);
 
         changeLogService.write(
                 ImmutableChangeLog.builder()
@@ -123,6 +123,8 @@ public class SurveyRunService {
                         .parentReference(EntityReference.mkRef(EntityKind.SURVEY_RUN, surveyRunId))
                         .message("Survey Run: status changed to " + newStatus)
                         .build());
+
+        return result;
     }
 
 
@@ -156,7 +158,7 @@ public class SurveyRunService {
     }
 
 
-    public void createSurveyInstancesAndRecipients(long surveyRunId,
+    public long createSurveyInstancesAndRecipients(long surveyRunId,
                                                    List<SurveyInstanceRecipient> excludedRecipients) {
         SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);
         checkNotNull(surveyRun, "surveyRun " + surveyRunId + " not found");
@@ -192,6 +194,8 @@ public class SurveyRunService {
                     }
                 }
         );
+
+        return instancesAndRecipientsToSave.size();
     }
 
 
