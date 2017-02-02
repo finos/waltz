@@ -20,8 +20,8 @@ public abstract class SurveyRunChangeCommand implements NameProvider, Descriptio
     public abstract Long surveyTemplateId();
     public abstract IdSelectionOptions selectionOptions();
     public abstract Set<Long> involvementKindIds();
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     public abstract Optional<LocalDate> dueDate();
     public abstract SurveyIssuanceKind issuanceKind();
     public abstract Optional<String> contactEmail();
+
 }

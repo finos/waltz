@@ -29,10 +29,10 @@
         <h4><strong>Issue Survey</strong></h4>
         <hr/>
 
-        Survey run '{{ctrl.surveyRun.name}}' has been saved.
+        Survey run <strong ng-bind="ctrl.surveyRun.name"></strong> has been saved.
         <br/>
         <br/>
-        Please click <a href="mailto:{{ctrl.surveyEmailRecipients}}?subject={{ctrl.surveyEmailSubject}}&body={{ctrl.surveyEmailBody}}">here</a> to generate survey invitation email.
+        Please click <a href="mailto:{{ctrl.surveyEmailHref}}">here</a> to generate survey invitation email.
     </div>
 
 </div>

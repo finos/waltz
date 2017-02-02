@@ -1,6 +1,5 @@
 package com.khartec.waltz.model.survey;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.IdProvider;
@@ -10,7 +9,6 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableSurveyInstanceRecipient.class)
 @JsonDeserialize(as = ImmutableSurveyInstanceRecipient.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class SurveyInstanceRecipient implements IdProvider {
 
     public abstract SurveyInstance surveyInstance();

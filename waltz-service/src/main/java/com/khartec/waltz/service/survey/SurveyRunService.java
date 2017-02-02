@@ -158,7 +158,7 @@ public class SurveyRunService {
     }
 
 
-    public long createSurveyInstancesAndRecipients(long surveyRunId,
+    public boolean createSurveyInstancesAndRecipients(long surveyRunId,
                                                    List<SurveyInstanceRecipient> excludedRecipients) {
         SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);
         checkNotNull(surveyRun, "surveyRun " + surveyRunId + " not found");
@@ -195,7 +195,7 @@ public class SurveyRunService {
                 }
         );
 
-        return instancesAndRecipientsToSave.size();
+        return true;
     }
 
 

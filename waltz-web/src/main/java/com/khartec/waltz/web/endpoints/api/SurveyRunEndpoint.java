@@ -90,7 +90,7 @@ public class SurveyRunEndpoint implements Endpoint {
         ListRoute<SurveyInstanceRecipient> generateSurveyRunRecipientsRoute = (request, response) ->
                 surveyRunService.generateSurveyInstanceRecipients(getId(request));
 
-        DatumRoute<Long> createSurveyRunInstancesAndRecipientsRoute = (request, response) ->
+        DatumRoute<Boolean> createSurveyRunInstancesAndRecipientsRoute = (request, response) ->
                 surveyRunService.createSurveyInstancesAndRecipients(getId(request), newArrayList(readBody(request, SurveyInstanceRecipient[].class)));
 
         getForList(generateSurveyRunRecipientsPath, generateSurveyRunRecipientsRoute);

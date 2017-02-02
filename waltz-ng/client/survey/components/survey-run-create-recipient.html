@@ -14,19 +14,24 @@
             </thead>
             <tbody>
             <tr ng-repeat="recipient in $ctrl.surveyRunRecipients"
+                class="waltz-visibility-parent"
                 ng-class="{'danger': recipient.isExcluded}">
                 <td><span ng-bind="recipient.surveyInstance.surveyEntity.name"></span></td>
                 <td><span ng-bind="recipient.person.displayName"></span></td>
                 <td><span ng-bind="recipient.person.email"></span></td>
                 <td>
-                    <button class="btn btn-xs"
-                            ng-show="!recipient.isExcluded"
-                            ng-click="$ctrl.excludeRecipient(recipient)">
+                    <button class="btn btn-xs btn-danger waltz-visibility-child-50"
+                            ng-if="!recipient.isExcluded"
+                            ng-click="$ctrl.excludeRecipient(recipient)"
+                            uib-popover="Exclude"
+                            popover-trigger="mouseenter">
                         <waltz-icon name="trash">
                     </button>
-                    <button class="btn btn-xs"
-                            ng-show="recipient.isExcluded"
-                            ng-click="$ctrl.includeRecipient(recipient)">
+                    <button class="btn btn-xs btn-success waltz-visibility-child-50"
+                            ng-if="recipient.isExcluded"
+                            ng-click="$ctrl.includeRecipient(recipient)"
+                            uib-popover="Include"
+                            popover-trigger="mouseenter">
                         <waltz-icon name="plus">
                     </button>
                 </td>

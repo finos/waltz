@@ -17,15 +17,19 @@
  */
 import {initialiseData} from "../../common/index";
 
+
 const bindings = {
     surveyTemplate: '<',
     surveyRun: '<',
     onSave: '<'
 };
 
+
 const initialState = {};
 
+
 const template = require('./survey-run-create-general.html');
+
 
 function controller(appGroupStore, involvementKindStore) {
     const vm = initialiseData(this, initialState);
@@ -47,11 +51,15 @@ function controller(appGroupStore, involvementKindStore) {
     }
 }
 
-controller.$inject = ['AppGroupStore', 'InvolvementKindStore'];
+
+controller.$inject = [
+    'AppGroupStore',
+    'InvolvementKindStore'
+];
+
 
 export default {
     bindings,
     template,
     controller
 };
-

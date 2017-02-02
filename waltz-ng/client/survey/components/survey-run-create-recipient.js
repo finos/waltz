@@ -18,6 +18,7 @@
 import {initialiseData} from "../../common/index";
 import _ from "lodash";
 
+
 const bindings = {
     surveyTemplate: '<',
     surveyRun: '<',
@@ -25,10 +26,12 @@ const bindings = {
     onGoBack: '<'
 };
 
+
 const initialState = {
     surveyRunRecipients: [],
     excludedRecipients: []
 };
+
 
 const template = require('./survey-run-create-recipient.html');
 
@@ -48,20 +51,23 @@ function controller(surveyRunStore) {
     };
 
     vm.onSubmit = () => {
-        const includeExcludeRecipients = _.partition(vm.surveyRunRecipients, r => !r.isExcluded);
+        const [included = [], excluded = []] =  _.partition(vm.surveyRunRecipients, r => !r.isExcluded);
         vm.onSave(this.surveyRun,
-            includeExcludeRecipients[0],
-            includeExcludeRecipients[1]);
+            _.map(included, r => _.omit(r, 'isExcluded')),
+            _.map(excluded, r => _.omit(r, 'isExcluded')));
     };
 
     vm.goBack = () => { vm.onGoBack(); }
 }
 
-controller.$inject = ['SurveyRunStore'];
+
+controller.$inject = [
+    'SurveyRunStore'
+];
+
 
 export default {
     bindings,
     template,
     controller
 };
-

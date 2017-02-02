@@ -42,22 +42,24 @@ function controller($location,
     vm.surveyRun.surveyTemplate = surveyTemplate;
 
     const generateEmailLink = (surveyRun, includedRecipients) => {
-        vm.surveyEmailRecipients = _
+        const surveyEmailRecipients = _
             .chain(includedRecipients)
             .map(r => r.person.email)
             .join(';');
 
-        vm.surveyEmailSubject = 'Survey invitation: ' + surveyRun.name;
+        const surveyEmailSubject = `Survey invitation: ${surveyRun.name}`;
         const surveyLink = _.replace($location.absUrl(), '#' + $location.url(), '')
             + $state.href('main.survey-run.response', {id: surveyRun.id});
 
         const newLine = '%0D%0A';
-        vm.surveyEmailBody = surveyRun.description
-            + newLine
-            + newLine
-            + 'Please click the link to fill the survey: '
-            + surveyLink
-            + newLine;
+        const surveyEmailBody = `${surveyRun.description}
+            ${newLine} 
+            ${newLine} 
+Please use this URL to fill the survey: ${surveyLink}
+            ${newLine} 
+            ${newLine} `;
+
+        vm.surveyEmailHref = `${surveyEmailRecipients}?subject=${surveyEmailSubject}&body=${surveyEmailBody}`;
     };
 
     vm.onSaveGeneral = (surveyRun) => {
@@ -72,19 +74,17 @@ function controller($location,
                 },
                 scope: surveyRun.selectorScope,
             },
-            involvementKindIds: surveyRun.involvementKinds,
+            involvementKindIds: _.map(surveyRun.involvementKinds, kind => kind.id),
             issuanceKind: surveyRun.issuanceKind,
             dueDate: timeFormat('%Y-%m-%d')(surveyRun.dueDate),
             contactEmail: surveyRun.contactEmail
         };
-
 
         if (surveyRun.id) {
             surveyRunStore.update(surveyRun.id, command)
                 .then(r => {
                     vm.step = 'RECIPIENT';
                 });
-
         } else {
             surveyRunStore.create(command)
                 .then(r => {
@@ -109,7 +109,12 @@ function controller($location,
     };
 }
 
-controller.$inject = ['$location', '$state', 'surveyTemplate', 'SurveyRunStore'];
+controller.$inject = [
+    '$location',
+    '$state',
+    'surveyTemplate',
+    'SurveyRunStore'
+];
 
 export default {
     template,

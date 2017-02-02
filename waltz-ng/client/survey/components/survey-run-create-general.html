@@ -12,7 +12,7 @@
         <div class="form-group">
             <label class="col-sm-2 control-label">Template</label>
             <div class="col-sm-10">
-                <strong>{{$ctrl.surveyTemplate.name}}</strong>
+                <strong ng-bind="$ctrl.surveyTemplate.name"></strong>
                 <div class='small text-muted'
                      ng-bind="$ctrl.surveyTemplate.description">
                 </div>
@@ -35,7 +35,7 @@
                 <input class="form-control"
                        id="name"
                        placeholder="Name for this survey run"
-                       ng-model="$ctrl.surveyRun.name">
+                       ng-model="$ctrl.surveyRun.name" />
             </div>
         </div>
 
@@ -45,10 +45,12 @@
                 Run description
             </label>
             <div class="col-sm-10">
-                <input class="form-control"
-                       id="description"
-                       placeholder="Description for this survey run"
-                       ng-model="$ctrl.surveyRun.description">
+                <textarea id="description"
+                          class="form-control"
+                          placeholder="Description for this survey run"
+                          ng-model="$ctrl.surveyRun.description"
+                          rows="3">
+                </textarea>
             </div>
         </div>
 
@@ -61,7 +63,7 @@
                 <input class="form-control"
                        id="email"
                        placeholder="Email for recipients to contact for questions regarding this survey run"
-                       ng-model="$ctrl.surveyRun.contactEmail">
+                       ng-model="$ctrl.surveyRun.contactEmail" />
             </div>
         </div>
 
@@ -85,10 +87,13 @@
             </label>
             <div class="col-sm-10">
                 <select id="selectorEntityKind"
-                       type="date"
-                       class="form-control"
-                       ng-model="$ctrl.surveyRun.selectorEntityKind">
-                    <option value="APP_GROUP" selected>Application Group</option>
+                        type="date"
+                        class="form-control"
+                        ng-model="$ctrl.surveyRun.selectorEntityKind">
+                    <option value="APP_GROUP"
+                            selected>
+                        Application Group
+                    </option>
                 </select>
             </div>
         </div>
@@ -107,7 +112,7 @@
                        typeahead-template-url="app-group-list-section/app-group-search-result.html"
                        class="form-control"
                        typeahead-show-hint="true"
-                       typeahead-min-length="2">
+                       typeahead-min-length="2" />
             </div>
         </div>
 
@@ -121,7 +126,10 @@
                         type="date"
                         class="form-control"
                         ng-model="$ctrl.surveyRun.selectorScope">
-                    <option value="EXACT" selected>Exact</option>
+                    <option value="EXACT"
+                            selected>
+                        Exact
+                    </option>
                 </select>
             </div>
         </div>
@@ -135,12 +143,9 @@
                 <select id="involmentKinds"
                         type="date"
                         class="form-control"
+                        ng-options="kind as kind.name for kind in $ctrl.availableInvolvementKinds track by kind.id"
                         ng-model="$ctrl.surveyRun.involvementKinds"
                         multiple>
-                    <option ng-repeat="involvementKind in $ctrl.availableInvolvementKinds"
-                            value="{{involvementKind.id}}">
-                        {{involvementKind.name}}
-                    </option>
                 </select>
             </div>
         </div>
@@ -154,7 +159,8 @@
                     <input name="issuanceKind"
                            type="radio"
                            ng-bind="$ctrl.surveyRun.issuanceKind"
-                           value="GROUP" checked>
+                           value="GROUP"
+                           checked />
                     Group
                 </label>
                 &nbsp;
@@ -162,7 +168,7 @@
                     <input name="issuanceKind"
                            type="radio"
                            ng-bind="$ctrl.surveyRun.issuanceKind"
-                           value="INDIVIDUAL">
+                           value="INDIVIDUAL" />
                     Individual
                 </label>
 
