@@ -20,11 +20,16 @@ package com.khartec.waltz.service.physical_flow_lineage;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.physical_flow_lineage.PhysicalFlowLineageDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.attestation.AttestationType;
+import com.khartec.waltz.model.attestation.ImmutableAttestation;
 import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineage;
 import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineageAddCommand;
 import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineageRemoveCommand;
+import com.khartec.waltz.service.attestation.AttestationService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,16 +43,20 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 @Service
 public class PhysicalFlowLineageService {
 
+    private final AttestationService attestationService;
     private final PhysicalFlowLineageDao physicalFlowLineageDao;
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
 
 
     @Autowired
-    public PhysicalFlowLineageService(ApplicationIdSelectorFactory applicationIdSelectorFactory,
+    public PhysicalFlowLineageService(AttestationService attestationService,
+                                      ApplicationIdSelectorFactory applicationIdSelectorFactory,
                                       PhysicalFlowLineageDao physicalFlowLineageDao) {
+        checkNotNull(attestationService, "attestationService cannot be null");
         checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
         checkNotNull(physicalFlowLineageDao, "physicalFlowLineageDao cannot be null");
 
+        this.attestationService = attestationService;
         this.applicationIdSelectorFactory = applicationIdSelectorFactory;
         this.physicalFlowLineageDao = physicalFlowLineageDao;
     }
@@ -82,6 +91,22 @@ public class PhysicalFlowLineageService {
 
     public CommandResponse<PhysicalFlowLineageAddCommand> addContribution(PhysicalFlowLineageAddCommand addCommand) {
         checkNotNull(addCommand, "addCommand cannot be null");
-        return physicalFlowLineageDao.addContribution(addCommand);
+        CommandResponse<PhysicalFlowLineageAddCommand> response = physicalFlowLineageDao.addContribution(addCommand);
+
+        ImmutableAttestation described = ImmutableAttestation.builder()
+                .entityReference(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, addCommand.describedFlowId()))
+                .attestationType(AttestationType.IMPLICIT)
+                .attestedBy(addCommand.lastUpdate().by())
+                .attestedAt(addCommand.lastUpdate().at())
+                .comments("Implied by lineage creation")
+                .build();
+
+        ImmutableAttestation contributing = ImmutableAttestation.copyOf(described)
+                .withEntityReference(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, addCommand.contributingFlowId()));
+
+        attestationService.create(described, addCommand.lastUpdate().by());
+        attestationService.create(contributing, addCommand.lastUpdate().by());
+
+        return response;
     }
 }

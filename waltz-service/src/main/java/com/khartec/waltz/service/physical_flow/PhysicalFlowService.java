@@ -26,6 +26,8 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.attestation.AttestationType;
+import com.khartec.waltz.model.attestation.ImmutableAttestation;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.command.CommandOutcome;
@@ -34,6 +36,7 @@ import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
+import com.khartec.waltz.service.attestation.AttestationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.data_type.DataTypeService;
@@ -53,6 +56,7 @@ import static com.khartec.waltz.common.StringUtilities.mkSafe;
 @Service
 public class PhysicalFlowService {
 
+    private final AttestationService attestationService;
     private final PhysicalFlowDao physicalFlowDao;
     private final PhysicalSpecificationDao physicalSpecificationDao;
     private final ChangeLogService changeLogService;
@@ -63,17 +67,20 @@ public class PhysicalFlowService {
     private final PhysicalFlowSearchDao searchDao;
 
     private final static String DEFAULT_DATATYPE_CODE_SETTING_NAME = "settings.data-type.default-code";
-
+    private final static String PROVENANCE = "waltz";
 
     @Autowired
-    public PhysicalFlowService(ChangeLogService changeLogService,
+    public PhysicalFlowService(AttestationService attestationService,
+                               ChangeLogService changeLogService,
                                LogicalFlowService dataFlowService,
                                DataFlowDecoratorService dataFlowDecoratorService,
                                DataTypeService dataTypeService,
                                PhysicalFlowDao physicalDataFlowDao,
                                PhysicalSpecificationDao physicalSpecificationDao,
-                               SettingsService settingsService, PhysicalFlowSearchDao searchDao) {
-        
+                               SettingsService settingsService,
+                               PhysicalFlowSearchDao searchDao) {
+
+        checkNotNull(attestationService, "attestationService cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dataFlowService, "dataFlowService cannot be null");
         checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
@@ -83,6 +90,7 @@ public class PhysicalFlowService {
         checkNotNull(settingsService, "settingsService cannot be null");
         checkNotNull(searchDao, "searchDao cannot be null");
 
+        this.attestationService = attestationService;
         this.changeLogService = changeLogService;
         this.dataFlowService = dataFlowService;
         this.dataFlowDecoratorService = dataFlowDecoratorService;
@@ -170,6 +178,8 @@ public class PhysicalFlowService {
                             specification.name(),
                             flow.target().safeName()),
                     Operation.REMOVE);
+
+            attestationService.deleteForEntity(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, command.flowId()), username);
         }
 
 
@@ -195,6 +205,14 @@ public class PhysicalFlowService {
                 .id()
                 .orElseGet(() -> physicalSpecificationDao.create(command.specification()));
 
+        attestationService.create(ImmutableAttestation.builder()
+                .entityReference(EntityReference.mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId))
+                .attestationType(AttestationType.EXPLICIT)
+                .attestedBy(username)
+                .comments("Creation of physical flow via Waltz")
+                .provenance(PROVENANCE)
+                .build(), username);
+
         PhysicalFlow flow = ImmutablePhysicalFlow.builder()
                 .specificationId(specId)
                 .basisOffset(command.flowAttributes().basisOffset())
@@ -205,7 +223,6 @@ public class PhysicalFlowService {
                 .build();
 
         long flowId = physicalFlowDao.create(flow);
-
 
         logChange(username,
                 command.specification().owningEntity(),
@@ -230,6 +247,15 @@ public class PhysicalFlowService {
                 Operation.ADD);
 
 
+        attestationService.create(ImmutableAttestation.builder()
+                .entityReference(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, flowId))
+                .attestationType(AttestationType.EXPLICIT)
+                .attestedBy(username)
+                .comments("Creation of physical flow via Waltz")
+                .provenance(PROVENANCE)
+                .build(), username);
+
+
         return ImmutablePhysicalFlowCreateCommandResponse.builder()
                 .originalCommand(command)
                 .outcome(CommandOutcome.SUCCESS)
@@ -245,6 +271,15 @@ public class PhysicalFlowService {
             return;
         } else {
             LogicalFlow logicalFlow = dataFlowService.findBySourceAndTarget(source, target);
+            // attest the flow
+            attestationService.create(ImmutableAttestation.builder()
+                    .entityReference(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, logicalFlow.id().get()))
+                    .attestationType(AttestationType.EXPLICIT)
+                    .attestedBy(username)
+                    .comments("Creation of physical flow via Waltz")
+                    .provenance(PROVENANCE)
+                    .build(), username);
+
             if(logicalFlow == null) {
                 Optional<String> defaultDataTypeCode = settingsService.getValue(DEFAULT_DATATYPE_CODE_SETTING_NAME);
                 if(!defaultDataTypeCode.isPresent()) {
@@ -256,7 +291,7 @@ public class PhysicalFlowService {
                         .source(source)
                         .target(target)
                         .build();
-                LogicalFlow createdFlow = dataFlowService.addFlow(newFlow, username);
+                logicalFlow = dataFlowService.addFlow(newFlow, username);
 
                 // add decorators
                 DataType defaultDataType = dataTypeService.getByCode(defaultDataTypeCode.get());
@@ -265,7 +300,7 @@ public class PhysicalFlowService {
                         defaultDataType.id().get(),
                         defaultDataType.name());
                 dataFlowDecoratorService.addDecorators(
-                        createdFlow.id().get(),
+                        logicalFlow.id().get(),
                         SetUtilities.fromArray(dataTypeRef),
                         username);
             }

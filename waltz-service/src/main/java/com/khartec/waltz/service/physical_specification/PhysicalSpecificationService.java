@@ -28,6 +28,7 @@ import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.command.ImmutableCommandResponse;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
+import com.khartec.waltz.service.attestation.AttestationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -44,20 +45,24 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 @Service
 public class PhysicalSpecificationService {
 
+    private final AttestationService attestationService;
     private final ChangeLogService changeLogService;
     private final PhysicalSpecificationDao specificationDao;
     private final PhysicalSpecificationSelectorFactory selectorFactory;
 
 
     @Autowired
-    public PhysicalSpecificationService(ChangeLogService changeLogService,
+    public PhysicalSpecificationService(AttestationService attestationService,
+                                        ChangeLogService changeLogService,
                                         PhysicalSpecificationDao specificationDao,
                                         PhysicalSpecificationSelectorFactory selectorFactory)
     {
+        checkNotNull(attestationService, "attestationService cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(specificationDao, "specificationDao cannot be null");
         checkNotNull(selectorFactory, "selectorFactory cannot be null");
 
+        this.attestationService = attestationService;
         this.changeLogService = changeLogService;
         this.specificationDao = specificationDao;
         this.selectorFactory = selectorFactory;
@@ -117,6 +122,9 @@ public class PhysicalSpecificationService {
                     String.format("Specification: %s removed",
                             specification.name()),
                     Operation.REMOVE);
+
+            attestationService.deleteForEntity(EntityReference.mkRef(EntityKind.PHYSICAL_SPECIFICATION,
+                    command.specificationId()), username);
 
         }
 
