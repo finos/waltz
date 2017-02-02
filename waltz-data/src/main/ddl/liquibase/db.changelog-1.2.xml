@@ -1193,4 +1193,15 @@
         </sql>
     </changeSet>
 
+    <changeSet id="20170202-1366-6"
+               author="kamransaleem">
+        <addColumn tableName="attestation">
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
