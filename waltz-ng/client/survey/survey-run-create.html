@@ -1,0 +1,38 @@
+<div>
+    <waltz-page-header icon="edit"
+                       name="Survey"
+                       small="create">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Survey</a></li>
+            <li>Create</li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+
+    <waltz-survey-run-create-general ng-if="ctrl.step === 'GENERAL'"
+                                     survey-template="ctrl.surveyTemplate"
+                                     survey-run="ctrl.surveyRun"
+                                     on-save="ctrl.onSaveGeneral">
+    </waltz-survey-run-create-general>
+
+
+    <waltz-survey-run-create-recipient ng-if="ctrl.step === 'RECIPIENT'"
+                                       survey-template="ctrl.surveyTemplate"
+                                       survey-run="ctrl.surveyRun"
+                                       on-save="ctrl.onSaveRecipient"
+                                       on-go-back="ctrl.goBack">
+    </waltz-survey-run-create-recipient>
+
+
+    <div ng-if="ctrl.step === 'COMPLETED'">
+        <h4><strong>Issue Survey</strong></h4>
+        <hr/>
+
+        Survey run <strong ng-bind="ctrl.surveyRun.name"></strong> has been saved.
+        <br/>
+        <br/>
+        Please click <a href="mailto:{{ctrl.surveyEmailHref}}">here</a> to generate survey invitation email.
+    </div>
+
+</div>
