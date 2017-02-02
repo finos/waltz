@@ -26,11 +26,11 @@ function setup() {
         .service('PerspectiveDefinitionStore', require('./serivces/perspective-definition-store'))
         .service('PerspectiveRatingStore', require('./serivces/perspective-rating-store'));
     module
+        .component('waltzPerspectiveEditor', require('./components/editor/perspective-editor'))
         .component('waltzPerspectiveGrid', require('./components/grid/perspective-grid'));
-
-
 
     return module.name;
 }
+
 
 export default setup;

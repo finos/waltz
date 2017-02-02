@@ -10,92 +10,16 @@
     </waltz-page-header>
 
 
-    <style>
-        .side-scroller {
-            overflow-y: hidden;
-            overflow-x: scroll;
-        }
-    </style>
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <div class="row">
-            <div class="col-sm-9"
-                 style="border-right: 1px solid #eee">
-                <div class="side-scroller">
-                    <waltz-perspective-grid existing-overrides="ctrl.existingOverrides"
-                                            pending-overrides="ctrl.pendingOverrides"
-                                            perspective-definition="ctrl.perspectiveDefinition"
-                                            measurables="ctrl.measurables"
-                                            measurable-ratings="ctrl.measurableRatings"
-                                            handlers="ctrl.handlers">
-                    </waltz-perspective-grid>
-                </div>
-
-            </div>
-            <div class="col-sm-3">
-                <style>
-                    .hover-section {
-                        opacity: 0;
-                        transition: opacity 200ms;
-                    }
-                    .hovered {
-                        opacity: 1;
-                    }
-                </style>
-                <div style="min-height: 40px"
-                     class="small">
-                    <div class='hover-section'
-                         ng-class="{hovered: ctrl.hovered}">
-                        <waltz-rating-indicator-cell label="ctrl.hovered.col.measurable.name"
-                                                     rating="ctrl.hovered.col.rating.rating">
-                        </waltz-rating-indicator-cell>
-                        <br>
-                        <waltz-rating-indicator-cell label="ctrl.hovered.row.measurable.name"
-                                                     rating="ctrl.hovered.row.rating.rating">
-                        </waltz-rating-indicator-cell>
-                    </div>
-
-                </div>
-                <hr>
-                <div ng-if="ctrl.selected">
-                    <waltz-rating-indicator-cell label="ctrl.selected.col.measurable.name"
-                                                 rating="ctrl.selected.col.rating.rating">
-                    </waltz-rating-indicator-cell>
-                    <br>
-                    <waltz-rating-indicator-cell label="ctrl.selected.row.measurable.name"
-                                                 rating="ctrl.selected.row.rating.rating">
-                    </waltz-rating-indicator-cell>
-                </div>
-
-                <hr>
-
-                <waltz-rating-picker selected="ctrl.activeRating"
-                                     on-select="ctrl.onRatingSelect">
-                </waltz-rating-picker>
-
-                <button class="btn"
-                        ng-click="ctrl.activeRating = 'X'">
-                    Remove
-                </button>
-
-                <hr>
-
-                <button class="btn btn-primary" ng-click="ctrl.apply();">
-                    Apply
-                </button>
-
-                <a class='clickable'
-                   ng-click="ctrl.undo()">
-                    Undo Changes
-                </a>
-            </div>
-        </div>
 
         <div class="row">
-            <div class="col-md-6">
-                <pre>{{ ctrl.existingOverrides | json }}</pre>
-            </div>
-            <div class="col-md-6">
-                <pre>{{ ctrl.pendingOverrides | json }}</pre>
+            <div class="col-sm-12">
+                <waltz-perspective-editor perspective-definition="ctrl.perspectiveDefinition"
+                                          measurables="ctrl.measurables"
+                                          measurable-ratings="ctrl.measurableRatings"
+                                          perspective-ratings="ctrl.perspectiveRatings"
+                                          on-save="ctrl.saveChanges">
+                </waltz-perspective-editor>
             </div>
         </div>
 

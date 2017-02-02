@@ -471,7 +471,11 @@ function controller($element) {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (c) => {
-        if (vm.measurables && vm.measurableRatings && vm.perspectiveDefinition) {
+        const canDraw = vm.measurables
+            && vm.measurableRatings
+            && vm.perspectiveDefinition;
+
+        if (canDraw) {
             vm.perspective = mkPerspective(
                 vm.perspectiveDefinition,
                 vm.measurables,
@@ -488,7 +492,10 @@ function controller($element) {
             vm.svg.call(drawPendingOverrides, vm.pendingOverrides);
         }
 
-        if ((vm.existingOverrides || vm.pendingOverrides) && vm.svg) {
+        const canRefresh = (vm.existingOverrides || vm.pendingOverrides)
+            && vm.svg;
+
+        if (canRefresh) {
             vm.svg.call(drawExistingOverrides, vm.existingOverrides);
             vm.svg.call(drawPendingOverrides, vm.pendingOverrides);
         }
