@@ -1193,4 +1193,92 @@
         </sql>
     </changeSet>
 
+
+    <!-- 1467: Survey Questions/Responses -->
+    <changeSet author="rovats"
+               id="20170202-1467-1">
+        <createTable tableName="survey_question">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="survey_question_pkey"/>
+            </column>
+            <column name="survey_template_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text"
+                    type="${longvarchar.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="section_name"
+                    type="${name.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="order"
+                    type="${int.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_mandatory"
+                    type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enable_comment"
+                    type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="rovats"
+               id="20170202-1467-2">
+        <createTable tableName="survey_response">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="survey_response_pkey"/>
+            </column>
+            <column name="survey_instance_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="question_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="person_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment"
+                    type="${longvarchar.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="string_response"
+                    type="${longvarchar.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="number_response"
+                    type="DECIMAL(19,4)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="boolean_response"
+                    type="boolean">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
