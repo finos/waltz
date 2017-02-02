@@ -1,5 +1,6 @@
 package com.khartec.waltz.model.survey;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
@@ -22,4 +23,5 @@ public abstract class SurveyRunCreateCommand implements NameProvider, Descriptio
     public abstract Optional<LocalDate> dueDate();
     public abstract SurveyIssuanceKind issuanceKind();
     public abstract Optional<String> contactEmail();
+
 }

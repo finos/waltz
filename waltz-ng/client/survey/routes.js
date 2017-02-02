@@ -1,3 +1,4 @@
+import {surveyTemplateResolver} from "./resolvers";
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,39 +17,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model;
+const baseState = {};
 
-public enum EntityKind {
+const createState = {
+    url: 'survey/template/{id:int}/new-run',
+    views: {'content@': require('./survey-run-create')},
+    resolve: {
+        surveyTemplate: surveyTemplateResolver
+    }
+};
 
-    APPLICATION,
-    APP_CAPABILITY,
-    APP_GROUP,
-    APP_RATING,
-    ASSET_COST,
-    ATTESTATION,
-    AUTHORITATIVE_SOURCE,
-    BOOKMARK,
-    XX_CAPABILITY,
-    CHANGE_INITIATIVE,
-    DATABASE,
-    DATA_TYPE,
-    END_USER_APPLICATION,
-    ENTITY_HIERARCHY,
-    ENTITY_STATISTIC,
-    INVOLVEMENT,
-    INVOLVEMENT_KIND,
-    ACTOR,
-    LOGICAL_DATA_FLOW,
-    MEASURABLE,
-    ORG_UNIT,
-    PERFORMANCE_METRIC_PACK,
-    PERSON,
-    PHYSICAL_SPECIFICATION,
-    PHYSICAL_FLOW,
-    PROCESS,
-    SERVER,
-    SOFTWARE,
-    SURVEY_RUN,
-    SURVEY_TEMPLATE,
-    SYSTEM
+const responseState = {
+    url: 'survey/run/{id:int}/response'
+};
+
+function setup($stateProvider) {
+    $stateProvider
+        .state('main.survey-run', baseState)
+        .state('main.survey-run.create', createState)
+        .state('main.survey-run.response', responseState);
+
 }
+
+
+setup.$inject = ['$stateProvider'];
+
+
+export default setup;

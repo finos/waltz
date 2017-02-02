@@ -1192,8 +1192,19 @@
             FROM physical_specification
         </sql>
     </changeSet>
+  
+    <changeSet id="20170202-1366-6"
+               author="kamransaleem">
+        <addColumn tableName="attestation">
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
 
-
+  
     <!-- 1467: Survey Questions/Responses -->
     <changeSet author="rovats"
                id="20170202-1467-1">
@@ -1280,5 +1291,5 @@
             </column>
         </createTable>
     </changeSet>
-
+   
 </databaseChangeLog>

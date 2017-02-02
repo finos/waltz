@@ -16,39 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model;
 
-public enum EntityKind {
-
-    APPLICATION,
-    APP_CAPABILITY,
-    APP_GROUP,
-    APP_RATING,
-    ASSET_COST,
-    ATTESTATION,
-    AUTHORITATIVE_SOURCE,
-    BOOKMARK,
-    XX_CAPABILITY,
-    CHANGE_INITIATIVE,
-    DATABASE,
-    DATA_TYPE,
-    END_USER_APPLICATION,
-    ENTITY_HIERARCHY,
-    ENTITY_STATISTIC,
-    INVOLVEMENT,
-    INVOLVEMENT_KIND,
-    ACTOR,
-    LOGICAL_DATA_FLOW,
-    MEASURABLE,
-    ORG_UNIT,
-    PERFORMANCE_METRIC_PACK,
-    PERSON,
-    PHYSICAL_SPECIFICATION,
-    PHYSICAL_FLOW,
-    PROCESS,
-    SERVER,
-    SOFTWARE,
-    SURVEY_RUN,
-    SURVEY_TEMPLATE,
-    SYSTEM
+export function surveyTemplateResolver(surveyTemplateStore, params) {
+    return surveyTemplateStore.getById( params.id );
 }
+
+surveyTemplateResolver.$inject = ['SurveyTemplateStore', '$stateParams'];
+
+

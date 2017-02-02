@@ -57,7 +57,7 @@ public class SurveyHarness {
         SurveyRunService surveyRunService = ctx.getBean(SurveyRunService.class);
 
         String userName = "livingston@mail.com";
-        long surveyRunId = surveyRunService.createSurveyRun(userName, surveyRunCreateCommand);
+        long surveyRunId = surveyRunService.createSurveyRun(userName, surveyRunCreateCommand).id().get();
 
         List<SurveyInstanceRecipient> surveyInstanceRecipients = surveyRunService.generateSurveyInstanceRecipients(surveyRunId);
 

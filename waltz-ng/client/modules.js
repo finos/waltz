@@ -95,6 +95,7 @@ const dependencies = [
     require('./software-catalog')(),
     require('./source-data-rating')(),
     require('./static-panel')(),
+    require('./survey')(),
     require('./svg-diagram')(),
     require('./system')(),
     require('./technology')(),

@@ -16,39 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model;
+function service($http, baseUrl) {
 
-public enum EntityKind {
+    const BASE = `${baseUrl}/survey-template`;
 
-    APPLICATION,
-    APP_CAPABILITY,
-    APP_GROUP,
-    APP_RATING,
-    ASSET_COST,
-    ATTESTATION,
-    AUTHORITATIVE_SOURCE,
-    BOOKMARK,
-    XX_CAPABILITY,
-    CHANGE_INITIATIVE,
-    DATABASE,
-    DATA_TYPE,
-    END_USER_APPLICATION,
-    ENTITY_HIERARCHY,
-    ENTITY_STATISTIC,
-    INVOLVEMENT,
-    INVOLVEMENT_KIND,
-    ACTOR,
-    LOGICAL_DATA_FLOW,
-    MEASURABLE,
-    ORG_UNIT,
-    PERFORMANCE_METRIC_PACK,
-    PERSON,
-    PHYSICAL_SPECIFICATION,
-    PHYSICAL_FLOW,
-    PROCESS,
-    SERVER,
-    SOFTWARE,
-    SURVEY_RUN,
-    SURVEY_TEMPLATE,
-    SYSTEM
+    const getById = (id) => {
+        return $http.get(`${BASE}/${id}`)
+            .then(result => result.data);
+    };
+
+    const findActive = () => {
+        return $http.get(`${BASE}/active`)
+            .then(result => result.data);
+    };
+
+    return {
+        getById,
+        findActive
+    };
 }
+
+
+service.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
+
+
+export default service;

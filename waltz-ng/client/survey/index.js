@@ -1,3 +1,4 @@
+
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,39 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model;
+import angular from 'angular';
 
-public enum EntityKind {
+export default () => {
+    const module = angular.module('waltz.survey', []);
 
-    APPLICATION,
-    APP_CAPABILITY,
-    APP_GROUP,
-    APP_RATING,
-    ASSET_COST,
-    ATTESTATION,
-    AUTHORITATIVE_SOURCE,
-    BOOKMARK,
-    XX_CAPABILITY,
-    CHANGE_INITIATIVE,
-    DATABASE,
-    DATA_TYPE,
-    END_USER_APPLICATION,
-    ENTITY_HIERARCHY,
-    ENTITY_STATISTIC,
-    INVOLVEMENT,
-    INVOLVEMENT_KIND,
-    ACTOR,
-    LOGICAL_DATA_FLOW,
-    MEASURABLE,
-    ORG_UNIT,
-    PERFORMANCE_METRIC_PACK,
-    PERSON,
-    PHYSICAL_SPECIFICATION,
-    PHYSICAL_FLOW,
-    PROCESS,
-    SERVER,
-    SOFTWARE,
-    SURVEY_RUN,
-    SURVEY_TEMPLATE,
-    SYSTEM
-}
+    module
+        .config(require('./routes'));
+
+    module
+        .component('waltzSurveyRunCreateGeneral', require('./components/survey-run-create-general'))
+        .component('waltzSurveyRunCreateRecipient', require('./components/survey-run-create-recipient'));
+
+    module
+        .service('SurveyRunStore', require('./services/survey-run-store'))
+        .service('SurveyTemplateStore', require('./services/survey-template-store'));
+
+    return module.name;
+};
