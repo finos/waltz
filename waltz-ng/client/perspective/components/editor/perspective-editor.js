@@ -75,13 +75,13 @@ function updateOverrides(overrides = {}, d, rating) {
 }
 
 
-function mkOverrides(ratings) {
+function mkOverrides(perspectiveRatings = []) {
     const reducer = (acc, r) => {
         const key = `${r.measurableX}_${r.measurableY}`;
         acc[key] = r;
         return acc;
     };
-    return _.reduce(ratings, reducer, {});
+    return _.reduce(_.map(perspectiveRatings, 'value'), reducer, {});
 }
 
 
@@ -117,12 +117,12 @@ function controller($timeout) {
     vm.onRatingSelect = r => vm.activeRating = r;
 
     vm.apply = () => {
-        const changes = _.values(vm.pendingOverrides);
+        const all = Object.assign({}, vm.existingOverrides, vm.pendingOverrides);
         if (vm.onSave) {
-            vm.onSave(changes)
+            vm.onSave(_.values(all))
                 .then(() => vm.pendingOverrides = {});
         } else {
-            console.log('wpe: no onSave listener provided', changes);
+            console.log('wpe: no onSave listener provided', _.values(all));
         }
     };
 

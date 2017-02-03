@@ -1193,4 +1193,14 @@
         </sql>
     </changeSet>
 
+
+    <!-- 1459: Add pk to perspective rating -->
+    <changeSet author="dwatkins"
+               id="20170203-1459-1">
+        <addPrimaryKey tableName="perspective_rating"
+                       constraintName="perspective_rating_pkey"
+                       columnNames="entity_id, measurable_x, measurable_y, entity_kind" />
+    </changeSet>
+
+
 </databaseChangeLog>

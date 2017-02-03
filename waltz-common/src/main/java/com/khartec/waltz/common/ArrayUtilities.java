@@ -25,6 +25,8 @@ import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
+
 public class ArrayUtilities {
 
 
@@ -41,8 +43,8 @@ public class ArrayUtilities {
      * predicate function <code>check</code>
      */
     public static <T> boolean all(T[] ts, Predicate<T> check) {
-        Checks.checkNotNull(ts, "Array must be provided");
-        Checks.checkNotNull(check, "Predicate must be provided");
+        checkNotNull(ts, "Array must be provided");
+        checkNotNull(check, "Predicate must be provided");
 
         for (T t : ts) {
             if (! check.test(t)) return false;
@@ -53,8 +55,8 @@ public class ArrayUtilities {
 
 
     public static <X, Y> List<Y> mapToList(X[] xs, Function<X, Y> transformer) {
-        Checks.checkNotNull(xs, "array must not be null");
-        Checks.checkNotNull(transformer, "transformer must not be null");
+        checkNotNull(xs, "array must not be null");
+        checkNotNull(transformer, "transformer must not be null");
 
         LinkedList<Y> ys = new LinkedList<>();
 
@@ -70,8 +72,6 @@ public class ArrayUtilities {
         int idx = rnd.nextInt(ts.length);
         return ts[idx];
     }
-
-
 
 
     public static <T> T[] of(T[] ts, T... moreTs) {
@@ -91,4 +91,15 @@ public class ArrayUtilities {
         if (arr.length == 0) return true;
         return false;
     }
+
+
+    public static int sum(int[] arr) {
+        checkNotNull(arr, "arr cannot be null");
+        int total = 0;
+        for (int i = 0; i < arr.length; i++) {
+            total += arr[i];
+        }
+        return total;
+    }
+
 }

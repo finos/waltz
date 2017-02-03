@@ -16,16 +16,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
+
+
+function stripRatings(ratings = []) {
+    return _.map(
+        ratings,
+        r => ({
+            measurableX: r.measurableX,
+            measurableY: r.measurableY,
+            rating: r.rating
+        }));
+}
+
+
 function store($http,
                BaseApiUrl) {
     const BASE = `${BaseApiUrl}/perspective-rating`;
 
-    const findForEntity = (categoryX, categoryY, ref) => $http
-        .get(`${BASE}/${categoryX}/${categoryY}/entity/${ref.kind}/${ref.id}`)
-        .then(result => result.data);
+
+    const mkEntityUrl = (categoryX, categoryY, ref) =>
+        `${BASE}/${categoryX}/${categoryY}/entity/${ref.kind}/${ref.id}`;
+
+    const findForEntity = (categoryX,
+                           categoryY,
+                           ref) => {
+        const url = mkEntityUrl(
+            categoryX,
+            categoryY,
+            ref);
+        return $http
+            .get(url)
+            .then(result => result.data);
+    };
+
+    const updateForEntity = (categoryX,
+                             categoryY,
+                             ref,
+                             perspectiveRatings = []) => {
+        const url = mkEntityUrl(
+            categoryX,
+            categoryY,
+            ref);
+        const strippedRatings = stripRatings(perspectiveRatings);
+        return $http
+            .put(url, strippedRatings)
+            .then(result => result.data);
+    };
 
     return {
-        findForEntity
+        findForEntity,
+        updateForEntity
     };
 }
 

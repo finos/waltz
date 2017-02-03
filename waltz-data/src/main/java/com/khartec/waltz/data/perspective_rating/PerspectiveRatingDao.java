@@ -18,10 +18,13 @@
 
 package com.khartec.waltz.data.perspective_rating;
 
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.perspective.ImmutablePerspectiveRating;
+import com.khartec.waltz.model.perspective.ImmutablePerspectiveRatingValue;
 import com.khartec.waltz.model.perspective.PerspectiveRating;
+import com.khartec.waltz.model.perspective.PerspectiveRatingValue;
 import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.schema.tables.Measurable;
 import com.khartec.waltz.schema.tables.records.PerspectiveRatingRecord;
@@ -32,9 +35,13 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 
+import static com.khartec.waltz.common.ArrayUtilities.sum;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.PerspectiveRating.PERSPECTIVE_RATING;
@@ -47,13 +54,18 @@ public class PerspectiveRatingDao {
 
     private static final RecordMapper<Record, PerspectiveRating> TO_DOMAIN_MAPPER = record -> {
         PerspectiveRatingRecord r = record.into(PERSPECTIVE_RATING);
-        return ImmutablePerspectiveRating.builder()
-                .entityReference(mkRef(
-                        EntityKind.valueOf(r.getEntityKind()),
-                        r.getEntityId()))
+
+        PerspectiveRatingValue rating = ImmutablePerspectiveRatingValue.builder()
                 .measurableX(r.getMeasurableX())
                 .measurableY(r.getMeasurableY())
                 .rating(RagRating.valueOf(r.getRating()))
+                .build();
+
+        return ImmutablePerspectiveRating.builder()
+                .value(rating)
+                .entityReference(mkRef(
+                        EntityKind.valueOf(r.getEntityKind()),
+                        r.getEntityId()))
                 .lastUpdatedBy(r.getLastUpdatedBy())
                 .lastUpdatedAt(r.getLastUpdatedAt().toLocalDateTime())
                 .build();
@@ -87,7 +99,8 @@ public class PerspectiveRatingDao {
         Condition entityMatches = PERSPECTIVE_RATING.ENTITY_KIND.eq(ref.kind().name())
                 .and(PERSPECTIVE_RATING.ENTITY_ID.eq(ref.id()));
 
-        return dsl.select(PERSPECTIVE_RATING.fields())
+        return dsl
+                .select(PERSPECTIVE_RATING.fields())
                 .from(PERSPECTIVE_RATING)
                 .innerJoin(mX)
                 .on(mXJoinCondition)
@@ -97,4 +110,40 @@ public class PerspectiveRatingDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
+    public int remove(EntityReference ref, Set<PerspectiveRatingValue> removals) {
+        Set<PerspectiveRatingRecord> records = SetUtilities.map(removals, item -> {
+            PerspectiveRatingRecord record = new PerspectiveRatingRecord();
+            record.setEntityKind(ref.kind().name());
+            record.setEntityId(ref.id());
+            record.setMeasurableX(item.measurableX());
+            record.setMeasurableY(item.measurableY());
+            return record;
+        });
+
+        int[] rc = dsl
+                .batchDelete(records)
+                .execute();
+        return sum(rc);
+    }
+
+    public int add(EntityReference ref, Set<PerspectiveRatingValue> additions, String username) {
+        Set<PerspectiveRatingRecord> records = SetUtilities.map(additions, item -> {
+            PerspectiveRatingRecord record = new PerspectiveRatingRecord();
+            record.setEntityKind(ref.kind().name());
+            record.setEntityId(ref.id());
+            record.setMeasurableX(item.measurableX());
+            record.setMeasurableY(item.measurableY());
+            record.setRating(item.rating().name());
+            record.setLastUpdatedAt(Timestamp.valueOf(nowUtc()));
+            record.setLastUpdatedBy(username);
+            return record;
+        });
+
+        int[] rc = dsl
+                .batchStore(records)
+                .execute();
+
+        return sum(rc);
+    }
 }

@@ -20,6 +20,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.perspective.PerspectiveRating;
+import com.khartec.waltz.model.perspective.PerspectiveRatingValue;
 import com.khartec.waltz.service.perspective_rating.PerspectiveRatingService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,13 @@ import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
 
+import java.io.IOException;
 import java.util.Collection;
 
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
-import static com.khartec.waltz.web.WebUtilities.getLong;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.common.SetUtilities.fromArray;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.putForDatum;
 
 
 @Service
@@ -52,8 +54,9 @@ public class PerspectiveRatingEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findForEntityPath = mkPath(BASE, ":x", ":y", "entity", ":kind", ":id");
-        getForList(findForEntityPath, this::findForEntity);
+        String entityPath = mkPath(BASE, ":x", ":y", "entity", ":kind", ":id");
+        getForList(entityPath, this::findForEntity);
+        putForDatum(entityPath, this::updateForEntity);
     }
 
 
@@ -62,5 +65,16 @@ public class PerspectiveRatingEndpoint implements Endpoint {
         long categoryX = getLong(request, "x");
         long categoryY = getLong(request, "y");
         return perspectiveRatingService.findForEntity(categoryX, categoryY, ref);
+    }
+
+
+    private int updateForEntity(Request request, Response z) throws IOException {
+        String username = getUsername(request);
+        EntityReference ref = getEntityReference(request);
+        long categoryX = getLong(request, "x");
+        long categoryY = getLong(request, "y");
+        PerspectiveRatingValue values[] = readBody(request, PerspectiveRatingValue[].class);
+
+        return perspectiveRatingService.updatePerspectiveRatings(categoryX, categoryY, ref, username, fromArray(values));
     }
 }
