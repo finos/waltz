@@ -182,12 +182,11 @@ public class DataFlowDecoratorService {
         dataTypeUsageService.recalculateForApplications(flow.source(), flow.target());
         audit("Added", decoratorReferences, flow, username);
 
-        attestationService.create(ImmutableAttestation.builder()
-                .entityReference(EntityReference.mkRef(LOGICAL_DATA_FLOW, flowId))
-                .attestationType(AttestationType.IMPLICIT)
-                .attestedBy(username)
-                .comments("Implicit due to data type decoration")
-                .build(), username);
+        attestationService.implicitlyAttest(
+                LOGICAL_DATA_FLOW,
+                flowId,
+                username,
+                "Implicit due to data type decoration");
 
         return added;
     }

@@ -26,8 +26,6 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.attestation.AttestationType;
-import com.khartec.waltz.model.attestation.ImmutableAttestation;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.command.CommandOutcome;
@@ -51,10 +49,15 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
+import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 
 
 @Service
 public class PhysicalFlowService {
+
+    public static final String ATTESTATION_COMMENT = "Creation of physical flow via Waltz";
 
     private final AttestationService attestationService;
     private final PhysicalFlowDao physicalFlowDao;
@@ -179,13 +182,13 @@ public class PhysicalFlowService {
                             flow.target().safeName()),
                     Operation.REMOVE);
 
-            attestationService.deleteForEntity(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, command.flowId()), username);
+            attestationService.deleteForEntity(EntityReference.mkRef(PHYSICAL_FLOW, command.flowId()), username);
         }
 
 
         return ImmutablePhysicalFlowDeleteCommandResponse.builder()
                 .originalCommand(command)
-                .entityReference(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, command.flowId()))
+                .entityReference(EntityReference.mkRef(PHYSICAL_FLOW, command.flowId()))
                 .outcome(commandOutcome)
                 .message(Optional.ofNullable(responseMessage))
                 .isSpecificationUnused(isSpecificationUnused)
@@ -205,13 +208,7 @@ public class PhysicalFlowService {
                 .id()
                 .orElseGet(() -> physicalSpecificationDao.create(command.specification()));
 
-        attestationService.create(ImmutableAttestation.builder()
-                .entityReference(EntityReference.mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId))
-                .attestationType(AttestationType.EXPLICIT)
-                .attestedBy(username)
-                .comments("Creation of physical flow via Waltz")
-                .provenance(PROVENANCE)
-                .build(), username);
+        attestationService.explicitlyAttest(PHYSICAL_SPECIFICATION, specId, username, ATTESTATION_COMMENT);
 
         PhysicalFlow flow = ImmutablePhysicalFlow.builder()
                 .specificationId(specId)
@@ -239,7 +236,7 @@ public class PhysicalFlowService {
                 Operation.ADD);
 
         logChange(username,
-                EntityReference.mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId),
+                EntityReference.mkRef(PHYSICAL_SPECIFICATION, specId),
                 String.format("Added physical flow (%s) from: %s, to %s",
                         command.specification().name(),
                         command.specification().owningEntity().safeName(),
@@ -247,19 +244,12 @@ public class PhysicalFlowService {
                 Operation.ADD);
 
 
-        attestationService.create(ImmutableAttestation.builder()
-                .entityReference(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, flowId))
-                .attestationType(AttestationType.EXPLICIT)
-                .attestedBy(username)
-                .comments("Creation of physical flow via Waltz")
-                .provenance(PROVENANCE)
-                .build(), username);
-
+        attestationService.explicitlyAttest(PHYSICAL_FLOW, flowId, username, ATTESTATION_COMMENT);
 
         return ImmutablePhysicalFlowCreateCommandResponse.builder()
                 .originalCommand(command)
                 .outcome(CommandOutcome.SUCCESS)
-                .entityReference(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, flowId))
+                .entityReference(EntityReference.mkRef(PHYSICAL_FLOW, flowId))
                 .build();
     }
 
@@ -272,13 +262,7 @@ public class PhysicalFlowService {
         } else {
             LogicalFlow logicalFlow = dataFlowService.findBySourceAndTarget(source, target);
             // attest the flow
-            attestationService.create(ImmutableAttestation.builder()
-                    .entityReference(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, logicalFlow.id().get()))
-                    .attestationType(AttestationType.EXPLICIT)
-                    .attestedBy(username)
-                    .comments("Creation of physical flow via Waltz")
-                    .provenance(PROVENANCE)
-                    .build(), username);
+            attestationService.explicitlyAttest(LOGICAL_DATA_FLOW, logicalFlow.id().get(), username, ATTESTATION_COMMENT);
 
             if(logicalFlow == null) {
                 Optional<String> defaultDataTypeCode = settingsService.getValue(DEFAULT_DATATYPE_CODE_SETTING_NAME);
@@ -318,7 +302,7 @@ public class PhysicalFlowService {
                 .message(message)
                 .severity(Severity.INFORMATION)
                 .userId(userId)
-                .childKind(EntityKind.PHYSICAL_FLOW)
+                .childKind(PHYSICAL_FLOW)
                 .operation(operation)
                 .build();
 

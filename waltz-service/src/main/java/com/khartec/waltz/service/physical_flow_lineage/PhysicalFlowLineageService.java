@@ -20,11 +20,7 @@ package com.khartec.waltz.service.physical_flow_lineage;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.physical_flow_lineage.PhysicalFlowLineageDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.attestation.AttestationType;
-import com.khartec.waltz.model.attestation.ImmutableAttestation;
 import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineage;
 import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineageAddCommand;
@@ -38,6 +34,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
 
 
 @Service
@@ -93,19 +90,9 @@ public class PhysicalFlowLineageService {
         checkNotNull(addCommand, "addCommand cannot be null");
         CommandResponse<PhysicalFlowLineageAddCommand> response = physicalFlowLineageDao.addContribution(addCommand);
 
-        ImmutableAttestation described = ImmutableAttestation.builder()
-                .entityReference(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, addCommand.describedFlowId()))
-                .attestationType(AttestationType.IMPLICIT)
-                .attestedBy(addCommand.lastUpdate().by())
-                .attestedAt(addCommand.lastUpdate().at())
-                .comments("Implied by lineage creation")
-                .build();
-
-        ImmutableAttestation contributing = ImmutableAttestation.copyOf(described)
-                .withEntityReference(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, addCommand.contributingFlowId()));
-
-        attestationService.create(described, addCommand.lastUpdate().by());
-        attestationService.create(contributing, addCommand.lastUpdate().by());
+        final String attestationComment = "Implied by lineage creation";
+        attestationService.implicitlyAttest(PHYSICAL_FLOW, addCommand.describedFlowId(), addCommand.lastUpdate().by(), attestationComment);
+        attestationService.implicitlyAttest(PHYSICAL_FLOW, addCommand.contributingFlowId(), addCommand.lastUpdate().by(), attestationComment);
 
         return response;
     }

@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 
 
 @Service
@@ -138,13 +139,11 @@ public class LogicalFlowService {
         auditFlowChange("added", flow, username, Operation.ADD);
         LogicalFlow logicalFlow = logicalFlowDao.addFlow(flow);
 
-        attestationService.create(ImmutableAttestation.builder()
-                .entityReference(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, logicalFlow.id().get()))
-                .attestationType(AttestationType.EXPLICIT)
-                .attestedBy(username)
-                .comments("Creation of logical flow via Waltz")
-                .provenance(PROVENANCE)
-                .build(), username);
+        attestationService.explicitlyAttest(
+                LOGICAL_DATA_FLOW,
+                logicalFlow.id().get(),
+                username,
+                "Creation of logical flow via Waltz");
 
         return logicalFlow;
     }
@@ -163,7 +162,7 @@ public class LogicalFlowService {
         dataTypeUsageService.recalculateForApplications(affectedEntityRefs.toArray(new EntityReference[affectedEntityRefs.size()]));
 
         flowIds.forEach(logicalFlowId -> {
-            attestationService.deleteForEntity(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, logicalFlowId), username);
+            attestationService.deleteForEntity(EntityReference.mkRef(LOGICAL_DATA_FLOW, logicalFlowId), username);
         });
 
         return deleted;
@@ -180,7 +179,7 @@ public class LogicalFlowService {
                         verb,
                         flow.source().name().orElse(Long.toString(flow.source().id())),
                         flow.target().name().orElse(Long.toString(flow.target().id()))))
-                .childKind(EntityKind.LOGICAL_DATA_FLOW)
+                .childKind(LOGICAL_DATA_FLOW)
                 .operation(operation)
                 .build();
 
