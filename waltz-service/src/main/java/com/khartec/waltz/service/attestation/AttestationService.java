@@ -25,6 +25,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.attestation.Attestation;
+import com.khartec.waltz.model.attestation.AttestationType;
 import com.khartec.waltz.model.attestation.ImmutableAttestation;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
@@ -60,7 +61,39 @@ public class AttestationService {
     }
 
 
-    public boolean create(Attestation attestation, String username) {
+    public boolean implicitlyAttest(EntityKind kind, long id, String username, String comments) {
+        return attest(kind, id, AttestationType.IMPLICIT, username, comments);
+    }
+
+
+    public boolean explicitlyAttest(EntityKind kind, long id, String username, String comments) {
+        return attest(kind, id, AttestationType.EXPLICIT, username, comments);
+    }
+
+
+    public boolean deleteForEntity(EntityReference reference, String username) {
+        boolean success = attestationDao.deleteForEntity(reference);
+        if(success) {
+            logChange(username,
+                    reference,
+                    "Attestation deleted due to parent deletion",
+                    Operation.REMOVE);
+        }
+        return success;
+    }
+
+
+    private boolean attest(EntityKind kind, long id, AttestationType type, String username, String comments) {
+        return create(ImmutableAttestation.builder()
+                .entityReference(EntityReference.mkRef(kind, id))
+                .attestationType(type)
+                .attestedBy(username)
+                .comments(comments)
+                .build(), username);
+    }
+
+
+    private boolean create(Attestation attestation, String username) {
 
         ImmutableAttestation at = ImmutableAttestation
                 .copyOf(attestation)
@@ -73,18 +106,6 @@ public class AttestationService {
                     attestation.entityReference(),
                     "Attestation created",
                     Operation.ADD);
-        }
-        return success;
-    }
-
-
-    public boolean deleteForEntity(EntityReference reference, String username) {
-        boolean success = attestationDao.deleteForEntity(reference);
-        if(success) {
-            logChange(username,
-                    reference,
-                    "Attestation deleted due to parent deletion",
-                    Operation.REMOVE);
         }
         return success;
     }

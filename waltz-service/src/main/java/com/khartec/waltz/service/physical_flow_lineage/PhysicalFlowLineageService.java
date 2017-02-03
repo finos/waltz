@@ -25,6 +25,7 @@ import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineage;
 import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineageAddCommand;
 import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineageRemoveCommand;
+import com.khartec.waltz.service.attestation.AttestationService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,21 +34,26 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
 
 
 @Service
 public class PhysicalFlowLineageService {
 
+    private final AttestationService attestationService;
     private final PhysicalFlowLineageDao physicalFlowLineageDao;
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
 
 
     @Autowired
-    public PhysicalFlowLineageService(ApplicationIdSelectorFactory applicationIdSelectorFactory,
+    public PhysicalFlowLineageService(AttestationService attestationService,
+                                      ApplicationIdSelectorFactory applicationIdSelectorFactory,
                                       PhysicalFlowLineageDao physicalFlowLineageDao) {
+        checkNotNull(attestationService, "attestationService cannot be null");
         checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
         checkNotNull(physicalFlowLineageDao, "physicalFlowLineageDao cannot be null");
 
+        this.attestationService = attestationService;
         this.applicationIdSelectorFactory = applicationIdSelectorFactory;
         this.physicalFlowLineageDao = physicalFlowLineageDao;
     }
@@ -82,6 +88,12 @@ public class PhysicalFlowLineageService {
 
     public CommandResponse<PhysicalFlowLineageAddCommand> addContribution(PhysicalFlowLineageAddCommand addCommand) {
         checkNotNull(addCommand, "addCommand cannot be null");
-        return physicalFlowLineageDao.addContribution(addCommand);
+        CommandResponse<PhysicalFlowLineageAddCommand> response = physicalFlowLineageDao.addContribution(addCommand);
+
+        final String attestationComment = "Implied by lineage creation";
+        attestationService.implicitlyAttest(PHYSICAL_FLOW, addCommand.describedFlowId(), addCommand.lastUpdate().by(), attestationComment);
+        attestationService.implicitlyAttest(PHYSICAL_FLOW, addCommand.contributingFlowId(), addCommand.lastUpdate().by(), attestationComment);
+
+        return response;
     }
 }

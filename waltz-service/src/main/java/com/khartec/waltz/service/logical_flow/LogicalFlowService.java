@@ -25,12 +25,15 @@ import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.attestation.AttestationType;
+import com.khartec.waltz.model.attestation.ImmutableAttestation;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowStatistics;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlowMeasures;
 import com.khartec.waltz.model.logical_flow.LogicalFlowStatistics;
 import com.khartec.waltz.model.tally.TallyPack;
+import com.khartec.waltz.service.attestation.AttestationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
@@ -48,11 +51,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 
 
 @Service
 public class LogicalFlowService {
 
+    private static final String PROVENANCE = "waltz";
+
+    private final AttestationService attestationService;
     private final LogicalFlowDao logicalFlowDao;
     private final LogicalFlowStatsDao logicalFlowStatsDao;
     private final DataFlowDecoratorService dataFlowDecoratorService;
@@ -64,7 +71,8 @@ public class LogicalFlowService {
 
 
     @Autowired
-    public LogicalFlowService(LogicalFlowDao logicalFlowDao,
+    public LogicalFlowService(AttestationService attestationService,
+                              LogicalFlowDao logicalFlowDao,
                               LogicalFlowStatsDao logicalFlowStatsDao,
                               DataFlowDecoratorService dataFlowDecoratorService,
                               ApplicationIdSelectorFactory appIdSelectorFactory,
@@ -72,6 +80,7 @@ public class LogicalFlowService {
                               DataTypeUsageService dataTypeUsageService,
                               ChangeLogService changeLogService,
                               DBExecutorPoolInterface dbExecutorPool) {
+        checkNotNull(attestationService, "attestationService cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
         checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
@@ -81,6 +90,7 @@ public class LogicalFlowService {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
 
+        this.attestationService = attestationService;
         this.appIdSelectorFactory = appIdSelectorFactory;
         this.logicalFlowStatsDao = logicalFlowStatsDao;
         this.logicalFlowDao = logicalFlowDao;
@@ -127,7 +137,15 @@ public class LogicalFlowService {
         }
 
         auditFlowChange("added", flow, username, Operation.ADD);
-        return logicalFlowDao.addFlow(flow);
+        LogicalFlow logicalFlow = logicalFlowDao.addFlow(flow);
+
+        attestationService.explicitlyAttest(
+                LOGICAL_DATA_FLOW,
+                logicalFlow.id().get(),
+                username,
+                "Creation of logical flow via Waltz");
+
+        return logicalFlow;
     }
 
 
@@ -143,8 +161,13 @@ public class LogicalFlowService {
         logicalFlows.forEach(flow -> auditFlowChange("removed", flow, username, Operation.REMOVE));
         dataTypeUsageService.recalculateForApplications(affectedEntityRefs.toArray(new EntityReference[affectedEntityRefs.size()]));
 
+        flowIds.forEach(logicalFlowId -> {
+            attestationService.deleteForEntity(EntityReference.mkRef(LOGICAL_DATA_FLOW, logicalFlowId), username);
+        });
+
         return deleted;
     }
+
 
     private void auditFlowChange(String verb, LogicalFlow flow, String username, Operation operation) {
         ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
@@ -156,7 +179,7 @@ public class LogicalFlowService {
                         verb,
                         flow.source().name().orElse(Long.toString(flow.source().id())),
                         flow.target().name().orElse(Long.toString(flow.target().id()))))
-                .childKind(EntityKind.LOGICAL_DATA_FLOW)
+                .childKind(LOGICAL_DATA_FLOW)
                 .operation(operation)
                 .build();
 
