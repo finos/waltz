@@ -22,6 +22,7 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.survey.SurveyQuestionService;
 import com.khartec.waltz.service.survey.SurveyRunService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -37,6 +38,8 @@ public class SurveyHarness {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
+        SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
+        surveyQuestionService.findForTemplate(1).forEach(System.out::println);
 
         IdSelectionOptions idSelectionOptions = ImmutableIdSelectionOptions.builder()
                 .entityReference(ImmutableEntityReference.mkRef(EntityKind.APP_GROUP, 1))
