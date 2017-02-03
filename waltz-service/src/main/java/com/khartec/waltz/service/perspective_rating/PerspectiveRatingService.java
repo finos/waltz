@@ -18,16 +18,20 @@
 
 package com.khartec.waltz.service.perspective_rating;
 
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.perspective_rating.PerspectiveRatingDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.perspective.PerspectiveDefinition;
 import com.khartec.waltz.model.perspective.PerspectiveRating;
+import com.khartec.waltz.model.perspective.PerspectiveRatingValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.map;
 
 
 @Service
@@ -57,4 +61,22 @@ public class PerspectiveRatingService {
         return findForEntity(defn.categoryX(), defn.categoryY(), ref);
     }
 
+
+    public int updatePerspectiveRatings(long categoryX,
+                                         long categoryY,
+                                         EntityReference ref,
+                                         String username,
+                                         Set<PerspectiveRatingValue> pendingValues) {
+        List<PerspectiveRating> existingRatings = findForEntity(categoryX, categoryY, ref);
+        Set<PerspectiveRatingValue> existingValues = SetUtilities.fromCollection(
+                map(existingRatings, PerspectiveRating::value));
+
+        Set<PerspectiveRatingValue> removals = SetUtilities.minus(existingValues, pendingValues);
+        Set<PerspectiveRatingValue> additions = SetUtilities.minus(pendingValues, existingValues);
+
+        int removalCount = perspectiveRatingDao.remove(ref, removals);
+        int additionCount = perspectiveRatingDao.add(ref, additions, username);
+
+        return removalCount + additionCount;
+    }
 }

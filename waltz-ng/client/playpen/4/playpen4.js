@@ -56,13 +56,13 @@ function controller($q,
         .findByAppSelector(idSelector)
         .then(ratings => vm.measurableRatings = ratings);
 
-    vm.saveChanges = (changes) => {
-        vm.perspectiveRatings = _.unionBy(
-            changes,
-            vm.perspectiveRatings,
-            r => r.measurableX + '_' + r.measurableY);
+    vm.save = (values = []) => {
+        const p = vm.perspectiveDefinition;
+        return perspectiveRatingStore
+            .updateForEntity(p.categoryX, p.categoryY, entityReference, values)
+            .then(() => perspectiveRatingStore.findForEntity(p.categoryX, p.categoryY, entityReference))
+            .then(rs => vm.perspectiveRatings = rs);
 
-        return $q.resolve();
     };
 
 }

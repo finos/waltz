@@ -20,16 +20,16 @@ package com.khartec.waltz.model.perspective;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdatedProvider;
+import com.khartec.waltz.model.rating.RagRating;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutablePerspectiveRating.class)
-@JsonDeserialize(as = ImmutablePerspectiveRating.class)
-public abstract class PerspectiveRating implements
-        LastUpdatedProvider {
+@JsonSerialize(as = ImmutablePerspectiveRatingValue.class)
+@JsonDeserialize(as = ImmutablePerspectiveRatingValue.class)
+public abstract class PerspectiveRatingValue {
 
-    public abstract EntityReference entityReference();
-    public abstract PerspectiveRatingValue value();
+    public abstract RagRating rating();
+    public abstract long measurableX();
+    public abstract long measurableY();
+
 }

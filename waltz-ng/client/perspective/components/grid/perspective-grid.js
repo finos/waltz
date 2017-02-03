@@ -202,8 +202,7 @@ function calculateCellTranslation(d) {
         dx: scales.x(d.measurableX),
         dy: scales.y(d.measurableY),
     };
-
-    return `translate(${ translation.dx } ,${ translation.dy })`;
+    return `translate(${ translation.dx }, ${ translation.dy })`;
 }
 
 
@@ -224,9 +223,7 @@ function drawExistingOverrides(selection, overrides = []) {
             .attr('y', cellDimensions.t)
             .attr('width', cellDimensions.w)
             .attr('height', cellDimensions.h)
-            .attr('fill', d => {
-                return ragColorScale(d.rating).brighter(1.3);
-            })
+            .attr('fill', d => ragColorScale(d.rating).brighter(1.3))
             ;
     };
 
@@ -493,7 +490,7 @@ function controller($element) {
         }
 
         const canRefresh = (vm.existingOverrides || vm.pendingOverrides)
-            && vm.svg;
+            && vm.svg && canDraw;
 
         if (canRefresh) {
             vm.svg.call(drawExistingOverrides, vm.existingOverrides);
