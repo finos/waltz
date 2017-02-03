@@ -1291,5 +1291,17 @@
             </column>
         </createTable>
     </changeSet>
-   
+
+
+    <!-- 1471: Survey Question Help Text -->
+    <changeSet id="20170203-1471-1"
+               author="rovats">
+        <addColumn tableName="survey_question">
+            <column name="help_text"
+                    type="${longvarchar.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
