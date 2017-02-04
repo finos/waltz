@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import { variableScale } from '../../common/colors';
+
 
 const initData = {
     candidateSpecifications: [],
@@ -24,41 +25,23 @@ const initData = {
 };
 
 
-function controller($q,
-                    $scope,
-                    notification,
-                    physicalSpecificationStore) {
+function controller() {
     const vm = Object.assign(this, initData);
 
-    const appId = 66779;
-    const sourceEntity = {
-        kind: 'APPLICATION',
-        id: appId
+    vm.config = {
+        labelProvider: d => d.key,
+        colorProvider: d => variableScale(d.data.key)
     };
 
-    vm.sourceEntity = sourceEntity;
-
-    physicalSpecificationStore
-        .findByEntityReference(sourceEntity)
-        .then(xs => vm.candidateSpecifications = xs);
-
-    vm.changeSpecification = (spec) => {
-        notification.info("Specification selected: " + spec.name);
-        vm.current = spec;
-        vm.cancel();
-    };
-
-    vm.cancel = () => vm.visible = false;
-
+    vm.data = [
+        { key: 'A', count: 10 },
+        { key: 'B', count: 5 },
+        { key: 'C', count: 5000 },
+    ];
 }
 
 
 controller.$inject = [
-    '$q',
-    '$scope',
-    'Notification',
-    'PhysicalSpecificationStore',
-    'PhysicalFlowStore'
 ];
 
 
