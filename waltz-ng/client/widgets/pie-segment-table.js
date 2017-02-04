@@ -19,12 +19,16 @@ import _ from "lodash";
 import {variableScale} from "../common/colors";
 import {numberFormatter} from "../common";
 
+
 const bindings = {
     config: '<',
     data: '<',
     headings: '<',
     selectedSegmentKey: '<'
 };
+
+
+const template = require('./pie-segment-table.html');
 
 
 const initialState = {
@@ -47,7 +51,8 @@ function controller() {
 
     vm.$onChanges = (changes) => {
         if (changes.data) {
-            vm.total = numberFormatter(_.sumBy(vm.data, 'count'), 2);
+            vm.total = _.sumBy(vm.data, 'count');
+            vm.totalStr = numberFormatter(vm.total);
         }
 
         if (changes.config) {
@@ -65,7 +70,7 @@ function controller() {
 
         return denominator === 0
             ? '-'
-            : Number((numerator / denominator) * 100).toFixed(1);
+            : Number(((numerator / denominator) * 100).toFixed(1)).toString();
     };
 }
 
@@ -73,7 +78,7 @@ function controller() {
 const component = {
     bindings,
     controller,
-    template: require('./pie-segment-table.html')
+    template
 };
 
 

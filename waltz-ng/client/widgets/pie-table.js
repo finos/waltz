@@ -34,7 +34,9 @@ function controller() {
     const vm = this;
 
     const defaultOnSelect = (d) => {
-        vm.selectedSegmentKey = d ? d.key : null;
+        vm.selectedSegmentKey = d
+            ? d.key
+            : null;
     };
 
     const dataChanged = (data = []) => {
@@ -61,7 +63,10 @@ function controller() {
         dataChanged(vm.data);
 
         if (changes.config) {
-            vm.config = Object.assign({}, { onSelect: defaultOnSelect }, vm.config);
+            vm.config = Object.assign(
+                {},
+                { onSelect: defaultOnSelect },
+                vm.config);
         }
     };
 

@@ -11,31 +11,14 @@
 
     <waltz-section name="foo">
 
-        <button class="btn"
-                ng-click="ctrl.visible = true">
-            Show
-        </button>
 
-        <hr>
-
-
-        <div class="row"
-             ng-if="ctrl.visible">
-            <div class="col-md-12">
-                <waltz-physical-flow-edit-specification owning-entity="ctrl.sourceEntity"
-                                                        candidates="ctrl.candidateSpecifications.produces"
-                                                        current="ctrl.current"
-                                                        on-dismiss="ctrl.cancel"
-                                                        on-change="ctrl.changeSpecification">
-                    <!--
-                    Picker or add new, on-change cannot give a null spec, but can give a spec with
-                    a null id (indicating new)
-                    -->
-                </waltz-physical-flow-edit-specification>
-
-            </div>
-        </div>
-
+        <waltz-pie-table x-data="ctrl.data"
+                         config="ctrl.config"
+                         title="Dummy"
+                         subTitle="Pie"
+                         icon="rocket"
+                         selectedSegmentKey="">
+        </waltz-pie-table>
 
 
     </waltz-section>

@@ -217,7 +217,7 @@ const variableScaleMap = _.reduce(
 const randomColorScale = scaleOrdinal(schemeCategory20c);
 
 
-export const variableScale = (x) => {
+export const variableScale = (x = '') => {
     const key = x.toUpperCase();
     const foundColor = variableScaleMap[key];
     return foundColor || rgb(randomColorScale(x));
