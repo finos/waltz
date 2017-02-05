@@ -97,7 +97,6 @@ export const entityNames = {
     ASSET_COST: 'Asset Cost',
     AUTHORITATIVE_SOURCE: "Authoritative Source",
     BOOKMARK: 'Bookmark',
-    CAPABILITY: 'Function',
     CHANGE_INITIATIVE: 'Change Initiative',
     DATABASE: 'Database',
     DATA_TYPE: 'Data Type',
