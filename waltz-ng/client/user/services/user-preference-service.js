@@ -18,7 +18,7 @@
  */
 
 import _ from "lodash";
-import {stringToBoolean} from "../../common";
+import {stringToBoolean} from "../../common/string-utils";
 
 let preferencePromise = null;
 

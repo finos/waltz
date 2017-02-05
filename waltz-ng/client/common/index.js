@@ -225,23 +225,6 @@ export function initialiseData(vm, initData) {
 }
 
 
-export function stringToBoolean(string){
-    switch(string.toLowerCase().trim()){
-        case "true":
-        case "yes":
-        case "1":
-            return true;
-        case "false":
-        case "no":
-        case "0":
-        case null:
-        case undefined:
-            return false;
-        default:
-            return Boolean(string);
-    }
-}
-
 
 /**
  * Invokes a function and also passes in any provided arguments in order
