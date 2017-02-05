@@ -418,7 +418,6 @@ function drawColTitles(elem, axis) {
         .filter(d => d.measurable.name.length > 32)
         .append('title')
         .text(d => d.measurable.name)
-
         ;
 
     colTitles
