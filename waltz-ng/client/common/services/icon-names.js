@@ -38,7 +38,6 @@ export const entityIconNames = {
     ASSET_COST: 'money',
     AUTHORITATIVE_SOURCE: "shield",
     BOOKMARK: 'bookmark-o',
-    CAPABILITY: 'puzzle-piece',
     CHANGE_INITIATIVE: 'paper-plane-o',
     DATABASE: 'database',
     DATA_TYPE: 'qrcode',

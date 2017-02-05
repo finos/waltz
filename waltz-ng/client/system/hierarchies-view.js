@@ -22,7 +22,6 @@ import {initialiseData, kindToViewState} from "../common";
 const initialState = {
     combinedTallies: [],
     kinds: [
-        'CAPABILITY',
         'CHANGE_INITIATIVE',
         'DATA_TYPE',
         'ENTITY_STATISTIC',

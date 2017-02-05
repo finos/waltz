@@ -193,9 +193,6 @@ export function kindToViewState(kind) {
     if (kind === 'APP_GROUP') {
         return "main.app-group.view";
     }
-    if (kind === 'CAPABILITY') {
-        return "main.capability.view";
-    }
     if (kind === 'DATA_TYPE') {
         return "main.data-type.view";
     }

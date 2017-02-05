@@ -1314,4 +1314,15 @@
     </changeSet>
 
 
+    <!-- 1478: Source Data Ratings - remove CAPABILITY -->
+    <changeSet author="dwatkins"
+               id="20170205-1478-1">
+        <sql>
+            UPDATE source_data_rating
+            SET entity_kind = 'MEASURABLE'
+            WHERE entity_kind = 'CAPABILITY'
+        </sql>
+    </changeSet>
+
+
 </databaseChangeLog>
