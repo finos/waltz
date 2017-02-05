@@ -1325,4 +1325,36 @@
     </changeSet>
 
 
+    <!-- 1478: Source Data Ratings - remove CAPABILITY -->
+    <changeSet author="dwatkins"
+               dbms="mssql"
+               id="20170205-1477-1a">
+        <sql>
+            UPDATE cl
+            SET cl.parent_kind = 'MEASURABLE', cl.parent_id = m.id
+            FROM change_log cl
+            INNER JOIN measurable m
+              ON m.external_id = cl.parent_id
+            INNER JOIN measurable_category mc
+              ON m.measurable_category_id = mc.id
+            WHERE cl.parent_kind = 'CAPABILITY'
+              AND mc.external_id = 'CAPABILITY'
+        </sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               dbms="mysql"
+               id="20170205-1477-1b">
+        <sql>
+            UPDATE change_log cl
+            INNER JOIN measurable m
+              ON m.external_id = cl.parent_id
+            INNER JOIN measurable_category mc
+              ON m.measurable_category_id = mc.id
+            SET cl.parent_kind = 'MEASURABLE', cl.parent_id = m.id
+            WHERE cl.parent_kind = 'CAPABILITY'
+              AND mc.external_id = 'CAPABILITY'
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
