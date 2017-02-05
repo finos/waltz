@@ -16,7 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {initialiseData, isEmpty, mkLinkGridCell} from "../../common";
+import {initialiseData, isEmpty} from "../../common";
+import {mkLinkGridCell} from "../../common/link-utils";
 
 const bindings = {
     complexity: '<',

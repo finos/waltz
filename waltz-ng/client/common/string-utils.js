@@ -77,3 +77,68 @@ export function stringToBoolean(str = ''){
             return Boolean(str);
     }
 }
+
+
+
+/**
+ * Given a url, turns it to a domain name i.e. www.test.com/blah becomes www.test.com
+ * if a mail link is supplied, i.e. mailto:mail@somewhere.com, this becomes mail@somehwere.com
+ * @param url
+ * @returns {*}
+ */
+export function toDomain(url) {
+    let domain;
+    //find & remove protocol (http, ftp, etc.) and get domain
+    if (url.indexOf("://") > -1) {
+        domain = url.split('/')[2];
+    } else if(url.indexOf("mailto:") > -1) {
+        domain = url.split('mailto:')[1];
+    }
+    else {
+        domain = url.split('/')[0];
+    }
+
+    //find & remove port number
+    domain = domain.split(':')[0];
+
+    return domain;
+}
+
+
+/**
+ * https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions#Using_Special_Characters
+ */
+export function escapeRegexCharacters(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+
+/**
+ * Takes a number and limits it to the given number
+ * of digits.
+ * Examples:
+ *   numberFormatter(500_000, 0) :: 500k
+ *   numberFormatter(5_000_000, 0) :: 5M
+ *   numberFormatter(5_000_000_000, 0) :: 5B
+ * @param num
+ * @param digits
+ * @returns {*}
+ */
+export function numberFormatter(num, digits = 0) {
+    const si = [
+        { value: 1E12, symbol: "T" },
+        { value: 1E9,  symbol: "B" },
+        { value: 1E6,  symbol: "M" },
+        { value: 1E3,  symbol: "k" }
+    ];
+
+    for (let i = 0; i < si.length; i++) {
+        if (num >= si[i].value) {
+            return (num / si[i].value)
+                    .toFixed(digits)
+                    .replace(/\.?0+$/, "") + si[i].symbol;
+        }
+    }
+    return num;
+}
+

@@ -16,7 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {kindToViewState, resetData} from "../common";
+import {resetData} from "../common";
+import {kindToViewState} from "../common/link-utils";
 import {hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload} from "./utilities";
 
 

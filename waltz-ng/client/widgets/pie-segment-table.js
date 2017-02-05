@@ -17,7 +17,7 @@
  */
 import _ from "lodash";
 import {variableScale} from "../common/colors";
-import {numberFormatter} from "../common";
+import {numberFormatter} from "../common/string-utils";
 
 
 const bindings = {
