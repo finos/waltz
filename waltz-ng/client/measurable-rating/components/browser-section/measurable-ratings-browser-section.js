@@ -17,7 +17,8 @@
  */
 
 import _ from 'lodash';
-import {initialiseData, mkLinkGridCell} from '../../../common';
+import {initialiseData} from '../../../common';
+import {mkLinkGridCell} from '../../../common/link-utils';
 
 /**
  * @name waltz-measurable-ratings-browser

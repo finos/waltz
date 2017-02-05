@@ -16,7 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData, mkEntityLinkGridCell, mkLinkGridCell, termSearch, invokeFunction} from "../../../common";
+import {initialiseData, termSearch, invokeFunction} from "../../../common";
+import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/link-utils";
 
 const bindings = {
     lineage: '<',

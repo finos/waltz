@@ -18,7 +18,7 @@
 
 import _ from "lodash";
 import {toGridOptions, assetCostKindNames} from "./../../common/services/display-names";
-import {mkEntityLinkGridCell} from "../../common";
+import {mkEntityLinkGridCell} from "../../common/link-utils";
 
 const DEFAULT_OPTIONS = {
     showAssetCode: true,

@@ -57,11 +57,6 @@ export function groupAndMap(coll = [], keyFn = d => d.id, valFn = d => d) {
 }
 
 
-// https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions#Using_Special_Characters
-export function escapeRegexCharacters(str) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 
 export function noop() {}
 
@@ -90,36 +85,6 @@ export function perhaps(fn, dflt) {
     } catch (e) {
         return dflt;
     }
-}
-
-
-/**
- * Takes a number and limits it to the given number
- * of digits.
- * Examples:
- *   numberFormatter(500_000, 0) :: 500k
- *   numberFormatter(5_000_000, 0) :: 5M
- *   numberFormatter(5_000_000_000, 0) :: 5B
- * @param num
- * @param digits
- * @returns {*}
- */
-export function numberFormatter(num, digits = 0) {
-    const si = [
-        { value: 1E12, symbol: "T" },
-        { value: 1E9,  symbol: "B" },
-        { value: 1E6,  symbol: "M" },
-        { value: 1E3,  symbol: "k" }
-    ];
-
-    for (let i = 0; i < si.length; i++) {
-        if (num >= si[i].value) {
-            return (num / si[i].value)
-                    .toFixed(digits)
-                    .replace(/\.?0+$/, "") + si[i].symbol;
-        }
-    }
-    return num;
 }
 
 
@@ -176,45 +141,6 @@ export function toKeyCounts(items = [], fn = x => x) {
 }
 
 
-/**
- * Given an entity kind, this will return the matching
- * ui-router state name if avaialble.  Otherwise it
- * will throw an error.
- * @param kind
- * @returns String state name
- */
-export function kindToViewState(kind) {
-    if (kind === 'APPLICATION') {
-        return "main.app.view";
-    }
-    if (kind === 'ACTOR') {
-        return "main.actor.view";
-    }
-    if (kind === 'APP_GROUP') {
-        return "main.app-group.view";
-    }
-    if (kind === 'DATA_TYPE') {
-        return "main.data-type.view";
-    }
-    if (kind === 'MEASURABLE') {
-        return "main.measurable.view";
-    }
-    if (kind === 'ORG_UNIT') {
-        return "main.org-unit.view";
-    }
-    if (kind === 'CHANGE_INITIATIVE') {
-        return "main.change-initiative.view";
-    }
-    if (kind === 'ENTITY_STATISTIC') {
-        return "main.entity-statistic.view";
-    }
-    if (kind === 'PROCESS') {
-        return "main.process.view";
-    }
-    throw "Unable to convert kind: "+kind+ " to a ui-view state";
-}
-
-
 export function resetData(vm, initData = {}) {
     return Object.assign(vm, _.cloneDeep(initData));
 }
@@ -237,52 +163,15 @@ export function invokeFunction(fn) {
         const parameters = _.slice(arguments, 1);
         return fn(...parameters);
     }
-    console.log("invokeFunction - attempted to invoke emtpy function: ", fn)
+    console.log("invokeFunction - attempted to invoke empty function: ", fn)
     return null;
 }
 
 
-/**
- * Creates a column def to render an entity link
- *
- * eg: usage: mkEntityLinkGridCell('Source', 'source', 'none')
- *
- * @param columnHeading column display name
- * @param entityRefField field name in grid data that stores the entity ref for which the link needs to be rendered
- * @param iconPlacement icon position, allowed values: left, right, none
- * @returns {{field: *, displayName: *, cellTemplate: string}}
- */
-export function mkEntityLinkGridCell(columnHeading, entityRefField, iconPlacement = 'left') {
-    return {
-        field: entityRefField + '.name',
-        displayName: columnHeading,
-        cellTemplate: `<div class="ui-grid-cell-contents"><waltz-entity-link entity-ref="row.entity['${entityRefField}']" icon-placement="'${iconPlacement}'"></waltz-entity-link></div>`
-    };
-}
-
-
-/**
- * Creates a column def to render a link with an id parameter
- *
- * @param columnHeading column display name
- * @param displayField field name that stores the value to be displayed on the grid
- * @param linkIdField field name that stores the link id field
- * @param linkNavViewName navigation view name
- * @returns {{field: *, displayName: *, cellTemplate: string}}
- */
-export function mkLinkGridCell(columnHeading, displayField, linkIdField, linkNavViewName) {
-    return {
-        field: displayField,
-        displayName: columnHeading,
-        cellTemplate: `<div class="ui-grid-cell-contents">\n<a ui-sref="${linkNavViewName} ({ id: row.entity.${linkIdField} })" ng-bind="COL_FIELD">\n</a>\n</div>`
-    };
-}
-
-
-export function toEntityRef(obj) {
+export function toEntityRef(obj, kind = obj.kind) {
     const ref = {
         id: obj.id,
-        kind: obj.kind,
+        kind,
         name: obj.name,
         description: obj.description
     };
@@ -290,30 +179,5 @@ export function toEntityRef(obj) {
     checkIsEntityRef(ref);
 
     return ref;
-}
-
-
-/**
- * Given a url, turns it to a domain name i.e. www.test.com/blah becomes www.test.com
- * if a mail link is supplied, i.e. mailto:mail@somewhere.com, this becomes mail@somehwere.com
- * @param url
- * @returns {*}
- */
-export function toDomain(url) {
-    let domain;
-    //find & remove protocol (http, ftp, etc.) and get domain
-    if (url.indexOf("://") > -1) {
-        domain = url.split('/')[2];
-    } else if(url.indexOf("mailto:") > -1) {
-        domain = url.split('mailto:')[1];
-    }
-    else {
-        domain = url.split('/')[0];
-    }
-
-    //find & remove port number
-    domain = domain.split(':')[0];
-
-    return domain;
 }
 

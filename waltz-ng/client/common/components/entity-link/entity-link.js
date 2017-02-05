@@ -16,7 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData, kindToViewState} from "../../../common";
+import {initialiseData} from "../../../common";
+import {kindToViewState} from "../../../common/link-utils";
 
 
 const bindings = {

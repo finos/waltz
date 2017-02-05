@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {numberFormatter} from "../../common";
+import {numberFormatter} from "../../common/string-utils";
 
 
 /**

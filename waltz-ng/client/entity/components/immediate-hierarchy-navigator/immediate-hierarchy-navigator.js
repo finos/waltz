@@ -17,7 +17,7 @@
  */
 
 import _ from "lodash";
-import {kindToViewState} from "../../../common";
+import {kindToViewState} from "../../../common/link-utils";
 
 const bindings = {
     parents: '<',

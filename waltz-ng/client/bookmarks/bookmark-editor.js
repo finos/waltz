@@ -18,7 +18,7 @@
  */
 
 import angular from "angular";
-import {kindToViewState} from "../common";
+import {kindToViewState} from "../common/link-utils";
 
 
 function controller($state,

@@ -16,7 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData, mkEntityLinkGridCell, mkLinkGridCell} from "../../../common";
+import {initialiseData} from "../../../common";
+import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/link-utils";
 
 
 const template = require('./physical-flow-lineage-panel.html');

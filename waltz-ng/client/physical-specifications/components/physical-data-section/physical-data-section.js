@@ -18,7 +18,8 @@
 
 import _ from "lodash";
 import {combineFlowData, enrichConsumes} from "../../utilities";
-import {initialiseData, mkEntityLinkGridCell, mkLinkGridCell, termSearch} from "../../../common";
+import {initialiseData, termSearch} from "../../../common";
+import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/link-utils";
 
 
 const bindings = {

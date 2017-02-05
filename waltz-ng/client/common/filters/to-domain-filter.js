@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {toDomain} from "../../common";
+import {toDomain} from "../../common/string-utils";
 
 function filter() {
     return (url) => toDomain(url);

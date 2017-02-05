@@ -17,7 +17,8 @@
  */
 
 import _ from "lodash";
-import {initialiseData, kindToViewState} from "../common";
+import {initialiseData} from "../common";
+import {kindToViewState} from "../common/link-utils";
 
 const initialState = {
     combinedTallies: [],
