@@ -16,7 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {stringToBoolean, initialiseData} from "../common";
+import {initialiseData} from "../common";
+import {stringToBoolean} from "../common/string-utils";
 
 
 const bindings = {

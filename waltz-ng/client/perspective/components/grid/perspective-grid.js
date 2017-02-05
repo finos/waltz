@@ -23,7 +23,9 @@ import {path} from 'd3-path';
 import {nest} from 'd3-collection';
 import {initialiseData} from '../../../common';
 import {ragColorScale} from '../../../common/colors';
+import {truncateMiddle} from '../../../common/string-utils';
 import {mkPerspective} from '../../perpective-utilities';
+
 
 
 /**
@@ -364,9 +366,12 @@ function drawRowTitles(elem, axis) {
     const drawText = (selection) => selection
         .append('text')
         .classed('row-title', true)
-        .text(d => d.measurable.name)
+        .text(d => truncateMiddle(d.measurable.name, 32))
         .attr('text-anchor', 'end')
         .attr('transform', d => `translate(-${labelPadding},  ${scales.y(d.measurable.id) + scales.y.bandwidth() / 2})`)
+        .filter(d => d.measurable.name.length > 32)
+        .append('title')
+        .text(d => d.measurable.name)
         ;
 
     const rowTitles = elem
@@ -406,10 +411,14 @@ function drawColTitles(elem, axis) {
     const drawText = selection => selection
         .append('text')
         .classed('col-title', true)
-        .text(d => d.measurable.name)
+        .text(d => truncateMiddle(d.measurable.name, 32))
         .attr('text-anchor', 'start')
         .attr('transform', d =>
             `translate(${scales.x(d.measurable.id) + scales.x.bandwidth() / 3}, -${labelPadding}) rotate(-20)`)
+        .filter(d => d.measurable.name.length > 32)
+        .append('title')
+        .text(d => d.measurable.name)
+
         ;
 
     colTitles
