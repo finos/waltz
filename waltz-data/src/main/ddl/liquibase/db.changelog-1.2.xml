@@ -1356,5 +1356,14 @@
               AND mc.external_id = 'CAPABILITY'
         </sql>
     </changeSet>
+  
+  <changeSet author="dwatkins"
+               id="20170205-1477-2">
+        <sql>
+            UPDATE change_log 
+            SET child_kind = 'MEASURABLE'
+            WHERE child_kind = 'CAPABILITY'
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>
