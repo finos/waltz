@@ -22,6 +22,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
+import com.khartec.waltz.data.perspective_rating.PerspectiveRatingDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.measurable.Measurable;
@@ -51,6 +52,7 @@ public class MeasurableRatingService {
     private final MeasurableRatingDao measurableRatingDao;
     private final MeasurableDao measurableDao;
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory;
+    private final PerspectiveRatingDao perspectiveRatingDao;
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
     private final ChangeLogService changeLogService;
 
@@ -59,17 +61,20 @@ public class MeasurableRatingService {
     public MeasurableRatingService(MeasurableRatingDao measurableRatingDao,
                                    MeasurableDao measurableDao,
                                    MeasurableIdSelectorFactory measurableIdSelectorFactory,
-                                   ApplicationIdSelectorFactory applicationIdSelectorFactory, 
+                                   PerspectiveRatingDao perspectiveRatingDao,
+                                   ApplicationIdSelectorFactory applicationIdSelectorFactory,
                                    ChangeLogService changeLogService) {
         checkNotNull(measurableRatingDao, "measurableRatingDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(measurableIdSelectorFactory, "measurableIdSelectorFactory cannot be null");
+        checkNotNull(perspectiveRatingDao, "perspectiveRatingDao cannot be null");
         checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.measurableRatingDao = measurableRatingDao;
         this.measurableDao = measurableDao;
         this.measurableIdSelectorFactory = measurableIdSelectorFactory;
+        this.perspectiveRatingDao = perspectiveRatingDao;
         this.applicationIdSelectorFactory = applicationIdSelectorFactory;
         this.changeLogService = changeLogService;
     }
@@ -120,6 +125,7 @@ public class MeasurableRatingService {
         Measurable measurable = measurableDao.getById(command.measurableId());
 
         boolean success = measurableRatingDao.remove(command);
+        perspectiveRatingDao.cascadeRemovalOfMeasurableRating(command.entityReference(), command.measurableId());
 
         if (success && measurable != null) {
             writeChangeLogEntry(
