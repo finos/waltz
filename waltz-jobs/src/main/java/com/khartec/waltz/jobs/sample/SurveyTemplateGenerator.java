@@ -32,6 +32,9 @@ import static com.khartec.waltz.schema.Tables.SURVEY_TEMPLATE;
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.util.Comparator.comparing;
 
+/**
+ * Generates random survey templates and associated questions
+ */
 public class SurveyTemplateGenerator {
     private final static int MIN_QUESTIONS_PER_SURVEY   = 10;
     private final static int MAX_QUESTIONS_PER_SURVEY   = 40;
