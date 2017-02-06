@@ -1357,7 +1357,7 @@
         </sql>
     </changeSet>
   
-  <changeSet author="dwatkins"
+    <changeSet author="dwatkins"
                id="20170205-1477-2">
         <sql>
             UPDATE change_log 
@@ -1365,5 +1365,36 @@
             WHERE child_kind = 'CAPABILITY'
         </sql>
     </changeSet>
+
+
+    <!-- 1495: Tighten Person constraints -->
+    <changeSet author="dwatkins"
+               id="20170206-1495-1">
+        <sql>UPDATE person SET email = '' WHERE email IS NULL</sql>
+        <sql>UPDATE person SET display_name = '' WHERE display_name IS NULL</sql>
+        <sql>UPDATE person SET kind = 'EMPLOYEE' WHERE kind IS NULL</sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20170206-1495-2">
+        <addNotNullConstraint columnDataType="${email.type}"
+                              columnName="email"
+                              tableName="person"/>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20170206-1495-3">
+        <addNotNullConstraint columnDataType="${name.type}"
+                              columnName="display_name"
+                              tableName="person"/>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20170206-1495-4">
+        <addNotNullConstraint columnDataType="${enum.type}"
+                              columnName="kind"
+                              tableName="person"/>
+    </changeSet>
+
 
 </databaseChangeLog>
