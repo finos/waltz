@@ -2,9 +2,11 @@ package com.khartec.waltz.data.survey;
 
 import com.khartec.waltz.model.survey.SurveyInstanceRecipientCreateCommand;
 import com.khartec.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -25,6 +27,15 @@ public class SurveyInstanceRecipientDao {
         this.dsl = dsl;
     }
 
+
+    public boolean isPersonInstanceRecipient(long personId, long surveyInstanceId) {
+        Condition recipientExists = DSL.exists(DSL.selectFrom(SURVEY_INSTANCE_RECIPIENT)
+                .where(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(surveyInstanceId)
+                        .and(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))));
+
+        return dsl.select(DSL.when(recipientExists, true).otherwise(false))
+                .fetchOne(Record1::value1);
+    }
 
 
     public long create(SurveyInstanceRecipientCreateCommand command) {

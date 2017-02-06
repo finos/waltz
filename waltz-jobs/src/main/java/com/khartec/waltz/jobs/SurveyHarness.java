@@ -18,10 +18,12 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.survey.SurveyInstanceService;
 import com.khartec.waltz.service.survey.SurveyQuestionService;
 import com.khartec.waltz.service.survey.SurveyRunService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -38,6 +40,11 @@ public class SurveyHarness {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
+//        surveyRunHarness(ctx);
+        surveyResponseHarness(ctx);
+    }
+
+    private static void surveyRunHarness(AnnotationConfigApplicationContext ctx) {
         SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
         surveyQuestionService.findForTemplate(1).forEach(System.out::println);
 
@@ -95,6 +102,58 @@ public class SurveyHarness {
 
         // finally publish
         surveyRunService.updateSurveyRunStatus(userName, surveyRunId, SurveyRunStatus.ISSUED);
+    }
+
+
+    private static void surveyResponseHarness(AnnotationConfigApplicationContext ctx) {
+        String userName = "1258battle@gmail.com";
+
+        SurveyRunService surveyRunService = ctx.getBean(SurveyRunService.class);
+        SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
+        SurveyInstanceService surveyInstanceService = ctx.getBean(SurveyInstanceService.class);
+
+        List<SurveyInstance> instances = surveyRunService.findInstancesForSurveyRunAndRecipient(
+                1,
+                userName);
+
+        System.out.println("===========Instances==========");
+        System.out.println(instances);
+
+        SurveyInstance instance = instances.get(0);
+        List<SurveyQuestion> questions = surveyQuestionService.findForTemplate(instance.surveyRunId());
+
+        System.out.println("===========Questions==========");
+        System.out.println(questions);
+
+        List<SurveyQuestionResponse> responses = surveyInstanceService.findResponses(instance.id().get());
+
+        System.out.println("===========Responses==========");
+        System.out.println(responses);
+
+        ImmutableSurveyQuestionResponseChange insertResponse = ImmutableSurveyQuestionResponseChange.builder()
+                .questionId(1L)
+                .comment("some comment")
+                .stringResponse("some response")
+                .build();
+
+        ImmutableSurveyInstanceResponseCommand insertCommand = ImmutableSurveyInstanceResponseCommand.builder()
+                .questionResponseChanges(ListUtilities.newArrayList(insertResponse))
+                .build();
+        List<SurveyQuestionResponse> insertedResponses = surveyInstanceService.saveResponses(userName, instance.id().get(), insertCommand);
+        System.out.println("===========Inserted Responses==========");
+        System.out.println(insertedResponses);
+
+        ImmutableSurveyQuestionResponseChange updateResponse = insertResponse
+                .withStringResponse("updated string response")
+                .withId(insertedResponses.get(0).id());
+
+        ImmutableSurveyInstanceResponseCommand updateCommand = insertCommand.withQuestionResponseChanges(ListUtilities.newArrayList(updateResponse));
+
+        List<SurveyQuestionResponse> updatedResponses = surveyInstanceService.saveResponses(userName, instance.id().get(), updateCommand);
+        System.out.println("===========Updated Responses==========");
+        System.out.println(updatedResponses);
+
+        surveyInstanceService.updateStatus(instance.id().get(), SurveyInstanceStatus.IN_PROGRESS);
     }
 
 

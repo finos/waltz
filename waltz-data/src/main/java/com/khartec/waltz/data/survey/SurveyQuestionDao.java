@@ -5,6 +5,7 @@ import com.khartec.waltz.model.survey.SurveyQuestion;
 import com.khartec.waltz.model.survey.SurveyQuestionFieldType;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionRecord;
 import org.jooq.DSLContext;
+import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -13,22 +14,26 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
 import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 
 @Repository
 public class SurveyQuestionDao {
 
-    private static final RecordMapper<SurveyQuestionRecord, SurveyQuestion> TO_DOMAIN_MAPPER = r -> ImmutableSurveyQuestion.builder()
-            .id(r.getId())
-            .surveyTemplateId(r.getSurveyTemplateId())
-            .questionText(r.getQuestionText())
-            .helpText(Optional.ofNullable(r.getHelpText()))
-            .fieldType(SurveyQuestionFieldType.valueOf(r.getFieldType()))
-            .sectionName(Optional.ofNullable(r.getSectionName()))
-            .position(r.getPosition())
-            .isMandatory(r.getIsMandatory())
-            .allowComment(r.getAllowComment())
-            .build();
+    private static final RecordMapper<Record, SurveyQuestion> TO_DOMAIN_MAPPER = r -> {
+        SurveyQuestionRecord record = r.into(SURVEY_QUESTION);
+        return ImmutableSurveyQuestion.builder()
+                .id(record.getId())
+                .surveyTemplateId(record.getSurveyTemplateId())
+                .questionText(record.getQuestionText())
+                .helpText(Optional.ofNullable(record.getHelpText()))
+                .fieldType(SurveyQuestionFieldType.valueOf(record.getFieldType()))
+                .sectionName(Optional.ofNullable(record.getSectionName()))
+                .position(record.getPosition())
+                .isMandatory(record.getIsMandatory())
+                .allowComment(record.getAllowComment())
+                .build();
+    };
 
 
     private final DSLContext dsl;
@@ -46,6 +51,16 @@ public class SurveyQuestionDao {
         return dsl.selectFrom(SURVEY_QUESTION)
                 .where(SURVEY_QUESTION.SURVEY_TEMPLATE_ID.eq(templateId))
                 .orderBy(SURVEY_QUESTION.POSITION.asc())
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<SurveyQuestion> findForSurveyRun(long surveyRunId) {
+        return dsl.select(SURVEY_QUESTION.fields())
+                .from(SURVEY_QUESTION)
+                .innerJoin(SURVEY_RUN)
+                    .on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_QUESTION.SURVEY_TEMPLATE_ID))
+                .where(SURVEY_RUN.ID.eq(surveyRunId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }
