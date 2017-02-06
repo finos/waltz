@@ -165,8 +165,12 @@ function controller($q,
         if (! vm.selected.measurable) return; // nothing selected
         if (r === getRating()) return; // rating not changed
 
-        return doSave(r, getDescription())
-            .then(() => notification.success('Saved'));
+        if (r === 'X') {
+            return vm.doRemove();
+        } else {
+            return doSave(r, getDescription())
+                .then(() => notification.success('Saved'));
+        }
     };
 
     vm.onSaveComment = (comment) => {
@@ -181,7 +185,7 @@ function controller($q,
 
         vm.saveInProgress = true;
 
-        measurableRatingStore
+        return measurableRatingStore
             .remove(entityReference, vm.selected.measurable.id)
             .then(rs => {
                 vm.saveInProgress = false;
@@ -197,7 +201,7 @@ function controller($q,
         const goRed = () => vm.onRatingSelect('R');
         const goGreen = () => vm.onRatingSelect('G');
         const goAmber = () => vm.onRatingSelect('A');
-        const remove = () => vm.doRemove();
+        const remove = () => vm.onRatingSelect('X');
         const cancel = () => vm.doCancel();
 
         const keyActions = {

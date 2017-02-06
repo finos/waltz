@@ -137,7 +137,7 @@
                                 <div class="col-sm-9">
                                     <waltz-rating-picker selected="ctrl.selected.rating.rating"
                                                          rag-names="ctrl.selected.category.ragNames"
-                                                         hide-options="['X', 'Z']"
+                                                         hide-options="['Z']"
                                                          edit-disabled="ctrl.saveInProgress"
                                                          on-select="ctrl.onRatingSelect"
                                                          on-keypress="ctrl.onKeypress">
@@ -169,20 +169,13 @@
                                 </div>
                             </div>
 
-                            <!-- REMOVE -->
-                            <div class="row"
-                                 ng-if="ctrl.selected.rating">
+                            <!-- CANCEL -->
+                            <div class="row">
                                 <hr>
-                                <div class="col-sm-3">
-                                    Remove:
-                                </div>
-                                <div class="col-sm-9">
-                                    <button ng-click="ctrl.doRemove()"
-                                            ng-disabled="ctrl.saveInProgress"
-                                            class="btn btn-danger">
-                                        <waltz-icon name="trash" size="lg"></waltz-icon>
-                                        Remove
-                                    </button>
+                                <div class="col-sm-12">
+                                    <a class="clickable" ng-click="ctrl.doCancel()">
+                                        &laquo; Back
+                                    </a>
                                 </div>
                             </div>
 

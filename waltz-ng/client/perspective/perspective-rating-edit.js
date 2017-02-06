@@ -81,9 +81,6 @@ function controller($stateParams,
             .then(() => perspectiveRatingStore.findForEntity(p.categoryX, p.categoryY, entityReference))
             .then(rs => vm.perspectiveRatings = rs);
     };
-
-
-
 }
 
 
