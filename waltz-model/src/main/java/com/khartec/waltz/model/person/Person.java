@@ -24,7 +24,6 @@ import com.khartec.waltz.model.IdProvider;
 import org.immutables.value.Value;
 
 import java.util.Optional;
-import java.util.Set;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutablePerson.class)
@@ -33,18 +32,14 @@ public abstract class Person implements IdProvider {
 
     public abstract String employeeId();
     public abstract String displayName();
-    public abstract Optional<String> title();
     public abstract String email();
+    public abstract PersonKind kind();
+    public abstract Optional<String> title();
     public abstract Optional<String> mobilePhone();
     public abstract Optional<String> officePhone();
-    public abstract String userPrincipalName();
-    public abstract PersonKind kind();
+    public abstract Optional<String> userPrincipalName();
     public abstract Optional<String> managerEmployeeId();
-
-    public abstract String departmentName();
-
-    public abstract Optional<Set<Long>> allManagers();
-
+    public abstract Optional<String> departmentName();
     public abstract Optional<Long> organisationalUnitId();
 
     @Value.Default

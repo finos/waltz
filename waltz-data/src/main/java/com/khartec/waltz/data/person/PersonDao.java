@@ -48,14 +48,14 @@ public class PersonDao {
         PersonRecord record = r.into(PersonRecord.class);
         return ImmutablePerson.builder()
                 .id(record.getId())
-                .email(record.getEmail())
-                .displayName(record.getDisplayName())
-                .userPrincipalName(record.getUserPrincipalName())
-                .departmentName(record.getDepartmentName())
                 .employeeId(record.getEmployeeId())
-                .managerEmployeeId(Optional.ofNullable(record.getManagerEmployeeId()))
-                .title(record.getTitle())
+                .displayName(record.getDisplayName())
+                .email(record.getEmail())
                 .kind(PersonKind.valueOf(record.getKind()))
+                .userPrincipalName(Optional.ofNullable(record.getUserPrincipalName()))
+                .departmentName(Optional.ofNullable(record.getDepartmentName()))
+                .managerEmployeeId(Optional.ofNullable(record.getManagerEmployeeId()))
+                .title(Optional.ofNullable(record.getTitle()))
                 .mobilePhone(Optional.ofNullable(record.getMobilePhone()))
                 .officePhone(Optional.ofNullable(record.getOfficePhone()))
                 .organisationalUnitId(Optional.ofNullable(record.getOrganisationalUnitId()))
@@ -138,29 +138,21 @@ public class PersonDao {
         List<PersonRecord> records = people.stream()
                 .map(p -> {
                     PersonRecord r = dsl.newRecord(PERSON);
-                    r.setDepartmentName(p.departmentName());
                     r.setDisplayName(p.displayName());
-                    r.setEmail(p.email());
                     r.setEmployeeId(p.employeeId());
+                    r.setEmail(p.email());
                     r.setKind(p.kind().name());
+                    r.setDepartmentName(p.departmentName().orElse(""));
                     r.setManagerEmployeeId(p.managerEmployeeId().orElse(""));
                     r.setTitle(p.title().orElse(""));
                     r.setOfficePhone(p.officePhone().orElse(""));
                     r.setMobilePhone(p.mobilePhone().orElse(""));
-                    r.setUserPrincipalName(p.userPrincipalName());
+                    r.setUserPrincipalName(p.userPrincipalName().orElse(""));
                     return r;
                 })
                 .collect(Collectors.toList());
 
         return dsl.batchInsert(records).execute();
-    }
-
-
-    public List<Person> findByOrganisationalUnitId(Long... orgUnitIds) {
-        return dsl.select(PERSON.fields())
-                .from(PERSON)
-                .where(PERSON.ORGANISATIONAL_UNIT_ID.in(orgUnitIds))
-                .fetch(personMapper);
     }
 
 
