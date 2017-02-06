@@ -57,7 +57,10 @@ function controller($stateParams,
 
     applicationStore
         .getById(applicationId)
-        .then(app => vm.application = app);
+        .then(app => {
+            vm.application = app;
+            vm.entityReference = Object.assign({}, entityReference, { name: app.name });
+        });
 
     perspectiveDefinitionStore
         .findAll()

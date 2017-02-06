@@ -145,11 +145,26 @@ function controller($q,
             });
     };
 
+    const doRemove = () => {
+
+        if (! vm.selected.rating) return $q.reject();
+
+        vm.saveInProgress = true;
+
+        return measurableRatingStore
+            .remove(entityReference, vm.selected.measurable.id)
+            .then(rs => {
+                vm.saveInProgress = false;
+                vm.ratings = rs;
+                vm.tabs = prepareTabs(vm.categories, vm.measurables, vm.ratings);
+                vm.selected.rating = null;
+            });
+    };
+
     const reset = () => {
         vm.saveInProgress = false;
         vm.selected = {};
     };
-
 
     vm.backUrl = $state
         .href(
@@ -166,7 +181,8 @@ function controller($q,
         if (r === getRating()) return; // rating not changed
 
         if (r === 'X') {
-            return vm.doRemove();
+            return doRemove()
+                .then(() => notification.success('Removed'));
         } else {
             return doSave(r, getDescription())
                 .then(() => notification.success('Saved'));
@@ -180,21 +196,6 @@ function controller($q,
 
     vm.doCancel = reset;
 
-    vm.doRemove = () => {
-        if (! vm.selected.rating) return;
-
-        vm.saveInProgress = true;
-
-        return measurableRatingStore
-            .remove(entityReference, vm.selected.measurable.id)
-            .then(rs => {
-                vm.saveInProgress = false;
-                vm.ratings = rs;
-                vm.tabs = prepareTabs(vm.categories, vm.measurables, vm.ratings);
-                vm.selected.rating = null;
-                notification.success('Removed');
-            });
-    };
 
 
     vm.onKeypress = (evt) => {

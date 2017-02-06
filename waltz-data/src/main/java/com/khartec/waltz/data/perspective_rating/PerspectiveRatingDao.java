@@ -127,6 +127,7 @@ public class PerspectiveRatingDao {
         return sum(rc);
     }
 
+
     public int add(EntityReference ref, Set<PerspectiveRatingValue> additions, String username) {
         Set<PerspectiveRatingRecord> records = SetUtilities.map(additions, item -> {
             PerspectiveRatingRecord record = new PerspectiveRatingRecord();
@@ -145,5 +146,17 @@ public class PerspectiveRatingDao {
                 .execute();
 
         return sum(rc);
+    }
+
+
+    public int cascadeRemovalOfMeasurableRating(EntityReference entityReference, long measurableId) {
+        Condition measurableMatchesEitherAxis = PERSPECTIVE_RATING.MEASURABLE_X.eq(measurableId)
+                .or(PERSPECTIVE_RATING.MEASURABLE_Y.eq(measurableId));
+
+        return dsl.deleteFrom(PERSPECTIVE_RATING)
+                .where(PERSPECTIVE_RATING.ENTITY_ID.eq(entityReference.id()))
+                .and(PERSPECTIVE_RATING.ENTITY_KIND.eq(entityReference.kind().name()))
+                .and(measurableMatchesEitherAxis)
+                .execute();
     }
 }

@@ -6,8 +6,7 @@
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>
-                <a ui-sref="main.app.view ({id: ctrl.application.id })"
-                   ng-bind="ctrl.application.name"></a>
+                <waltz-entity-link entity-ref="ctrl.entityReference"></waltz-entity-link>
             </li>
             <li>Perspective</li>
             <li ng-bind="ctrl.perspectiveDefinition.name"></li>
