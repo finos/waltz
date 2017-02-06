@@ -33,7 +33,6 @@ const initialState = {};
 const template = require('./perspective-rating-edit.html');
 
 
-// url: '/{id:int}/rating/APPLICATION/{appId:int}/edit',
 function controller($stateParams,
                     applicationStore,
                     perspectiveDefinitionStore,
@@ -60,14 +59,9 @@ function controller($stateParams,
         .getById(applicationId)
         .then(app => vm.application = app);
 
-
     perspectiveDefinitionStore
         .findAll()
         .then(pds => vm.perspectiveDefinition = _.find(pds, { id: perspectiveId || 1 }))
-        .then(x => {
-            console.log(x);
-            return x;
-        })
         .then(pd => perspectiveRatingStore.findForEntity(pd.categoryX, pd.categoryY, entityReference))
         .then(rs => vm.perspectiveRatings = rs);
 
@@ -81,8 +75,9 @@ function controller($stateParams,
 
     vm.save = (values = []) => {
         const p = vm.perspectiveDefinition;
+        const withoutUnknowns = _.reject(values, { rating: 'Z' });
         return perspectiveRatingStore
-            .updateForEntity(p.categoryX, p.categoryY, entityReference, values)
+            .updateForEntity(p.categoryX, p.categoryY, entityReference, withoutUnknowns)
             .then(() => perspectiveRatingStore.findForEntity(p.categoryX, p.categoryY, entityReference))
             .then(rs => vm.perspectiveRatings = rs);
     };

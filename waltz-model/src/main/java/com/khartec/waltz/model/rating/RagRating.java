@@ -20,19 +20,10 @@ package com.khartec.waltz.model.rating;
 
 public enum RagRating {
 
-    R("Red"),
-    A("Amber"),
-    G("Green"),
-    Z("Unknown"),
-    X("None");
+    R, // Red
+    A, // Amber
+    G, // Green
+    Z, // Unknown
+    X  // None
 
-    private final String displayName;
-
-    RagRating(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
 }

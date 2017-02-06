@@ -16,13 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../../../common";
+import _ from 'lodash';
+
 
 const bindings = {
     selected: '<',
     editDisabled: '<',
     onSelect: '<',
     onKeypress: '<',
-    ragNames: '<'
+    ragNames: '<',
+    hideOptions: '<'
 };
 
 
@@ -31,17 +34,15 @@ const template = require('./rating-picker.html');
 
 const initialState = {
     pickerStyle: {},
+    hideOptions: [],
     onSelect: (rating) => 'No onSelect handler defined for rating-picker: ' + rating,
     ragNames: {
         R: "Poor",
         A: "Adequate",
-        G: "Good"
-    },
-    options: [
-        { value: 'G', clazz: 'rating-G' },
-        { value: 'A', clazz: 'rating-A' },
-        { value: 'R', clazz: 'rating-R' }
-    ]
+        G: "Good",
+        X: "Not applicable",
+        Z: "Unknown"
+    }
 };
 
 
@@ -53,6 +54,20 @@ function controller() {
             vm.pickerStyle = vm.disabled
                 ? { opacity: 0.4 }
                 : [];
+        }
+
+        if (c.ragNames) {
+            vm.options = _
+                .chain(vm.ragNames)
+                .map((v, k) => {
+                    return {
+                        value: k,
+                        clazz: `rating-${k}`,
+                        label: v
+                    };
+                })
+                .reject(option => _.includes(vm.hideOptions, option.value))
+                .value();
         }
     }
 

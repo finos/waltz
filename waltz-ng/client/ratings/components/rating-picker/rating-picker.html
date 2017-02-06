@@ -3,7 +3,7 @@
      ng-keydown="$ctrl.onKeypress($event)"
      ng-style="$ctrl.pickerStyle">
 
-    <div ng-repeat="option in $ctrl.options"
+    <div ng-repeat="option in $ctrl.options track by option.value"
          class="wrp-option">
         <input type="radio"
                value="{{ option.value }}"
@@ -13,7 +13,7 @@
                id="wrp-inp-{{ option.value }}-{{ $id }}">
         <label for="wrp-inp-{{ option.value }}-{{ $id }}"
                ng-class="option.clazz"
-               ng-bind="$ctrl.ragNames[option.value]">
+               ng-bind="option.label">
         </label>
     </div>
 </div>
