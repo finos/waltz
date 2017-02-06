@@ -2,7 +2,7 @@
     <style>
         .side-scroller {
             overflow-y: hidden;
-            overflow-x: scroll;
+            overflow-x: auto;
         }
     </style>
     <div class="col-md-9">
@@ -39,14 +39,5 @@
            ng-click="$ctrl.undo()">
             Undo Changes
         </a>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6">
-        <pre>{{ $ctrl.existingOverrides | json }}</pre>
-    </div>
-    <div class="col-md-6">
-        <pre>{{ $ctrl.pendingOverrides | json }}</pre>
     </div>
 </div>
