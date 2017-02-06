@@ -16,24 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+const baseState = {
+    url: 'perspective',
+};
 
 
-function setup() {
-    const module = angular.module('waltz.perspective', []);
+const editState = {
+    url: '/{id:int}/rating/APPLICATION/{appId:int}/edit',
+    views: {'content@': require('./perspective-rating-edit') },
+};
 
-    module
-        .config(require('./routes'));
 
-    module
-        .service('PerspectiveDefinitionStore', require('./serivces/perspective-definition-store'))
-        .service('PerspectiveRatingStore', require('./serivces/perspective-rating-store'));
-    module
-        .component('waltzPerspectiveEditor', require('./components/editor/perspective-editor'))
-        .component('waltzPerspectiveGrid', require('./components/grid/perspective-grid'));
-
-    return module.name;
+function setup($stateProvider) {
+    $stateProvider
+        .state('main.perspective', baseState)
+        .state('main.perspective.rating-edit', editState);
 }
+
+
+setup.$inject = ['$stateProvider'];
 
 
 export default setup;
