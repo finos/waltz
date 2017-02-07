@@ -1397,4 +1397,55 @@
     </changeSet>
 
 
+    <!-- 1497: Add rag names to Perspective -->
+    <changeSet author="dwatkins"
+               id="20170207-1497-1">
+        <addColumn tableName="perspective_definition">
+            <column name="rating_name_r"
+                    type="${name.type}">
+            </column>
+            <column name="rating_name_a"
+                    type="${name.type}">
+            </column>
+            <column name="rating_name_g"
+                    type="${name.type}">
+            </column>
+            <column name="rating_name_z"
+                    type="${name.type}">
+            </column>
+            <column name="rating_name_x"
+                    type="${name.type}">
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20170207-1497-2">
+        <sql>UPDATE perspective_definition SET rating_name_r = 'Poor'</sql>
+        <sql>UPDATE perspective_definition SET rating_name_a = 'Adequate'</sql>
+        <sql>UPDATE perspective_definition SET rating_name_g = 'Good'</sql>
+        <sql>UPDATE perspective_definition SET rating_name_z = 'Unknown'</sql>
+        <sql>UPDATE perspective_definition SET rating_name_x = 'Not Applicable'</sql>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20170207-1497-3">
+        <addNotNullConstraint columnDataType="${name.type}"
+                              columnName="rating_name_r"
+                              tableName="perspective_definition"/>
+        <addNotNullConstraint columnDataType="${name.type}"
+                              columnName="rating_name_a"
+                              tableName="perspective_definition"/>
+        <addNotNullConstraint columnDataType="${name.type}"
+                              columnName="rating_name_g"
+                              tableName="perspective_definition"/>
+        <addNotNullConstraint columnDataType="${name.type}"
+                              columnName="rating_name_z"
+                              tableName="perspective_definition"/>
+        <addNotNullConstraint columnDataType="${name.type}"
+                              columnName="rating_name_x"
+                              tableName="perspective_definition"/>
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -16,43 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.rating;
+package com.khartec.waltz.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.immutables.value.Value;
+import com.khartec.waltz.model.rating.RagNames;
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableRagNames.class)
-@JsonDeserialize(as = ImmutableRagNames.class)
-public abstract class RagNames {
-
-    @Value.Default
-    public String R() {
-        return "Poor";
-    }
-
-
-    @Value.Default
-    public String A() {
-        return "Adequate";
-    }
-
-
-    @Value.Default
-    public String G() {
-        return "Good";
-    }
-
-
-    @Value.Default
-    public String Z() {
-        return "Unknown";
-    }
-
-
-    @Value.Default
-    public String X() {
-        return "Not Applicable";
-    }
+public interface RagNamesProvider {
+    RagNames ragNames();
 }

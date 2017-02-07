@@ -21,7 +21,6 @@ package com.khartec.waltz.model.measurable_category;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.rating.RagNames;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -32,7 +31,7 @@ public abstract class MeasurableCategory implements
         NameProvider,
         DescriptionProvider,
         ExternalIdProvider,
-        LastUpdatedProvider {
+        LastUpdatedProvider,
+        RagNamesProvider {
 
-    public abstract RagNames ragNames();
 }

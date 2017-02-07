@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.RagNamesProvider;
 import org.immutables.value.Value;
 
 
@@ -32,7 +33,8 @@ import org.immutables.value.Value;
 public abstract class PerspectiveDefinition implements
         IdProvider,
         NameProvider,
-        DescriptionProvider {
+        DescriptionProvider,
+        RagNamesProvider {
 
     public abstract long categoryX();
 
