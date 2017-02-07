@@ -129,6 +129,37 @@ function controller($timeout) {
     vm.undo = () => {
         vm.pendingOverrides = {};
     };
+
+
+
+    vm.onKeypress = (evt) => {
+        const goRed = () => vm.onRatingSelect('R');
+        const goGreen = () => vm.onRatingSelect('G');
+        const goAmber = () => vm.onRatingSelect('A');
+        const goNotApplicable = () => vm.onRatingSelect('X');
+        const goReset = () => vm.onRatingSelect('Z');
+        const cancel = () => vm.doCancel();
+
+        const keyActions = {
+            'r': goRed,
+            'R': goRed,
+            'a': goAmber,
+            'A': goAmber,
+            'y': goAmber,
+            'Y': goAmber,
+            'g': goGreen,
+            'G': goGreen,
+            'x': goNotApplicable,
+            'X': goNotApplicable,
+            'z': goReset,
+            'Z': goReset,
+            27: cancel,
+        };
+
+        const action = keyActions[evt.keyCode] || keyActions[evt.key];
+
+        if (action) action();
+    };
 }
 
 
