@@ -40,14 +40,16 @@ const initialState = {
         R: "Poor",
         A: "Adequate",
         G: "Good",
-        X: "Not applicable",
+        X: "Not Applicable",
         Z: "Unknown"
     }
 };
 
 
 function controller() {
-    const vm = initialiseData(this, initialState);
+    const vm = this;
+
+    vm.$onInit = () => initialiseData(this, initialState);
 
     vm.$onChanges = (c) => {
         if (c.disabled) {

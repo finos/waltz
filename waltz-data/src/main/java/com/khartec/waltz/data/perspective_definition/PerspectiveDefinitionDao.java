@@ -20,6 +20,8 @@ package com.khartec.waltz.data.perspective_definition;
 
 import com.khartec.waltz.model.perspective.ImmutablePerspectiveDefinition;
 import com.khartec.waltz.model.perspective.PerspectiveDefinition;
+import com.khartec.waltz.model.rating.ImmutableRagNames;
+import com.khartec.waltz.model.rating.RagNames;
 import com.khartec.waltz.schema.tables.records.PerspectiveDefinitionRecord;
 import org.jooq.DSLContext;
 import org.jooq.RecordMapper;
@@ -34,14 +36,24 @@ import static com.khartec.waltz.schema.tables.PerspectiveDefinition.PERSPECTIVE_
 @Repository
 public class PerspectiveDefinitionDao {
 
-    private static final RecordMapper<PerspectiveDefinitionRecord, PerspectiveDefinition> TO_DOMAIN_MAPPER =
-            r -> ImmutablePerspectiveDefinition.builder()
-                    .id(r.getId())
-                    .name(r.getName())
-                    .description(r.getDescription())
-                    .categoryX(r.getCategoryX())
-                    .categoryY(r.getCategoryY())
-                    .build();
+    private static final RecordMapper<PerspectiveDefinitionRecord, PerspectiveDefinition> TO_DOMAIN_MAPPER = r -> {
+        RagNames ragNames = ImmutableRagNames.builder()
+                .R(r.getRatingNameR())
+                .A(r.getRatingNameA())
+                .G(r.getRatingNameG())
+                .Z(r.getRatingNameZ())
+                .X(r.getRatingNameX())
+                .build();
+
+        return ImmutablePerspectiveDefinition.builder()
+                .id(r.getId())
+                .name(r.getName())
+                .description(r.getDescription())
+                .categoryX(r.getCategoryX())
+                .categoryY(r.getCategoryY())
+                .ragNames(ragNames)
+                .build();
+    };
 
 
     private final DSLContext dsl;
