@@ -52,13 +52,12 @@ public class SurveyInstanceDao {
     }
 
 
-    public List<SurveyInstance> findForSurveyRunAndRecipient(long surveyRunId, long personId) {
-        return dsl.select()
+    public List<SurveyInstance> findForRecipient(long personId) {
+        return dsl.select(SURVEY_INSTANCE.fields())
                 .from(SURVEY_INSTANCE)
                 .innerJoin(SURVEY_INSTANCE_RECIPIENT)
-                    .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
-                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId)
-                        .and(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId)))
+                .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
+                .where(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

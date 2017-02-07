@@ -1,18 +1,19 @@
 package com.khartec.waltz.service.survey;
 
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.data.survey.SurveyInstanceDao;
 import com.khartec.waltz.data.survey.SurveyInstanceRecipientDao;
 import com.khartec.waltz.data.survey.SurveyQuestionResponseDao;
+import com.khartec.waltz.model.IdCommandResponse;
+import com.khartec.waltz.model.ImmutableIdCommandResponse;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.survey.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
@@ -48,17 +49,27 @@ public class SurveyInstanceService {
     }
 
 
-    public List<SurveyQuestionResponse> findResponses(long instanceId) {
+    public List<SurveyInstance> findForRecipient(String userName) {
+        checkNotNull(userName, "userName cannot be null");
+
+        Person person = personDao.getByUserName(userName);
+        checkNotNull(person, "userName " + userName + " cannot be resolved");
+
+        return surveyInstanceDao.findForRecipient(person.id().get());
+    }
+
+
+    public List<SurveyInstanceQuestionResponse> findResponses(long instanceId) {
         return surveyQuestionResponseDao.findForInstance(instanceId);
     }
 
 
-    public List<SurveyQuestionResponse> saveResponses(String userName,
-                                                      long instanceId,
-                                                      SurveyInstanceResponseCommand command) {
+    public IdCommandResponse saveResponse(String userName,
+                                          long instanceId,
+                                          SurveyQuestionResponse questionResponse) {
 
         checkNotNull(userName, "userName cannot be null");
-        checkNotNull(command, "command cannot be null");
+        checkNotNull(questionResponse, "questionResponse cannot be null");
 
         Person person = personDao.getByUserName(userName);
         checkNotNull(person, "userName " + userName + " cannot be resolved");
@@ -73,17 +84,18 @@ public class SurveyInstanceService {
                     || surveyInstance.status() == SurveyInstanceStatus.IN_PROGRESS,
                 "Survey instance cannot be updated, current status: " + surveyInstance.status());
 
-        Map<Boolean, List<SurveyQuestionResponseChange>> updatesInserts = command.questionResponseChanges()
-                .stream()
-                .collect(Collectors.partitioningBy(change -> change.id().isPresent()));
+        SurveyInstanceQuestionResponse instanceQuestionResponse = ImmutableSurveyInstanceQuestionResponse.builder()
+                .surveyInstanceId(instanceId)
+                .personId(person.id().get())
+                .lastUpdatedAt(DateTimeUtilities.nowUtc())
+                .questionResponse(questionResponse)
+                .build();
 
-        List<SurveyQuestionResponseChange> updates = updatesInserts.get(true);
-        List<SurveyQuestionResponseChange> inserts = updatesInserts.get(false);
+        long savedId = surveyQuestionResponseDao.saveResponse(instanceQuestionResponse);
 
-        surveyQuestionResponseDao.updateQuestionResponses(person.id().get(), instanceId, updates);
-        surveyQuestionResponseDao.insertQuestionResponses(person.id().get(), instanceId, inserts);
-
-        return findResponses(instanceId);
+        return ImmutableIdCommandResponse.builder()
+                .id(savedId)
+                .build();
     }
 
 

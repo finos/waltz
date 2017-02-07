@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
 import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 
@@ -55,12 +56,14 @@ public class SurveyQuestionDao {
     }
 
 
-    public List<SurveyQuestion> findForSurveyRun(long surveyRunId) {
+    public List<SurveyQuestion> findForSurveyInstance(long surveyInstanceId) {
         return dsl.select(SURVEY_QUESTION.fields())
                 .from(SURVEY_QUESTION)
                 .innerJoin(SURVEY_RUN)
-                    .on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_QUESTION.SURVEY_TEMPLATE_ID))
-                .where(SURVEY_RUN.ID.eq(surveyRunId))
+                .on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_QUESTION.SURVEY_TEMPLATE_ID))
+                .innerJoin(SURVEY_INSTANCE)
+                .on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
+                .where(SURVEY_INSTANCE.ID.eq(surveyInstanceId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

@@ -4,10 +4,11 @@ import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.IdSelectorFactoryProvider;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.data.person.PersonDao;
-import com.khartec.waltz.data.survey.*;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.data.survey.SurveyInstanceDao;
+import com.khartec.waltz.data.survey.SurveyInstanceRecipientDao;
+import com.khartec.waltz.data.survey.SurveyRunDao;
+import com.khartec.waltz.data.survey.SurveyTemplateDao;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.survey.*;
@@ -37,7 +38,6 @@ public class SurveyRunService {
     private final PersonDao personDao;
     private final SurveyInstanceDao surveyInstanceDao;
     private final SurveyInstanceRecipientDao surveyInstanceRecipientDao;
-    private final SurveyQuestionDao surveyQuestionDao;
     private final SurveyRunDao surveyRunDao;
     private final SurveyTemplateDao surveyTemplateDao;
 
@@ -49,7 +49,6 @@ public class SurveyRunService {
                             PersonDao personDao,
                             SurveyInstanceDao surveyInstanceDao,
                             SurveyInstanceRecipientDao surveyInstanceRecipientDao,
-                            SurveyQuestionDao surveyQuestionDao,
                             SurveyRunDao surveyRunDao,
                             SurveyTemplateDao surveyTemplateDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
@@ -58,7 +57,6 @@ public class SurveyRunService {
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(surveyInstanceDao, "surveyInstanceDao cannot be null");
         checkNotNull(surveyInstanceRecipientDao, "surveyInstanceRecipientDao cannot be null");
-        checkNotNull(surveyQuestionDao, "surveyQuestionDao cannot be null");
         checkNotNull(surveyRunDao, "surveyRunDao cannot be null");
         checkNotNull(surveyTemplateDao, "surveyTemplateDao cannot be null");
 
@@ -68,13 +66,12 @@ public class SurveyRunService {
         this.personDao = personDao;
         this.surveyInstanceDao = surveyInstanceDao;
         this.surveyInstanceRecipientDao = surveyInstanceRecipientDao;
-        this.surveyQuestionDao = surveyQuestionDao;
         this.surveyRunDao = surveyRunDao;
         this.surveyTemplateDao = surveyTemplateDao;
     }
 
 
-    public SurveyRunCreateResponse createSurveyRun(String userName, SurveyRunCreateCommand command) {
+    public IdCommandResponse createSurveyRun(String userName, SurveyRunCreateCommand command) {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(command, "create command cannot be null");
 
@@ -91,7 +88,7 @@ public class SurveyRunService {
                         .message("Survey Run: " + command.name() + " added")
                         .build());
 
-        return ImmutableSurveyRunCreateResponse.builder()
+        return ImmutableIdCommandResponse.builder()
                 .id(surveyRunId)
                 .build();
     }
@@ -197,21 +194,6 @@ public class SurveyRunService {
         );
 
         return true;
-    }
-
-
-    public List<SurveyInstance> findInstancesForSurveyRunAndRecipient(long surveyRunId, String userName) {
-        checkNotNull(userName, "userName cannot be null");
-
-        Person person = personDao.getByUserName(userName);
-        checkNotNull(person, "userName " + userName + " cannot be resolved");
-
-        return surveyInstanceDao.findForSurveyRunAndRecipient(surveyRunId, person.id().get());
-    }
-
-
-    public List<SurveyQuestion> findQuestionsForSurveyRun(long surveyRunId) {
-        return surveyQuestionDao.findForSurveyRun(surveyRunId);
     }
 
 

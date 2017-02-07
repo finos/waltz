@@ -18,7 +18,6 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.survey.*;
@@ -46,7 +45,7 @@ public class SurveyHarness {
 
     private static void surveyRunHarness(AnnotationConfigApplicationContext ctx) {
         SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
-        surveyQuestionService.findForTemplate(1).forEach(System.out::println);
+        surveyQuestionService.findForSurveyTemplate(1).forEach(System.out::println);
 
         IdSelectionOptions idSelectionOptions = ImmutableIdSelectionOptions.builder()
                 .entityReference(ImmutableEntityReference.mkRef(EntityKind.APP_GROUP, 1))
@@ -108,50 +107,44 @@ public class SurveyHarness {
     private static void surveyResponseHarness(AnnotationConfigApplicationContext ctx) {
         String userName = "1258battle@gmail.com";
 
-        SurveyRunService surveyRunService = ctx.getBean(SurveyRunService.class);
         SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
         SurveyInstanceService surveyInstanceService = ctx.getBean(SurveyInstanceService.class);
 
-        List<SurveyInstance> instances = surveyRunService.findInstancesForSurveyRunAndRecipient(
-                1,
-                userName);
+        List<SurveyInstance> instances = surveyInstanceService.findForRecipient(userName);
 
         System.out.println("===========Instances==========");
         System.out.println(instances);
 
         SurveyInstance instance = instances.get(0);
-        List<SurveyQuestion> questions = surveyQuestionService.findForTemplate(instance.surveyRunId());
+        List<SurveyQuestion> questions = surveyQuestionService.findForSurveyInstance(instance.id().get());
 
         System.out.println("===========Questions==========");
         System.out.println(questions);
 
-        List<SurveyQuestionResponse> responses = surveyInstanceService.findResponses(instance.id().get());
+        List<SurveyInstanceQuestionResponse> responses = surveyInstanceService.findResponses(instance.id().get());
 
         System.out.println("===========Responses==========");
         System.out.println(responses);
 
-        ImmutableSurveyQuestionResponseChange insertResponse = ImmutableSurveyQuestionResponseChange.builder()
+        ImmutableSurveyQuestionResponse insertResponse = ImmutableSurveyQuestionResponse.builder()
                 .questionId(1L)
                 .comment("some comment")
                 .stringResponse("some response")
                 .build();
 
-        ImmutableSurveyInstanceResponseCommand insertCommand = ImmutableSurveyInstanceResponseCommand.builder()
-                .questionResponseChanges(ListUtilities.newArrayList(insertResponse))
-                .build();
-        List<SurveyQuestionResponse> insertedResponses = surveyInstanceService.saveResponses(userName, instance.id().get(), insertCommand);
+        IdCommandResponse idCommandResponse = surveyInstanceService.saveResponse(userName, instance.id().get(), insertResponse);
         System.out.println("===========Inserted Responses==========");
-        System.out.println(insertedResponses);
+        System.out.println(idCommandResponse);
+        System.out.println(surveyInstanceService.findResponses(instance.id().get()));
 
-        ImmutableSurveyQuestionResponseChange updateResponse = insertResponse
+        ImmutableSurveyQuestionResponse updateResponse = insertResponse
                 .withStringResponse("updated string response")
-                .withId(insertedResponses.get(0).id());
+                .withId(idCommandResponse.id());
 
-        ImmutableSurveyInstanceResponseCommand updateCommand = insertCommand.withQuestionResponseChanges(ListUtilities.newArrayList(updateResponse));
-
-        List<SurveyQuestionResponse> updatedResponses = surveyInstanceService.saveResponses(userName, instance.id().get(), updateCommand);
+        IdCommandResponse updateIdCommandResponse = surveyInstanceService.saveResponse(userName, instance.id().get(), updateResponse);
         System.out.println("===========Updated Responses==========");
-        System.out.println(updatedResponses);
+        System.out.println(updateIdCommandResponse);
+        System.out.println(surveyInstanceService.findResponses(instance.id().get()));
 
         surveyInstanceService.updateStatus(instance.id().get(), SurveyInstanceStatus.IN_PROGRESS);
     }
