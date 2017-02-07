@@ -18,7 +18,11 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.survey.*;
+import com.khartec.waltz.model.IdCommandResponse;
+import com.khartec.waltz.model.survey.SurveyInstanceRecipient;
+import com.khartec.waltz.model.survey.SurveyRunChangeCommand;
+import com.khartec.waltz.model.survey.SurveyRunCreateCommand;
+import com.khartec.waltz.model.survey.SurveyRunStatusChangeCommand;
 import com.khartec.waltz.service.survey.SurveyRunService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -58,7 +62,7 @@ public class SurveyRunEndpoint implements Endpoint {
         String createSurveyRunInstancesAndRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String updateSurveyRunStatusPath = mkPath(BASE_URL, ":id", "status");
 
-        DatumRoute<SurveyRunCreateResponse> surveyRunCreateRoute = (req, res) -> {
+        DatumRoute<IdCommandResponse> surveyRunCreateRoute = (req, res) -> {
             res.type(WebUtilities.TYPE_JSON);
             SurveyRunCreateCommand surveyRunChangeCommand = readBody(req, SurveyRunCreateCommand.class);
 

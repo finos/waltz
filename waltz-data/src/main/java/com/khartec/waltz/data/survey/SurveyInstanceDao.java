@@ -13,8 +13,11 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
+import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE_RECIPIENT;
 
 @Repository
 public class SurveyInstanceDao {
@@ -49,6 +52,16 @@ public class SurveyInstanceDao {
     }
 
 
+    public List<SurveyInstance> findForRecipient(long personId) {
+        return dsl.select(SURVEY_INSTANCE.fields())
+                .from(SURVEY_INSTANCE)
+                .innerJoin(SURVEY_INSTANCE_RECIPIENT)
+                .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
+                .where(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
     public long create(SurveyInstanceCreateCommand command) {
         checkNotNull(command, "command cannot be null");
 
@@ -66,6 +79,17 @@ public class SurveyInstanceDao {
     public int deleteForSurveyRun(long surveyRunId) {
         return dsl.delete(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+                .execute();
+    }
+
+
+    public int updateStatus(long instanceId, SurveyInstanceStatus newStatus) {
+        checkNotNull(newStatus, "newStatus cannot be null");
+
+        return dsl.update(SURVEY_INSTANCE)
+                .set(SURVEY_INSTANCE.STATUS, newStatus.name())
+                .where(SURVEY_INSTANCE.STATUS.notEqual(newStatus.name())
+                        .and(SURVEY_INSTANCE.ID.eq(instanceId)))
                 .execute();
     }
 }

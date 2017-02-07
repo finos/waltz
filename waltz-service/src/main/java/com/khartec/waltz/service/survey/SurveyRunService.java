@@ -8,9 +8,7 @@ import com.khartec.waltz.data.survey.SurveyInstanceDao;
 import com.khartec.waltz.data.survey.SurveyInstanceRecipientDao;
 import com.khartec.waltz.data.survey.SurveyRunDao;
 import com.khartec.waltz.data.survey.SurveyTemplateDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.survey.*;
@@ -73,7 +71,7 @@ public class SurveyRunService {
     }
 
 
-    public SurveyRunCreateResponse createSurveyRun(String userName, SurveyRunCreateCommand command) {
+    public IdCommandResponse createSurveyRun(String userName, SurveyRunCreateCommand command) {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(command, "create command cannot be null");
 
@@ -90,7 +88,7 @@ public class SurveyRunService {
                         .message("Survey Run: " + command.name() + " added")
                         .build());
 
-        return ImmutableSurveyRunCreateResponse.builder()
+        return ImmutableIdCommandResponse.builder()
                 .id(surveyRunId)
                 .build();
     }
@@ -229,7 +227,7 @@ public class SurveyRunService {
         SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);
         checkNotNull(surveyRun, "surveyRun " + surveyRunId + " not found");
 
-        checkTrue(Objects.equals(surveyRun.ownerId(), owner.id().get()), " permission denied");
+        checkTrue(Objects.equals(surveyRun.ownerId(), owner.id().get()), "Permission denied");
 
         checkTrue(surveyRun.status() == SurveyRunStatus.DRAFT, "survey run can only be updated when it's still in DRAFT mode");
     }

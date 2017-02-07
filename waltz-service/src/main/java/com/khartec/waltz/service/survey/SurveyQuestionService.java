@@ -24,7 +24,12 @@ public class SurveyQuestionService {
     }
 
 
-    public List<SurveyQuestion> findForTemplate(long templateId) {
+    public List<SurveyQuestion> findForSurveyTemplate(long templateId) {
         return surveyQuestionDao.findForTemplate(templateId);
+    }
+
+
+    public List<SurveyQuestion> findForSurveyInstance(long surveyInstanceId) {
+        return surveyQuestionDao.findForSurveyInstance(surveyInstanceId);
     }
 }
