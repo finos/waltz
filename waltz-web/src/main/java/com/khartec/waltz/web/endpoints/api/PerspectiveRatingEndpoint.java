@@ -21,7 +21,9 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.perspective.PerspectiveRating;
 import com.khartec.waltz.model.perspective.PerspectiveRatingValue;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.perspective_rating.PerspectiveRatingService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ import spark.Response;
 import java.io.IOException;
 import java.util.Collection;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.fromArray;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
@@ -44,11 +47,17 @@ public class PerspectiveRatingEndpoint implements Endpoint {
 
 
     private final PerspectiveRatingService perspectiveRatingService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public PerspectiveRatingEndpoint(PerspectiveRatingService perspectiveRatingService) {
+    public PerspectiveRatingEndpoint(PerspectiveRatingService perspectiveRatingService, 
+                                     UserRoleService userRoleService) {
+        checkNotNull(perspectiveRatingService, "perspectiveRatingService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
+
         this.perspectiveRatingService = perspectiveRatingService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -69,6 +78,7 @@ public class PerspectiveRatingEndpoint implements Endpoint {
 
 
     private int updateForEntity(Request request, Response z) throws IOException {
+        requireRole(userRoleService, request, Role.CAPABILITY_EDITOR);
         String username = getUsername(request);
         EntityReference ref = getEntityReference(request);
         long categoryX = getLong(request, "x");
