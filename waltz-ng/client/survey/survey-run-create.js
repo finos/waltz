@@ -49,7 +49,7 @@ function controller($location,
 
         const surveyEmailSubject = `Survey invitation: ${surveyRun.name}`;
         const surveyLink = _.replace($location.absUrl(), '#' + $location.url(), '')
-            + $state.href('main.survey-run.response', {id: surveyRun.id});
+            + $state.href('main.survey.instance.user');
 
         const newLine = '%0D%0A';
         const surveyEmailBody = `${surveyRun.description}

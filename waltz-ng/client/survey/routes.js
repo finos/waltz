@@ -17,26 +17,55 @@ import {surveyTemplateResolver} from "./resolvers";
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const baseState = {};
+const baseState = {
+    url: 'survey'
+};
 
-const createState = {
-    url: 'survey/template/{id:int}/new-run',
+
+const runBaseState = {
+    url: '/run'
+};
+
+
+const instanceBaseState = {
+    url: '/instance'
+};
+
+
+const runCreateState = {
+    url: '/template/{id:int}/new-run',
     views: {'content@': require('./survey-run-create')},
     resolve: {
         surveyTemplate: surveyTemplateResolver
     }
 };
 
-const responseState = {
-    url: 'survey/run/{id:int}/response'
+
+const instanceUserState = {
+    url: '/user',
+    views: {'content@': require('./survey-instance-list-user-view')}
 };
+
+
+const instanceResponseState = {
+    url: '/{id:int}/response'
+};
+
+
+const instanceResponseEditState = {
+    url: '/edit'
+};
+
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.survey-run', baseState)
-        .state('main.survey-run.create', createState)
-        .state('main.survey-run.response', responseState);
-
+        .state('main.survey', baseState)
+        .state('main.survey.run', runBaseState)
+        .state('main.survey.run.create', runCreateState)
+        .state('main.survey.instance', instanceBaseState)
+        .state('main.survey.instance.user', instanceUserState)
+        .state('main.survey.instance.response', instanceResponseState)
+        .state('main.survey.instance.response.edit', instanceResponseEditState);
 }
 
 

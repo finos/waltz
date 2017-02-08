@@ -19,10 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.IdCommandResponse;
-import com.khartec.waltz.model.survey.SurveyInstanceRecipient;
-import com.khartec.waltz.model.survey.SurveyRunChangeCommand;
-import com.khartec.waltz.model.survey.SurveyRunCreateCommand;
-import com.khartec.waltz.model.survey.SurveyRunStatusChangeCommand;
+import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.service.survey.SurveyRunService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -57,10 +54,14 @@ public class SurveyRunEndpoint implements Endpoint {
 
     @Override
     public void register() {
+        String surveyRunListForUserPath = mkPath(BASE_URL, "user");
         String surveyRunUpdatePath = mkPath(BASE_URL, ":id");
         String generateSurveyRunRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String createSurveyRunInstancesAndRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String updateSurveyRunStatusPath = mkPath(BASE_URL, ":id", "status");
+
+        ListRoute<SurveyRun> surveyRunListForUserRoute =
+                (req, res) -> surveyRunService.findForRecipient(getUsername(req));
 
         DatumRoute<IdCommandResponse> surveyRunCreateRoute = (req, res) -> {
             res.type(WebUtilities.TYPE_JSON);
@@ -98,6 +99,7 @@ public class SurveyRunEndpoint implements Endpoint {
                 surveyRunService.createSurveyInstancesAndRecipients(getId(request), newArrayList(readBody(request, SurveyInstanceRecipient[].class)));
 
         getForList(generateSurveyRunRecipientsPath, generateSurveyRunRecipientsRoute);
+        getForList(surveyRunListForUserPath, surveyRunListForUserRoute);
         postForDatum(BASE_URL, surveyRunCreateRoute);
         putForDatum(surveyRunUpdatePath, surveyRunUpdateRoute);
         postForDatum(createSurveyRunInstancesAndRecipientsPath, createSurveyRunInstancesAndRecipientsRoute);

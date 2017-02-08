@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,8 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import angular from 'angular';
+import angular from "angular";
 
 export default () => {
     const module = angular.module('waltz.survey', []);
@@ -30,6 +28,7 @@ export default () => {
         .component('waltzSurveyRunCreateRecipient', require('./components/survey-run-create-recipient'));
 
     module
+        .service('SurveyInstanceStore', require('./services/survey-instance-store'))
         .service('SurveyRunStore', require('./services/survey-run-store'))
         .service('SurveyTemplateStore', require('./services/survey-template-store'));
 

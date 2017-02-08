@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import _ from "lodash";
 import BaseLookupService from "./BaseLookupService";
 import {
@@ -36,6 +35,7 @@ import {
     orgUnitKindNames,
     rollupKindNames,
     severityNames,
+    surveyInstanceStatusNames,
     usageKindDisplayNames,
     transportKindNames,
     frequencyKindNames,
@@ -123,6 +123,7 @@ export default (module) => {
         .register('rating', authSourceRatingNames)
         .register('rollupKind', rollupKindNames)
         .register('severity', severityNames)
+        .register('surveyInstanceStatus', surveyInstanceStatusNames)
         .register('usageKind', usageKindDisplayNames)
         .register('transportKind', transportKindNames)
         ;

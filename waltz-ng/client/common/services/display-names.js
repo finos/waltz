@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import _ from "lodash";
 
 
@@ -217,6 +216,14 @@ export const lifecycleStatusNames = {
     'INACTIVE': 'Inactive',
     'RETIRING': 'Retiring',
     'UNKNOWN': 'Unknown'
+};
+
+
+export const surveyInstanceStatusNames = {
+    'COMPLETED': 'Completed',
+    'EXPIRED': 'Expired',
+    'IN_PROGRESS': 'In Progress',
+    'NOT_STARTED': 'Not Started'
 };
 
 
