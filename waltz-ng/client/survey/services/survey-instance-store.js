@@ -23,7 +23,7 @@ function store($http, baseApiUrl) {
     const findForUser = () => {
         return $http
             .get(`${base}/user`)
-            .then(t => t.data);
+            .then(result => result.data);
     };
 
     return {

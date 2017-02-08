@@ -29,7 +29,7 @@ function store($http, baseApiUrl) {
     const findForUser = () => {
         return $http
             .get(`${base}/user`)
-            .then(t => t.data);
+            .then(r => r.data);
     };
 
     const update = (id, cmd) => {
