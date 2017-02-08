@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -46,9 +47,6 @@ import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.PerspectiveRating.PERSPECTIVE_RATING;
 
-/**
- * Created by dwatkins on 01/02/2017.
- */
 @Repository
 public class PerspectiveRatingDao {
 
@@ -158,5 +156,15 @@ public class PerspectiveRatingDao {
                 .and(PERSPECTIVE_RATING.ENTITY_KIND.eq(entityReference.kind().name()))
                 .and(measurableMatchesEitherAxis)
                 .execute();
+    }
+
+
+    public Collection<PerspectiveRating> findForEntity(EntityReference ref) {
+        return dsl
+                .select(PERSPECTIVE_RATING.fields())
+                .from(PERSPECTIVE_RATING)
+                .where(PERSPECTIVE_RATING.ENTITY_ID.eq(ref.id()))
+                .and(PERSPECTIVE_RATING.ENTITY_KIND.eq(ref.kind().name()))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

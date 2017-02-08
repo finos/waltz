@@ -50,6 +50,7 @@
             <span ng-bind="node.name"
                   ng-class="{ 'italics' : ! node.concrete }">
             </span>
+            <span ng-if="$ctrl.overrides.indexOf(node.id) > -1">*</span>
         </span>
 
     </treecontrol>

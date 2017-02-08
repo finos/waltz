@@ -17,6 +17,7 @@
  */
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
+import {mergeKeyedLists, toGroupedMap} from '../../../common/map-utils';
 
 /**
  * @name waltz-measurable-rating-panel
@@ -34,6 +35,7 @@ const bindings = {
     categories: '<',
     measurables: '<',
     ratings: '<',
+    perspectiveRatings: '<',
     sourceDataRatings: '<'
 };
 
@@ -43,6 +45,7 @@ const template = require('./measurable-rating-app-section.html');
 
 const initialState = {
     ratings: [],
+    perspectiveRatings: [],
     categories: [],
     measurables: [],
     visibility: {
@@ -55,7 +58,7 @@ const initialState = {
 
 
 
-function groupByCategory(categories = [], measurables = [], ratings = []) {
+function mkTabs(categories = [], measurables = [], ratings = []) {
 
     const measurablesByCategory = _.groupBy(
         measurables,
@@ -82,12 +85,43 @@ function groupByCategory(categories = [], measurables = [], ratings = []) {
 }
 
 
-function controller() {
-    const vm = initialiseData(this, initialState);
+function mkOverridesMap(perspectiveRatings = [], measurables = []) {
+    const ratings = _.map(perspectiveRatings, 'value');
+    const measurablesById = _.keyBy(measurables, 'id');
 
-    vm.$onChanges = (c) => {
-        if (c.measurables || c.ratings || vm.categories) {
-            vm.tabs = groupByCategory(vm.categories, vm.measurables, vm.ratings);
+    const byX = toGroupedMap(
+        ratings,
+        r => r.measurableX,
+        r => ({
+            measurable: measurablesById[r.measurableY],
+            rating: r.rating
+        }));
+    const byY = toGroupedMap(
+        ratings,
+        r => r.measurableY,
+        r => ({
+            measurable: measurablesById[r.measurableX],
+            rating: r.rating
+        }));
+
+    return mergeKeyedLists(byX, byY);
+}
+
+
+function controller() {
+    const vm = this;
+
+    vm.$onInit = () => {
+        initialiseData(vm, initialState);
+    };
+
+    vm.$onChanges = () => {
+        if (vm.perspectiveRatings && vm.measurables) {
+            vm.overridesByMeasurableId = mkOverridesMap(vm.perspectiveRatings, vm.measurables);
+        }
+
+        if (vm.measurables && vm.ratings && vm.categories) {
+            vm.tabs = mkTabs(vm.categories, vm.measurables, vm.ratings);
             const firstNonEmptyTab = _.find(vm.tabs, t => t.ratings.length > 0);
             vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
         }
