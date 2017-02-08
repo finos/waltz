@@ -63,7 +63,7 @@ function controller($q,
             { width: "30%" }
         ),
         Object.assign(
-            mkEntityLinkGridCell('Survey Entity', 'surveyEntity'),
+            mkEntityLinkGridCell('Survey Subject', 'surveyEntity'),
             { width: "30%" }
         ),
         { field: 'surveyInstance.status', displayName: 'Status', cellFilter: "toDisplayName:'surveyInstanceStatus'", width: "13%"},
