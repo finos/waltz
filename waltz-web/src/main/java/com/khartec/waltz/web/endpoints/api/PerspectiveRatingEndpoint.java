@@ -63,13 +63,22 @@ public class PerspectiveRatingEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String entityPath = mkPath(BASE, ":x", ":y", "entity", ":kind", ":id");
+        String entityPath = mkPath(BASE, "entity", ":kind", ":id");
+        String entityAxisPath = mkPath(entityPath, ":x", ":y");
+
         getForList(entityPath, this::findForEntity);
-        putForDatum(entityPath, this::updateForEntity);
+        putForDatum(entityAxisPath, this::updateForEntityAxis);
+        getForList(entityAxisPath, this::findForEntityAxis);
     }
 
 
     private Collection<PerspectiveRating> findForEntity(Request request, Response z) {
+        EntityReference ref = getEntityReference(request);
+        return perspectiveRatingService.findForEntity(ref);
+    }
+
+
+    private Collection<PerspectiveRating> findForEntityAxis(Request request, Response z) {
         EntityReference ref = getEntityReference(request);
         long categoryX = getLong(request, "x");
         long categoryY = getLong(request, "y");
@@ -77,7 +86,7 @@ public class PerspectiveRatingEndpoint implements Endpoint {
     }
 
 
-    private int updateForEntity(Request request, Response z) throws IOException {
+    private int updateForEntityAxis(Request request, Response z) throws IOException {
         requireRole(userRoleService, request, Role.CAPABILITY_EDITOR);
         String username = getUsername(request);
         EntityReference ref = getEntityReference(request);

@@ -89,6 +89,8 @@ function controller($q,
                     measurableCategoryStore,
                     measurableRatingStore,
                     orgUnitStore,
+                    perspectiveDefinitionStore,
+                    perspectiveRatingStore,
                     physicalSpecificationStore,
                     physicalFlowStore,
                     serverInfoStore,
@@ -207,7 +209,16 @@ function controller($q,
 
             assetCostStore
                 .findByAppId(id)
-                .then(costs => vm.costs = costs)
+                .then(costs => vm.costs = costs),
+
+            perspectiveDefinitionStore
+                .findAll()
+                .then(pds => vm.perspectiveDefinitions = pds),
+
+            perspectiveRatingStore
+                .findForEntity(entityReference)
+                .then(prs => vm.perspectiveRatings = prs),
+
         ];
 
         return $q.all(promises)
@@ -245,6 +256,8 @@ controller.$inject = [
     'MeasurableCategoryStore',
     'MeasurableRatingStore',
     'OrgUnitStore',
+    'PerspectiveDefinitionStore',
+    'PerspectiveRatingStore',
     'PhysicalSpecificationStore',
     'PhysicalFlowStore',
     'ServerInfoStore',

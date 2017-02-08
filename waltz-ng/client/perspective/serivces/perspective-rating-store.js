@@ -36,9 +36,18 @@ function store($http,
 
 
     const mkEntityUrl = (categoryX, categoryY, ref) =>
-        `${BASE}/${categoryX}/${categoryY}/entity/${ref.kind}/${ref.id}`;
+        `${BASE}/entity/${ref.kind}/${ref.id}/${categoryX}/${categoryY}`;
 
-    const findForEntity = (categoryX,
+
+    const findForEntity = (ref) => {
+
+        return $http
+            .get(`${BASE}/entity/${ref.kind}/${ref.id}`)
+            .then(result => result.data);
+    };
+
+
+    const findForEntityAxis = (categoryX,
                            categoryY,
                            ref) => {
         const url = mkEntityUrl(
@@ -50,7 +59,8 @@ function store($http,
             .then(result => result.data);
     };
 
-    const updateForEntity = (categoryX,
+
+    const updateForEntityAxis = (categoryX,
                              categoryY,
                              ref,
                              perspectiveRatings = []) => {
@@ -66,7 +76,8 @@ function store($http,
 
     return {
         findForEntity,
-        updateForEntity
+        findForEntityAxis,
+        updateForEntityAxis
     };
 }
 

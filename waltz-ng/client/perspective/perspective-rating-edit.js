@@ -65,7 +65,7 @@ function controller($stateParams,
     perspectiveDefinitionStore
         .findAll()
         .then(pds => vm.perspectiveDefinition = _.find(pds, { id: perspectiveId || 1 }))
-        .then(pd => perspectiveRatingStore.findForEntity(pd.categoryX, pd.categoryY, entityReference))
+        .then(pd => perspectiveRatingStore.findForEntityAxis(pd.categoryX, pd.categoryY, entityReference))
         .then(rs => vm.perspectiveRatings = rs);
 
     measurableStore
@@ -80,8 +80,8 @@ function controller($stateParams,
         const p = vm.perspectiveDefinition;
         const withoutUnknowns = _.reject(values, { rating: 'Z' });
         return perspectiveRatingStore
-            .updateForEntity(p.categoryX, p.categoryY, entityReference, withoutUnknowns)
-            .then(() => perspectiveRatingStore.findForEntity(p.categoryX, p.categoryY, entityReference))
+            .updateForEntityAxis(p.categoryX, p.categoryY, entityReference, withoutUnknowns)
+            .then(() => perspectiveRatingStore.findForEntityAxis(p.categoryX, p.categoryY, entityReference))
             .then(rs => vm.perspectiveRatings = rs);
     };
 }
