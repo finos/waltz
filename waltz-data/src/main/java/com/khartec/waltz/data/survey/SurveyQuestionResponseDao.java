@@ -5,9 +5,7 @@ import com.khartec.waltz.model.survey.ImmutableSurveyInstanceQuestionResponse;
 import com.khartec.waltz.model.survey.ImmutableSurveyQuestionResponse;
 import com.khartec.waltz.model.survey.SurveyInstanceQuestionResponse;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionResponseRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +17,7 @@ import java.util.Optional;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
+import static org.jooq.impl.DSL.*;
 
 @Repository
 public class SurveyQuestionResponseDao {
@@ -31,7 +30,6 @@ public class SurveyQuestionResponseDao {
                 .personId(record.getPersonId())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .questionResponse(ImmutableSurveyQuestionResponse.builder()
-                        .id(record.getId())
                         .questionId(record.getQuestionId())
                         .comment(Optional.ofNullable(record.getComment()))
                         .stringResponse(Optional.ofNullable(record.getStringResponse()))
@@ -70,26 +68,30 @@ public class SurveyQuestionResponseDao {
     }
 
 
-    public long saveResponse(SurveyInstanceQuestionResponse response) {
+    public void saveResponse(SurveyInstanceQuestionResponse response) {
         checkNotNull(response, "response cannot be null");
         checkNotNull(response.questionResponse(), "response.questionResponse() cannot be null");
 
         SurveyQuestionResponseRecord record = mkRecord(response);
 
-        if (response.questionResponse().id().isPresent()) {
+        Condition responseExistsCondition = exists(selectFrom(SURVEY_QUESTION_RESPONSE)
+                .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(response.surveyInstanceId())
+                        .and(SURVEY_QUESTION_RESPONSE.QUESTION_ID.eq(response.questionResponse().questionId()))));
+
+        Boolean responseExists = dsl.select(when(responseExistsCondition, true).otherwise(false))
+                .fetchOne(Record1::value1);
+
+        if (responseExists) {
             record.update();
         } else {
             record.insert();
         }
-
-        return record.getId();
     }
 
 
     private SurveyQuestionResponseRecord mkRecord(SurveyInstanceQuestionResponse response) {
-        SurveyQuestionResponseRecord record = dsl.newRecord(SURVEY_QUESTION_RESPONSE);;
+        SurveyQuestionResponseRecord record = dsl.newRecord(SURVEY_QUESTION_RESPONSE);
 
-        response.questionResponse().id().ifPresent(record::setId);
         record.setSurveyInstanceId(response.surveyInstanceId());
         record.setQuestionId(response.questionResponse().questionId());
         record.setPersonId(response.personId());

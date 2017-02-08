@@ -1448,4 +1448,16 @@
     </changeSet>
 
 
+    <!-- 1519: Change Survey_Question_Response primary key -->
+    <changeSet author="rovats"
+               id="20170208-1519-1">
+        <dropColumn tableName="survey_question_response"
+                    columnName="id">
+        </dropColumn>
+
+        <addPrimaryKey columnNames="survey_instance_id, question_id"
+                       constraintName="survey_question_response_pkey"
+                       tableName="survey_question_response"/>
+    </changeSet>
+
 </databaseChangeLog>

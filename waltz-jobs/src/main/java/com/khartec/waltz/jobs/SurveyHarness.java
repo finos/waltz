@@ -132,18 +132,15 @@ public class SurveyHarness {
                 .stringResponse("some response")
                 .build();
 
-        IdCommandResponse idCommandResponse = surveyInstanceService.saveResponse(userName, instance.id().get(), insertResponse);
+        surveyInstanceService.saveResponse(userName, instance.id().get(), insertResponse);
         System.out.println("===========Inserted Responses==========");
-        System.out.println(idCommandResponse);
         System.out.println(surveyInstanceService.findResponses(instance.id().get()));
 
         ImmutableSurveyQuestionResponse updateResponse = insertResponse
-                .withStringResponse("updated string response")
-                .withId(idCommandResponse.id());
+                .withStringResponse("updated string response");
 
-        IdCommandResponse updateIdCommandResponse = surveyInstanceService.saveResponse(userName, instance.id().get(), updateResponse);
+        surveyInstanceService.saveResponse(userName, instance.id().get(), updateResponse);
         System.out.println("===========Updated Responses==========");
-        System.out.println(updateIdCommandResponse);
         System.out.println(surveyInstanceService.findResponses(instance.id().get()));
 
         surveyInstanceService.updateStatus(instance.id().get(), SurveyInstanceStatus.IN_PROGRESS);

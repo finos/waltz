@@ -6,8 +6,6 @@ import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.data.survey.SurveyInstanceDao;
 import com.khartec.waltz.data.survey.SurveyInstanceRecipientDao;
 import com.khartec.waltz.data.survey.SurveyQuestionResponseDao;
-import com.khartec.waltz.model.IdCommandResponse;
-import com.khartec.waltz.model.ImmutableIdCommandResponse;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.survey.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,9 +62,9 @@ public class SurveyInstanceService {
     }
 
 
-    public IdCommandResponse saveResponse(String userName,
-                                          long instanceId,
-                                          SurveyQuestionResponse questionResponse) {
+    public boolean saveResponse(String userName,
+                                long instanceId,
+                                SurveyQuestionResponse questionResponse) {
 
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(questionResponse, "questionResponse cannot be null");
@@ -91,11 +89,9 @@ public class SurveyInstanceService {
                 .questionResponse(questionResponse)
                 .build();
 
-        long savedId = surveyQuestionResponseDao.saveResponse(instanceQuestionResponse);
+        surveyQuestionResponseDao.saveResponse(instanceQuestionResponse);
 
-        return ImmutableIdCommandResponse.builder()
-                .id(savedId)
-                .build();
+        return true;
     }
 
 
