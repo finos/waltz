@@ -1,0 +1,19 @@
+<div>
+    <waltz-page-header icon="edit"
+                       name="Surveys"
+                       small="{{ctrl.user.userName}}">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Survey</a></li>
+            <li ng-bind="ctrl.user.userName"></li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div ng-if="ctrl.gridData.length > 0">
+            <waltz-grid-with-search column-defs="ctrl.columnDefs"
+                                    entries="ctrl.gridData"
+                                    search-placeholder-text="Search...">
+            </waltz-grid-with-search>
+        </div>
+    </div>
+</div>

@@ -15,12 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.join;
 import static com.khartec.waltz.common.StringUtilities.splitThenMap;
-import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
+import static com.khartec.waltz.schema.Tables.*;
 
 @Repository
 public class SurveyRunDao {
@@ -69,6 +70,18 @@ public class SurveyRunDao {
                 .from(SURVEY_RUN)
                 .where(SURVEY_RUN.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<SurveyRun> findForRecipient(long personId) {
+        return dsl.select(SURVEY_RUN.fields())
+                .from(SURVEY_RUN)
+                .innerJoin(SURVEY_INSTANCE)
+                .on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
+                .innerJoin(SURVEY_INSTANCE_RECIPIENT)
+                .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
+                .where(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 

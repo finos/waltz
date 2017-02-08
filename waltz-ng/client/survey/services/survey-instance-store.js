@@ -18,13 +18,7 @@
 
 function store($http, baseApiUrl) {
 
-    const base = `${baseApiUrl}/survey-run`;
-
-    const create = (cmd) => {
-        return $http
-            .post(base, cmd)
-            .then(r => r.data);
-    };
+    const base = `${baseApiUrl}/survey-instance`;
 
     const findForUser = () => {
         return $http
@@ -32,35 +26,8 @@ function store($http, baseApiUrl) {
             .then(t => t.data);
     };
 
-    const update = (id, cmd) => {
-        return $http
-            .put(`${base}/${id}`, cmd)
-            .then(r => r.data);
-    };
-
-    const updateStatus = (id, newStatus) => {
-        return $http
-            .put(`${base}/${id}/status`, newStatus)
-            .then(r => r.data);
-    };
-
-    const generateSurveyRunRecipients = (id) => {
-        return $http
-            .get(`${base}/${id}/recipients`)
-    };
-
-    const createSurveyRunInstancesAndRecipients = (id, excludedRecipients) => {
-        return $http
-            .post(`${base}/${id}/recipients`, excludedRecipients);
-    };
-
     return {
-        create,
         findForUser,
-        update,
-        updateStatus,
-        generateSurveyRunRecipients,
-        createSurveyRunInstancesAndRecipients
     };
 }
 

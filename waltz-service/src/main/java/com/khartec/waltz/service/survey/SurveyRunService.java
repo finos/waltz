@@ -71,6 +71,21 @@ public class SurveyRunService {
     }
 
 
+    public SurveyRun getById(long id) {
+        return surveyRunDao.getById(id);
+    }
+
+
+    public List<SurveyRun> findForRecipient(String userName) {
+        checkNotNull(userName, "userName cannot be null");
+
+        Person person = personDao.getByUserName(userName);
+        checkNotNull(person, "userName " + userName + " cannot be resolved");
+
+        return surveyRunDao.findForRecipient(person.id().get());
+    }
+
+
     public IdCommandResponse createSurveyRun(String userName, SurveyRunCreateCommand command) {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(command, "create command cannot be null");
