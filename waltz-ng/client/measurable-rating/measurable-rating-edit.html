@@ -142,7 +142,7 @@
                                                          on-select="ctrl.onRatingSelect"
                                                          on-keypress="ctrl.onKeypress">
                                     </waltz-rating-picker>
-                                    <div ng-if="ctrl.selected.rating !== ctrl.entityRating"
+                                    <div ng-if="ctrl.selected.rating.rating !== ctrl.entityRating"
                                          class="small text-muted">
                                         <waltz-icon name="warning">
                                         </waltz-icon>
