@@ -87,7 +87,7 @@ public class PerspectiveRatingEndpoint implements Endpoint {
 
 
     private int updateForEntityAxis(Request request, Response z) throws IOException {
-        requireRole(userRoleService, request, Role.CAPABILITY_EDITOR);
+        requireRole(userRoleService, request, Role.RATING_EDITOR);
         String username = getUsername(request);
         EntityReference ref = getEntityReference(request);
         long categoryX = getLong(request, "x");
