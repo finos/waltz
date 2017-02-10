@@ -21,19 +21,14 @@
                 <div class="small"
                      ng-bind="$ctrl.selected.measurable.description">
                 </div>
-            </div>
-            <div ng-if="$ctrl.selected.rating != null">
-                <hr>
-                <h4>
-                    Rating
-                </h4>
+                <br>
                 <div>
-                    <waltz-rating-indicator-cell rating="$ctrl.selected.rating.rating"
+                    Rating: <waltz-rating-indicator-cell rating="$ctrl.selected.rating.rating"
                                                  label="$ctrl.category.ragNames[$ctrl.selected.rating.rating]">
                     </waltz-rating-indicator-cell>
                     -
                     <span class="small"
-                          ng-bind="$ctrl.selected.rating.description">
+                          ng-bind="$ctrl.selected.rating.description || 'No comment given'">
                     </span>
                 </div>
                 <div class="pull-right small">
@@ -48,22 +43,15 @@
                 </div>
             </div>
         </div>
-        <hr>
         <div ng-if="$ctrl.selected.overrides">
-            <h4>Overrides</h4>
-            <ul class="list-unstyled small">
-                <li ng-repeat="override in $ctrl.selected.overrides | orderBy:'measurable.name'">
-                    <span ng-bind="override.measurable.name">
-                    </span>
-                    <span class='text-muted'
-                          ng-bind="override.measurable.categoryId | toDisplayName:'measurableCategory'">
-                    </span>
-                    -
-                    <waltz-rating-indicator-cell class="small"
-                                                 rating="override.rating">
-                    </waltz-rating-indicator-cell>
-                </li>
-            </ul>
+            <hr>
+            <h5>Overrides</h5>
+
+            <waltz-perspective-overrides overrides="$ctrl.selected.overrides"
+                                         base-measurable="$ctrl.selected.measurable"
+                                         base-rating="$ctrl.selected.rating.rating"
+                                         rag-names="$ctrl.category.ragNames">
+            </waltz-perspective-overrides>
         </div>
 
     </div>

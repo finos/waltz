@@ -30,7 +30,8 @@ function setup() {
         .service('PerspectiveRatingStore', require('./serivces/perspective-rating-store'));
     module
         .component('waltzPerspectiveEditor', require('./components/editor/perspective-editor'))
-        .component('waltzPerspectiveGrid', require('./components/grid/perspective-grid'));
+        .component('waltzPerspectiveGrid', require('./components/grid/perspective-grid'))
+        .component('waltzPerspectiveOverrides', require('./components/overrides/perspective-overrides'));
 
     return module.name;
 }

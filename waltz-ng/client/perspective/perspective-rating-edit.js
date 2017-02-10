@@ -42,8 +42,8 @@ function controller($stateParams,
 {
     const vm = initialiseData(this, initialState);
 
-    const perspectiveId = $stateParams.id;
-    const applicationId = $stateParams.appId;
+    const perspectiveId = $stateParams.perspectiveId;
+    const applicationId = $stateParams.entityId;
 
     const entityReference = {
         id: applicationId,

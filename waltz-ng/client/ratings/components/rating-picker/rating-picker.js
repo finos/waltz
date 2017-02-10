@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../../../common";
+import {baseRagNames} from "../../rating-utils";
 import _ from 'lodash';
 
 
@@ -36,13 +37,7 @@ const initialState = {
     pickerStyle: {},
     hideOptions: [],
     onSelect: (rating) => 'No onSelect handler defined for rating-picker: ' + rating,
-    ragNames: {
-        R: "Poor",
-        A: "Adequate",
-        G: "Good",
-        X: "Not Applicable",
-        Z: "Unknown"
-    }
+    ragNames: baseRagNames
 };
 
 

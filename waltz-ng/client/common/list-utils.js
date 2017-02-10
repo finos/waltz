@@ -1,3 +1,4 @@
+
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,34 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const baseState = {
-    url: 'perspective',
-};
+import _ from 'lodash';
 
 
-const ratingViewState = {
-    url: '/{perspectiveId:int}/rating/{entityKind:string}/{entityId:int}',
-    views: {'content@': require('./perspective-rating-edit') },
-};
-
-
-const ratingEditState = {
-    url: '/edit',
-    views: {'content@': require('./perspective-rating-edit') },
-};
-
-
-function setup($stateProvider) {
-    $stateProvider
-        .state('main.perspective', baseState)
-        .state('main.perspective.rating', ratingViewState)
-        .state('main.perspective.rating.edit', ratingEditState);
+export function containsAll(xs = [], ys = []) {
+    return _.every(ys, y => _.includes(xs, y));
 }
-
-
-setup.$inject = [
-    '$stateProvider'
-];
-
-
-export default setup;

@@ -16,34 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const baseState = {
-    url: 'perspective',
+
+export const baseRagNames = {
+    'R': 'Poor',
+    'A': 'Adequate',
+    'G': 'Good',
+    'Z': 'Unknown',
+    'X': 'Not Applicable'
 };
-
-
-const ratingViewState = {
-    url: '/{perspectiveId:int}/rating/{entityKind:string}/{entityId:int}',
-    views: {'content@': require('./perspective-rating-edit') },
-};
-
-
-const ratingEditState = {
-    url: '/edit',
-    views: {'content@': require('./perspective-rating-edit') },
-};
-
-
-function setup($stateProvider) {
-    $stateProvider
-        .state('main.perspective', baseState)
-        .state('main.perspective.rating', ratingViewState)
-        .state('main.perspective.rating.edit', ratingEditState);
-}
-
-
-setup.$inject = [
-    '$stateProvider'
-];
-
-
-export default setup;
