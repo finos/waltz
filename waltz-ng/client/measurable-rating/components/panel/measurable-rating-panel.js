@@ -38,6 +38,7 @@ const bindings = {
     category: '<',
     ratings: '<',
     measurables: '<',
+    perspectiveDefinitions: '<',
     overrides: '<'
 };
 

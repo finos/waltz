@@ -35,6 +35,7 @@ const bindings = {
     categories: '<',
     measurables: '<',
     ratings: '<',
+    perspectiveDefinitions: '<',
     perspectiveRatings: '<',
     sourceDataRatings: '<'
 };
@@ -45,6 +46,7 @@ const template = require('./measurable-rating-app-section.html');
 
 const initialState = {
     ratings: [],
+    perspectiveDefinitions: [],
     perspectiveRatings: [],
     categories: [],
     measurables: [],
@@ -58,7 +60,7 @@ const initialState = {
 
 
 
-function mkTabs(categories = [], measurables = [], ratings = []) {
+function mkTabs(categories = [], measurables = [], ratings = [], perspectiveDefinitions = []) {
 
     const measurablesByCategory = _.groupBy(
         measurables,
@@ -75,7 +77,8 @@ function mkTabs(categories = [], measurables = [], ratings = []) {
         return {
             category,
             measurables: usedMeasurables,
-            ratings: ratingsForMeasure
+            ratings: ratingsForMeasure,
+            perspectiveDefinitions
         };
     });
 
@@ -121,7 +124,7 @@ function controller() {
         }
 
         if (vm.measurables && vm.ratings && vm.categories) {
-            vm.tabs = mkTabs(vm.categories, vm.measurables, vm.ratings);
+            vm.tabs = mkTabs(vm.categories, vm.measurables, vm.ratings, vm.perspectiveDefinitions);
             const firstNonEmptyTab = _.find(vm.tabs, t => t.ratings.length > 0);
             vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
         }

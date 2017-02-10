@@ -31,6 +31,7 @@ export default () => {
         ;
 
     module
+        .component('waltzAssociatedPerspectives', require('./components/associated-perspectives/associated-perspectives'))
         .component('waltzMeasurableRatingAppSection', require('./components/app-section/measurable-rating-app-section'))
         .component('waltzMeasurableRatingExplorerSection', require('./components/explorer-section/measurable-rating-explorer-section'))
         .component('waltzMeasurableRatingPanel', require('./components/panel/measurable-rating-panel'))

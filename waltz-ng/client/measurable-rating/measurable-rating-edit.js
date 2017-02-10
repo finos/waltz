@@ -77,7 +77,8 @@ function controller($q,
                     measurableStore,
                     measurableCategoryStore,
                     measurableRatingStore,
-                    notification) {
+                    notification,
+                    perspectiveDefinitionStore) {
 
     const entityReference = {
         kind: $stateParams.kind,
@@ -114,6 +115,10 @@ function controller($q,
             vm.tabs = prepareTabs(vm.categories, vm.measurables, vm.ratings);
             vm.visibility.tab = determineSelectedTab(vm.tabs);
         });
+
+    perspectiveDefinitionStore
+        .findAll()
+        .then(pds => vm.perspectiveDefinitions = pds);
 
 
     // -- INTERACT ---
@@ -196,7 +201,10 @@ function controller($q,
 
     vm.doCancel = reset;
 
+    vm.onTabChange = (categoryId) => {
+        reset();
 
+    };
 
     vm.onKeypress = (evt) => {
         const goRed = () => vm.onRatingSelect('R');
@@ -234,7 +242,8 @@ controller.$inject = [
     'MeasurableStore',
     'MeasurableCategoryStore',
     'MeasurableRatingStore',
-    'Notification'
+    'Notification',
+    'PerspectiveDefinitionStore'
 ];
 
 

@@ -95,7 +95,7 @@
 
                 <!-- EDIT SECTION -->
                 <div class="row"
-                     ng-if="ctrl.selected">
+                     ng-if="ctrl.selected.measurable">
                     <div class="col-sm-12">
                         <h4 ng-bind="ctrl.selected.measurable.name"></h4>
                         <p class="text-muted"
@@ -183,6 +183,25 @@
 
                     </div>
                 </div>
+
+                <div class="row">
+                    <hr>
+                    <div class="col-md-12">
+                        <h4>Associated Perspectives</h4>
+                        <p class="text-muted small">
+                            Perspectives allow for a more precise view of an applications features and ratings
+                            by combining two categories.
+                        </p>
+
+                        <waltz-associated-perspectives measurables="ctrl.measurables"
+                                                       entity-ref="ctrl.entityRef"
+                                                       perspective-definitions="ctrl.perspectiveDefinitions"
+                                                       ratings="ctrl.ratings"
+                                                       category-id="ctrl.visibility.tab">
+                        </waltz-associated-perspectives>
+
+                    </div>
+                </div>
             </div>
 
             <!-- TABS & TREES -->
@@ -190,6 +209,7 @@
                 <div class="waltz-tabs">
                     <!-- TAB HEADERS -->
                     <input type="radio"
+                           ng-change="ctrl.onTabChange(tab.category.id)"
                            ng-repeat-start="tab in ctrl.tabs track by tab.category.id"
                            ng-model="ctrl.visibility.tab"
                            ng-value="tab.category.id"

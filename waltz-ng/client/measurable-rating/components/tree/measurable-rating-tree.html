@@ -34,23 +34,28 @@
                  on-selection="$ctrl.onSelect(node, $ctrl.ratingsByMeasurable[node.id])"
                  order-by="'-name'">
 
-        <span ng-if="node.concrete">
-            <waltz-rating-indicator-cell rating="$ctrl.ratingsByMeasurable[node.id].rating">
-            </waltz-rating-indicator-cell>
-        </span>
-
-        <span ng-if="! node.concrete">
-            <waltz-icon name='genderless'>
-            </waltz-icon>
-        </span>
-
-        <span ng-attr-title="{{ node.description }}"
-              ng-class="{ 'text-muted': $ctrl.ratingsByMeasurable[node.id].rating == null }"
-              class="no-overflow">
-            <span ng-bind="node.name"
-                  ng-class="{ 'italics' : ! node.concrete }">
+        <span class="waltz-visibility-parent">
+            <span ng-if="node.concrete">
+                <waltz-rating-indicator-cell rating="$ctrl.ratingsByMeasurable[node.id].rating">
+                </waltz-rating-indicator-cell>
             </span>
-            <span ng-if="$ctrl.overrides.indexOf(node.id) > -1">*</span>
+
+            <span ng-if="! node.concrete">
+                <waltz-icon name='genderless'>
+                </waltz-icon>
+            </span>
+
+            <span ng-attr-title="{{ node.description }}"
+                  ng-class="{ 'text-muted': $ctrl.ratingsByMeasurable[node.id].rating == null }"
+                  class="no-overflow">
+                <span ng-bind="node.name"
+                      ng-class="{ 'italics' : ! node.concrete }">
+                </span>
+                <span ng-if="$ctrl.overrides.indexOf(node.id) > -1"
+                      class="waltz-visibility-child-50">
+                    *
+                </span>
+            </span>
         </span>
 
     </treecontrol>
