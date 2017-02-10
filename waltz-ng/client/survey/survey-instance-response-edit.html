@@ -1,0 +1,170 @@
+<div>
+    <waltz-page-header icon="edit"
+                       name="{{ ctrl.surveyRun.name }}"
+                       small="edit response">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>
+                <a class="clickable"
+                   ng-click="ctrl.goToParent()">
+                    <span ng-bind="ctrl.surveyInstance.surveyEntity.name"></span>
+                </a>
+            </li>
+            <li>Surveys</li>
+            <li>
+                <span ng-bind="ctrl.surveyRun.name">
+                </span>
+            </li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-sm-12"
+                 ng-bind="ctrl.surveyRun.description">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-4 waltz-display-field-label">
+                Survey Subject
+            </div>
+            <div class="col-sm-8">
+                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity"></waltz-entity-link>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-4 waltz-display-field-label">
+                Status
+            </div>
+            <div class="col-sm-8"
+                 ng-bind="ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-4 waltz-display-field-label">
+                Due
+            </div>
+            <div class="col-sm-8">
+                <waltz-from-now timestamp="ctrl.surveyRun.dueDate"></waltz-from-now>
+            </div>
+        </div>
+    </div>
+
+    <br>
+    <waltz-section name="Responses">
+        <form name="surveyResponseForm"
+              class="form-horizontal"
+              role="form"
+              ng-submit="ctrl.submit()">
+            <div ng-repeat="groupedQuestion in ctrl.surveyQuestions">
+
+                <h4 ng-bind="groupedQuestion.sectionName" class="text-muted"></h4>
+                <hr>
+
+                <div ng-repeat="question in groupedQuestion.questions"
+                     class="form-group">
+                    <label for="{{ question.id }}"
+                           class="col-sm-5 control-label">
+                        <span ng-bind="question.questionText">
+                        </span>
+                            <span ng-if="question.isMandatory"
+                                  class="text-danger">
+                            *
+                        </span>
+                        <!-- help text -->
+                        <div ng-bind="question.helpText"
+                             class='small text-muted'>
+                        </div>
+                    </label>
+                    <div ng-switch="question.fieldType"
+                         class="col-sm-7">
+                        <!-- input control -->
+                        <!-- text -->
+                        <input ng-switch-when="TEXT"
+                               type="text"
+                               id="{{ question.id }}"
+                               ng-model="ctrl.surveyResponses[question.id].stringResponse"
+                               ng-required="question.isMandatory"
+                               ng-blur="ctrl.saveResponse(question.id)"
+                               class="form-control"/>
+                        <!-- number -->
+                        <input ng-switch-when="NUMBER"
+                               type="number"
+                               id="{{ question.id }}"
+                               ng-model="ctrl.surveyResponses[question.id].numberResponse"
+                               ng-required="question.isMandatory"
+                               ng-blur="ctrl.saveResponse(question.id)"
+                               class="form-control"/>
+                        <!-- boolean -->
+                        <div ng-switch-when="BOOLEAN">
+                            <label>
+                                <input name="{{ question.id }}"
+                                       type="radio"
+                                       ng-model="ctrl.surveyResponses[question.id].booleanResponse"
+                                       ng-required="question.isMandatory"
+                                       ng-change="ctrl.saveResponse(question.id)"
+                                       value="true"/>
+                                Yes
+                            </label>
+                            &nbsp;
+                            &nbsp;
+                            &nbsp;
+                            <label>
+                                <input name="{{ question.id }}"
+                                       type="radio"
+                                       ng-model="ctrl.surveyResponses[question.id].booleanResponse"
+                                       ng-required="question.isMandatory"
+                                       ng-change="ctrl.saveResponse(question.id)"
+                                       value="false"/>
+                                No
+                            </label>
+                            &nbsp;
+                            &nbsp;
+                            &nbsp;
+                            <label ng-if="! question.isMandatory">
+                                <input name="{{ question.id }}"
+                                       type="radio"
+                                       ng-model="ctrl.surveyResponses[question.id].booleanResponse"
+                                       ng-change="ctrl.saveResponse(question.id)"
+                                       value="null"/>
+                                N/a
+                            </label>
+                        </div>
+                        <!-- textarea -->
+                        <textarea ng-switch-when="TEXTAREA"
+                                  id="{{ question.id }}"
+                                  ng-model="ctrl.surveyResponses[question.id].stringResponse"
+                                  ng-required="question.isMandatory"
+                                  ng-blur="ctrl.saveResponse(question.id)"
+                                  class="form-control">
+                        </textarea>
+                        <!-- comment -->
+                        <waltz-editable-field ng-if="question.allowComment"
+                                              fieldType="textarea"
+                                              initial-val="ctrl.surveyResponses[question.id].comment"
+                                              item-id="question.id"
+                                              on-save="ctrl.saveComment"
+                                              button-label="Comment"
+                                              class="small text-muted">
+                        </waltz-editable-field>
+                    </div>
+                </div>
+                <hr>
+            </div>
+
+            <!-- submit button -->
+            <div class="form-group">
+                <div class="col-sm-offset-10 col-sm-2">
+                    <button type="submit"
+                            class="btn btn-success">
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </form>
+    </waltz-section>
+    </div>
+</div>

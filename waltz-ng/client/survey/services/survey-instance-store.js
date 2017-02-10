@@ -20,14 +20,42 @@ function store($http, baseApiUrl) {
 
     const base = `${baseApiUrl}/survey-instance`;
 
+    const getById = (id) => {
+        return $http
+            .get(`${base}/id/${id}`)
+            .then(result => result.data);
+    };
+
     const findForUser = () => {
         return $http
             .get(`${base}/user`)
             .then(result => result.data);
     };
 
+    const findResponses = (id) => {
+        return $http
+            .get(`${base}/${id}/responses`)
+            .then(result => result.data);
+    };
+
+    const saveResponse = (id, questionResponse) => {
+        return $http
+            .put(`${base}/${id}/response`, questionResponse)
+            .then(result => result.data);
+    };
+
+    const updateStatus = (id, command) => {
+        return $http
+            .post(`${base}/${id}/status`, command)
+            .then(result => result.data);
+    };
+
     return {
+        getById,
         findForUser,
+        findResponses,
+        saveResponse,
+        updateStatus
     };
 }
 

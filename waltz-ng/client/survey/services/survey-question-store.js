@@ -15,23 +15,26 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import angular from "angular";
 
-export default () => {
-    const module = angular.module('waltz.survey', []);
+function service($http, baseUrl) {
 
-    module
-        .config(require('./routes'));
+    const BASE = `${baseUrl}/survey-question`;
 
-    module
-        .component('waltzSurveyRunCreateGeneral', require('./components/survey-run-create-general'))
-        .component('waltzSurveyRunCreateRecipient', require('./components/survey-run-create-recipient'));
+    const findForInstance = (id) => {
+        return $http.get(`${BASE}/instance/${id}`)
+            .then(result => result.data);
+    };
 
-    module
-        .service('SurveyInstanceStore', require('./services/survey-instance-store'))
-        .service('SurveyRunStore', require('./services/survey-run-store'))
-        .service('SurveyTemplateStore', require('./services/survey-template-store'))
-        .service('SurveyQuestionStore', require('./services/survey-question-store'));
+    return {
+        findForInstance
+    };
+}
 
-    return module.name;
-};
+
+service.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
+
+
+export default service;
