@@ -27,6 +27,7 @@ import com.khartec.waltz.model.perspective.PerspectiveRatingValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -78,5 +79,9 @@ public class PerspectiveRatingService {
         int additionCount = perspectiveRatingDao.add(ref, additions, username);
 
         return removalCount + additionCount;
+    }
+
+    public Collection<PerspectiveRating> findForEntity(EntityReference ref) {
+        return perspectiveRatingDao.findForEntity(ref);
     }
 }

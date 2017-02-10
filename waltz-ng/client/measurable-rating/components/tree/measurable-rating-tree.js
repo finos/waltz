@@ -33,6 +33,7 @@ import {buildHierarchies, switchToParentIds, prepareSearchNodes, doSearch} from 
 const bindings = {
     ratings: '<',
     measurables: '<',
+    overrides: '<',
     onKeypress: '<',
     onSelect: '<',
     scrollHeight: '@' // should correspond to numeric values in `waltz-scroll-region` classes

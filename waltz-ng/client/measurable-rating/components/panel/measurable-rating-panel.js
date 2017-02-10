@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from 'lodash';
 import {initialiseData} from '../../../common';
 
 
@@ -37,20 +38,36 @@ const bindings = {
     category: '<',
     ratings: '<',
     measurables: '<',
+    perspectiveDefinitions: '<',
+    overrides: '<'
 };
 
 
 const initialState = {
     measurables: [],
     ratings: [],
+    overrides: [],
     selected: null
 };
 
 
 function controller() {
-    const vm = initialiseData(this, initialState);
+    const vm = this;
+
+    vm.$onInit = () => initialiseData(vm, initialState);
+
+    vm.$onChanges = () => {
+        vm.overriddenMeasurableIds = _.map(
+            _.keys(vm.overrides || {}),
+            Number);
+    };
+
     vm.onSelect = (measurable, rating) =>
-        vm.selected = { measurable, rating };
+        vm.selected = {
+            measurable,
+            rating,
+            overrides: vm.overrides[measurable.id]
+        };
 }
 
 

@@ -1450,6 +1450,13 @@
 
     <!-- 1519: Change Survey_Question_Response primary key -->
     <changeSet author="rovats"
+               dbms="mssql"
+               id="20170208-1519-0">
+        <dropPrimaryKey tableName="survey_question_response"
+                        constraintName="survey_question_response_pkey"/>
+    </changeSet>
+
+    <changeSet author="rovats"
                id="20170208-1519-1">
         <dropColumn tableName="survey_question_response"
                     columnName="id">

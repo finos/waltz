@@ -7,10 +7,7 @@ import com.khartec.waltz.model.survey.SurveyInstance;
 import com.khartec.waltz.model.survey.SurveyInstanceCreateCommand;
 import com.khartec.waltz.model.survey.SurveyInstanceStatus;
 import com.khartec.waltz.schema.tables.records.SurveyInstanceRecord;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -105,5 +102,13 @@ public class SurveyInstanceDao {
                 .where(SURVEY_INSTANCE.STATUS.notEqual(newStatus.name())
                         .and(SURVEY_INSTANCE.ID.eq(instanceId)))
                 .execute();
+    }
+
+
+    public List<SurveyInstance> findBySurveyInstanceIdSelector(Select<Record1<Long>> selector) {
+        return dsl.select(SURVEY_INSTANCE.fields())
+                .from(SURVEY_INSTANCE)
+                .where(SURVEY_INSTANCE.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

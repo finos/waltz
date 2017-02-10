@@ -8,9 +8,7 @@ import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.schema.tables.records.SurveyRunRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -141,5 +139,15 @@ public class SurveyRunDao {
                 .set(SURVEY_RUN.ISSUED_ON, java.sql.Date.valueOf(DateTimeUtilities.nowUtc().toLocalDate()))
                 .where(SURVEY_RUN.ID.eq(surveyRunId))
                 .execute();
+    }
+
+
+    public List<SurveyRun> findBySurveyInstanceIdSelector(Select<Record1<Long>> idSelector) {
+        return dsl
+                .selectDistinct(SURVEY_RUN.fields())
+                .from(SURVEY_RUN)
+                .join(SURVEY_INSTANCE).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
+                .where(SURVEY_INSTANCE.ID.in(idSelector))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

@@ -15,6 +15,9 @@ import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.khartec.waltz.model.IdSelectionOptions;
+import org.jooq.Record1;
+import org.jooq.Select;
 
 import java.util.List;
 
@@ -30,24 +33,28 @@ public class SurveyInstanceService {
     private final SurveyInstanceRecipientDao surveyInstanceRecipientDao;
     private final SurveyQuestionResponseDao surveyQuestionResponseDao;
 
+    private final SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory;
 
     @Autowired
     public SurveyInstanceService(ChangeLogService changeLogService,
                                  PersonDao personDao,
                                  SurveyInstanceDao surveyInstanceDao,
                                  SurveyInstanceRecipientDao surveyInstanceRecipientDao,
-                                 SurveyQuestionResponseDao surveyQuestionResponseDao) {
+                                 SurveyQuestionResponseDao surveyQuestionResponseDao
+                                 SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(surveyInstanceDao, "surveyInstanceDao cannot be null");
         checkNotNull(surveyInstanceRecipientDao, "surveyInstanceRecipientDao cannot be null");
         checkNotNull(surveyQuestionResponseDao, "surveyQuestionResponseDao cannot be null");
+        checkNotNull(surveyInstanceIdSelectorFactory, "surveyInstanceIdSelectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
         this.personDao = personDao;
         this.surveyInstanceDao = surveyInstanceDao;
         this.surveyInstanceRecipientDao = surveyInstanceRecipientDao;
         this.surveyQuestionResponseDao = surveyQuestionResponseDao;
+        this.surveyInstanceIdSelectorFactory = surveyInstanceIdSelectorFactory;
     }
 
 
@@ -120,5 +127,14 @@ public class SurveyInstanceService {
         }
 
         return result;
+    }
+
+
+    public List<SurveyInstance> findBySurveyInstanceIdSelector(IdSelectionOptions idSelectionOptions) {
+        checkNotNull(idSelectionOptions,  "idSelectionOptions cannot be null");
+
+        Select<Record1<Long>> selector = surveyInstanceIdSelectorFactory.apply(idSelectionOptions);
+
+        return surveyInstanceDao.findBySurveyInstanceIdSelector(selector);
     }
 }
