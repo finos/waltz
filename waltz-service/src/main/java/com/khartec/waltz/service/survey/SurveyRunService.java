@@ -41,6 +41,8 @@ public class SurveyRunService {
     private final SurveyRunDao surveyRunDao;
     private final SurveyTemplateDao surveyTemplateDao;
 
+    private final SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory;
+
 
     @Autowired
     public SurveyRunService(ChangeLogService changeLogService,
@@ -50,7 +52,8 @@ public class SurveyRunService {
                             SurveyInstanceDao surveyInstanceDao,
                             SurveyInstanceRecipientDao surveyInstanceRecipientDao,
                             SurveyRunDao surveyRunDao,
-                            SurveyTemplateDao surveyTemplateDao) {
+                            SurveyTemplateDao surveyTemplateDao,
+                            SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(idSelectorFactoryProvider, "idSelectorFactoryProvider cannot be null");
         checkNotNull(involvementDao, "involvementDao cannot be null");
@@ -59,6 +62,7 @@ public class SurveyRunService {
         checkNotNull(surveyInstanceRecipientDao, "surveyInstanceRecipientDao cannot be null");
         checkNotNull(surveyRunDao, "surveyRunDao cannot be null");
         checkNotNull(surveyTemplateDao, "surveyTemplateDao cannot be null");
+        checkNotNull(surveyInstanceIdSelectorFactory, "surveyInstanceIdSelectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
         this.idSelectorFactoryProvider = idSelectorFactoryProvider;
@@ -68,6 +72,7 @@ public class SurveyRunService {
         this.surveyInstanceRecipientDao = surveyInstanceRecipientDao;
         this.surveyRunDao = surveyRunDao;
         this.surveyTemplateDao = surveyTemplateDao;
+        this.surveyInstanceIdSelectorFactory = surveyInstanceIdSelectorFactory;
     }
 
 
@@ -245,5 +250,14 @@ public class SurveyRunService {
         checkTrue(Objects.equals(surveyRun.ownerId(), owner.id().get()), "Permission denied");
 
         checkTrue(surveyRun.status() == SurveyRunStatus.DRAFT, "survey run can only be updated when it's still in DRAFT mode");
+    }
+
+
+    public List<SurveyRun> findBySurveyInstanceIdSelector(IdSelectionOptions idSelectionOptions) {
+        checkNotNull(idSelectionOptions,  "idSelectionOptions cannot be null");
+
+        Select<Record1<Long>> selector = surveyInstanceIdSelectorFactory.apply(idSelectionOptions);
+
+        return surveyRunDao.findBySurveyInstanceIdSelector(selector);
     }
 }
