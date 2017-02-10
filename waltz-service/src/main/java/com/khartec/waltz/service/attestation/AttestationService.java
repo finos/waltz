@@ -20,6 +20,9 @@ package com.khartec.waltz.service.attestation;
 
 
 import com.khartec.waltz.data.attestation.AttestationDao;
+import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
+import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
@@ -29,6 +32,9 @@ import com.khartec.waltz.model.attestation.AttestationType;
 import com.khartec.waltz.model.attestation.ImmutableAttestation;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
+import com.khartec.waltz.model.physical_flow.PhysicalFlow;
+import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +43,10 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
+import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
+import static com.khartec.waltz.model.attestation.AttestationType.IMPLICIT;
 
 
 @Service
@@ -44,15 +54,28 @@ public class AttestationService {
 
     private final AttestationDao attestationDao;
     private final ChangeLogService changeLogService;
+    private final LogicalFlowDao logicalFlowDao;
+    private final PhysicalFlowDao physicalFlowDao;
+    private final PhysicalSpecificationDao physicalSpecificationDao;
 
 
     @Autowired
-    public AttestationService(AttestationDao attestationDao, ChangeLogService changeLogService) {
+    public AttestationService(AttestationDao attestationDao,
+                              ChangeLogService changeLogService,
+                              LogicalFlowDao logicalFlowDao,
+                              PhysicalFlowDao physicalFlowDao,
+                              PhysicalSpecificationDao physicalSpecificationDao) {
         checkNotNull(attestationDao, "attestationDao cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
+        checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
+        checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
 
         this.attestationDao = attestationDao;
         this.changeLogService = changeLogService;
+        this.logicalFlowDao = logicalFlowDao;
+        this.physicalFlowDao = physicalFlowDao;
+        this.physicalSpecificationDao = physicalSpecificationDao;
     }
 
 
@@ -61,8 +84,25 @@ public class AttestationService {
     }
 
 
+    public boolean attestPhysicalFlow(AttestationType type, long id, String username, String comments) {
+
+        boolean physicalAttestation = attest(PHYSICAL_FLOW, id, type, username, comments);
+
+        // now attest the spec and logical flow implicitly
+        PhysicalFlow physicalFlow = physicalFlowDao.getById(id);
+
+        PhysicalSpecification spec = physicalSpecificationDao.getById(physicalFlow.specificationId());
+        boolean specAttestation = attest(PHYSICAL_SPECIFICATION, spec.id().get(), IMPLICIT, username, comments + "  Due to attesation of physical flow: " + physicalFlow);
+
+        LogicalFlow logical = logicalFlowDao.findBySourceAndTarget(spec.owningEntity(), physicalFlow.target());
+        boolean logicalAttestation = attest(LOGICAL_DATA_FLOW, logical.id().get(), IMPLICIT, username, comments + "  Due to attesation of physical flow: " + physicalFlow);
+
+        return physicalAttestation && specAttestation && logicalAttestation;
+    }
+
+
     public boolean implicitlyAttest(EntityKind kind, long id, String username, String comments) {
-        return attest(kind, id, AttestationType.IMPLICIT, username, comments);
+        return attest(kind, id, IMPLICIT, username, comments);
     }
 
 

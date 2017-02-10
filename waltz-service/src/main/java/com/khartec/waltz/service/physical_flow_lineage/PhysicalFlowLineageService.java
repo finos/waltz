@@ -21,6 +21,7 @@ package com.khartec.waltz.service.physical_flow_lineage;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.physical_flow_lineage.PhysicalFlowLineageDao;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.attestation.AttestationType;
 import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineage;
 import com.khartec.waltz.model.physical_flow_lineage.PhysicalFlowLineageAddCommand;
@@ -91,8 +92,8 @@ public class PhysicalFlowLineageService {
         CommandResponse<PhysicalFlowLineageAddCommand> response = physicalFlowLineageDao.addContribution(addCommand);
 
         final String attestationComment = "Implied by lineage creation";
-        attestationService.implicitlyAttest(PHYSICAL_FLOW, addCommand.describedFlowId(), addCommand.lastUpdate().by(), attestationComment);
-        attestationService.implicitlyAttest(PHYSICAL_FLOW, addCommand.contributingFlowId(), addCommand.lastUpdate().by(), attestationComment);
+        attestationService.attestPhysicalFlow(AttestationType.IMPLICIT, addCommand.describedFlowId(), addCommand.lastUpdate().by(), attestationComment);
+        attestationService.attestPhysicalFlow(AttestationType.IMPLICIT, addCommand.contributingFlowId(), addCommand.lastUpdate().by(), attestationComment);
 
         return response;
     }
