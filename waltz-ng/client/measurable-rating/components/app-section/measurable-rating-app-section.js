@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
-import {initialiseData} from '../../../common';
-import {mergeKeyedLists, toGroupedMap} from '../../../common/map-utils';
+import _ from "lodash";
+import {initialiseData} from "../../../common";
+import {mergeKeyedLists, toGroupedMap} from "../../../common/map-utils";
 
 /**
  * @name waltz-measurable-rating-panel

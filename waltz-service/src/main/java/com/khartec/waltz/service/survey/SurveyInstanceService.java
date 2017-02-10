@@ -8,16 +8,16 @@ import com.khartec.waltz.data.survey.SurveyInstanceRecipientDao;
 import com.khartec.waltz.data.survey.SurveyQuestionResponseDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ public class SurveyInstanceService {
                                  PersonDao personDao,
                                  SurveyInstanceDao surveyInstanceDao,
                                  SurveyInstanceRecipientDao surveyInstanceRecipientDao,
-                                 SurveyQuestionResponseDao surveyQuestionResponseDao
+                                 SurveyQuestionResponseDao surveyQuestionResponseDao,
                                  SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
