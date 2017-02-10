@@ -143,7 +143,12 @@ public class SurveyHarness {
         System.out.println("===========Updated Responses==========");
         System.out.println(surveyInstanceService.findResponses(instance.id().get()));
 
-        surveyInstanceService.updateStatus(instance.id().get(), SurveyInstanceStatus.IN_PROGRESS);
+        surveyInstanceService.updateStatus(
+                userName,
+                instance.id().get(),
+                ImmutableSurveyInstanceStatusChangeCommand.builder()
+                        .newStatus(SurveyInstanceStatus.IN_PROGRESS)
+                        .build());
     }
 
 
