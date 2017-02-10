@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.ifEmpty;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
 import static org.jooq.impl.DSL.*;
@@ -96,9 +97,15 @@ public class SurveyQuestionResponseDao {
         record.setQuestionId(response.questionResponse().questionId());
         record.setPersonId(response.personId());
         record.setLastUpdatedAt(Timestamp.valueOf(response.lastUpdatedAt()));
-        record.setComment(response.questionResponse().comment().orElse(null));
-        record.setStringResponse(response.questionResponse().stringResponse().orElse(null));
-        record.setNumberResponse(response.questionResponse().numberResponse().map(BigDecimal::valueOf).orElse(null));
+        record.setComment(response.questionResponse().comment()
+                            .map(c -> ifEmpty(c, null))
+                            .orElse(null));
+        record.setStringResponse(response.questionResponse().stringResponse()
+                                    .map(s -> ifEmpty(s, null))
+                                    .orElse(null));
+        record.setNumberResponse(response.questionResponse().numberResponse()
+                                    .map(BigDecimal::valueOf)
+                                    .orElse(null));
         record.setBooleanResponse(response.questionResponse().booleanResponse().orElse(null));
 
         return record;

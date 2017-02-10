@@ -56,6 +56,11 @@ public class StringUtilities {
     }
 
 
+    public static String ifEmpty(String x, String defaultValue) {
+        return isEmpty(x) ? defaultValue : x;
+    }
+
+
     public static Long parseLong(String value, Long dflt) {
         try {
             return Long.parseLong(value);

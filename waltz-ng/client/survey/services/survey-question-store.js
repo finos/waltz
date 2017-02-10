@@ -15,25 +15,26 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import angular from "angular";
 
+function service($http, baseUrl) {
 
-function setup() {
-    const module = angular.module('waltz.perspective', []);
+    const BASE = `${baseUrl}/survey-question`;
 
-    module
-        .config(require('./routes'));
+    const findForInstance = (id) => {
+        return $http.get(`${BASE}/instance/${id}`)
+            .then(result => result.data);
+    };
 
-    module
-        .service('PerspectiveDefinitionStore', require('./serivces/perspective-definition-store'))
-        .service('PerspectiveRatingStore', require('./serivces/perspective-rating-store'));
-    module
-        .component('waltzPerspectiveEditor', require('./components/editor/perspective-editor'))
-        .component('waltzPerspectiveGrid', require('./components/grid/perspective-grid'))
-        .component('waltzPerspectiveOverrides', require('./components/overrides/perspective-overrides'));
-
-    return module.name;
+    return {
+        findForInstance
+    };
 }
 
 
-export default setup;
+service.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
+
+
+export default service;

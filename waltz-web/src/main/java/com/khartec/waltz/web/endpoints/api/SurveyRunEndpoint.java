@@ -54,11 +54,14 @@ public class SurveyRunEndpoint implements Endpoint {
 
     @Override
     public void register() {
+        String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String surveyRunListForUserPath = mkPath(BASE_URL, "user");
         String surveyRunUpdatePath = mkPath(BASE_URL, ":id");
         String generateSurveyRunRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String createSurveyRunInstancesAndRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String updateSurveyRunStatusPath = mkPath(BASE_URL, ":id", "status");
+
+        DatumRoute<SurveyRun> getByIdRoute = (req, res) -> surveyRunService.getById(getId(req));
 
         ListRoute<SurveyRun> surveyRunListForUserRoute =
                 (req, res) -> surveyRunService.findForRecipient(getUsername(req));
@@ -98,6 +101,7 @@ public class SurveyRunEndpoint implements Endpoint {
         DatumRoute<Boolean> createSurveyRunInstancesAndRecipientsRoute = (request, response) ->
                 surveyRunService.createSurveyInstancesAndRecipients(getId(request), newArrayList(readBody(request, SurveyInstanceRecipient[].class)));
 
+        getForDatum(getByIdPath, getByIdRoute);
         getForList(generateSurveyRunRecipientsPath, generateSurveyRunRecipientsRoute);
         getForList(surveyRunListForUserPath, surveyRunListForUserRoute);
         postForDatum(BASE_URL, surveyRunCreateRoute);

@@ -30,7 +30,8 @@ export default () => {
     module
         .service('SurveyInstanceStore', require('./services/survey-instance-store'))
         .service('SurveyRunStore', require('./services/survey-run-store'))
-        .service('SurveyTemplateStore', require('./services/survey-template-store'));
+        .service('SurveyTemplateStore', require('./services/survey-template-store'))
+        .service('SurveyQuestionStore', require('./services/survey-question-store'));
 
     return module.name;
 };

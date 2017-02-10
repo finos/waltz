@@ -26,6 +26,12 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const getById = (id) => {
+        return $http
+            .get(`${base}/id/${id}`)
+            .then(r => r.data);
+    };
+
     const findForUser = () => {
         return $http
             .get(`${base}/user`)
@@ -56,6 +62,7 @@ function store($http, baseApiUrl) {
 
     return {
         create,
+        getById,
         findForUser,
         update,
         updateStatus,

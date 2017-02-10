@@ -17,7 +17,7 @@
  */
 import {initialiseData} from "../../../common";
 import {baseRagNames} from "../../rating-utils";
-import _ from 'lodash';
+import _ from "lodash";
 
 
 const bindings = {

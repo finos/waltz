@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {initialiseData} from '../common';
+import {initialiseData} from "../common";
 
 const template = require('./editable-field.html');
 
@@ -25,7 +24,8 @@ const bindings = {
     initialVal: '<',
     onSave: '<',
     fieldType: '@',
-    itemId: '<'
+    itemId: '<',
+    buttonLabel: '@'
 };
 
 
@@ -34,6 +34,7 @@ const initialState = {
     editing: false,
     saving: false,
     fieldType: 'text',
+    buttonLabel: 'Edit',
     onSave: () => console.log("WETF: No on-save method provided")
 };
 

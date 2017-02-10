@@ -24,3 +24,10 @@ export function surveyTemplateResolver(surveyTemplateStore, params) {
 surveyTemplateResolver.$inject = ['SurveyTemplateStore', '$stateParams'];
 
 
+export function surveyInstanceResolver(surveyInstanceStore, params) {
+    return surveyInstanceStore.getById( params.id );
+}
+
+surveyInstanceResolver.$inject = ['SurveyInstanceStore', '$stateParams'];
+
+

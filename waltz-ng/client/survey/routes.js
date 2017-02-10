@@ -1,4 +1,4 @@
-import {surveyTemplateResolver} from "./resolvers";
+import {surveyInstanceResolver, surveyTemplateResolver} from "./resolvers";
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -53,7 +53,11 @@ const instanceResponseState = {
 
 
 const instanceResponseEditState = {
-    url: '/edit'
+    url: '/edit',
+    views: {'content@': require('./survey-instance-response-edit')},
+    resolve: {
+        surveyInstance: surveyInstanceResolver
+    }
 };
 
 
