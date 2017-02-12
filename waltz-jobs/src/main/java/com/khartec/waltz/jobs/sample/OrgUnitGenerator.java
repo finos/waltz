@@ -50,14 +50,13 @@ public class OrgUnitGenerator {
         List<OrganisationalUnitRecord> records = lines.stream()
                 .skip(1)
                 .map(line -> line.split(","))
-                .filter(cells -> cells.length == 5)
+                .filter(cells -> cells.length == 4)
                 .map(cells -> {
                     OrganisationalUnitRecord record = new OrganisationalUnitRecord();
                     record.setId(longVal(cells[0]));
                     record.setParentId(longVal(cells[1]));
                     record.setName(cells[2]);
                     record.setDescription(cells[3]);
-                    record.setKind(cells[4]);
                     record.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
                     System.out.println(record);

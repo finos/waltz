@@ -1467,4 +1467,12 @@
                        tableName="survey_question_response"/>
     </changeSet>
 
+
+    <!-- 1547: remove org-unit kind -->
+    <changeSet author="dwatkins"
+               id="20170212-1547-1">
+        <dropColumn tableName="organisational_unit"
+                    columnName="kind" />
+    </changeSet>
+
 </databaseChangeLog>

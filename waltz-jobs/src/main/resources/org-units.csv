@@ -1,31 +1,31 @@
-Organisation ID,Parent ID,Name,Description,Type
-10,,CEO Office,,BUSINESS
-20,10,CIO Office,,BUSINESS
-30,10,COO Office,,BUSINESS
-40,10,CTO Office,,BUSINESS
-50,30,Front Office,,BUSINESS
-60,30,Head of CONTROL,,CONTROL
-70,60,Market Risk,,CONTROL
-80,60,Credit Risk,,CONTROL
-90,60,Liquidity Risk,,CONTROL
-100,60,Treasury,,CONTROL
-110,60,Finance,,CONTROL
-120,60,Compliance,,CONTROL
-130,60,Fraud,,CONTROL
-140,50,Operations,,BUSINESS
-150,50,Equities,,BUSINESS
-160,50,Fixed Income,,BUSINESS
-170,50,FX,,BUSINESS
-180,50,Research,,BUSINESS
-190,20,Enterprise Systems,,IT
-200,20,Operation IT,,IT
-210,20,Risk IT,,IT
-220,210,Market Risk IT,,IT
-230,210,Credit Risk IT,,IT
-240,210,Liquidity Risk IT,,IT
-250,20,Treasury IT,,IT
-260,50,Front Office IT,,IT
-270,260,Equities IT,,IT
-280,260,Fixed Income IT,,IT
-290,260,FX IT,,IT
-300,260,Research IT,,IT
+Organisation ID,Parent ID,Name,Description
+10,,CEO Office,
+20,10,CIO Office,
+30,10,COO Office,
+40,10,CTO Office,
+50,30,Front Office,
+60,30,Head of CONTROL,
+70,60,Market Risk,
+80,60,Credit Risk,
+90,60,Liquidity Risk,
+100,60,Treasury,
+110,60,Finance,
+120,60,Compliance,
+130,60,Fraud,
+140,50,Operations,
+150,50,Equities,
+160,50,Fixed Income,
+170,50,FX,
+180,50,Research,
+190,20,Enterprise Systems,
+200,20,Operation IT,
+210,20,Risk IT,
+220,210,Market Risk IT,
+230,210,Credit Risk IT,
+240,210,Liquidity Risk IT,
+250,20,Treasury IT,
+260,50,Front Office IT,
+270,260,Equities IT,
+280,260,Fixed Income IT,
+290,260,FX IT,
+300,260,Research IT,
