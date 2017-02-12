@@ -34,8 +34,4 @@ public abstract class OrganisationalUnit implements
         ParentIdProvider,
         NameProvider,
         DescriptionProvider {
-
-
-    public abstract OrganisationalUnitKind kind();
-
 }

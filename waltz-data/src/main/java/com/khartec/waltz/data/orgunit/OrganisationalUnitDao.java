@@ -25,7 +25,6 @@ import com.khartec.waltz.model.ImmutableLeveledEntityReference;
 import com.khartec.waltz.model.LeveledEntityReference;
 import com.khartec.waltz.model.orgunit.ImmutableOrganisationalUnit;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.model.orgunit.OrganisationalUnitKind;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -38,7 +37,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
@@ -59,7 +57,6 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
                 .description(orgUnitRecord.getDescription())
                 .id(orgUnitRecord.getId())
                 .parentId(Optional.ofNullable(orgUnitRecord.getParentId()))
-                .kind(readEnum(orgUnitRecord.getKind(), OrganisationalUnitKind.class, (s) -> OrganisationalUnitKind.IT))
                 .build();
     };
 

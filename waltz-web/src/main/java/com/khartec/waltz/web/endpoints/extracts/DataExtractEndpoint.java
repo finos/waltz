@@ -77,7 +77,6 @@ public class DataExtractEndpoint implements Endpoint {
                     "id",
                     "parentId",
                     "name",
-                    "kind",
                     "description");
 
             orgUnitService.findAll()
@@ -87,9 +86,7 @@ public class DataExtractEndpoint implements Endpoint {
                                     ou.id().orElse(null),
                                     ou.parentId().orElse(null),
                                     ou.name(),
-                                    ou.kind().name(),
-                                    ou.description()
-                            );
+                                    ou.description());
                         } catch (IOException ioe) {
                             LOG.warn("Failed to write ou: " + ou, ioe);
                         }
