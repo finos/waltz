@@ -5,7 +5,8 @@
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>
-                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity"></waltz-entity-link>
+                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
+                </waltz-entity-link>
             </li>
             <li>Surveys</li>
             <li>
@@ -27,7 +28,8 @@
                 Survey Subject
             </div>
             <div class="col-sm-8">
-                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity"></waltz-entity-link>
+                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
+                </waltz-entity-link>
             </div>
         </div>
         <br>
@@ -45,7 +47,8 @@
                 Due
             </div>
             <div class="col-sm-8">
-                <waltz-from-now timestamp="ctrl.surveyRun.dueDate"></waltz-from-now>
+                <waltz-from-now timestamp="ctrl.surveyRun.dueDate">
+                </waltz-from-now>
             </div>
         </div>
     </div>
@@ -58,7 +61,8 @@
               ng-submit="ctrl.submit()">
             <div ng-repeat="groupedQuestion in ctrl.surveyQuestions">
 
-                <h4 ng-bind="groupedQuestion.sectionName" class="text-muted"></h4>
+                <h4 ng-bind="groupedQuestion.sectionName"
+                    class="text-muted"></h4>
                 <hr>
 
                 <div ng-repeat="question in groupedQuestion.questions"
