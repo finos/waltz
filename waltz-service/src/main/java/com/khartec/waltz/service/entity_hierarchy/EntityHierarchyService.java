@@ -30,7 +30,6 @@ import com.khartec.waltz.data.entity_hierarchy.EntityRootsSelectorFactory;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.data.process.ProcessDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_hierarchy.EntityHierarchyItem;
@@ -62,7 +61,6 @@ public class EntityHierarchyService {
     private final EntityStatisticDao entityStatisticDao;
     private final MeasurableDao measurableDao;
     private final OrganisationalUnitDao organisationalUnitDao;
-    private final ProcessDao processDao;
     private final PersonHierarchyService personHierarchyService;
 
     @Autowired
@@ -74,8 +72,7 @@ public class EntityHierarchyService {
                                   EntityStatisticDao entityStatisticDao,
                                   MeasurableDao measurableDao, 
                                   OrganisationalUnitDao organisationalUnitDao,
-                                  PersonHierarchyService personHierarchyService,
-                                  ProcessDao processDao) {
+                                  PersonHierarchyService personHierarchyService) {
 
         checkNotNull(dsl, "dsl cannot be null");
         checkNotNull(changeInitiativeDao, "changeInitiativeDao cannot be null");
@@ -86,7 +83,6 @@ public class EntityHierarchyService {
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(organisationalUnitDao, "organisationalUnitDao cannot be null");
         checkNotNull(personHierarchyService, "personHierarchyService cannot be null");
-        checkNotNull(processDao, "processDao cannot be null");
 
         this.dsl = dsl;
         this.changeInitiativeDao = changeInitiativeDao;
@@ -97,7 +93,6 @@ public class EntityHierarchyService {
         this.measurableDao = measurableDao;
         this.organisationalUnitDao = organisationalUnitDao;
         this.personHierarchyService = personHierarchyService;
-        this.processDao = processDao;
     }
 
 
@@ -135,8 +130,6 @@ public class EntityHierarchyService {
                 return measurableDao.findByIdSelectorAsEntityReference(selector);
             case ORG_UNIT:
                 return organisationalUnitDao.findByIdSelectorAsEntityReference(selector);
-            case PROCESS:
-                return processDao.findByIdSelectorAsEntityReference(selector);
             case PERSON:
                 return Collections.emptyList();
             default:
@@ -233,8 +226,6 @@ public class EntityHierarchyService {
                 return Tables.MEASURABLE;
             case ORG_UNIT:
                 return Tables.ORGANISATIONAL_UNIT;
-            case PROCESS:
-                return Tables.PROCESS;
             default:
                 throw new IllegalArgumentException("Cannot determine hierarchy table for kind: "+kind);
         }
