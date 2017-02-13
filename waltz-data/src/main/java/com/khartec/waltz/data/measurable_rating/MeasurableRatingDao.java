@@ -169,4 +169,26 @@ public class MeasurableRatingDao {
                 .fetch(TO_TALLY_MAPPER);
     }
 
+
+    public List<MeasurableRatingTally> statsForRelatedMeasurable(long measurableId) {
+        com.khartec.waltz.schema.tables.MeasurableRating related = MEASURABLE_RATING.as("related");
+        com.khartec.waltz.schema.tables.MeasurableRating orig = MEASURABLE_RATING.as("orig");
+
+        SelectConditionStep<Record1<Long>> relatedAppIds = DSL
+                .selectDistinct(orig.ENTITY_ID)
+                .from(orig)
+                .where(orig.MEASURABLE_ID.eq(measurableId))
+                .and(orig.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+
+        return dsl
+                .select(related.MEASURABLE_ID,
+                        related.RATING,
+                        DSL.count())
+                .from(related)
+                .where(related.ENTITY_ID.in(relatedAppIds))
+                .groupBy(related.MEASURABLE_ID,
+                        related.RATING)
+                .fetch(TO_TALLY_MAPPER);
+    }
+
 }

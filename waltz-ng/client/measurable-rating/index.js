@@ -37,6 +37,7 @@ export default () => {
         .component('waltzMeasurableRatingTree', require('./components/tree/measurable-rating-tree'))
         .component('waltzMeasurableRatingsBrowser', require('./components/browser/measurable-ratings-browser'))
         .component('waltzMeasurableRatingsBrowserSection', require('./components/browser-section/measurable-ratings-browser-section'))
+        .component('waltzRelatedMeasurablesSection', require('./components/related-measurables-section/related-measurables-section'))
         ;
 
     return module.name;

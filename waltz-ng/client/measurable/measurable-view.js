@@ -18,6 +18,7 @@
 
 import _ from 'lodash';
 import {initialiseData} from '../common';
+import {populateParents, getParents} from '../common/hierarchy-utils';
 
 
 const initialState = {
@@ -54,7 +55,6 @@ function controller($q,
 
     const id = $stateParams.id;
     const ref = { id, kind: 'MEASURABLE' };
-    const parentsSelector = { entityReference: ref, scope: 'PARENTS' }
     const childrenSelector = { entityReference: ref, scope: 'CHILDREN' }
 
     const vm = initialiseData(this, initialState);
@@ -66,24 +66,33 @@ function controller($q,
     const loadWave1 = () =>
         $q.all([
             measurableStore
-                .findMeasurablesBySelector(parentsSelector)
-                .then(ps => {
-                    vm.parents = ps;
-                    vm.measurable = _.find(ps, { id });
+                .findAll()
+                .then(all => {
+                    vm.allMeasurables = all;
+                    const withParents = populateParents(all);
+                    vm.measurable = _.find(withParents, { id });
+                    vm.parents = getParents(vm.measurable);
+                    vm.children = _.chain(all)
+                        .filter({ parentId: id })
+                        .sortBy('name')
+                        .value();
                 }),
         ]);
 
     const loadWave2 = () =>
         $q.all([
             measurableCategoryStore
-                .getById(vm.measurable.categoryId)
-                .then(c => vm.measurableCategory = c),
+                .findAll()
+                .then(cs => {
+                    vm.measurableCategories = cs;
+                    vm.measurableCategory = _.find(cs, { id: vm.measurable.categoryId });
+                }),
             measurableRatingStore
                 .findByMeasurableSelector(childrenSelector)
                 .then(rs => vm.ratings = rs),
-            measurableStore
-                .findMeasurablesBySelector(childrenSelector)
-                .then(cs => vm.children = cs),
+            measurableRatingStore
+                .statsForRelatedMeasurables(id)
+                .then(rs => vm.relatedStats = rs),
             applicationStore
                 .findBySelector(childrenSelector)
                 .then(apps => vm.applications = apps),

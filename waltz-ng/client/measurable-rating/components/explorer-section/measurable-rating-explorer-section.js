@@ -164,7 +164,10 @@ function controller() {
                 onSelect);
         }
 
-        if (vm.ratings && vm.applications && vm.measurables && vm.measurableCategory) {
+        if (vm.ratings
+            && vm.applications
+            && vm.measurables
+            && vm.measurableCategory) {
             vm.tableData = prepareTableData(
                 vm.ratings,
                 vm.applications,

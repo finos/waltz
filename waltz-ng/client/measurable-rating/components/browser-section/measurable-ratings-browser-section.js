@@ -32,7 +32,7 @@ const bindings = {
     applications: '<',
     measurables: '<',
     measurableCategories: '<',
-    ratings: '<',
+    ratingTallies: '<',
     onLoadDetail: '<'
 };
 
@@ -41,7 +41,7 @@ const initialState = {
     applications: [],
     measurables: [],
     measurableCategories: [],
-    ratings: [],
+    ratingTallies: [],
     detail: null,
     visibility: {
         loading: false

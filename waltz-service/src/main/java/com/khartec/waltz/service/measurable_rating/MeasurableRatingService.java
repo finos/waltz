@@ -144,6 +144,11 @@ public class MeasurableRatingService {
     }
 
 
+    public Collection<MeasurableRatingTally> statsForRelatedMeasurable(long measurableId) {
+        return measurableRatingDao.statsForRelatedMeasurable(measurableId);
+    }
+
+
     public List<MeasurableRatingTally> statsByAppSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
@@ -189,5 +194,6 @@ public class MeasurableRatingService {
                 .operation(operation)
                 .build());
     }
+
 
 }
