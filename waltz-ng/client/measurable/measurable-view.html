@@ -33,10 +33,17 @@
     <!-- RATINGS -->
     <waltz-measurable-rating-explorer-section ratings="ctrl.ratings"
                                               measurable-category="ctrl.measurableCategory"
-                                              measurables="ctrl.children"
+                                              measurables="ctrl.allMeasurables"
                                               applications="ctrl.applications"
                                               source-data-ratings="ctrl.sourceDataRatings">
     </waltz-measurable-rating-explorer-section>
+
+
+    <!-- RELATED -->
+    <waltz-related-measurables-section stats="ctrl.relatedStats"
+                                       measurables="ctrl.allMeasurables"
+                                       categories="ctrl.measurableCategories">
+    </waltz-related-measurables-section>
 
 
     <!-- BOOKMARKS -->

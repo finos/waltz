@@ -51,6 +51,12 @@ function store($http, baseApiUrl) {
     };
 
 
+    const statsForRelatedMeasurables = (measurableId) => {
+        return $http
+            .get(`${baseUrl}/related-stats/measurable/${measurableId}`)
+            .then(d => d.data);
+    };
+
     const countByMeasurable = () => {
         return $http
             .get(`${baseUrl}/count-by/measurable`)
@@ -84,6 +90,7 @@ function store($http, baseApiUrl) {
         findForEntityReference,
         countByMeasurable,
         statsByAppSelector,
+        statsForRelatedMeasurables,
         create,
         update,
         remove

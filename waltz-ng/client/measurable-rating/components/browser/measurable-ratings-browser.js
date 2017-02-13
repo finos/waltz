@@ -31,7 +31,7 @@ import {buildHierarchies, switchToParentIds} from '../../../common/hierarchy-uti
 const bindings = {
     measurables: '<',
     categories: '<',
-    ratings: '<',
+    ratingTallies: '<',
     onSelect: '<',
     scrollHeight: '<'
 };
@@ -40,7 +40,7 @@ const bindings = {
 const initialState = {
     containerClass: [],
     measurables: [],
-    ratings: [],
+    ratingTallies: [],
     treeOptions: {
         nodeChildren: "children",
         dirSelectable: true,
@@ -62,14 +62,13 @@ const initialState = {
 const template = require('./measurable-ratings-browser.html');
 
 
-function mkEmptyRating() {
+function mkEmptyRatingTally() {
     return { R: 0, A: 0, G: 0, Z: 0, total: 0};
 }
 
 
-function addRatings(
-    r1 = mkEmptyRating(),
-    r2 = mkEmptyRating()) {
+function addRatingTallies(r1 = mkEmptyRatingTally(),
+                    r2 = mkEmptyRatingTally()) {
 
     return {
         R: (r1.R || 0) + (r2.R || 0),
@@ -81,7 +80,7 @@ function addRatings(
 }
 
 
-function toRatingsObj(ratings = []) {
+function toRatingsSummaryObj(ratings = []) {
     const byRating = _.keyBy(ratings, 'rating');
     const r = _.get(byRating, 'R.count', 0);
     const a = _.get(byRating, 'A.count', 0);
@@ -132,40 +131,40 @@ function findFirstNonEmptyTab(tabs = []) {
 }
 
 
-function initialiseRatingsMap(ratings, measurables) {
-    const ratingsById = _.groupBy(ratings, 'id');
+function initialiseRatingTalliesMap(ratingTallies, measurables) {
+    const talliesById = _.groupBy(ratingTallies, 'id');
 
     const reducer = (acc, m) => {
-        const ratingsObj = ratingsById[m.id]
-            ? toRatingsObj(ratingsById[m.id])
-            : mkEmptyRating();
+        const summaryObj = talliesById[m.id]
+            ? toRatingsSummaryObj(talliesById[m.id])
+            : mkEmptyRatingTally();
 
         acc[m.id] = {
-            direct: _.clone(ratingsObj),
-            total: _.clone(ratingsObj),
+            direct: _.clone(summaryObj),
+            total: _.clone(summaryObj),
         };
         return acc;
     };
-    const ratingsMap = _.reduce(measurables, reducer, {});
-    return ratingsMap;
+    const talliesMap = _.reduce(measurables, reducer, {});
+    return talliesMap;
 }
 
 
-function mkRatingsMap(ratings = [], measurables = []) {
+function mkRatingTalliesMap(ratingTallies = [], measurables = []) {
     const measurablesById = _.keyBy(measurables, 'id');
-    const ratingsMap = initialiseRatingsMap(ratings, measurables);
+    const talliesMap = initialiseRatingTalliesMap(ratingTallies, measurables);
 
     _.each(measurables, m => {
-        const rs = ratingsMap[m.id];
+        const rs = talliesMap[m.id];
         while (m.parentId) {
             const parent = measurablesById[m.parentId];
-            const parentRating = ratingsMap[m.parentId];
-            parentRating.total = addRatings(parentRating.total, rs.direct);
+            const parentRating = talliesMap[m.parentId];
+            parentRating.total = addRatingTallies(parentRating.total, rs.direct);
             m = parent;
         }
     });
 
-    return ratingsMap;
+    return talliesMap;
 }
 
 
@@ -173,9 +172,9 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (c) => {
-        if (c.measurables || c.ratings || vm.categories) {
+        if (vm.measurables && vm.ratingTallies && vm.categories) {
             vm.tabs = prepareTabs(vm.categories, vm.measurables);
-            vm.ratingsMap = mkRatingsMap(vm.ratings, vm.measurables);
+            vm.ratingsMap = mkRatingTalliesMap(vm.ratingTallies, vm.measurables);
             vm.visibility.tab = findFirstNonEmptyTab(vm.tabs);
             vm.maxTotal = _.max(
                 _.map(
