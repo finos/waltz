@@ -29,6 +29,11 @@ public class SurveyQuestionService {
     }
 
 
+    public List<SurveyQuestion> findForSurveyRun(long surveyRunId) {
+        return surveyQuestionDao.findForSurveyRun(surveyRunId);
+    }
+
+
     public List<SurveyQuestion> findForSurveyInstance(long surveyInstanceId) {
         return surveyQuestionDao.findForSurveyInstance(surveyInstanceId);
     }

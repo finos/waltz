@@ -1,6 +1,7 @@
 package com.khartec.waltz.jobs.sample;
 
 
+import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.data.app_group.AppGroupDao;
 import com.khartec.waltz.data.involvement_kind.InvolvementKindDao;
 import com.khartec.waltz.data.person.PersonDao;
@@ -10,29 +11,42 @@ import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.involvement_kind.InvolvementKind;
 import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.model.survey.SurveyIssuanceKind;
-import com.khartec.waltz.model.survey.SurveyRunStatus;
-import com.khartec.waltz.model.survey.SurveyTemplate;
+import com.khartec.waltz.model.survey.*;
+import com.khartec.waltz.schema.tables.records.SurveyQuestionResponseRecord;
 import com.khartec.waltz.schema.tables.records.SurveyRunRecord;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.survey.SurveyInstanceService;
+import com.khartec.waltz.service.survey.SurveyQuestionService;
 import com.khartec.waltz.service.survey.SurveyRunService;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.Select;
+import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
-import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
-import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.*;
 
 /**
  * Generates random survey runs and associated instances and recipients
  */
 public class SurveyRunGenerator {
+    private static final Logger LOG = LoggerFactory.getLogger(SurveyRunGenerator.class);
+
+
     private static final int NUMBER_OF_RUNS = 20;
     private static final int MAX_INVOLVEMENT_KINDS_PER_RUN = 3;
     private static final int MAX_SURVEY_AGE_IN_DAYS = 30;
@@ -43,6 +57,18 @@ public class SurveyRunGenerator {
     private static final Random random = new Random();
 
     private static final String[] SURVEY_RUN_PREFIXES = {"ANNUAL", "Q1", "Q2", "Q3", "Q4"};
+    private static final String SURVEY_RUN_SUFFIX = "(GENERATOR)"; // so we can delete previous generated data before rerun
+
+    private static final String[] SURVEY_QUESTION_STRING_RESPONSES = {
+            "This is a simple one-liner response.",
+            "This is a long response with multiple lines.\n This should be associated with a TEXT_AREA question type. We expect the UI to display this response with line-breaks."
+    };
+
+    private static final String[] SURVEY_QUESTION_RESPONSE_COMMENTS = {
+            "This is a simple one-liner response comment.",
+            "This is a long response comment with multiple lines.\n We expect the UI to display this comment with line-breaks."
+    };
+
     public static void main(String[] args) {
 
         try {
@@ -67,7 +93,12 @@ public class SurveyRunGenerator {
             List<InvolvementKind> involvementKinds = involvementKindDao.findAll();
 
             final SurveyRunService surveyRunService = ctx.getBean(SurveyRunService.class);
+            final SurveyInstanceService surveyInstanceService = ctx.getBean(SurveyInstanceService.class);
+            final SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
 
+            deleteSurveyRunsAndResponses(dsl);
+
+            AtomicInteger surveyCompletedCount = new AtomicInteger(0);
             IntStream.range(0, NUMBER_OF_RUNS).forEach(idx -> {
                 SurveyTemplate surveyTemplate = surveyTemplates.get(random.nextInt(surveyTemplates.size()));
                 Person owner = owners.get(random.nextInt(owners.size()));
@@ -78,10 +109,78 @@ public class SurveyRunGenerator {
                 long surveyRunId = surveyRunRecord.getId();
 
                 surveyRunService.createSurveyInstancesAndRecipients(surveyRunId, Collections.emptyList());
+
+                if (random.nextBoolean()) {     // should this survey is a completed one?
+                    surveyRunRecord.setStatus(SurveyRunStatus.COMPLETED.name());
+                    surveyRunRecord.store();
+
+                    List<SurveyInstanceQuestionResponse> surveyInstanceQuestionResponses = mkRandomSurveyRunResponses(
+                            surveyRunId, surveyInstanceService, surveyQuestionService);
+
+                    dsl.batchInsert(surveyInstanceQuestionResponses.stream()
+                            .map(r -> {
+                                SurveyQuestionResponse questionResponse = r.questionResponse();
+                                SurveyQuestionResponseRecord record = new SurveyQuestionResponseRecord();
+                                record.setSurveyInstanceId(r.surveyInstanceId());
+                                record.setPersonId(r.personId());
+                                record.setQuestionId(questionResponse.questionId());
+                                record.setBooleanResponse(questionResponse.booleanResponse().orElse(null));
+                                record.setNumberResponse(questionResponse.numberResponse().map(BigDecimal::valueOf).orElse(null));
+                                record.setStringResponse(questionResponse.stringResponse().orElse(null));
+                                record.setComment(r.questionResponse().comment().orElse(null));
+
+                                return record;
+                            })
+                            .collect(toList()))
+                            .execute();
+
+                    surveyCompletedCount.incrementAndGet();
+                }
             });
+
+            LOG.debug("Generated: {} survey runs, in which {} are completed", NUMBER_OF_RUNS, surveyCompletedCount.get());
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    private static void deleteSurveyRunsAndResponses(DSLContext dsl) {
+        Condition previousSurveyRunCondition = SURVEY_RUN.NAME.like("% " + SURVEY_RUN_SUFFIX);
+
+        Select<Record1<Long>> surveyRunIdSelector = DSL
+                .select(SURVEY_RUN.ID)
+                .from(SURVEY_RUN)
+                .where(previousSurveyRunCondition);
+
+        Select<Record1<Long>> surveyInstanceIdSelector = DSL
+                .select(SURVEY_INSTANCE.ID)
+                .from(SURVEY_INSTANCE)
+                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.in(surveyRunIdSelector));
+
+        int deleteCount = dsl
+                .deleteFrom(SURVEY_QUESTION_RESPONSE)
+                .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.in(surveyInstanceIdSelector))
+                .execute();
+        LOG.debug("Deleted: {} existing question responses", deleteCount);
+
+        deleteCount = dsl
+                .deleteFrom(SURVEY_INSTANCE_RECIPIENT)
+                .where(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.in(surveyInstanceIdSelector))
+                .execute();
+        LOG.debug("Deleted: {} existing instance recipients", deleteCount);
+
+        deleteCount = dsl
+                .deleteFrom(SURVEY_INSTANCE)
+                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.in(surveyRunIdSelector))
+                .execute();
+        LOG.debug("Deleted: {} existing survey instances", deleteCount);
+
+        deleteCount = dsl
+                .deleteFrom(SURVEY_RUN)
+                .where(previousSurveyRunCondition)
+                .execute();
+        LOG.debug("Deleted: {} existing survey runs", deleteCount);
     }
 
     private static SurveyRunRecord mkRandomSurveyRunRecord(DSLContext dsl,
@@ -93,7 +192,8 @@ public class SurveyRunGenerator {
         surveyRunRecord.setOwnerId(owner.id().get());
         surveyRunRecord.setContactEmail(owner.email());
         surveyRunRecord.setSurveyTemplateId(surveyTemplate.id().get());
-        surveyRunRecord.setName(surveyTemplate.name() + " " + SURVEY_RUN_PREFIXES[random.nextInt(SURVEY_RUN_PREFIXES.length)]);
+        surveyRunRecord.setName(String.format("%s %s %s",
+                getRandomElementFromArray(SURVEY_RUN_PREFIXES, random), surveyTemplate.name(), SURVEY_RUN_SUFFIX));
         surveyRunRecord.setDescription(surveyTemplate.description());
         surveyRunRecord.setSelectorEntityKind(EntityKind.APP_GROUP.name());
         surveyRunRecord.setSelectorEntityId(appGroups.get(random.nextInt(appGroups.size())).id().get());
@@ -111,10 +211,60 @@ public class SurveyRunGenerator {
         LocalDate dueDate = random.nextBoolean()
                 ? issuedOn.plusDays(random.nextInt(MAX_SURVEY_LIFESPAN_IN_DAYS))
                 : null;
-        surveyRunRecord.setDueDate(dueDate == null? null : java.sql.Date.valueOf(dueDate));
+        surveyRunRecord.setDueDate(dueDate == null ? null : java.sql.Date.valueOf(dueDate));
         surveyRunRecord.setStatus(SurveyRunStatus.ISSUED.name());
 
         return surveyRunRecord;
+    }
+
+
+    private static List<SurveyInstanceQuestionResponse> mkRandomSurveyRunResponses(long surveyRunId,
+                                                                                   SurveyInstanceService surveyInstanceService,
+                                                                                   SurveyQuestionService surveyQuestionService) {
+
+        List<SurveyQuestion> surveyQuestions = surveyQuestionService.findForSurveyRun(surveyRunId);
+        List<SurveyInstanceRecipient> surveyInstanceRecipients = surveyInstanceService.findRecipients(surveyRunId);
+        Map<SurveyInstance, List<SurveyInstanceRecipient>> surveyInstanceRecipientsMap = surveyInstanceRecipients
+                .stream()
+                .collect(groupingBy(r -> r.surveyInstance()));
+
+
+        return surveyInstanceRecipientsMap.entrySet()
+                .stream()
+                .flatMap(entry -> {
+                    SurveyInstance surveyInstance = entry.getKey();
+                    List<SurveyInstanceRecipient> instanceRecipients = entry.getValue();
+
+                    return surveyQuestions.stream()
+                            .map(q -> ImmutableSurveyInstanceQuestionResponse.builder()
+                                    .surveyInstanceId(surveyInstance.id().get())
+                                    .personId(getRandomElementFromList(instanceRecipients, random).id().get())
+                                    .questionResponse(mkRandomSurveyQuestionResponse(q, random))
+                                    .lastUpdatedAt(nowUtc())
+                                    .build());
+                })
+                .collect(toList());
+
+    }
+
+
+    private static SurveyQuestionResponse mkRandomSurveyQuestionResponse(SurveyQuestion surveyQuestion, Random random) {
+        SurveyQuestionFieldType fieldType = surveyQuestion.fieldType();
+        return ImmutableSurveyQuestionResponse.builder()
+                .questionId(surveyQuestion.id().get())
+                .booleanResponse((fieldType == SurveyQuestionFieldType.BOOLEAN)
+                        ? Optional.of(random.nextBoolean())
+                        : Optional.empty())
+                .numberResponse((fieldType == SurveyQuestionFieldType.NUMBER)
+                        ? Optional.of(Double.valueOf(random.nextInt()))
+                        : Optional.empty())
+                .stringResponse((fieldType == SurveyQuestionFieldType.TEXT || fieldType == SurveyQuestionFieldType.TEXTAREA)
+                        ? Optional.of(getRandomElementFromArray(SURVEY_QUESTION_STRING_RESPONSES, random))
+                        : Optional.empty())
+                .comment(random.nextBoolean()
+                        ? Optional.of(getRandomElementFromArray(SURVEY_QUESTION_RESPONSE_COMMENTS, random))
+                        : Optional.empty())
+                .build();
     }
 
 
@@ -123,5 +273,18 @@ public class SurveyRunGenerator {
         checkFalse(isEmpty(values), "No values found for enum " + enumClass.getSimpleName());
 
         return values.get(random.nextInt(values.size()));
+    }
+
+    private static <T> T getRandomElementFromList(List<T> values, Random random) {
+        checkFalse(isEmpty(values), "values must not be empty");
+
+        return values.get(random.nextInt(values.size()));
+    }
+
+
+    private static <T> T getRandomElementFromArray(T[] values, Random random) {
+        checkFalse(ArrayUtilities.isEmpty(values), "values must not be empty");
+
+        return values[random.nextInt(values.length)];
     }
 }
