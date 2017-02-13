@@ -74,11 +74,9 @@ function controller() {
     vm.$onInit = () => initialiseData(vm, initialState);
 
     vm.$onChanges = (c) => {
-        console.log(c);
         vm.associatedPerspectives = calcAssociatedPerspectives(vm.categoryId, vm.measurables, vm.perspectiveDefinitions, vm.ratings);
     };
 
-    console.log('associated-perspectives - init');
 }
 
 
