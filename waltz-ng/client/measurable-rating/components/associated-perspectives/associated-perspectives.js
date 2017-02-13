@@ -59,8 +59,6 @@ function calcAssociatedPerspectives(categoryId,
         perspectiveDefinitions,
         p => p.categoryX === categoryId || p.categoryY === categoryId);
 
-    console.log('pp', categoryId, possiblePerspectives, usedCategoryIds);
-
     return _.map(
         possiblePerspectives,
         p => ({
