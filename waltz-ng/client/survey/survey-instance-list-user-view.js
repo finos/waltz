@@ -59,7 +59,7 @@ function controller($q,
 
     vm.columnDefs = [
         Object.assign(
-            mkLinkGridCell('Survey', 'surveyRun.name', 'surveyInstance.id', 'main.survey.instance.response.edit'),
+            mkLinkGridCell('Survey', 'surveyRun.name', 'surveyInstance.id', 'main.survey.instance.response'),
             { width: "30%" }
         ),
         Object.assign(

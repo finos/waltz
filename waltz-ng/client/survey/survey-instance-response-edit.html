@@ -5,10 +5,7 @@
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>
-                <a class="clickable"
-                   ng-click="ctrl.goToParent()">
-                    <span ng-bind="ctrl.surveyInstance.surveyEntity.name"></span>
-                </a>
+                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity"></waltz-entity-link>
             </li>
             <li>Surveys</li>
             <li>
@@ -139,6 +136,7 @@
                                   ng-model="ctrl.surveyResponses[question.id].stringResponse"
                                   ng-required="question.isMandatory"
                                   ng-blur="ctrl.saveResponse(question.id)"
+                                  rows="4"
                                   class="form-control">
                         </textarea>
                         <!-- comment -->

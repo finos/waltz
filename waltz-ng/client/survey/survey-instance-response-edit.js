@@ -16,43 +16,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../common/index";
-import {kindToViewState} from "../common/link-utils";
-import {timeFormat} from "d3-time-format";
+import {groupQuestions} from './survey-utils';
 import _ from "lodash";
+
 
 const initialState = {
     surveyQuestions: [],
     surveyResponses: {},
 };
 
+
 const template = require('./survey-instance-response-edit.html');
 
 
-function groupQuestions(questions = []) {
-    const sections = _.chain(questions)
-        .map(q => q.sectionName || "Other")
-        .uniq()
-        .value();
-
-    const groupedQuestions = _.groupBy(questions, q => q.sectionName || "Other");
-
-    return _.map(sections, s => {
-        return {
-            'sectionName': s,
-            'questions': groupedQuestions[s]
-        }
-    });
-}
-
-
-function groupResponses(responses = []) {
+function indexResponses(responses = []) {
     return _.chain(responses)
         .map(r => r.questionResponse)
         .map(qr => {
             if (!_.isNil(qr.booleanResponse) && !_.isString(qr.booleanResponse)) {
                 qr.booleanResponse = qr.booleanResponse
-                                    ? 'true'
-                                    : 'false';
+                    ? 'true'
+                    : 'false';
             }
             return qr;
         })
@@ -61,10 +45,7 @@ function groupResponses(responses = []) {
 }
 
 
-function controller($q,
-                    $state,
-                    $window,
-                    surveyInstance,
+function controller($stateParams,
                     notification,
                     surveyInstanceStore,
                     surveyRunStore,
@@ -72,22 +53,27 @@ function controller($q,
 
     const vm = initialiseData(this, initialState);
 
-    vm.surveyInstance = surveyInstance;
+    const id = $stateParams.id;
 
-    surveyRunStore.getById(surveyInstance.surveyRunId)
+    const instancePromise  = surveyInstanceStore
+        .getById(id)
+        .then(r => vm.surveyInstance = r);
+
+    instancePromise
+        .then(instance => surveyRunStore.getById(instance.surveyRunId))
         .then(sr => vm.surveyRun = sr);
 
-    const questionPromise = surveyQuestionStore.findForInstance(surveyInstance.id);
-    const responsePromise = surveyInstanceStore.findResponses(surveyInstance.id);
-    $q.all([questionPromise, responsePromise])
-        .then(([questions, responses = {}]) => {
-            vm.surveyQuestions = groupQuestions(questions);
-            vm.surveyResponses = groupResponses(responses);
-        });
+    surveyQuestionStore
+        .findForInstance(id)
+        .then(qs => vm.surveyQuestions = groupQuestions(qs));
+
+    surveyInstanceStore
+        .findResponses(id)
+        .then(rs => vm.surveyResponses = indexResponses(rs));
 
     vm.saveResponse = (questionId) => {
         surveyInstanceStore.saveResponse(
-            surveyInstance.id,
+            vm.surveyInstance.id,
             Object.assign({'questionId': questionId}, vm.surveyResponses[questionId])
         );
     };
@@ -99,35 +85,23 @@ function controller($q,
         vm.surveyResponses[questionId].comment = valObj.newVal;
 
         return surveyInstanceStore.saveResponse(
-            surveyInstance.id,
+            vm.surveyInstance.id,
             Object.assign({'questionId': questionId}, vm.surveyResponses[questionId])
         );
     };
 
     vm.submit = () => {
         surveyInstanceStore.updateStatus(
-            surveyInstance.id,
+            vm.surveyInstance.id,
             { newStatus: 'COMPLETED' }
         )
         .then(result => notification.success('Survey response submitted successfully'));
     };
 
-    vm.goToParent = () => {
-        try {
-            const nextState = kindToViewState(surveyInstance.surveyEntity.kind);
-            $state.go(nextState, surveyInstance.surveyEntity);
-        } catch (e) {
-            $window.history.back();
-        }
-    };
 }
 
-
 controller.$inject = [
-    '$q',
-    '$state',
-    '$window',
-    'surveyInstance',
+    '$stateParams',
     'Notification',
     'SurveyInstanceStore',
     'SurveyRunStore',

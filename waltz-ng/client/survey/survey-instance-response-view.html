@@ -1,0 +1,131 @@
+<div>
+    <waltz-page-header icon="edit"
+                       name="{{ ctrl.surveyRun.name }}"
+                       small="Response">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>
+                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity"></waltz-entity-link>
+            </li>
+            <li>Surveys</li>
+            <li>
+                <span ng-bind="ctrl.surveyRun.name">
+                </span>
+            </li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-sm-12"
+                 ng-bind="ctrl.surveyRun.description">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Survey Subject
+            </div>
+            <div class="col-sm-10">
+                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
+                </waltz-entity-link>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Status
+            </div>
+            <div class="col-sm-10"
+                 ng-bind="ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Due
+            </div>
+            <div class="col-sm-4">
+                <waltz-from-now timestamp="ctrl.surveyRun.dueDate"></waltz-from-now>
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Issued
+            </div>
+            <div class="col-sm-4">
+                <waltz-from-now timestamp="ctrl.surveyRun.issuedOn"></waltz-from-now>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Participants
+            </div>
+            <div class="col-sm-10">
+                <ul class="list-unstyled list-inline">
+                    <li ng-repeat="p in ctrl.participants | orderBy:'displayName'">
+                        <span>
+                            <span ng-bind="p.displayName"></span>
+                        </span>
+                        <span ng-hide="$last">, </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="alert alert-info"
+         ng-if="ctrl.surveyInstance.status === 'IN_PROGRESS'">
+        <h4>Survey In Progress</h4>
+        <p>Survey responses cannot be viewed until they have been submitted</p>
+    </div>
+
+    <div class="alert alert-warning"
+         ng-if="ctrl.surveyInstance.status === 'NOT_STARTED'">
+        <h4>Survey Not Started</h4>
+        <p>This survey response has not yet been started</p>
+    </div>
+
+    <div class="alert alert-fatal"
+         ng-if="ctrl.surveyInstance.status === 'EXPIRED'">
+        <h4>Survey Expired</h4>
+        <p>This survey response expired without being submitted</p>
+    </div>
+
+
+    <waltz-section name="Survey Response"
+                   ng-if="ctrl.surveyInstance.status === 'COMPLETED'">
+        <div ng-repeat="groupedQuestion in ctrl.surveyQuestions">
+            <br ng-hide="$first">
+
+            <h4 ng-bind="groupedQuestion.sectionName"
+                style="border-bottom: 1px solid #ccc"
+                class="text-muted">
+            </h4>
+
+            <div ng-repeat="question in groupedQuestion.questions">
+                <div class="row">
+                    <div class="col-sm-5">
+                        <div ng-bind="question.questionText"
+                             class="text-muted">
+                        </div>
+                    </div>
+                    <div class="col-sm-7">
+                        <div style="border-bottom: 1px dotted #ddd; margin-bottom: 1em">
+                            <div ng-bind="ctrl.answers[question.id].answer">
+                            </div>
+                            <div class='small text-muted'
+                                 ng-if="ctrl.answers[question.id].comment">
+                                <strong>Comment:</strong>
+                                <span ng-bind="ctrl.answers[question.id].comment"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </waltz-section>
+
+
+</div>
