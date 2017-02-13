@@ -59,8 +59,6 @@ function calcAssociatedPerspectives(categoryId,
         perspectiveDefinitions,
         p => p.categoryX === categoryId || p.categoryY === categoryId);
 
-    console.log('pp', categoryId, possiblePerspectives, usedCategoryIds);
-
     return _.map(
         possiblePerspectives,
         p => ({
@@ -76,11 +74,9 @@ function controller() {
     vm.$onInit = () => initialiseData(vm, initialState);
 
     vm.$onChanges = (c) => {
-        console.log(c);
         vm.associatedPerspectives = calcAssociatedPerspectives(vm.categoryId, vm.measurables, vm.perspectiveDefinitions, vm.ratings);
     };
 
-    console.log('associated-perspectives - init');
 }
 
 
