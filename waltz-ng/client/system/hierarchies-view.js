@@ -28,7 +28,6 @@ const initialState = {
         'ENTITY_STATISTIC',
         'ORG_UNIT',
         'MEASURABLE',
-        'PROCESS',
         'PERSON'
     ]
 };
