@@ -1,21 +1,35 @@
 package com.khartec.waltz.data.survey;
 
-import com.khartec.waltz.model.survey.SurveyInstanceRecipientCreateCommand;
+import com.khartec.waltz.data.person.PersonDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Select;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
-import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE_RECIPIENT;
+import static com.khartec.waltz.schema.Tables.*;
 
 @Repository
 public class SurveyInstanceRecipientDao {
+    private static final RecordMapper<Record, SurveyInstanceRecipient> TO_DOMAIN_MAPPER = record ->
+            ImmutableSurveyInstanceRecipient.builder()
+                    .id(record.getValue(SURVEY_INSTANCE_RECIPIENT.ID))
+                    .surveyInstance(ImmutableSurveyInstance.builder()
+                            .id(record.getValue(SURVEY_INSTANCE.ID))
+                            .surveyRunId(record.getValue(SURVEY_INSTANCE.SURVEY_RUN_ID))
+                            .surveyEntity(EntityReference.mkRef(
+                                    EntityKind.valueOf(record.getValue(SURVEY_INSTANCE.ENTITY_KIND)),
+                                    record.getValue(SURVEY_INSTANCE.ENTITY_ID)))
+                            .status(SurveyInstanceStatus.valueOf(record.getValue(SURVEY_INSTANCE.STATUS)))
+                            .build())
+                    .person(PersonDao.personMapper.map(record))
+                    .build();
 
     private final DSLContext dsl;
 
@@ -58,5 +72,18 @@ public class SurveyInstanceRecipientDao {
         return dsl.delete(SURVEY_INSTANCE_RECIPIENT)
                 .where(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.in(surveyInstanceIdSelector))
                 .execute();
+    }
+
+
+    public List<SurveyInstanceRecipient> findForSurveyInstance(long surveyInstanceId) {
+        return dsl
+                .select(SURVEY_INSTANCE_RECIPIENT.fields())
+                .select(SURVEY_INSTANCE.fields())
+                .select(PERSON.fields())
+                .from(SURVEY_INSTANCE_RECIPIENT)
+                .innerJoin(SURVEY_INSTANCE).on(SURVEY_INSTANCE.ID.eq(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID))
+                .innerJoin(PERSON).on(PERSON.ID.eq(SURVEY_INSTANCE_RECIPIENT.PERSON_ID))
+                .where(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

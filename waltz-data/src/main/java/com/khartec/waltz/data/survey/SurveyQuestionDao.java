@@ -4,9 +4,8 @@ import com.khartec.waltz.model.survey.ImmutableSurveyQuestion;
 import com.khartec.waltz.model.survey.SurveyQuestion;
 import com.khartec.waltz.model.survey.SurveyQuestionFieldType;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -49,21 +48,31 @@ public class SurveyQuestionDao {
 
 
     public List<SurveyQuestion> findForTemplate(long templateId) {
-        return dsl.selectFrom(SURVEY_QUESTION)
-                .where(SURVEY_QUESTION.SURVEY_TEMPLATE_ID.eq(templateId))
-                .orderBy(SURVEY_QUESTION.POSITION.asc())
-                .fetch(TO_DOMAIN_MAPPER);
+        return findForTemplateIdSelector(DSL.select(DSL.val(templateId)));
+    }
+
+
+    public List<SurveyQuestion> findForSurveyRun(long surveyRunId) {
+        return findForTemplateIdSelector(DSL
+                .select(SURVEY_RUN.SURVEY_TEMPLATE_ID)
+                .from(SURVEY_RUN)
+                .where(SURVEY_RUN.ID.eq(surveyRunId)));
     }
 
 
     public List<SurveyQuestion> findForSurveyInstance(long surveyInstanceId) {
-        return dsl.select(SURVEY_QUESTION.fields())
-                .from(SURVEY_QUESTION)
-                .innerJoin(SURVEY_RUN)
-                .on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_QUESTION.SURVEY_TEMPLATE_ID))
-                .innerJoin(SURVEY_INSTANCE)
-                .on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
-                .where(SURVEY_INSTANCE.ID.eq(surveyInstanceId))
+        return findForTemplateIdSelector(DSL
+                .select(SURVEY_RUN.SURVEY_TEMPLATE_ID)
+                .from(SURVEY_RUN)
+                .innerJoin(SURVEY_INSTANCE).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
+                .where(SURVEY_INSTANCE.ID.eq(surveyInstanceId)));
+    }
+
+
+    private List<SurveyQuestion> findForTemplateIdSelector(Select<Record1<Long>> templateIdSelector) {
+        return dsl.selectFrom(SURVEY_QUESTION)
+                .where(SURVEY_QUESTION.SURVEY_TEMPLATE_ID.in(templateIdSelector))
+                .orderBy(SURVEY_QUESTION.POSITION.asc())
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

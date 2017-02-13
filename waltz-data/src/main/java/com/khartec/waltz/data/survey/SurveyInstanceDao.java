@@ -73,6 +73,15 @@ public class SurveyInstanceDao {
     }
 
 
+    public List<SurveyInstance> findForSurveyRun(long surveyRunId) {
+        return dsl.select(SURVEY_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(SURVEY_INSTANCE)
+                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
     public long create(SurveyInstanceCreateCommand command) {
         checkNotNull(command, "command cannot be null");
 
