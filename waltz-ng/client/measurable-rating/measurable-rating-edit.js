@@ -182,15 +182,14 @@ function controller($q,
 
     vm.onRatingSelect = r => {
         if (! vm.selected.measurable) return; // nothing selected
+        if (! vm.selected.measurable.concrete) return; // not concrete
         if (r === getRating()) return; // rating not changed
 
-        if (r === 'X') {
-            return doRemove()
-                .then(() => notification.success('Removed'));
-        } else {
-            return doSave(r, getDescription())
+        return r === 'X'
+            ? doRemove()
+                .then(() => notification.success('Removed'))
+            : doSave(r, getDescription())
                 .then(() => notification.success('Saved'));
-        }
     };
 
     vm.onSaveComment = (comment) => {

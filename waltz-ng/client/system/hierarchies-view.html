@@ -58,7 +58,10 @@
 
             <div class="col-md-4"
                  ng-if="ctrl.roots.length > 0">
-                <h4><span ng-bind="ctrl.roots[0].kind | toDisplayName:'entity'"></span> Roots</h4>
+                <h4>
+                    <span ng-bind="ctrl.roots[0].kind | toDisplayName:'entity'"></span>
+                    Roots
+                </h4>
                 <div class="waltz-scroll-region"
                      style="height: 300px">
                     <table class="table table-condensed small">
