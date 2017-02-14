@@ -31,6 +31,7 @@ import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkFalse;
@@ -67,6 +68,8 @@ public class PhysicalFlowDao {
                                 record.getTargetEntityId(),
                                 r.getValue(targetEntityNameField)))
                 .transport(TransportKind.valueOf(record.getTransport()))
+                .lastUpdatedBy(record.getLastUpdatedBy())
+                .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .build();
     };
 
@@ -157,6 +160,8 @@ public class PhysicalFlowDao {
         record.setSpecificationId(flow.specificationId());
 
         record.setDescription(flow.description());
+        record.setLastUpdatedBy(flow.lastUpdatedBy());
+        record.setLastUpdatedAt(Timestamp.valueOf(flow.lastUpdatedAt()));
         record.setProvenance("waltz");
 
         record.store();
