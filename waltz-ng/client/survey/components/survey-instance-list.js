@@ -56,7 +56,7 @@ function controller() {
 
     vm.columnDefs = [
         Object.assign(
-            mkLinkGridCell('Title', 'surveyRun.name', 'surveyInstance.id', 'main.survey.instance.response.view'),
+            mkLinkGridCell('Title', 'surveyRun.name', 'surveyInstance.id', 'main.survey.instance.view'),
             {width: "30%"}
         ),
 
