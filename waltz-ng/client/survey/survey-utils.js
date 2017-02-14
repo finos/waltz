@@ -1,3 +1,4 @@
+
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,12 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 
-export function surveyTemplateResolver(surveyTemplateStore, params) {
-    return surveyTemplateStore.getById( params.id );
+
+export function groupQuestions(questions = []) {
+    const sections = _.chain(questions)
+        .map(q => q.sectionName || "Other")
+        .uniq()
+        .value();
+
+    const groupedQuestions = _.groupBy(questions, q => q.sectionName || "Other");
+
+    return _.map(sections, s => {
+        return {
+            'sectionName': s,
+            'questions': groupedQuestions[s]
+        }
+    });
 }
-
-surveyTemplateResolver.$inject = ['SurveyTemplateStore', '$stateParams'];
-
-
-

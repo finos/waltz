@@ -47,17 +47,15 @@ const instanceUserState = {
 };
 
 
-const instanceResponseState = {
-    url: '/{id:int}/response'
+const instanceViewState = {
+    url: '/{id:int}/view',
+    views: {'content@': require('./survey-instance-response-view')}
 };
 
 
-const instanceResponseEditState = {
-    url: '/edit',
-    views: {'content@': require('./survey-instance-response-edit')},
-    resolve: {
-        surveyInstance: surveyInstanceResolver
-    }
+const instanceEditState = {
+    url: '/{id:int}/edit',
+    views: {'content@': require('./survey-instance-response-edit')}
 };
 
 
@@ -68,8 +66,9 @@ function setup($stateProvider) {
         .state('main.survey.run.create', runCreateState)
         .state('main.survey.instance', instanceBaseState)
         .state('main.survey.instance.user', instanceUserState)
-        .state('main.survey.instance.response', instanceResponseState)
-        .state('main.survey.instance.response.edit', instanceResponseEditState);
+        .state('main.survey.instance.edit', instanceEditState)
+        .state('main.survey.instance.view', instanceViewState)
+        ;
 }
 
 

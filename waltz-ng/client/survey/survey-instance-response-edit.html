@@ -5,10 +5,8 @@
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>
-                <a class="clickable"
-                   ng-click="ctrl.goToParent()">
-                    <span ng-bind="ctrl.surveyInstance.surveyEntity.name"></span>
-                </a>
+                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
+                </waltz-entity-link>
             </li>
             <li>Surveys</li>
             <li>
@@ -30,7 +28,8 @@
                 Survey Subject
             </div>
             <div class="col-sm-8">
-                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity"></waltz-entity-link>
+                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
+                </waltz-entity-link>
             </div>
         </div>
         <br>
@@ -48,7 +47,8 @@
                 Due
             </div>
             <div class="col-sm-8">
-                <waltz-from-now timestamp="ctrl.surveyRun.dueDate"></waltz-from-now>
+                <waltz-from-now timestamp="ctrl.surveyRun.dueDate">
+                </waltz-from-now>
             </div>
         </div>
     </div>
@@ -61,7 +61,8 @@
               ng-submit="ctrl.submit()">
             <div ng-repeat="groupedQuestion in ctrl.surveyQuestions">
 
-                <h4 ng-bind="groupedQuestion.sectionName" class="text-muted"></h4>
+                <h4 ng-bind="groupedQuestion.sectionName"
+                    class="text-muted"></h4>
                 <hr>
 
                 <div ng-repeat="question in groupedQuestion.questions"
@@ -139,6 +140,7 @@
                                   ng-model="ctrl.surveyResponses[question.id].stringResponse"
                                   ng-required="question.isMandatory"
                                   ng-blur="ctrl.saveResponse(question.id)"
+                                  rows="4"
                                   class="form-control">
                         </textarea>
                         <!-- comment -->
