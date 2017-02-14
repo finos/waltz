@@ -1501,4 +1501,31 @@
 
     </changeSet>
 
+
+    <!-- 1482: add last updated to physical specification -->
+    <changeSet id="20170214-1482-1"
+               author="kamransaleem">
+
+        <addColumn tableName="physical_specification">
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+            </column>
+        </addColumn>
+
+        <sql>
+            update physical_specification
+            set last_updated_by = 'admin'
+        </sql>
+
+        <addNotNullConstraint columnDataType="${name.type}"
+                              columnName="last_updated_by"
+                              tableName="physical_specification"/>
+
+    </changeSet>
+
 </databaseChangeLog>

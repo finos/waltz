@@ -63,7 +63,8 @@ const idSelectorShape = {
 const specificationShape = {
     name: apiCheck.string,
     description: apiCheck.string,
-    format: apiCheck.string
+    format: apiCheck.string,
+    lastUpdatedBy: apiCheck.string
 };
 
 const flowAttributesShape = {

@@ -73,7 +73,7 @@ function controller() {
         vm.onChange(Object.assign(
             {},
             vm.form,
-            { owningEntity: toEntityRef(vm.owningEntity) }));
+            { owningEntity: toEntityRef(vm.owningEntity), lastUpdatedBy: "ignored, server will set" }));
     };
 
     vm.cancel = () => vm.onDismiss();
