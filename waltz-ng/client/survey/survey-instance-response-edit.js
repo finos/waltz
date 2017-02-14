@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../common/index";
-import {groupQuestions} from './survey-utils';
+import {groupQuestions} from "./survey-utils";
 import _ from "lodash";
 
 
@@ -45,7 +45,8 @@ function indexResponses(responses = []) {
 }
 
 
-function controller($stateParams,
+function controller($state,
+                    $stateParams,
                     notification,
                     surveyInstanceStore,
                     surveyRunStore,
@@ -95,12 +96,16 @@ function controller($stateParams,
             vm.surveyInstance.id,
             { newStatus: 'COMPLETED' }
         )
-        .then(result => notification.success('Survey response submitted successfully'));
+        .then(result => {
+            notification.success('Survey response submitted successfully');
+            $state.go('main.survey.instance.view', { id: id });
+        });
     };
 
 }
 
 controller.$inject = [
+    '$state',
     '$stateParams',
     'Notification',
     'SurveyInstanceStore',
