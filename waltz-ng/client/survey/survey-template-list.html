@@ -51,7 +51,7 @@
                         <span ng-bind="template.status"></span>
                     </td>
                     <td>
-                        <span ng-bind="template.createdAt"></span>
+                        <waltz-from-now timestamp="template.createdAt"></waltz-from-now>
                     </td>
                     <td>
                         <span ng-bind="ctrl.owners[template.ownerId].displayName"></span>
