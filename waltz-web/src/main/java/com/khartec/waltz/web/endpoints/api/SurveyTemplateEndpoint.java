@@ -59,7 +59,7 @@ public class SurveyTemplateEndpoint implements Endpoint {
         ListRoute<SurveyTemplate> findAllActiveRoute = (request, response) ->
                 surveyTemplateService.findAllActive();
 
-        getForDatum(getByIdPath, getByIdRoute);
         getForList(findAllActivePath, findAllActiveRoute);
+        getForDatum(getByIdPath, getByIdRoute);
     }
 }

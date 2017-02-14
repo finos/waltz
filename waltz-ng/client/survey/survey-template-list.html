@@ -1,0 +1,70 @@
+<div>
+    <waltz-page-header icon="edit"
+                       name="Survey Templates">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main">Survey</a></li>
+            <li> Templates</li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+
+        <div ng-repeat="group in ctrl.groupedTemplates track by group.key">
+            <br ng-if="!$first">
+            <h4>
+                <waltz-icon fixed-width="true"
+                            name="{{ group.key | toIconName:'entity' }}"
+                            style="color: #332b23;">
+                </waltz-icon>
+                <span ng-bind="group.key | toDisplayName:'entity'">
+                </span>
+                <span class="small">Target Entity Kind</span>
+            </h4>
+
+            <table class="table table-condensed table-striped table-hover">
+                <colgroup>
+                    <col width="30%">
+                    <col width="10%">
+                    <col width="10%">
+                    <col width="20%">
+                    <col width="30%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th>Owner</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="template in group.values track by template.id">
+                    <td>
+                        <a ui-sref='main.survey.template.view ({id: template.id})'
+                           class="clickable"
+                           ng-bind="template.name">
+                        </a>
+                    </td>
+                    <td>
+                        <span ng-bind="template.status"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="template.createdAt"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="ctrl.owners[template.ownerId].displayName"></span>
+                    </td>
+                    <td>
+                        <span class='small'
+                              ng-bind="template.description | limitTo:100">
+                        </span>
+                        <span ng-if="template.description.length > 100">...</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
