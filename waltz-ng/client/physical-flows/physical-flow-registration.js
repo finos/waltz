@@ -140,8 +140,14 @@ function controller(
             physicalFlowStore
                 .create(cmd)
                 .then(resp => {
-                    notification.info("Created new flow");
-                    $state.go('main.physical-flow.view', {id: resp.entityReference.id });
+                    if(resp.outcome == 'SUCCESS') {
+                        notification.info("Created new flow");
+                    } else if(resp.outcome == 'FAILURE') {
+                        notification.warning(resp.message + ", redirected to existing.")
+                    }
+                    if(resp.entityReference) {
+                        $state.go('main.physical-flow.view', {id: resp.entityReference.id});
+                    }
                 })
         } else {
             const messages =  _.join(validationResult.messages, '<br> - ');

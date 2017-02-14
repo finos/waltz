@@ -212,8 +212,6 @@ public class PhysicalFlowService {
                         .withLastUpdatedBy(username)
                         .withLastUpdatedAt(nowUtc())));
 
-        attestationService.explicitlyAttest(PHYSICAL_SPECIFICATION, specId, username, ATTESTATION_COMMENT);
-
         PhysicalFlow flow = ImmutablePhysicalFlow.builder()
                 .specificationId(specId)
                 .basisOffset(command.flowAttributes().basisOffset())
@@ -224,6 +222,17 @@ public class PhysicalFlowService {
                 .lastUpdatedBy(username)
                 .lastUpdatedAt(nowUtc())
                 .build();
+
+        // ensure existing not in database
+        List<PhysicalFlow> byAttributesAndSpecification = physicalFlowDao.findByAttributesAndSpecification(flow);
+        if(byAttributesAndSpecification.size() > 0) {
+            return ImmutablePhysicalFlowCreateCommandResponse.builder()
+                    .originalCommand(command)
+                    .outcome(CommandOutcome.FAILURE)
+                    .message("Duplicate with existing flow")
+                    .entityReference(EntityReference.mkRef(PHYSICAL_FLOW, byAttributesAndSpecification.get(0).id().get()))
+                    .build();
+        }
 
         long flowId = physicalFlowDao.create(flow);
 
@@ -250,6 +259,10 @@ public class PhysicalFlowService {
                 Operation.ADD);
 
 
+        attestationService.explicitlyAttest(PHYSICAL_SPECIFICATION,
+                specId,
+                username,
+                ATTESTATION_COMMENT + " [Id : " + flowId + "]");
         attestationService.explicitlyAttest(PHYSICAL_FLOW, flowId, username, ATTESTATION_COMMENT);
 
         return ImmutablePhysicalFlowCreateCommandResponse.builder()

@@ -126,6 +126,19 @@ public class PhysicalFlowDao {
     }
 
 
+    public List<PhysicalFlow> findByAttributesAndSpecification(PhysicalFlow flow) {
+
+        Condition sameFlow = PHYSICAL_FLOW.SPECIFICATION_ID.eq(flow.specificationId())
+                .and(PHYSICAL_FLOW.BASIS_OFFSET.eq(flow.basisOffset()))
+                .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().name()))
+                .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport().name()))
+                .and(PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(flow.target().kind().name()))
+                .and(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(flow.target().id()));
+
+        return findByCondition(sameFlow);
+    }
+
+
     public int delete(long flowId) {
         return dsl.delete(PHYSICAL_FLOW)
                 .where(PHYSICAL_FLOW.ID.eq(flowId))
