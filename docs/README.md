@@ -1,5 +1,6 @@
 # Waltz Documentation
 
+- [Features](features/README.md)
 
 ### License 
 

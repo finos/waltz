@@ -21,19 +21,13 @@ package com.khartec.waltz.model.logical_flow;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdProvider;
-import com.khartec.waltz.model.LastUpdatedProvider;
-import com.khartec.waltz.model.ProvenanceProvider;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
-
 @Value.Immutable
-@JsonSerialize(as = ImmutableLogicalFlow.class)
-@JsonDeserialize(as = ImmutableLogicalFlow.class)
-public abstract class LogicalFlow implements
-        IdProvider,
-        ProvenanceProvider,
-        LastUpdatedProvider {
+@JsonSerialize(as = ImmutableAddLogicalFlowCommand.class)
+@JsonDeserialize(as = ImmutableAddLogicalFlowCommand.class)
+public abstract class AddLogicalFlowCommand implements Command {
 
     public abstract EntityReference source();
     public abstract EntityReference target();

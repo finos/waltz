@@ -28,6 +28,7 @@ import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -46,6 +47,7 @@ public class LogicalFlowDao {
 
     public static final RecordMapper<Record, LogicalFlow> TO_DOMAIN_MAPPER = r -> {
         LogicalFlowRecord record = r.into(LogicalFlowRecord.class);
+
         return ImmutableLogicalFlow.builder()
                 .id(record.getId())
                 .source(ImmutableEntityReference.builder()
@@ -58,6 +60,8 @@ public class LogicalFlowDao {
                         .id(record.getTargetEntityId())
                         .name(r.getValue(targetAppAlias.NAME))
                         .build())
+                .lastUpdatedBy(record.getLastUpdatedBy())
+                .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .provenance(record.getProvenance())
                 .build();
     };
@@ -65,11 +69,13 @@ public class LogicalFlowDao {
 
     public static final BiFunction<LogicalFlow, DSLContext, LogicalFlowRecord> TO_RECORD_MAPPER = (flow, dsl) -> {
         LogicalFlowRecord record = dsl.newRecord(LOGICAL_FLOW);
-        record.setProvenance(flow.provenance());
         record.setSourceEntityId(flow.source().id());
         record.setSourceEntityKind(flow.source().kind().name());
         record.setTargetEntityId(flow.target().id());
         record.setTargetEntityKind(flow.target().kind().name());
+        record.setLastUpdatedBy(flow.lastUpdatedBy());
+        record.setLastUpdatedAt(Timestamp.valueOf(flow.lastUpdatedAt()));
+        record.setProvenance(flow.provenance());
         return record;
     };
 
