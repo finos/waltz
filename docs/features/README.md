@@ -9,6 +9,12 @@
 - [Server / Database Information](servers_and_databases/servers_and_databases.md)
 - [Surveys](surveys/survey.md)
 
+- Configuration
+    - [Properties](configuration/properties.md) 
+    - [Settings](configuration/settings.md) 
+    - [Static Panels](configuration/static-panels.md) 
+
+
 ## Notes 
 The model diagrams do not attempt to show every field and relationship.  Instead they try 
 to convey the important aspects of the model with regard to the subject being discussed.

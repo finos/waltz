@@ -26,7 +26,3 @@ Currently assigned groups are:
 - ```HOME.PERSON```: For the People overview page
 - ```HOME.PROCESS```: For the Process list page
 - ```HOME.PERFORMANCE```: For the Performance Metric overview page
-
-
-
-
