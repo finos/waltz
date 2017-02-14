@@ -44,7 +44,9 @@
             Overall Rating
         </div>
         <div class="col-sm-4">
-            <span ng-bind="ctrl.app.overallRating | toDisplayName:'investmentRating'"></span>
+            <waltz-rating-indicator-cell rating="ctrl.app.overallRating"
+                                         label="ctrl.app.overallRating | toDisplayName:'investmentRating'">
+            </waltz-rating-indicator-cell>
         </div>
     </div>
 
