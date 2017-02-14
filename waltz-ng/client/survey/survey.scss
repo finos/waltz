@@ -1,0 +1,13 @@
+.survey-form {
+    input.ng-invalid {
+        border-color: #e9322d;
+    }
+
+    input[type=radio].ng-invalid{
+        outline: 1px solid #e9322d
+    }
+
+    textarea.ng-invalid {
+        border-color: #e9322d;
+    }
+}

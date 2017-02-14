@@ -91,6 +91,11 @@ function controller($state,
         );
     };
 
+    vm.saveForLater = () => {
+        notification.success('Survey response saved successfully');
+        $state.go('main.survey.instance.user');
+    };
+
     vm.submit = () => {
         surveyInstanceStore.updateStatus(
             vm.surveyInstance.id,
