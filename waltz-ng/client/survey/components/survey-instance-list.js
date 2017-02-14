@@ -51,7 +51,6 @@ function controller() {
     vm.$onChanges = () => {
         if (vm.surveyInstances && vm.surveyRuns) {
             vm.gridData = mkGridData(vm.surveyRuns, vm.surveyInstances);
-            console.log(vm.gridData);
         }
     };
 

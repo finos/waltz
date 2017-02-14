@@ -17,6 +17,7 @@
  */
 
 import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
+import * as _ from "lodash";
 
 const initialState = {
     bookmarks: [],
@@ -95,9 +96,10 @@ function controller($q,
         .findByEntityReference(vm.entityRef)
         .then(surveyRuns => vm.surveyRuns = surveyRuns);
 
+    // only get back completed instances
     surveyInstanceStore
         .findByEntityReference(vm.entityRef)
-        .then(surveyInstances => vm.surveyInstances = surveyInstances);
+        .then(surveyInstances => vm.surveyInstances = _.filter(surveyInstances, {'status': 'COMPLETED'}));
 
     const involvementPromises = [
         involvementStore.findByEntityReference('CHANGE_INITIATIVE', id),

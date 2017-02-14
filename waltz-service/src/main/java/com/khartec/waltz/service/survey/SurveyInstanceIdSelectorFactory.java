@@ -6,7 +6,6 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableIdSelectionOptions;
-import com.khartec.waltz.model.survey.SurveyInstanceStatus;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -62,8 +61,7 @@ public class SurveyInstanceIdSelectorFactory implements IdSelectorFactory {
                 .select(SURVEY_INSTANCE.ID)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.ENTITY_KIND.eq(ref.kind().name())
-                        .and(SURVEY_INSTANCE.ENTITY_ID.eq(ref.id()))
-                        .and(SURVEY_INSTANCE.STATUS.eq(SurveyInstanceStatus.COMPLETED.name()))); // only completed instances
+                        .and(SURVEY_INSTANCE.ENTITY_ID.eq(ref.id())));
     }
 
 
@@ -81,7 +79,6 @@ public class SurveyInstanceIdSelectorFactory implements IdSelectorFactory {
                 .selectDistinct(SURVEY_INSTANCE.ID)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.ENTITY_KIND.eq(ref.kind().name())
-                        .and(SURVEY_INSTANCE.ENTITY_ID.in(ouSelector))
-                        .and(SURVEY_INSTANCE.STATUS.eq(SurveyInstanceStatus.COMPLETED.name()))); // only completed instances
+                        .and(SURVEY_INSTANCE.ENTITY_ID.in(ouSelector)));
     }
 }
