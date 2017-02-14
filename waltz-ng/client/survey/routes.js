@@ -1,4 +1,3 @@
-import {surveyInstanceResolver, surveyTemplateResolver} from "./resolvers";
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -34,10 +33,7 @@ const instanceBaseState = {
 
 const runCreateState = {
     url: '/template/{id:int}/new-run',
-    views: {'content@': require('./survey-run-create')},
-    resolve: {
-        surveyTemplate: surveyTemplateResolver
-    }
+    views: {'content@': require('./survey-run-create')}
 };
 
 
@@ -67,8 +63,7 @@ function setup($stateProvider) {
         .state('main.survey.instance', instanceBaseState)
         .state('main.survey.instance.user', instanceUserState)
         .state('main.survey.instance.edit', instanceEditState)
-        .state('main.survey.instance.view', instanceViewState)
-        ;
+        .state('main.survey.instance.view', instanceViewState);
 }
 
 
