@@ -219,6 +219,8 @@ public class PhysicalFlowService {
                 .transport(command.flowAttributes().transport())
                 .description(mkSafe(command.flowAttributes().description()))
                 .target(command.targetEntity())
+                .lastUpdatedBy(username)
+                .lastUpdatedAt(nowUtc())
                 .build();
 
         // ensure existing not in database
