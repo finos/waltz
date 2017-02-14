@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
 import {initialiseData} from "../common/index";
 import {timeFormat} from "d3-time-format";
 
@@ -37,13 +37,18 @@ const template = require('./survey-run-create.html');
 
 function controller($location,
                     $state,
-                    surveyTemplate,
-                    surveyRunStore) {
+                    $stateParams,
+                    surveyRunStore,
+                    surveyTemplateStore) {
 
     const vm = initialiseData(this, initialState);
+    const templateId = $stateParams.id;
 
-    vm.surveyTemplate = surveyTemplate;
-    vm.surveyRun.surveyTemplate = surveyTemplate;
+    surveyTemplateStore.getById(templateId)
+        .then(t => {
+            vm.surveyTemplate = t;
+            vm.surveyRun.surveyTemplate = t;
+        });
 
     const generateEmailLink = (surveyRun, includedRecipients) => {
         const surveyEmailRecipients = _
@@ -117,8 +122,9 @@ Please use this URL to fill the survey: ${surveyLink}
 controller.$inject = [
     '$location',
     '$state',
-    'surveyTemplate',
-    'SurveyRunStore'
+    '$stateParams',
+    'SurveyRunStore',
+    'SurveyTemplateStore'
 ];
 
 
