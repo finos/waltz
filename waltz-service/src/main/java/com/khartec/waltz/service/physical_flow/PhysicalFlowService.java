@@ -34,6 +34,7 @@ import com.khartec.waltz.model.logical_flow.AddLogicalFlowCommand;
 import com.khartec.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.*;
+import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.attestation.AttestationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.model.EntityKind.*;
 
@@ -205,7 +207,10 @@ public class PhysicalFlowService {
         long specId = command
                 .specification()
                 .id()
-                .orElseGet(() -> physicalSpecificationDao.create(command.specification()));
+                .orElseGet(() -> physicalSpecificationDao.create(ImmutablePhysicalSpecification
+                        .copyOf(command.specification())
+                        .withLastUpdatedBy(username)
+                        .withLastUpdatedAt(nowUtc())));
 
         attestationService.explicitlyAttest(PHYSICAL_SPECIFICATION, specId, username, ATTESTATION_COMMENT);
 
@@ -260,8 +265,11 @@ public class PhysicalFlowService {
             return;
         } else {
             LogicalFlow logicalFlow = dataFlowService.findBySourceAndTarget(source, target);
-            // attest the flow
-            attestationService.explicitlyAttest(LOGICAL_DATA_FLOW, logicalFlow.id().get(), username, ATTESTATION_COMMENT);
+
+            // attest the flow if exists
+            if(logicalFlow != null) {
+                attestationService.explicitlyAttest(LOGICAL_DATA_FLOW, logicalFlow.id().get(), username, ATTESTATION_COMMENT);
+            }
 
             if(logicalFlow == null) {
                 Optional<String> defaultDataTypeCode = settingsService.getValue(DEFAULT_DATATYPE_CODE_SETTING_NAME);

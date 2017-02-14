@@ -33,6 +33,7 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +71,8 @@ public class PhysicalSpecificationDao {
                 .name(record.getName())
                 .description(record.getDescription())
                 .format(DataFormatKind.valueOf(record.getFormat()))
+                .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
+                .lastUpdatedBy(record.getLastUpdatedBy())
                 .provenance(record.getProvenance())
                 .build();
     };
@@ -184,6 +187,8 @@ public class PhysicalSpecificationDao {
         record.setExternalId(specification.externalId().orElse(""));
         record.setDescription(specification.description());
         record.setFormat(specification.format().name());
+        record.setLastUpdatedAt(Timestamp.valueOf(specification.lastUpdatedAt()));
+        record.setLastUpdatedBy(specification.lastUpdatedBy());
         record.setProvenance("waltz");
 
         record.store();

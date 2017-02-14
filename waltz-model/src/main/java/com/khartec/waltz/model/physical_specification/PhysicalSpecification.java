@@ -38,7 +38,8 @@ public abstract class PhysicalSpecification implements
         ExternalIdProvider,
         NameProvider,
         DescriptionProvider,
-        ProvenanceProvider {
+        ProvenanceProvider,
+        LastUpdatedProvider {
 
     public abstract EntityReference owningEntity();
     public abstract DataFormatKind format();
