@@ -135,6 +135,12 @@ public class SurveyRunGenerator {
                             .execute();
 
                     surveyCompletedCount.incrementAndGet();
+
+                    // update instances to COMPLETED
+                    dsl.update(SURVEY_INSTANCE)
+                            .set(SURVEY_INSTANCE.STATUS, SurveyInstanceStatus.COMPLETED.name())
+                            .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+                            .execute();
                 }
             });
 

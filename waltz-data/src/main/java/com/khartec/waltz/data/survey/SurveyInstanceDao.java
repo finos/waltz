@@ -116,6 +116,7 @@ public class SurveyInstanceDao {
 
     public List<SurveyInstance> findBySurveyInstanceIdSelector(Select<Record1<Long>> selector) {
         return dsl.select(SURVEY_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);

@@ -32,6 +32,8 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -55,6 +57,7 @@ public class SurveyRunEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String surveyRunListForUserPath = mkPath(BASE_URL, "user");
         String surveyRunUpdatePath = mkPath(BASE_URL, ":id");
         String generateSurveyRunRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
@@ -63,8 +66,11 @@ public class SurveyRunEndpoint implements Endpoint {
 
         DatumRoute<SurveyRun> getByIdRoute = (req, res) -> surveyRunService.getById(getId(req));
 
-        ListRoute<SurveyRun> surveyRunListForUserRoute =
-                (req, res) -> surveyRunService.findForRecipient(getUsername(req));
+        ListRoute<SurveyRun> findByEntityRoute = (req, res)
+                -> surveyRunService.findBySurveyInstanceIdSelector(mkOpts(getEntityReference(req), EXACT));
+
+        ListRoute<SurveyRun> surveyRunListForUserRoute = (req, res)
+                -> surveyRunService.findForRecipient(getUsername(req));
 
         DatumRoute<IdCommandResponse> surveyRunCreateRoute = (req, res) -> {
             res.type(WebUtilities.TYPE_JSON);
@@ -102,6 +108,7 @@ public class SurveyRunEndpoint implements Endpoint {
                 surveyRunService.createSurveyInstancesAndRecipients(getId(request), newArrayList(readBody(request, SurveyInstanceRecipient[].class)));
 
         getForDatum(getByIdPath, getByIdRoute);
+        getForList(findByEntityRefPath, findByEntityRoute);
         getForList(generateSurveyRunRecipientsPath, generateSurveyRunRecipientsRoute);
         getForList(surveyRunListForUserPath, surveyRunListForUserRoute);
         postForDatum(BASE_URL, surveyRunCreateRoute);

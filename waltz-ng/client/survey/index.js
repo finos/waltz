@@ -25,7 +25,8 @@ export default () => {
 
     module
         .component('waltzSurveyRunCreateGeneral', require('./components/survey-run-create-general'))
-        .component('waltzSurveyRunCreateRecipient', require('./components/survey-run-create-recipient'));
+        .component('waltzSurveyRunCreateRecipient', require('./components/survey-run-create-recipient'))
+        .component('waltzSurveyInstanceList', require('./components/survey-instance-list'));
 
     module
         .service('SurveyInstanceStore', require('./services/survey-instance-store'))
