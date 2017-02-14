@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../common/index";
-import {mkEntityLinkGridCell, mkLinkGridCell} from "../common/link-utils";
 import {timeFormat} from "d3-time-format";
 import _ from "lodash";
 
@@ -26,16 +25,24 @@ const initialState = {
 
 const template = require('./survey-instance-list-user-view.html');
 
-function mkGridData(surveyRuns = [], surveyInstances = []) {
+function mkSurveyData(surveyRuns = [], surveyInstances = []) {
     const runsById = _.keyBy(surveyRuns, 'id');
 
-    return _.map(surveyInstances, instance => {
-        return {
-            'surveyInstance': instance,
-            'surveyRun': runsById[instance.surveyRunId],
-            'surveyEntity': instance.surveyEntity
-        }
-    });
+    const mappedData = _.map(surveyInstances, instance => {
+            return {
+                'surveyInstance': instance,
+                'surveyRun': runsById[instance.surveyRunId]
+            }
+        });
+
+    const [incomplete = [], complete = []] = _.partition(mappedData,
+        data => data.surveyInstance.status == 'NOT_STARTED'
+        || data.surveyInstance.status == 'IN_PROGRESS');
+
+    return {
+        'incomplete': incomplete,
+        'complete': complete
+    };
 }
 
 
@@ -54,22 +61,8 @@ function controller($q,
 
     $q.all([surveyRunsPromise, surveyInstancesPromise])
         .then(([surveyRuns, surveyInstances]) => {
-            vm.gridData = mkGridData(surveyRuns, surveyInstances);
+            vm.surveys = mkSurveyData(surveyRuns, surveyInstances);
         });
-
-    vm.columnDefs = [
-        Object.assign(
-            mkLinkGridCell('Survey', 'surveyRun.name', 'surveyInstance.id', 'main.survey.instance.view'),
-            { width: "30%" }
-        ),
-        Object.assign(
-            mkEntityLinkGridCell('Survey Subject', 'surveyEntity'),
-            { width: "30%" }
-        ),
-        { field: 'surveyInstance.status', displayName: 'Status', cellFilter: "toDisplayName:'surveyInstanceStatus'", width: "13%"},
-        { field: 'surveyRun.issuedOn', displayName: 'Issued On', width: "13%"},
-        { field: 'surveyRun.dueDate', displayName: 'Due Date', sort: { direction: 'desc' }, width: "13%" }
-    ];
 }
 
 
