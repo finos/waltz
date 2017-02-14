@@ -158,25 +158,32 @@
             </div>
 
             <!-- buttons -->
-            <div class="row">
-                <div class="col-sm-offset-8 col-sm-4">
-                    <a class="clickable"
-                       ng-click="ctrl.saveForLater()">
-                        Save For Later
-                    </a>
-                    &nbsp;
-                    <button type="button"
-                            ng-if="surveyResponseForm.$valid"
-                            ng-click="ctrl.submit()"
-                            class="btn btn-success">
-                        Submit
-                    </button>
-                    <div ng-if="surveyResponseForm.$invalid"
-                         class="alert alert-warning">
-                        Survey response cannot be submitted until all required questions are answered.
-                    </div>
-                </div>
-            </div>
+            <table class="table-condensed" align="right">
+                <tr>
+                    <td>
+                        <a class="clickable"
+                           ng-click="ctrl.saveForLater()">
+                            Save For Later
+                        </a>
+                    </td>
+                    <td ng-if="surveyResponseForm.$valid">
+                        <button type="button"
+
+                                ng-click="ctrl.submit()"
+                                class="btn btn-success btn-lg">
+                            <waltz-icon name="envelope">
+                            </waltz-icon>
+                            Submit
+                        </button>
+                    </td>
+                    <td ng-if="surveyResponseForm.$invalid"
+                        style="padding-bottom: 10px;">
+                        <span class="alert alert-warning">
+                                Survey response cannot be submitted until all required questions are answered.
+                        </span>
+                    </td>
+                </tr>
+            </table>
         </form>
     </waltz-section>
     </div>
