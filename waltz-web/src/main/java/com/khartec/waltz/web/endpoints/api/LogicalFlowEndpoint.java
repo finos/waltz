@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.logical_flow.AddLogicalFlowCommand;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlowStatistics;
 import com.khartec.waltz.model.user.Role;
@@ -94,16 +95,13 @@ public class LogicalFlowEndpoint implements Endpoint {
     private LogicalFlow addFlowRoute(Request request, Response response) throws IOException {
         ensureUserHasEditRights(request);
 
-        LogicalFlow logicalFlow = readBody(request, LogicalFlow.class);
         String username = getUsername(request);
 
-        if (logicalFlow.id().isPresent()) {
-            LOG.warn("User: {}, ignoring attempt to add duplicate logical flow: {}", username, logicalFlow);
-            return logicalFlow;
-        }
+        AddLogicalFlowCommand addCmd = readBody(request, AddLogicalFlowCommand.class);
 
-        LOG.info("User: {}, adding new logical flow: {}", username, logicalFlow);
-        LogicalFlow savedFlow = logicalFlowService.addFlow(logicalFlow, username);
+
+        LOG.info("User: {}, adding new logical flow: {}", username, addCmd);
+        LogicalFlow savedFlow = logicalFlowService.addFlow(addCmd, username);
         return savedFlow;
     }
 

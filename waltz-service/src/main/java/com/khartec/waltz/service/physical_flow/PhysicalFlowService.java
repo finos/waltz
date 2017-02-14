@@ -30,7 +30,8 @@ import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.datatype.DataType;
-import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
+import com.khartec.waltz.model.logical_flow.AddLogicalFlowCommand;
+import com.khartec.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
@@ -49,9 +50,7 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
-import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
-import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
-import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
+import static com.khartec.waltz.model.EntityKind.*;
 
 
 @Service
@@ -271,7 +270,7 @@ public class PhysicalFlowService {
                 }
 
                 // we need to create a flow with an unknown data type
-                ImmutableLogicalFlow newFlow = ImmutableLogicalFlow.builder()
+                AddLogicalFlowCommand newFlow = ImmutableAddLogicalFlowCommand.builder()
                         .source(source)
                         .target(target)
                         .build();

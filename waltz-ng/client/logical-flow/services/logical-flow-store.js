@@ -63,8 +63,8 @@ function service($http, BaseApiUrl) {
         .delete(`${BASE}/${id}`)
         .then(r => r.data);
 
-    const addFlow = (flow) => $http
-        .post(`${BASE}`, flow)
+    const addFlow = (addFlowCmd) => $http
+        .post(`${BASE}`, addFlowCmd)
         .then(r => r.data);
 
     return {

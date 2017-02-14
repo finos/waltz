@@ -93,6 +93,14 @@ function addFlow(flows, flow) {
 }
 
 
+function mkAddFlowCommand(flow) {
+    return {
+        source: flow.source,
+        target: flow.target
+    };
+}
+
+
 function controller($scope,
                     application,
                     authSourceStore,
@@ -169,7 +177,7 @@ function controller($scope,
 
     vm.updateFlow = (command) => {
         if (! command.flowId) {
-            return logicalFlowStore.addFlow(vm.selectedFlow)
+            return logicalFlowStore.addFlow(mkAddFlowCommand(vm.selectedFlow))
                 .then(flow => Object.assign(command, { flowId: flow.id }))
                 .then(updateDecorators);
 

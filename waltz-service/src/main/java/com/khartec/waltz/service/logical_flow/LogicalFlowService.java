@@ -24,14 +24,12 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.attestation.AttestationType;
-import com.khartec.waltz.model.attestation.ImmutableAttestation;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowStatistics;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.logical_flow.LogicalFlowMeasures;
-import com.khartec.waltz.model.logical_flow.LogicalFlowStatistics;
+import com.khartec.waltz.model.logical_flow.*;
 import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.attestation.AttestationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -51,6 +49,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 
 
@@ -131,13 +130,24 @@ public class LogicalFlowService {
     }
 
 
-    public LogicalFlow addFlow(LogicalFlow flow, String username) {
-        if (flow.source().equals(flow.target())) {
-            throw new IllegalArgumentException("Cannot have a flow with same source and target");
-        }
+    public LogicalFlow addFlow(AddLogicalFlowCommand addCmd, String username) {
+        rejectIfSelfLoop(addCmd);
 
-        auditFlowChange("added", flow, username, Operation.ADD);
-        LogicalFlow logicalFlow = logicalFlowDao.addFlow(flow);
+        auditFlowChange(
+                "added",
+                addCmd.source(),
+                addCmd.target(),
+                username,
+                Operation.ADD);
+
+        LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
+                .source(addCmd.source())
+                .target(addCmd.target())
+                .lastUpdatedAt(nowUtc())
+                .lastUpdatedBy(username)
+                .build();
+
+        LogicalFlow logicalFlow = logicalFlowDao.addFlow(flowToAdd);
 
         attestationService.explicitlyAttest(
                 LOGICAL_DATA_FLOW,
@@ -146,6 +156,16 @@ public class LogicalFlowService {
                 "Creation of logical flow via Waltz");
 
         return logicalFlow;
+    }
+
+
+    private void rejectIfSelfLoop(AddLogicalFlowCommand addCmd) {
+        boolean sameKind = addCmd.source().kind().equals(addCmd.target().kind());
+        boolean sameId = addCmd.source().id() == addCmd.target().id();
+
+        if (sameKind && sameId) {
+            throw new IllegalArgumentException("Cannot have a flow with same source and target");
+        }
     }
 
 
@@ -158,7 +178,12 @@ public class LogicalFlowService {
                 .flatMap(df -> Stream.of(df.source(), df.target()))
                 .collect(Collectors.toSet());
 
-        logicalFlows.forEach(flow -> auditFlowChange("removed", flow, username, Operation.REMOVE));
+        logicalFlows.forEach(flow -> auditFlowChange(
+                "removed",
+                flow.source(),
+                flow.target(),
+                username,
+                Operation.REMOVE));
         dataTypeUsageService.recalculateForApplications(affectedEntityRefs.toArray(new EntityReference[affectedEntityRefs.size()]));
 
         flowIds.forEach(logicalFlowId -> {
@@ -169,22 +194,22 @@ public class LogicalFlowService {
     }
 
 
-    private void auditFlowChange(String verb, LogicalFlow flow, String username, Operation operation) {
+    private void auditFlowChange(String verb, EntityReference source, EntityReference target, String username, Operation operation) {
         ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
-                .parentReference(flow.source())
+                .parentReference(source)
                 .severity(Severity.INFORMATION)
                 .userId(username)
                 .message(String.format(
                         "Flow %s between: %s and %s",
                         verb,
-                        flow.source().name().orElse(Long.toString(flow.source().id())),
-                        flow.target().name().orElse(Long.toString(flow.target().id()))))
+                        source.name().orElse(Long.toString(source.id())),
+                        target.name().orElse(Long.toString(target.id()))))
                 .childKind(LOGICAL_DATA_FLOW)
                 .operation(operation)
                 .build();
 
         changeLogService.write(logEntry);
-        changeLogService.write(logEntry.withParentReference(flow.target()));
+        changeLogService.write(logEntry.withParentReference(target));
     }
 
 
