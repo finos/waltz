@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -32,6 +34,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findForUserPath = mkPath(BASE_URL, "user");
         String findResponsesPath = mkPath(BASE_URL, ":id", "responses");
         String saveResponsePath = mkPath(BASE_URL, ":id", "response");
@@ -39,6 +42,9 @@ public class SurveyInstanceEndpoint implements Endpoint {
 
         DatumRoute<SurveyInstance> getByIdRoute =
                 (req, res) -> surveyInstanceService.getById(getId(req));
+
+        ListRoute<SurveyInstance> findByEntityRefRoute = (req, res)
+                -> surveyInstanceService.findBySurveyInstanceIdSelector(mkOpts(getEntityReference(req), EXACT));
 
         ListRoute<SurveyInstance> findForUserRoute =
                 (req, res) -> surveyInstanceService.findForRecipient(getUsername(req));
@@ -72,6 +78,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
                 );
 
         getForDatum(getByIdPath, getByIdRoute);
+        getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findForUserPath, findForUserRoute);
         getForList(findResponsesPath, findResponsesRoute);
         putForDatum(saveResponsePath, saveResponseRoute);

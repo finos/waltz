@@ -23,6 +23,8 @@ const initialState = {
     changeInitiative: {},
     involvements: [],
     sourceDataRatings: [],
+    surveyInstances: [],
+    surveyRuns: [],
     related: {
         appGroups: []
     }
@@ -35,10 +37,17 @@ function controller($q,
                     bookmarkStore,
                     changeInitiativeStore,
                     involvementStore,
-                    sourceDataRatingStore) {
+                    sourceDataRatingStore,
+                    surveyInstanceStore,
+                    surveyRunStore) {
 
-    const { id } = $stateParams;
+    const {id} = $stateParams;
     const vm = Object.assign(this, initialState);
+
+    vm.entityRef = {
+        kind: 'CHANGE_INITIATIVE',
+        id: id
+    };
 
     const loadRelatedEntities = (id, rels = []) => {
 
@@ -56,7 +65,7 @@ function controller($q,
         return $q
             .all(promises)
             .then(([appGroups]) => {
-                return { appGroups }
+                return {appGroups}
             });
 
     };
@@ -73,7 +82,7 @@ function controller($q,
 
 
     bookmarkStore
-        .findByParent({ kind: 'CHANGE_INITIATIVE', id })
+        .findByParent({kind: 'CHANGE_INITIATIVE', id})
         .then(bs => vm.bookmarks = bs);
 
 
@@ -82,6 +91,13 @@ function controller($q,
         .then(rels => loadRelatedEntities(id, rels))
         .then(related => vm.related = related);
 
+    surveyRunStore
+        .findByEntityReference(vm.entityRef)
+        .then(surveyRuns => vm.surveyRuns = surveyRuns);
+
+    surveyInstanceStore
+        .findByEntityReference(vm.entityRef)
+        .then(surveyInstances => vm.surveyInstances = surveyInstances);
 
     const involvementPromises = [
         involvementStore.findByEntityReference('CHANGE_INITIATIVE', id),
@@ -100,7 +116,9 @@ controller.$inject = [
     'BookmarkStore',
     'ChangeInitiativeStore',
     'InvolvementStore',
-    'SourceDataRatingStore'
+    'SourceDataRatingStore',
+    'SurveyInstanceStore',
+    'SurveyRunStore'
 ];
 
 

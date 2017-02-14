@@ -1,3 +1,4 @@
+import {checkIsEntityRef} from "../../common/checks";
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -26,6 +27,13 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const findByEntityReference = (ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${base}/entity/${ref.kind}/${ref.id}`)
+            .then(r => r.data);
+    };
+
     const findForUser = () => {
         return $http
             .get(`${base}/user`)
@@ -52,6 +60,7 @@ function store($http, baseApiUrl) {
 
     return {
         getById,
+        findByEntityReference,
         findForUser,
         findResponses,
         saveResponse,
