@@ -1561,4 +1561,48 @@
                               tableName="physical_flow"/>
     </changeSet>
 
+
+    <!-- 1595: Add indexes on survey tables -->
+    <changeSet author="rovats"
+               id="20170215-1595-1">
+        <createIndex indexName="idx_survey_run_template"
+                     tableName="survey_run"
+                     unique="false">
+            <column name="survey_template_id" type="${long.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="rovats"
+               id="20170215-1595-2">
+        <createIndex indexName="idx_survey_instance_run"
+                     tableName="survey_instance"
+                     unique="false">
+            <column name="survey_run_id" type="${long.type}"/>
+        </createIndex>
+        <createIndex indexName="idx_survey_instance_entity"
+                     tableName="survey_instance"
+                     unique="false">
+            <column name="entity_id" type="${id.type}"/>
+            <column name="entity_kind" type="${enum.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="rovats"
+               id="20170215-1595-3">
+        <createIndex indexName="idx_survey_recipient_instance"
+                     tableName="survey_instance_recipient"
+                     unique="false">
+            <column name="survey_instance_id" type="${long.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="rovats"
+               id="20170215-1595-4">
+        <createIndex indexName="idx_survey_question_template"
+                     tableName="survey_question"
+                     unique="false">
+            <column name="survey_template_id" type="${long.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
