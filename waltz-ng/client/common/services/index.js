@@ -36,6 +36,8 @@ import {
     rollupKindNames,
     severityNames,
     surveyInstanceStatusNames,
+    surveyRunStatusNames,
+    surveyTemplateStatusNames,
     usageKindDisplayNames,
     transportKindNames,
     frequencyKindNames,
@@ -124,6 +126,8 @@ export default (module) => {
         .register('rollupKind', rollupKindNames)
         .register('severity', severityNames)
         .register('surveyInstanceStatus', surveyInstanceStatusNames)
+        .register('surveyRunStatus', surveyRunStatusNames)
+        .register('surveyTemplateStatus', surveyTemplateStatusNames)
         .register('usageKind', usageKindDisplayNames)
         .register('transportKind', transportKindNames)
         ;

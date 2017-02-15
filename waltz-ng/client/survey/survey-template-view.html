@@ -48,7 +48,7 @@
                 Status
             </div>
             <div class="col-sm-10">
-                <span ng-bind="ctrl.template.status"></span>
+                <span ng-bind="ctrl.template.status | toDisplayName:'surveyTemplateStatus'"></span>
             </div>
         </div>
     </div>
@@ -86,7 +86,7 @@
                 </thead>
                 <tr ng-repeat="r in ctrl.surveyRuns">
                     <td><span ng-bind="r.name"></span></td>
-                    <td><span ng-bind="r.status"></span></td>
+                    <td><span ng-bind="r.status | toDisplayName:'surveyRunStatus'"></span></td>
                     <td><span ng-bind="r.contactEmail"></span></td>
                     <td><waltz-from-now timestamp="r.issuedOn"></waltz-from-now></td>
                     <td><waltz-from-now ng-if='r.dueDate'

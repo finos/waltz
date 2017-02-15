@@ -227,6 +227,20 @@ export const surveyInstanceStatusNames = {
 };
 
 
+export const surveyTemplateStatusNames = {
+    DRAFT: 'Draft',
+    ACTIVE: 'Active',
+    OBSOLETE: 'Obsolete'
+};
+
+
+export const surveyRunStatusNames = {
+    DRAFT: 'Draft',
+    ISSUED: 'Issued',
+    COMPLETED: 'Completed'
+};
+
+
 /**
  * Used to convert a map of ( { code -> displayName }
  * @param lookups
