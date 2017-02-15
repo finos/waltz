@@ -33,6 +33,12 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const findByTemplateId = (id) => {
+        return $http
+            .get(`${base}/template-id/${id}`)
+            .then(r => r.data);
+    };
+
     const findByEntityReference = (ref) => {
         checkIsEntityRef(ref);
         return $http
@@ -71,6 +77,7 @@ function store($http, baseApiUrl) {
     return {
         create,
         getById,
+        findByTemplateId,
         findByEntityReference,
         findForUser,
         update,

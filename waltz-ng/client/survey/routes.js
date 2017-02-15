@@ -66,6 +66,12 @@ const templateListState = {
 };
 
 
+const templateViewState = {
+    url: '/{id:int}/view',
+    views: {'content@': require('./survey-template-view')}
+};
+
+
 function setup($stateProvider) {
     $stateProvider
         .state('main.survey', baseState)
@@ -76,7 +82,8 @@ function setup($stateProvider) {
         .state('main.survey.instance.edit', instanceEditState)
         .state('main.survey.instance.view', instanceViewState)
         .state('main.survey.template', templateBaseState)
-        .state('main.survey.template.list', templateListState);
+        .state('main.survey.template.list', templateListState)
+        .state('main.survey.template.view', templateViewState);
 
 }
 
