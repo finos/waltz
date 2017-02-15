@@ -21,6 +21,9 @@ import _ from "lodash";
 
 
 const initialState = {
+    isUserInstanceRecipient: false,
+    instanceCanBeEdited: false,
+    surveyInstance: {},
     surveyQuestions: [],
     surveyResponses: {},
 };
@@ -56,9 +59,16 @@ function controller($state,
 
     const id = $stateParams.id;
 
+    surveyInstanceStore
+        .isUserInstanceRecipient(id)
+        .then(b => vm.isUserInstanceRecipient = b);
+
     const instancePromise  = surveyInstanceStore
         .getById(id)
-        .then(r => vm.surveyInstance = r);
+        .then(r => {
+            vm.surveyInstance = r;
+            vm.instanceCanBeEdited = (r.status === 'NOT_STARTED' || r.status === 'IN_PROGRESS');
+        });
 
     instancePromise
         .then(instance => surveyRunStore.getById(instance.surveyRunId))

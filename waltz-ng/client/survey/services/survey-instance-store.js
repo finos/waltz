@@ -58,13 +58,20 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const isUserInstanceRecipient = (id) => {
+        return $http
+            .get(`${base}/${id}/isUserInstanceRecipient`)
+            .then(result => result.data);
+    };
+
     return {
         getById,
         findByEntityReference,
         findForUser,
         findResponses,
         saveResponse,
-        updateStatus
+        updateStatus,
+        isUserInstanceRecipient
     };
 }
 

@@ -39,6 +39,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String findResponsesPath = mkPath(BASE_URL, ":id", "responses");
         String saveResponsePath = mkPath(BASE_URL, ":id", "response");
         String updateStatusPath = mkPath(BASE_URL, ":id", "status");
+        String isUserInstanceRecipientPath = mkPath(BASE_URL, ":id", "isUserInstanceRecipient");
 
         DatumRoute<SurveyInstance> getByIdRoute =
                 (req, res) -> surveyInstanceService.getById(getId(req));
@@ -77,11 +78,17 @@ public class SurveyInstanceEndpoint implements Endpoint {
                         readBody(req, SurveyInstanceStatusChangeCommand.class)
                 );
 
+        DatumRoute<Boolean> isUserInstanceRecipientRoute =
+                (req, res) -> surveyInstanceService.isPersonInstanceRecipient(
+                                getUsername(req),
+                                getId(req));
+
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findForUserPath, findForUserRoute);
         getForList(findResponsesPath, findResponsesRoute);
         putForDatum(saveResponsePath, saveResponseRoute);
         postForDatum(updateStatusPath, updateStatusRoute);
+        getForDatum(isUserInstanceRecipientPath, isUserInstanceRecipientRoute);
     }
 }
