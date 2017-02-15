@@ -83,7 +83,7 @@ function controller($state,
         .then(([user = {}, recipients = []]) => {
             vm.user = user;
             vm.surveyRecipients = recipients;
-            vm.isUserInstanceRecipient = !! _.find(recipients, r => r.person.email === user.userName);
+            vm.isUserInstanceRecipient = _.some(recipients, r => r.person.email === user.userName);
         });
 
     surveyInstanceStore
