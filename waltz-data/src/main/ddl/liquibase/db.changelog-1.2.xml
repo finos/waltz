@@ -1605,4 +1605,38 @@
         </createIndex>
     </changeSet>
 
+  
+    <!-- 1599: Perspective Indexes -->
+    <changeSet id="20170215-1599-1"
+               author="dwatkins">
+        <createIndex tableName="perspective_rating"
+                     indexName="idx_measurable_x"
+                     unique="false">
+            <column name="measurable_x"
+                    type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20170215-1599-2"
+               author="dwatkins">
+        <createIndex tableName="perspective_rating"
+                     indexName="idx_measurable_y"
+                     unique="false">
+            <column name="measurable_y"
+                    type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20170215-1599-3"
+               author="dwatkins">
+        <createIndex tableName="perspective_rating"
+                     indexName="idx_entity_ref"
+                     unique="false">
+            <column name="entity_id"
+                    type="${id.type}"/>
+            <column name="entity_kind"
+                    type="${enum.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
