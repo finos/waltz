@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../../common/index";
-import {mkEntityLinkGridCell, mkLinkGridCell} from "../../common/link-utils";
+import {mkLinkGridCell} from "../../common/link-utils";
 import _ from "lodash";
 
 const initialState = {
@@ -59,8 +59,7 @@ function controller() {
             mkLinkGridCell('Title', 'surveyRun.name', 'surveyInstance.id', 'main.survey.instance.view'),
             {width: "30%"}
         ),
-
-        {field: 'surveyRun.description', displayName: 'Description', width: "50%"},
+        {field: 'surveyRun.description', displayName: 'Description', width: "44%"},
         {field: 'surveyRun.issuedOn', displayName: 'Issued On', width: "13%"},
         {field: 'surveyRun.dueDate', displayName: 'Due Date', sort: {direction: 'desc'}, width: "13%"}
     ];

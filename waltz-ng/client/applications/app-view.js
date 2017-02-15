@@ -47,6 +47,8 @@ const initialState = {
     servers: [],
     softwareCatalog: [],
     sourceDataRatings: [],
+    surveyInstances: [],
+    surveyRuns: [],
     tags: [],
     visibility: {},
     physicalFlowsProducesCount: 0,
@@ -94,7 +96,9 @@ function controller($q,
                     physicalFlowStore,
                     serverInfoStore,
                     softwareCatalogStore,
-                    sourceDataRatingStore) {
+                    sourceDataRatingStore,
+                    surveyInstanceStore,
+                    surveyRunStore) {
 
     const id = $stateParams.id;
     const entityReference = { id, kind: 'APPLICATION' };
@@ -147,6 +151,7 @@ function controller($q,
         loadFirstWave()
             .then(() => loadSecondWave())
             .then(() => loadThirdWave())
+            .then(() => loadFourthWave())
             .then(() => postLoadActions());
     }
 
@@ -225,6 +230,21 @@ function controller($q,
             .then(() => loadSourceDataRatings(sourceDataRatingStore, vm))
     }
 
+    function loadFourthWave() {
+        const promises = [
+            surveyRunStore
+                .findByEntityReference(vm.entityRef)
+                .then(surveyRuns => vm.surveyRuns = surveyRuns),
+
+            // only get back completed instances
+            surveyInstanceStore
+                .findByEntityReference(vm.entityRef)
+                .then(surveyInstances => vm.surveyInstances = _.filter(surveyInstances, {'status': 'COMPLETED'}))
+        ];
+
+        return $q.all(promises);
+    }
+
     function postLoadActions() {
         addToHistory(historyStore, vm.app);
     }
@@ -261,7 +281,9 @@ controller.$inject = [
     'PhysicalFlowStore',
     'ServerInfoStore',
     'SoftwareCatalogStore',
-    'SourceDataRatingStore'
+    'SourceDataRatingStore',
+    'SurveyInstanceStore',
+    'SurveyRunStore'
 ];
 
 
