@@ -88,16 +88,6 @@ public class SurveyInstanceService {
     }
 
 
-    public boolean isPersonInstanceRecipient(String userName, long surveyInstanceId) {
-        checkNotNull(userName, "userName cannot be null");
-
-        Person person = personDao.getByUserName(userName);
-        checkNotNull(person, "userName " + userName + " cannot be resolved");
-
-        return surveyInstanceRecipientDao.isPersonInstanceRecipient(person.id().get(), surveyInstanceId);
-    }
-
-
     public boolean saveResponse(String userName,
                                 long instanceId,
                                 SurveyQuestionResponse questionResponse) {

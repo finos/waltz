@@ -40,6 +40,12 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const findRecipients = (id) => {
+        return $http
+            .get(`${base}/${id}/recipients`)
+            .then(result => result.data);
+    };
+
     const findResponses = (id) => {
         return $http
             .get(`${base}/${id}/responses`)
@@ -58,20 +64,14 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
-    const isUserInstanceRecipient = (id) => {
-        return $http
-            .get(`${base}/${id}/isUserInstanceRecipient`)
-            .then(result => result.data);
-    };
-
     return {
         getById,
         findByEntityReference,
         findForUser,
+        findRecipients,
         findResponses,
         saveResponse,
-        updateStatus,
-        isUserInstanceRecipient
+        updateStatus
     };
 }
 
