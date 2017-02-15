@@ -21,8 +21,13 @@ import _ from "lodash";
 
 
 const initialState = {
+    isUserInstanceRecipient: false,
+    instanceCanBeEdited: false,
+    surveyInstance: {},
+    surveyRecipients: [],
     surveyQuestions: [],
     surveyResponses: {},
+    user: {}
 };
 
 
@@ -50,7 +55,8 @@ function controller($state,
                     notification,
                     surveyInstanceStore,
                     surveyRunStore,
-                    surveyQuestionStore) {
+                    surveyQuestionStore,
+                    userService) {
 
     const vm = initialiseData(this, initialState);
 
@@ -58,7 +64,11 @@ function controller($state,
 
     const instancePromise  = surveyInstanceStore
         .getById(id)
-        .then(r => vm.surveyInstance = r);
+        .then(r => {
+            vm.instanceCanBeEdited = (r.status === 'NOT_STARTED' || r.status === 'IN_PROGRESS');
+            vm.surveyInstance = r;
+            return r;
+        });
 
     instancePromise
         .then(instance => surveyRunStore.getById(instance.surveyRunId))
@@ -67,6 +77,14 @@ function controller($state,
     surveyQuestionStore
         .findForInstance(id)
         .then(qs => vm.surveyQuestions = groupQuestions(qs));
+
+    Promise
+        .all([userService.whoami(), surveyInstanceStore.findRecipients(id)])
+        .then(([user = {}, recipients = []]) => {
+            vm.user = user;
+            vm.surveyRecipients = recipients;
+            vm.isUserInstanceRecipient = _.some(recipients, r => r.person.email === user.userName);
+        });
 
     surveyInstanceStore
         .findResponses(id)
@@ -117,7 +135,8 @@ controller.$inject = [
     'Notification',
     'SurveyInstanceStore',
     'SurveyRunStore',
-    'SurveyQuestionStore'
+    'SurveyQuestionStore',
+    'UserService'
 ];
 
 
