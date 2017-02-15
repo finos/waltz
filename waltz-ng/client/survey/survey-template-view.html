@@ -1,0 +1,100 @@
+<div>
+    <waltz-page-header icon="edit"
+                       name="Survey Templates">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main">Survey</a></li>
+            <li><a ui-sref="main.survey.template.list">Templates</a></li>
+            <li>Templates</li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Template Name
+            </div>
+            <div class="col-sm-10">
+                <span ng-bind="ctrl.template.name"></span>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Description
+            </div>
+            <div class="col-sm-10">
+                <span ng-bind="ctrl.template.description"></span>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Owner
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="ctrl.people[ctrl.template.ownerId].displayName"></span>
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Created
+            </div>
+            <div class="col-sm-4">
+                <waltz-from-now timestamp="ctrl.template.createdAt"></waltz-from-now>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Status
+            </div>
+            <div class="col-sm-10">
+                <span ng-bind="ctrl.template.status | toDisplayName:'surveyTemplateStatus'"></span>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <waltz-section icon='bolt'
+                   name="Runs">
+        <waltz-section-actions>
+            <a class="btn btn-primary btn-xs"
+               ui-sref="main.survey.run.create ({id: ctrl.template.id })">
+                Create
+            </a>
+        </waltz-section-actions>
+
+        <div>
+            <table class="table table.condensed">
+                <colgroup>
+                    <col width="30%">
+                    <col width="10%">
+                    <col width="15%">
+                    <col width="10%">
+                    <col width="15%">
+                    <col width="15%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Contact</th>
+                    <th>Issued</th>
+                    <th>Due</th>
+                    <th>Owner</th>
+                </tr>
+                </thead>
+                <tr ng-repeat="r in ctrl.surveyRuns">
+                    <td><span ng-bind="r.name"></span></td>
+                    <td><span ng-bind="r.status | toDisplayName:'surveyRunStatus'"></span></td>
+                    <td><span ng-bind="r.contactEmail"></span></td>
+                    <td><waltz-from-now timestamp="r.issuedOn"></waltz-from-now></td>
+                    <td><waltz-from-now ng-if='r.dueDate'
+                                        timestamp="r.dueDate"></waltz-from-now>
+                    </td>
+                    <td><span ng-bind="ctrl.people[r.ownerId].displayName"></span></td>
+                </tr>
+            </table>
+        </div>
+    </waltz-section>
+</div>

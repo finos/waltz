@@ -57,6 +57,7 @@ public class SurveyRunEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String findByTemplateIdPath = mkPath(BASE_URL, "template-id", ":id");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String surveyRunListForUserPath = mkPath(BASE_URL, "user");
         String surveyRunUpdatePath = mkPath(BASE_URL, ":id");
@@ -64,7 +65,11 @@ public class SurveyRunEndpoint implements Endpoint {
         String createSurveyRunInstancesAndRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String updateSurveyRunStatusPath = mkPath(BASE_URL, ":id", "status");
 
-        DatumRoute<SurveyRun> getByIdRoute = (req, res) -> surveyRunService.getById(getId(req));
+        DatumRoute<SurveyRun> getByIdRoute = (req, res) ->
+                surveyRunService.getById(getId(req));
+
+        ListRoute<SurveyRun> findByTemplateIdRoute = (req, res) ->
+                surveyRunService.findByTemplateId(getId(req));
 
         ListRoute<SurveyRun> findByEntityRoute = (req, res)
                 -> surveyRunService.findBySurveyInstanceIdSelector(mkOpts(getEntityReference(req), EXACT));
@@ -108,6 +113,7 @@ public class SurveyRunEndpoint implements Endpoint {
                 surveyRunService.createSurveyInstancesAndRecipients(getId(request), newArrayList(readBody(request, SurveyInstanceRecipient[].class)));
 
         getForDatum(getByIdPath, getByIdRoute);
+        getForList(findByTemplateIdPath, findByTemplateIdRoute);
         getForList(findByEntityRefPath, findByEntityRoute);
         getForList(generateSurveyRunRecipientsPath, generateSurveyRunRecipientsRoute);
         getForList(surveyRunListForUserPath, surveyRunListForUserRoute);

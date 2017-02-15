@@ -260,4 +260,10 @@ public class SurveyRunService {
 
         return surveyRunDao.findBySurveyInstanceIdSelector(selector);
     }
+
+
+    public List<SurveyRun> findByTemplateId(long templateId) {
+        return surveyRunDao.findByTemplateId(templateId);
+    }
 }
+

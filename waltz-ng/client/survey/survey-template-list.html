@@ -48,7 +48,7 @@
                         </a>
                     </td>
                     <td>
-                        <span ng-bind="template.status"></span>
+                        <span ng-bind="template.status | toDisplayName:'surveyTemplateStatus'"></span>
                     </td>
                     <td>
                         <waltz-from-now timestamp="template.createdAt"></waltz-from-now>

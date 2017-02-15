@@ -150,4 +150,12 @@ public class SurveyRunDao {
                 .where(SURVEY_INSTANCE.ID.in(idSelector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
+
+    public List<SurveyRun> findByTemplateId(long templateId) {
+        return dsl
+                .selectFrom(SURVEY_RUN)
+                .where(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(templateId))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }
