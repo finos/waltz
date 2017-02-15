@@ -56,9 +56,9 @@
     <br>
     <waltz-section name="Responses">
         <form name="surveyResponseForm"
-              class="form-horizontal"
+              class="form-horizontal survey-form"
               role="form"
-              ng-submit="ctrl.submit()">
+              novalidate>
             <div ng-repeat="groupedQuestion in ctrl.surveyQuestions">
 
                 <h4 ng-bind="groupedQuestion.sectionName"
@@ -157,15 +157,33 @@
                 <hr>
             </div>
 
-            <!-- submit button -->
-            <div class="form-group">
-                <div class="col-sm-offset-10 col-sm-2">
-                    <button type="submit"
-                            class="btn btn-success">
-                        Submit
-                    </button>
-                </div>
-            </div>
+            <!-- buttons -->
+            <table class="table-condensed" align="right">
+                <tr>
+                    <td>
+                        <a class="clickable"
+                           ng-click="ctrl.saveForLater()">
+                            Save For Later
+                        </a>
+                    </td>
+                    <td ng-if="surveyResponseForm.$valid">
+                        <button type="button"
+
+                                ng-click="ctrl.submit()"
+                                class="btn btn-success btn-lg">
+                            <waltz-icon name="envelope">
+                            </waltz-icon>
+                            Submit
+                        </button>
+                    </td>
+                    <td ng-if="surveyResponseForm.$invalid"
+                        style="padding-bottom: 10px;">
+                        <span class="alert alert-warning">
+                                Survey response cannot be submitted until all required questions are answered.
+                        </span>
+                    </td>
+                </tr>
+            </table>
         </form>
     </waltz-section>
     </div>

@@ -91,15 +91,22 @@ function controller($state,
         );
     };
 
+    vm.saveForLater = () => {
+        notification.success('Survey response saved successfully');
+        $state.go('main.survey.instance.user');
+    };
+
     vm.submit = () => {
-        surveyInstanceStore.updateStatus(
-            vm.surveyInstance.id,
-            { newStatus: 'COMPLETED' }
-        )
-        .then(result => {
-            notification.success('Survey response submitted successfully');
-            $state.go('main.survey.instance.view', { id: id });
-        });
+        if (confirm('The survey cannot be edited once submitted. Are you sure you want to submit your responses?')) {
+            surveyInstanceStore.updateStatus(
+                vm.surveyInstance.id,
+                {newStatus: 'COMPLETED'}
+            )
+            .then(result => {
+                notification.success('Survey response submitted successfully');
+                $state.go('main.survey.instance.view', {id: id});
+            });
+        }
     };
 
 }
