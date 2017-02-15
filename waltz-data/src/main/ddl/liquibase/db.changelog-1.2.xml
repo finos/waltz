@@ -1562,7 +1562,7 @@
     </changeSet>
 
 
-    <!-- 1599: Perspecive Indexes -->
+    <!-- 1599: Perspective Indexes -->
     <changeSet id="20170215-1599-1"
                author="dwatkins">
         <createIndex tableName="perspective_rating"
