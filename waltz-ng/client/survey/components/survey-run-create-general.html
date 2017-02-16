@@ -107,7 +107,7 @@
                 <input id="selectorEntity"
                        type="text"
                        ng-model="$ctrl.surveyRun.selectorEntity"
-                       placeholder="Search for public group"
+                       placeholder="Search for an available group"
                        uib-typeahead="group as group.name for group in $ctrl.availableAppGroups | filter:{name:$viewValue}"
                        typeahead-template-url="app-group-list-section/app-group-search-result.html"
                        class="form-control"

@@ -34,9 +34,10 @@ const template = require('./survey-run-create-general.html');
 function controller(appGroupStore, involvementKindStore) {
     const vm = initialiseData(this, initialState);
 
-    appGroupStore.findPublicGroups().then(
-        appGroups => {
-            vm.availableAppGroups = appGroups;
+    Promise
+        .all([appGroupStore.findPublicGroups(), appGroupStore.findPrivateGroups()])
+        .then(([publicGroups = [], privateGroups = []]) => {
+            vm.availableAppGroups = [].concat(publicGroups, privateGroups);
         }
     );
 

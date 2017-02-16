@@ -41,6 +41,11 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const findPrivateGroups = () => $http
+        .get(`${BASE}/private`)
+        .then(result => result.data);
+
+
     const subscribe = (id) => $http
         .post(`${BASE}/id/${id}/subscribe`, {})
         .then(result => result.data);
@@ -97,6 +102,7 @@ function service($http, BaseApiUrl) {
         getById,
         findByIds,
         findPublicGroups,
+        findPrivateGroups,
 
         subscribe,
         unsubscribe,

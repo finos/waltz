@@ -121,6 +121,11 @@ public class AppGroupService {
     }
 
 
+    public List<AppGroup> findPrivateGroupsByOwner(String ownerId) {
+        return appGroupDao.findPrivateGroupsByOwner(ownerId);
+    }
+
+
     public void subscribe(String userId, long groupId) {
         audit(groupId, userId, "Subscribed to group", EntityKind.PERSON, Operation.ADD);
         appGroupMemberDao.register(groupId, userId);

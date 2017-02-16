@@ -20,6 +20,7 @@ package com.khartec.waltz.data.app_group;
 
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupKind;
+import com.khartec.waltz.model.app_group.AppGroupMemberRole;
 import com.khartec.waltz.model.app_group.ImmutableAppGroup;
 import com.khartec.waltz.schema.tables.records.ApplicationGroupRecord;
 import org.jooq.*;
@@ -72,6 +73,25 @@ public class AppGroupDao {
                 .from(APPLICATION_GROUP_MEMBER)
                 .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId));
 
+        return findAppGroupsBySelectorId(groupIds);
+    }
+
+
+    public List<AppGroup> findPrivateGroupsByOwner(String userId) {
+        SelectConditionStep<Record1<Long>> groupIds = DSL.select(APPLICATION_GROUP_MEMBER.GROUP_ID)
+                .from(APPLICATION_GROUP_MEMBER)
+                .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId)
+                    .and(APPLICATION_GROUP_MEMBER.ROLE.eq(AppGroupMemberRole.OWNER.name())));
+
+        return dsl.select(APPLICATION_GROUP.fields())
+                .from(APPLICATION_GROUP)
+                .where(APPLICATION_GROUP.ID.in(groupIds)
+                        .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name())))
+                .fetch(TO_DOMAIN);
+    }
+
+
+    private List<AppGroup> findAppGroupsBySelectorId(SelectConditionStep<Record1<Long>> groupIds) {
         return dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.in(groupIds))
