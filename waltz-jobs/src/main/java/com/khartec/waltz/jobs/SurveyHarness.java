@@ -25,12 +25,14 @@ import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.survey.SurveyInstanceService;
 import com.khartec.waltz.service.survey.SurveyQuestionService;
 import com.khartec.waltz.service.survey.SurveyRunService;
+import com.khartec.waltz.service.survey.SurveyTemplateService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.LongStream;
 
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static java.util.stream.Collectors.toList;
 
 
@@ -39,9 +41,42 @@ public class SurveyHarness {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
+        surveyTempateHarness(ctx);
 //        surveyRunHarness(ctx);
-        surveyResponseHarness(ctx);
+//        surveyResponseHarness(ctx);
     }
+
+    private static void surveyTempateHarness(AnnotationConfigApplicationContext ctx) {
+        SurveyTemplateService surveyTemplateService = ctx.getBean(SurveyTemplateService.class);
+        SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
+
+        SurveyTemplate surveyTemplate = ImmutableSurveyTemplate.builder()
+                .name("AAA")
+                .description("BBB")
+                .ownerId(1L)
+                .targetEntityKind(EntityKind.CHANGE_INITIATIVE)
+                .status(SurveyTemplateStatus.ACTIVE)
+                .createdAt(nowUtc())
+                .build();
+
+        long templateId = surveyTemplateService.create(surveyTemplate);
+        System.out.println("Created: template create with ID = " + templateId);
+
+        SurveyQuestion surveyQuestion = ImmutableSurveyQuestion.builder()
+                .surveyTemplateId(templateId)
+                .sectionName("SSS")
+                .questionText("QQQ")
+                .helpText("HHH")
+                .fieldType(SurveyQuestionFieldType.TEXTAREA)
+                .position(1)
+                .isMandatory(false)
+                .allowComment(true)
+                .build();
+
+        long questionId = surveyQuestionService.create(surveyQuestion);
+        System.out.println("Created: question create with ID = " + questionId);
+    }
+
 
     private static void surveyRunHarness(AnnotationConfigApplicationContext ctx) {
         SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);

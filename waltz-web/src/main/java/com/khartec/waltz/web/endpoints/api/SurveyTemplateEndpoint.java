@@ -27,10 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getId;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class SurveyTemplateEndpoint implements Endpoint {
@@ -59,7 +57,11 @@ public class SurveyTemplateEndpoint implements Endpoint {
         ListRoute<SurveyTemplate> findAllActiveRoute = (request, response) ->
                 surveyTemplateService.findAllActive();
 
+        DatumRoute<Long> createSurveyTemplateRoute =
+                (req, res) -> surveyTemplateService.create(readBody(req, SurveyTemplate.class));
+
         getForList(findAllActivePath, findAllActiveRoute);
         getForDatum(getByIdPath, getByIdRoute);
+        postForDatum(BASE_URL, createSurveyTemplateRoute);
     }
 }
