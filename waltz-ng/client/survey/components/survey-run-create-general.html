@@ -4,10 +4,9 @@
     <hr/>
 
     <form name="surveyRunForm"
-          class="form-horizontal"
-          novalidate
+          class="survey-form form-horizontal"
           role="form"
-          ng-submit="$ctrl.onSubmit({surveyRun: $ctrl.surveyRun})">
+          novalidate>
 
         <div class="form-group">
             <label class="col-sm-2 control-label">Template</label>
@@ -29,10 +28,11 @@
         <div class="form-group">
             <label for="name"
                    class="col-sm-2 control-label">
-                Run name
+                Run name <span class="text-danger">*</span>
             </label>
             <div class="col-sm-10">
-                <input class="form-control"
+                <input class="form-control form-control-warning"
+                       required
                        id="name"
                        placeholder="Name for this survey run"
                        ng-model="$ctrl.surveyRun.name" />
@@ -57,10 +57,11 @@
         <div class="form-group">
             <label for="email"
                    class="col-sm-2 control-label">
-                Contact Email
+                Contact Email <span class="text-danger">*</span>
             </label>
             <div class="col-sm-10">
                 <input class="form-control"
+                       required
                        id="email"
                        placeholder="Email for recipients to contact for questions regarding this survey run"
                        ng-model="$ctrl.surveyRun.contactEmail" />
@@ -83,10 +84,11 @@
         <div class="form-group">
             <label for="selectorEntityKind"
                    class="col-sm-2 control-label">
-                Selector Kind
+                Selector Kind <span class="text-danger">*</span>
             </label>
             <div class="col-sm-10">
                 <select id="selectorEntityKind"
+                        required
                         type="date"
                         class="form-control"
                         ng-model="$ctrl.surveyRun.selectorEntityKind">
@@ -101,10 +103,11 @@
         <div class="form-group">
             <label for="selectorEntity"
                    class="col-sm-2 control-label">
-                Selector Entity
+                Selector Entity <span class="text-danger">*</span>
             </label>
             <div class="col-sm-10">
                 <input id="selectorEntity"
+                       required
                        type="text"
                        ng-model="$ctrl.surveyRun.selectorEntity"
                        placeholder="Search for public group"
@@ -119,7 +122,7 @@
         <div class="form-group">
             <label for="selectorEntityKind"
                    class="col-sm-2 control-label">
-                Scope
+                Scope <span class="text-danger">*</span>
             </label>
             <div class="col-sm-10">
                 <select id="selectorScope"
@@ -137,10 +140,11 @@
         <div class="form-group">
             <label for="involmentKinds"
                    class="col-sm-2 control-label">
-                Involvement Kind
+                Involvement Kind <span class="text-danger">*</span>
             </label>
             <div class="col-sm-10">
                 <select id="involmentKinds"
+                        required
                         type="date"
                         class="form-control"
                         ng-options="kind as kind.name for kind in $ctrl.availableInvolvementKinds track by kind.id"
@@ -152,7 +156,7 @@
 
         <div class="form-group">
             <label class="col-sm-2 control-label">
-                Issuance Kind
+                Issuance Kind <span class="text-danger">*</span>
             </label>
             <div class="col-sm-10">
                 <label>
@@ -179,13 +183,19 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="padding-top: 10px">
             <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit"
-                        ng-disabled="$ctrl.submitDisabled"
+                <button type="button"
+                        ng-if="!(surveyRunForm.$invalid)"
+                        ng-click="$ctrl.onSubmit()"
                         class="btn btn-success">
                     Next
                 </button>
+                <span ng-if="surveyRunForm.$invalid"
+                      class="alert alert-warning"
+                      style="padding-bottom: 10px;">
+                    Please fill in all required fields
+                </span>
             </div>
         </div>
     </form>
