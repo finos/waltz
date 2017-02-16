@@ -229,7 +229,11 @@ public class SurveyRunGenerator {
                                                                                    SurveyQuestionService surveyQuestionService) {
 
         List<SurveyQuestion> surveyQuestions = surveyQuestionService.findForSurveyRun(surveyRunId);
-        List<SurveyInstanceRecipient> surveyInstanceRecipients = surveyInstanceService.findRecipients(surveyRunId);
+        List<SurveyInstance> surveyInstances = surveyInstanceService.findForSurveyRun(surveyRunId);
+        List<SurveyInstanceRecipient> surveyInstanceRecipients = surveyInstances.stream()
+                .flatMap(surveyInstance -> surveyInstanceService.findRecipients(surveyInstance.id().get()).stream())
+                .collect(toList());
+
         Map<SurveyInstance, List<SurveyInstanceRecipient>> surveyInstanceRecipientsMap = surveyInstanceRecipients
                 .stream()
                 .collect(groupingBy(r -> r.surveyInstance()));
