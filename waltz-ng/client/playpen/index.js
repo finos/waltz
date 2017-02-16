@@ -50,7 +50,7 @@ export default () => {
                     views: { 'content@': playpenView2 }
                 })
                 .state('main.playpen.3', {
-                    url: '/3',
+                    url: '/3/{id:int}',
                     views: { 'content@': playpenView3 }
                 })
                 .state('main.playpen.4', {
