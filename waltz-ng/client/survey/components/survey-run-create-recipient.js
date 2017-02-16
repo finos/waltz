@@ -29,6 +29,7 @@ const bindings = {
 
 const initialState = {
     surveyRunRecipients: [],
+    includedRecipients: [],
     excludedRecipients: []
 };
 
@@ -40,24 +41,31 @@ function controller(surveyRunStore) {
     const vm = initialiseData(this, initialState);
 
     surveyRunStore.generateSurveyRunRecipients(vm.surveyRun.id)
-        .then(r => vm.surveyRunRecipients = r.data);
+        .then(r => {
+            vm.surveyRunRecipients = r.data;
+            vm.includedRecipients = [].concat(vm.surveyRunRecipients);
+            vm.excludeRecipients = [];
+        });
 
     vm.excludeRecipient = (recipient) => {
-        recipient.isExcluded = true;
+        _.pull(vm.includedRecipients, recipient);
+        vm.excludeRecipients.push(recipient);
     };
 
     vm.includeRecipient = (recipient) => {
-        recipient.isExcluded = false;
+        vm.includedRecipients.push(recipient);
+        _.pull(vm.excludeRecipients, recipient);
     };
 
-    vm.onSubmit = () => {
-        const [included = [], excluded = []] =  _.partition(vm.surveyRunRecipients, r => !r.isExcluded);
-        vm.onSave(this.surveyRun,
-            _.map(included, r => _.omit(r, 'isExcluded')),
-            _.map(excluded, r => _.omit(r, 'isExcluded')));
-    };
+    vm.isRecipientIncluded = (recipient) =>
+        vm.includedRecipients.indexOf(recipient) >= 0;
 
-    vm.goBack = () => { vm.onGoBack(); }
+    vm.onSubmit = () =>
+        vm.onSave(this.surveyRun, this.includedRecipients, this.excludedRecipients);
+
+    vm.goBack = () => {
+        vm.onGoBack();
+    }
 }
 
 

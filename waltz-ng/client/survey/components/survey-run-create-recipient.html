@@ -21,14 +21,14 @@
                 <td><span ng-bind="recipient.person.email"></span></td>
                 <td>
                     <button class="btn btn-xs btn-danger waltz-visibility-child-50"
-                            ng-if="!recipient.isExcluded"
+                            ng-if="$ctrl.isRecipientIncluded(recipient)"
                             ng-click="$ctrl.excludeRecipient(recipient)"
                             uib-popover="Exclude"
                             popover-trigger="mouseenter">
                         <waltz-icon name="trash">
                     </button>
                     <button class="btn btn-xs btn-success waltz-visibility-child-50"
-                            ng-if="recipient.isExcluded"
+                            ng-if="!($ctrl.isRecipientIncluded(recipient))"
                             ng-click="$ctrl.includeRecipient(recipient)"
                             uib-popover="Include"
                             popover-trigger="mouseenter">
@@ -43,15 +43,21 @@
     <hr/>
     <div class="row">
         <div class="col-sm-offset-2 col-sm-10">
-            <button type="button"
-                    ng-click="$ctrl.onSubmit()"
-                    class="btn btn-success">
-                Next
-            </button>
             <a ng-click="$ctrl.goBack()"
                class="clickable">
                 Back
             </a>
+            <button type="button"
+                    ng-if="$ctrl.includedRecipients.length > 0"
+                    ng-click="$ctrl.onSubmit()"
+                    class="btn btn-success">
+                Next
+            </button>
+            <span ng-if="$ctrl.includedRecipients.length === 0"
+                  class="alert alert-warning"
+                  style="padding-bottom: 10px;">
+                At least 1 recipient required to issue a survey run
+            </span>
         </div>
     </div>
 
