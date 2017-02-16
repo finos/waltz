@@ -12,7 +12,9 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
@@ -33,6 +35,20 @@ public class SurveyTemplateDao {
                 .status(SurveyTemplateStatus.valueOf(record.getStatus()))
                 .build();
     };
+
+
+    public static final Function<SurveyTemplate, SurveyTemplateRecord> TO_RECORD_MAPPER = template -> {
+        SurveyTemplateRecord record = new SurveyTemplateRecord();
+        record.setName(template.name());
+        record.setOwnerId(template.ownerId());
+        record.setDescription(template.description());
+        record.setTargetEntityKind(template.targetEntityKind().name());
+        record.setCreatedAt(Timestamp.valueOf(template.createdAt()));
+        record.setStatus(template.status().name());
+
+        return record;
+    };
+
 
     private final DSLContext dsl;
 
@@ -58,5 +74,17 @@ public class SurveyTemplateDao {
                 .from(SURVEY_TEMPLATE)
                 .where(SURVEY_TEMPLATE.STATUS.eq(SurveyTemplateStatus.ACTIVE.name()))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+    
+    public long create(SurveyTemplate surveyTemplate) {
+        checkNotNull(surveyTemplate, "surveyTemplate cannot be null");
+        
+        SurveyTemplateRecord record = TO_RECORD_MAPPER.apply(surveyTemplate);
+        return dsl.insertInto(SURVEY_TEMPLATE)
+                .set(record)
+                .returning(SURVEY_TEMPLATE.ID)
+                .fetchOne()
+                .getId();
     }
 }

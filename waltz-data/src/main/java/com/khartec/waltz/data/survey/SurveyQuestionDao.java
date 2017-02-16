@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
@@ -33,6 +34,21 @@ public class SurveyQuestionDao {
                 .isMandatory(record.getIsMandatory())
                 .allowComment(record.getAllowComment())
                 .build();
+    };
+
+
+    private static final Function<SurveyQuestion, SurveyQuestionRecord> TO_RECORD_MAPPER = question -> {
+        SurveyQuestionRecord record = new SurveyQuestionRecord();
+        record.setSurveyTemplateId(question.surveyTemplateId());
+        record.setQuestionText(question.questionText());
+        record.setHelpText(question.helpText().orElse(""));
+        record.setFieldType(question.fieldType().name());
+        record.setSectionName(question.sectionName().orElse(""));
+        record.setPosition(question.position());
+        record.setIsMandatory(question.isMandatory());
+        record.setAllowComment(question.allowComment());
+
+        return record;
     };
 
 
@@ -66,6 +82,18 @@ public class SurveyQuestionDao {
                 .from(SURVEY_RUN)
                 .innerJoin(SURVEY_INSTANCE).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
                 .where(SURVEY_INSTANCE.ID.eq(surveyInstanceId)));
+    }
+
+
+    public long create(SurveyQuestion surveyQuestion) {
+        checkNotNull(surveyQuestion, "surveyQuestion cannot be null");
+
+        SurveyQuestionRecord record = TO_RECORD_MAPPER.apply(surveyQuestion);
+        return dsl.insertInto(SURVEY_QUESTION)
+                .set(record)
+                .returning(SURVEY_QUESTION.ID)
+                .fetchOne()
+                .getId();
     }
 
 
