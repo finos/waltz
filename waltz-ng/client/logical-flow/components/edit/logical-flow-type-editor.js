@@ -122,6 +122,12 @@ function controller() {
         vm.checkedItemIds = _.union(vm.checkedItemIds, [id])
     };
 
+    vm.toggleTypeChecked = (id) => {
+        _.some(vm.checkedItemIds, x => x === id)
+            ? vm.typeUnchecked(id)
+            : vm.typeChecked(id);
+    };
+
     vm.typeUnchecked = (id) => {
         vm.checkedItemIds = _.without(vm.checkedItemIds, id);
     };
