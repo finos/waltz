@@ -85,7 +85,7 @@ Please use this URL to fill the survey: ${surveyLink}
             },
             involvementKindIds: _.map(surveyRun.involvementKinds, kind => kind.id),
             issuanceKind: surveyRun.issuanceKind,
-            dueDate: timeFormat('%Y-%m-%d')(surveyRun.dueDate),
+            dueDate: surveyRun.dueDate ? timeFormat('%Y-%m-%d')(surveyRun.dueDate) : null,
             contactEmail: surveyRun.contactEmail
         };
 
