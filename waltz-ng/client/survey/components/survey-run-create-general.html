@@ -147,9 +147,10 @@
                         required
                         type="date"
                         class="form-control"
-                        ng-options="kind as kind.name for kind in $ctrl.availableInvolvementKinds track by kind.id"
+                        ng-options="kind as kind.name for kind in $ctrl.availableInvolvementKinds | orderBy:'name' track by kind.id"
                         ng-model="$ctrl.surveyRun.involvementKinds"
-                        multiple>
+                        multiple
+                        style="height: 250px;">
                 </select>
             </div>
         </div>
