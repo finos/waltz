@@ -37,7 +37,7 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         <waltz-basic-info-tile name="Portfolio Cost"
                                                description="Cumulative value of infra and app dev costs"
                                                waltz-jump-to="costs-section"
@@ -47,7 +47,7 @@
                             </span>
                         </waltz-basic-info-tile>
                     </div>
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         <waltz-basic-info-tile name="Complexity"
                                                description="Derived from functions, connections and servers"
                                                class="clickable"
@@ -66,7 +66,7 @@
                         </waltz-basic-info-tile>
 
                     </div>
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         <waltz-basic-info-tile name="Servers"
                                                description="Number of servers supporting this org unit"
                                                icon="server">
@@ -82,23 +82,6 @@
 
                     </div>
 
-                    <div class="col-sm-3">
-                        <waltz-basic-info-tile name="Functions"
-                                               description="Functions performed within this OU"
-                                               waltz-jump-to="ratings-section"
-                                               icon="puzzle-piece">
-                            <div>
-                                <div style="font-size: xx-large;">
-                                    #
-                                    <span ng-bind="$ctrl.capabilityStats.total"></span>
-                                </div>
-                                <div class="small text-muted">
-                                    <span ng-bind="$ctrl.capabilityStats.perApplication"></span>
-                                    per app
-                                </div>
-                            </div>
-                        </waltz-basic-info-tile>
-                    </div>
                 </div>
             </div>
 
