@@ -39,10 +39,7 @@ const nester = nest()
 
 
 function mkNest(overrides = [], baseRating) {
-    const nested = nester.entries(overrides);
-
-    // remove overrides with same rating as the base measurable
-    return _.reject(nested, d => d.key === baseRating);
+    return nester.entries(overrides);
 }
 
 
