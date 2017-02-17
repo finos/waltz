@@ -69,7 +69,7 @@ function controller() {
                 { sort: { direction: 'asc' }, width: '30%' }
             ),
             { field: 'connectionComplexity.score', displayName: 'Connection Score', cellFilter: "toFixed:'2'" },
-            { field: 'measurableComplexity.score', displayName: 'Characteristic Score', cellFilter: "toFixed:'2'" },
+            { field: 'measurableComplexity.score', displayName: 'Viewpoints Score', cellFilter: "toFixed:'2'" },
             { field: 'serverComplexity.score', displayName: 'Server Score', cellFilter: "toFixed:'2'" },
             { field: 'overallScore', displayName: 'Overall Score', cellFilter: "toFixed:'2'" }
         ];
