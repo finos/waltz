@@ -63,6 +63,7 @@ public class AppGroupEndpoint implements Endpoint {
 
         String findGroupSubscriptionsForUserPath = mkPath(BASE_URL, "my-group-subscriptions");
         String findPublicGroupsPath = mkPath(BASE_URL, "public");
+        String findPrivateGroupsPath = mkPath(BASE_URL, "private");
 
         String subscribePath = mkPath(idPath, "subscribe");
         String unsubscribePath = mkPath(idPath, "unsubscribe");
@@ -89,6 +90,9 @@ public class AppGroupEndpoint implements Endpoint {
 
         ListRoute<AppGroup> findPublicGroupsRoute = (request, response) ->
                 appGroupService.findPublicGroups();
+
+        ListRoute<AppGroup> findPrivateGroupsRoute = (request, response) ->
+                appGroupService.findPrivateGroupsByOwner(getUsername(request));
 
         ListRoute<AppGroupSubscription> subscribeRoute = (request, response) -> {
             long groupId = getId(request);
@@ -175,6 +179,7 @@ public class AppGroupEndpoint implements Endpoint {
         getForDatum(getDetailByIdPath, getDetailByIdRoute);
         postForList(findByIdsPath, findByIdsRoute);
         getForList(findPublicGroupsPath, findPublicGroupsRoute);
+        getForList(findPrivateGroupsPath, findPrivateGroupsRoute);
 
         postForList(subscribePath, subscribeRoute);
         postForList(unsubscribePath, unsubscribeRoute);
