@@ -31,8 +31,25 @@ const initialState = {};
 const template = require('./survey-run-create-general.html');
 
 
+function initialiseDatePicker(vm) {
+    vm.dateOptions = {
+        formatYear: 'yyyy',
+        maxDate: new Date(2020, 5, 22),
+        minDate: new Date(),
+        startingDay: 1
+    };
+
+    vm.dueDatePickerOpened = false;
+    vm.dueDatePickerOpen = () => {
+        vm.dueDatePickerOpened = true;
+    };
+}
+
+
 function controller(appGroupStore, involvementKindStore) {
     const vm = initialiseData(this, initialState);
+
+    initialiseDatePicker(vm);
 
     Promise
         .all([appGroupStore.findPublicGroups(), appGroupStore.findPrivateGroups()])

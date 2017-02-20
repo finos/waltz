@@ -74,10 +74,24 @@
                 Due Date
             </label>
             <div class="col-sm-10">
+                <p class="input-group">
                     <input id="dueDate"
-                           type="date"
+                           placeholder="yyyy-MM-dd"
+                           type="text"
                            class="form-control"
-                           ng-model="$ctrl.surveyRun.dueDate" />
+                           ng-model="$ctrl.surveyRun.dueDate"
+                           uib-datepicker-popup="yyyy-MM-dd"
+                           is-open="$ctrl.dueDatePickerOpened"
+                           datepicker-options="$ctrl.dateOptions"
+                           close-text="Close" />
+                    <span class="input-group-btn">
+						<button type="button"
+                                class="btn btn-default"
+                                ng-click="$ctrl.dueDatePickerOpen()">
+							<waltz-icon name="calendar"  />
+						</button>
+					</span>
+                </p>
             </div>
         </div>
 
@@ -110,7 +124,7 @@
                        required
                        type="text"
                        ng-model="$ctrl.surveyRun.selectorEntity"
-                       placeholder="Search for an available group"
+                       placeholder="Search for an available group and select"
                        uib-typeahead="group as group.name for group in $ctrl.availableAppGroups | filter:{name:$viewValue}"
                        typeahead-template-url="app-group-list-section/app-group-search-result.html"
                        class="form-control"
