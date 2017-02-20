@@ -59,7 +59,7 @@ public class SurveyHarness {
                 .createdAt(nowUtc())
                 .build();
 
-        long templateId = surveyTemplateService.create(surveyTemplate);
+        long templateId = surveyTemplateService.create("admin", surveyTemplate);
         System.out.println("Created: template create with ID = " + templateId);
 
         SurveyQuestion surveyQuestion = ImmutableSurveyQuestion.builder()
