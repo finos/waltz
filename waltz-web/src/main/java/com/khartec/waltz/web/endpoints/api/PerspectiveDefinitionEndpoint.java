@@ -19,15 +19,25 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.perspective.PerspectiveDefinition;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.perspective_definition.PerspectiveDefinitionService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
+
+import java.io.IOException;
+import java.util.Collection;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.readBody;
+import static com.khartec.waltz.web.WebUtilities.requireRole;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -35,13 +45,16 @@ public class PerspectiveDefinitionEndpoint implements Endpoint {
 
     private static final String BASE_URL = mkPath("api", "perspective-definition");
 
-
+    private final UserRoleService userRoleService;
     private final PerspectiveDefinitionService perspectiveDefinitionService;
 
     
     @Autowired
-    public PerspectiveDefinitionEndpoint(PerspectiveDefinitionService perspectiveDefinitionService) {
+    public PerspectiveDefinitionEndpoint(UserRoleService userRoleService, PerspectiveDefinitionService perspectiveDefinitionService) {
+        checkNotNull(userRoleService, "userRoleService cannot be null");
         checkNotNull(perspectiveDefinitionService, "perspectiveDefinitionService cannot be null");
+
+        this.userRoleService = userRoleService;
         this.perspectiveDefinitionService = perspectiveDefinitionService;
     }
 
@@ -51,6 +64,15 @@ public class PerspectiveDefinitionEndpoint implements Endpoint {
         ListRoute<PerspectiveDefinition> findAllRoute = (request, response) -> perspectiveDefinitionService.findAll();
 
         getForList(BASE_URL, findAllRoute);
+        postForList(BASE_URL, this::createRoute);
+    }
+
+
+    private Collection<PerspectiveDefinition> createRoute(Request request, Response response) throws IOException {
+        requireRole(userRoleService, request, Role.ADMIN);
+        PerspectiveDefinition perspectiveDefinition = readBody(request, PerspectiveDefinition.class);
+        perspectiveDefinitionService.create(perspectiveDefinition);
+        return perspectiveDefinitionService.findAll();
     }
 
 }

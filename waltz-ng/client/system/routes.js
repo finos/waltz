@@ -65,6 +65,12 @@ const involvementKindsState = {
 };
 
 
+const perspectivesState = {
+    url: '/perspectives',
+    views: { 'content@': require('./perspectives-view') }
+};
+
+
 function setupRoutes($stateProvider) {
     $stateProvider
         .state('main.system', baseState)
@@ -74,6 +80,7 @@ function setupRoutes($stateProvider) {
         .state('main.system.orphans', orphansState)
         .state('main.system.actors', actorsState)
         .state('main.system.involvementKinds', involvementKindsState)
+        .state('main.system.perspectives', perspectivesState)
         .state('main.system.recalculate', recalculateState);
 }
 

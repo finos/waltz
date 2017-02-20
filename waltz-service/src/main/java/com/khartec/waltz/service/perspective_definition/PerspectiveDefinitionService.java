@@ -20,6 +20,8 @@ package com.khartec.waltz.service.perspective_definition;
 
 import com.khartec.waltz.data.perspective_definition.PerspectiveDefinitionDao;
 import com.khartec.waltz.model.perspective.PerspectiveDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,13 +29,13 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
-/**
- * Created by dwatkins on 01/02/2017.
- */
 @Service
 public class PerspectiveDefinitionService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(PerspectiveDefinitionService.class);
+
     private final PerspectiveDefinitionDao perspectiveDefinitionDao;
+
 
     @Autowired
     public PerspectiveDefinitionService(PerspectiveDefinitionDao perspectiveDefinitionDao) {
@@ -41,7 +43,20 @@ public class PerspectiveDefinitionService {
         this.perspectiveDefinitionDao = perspectiveDefinitionDao;
     }
 
+
     public List<PerspectiveDefinition> findAll() {
         return perspectiveDefinitionDao.findAll();
+    }
+
+
+    public boolean create(PerspectiveDefinition perspectiveDefinition) {
+        checkNotNull(perspectiveDefinition, "perspectiveDefinition cannot be null");
+
+        boolean result = perspectiveDefinitionDao.create(perspectiveDefinition);
+        String msg = result
+                ? "Created new perspective definition: {}"
+                : "Ignoring new perspective definition: {}, as already exists";
+        LOG.info(msg, perspectiveDefinition);
+        return result;
     }
 }

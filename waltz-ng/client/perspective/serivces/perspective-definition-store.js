@@ -24,8 +24,17 @@ function store($http,
         .get(`${BASE}`)
         .then(result => result.data);
 
+    /**
+     * Creates the definition and returns all definitions
+     * @param defn
+     */
+    const create = (defn) => $http
+        .post(`${BASE}`, defn)
+        .then(result => result.data);
+
     return {
-        findAll
+        findAll,
+        create
     };
 }
 

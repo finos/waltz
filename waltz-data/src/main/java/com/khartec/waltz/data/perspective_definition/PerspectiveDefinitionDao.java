@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.perspective_definition;
 
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.perspective.ImmutablePerspectiveDefinition;
 import com.khartec.waltz.model.perspective.PerspectiveDefinition;
 import com.khartec.waltz.model.rating.ImmutableRagNames;
@@ -29,8 +30,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.PerspectiveDefinition.PERSPECTIVE_DEFINITION;
 
 @Repository
@@ -70,5 +74,39 @@ public class PerspectiveDefinitionDao {
         return dsl.selectFrom(PERSPECTIVE_DEFINITION)
                 .orderBy(PERSPECTIVE_DEFINITION.NAME.asc())
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+    public boolean create(PerspectiveDefinition perspectiveDefinition) {
+
+        Set<Set<Long>> existing = dsl
+                .select(PERSPECTIVE_DEFINITION.CATEGORY_X, PERSPECTIVE_DEFINITION.CATEGORY_Y)
+                .from(PERSPECTIVE_DEFINITION)
+                .fetch()
+                .stream()
+                .map(pd -> SetUtilities.fromArray(pd.value1(), pd.value2()))
+                .collect(Collectors.toSet());
+
+        Set<Long> proposed = SetUtilities.fromArray(
+                perspectiveDefinition.categoryX(),
+                perspectiveDefinition.categoryY());
+
+        if (existing.contains(proposed)) {
+            return false;
+        } else {
+            RagNames ragNames = perspectiveDefinition.ragNames();
+
+            PerspectiveDefinitionRecord record = dsl.newRecord(PERSPECTIVE_DEFINITION);
+            record.setName(perspectiveDefinition.name());
+            record.setCategoryX(perspectiveDefinition.categoryX());
+            record.setCategoryY(perspectiveDefinition.categoryY());
+            record.setRatingNameR(ragNames.R());
+            record.setRatingNameA(ragNames.A());
+            record.setRatingNameG(ragNames.G());
+            record.setRatingNameZ(ragNames.Z());
+            record.setRatingNameX(ragNames.X());
+            record.setDescription(mkSafe(perspectiveDefinition.description()));
+
+            return record.insert() == 1;
+        }
     }
 }
