@@ -20,15 +20,16 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.IdCommandResponse;
 import com.khartec.waltz.model.survey.*;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.survey.SurveyRunService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
@@ -39,18 +40,22 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class SurveyRunEndpoint implements Endpoint {
-    private static final Logger LOG = LoggerFactory.getLogger(SurveyRunEndpoint.class);
 
     private static final String BASE_URL = mkPath("api", "survey-run");
 
     private final SurveyRunService surveyRunService;
 
+    private final UserRoleService userRoleService;
+
 
     @Autowired
-    public SurveyRunEndpoint(SurveyRunService surveyRunService) {
+    public SurveyRunEndpoint(SurveyRunService surveyRunService,
+                             UserRoleService userRoleService) {
         checkNotNull(surveyRunService, "surveyRunService must not be null");
+        checkNotNull(userRoleService, "userRoleService must not be null");
 
         this.surveyRunService = surveyRunService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -78,6 +83,8 @@ public class SurveyRunEndpoint implements Endpoint {
                 -> surveyRunService.findForRecipient(getUsername(req));
 
         DatumRoute<IdCommandResponse> surveyRunCreateRoute = (req, res) -> {
+            ensureUserHasAdminRights(req);
+
             res.type(WebUtilities.TYPE_JSON);
             SurveyRunCreateCommand surveyRunChangeCommand = readBody(req, SurveyRunCreateCommand.class);
 
@@ -86,31 +93,42 @@ public class SurveyRunEndpoint implements Endpoint {
         };
 
         DatumRoute<Integer> surveyRunUpdateRoute = (req, res) -> {
+            ensureUserHasAdminRights(req);
+
             res.type(WebUtilities.TYPE_JSON);
             SurveyRunChangeCommand surveyRunChangeCommand = readBody(req, SurveyRunChangeCommand.class);
 
-            return surveyRunService
-                    .updateSurveyRun(WebUtilities.getUsername(req),
-                            getId(req),
-                            surveyRunChangeCommand);
+            return surveyRunService.updateSurveyRun(
+                    WebUtilities.getUsername(req),
+                    getId(req),
+                    surveyRunChangeCommand);
         };
 
         DatumRoute<Integer> surveyRunUpdateStatusRoute = (req, res) -> {
+            ensureUserHasAdminRights(req);
+
             res.type(WebUtilities.TYPE_JSON);
             SurveyRunStatusChangeCommand surveyRunStatusChangeCommand = readBody(req, SurveyRunStatusChangeCommand.class);
 
-            return surveyRunService
-                    .updateSurveyRunStatus(
-                            WebUtilities.getUsername(req),
-                            getId(req),
-                            surveyRunStatusChangeCommand.newStatus());
+            return surveyRunService.updateSurveyRunStatus(
+                    WebUtilities.getUsername(req),
+                    getId(req),
+                    surveyRunStatusChangeCommand.newStatus());
         };
 
-        ListRoute<SurveyInstanceRecipient> generateSurveyRunRecipientsRoute = (request, response) ->
-                surveyRunService.generateSurveyInstanceRecipients(getId(request));
+        ListRoute<SurveyInstanceRecipient> generateSurveyRunRecipientsRoute = (request, response) -> {
+            ensureUserHasAdminRights(request);
 
-        DatumRoute<Boolean> createSurveyRunInstancesAndRecipientsRoute = (request, response) ->
-                surveyRunService.createSurveyInstancesAndRecipients(getId(request), newArrayList(readBody(request, SurveyInstanceRecipient[].class)));
+            return surveyRunService.generateSurveyInstanceRecipients(getId(request));
+        };
+
+        DatumRoute<Boolean> createSurveyRunInstancesAndRecipientsRoute = (request, response) -> {
+            ensureUserHasAdminRights(request);
+
+            return surveyRunService.createSurveyInstancesAndRecipients(
+                    getId(request),
+                    newArrayList(readBody(request, SurveyInstanceRecipient[].class)));
+        };
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByTemplateIdPath, findByTemplateIdRoute);
@@ -122,4 +140,10 @@ public class SurveyRunEndpoint implements Endpoint {
         postForDatum(createSurveyRunInstancesAndRecipientsPath, createSurveyRunInstancesAndRecipientsRoute);
         putForDatum(updateSurveyRunStatusPath, surveyRunUpdateStatusRoute);
     }
+
+
+    private void ensureUserHasAdminRights(Request request) {
+        requireRole(userRoleService, request, Role.ADMIN);
+    }
+
 }
