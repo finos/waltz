@@ -19,12 +19,15 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.survey.SurveyTemplate;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.survey.SurveyTemplateService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -36,13 +39,16 @@ public class SurveyTemplateEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "survey-template");
 
     private final SurveyTemplateService surveyTemplateService;
-
+    private final UserRoleService userRoleService;
 
     @Autowired
-    public SurveyTemplateEndpoint(SurveyTemplateService surveyTemplateService) {
+    public SurveyTemplateEndpoint(SurveyTemplateService surveyTemplateService,
+                                  UserRoleService userRoleService) {
         checkNotNull(surveyTemplateService, "surveyTemplateService must not be null");
+        checkNotNull(userRoleService, "userRoleService must not be null");
 
         this.surveyTemplateService = surveyTemplateService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -58,10 +64,18 @@ public class SurveyTemplateEndpoint implements Endpoint {
                 surveyTemplateService.findAllActive();
 
         DatumRoute<Long> createSurveyTemplateRoute =
-                (req, res) -> surveyTemplateService.create(readBody(req, SurveyTemplate.class));
+                (req, res) -> {
+                    ensureUserHasAdminRights(req);
+                    return surveyTemplateService.create(getUsername(req), readBody(req, SurveyTemplate.class));
+                };
 
         getForList(findAllActivePath, findAllActiveRoute);
         getForDatum(getByIdPath, getByIdRoute);
         postForDatum(BASE_URL, createSurveyTemplateRoute);
+    }
+
+
+    private void ensureUserHasAdminRights(Request request) {
+        requireRole(userRoleService, request, Role.ADMIN);
     }
 }
