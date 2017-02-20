@@ -27,9 +27,6 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
-/**
- * Created by dwatkins on 01/02/2017.
- */
 @Service
 public class PerspectiveDefinitionService {
 
@@ -43,5 +40,12 @@ public class PerspectiveDefinitionService {
 
     public List<PerspectiveDefinition> findAll() {
         return perspectiveDefinitionDao.findAll();
+    }
+
+    public void create(PerspectiveDefinition perspectiveDefinition) {
+        checkNotNull(perspectiveDefinition, "perspectiveDefinition cannot be null");
+        perspectiveDefinitionDao.create(perspectiveDefinition);
+
+        System.out.println("Creating: "+perspectiveDefinition);   
     }
 }
