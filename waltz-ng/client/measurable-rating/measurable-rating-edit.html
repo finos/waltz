@@ -142,14 +142,16 @@
                                                          on-select="ctrl.onRatingSelect"
                                                          on-keypress="ctrl.onKeypress">
                                     </waltz-rating-picker>
-                                    <div ng-if="ctrl.selected.rating.rating !== ctrl.entityRating"
-                                         class="small text-muted">
-                                        <waltz-icon name="warning">
-                                        </waltz-icon>
-                                        Note: this rating does not match the overall rating, which is
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <small class="text-muted">
+                                        Note: the overall rating for this application is
                                         <span ng-bind="ctrl.entityRating | toDisplayName:'investmentRating'">
                                         </span>
-                                    </div>
+                                    </small>
                                 </div>
                             </div>
 
