@@ -24,13 +24,17 @@
         <div class="row"
              ng-if="$ctrl.bookmarks.length > 0">
 
-            <div class="col-md-3">
+            <div class="col-md-3"
+                 ng-if="$ctrl.showFilter">
                 <waltz-bookmark-kinds bookmarks="$ctrl.bookmarks"
                                       on-select="$ctrl.selectBookmarkKind">
                 </waltz-bookmark-kinds>
             </div>
 
-            <div class="col-md-9">
+            <div ng-class="{
+                        'col-md-9': $ctrl.showFilter,
+                        'col-md-12': !$ctrl.showFilter
+                    }">
                     <table class="table table-condensed wbs-bookmark-table">
                         <colgroup>
                             <col width="10%">
