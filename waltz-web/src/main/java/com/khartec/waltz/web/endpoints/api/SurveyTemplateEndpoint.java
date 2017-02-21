@@ -76,6 +76,6 @@ public class SurveyTemplateEndpoint implements Endpoint {
 
 
     private void ensureUserHasAdminRights(Request request) {
-        requireRole(userRoleService, request, Role.ADMIN);
+        requireRole(userRoleService, request, Role.SURVEY_ADMIN);
     }
 }
