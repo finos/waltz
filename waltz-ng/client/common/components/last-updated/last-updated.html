@@ -1,9 +1,9 @@
 <span class="text-muted">
     Last Modified:
 </span>
-<span ng-if="$ctrl.lastUpdatedBy">
-    <span ng-bind="$ctrl.lastUpdatedBy"></span>,
+<span ng-if="$ctrl.entity.lastUpdatedBy">
+    <span ng-bind="$ctrl.entity.lastUpdatedBy"></span>,
 </span>
 <waltz-from-now class='text-muted'
-                timestamp="$ctrl.lastUpdatedAt">
+                timestamp="$ctrl.entity.lastUpdatedAt">
 </waltz-from-now>
