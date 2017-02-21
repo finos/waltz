@@ -20,9 +20,10 @@ import _ from "lodash";
 import {termSearch, perhaps} from "../../common";
 
 const BINDINGS = {
-    softwareCatalog: '=',
-    servers: '=',
-    databases: '='
+    softwareCatalog: '<',
+    servers: '<',
+    databases: '<',
+    sourceDataRatings: '<'
 };
 
 
