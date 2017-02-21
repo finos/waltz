@@ -48,6 +48,10 @@ function controller($location,
         .then(t => {
             vm.surveyTemplate = t;
             vm.surveyRun.surveyTemplate = t;
+
+            // copy name and description from the template if they are not set
+            if (!vm.surveyRun.name) vm.surveyRun.name = t.name;
+            if (!vm.surveyRun.description) vm.surveyRun.description = t.description;
         });
 
     const generateEmailLink = (surveyRun, includedRecipients) => {
