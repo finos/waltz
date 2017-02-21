@@ -24,13 +24,15 @@ const bindings = {
     entityId: '@',
     kind: '@', // entity-kind - not bookmark kind !
     parentName: '@',
-    sourceDataRatings: '<'
+    sourceDataRatings: '<',
+    showFilter: '@'
 };
 
 
 const initialState = {
     filteredBookmarks: [],
-    bookmarkKind: null
+    bookmarkKind: null,
+    showFilter: false
 };
 
 
