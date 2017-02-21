@@ -32,14 +32,9 @@
                     </span>
                 </div>
                 <div class="pull-right small">
-                    <span class="text-muted">
-                        Last Modified:
-                    </span>
-                    <span ng-bind="$ctrl.selected.rating.lastUpdatedBy">
-                    </span>,
-                    <waltz-from-now class='text-muted'
-                                    timestamp="$ctrl.selected.rating.lastUpdatedAt">
-                    </waltz-from-now>
+                    <waltz-last-updated last-updated-by="$ctrl.selected.rating.lastUpdatedBy"
+                                        last-updated-at="$ctrl.selected.rating.lastUpdatedAt">
+                    </waltz-last-updated>
                 </div>
             </div>
         </div>

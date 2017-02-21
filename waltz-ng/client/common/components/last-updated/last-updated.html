@@ -1,0 +1,9 @@
+<span class="text-muted">
+    Last Modified:
+</span>
+<span ng-if="$ctrl.lastUpdatedBy">
+    <span ng-bind="$ctrl.lastUpdatedBy"></span>,
+</span>
+<waltz-from-now class='text-muted'
+                timestamp="$ctrl.lastUpdatedAt">
+</waltz-from-now>
