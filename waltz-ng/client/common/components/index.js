@@ -25,6 +25,7 @@ export default (module) => {
         .component('waltzEntityLink', require('./entity-link/entity-link'))
         .component('waltzGrid', require('./grid/grid'))
         .component('waltzGridSref', require('./grid-sref/grid-sref'))
-        .component('waltzGridWithSearch', require('./grid/grid-with-search'));
+        .component('waltzGridWithSearch', require('./grid/grid-with-search'))
+        .component('waltzDatePickerFormInput', require('./date-picker/date-picker-form-input'));
 
 };
