@@ -1,0 +1,18 @@
+<p class="input-group">
+    <input id="{{$ctrl.id}}"
+           type="text"
+           class="form-control"
+           placeholder="{{$ctrl.placeHolder}}"
+           ng-model="$ctrl.model"
+           uib-datepicker-popup="{{$ctrl.format}}"
+           is-open="$ctrl.datePickerOpened"
+           datepicker-options="$ctrl.dateOptions"
+           close-text="Close"/>
+    <span class="input-group-btn">
+        <button type="button"
+                class="btn btn-default"
+                ng-click="$ctrl.datePickerOpen()">
+            <waltz-icon name="calendar"/>
+        </button>
+    </span>
+</p>

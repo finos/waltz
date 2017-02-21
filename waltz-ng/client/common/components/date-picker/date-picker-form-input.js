@@ -15,52 +15,46 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {initialiseData} from "../../common/index";
+
+import {initialiseData} from "../../../common";
 
 
 const bindings = {
-    surveyTemplate: '<',
-    surveyRun: '<',
-    onSave: '<'
+    id: '@',
+    placeHolder: '@',
+    format: '@',
+    model: '='
 };
 
 
-const initialState = {};
+const template = require('./date-picker-form-input.html');
 
 
-const template = require('./survey-run-create-general.html');
+const initialState = {
+    dateOptions: {
+        formatYear: 'yyyy',
+        minDate: new Date(),
+        startingDay: 1
+    },
+    datePickerOpened: false,
+    placeHolder: ''
+};
 
 
-function controller(appGroupStore, involvementKindStore) {
+function controller() {
     const vm = initialiseData(this, initialState);
 
-    Promise
-        .all([appGroupStore.findPublicGroups(), appGroupStore.findPrivateGroups()])
-        .then(([publicGroups = [], privateGroups = []]) => {
-            vm.availableAppGroups = [].concat(publicGroups, privateGroups);
-        }
-    );
-
-    involvementKindStore.findAll().then(
-        involvementKinds => {
-            vm.availableInvolvementKinds = involvementKinds;
-        }
-    );
-
-    vm.onSubmit = () => {
-        vm.onSave(this.surveyRun);
-    }
+    vm.datePickerOpen = () => {
+        vm.datePickerOpened = true;
+    };
 }
 
 
-controller.$inject = [
-    'AppGroupStore',
-    'InvolvementKindStore'
-];
-
-
-export default {
+const component = {
     bindings,
     template,
     controller
 };
+
+
+export default component;

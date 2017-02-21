@@ -74,24 +74,10 @@
                 Due Date
             </label>
             <div class="col-sm-10">
-                <p class="input-group">
-                    <input id="dueDate"
-                           placeholder="yyyy-MM-dd"
-                           type="text"
-                           class="form-control"
-                           ng-model="$ctrl.surveyRun.dueDate"
-                           uib-datepicker-popup="yyyy-MM-dd"
-                           is-open="$ctrl.dueDatePickerOpened"
-                           datepicker-options="$ctrl.dateOptions"
-                           close-text="Close" />
-                    <span class="input-group-btn">
-						<button type="button"
-                                class="btn btn-default"
-                                ng-click="$ctrl.dueDatePickerOpen()">
-							<waltz-icon name="calendar"  />
-						</button>
-					</span>
-                </p>
+                <waltz-date-picker-form-input id="dueDate"
+                                              place-holder="yyyy-MM-dd"
+                                              format="yyyy-MM-dd"
+                                              model="$ctrl.surveyRun.dueDate"/>
             </div>
         </div>
 
