@@ -34,7 +34,8 @@ public enum Role {
     LINEAGE_EDITOR,
     LOGICAL_DATA_FLOW_EDITOR,
     ORG_UNIT_EDITOR,
-    RATING_EDITOR
+    RATING_EDITOR,
+    SURVEY_ADMIN
     ;
 
 
