@@ -53,7 +53,7 @@
         </waltz-physical-flow-edit-specification>
 
 
-        <div ng-if="ctrl.visibility.editor == ''">
+        <div ng-if="ctrl.visibility.editor == '' && ctrl.similarFlows.length === 0">
             <div class="row">
                 <div class="col-md-offset-8 col-md-2">
                     <button class="btn btn-success"
@@ -76,6 +76,48 @@
                             <span ng-bind="message" class="error"></span>
                         </li>
                     </ul>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div ng-if="ctrl.visibility.editor == '' && ctrl.similarFlows.length > 0">
+            <div class="row" ng-hide="ctrl.visibility.similarFlows">
+                <div class="col-md-offset-8 col-md-2">
+                    <strong class="text-warning">Similar flows exist!</strong>
+                    <button class="btn btn-warning"
+                            ng-click="ctrl.visibility.similarFlows = true">
+                        Show
+                    </button>
+                </div>
+            </div>
+
+            <div ng-if="ctrl.visibility.similarFlows">
+                <h4>
+                    Existing flows from
+                    <waltz-entity-icon-label entity-ref="ctrl.sourceEntity"></waltz-entity-icon-label>
+                    to
+                    <waltz-entity-icon-label entity-ref="ctrl.targetEntity"></waltz-entity-icon-label>
+                </h4>
+                <waltz-grid column-defs="ctrl.similarFlowDefs"
+                            row-data="ctrl.similarFlows"
+                            class="small">
+                </waltz-grid>
+                <div class="row">
+                    <div class="col-md-offset-8 col-md-2">
+                        <button class="btn btn-success"
+                                ng-click="ctrl.doSave()"
+                                xxng-disabled="!ctrl.validation.canSave">
+                            <waltz-icon name="check"></waltz-icon>
+                            Save anyway
+                        </button>
+                        &nbsp;
+                        <a ng-href="{{ ctrl.cancelLink }}"
+                           class="clickable">
+                            Cancel
+                        </a>
+                    </div>
                 </div>
             </div>
 

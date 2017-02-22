@@ -21,6 +21,7 @@ package com.khartec.waltz.jobs.sample;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
 import com.khartec.waltz.service.DIConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -49,7 +50,7 @@ public class OrgUnitGenerator {
 
         List<OrganisationalUnitRecord> records = lines.stream()
                 .skip(1)
-                .map(line -> line.split(","))
+                .map(line -> StringUtils.splitPreserveAllTokens(line, ","))
                 .filter(cells -> cells.length == 4)
                 .map(cells -> {
                     OrganisationalUnitRecord record = new OrganisationalUnitRecord();

@@ -32,12 +32,15 @@ const initialState = {
     specification: null,
     targetEntity: null,
     existingTargets: [],
+    existingFlowsToTarget: [],
+    similarFlows: [],
     validation: {
         messages: [],
         canSave: false
     },
     visibility: {
-        editor: ""
+        editor: "",
+        similarFlows: false
     }
 };
 
@@ -72,6 +75,17 @@ function validate(specification, flowAttributes, targetEntity) {
 }
 
 
+function getSimilarFlows(specification, flowAttributes, targetEntity, existingFlows = []) {
+    if(specification && flowAttributes && targetEntity) {
+        return _.chain(existingFlows)
+                .filter(f => f.specificationId === specification.id)
+                .map(physicalFlow => ({specification, physicalFlow}))
+                .value();
+    }
+    return [];
+}
+
+
 function controller(
     $q,
     $state,
@@ -85,6 +99,18 @@ function controller(
 
     const vm = initialiseData(this, initialState);
 
+
+    vm.similarFlowDefs = [
+        { field: 'specification.name', displayName: 'Name', width: "10%" },
+        { field: 'specification.format', displayName: 'Format', width: "10%", cellFilter: 'toDisplayName:"dataFormatKind"' },
+        { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%", cellFilter: 'toDisplayName:"transportKind"' },
+        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "10%", cellFilter: 'toDisplayName:"frequencyKind"' },
+        { field: 'physicalFlow.basisOffset', displayName: 'Basis', width: "10%", cellFilter: 'toBasisOffset' },
+        { field: 'specification.description', displayName: 'Description' }
+
+    ];
+
+
     const sourceEntityRef = {
         id: $stateParams.id,
         kind: $stateParams.kind
@@ -93,7 +119,12 @@ function controller(
     const viewState = kindToViewState(sourceEntityRef.kind);
     vm.cancelLink = $state.href(viewState, { id: sourceEntityRef.id });
 
-    const doValidation = () => validate(vm.specification, vm.flowAttributes, vm.targetEntity);
+    const doValidation = () => {
+        vm.similarFlows = [];
+        vm.visibility.similarFlows = false;
+        vm.similarFlows = getSimilarFlows(vm.specification, vm.flowAttributes, vm.targetEntity, vm.existingFlowsToTarget);
+        return validate(vm.specification, vm.flowAttributes, vm.targetEntity);
+    };
 
     vm.focusSpecification = () => {
         vm.visibility.editor = 'SPECIFICATION';
@@ -114,6 +145,11 @@ function controller(
 
     vm.targetChanged = (target) => {
         vm.targetEntity = target;
+        physicalFlowStore.findByConsumerEntityReference(target)
+            .then(flows => {
+                vm.existingFlowsToTarget = flows;
+                doValidation();
+            });
         vm.editorDismiss();
     };
 

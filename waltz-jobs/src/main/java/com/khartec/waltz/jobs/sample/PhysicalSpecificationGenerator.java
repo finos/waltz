@@ -105,7 +105,7 @@ public class PhysicalSpecificationGenerator {
         List<PhysicalSpecificationRecord> records = appIds
                 .stream()
                 .flatMap(appId -> IntStream
-                        .range(0, rnd.nextInt(8))
+                        .range(0, rnd.nextInt(4))
                         .mapToObj(i -> tuple(appId, i)))
                 .map(t -> {
                     String name = mkName(t.v2);
@@ -117,6 +117,7 @@ public class PhysicalSpecificationGenerator {
                     record.setDescription("Desc "+ name + " " + t.v2);
                     record.setName(name);
                     record.setExternalId("ext-" + t.v1 + "." + t.v2);
+                    record.setLastUpdatedBy("admin");
                     return record;
                 })
                 .collect(Collectors.toList());
