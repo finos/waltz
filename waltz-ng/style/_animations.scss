@@ -9,14 +9,14 @@
  * You must not remove this notice, or any other, from this software.
  *
  */
-
+$animation-speed: 0.2s;
 
 .animate-if.ng-enter, .animate-if.ng-leave {
-  -webkit-transition: 0.2s linear all;
-  -moz-transition: 0.2s linear all;
-  -ms-transition: 0.2s linear all;
-  -o-transition: 0.2s linear all;
-  transition: 0.2s linear all;
+  -webkit-transition: $animation-speed linear all;
+  -moz-transition: $animation-speed linear all;
+  -ms-transition: $animation-speed linear all;
+  -o-transition: $animation-speed linear all;
+  transition: $animation-speed linear all;
 }
 
 .animate-if.ng-enter {
@@ -37,4 +37,24 @@
 .animate-if.ng-leave.ng-leave-active {
   max-height: 0;
   opacity:0;
+}
+
+
+.waltz-fade-if.ng-enter,
+.waltz-fade-if.ng-leave {
+    -webkit-transition: opacity ease-in-out $animation-speed;
+    -moz-transition: opacity ease-in-out $animation-speed;
+    -ms-transition: opacity ease-in-out $animation-speed;
+    -o-transition: opacity ease-in-out $animation-speed;
+    transition: opacity ease-in-out $animation-speed;
+}
+
+.waltz-fade-if.ng-enter,
+.waltz-fade-if.ng-leave.ng-leave-active {
+    opacity: 0;
+}
+
+.waltz-fade-if.ng-leave,
+.waltz-fade-if.ng-enter.ng-enter-active {
+    opacity: 1;
 }

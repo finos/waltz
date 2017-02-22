@@ -66,4 +66,23 @@ function mkPerspective(perspectiveDefinition,
 }
 
 
+/**
+ * Takes an array of perspective ratings and
+ * converts it into a object keyed by the
+ * ratings x and y identifiers (<`mX>_<mY>`)
+ * @param perspectiveRatings
+ */
+export function mkOverrides(perspectiveRatings = []) {
+    const reducer = (acc, r) => {
+        const key = `${r.measurableX}_${r.measurableY}`;
+        acc[key] = r;
+        return acc;
+    };
+    return _.reduce(
+        _.map(perspectiveRatings, 'value'),
+        reducer,
+        {});
+}
+
+
 export { mkPerspective };

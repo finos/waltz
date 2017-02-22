@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash';
+import {mkOverrides} from '../../perspective/perpective-utilities';
 
 
 const initialState = {
@@ -45,8 +46,11 @@ function controller($q,
     perspectiveDefinitionStore
         .findAll()
         .then(ps => vm.perspectiveDefinition = _.find(ps, { id: $stateParams.perspective || 1 }))
-        .then(p => perspectiveRatingStore.findForEntity(p.categoryX, p.categoryY, entityReference))
-        .then(rs => vm.perspectiveRatings = rs);
+        .then(p => perspectiveRatingStore.findForEntity(entityReference))
+        .then(rs => {
+            vm.perspectiveRatings = rs;
+            vm.perspectiveOverrides = mkOverrides(rs);
+        });
 
     measurableStore
         .findMeasurablesBySelector(idSelector)

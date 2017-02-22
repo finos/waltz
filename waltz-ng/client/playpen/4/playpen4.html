@@ -10,6 +10,7 @@
     </waltz-page-header>
 
 
+
     <div class="waltz-page-summary waltz-page-summary-attach">
 
         <div class="row">
@@ -24,5 +25,19 @@
         </div>
 
     </div>
+
+    <br>
+
+    <waltz-section>
+        <waltz-perspective-grid existing-overrides="ctrl.perspectiveOverrides"
+                                pending-overrides="[]"
+                                perspective-definition="ctrl.perspectiveDefinition"
+                                measurables="ctrl.measurables"
+                                measurable-ratings="ctrl.measurableRatings">
+        </waltz-perspective-grid>
+
+        <pre>{{ ctrl.perspectiveRatings | json }}</pre>
+    </waltz-section>
+
 
 </div>

@@ -8,8 +8,8 @@
     </div>
     <div class="col-sm-6"
          style="border-left: 1px solid #eee">
-        <div ng-if="$ctrl.selected != null">
-
+        <div ng-if="$ctrl.selected != null"
+             class="waltz-fade-if">
             <div>
                 <h4>
                     <span ng-bind="$ctrl.selected.measurable.name"></span>
@@ -37,7 +37,8 @@
                 </div>
             </div>
         </div>
-        <div ng-if="$ctrl.selected.overrides">
+        <div ng-if="$ctrl.selected.overrides"
+             class="waltz-fade-if">
             <hr>
             <h5>Overrides</h5>
 
