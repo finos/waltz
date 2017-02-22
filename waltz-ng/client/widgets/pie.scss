@@ -1,11 +1,13 @@
 .waltz-pie {
     .arc {
+        transition: opacity 0.2s;
         opacity: 1;
     }
     .arc:hover {
         opacity: 0.7;
     }
     .wp-selected {
+        transition: stroke-width 0.2s;
         stroke-width: 3px;
     }
 

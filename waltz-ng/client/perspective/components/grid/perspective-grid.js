@@ -18,9 +18,8 @@
 
 import _ from 'lodash';
 import {scaleBand} from 'd3-scale';
-import {select, selectAll, event} from 'd3-selection';
+import {select, event} from 'd3-selection';
 import {path} from 'd3-path';
-import {nest} from 'd3-collection';
 import {initialiseData} from '../../../common';
 import {ragColorScale} from '../../../common/colors';
 import {truncateMiddle} from '../../../common/string-utils';
@@ -76,18 +75,6 @@ const cellWidth = 40;
 const cellHeight = 35;
 const maxLabelLength = 32;
 
-/**
- * { mA -> mB -> { measurableA, measurableB, rating } }
- * @param overrides
- */
-function nestOverrides(overrides = []) {
-    return nest()
-        .key(d => d.measurableA)
-        .key(d => d.measurableB)
-        .rollup(xs => xs[0])
-        .object(overrides);
-}
-
 
 function setupScales(perspective) {
     scales.x = scaleBand()
@@ -128,7 +115,7 @@ function drawGrid(selection, perspective, handlers) {
 }
 
 
-const maybeDrag = function(d, handler) {
+const maybeDrag = function(d, handler = () => {}) {
     const evt = event;
     if (evt.buttons > 0) {
         handler(d);

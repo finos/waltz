@@ -34,7 +34,8 @@
 
                     <div class="col-sm-4"
                          style="border-left: 1px solid #eee">
-                        <div ng-if="$ctrl.summarySelection">
+                        <div ng-if="$ctrl.summarySelection"
+                             class="waltz-fade-if">
                             <a ui-sref="main.app.view ({ id: $ctrl.summarySelection.entityRef.id })">
                                 <h5 ng-bind="$ctrl.summarySelection.entityRef.name"></h5>
                             </a>

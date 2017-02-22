@@ -1,7 +1,6 @@
 <waltz-section name="Related Viewpoints"
                icon="link"
                id="related-measurables">
-
     <div class="row">
         <div class="col-sm-7">
             <waltz-measurable-ratings-browser rating-tallies="$ctrl.stats"
@@ -13,6 +12,7 @@
         </div>
         <div class="col-sm-5">
             <div ng-if="$ctrl.selectedMeasurable"
+                 class="waltz-fade-if"
                  style="padding-top: 4em">
                 <h4>
                     <span ng-bind="$ctrl.selectedMeasurable.name">

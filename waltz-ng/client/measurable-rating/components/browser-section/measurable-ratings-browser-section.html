@@ -12,10 +12,11 @@
         </div>
         <div class="col-sm-6">
             <waltz-loading-notification show="$ctrl.visibility.loading"
+                                        style="padding-top: 54px;"
                                         name="Loading">
             </waltz-loading-notification>
             <div ng-if="$ctrl.tableData"
-                 style="padding-top: 54px;">
+                 class="waltz-fade-if">
                 <h4>
                     <span ng-bind="$ctrl.selectedMeasurable.name">
                     </span>

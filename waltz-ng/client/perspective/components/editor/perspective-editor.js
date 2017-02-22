@@ -18,6 +18,7 @@
 
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
+import {mkOverrides} from '../../perpective-utilities';
 
 
 /**
@@ -74,15 +75,6 @@ function updateOverrides(overrides = {}, d, rating) {
     }
 }
 
-
-function mkOverrides(perspectiveRatings = []) {
-    const reducer = (acc, r) => {
-        const key = `${r.measurableX}_${r.measurableY}`;
-        acc[key] = r;
-        return acc;
-    };
-    return _.reduce(_.map(perspectiveRatings, 'value'), reducer, {});
-}
 
 
 function controller($timeout) {

@@ -22,7 +22,7 @@
             </div>
 
             <div class="col-md-7">
-                <div ng-if="$ctrl.activeSummary == null && ! $ctrl.loading">
+                <div ng-if="$ctrl.activeSummary == null && ! $ctrl.loading" >
                     <div class="alert alert-info">
                         <waltz-icon size="lg"
                                     name="info">
@@ -34,13 +34,12 @@
                             details.
                         </span>
                     </div>
-
-
                 </div>
                 <div ng-if="$ctrl.activeSummary != null && $ctrl.loading"
                      style="height: 230px">
                 </div>
-                <div ng-if="$ctrl.activeSummary != null && ! $ctrl.loading">
+                <div ng-if="$ctrl.activeSummary != null && ! $ctrl.loading"
+                     class="waltz-fade-if">
                     <waltz-entity-statistic-summary-card summary="$ctrl.activeSummary"
                                                          definition="$ctrl.activeDefinition"
                                                          parent-ref="$ctrl.parentRef"
