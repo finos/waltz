@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import {rgb} from "d3-color";
 import {scaleOrdinal, schemeCategory20c} from "d3-scale";
 import _ from "lodash";
@@ -124,7 +123,8 @@ const variableColorList = [
             'OVERDUE',
             'LATE',
             'BAD',
-            'END_OF_LIFE'
+            'END_OF_LIFE',
+            'Non PaaS'
         ]
     }, {
         color: green,
@@ -143,7 +143,8 @@ const variableColorList = [
             'DEV',
             'GREEN',
             'GOOD',
-            'NOT_END_OF_LIFE'
+            'NOT_END_OF_LIFE',
+            'PaaS'
         ]
     }, {
         color: amber,
