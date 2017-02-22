@@ -59,6 +59,7 @@ function controller($document,
         const surveyEmailRecipients = _
             .chain(includedRecipients)
             .map(r => r.person.email)
+            .uniq()
             .join(';');
 
         const surveyEmailSubject = `Survey invitation: ${surveyRun.name}`;
@@ -68,7 +69,7 @@ function controller($document,
         const newLine = '%0D%0A';
         const surveyEmailBody = `You have been invited to participate to the following survey. ${newLine}${newLine}`
                 + `Name: ${surveyRun.name} ${newLine}${newLine}`
-                + `Description: ${surveyRun.name} ${newLine}${newLine}`
+                + `Description: ${surveyRun.description} ${newLine}${newLine}`
                 + `${newLine}${newLine}`
                 + `Please use this URL to find and respond to that survey:  ${surveyLink} ${newLine}${newLine}`;
 
