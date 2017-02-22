@@ -35,7 +35,8 @@ const initialState = {
 const template = require('./survey-run-create.html');
 
 
-function controller($location,
+function controller($document,
+                    $location,
                     $state,
                     $stateParams,
                     surveyRunStore,
@@ -65,14 +66,23 @@ function controller($location,
             + $state.href('main.survey.instance.user');
 
         const newLine = '%0D%0A';
-        const surveyEmailBody = `${surveyRun.description}
-            ${newLine} 
-            ${newLine} 
-Please use this URL to fill the survey: ${surveyLink}
-            ${newLine} 
-            ${newLine} `;
+        const surveyEmailBody = `You have been invited to participate to the following survey. ${newLine}${newLine}`
+                + `Name: ${surveyRun.name} ${newLine}${newLine}`
+                + `Description: ${surveyRun.name} ${newLine}${newLine}`
+                + `${newLine}${newLine}`
+                + `Please use this URL to find and respond to that survey:  ${surveyLink} ${newLine}${newLine}`;
 
-        vm.surveyEmailHref = `${surveyEmailRecipients}?subject=${surveyEmailSubject}&body=${surveyEmailBody}`;
+        vm.surveyEmailHref = `mailto:${surveyEmailRecipients}?subject=${surveyEmailSubject}&body=${surveyEmailBody}`;
+    };
+
+    // use this as a workaround on IE issue with long email body
+    vm.generateEmail = () => {
+        const document = $document[0];
+        const iframeHack = document.createElement("IFRAME");
+
+        iframeHack.src = vm.surveyEmailHref;
+        document.body.appendChild(iframeHack);
+        document.body.removeChild(iframeHack);
     };
 
     vm.onSaveGeneral = (surveyRun) => {
@@ -124,6 +134,7 @@ Please use this URL to fill the survey: ${surveyLink}
 
 
 controller.$inject = [
+    '$document',
     '$location',
     '$state',
     '$stateParams',
