@@ -172,7 +172,8 @@ const variableColorList = [
             'B',
             'NOT_STARTED',
             'BLUE',
-            'MEDIUM'
+            'MEDIUM',
+            'Virtual'
         ]
     }, {
         color: blue.darker(),
@@ -202,7 +203,8 @@ const variableColorList = [
             'N/A',
             'NA',
             'NOT_APPLICABLE',
-            'MEH'
+            'MEH',
+            'Physical'
         ]
     }
 ];
