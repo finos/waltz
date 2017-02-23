@@ -32,7 +32,7 @@ const initialState = {
     specification: null,
     targetEntity: null,
     existingTargets: [],
-    existingFlowsToTarget: [],
+    existingFlowsByTarget: {},
     similarFlows: [],
     validation: {
         messages: [],
@@ -75,8 +75,9 @@ function validate(specification, flowAttributes, targetEntity) {
 }
 
 
-function getSimilarFlows(specification, flowAttributes, targetEntity, existingFlows = []) {
+function findSimilarFlows(specification, flowAttributes, targetEntity, existingFlowsByTarget = {}) {
     if(specification && flowAttributes && targetEntity) {
+        const existingFlows = existingFlowsByTarget[targetEntity.kind + "_" + targetEntity.id] || [];
         return _.chain(existingFlows)
                 .filter(f => f.specificationId === specification.id)
                 .map(physicalFlow => ({specification, physicalFlow}))
@@ -120,9 +121,8 @@ function controller(
     vm.cancelLink = $state.href(viewState, { id: sourceEntityRef.id });
 
     const doValidation = () => {
-        vm.similarFlows = [];
         vm.visibility.similarFlows = false;
-        vm.similarFlows = getSimilarFlows(vm.specification, vm.flowAttributes, vm.targetEntity, vm.existingFlowsToTarget);
+        vm.similarFlows = findSimilarFlows(vm.specification, vm.flowAttributes, vm.targetEntity, vm.existingFlowsByTarget);
         return validate(vm.specification, vm.flowAttributes, vm.targetEntity);
     };
 
@@ -145,11 +145,6 @@ function controller(
 
     vm.targetChanged = (target) => {
         vm.targetEntity = target;
-        physicalFlowStore.findByConsumerEntityReference(target)
-            .then(flows => {
-                vm.existingFlowsToTarget = flows;
-                doValidation();
-            });
         vm.editorDismiss();
     };
 
@@ -198,6 +193,13 @@ function controller(
         .findByEntityReference(sourceEntityRef)
         .then(specs => vm.candidateSpecifications = specs);
 
+    physicalFlowStore
+        .findByProducerEntityReference(sourceEntityRef)
+        .then(flows =>
+            _.chain(flows)
+                .groupBy(i => i.target.kind + "_" + i.target.id)
+                .value()
+        ).then(flowsByTarget => vm.existingFlowsByTarget = flowsByTarget);
 
     const existingLogicalTargetPromise = logicalFlowStore
         .findByEntityReference(sourceEntityRef.kind, sourceEntityRef.id)
