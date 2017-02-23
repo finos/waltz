@@ -17,6 +17,7 @@
  */
 import _ from 'lodash';
 import {initialiseData} from '../common';
+import {nest} from "d3-collection";
 
 
 const initialState = {
@@ -81,7 +82,11 @@ function controller($q,
     $q.all([measurablePromise, measurableCategoryPromise, countPromise])
         .then(([measurables = [], categories = [], counts = []]) => {
             vm.tabs = prepareTabs(categories, measurables, counts);
-            vm.measurablesByExternalId = _.keyBy(measurables, 'externalId');
+            vm.measurablesByCategoryThenExternalId = nest()
+                .key(d => d.categoryId)
+                .key(d => d.externalId)
+                .rollup(vs => vs[0])
+                .object(measurables);
             vm.visibility.tab = $stateParams.category || findFirstNonEmptyTab(vm.tabs);
         });
 
@@ -98,7 +103,7 @@ function controller($q,
 
     vm.blockProcessor = b => {
         const extId = b.value;
-        const measurable = vm.measurablesByExternalId[extId];
+        const measurable = vm.measurablesByCategoryThenExternalId[vm.visibility.tab][extId];
         if (measurable) {
             b.block.onclick = () => $state.go('main.measurable.view', { id: measurable.id });
             angular.element(b.block).addClass('clickable');
