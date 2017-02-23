@@ -1,5 +1,5 @@
 <div>
-    <waltz-page-header icon="edit"
+    <waltz-page-header icon="newspaper-o"
                        name="Surveys"
                        small="{{ctrl.user.userName}}">
         <ol class="waltz-breadcrumbs">
@@ -9,6 +9,14 @@
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-section-actions>
+            <a class="btn btn-primary btn-xs"
+               waltz-has-role="SURVEY_ADMIN"
+               ui-sref="main.survey.template.list">
+                Manage Templates
+            </a>
+        </waltz-section-actions>
+
         <h4>Incomplete</h4>
         <br>
         <div ng-if="ctrl.surveys.incomplete.length > 0">
