@@ -82,7 +82,7 @@ function controller($q,
     $q.all([measurablePromise, measurableCategoryPromise, countPromise])
         .then(([measurables = [], categories = [], counts = []]) => {
             vm.tabs = prepareTabs(categories, measurables, counts);
-            vm.measurablesByCategoryAndExternalId = nest()
+            vm.measurablesByCategoryThenExternalId = nest()
                 .key(d => d.categoryId)
                 .key(d => d.externalId)
                 .rollup(vs => vs[0])
@@ -103,7 +103,7 @@ function controller($q,
 
     vm.blockProcessor = b => {
         const extId = b.value;
-        const measurable = vm.measurablesByCategoryAndExternalId[vm.visibility.tab][extId];
+        const measurable = vm.measurablesByCategoryThenExternalId[vm.visibility.tab][extId];
         if (measurable) {
             b.block.onclick = () => $state.go('main.measurable.view', { id: measurable.id });
             angular.element(b.block).addClass('clickable');
