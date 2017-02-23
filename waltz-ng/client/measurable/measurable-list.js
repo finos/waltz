@@ -17,6 +17,7 @@
  */
 import _ from 'lodash';
 import {initialiseData} from '../common';
+import {nest} from "d3-collection";
 
 
 const initialState = {
@@ -57,11 +58,6 @@ function findFirstNonEmptyTab(tabs = []) {
 }
 
 
-function mkMeasurableKey(categoryId, externalId) {
-    return categoryId + "_" + externalId;
-}
-
-
 function controller($q,
                     $state,
                     $stateParams,
@@ -86,7 +82,11 @@ function controller($q,
     $q.all([measurablePromise, measurableCategoryPromise, countPromise])
         .then(([measurables = [], categories = [], counts = []]) => {
             vm.tabs = prepareTabs(categories, measurables, counts);
-            vm.measurablesByCategoryAndExternalId = _.keyBy(measurables, m => mkMeasurableKey(m.categoryId, m.externalId));
+            vm.measurablesByCategoryAndExternalId = nest()
+                .key(d => d.categoryId)
+                .key(d => d.externalId)
+                .rollup(vs => vs[0] || undefined)
+                .object(measurables);
             vm.visibility.tab = $stateParams.category || findFirstNonEmptyTab(vm.tabs);
         });
 
@@ -103,7 +103,7 @@ function controller($q,
 
     vm.blockProcessor = b => {
         const extId = b.value;
-        const measurable = vm.measurablesByCategoryAndExternalId[mkMeasurableKey(vm.visibility.tab, extId)];
+        const measurable = vm.measurablesByCategoryAndExternalId[vm.visibility.tab][extId];
         if (measurable) {
             b.block.onclick = () => $state.go('main.measurable.view', { id: measurable.id });
             angular.element(b.block).addClass('clickable');
