@@ -85,7 +85,7 @@ function controller($q,
             vm.measurablesByCategoryAndExternalId = nest()
                 .key(d => d.categoryId)
                 .key(d => d.externalId)
-                .rollup(vs => vs[0] || undefined)
+                .rollup(vs => vs[0])
                 .object(measurables);
             vm.visibility.tab = $stateParams.category || findFirstNonEmptyTab(vm.tabs);
         });
