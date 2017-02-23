@@ -36,6 +36,7 @@ const template = require('./measurable-rating-panel.html');
 
 const bindings = {
     category: '<',
+    entityReference: '<',
     ratings: '<',
     measurables: '<',
     perspectiveDefinitions: '<',

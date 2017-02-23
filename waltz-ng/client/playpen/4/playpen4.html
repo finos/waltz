@@ -10,33 +10,34 @@
     </waltz-page-header>
 
 
+    <style>
+        .side-scroller {
+            overflow-y: hidden;
+            overflow-x: auto;
+        }
+    </style>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
 
-        <div class="row">
-            <div class="col-sm-12">
-                <waltz-perspective-editor perspective-definition="ctrl.perspectiveDefinition"
-                                          measurables="ctrl.measurables"
-                                          measurable-ratings="ctrl.measurableRatings"
-                                          perspective-ratings="ctrl.perspectiveRatings"
-                                          on-save="ctrl.save">
-                </waltz-perspective-editor>
-            </div>
-        </div>
-
+        blah blah
     </div>
 
     <br>
 
-    <waltz-section>
-        <waltz-perspective-grid existing-overrides="ctrl.perspectiveOverrides"
-                                pending-overrides="[]"
-                                perspective-definition="ctrl.perspectiveDefinition"
-                                measurables="ctrl.measurables"
-                                measurable-ratings="ctrl.measurableRatings">
-        </waltz-perspective-grid>
+    <waltz-section name="{{pb.definition.name}}"
+                   id=""
+                   ng-repeat="pb in ctrl.perspectiveBlocks | orderBy:'name'">
+        <p ng-bind="pb.definition.description"></p>
 
-        <pre>{{ ctrl.perspectiveRatings | json }}</pre>
+        <div class="side-scroller">
+            <waltz-perspective-grid existing-overrides="pb.overrides"
+                                    pending-overrides="[]"
+                                    perspective-definition="pb.definition"
+                                    measurables="ctrl.measurables"
+                                    measurable-ratings="ctrl.measurableRatings">
+            </waltz-perspective-grid>
+        </div>
+
     </waltz-section>
 
 

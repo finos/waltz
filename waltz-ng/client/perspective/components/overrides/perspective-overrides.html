@@ -2,8 +2,14 @@
     <p class="small text-muted">
         Overrides show how a particular rating may change when viewed in conjunction with another aspect
         of this application.
+        <a ui-sref="main.perspective.rating ({
+                        entityKind: $ctrl.entityReference.kind,
+                        entityId: $ctrl.entityReference.id
+                    })"
+           class="clickable">
+            More &raquo;
+        </a>
     </p>
-
     <ul class="list-unstyled">
         <li ng-repeat="r in $ctrl.overrideNest">
             <waltz-rating-indicator-cell label="$ctrl.ragNames[r.key]"

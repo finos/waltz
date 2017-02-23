@@ -15,27 +15,25 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import _ from 'lodash';
-import {mkOverrides} from '../../perspective/perpective-utilities';
-
-
-const initialState = {
-
-};
+import template from './perspective-rating-view.html';
+import {mkOverrides} from './perpective-utilities';
 
 
 function controller($q,
                     $stateParams,
-                    perspectiveDefinitionStore,
-                    perspectiveRatingStore,
+                    applicationStore,
                     measurableStore,
-                    measurableRatingStore) {
+                    measurableRatingStore,
+                    perspectiveDefinitionStore,
+                    perspectiveRatingStore) {
 
-    const vm = Object.assign(this, initialState);
+    const vm = this;
 
     const entityReference = {
-        id: $stateParams.id,
-        kind: 'APPLICATION'
+        id: $stateParams.entityId,
+        kind: $stateParams.entityKind
     };
 
     const idSelector = {
@@ -50,12 +48,18 @@ function controller($q,
         });
 
 
+    applicationStore
+        .getById(entityReference.id)
+        .then(app => {
+            vm.application = app;
+            vm.entityReference = Object.assign({}, entityReference, { name: app.name });
+        });
+
     const ratingPromise = perspectiveRatingStore
         .findForEntity(entityReference)
         .then(rs => {
             vm.perspectiveRatings = rs;
         });
-
 
     const measurablePromise = measurableStore
         .findMeasurablesBySelector(idSelector)
@@ -65,9 +69,7 @@ function controller($q,
         .findByAppSelector(idSelector)
         .then(ratings => vm.measurableRatings = ratings);
 
-    defnPromise
-        .then(() => ratingPromise)
-        .then(() => measurablePromise)
+    $q.all([ratingPromise, measurablePromise, defnPromise])
         .then(() => {
             vm.perspectiveBlocks = _
                 .chain(vm.perspectives)
@@ -94,27 +96,25 @@ function controller($q,
         })
 
 
-
 }
+
 
 
 controller.$inject = [
     '$q',
     '$stateParams',
-    'PerspectiveDefinitionStore',
-    'PerspectiveRatingStore',
+    'ApplicationStore',
     'MeasurableStore',
-    'MeasurableRatingStore'
+    'MeasurableRatingStore',
+    'PerspectiveDefinitionStore',
+    'PerspectiveRatingStore'
 ];
 
 
-const view = {
-    template: require('./playpen4.html'),
+const page = {
     controller,
     controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
+    template
 };
 
-
-export default view;
+export default page;
