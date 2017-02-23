@@ -47,7 +47,6 @@ function controller($q,
             vm.perspectives = ps;
         });
 
-
     applicationStore
         .getById(entityReference.id)
         .then(app => {
@@ -93,11 +92,9 @@ function controller($q,
                     return result;
                 })
                 .value();
-        })
-
+        });
 
 }
-
 
 
 controller.$inject = [
@@ -116,5 +113,6 @@ const page = {
     controllerAs: 'ctrl',
     template
 };
+
 
 export default page;
