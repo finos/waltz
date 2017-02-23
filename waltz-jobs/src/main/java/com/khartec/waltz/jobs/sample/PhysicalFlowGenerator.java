@@ -117,6 +117,7 @@ public class PhysicalFlowGenerator {
                     record.setBasisOffset(randomPick(newArrayList(0, 0, 0, 0, 1, 1, 2, -1)));
                     record.setTransport(ArrayUtilities.randomPick(TransportKind.values()).name());
                     record.setFrequency(ArrayUtilities.randomPick(FrequencyKind.values()).name());
+                    record.setLastUpdatedBy("admin");
                     return record;
                 })
                 .collect(Collectors.toList());

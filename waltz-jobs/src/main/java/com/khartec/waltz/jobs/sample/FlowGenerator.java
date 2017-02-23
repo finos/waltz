@@ -97,6 +97,7 @@ public class FlowGenerator {
                             return ImmutableLogicalFlow.builder()
                                     .source(a.toEntityReference())
                                     .target(target)
+                                    .lastUpdatedBy("admin")
                                     .build();
                         }))
                 .collect(toSet());
