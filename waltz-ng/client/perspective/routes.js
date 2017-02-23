@@ -22,13 +22,13 @@ const baseState = {
 
 
 const ratingViewState = {
-    url: '/{perspectiveId:int}/rating/{entityKind:string}/{entityId:int}',
-    views: {'content@': require('./perspective-rating-edit') },
+    url: '/entity/{entityKind:string}/{entityId:int}',
+    views: {'content@': require('./perspective-rating-view') },
 };
 
 
 const ratingEditState = {
-    url: '/edit',
+    url: '/{perspectiveId:int}/edit',
     views: {'content@': require('./perspective-rating-edit') },
 };
 

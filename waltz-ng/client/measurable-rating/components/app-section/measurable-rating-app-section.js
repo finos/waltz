@@ -119,6 +119,12 @@ function controller() {
     };
 
     vm.$onChanges = () => {
+        if (vm.application) {
+            vm.entityReference = {
+                kind: 'APPLICATION',
+                id: vm.application.id
+            };
+        }
         if (vm.perspectiveRatings && vm.measurables) {
             vm.overridesByMeasurableId = mkOverridesMap(vm.perspectiveRatings, vm.measurables);
         }

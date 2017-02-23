@@ -8,7 +8,14 @@
             <li>
                 <waltz-entity-link entity-ref="ctrl.entityReference"></waltz-entity-link>
             </li>
-            <li>Perspective</li>
+            <li>
+                <a ui-sref="main.perspective.rating ({
+                                entityKind: ctrl.entityReference.kind,
+                                entityId: ctrl.entityReference.id
+                           })">
+                    Perspectives
+                </a>
+            </li>
             <li ng-bind="ctrl.perspectiveDefinition.name"></li>
             <li>Edit</li>
         </ol>

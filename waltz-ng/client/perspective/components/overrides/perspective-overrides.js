@@ -16,6 +16,7 @@ const bindings = {
     baseRating: '<',
     ragNames: '<',
     overrides: '<',
+    entityReference: '<',
     perspectiveDefinitions: '<'
 };
 
