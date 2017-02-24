@@ -40,6 +40,13 @@ const initialState = {
 };
 
 
+function calcHasFlows(flowData) {
+    const counts = _.get(flowData, 'stats.flowCounts') || {}
+    const total = _.sum(_.values(counts));
+    return total > 0;
+}
+
+
 function controller() {
     const vm = _.defaultsDeep(this, initialState);
 
@@ -52,6 +59,9 @@ function controller() {
     vm.tableInitialised = (cfg) =>
         vm.export = () => cfg.exportFn('logical-flows.csv');
 
+    vm.$onChanges = c => {
+        vm.hasFlows = calcHasFlows(vm.flowData);
+    }
 }
 
 

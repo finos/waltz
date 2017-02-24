@@ -1,6 +1,19 @@
 <waltz-section name="Related Viewpoints"
                icon="link"
                id="related-measurables">
+
+    <div class="row"
+         ng-if="$ctrl.relatedMeasurables.length < 2">
+        <div class="col-sm-12">
+            <waltz-no-data>
+                <message>
+                    <strong>No related viewpoints found.</strong>
+                </message>
+            </waltz-no-data>
+
+        </div>
+    </div>
+
     <div class="row"
          ng-if="$ctrl.relatedMeasurables.length > 1">
         <div class="col-sm-7">
@@ -32,18 +45,7 @@
     </div>
 
     <div class="row"
-         ng-if="$ctrl.relatedMeasurables.length < 2">
-        <div class="col-sm-12">
-            <waltz-no-data>
-                <message>
-                    <strong>No related viewpoints found.</strong>
-                </message>
-            </waltz-no-data>
-
-        </div>
-    </div>
-
-    <div class="row">
+         ng-if="$ctrl.relatedMeasurables.length > 1">
         <div class="col-sm-12">
             <br>
             <p class="text-muted small">

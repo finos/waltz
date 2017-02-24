@@ -21,13 +21,23 @@
                                    entities="['LOGICAL_DATA_FLOW']">
         </waltz-source-data-overlay>
 
-        <waltz-logical-flows-tabgroup flow-data="$ctrl.flowData"
-                                      on-load-detail="$ctrl.onLoadDetail"
-                                      applications="$ctrl.applications"
-                                      options="$ctrl.flowOptions"
-                                      options-visible="$ctrl.visibility.flowConfigOverlay"
-                                      on-tab-change="$ctrl.tabChanged"
-                                      on-table-initialise="$ctrl.tableInitialised">
-        </waltz-logical-flows-tabgroup>
+        <div ng-if="$ctrl.hasFlows">
+            <waltz-logical-flows-tabgroup flow-data="$ctrl.flowData"
+                                          on-load-detail="$ctrl.onLoadDetail"
+                                          applications="$ctrl.applications"
+                                          options="$ctrl.flowOptions"
+                                          options-visible="$ctrl.visibility.flowConfigOverlay"
+                                          on-tab-change="$ctrl.tabChanged"
+                                          on-table-initialise="$ctrl.tableInitialised">
+            </waltz-logical-flows-tabgroup>
+        </div>
+        <div ng-if="!$ctrl.hasFlows">
+            <waltz-no-data>
+                <message>
+                    <strong>No related flows found.</strong>
+                </message>
+            </waltz-no-data>
+
+        </div>
     </waltz-section>
 </div>

@@ -20,7 +20,20 @@
                                entities="['APP_RATING', 'APP_CAPABILITY']">
     </waltz-source-data-overlay>
 
-    <div class="row">
+    <div class="row"
+         ng-if="$ctrl.applications.length === 0">
+        <div class="col-sm-12">
+            <waltz-no-data>
+                <message>
+                    <strong>No applications have been rated against this viewpoint.</strong>
+                </message>
+            </waltz-no-data>
+
+        </div>
+    </div>
+
+    <div class="row"
+         ng-if="$ctrl.applications.length > 0">
         <div class="col-sm-3">
             <div style="text-align: center">
                 <waltz-pie data="$ctrl.pie.data"
