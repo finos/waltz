@@ -14,7 +14,15 @@
                                    entities="['ASSET_COST']">
         </waltz-source-data-overlay>
 
-        <uib-tabset>
+        <div ng-if="$ctrl.costView.total.amount === 0">
+            <waltz-no-data>
+                <message>
+                    <strong>No associated costs found.</strong>
+                </message>
+            </waltz-no-data>
+        </div>
+
+        <uib-tabset ng-if="$ctrl.costView.total.amount > 0">
             <!-- TOP 10 -->
             <uib-tab select="$ctrl.showSummary()">
                 <uib-tab-heading>
