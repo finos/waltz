@@ -29,7 +29,7 @@ const bindings = {
 };
 
 
-const template = require('./survey-instance-list.html');
+const template = require('./survey-section.html');
 
 function mkGridData(surveyRuns = [], surveyInstances = []) {
     const runsById = _.keyBy(surveyRuns, 'id');

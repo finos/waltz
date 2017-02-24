@@ -225,7 +225,7 @@ function controller($animate, $scope, uiGridConstants) {
     vm.hasAnyData = () => {
         const hasSoftware = perhaps(() => vm.softwareCatalog.packages.length > 0, false);
         const hasServers = perhaps(() => vm.servers.length > 0, false);
-        const hasDatabases = false;
+        const hasDatabases = perhaps(() => vm.databases.length > 0, false);
 
         return hasSoftware || hasServers || hasDatabases;
     }
