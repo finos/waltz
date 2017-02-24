@@ -124,7 +124,7 @@ const variableColorList = [
             'LATE',
             'BAD',
             'END_OF_LIFE',
-            'Non PaaS'
+            'NON PAAS'
         ]
     }, {
         color: green,
@@ -144,7 +144,7 @@ const variableColorList = [
             'GREEN',
             'GOOD',
             'NOT_END_OF_LIFE',
-            'PaaS'
+            'PAAS'
         ]
     }, {
         color: amber,
@@ -173,7 +173,7 @@ const variableColorList = [
             'NOT_STARTED',
             'BLUE',
             'MEDIUM',
-            'Virtual'
+            'VIRTUAL'
         ]
     }, {
         color: blue.darker(),
@@ -204,7 +204,7 @@ const variableColorList = [
             'NA',
             'NOT_APPLICABLE',
             'MEH',
-            'Physical'
+            'PHYSICAL'
         ]
     }
 ];
