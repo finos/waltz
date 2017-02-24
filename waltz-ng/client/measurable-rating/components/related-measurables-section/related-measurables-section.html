@@ -1,7 +1,8 @@
 <waltz-section name="Related Viewpoints"
                icon="link"
                id="related-measurables">
-    <div class="row">
+    <div class="row"
+         ng-if="$ctrl.relatedMeasurables.length > 1">
         <div class="col-sm-7">
             <waltz-measurable-ratings-browser rating-tallies="$ctrl.stats"
                                               measurables="$ctrl.relatedMeasurables"
@@ -10,6 +11,7 @@
                                               scroll-height="400">
             </waltz-measurable-ratings-browser>
         </div>
+
         <div class="col-sm-5">
             <div ng-if="$ctrl.selectedMeasurable"
                  class="waltz-fade-if"
@@ -26,6 +28,18 @@
                     More &raquo;
                 </a>
             </div>
+        </div>
+    </div>
+
+    <div class="row"
+         ng-if="$ctrl.relatedMeasurables.length < 2">
+        <div class="col-sm-12">
+            <waltz-no-data>
+                <message>
+                    <strong>No related viewpoints found.</strong>
+                </message>
+            </waltz-no-data>
+
         </div>
     </div>
 
