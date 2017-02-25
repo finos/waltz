@@ -36,7 +36,7 @@ function controller() {
     vm.data = [
         { key: 'A', count: 10 },
         { key: 'B', count: 5 },
-        { key: 'C', count: 5000 },
+        { key: 'C', count: 50 },
     ];
 }
 

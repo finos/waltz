@@ -43,7 +43,7 @@ const bindings = {
 const defaultOnSelect = (d) => console.log("pie.onSelect default handler: ", d);
 
 
-const DEFAULT_SIZE = 70;
+const DEFAULT_SIZE = 80;
 
 
 function renderArcs(holder, config, data, onSelect) {
@@ -58,8 +58,11 @@ function renderArcs(holder, config, data, onSelect) {
     const radius = size / 2;
 
     const pieArc = arc()
-        .outerRadius(radius - 10)
-        .innerRadius(0);
+            .outerRadius(radius - 10)
+            .innerRadius(radius / 2.5)
+            .padAngle(0.07)
+            .cornerRadius(0)
+            ;
 
     const pieLayout = pie()
         .value(valueProvider);
