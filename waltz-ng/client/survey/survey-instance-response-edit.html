@@ -51,6 +51,15 @@
                 </waltz-from-now>
             </div>
         </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-4 waltz-display-field-label">
+                Contact Email
+            </div>
+            <div class="col-sm-8">
+                <a href="mailto:{{ctrl.surveyRun.contactEmail}}?Subject=RE: {{ctrl.surveyRun.name}}" ng-bind="ctrl.surveyRun.contactEmail"></a>
+            </div>
+        </div>
     </div>
 
     <br>
