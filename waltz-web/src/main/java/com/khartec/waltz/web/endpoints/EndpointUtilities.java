@@ -82,8 +82,6 @@ public class EndpointUtilities {
     }
 
 
-
-
     // -- helpers ---
 
     private static <T> Route wrapListHandler(ListRoute<T> handler) {

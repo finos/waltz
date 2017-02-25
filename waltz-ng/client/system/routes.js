@@ -71,6 +71,12 @@ const perspectivesState = {
 };
 
 
+const staticPanelsState = {
+    url: '/static-panels',
+    views: { 'content@': require('./static-panels-view') }
+};
+
+
 function setupRoutes($stateProvider) {
     $stateProvider
         .state('main.system', baseState)
@@ -79,8 +85,9 @@ function setupRoutes($stateProvider) {
         .state('main.system.hierarchies', hierarchiesState)
         .state('main.system.orphans', orphansState)
         .state('main.system.actors', actorsState)
-        .state('main.system.involvementKinds', involvementKindsState)
+        .state('main.system.involvement-kinds', involvementKindsState)
         .state('main.system.perspectives', perspectivesState)
+        .state('main.system.static-panels', staticPanelsState)
         .state('main.system.recalculate', recalculateState);
 }
 

@@ -23,13 +23,25 @@ function service($http, base) {
         return $http
             .get(`${baseUrl}/group`, {params: {group: groups}})
             .then(r => r.data);
-    }
+    };
+
+    const findAll = () =>
+        $http
+            .get(baseUrl)
+            .then(r => r.data);
 
     const findByGroup = (group) => findByGroups([group]);
 
+    const save = (p) =>
+        $http
+            .post(baseUrl, p)
+            .then(r => r.data);
+
     return {
+        findAll,
         findByGroup,
-        findByGroups
+        findByGroups,
+        save
     };
 }
 

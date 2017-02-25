@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static com.khartec.waltz.schema.tables.StaticPanel.STATIC_PANEL;
 
@@ -53,6 +54,23 @@ public class StaticPanelDao {
     };
 
 
+    private static final Function<StaticPanel, StaticPanelRecord> TO_RECORD_MAPPER = panel -> {
+        StaticPanelRecord record = new StaticPanelRecord();
+
+        panel.id().ifPresent(id -> record.setId(id));
+
+        record.setContent(panel.content());
+        record.setTitle(panel.title());
+        record.setWidth(panel.width());
+        record.setPriority(panel.priority());
+        record.setGroup(panel.group());
+        record.setIcon(panel.icon());
+        record.setEncoding(panel.encoding().name());
+
+        return record;
+    };
+
+
     @Autowired
     public StaticPanelDao(DSLContext dsl) {
         this.dsl = dsl;
@@ -60,10 +78,29 @@ public class StaticPanelDao {
 
 
     public List<StaticPanel> findByGroups(String... groups) {
-        return dsl.select(STATIC_PANEL.fields())
-                .from(STATIC_PANEL)
+        return dsl
+                .selectFrom(STATIC_PANEL)
                 .where(STATIC_PANEL.GROUP.in(groups))
                 .orderBy(STATIC_PANEL.PRIORITY.asc())
                 .fetch(panelMapper);
+    }
+
+
+    public List<StaticPanel> findAll() {
+        return dsl
+                .selectFrom(STATIC_PANEL)
+                .fetch(panelMapper);
+    }
+
+
+    public boolean update(StaticPanel panel) {
+        StaticPanelRecord record = TO_RECORD_MAPPER.apply(panel);
+        return dsl.executeUpdate(record) == 1;
+    }
+
+
+    public boolean create(StaticPanel panel) {
+        StaticPanelRecord record = TO_RECORD_MAPPER.apply(panel);
+        return dsl.executeInsert(record) == 1;
     }
 }

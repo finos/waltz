@@ -45,4 +45,17 @@ public class StaticPanelService {
         if (ArrayUtilities.isEmpty(groups)) return Collections.emptyList();
         return staticPanelDao.findByGroups(groups);
     }
+
+
+    public List<StaticPanel> findAll() {
+        return staticPanelDao.findAll();
+    }
+
+
+    public boolean save(StaticPanel panel) {
+        return panel.id().isPresent()
+                ? staticPanelDao.update(panel)
+                : staticPanelDao.create(panel);
+    }
+
 }
