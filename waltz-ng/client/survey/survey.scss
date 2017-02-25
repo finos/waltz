@@ -1,17 +1,20 @@
-.survey-form {
+$invalid-color: #f0ad4e;
+
+
+.waltz-survey-form {
     input.ng-invalid {
-        border-color: #f0ad4e;
+        border-color: $invalid-color;
     }
 
     input[type=radio].ng-invalid {
-        outline: 1px dashed #f0ad4e;
+        outline: 1px dashed $invalid-color;
     }
 
     textarea.ng-invalid {
-        border-color: #f0ad4e;
+        border-color: $invalid-color;
     }
 
     select.ng-invalid {
-        border-color: #f0ad4e;
+        border-color: $invalid-color;
     }
 }
