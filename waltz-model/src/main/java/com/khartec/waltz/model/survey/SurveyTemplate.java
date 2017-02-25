@@ -17,6 +17,16 @@ public abstract class SurveyTemplate implements IdProvider, NameProvider, Descri
 
     public abstract EntityKind targetEntityKind();
     public abstract Long ownerId();
-    public abstract LocalDateTime createdAt();
-    public abstract SurveyTemplateStatus status();
+
+
+    @Value.Default
+    public LocalDateTime createdAt() {
+        return LocalDateTime.now();
+    }
+
+
+    @Value.Default
+    public SurveyTemplateStatus status() {
+        return SurveyTemplateStatus.ACTIVE;
+    }
 }

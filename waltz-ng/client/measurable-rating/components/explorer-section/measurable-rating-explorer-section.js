@@ -68,6 +68,7 @@ function preparePie(ratings = [],
         selectedSegmentKey: null,
         data,
         config: {
+            size: 130,
             onSelect,
             colorProvider: (d) => ragColorScale(d.data.key),
             labelProvider: (d) => ragNames[d.key] || d.key
