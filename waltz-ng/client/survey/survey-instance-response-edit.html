@@ -63,9 +63,10 @@
     </div>
 
     <br>
-    <waltz-section name="Responses" ng-if="ctrl.isUserInstanceRecipient && ctrl.instanceCanBeEdited">
-        <form name="surveyResponseForm"
-              class="form-horizontal survey-form"
+    <waltz-section name="Responses"
+                   ng-if="ctrl.isUserInstanceRecipient && ctrl.instanceCanBeEdited">
+        <form name="ctrl.surveyResponseForm"
+              class="form-horizontal waltz-survey-form"
               role="form"
               novalidate>
             <div ng-repeat="groupedQuestion in ctrl.surveyQuestions">
@@ -104,6 +105,7 @@
                         <input ng-switch-when="NUMBER"
                                type="number"
                                id="{{ question.id }}"
+                               placeholder="please enter a number"
                                ng-model="ctrl.surveyResponses[question.id].numberResponse"
                                ng-required="question.isMandatory"
                                ng-blur="ctrl.saveResponse(question.id)"
