@@ -42,6 +42,12 @@ const runCreateState = {
 };
 
 
+const runViewState = {
+    url: '/run/{id:int}',
+    views: {'content@': require('./survey-run-view')}
+};
+
+
 const instanceUserState = {
     url: '/user',
     views: {'content@': require('./survey-instance-list-user-view')}
@@ -77,6 +83,7 @@ function setup($stateProvider) {
         .state('main.survey', baseState)
         .state('main.survey.run', runBaseState)
         .state('main.survey.run.create', runCreateState)
+        .state('main.survey.run.view', runViewState)
         .state('main.survey.instance', instanceBaseState)
         .state('main.survey.instance.user', instanceUserState)
         .state('main.survey.instance.edit', instanceEditState)

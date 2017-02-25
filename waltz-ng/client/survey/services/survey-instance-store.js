@@ -40,6 +40,12 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const findForSurveyRun = (id) => {
+        return $http
+            .get(`${base}/run/${id}`)
+            .then(result => result.data);
+    };
+
     const findRecipients = (id) => {
         return $http
             .get(`${base}/${id}/recipients`)
@@ -68,6 +74,7 @@ function store($http, baseApiUrl) {
         getById,
         findByEntityReference,
         findForUser,
+        findForSurveyRun,
         findRecipients,
         findResponses,
         saveResponse,

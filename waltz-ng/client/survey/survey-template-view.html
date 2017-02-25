@@ -1,56 +1,19 @@
 <div>
     <waltz-page-header icon="wpforms"
-                       name="Survey Templates">
+                       name="{{ ctrl.template.name }}"
+                       small="Survey Template">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main">Survey</a></li>
+            <li><a ui-sref="main.survey.instance.user">Survey</a></li>
             <li><a ui-sref="main.survey.template.list">Templates</a></li>
             <li>Templates</li>
         </ol>
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <div class="row">
-            <div class="col-sm-2 waltz-display-field-label">
-                Template Name
-            </div>
-            <div class="col-sm-10">
-                <span ng-bind="ctrl.template.name"></span>
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-sm-2 waltz-display-field-label">
-                Description
-            </div>
-            <div class="col-sm-10">
-                <span ng-bind="ctrl.template.description"></span>
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-sm-2 waltz-display-field-label">
-                Owner
-            </div>
-            <div class="col-sm-4">
-                <span ng-bind="ctrl.people[ctrl.template.ownerId].displayName"></span>
-            </div>
-            <div class="col-sm-2 waltz-display-field-label">
-                Created
-            </div>
-            <div class="col-sm-4">
-                <waltz-from-now timestamp="ctrl.template.createdAt"></waltz-from-now>
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-sm-2 waltz-display-field-label">
-                Status
-            </div>
-            <div class="col-sm-10">
-                <span ng-bind="ctrl.template.status | toDisplayName:'surveyTemplateStatus'"></span>
-            </div>
-        </div>
+        <waltz-survey-template-overview template="ctrl.template"
+                                        people="ctrl.people">
+        </waltz-survey-template-overview>
     </div>
 
     <br>
@@ -86,7 +49,11 @@
                 </tr>
                 </thead>
                 <tr ng-repeat="r in ctrl.surveyRuns">
-                    <td><span ng-bind="r.name"></span></td>
+                    <td>
+                        <a ng-bind="r.name"
+                           class="clickable"
+                           ui-sref="main.survey.run.view ({id: r.id})"></a>
+                    </td>
                     <td><span ng-bind="r.status | toDisplayName:'surveyRunStatus'"></span></td>
                     <td><span ng-bind="r.contactEmail"></span></td>
                     <td><waltz-from-now timestamp="r.issuedOn"></waltz-from-now></td>

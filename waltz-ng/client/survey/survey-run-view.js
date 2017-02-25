@@ -16,57 +16,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import template from './survey-run-view.html';
 
 
 function controller($stateParams,
-                    personStore,
+                    surveyInstanceStore,
                     surveyRunStore,
                     surveyTemplateStore) {
-    const templateId = $stateParams.id;
 
+    const id = $stateParams.id;
     const vm = this;
 
-    vm.people = [];
-
-    surveyTemplateStore
-        .getById(templateId)
-        .then(t => vm.template = t)
-        .then(t => personStore.getById(t.ownerId))
-        .then(p => vm.people = _.union(vm.people, [p]));
-
     surveyRunStore
-        .findByTemplateId(templateId)
-        .then(rs => {
-            vm.surveyRuns = rs;
-            _.chain(rs)
-                .map('ownerId')
-                .uniq()
-                .value()
-                .forEach(personId => personStore
-                    .getById(personId)
-                    .then(p => {
-                        if (p) {
-                            vm.people = _.union(vm.people, [p]);
-                        }
-                    }));
-        });
+        .getById(id)
+        .then(sr => {
+            vm.surveyRun = sr;
+            return surveyTemplateStore
+                .getById(sr.surveyTemplateId);
+        })
+        .then(t => vm.surveyTemplate = t);
+
+    surveyInstanceStore
+        .findForSurveyRun(id)
+        .then(xs => vm.surveyInstances = xs);
+
 
 }
 
-
 controller.$inject = [
     '$stateParams',
-    'PersonStore',
+    'SurveyInstanceStore',
     'SurveyRunStore',
-    'SurveyTemplateStore'
+    'SurveyTemplateStore',
 ];
 
 
 const page = {
+    template,
     controller,
-    controllerAs: 'ctrl',
-    template: require('./survey-template-view.html')
+    controllerAs: 'ctrl'
 };
 
 
