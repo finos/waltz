@@ -21,3 +21,16 @@ FROM measurable_rating mr
 WHERE
   m.measurable_kind = 'PROCESS'
 ;
+
+
+
+--[SURVEYS]---
+
+-- remove all
+DELETE FROM survey_instance;
+DELETE FROM survey_instance_recipient;
+DELETE FROM survey_question_response;
+DELETE FROM survey_run;
+DELETE FROM survey_question;
+DELETE FROM survey_template;
+

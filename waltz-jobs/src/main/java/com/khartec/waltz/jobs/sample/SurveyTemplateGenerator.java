@@ -2,147 +2,156 @@ package com.khartec.waltz.jobs.sample;
 
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.survey.SurveyQuestionFieldType;
-import com.khartec.waltz.model.survey.SurveyTemplateStatus;
-import com.khartec.waltz.schema.tables.Person;
-import com.khartec.waltz.schema.tables.records.PersonRecord;
-import com.khartec.waltz.schema.tables.records.SurveyQuestionRecord;
-import com.khartec.waltz.schema.tables.records.SurveyTemplateRecord;
+import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.survey.SurveyQuestionService;
+import com.khartec.waltz.service.survey.SurveyTemplateService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.supercsv.io.CsvListReader;
-import org.supercsv.prefs.CsvPreference;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.Tables.SURVEY_QUESTION;
-import static com.khartec.waltz.schema.Tables.SURVEY_TEMPLATE;
-import static java.lang.ClassLoader.getSystemClassLoader;
-import static java.util.Comparator.comparing;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.schema.tables.Person.PERSON;
+import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
+import static com.khartec.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
 
 /**
  * Generates random survey templates and associated questions
  */
 public class SurveyTemplateGenerator {
-    private final static int MIN_QUESTIONS_PER_SURVEY   = 10;
-    private final static int MAX_QUESTIONS_PER_SURVEY   = 40;
-
-    private static final Random random = new Random();
-
 
     public static void main(String[] args) {
 
         try {
-            final List<List<String>> csvTemplates = readFromCsv("surveys.csv");
-            final List<List<String>> csvQuestions = readFromCsv("questions.csv");
 
-            final AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-            final DSLContext dsl = ctx.getBean(DSLContext.class);
+            AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+            DSLContext dsl = ctx.getBean(DSLContext.class);
+            SurveyTemplateService surveyTemplateService = ctx.getBean(SurveyTemplateService.class);
+            SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
 
-            List<Long> ownerIds = dsl.selectFrom(Person.PERSON)
-                    .limit(csvTemplates.size())
-                    .fetch()
-                    .map(PersonRecord::getId);
+            dsl.deleteFrom(SURVEY_TEMPLATE).execute();
+            dsl.deleteFrom(SURVEY_QUESTION).execute();
 
-            csvTemplates.forEach(template -> {
-                SurveyTemplateRecord surveyTemplateRecord = dsl.newRecord(SURVEY_TEMPLATE);
-                surveyTemplateRecord.setName(template.get(0));
-                surveyTemplateRecord.setDescription(template.get(1));
-                surveyTemplateRecord.setTargetEntityKind(getRandomEntityKind().name());
-                surveyTemplateRecord.setOwnerId(ownerIds.get(random.nextInt(ownerIds.size())));
-                surveyTemplateRecord.setStatus(SurveyTemplateStatus.ACTIVE.name());
+            Long ownerId = dsl
+                    .select(PERSON.ID)
+                    .from(PERSON)
+                    .limit(1)
+                    .fetchOne(PERSON.ID);
 
-                surveyTemplateRecord.store();
-                Long surveyTemplateId = surveyTemplateRecord.getId();
+            SurveyTemplate appSurvey = mkAppSurvey(ownerId);
+            long aid = surveyTemplateService.create("admin", appSurvey);
+            List<SurveyQuestion> appQs = mkAppQuestions(aid);
+            appQs.forEach(surveyQuestionService::create);
 
-                List<SurveyQuestionRecord> surveyQuestionRecords = generateSurveyQuestions(
-                        dsl, surveyTemplateId, csvQuestions);
+            SurveyTemplate projectSurvey = mkProjectSurvey(ownerId);
+            long pid = surveyTemplateService.create("admin", projectSurvey);
+            List<SurveyQuestion> projQs = mkProjQuestions(pid);
+            projQs.forEach(surveyQuestionService::create);
 
-                dsl.batchInsert(surveyQuestionRecords).execute();
-            });
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 
-    private static List<SurveyQuestionRecord> generateSurveyQuestions(DSLContext dsl,
-                                                                      long surveyTemplateId,
-                                                                      List<List<String>> questions) {
-        int numOfQuestions = random.nextInt(
-                MAX_QUESTIONS_PER_SURVEY - MIN_QUESTIONS_PER_SURVEY) + MIN_QUESTIONS_PER_SURVEY;
 
-        final AtomicInteger position = new AtomicInteger(1);
 
-        return random.ints(numOfQuestions, 0, questions.size())
-                .mapToObj(questions::get)
-                .sorted(comparing(q -> q.get(0)))    // section
-                .map(q -> {
-                    if (q.size() < 3) {
-                        System.out.print(q);
-                    }
-                    SurveyQuestionRecord surveyQuestionRecord = dsl.newRecord(SURVEY_QUESTION);
-                    surveyQuestionRecord.setAllowComment(random.nextBoolean());
-                    surveyQuestionRecord.setFieldType(getRandomFieldType().name());
-                    if (random.nextBoolean()) {
-                        surveyQuestionRecord.setHelpText(q.get(2));     // help
-                    }
-                    surveyQuestionRecord.setIsMandatory(random.nextBoolean());
-                    surveyQuestionRecord.setQuestionText(q.get(1));     // question
-                    surveyQuestionRecord.setSectionName(q.get(0));      // section
-                    surveyQuestionRecord.setSurveyTemplateId(surveyTemplateId);
-                    surveyQuestionRecord.setPosition(position.getAndIncrement());
-                    return surveyQuestionRecord;
-                })
-                .collect(Collectors.toList());
+    private static SurveyTemplate mkAppSurvey(Long ownerId) {
+        SurveyTemplate appSurvey = ImmutableSurveyTemplate.builder()
+                .name("App Survey")
+                .description("Questions about your application")
+                .targetEntityKind(EntityKind.APPLICATION)
+                .ownerId(ownerId)
+                .build();
 
+        return appSurvey;
     }
 
 
-    private static SurveyQuestionFieldType getRandomFieldType() {
-        SurveyQuestionFieldType[] allTypes = SurveyQuestionFieldType.values();
-        return allTypes[random.nextInt(allTypes.length)];
+    private static List<SurveyQuestion> mkAppQuestions(long templateId) {
+        return newArrayList(
+                ImmutableSurveyQuestion
+                        .builder()
+                        .questionText("Is your app accessible via a browser")
+                        .helpText("IE11, Chrome, FFox etc")
+                        .isMandatory(true)
+                        .fieldType(SurveyQuestionFieldType.BOOLEAN)
+                        .surveyTemplateId(templateId)
+                        .build(),
+                ImmutableSurveyQuestion
+                        .builder()
+                        .questionText("What percentage of your code base has tests")
+                        .helpText("Approximation is fine (0-100)")
+                        .isMandatory(true)
+                        .allowComment(true)
+                        .surveyTemplateId(templateId)
+                        .fieldType(SurveyQuestionFieldType.NUMBER)
+                        .build(),
+                ImmutableSurveyQuestion
+                        .builder()
+                        .questionText("What is the primary goal for the next release")
+                        .isMandatory(true)
+                        .surveyTemplateId(templateId)
+                        .fieldType(SurveyQuestionFieldType.TEXTAREA)
+                        .build(),
+                ImmutableSurveyQuestion
+                        .builder()
+                        .questionText("Who is your primary customer")
+                        .surveyTemplateId(templateId)
+                        .fieldType(SurveyQuestionFieldType.TEXT)
+                        .build()
+        );
     }
 
 
-    private static EntityKind getRandomEntityKind() {
-        final EntityKind[] possibleEntityKinds = {EntityKind.APPLICATION, EntityKind.CHANGE_INITIATIVE};
-        return possibleEntityKinds[random.nextInt(possibleEntityKinds.length)];
+    private static SurveyTemplate mkProjectSurvey(Long ownerId) {
+        return ImmutableSurveyTemplate.builder()
+                .name("Programme Survey")
+                .description("Questions about your programme governance")
+                .targetEntityKind(EntityKind.CHANGE_INITIATIVE)
+                .ownerId(ownerId)
+                .build();
     }
 
 
-    private static List<List<String>> readFromCsv(String filename) throws IOException, URISyntaxException {
-        URL classPathResource = getSystemClassLoader().getResource(filename);
-        if (classPathResource == null) {
-            throw new FileNotFoundException(filename);
-        }
+    private static List<SurveyQuestion> mkProjQuestions(long templateId) {
 
-        Path filePath = Paths.get(classPathResource.toURI());
-        try (CsvListReader csvReader = new CsvListReader(Files.newBufferedReader(filePath), CsvPreference.STANDARD_PREFERENCE)) {
-
-            csvReader.getHeader(true);  // skip header
-
-            final List<List<String>> rows = new ArrayList<>();
-            List<String> colValues;
-            while ((colValues = csvReader.read()) != null) {
-                rows.add(colValues);
-            }
-
-            return rows;
-        }
+        return newArrayList(
+                ImmutableSurveyQuestion
+                        .builder()
+                        .questionText("Does this program change operational risk ?")
+                        .helpText("If yes add a comment")
+                        .isMandatory(true)
+                        .surveyTemplateId(templateId)
+                        .allowComment(true)
+                        .fieldType(SurveyQuestionFieldType.BOOLEAN)
+                        .build(),
+                ImmutableSurveyQuestion
+                        .builder()
+                        .questionText("How many months will this programme take to implement?")
+                        .allowComment(true)
+                        .isMandatory(true)
+                        .surveyTemplateId(templateId)
+                        .fieldType(SurveyQuestionFieldType.NUMBER)
+                        .build(),
+                ImmutableSurveyQuestion
+                        .builder()
+                        .questionText("What steps have you taken to ensure compliance with policies?")
+                        .isMandatory(true)
+                        .surveyTemplateId(templateId)
+                        .fieldType(SurveyQuestionFieldType.TEXTAREA)
+                        .build(),
+                ImmutableSurveyQuestion
+                        .builder()
+                        .surveyTemplateId(templateId)
+                        .questionText("Who is the primary stakeholder?")
+                        .fieldType(SurveyQuestionFieldType.TEXT)
+                        .build()
+        );
     }
+
 
 }
 

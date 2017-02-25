@@ -35,6 +35,7 @@ import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
+import static com.khartec.waltz.common.CollectionUtilities.randomPick;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
@@ -199,7 +200,9 @@ public class SurveyRunGenerator {
         surveyRunRecord.setContactEmail(owner.email());
         surveyRunRecord.setSurveyTemplateId(surveyTemplate.id().get());
         surveyRunRecord.setName(String.format("%s %s %s",
-                getRandomElementFromArray(SURVEY_RUN_PREFIXES, random), surveyTemplate.name(), SURVEY_RUN_SUFFIX));
+                ArrayUtilities.randomPick(SURVEY_RUN_PREFIXES),
+                surveyTemplate.name(),
+                SURVEY_RUN_SUFFIX));
         surveyRunRecord.setDescription(surveyTemplate.description());
         surveyRunRecord.setSelectorEntityKind(EntityKind.APP_GROUP.name());
         surveyRunRecord.setSelectorEntityId(appGroups.get(random.nextInt(appGroups.size())).id().get());
@@ -211,7 +214,7 @@ public class SurveyRunGenerator {
                 .map(kind -> kind.id().get().toString())
                 .collect(joining(ID_SEPARATOR)));
 
-        surveyRunRecord.setIssuanceKind(getRandomEnum(SurveyIssuanceKind.class, random).name());
+        surveyRunRecord.setIssuanceKind(ArrayUtilities.randomPick(SurveyIssuanceKind.values()).name());
         LocalDate issuedOn = LocalDate.now().minusDays(random.nextInt(MAX_SURVEY_AGE_IN_DAYS));
         surveyRunRecord.setIssuedOn(java.sql.Date.valueOf(issuedOn));
         LocalDate dueDate = random.nextBoolean()
@@ -248,7 +251,7 @@ public class SurveyRunGenerator {
                     return surveyQuestions.stream()
                             .map(q -> ImmutableSurveyInstanceQuestionResponse.builder()
                                     .surveyInstanceId(surveyInstance.id().get())
-                                    .personId(getRandomElementFromList(instanceRecipients, random).id().get())
+                                    .personId(randomPick(instanceRecipients).id().get())
                                     .questionResponse(mkRandomSurveyQuestionResponse(q, random))
                                     .lastUpdatedAt(nowUtc())
                                     .build());
@@ -269,32 +272,13 @@ public class SurveyRunGenerator {
                         ? Optional.of(Double.valueOf(random.nextInt()))
                         : Optional.empty())
                 .stringResponse((fieldType == SurveyQuestionFieldType.TEXT || fieldType == SurveyQuestionFieldType.TEXTAREA)
-                        ? Optional.of(getRandomElementFromArray(SURVEY_QUESTION_STRING_RESPONSES, random))
+                        ? Optional.of(ArrayUtilities.randomPick(SURVEY_QUESTION_STRING_RESPONSES))
                         : Optional.empty())
                 .comment(random.nextBoolean()
-                        ? Optional.of(getRandomElementFromArray(SURVEY_QUESTION_RESPONSE_COMMENTS, random))
+                        ? Optional.of(ArrayUtilities.randomPick(SURVEY_QUESTION_RESPONSE_COMMENTS))
                         : Optional.empty())
                 .build();
     }
 
 
-    private static <E extends Enum<E>> E getRandomEnum(Class<E> enumClass, Random random) {
-        List<E> values = new ArrayList<E>(EnumSet.allOf(enumClass));
-        checkFalse(isEmpty(values), "No values found for enum " + enumClass.getSimpleName());
-
-        return values.get(random.nextInt(values.size()));
-    }
-
-    private static <T> T getRandomElementFromList(List<T> values, Random random) {
-        checkFalse(isEmpty(values), "values must not be empty");
-
-        return values.get(random.nextInt(values.size()));
-    }
-
-
-    private static <T> T getRandomElementFromArray(T[] values, Random random) {
-        checkFalse(ArrayUtilities.isEmpty(values), "values must not be empty");
-
-        return values[random.nextInt(values.length)];
-    }
 }

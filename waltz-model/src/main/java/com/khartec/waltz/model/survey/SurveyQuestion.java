@@ -18,7 +18,19 @@ public abstract class SurveyQuestion implements IdProvider {
     public abstract Optional<String> helpText();
     public abstract SurveyQuestionFieldType fieldType();
     public abstract Optional<String> sectionName();
-    public abstract Integer position();
-    public abstract Boolean isMandatory();
-    public abstract Boolean allowComment();
+
+    @Value.Default
+    public Integer position() {
+        return 1;
+    }
+
+    @Value.Default
+    public boolean isMandatory() {
+        return false;
+    }
+
+    @Value.Default
+    public Boolean allowComment() {
+        return false;
+    }
 }
