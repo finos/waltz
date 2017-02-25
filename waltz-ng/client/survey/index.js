@@ -26,6 +26,8 @@ export default () => {
     module
         .component('waltzSurveyRunCreateGeneral', require('./components/survey-run-create-general'))
         .component('waltzSurveyRunCreateRecipient', require('./components/survey-run-create-recipient'))
+        .component('waltzSurveyRunOverview', require('./components/survey-run-overview'))
+        .component('waltzSurveyTemplateOverview', require('./components/survey-template-overview'))
         .component('waltzSurveySection', require('./components/survey-section'));
 
     module

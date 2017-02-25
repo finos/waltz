@@ -1,0 +1,45 @@
+<div>
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Run Name
+        </div>
+        <div class="col-sm-10">
+            <span ng-bind="$ctrl.run.name"></span>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Template Name
+        </div>
+        <div class="col-sm-10">
+            <span ng-bind="$ctrl.template.name"></span>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Description
+        </div>
+        <div class="col-sm-10">
+            <span ng-bind="$ctrl.run.description"></span>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Contact
+        </div>
+        <div class="col-sm-4">
+            <span ng-bind="$ctrl.run.contactEmail"></span>
+        </div>
+        <div class="col-sm-2 waltz-display-field-label">
+            Status
+        </div>
+        <div class="col-sm-4">
+            <span ng-bind="$ctrl.run.status | toDisplayName:'surveyRunStatus'"></span>
+        </div>
+    </div>
+
+
+</div>

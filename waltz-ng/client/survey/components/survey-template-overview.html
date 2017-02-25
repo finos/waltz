@@ -1,0 +1,44 @@
+<div>
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Template Name
+        </div>
+        <div class="col-sm-10">
+            <span ng-bind="$ctrl.template.name"></span>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Description
+        </div>
+        <div class="col-sm-10">
+            <span ng-bind="$ctrl.template.description"></span>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Owner
+        </div>
+        <div class="col-sm-4">
+            <span ng-bind="$ctrl.peopleById[$ctrl.template.ownerId].displayName"></span>
+        </div>
+        <div class="col-sm-2 waltz-display-field-label">
+            Created
+        </div>
+        <div class="col-sm-4">
+            <waltz-from-now timestamp="$ctrl.template.createdAt"></waltz-from-now>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Status
+        </div>
+        <div class="col-sm-10">
+            <span ng-bind="$ctrl.template.status | toDisplayName:'surveyTemplateStatus'"></span>
+        </div>
+    </div>
+
+</div>

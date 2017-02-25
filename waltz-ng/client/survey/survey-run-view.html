@@ -1,0 +1,45 @@
+<div>
+    <waltz-page-header icon="wpforms"
+                       name="{{ ctrl.surveyRun.name }}"
+                       small="Survey Run">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.survey.instance.user">Survey</a></li>
+            <li><a ui-sref="main.survey.template.list">Templates</a></li>
+            <li><a ui-sref="main.survey.template.view ({id: ctrl.surveyTemplate.id })"
+                   ng-bind="ctrl.surveyTemplate.name"></a></li>
+            <li>Runs</li>
+            <li ng-bind="ctrl.surveyRun.name"></li>
+        </ol>
+    </waltz-page-header>
+
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-survey-run-overview run="ctrl.surveyRun"
+                                   template="ctrl.surveyTemplate">
+        </waltz-survey-run-overview>
+    </div>
+
+    <br>
+
+    <waltz-section name="Instances">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Status</th>
+                <th>Entity</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="instance in ctrl.surveyInstances">
+                <td><a class='clickable'
+                       ui-sref="main.survey.instance.view ({id: instance.id })"
+                       ng-bind="instance.id"></a></td>
+                <td><span ng-bind="instance.status | toDisplayName:'surveyInstanceStatus'"></span></td>
+                <td><waltz-entity-link entity-ref="instance.surveyEntity"></waltz-entity-link></td>
+            </tr>
+            </tbody>
+        </table>
+    </waltz-section>
+</div>
