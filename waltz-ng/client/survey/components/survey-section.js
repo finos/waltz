@@ -31,7 +31,7 @@ const bindings = {
 
 const template = require('./survey-section.html');
 
-function mkGridData(surveyRuns = [], surveyInstances = []) {
+function mkTableData(surveyRuns = [], surveyInstances = []) {
     const runsById = _.keyBy(surveyRuns, 'id');
 
     return _.map(surveyInstances, instance => {
@@ -50,19 +50,10 @@ function controller() {
 
     vm.$onChanges = () => {
         if (vm.surveyInstances && vm.surveyRuns) {
-            vm.gridData = mkGridData(vm.surveyRuns, vm.surveyInstances);
+            vm.surveys = mkTableData(vm.surveyRuns, vm.surveyInstances);
         }
     };
 
-    vm.columnDefs = [
-        Object.assign(
-            mkLinkGridCell('Title', 'surveyRun.name', 'surveyInstance.id', 'main.survey.instance.view'),
-            {width: "30%"}
-        ),
-        {field: 'surveyRun.description', displayName: 'Description', width: "44%"},
-        {field: 'surveyRun.issuedOn', displayName: 'Issued On', width: "13%"},
-        {field: 'surveyRun.dueDate', displayName: 'Due Date', sort: {direction: 'desc'}, width: "13%"}
-    ];
 }
 
 
