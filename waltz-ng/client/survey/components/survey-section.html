@@ -1,17 +1,34 @@
 <div>
     <waltz-section name="Surveys"
                    icon="wpforms"
-                   small="( {{$ctrl.surveyInstances.length}} )"
+                   small="( {{$ctrl.surveys.length}} )"
                    id="survey-instance-list-section">
 
-        <div ng-if="$ctrl.gridData.length > 0">
-            <waltz-grid-with-search column-defs="$ctrl.columnDefs"
-                                    entries="$ctrl.gridData"
-                                    search-placeholder-text="Search...">
-            </waltz-grid-with-search>
+        <div ng-if="$ctrl.surveys.length > 0">
+
+            <table class="table table-condensed table-striped small">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Issued On</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="row in $ctrl.surveys | orderBy:'surveyRun.name'">
+                    <td>
+                        <a ng-bind="row.surveyRun.name"
+                           class="clickable"
+                           ui-sref="main.survey.instance.view ({id: row.surveyInstance.id })"></a>
+                    </td>
+                    <td><span ng-bind="row.surveyRun.description"></span></td>
+                    <td><span ng-bind="row.surveyRun.issuedOn"></span></td>
+                </tr>
+                </tbody>
+            </table>
         </div>
 
-        <waltz-no-data ng-if="$ctrl.surveyInstances.length == 0">
+        <waltz-no-data ng-if="$ctrl.surveys.length == 0">
             <message>
                 <strong>No surveys</strong>
             </message>
