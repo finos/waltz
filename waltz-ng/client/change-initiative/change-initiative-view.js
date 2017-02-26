@@ -37,6 +37,7 @@ function controller($q,
                     appGroupStore,
                     bookmarkStore,
                     changeInitiativeStore,
+                    historyStore,
                     involvementStore,
                     sourceDataRatingStore,
                     surveyInstanceStore,
@@ -74,7 +75,15 @@ function controller($q,
 
     changeInitiativeStore
         .getById(id)
-        .then(ci => vm.changeInitiative = ci);
+        .then(ci => {
+            vm.changeInitiative = ci;
+            historyStore
+                .put(
+                    ci.name,
+                    'CHANGE_INITIATIVE',
+                    'main.change-initiative.view',
+                    { id: ci.id });
+        });
 
 
     sourceDataRatingStore
@@ -117,6 +126,7 @@ controller.$inject = [
     'AppGroupStore',
     'BookmarkStore',
     'ChangeInitiativeStore',
+    'HistoryStore',
     'InvolvementStore',
     'SourceDataRatingStore',
     'SurveyInstanceStore',
