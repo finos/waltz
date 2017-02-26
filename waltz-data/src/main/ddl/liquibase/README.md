@@ -10,18 +10,18 @@ on the liquibase site.
 
 Id's have undergone several changes since project inception.  The current format is:
 
-```<yyyymmdd>-<issueId>-<counter>```
+`<yyyymmdd>-<issueId>-<counter>`
 
 For example:
 
-```20160302-102-2``` can easily be read as the second change relating to issues 102 and was created on 2nd March 2016.
+`20160302-102-2` can easily be read as the second change relating to issues 102 and was created on 2nd March 2016.
 Strictly speaking the date is not required but it helps when searching for changes in a certain time range.
 
 
 ## Executing the changes:
 
 ### Sample .bat file (MariaDB)
-````
+```
 C:/tools/liquibase-3.5.1-bin/liquibase.bat ^
 --driver=org.mariadb.jdbc.Driver ^
 --classpath=<path to driver>/mariadb-java-client-1.4.6.jar ^
@@ -30,10 +30,10 @@ C:/tools/liquibase-3.5.1-bin/liquibase.bat ^
 --username=<user> ^
 --password=<password> ^
 migrate
-````
+```
 
 ### Sample .bat file (MSSQL)
-````
+```
 C:/tools/liquibase-3.5.1-bin/liquibase.bat ^
 --driver=com.microsoft.sqlserver.jdbc.SQLServerDriver ^
 --classpath=<path to driver>/sqljdbc4-4.0.2206.100.jar ^
@@ -42,11 +42,10 @@ C:/tools/liquibase-3.5.1-bin/liquibase.bat ^
 --username=<user> ^
 --password=<password> ^
 migrate
-
-````
+```
 
 ### Sample .sh file (MariaDB)
-````
+```
 #!/bin/sh
 ~/dev/tools/liquibase/liquibase --driver=org.mariadb.jdbc.Driver \
       --classpath=<path to driver>/mariadb-java-client/1.3.2/mariadb-java-client-1.3.2.jar \
@@ -55,11 +54,11 @@ migrate
       --username=<user> \
       --password=<password> \
       migrate
-````
+```
 
 
 Waltz provides sample files:
-- ```migrate*.*```
+- `migrate*.*`
 
 Which you may copy and adapt to your environment.
 
