@@ -19,17 +19,61 @@
 import angular from 'angular';
 
 
+function customFieldSetup(formlyConfig) {
+    formlyConfig.setType({
+        name: 'number',
+        template: `
+            <div class="form-group"
+                 ng-class="{ 'has-error': form[options.id].$invalid }">
+                <label class='control-label'
+                       for='{{ options.name }}'>
+                    <span ng-bind="to.label"></span>
+                    <span ng-if="to.required">*</span>
+                </label>
+                <input class="form-control" 
+                       id="{{ options.id }}"
+                       ng-model="model[options.key]" 
+                       type="number"/>
+            </div>`
+    });
+
+    formlyConfig.setType({
+        name: 'html',
+        template: `
+            <div class="form-group"
+                 ng-class="{ 'has-error': form[options.id].$invalid }">
+                <label class='control-label'
+                       for='{{ options.name }}'>
+                    <span ng-bind="to.label"></span>
+                    <span ng-if="to.required">*</span>
+                </label>
+                <textarea style="font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;"
+                          class="form-control" 
+                          id="{{ options.id }}"
+                          ng-model="model[options.key]"
+                          rows="10"/>
+            </div>`
+    });
+}
+
+customFieldSetup.$inject = ['formlyConfig'];
+
+
+
 export default () => {
     const module = angular.module('waltz.formly', []);
 
-    module.run([
-        'formlyConfig',
-        (formlyConfig) => {
-            require('./ui-select')(formlyConfig);
-        }
-    ]);
+    module
+        .run(customFieldSetup)
+        .run([
+            'formlyConfig',
+            (formlyConfig) => {
+                require('./ui-select')(formlyConfig);
+            }
+        ]);
 
-    module.config([
+    module
+        .config([
         'formlyConfigProvider',
         (formlyConfigProvider) => {
             formlyConfigProvider.setType({

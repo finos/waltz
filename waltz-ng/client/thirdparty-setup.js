@@ -16,46 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function formlySetup(formlyConfig) {
-    formlyConfig.setType({
-        name: 'number',
-        template: `
-            <div class="form-group"
-                 ng-class="{ 'has-error': form[options.id].$invalid }">
-                <label class='control-label'
-                       for='{{ options.name }}'>
-                    <span ng-bind="to.label"></span>
-                    <span ng-if="to.required">*</span>
-                </label>
-                <input class="form-control" 
-                       id="{{ options.id }}"
-                       ng-model="model[options.key]" 
-                       type="number"/>
-            </div>`
-    });
-
-    formlyConfig.setType({
-        name: 'html',
-        template: `
-            <div class="form-group"
-                 ng-class="{ 'has-error': form[options.id].$invalid }">
-                <label class='control-label'
-                       for='{{ options.name }}'>
-                    <span ng-bind="to.label"></span>
-                    <span ng-if="to.required">*</span>
-                </label>
-                <textarea style="font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;"
-                          class="form-control" 
-                          id="{{ options.id }}"
-                          ng-model="model[options.key]"
-                          rows="10"/>
-            </div>`
-    });
-}
-
-formlySetup.$inject = ['formlyConfig'];
-
-
 function uiSelectSetup(uiSelectConfig) {
     uiSelectConfig.theme = 'bootstrap';
     uiSelectConfig.resetSearchInput = true;
@@ -91,8 +51,9 @@ authProviderSetup.$inject = [
 function setup(module) {
     module
         .config(uiSelectSetup)
-        .config(authProviderSetup)
-        .run(formlySetup);
+        .config(authProviderSetup);
+
+    // for formly setup see: `formly/index.js`
 }
 
 
