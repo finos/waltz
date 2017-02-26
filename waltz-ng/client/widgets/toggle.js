@@ -20,7 +20,7 @@
 import _ from "lodash";
 
 
-const BINDINGS = {
+const bindings = {
     labelOn: '@',
     labelOff: '@',
     iconOn: '@',
@@ -45,15 +45,11 @@ function controller() {
 }
 
 
-export default [
-    () => ({
-        restrict: 'E',
-        replace: false,
-        template: require('./toggle.html'),
-        scope: {},
-        bindToController: BINDINGS,
-        controllerAs: 'ctrl',
-        controller
-    })
-]
-;
+const component = {
+    template: require('./toggle.html'),
+    bindings,
+    controller
+};
+
+
+export default component;
