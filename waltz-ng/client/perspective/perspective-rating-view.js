@@ -75,6 +75,7 @@ function controller($q,
                 .map(p => {
                     return {
                         definition: p,
+                        hideImplied: false,
                         measurablesX: _.filter(vm.measurables, { categoryId: p.categoryX }),
                         measurablesY: _.filter(vm.measurables, { categoryId: p.categoryY })
                     };

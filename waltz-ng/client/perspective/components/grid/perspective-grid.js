@@ -41,11 +41,13 @@ const bindings = {
     measurableRatings: '<',
     existingOverrides: '<',
     pendingOverrides: '<',
-    handlers: '<'
+    handlers: '<',
+    hideImplied: '<'
 };
 
 
 const initialState = {
+    hideInherited: true,
     handlers: {
         onCellClick: d => console.log('perspective-grid:onCellClick', d)
     }
@@ -116,8 +118,7 @@ function drawGrid(selection, perspective, handlers) {
 
 
 const maybeDrag = function(d, handler = () => {}) {
-    const evt = event;
-    if (evt.buttons > 0) {
+    if (event.buttons > 0) {
         handler(d);
     }
 };
@@ -171,7 +172,7 @@ function drawXShape(selection, cellDimensions, isPending = false) {
         .attr('d', pathData)
         .attr('stroke', '#ddd')
         .attr('stroke-width', strokeWidth);
-};
+}
 
 
 function calcOverrideCellDimensions(cellPadding) {

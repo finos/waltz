@@ -1,0 +1,36 @@
+.waltz-perspective-grid {
+
+    &.wpg-show-implied {
+        .cell-inherited {
+            opacity: 0.4;
+        }
+
+        .cell-inherited:hover {
+            opacity: 0.8;
+        }
+    }
+
+    &.wpg-hide-implied {
+        .cell-inherited {
+            opacity: 0;
+        }
+    }
+
+    .col-titles,
+    .row-titles {
+        font-size: smaller;
+    }
+
+    .cell-override {
+        pointer-events: none;
+    }
+
+    .pending-override {
+        opacity: 1;
+    }
+
+    .existing-override {
+        opacity: 1;
+    }
+}
+

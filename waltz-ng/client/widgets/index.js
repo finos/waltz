@@ -34,7 +34,6 @@ export default () => {
     module.directive('waltzSearch', require('./search'));
     module.directive('waltzSectionActions', require('./section-actions'));
     module.directive('waltzStepCount', require('./step-count'));
-    module.directive('waltzToggle', require('./toggle'));
     module.directive('waltzYqSelect', require('./yq-select'));
     module
         .component('waltzBasicInfoTile', require('./basic-info-tile'))
@@ -49,6 +48,7 @@ export default () => {
         .component('waltzPieTable', require('./pie-table'))
         .component('waltzSection', require('./section'))
         .component('waltzSimpleStackChart', require('./simple-stack-chart'))
+        .component('waltzToggle', require('./toggle'))
         .component('waltzTwistie', require('./twistie'));
 
     return module.name;
