@@ -19,25 +19,13 @@ import _ from "lodash";
 import {initialiseData} from "../common";
 
 
-/**
- * @name waltz-perspective-rating-edit
- *
- * @description
- */
-
-
-const initialState = {};
-
-
-const template = require('./perspective-rating-edit.html');
-
-
 function controller($stateParams,
                     applicationStore,
+                    measurableStore,
+                    measurableRatingStore,
                     perspectiveDefinitionStore,
                     perspectiveRatingStore,
-                    measurableStore,
-                    measurableRatingStore)
+                    staticPanelStore)
 {
     const vm = initialiseData(this, initialState);
 
@@ -53,6 +41,10 @@ function controller($stateParams,
         entityReference,
         scope: 'EXACT'
     };
+
+    staticPanelStore
+        .findByGroup('PERSPECTIVE.RATING.EDIT')
+        .then(panels => vm.panels = panels);
 
     applicationStore
         .getById(applicationId)
@@ -86,13 +78,27 @@ function controller($stateParams,
 }
 
 
+/**
+ * @name waltz-perspective-rating-edit
+ *
+ * @description
+ */
+
+
+const initialState = {};
+
+
+const template = require('./perspective-rating-edit.html');
+
+
 controller.$inject = [
     '$stateParams',
     'ApplicationStore',
+    'MeasurableStore',
+    'MeasurableRatingStore',
     'PerspectiveDefinitionStore',
     'PerspectiveRatingStore',
-    'MeasurableStore',
-    'MeasurableRatingStore'
+    'StaticPanelStore'
 ];
 
 

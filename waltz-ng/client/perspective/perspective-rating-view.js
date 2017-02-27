@@ -15,10 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import _ from 'lodash';
-import template from './perspective-rating-view.html';
-import {mkOverrides} from './perpective-utilities';
+import _ from "lodash";
+import template from "./perspective-rating-view.html";
+import {mkOverrides} from "./perpective-utilities";
 
 
 function controller($q,
@@ -27,7 +26,8 @@ function controller($q,
                     measurableStore,
                     measurableRatingStore,
                     perspectiveDefinitionStore,
-                    perspectiveRatingStore) {
+                    perspectiveRatingStore,
+                    staticPanelStore) {
 
     const vm = this;
 
@@ -46,6 +46,11 @@ function controller($q,
         .then(ps => {
             vm.perspectives = ps;
         });
+
+    staticPanelStore
+        .findByGroup('PERSPECTIVE.RATING.VIEW.HEADER')
+        .then(panels => vm.headerPanels = panels);
+
 
     applicationStore
         .getById(entityReference.id)
@@ -105,7 +110,8 @@ controller.$inject = [
     'MeasurableStore',
     'MeasurableRatingStore',
     'PerspectiveDefinitionStore',
-    'PerspectiveRatingStore'
+    'PerspectiveRatingStore',
+    'StaticPanelStore'
 ];
 
 
