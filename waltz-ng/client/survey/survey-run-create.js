@@ -63,8 +63,9 @@ function controller($document,
             .join(';');
 
         const surveyEmailSubject = `Survey invitation: ${surveyRun.name}`;
-        const surveyLink = _.replace($location.absUrl(), '#' + $location.url(), '')
-            + $state.href('main.survey.instance.user');
+        const surveyLink = encodeURIComponent(
+            _.replace($location.absUrl(), '#' + $location.url(), '')
+            + $state.href('main.survey.instance.user'));
 
         const newLine = '%0D%0A';
         const surveyEmailBody = `You have been invited to participate to the following survey. ${newLine}${newLine}`
