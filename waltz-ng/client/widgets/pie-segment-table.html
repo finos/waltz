@@ -41,7 +41,7 @@
             </span>
             %
         </td>
-        <td>
+        <td width="36px">   <!-- fix the row on-select jumpy issue on IE  -->
             <a class='clickable'
                ng-if="$ctrl.selectedSegmentKey === r.key"
                ng-click="$ctrl.rowSelected(null, $event)">
