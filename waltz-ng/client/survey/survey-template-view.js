@@ -27,18 +27,16 @@ function controller($stateParams,
 
     const vm = this;
 
-    vm.people = [];
-
     surveyTemplateStore
         .getById(templateId)
         .then(t => vm.template = t)
-        .then(t => personStore.getById(t.ownerId))
-        .then(p => vm.people = _.union(vm.people, [p]));
+        .then(t => personStore.getById(t.ownerId));
 
+    vm.people = {};
     surveyRunStore
         .findByTemplateId(templateId)
         .then(rs => {
-            vm.surveyRuns = rs;
+            [vm.issuedAndCompletedRuns = [], vm.draftRuns = []] = _.partition(rs, r => r.status !== 'DRAFT');
             _.chain(rs)
                 .map('ownerId')
                 .uniq()
@@ -47,7 +45,7 @@ function controller($stateParams,
                     .getById(personId)
                     .then(p => {
                         if (p) {
-                            vm.people = _.union(vm.people, [p]);
+                            vm.people[p.id] = p;
                         }
                     }));
         });

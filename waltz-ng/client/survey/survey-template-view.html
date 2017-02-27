@@ -19,7 +19,8 @@
     <br>
 
     <waltz-section icon='bolt'
-                   name="Runs">
+                   name="Runs"
+                   small="( {{ctrl.issuedAndCompletedRuns.length }} )" >
         <waltz-section-actions>
             <a class="btn btn-primary btn-xs"
                waltz-has-role="SURVEY_ADMIN"
@@ -48,7 +49,7 @@
                     <th>Owner</th>
                 </tr>
                 </thead>
-                <tr ng-repeat="r in ctrl.surveyRuns | filter: {'status' : '!DRAFT'}">   <!-- don't show DRAFT runs -->
+                <tr ng-repeat="r in ctrl.issuedAndCompletedRuns">   <!-- don't show DRAFT runs -->
                     <td>
                         <a ng-bind="r.name"
                            class="clickable"
@@ -64,5 +65,8 @@
                 </tr>
             </table>
         </div>
+        <span ng-if="ctrl.draftRuns.length > 0" class="text-muted small">
+            Excluding {{ctrl.draftRuns.length}} draft {{ctrl.draftRuns.length === 1? 'run' : 'runs'}}.
+        </span>
     </waltz-section>
 </div>
