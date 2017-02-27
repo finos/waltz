@@ -15,16 +15,20 @@
  *  along with Waltz.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+@import "../../../style/variables";
 
 .waltz-complexity-bar-chart {
     .wcbc-bar {
         rect {
-            opacity: 0.85;
+            transition: opacity 0.2s linear;
+            transition: fill 0.2s linear;
+            opacity: 0.75;
             cursor: pointer;
         }
 
         text {
-            opacity: 0.85;
+            transition: fill 0.2s linear;
+            fill: lighten($waltz-font-color, 20);
             font-size: 0.75em;
             cursor: pointer;
         }
@@ -32,12 +36,22 @@
 
     .wcbc-bar:hover {
         rect {
+            fill: rgb(198, 220, 249);
             opacity: 1;
         }
 
         text {
+            fill: $waltz-font-color;
             opacity: 1;
         }
+    }
+
+    path.domain {
+        stroke: #ccc;
+    }
+
+    .tick line{
+        stroke: #ccc;
     }
 }
 
