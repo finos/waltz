@@ -1,4 +1,12 @@
 .waltz-simple-stack-chart {
+
+    opacity: 0.7;
+    transition: opacity 0.2s linear;
+
+    &:hover {
+        opacity: 1;
+    }
+
     .wssc-stack-0 {
         opacity: 1;
     }
