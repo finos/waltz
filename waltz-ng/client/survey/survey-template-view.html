@@ -48,7 +48,7 @@
                     <th>Owner</th>
                 </tr>
                 </thead>
-                <tr ng-repeat="r in ctrl.surveyRuns">
+                <tr ng-repeat="r in ctrl.surveyRuns | filter: {'status' : '!DRAFT'}">   <!-- don't show DRAFT runs -->
                     <td>
                         <a ng-bind="r.name"
                            class="clickable"
