@@ -57,7 +57,8 @@
                 Contact Email
             </div>
             <div class="col-sm-8">
-                <a href="mailto:{{ctrl.surveyRun.contactEmail}}?Subject=RE: {{ctrl.surveyRun.name}}" ng-bind="ctrl.surveyRun.contactEmail"></a>
+                <a href="mailto:{{ctrl.surveyRun.contactEmail}}?Subject=RE: {{ctrl.surveyRun.name}}"
+                   ng-bind="ctrl.surveyRun.contactEmail"></a>
             </div>
         </div>
         <br>
@@ -67,8 +68,9 @@
             </div>
             <div class="col-sm-8">
                 <span ng-repeat="recipient in ctrl.otherRecipients">
-                    <a href="mailto:{{recipient.email}}?Subject=RE: {{ctrl.surveyRun.name}}" ng-bind="recipient.displayName"></a>
-                    <span ng-hide="$last">, </span>
+                    <a href="mailto:{{recipient.email}}?Subject=RE: {{ctrl.surveyRun.name}}"
+                       ng-bind="recipient.displayName">
+                    </a><span ng-hide="$last">, </span>
                 </span>
             </div>
         </div>
