@@ -29,6 +29,12 @@ export const applicationKindDisplayNames = {
 };
 
 
+export const attestationTypeDisplayNames = {
+    IMPLICIT: 'Implicit',
+    EXPLICIT: 'Explicit',
+};
+
+
 export const authSourceRatingNames = {
     PRIMARY: 'Primary Source',
     SECONDARY: 'Secondary Source',

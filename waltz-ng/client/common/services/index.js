@@ -21,6 +21,7 @@ import {
     applicationKindDisplayNames,
     applicationRatingNames,
     assetCostKindNames,
+    attestationTypeDisplayNames,
     authSourceRatingNames,
     bookmarkNames,
     capabilityRatingNames,
@@ -109,6 +110,7 @@ export default (module) => {
         .register('applicationKind', applicationKindDisplayNames)
         .register('applicationRating', applicationRatingNames)
         .register('assetCost', assetCostKindNames)
+        .register('attestationType', attestationTypeDisplayNames)
         .register('bookmark', bookmarkNames)
         .register('capabilityRating', capabilityRatingNames)
         .register('changeInitiative', changeInitiativeNames)
