@@ -24,7 +24,6 @@ const initialState = {
     isUserInstanceRecipient: false,
     instanceCanBeEdited: false,
     surveyInstance: {},
-    surveyRecipients: [],
     surveyQuestions: [],
     surveyResponses: {},
     user: {}
@@ -82,8 +81,11 @@ function controller($state,
         .all([userService.whoami(), surveyInstanceStore.findRecipients(id)])
         .then(([user = {}, recipients = []]) => {
             vm.user = user;
-            vm.surveyRecipients = recipients;
-            vm.isUserInstanceRecipient = _.some(recipients, r => r.person.email === user.userName);
+            const [currentRecipients = [], otherRecipients = []] = _.partition(recipients,
+                r => r.person.email === user.userName);
+
+            vm.isUserInstanceRecipient = currentRecipients.length > 0;
+            vm.otherRecipients = otherRecipients.map(r => r.person);
         });
 
     surveyInstanceStore
