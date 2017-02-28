@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import {numberFormatter} from "../../common/string-utils";
 
 
@@ -24,5 +23,5 @@ import {numberFormatter} from "../../common/string-utils";
  * @param costs
  */
 export function calcPortfolioCost(total = { amount: 0 }) {
-    return '€ ' + numberFormatter(total.amount, 1);
+    return '€ ' + numberFormatter(total.amount, 1, true);
 }
