@@ -122,9 +122,10 @@ export function escapeRegexCharacters(str) {
  *   numberFormatter(5_000_000_000, 0) :: 5B
  * @param num
  * @param digits
+ * @param simplify
  * @returns {*}
  */
-export function numberFormatter(num, digits = 0) {
+export function numberFormatter(num, digits = 0, simplify = true) {
     const si = [
         { value: 1E12, symbol: "T" },
         { value: 1E9,  symbol: "B" },
@@ -132,13 +133,18 @@ export function numberFormatter(num, digits = 0) {
         { value: 1E3,  symbol: "k" }
     ];
 
-    for (let i = 0; i < si.length; i++) {
-        if (num >= si[i].value) {
-            return (num / si[i].value)
-                    .toFixed(digits)
-                    .replace(/\.?0+$/, "") + si[i].symbol;
+    if (simplify) {
+        for (let i = 0; i < si.length; i++) {
+            if (num >= si[i].value) {
+                return (num / si[i].value)
+                        .toFixed(digits)
+                        .replace(/\.?0+$/, "") + si[i].symbol;
+            }
         }
+    } else {
+        return num
+            .toFixed(digits)
+            .replace(/\.?0+$/, "");
     }
-    return num;
 }
 

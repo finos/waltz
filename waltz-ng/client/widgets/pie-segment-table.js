@@ -52,7 +52,7 @@ function controller() {
     vm.$onChanges = (changes) => {
         if (changes.data) {
             vm.total = _.sumBy(vm.data, 'count');
-            vm.totalStr = numberFormatter(vm.total);
+            vm.totalStr = numberFormatter(vm.total, 2, false);
         }
 
         if (changes.config) {
