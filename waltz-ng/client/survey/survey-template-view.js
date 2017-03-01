@@ -17,15 +17,24 @@
  */
 
 import _ from 'lodash';
+import {initialiseData} from "../common/index";
+
+
+const initialState = {
+    template: {},
+    issuedAndCompletedRuns: [],
+    draftRuns: [],
+    runCompletionRates: {}
+};
 
 
 function controller($stateParams,
                     personStore,
                     surveyRunStore,
                     surveyTemplateStore) {
-    const templateId = $stateParams.id;
+    const vm = initialiseData(this, initialState);
 
-    const vm = this;
+    const templateId = $stateParams.id;
 
     surveyTemplateStore
         .getById(templateId)
@@ -37,7 +46,22 @@ function controller($stateParams,
         .findByTemplateId(templateId)
         .then(rs => {
             [vm.issuedAndCompletedRuns = [], vm.draftRuns = []] = _.partition(rs, r => r.status !== 'DRAFT');
-            _.chain(rs)
+
+            // populate completion rates
+            vm.issuedAndCompletedRuns
+                .forEach(run => {
+                    surveyRunStore.getCompletionRate(run.id)
+                        .then(rate => vm.runCompletionRates[run.id] = Object.assign({},
+                            rate,
+                            {'totalCount': rate.notStartedCount + rate.inProgressCount + rate.completedCount + rate.expiredCount},
+                            {'text': (run.status === 'COMPLETED')
+                                ? `${rate.completedCount} completed, ${rate.expiredCount} expired`
+                                : `${rate.completedCount} completed, ${rate.inProgressCount} in progress, ${rate.notStartedCount} not started`})
+                        )
+                });
+
+            // populate owners
+            _.chain(vm.issuedAndCompletedRuns)
                 .map('ownerId')
                 .uniq()
                 .value()
@@ -49,7 +73,6 @@ function controller($stateParams,
                         }
                     }));
         });
-
 }
 
 

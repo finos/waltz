@@ -265,5 +265,10 @@ public class SurveyRunService {
     public List<SurveyRun> findByTemplateId(long templateId) {
         return surveyRunDao.findByTemplateId(templateId);
     }
+
+
+    public SurveyRunCompletionRate getCompletionRate(long surveyRunId) {
+        return surveyInstanceDao.getCompletionRateForSurveyRun(surveyRunId);
+    }
 }
 

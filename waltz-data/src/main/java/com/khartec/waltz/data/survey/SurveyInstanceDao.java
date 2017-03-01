@@ -2,12 +2,10 @@ package com.khartec.waltz.data.survey;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.survey.ImmutableSurveyInstance;
-import com.khartec.waltz.model.survey.SurveyInstance;
-import com.khartec.waltz.model.survey.SurveyInstanceCreateCommand;
-import com.khartec.waltz.model.survey.SurveyInstanceStatus;
+import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.schema.tables.records.SurveyInstanceRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -120,5 +118,31 @@ public class SurveyInstanceDao {
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public SurveyRunCompletionRate getCompletionRateForSurveyRun(long surveyRunId) {
+        final Result<Record2<String, Integer>> countsByStatus = dsl.select(SURVEY_INSTANCE.STATUS, DSL.count(SURVEY_INSTANCE.ID))
+                .from(SURVEY_INSTANCE)
+                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+                .groupBy(SURVEY_INSTANCE.STATUS)
+                .fetch();
+
+        return ImmutableSurveyRunCompletionRate.builder()
+                .notStartedCount(getCountByStatus(countsByStatus, SurveyInstanceStatus.NOT_STARTED))
+                .inProgressCount(getCountByStatus(countsByStatus, SurveyInstanceStatus.IN_PROGRESS))
+                .completedCount(getCountByStatus(countsByStatus, SurveyInstanceStatus.COMPLETED))
+                .expiredCount(getCountByStatus(countsByStatus, SurveyInstanceStatus.EXPIRED))
+                .build();
+    }
+
+
+    private int getCountByStatus(Result<Record2<String, Integer>> countsByStatus, SurveyInstanceStatus status) {
+        return countsByStatus.stream()
+                .filter(r -> status.name().equals(r.value1()))
+                .findAny()
+                .map(Record2::value2)
+                .orElse(0);
+
     }
 }

@@ -69,6 +69,7 @@ public class SurveyRunEndpoint implements Endpoint {
         String generateSurveyRunRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String createSurveyRunInstancesAndRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String updateSurveyRunStatusPath = mkPath(BASE_URL, ":id", "status");
+        String getSurveyRunCompletionRate = mkPath(BASE_URL, ":id", "completion-rate");
 
         DatumRoute<SurveyRun> getByIdRoute = (req, res) ->
                 surveyRunService.getById(getId(req));
@@ -130,6 +131,9 @@ public class SurveyRunEndpoint implements Endpoint {
                     newArrayList(readBody(request, SurveyInstanceRecipient[].class)));
         };
 
+        DatumRoute<SurveyRunCompletionRate> getSurveyRunCompletionRateRoute = (request, response)
+                -> surveyRunService.getCompletionRate(getId(request));
+
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByTemplateIdPath, findByTemplateIdRoute);
         getForList(findByEntityRefPath, findByEntityRoute);
@@ -139,6 +143,7 @@ public class SurveyRunEndpoint implements Endpoint {
         putForDatum(surveyRunUpdatePath, surveyRunUpdateRoute);
         postForDatum(createSurveyRunInstancesAndRecipientsPath, createSurveyRunInstancesAndRecipientsRoute);
         putForDatum(updateSurveyRunStatusPath, surveyRunUpdateStatusRoute);
+        getForDatum(getSurveyRunCompletionRate, getSurveyRunCompletionRateRoute);
     }
 
 
