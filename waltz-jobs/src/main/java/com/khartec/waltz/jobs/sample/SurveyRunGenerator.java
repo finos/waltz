@@ -23,8 +23,6 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple;
-import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -33,7 +31,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.Checks.checkFalse;
@@ -111,83 +108,40 @@ public class SurveyRunGenerator {
 
                 surveyRunRecord.store();
                 long surveyRunId = surveyRunRecord.getId();
-                LOG.debug("Survey Run: {} / {}", surveyRunId, surveyRunRecord.getName());
 
                 surveyRunService.createSurveyInstancesAndRecipients(surveyRunId, Collections.emptyList());
-
-
-                List<SurveyInstanceQuestionResponse> surveyInstanceQuestionResponses = mkRandomSurveyRunResponses(
-                        surveyRunId, surveyInstanceService, surveyQuestionService);
-
-                Map<SurveyInstanceStatus, Set<Long>> surveyInstanceStatusMap = surveyInstanceQuestionResponses.stream()
-                        .mapToLong(response -> response.surveyInstanceId())
-                        .distinct()
-                        .mapToObj(id -> Tuple.tuple(ArrayUtilities.randomPick(
-                                SurveyInstanceStatus.NOT_STARTED, SurveyInstanceStatus.IN_PROGRESS, SurveyInstanceStatus.COMPLETED), id))
-                        .collect(groupingBy(t -> t.v1, mapping(t -> t.v2, toSet())));
-
-                dsl.batchInsert(surveyInstanceQuestionResponses.stream()
-                        .map(r -> {
-                            if (surveyInstanceStatusMap.containsKey(SurveyInstanceStatus.NOT_STARTED)
-                                    && surveyInstanceStatusMap.get(SurveyInstanceStatus.NOT_STARTED).contains(r.surveyInstanceId())) {
-                                return null;    // don't create response for NOT_STARTED
-                            }
-
-                            SurveyQuestionResponse questionResponse = r.questionResponse();
-                            SurveyQuestionResponseRecord record = new SurveyQuestionResponseRecord();
-                            record.setSurveyInstanceId(r.surveyInstanceId());
-                            record.setPersonId(r.personId());
-                            record.setQuestionId(questionResponse.questionId());
-                            record.setBooleanResponse(questionResponse.booleanResponse().orElse(null));
-                            record.setNumberResponse(questionResponse.numberResponse().map(BigDecimal::valueOf).orElse(null));
-                            record.setStringResponse(questionResponse.stringResponse().orElse(null));
-                            record.setComment(r.questionResponse().comment().orElse(null));
-
-                            return record;
-                        })
-                        .filter(Objects::nonNull)
-                        .collect(toList()))
-                        .execute();
 
                 if (random.nextBoolean()) {     // should this survey is a completed one?
                     surveyRunRecord.setStatus(SurveyRunStatus.COMPLETED.name());
                     surveyRunRecord.store();
 
+                    List<SurveyInstanceQuestionResponse> surveyInstanceQuestionResponses = mkRandomSurveyRunResponses(
+                            surveyRunId, surveyInstanceService, surveyQuestionService);
+
+                    dsl.batchInsert(surveyInstanceQuestionResponses.stream()
+                            .map(r -> {
+                                SurveyQuestionResponse questionResponse = r.questionResponse();
+                                SurveyQuestionResponseRecord record = new SurveyQuestionResponseRecord();
+                                record.setSurveyInstanceId(r.surveyInstanceId());
+                                record.setPersonId(r.personId());
+                                record.setQuestionId(questionResponse.questionId());
+                                record.setBooleanResponse(questionResponse.booleanResponse().orElse(null));
+                                record.setNumberResponse(questionResponse.numberResponse().map(BigDecimal::valueOf).orElse(null));
+                                record.setStringResponse(questionResponse.stringResponse().orElse(null));
+                                record.setComment(r.questionResponse().comment().orElse(null));
+
+                                return record;
+                            })
+                            .collect(toList()))
+                            .execute();
+
                     surveyCompletedCount.incrementAndGet();
 
                     // update instances to COMPLETED
-                    if (surveyInstanceStatusMap.containsKey(SurveyInstanceStatus.COMPLETED)) {
-                        Set<Long> completedInstanceIds = surveyInstanceStatusMap.get(SurveyInstanceStatus.COMPLETED);
-                        dsl.update(SURVEY_INSTANCE)
-                                .set(SURVEY_INSTANCE.STATUS, SurveyInstanceStatus.COMPLETED.name())
-                                .where(SURVEY_INSTANCE.ID.in(completedInstanceIds))
-                                .execute();
-                        LOG.debug(" --- Completed instances: {}", completedInstanceIds);
-                    }
-
-                    // update instances to EXPIRED
-                    if (surveyInstanceStatusMap.containsKey(SurveyInstanceStatus.NOT_STARTED)
-                            || surveyInstanceStatusMap.containsKey(SurveyInstanceStatus.IN_PROGRESS)) {
-                        Set<Long> expiredInstanceIds = surveyInstanceStatusMap.entrySet()
-                                .stream()
-                                .filter(e -> e.getKey() != SurveyInstanceStatus.COMPLETED)
-                                .flatMap(e -> e.getValue().stream())
-                                .collect(toSet());
-
-                        dsl.update(SURVEY_INSTANCE)
-                                .set(SURVEY_INSTANCE.STATUS, SurveyInstanceStatus.EXPIRED.name())
-                                .where(SURVEY_INSTANCE.ID.in(expiredInstanceIds))
-                                .execute();
-                        LOG.debug(" --- Expired instances: {}", expiredInstanceIds);
-                    }
-                } else {
-                    surveyInstanceStatusMap.forEach(((status, instanceIds) -> {
-                        dsl.update(SURVEY_INSTANCE)
-                                .set(SURVEY_INSTANCE.STATUS, status.name())
-                                .where(SURVEY_INSTANCE.ID.in(instanceIds))
-                                .execute();
-                        LOG.debug(" --- {} instances: {}", status.name(), instanceIds);
-                    }));
+                    dsl.update(SURVEY_INSTANCE)
+                            .set(SURVEY_INSTANCE.STATUS, SurveyInstanceStatus.COMPLETED.name())
+                            .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+                            .execute();
                 }
             });
 
