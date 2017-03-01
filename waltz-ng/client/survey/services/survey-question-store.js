@@ -20,13 +20,38 @@ function service($http, baseUrl) {
 
     const BASE = `${baseUrl}/survey-question`;
 
+    const create = (q) => {
+        return $http.post(`${BASE}`, q)
+            .then(result => result.data);
+    };
+
+    const update = (q) => {
+        return $http.put(`${BASE}`, q)
+            .then(result => result.data);
+    };
+
+    const deleteQuestion = (id) => {
+        return $http.delete(`${BASE}/${id}`)
+            .then(result => result.data);
+    };
+
+
     const findForInstance = (id) => {
         return $http.get(`${BASE}/instance/${id}`)
             .then(result => result.data);
     };
 
+    const findForTemplate = (id) => {
+        return $http.get(`${BASE}/template/${id}`)
+            .then(result => result.data);
+    };
+
     return {
-        findForInstance
+        create,
+        update,
+        deleteQuestion,
+        findForInstance,
+        findForTemplate
     };
 }
 

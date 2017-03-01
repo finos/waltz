@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkTrue;
 
 @Service
 public class SurveyQuestionService {
@@ -43,5 +44,18 @@ public class SurveyQuestionService {
         checkNotNull(surveyQuestion, "surveyQuestion cannot be null");
 
         return surveyQuestionDao.create(surveyQuestion);
+    }
+
+
+    public int update(SurveyQuestion surveyQuestion) {
+        checkNotNull(surveyQuestion, "surveyQuestion cannot be null");
+        checkTrue(surveyQuestion.id().isPresent(), "question id cannot be null");
+
+        return surveyQuestionDao.update(surveyQuestion);
+    }
+
+
+    public int delete(long questionId) {
+        return surveyQuestionDao.delete(questionId);
     }
 }

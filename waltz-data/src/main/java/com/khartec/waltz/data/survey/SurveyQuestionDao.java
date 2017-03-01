@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
 import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
@@ -94,6 +95,25 @@ public class SurveyQuestionDao {
                 .returning(SURVEY_QUESTION.ID)
                 .fetchOne()
                 .getId();
+    }
+
+
+    public int update(SurveyQuestion surveyQuestion) {
+        checkNotNull(surveyQuestion, "surveyQuestion cannot be null");
+        checkTrue(surveyQuestion.id().isPresent(), "question id cannot be null");
+
+        SurveyQuestionRecord record = TO_RECORD_MAPPER.apply(surveyQuestion);
+        return dsl.update(SURVEY_QUESTION)
+                .set(record)
+                .where(SURVEY_QUESTION.ID.eq(surveyQuestion.id().get()))
+                .execute();
+    }
+
+
+    public int delete(long questionId) {
+        return dsl.delete(SURVEY_QUESTION)
+                .where(SURVEY_QUESTION.ID.eq(questionId))
+                .execute();
     }
 
 

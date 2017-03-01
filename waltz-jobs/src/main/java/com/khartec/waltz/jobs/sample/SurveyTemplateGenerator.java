@@ -12,7 +12,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import java.util.List;
 
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 import static com.khartec.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
 
@@ -33,22 +32,19 @@ public class SurveyTemplateGenerator {
             dsl.deleteFrom(SURVEY_TEMPLATE).execute();
             dsl.deleteFrom(SURVEY_QUESTION).execute();
 
-            Long ownerId = dsl
-                    .select(PERSON.ID)
-                    .from(PERSON)
-                    .limit(1)
-                    .fetchOne(PERSON.ID);
-
-            SurveyTemplate appSurvey = mkAppSurvey(ownerId);
+            SurveyTemplateChangeCommand appSurvey = mkAppSurvey();
             long aid = surveyTemplateService.create("admin", appSurvey);
             List<SurveyQuestion> appQs = mkAppQuestions(aid);
             appQs.forEach(surveyQuestionService::create);
 
-            SurveyTemplate projectSurvey = mkProjectSurvey(ownerId);
+            //TODO set status to active
+
+            SurveyTemplateChangeCommand projectSurvey = mkProjectSurvey();
             long pid = surveyTemplateService.create("admin", projectSurvey);
             List<SurveyQuestion> projQs = mkProjQuestions(pid);
             projQs.forEach(surveyQuestionService::create);
 
+            //TODO set status to active
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,15 +54,12 @@ public class SurveyTemplateGenerator {
 
 
 
-    private static SurveyTemplate mkAppSurvey(Long ownerId) {
-        SurveyTemplate appSurvey = ImmutableSurveyTemplate.builder()
+    private static SurveyTemplateChangeCommand mkAppSurvey() {
+        return ImmutableSurveyTemplateChangeCommand.builder()
                 .name("App Survey")
                 .description("Questions about your application")
                 .targetEntityKind(EntityKind.APPLICATION)
-                .ownerId(ownerId)
                 .build();
-
-        return appSurvey;
     }
 
 
@@ -79,6 +72,7 @@ public class SurveyTemplateGenerator {
                         .isMandatory(true)
                         .fieldType(SurveyQuestionFieldType.BOOLEAN)
                         .surveyTemplateId(templateId)
+                        .position(1)
                         .build(),
                 ImmutableSurveyQuestion
                         .builder()
@@ -88,6 +82,7 @@ public class SurveyTemplateGenerator {
                         .allowComment(true)
                         .surveyTemplateId(templateId)
                         .fieldType(SurveyQuestionFieldType.NUMBER)
+                        .position(2)
                         .build(),
                 ImmutableSurveyQuestion
                         .builder()
@@ -95,23 +90,24 @@ public class SurveyTemplateGenerator {
                         .isMandatory(true)
                         .surveyTemplateId(templateId)
                         .fieldType(SurveyQuestionFieldType.TEXTAREA)
+                        .position(3)
                         .build(),
                 ImmutableSurveyQuestion
                         .builder()
                         .questionText("Who is your primary customer")
                         .surveyTemplateId(templateId)
                         .fieldType(SurveyQuestionFieldType.TEXT)
+                        .position(4)
                         .build()
         );
     }
 
 
-    private static SurveyTemplate mkProjectSurvey(Long ownerId) {
-        return ImmutableSurveyTemplate.builder()
+    private static SurveyTemplateChangeCommand mkProjectSurvey() {
+        return ImmutableSurveyTemplateChangeCommand.builder()
                 .name("Programme Survey")
                 .description("Questions about your programme governance")
                 .targetEntityKind(EntityKind.CHANGE_INITIATIVE)
-                .ownerId(ownerId)
                 .build();
     }
 
@@ -127,6 +123,7 @@ public class SurveyTemplateGenerator {
                         .surveyTemplateId(templateId)
                         .allowComment(true)
                         .fieldType(SurveyQuestionFieldType.BOOLEAN)
+                        .position(1)
                         .build(),
                 ImmutableSurveyQuestion
                         .builder()
@@ -135,6 +132,7 @@ public class SurveyTemplateGenerator {
                         .isMandatory(true)
                         .surveyTemplateId(templateId)
                         .fieldType(SurveyQuestionFieldType.NUMBER)
+                        .position(2)
                         .build(),
                 ImmutableSurveyQuestion
                         .builder()
@@ -142,12 +140,14 @@ public class SurveyTemplateGenerator {
                         .isMandatory(true)
                         .surveyTemplateId(templateId)
                         .fieldType(SurveyQuestionFieldType.TEXTAREA)
+                        .position(3)
                         .build(),
                 ImmutableSurveyQuestion
                         .builder()
                         .surveyTemplateId(templateId)
                         .questionText("Who is the primary stakeholder?")
                         .fieldType(SurveyQuestionFieldType.TEXT)
+                        .position(4)
                         .build()
         );
     }

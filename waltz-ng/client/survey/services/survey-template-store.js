@@ -20,6 +20,11 @@ function service($http, baseUrl) {
 
     const BASE = `${baseUrl}/survey-template`;
 
+    const create = (cmd) => {
+        return $http.post(`${BASE}`, cmd)
+            .then(result => result.data);
+    };
+
     const getById = (id) => {
         return $http.get(`${BASE}/${id}`)
             .then(result => result.data);
@@ -30,9 +35,16 @@ function service($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const update = (cmd) => {
+        return $http.put(`${BASE}`, cmd)
+            .then(result => result.data);
+    };
+
     return {
+        create,
         getById,
-        findActive
+        findActive,
+        update
     };
 }
 

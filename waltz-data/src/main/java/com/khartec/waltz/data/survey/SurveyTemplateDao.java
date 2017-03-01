@@ -4,6 +4,7 @@ package com.khartec.waltz.data.survey;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.survey.ImmutableSurveyTemplate;
 import com.khartec.waltz.model.survey.SurveyTemplate;
+import com.khartec.waltz.model.survey.SurveyTemplateChangeCommand;
 import com.khartec.waltz.model.survey.SurveyTemplateStatus;
 import com.khartec.waltz.schema.tables.records.SurveyTemplateRecord;
 import org.jooq.DSLContext;
@@ -86,5 +87,17 @@ public class SurveyTemplateDao {
                 .returning(SURVEY_TEMPLATE.ID)
                 .fetchOne()
                 .getId();
+    }
+
+
+    public int update(SurveyTemplateChangeCommand command) {
+        checkNotNull(command, "command cannot be null");
+
+        return dsl.update(SURVEY_TEMPLATE)
+                .set(SURVEY_TEMPLATE.NAME, command.name())
+                .set(SURVEY_TEMPLATE.DESCRIPTION, command.description())
+                .set(SURVEY_TEMPLATE.TARGET_ENTITY_KIND, command.targetEntityKind().name())
+                .where(SURVEY_TEMPLATE.ID.eq(command.id().get()))
+                .execute();
     }
 }

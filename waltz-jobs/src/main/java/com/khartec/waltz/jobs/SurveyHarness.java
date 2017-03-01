@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.LongStream;
 
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static java.util.stream.Collectors.toList;
 
 
@@ -50,16 +49,13 @@ public class SurveyHarness {
         SurveyTemplateService surveyTemplateService = ctx.getBean(SurveyTemplateService.class);
         SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
 
-        SurveyTemplate surveyTemplate = ImmutableSurveyTemplate.builder()
+        SurveyTemplateChangeCommand surveyTemplateChangeCommand = ImmutableSurveyTemplateChangeCommand.builder()
                 .name("AAA")
                 .description("BBB")
-                .ownerId(1L)
                 .targetEntityKind(EntityKind.CHANGE_INITIATIVE)
-                .status(SurveyTemplateStatus.ACTIVE)
-                .createdAt(nowUtc())
                 .build();
 
-        long templateId = surveyTemplateService.create("admin", surveyTemplate);
+        long templateId = surveyTemplateService.create("admin", surveyTemplateChangeCommand);
         System.out.println("Created: template create with ID = " + templateId);
 
         SurveyQuestion surveyQuestion = ImmutableSurveyQuestion.builder()
