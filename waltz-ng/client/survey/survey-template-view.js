@@ -32,14 +32,16 @@ function controller($stateParams,
     surveyTemplateStore
         .getById(templateId)
         .then(t => {
-            vm.template = t;
-            personStore
-                .getById(t.ownerId)
-                .then(p => {
-                    if (p) {
-                        vm.people[t.ownerId] = p;
-                    }
-                });
+            if (t) {
+                vm.template = t;
+                personStore
+                    .getById(t.ownerId)
+                    .then(p => {
+                        if (p) {
+                            vm.people[t.ownerId] = p;
+                        }
+                    });
+            }
         });
 
     surveyRunStore
