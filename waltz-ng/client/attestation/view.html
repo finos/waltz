@@ -1,0 +1,30 @@
+<div>
+    <waltz-page-header name="Attestations"
+                       small="{{ ctrl.entityRef.name }}">
+    </waltz-page-header>
+
+    <waltz-section name="Entries">
+
+        <waltz-section-actions>
+            <button ng-click="ctrl.exportAttestations()"
+                    class="btn btn-xs btn-primary"
+                    ng-if="ctrl.entries.length > 0">
+                <waltz-icon name="cloud-download"></waltz-icon>
+                Export
+            </button>
+        </waltz-section-actions>
+
+        <div ng-if="ctrl.entries.length > 0">
+            <waltz-attestation-table entries="ctrl.entries"
+                                    on-initialise="ctrl.attestationTableInitialised">
+            </waltz-attestation-table>
+        </div>
+
+        <div ng-if="ctrl.entries.length == 0">
+            <i class="text-muted">
+                No attestations for <span ng-bind="ctrl.entityRef.name"></span>
+            </i>
+        </div>
+    </waltz-section>
+
+</div>

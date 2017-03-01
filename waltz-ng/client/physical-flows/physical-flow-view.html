@@ -28,9 +28,24 @@
             </button>
         </waltz-section-actions>
 
+
         <waltz-physical-flow-overview physical-flow="ctrl.physicalFlow"
                                       specification="ctrl.specification">
         </waltz-physical-flow-overview>
+
+
+        <div class="small">
+            <a class="clickable pull-right"
+               ui-sref="main.attestation.view ( {
+                        id: ctrl.physicalFlow.id,
+                        kind: 'PHYSICAL_FLOW',
+                        name: ctrl.specification.owningEntity.name + ' → ' + ctrl.physicalFlow.target.name
+                } )">
+                view attestations
+            </a>
+            <br>
+        </div>
+
     </div>
 
     <br>

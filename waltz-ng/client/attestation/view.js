@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
+import {initialiseData} from '../common'
 
 
 const initialState = {
@@ -26,9 +26,9 @@ const initialState = {
 
 
 function controller($stateParams,
-                    changeLogStore) {
+                    attestationStore) {
 
-    const vm = _.defaultsDeep(this);
+    const vm = initialiseData(this, initialState);
 
     const entityRef = {
         kind: $stateParams.kind,
@@ -36,21 +36,21 @@ function controller($stateParams,
         name: $stateParams.name
     };
 
-    vm.changeLogTableInitialised = (api) => {
-        vm.exportChangeLog = () => api.exportFn("change-log.csv");
+    vm.attestationTableInitialised = (api) => {
+        vm.exportAttestations = () => api.exportFn("attestations.csv");
     };
 
 
     vm.entityRef = entityRef;
-    changeLogStore
-        .findByEntityReference(entityRef.kind, entityRef.id)
+    attestationStore
+        .findForEntity(entityRef)
         .then(rs => vm.entries = rs);
 }
 
 
 controller.$inject = [
     '$stateParams',
-    'ChangeLogStore'
+    'AttestationStore'
 ];
 
 

@@ -23,7 +23,6 @@ const bindings = {
     columnDefs: '<',
     entries: '<',
     searchPlaceholderText: '@',
-    exportFilename: '@',
     onInitialise: '<',
     onChange: '<'
 };
