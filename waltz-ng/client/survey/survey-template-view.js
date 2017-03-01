@@ -27,12 +27,21 @@ function controller($stateParams,
 
     const vm = this;
 
+    vm.people = {};
+
     surveyTemplateStore
         .getById(templateId)
-        .then(t => vm.template = t)
-        .then(t => personStore.getById(t.ownerId));
+        .then(t => {
+            vm.template = t;
+            personStore
+                .getById(t.ownerId)
+                .then(p => {
+                    if (p) {
+                        vm.people[t.ownerId] = p;
+                    }
+                });
+        });
 
-    vm.people = {};
     surveyRunStore
         .findByTemplateId(templateId)
         .then(rs => {

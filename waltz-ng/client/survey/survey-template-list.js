@@ -43,7 +43,11 @@ function loadOwners(holder, personStore, templates = []) {
 
     _.each(
         personIds,
-        id => personStore.getById(id).then(p => holder.owners[p.id] = p));
+        id => personStore.getById(id).then(p => {
+            if (p) {
+                holder.owners[id] = p;
+            }
+        }));
 }
 
 function controller(personStore, surveyTemplateStore) {
