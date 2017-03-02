@@ -35,7 +35,6 @@ const bindings = {
 
 
 const initialState = {
-    //people: []
 };
 
 
@@ -46,10 +45,6 @@ function controller() {
     const vm = this;
 
     vm.$onInit = () => initialiseData(vm, initialState);
-
-    vm.$onChanges = (c) => {
-        vm.peopleById = _.keyBy(vm.people || [], 'id');
-    };
 }
 
 
