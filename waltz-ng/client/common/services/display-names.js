@@ -241,6 +241,14 @@ export const surveyRunStatusNames = {
 };
 
 
+export const surveyQuestionFieldTypeNames = {
+    TEXT: 'Text',
+    TEXTAREA: 'Text Area',
+    NUMBER: 'Number',
+    BOOLEAN: 'Boolean'
+};
+
+
 /**
  * Used to convert a map of ( { code -> displayName }
  * @param lookups

@@ -76,9 +76,16 @@ function controller($stateParams,
 
     vm.showAddQuestionForm = () => {
         vm.editingQuestion = true;
+        const currentMaxPos = _.chain(vm.surveyQuestions)
+            .map(q => q.position)
+            .max()
+            .value();
+
         vm.selectedQuestion = {
             surveyTemplateId: vm.id,
-            position: vm.surveyQuestions.length + 1
+            isMandatory: false,
+            allowComment: false,
+            position: (currentMaxPos || 0) + 10
         };
     };
 

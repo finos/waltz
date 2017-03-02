@@ -38,6 +38,7 @@ import {
     surveyInstanceStatusNames,
     surveyRunStatusNames,
     surveyTemplateStatusNames,
+    surveyQuestionFieldTypeNames,
     usageKindDisplayNames,
     transportKindNames,
     frequencyKindNames,
@@ -128,6 +129,7 @@ export default (module) => {
         .register('surveyInstanceStatus', surveyInstanceStatusNames)
         .register('surveyRunStatus', surveyRunStatusNames)
         .register('surveyTemplateStatus', surveyTemplateStatusNames)
+        .register('surveyQuestionFieldType', surveyQuestionFieldTypeNames)
         .register('usageKind', usageKindDisplayNames)
         .register('transportKind', transportKindNames)
         ;
