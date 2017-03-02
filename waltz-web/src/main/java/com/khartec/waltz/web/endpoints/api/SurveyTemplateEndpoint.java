@@ -56,13 +56,12 @@ public class SurveyTemplateEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, ":id");
-        String findAllActivePath = mkPath(BASE_URL, "active");
 
         DatumRoute<SurveyTemplate> getByIdRoute = (request, response) ->
                 surveyTemplateService.getById(getId(request));
 
-        ListRoute<SurveyTemplate> findAllActiveRoute = (request, response) ->
-                surveyTemplateService.findAllActive();
+        ListRoute<SurveyTemplate> findAllRoute = (request, response) ->
+                surveyTemplateService.findAll(getUsername(request));
 
         DatumRoute<Long> createSurveyTemplateRoute =
                 (req, res) -> {
@@ -80,7 +79,7 @@ public class SurveyTemplateEndpoint implements Endpoint {
                             readBody(req, SurveyTemplateChangeCommand.class));
                 };
 
-        getForList(findAllActivePath, findAllActiveRoute);
+        getForList(BASE_URL, findAllRoute);
         getForDatum(getByIdPath, getByIdRoute);
         postForDatum(BASE_URL, createSurveyTemplateRoute);
         putForDatum(BASE_URL, updateSurveyTemplateRoute);

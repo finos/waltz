@@ -70,10 +70,17 @@ public class SurveyTemplateDao {
     }
 
 
-    public List<SurveyTemplate> findAllActive() {
+    /**
+     * @param ownerId
+     * @return Returns all 'ACTIVE' templates (owned by any user)
+     *          and all 'DRAFT' templates owned by the specified user
+     */
+    public List<SurveyTemplate> findAll(long ownerId) {
         return dsl.select()
                 .from(SURVEY_TEMPLATE)
                 .where(SURVEY_TEMPLATE.STATUS.eq(SurveyTemplateStatus.ACTIVE.name()))
+                .or(SURVEY_TEMPLATE.STATUS.eq(SurveyTemplateStatus.DRAFT.name())
+                        .and(SURVEY_TEMPLATE.OWNER_ID.eq(ownerId)))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

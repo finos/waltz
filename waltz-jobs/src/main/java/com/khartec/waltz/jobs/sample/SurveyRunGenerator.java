@@ -77,19 +77,20 @@ public class SurveyRunGenerator {
             final AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
             final DSLContext dsl = ctx.getBean(DSLContext.class);
 
+            List<Person> owners = dsl.selectFrom(PERSON)
+                    .limit(NUMBER_OF_RUNS)
+                    .fetch()
+                    .map(PersonDao.personMapper);
+            checkFalse(isEmpty(owners), "No person found, please generate person data first");
+
             final SurveyTemplateDao surveyTemplateDao = ctx.getBean(SurveyTemplateDao.class);
-            List<SurveyTemplate> surveyTemplates = surveyTemplateDao.findAllActive();
+            List<SurveyTemplate> surveyTemplates = surveyTemplateDao.findAll(owners.get(0).id().get());
             checkFalse(isEmpty(surveyTemplates), "No template found, please generate templates first");
 
             final AppGroupDao appGroupDao = ctx.getBean(AppGroupDao.class);
             List<AppGroup> appGroups = appGroupDao.findPublicGroups();
             checkFalse(isEmpty(appGroups), "No public app group found, please generate app groups first");
 
-            List<Person> owners = dsl.selectFrom(PERSON)
-                    .limit(NUMBER_OF_RUNS)
-                    .fetch()
-                    .map(PersonDao.personMapper);
-            checkFalse(isEmpty(owners), "No person found, please generate person data first");
 
             final InvolvementKindDao involvementKindDao = ctx.getBean(InvolvementKindDao.class);
             List<InvolvementKind> involvementKinds = involvementKindDao.findAll();

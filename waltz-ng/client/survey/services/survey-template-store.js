@@ -30,8 +30,8 @@ function service($http, baseUrl) {
             .then(result => result.data);
     };
 
-    const findActive = () => {
-        return $http.get(`${BASE}/active`)
+    const findAll = () => {
+        return $http.get(`${BASE}`)
             .then(result => result.data);
     };
 
@@ -43,7 +43,7 @@ function service($http, baseUrl) {
     return {
         create,
         getById,
-        findActive,
+        findAll,
         update
     };
 }
