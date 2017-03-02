@@ -20,6 +20,12 @@ function store($http,
                  BaseApiUrl) {
     const BASE = `${BaseApiUrl}/person`;
 
+    const unknownPerson = (id, displayName = 'Unknown') => {
+        return {
+            id: id,
+            displayName: displayName
+        }
+    };
 
     const getByEmployeeId = (empId) => $http
         .get(`${BASE}/employee-id/${empId}`)
@@ -32,7 +38,7 @@ function store($http,
 
     const getById = (id) => $http
         .get(`${BASE}/id/${id}`)
-        .then(result => result.data);
+        .then(result => (result.data)? result.data : unknownPerson(id));
 
     const findDirects = (empId) => $http
         .get(`${BASE}/employee-id/${empId}/directs`)
