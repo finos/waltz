@@ -17,4 +17,9 @@ $invalid-color: #f0ad4e;
     select.ng-invalid {
         border-color: $invalid-color;
     }
+
+    input[type=checkbox] {
+        box-shadow: none;
+        margin: 0;
+    }
 }

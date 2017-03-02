@@ -1,0 +1,289 @@
+<div>
+    <waltz-page-header icon="wpforms"
+                       name="Survey Template"
+                       small="Edit">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.survey.instance.user">Survey</a></li>
+            <li><a ui-sref="main.survey.template.list">Templates</a></li>
+            <li>
+                <a ui-sref="main.survey.template.view ({id: ctrl.id})">
+                    <span ng-bind="ctrl.surveyTemplate.name"></span>
+                </a>
+            </li>
+            <li>Edit</li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <form name="surveyTemplateForm"
+              class="waltz-survey-form form-horizontal"
+              role="form"
+              novalidate>
+
+            <div class="form-group">
+                <label for="name"
+                       class="col-sm-2 control-label">
+                    Name <span class="text-danger">*</span>
+                </label>
+                <div class="col-sm-10">
+                    <input class="form-control form-control-warning"
+                           required
+                           id="name"
+                           placeholder="Name for this template"
+                           ng-model="ctrl.surveyTemplate.name" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description"
+                       class="col-sm-2 control-label">
+                    Description
+                </label>
+                <div class="col-sm-10">
+                <textarea id="description"
+                          class="form-control"
+                          placeholder="Description for this template"
+                          ng-model="ctrl.surveyTemplate.description"
+                          rows="4">
+                </textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="targetEntityKind"
+                       class="col-sm-2 control-label">
+                    Target Kind <span class="text-danger">*</span>
+                </label>
+                <div class="col-sm-10">
+                    <select id="targetEntityKind"
+                            required
+                            class="form-control"
+                            ng-options="kind.value as kind.name for kind in ctrl.targetEntityKinds"
+                            ng-model="ctrl.surveyTemplate.targetEntityKind">
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" style="padding-top: 10px">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="button"
+                            ng-if="!(surveyTemplateForm.$invalid)"
+                            ng-click="ctrl.updateTemplate()"
+                            class="btn btn-success">
+                        Update
+                    </button>
+                    <span ng-if="surveyTemplateForm.$invalid"
+                          class="alert alert-warning"
+                          style="padding-bottom: 10px;">
+                    Please fill in all required fields
+                </span>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <br>
+
+    <waltz-section icon="question"
+                   name="Questions"
+                   small="( {{ ctrl.surveyQuestions.length }} )">
+        <waltz-section-actions>
+            <a class="btn btn-primary btn-xs"
+               waltz-has-role="SURVEY_ADMIN"
+               ng-click="ctrl.showAddQuestionForm()">
+                Add New
+            </a>
+        </waltz-section-actions>
+
+        <div ng-if="ctrl.editingQuestion">
+            <form name="surveyQuestionForm"
+                  class="waltz-survey-form form-horizontal"
+                  role="form"
+                  novalidate>
+
+                <div class="form-group">
+                    <label for="qSectionName"
+                           class="col-sm-2 control-label">
+                        Section Name
+                    </label>
+                    <div class="col-sm-10">
+                        <input class="form-control form-control-warning"
+                               id="qSectionName"
+                               placeholder="Section name for this question"
+                               ng-model="ctrl.selectedQuestion.sectionName" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="qText"
+                           class="col-sm-2 control-label">
+                        Question Text <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-sm-10">
+                        <textarea id="qText"
+                                  class="form-control"
+                                  required
+                                  placeholder="Question text"
+                                  ng-model="ctrl.selectedQuestion.questionText"
+                                  rows="3">
+                        </textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="qFieldType"
+                           class="col-sm-2 control-label">
+                        Field Type <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-sm-10">
+                        <select id="qFieldType"
+                                required
+                                class="form-control"
+                                ng-options="fieldType.value as fieldType.name for fieldType in ctrl.questionFieldTypes"
+                                ng-model="ctrl.selectedQuestion.fieldType">
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="qHelpText"
+                           class="col-sm-2 control-label">
+                        Help Text
+                    </label>
+                    <div class="col-sm-10">
+                        <textarea id="qHelpText"
+                                  class="form-control"
+                                  placeholder="Help text (appears below the question)"
+                                  ng-model="ctrl.selectedQuestion.helpText"
+                                  rows="3">
+                        </textarea>
+                    </div>
+                </div>
+
+                <div class="form-group"></div>
+
+                <div class="form-group">
+                    <label for="qIsMandatory"
+                    class="col-sm-2 control-label">
+                        Is Mandatory
+                    </label>
+                    <div class="col-sm-4">
+                        <input class="form-control form-control-warning"
+                        type="checkbox"
+                        id="qIsMandatory"
+                        ng-model="ctrl.selectedQuestion.isMandatory" />
+                    </div>
+
+                    <label for="qAllowComment"
+                           class="col-sm-2 control-label">
+                        Allow Comment
+                    </label>
+                    <div class="col-sm-4">
+                        <input class="form-control form-control-warning"
+                               type="checkbox"
+                               id="qAllowComment"
+                               ng-model="ctrl.selectedQuestion.allowComment" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="qPosition"
+                           class="col-sm-2 control-label">
+                        Position <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-sm-10">
+                        <input class="form-control form-control-warning"
+                               type="number"
+                               id="qPosition"
+                               required
+                               placeholder="Controls the order of the questions"
+                               ng-model="ctrl.selectedQuestion.position" />
+                        <div class='small text-muted'>
+                            We recommended using position values in increments of 10 for easier re-ordering in future
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="padding-top: 10px">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <span ng-if="ctrl.selectedQuestion.id">
+                            <button type="button"
+                                    ng-if="!(surveyQuestionForm.$invalid)"
+                                    ng-click="ctrl.updateQuestion(ctrl.selectedQuestion)"
+                                    class="btn btn-success">
+                                Update
+                            </button>
+                            <button type="button"
+                                    ng-click="ctrl.deleteQuestion(ctrl.selectedQuestion)"
+                                    class="btn btn-danger">
+                                Delete
+                            </button>
+                        </span>
+                        <span ng-if="! ctrl.selectedQuestion.id">
+                            <button type="button"
+                                    ng-if="!(surveyQuestionForm.$invalid)"
+                                    ng-click="ctrl.createQuestion(ctrl.selectedQuestion)"
+                                    class="btn btn-success">
+                                Create
+                            </button>
+                        </span>
+                        <span ng-if="surveyQuestionForm.$invalid"
+                              class="alert alert-warning"
+                              style="padding-bottom: 10px;">
+                            Please fill in all required fields
+                        </span>
+                        &nbsp;
+                        <a class="clickable"
+                           ng-click="ctrl.cancelQuestionForm()">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </form>
+            <hr>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <table class="table table.condensed">
+                    <colgroup>
+                        <col width="13%">
+                        <col width="25%">
+                        <col width="13%">
+                        <col width="24%">
+                        <col width="10%">
+                        <col width="13%">
+                        <col width="8%">
+                        <col width="4%">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>Section Name</th>
+                        <th>Question Text</th>
+                        <th>Field Type</th>
+                        <th>Help Text</th>
+                        <th>Mandatory</th>
+                        <th>Allow Comment</th>
+                        <th>Position</th>
+                    </tr>
+                    </thead>
+                    <tr ng-repeat="q in ctrl.surveyQuestions | orderBy:'position'">
+                        <td><span ng-bind="q.sectionName"></span></td>
+                        <td><span ng-bind="q.questionText"></span></td>
+                        <td><span ng-bind="q.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>
+                        <td><span ng-bind="q.helpText"></span></td>
+                        <td><span ng-bind="q.isMandatory"></span></td>
+                        <td><span ng-bind="q.allowComment"></span></td>
+                        <td><span ng-bind="q.position"></span></td>
+                        <td><a ng-click="ctrl.showEditQuestionForm(q)"
+                               class="btn btn-xs waltz-visibility-child-30">
+                            <waltz-icon name="pencil"></waltz-icon>
+                            Edit
+                        </a></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </waltz-section>
+</div>

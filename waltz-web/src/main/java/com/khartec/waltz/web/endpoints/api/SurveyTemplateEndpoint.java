@@ -19,6 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.survey.SurveyTemplate;
+import com.khartec.waltz.model.survey.SurveyTemplateChangeCommand;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.survey.SurveyTemplateService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -66,12 +67,23 @@ public class SurveyTemplateEndpoint implements Endpoint {
         DatumRoute<Long> createSurveyTemplateRoute =
                 (req, res) -> {
                     ensureUserHasAdminRights(req);
-                    return surveyTemplateService.create(getUsername(req), readBody(req, SurveyTemplate.class));
+                    return surveyTemplateService.create(
+                            getUsername(req),
+                            readBody(req, SurveyTemplateChangeCommand.class));
+                };
+
+        DatumRoute<Integer> updateSurveyTemplateRoute =
+                (req, res) -> {
+                    ensureUserHasAdminRights(req);
+                    return surveyTemplateService.update(
+                            getUsername(req),
+                            readBody(req, SurveyTemplateChangeCommand.class));
                 };
 
         getForList(findAllActivePath, findAllActiveRoute);
         getForDatum(getByIdPath, getByIdRoute);
         postForDatum(BASE_URL, createSurveyTemplateRoute);
+        putForDatum(BASE_URL, updateSurveyTemplateRoute);
     }
 
 

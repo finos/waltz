@@ -9,6 +9,13 @@
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-section-actions>
+            <a class="btn btn-primary btn-xs"
+               waltz-has-role="SURVEY_ADMIN"
+               ui-sref="main.survey.template.create">
+                Create New
+            </a>
+        </waltz-section-actions>
 
         <div ng-repeat="group in ctrl.groupedTemplates track by group.key">
             <br ng-if="!$first">

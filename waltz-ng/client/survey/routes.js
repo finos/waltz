@@ -72,6 +72,18 @@ const templateListState = {
 };
 
 
+const templateCreateState = {
+    url: '/create',
+    views: {'content@': require('./survey-template-create')}
+};
+
+
+const templateEditState = {
+    url: '/{id:int}/edit',
+    views: {'content@': require('./survey-template-edit')}
+};
+
+
 const templateViewState = {
     url: '/{id:int}/view',
     views: {'content@': require('./survey-template-view')}
@@ -90,6 +102,8 @@ function setup($stateProvider) {
         .state('main.survey.instance.view', instanceViewState)
         .state('main.survey.template', templateBaseState)
         .state('main.survey.template.list', templateListState)
+        .state('main.survey.template.create', templateCreateState)
+        .state('main.survey.template.edit', templateEditState)
         .state('main.survey.template.view', templateViewState);
 
 }

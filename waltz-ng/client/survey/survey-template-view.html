@@ -11,6 +11,15 @@
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-section-actions>
+            <a class="btn btn-primary btn-xs"
+               waltz-has-role="SURVEY_ADMIN"
+               ng-if="ctrl.template.status === 'DRAFT'"
+               ui-sref="main.survey.template.edit ({id: ctrl.template.id })">
+                Edit
+            </a>
+        </waltz-section-actions>
+
         <waltz-survey-template-overview template="ctrl.template"
                                         people="ctrl.people">
         </waltz-survey-template-overview>
