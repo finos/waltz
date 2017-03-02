@@ -47,8 +47,13 @@ public class SurveyTemplateService {
     }
 
 
-    public List<SurveyTemplate> findAllActive() {
-        return surveyTemplateDao.findAllActive();
+    public List<SurveyTemplate> findAll(String userName) {
+        checkNotNull(userName, "userName cannot be null");
+
+        Person owner = personDao.getByUserName(userName);
+        checkNotNull(owner, "userName " + userName + " cannot be resolved");
+
+        return surveyTemplateDao.findAll(owner.id().get());
     }
 
 

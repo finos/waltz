@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
-import {nest} from 'd3-collection';
-import {ascending} from 'd3-array';
+import _ from "lodash";
+import {nest} from "d3-collection";
+import {ascending} from "d3-array";
 
 
 function processTemplates(templates = []) {
@@ -55,7 +55,7 @@ function controller(personStore, surveyTemplateStore) {
     const vm = this;
 
     surveyTemplateStore
-        .findActive()
+        .findAll()
         .then(ts => {
             vm.groupedTemplates = processTemplates(ts);
             loadOwners(vm, personStore, ts)
