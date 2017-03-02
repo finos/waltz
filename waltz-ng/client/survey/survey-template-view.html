@@ -34,15 +34,17 @@
                 <colgroup>
                     <col width="30%">
                     <col width="10%">
-                    <col width="15%">
                     <col width="10%">
                     <col width="15%">
+                    <col width="10%">
+                    <col width="10%">
                     <col width="15%">
                 </colgroup>
                 <thead>
                 <tr>
                     <th>Name</th>
                     <th>Status</th>
+                    <th>Responses</th>
                     <th>Contact</th>
                     <th>Issued</th>
                     <th>Due</th>
@@ -56,6 +58,28 @@
                            ui-sref="main.survey.run.view ({id: r.id})"></a>
                     </td>
                     <td><span ng-bind="r.status | toDisplayName:'surveyRunStatus'"></span></td>
+                    <td>
+                        <div uib-popover="{{ctrl.runCompletionRates[r.id].text}}" popover-trigger="mouseenter">
+                            <uib-progress max="ctrl.runCompletionRates[r.id].totalCount">
+                                <uib-bar value="ctrl.runCompletionRates[r.id].completedCount"
+                                         ng-bind="ctrl.runCompletionRates[r.id].completedCount"
+                                         type="success">
+                                </uib-bar>
+                                <uib-bar value="ctrl.runCompletionRates[r.id].inProgressCount"
+                                         ng-bind="ctrl.runCompletionRates[r.id].inProgressCount"
+                                         type="info">
+                                </uib-bar>
+                                <uib-bar value="ctrl.runCompletionRates[r.id].notStartedCount"
+                                         ng-bind="ctrl.runCompletionRates[r.id].notStartedCount"
+                                         type="warning">
+                                </uib-bar>
+                                <uib-bar value="ctrl.runCompletionRates[r.id].expiredCount"
+                                         ng-bind="ctrl.runCompletionRates[r.id].expiredCount"
+                                         type="danger">
+                                </uib-bar>
+                            </uib-progress>
+                        </div>
+                    </td>
                     <td><span ng-bind="r.contactEmail"></span></td>
                     <td><waltz-from-now timestamp="r.issuedOn"></waltz-from-now></td>
                     <td><waltz-from-now ng-if='r.dueDate'
@@ -65,7 +89,7 @@
                 </tr>
             </table>
         </div>
-        <span ng-if="ctrl.draftRuns.length > 0" 
+        <span ng-if="ctrl.draftRuns.length > 0"
               class="text-muted small">
             Excluding <b ng-bind="ctrl.draftRuns.length"></b> draft run(s).
         </span>

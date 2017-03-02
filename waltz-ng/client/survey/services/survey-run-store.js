@@ -74,6 +74,12 @@ function store($http, baseApiUrl) {
             .post(`${base}/${id}/recipients`, excludedRecipients);
     };
 
+    const getCompletionRate = (id) => {
+        return $http
+            .get(`${base}/${id}/completion-rate`)
+            .then(r => r.data);
+    };
+
     return {
         create,
         getById,
@@ -83,7 +89,8 @@ function store($http, baseApiUrl) {
         update,
         updateStatus,
         generateSurveyRunRecipients,
-        createSurveyRunInstancesAndRecipients
+        createSurveyRunInstancesAndRecipients,
+        getCompletionRate
     };
 }
 
