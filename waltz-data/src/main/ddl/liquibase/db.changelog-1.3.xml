@@ -23,6 +23,97 @@
                    logicalFilePath="db.changelog-1.3.xml">
 
     <!-- NOTE: if copying remember to update logical file path (above) -->
-    <!-- NOTE: changes should now be described with a comment tag rather than an xml comment -->
+    <!-- NOTE: changes should now be described with a comment tag -->
 
+    <!-- 1742 -->
+    <changeSet id="20170228-1742-1"
+               author="davidwatkins73">
+        <comment>1742: create data type association table</comment>
+        <createTable tableName="data_type_association"
+                     remarks="Used to associate entities to data types. Entities are typically flow, specifications or applications">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="data_type_association_pkey"/>
+            </column>
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_type_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20170303-1742-2"
+               author="dwatkins">
+        <comment>1742: populate associations from data_type_usage</comment>
+        <sql>
+            INSERT INTO data_type_association (entity_id,
+                                                entity_kind,
+                                                data_type_id,
+                                                description,
+                                                last_updated_at,
+                                                last_updated_by,
+                                                provenance)
+            SELECT dtu.entity_id,
+                    dtu.entity_kind,
+                    dt.id,
+                    dtu.description,
+                    ${now.value},
+                    'admin',
+                    dtu.provenance
+            FROM data_type_usage dtu
+            INNER JOIN data_type dt
+                ON dtu.data_type_code = dt.code;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20170303-1742-3"
+               author="dwatkins">
+        <comment>1742: populate associations from data_flow_decorator</comment>
+        <sql>
+            INSERT INTO data_type_association (entity_id,
+                                                entity_kind,
+                                                data_type_id,
+                                                description,
+                                                last_updated_at,
+                                                last_updated_by,
+                                                provenance)
+            SELECT data_flow_id,
+                    'LOGICAL_DATA_FLOW',
+                    decorator_entity_id,
+                    '',
+                    ${now.value},
+                    'admin',
+                    provenance
+            FROM data_flow_decorator
+            WHERE decorator_entity_kind = 'DATA_TYPE' ;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
