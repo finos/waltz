@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from "lodash";
 import {initialiseData} from "../../common";
+import {strToBool} from "../bool-utils";
 
 
 const bindings = {
@@ -24,32 +24,27 @@ const bindings = {
 };
 
 
-const template = `<waltz-icon ng-if="$ctrl.value" name="check"></waltz-icon>
-                  <span ng-if="! $ctrl.value">-</span>`;
+const template = `<waltz-icon ng-if="$ctrl.booleanValue === true" name="check" class="text-success"></waltz-icon>
+                  <waltz-icon ng-if="$ctrl.booleanValue === false" name="times" class="text-danger"></waltz-icon>
+                  <span ng-if="$ctrl.booleanValue == null" class="text-muted">-</span>`;
 
 
 const initialState = {
-    booleanValue: false
+    booleanValue: null
 };
-
-
-const trueStrings = ['TRUE', 'YES'];
-
-
-function isTrueString(str) {
-    return str
-            && _.isString(str)
-            && _.includes(trueStrings, _.upperCase(str));
-
-}
 
 
 function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (changes) => {
-        vm.booleanValue = !!(vm.value
-                             && (vm.value === true || isTrueString(vm.value)));
+        if (vm.value === true || strToBool(vm.value) === true) {
+            vm.booleanValue = true;
+        } else if (vm.value === false || strToBool(vm.value) === false) {
+            vm.booleanValue = false;
+        } else {
+            vm.booleanValue = null;
+        }
     };
 }
 
