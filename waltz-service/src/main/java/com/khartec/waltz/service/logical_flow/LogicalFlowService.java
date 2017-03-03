@@ -31,7 +31,6 @@ import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.logical_flow.*;
 import com.khartec.waltz.model.tally.TallyPack;
-import com.khartec.waltz.service.attestation.AttestationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
@@ -58,7 +57,6 @@ public class LogicalFlowService {
 
     private static final String PROVENANCE = "waltz";
 
-    private final AttestationService attestationService;
     private final LogicalFlowDao logicalFlowDao;
     private final LogicalFlowStatsDao logicalFlowStatsDao;
     private final DataFlowDecoratorService dataFlowDecoratorService;
@@ -70,8 +68,7 @@ public class LogicalFlowService {
 
 
     @Autowired
-    public LogicalFlowService(AttestationService attestationService,
-                              LogicalFlowDao logicalFlowDao,
+    public LogicalFlowService(LogicalFlowDao logicalFlowDao,
                               LogicalFlowStatsDao logicalFlowStatsDao,
                               DataFlowDecoratorService dataFlowDecoratorService,
                               ApplicationIdSelectorFactory appIdSelectorFactory,
@@ -79,7 +76,6 @@ public class LogicalFlowService {
                               DataTypeUsageService dataTypeUsageService,
                               ChangeLogService changeLogService,
                               DBExecutorPoolInterface dbExecutorPool) {
-        checkNotNull(attestationService, "attestationService cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
         checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
@@ -89,7 +85,6 @@ public class LogicalFlowService {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
 
-        this.attestationService = attestationService;
         this.appIdSelectorFactory = appIdSelectorFactory;
         this.logicalFlowStatsDao = logicalFlowStatsDao;
         this.logicalFlowDao = logicalFlowDao;
@@ -149,12 +144,6 @@ public class LogicalFlowService {
 
         LogicalFlow logicalFlow = logicalFlowDao.addFlow(flowToAdd);
 
-        attestationService.explicitlyAttest(
-                LOGICAL_DATA_FLOW,
-                logicalFlow.id().get(),
-                username,
-                "Creation of logical flow via Waltz");
-
         return logicalFlow;
     }
 
@@ -185,10 +174,6 @@ public class LogicalFlowService {
                 username,
                 Operation.REMOVE));
         dataTypeUsageService.recalculateForApplications(affectedEntityRefs.toArray(new EntityReference[affectedEntityRefs.size()]));
-
-        flowIds.forEach(logicalFlowId -> {
-            attestationService.deleteForEntity(EntityReference.mkRef(LOGICAL_DATA_FLOW, logicalFlowId), username);
-        });
 
         return deleted;
     }
