@@ -24,15 +24,12 @@ import com.khartec.waltz.data.data_flow_decorator.DataFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.attestation.AttestationType;
-import com.khartec.waltz.model.attestation.ImmutableAttestation;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableDataFlowDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
-import com.khartec.waltz.service.attestation.AttestationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
@@ -47,12 +44,10 @@ import java.util.Set;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
-import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 
 @Service
 public class DataFlowDecoratorService {
 
-    private final AttestationService attestationService;
     private final DataFlowDecoratorDao dataFlowDecoratorDao;
     private final DataFlowDecoratorRatingsService ratingsService;
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
@@ -63,8 +58,7 @@ public class DataFlowDecoratorService {
 
 
     @Autowired
-    public DataFlowDecoratorService(AttestationService attestationService,
-                                    DataFlowDecoratorDao dataFlowDecoratorDao,
+    public DataFlowDecoratorService(DataFlowDecoratorDao dataFlowDecoratorDao,
                                     DataFlowDecoratorRatingsService ratingsService,
                                     ApplicationIdSelectorFactory applicationIdSelectorFactory,
                                     DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
@@ -72,7 +66,6 @@ public class DataFlowDecoratorService {
                                     LogicalFlowDao dataFlowDao,
                                     ChangeLogService changeLogService) {
 
-        checkNotNull(attestationService, "attestationService cannot be null");
         checkNotNull(dataFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
         checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
         checkNotNull(ratingsService, "ratingsService cannot be null");
@@ -81,7 +74,6 @@ public class DataFlowDecoratorService {
         checkNotNull(dataFlowDao, "dataFlowDao cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
-        this.attestationService = attestationService;
         this.dataFlowDecoratorDao = dataFlowDecoratorDao;
         this.ratingsService = ratingsService;
         this.applicationIdSelectorFactory = applicationIdSelectorFactory;
@@ -181,12 +173,6 @@ public class DataFlowDecoratorService {
         LogicalFlow flow = dataFlowDao.findByFlowId(flowId);
         dataTypeUsageService.recalculateForApplications(flow.source(), flow.target());
         audit("Added", decoratorReferences, flow, username);
-
-        attestationService.implicitlyAttest(
-                LOGICAL_DATA_FLOW,
-                flowId,
-                username,
-                "Implicit due to data type decoration");
 
         return added;
     }
