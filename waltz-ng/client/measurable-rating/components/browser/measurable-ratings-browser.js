@@ -117,7 +117,7 @@ function prepareTabs(categories = [], measurables = []) {
             category,
             treeData,
             maxSize,
-            expandedNodes: _.clone(byCategory[category.id] || [])
+            expandedNodes: []
         };
     });
 
