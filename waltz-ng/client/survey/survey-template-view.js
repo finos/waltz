@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import _ from 'lodash';
+import _ from "lodash";
 import {initialiseData} from "../common/index";
 
 
@@ -24,12 +23,14 @@ const initialState = {
     template: {},
     issuedAndCompletedRuns: [],
     draftRuns: [],
+    questions: [],
     runCompletionRates: {}
 };
 
 
 function controller($stateParams,
                     personStore,
+                    surveyQuestionStore,
                     surveyRunStore,
                     surveyTemplateStore) {
     const vm = initialiseData(this, initialState);
@@ -84,12 +85,17 @@ function controller($stateParams,
                         }
                     }));
         });
+
+    surveyQuestionStore
+        .findForTemplate(templateId)
+        .then(qs => vm.questions = qs);
 }
 
 
 controller.$inject = [
     '$stateParams',
     'PersonStore',
+    'SurveyQuestionStore',
     'SurveyRunStore',
     'SurveyTemplateStore'
 ];
