@@ -72,7 +72,7 @@ public class SurveyTemplateGenerator {
                         .isMandatory(true)
                         .fieldType(SurveyQuestionFieldType.BOOLEAN)
                         .surveyTemplateId(templateId)
-                        .position(1)
+                        .position(10)
                         .build(),
                 ImmutableSurveyQuestion
                         .builder()
@@ -82,7 +82,7 @@ public class SurveyTemplateGenerator {
                         .allowComment(true)
                         .surveyTemplateId(templateId)
                         .fieldType(SurveyQuestionFieldType.NUMBER)
-                        .position(2)
+                        .position(20)
                         .build(),
                 ImmutableSurveyQuestion
                         .builder()
@@ -90,14 +90,14 @@ public class SurveyTemplateGenerator {
                         .isMandatory(true)
                         .surveyTemplateId(templateId)
                         .fieldType(SurveyQuestionFieldType.TEXTAREA)
-                        .position(3)
+                        .position(30)
                         .build(),
                 ImmutableSurveyQuestion
                         .builder()
                         .questionText("Who is your primary customer")
                         .surveyTemplateId(templateId)
                         .fieldType(SurveyQuestionFieldType.TEXT)
-                        .position(4)
+                        .position(40)
                         .build()
         );
     }
@@ -123,7 +123,7 @@ public class SurveyTemplateGenerator {
                         .surveyTemplateId(templateId)
                         .allowComment(true)
                         .fieldType(SurveyQuestionFieldType.BOOLEAN)
-                        .position(1)
+                        .position(10)
                         .build(),
                 ImmutableSurveyQuestion
                         .builder()
@@ -132,7 +132,7 @@ public class SurveyTemplateGenerator {
                         .isMandatory(true)
                         .surveyTemplateId(templateId)
                         .fieldType(SurveyQuestionFieldType.NUMBER)
-                        .position(2)
+                        .position(20)
                         .build(),
                 ImmutableSurveyQuestion
                         .builder()
@@ -140,14 +140,14 @@ public class SurveyTemplateGenerator {
                         .isMandatory(true)
                         .surveyTemplateId(templateId)
                         .fieldType(SurveyQuestionFieldType.TEXTAREA)
-                        .position(3)
+                        .position(30)
                         .build(),
                 ImmutableSurveyQuestion
                         .builder()
                         .surveyTemplateId(templateId)
                         .questionText("Who is the primary stakeholder?")
                         .fieldType(SurveyQuestionFieldType.TEXT)
-                        .position(4)
+                        .position(40)
                         .build()
         );
     }

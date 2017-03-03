@@ -34,26 +34,21 @@ const initialState = {
 };
 
 
-const trueStrings = ['TRUE', 'YES'];
+const aliases = {
+    'TRUE': true,
+    'YES': true,
+    'Y': true,
+    'FALSE': false,
+    'NO': false,
+    'N': false
+};
 
 
-const falseStrings = ['FALSE', 'NO'];
-
-
-function checkStr(str, collection) {
-    return str
-        && _.isString(str)
-        && _.includes(collection, _.upperCase(str));
-}
-
-
-function isTrueString(str) {
-    return checkStr(str, trueStrings);
-}
-
-
-function isFalseString(str) {
-    return checkStr(str, falseStrings);
+function strToBool(boolStr) {
+    if (boolStr && _.isString(boolStr) && _.has(aliases, boolStr)) {
+        return aliases[boolStr];
+    }
+    return null;
 }
 
 
@@ -61,9 +56,9 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (changes) => {
-        if (vm.value === true || isTrueString(vm.value)) {
+        if (vm.value === true || strToBool(vm.value) === true) {
             vm.booleanValue = true;
-        } else if (vm.value === false || isFalseString(vm.value)) {
+        } else if (vm.value === false || strToBool(vm.value) === false) {
             vm.booleanValue = false;
         } else {
             vm.booleanValue = null;
