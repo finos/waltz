@@ -24,23 +24,36 @@ const bindings = {
 };
 
 
-const template = `<waltz-icon ng-if="$ctrl.value" name="check"></waltz-icon>
-                  <span ng-if="! $ctrl.value">-</span>`;
+const template = `<waltz-icon ng-if="$ctrl.value === true" name="check" class="text-success"></waltz-icon>
+                  <waltz-icon ng-if="$ctrl.value === false" name="times" class="text-danger"></waltz-icon>
+                  <span ng-if="$ctrl.value == null" class="text-muted">-</span>`;
 
 
 const initialState = {
-    booleanValue: false
+    booleanValue: null
 };
 
 
 const trueStrings = ['TRUE', 'YES'];
 
 
-function isTrueString(str) {
-    return str
-            && _.isString(str)
-            && _.includes(trueStrings, _.upperCase(str));
+const falseStrings = ['FALSE', 'NO'];
 
+
+function checkStr(str, collection) {
+    return str
+        && _.isString(str)
+        && _.includes(collection, _.upperCase(str));
+}
+
+
+function isTrueString(str) {
+    return checkStr(str, trueStrings);
+}
+
+
+function isFalseString(str) {
+    return checkStr(str, falseStrings);
 }
 
 
@@ -48,8 +61,13 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (changes) => {
-        vm.booleanValue = !!(vm.value
-                             && (vm.value === true || isTrueString(vm.value)));
+        if (vm.value === true || isTrueString(vm.value)) {
+            vm.booleanValue = true;
+        } else if (vm.value === false || isFalseString(vm.value)) {
+            vm.booleanValue = false;
+        } else {
+            vm.booleanValue = null;
+        }
     };
 }
 

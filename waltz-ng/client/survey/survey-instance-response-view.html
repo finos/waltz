@@ -113,7 +113,13 @@
                     </div>
                     <div class="col-sm-7">
                         <div style="border-bottom: 1px dotted #ddd; margin-bottom: 1em">
-                            <div ng-bind="ctrl.answers[question.id].answer">
+                            <div ng-if="question.fieldType === 'BOOLEAN'">
+                                <waltz-boolean-renderer value="ctrl.answers[question.id].answer">
+                                </waltz-boolean-renderer>
+                            </div>
+                            <div ng-if="question.fieldType !== 'BOOLEAN'">
+                                <span ng-bind="ctrl.answers[question.id].answer">
+                                </span>
                             </div>
                             <div class='small text-muted'
                                  ng-if="ctrl.answers[question.id].comment">
