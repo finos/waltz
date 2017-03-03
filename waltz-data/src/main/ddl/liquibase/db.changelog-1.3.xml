@@ -116,4 +116,20 @@
             WHERE decorator_entity_kind = 'DATA_TYPE' ;
         </sql>
     </changeSet>
+
+
+    <!-- 1710: add submitted at/by to survey instance -->
+    <changeSet id="20170303-1710-1"
+               author="rovats">
+        <addColumn tableName="survey_instance">
+            <column name="submitted_at"
+                    type="TIMESTAMP">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="submitted_by"
+                    type="${name.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

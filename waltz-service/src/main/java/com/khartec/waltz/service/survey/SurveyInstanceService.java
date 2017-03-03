@@ -127,6 +127,10 @@ public class SurveyInstanceService {
         int result = surveyInstanceDao.updateStatus(instanceId, command.newStatus());
 
         if (result > 0) {
+            if (command.newStatus() == SurveyInstanceStatus.COMPLETED) {
+                surveyInstanceDao.updateSubmitted(instanceId, userName);
+            }
+
             changeLogService.write(
                     ImmutableChangeLog.builder()
                             .operation(Operation.ADD)

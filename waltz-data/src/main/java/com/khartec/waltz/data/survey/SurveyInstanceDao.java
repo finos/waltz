@@ -9,13 +9,16 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE_RECIPIENT;
+import static java.util.Optional.ofNullable;
 
 @Repository
 public class SurveyInstanceDao {
@@ -37,6 +40,8 @@ public class SurveyInstanceDao {
                         record.getEntityId(),
                         r.getValue(ENTITY_NAME_FIELD)))
                 .status(SurveyInstanceStatus.valueOf(record.getStatus()))
+                .submittedAt(ofNullable(record.getSubmittedAt()).map(Timestamp::toLocalDateTime).orElse(null))
+                .submittedBy(record.getSubmittedBy())
                 .build();
     };
 
@@ -108,6 +113,17 @@ public class SurveyInstanceDao {
                 .set(SURVEY_INSTANCE.STATUS, newStatus.name())
                 .where(SURVEY_INSTANCE.STATUS.notEqual(newStatus.name())
                         .and(SURVEY_INSTANCE.ID.eq(instanceId)))
+                .execute();
+    }
+
+
+    public int updateSubmitted(long instanceId, String userName) {
+        checkNotNull(userName, "userName cannot be null");
+
+        return dsl.update(SURVEY_INSTANCE)
+                .set(SURVEY_INSTANCE.SUBMITTED_AT, Timestamp.valueOf(nowUtc()))
+                .set(SURVEY_INSTANCE.SUBMITTED_BY, userName)
+                .where(SURVEY_INSTANCE.ID.eq(instanceId))
                 .execute();
     }
 
