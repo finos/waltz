@@ -39,7 +39,7 @@
         </waltz-section-actions>
 
         <div>
-            <table class="table table.condensed">
+            <table class="table table-condensed table-striped">
                 <colgroup>
                     <col width="30%">
                     <col width="10%">
@@ -102,5 +102,52 @@
               class="text-muted small">
             Excluding <b ng-bind="ctrl.draftRuns.length"></b> draft run(s).
         </span>
+    </waltz-section>
+
+    <waltz-section icon="question"
+                   name="Questions"
+                   small="( {{ ctrl.questions.length }} )">
+
+        <div class="row">
+            <div class="col-sm-12">
+                <table class="table table-condensed table-striped">
+                    <colgroup>
+                        <col width="15%">
+                        <col width="25%">
+                        <col width="15%">
+                        <col width="24%">
+                        <col width="10%">
+                        <col width="13%">
+                        <col width="8%">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>Section Name</th>
+                        <th>Question Text</th>
+                        <th>Field Type</th>
+                        <th>Help Text</th>
+                        <th>Mandatory</th>
+                        <th>Allow Comment</th>
+                        <th>Position</th>
+                    </tr>
+                    </thead>
+                    <tr ng-repeat="q in ctrl.questions | orderBy:'position'">
+                        <td><span ng-bind="q.sectionName"></span></td>
+                        <td><span ng-bind="q.questionText"></span></td>
+                        <td><span ng-bind="q.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>
+                        <td><span ng-bind="q.helpText"></span></td>
+                        <td>
+                            <waltz-boolean-renderer value="q.isMandatory">
+                            </waltz-boolean-renderer>
+                        </td>
+                        <td>
+                            <waltz-boolean-renderer value="q.allowComment">
+                            </waltz-boolean-renderer>
+                        </td>
+                        <td><span ng-bind="q.position"></span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </waltz-section>
 </div>

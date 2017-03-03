@@ -246,7 +246,7 @@
 
         <div class="row">
             <div class="col-sm-12">
-                <table class="table table.condensed">
+                <table class="table table-hover">
                     <colgroup>
                         <col width="13%">
                         <col width="25%">
@@ -273,8 +273,14 @@
                         <td><span ng-bind="q.questionText"></span></td>
                         <td><span ng-bind="q.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>
                         <td><span ng-bind="q.helpText"></span></td>
-                        <td><span ng-bind="q.isMandatory"></span></td>
-                        <td><span ng-bind="q.allowComment"></span></td>
+                        <td>
+                            <waltz-boolean-renderer value="q.isMandatory">
+                            </waltz-boolean-renderer>
+                        </td>
+                        <td>
+                            <waltz-boolean-renderer value="q.allowComment">
+                            </waltz-boolean-renderer>
+                        </td>
                         <td><span ng-bind="q.position"></span></td>
                         <td><a ng-click="ctrl.showEditQuestionForm(q)"
                                class="btn btn-xs waltz-visibility-child-30">

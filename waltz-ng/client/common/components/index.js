@@ -18,6 +18,7 @@
 
 export default (module) => {
     module
+        .component('waltzBooleanRenderer', require('./boolean-renderer'))
         .component('waltzBucketChart', require('./bucket-chart'))
         .component('waltzLastUpdated', require('./last-updated/last-updated'))
         .component('waltzMultiSelectTreeControl', require('./multi-select-tree-control/multi-select-treecontrol'))
