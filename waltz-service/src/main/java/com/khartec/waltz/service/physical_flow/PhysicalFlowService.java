@@ -36,7 +36,6 @@ import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
-import com.khartec.waltz.service.attestation.AttestationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
 import com.khartec.waltz.service.data_type.DataTypeService;
@@ -52,15 +51,13 @@ import java.util.Optional;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
-import static com.khartec.waltz.model.EntityKind.*;
+import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
+import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 
 
 @Service
 public class PhysicalFlowService {
 
-    public static final String ATTESTATION_COMMENT = "Creation of physical flow via Waltz";
-
-    private final AttestationService attestationService;
     private final PhysicalFlowDao physicalFlowDao;
     private final PhysicalSpecificationDao physicalSpecificationDao;
     private final ChangeLogService changeLogService;
@@ -74,8 +71,7 @@ public class PhysicalFlowService {
     private final static String PROVENANCE = "waltz";
 
     @Autowired
-    public PhysicalFlowService(AttestationService attestationService,
-                               ChangeLogService changeLogService,
+    public PhysicalFlowService(ChangeLogService changeLogService,
                                LogicalFlowService dataFlowService,
                                DataFlowDecoratorService dataFlowDecoratorService,
                                DataTypeService dataTypeService,
@@ -84,7 +80,6 @@ public class PhysicalFlowService {
                                SettingsService settingsService,
                                PhysicalFlowSearchDao searchDao) {
 
-        checkNotNull(attestationService, "attestationService cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dataFlowService, "dataFlowService cannot be null");
         checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
@@ -94,7 +89,6 @@ public class PhysicalFlowService {
         checkNotNull(settingsService, "settingsService cannot be null");
         checkNotNull(searchDao, "searchDao cannot be null");
 
-        this.attestationService = attestationService;
         this.changeLogService = changeLogService;
         this.dataFlowService = dataFlowService;
         this.dataFlowDecoratorService = dataFlowDecoratorService;
@@ -182,8 +176,6 @@ public class PhysicalFlowService {
                             specification.name(),
                             flow.target().safeName()),
                     Operation.REMOVE);
-
-            attestationService.deleteForEntity(EntityReference.mkRef(PHYSICAL_FLOW, command.flowId()), username);
         }
 
 
@@ -258,13 +250,6 @@ public class PhysicalFlowService {
                         command.targetEntity().safeName()),
                 Operation.ADD);
 
-
-        attestationService.explicitlyAttest(PHYSICAL_SPECIFICATION,
-                specId,
-                username,
-                ATTESTATION_COMMENT + " [Id : " + flowId + "]");
-        attestationService.explicitlyAttest(PHYSICAL_FLOW, flowId, username, ATTESTATION_COMMENT);
-
         return ImmutablePhysicalFlowCreateCommandResponse.builder()
                 .originalCommand(command)
                 .outcome(CommandOutcome.SUCCESS)
@@ -280,11 +265,6 @@ public class PhysicalFlowService {
             return;
         } else {
             LogicalFlow logicalFlow = dataFlowService.findBySourceAndTarget(source, target);
-
-            // attest the flow if exists
-            if(logicalFlow != null) {
-                attestationService.explicitlyAttest(LOGICAL_DATA_FLOW, logicalFlow.id().get(), username, ATTESTATION_COMMENT);
-            }
 
             if(logicalFlow == null) {
                 Optional<String> defaultDataTypeCode = settingsService.getValue(DEFAULT_DATATYPE_CODE_SETTING_NAME);
