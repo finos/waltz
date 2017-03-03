@@ -45,7 +45,7 @@ const aliases = {
 
 
 function strToBool(boolStr) {
-    if (boolStr && _.isString(boolStr) && _.has(aliases, boolStr)) {
+    if (boolStr && _.isString(boolStr) && _.has(aliases, _.toUpper(boolStr))) {
         return aliases[boolStr];
     }
     return null;
