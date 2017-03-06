@@ -24,12 +24,14 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
+import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.logical_flow.*;
+import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
@@ -49,6 +51,7 @@ import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 
 
@@ -57,42 +60,46 @@ public class LogicalFlowService {
 
     private static final String PROVENANCE = "waltz";
 
-    private final LogicalFlowDao logicalFlowDao;
-    private final LogicalFlowStatsDao logicalFlowStatsDao;
-    private final DataFlowDecoratorService dataFlowDecoratorService;
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
-    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
-    private final DataTypeUsageService dataTypeUsageService;
     private final ChangeLogService changeLogService;
+    private final DataFlowDecoratorService dataFlowDecoratorService;
+    private final DataTypeUsageService dataTypeUsageService;
     private final DBExecutorPoolInterface dbExecutorPool;
+    private final LogicalFlowDao logicalFlowDao;
+    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
+    private final LogicalFlowStatsDao logicalFlowStatsDao;
+    private final PhysicalFlowDao physicalFlowDao;
 
 
     @Autowired
-    public LogicalFlowService(LogicalFlowDao logicalFlowDao,
-                              LogicalFlowStatsDao logicalFlowStatsDao,
-                              DataFlowDecoratorService dataFlowDecoratorService,
-                              ApplicationIdSelectorFactory appIdSelectorFactory,
-                              LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory,
-                              DataTypeUsageService dataTypeUsageService,
+    public LogicalFlowService(ApplicationIdSelectorFactory appIdSelectorFactory,
                               ChangeLogService changeLogService,
-                              DBExecutorPoolInterface dbExecutorPool) {
-        checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
-        checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
-        checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
+                              DataFlowDecoratorService dataFlowDecoratorService,
+                              DataTypeUsageService dataTypeUsageService,
+                              DBExecutorPoolInterface dbExecutorPool,
+                              LogicalFlowDao logicalFlowDao,
+                              LogicalFlowStatsDao logicalFlowStatsDao,
+                              LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory,
+                              PhysicalFlowDao physicalFlowDao) {
         checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
-        checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
-        checkNotNull(logicalFlowIdSelectorFactory, "logicalFlowIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
+        checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
+        checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
+        checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
+        checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
+        checkNotNull(logicalFlowIdSelectorFactory, "logicalFlowIdSelectorFactory cannot be null");
+        checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
 
         this.appIdSelectorFactory = appIdSelectorFactory;
-        this.logicalFlowStatsDao = logicalFlowStatsDao;
-        this.logicalFlowDao = logicalFlowDao;
+        this.changeLogService = changeLogService;
         this.dataFlowDecoratorService = dataFlowDecoratorService;
         this.dataTypeUsageService = dataTypeUsageService;
-        this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
-        this.changeLogService = changeLogService;
         this.dbExecutorPool = dbExecutorPool;
+        this.logicalFlowStatsDao = logicalFlowStatsDao;
+        this.logicalFlowDao = logicalFlowDao;
+        this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
+        this.physicalFlowDao = physicalFlowDao;
     }
 
 
@@ -158,8 +165,11 @@ public class LogicalFlowService {
     }
 
 
+    @Deprecated
+    // Replace with a method that removes for a single flowId
     public int removeFlows(List<Long> flowIds, String username) {
         List<LogicalFlow> logicalFlows = logicalFlowDao.findByFlowIds(flowIds);
+
         int deleted = logicalFlowDao.removeFlows(flowIds);
         dataFlowDecoratorService.deleteAllDecoratorsForFlowIds(flowIds);
 
@@ -179,22 +189,10 @@ public class LogicalFlowService {
     }
 
 
-    private void auditFlowChange(String verb, EntityReference source, EntityReference target, String username, Operation operation) {
-        ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
-                .parentReference(source)
-                .severity(Severity.INFORMATION)
-                .userId(username)
-                .message(String.format(
-                        "Flow %s between: %s and %s",
-                        verb,
-                        source.name().orElse(Long.toString(source.id())),
-                        target.name().orElse(Long.toString(target.id()))))
-                .childKind(LOGICAL_DATA_FLOW)
-                .operation(operation)
-                .build();
-
-        changeLogService.write(logEntry);
-        changeLogService.write(logEntry.withParentReference(target));
+    public int removeFlow(long flowId, String username) {
+        LogicalFlow logicalFlow = logicalFlowDao.findByFlowId(flowId);
+        ensureNoAssociatedPhysicalFlows(logicalFlow);
+        return removeFlows(newArrayList(flowId), username);
     }
 
 
@@ -241,6 +239,34 @@ public class LogicalFlowService {
                 .build());
 
         return statSupplier.get();
+    }
+
+
+    private void ensureNoAssociatedPhysicalFlows(LogicalFlow logicalFlow) {
+        List<PhysicalFlow> physicalFlows = physicalFlowDao.findByProducerAndConsumer(
+                logicalFlow.source(),
+                logicalFlow.target());
+
+        if(physicalFlows.size() > 0) { throw new RuntimeException("Could not delete Logical Flow because it has associated Physical Flows"); }
+    }
+
+
+    private void auditFlowChange(String verb, EntityReference source, EntityReference target, String username, Operation operation) {
+        ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
+                .parentReference(source)
+                .severity(Severity.INFORMATION)
+                .userId(username)
+                .message(String.format(
+                        "Flow %s between: %s and %s",
+                        verb,
+                        source.name().orElse(Long.toString(source.id())),
+                        target.name().orElse(Long.toString(target.id()))))
+                .childKind(LOGICAL_DATA_FLOW)
+                .operation(operation)
+                .build();
+
+        changeLogService.write(logEntry);
+        changeLogService.write(logEntry.withParentReference(target));
     }
 
 }

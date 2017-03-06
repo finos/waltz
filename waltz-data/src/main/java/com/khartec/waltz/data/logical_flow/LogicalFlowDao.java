@@ -106,6 +106,8 @@ public class LogicalFlowDao {
     }
 
 
+    @Deprecated
+    // replace with a method that delete for a single flowId
     public int removeFlows(List<Long> flowIds) {
         return dsl.deleteFrom(LOGICAL_FLOW)
                 .where(LOGICAL_FLOW.ID.in(flowIds))

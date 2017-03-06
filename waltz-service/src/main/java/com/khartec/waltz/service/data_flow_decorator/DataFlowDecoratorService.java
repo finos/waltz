@@ -133,7 +133,8 @@ public class DataFlowDecoratorService {
 
 
     // --- UPDATERS ---
-
+    @Deprecated
+    // Replace with a method that delete for a single flow id
     public int deleteAllDecoratorsForFlowIds(List<Long> flowIds) {
         return dataFlowDecoratorDao.removeAllDecoratorsForFlowIds(flowIds);
     }

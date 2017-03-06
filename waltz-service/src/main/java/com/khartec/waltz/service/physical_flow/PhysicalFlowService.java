@@ -118,6 +118,14 @@ public class PhysicalFlowService {
     }
 
 
+    public List<PhysicalFlow> findByProducerAndConsumerEntityReferences(EntityReference producer, EntityReference consumer) {
+        checkNotNull(producer, "producer cannot be null");
+        checkNotNull(consumer, "consumer cannot be null");
+
+        return physicalFlowDao.findByProducerAndConsumer(producer, consumer);
+    }
+
+
     public List<PhysicalFlow> findBySpecificationId(long specificationId) {
         return physicalFlowDao.findBySpecificationId(specificationId);
     }
