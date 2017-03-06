@@ -8,10 +8,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.model.survey.ImmutableSurveyTemplate;
-import com.khartec.waltz.model.survey.SurveyTemplate;
-import com.khartec.waltz.model.survey.SurveyTemplateChangeCommand;
-import com.khartec.waltz.model.survey.SurveyTemplateStatus;
+import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -101,5 +98,24 @@ public class SurveyTemplateService {
                         .build());
 
         return numUpdated;
+    }
+
+
+    public int updateStatus(String userName, long templateId, SurveyTemplateStatusChangeCommand command) {
+        checkNotNull(command, "command cannot be null");
+
+        int result = surveyTemplateDao.updateStatus(templateId, command.newStatus());
+
+        if (result > 0) {
+            changeLogService.write(
+                    ImmutableChangeLog.builder()
+                            .operation(Operation.UPDATE)
+                            .userId(userName)
+                            .parentReference(EntityReference.mkRef(EntityKind.SURVEY_TEMPLATE, templateId))
+                            .message("Survey Template: status changed to " + command.newStatus())
+                            .build());
+        }
+
+        return result;
     }
 }

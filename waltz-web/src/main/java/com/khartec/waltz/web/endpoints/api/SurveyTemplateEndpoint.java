@@ -20,6 +20,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.survey.SurveyTemplate;
 import com.khartec.waltz.model.survey.SurveyTemplateChangeCommand;
+import com.khartec.waltz.model.survey.SurveyTemplateStatusChangeCommand;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.survey.SurveyTemplateService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -56,6 +57,7 @@ public class SurveyTemplateEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, ":id");
+        String updateStatusPath = mkPath(BASE_URL, ":id", "status");
 
         DatumRoute<SurveyTemplate> getByIdRoute = (request, response) ->
                 surveyTemplateService.getById(getId(request));
@@ -63,7 +65,7 @@ public class SurveyTemplateEndpoint implements Endpoint {
         ListRoute<SurveyTemplate> findAllRoute = (request, response) ->
                 surveyTemplateService.findAll(getUsername(request));
 
-        DatumRoute<Long> createSurveyTemplateRoute =
+        DatumRoute<Long> createRoute =
                 (req, res) -> {
                     ensureUserHasAdminRights(req);
                     return surveyTemplateService.create(
@@ -71,7 +73,7 @@ public class SurveyTemplateEndpoint implements Endpoint {
                             readBody(req, SurveyTemplateChangeCommand.class));
                 };
 
-        DatumRoute<Integer> updateSurveyTemplateRoute =
+        DatumRoute<Integer> updateRoute =
                 (req, res) -> {
                     ensureUserHasAdminRights(req);
                     return surveyTemplateService.update(
@@ -79,10 +81,18 @@ public class SurveyTemplateEndpoint implements Endpoint {
                             readBody(req, SurveyTemplateChangeCommand.class));
                 };
 
+        DatumRoute<Integer> updateStatusRoute =
+                (req, res) -> surveyTemplateService.updateStatus(
+                        getUsername(req),
+                        getId(req),
+                        readBody(req, SurveyTemplateStatusChangeCommand.class)
+                );
+
         getForList(BASE_URL, findAllRoute);
         getForDatum(getByIdPath, getByIdRoute);
-        postForDatum(BASE_URL, createSurveyTemplateRoute);
-        putForDatum(BASE_URL, updateSurveyTemplateRoute);
+        postForDatum(BASE_URL, createRoute);
+        putForDatum(BASE_URL, updateRoute);
+        putForDatum(updateStatusPath, updateStatusRoute);
     }
 
 

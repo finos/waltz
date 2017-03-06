@@ -29,6 +29,7 @@ const initialState = {
 
 
 function controller($stateParams,
+                    notification,
                     personStore,
                     surveyQuestionStore,
                     surveyRunStore,
@@ -89,11 +90,32 @@ function controller($stateParams,
     surveyQuestionStore
         .findForTemplate(templateId)
         .then(qs => vm.questions = qs);
+
+    vm.markTemplateAsActive = () => {
+        surveyTemplateStore.updateStatus(templateId, {
+            newStatus: 'ACTIVE'
+        })
+        .then(updateCount => {
+            vm.template.status = 'ACTIVE';
+            notification.success('Survey template successfully marked as Active');
+        })
+    };
+
+    vm.markTemplateAsObsolete = () => {
+        surveyTemplateStore.updateStatus(templateId, {
+            newStatus: 'OBSOLETE'
+        })
+        .then(updateCount => {
+            vm.template.status = 'OBSOLETE';
+            notification.success('Survey template successfully marked as Obsolete');
+        })
+    };
 }
 
 
 controller.$inject = [
     '$stateParams',
+    'Notification',
     'PersonStore',
     'SurveyQuestionStore',
     'SurveyRunStore',
