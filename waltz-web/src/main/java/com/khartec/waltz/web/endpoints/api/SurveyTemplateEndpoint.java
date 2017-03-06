@@ -82,11 +82,13 @@ public class SurveyTemplateEndpoint implements Endpoint {
                 };
 
         DatumRoute<Integer> updateStatusRoute =
-                (req, res) -> surveyTemplateService.updateStatus(
-                        getUsername(req),
-                        getId(req),
-                        readBody(req, SurveyTemplateStatusChangeCommand.class)
-                );
+                (req, res) -> {
+                    ensureUserHasAdminRights(req);
+                    return surveyTemplateService.updateStatus(
+                            getUsername(req),
+                            getId(req),
+                            readBody(req, SurveyTemplateStatusChangeCommand.class));
+                };
 
         getForList(BASE_URL, findAllRoute);
         getForDatum(getByIdPath, getByIdRoute);
