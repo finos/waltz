@@ -141,6 +141,7 @@ export function numberFormatter(num, digits = 0, simplify = true) {
                         .replace(/\.?0+$/, "") + si[i].symbol;
             }
         }
+        return num;
     } else {
         return num
             .toFixed(digits)
