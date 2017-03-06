@@ -107,4 +107,15 @@ public class SurveyTemplateDao {
                 .where(SURVEY_TEMPLATE.ID.eq(command.id().get()))
                 .execute();
     }
+
+
+    public int updateStatus(long templateId, SurveyTemplateStatus newStatus) {
+        checkNotNull(newStatus, "newStatus cannot be null");
+
+        return dsl.update(SURVEY_TEMPLATE)
+                .set(SURVEY_TEMPLATE.STATUS, newStatus.name())
+                .where(SURVEY_TEMPLATE.STATUS.notEqual(newStatus.name())
+                        .and(SURVEY_TEMPLATE.ID.eq(templateId)))
+                .execute();
+    }
 }
