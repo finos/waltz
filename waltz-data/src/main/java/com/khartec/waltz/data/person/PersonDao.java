@@ -103,6 +103,7 @@ public class PersonDao {
         return dsl.select()
                 .from(PERSON)
                 .where(dsl.renderInlined(PERSON.MANAGER_EMPLOYEE_ID.eq(employeeId)))
+                .orderBy(PERSON.DISPLAY_NAME)
                 .fetch(personMapper);
     }
 

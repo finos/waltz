@@ -5,7 +5,7 @@
         <col width="35%">
         <col width="15%">
     </colgroup>
-    <tr ng-repeat="direct in ctrl.directs | orderBy:'displayName' track by direct.id">
+    <tr ng-repeat="direct in ctrl.directs track by direct.id">
         <td>
             <waltz-person-link person="direct"></waltz-person-link>
         </td>
