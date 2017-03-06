@@ -217,6 +217,8 @@ public class DataFlowDecoratorDao {
     }
 
 
+    @Deprecated
+    // Replace with a method that removes decorators for a single flow
     public int removeAllDecoratorsForFlowIds(List<Long> flowIds) {
         return dsl.deleteFrom(DATA_FLOW_DECORATOR)
                 .where(DATA_FLOW_DECORATOR.DATA_FLOW_ID.in(flowIds))

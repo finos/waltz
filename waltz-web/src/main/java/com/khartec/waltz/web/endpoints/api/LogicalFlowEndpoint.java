@@ -37,7 +37,6 @@ import spark.Response;
 import java.io.IOException;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -114,7 +113,7 @@ public class LogicalFlowEndpoint implements Endpoint {
 
         LOG.info("User: {} removing logical flow: {}", username, flowId);
 
-        return logicalFlowService.removeFlows(newArrayList(flowId), username);
+        return logicalFlowService.removeFlow(flowId, username);
     }
 
 

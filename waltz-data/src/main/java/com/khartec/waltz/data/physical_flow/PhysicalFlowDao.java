@@ -108,6 +108,12 @@ public class PhysicalFlowDao {
     }
 
 
+    public List<PhysicalFlow> findByProducerAndConsumer(EntityReference producer, EntityReference consumer) {
+        return findByProducerAndConsumerEntityReferenceQuery(producer, consumer)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
     public PhysicalFlow getById(long id) {
         return findByCondition(PHYSICAL_FLOW.ID.eq(id))
                 .stream()
@@ -208,6 +214,24 @@ public class PhysicalFlowDao {
                 .select(targetEntityNameField)
                 .from(PHYSICAL_FLOW)
                 .where(dsl.renderInlined(isTarget));
+    }
+
+
+    private Select<Record> findByProducerAndConsumerEntityReferenceQuery(EntityReference producer, EntityReference consumer) {
+
+        Condition isSource = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(producer.id())
+                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(producer.kind().name()));
+
+        Condition isTarget = PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(consumer.kind().name())
+                .and(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(consumer.id()));
+
+        return dsl
+                .select(PHYSICAL_FLOW.fields())
+                .select(targetEntityNameField)
+                .from(PHYSICAL_FLOW)
+                .innerJoin(PHYSICAL_SPECIFICATION)
+                .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
+                .where(dsl.renderInlined(isSource.and(isTarget)));
     }
 
 }
