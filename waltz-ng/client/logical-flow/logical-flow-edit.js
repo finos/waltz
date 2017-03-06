@@ -191,7 +191,7 @@ function controller($scope,
             .removeFlow(flow.id)
             .then(reload)
             .then(() => notification.warning('Data flow removed'))
-            .catch(e => notification.error(_.split(e.data.message, '/')[0]));
+            .catch(e => notification.error(_.split(e.data.message, '/')[0] || "System error, please contact support"));
     };
 
     vm.saveUsages = (usages = []) => {
