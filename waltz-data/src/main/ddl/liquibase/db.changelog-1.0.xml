@@ -3598,10 +3598,22 @@
 
     <!-- 1004 - Logical flow id column should be auto increment on MariaDb -->
     <changeSet id="20161118-1004-1"
+               failOnError="false"
                author="kamransaleem"
                dbms="mysql">
         <sql>
             ALTER TABLE waltz.logical_flow
+            MODIFY COLUMN id BIGINT(20) AUTO_INCREMENT
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="20161118-1004-1b"
+               failOnError="false"
+               author="dwatkins"
+               dbms="mysql">
+        <sql>
+            ALTER TABLE logical_flow
             MODIFY COLUMN id BIGINT(20) AUTO_INCREMENT
         </sql>
     </changeSet>
