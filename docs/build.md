@@ -7,7 +7,7 @@ Waltz is built using maven.
 - Git
 - Maven 3
 - JDK 8
-- Liquibase
+- Liquibase (recommended but not essential)
 - Node
 - Sass
 - Database - either
@@ -17,18 +17,23 @@ Waltz is built using maven.
 
 ## Obtaining the code
 
-It is recommended that you clone the repository on GitHub (see ...)
+It is recommended that you clone the repository on GitHub to maintain your own fork and pull in changes as required.
 
 ## Preparing the database
 
+For Mariadb create a new database:
+```
+mysql -u root -e "create database IF NOT EXISTS waltz CHARACTER SET='utf8';"
+```
+
+When you run the first build (using `mvn package`) the schema will be generated using the liquibase maven task (ref: `waltz-schema/pom.xml`).  
 
 ## Setting up maven profiles
 
-Generic database profiles are located in  
-then `<REPO>/waltz-schema/pom.xml` file and should not
-need to be changed.
+Waltz uses maven profiles to target the build against the correct database.  Generic db vendor settings are located in  
+the profiles section of `<REPO>/waltz-schema/pom.xml` and should not need to be changed.
 
-Specific database connection details should be created your accounts
+Specific database connection details should be configure in the 
 `~/.m2/settings.xml` file.  An example (for both MariaDB and Microsoft 
 SQL Server) would look like:
 
@@ -63,19 +68,15 @@ SQL Server) would look like:
 ```
 
 
-### MSSQL settings
-
-### MariaDB settings
-
 ## Running the build
 
-Quick build
+Typically one of two maven targets is executed.  For the first run (and whenever schema updates are required) then a full `package` build should be executed.  For code only change then the quicker `compile` target can be used.
 
+When running either variant you must provide the names of two profiles, firstly the generic database profile (either `waltz-mariadb` or `waltz-mssql`) and the specific profile created in your `~.m2/settings.xml` file (in the example above either `dev-maria` or `dev-mssql`).
 
+### Examples (using aliases)
 
-### Aliases
-
-These may be useful:
+Below are some example maven command lines.  We typically register the command as an alias to save time.
 
 ```
 alias compile-maria='mvn clean compile -P waltz-mariadb,dev-maria'
