@@ -17,15 +17,20 @@
 
     <div class="waltz-page-summary waltz-page-summary-attach">
         <waltz-section-actions>
-            <button waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
-                    class="btn btn-xs btn-danger"
-                    ng-disabled="! (ctrl.mentions | isEmpty)"
-                    uib-popover="This flow cannot be deleted as it is being used in a lineage"
-                    popover-trigger="mouseenter"
-                    popover-enable="{{ ! (ctrl.mentions | isEmpty) }}"
-                    ng-click="ctrl.deleteFlow()">
-                Delete
-            </button>
+            <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                <button class="btn btn-xs btn-danger"
+                        ng-disabled="! (ctrl.mentions | isEmpty)"
+                        ng-click="(ctrl.mentions | isEmpty) && ctrl.deleteFlow()">
+                    Delete
+                </button>
+                <waltz-icon name="exclamation-circle"
+                            ng-if="! (ctrl.mentions | isEmpty)"
+                            class="small"
+                            uib-popover="This flow cannot be deleted as it is being used in a lineage"
+                            popover-trigger="mouseenter"
+                            style="color: #777; vertical-align: text-top;">
+                </waltz-icon>
+            </div>
         </waltz-section-actions>
 
 
