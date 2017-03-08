@@ -25,15 +25,9 @@ const service = ($http, root) => {
     const BASE = `${root}/authoritative-source`;
 
 
-    const findByKind = kind =>
-        $http
-            .get(`${BASE}/kind/${kind}`)
-            .then(result => result.data);
-
-
     const findByReference = (kind, id) =>
         $http
-            .get(`${BASE}/kind/${kind}/${id}`)
+            .get(`${BASE}/entity-ref/${kind}/${id}`)
             .then(result => result.data);
 
 
@@ -82,16 +76,21 @@ const service = ($http, root) => {
             .post(url, rating);
     };
 
+    const determineAuthSourcesForOrgUnit = (orgUnitId) =>
+        $http
+            .get(`${BASE}/org-unit/${orgUnitId}`)
+            .then(r => r.data);
+
     return {
         calculateConsumersForDataTypeIdSelector,
-        findByKind,
         findByReference,
         findByApp,
         findByDataTypeIdSelector,
         update,
         insert,
         recalculateAll,
-        remove
+        remove,
+        determineAuthSourcesForOrgUnit
     };
 
 };

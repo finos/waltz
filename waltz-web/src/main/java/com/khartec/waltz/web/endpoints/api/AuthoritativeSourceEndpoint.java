@@ -28,6 +28,7 @@ import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.user.UserRoleService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
@@ -45,7 +46,6 @@ import java.util.Map;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
-import static spark.Spark.delete;
 
 
 @Service
@@ -77,84 +77,97 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
     @Override
     public void register() {
 
+        // -- PATHS
+
         String recalculateFlowRatingsPath = mkPath(BASE_URL, "recalculate-flow-ratings");
         String findByDataTypeIdSelectPath = mkPath(BASE_URL, "data-type");
         String calculateConsumersForDataTypeIdSelectorPath = mkPath(BASE_URL, "data-type", "consumers");
+        String findByEntityReferencePath = mkPath(BASE_URL, "entity-ref", ":kind", ":id");
+        String findByApplicationIdPath = mkPath(BASE_URL, "app", ":id");
+        String updatePath = mkPath(BASE_URL, "id", ":id");
+        String deletePath = mkPath(BASE_URL, "id", ":id");
+        String insertPath = mkPath(BASE_URL, "kind", ":kind", ":id", ":dataType", ":appId");
+        String determineAuthSourcesForOrgUnitPath = mkPath(BASE_URL, "org-unit", ":id");
+
+
+        // -- ROUTES
 
         ListRoute<AuthoritativeSource> findByDataTypeIdSelectorRoute = (request, response)
                 -> authoritativeSourceService.findByDataTypeIdSelector(readIdSelectionOptionsFromBody(request));
 
-        getForDatum(
-                recalculateFlowRatingsPath,
-                this:: recalculateFlowRatingsRoute);
+        ListRoute<AuthoritativeSource> findByEntityReferenceRoute = (request, response)
+                -> authoritativeSourceService.findByEntityReference(getEntityReference(request));
 
-        postForList(calculateConsumersForDataTypeIdSelectorPath,
-                this::calculateConsumersForDataTypeIdSelectorRoute);
+        ListRoute<AuthoritativeSource> findByApplicationIdRoute = (request, response)
+                -> authoritativeSourceService.findByApplicationId(getId(request));
 
-        postForList(
-                findByDataTypeIdSelectPath,
-                findByDataTypeIdSelectorRoute);
+        DatumRoute<?> determineAuthSourcesForOrgUnitRoute = (request, response)
+                -> authoritativeSourceService.determineAuthSourcesForOrgUnit(getId(request));
 
-        // --- TODO: convert these into new style...
+        getForDatum(recalculateFlowRatingsPath, this::recalculateFlowRatingsRoute);
+        postForList(calculateConsumersForDataTypeIdSelectorPath, this::calculateConsumersForDataTypeIdSelectorRoute);
+        postForList(findByDataTypeIdSelectPath, findByDataTypeIdSelectorRoute);
+        getForList(findByEntityReferencePath, findByEntityReferenceRoute);
+        getForList(findByApplicationIdPath, findByApplicationIdRoute);
+        postForDatum(updatePath, this::updateRoute);
+        deleteForDatum(deletePath, this::deleteRoute);
+        postForDatum(insertPath, this::insertRoute);
 
-        getForList(mkPath(BASE_URL, "kind", ":kind"), (request, response)
-                -> authoritativeSourceService.findByEntityKind(getKind(request)));
 
-        getForList(mkPath(BASE_URL, "kind", ":kind", ":id"), (request, response)
-                -> authoritativeSourceService.findByEntityReference(getEntityReference(request)));
+        getForDatum(determineAuthSourcesForOrgUnitPath, determineAuthSourcesForOrgUnitRoute);
+    }
 
-        getForList(mkPath(BASE_URL, "app", ":id"), (request, response)
-                -> authoritativeSourceService.findByApplicationId(getId(request)));
 
-        postForDatum(mkPath(BASE_URL, "id", ":id"), (request, response) -> {
-            requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
-            String ratingStr = request.body();
-            AuthoritativenessRating rating = AuthoritativenessRating.valueOf(ratingStr);
-            authoritativeSourceService.update(getId(request), rating);
+    private String insertRoute(Request request, Response response) {
+        requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
+        EntityReference parentRef = getEntityReference(request);
+        String dataType = request.params("dataType");
+        Long appId = getLong(request, "appId");
+
+        String ratingStr = request.body();
+        AuthoritativenessRating rating = AuthoritativenessRating.valueOf(ratingStr);
+
+        authoritativeSourceService.insert(parentRef, dataType, appId, rating);
+        return "done";
+    }
+
+
+    private String deleteRoute(Request request, Response response) {
+        requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
+        long id = getId(request);
+        AuthoritativeSource authSource = authoritativeSourceService.getById(id);
+        if (authSource == null) {
             return "done";
-        });
+        }
 
-        delete(mkPath(BASE_URL, "id", ":id"), (request, response) -> {
-            requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
-            long id = getId(request);
-            AuthoritativeSource authSource = authoritativeSourceService.getById(id);
-            if (authSource == null) {
-                return "done";
-            }
+        String msg = String.format(
+                "Removed %s as an %s authoritative source for %s",
+                authSource.applicationReference().name().orElse("an application"),
+                authSource.rating().name(),
+                authSource.dataType());
 
-            String msg = String.format(
-                    "Removed %s as an %s authoritative source for %s",
-                    authSource.applicationReference().name().orElse("an application"),
-                    authSource.rating().name(),
-                    authSource.dataType());
+        ChangeLog log = ImmutableChangeLog.builder()
+                .message(msg)
+                .severity(Severity.INFORMATION)
+                .userId(getUsername(request))
+                .parentReference(authSource.parentReference())
+                .childKind(EntityKind.APPLICATION)
+                .operation(Operation.REMOVE)
+                .build();
 
-            ChangeLog log = ImmutableChangeLog.builder()
-                    .message(msg)
-                    .severity(Severity.INFORMATION)
-                    .userId(getUsername(request))
-                    .parentReference(authSource.parentReference())
-                    .childKind(EntityKind.APPLICATION)
-                    .operation(Operation.REMOVE)
-                    .build();
+        changeLogService.write(log);
+        authoritativeSourceService.remove(id);
 
-            changeLogService.write(log);
-            authoritativeSourceService.remove(id);
+        return "done";
+    }
 
-            return "done";
-        });
 
-        postForDatum(mkPath(BASE_URL, "kind", ":kind", ":id", ":dataType", ":appId"), (request, response) -> {
-            requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
-            EntityReference parentRef = getEntityReference(request);
-            String dataType = request.params("dataType");
-            Long appId = getLong(request, "appId");
-
-            String ratingStr = request.body();
-            AuthoritativenessRating rating = AuthoritativenessRating.valueOf(ratingStr);
-
-            authoritativeSourceService.insert(parentRef, dataType, appId, rating);
-            return "done";
-        });
+    private String updateRoute(Request request, Response response) {
+        requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
+        String ratingStr = request.body();
+        AuthoritativenessRating rating = AuthoritativenessRating.valueOf(ratingStr);
+        authoritativeSourceService.update(getId(request), rating);
+        return "done";
     }
 
 

@@ -90,14 +90,14 @@ function initialiseAssetCosts(service, selector, holder) {
 
 function loadAuthSources(store, id, holder) {
     return store
-        .findByOrgUnit(id)  // use orgIds(ASC)
+        .determineAuthSourcesForOrgUnit(id)
         .then(r => holder.authSources = r);
 }
 
 
 function loadEndUserApps(store, selector, holder) {
     return store
-        .findBySelector(selector)   // use orgIds(DESC)
+        .findBySelector(selector)
         .then(apps => _.map(
                 apps,
                 a => _.assign(
@@ -185,7 +185,7 @@ function loadMeasurableRatings(store, selector, holder) {
 function service($q,
                  appStore,
                  assetCostViewService,
-                 authSourceCalculator,
+                 authSourcesStore,
                  bookmarkStore,
                  changeLogStore,
                  complexityStore,
@@ -243,7 +243,7 @@ function service($q,
         return $q.all([
             initialiseDataFlows(logicalFlowViewService, orgUnitId, rawData),
             loadInvolvement(involvementStore, orgUnitId, rawData),
-            loadAuthSources(authSourceCalculator, orgUnitId, rawData),
+            loadAuthSources(authSourcesStore, orgUnitId, rawData),
             loadComplexity(complexityStore, orgUnitId, rawData),
             loadEntityStatisticDefinitions(entityStatisticStore, selector, rawData),
             loadLineageReports(physicalFlowLineageStore, selector, rawData)
@@ -315,7 +315,7 @@ service.$inject = [
     '$q',
     'ApplicationStore',
     'AssetCostViewService',
-    'AuthSourcesCalculator',
+    'AuthSourcesStore',
     'BookmarkStore',
     'ChangeLogStore',
     'ComplexityStore',
