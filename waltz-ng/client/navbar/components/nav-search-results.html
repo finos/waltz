@@ -40,6 +40,31 @@
 
             <hr>
 
+            <!-- CHANGE INITIATIVE -->
+            <h5>
+                <waltz-icon name="paper-plane-o"></waltz-icon>
+                Change Initiatives
+            </h5>
+            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.changeInitiatives.length > 10 }">
+                <ul class="list-unstyled">
+                    <li ng-repeat="changeInitiative in $ctrl.results.changeInitiatives">
+                        <a ui-sref="main.change-initiative.view"
+                           ng-click="$ctrl.dismiss()">
+                            <span ng-bind="changeInitiative.name"></span>
+                            <small>
+                                ( <span ng-bind="changeInitiative.externalId"></span> )
+                            </small>
+                        </a>
+                    </li>
+                    <li ng-show="$ctrl.results.changeInitiatives.length == 0"
+                        class="text-muted">
+                        No results...
+                    </li>
+                </ul>
+            </div>
+
+            <hr>
+
             <!-- CHARACTERISTICS -->
             <h5>
                 <waltz-icon name="puzzle-piece"></waltz-icon>

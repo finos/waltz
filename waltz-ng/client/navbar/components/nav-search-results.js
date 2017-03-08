@@ -47,12 +47,12 @@ function controller($element,
         } else {
             console.log('No dismiss handler registered');
         }
-    }
+    };
 
     const onClick = (e) => {
         const element = $element[0];
         if(!isDescendant(element, e.target)) vm.dismiss();
-    }
+    };
 
     vm.$onInit = () => {
         $document.on('click', onClick);
