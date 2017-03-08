@@ -143,19 +143,40 @@
     </changeSet>
 
 
+    <!-- 1794: data type association authoritative rating -->
+    <changeSet id="20170306-1794-1"
+               author="davidwatkins73">
+        <comment>1794: create data type association authoritative rating table</comment>
+        <createTable tableName="dta_auth_rating"
+                     remarks="Used to rate the authoritativeness of a data type association">
+            <column name="association_id"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="dta_auth_rating_pkey"/>
+            </column>
+            <column name="rating"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
     <!-- 1735 -->
     <changeSet id="20170308-1735-1"
                author="rovats">
         <comment>1735: remove APP_CAPABILITY from EntityKind (migrate to MEASURABLE_RATING)</comment>
         <sql>
             UPDATE source_data_rating set
-                entity_kind = 'MEASURABLE_RATING'
+            entity_kind = 'MEASURABLE_RATING'
             WHERE entity_kind = 'APP_CAPABILITY'
         </sql>
         <sql>
             UPDATE system_job_log set
-                entity_kind = 'MEASURABLE_RATING'
+            entity_kind = 'MEASURABLE_RATING'
             WHERE entity_kind = 'APP_CAPABILITY'
         </sql>
     </changeSet>
+
 </databaseChangeLog>

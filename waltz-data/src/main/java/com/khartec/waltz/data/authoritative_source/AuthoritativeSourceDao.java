@@ -208,14 +208,16 @@ public class AuthoritativeSourceDao {
 
     public List<AuthoritativeRatingVantagePoint> findAuthoritativeRatingVantagePoints(Set<Long> orgIds) {
         return dsl.select(
-                ENTITY_HIERARCHY.ID,
-                ENTITY_HIERARCHY.LEVEL,
-                AUTHORITATIVE_SOURCE.DATA_TYPE,
-                AUTHORITATIVE_SOURCE.APPLICATION_ID,
-                AUTHORITATIVE_SOURCE.RATING)
+                    ENTITY_HIERARCHY.ID,
+                    ENTITY_HIERARCHY.LEVEL,
+                    AUTHORITATIVE_SOURCE.DATA_TYPE,
+                    AUTHORITATIVE_SOURCE.APPLICATION_ID,
+                    AUTHORITATIVE_SOURCE.RATING)
                 .from(ENTITY_HIERARCHY)
-                .join(AUTHORITATIVE_SOURCE).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID))
-                .where(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name()).and(ENTITY_HIERARCHY.ID.in(orgIds)))
+                .join(AUTHORITATIVE_SOURCE)
+                .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID))
+                .where(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())
+                        .and(ENTITY_HIERARCHY.ID.in(orgIds)))
                 .orderBy(ENTITY_HIERARCHY.ID, ENTITY_HIERARCHY.LEVEL)
                 .fetch(TO_VANTAGE_MAPPER);
     }
