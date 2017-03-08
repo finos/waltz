@@ -134,6 +134,15 @@
     </changeSet>
 
 
+    <!-- 1725 -->
+    <changeSet id="20170307-1725-1"
+               author="rovats">
+        <comment>1725: remove trait and trait_usage</comment>
+        <dropTable tableName="trait" />
+        <dropTable tableName="trait_usage" />
+    </changeSet>
+
+
     <!-- 1794: data type association authoritative rating -->
     <changeSet id="20170306-1794-1"
                author="davidwatkins73">

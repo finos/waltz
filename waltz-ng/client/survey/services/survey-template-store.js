@@ -40,11 +40,18 @@ function service($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const updateStatus = (id, cmd) => {
+        return $http.put(`${BASE}/${id}/status`, cmd)
+            .then(result => result.data);
+    };
+
+
     return {
         create,
         getById,
         findAll,
-        update
+        update,
+        updateStatus
     };
 }
 

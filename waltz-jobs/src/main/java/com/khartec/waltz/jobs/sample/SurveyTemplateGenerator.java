@@ -32,19 +32,21 @@ public class SurveyTemplateGenerator {
             dsl.deleteFrom(SURVEY_TEMPLATE).execute();
             dsl.deleteFrom(SURVEY_QUESTION).execute();
 
+            SurveyTemplateStatusChangeCommand statusChangeCommand = ImmutableSurveyTemplateStatusChangeCommand.builder()
+                    .newStatus(SurveyTemplateStatus.ACTIVE)
+                    .build();
+
             SurveyTemplateChangeCommand appSurvey = mkAppSurvey();
             long aid = surveyTemplateService.create("admin", appSurvey);
             List<SurveyQuestion> appQs = mkAppQuestions(aid);
             appQs.forEach(surveyQuestionService::create);
-
-            //TODO set status to active
+            surveyTemplateService.updateStatus("admin", aid, statusChangeCommand);
 
             SurveyTemplateChangeCommand projectSurvey = mkProjectSurvey();
             long pid = surveyTemplateService.create("admin", projectSurvey);
             List<SurveyQuestion> projQs = mkProjQuestions(pid);
             projQs.forEach(surveyQuestionService::create);
-
-            //TODO set status to active
+            surveyTemplateService.updateStatus("admin", pid, statusChangeCommand);
 
         } catch (Exception e) {
             e.printStackTrace();
