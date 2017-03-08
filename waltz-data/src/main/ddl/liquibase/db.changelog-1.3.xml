@@ -141,4 +141,21 @@
         <dropTable tableName="trait" />
         <dropTable tableName="trait_usage" />
     </changeSet>
+
+
+    <!-- 1735 -->
+    <changeSet id="20170308-1735-1"
+               author="rovats">
+        <comment>1735: remove APP_CAPABILITY from EntityKind (migrate to MEASURABLE_RATING)</comment>
+        <sql>
+            UPDATE source_data_rating set
+                entity_kind = 'MEASURABLE_RATING'
+            WHERE entity_kind = 'APP_CAPABILITY'
+        </sql>
+        <sql>
+            UPDATE system_job_log set
+                entity_kind = 'MEASURABLE_RATING'
+            WHERE entity_kind = 'APP_CAPABILITY'
+        </sql>
+    </changeSet>
 </databaseChangeLog>
