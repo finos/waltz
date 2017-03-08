@@ -59,7 +59,7 @@ public class DataFlowDecoratorRatingsService {
 
     private final ApplicationService applicationService;
     private final AuthoritativeSourceDao authoritativeSourceDao;
-    private final LogicalFlowDao dataFlowDao;
+    private final LogicalFlowDao logicalFlowDao;
     private final DataTypeDao dataTypeDao;
     private final DataFlowDecoratorDao dataFlowDecoratorDao;
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
@@ -69,20 +69,20 @@ public class DataFlowDecoratorRatingsService {
     public DataFlowDecoratorRatingsService(ApplicationService applicationService,
                                            ApplicationIdSelectorFactory selectorFactory,
                                            AuthoritativeSourceDao authoritativeSourceDao,
-                                           LogicalFlowDao dataFlowDao,
+                                           LogicalFlowDao logicalFlowDao,
                                            DataTypeDao dataTypeDao,
                                            DataFlowDecoratorDao dataFlowDecoratorDao) {
         checkNotNull(applicationService, "applicationService cannot be null");
         checkNotNull(selectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao cannot be null");
-        checkNotNull(dataFlowDao, "dataFlowDao cannot be null");
+        checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
         checkNotNull(dataFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
 
         this.applicationService = applicationService;
         this.appIdSelectorFactory = selectorFactory;
         this.authoritativeSourceDao = authoritativeSourceDao;
-        this.dataFlowDao = dataFlowDao;
+        this.logicalFlowDao = logicalFlowDao;
         this.dataTypeDao = dataTypeDao;
         this.dataFlowDecoratorDao = dataFlowDecoratorDao;
     }
@@ -206,7 +206,7 @@ public class DataFlowDecoratorRatingsService {
 
     private List<LogicalFlow> loadFlows(Collection<DataFlowDecorator> decorators) {
         Set<Long> dataFlowIds = map(decorators, d -> d.dataFlowId());
-        return dataFlowDao.findByFlowIds(dataFlowIds);
+        return logicalFlowDao.findByFlowIds(dataFlowIds);
     }
 
 

@@ -19,7 +19,15 @@
 
 import _ from "lodash";
 import {authoritativeRatingColorScale} from "../../common/colors";
-import {pickWorst} from "../../auth-sources/services/auth-sources-utils";
+
+
+function pickWorst(ratings = []) {
+
+    const sortedByBadness = [ 'DISCOURAGED', 'SECONDARY', 'PRIMARY', 'NO_OPINION' ];
+    const worst = _.find(sortedByBadness, x => _.includes(ratings, x));
+
+    return worst || 'NO_OPINION';
+}
 
 
 export default [

@@ -141,4 +141,25 @@
         <dropTable tableName="trait" />
         <dropTable tableName="trait_usage" />
     </changeSet>
+
+
+    <!-- 1794: data type association authoritative rating -->
+    <changeSet id="20170306-1794-1"
+               author="davidwatkins73">
+        <comment>1794: create data type association authoritative rating table</comment>
+        <createTable tableName="dta_auth_rating"
+                     remarks="Used to rate the authoritativeness of a data type association">
+            <column name="association_id"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="dta_auth_rating_pkey"/>
+            </column>
+            <column name="rating"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

@@ -17,9 +17,7 @@
  */
 
 import _ from "lodash";
-import {
-    loadDataTypes,
-    loadAppAuthSources} from "./registration-utils";
+import {loadDataTypes} from "./registration-utils";
 import {
     loadDataFlows,
     loadDataFlowDecorators} from "../applications/data-load";
@@ -103,7 +101,6 @@ function mkAddFlowCommand(flow) {
 
 function controller($scope,
                     application,
-                    authSourceStore,
                     dataTypeService,
                     dataTypeUsageStore,
                     logicalFlowDecoratorStore,
@@ -224,7 +221,6 @@ function controller($scope,
     };
 
     // -- BOOT
-    loadAppAuthSources(authSourceStore, primaryAppId, vm);
     loadDataTypes(dataTypeService, vm);
     reload();
 
@@ -234,7 +230,6 @@ function controller($scope,
 controller.$inject = [
     '$scope',
     'application',
-    'AuthSourcesStore',
     'DataTypeService',
     'DataTypeUsageStore',
     'LogicalFlowDecoratorStore',

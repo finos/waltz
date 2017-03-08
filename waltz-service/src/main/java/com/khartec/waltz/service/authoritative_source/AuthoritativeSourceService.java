@@ -18,16 +18,17 @@
 
 package com.khartec.waltz.service.authoritative_source;
 
+import com.khartec.waltz.common.hierarchy.Node;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
+import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorRatingsService;
-import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
-import com.khartec.waltz.service.data_type.DataTypeService;
+import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.slf4j.Logger;
@@ -40,6 +41,10 @@ import java.util.List;
 import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.*;
+import static com.khartec.waltz.common.MapUtilities.groupBy;
+import static com.khartec.waltz.common.MapUtilities.newHashMap;
+import static com.khartec.waltz.common.hierarchy.HierarchyUtilities.parents;
 
 
 @Service
@@ -49,28 +54,23 @@ public class AuthoritativeSourceService {
 
     private final AuthoritativeSourceDao authoritativeSourceDao;
     private final DataFlowDecoratorRatingsService ratingService;
-    private final DataFlowDecoratorService decoratorService;
-    private final DataTypeService dataTypeService;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
+    private final OrganisationalUnitService organisationalUnitService;
 
 
     @Autowired
     public AuthoritativeSourceService(AuthoritativeSourceDao authoritativeSourceDao,
                                       DataFlowDecoratorRatingsService ratingService,
-                                      DataFlowDecoratorService dataFlowDecoratorService,
-                                      DataTypeService dataTypeService,
-                                      DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
+                                      DataTypeIdSelectorFactory dataTypeIdSelectorFactory, OrganisationalUnitService organisationalUnitService) {
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao must not be null");
         checkNotNull(ratingService, "ratingService cannot be null");
-        checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
-        checkNotNull(dataTypeService, "dataTypeService cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
+        checkNotNull(organisationalUnitService, "organisationalUnitService cannot be null");
 
         this.authoritativeSourceDao = authoritativeSourceDao;
         this.ratingService = ratingService;
-        this.decoratorService = dataFlowDecoratorService;
-        this.dataTypeService = dataTypeService;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
+        this.organisationalUnitService = organisationalUnitService;
     }
 
 
@@ -143,4 +143,42 @@ public class AuthoritativeSourceService {
         Select<Record1<Long>> selector = dataTypeIdSelectorFactory.apply(options);
         return authoritativeSourceDao.calculateConsumersForDataTypeIdSelector(selector);
     }
+
+
+    /** (ouId) -> dataType -> appId -> rating
+     * @param orgUnitId */
+    public Map<String, Map<Long, AuthoritativeSource>> determineAuthSourcesForOrgUnit(long orgUnitId) {
+        Node<OrganisationalUnit, Long> startNode = organisationalUnitService.loadHierarchy(orgUnitId);
+        List<AuthoritativeSource> allAuthSources = findByEntityKind(EntityKind.ORG_UNIT);
+        Map<Long, Collection<AuthoritativeSource>> authSourcesByOrgId = groupBy(as -> as.parentReference().id(), allAuthSources);
+        return determineCumulativeRules(startNode, authSourcesByOrgId);
+    }
+
+
+    /** (ouNode, ouId -> [authSource]) -> dataType -> appId -> rating */
+    private Map<String, Map<Long, AuthoritativeSource>> determineCumulativeRules(Node<OrganisationalUnit, Long> node,
+                                                                                 Map<Long, Collection<AuthoritativeSource>> authSourcesByOrgId) {
+
+        // get orgIds in order from root (reverse of our parents + us)
+        List<Long> ids = append(reverse(map(parents(node), x -> x.getId())), node.getId());
+
+
+        Map<String, Map<Long, AuthoritativeSource>> cumulativeRules = newHashMap();
+
+        for (Long unitId : ids) {
+            Collection<AuthoritativeSource> authSources = authSourcesByOrgId.getOrDefault(unitId, newArrayList());
+            Map<String, Collection<AuthoritativeSource>> byType = groupBy(as -> as.dataType(), authSources);
+            for (String type: byType.keySet()) {
+                Map<Long, AuthoritativeSource> appRatingMap = cumulativeRules.getOrDefault(type, newHashMap());
+                byType.get(type).forEach(as -> appRatingMap.put(as.applicationReference().id(), as));
+                cumulativeRules.put(type, appRatingMap);
+            }
+        }
+
+        return cumulativeRules;
+
+    }
+
+
+
 }

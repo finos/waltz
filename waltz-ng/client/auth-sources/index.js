@@ -19,16 +19,6 @@
 
 import angular from 'angular';
 
-import {
-    authSourcesResolver,
-    flowResolver,
-    idResolver,
-    orgUnitsResolver,
-    dataTypesResolver,
-    flowDecoratorsResolver
-} from "./resolvers";
-import editView from "./edit";
-
 
 export default () => {
 
@@ -37,35 +27,17 @@ export default () => {
     require('./directives')(module);
 
     module
-        .service('AuthSourcesStore', require('./services/auth-sources-store'))
-        .service('AuthSourcesCalculator', require('./services/auth-sources-calculator'));
+        .service('AuthSourcesStore', require('./services/auth-sources-store'));
 
     module
         .component('waltzAuthSourcesList', require('./components/auth-sources-list'))
         .component('waltzNonAuthSourcesList', require('./components/non-auth-sources-list'))
         .component('waltzAuthSourcesTable', require('./components/auth-sources-table'));
 
-    module.config([
-        '$stateProvider',
-        ($stateProvider) => {
-            $stateProvider
-                .state('main.auth-sources', {
-                    url: 'auth-sources'
-                })
-                .state('main.auth-sources.edit', {
-                    url: '/:kind/{id:int}/edit',
-                    views: { 'content@': editView },
-                    resolve: {
-                        authSources: authSourcesResolver,
-                        orgUnits: orgUnitsResolver,
-                        id: idResolver,
-                        flows: flowResolver,
-                        flowDecorators: flowDecoratorsResolver,
-                        dataTypes: dataTypesResolver
-                    }
-                });
-        }
-    ]);
+    module
+        .config(require('./routes'));
+
+
 
     return module.name;
 };

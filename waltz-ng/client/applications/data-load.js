@@ -89,28 +89,33 @@ export function loadInvolvements($q, involvementStore, id, vm) {
     });
 }
 
+
 export function loadAuthSources(authSourceStore, orgUnitStore, appId, ouId, vm) {
     const appAuthSourcePromise = authSourceStore.findByApp(appId);
-    const ouAuthSourcesPromise = authSourceStore.findByReference('ORG_UNIT', ouId);
 
-    ouAuthSourcesPromise.then(ouas => vm.ouAuthSources = ouas);
-    appAuthSourcePromise.then(aas => vm.appAuthSources = aas);
-
-    appAuthSourcePromise.then(authSources => nest()
-        .key(a => a.dataType)
-        .key(a => a.rating)
-        .object(authSources))
+    appAuthSourcePromise
+        .then(authSources => nest()
+            .key(a => a.dataType)
+            .key(a => a.rating)
+            .object(authSources))
         .then(nested => vm.authSources = nested)
         .then(nested => addDataTypes(_.keys(nested), vm));
 
-    return appAuthSourcePromise
-        .then(authSources => _.chain(authSources)
+    const loadDeclaringOUs = (authSources) => {
+        const orgUnitIds = _
+            .chain(authSources)
             .filter(a => a.parentReference.kind === 'ORG_UNIT')
             .map(a => a.parentReference.id)
             .uniq()
-            .value())
-        .then(orgUnitIds => orgUnitStore.findByIds(orgUnitIds))
-        .then(orgUnits => addOrgUnits(orgUnits, vm));
+            .value();
+
+        orgUnitStore
+            .findByIds(orgUnitIds)
+            .then(orgUnits => addOrgUnits(orgUnits, vm))
+    };
+
+    return appAuthSourcePromise
+        .then(loadDeclaringOUs);
 }
 
 
