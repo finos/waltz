@@ -31,6 +31,7 @@ const initialState = {
         apps: [],
         people: [],
         capabilities: [],
+        changeInitiatives: [],
         orgUnits: []
     }
 };
@@ -42,6 +43,7 @@ const template = require('./navbar-search-form.html');
 function controller($timeout,
                     actorStore,
                     applicationStore,
+                    changeInitiativeStore,
                     measurableStore,
                     personStore,
                     physicalFlowStore,
@@ -65,6 +67,7 @@ function controller($timeout,
         } else {
             searchResults.show = true;
             handleSearch(query, applicationStore, 'apps');
+            handleSearch(query, changeInitiativeStore, 'changeInitiatives');
             handleSearch(query, personStore, 'people');
             handleSearch(query, measurableStore, 'measurables');
             handleSearch(query, orgUnitStore, 'orgUnits');
@@ -91,6 +94,7 @@ controller.$inject = [
     '$timeout',
     'ActorStore',
     'ApplicationStore',
+    'ChangeInitiativeStore',
     'MeasurableStore',
     'PersonStore',
     'PhysicalFlowStore',
