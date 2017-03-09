@@ -21,8 +21,7 @@ import {
     idResolver,
     orgUnitsResolver,
     dataTypesResolver,
-    flowDecoratorsResolver
-} from "./resolvers";
+    flowDecoratorsResolver } from "./resolvers";
 import editView from "./edit";
 
 
