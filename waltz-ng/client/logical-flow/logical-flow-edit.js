@@ -15,12 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import _ from "lodash";
 import {loadDataTypes} from "./registration-utils";
-import {
-    loadDataFlows,
-    loadDataFlowDecorators} from "../applications/data-load";
+import {loadDataFlows, loadDataFlowDecorators} from "../applications/data-load";
 
 
 function vetoMove(isDirty) {
