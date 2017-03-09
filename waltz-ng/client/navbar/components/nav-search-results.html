@@ -48,7 +48,7 @@
             <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.changeInitiatives.length > 10 }">
                 <ul class="list-unstyled">
                     <li ng-repeat="changeInitiative in $ctrl.results.changeInitiatives">
-                        <a ui-sref="main.change-initiative.view"
+                        <a ui-sref="main.change-initiative.view ({id: changeInitiative.id})"
                            ng-click="$ctrl.dismiss()">
                             <span ng-bind="changeInitiative.name"></span>
                             <small>
