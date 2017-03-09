@@ -179,4 +179,23 @@
         </sql>
     </changeSet>
 
+
+    <!-- 1721 -->
+    <changeSet id="20170309-1721-1"
+               author="rovats"
+               dbms="mssql">
+        <comment>1721: Remove capability tables from full text index</comment>
+        <sql>
+            DROP FULLTEXT INDEX ON capability
+        </sql>
+    </changeSet>
+
+    <changeSet id="20170309-1721-2"
+               author="rovats"
+               dbms="mysql">
+        <comment>1721: Remove capability tables from full text index</comment>
+        <dropIndex indexName="capability_content_ft_idx"
+                   tableName="capability"/>
+    </changeSet>
+
 </databaseChangeLog>
