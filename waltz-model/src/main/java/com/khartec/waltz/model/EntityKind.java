@@ -21,7 +21,6 @@ package com.khartec.waltz.model;
 public enum EntityKind {
 
     APPLICATION,
-    APP_CAPABILITY,
     APP_GROUP,
     APP_RATING,
     ASSET_COST,
@@ -40,6 +39,7 @@ public enum EntityKind {
     ACTOR,
     LOGICAL_DATA_FLOW,
     MEASURABLE,
+    MEASURABLE_RATING,
     ORG_UNIT,
     PERFORMANCE_METRIC_PACK,
     PERSON,
