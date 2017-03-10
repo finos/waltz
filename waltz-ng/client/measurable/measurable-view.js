@@ -19,6 +19,7 @@
 import _ from 'lodash';
 import {initialiseData} from '../common';
 import {populateParents, getParents} from '../common/hierarchy-utils';
+import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
 
 
 const initialState = {
@@ -45,6 +46,7 @@ function controller($q,
                     complexityStore,
                     entityStatisticStore,
                     historyStore,
+                    involvementStore,
                     logicalFlowViewService,
                     measurableStore,
                     measurableCategoryStore,
@@ -101,7 +103,13 @@ function controller($q,
                 .then(flowView => vm.logicalFlowView = flowView),
             bookmarkStore
                 .findByParent(ref)
-                .then(bookmarks => vm.bookmarks = bookmarks)
+                .then(bookmarks => vm.bookmarks = bookmarks),
+            $q.all([
+                involvementStore.findByEntityReference('MEASURABLE', id),
+                involvementStore.findPeopleByEntityReference('MEASURABLE', id)
+            ]).then(([involvements, people]) =>
+                vm.peopleInvolvements = aggregatePeopleInvolvements(involvements, people)
+            )
         ]);
 
     const loadWave3 = () =>
@@ -170,6 +178,7 @@ controller.$inject = [
     'ComplexityStore',
     'EntityStatisticStore',
     'HistoryStore',
+    'InvolvementStore',
     'LogicalFlowViewService',
     'MeasurableStore',
     'MeasurableCategoryStore',
