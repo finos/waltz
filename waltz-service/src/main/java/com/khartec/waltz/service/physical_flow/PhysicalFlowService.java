@@ -37,7 +37,7 @@ import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
+import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import com.khartec.waltz.service.data_type.DataTypeService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.settings.SettingsService;
@@ -62,7 +62,7 @@ public class PhysicalFlowService {
     private final PhysicalSpecificationDao physicalSpecificationDao;
     private final ChangeLogService changeLogService;
     private final LogicalFlowService dataFlowService;
-    private final DataFlowDecoratorService dataFlowDecoratorService;
+    private final LogicalFlowDecoratorService logicalFlowDecoratorService;
     private final DataTypeService dataTypeService;
     private final SettingsService settingsService;
     private final PhysicalFlowSearchDao searchDao;
@@ -73,7 +73,7 @@ public class PhysicalFlowService {
     @Autowired
     public PhysicalFlowService(ChangeLogService changeLogService,
                                LogicalFlowService dataFlowService,
-                               DataFlowDecoratorService dataFlowDecoratorService,
+                               LogicalFlowDecoratorService logicalFlowDecoratorService,
                                DataTypeService dataTypeService,
                                PhysicalFlowDao physicalDataFlowDao,
                                PhysicalSpecificationDao physicalSpecificationDao,
@@ -82,7 +82,7 @@ public class PhysicalFlowService {
 
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dataFlowService, "dataFlowService cannot be null");
-        checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
+        checkNotNull(logicalFlowDecoratorService, "dataFlowDecoratorService cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
         checkNotNull(physicalDataFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
@@ -91,7 +91,7 @@ public class PhysicalFlowService {
 
         this.changeLogService = changeLogService;
         this.dataFlowService = dataFlowService;
-        this.dataFlowDecoratorService = dataFlowDecoratorService;
+        this.logicalFlowDecoratorService = logicalFlowDecoratorService;
         this.dataTypeService = dataTypeService;
         this.physicalFlowDao = physicalDataFlowDao;
         this.physicalSpecificationDao = physicalSpecificationDao;
@@ -293,7 +293,7 @@ public class PhysicalFlowService {
                         EntityKind.DATA_TYPE,
                         defaultDataType.id().get(),
                         defaultDataType.name());
-                dataFlowDecoratorService.addDecorators(
+                logicalFlowDecoratorService.addDecorators(
                         logicalFlow.id().get(),
                         SetUtilities.fromArray(dataTypeRef),
                         username);

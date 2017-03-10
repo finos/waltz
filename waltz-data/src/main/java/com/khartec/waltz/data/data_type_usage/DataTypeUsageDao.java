@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.limit;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -57,7 +57,7 @@ public class DataTypeUsageDao {
     private final com.khartec.waltz.schema.tables.DataType dt = DATA_TYPE.as("dt");
     private final com.khartec.waltz.schema.tables.DataTypeUsage dtu = DATA_TYPE_USAGE.as("dtu");
     private final com.khartec.waltz.schema.tables.LogicalFlow lf = LOGICAL_FLOW.as("lf");
-    private final com.khartec.waltz.schema.tables.DataFlowDecorator dfd = DATA_FLOW_DECORATOR.as("dfd");
+    private final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
     private final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
 
     private final Condition bothApps = lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
@@ -369,11 +369,11 @@ public class DataTypeUsageDao {
                 .on(app.ID.eq(lf.SOURCE_ENTITY_ID)
                         .or(app.ID.eq(lf.TARGET_ENTITY_ID))
                         .and(bothApps))
-                .innerJoin(dfd)
-                .on(dfd.DATA_FLOW_ID.eq(lf.ID))
-                .and(dfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+                .innerJoin(lfd)
+                .on(lfd.LOGICAL_FLOW_ID.eq(lf.ID))
+                .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
                 .innerJoin(dt)
-                .on(dt.ID.eq(dfd.DECORATOR_ENTITY_ID))
+                .on(dt.ID.eq(lfd.DECORATOR_ENTITY_ID))
                 .where(app.ID.in(appIdSelector))
                 .asTable("cons_dist");
     }

@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 
 
@@ -108,10 +108,10 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
     private Select<Record1<Long>> mkForDataType(IdSelectionOptions options) {
         Select<Record1<Long>> dataTypeSelector = dataTypeIdSelectorFactory.apply(options);
 
-        return DSL.select(DATA_FLOW_DECORATOR.DATA_FLOW_ID)
-                .from(DATA_FLOW_DECORATOR)
-                .where(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector)
-                        .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())));
+        return DSL.select(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID)
+                .from(LOGICAL_FLOW_DECORATOR)
+                .where(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector)
+                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())));
 
     }
 }

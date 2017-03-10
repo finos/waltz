@@ -63,6 +63,7 @@ public class MeasurablesGenerator {
                         .select(MEASURABLE_CATEGORY.ID)
                         .from(MEASURABLE_CATEGORY)
                         .where(MEASURABLE_CATEGORY.EXTERNAL_ID.eq(REGION_CATEGORY_EXTERNAL_ID))))
+                .and(MEASURABLE.PROVENANCE.eq("demo"))
                 .execute();
         System.out.println("Deleted: " + deletedCount + " existing Regions & Countries");
 
@@ -125,6 +126,9 @@ public class MeasurablesGenerator {
         record.setName(name);
         record.setMeasurableCategoryId(measurableCategoryId);
         record.setConcrete(concrete);
+        record.setDescription("");
+        record.setLastUpdatedBy("");
+        record.setProvenance("demo");
 
         return record;
     }

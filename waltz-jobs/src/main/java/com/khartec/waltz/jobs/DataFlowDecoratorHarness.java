@@ -23,7 +23,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
+import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.sql.SQLException;
@@ -36,7 +36,7 @@ public class DataFlowDecoratorHarness {
     public static void main(String[] args) throws SQLException {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
-        DataFlowDecoratorService service = ctx.getBean(DataFlowDecoratorService.class);
+        LogicalFlowDecoratorService service = ctx.getBean(LogicalFlowDecoratorService.class);
 
         EntityReference dataType = EntityReference.mkRef(EntityKind.DATA_TYPE, 8000);
         IdSelectionOptions options = IdSelectionOptions.mkOpts(dataType, HierarchyQueryScope.CHILDREN);

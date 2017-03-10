@@ -207,4 +207,29 @@
         <dropTable tableName="dta_auth_rating" />
     </changeSet>
 
+
+    <!-- 1813 -->
+    <changeSet id="20170310-1814-1"
+               author="davidwatkins73">
+        <comment>1814: Rename data_flow_decorator table to logical_flow_decorator</comment>
+        <renameTable oldTableName="data_flow_decorator"
+                     newTableName="logical_flow_decorator" />
+    </changeSet>
+
+    <changeSet id="20170310-1814-2"
+               author="davidwatkins73">
+        <comment>1814: Update index  and column names to reflect new table name</comment>
+        <dropIndex tableName="logical_flow_decorator"
+                   indexName="idx_df_dec_df_id_dec_kind"/>
+        <renameColumn tableName="logical_flow_decorator"
+                      columnDataType="${id.type}"
+                      oldColumnName="data_flow_id"
+                      newColumnName="logical_flow_id"/>
+        <createIndex tableName="logical_flow_decorator"
+                     indexName="idx_lfd_lfid_deckind">
+            <column name="logical_flow_id"/>
+            <column name="decorator_entity_kind"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

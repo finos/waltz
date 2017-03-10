@@ -27,9 +27,9 @@ import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableDataFlowDecorator.class)
-@JsonDeserialize(as = ImmutableDataFlowDecorator.class)
-public abstract class DataFlowDecorator implements ProvenanceProvider {
+@JsonSerialize(as = ImmutableLogicalFlowDecorator.class)
+@JsonDeserialize(as = ImmutableLogicalFlowDecorator.class)
+public abstract class LogicalFlowDecorator implements ProvenanceProvider {
 
     public abstract long dataFlowId();
     public abstract EntityReference decoratorEntity();
