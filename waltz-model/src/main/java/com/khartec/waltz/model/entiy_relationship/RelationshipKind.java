@@ -25,6 +25,7 @@ public enum RelationshipKind {
 
     HAS,
     PARTICIPATES_IN,
+    LOOSELY_RELATES_TO,
     RELATES_TO,
     SUPPORTS
 
