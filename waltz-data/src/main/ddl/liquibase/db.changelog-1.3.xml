@@ -198,4 +198,13 @@
                    tableName="capability"/>
     </changeSet>
 
+
+    <!-- 1811 -->
+    <changeSet id="20170309-1811-1"
+               author="davidwatkins73">
+        <comment>1811: Remove data_type_association and dta_auth_rating tables</comment>
+        <dropTable tableName="data_type_association"/>
+        <dropTable tableName="dta_auth_rating" />
+    </changeSet>
+
 </databaseChangeLog>
