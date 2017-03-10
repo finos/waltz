@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
+import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.model.user.Role;
-import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
+import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.action.UpdateDataFlowDecoratorsAction;
@@ -52,16 +52,16 @@ public class DataFlowDecoratorEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "data-flow-decorator");
 
 
-    private final DataFlowDecoratorService dataFlowDecoratorService;
+    private final LogicalFlowDecoratorService logicalFlowDecoratorService;
     private final UserRoleService userRoleService;
 
 
     @Autowired
-    public DataFlowDecoratorEndpoint(DataFlowDecoratorService dataFlowDecoratorService,
+    public DataFlowDecoratorEndpoint(LogicalFlowDecoratorService logicalFlowDecoratorService,
                                      UserRoleService userRoleService) {
-        checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
+        checkNotNull(logicalFlowDecoratorService, "dataFlowDecoratorService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
-        this.dataFlowDecoratorService = dataFlowDecoratorService;
+        this.logicalFlowDecoratorService = logicalFlowDecoratorService;
         this.userRoleService = userRoleService;
     }
 
@@ -73,19 +73,19 @@ public class DataFlowDecoratorEndpoint implements Endpoint {
         String updateDecoratorsPath = mkPath(BASE_URL, ":flowId");
         String summarizeForSelectorPath = mkPath(BASE_URL, "summarize");
 
-        ListRoute<DataFlowDecorator> findByIdSelectorAndKindRoute =
-                (request, response) -> dataFlowDecoratorService
+        ListRoute<LogicalFlowDecorator> findByIdSelectorAndKindRoute =
+                (request, response) -> logicalFlowDecoratorService
                         .findByIdSelectorAndKind(
                                 readIdSelectionOptionsFromBody(request),
                                 getKind(request));
 
-        ListRoute<DataFlowDecorator> findByIdSelectorRoute =
-                (request, response) -> dataFlowDecoratorService
+        ListRoute<LogicalFlowDecorator> findByIdSelectorRoute =
+                (request, response) -> logicalFlowDecoratorService
                         .findBySelector(
                                 readIdSelectionOptionsFromBody(request));
 
         ListRoute<DecoratorRatingSummary> summarizeForSelectorRoute =
-                (request, response) -> dataFlowDecoratorService.summarizeForSelector(
+                (request, response) -> logicalFlowDecoratorService.summarizeForSelector(
                         readIdSelectionOptionsFromBody(request));
 
         postForList(
@@ -106,7 +106,7 @@ public class DataFlowDecoratorEndpoint implements Endpoint {
     }
 
 
-    private Collection<DataFlowDecorator> updateDecoratorsRoute(Request request, Response response) throws IOException {
+    private Collection<LogicalFlowDecorator> updateDecoratorsRoute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
 
         String user = getUsername(request);
@@ -114,15 +114,15 @@ public class DataFlowDecoratorEndpoint implements Endpoint {
 
         if (notEmpty(action.removedDecorators())) {
             LOG.info("User: {}, deleting decorators: {} for flow: {}", user, action.removedDecorators(), action.flowId());
-            dataFlowDecoratorService.deleteDecorators(action.flowId(), action.removedDecorators(), user);
+            logicalFlowDecoratorService.deleteDecorators(action.flowId(), action.removedDecorators(), user);
         }
 
         if (notEmpty(action.addedDecorators())) {
             LOG.info("User: {}, adding decorators: {} for flow: {}", user, action.addedDecorators(), action.flowId());
-            dataFlowDecoratorService.addDecorators(action.flowId(), action.addedDecorators(), user);
+            logicalFlowDecoratorService.addDecorators(action.flowId(), action.addedDecorators(), user);
         }
 
-        return dataFlowDecoratorService.findByFlowIds(newArrayList(action.flowId()));
+        return logicalFlowDecoratorService.findByFlowIds(newArrayList(action.flowId()));
     }
 
 

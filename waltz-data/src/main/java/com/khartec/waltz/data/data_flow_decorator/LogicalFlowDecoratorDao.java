@@ -22,12 +22,12 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
-import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
-import com.khartec.waltz.model.data_flow_decorator.ImmutableDataFlowDecorator;
+import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableDecoratorRatingSummary;
-import com.khartec.waltz.schema.tables.records.DataFlowDecoratorRecord;
+import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,19 +42,19 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.sourceAppAlias;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.targetAppAlias;
-import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.stream.Collectors.toList;
 
 
 @Repository
-public class DataFlowDecoratorDao {
+public class LogicalFlowDecoratorDao {
 
-    private static final RecordMapper<Record, DataFlowDecorator> TO_DECORATOR_MAPPER = r -> {
-        DataFlowDecoratorRecord record = r.into(DATA_FLOW_DECORATOR);
+    private static final RecordMapper<Record, LogicalFlowDecorator> TO_DECORATOR_MAPPER = r -> {
+        LogicalFlowDecoratorRecord record = r.into(LOGICAL_FLOW_DECORATOR);
 
-        return ImmutableDataFlowDecorator.builder()
-                .dataFlowId(record.getDataFlowId())
+        return ImmutableLogicalFlowDecorator.builder()
+                .dataFlowId(record.getLogicalFlowId())
                 .decoratorEntity(ImmutableEntityReference.builder()
                         .id(record.getDecoratorEntityId())
                         .kind(EntityKind.valueOf(record.getDecoratorEntityKind()))
@@ -64,11 +64,11 @@ public class DataFlowDecoratorDao {
                 .build();
     };
 
-    private static final Function<DataFlowDecorator, DataFlowDecoratorRecord> TO_RECORD = d -> {
-        DataFlowDecoratorRecord r = new DataFlowDecoratorRecord();
+    private static final Function<LogicalFlowDecorator, LogicalFlowDecoratorRecord> TO_RECORD = d -> {
+        LogicalFlowDecoratorRecord r = new LogicalFlowDecoratorRecord();
         r.setDecoratorEntityKind(d.decoratorEntity().kind().name());
         r.setDecoratorEntityId(d.decoratorEntity().id());
-        r.setDataFlowId(d.dataFlowId());
+        r.setLogicalFlowId(d.dataFlowId());
         r.setProvenance(d.provenance());
         r.setRating(d.rating().name());
         return r;
@@ -78,7 +78,7 @@ public class DataFlowDecoratorDao {
 
 
     @Autowired
-    public DataFlowDecoratorDao(DSLContext dsl) {
+    public LogicalFlowDecoratorDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
         this.dsl = dsl;
     }
@@ -86,74 +86,74 @@ public class DataFlowDecoratorDao {
 
     // --- FINDERS ---
 
-    public List<DataFlowDecorator> findByAppIdSelectorAndKind(Select<Record1<Long>> appIdSelector,
-                                                              EntityKind decoratorEntityKind) {
+    public List<LogicalFlowDecorator> findByAppIdSelectorAndKind(Select<Record1<Long>> appIdSelector,
+                                                                 EntityKind decoratorEntityKind) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
         checkNotNull(decoratorEntityKind, "decoratorEntityKind cannot be null");
 
         return dsl
-                .select(DATA_FLOW_DECORATOR.fields())
-                .from(DATA_FLOW_DECORATOR)
+                .select(LOGICAL_FLOW_DECORATOR.fields())
+                .from(LOGICAL_FLOW_DECORATOR)
                 .innerJoin(LOGICAL_FLOW)
-                .on(LOGICAL_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID)) // join on application to prevent orphan flows
+                .on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID)) // join on application to prevent orphan flows
                 .innerJoin(sourceAppAlias)                             // being returned
                 .on(sourceAppAlias.ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID))
                 .innerJoin(targetAppAlias)
                 .on(targetAppAlias.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID))
                 .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.in(appIdSelector)
                                 .or(LOGICAL_FLOW.TARGET_ENTITY_ID.in(appIdSelector)))
-                .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorEntityKind.name()))
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorEntityKind.name()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .fetch(TO_DECORATOR_MAPPER);
     }
 
 
-    public List<DataFlowDecorator> findByDecoratorEntityIdSelectorAndKind(Select<Record1<Long>> decoratorEntityIdSelector,
-                                                                          EntityKind decoratorKind) {
+    public List<LogicalFlowDecorator> findByDecoratorEntityIdSelectorAndKind(Select<Record1<Long>> decoratorEntityIdSelector,
+                                                                             EntityKind decoratorKind) {
         checkNotNull(decoratorEntityIdSelector, "decoratorEntityIdSelector cannot be null");
         checkNotNull(decoratorKind, "decoratorKind cannot be null");
 
-        Condition condition = DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorKind.name())
-                .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(decoratorEntityIdSelector));
+        Condition condition = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorKind.name())
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(decoratorEntityIdSelector));
 
         return dsl
-                .select(DATA_FLOW_DECORATOR.fields())
-                .from(DATA_FLOW_DECORATOR)
+                .select(LOGICAL_FLOW_DECORATOR.fields())
+                .from(LOGICAL_FLOW_DECORATOR)
                 .where(dsl.renderInlined(condition))
                 .fetch(TO_DECORATOR_MAPPER);
     }
 
 
-    public List<DataFlowDecorator> findByFlowIds(Collection<Long> flowIds) {
+    public List<LogicalFlowDecorator> findByFlowIds(Collection<Long> flowIds) {
         checkNotNull(flowIds, "flowIds cannot be null");
 
-        Condition condition = DATA_FLOW_DECORATOR.DATA_FLOW_ID.in(flowIds);
+        Condition condition = LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowIds);
 
         return findByCondition(condition);
     }
 
 
-    public List<DataFlowDecorator> findByFlowIdsAndKind(Collection<Long> flowIds,
-                                                        EntityKind decoratorEntityKind) {
+    public List<LogicalFlowDecorator> findByFlowIdsAndKind(Collection<Long> flowIds,
+                                                           EntityKind decoratorEntityKind) {
         checkNotNull(flowIds, "flowIds cannot be null");
         checkNotNull(decoratorEntityKind, "decoratorEntityKind cannot be null");
 
-        Condition condition = DATA_FLOW_DECORATOR.DATA_FLOW_ID.in(flowIds)
-                .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorEntityKind.name()));
+        Condition condition = LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowIds)
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorEntityKind.name()));
 
         return findByCondition(condition);
     }
 
 
-    public Collection<DataFlowDecorator> findByAppIdSelector(Select<Record1<Long>> appIdSelector) {
+    public Collection<LogicalFlowDecorator> findByAppIdSelector(Select<Record1<Long>> appIdSelector) {
         Condition condition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(appIdSelector)
                 .or(LOGICAL_FLOW.SOURCE_ENTITY_ID.in(appIdSelector));
 
-        return dsl.select(DATA_FLOW_DECORATOR.fields())
-                .from(DATA_FLOW_DECORATOR)
+        return dsl.select(LOGICAL_FLOW_DECORATOR.fields())
+                .from(LOGICAL_FLOW_DECORATOR)
                 .innerJoin(LOGICAL_FLOW)
-                .on(LOGICAL_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID))
+                .on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
                 .where(dsl.renderInlined(condition))
                 .fetch(TO_DECORATOR_MAPPER);
     }
@@ -165,28 +165,28 @@ public class DataFlowDecoratorDao {
         // this is intentionally TARGET only as we use to calculate auth source stats
         Condition condition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(selector);
 
-        Condition dataFlowJoinCondition = LOGICAL_FLOW.ID.eq(DATA_FLOW_DECORATOR.DATA_FLOW_ID);
+        Condition dataFlowJoinCondition = LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID);
 
         Collection<Field<?>> groupingFields = newArrayList(
-                DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND,
-                DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID,
-                DATA_FLOW_DECORATOR.RATING);
+                LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND,
+                LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID,
+                LOGICAL_FLOW_DECORATOR.RATING);
 
-        Field<Integer> countField = DSL.count(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID).as("count");
+        Field<Integer> countField = DSL.count(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID).as("count");
 
         return dsl.select(groupingFields)
                 .select(countField)
-                .from(DATA_FLOW_DECORATOR)
+                .from(LOGICAL_FLOW_DECORATOR)
                 .innerJoin(LOGICAL_FLOW)
                 .on(dsl.renderInlined(dataFlowJoinCondition))
                 .where(dsl.renderInlined(condition))
                 .groupBy(groupingFields)
                 .fetch(r -> {
-                    EntityKind decoratorEntityKind = EntityKind.valueOf(r.getValue(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND));
-                    long decoratorEntityId = r.getValue(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID);
+                    EntityKind decoratorEntityKind = EntityKind.valueOf(r.getValue(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND));
+                    long decoratorEntityId = r.getValue(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID);
 
                     EntityReference decoratorRef = EntityReference.mkRef(decoratorEntityKind, decoratorEntityId);
-                    AuthoritativenessRating rating = AuthoritativenessRating.valueOf(r.getValue(DATA_FLOW_DECORATOR.RATING));
+                    AuthoritativenessRating rating = AuthoritativenessRating.valueOf(r.getValue(LOGICAL_FLOW_DECORATOR.RATING));
                     Integer count = r.getValue(countField);
 
                     return ImmutableDecoratorRatingSummary.builder()
@@ -201,11 +201,11 @@ public class DataFlowDecoratorDao {
     // --- UPDATERS ---
 
     public int[] deleteDecorators(Long flowId, Collection<EntityReference> decoratorReferences) {
-        List<DataFlowDecoratorRecord> records = decoratorReferences
+        List<LogicalFlowDecoratorRecord> records = decoratorReferences
                 .stream()
                 .map(ref -> {
-                    DataFlowDecoratorRecord record = dsl.newRecord(DATA_FLOW_DECORATOR);
-                    record.setDataFlowId(flowId);
+                    LogicalFlowDecoratorRecord record = dsl.newRecord(LOGICAL_FLOW_DECORATOR);
+                    record.setLogicalFlowId(flowId);
                     record.setDecoratorEntityId(ref.id());
                     record.setDecoratorEntityKind(ref.kind().name());
                     return record;
@@ -220,16 +220,16 @@ public class DataFlowDecoratorDao {
     @Deprecated
     // Replace with a method that removes decorators for a single flow
     public int removeAllDecoratorsForFlowIds(List<Long> flowIds) {
-        return dsl.deleteFrom(DATA_FLOW_DECORATOR)
-                .where(DATA_FLOW_DECORATOR.DATA_FLOW_ID.in(flowIds))
+        return dsl.deleteFrom(LOGICAL_FLOW_DECORATOR)
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowIds))
                 .execute();
     }
 
 
-    public int[] addDecorators(Collection<DataFlowDecorator> decorators) {
+    public int[] addDecorators(Collection<LogicalFlowDecorator> decorators) {
         checkNotNull(decorators, "decorators cannot be null");
 
-        List<DataFlowDecoratorRecord> records = decorators.stream()
+        List<LogicalFlowDecoratorRecord> records = decorators.stream()
                 .map(TO_RECORD)
                 .collect(toList());
 
@@ -237,18 +237,18 @@ public class DataFlowDecoratorDao {
     }
 
 
-    public int[] updateDecorators(Set<DataFlowDecorator> decorators) {
-        Set<DataFlowDecoratorRecord> records = SetUtilities.map(decorators, TO_RECORD);
+    public int[] updateDecorators(Set<LogicalFlowDecorator> decorators) {
+        Set<LogicalFlowDecoratorRecord> records = SetUtilities.map(decorators, TO_RECORD);
         return dsl.batchUpdate(records).execute();
     }
 
 
     // --- HELPERS ---
 
-    private List<DataFlowDecorator> findByCondition(Condition condition) {
+    private List<LogicalFlowDecorator> findByCondition(Condition condition) {
         return dsl
-                .select(DATA_FLOW_DECORATOR.fields())
-                .from(DATA_FLOW_DECORATOR)
+                .select(LOGICAL_FLOW_DECORATOR.fields())
+                .from(LOGICAL_FLOW_DECORATOR)
                 .where(dsl.renderInlined(condition))
                 .fetch(TO_DECORATOR_MAPPER);
     }

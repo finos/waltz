@@ -27,7 +27,7 @@ import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.ImmutableTallyPack;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.tally.TallyPack;
-import com.khartec.waltz.schema.tables.DataFlowDecorator;
+import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
 import com.khartec.waltz.schema.tables.DataType;
 import com.khartec.waltz.schema.tables.LogicalFlow;
 import org.jooq.*;
@@ -59,7 +59,7 @@ public class LogicalFlowStatsDao {
 
     private static final LogicalFlow lf = LOGICAL_FLOW.as("lf");
     private static final com.khartec.waltz.schema.tables.DataType dt = DataType.DATA_TYPE.as("dt");
-    private static final com.khartec.waltz.schema.tables.DataFlowDecorator dfd = DataFlowDecorator.DATA_FLOW_DECORATOR.as("dfd");
+    private static final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR.as("lfd");
 
 
     private static final Condition BOTH_APPS =
@@ -134,24 +134,24 @@ public class LogicalFlowStatsDao {
                 .and(BOTH_APPS);
 
         Result<Record3<Long, String, Integer>> records = dsl.select(
-                    dfd.DECORATOR_ENTITY_ID,
+                    lfd.DECORATOR_ENTITY_ID,
                     flowTypeCase.as(flowType),
                     count().as(flowCount))
                 .from(lf)
-                .innerJoin(dfd)
-                    .on(lf.ID.eq(dfd.DATA_FLOW_ID)
-                        .and(dfd.DECORATOR_ENTITY_KIND.eq(inline(DATA_TYPE.name()))))
+                .innerJoin(lfd)
+                    .on(lf.ID.eq(lfd.LOGICAL_FLOW_ID)
+                        .and(lfd.DECORATOR_ENTITY_KIND.eq(inline(DATA_TYPE.name()))))
                 .leftJoin(sourceApp)
                     .on(sourceAppId.eq(lf.SOURCE_ENTITY_ID))
                 .leftJoin(targetApp)
                     .on(targetAppId.eq(lf.TARGET_ENTITY_ID))
                 .where(dsl.renderInlined(condition))
-                .groupBy(dfd.DECORATOR_ENTITY_ID, flowTypeCase)
+                .groupBy(lfd.DECORATOR_ENTITY_ID, flowTypeCase)
                 .fetch();
 
         Map<EntityReference, List<Tally<String>>> dataTypeRefToTallies = records.stream()
                 .map(r -> tuple(
-                        mkRef(EntityKind.DATA_TYPE, r.getValue(dfd.DECORATOR_ENTITY_ID)),
+                        mkRef(EntityKind.DATA_TYPE, r.getValue(lfd.DECORATOR_ENTITY_ID)),
                         ImmutableTally.<String>builder()
                                 .id(r.getValue(flowType))
                                 .count(r.getValue(flowCount))

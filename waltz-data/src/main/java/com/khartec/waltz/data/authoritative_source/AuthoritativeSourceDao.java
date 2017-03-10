@@ -44,7 +44,7 @@ import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
-import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -56,7 +56,7 @@ public class AuthoritativeSourceDao {
 
     private static LogicalFlow lf = LOGICAL_FLOW.as("lf");
     private static DataType dt = DATA_TYPE.as("dt");
-    private static DataFlowDecorator dfd = DATA_FLOW_DECORATOR.as("dfd");
+    private static LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
     private static EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
     private static Application app = APPLICATION.as("app");
     private static com.khartec.waltz.schema.tables.AuthoritativeSource au = AUTHORITATIVE_SOURCE.as("au");
@@ -258,10 +258,10 @@ public class AuthoritativeSourceDao {
         Condition authSourceJoin = au.APPLICATION_ID.eq(lf.SOURCE_ENTITY_ID)
                 .and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
-        Condition dataFlowDecoratorJoin = dfd.DATA_FLOW_ID.eq(lf.ID);
+        Condition dataFlowDecoratorJoin = lfd.LOGICAL_FLOW_ID.eq(lf.ID);
 
-        Condition condition = dfd.DECORATOR_ENTITY_ID.in(selector)
-                .and(dfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+        Condition condition = lfd.DECORATOR_ENTITY_ID.in(selector)
+                .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
                 .and(au.DATA_TYPE.in(dataTypeCodeSelector));
 
         Field<Long> authSourceIdField = au.ID.as("auth_source_id");
@@ -273,7 +273,7 @@ public class AuthoritativeSourceDao {
                         applicationIdField,
                         applicationNameField)
                 .from(lf)
-                .innerJoin(dfd).on(dataFlowDecoratorJoin)
+                .innerJoin(lfd).on(dataFlowDecoratorJoin)
                 .innerJoin(au).on(authSourceJoin)
                 .innerJoin(eh).on(hierarchyJoin)
                 .innerJoin(app).on(appJoin)

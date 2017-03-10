@@ -21,7 +21,7 @@ package com.khartec.waltz.jobs;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
-import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorRatingsService;
+import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.sql.SQLException;
@@ -34,7 +34,7 @@ public class DataFlowDecoratorRatingsServiceHarness {
 
     public static void main(String[] args) throws SQLException {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        DataFlowDecoratorRatingsService ratingService = ctx.getBean(DataFlowDecoratorRatingsService.class);
+        LogicalFlowDecoratorRatingsService ratingService = ctx.getBean(LogicalFlowDecoratorRatingsService.class);
         AuthoritativeSourceService authoritativeSourceService = ctx.getBean(AuthoritativeSourceService.class);
 
         List<AuthoritativeSource> authSources = authoritativeSourceService.findAll();

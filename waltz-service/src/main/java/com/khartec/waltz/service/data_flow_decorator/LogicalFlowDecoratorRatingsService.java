@@ -22,14 +22,14 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
-import com.khartec.waltz.data.data_flow_decorator.DataFlowDecoratorDao;
+import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
+import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
-import com.khartec.waltz.model.data_flow_decorator.DataFlowDecorator;
-import com.khartec.waltz.model.data_flow_decorator.ImmutableDataFlowDecorator;
+import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.service.application.ApplicationService;
@@ -53,38 +53,38 @@ import static com.khartec.waltz.model.utils.IdUtilities.indexById;
 import static java.util.stream.Collectors.toList;
 
 @Service
-public class DataFlowDecoratorRatingsService {
+public class LogicalFlowDecoratorRatingsService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataFlowDecoratorRatingsService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowDecoratorRatingsService.class);
 
     private final ApplicationService applicationService;
     private final AuthoritativeSourceDao authoritativeSourceDao;
     private final LogicalFlowDao logicalFlowDao;
     private final DataTypeDao dataTypeDao;
-    private final DataFlowDecoratorDao dataFlowDecoratorDao;
+    private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
 
 
     @Autowired
-    public DataFlowDecoratorRatingsService(ApplicationService applicationService,
-                                           ApplicationIdSelectorFactory selectorFactory,
-                                           AuthoritativeSourceDao authoritativeSourceDao,
-                                           LogicalFlowDao logicalFlowDao,
-                                           DataTypeDao dataTypeDao,
-                                           DataFlowDecoratorDao dataFlowDecoratorDao) {
+    public LogicalFlowDecoratorRatingsService(ApplicationService applicationService,
+                                              ApplicationIdSelectorFactory selectorFactory,
+                                              AuthoritativeSourceDao authoritativeSourceDao,
+                                              LogicalFlowDao logicalFlowDao,
+                                              DataTypeDao dataTypeDao,
+                                              LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
         checkNotNull(applicationService, "applicationService cannot be null");
         checkNotNull(selectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
-        checkNotNull(dataFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
+        checkNotNull(logicalFlowDecoratorDao, "dataFlowDecoratorDao cannot be null");
 
         this.applicationService = applicationService;
         this.appIdSelectorFactory = selectorFactory;
         this.authoritativeSourceDao = authoritativeSourceDao;
         this.logicalFlowDao = logicalFlowDao;
         this.dataTypeDao = dataTypeDao;
-        this.dataFlowDecoratorDao = dataFlowDecoratorDao;
+        this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
     }
 
 
@@ -109,7 +109,7 @@ public class DataFlowDecoratorRatingsService {
 
         Select<Record1<Long>> selector = appIdSelectorFactory.apply(selectorOptions);
 
-        Collection<DataFlowDecorator> impactedDecorators = dataFlowDecoratorDao
+        Collection<LogicalFlowDecorator> impactedDecorators = logicalFlowDecoratorDao
                 .findByAppIdSelectorAndKind(
                     selector,
                     EntityKind.DATA_TYPE)
@@ -117,9 +117,9 @@ public class DataFlowDecoratorRatingsService {
                 .filter(decorator -> decorator.decoratorEntity().id() == dataType.id().get())
                 .collect(toList());
 
-        Collection<DataFlowDecorator> reRatedDecorators = calculateRatings(impactedDecorators);
+        Collection<LogicalFlowDecorator> reRatedDecorators = calculateRatings(impactedDecorators);
 
-        Set<DataFlowDecorator> modifiedDecorators = SetUtilities.minus(
+        Set<LogicalFlowDecorator> modifiedDecorators = SetUtilities.minus(
                 fromCollection(reRatedDecorators),
                 fromCollection(impactedDecorators));
 
@@ -132,7 +132,7 @@ public class DataFlowDecoratorRatingsService {
     }
 
 
-    public Collection<DataFlowDecorator> calculateRatings(Collection<DataFlowDecorator> decorators) {
+    public Collection<LogicalFlowDecorator> calculateRatings(Collection<LogicalFlowDecorator> decorators) {
 
         List<LogicalFlow> flows = loadFlows(decorators);
         List<Application> targetApps = loadTargetApplications(flows);
@@ -156,7 +156,7 @@ public class DataFlowDecoratorRatingsService {
                                 targetAppsById,
                                 resolver,
                                 decorator);
-                        return ImmutableDataFlowDecorator
+                        return ImmutableLogicalFlowDecorator
                                 .copyOf(decorator)
                                 .withRating(rating);
                     }
@@ -168,7 +168,7 @@ public class DataFlowDecoratorRatingsService {
                                                  Map<Long, LogicalFlow> flowsById,
                                                  Map<Long, Application> targetAppsById,
                                                  AuthoritativeSourceResolver resolver,
-                                                 DataFlowDecorator decorator) {
+                                                 LogicalFlowDecorator decorator) {
         LogicalFlow flow = flowsById.get(decorator.dataFlowId());
 
         EntityReference vantagePoint = lookupVantagePoint(targetAppsById, flow);
@@ -188,7 +188,7 @@ public class DataFlowDecoratorRatingsService {
     }
 
 
-    private String lookupDataTypeCode(Map<Long, DataType> typesById, DataFlowDecorator decorator) {
+    private String lookupDataTypeCode(Map<Long, DataType> typesById, LogicalFlowDecorator decorator) {
         long dataTypeId = decorator.decoratorEntity().id();
         return typesById.get(dataTypeId).code();
     }
@@ -204,7 +204,7 @@ public class DataFlowDecoratorRatingsService {
     }
 
 
-    private List<LogicalFlow> loadFlows(Collection<DataFlowDecorator> decorators) {
+    private List<LogicalFlow> loadFlows(Collection<LogicalFlowDecorator> decorators) {
         Set<Long> dataFlowIds = map(decorators, d -> d.dataFlowId());
         return logicalFlowDao.findByFlowIds(dataFlowIds);
     }
@@ -221,10 +221,10 @@ public class DataFlowDecoratorRatingsService {
     }
 
 
-    private int[] updateDecorators(Set<DataFlowDecorator> decorators) {
+    private int[] updateDecorators(Set<LogicalFlowDecorator> decorators) {
         checkNotNull(decorators, "decorators cannot be null");
         if (decorators.isEmpty()) return new int[] {};
-        return dataFlowDecoratorDao.updateDecorators(decorators);
+        return logicalFlowDecoratorDao.updateDecorators(decorators);
     }
 
 }

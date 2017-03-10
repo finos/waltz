@@ -19,7 +19,7 @@
 package com.khartec.waltz.jobs.sample;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.schema.tables.records.DataFlowDecoratorRecord;
+import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -30,9 +30,7 @@ import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.common.ListUtilities.randomPick;
 import static com.khartec.waltz.schema.Tables.*;
 
-/**
- * Created by dwatkins on 29/09/2016.
- */
+
 public class FlowDecorationGenerator {
 
     public static void main(String[] args) {
@@ -50,11 +48,11 @@ public class FlowDecorationGenerator {
                 .from(DATA_TYPE)
                 .fetch(DATA_TYPE.ID);
 
-        List<DataFlowDecoratorRecord> records = map(
+        List<LogicalFlowDecoratorRecord> records = map(
                 flowIds,
                 id -> {
-                    DataFlowDecoratorRecord record = dsl.newRecord(DATA_FLOW_DECORATOR);
-                    record.setDataFlowId(id);
+                    LogicalFlowDecoratorRecord record = dsl.newRecord(LOGICAL_FLOW_DECORATOR);
+                    record.setLogicalFlowId(id);
                     record.setDecoratorEntityId(randomPick(typeIds));
                     record.setDecoratorEntityKind(EntityKind.DATA_TYPE.name());
                     record.setProvenance("sample");
@@ -62,8 +60,8 @@ public class FlowDecorationGenerator {
                 });
 
 
-        dsl.deleteFrom(DATA_FLOW_DECORATOR)
-                .where(DATA_FLOW_DECORATOR.PROVENANCE.eq("sample"))
+        dsl.deleteFrom(LOGICAL_FLOW_DECORATOR)
+                .where(LOGICAL_FLOW_DECORATOR.PROVENANCE.eq("sample"))
                 .execute();
         System.out.println("--- saving: "+records.size());
         dsl.batchStore(records).execute();

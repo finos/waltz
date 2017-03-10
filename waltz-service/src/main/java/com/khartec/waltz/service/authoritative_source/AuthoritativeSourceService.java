@@ -27,7 +27,7 @@ import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
-import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorRatingsService;
+import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -53,14 +53,14 @@ public class AuthoritativeSourceService {
     private static final Logger LOG = LoggerFactory.getLogger(AuthoritativeSourceService.class);
 
     private final AuthoritativeSourceDao authoritativeSourceDao;
-    private final DataFlowDecoratorRatingsService ratingService;
+    private final LogicalFlowDecoratorRatingsService ratingService;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
     private final OrganisationalUnitService organisationalUnitService;
 
 
     @Autowired
     public AuthoritativeSourceService(AuthoritativeSourceDao authoritativeSourceDao,
-                                      DataFlowDecoratorRatingsService ratingService,
+                                      LogicalFlowDecoratorRatingsService ratingService,
                                       DataTypeIdSelectorFactory dataTypeIdSelectorFactory, OrganisationalUnitService organisationalUnitService) {
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao must not be null");
         checkNotNull(ratingService, "ratingService cannot be null");

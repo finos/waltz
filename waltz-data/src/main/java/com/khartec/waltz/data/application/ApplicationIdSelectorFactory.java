@@ -35,12 +35,11 @@ import org.springframework.stereotype.Service;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
-import static com.khartec.waltz.schema.tables.AppCapability.APP_CAPABILITY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
-import static com.khartec.waltz.schema.tables.DataFlowDecorator.DATA_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
@@ -57,7 +56,6 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
 
     private final Application app = APPLICATION.as("app");
-    private final AppCapability appCapability = APP_CAPABILITY.as("appcap");
     private final ApplicationGroupEntry appGroup = APPLICATION_GROUP_ENTRY.as("appgrp");
     private final EntityRelationship relationship = EntityRelationship.ENTITY_RELATIONSHIP.as("relationship");
     private final Involvement involvement = INVOLVEMENT.as("involvement");
@@ -234,8 +232,8 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     private Select<Record1<Long>> mkForDataType(IdSelectionOptions options) {
         Select<Record1<Long>> dataTypeSelector = dataTypeIdSelectorFactory.apply(options);
 
-        Condition condition = DATA_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector)
-                .and(DATA_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()));
+        Condition condition = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector)
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()));
 
         Field appId = DSL.field("app_id", Long.class);
 
@@ -259,8 +257,8 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
         return dsl
                 .select(appField)
                 .from(LOGICAL_FLOW)
-                .innerJoin(DATA_FLOW_DECORATOR)
-                .on(DATA_FLOW_DECORATOR.DATA_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                .innerJoin(LOGICAL_FLOW_DECORATOR)
+                .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
                 .where(dsl.renderInlined(condition));
     }
 

@@ -34,7 +34,7 @@ import com.khartec.waltz.model.logical_flow.*;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.data_flow_decorator.DataFlowDecoratorService;
+import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -62,7 +62,7 @@ public class LogicalFlowService {
 
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
     private final ChangeLogService changeLogService;
-    private final DataFlowDecoratorService dataFlowDecoratorService;
+    private final LogicalFlowDecoratorService logicalFlowDecoratorService;
     private final DataTypeUsageService dataTypeUsageService;
     private final DBExecutorPoolInterface dbExecutorPool;
     private final LogicalFlowDao logicalFlowDao;
@@ -74,7 +74,7 @@ public class LogicalFlowService {
     @Autowired
     public LogicalFlowService(ApplicationIdSelectorFactory appIdSelectorFactory,
                               ChangeLogService changeLogService,
-                              DataFlowDecoratorService dataFlowDecoratorService,
+                              LogicalFlowDecoratorService logicalFlowDecoratorService,
                               DataTypeUsageService dataTypeUsageService,
                               DBExecutorPoolInterface dbExecutorPool,
                               LogicalFlowDao logicalFlowDao,
@@ -84,7 +84,7 @@ public class LogicalFlowService {
         checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
-        checkNotNull(dataFlowDecoratorService, "dataFlowDecoratorService cannot be null");
+        checkNotNull(logicalFlowDecoratorService, "dataFlowDecoratorService cannot be null");
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
@@ -93,7 +93,7 @@ public class LogicalFlowService {
 
         this.appIdSelectorFactory = appIdSelectorFactory;
         this.changeLogService = changeLogService;
-        this.dataFlowDecoratorService = dataFlowDecoratorService;
+        this.logicalFlowDecoratorService = logicalFlowDecoratorService;
         this.dataTypeUsageService = dataTypeUsageService;
         this.dbExecutorPool = dbExecutorPool;
         this.logicalFlowStatsDao = logicalFlowStatsDao;
@@ -171,7 +171,7 @@ public class LogicalFlowService {
         List<LogicalFlow> logicalFlows = logicalFlowDao.findByFlowIds(flowIds);
 
         int deleted = logicalFlowDao.removeFlows(flowIds);
-        dataFlowDecoratorService.deleteAllDecoratorsForFlowIds(flowIds);
+        logicalFlowDecoratorService.deleteAllDecoratorsForFlowIds(flowIds);
 
         Set<EntityReference> affectedEntityRefs = logicalFlows.stream()
                 .flatMap(df -> Stream.of(df.source(), df.target()))
