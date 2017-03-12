@@ -32,8 +32,6 @@ import java.util.List;
 public abstract class AppChangeAction {
 
     public abstract Application app();
-    public abstract List<String> tags();
-    public abstract List<String> aliases();
     public abstract List<FieldChange> changes();
 
 }

@@ -104,27 +104,6 @@ export const lifecyclePhaseField = {
 };
 
 
-export const aliasesField = {
-    type: 'tags-input',
-    key: 'aliases',
-    templateOptions: {
-        label: 'Aliases',
-        placeholder: 'Add an alias',
-        required: false
-    }
-};
-
-
-export const tagsField = {
-    type: 'tags-input',
-    key: 'tags',
-    templateOptions: {
-        label: 'Additional Tags',
-        required: false
-    }
-};
-
-
 export const overallRatingField = {
     type: 'select',
     key: 'overallRating',

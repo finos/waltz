@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -17,41 +16,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import angular from 'angular';
 import _ from 'lodash';
+import {initialiseData} from '../common';
 
-function controller($stateParams, appStore) {
+
+/**
+ * @name waltz-keyword-edit
+ *
+ * @description
+ * This component ...
+ */
 
 
-    const vm = this;
-    vm.tagSets = [];
-
-    const addTagSet = (selectedTag) => {
-        appStore.findByTag(selectedTag).then(r => {
-            vm.tagSets.push({ tag: selectedTag, apps: r});
-        });
-    };
-
-    const removeTagSet = (selectedTagSet) => {
-        vm.tagSets = _.reject(vm.tagSets, ts => ts === selectedTagSet);
-    };
-
-    appStore.findAllTags().then(r => {
-        vm.tags = r;
-    });
-
-    vm.addTagSet = addTagSet;
-    vm.removeTagSet = removeTagSet;
-
-    addTagSet($stateParams.tag);
-}
-
-controller.$inject = ['$stateParams', 'ApplicationStore'];
-
-export default {
-    template: require('./app-tag-explorer.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
+const bindings = {
+    onCancel: '<',
+    onSave: '<',
+    keywords: '<'
 };
 
+
+const initialState = {};
+
+
+const template = require('./keyword-edit.html');
+
+
+function controller() {
+    const vm = this;
+
+    vm.$onInit = () => initialiseData(vm, initialState);
+
+    vm.$onChanges = (c) => {
+        vm.working = angular.copy(vm.keywords);
+    };
+
+    vm.save = () => {
+        const values = _.map(vm.working, 'text');
+        vm.onSave(values);
+    };
+}
+
+
+controller.$inject = [];
+
+
+const component = {
+    template,
+    bindings,
+    controller
+};
+
+
+export default component;

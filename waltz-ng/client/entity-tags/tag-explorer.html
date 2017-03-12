@@ -1,16 +1,16 @@
 <div>
 
-    <waltz-page-header name="Application Tag Explorer" icon="tags">
+    <waltz-page-header name="Tag Explorer" icon="tags">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li>Application Tag Explorer</li>
+            <li>Tag Explorer</li>
         </ol>
     </waltz-page-header>
 
     <div class="row">
         <div class="col-md-8">
             <waltz-section name="{{ tagSet.tag }}"
-                           small="( {{tagSet.apps.length }} )"
+                           small="( {{tagSet.refs.length }} )"
                            icon="tag"
                            ng-repeat="tagSet in ctrl.tagSets">
                 <waltz-section-actions>
@@ -20,18 +20,13 @@
                     </button>
                 </waltz-section-actions>
                 <ul>
-                    <li ng-repeat="app in tagSet.apps | orderBy:'name'" >
-                        <a ui-sref="main.app.view ({ id: app.id })">
-                            <strong>
-                                {{ app.name }}
-                            </strong>
-                    <span class="small">
-                        {{ app.assetCode }}
-                    </span>
-                        </a>
-                        <span class="small text-muted">{{ app.lifecyclePhase | toDisplayName:'lifecyclePhase' }} , {{ app.kind | toDisplayName:'applicationKind' }}</span>
-                        <br>
-                        <span class="small text-muted">{{ app.description }}</span>
+                    <li ng-repeat="refGroup in tagSet.refsByKind">
+                        <h4 ng-bind="refGroup.key | toDisplayName:'entity'"></h4>
+                        <ul>
+                            <li ng-repeat="ref in refGroup.values">
+                                <waltz-entity-link entity-ref="ref"></waltz-entity-link>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </waltz-section>
@@ -44,8 +39,10 @@
                        ng-model="tagQuery">
                 <br>
                 <ul class="waltz-keyword-list">
-                    <li ng-repeat="tag in ctrl.tags | filter:tagQuery" class="clickable" ng-click="ctrl.addTagSet(tag)">
-                        {{ tag }}
+                    <li ng-repeat="tag in ctrl.tags | filter:tagQuery"
+                        ng-bind="tag"
+                        class="clickable"
+                        ng-click="ctrl.addTagSet(tag)">
                     </li>
                 </ul>
             </waltz-section>

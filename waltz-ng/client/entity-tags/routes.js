@@ -16,55 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from '../common';
+import tagExplorerView from './tag-explorer';
 
 
-/**
- * @name waltz-keyword-list
- *
- * @description
- * This component ...
- */
-
-const bindings = {
-    keywords: '<',
-    onSelect: '&?'
-};
-
-const transclude = {
-    empty: '?empty',
-    last: '?last'
+const base = {
+    url: 'tags'
 };
 
 
-const initialState = {};
+const explorerState = {
+    url: '/explorer/:tag',
+    views: {'content@': tagExplorerView }
+};
 
 
-const template = require('./keyword-list.html');
-
-
-function controller() {
-    const vm = this;
-
-    vm.$onInit = () => initialiseData(vm, initialState);
-
-    vm.$onChanges = (c) => {
-        console.log('keyword-list - oc', vm);
-    };
-
-
+function setup($stateProvider) {
+    $stateProvider
+        .state('main.entity-tag', base)
+        .state('main.entity-tag.explorer', explorerState);
 }
 
 
-controller.$inject = [];
+setup.$inject = [
+    '$stateProvider'
+];
 
 
-const component = {
-    template,
-    transclude,
-    bindings,
-    controller
-};
-
-
-export default component;
+export default setup;

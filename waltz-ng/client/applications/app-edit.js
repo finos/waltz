@@ -20,14 +20,6 @@ import _ from "lodash";
 import * as fields from "./formly/fields";
 
 
-function setupTagAutoComplete(appStore) {
-    appStore.findAllTags().then(tags => {
-        fields.tagsField.templateOptions.autoCompleteLoader = (query) =>
-            _.filter(tags, t => t.toLowerCase().indexOf(query.toLowerCase()) > -1);
-    });
-}
-
-
 function setupDropDowns(orgUnits) {
     fields.orgUnitField.templateOptions.options = _.map(orgUnits, (u) => ({ name: u.name, code: u.id}));
 }
@@ -37,8 +29,8 @@ const fieldLayout = [
     {
         className: 'row',
         fieldGroup: [
-            {className: 'col-xs-8', fieldGroup: [ fields.nameField, fields.aliasesField, fields.tagsField ]},
-            {className: 'col-xs-4', fieldGroup: [ fields.assetCodeField, fields.parentAssetCodeField, fields.orgUnitField ]}
+            {className: 'col-xs-8', fieldGroup: [ fields.nameField, fields.orgUnitField ]},
+            {className: 'col-xs-4', fieldGroup: [ fields.assetCodeField, fields.parentAssetCodeField ]}
         ]
     }, {
         className: 'row',
@@ -77,20 +69,15 @@ function fieldDiff(field) {
 
 
 function controller(app,
-                    tags,
-                    aliases,
                     orgUnits,
                     appStore,
                     notification,
                     $state) {
 
     setupDropDowns(orgUnits);
-    setupTagAutoComplete(appStore);
 
     const formModel = {
-        app,
-        tags,
-        aliases
+        app
     };
 
     fields.nameField.model = formModel.app;
@@ -100,8 +87,6 @@ function controller(app,
     fields.orgUnitField.model = formModel.app;
     fields.typeField.model = formModel.app;
     fields.lifecyclePhaseField.model = formModel.app;
-    fields.aliasesField.model = formModel;
-    fields.tagsField.model = formModel;
     fields.overallRatingField.model = formModel.app;
     fields.businessCriticalityField.model = formModel.app;
 
@@ -124,8 +109,6 @@ function controller(app,
 
         const action = {
             ...formModel,
-            tags: _.map(formModel.tags, 'text'),   // override model
-            aliases: _.map(formModel.aliases, 'text'),  // override model
             changes
         };
 
@@ -144,8 +127,6 @@ function controller(app,
 
 controller.$inject = [
     'app',
-    'tags',
-    'aliases',
     'orgUnits',
     'ApplicationStore',
     'Notification',

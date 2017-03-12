@@ -18,8 +18,7 @@
 
 import AppEdit from "./app-edit";
 import AppRegistration from "./app-registration";
-import appTagExplorerView from "./app-tag-explorer";
-import {appResolver, appByAssetCodeResolver, tagsResolver, aliasesResolver, orgUnitsResolver} from "./resolvers";
+import {appResolver, appByAssetCodeResolver, orgUnitsResolver} from "./resolvers";
 
 
 const base = {
@@ -54,17 +53,9 @@ const appEditState = {
     url: '/{id:int}/edit',
     resolve: {
         app: appResolver,
-        tags: tagsResolver,
-        aliases: aliasesResolver,
         orgUnits: orgUnitsResolver
     },
     views: {'content@': AppEdit}
-};
-
-
-const appTagExplorerState = {
-    url: 'tag-explorer/:tag',
-    views: {'content@': appTagExplorerView }
 };
 
 
@@ -75,7 +66,6 @@ function setup($stateProvider) {
         .state('main.app.view', appViewState)
         .state('main.app.asset-code', appViewByAssetCodeState)
         .state('main.app.edit', appEditState)
-        .state('main.app.tag-explorer', appTagExplorerState);
 }
 
 

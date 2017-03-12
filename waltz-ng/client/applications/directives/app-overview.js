@@ -32,9 +32,6 @@ const BINDINGS = {
 const initialState = {
     visibility: {
         aliasEditor: false
-    },
-    fieldEditor: {
-        aliases: []
     }
 };
 
@@ -44,20 +41,19 @@ function controller($state) {
 
     vm.showAliasEditor = () => {
         vm.visibility.aliasEditor = true;
-        vm.fieldEditor.aliases = vm.aliases;
     };
 
     vm.dismissAliasEditor = () => {
         vm.visibility.aliasEditor = false;
-        vm.fieldEditor.aliases = [];
     };
 
-    vm.tagSelected = (tag) => {
-        $state.go('main.app.tag-explorer', { tag });
+    vm.tagSelected = (keyword) => {
+        const params = { tag: keyword };
+        $state.go('main.entity-tag.explorer', params);
     };
 
-    vm.saveTags = () => {
-        vm.updateAliases({ aliases: vm.fieldEditor.aliases })
+    vm.saveAliases = (aliases = []) => {
+        vm.updateAliases({ aliases })
             .then(() => vm.dismissAliasEditor());
     };
 

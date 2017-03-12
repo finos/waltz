@@ -75,26 +75,12 @@
                     </i>
                 </empty>
             </waltz-keyword-list>
-            <div ng-if="ctrl.visibility.aliasEditor"
-                 style="padding: 10px; border-radius: 3px; border: 1px solid #ddd; background-color: #f5f5f5">
-                <tags-input class="bootstrap"
-                            ng-model="ctrl.fieldEditor.aliases"
-                            replace-spaces-with-dashes="false"
-                            placeholder="Edit aliases">
-                </tags-input>
 
-                <div style='margin-top: 4px'>
-                    <button class="btn btn-xs btn-success"
-                            ng-click="ctrl.saveTags()">
-                        Update
-                    </button>
-                    <a class="clickable small"
-                       ng-click="ctrl.dismissAliasEditor()">
-                        Cancel
-                    </a>
-                </div>
-
-            </div>
+            <waltz-keyword-edit ng-if="ctrl.visibility.aliasEditor"
+                                keywords="ctrl.aliases"
+                                on-save="ctrl.saveAliases"
+                                on-cancel="ctrl.dismissAliasEditor">
+            </waltz-keyword-edit>
         </div>
         <div class="col-sm-2 waltz-display-field-label">
             Tags

@@ -91,7 +91,7 @@ public class AppGenerator {
         dsl.deleteFrom(AUTHORITATIVE_SOURCE).execute();
         dsl.deleteFrom(APPLICATION).execute();
 
-        registrationRequests.forEach(applicationDao::registerApp);
+        registrationRequests.forEach(a -> applicationDao.registerApp(a, "admin"));
 
     }
 }

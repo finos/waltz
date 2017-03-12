@@ -31,27 +31,6 @@ export function appByAssetCodeResolver(appStore, $stateParams) {
 appByAssetCodeResolver.$inject = ['ApplicationStore', '$stateParams'];
 
 
-// -- ALIASES --
-export function aliasesResolver(aliasStore, $stateParams) {
-
-    const ref = {
-        id: $stateParams.id,
-        kind: 'APPLICATION'
-    };
-
-    return aliasStore.getForEntity(ref);
-}
-
-aliasesResolver.$inject = ['AliasStore', '$stateParams'];
-
-
-// -- TAGS --
-export function tagsResolver(appStore, $stateParams) {
-    return appStore.getAppTagsById($stateParams.id);
-}
-
-tagsResolver.$inject = ['ApplicationStore', '$stateParams'];
-
 
 // -- OUs --
 export function orgUnitsResolver(orgUnitStore) {

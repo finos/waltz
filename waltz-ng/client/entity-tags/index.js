@@ -16,55 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from '../common';
 
 
-/**
- * @name waltz-keyword-list
- *
- * @description
- * This component ...
- */
+export default () => {
 
-const bindings = {
-    keywords: '<',
-    onSelect: '&?'
+    const module = angular.module('waltz.entity-tags', []);
+
+    module
+        .config(require('./routes'));
+
+    module
+        .service("EntityTagStore", require('./services/entity-tag-store'));
+
+    return module.name;
 };
-
-const transclude = {
-    empty: '?empty',
-    last: '?last'
-};
-
-
-const initialState = {};
-
-
-const template = require('./keyword-list.html');
-
-
-function controller() {
-    const vm = this;
-
-    vm.$onInit = () => initialiseData(vm, initialState);
-
-    vm.$onChanges = (c) => {
-        console.log('keyword-list - oc', vm);
-    };
-
-
-}
-
-
-controller.$inject = [];
-
-
-const component = {
-    template,
-    transclude,
-    bindings,
-    controller
-};
-
-
-export default component;

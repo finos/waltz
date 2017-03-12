@@ -31,7 +31,7 @@ import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.complexity.ComplexityRatingService;
 import com.khartec.waltz.service.entity_alias.EntityAliasService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
-import com.khartec.waltz.service.tags.AppTagService;
+import com.khartec.waltz.service.entity_tag.EntityTagService;
 import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,13 +40,14 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 
 
 @Service
 public class AppViewService {
 
     private final ApplicationService applicationService;
-    private final AppTagService appTagService;
+    private final EntityTagService entityTagService;
     private final ComplexityRatingService complexityRatingService;
     private final EntityAliasService entityAliasService;
     private final OrganisationalUnitService organisationalUnitService;
@@ -54,21 +55,21 @@ public class AppViewService {
 
 
     @Autowired
-    public AppViewService(AppTagService appTagService,
+    public AppViewService(EntityTagService entityTagService,
                           ApplicationService applicationService,
                           ComplexityRatingService complexityRatingService,
                           EntityAliasService entityAliasService,
                           DBExecutorPoolInterface dbExecutorPool,
                           OrganisationalUnitService organisationalUnitService) {
 
-        checkNotNull(appTagService, "appTagService cannot be null");
+        checkNotNull(entityTagService, "appTagService cannot be null");
         checkNotNull(applicationService, "applicationService cannot be null");
         checkNotNull(complexityRatingService, "complexityRatingService cannot be null");
         checkNotNull(entityAliasService, "entityAliasService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(organisationalUnitService, "organisationalUnitService must not be null");
 
-        this.appTagService = appTagService;
+        this.entityTagService = entityTagService;
         this.applicationService = applicationService;
         this.complexityRatingService = complexityRatingService;
         this.entityAliasService = entityAliasService;
@@ -91,7 +92,7 @@ public class AppViewService {
                 organisationalUnitService.getByAppId(id));
 
         Future<List<String>> tags = dbExecutorPool.submit(() ->
-                appTagService.findTagsForApplication(id));
+                entityTagService.findTagsForEntityReference(mkRef(EntityKind.APPLICATION, id)));
 
         Future<List<String>> aliases = dbExecutorPool.submit(() ->
                 entityAliasService.findAliasesForEntityReference(ref));
