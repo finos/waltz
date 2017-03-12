@@ -58,8 +58,9 @@ public class EntityTagService {
     }
 
 
-    public int[] updateTags(EntityReference ref, Collection<String> tags, String username) {
+    public List<String> updateTags(EntityReference ref, Collection<String> tags, String username) {
         checkNotNull(tags, "tags cannot be null");
-        return entityTagDao.updateTags(ref, tags, username);
+        entityTagDao.updateTags(ref, tags, username);
+        return findTagsForEntityReference(ref);
     }
 }

@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import {checkIsEntityRef, checkIsStringList} from "../../common/checks";
+
 
 function store($http, base) {
     const BASE = `${base}/entity-tag`;
@@ -32,10 +34,20 @@ function store($http, base) {
         .post(`${BASE}/entity/${ref.kind}/${ref.id}`)
         .then(x => x.data);
 
+    const update = (entityRef, tags = []) => {
+        checkIsEntityRef(entityRef);
+        checkIsStringList(tags);
+
+        return $http
+            .post(`${BASE}/entity/${entityRef.kind}/${entityRef.id}`, tags)
+            .then(r => r.data);
+    };
+
     return {
         findAllTags,
         findByTag,
-        findTagsByEntityRef
+        findTagsByEntityRef,
+        update
     };
 }
 

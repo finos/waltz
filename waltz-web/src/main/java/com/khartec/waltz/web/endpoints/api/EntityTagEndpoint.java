@@ -25,8 +25,10 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
@@ -52,9 +54,16 @@ public class EntityTagEndpoint implements Endpoint {
         ListRoute<EntityReference> findByTagRoute = (request, response)
                 -> entityTagService.findByTag(request.body());
 
+        ListRoute<String> updateRoute = (req, resp) -> {
+            String username = getUsername(req);
+            EntityReference ref = getEntityReference(req);
+            List<String> tags = readStringsFromBody(req);
+            return entityTagService.updateTags(ref, tags, username);
+        };
+
         getForList(mkPath(BASE_URL, "tags"), findAllTagsRoute);
-        postForList(mkPath(BASE_URL, "tags"), findByTagRoute);  // POST as may not be good for qparam
-
-
+        postForList(mkPath(BASE_URL, "tags"), findByTagRoute);
+        postForList(mkPath(BASE_URL, "entity", ":kind", ":id"), updateRoute);
     }
+
 }
