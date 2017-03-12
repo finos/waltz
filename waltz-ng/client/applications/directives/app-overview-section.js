@@ -30,7 +30,8 @@ export default () => ({
         complexity: '=',
         tags: '=',
         aliases: '=',
-        updateAliases: '&'
+        onSaveAliases: '<',
+        onSaveTags: '<'
     },
     controller,
     controllerAs: 'ctrl',

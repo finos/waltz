@@ -25,13 +25,15 @@ const BINDINGS = {
     aliases: '<',
     organisationalUnit: '<',
     complexity: '<',
-    updateAliases: '&'
+    onSaveAliases: '<',
+    onSaveTags: '<'
 };
 
 
 const initialState = {
     visibility: {
-        aliasEditor: false
+        aliasEditor: false,
+        tagEditor: false
     }
 };
 
@@ -39,13 +41,11 @@ const initialState = {
 function controller($state) {
     const vm = _.defaultsDeep(this, initialState);
 
-    vm.showAliasEditor = () => {
-        vm.visibility.aliasEditor = true;
-    };
+    vm.showAliasEditor = () => vm.visibility.aliasEditor = true;
+    vm.showTagEditor = () => vm.visibility.tagEditor = true;
 
-    vm.dismissAliasEditor = () => {
-        vm.visibility.aliasEditor = false;
-    };
+    vm.dismissAliasEditor = () =>  vm.visibility.aliasEditor = false;
+    vm.dismissTagEditor = () => vm.visibility.tagEditor = false;
 
     vm.tagSelected = (keyword) => {
         const params = { tag: keyword };
@@ -53,10 +53,14 @@ function controller($state) {
     };
 
     vm.saveAliases = (aliases = []) => {
-        vm.updateAliases({ aliases })
+        vm.onSaveAliases(aliases)
             .then(() => vm.dismissAliasEditor());
     };
 
+    vm.saveTags = (tags = []) => {
+        vm.onSaveTags(tags)
+            .then(() => vm.dismissTagEditor());
+    };
 }
 
 controller.$inject = ['$state'];

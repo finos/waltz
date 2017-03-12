@@ -9,10 +9,10 @@
 
     <waltz-app-overview app="ctrl.app"
                         aliases="ctrl.aliases"
-                        update-aliases="ctrl.updateAliases({ aliases })"
                         tags="ctrl.tags"
                         organisational-unit="ctrl.organisationalUnit"
-                        complexity="ctrl.complexity">
-
+                        complexity="ctrl.complexity"
+                        on-save-aliases="ctrl.onSaveAliases"
+                        on-save-tags="ctrl.onSaveTags">
     </waltz-app-overview>
 </div>

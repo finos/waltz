@@ -82,6 +82,7 @@ function controller($q,
                     databaseStore,
                     dataTypeUsageStore,
                     entityStatisticStore,
+                    entityTagStore,
                     historyStore,
                     involvementStore,
                     logicalFlowDecoratorStore,
@@ -119,6 +120,12 @@ function controller($q,
         return aliasStore
             .update(entityReference, aliases)
             .then(() => vm.aliases = aliases);
+    };
+
+    vm.saveTags = (tags = []) => {
+        return entityTagStore
+            .update(entityReference, tags)
+            .then(xs => vm.tags = xs);
     };
 
     vm.onPhysicalFlowsInitialise = (e) => {
@@ -266,6 +273,7 @@ controller.$inject = [
     'DatabaseStore',
     'DataTypeUsageStore',
     'EntityStatisticStore',
+    'EntityTagStore',
     'HistoryStore',
     'InvolvementStore',
     'LogicalFlowDecoratorStore',

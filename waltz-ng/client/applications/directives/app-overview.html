@@ -88,13 +88,30 @@
         <div class="col-sm-4">
             <waltz-keyword-list keywords="ctrl.tags"
                                 on-select="ctrl.tagSelected(keyword)">
+                <last>
+                    <span class="small">
+                        <a ng-click="ctrl.showTagEditor()"
+                           class="clickable">
+                            update
+                        </a>
+                    </span>
+                </last>
                 <empty>
                     <i class="text-muted">
-                        No tags defined
+                        No aliases defined,
+                        <a class="clickable"
+                           ng-click="ctrl.showTagEditor()">
+                            add one.
+                        </a>
                     </i>
                 </empty>
             </waltz-keyword-list>
 
+            <waltz-keyword-edit ng-if="ctrl.visibility.tagEditor"
+                                keywords="ctrl.tags"
+                                on-save="ctrl.saveTags"
+                                on-cancel="ctrl.dismissTagEditor">
+            </waltz-keyword-edit>
 
         </div>
     </div>
