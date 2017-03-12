@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.service.application;
 
-import com.khartec.waltz.data.application.AppTagDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.application.search.ApplicationSearchDao;
 import com.khartec.waltz.data.entity_alias.EntityAliasDao;
+import com.khartec.waltz.data.entity_tag.EntityTagDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -54,7 +54,7 @@ public class ApplicationService {
 
 
     private final ApplicationDao applicationDao;
-    private final AppTagDao appTagDao;
+    private final EntityTagDao entityTagDao;
     private final EntityAliasDao entityAliasDao;
     private final ApplicationSearchDao appSearchDao;
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
@@ -62,18 +62,18 @@ public class ApplicationService {
 
     @Autowired
     public ApplicationService(ApplicationDao appDao,
-                              AppTagDao appTagDao,
+                              EntityTagDao entityTagDao,
                               EntityAliasDao entityAliasDao,
                               ApplicationSearchDao appSearchDao,
                               ApplicationIdSelectorFactory appIdSelectorFactory) {
         checkNotNull(appDao, "appDao must not be null");
-        checkNotNull(appTagDao, "appTagDao must not be null");
+        checkNotNull(entityTagDao, "entityTagDao must not be null");
         checkNotNull(entityAliasDao, "entityAliasDao must not be null");
         checkNotNull(appSearchDao, "appSearchDao must not be null");
         checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
 
         this.applicationDao = appDao;
-        this.appTagDao = appTagDao;
+        this.entityTagDao = entityTagDao;
         this.entityAliasDao = entityAliasDao;
         this.appSearchDao = appSearchDao;
         this.appIdSelectorFactory = appIdSelectorFactory;
@@ -111,7 +111,7 @@ public class ApplicationService {
     }
 
 
-    public AppRegistrationResponse registerApp(AppRegistrationRequest request) {
+    public AppRegistrationResponse registerApp(AppRegistrationRequest request, String username) {
         checkNotEmpty(request.name(), "Cannot register app with no name");
         AppRegistrationResponse response = applicationDao.registerApp(request);
 
@@ -124,7 +124,7 @@ public class ApplicationService {
             entityAliasDao.updateAliases(entityReference,
                     request.aliases());
 
-            appTagDao.updateTags(response.id().get(), request.tags());
+            entityTagDao.updateTags(entityReference, request.tags(), username);
         }
 
         return response;

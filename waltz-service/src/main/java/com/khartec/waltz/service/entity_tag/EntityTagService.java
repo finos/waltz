@@ -16,10 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.service.tags;
+package com.khartec.waltz.service.entity_tag;
 
-import com.khartec.waltz.data.application.AppTagDao;
-import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.data.entity_tag.EntityTagDao;
+import com.khartec.waltz.model.EntityReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,34 +32,34 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
  * Tags for applications
  */
 @Service
-public class AppTagService {
+public class EntityTagService {
 
-    private final AppTagDao appTagDao;
+    private final EntityTagDao entityTagDao;
 
 
     @Autowired
-    public AppTagService(AppTagDao appTagDao) {
-        this.appTagDao = appTagDao;
+    public EntityTagService(EntityTagDao entityTagDao) {
+        this.entityTagDao = entityTagDao;
     }
 
 
     public List<String> findAllTags() {
-        return appTagDao.findAllTags();
+        return entityTagDao.findAllTags();
     }
 
 
-    public List<String> findTagsForApplication(long appId) {
-        return appTagDao.findTagsForApplication(appId);
+    public List<String> findTagsForEntityReference(EntityReference reference) {
+        return entityTagDao.findTagsForEntityReference(reference);
     }
 
 
-    public List<Application> findByTag(String tag) {
-        return appTagDao.findByTag(tag);
+    public List<EntityReference> findByTag(String tag) {
+        return entityTagDao.findByTag(tag);
     }
 
 
-    public int[] updateTags(long id, Collection<String> tags) {
+    public int[] updateTags(EntityReference ref, Collection<String> tags, String username) {
         checkNotNull(tags, "tags cannot be null");
-        return appTagDao.updateTags(id, tags);
+        return entityTagDao.updateTags(ref, tags, username);
     }
 }

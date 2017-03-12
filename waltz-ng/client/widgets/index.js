@@ -25,7 +25,6 @@ export default () => {
     module.directive('waltzExternalLink', require('./external-link'));
     module.directive('waltzFromNow', require('./from-now'));
     module.directive('waltzJumpTo', require('./jump-to'));
-    module.directive('waltzKeywordList', require('./keyword-list'));
     module.directive('waltzLoadingNotification', require('./loading-notification'));
     module.directive('waltzMailTo', require('./mail-to'));
     module.directive('waltzOverlayPanel', require('./overlay-panel'));
@@ -41,6 +40,8 @@ export default () => {
         .component('waltzEditableField', require('./editable-field'))
         .component('waltzIcon', require('./icon'))
         .component('waltzInlineEditArea', require('./inline-edit-area'))
+        .component('waltzKeywordList', require('./keyword-list'))
+        .component('waltzKeywordEdit', require('./keyword-edit'))
         .component('waltzNoData', require('./no-data'))
         .component('waltzPageHeader', require('./page-header/page-header'))
         .component('waltzPie', require('./pie'))

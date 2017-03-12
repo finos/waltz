@@ -1,0 +1,18 @@
+<div style="padding: 10px; border-radius: 3px; border: 1px solid #ddd; background-color: #f5f5f5">
+    <tags-input class="bootstrap"
+                ng-model="$ctrl.working"
+                replace-spaces-with-dashes="false"
+                placeholder="Edit">
+    </tags-input>
+
+    <div style='margin-top: 4px'>
+        <button class="btn btn-xs btn-success"
+                ng-click="$ctrl.save()">
+            Update
+        </button>
+        <a class="clickable small"
+           ng-click="$ctrl.onCancel()">
+            Cancel
+        </a>
+    </div>
+</div>

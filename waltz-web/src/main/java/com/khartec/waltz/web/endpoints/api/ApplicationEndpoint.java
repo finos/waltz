@@ -28,8 +28,7 @@ import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.entity_alias.EntityAliasService;
-import com.khartec.waltz.service.tags.AppTagService;
+import com.khartec.waltz.service.entity_tag.EntityTagService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
@@ -45,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.lang.Long.parseLong;
@@ -60,24 +60,20 @@ public class ApplicationEndpoint implements Endpoint {
 
     private final ApplicationService appService;
     private final ChangeLogService changeLogService;
-    private final EntityAliasService entityAliasService;
-    private final AppTagService appTagService;
+    private final EntityTagService entityTagService;
 
 
     @Autowired
     public ApplicationEndpoint(ApplicationService appService,
                                ChangeLogService changeLogService,
-                               EntityAliasService entityAliasService, 
-                               AppTagService appTagService) {
+                               EntityTagService entityTagService) {
         checkNotNull(appService, "appService must not be null");
         checkNotNull(changeLogService, "changeLogService must not be null");
-        checkNotNull(entityAliasService, "entityAliasService cannot be null");
-        checkNotNull(appTagService, "appTagService cannot be null");
+        checkNotNull(entityTagService, "appTagService cannot be null");
 
         this.appService = appService;
         this.changeLogService = changeLogService;
-        this.entityAliasService = entityAliasService;
-        this.appTagService = appTagService;
+        this.entityTagService = entityTagService;
     }
 
 
@@ -94,6 +90,7 @@ public class ApplicationEndpoint implements Endpoint {
             res.type(WebUtilities.TYPE_JSON);
             AppChangeAction appChange = readBody(req, AppChangeAction.class);
             LOG.info("Updating application: " + appChange);
+            String username = getUsername(req);
 
             Long appId = appChange.app().id().get();
 
@@ -103,19 +100,18 @@ public class ApplicationEndpoint implements Endpoint {
                     .build();
 
             appChange.changes()
-                    .forEach(c -> changeLogService.write(
-                        ImmutableChangeLog.builder()
-                                .message(c.toDescription())
-                                .severity(Severity.INFORMATION)
-                                .userId(WebUtilities.getUsername(req))
-                                .parentReference(ref)
-                                .operation(Operation.UPDATE)
-                                .build()));
+                    .forEach(c -> {
+                        changeLogService.write(
+                                ImmutableChangeLog.builder()
+                                        .message(c.toDescription())
+                                        .severity(Severity.INFORMATION)
+                                        .userId(username)
+                                        .parentReference(ref)
+                                        .operation(Operation.UPDATE)
+                                        .build());
+                    });
 
             appService.update(appChange.app());
-            appTagService.updateTags(appId, appChange.tags());
-            entityAliasService.updateAliases(ref, appChange.aliases());
-
             return true;
         };
 
@@ -132,13 +128,13 @@ public class ApplicationEndpoint implements Endpoint {
             LOG.info("Registering new application:" + registrationRequest);
 
             AppRegistrationResponse registrationResponse = appService
-                    .registerApp(registrationRequest);
+                    .registerApp(registrationRequest, getUsername(req));
 
             if (registrationResponse.registered()) {
                 ImmutableChangeLog changeLogEntry = ImmutableChangeLog.builder()
                         .message("Registered new application: " + registrationRequest.name())
                         .severity(Severity.INFORMATION)
-                        .userId(WebUtilities.getUsername(req))
+                        .userId(getUsername(req))
                         .parentReference(ImmutableEntityReference.builder()
                                 .kind(EntityKind.APPLICATION)
                                 .id(registrationResponse.id().get())
@@ -179,12 +175,6 @@ public class ApplicationEndpoint implements Endpoint {
                     .getById(parseLong(id));
         };
 
-        ListRoute<String> findAllTagsRoute = (request, response)
-                -> appTagService.findAllTags();
-
-        ListRoute<Application> findByTagRoute = (request, response)
-                -> appTagService.findByTag(request.body());
-
         ListRoute<Application> findBySelectorRoute = ((request, response)
                 -> appService.findByAppIdSelector(readIdSelectionOptionsFromBody(request)));
 
@@ -192,17 +182,14 @@ public class ApplicationEndpoint implements Endpoint {
                 -> appService.findByAssetCode(request.params("assetCode")));
 
         ListRoute<String> getAppTagsRoute = (request, response)
-                -> appTagService.findTagsForApplication(getId(request));
+                -> entityTagService.findTagsForEntityReference(mkRef(EntityKind.APPLICATION, getId(request)));
 
         getForList(mkPath(BASE_URL, "search", ":query"), searchRoute);
         getForList(mkPath(BASE_URL, "count-by", "org-unit"), tallyByOrgUnitRoute);
-        getForList(mkPath(BASE_URL, "tags"), findAllTagsRoute);
 
         getForDatum(mkPath(BASE_URL, "id", ":id"), getByIdRoute);
         getForList(mkPath(BASE_URL, "id", ":id", "tags"), getAppTagsRoute);
         getForDatum(mkPath(BASE_URL, "id", ":id", "related"), findRelatedRoute);
-
-        postForList(mkPath(BASE_URL, "tags"), findByTagRoute);  // POST as may not be good for qparam
         postForList(mkPath(BASE_URL, "by-ids"), findByIdsRoute);
         postForList(mkPath(BASE_URL, "selector"), findBySelectorRoute);
         getForList(mkPath(BASE_URL, "asset-code", ":assetCode"), findByAssetCodeRoute);

@@ -16,55 +16,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from '../common';
+function store($http, base) {
+    const BASE = `${base}/entity-tag`;
+
+    const findAllTags = () => $http
+        .get(`${BASE}/tags`)
+        .then(x => x.data);
 
 
-/**
- * @name waltz-keyword-list
- *
- * @description
- * This component ...
- */
+    const findByTag = (tag) => $http
+        .post(`${BASE}/tags`, tag)
+        .then(x => x.data);
 
-const bindings = {
-    keywords: '<',
-    onSelect: '&?'
-};
+    const findTagsByEntityRef = (ref) => $http
+        .post(`${BASE}/entity/${ref.kind}/${ref.id}`)
+        .then(x => x.data);
 
-const transclude = {
-    empty: '?empty',
-    last: '?last'
-};
-
-
-const initialState = {};
-
-
-const template = require('./keyword-list.html');
-
-
-function controller() {
-    const vm = this;
-
-    vm.$onInit = () => initialiseData(vm, initialState);
-
-    vm.$onChanges = (c) => {
-        console.log('keyword-list - oc', vm);
+    return {
+        findAllTags,
+        findByTag,
+        findTagsByEntityRef
     };
-
-
 }
 
 
-controller.$inject = [];
+store.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
 
 
-const component = {
-    template,
-    transclude,
-    bindings,
-    controller
-};
-
-
-export default component;
+export default store;

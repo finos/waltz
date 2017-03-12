@@ -1,14 +1,14 @@
 <span>
-    <span ng-if="keywords.length == 0">
+    <span ng-if="$ctrl.keywords.length == 0">
         <div ng-transclude="empty"></div>
     </span>
 
-    <ul ng-if="keywords.length > 0"
+    <ul ng-if="$ctrl.keywords.length > 0"
         class="waltz-keyword-list">
-        <li ng-repeat="keyword in keywords | orderBy"
-            ng-click="onSelect({keyword: keywordItem})"
+        <li ng-repeat="keyword in $ctrl.keywords | orderBy"
+            ng-click="$ctrl.onSelect({keyword: keyword})"
             class="wkl-keyword"
-            ng-class="{ 'clickable': onSelect }">
+            ng-class="{ 'clickable': $ctrl.onSelect }">
             <span ng-bind="keyword"></span>
         </li>
 

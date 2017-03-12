@@ -61,16 +61,6 @@ function service($http, BaseApiUrl) {
         .then(x => x.data);
 
 
-    const findAllTags = () => $http
-        .get(`${BASE}/tags`)
-        .then(x => x.data);
-
-
-    const findByTag = (tag) => $http
-        .post(`${BASE}/tags`, tag)
-        .then(x => x.data);
-
-
     const findBySelector = (options) => $http
         .post(`${BASE}/selector`, options)
         .then(x => x.data);
@@ -83,8 +73,6 @@ function service($http, BaseApiUrl) {
 
     return {
         getById,
-        findAllTags,
-        findByTag,
         getAppTagsById,
         findRelatedById,
         findByIds,

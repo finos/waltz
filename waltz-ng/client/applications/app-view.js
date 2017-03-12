@@ -115,11 +115,10 @@ function controller($q,
     };
     vm.entityRef = entityReference;
 
-    vm.saveAliases = (aliases) => {
-        const aliasValues = _.map(aliases, 'text');
+    vm.saveAliases = (aliases = []) => {
         return aliasStore
-            .update(entityReference, aliasValues)
-            .then(() => vm.aliases = aliasValues);
+            .update(entityReference, aliases)
+            .then(() => vm.aliases = aliases);
     };
 
     vm.onPhysicalFlowsInitialise = (e) => {

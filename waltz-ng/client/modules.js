@@ -70,6 +70,7 @@ const dependencies = [
     require('./end-user-apps')(),
     require('./entity')(),
     require('./entity-statistics')(),
+    require('./entity-tags')(),
     require('./examples')(),
     require('./formly')(),
     require('./history')(),
