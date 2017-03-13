@@ -21,27 +21,51 @@ package com.khartec.waltz.data.application.search;
 import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.application.ApplicationDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.Application;
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.Result;
+import org.jooq.impl.DSL;
 
 import java.util.List;
+
+import static com.khartec.waltz.common.ListUtilities.map;
+import static com.khartec.waltz.common.StringUtilities.mkTerms;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 
 public class MariaAppSearch implements FullTextSearch<Application>, DatabaseVendorSpecific {
 
 
     private static final String QUERY
-            = "SELECT * FROM application\n"
-            + " WHERE\n"
-            + "  MATCH(name, description, asset_code, parent_asset_code)\n"
-            + "  AGAINST (?)\n"
-            + " LIMIT 20";
+            = "SELECT app.*\n" +
+            "FROM application app\n" +
+            "WHERE\n" +
+            "  MATCH(app.name, app.description, app.asset_code, app.parent_asset_code)\n" +
+            "  AGAINST (?)\n" +
+            "UNION ALL\n" +
+            "SELECT DISTINCT app.*\n" +
+            "FROM application app\n" +
+            "  INNER JOIN entity_alias alias\n" +
+            "    ON app.id = alias.id AND alias.kind = 'APPLICATION'\n" +
+            "WHERE\n" +
+            "  LOWER(alias.alias) IN (?)\n";
+
 
     @Override
     public List<Application> search(DSLContext dsl, String terms) {
-        Result<Record> records = dsl.fetch(QUERY, terms);
-        return records.map(ApplicationDao.TO_DOMAIN_MAPPER);
+        List<String> tokens = map(mkTerms(terms), t -> t.toLowerCase());
+
+        return dsl
+                .select(APPLICATION.fields())
+                .from(APPLICATION)
+                .where("MATCH(name, description, asset_code, parent_asset_code) AGAINST (?)", terms)
+                .unionAll(DSL.selectDistinct(APPLICATION.fields())
+                                .from(APPLICATION)
+                                .innerJoin(ENTITY_ALIAS)
+                                .on(ENTITY_ALIAS.ID.eq(APPLICATION.ID)
+                                        .and(ENTITY_ALIAS.KIND.eq(EntityKind.APPLICATION.name())))
+                                .where(DSL.lower(ENTITY_ALIAS.ALIAS).in(tokens)))
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
     }
 
 }
