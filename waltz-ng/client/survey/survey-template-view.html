@@ -148,7 +148,8 @@
                         <td><span ng-bind="q.sectionName"></span></td>
                         <td><span ng-bind="q.questionText"></span></td>
                         <td><span ng-bind="q.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>
-                        <td><span ng-bind="q.helpText"></span></td>
+                        <td><span ng-if="q.helpText"
+                                  markdown-to-html="q.helpText"></span></td>
                         <td>
                             <waltz-boolean-renderer value="q.isMandatory">
                             </waltz-boolean-renderer>

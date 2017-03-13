@@ -48,10 +48,24 @@ authProviderSetup.$inject = [
 ];
 
 
+function showdownSetup($showdownProvider) {
+    $showdownProvider.setOption('headerLevelStart', 6);
+    $showdownProvider.setOption('simplifiedAutoLink', true);
+    $showdownProvider.setOption('sanitize', true);
+    $showdownProvider.setOption('excludeTrailingPunctuationFromURLs', true);
+    $showdownProvider.setOption('simpleLineBreaks', true);
+}
+
+showdownSetup.$inject  = [
+    '$showdownProvider'
+];
+
+
 function setup(module) {
     module
         .config(uiSelectSetup)
-        .config(authProviderSetup);
+        .config(authProviderSetup)
+        .config(showdownSetup);
 
     // for formly setup see: `formly/index.js`
 }

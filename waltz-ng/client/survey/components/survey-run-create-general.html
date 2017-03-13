@@ -13,7 +13,8 @@
             <div class="col-sm-10">
                 <strong ng-bind="$ctrl.surveyTemplate.name"></strong>
                 <div class='small text-muted'
-                     ng-bind="$ctrl.surveyTemplate.description">
+                     ng-if="$ctrl.surveyTemplate.description"
+                     markdown-to-html="$ctrl.surveyTemplate.description">
                 </div>
             </div>
         </div>

@@ -18,7 +18,8 @@
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div class="row">
             <div class="col-sm-12"
-                 ng-bind="ctrl.surveyRun.description">
+                 ng-if="ctrl.surveyRun.description"
+                 markdown-to-html="ctrl.surveyRun.description">
             </div>
         </div>
         <br>
