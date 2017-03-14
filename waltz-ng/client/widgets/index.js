@@ -43,6 +43,7 @@ export default () => {
         .component('waltzKeywordList', require('./keyword-list'))
         .component('waltzKeywordEdit', require('./keyword-edit'))
         .component('waltzNoData', require('./no-data'))
+        .component('waltzMarkdown', require('./markdown'))
         .component('waltzPageHeader', require('./page-header/page-header'))
         .component('waltzPie', require('./pie'))
         .component('waltzPieSegmentTable', require('./pie-segment-table'))

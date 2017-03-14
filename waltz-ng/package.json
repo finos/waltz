@@ -52,6 +52,7 @@
     "intro.js": "^2.3.0",
     "lodash": "4.13.1",
     "moment": "2.13.0",
+    "ng-showdown": "1.1.0",
     "ng-tags-input": "3.1.1",
     "satellizer": "^0.12.5",
     "ui-select": "0.18.0"

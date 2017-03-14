@@ -27,6 +27,7 @@ import "angular-ui-router";
 import "angular-ui-bootstrap";
 import "babel-core/polyfill";
 import "ng-tags-input";
+import "ng-showdown";
 import "satellizer";
 import "ui-select";
 
@@ -43,6 +44,7 @@ const dependencies = [
     'ngAnimate',
     'ngSanitize',
     'ngTagsInput',
+    'ng-showdown',
     'satellizer',
     'LocalStorageModule',
     require('angular-formly'),

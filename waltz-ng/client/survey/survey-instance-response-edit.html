@@ -18,8 +18,9 @@
 
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div class="row">
-            <div class="col-sm-12"
-                 ng-bind="ctrl.surveyRun.description">
+            <div class="col-sm-12">
+                 <waltz-markdown text="ctrl.surveyRun.description">
+                 </waltz-markdown>
             </div>
         </div>
         <br>
@@ -100,9 +101,9 @@
                             *
                         </span>
                         <!-- help text -->
-                        <div ng-bind="question.helpText"
-                             class='small text-muted'>
-                        </div>
+                        <waltz-markdown text="question.helpText"
+                                        class='small text-muted'>
+                        </waltz-markdown>
                     </label>
                     <div ng-switch="question.fieldType"
                          class="col-sm-7">
