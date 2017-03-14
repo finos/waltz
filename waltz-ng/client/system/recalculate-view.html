@@ -64,6 +64,20 @@
                         Recalculate Complexity Ratings
                     </button>
                 </div>
+
+                <div>
+                    <hr>
+                    <h4>Attestations</h4>
+                    <p class="small text-muted">
+                        Used to track attestations to entities in Waltz either by explicit user action or by implicit use
+                        of the attested entity by another entity.
+                    </p>
+
+                    <button class="btn btn-primary"
+                            ng-click="ctrl.recalcLineageAttestations()">
+                        Recalculate for Lineage
+                    </button>
+                </div>
             </div>
         </div>
 

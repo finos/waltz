@@ -25,8 +25,8 @@ import com.khartec.waltz.model.attestation.Attestation;
 import com.khartec.waltz.model.attestation.AttestationType;
 import com.khartec.waltz.model.attestation.ImmutableAttestation;
 import com.khartec.waltz.schema.tables.records.AttestationRecord;
-import org.jooq.DSLContext;
-import org.jooq.RecordMapper;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW_LINEAGE;
 import static com.khartec.waltz.schema.tables.Attestation.ATTESTATION;
 
 
@@ -107,6 +108,68 @@ public class AttestationDao {
                 .where(ATTESTATION.ENTITY_KIND.eq(reference.kind().name())
                         .and(ATTESTATION.ENTITY_ID.eq(reference.id())))
                 .execute() > 0;
+    }
+
+
+    public boolean recalculateForPhysicalFlowLineage() {
+        final String provenance = "lineage";
+
+        dsl.transaction(configuration -> {
+            DSLContext tx = DSL.using(configuration);
+
+            Condition isImpliedLineageAttestation = ATTESTATION.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())
+                    .and(ATTESTATION.ATTESTATION_TYPE.eq(AttestationType.IMPLICIT.name()))
+                    .and(ATTESTATION.PROVENANCE.eq(provenance));
+
+            // clear existing attestations
+            tx.deleteFrom(ATTESTATION)
+                    .where(isImpliedLineageAttestation)
+                    .execute();
+
+            Select<Record7<String, Long, String, String, Timestamp, String, String>> described = DSL.select(
+                    DSL.val(EntityKind.PHYSICAL_FLOW.name()).as("entity_kind"),
+                    PHYSICAL_FLOW_LINEAGE.DESCRIBED_FLOW_ID.as("entity_id"),
+                    DSL.val(AttestationType.IMPLICIT.name()).as("attestation_type"),
+                    PHYSICAL_FLOW_LINEAGE.LAST_UPDATED_BY.as("attested_by"),
+                    PHYSICAL_FLOW_LINEAGE.LAST_UPDATED_AT.as("attested_at"),
+                    (DSL.val("Implied by lineage creation, described by contributing flow: ")
+                            .concat(PHYSICAL_FLOW_LINEAGE.CONTRIBUTOR_FLOW_ID)).as("attestation_type"),
+                    DSL.val(provenance).as("provenance"))
+                    .from(PHYSICAL_FLOW_LINEAGE);
+
+            Select<Record7<String, Long, String, String, Timestamp, String, String>> contributed = DSL.select(
+                    DSL.val(EntityKind.PHYSICAL_FLOW.name()).as("entity_kind"),
+                    PHYSICAL_FLOW_LINEAGE.CONTRIBUTOR_FLOW_ID.as("entity_id"),
+                    DSL.val(AttestationType.IMPLICIT.name()).as("attestation_type"),
+                    PHYSICAL_FLOW_LINEAGE.LAST_UPDATED_BY.as("attested_by"),
+                    PHYSICAL_FLOW_LINEAGE.LAST_UPDATED_AT.as("attested_at"),
+                    (DSL.val("Implied by lineage creation as a contributor to describe flow: ")
+                            .concat(PHYSICAL_FLOW_LINEAGE.DESCRIBED_FLOW_ID)).as("attestation_type"),
+                    DSL.val(provenance).as("provenance"))
+                    .from(PHYSICAL_FLOW_LINEAGE);
+
+            insertAttestations(tx, described);
+            insertAttestations(tx, contributed);
+        });
+
+        return true;
+    }
+
+
+    private void insertAttestations(DSLContext tx,
+                                    Select<Record7<String, Long, String, String, Timestamp, String, String>> attesationsSelector) {
+
+        //insert into attestation(entity_kind, entity_id, attestation_type, attested_by, attested_at, comments, provenance)
+        tx.insertInto(ATTESTATION)
+                .columns(ATTESTATION.ENTITY_KIND,
+                        ATTESTATION.ENTITY_ID,
+                        ATTESTATION.ATTESTATION_TYPE,
+                        ATTESTATION.ATTESTED_BY,
+                        ATTESTATION.ATTESTED_AT,
+                        ATTESTATION.COMMENTS,
+                        ATTESTATION.PROVENANCE)
+                .select(attesationsSelector)
+                .execute();
     }
 
 }

@@ -20,6 +20,7 @@ const template = require('./recalculate-view.html');
 
 
 function controller(notification,
+                    attestationStore,
                     authSourceStore,
                     complexityStore,
                     dataTypeUsageStore) {
@@ -46,11 +47,19 @@ function controller(notification,
             .recalculateAll()
             .then(() => notification.success('Complexity recalculated'));
     }
+
+    vm.recalcLineageAttestations = () => {
+        notification.info('Lineage attestation recalculation requested');
+        attestationStore
+            .recalculateForLineage()
+            .then(() => notification.success('Lineage attestation recalculated'));
+    }
 }
 
 
 controller.$inject = [
     'Notification',
+    'AttestationStore',
     'AuthSourcesStore',
     'ComplexityStore',
     'DataTypeUsageStore'
