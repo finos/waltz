@@ -123,6 +123,11 @@ public class AttestationService {
     }
 
 
+    public boolean recalculateForPhysicalFlowLineage() {
+        return attestationDao.recalculateForPhysicalFlowLineage();
+    }
+
+
     private boolean attest(EntityKind kind, long id, AttestationType type, String username, String comments) {
         return create(ImmutableAttestation.builder()
                 .entityReference(EntityReference.mkRef(kind, id))

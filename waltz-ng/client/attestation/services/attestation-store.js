@@ -30,8 +30,17 @@ export default [
                 .then(result => result.data);
         };
 
+
+        const recalculateForLineage = () => {
+            return $http
+                .get(`${BASE}/calculate-all/lineage`)
+                .then(result => result.data);
+        };
+
+
         return {
             findForEntity,
+            recalculateForLineage
         };
     }
 ];

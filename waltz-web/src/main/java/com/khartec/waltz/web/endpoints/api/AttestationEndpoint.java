@@ -20,14 +20,20 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.attestation.AttestationService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.requireRole;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
 @Service
@@ -36,21 +42,37 @@ public class AttestationEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "attestation");
 
     private final AttestationService attestationService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public AttestationEndpoint(AttestationService attestationService) {
+    public AttestationEndpoint(AttestationService attestationService,
+                               UserRoleService userRoleService) {
         checkNotNull(attestationService, "attestationService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.attestationService = attestationService;
+        this.userRoleService = userRoleService;
     }
 
 
     @Override
     public void register() {
+        String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String calculateForLineagePath = mkPath(BASE_URL, "calculate-all", "lineage");
+
+
         getForList(
-                mkPath(BASE_URL, "entity", ":kind", ":id"),
+                findForEntityPath,
                 (request, response) -> attestationService.findForEntity(getEntityReference(request)));
+
+        getForDatum(calculateForLineagePath, this::calculateForLineageRoute);
+    }
+
+
+    private Boolean calculateForLineageRoute(Request request, Response response) {
+        requireRole(userRoleService, request, Role.ADMIN);
+        return attestationService.recalculateForPhysicalFlowLineage();
     }
 
 }
