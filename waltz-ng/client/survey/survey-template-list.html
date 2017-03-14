@@ -64,9 +64,9 @@
                         <span ng-bind="ctrl.owners[template.ownerId].displayName"></span>
                     </td>
                     <td>
-                        <span class='small'
-                              ng-bind="template.description | limitTo:100">
-                        </span>
+                        <waltz-markdown class='small'
+                                        text="template.description | limitTo:100">
+                        </waltz-markdown>
                         <span ng-if="template.description.length > 100">...</span>
                     </td>
                 </tr>

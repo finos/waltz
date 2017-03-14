@@ -13,8 +13,8 @@
             Description
         </div>
         <div class="col-sm-10">
-            <span ng-if="$ctrl.template.description"
-                  markdown-to-html="$ctrl.template.description"></span>
+            <waltz-markdown text="$ctrl.template.description">
+            </waltz-markdown>
         </div>
     </div>
     <br>

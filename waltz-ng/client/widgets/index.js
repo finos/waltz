@@ -42,6 +42,7 @@ export default () => {
         .component('waltzIcon', require('./icon'))
         .component('waltzInlineEditArea', require('./inline-edit-area'))
         .component('waltzNoData', require('./no-data'))
+        .component('waltzMarkdown', require('./markdown'))
         .component('waltzPageHeader', require('./page-header/page-header'))
         .component('waltzPie', require('./pie'))
         .component('waltzPieSegmentTable', require('./pie-segment-table'))
