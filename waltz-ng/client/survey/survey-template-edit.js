@@ -59,9 +59,10 @@ function controller($stateParams,
         .getById(vm.id)
         .then(template => vm.surveyTemplate = template);
 
-    surveyQuestionStore
-        .findForTemplate(vm.id)
-        .then(questions => vm.surveyQuestions = questions);
+    const loadQuestions = () =>
+        surveyQuestionStore
+            .findForTemplate(vm.id)
+            .then(questions => vm.surveyQuestions = questions);
 
     vm.updateTemplate = () => {
         surveyTemplateStore
@@ -91,7 +92,7 @@ function controller($stateParams,
 
     vm.showEditQuestionForm = (q) => {
         vm.editingQuestion = true;
-        vm.selectedQuestion = q;
+        vm.selectedQuestion = _.cloneDeep(q);
     };
 
 
@@ -105,8 +106,7 @@ function controller($stateParams,
             .create(q)
             .then(questionId => {
                 notification.success('Survey question created successfully');
-                q.id = questionId;
-                vm.surveyQuestions.push(q);
+                loadQuestions();
                 vm.cancelQuestionForm();
             });
     };
@@ -116,6 +116,7 @@ function controller($stateParams,
             .update(q)
             .then(updateCount => {
                 notification.success('Survey question updated successfully');
+                loadQuestions();
                 vm.cancelQuestionForm();
             });
     };
@@ -126,12 +127,13 @@ function controller($stateParams,
                 .deleteQuestion(q.id)
                 .then(deleteCount => {
                     notification.success('Survey question deleted successfully');
-                    _.remove(vm.surveyQuestions, que => que.id === q.id);
+                    loadQuestions();
                     vm.cancelQuestionForm();
                 });
         }
     };
 
+    loadQuestions();
 }
 
 
