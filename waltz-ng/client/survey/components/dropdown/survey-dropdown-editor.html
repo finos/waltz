@@ -1,0 +1,55 @@
+<div>
+    <table class="table table-condensed">
+        <thead>
+        <tr>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="entry in $ctrl.entries | orderBy:'position'"
+            class="waltz-visibility-parent">
+            <td>
+                <waltz-editable-field on-save="$ctrl.updateValue"
+                                      field-type="text"
+                                      initial-val="entry.value"
+                                      item-id="entry.id">
+                </waltz-editable-field>
+            </td>
+            <td>
+                <a ng-click="$ctrl.removeEntry(entry)"
+                   class="btn btn-xs waltz-visibility-child-30">
+                    <waltz-icon name="trash-o"></waltz-icon>
+                    Delete
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button class="btn btn-primary btn-xs"
+                        ng-if="$ctrl.creatingEntry === false"
+                        ng-click="$ctrl.startNewEntry()">
+                    Add
+                </button>
+                <div ng-if="$ctrl.creatingEntry === true">
+                    <input type="text"
+                           ng-model="$ctrl.newEntry.value"
+                           class="form-control input-sm">
+                </div>
+            </td>
+            <td>
+                <button class="btn btn-success btn-xs"
+                        ng-if="$ctrl.creatingEntry === true"
+                        ng-click="$ctrl.saveNewEntry($ctrl.newEntry)">
+                    Save
+                </button>
+                <button class="btn btn-default btn-xs"
+                        ng-if="$ctrl.creatingEntry === true"
+                        ng-click="$ctrl.cancelNewEntry()">
+                    Cancel
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

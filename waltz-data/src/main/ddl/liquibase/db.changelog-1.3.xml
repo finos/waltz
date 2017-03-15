@@ -284,4 +284,33 @@
         </sql>
     </changeSet>
 
+
+    <!-- 1733 -->
+    <changeSet id="20170314-1733-1"
+               author="rovats">
+        <comment>1733: Support survey question type DROPDOWN</comment>
+        <createTable tableName="survey_question_dropdown_entry"
+                     remarks="Stores allowed dropdown values for a survey question">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="sq_dropdown_entry_pkey"/>
+            </column>
+            <column name="question_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value"
+                    type="${longvarchar.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position"
+                    type="${int.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

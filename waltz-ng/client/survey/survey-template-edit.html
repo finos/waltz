@@ -87,7 +87,7 @@
 
     <waltz-section icon="question"
                    name="Questions"
-                   small="( {{ ctrl.surveyQuestions.length }} )">
+                   small="( {{ ctrl.surveyQuestionInfos.length }} )">
         <waltz-section-actions>
             <a class="btn btn-primary btn-xs"
                waltz-has-role="SURVEY_ADMIN"
@@ -111,7 +111,7 @@
                         <input class="form-control form-control-warning"
                                id="qSectionName"
                                placeholder="Section name for this question"
-                               ng-model="ctrl.selectedQuestion.sectionName" />
+                               ng-model="ctrl.selectedQuestionInfo.question.sectionName" />
                     </div>
                 </div>
 
@@ -125,7 +125,7 @@
                                   class="form-control"
                                   required
                                   placeholder="Question text"
-                                  ng-model="ctrl.selectedQuestion.questionText"
+                                  ng-model="ctrl.selectedQuestionInfo.question.questionText"
                                   rows="3">
                         </textarea>
                     </div>
@@ -141,8 +141,18 @@
                                 required
                                 class="form-control"
                                 ng-options="fieldType.value as fieldType.name for fieldType in ctrl.questionFieldTypes"
-                                ng-model="ctrl.selectedQuestion.fieldType">
+                                ng-model="ctrl.selectedQuestionInfo.question.fieldType">
                         </select>
+                    </div>
+                    <div ng-if="ctrl.selectedQuestionInfo.question.fieldType === 'DROPDOWN'"
+                         class="col-sm-7 col-sm-offset-3"
+                         style="background-color: #F8F9F9; margin-top:10px;">
+                        <span class="text-muted small">
+                            Please add values for dropdown options
+                        </span>
+                        <waltz-survey-dropdown-editor entries="ctrl.selectedQuestionInfo.dropdownEntries"
+                                                      on-change="ctrl.updateEntries">
+                        </waltz-survey-dropdown-editor>
                     </div>
                 </div>
 
@@ -155,7 +165,7 @@
                         <textarea id="qHelpText"
                                   class="form-control"
                                   placeholder="Help text (appears below the question)"
-                                  ng-model="ctrl.selectedQuestion.helpText"
+                                  ng-model="ctrl.selectedQuestionInfo.question.helpText"
                                   rows="3">
                         </textarea>
                     </div>
@@ -172,7 +182,7 @@
                         <input class="form-control form-control-warning"
                         type="checkbox"
                         id="qIsMandatory"
-                        ng-model="ctrl.selectedQuestion.isMandatory" />
+                        ng-model="ctrl.selectedQuestionInfo.question.isMandatory" />
                     </div>
 
                     <label for="qAllowComment"
@@ -183,7 +193,7 @@
                         <input class="form-control form-control-warning"
                                type="checkbox"
                                id="qAllowComment"
-                               ng-model="ctrl.selectedQuestion.allowComment" />
+                               ng-model="ctrl.selectedQuestionInfo.question.allowComment" />
                     </div>
                 </div>
 
@@ -198,7 +208,7 @@
                                id="qPosition"
                                required
                                placeholder="Controls the order of the questions"
-                               ng-model="ctrl.selectedQuestion.position" />
+                               ng-model="ctrl.selectedQuestionInfo.question.position" />
                         <div class='small text-muted'>
                             We recommended using position values in increments of 10 for easier re-ordering in future
                         </div>
@@ -207,23 +217,23 @@
 
                 <div class="form-group" style="padding-top: 10px">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <span ng-if="ctrl.selectedQuestion.id">
+                        <span ng-if="ctrl.selectedQuestionInfo.question.id">
                             <button type="button"
                                     ng-if="!(surveyQuestionForm.$invalid)"
-                                    ng-click="ctrl.updateQuestion(ctrl.selectedQuestion)"
+                                    ng-click="ctrl.updateQuestion(ctrl.selectedQuestionInfo)"
                                     class="btn btn-success">
                                 Update
                             </button>
                             <button type="button"
-                                    ng-click="ctrl.deleteQuestion(ctrl.selectedQuestion)"
+                                    ng-click="ctrl.deleteQuestion(ctrl.selectedQuestionInfo)"
                                     class="btn btn-danger">
                                 Delete
                             </button>
                         </span>
-                        <span ng-if="! ctrl.selectedQuestion.id">
+                        <span ng-if="! ctrl.selectedQuestionInfo.question.id">
                             <button type="button"
                                     ng-if="!(surveyQuestionForm.$invalid)"
-                                    ng-click="ctrl.createQuestion(ctrl.selectedQuestion)"
+                                    ng-click="ctrl.createQuestion(ctrl.selectedQuestionInfo)"
                                     class="btn btn-success">
                                 Create
                             </button>
@@ -268,24 +278,24 @@
                         <th>Position</th>
                     </tr>
                     </thead>
-                    <tr ng-repeat="q in ctrl.surveyQuestions | orderBy:'position'">
-                        <td><span ng-bind="q.sectionName"></span></td>
-                        <td><span ng-bind="q.questionText"></span></td>
-                        <td><span ng-bind="q.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>
+                    <tr ng-repeat="qi in ctrl.surveyQuestionInfos | orderBy:'question.position'">
+                        <td><span ng-bind="qi.question.sectionName"></span></td>
+                        <td><span ng-bind="qi.question.questionText"></span></td>
+                        <td><span ng-bind="qi.question.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>
                         <td>
-                            <waltz-markdown text="q.helpText">
+                            <waltz-markdown text="qi.question.helpText">
                             </waltz-markdown>
                         </td>
                         <td>
-                            <waltz-boolean-renderer value="q.isMandatory">
+                            <waltz-boolean-renderer value="qi.question.isMandatory">
                             </waltz-boolean-renderer>
                         </td>
                         <td>
-                            <waltz-boolean-renderer value="q.allowComment">
+                            <waltz-boolean-renderer value="qi.question.allowComment">
                             </waltz-boolean-renderer>
                         </td>
-                        <td><span ng-bind="q.position"></span></td>
-                        <td><a ng-click="ctrl.showEditQuestionForm(q)"
+                        <td><span ng-bind="qi.question.position"></span></td>
+                        <td><a ng-click="ctrl.showEditQuestionForm(qi)"
                                class="btn btn-xs waltz-visibility-child-30">
                             <waltz-icon name="pencil"></waltz-icon>
                             Edit

@@ -24,6 +24,7 @@ export default () => {
         .config(require('./routes'));
 
     module
+        .component('waltzSurveyDropdownEditor', require('./components/dropdown/survey-dropdown-editor'))
         .component('waltzSurveyRunCreateGeneral', require('./components/survey-run-create-general'))
         .component('waltzSurveyRunCreateRecipient', require('./components/survey-run-create-recipient'))
         .component('waltzSurveyRunOverview', require('./components/survey-run-overview'))

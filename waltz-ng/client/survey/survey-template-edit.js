@@ -33,9 +33,12 @@ const initialState = {
     },{
         name: 'Boolean',
         value: 'BOOLEAN'
+    },{
+        name: 'Dropdown',
+        value: 'DROPDOWN'
     }],
-    selectedQuestion: {},
-    surveyQuestions: [],
+    selectedQuestionInfo: {},
+    surveyQuestionInfos: [],
     surveyTemplate: {},
     targetEntityKinds: [{
         name: 'Application',
@@ -62,7 +65,7 @@ function controller($stateParams,
     const loadQuestions = () =>
         surveyQuestionStore
             .findForTemplate(vm.id)
-            .then(questions => vm.surveyQuestions = questions);
+            .then(qis => vm.surveyQuestionInfos = qis);
 
     vm.updateTemplate = () => {
         surveyTemplateStore
@@ -77,33 +80,36 @@ function controller($stateParams,
 
     vm.showAddQuestionForm = () => {
         vm.editingQuestion = true;
-        const currentMaxPos = _.chain(vm.surveyQuestions)
-            .map(q => q.position)
+        const currentMaxPos = _.chain(vm.surveyQuestionInfos)
+            .map(qi => qi.question.position)
             .max()
             .value();
 
-        vm.selectedQuestion = {
-            surveyTemplateId: vm.id,
-            isMandatory: false,
-            allowComment: false,
-            position: (currentMaxPos || 0) + 10
+        vm.selectedQuestionInfo = {
+            question: {
+                surveyTemplateId: vm.id,
+                isMandatory: false,
+                allowComment: false,
+                position: (currentMaxPos || 0) + 10
+            },
+            dropdownEntries: []
         };
     };
 
-    vm.showEditQuestionForm = (q) => {
+    vm.showEditQuestionForm = (qi) => {
         vm.editingQuestion = true;
-        vm.selectedQuestion = _.cloneDeep(q);
+        vm.selectedQuestionInfo = _.cloneDeep(qi);
     };
 
 
     vm.cancelQuestionForm = () => {
         vm.editingQuestion = false;
-        vm.selectedQuestion = null;
+        vm.selectedQuestionInfo = null;
     };
 
-    vm.createQuestion = (q) => {
+    vm.createQuestion = (qi) => {
         surveyQuestionStore
-            .create(q)
+            .create(qi)
             .then(questionId => {
                 notification.success('Survey question created successfully');
                 loadQuestions();
@@ -111,9 +117,9 @@ function controller($stateParams,
             });
     };
 
-    vm.updateQuestion = (q) => {
+    vm.updateQuestion = (qi) => {
         surveyQuestionStore
-            .update(q)
+            .update(qi)
             .then(updateCount => {
                 notification.success('Survey question updated successfully');
                 loadQuestions();
@@ -121,16 +127,25 @@ function controller($stateParams,
             });
     };
 
-    vm.deleteQuestion = (q) => {
+    vm.deleteQuestion = (qi) => {
         if (confirm("Are you sure you want to delete this question?")) {
             surveyQuestionStore
-                .deleteQuestion(q.id)
+                .deleteQuestion(qi.question.id)
                 .then(deleteCount => {
                     notification.success('Survey question deleted successfully');
                     loadQuestions();
                     vm.cancelQuestionForm();
                 });
         }
+    };
+
+    vm.updateEntries = (entries) => {
+        vm.selectedQuestionInfo.dropdownEntries = _.map(
+            entries,
+            (e, i) => Object.assign({
+                questionId: vm.selectedQuestionInfo.question.id,
+                position: i + 1
+            }, e));
     };
 
     loadQuestions();

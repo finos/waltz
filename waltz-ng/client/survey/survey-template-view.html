@@ -119,7 +119,7 @@
 
     <waltz-section icon="question"
                    name="Questions"
-                   small="( {{ ctrl.questions.length }} )">
+                   small="( {{ ctrl.questionInfos.length }} )">
 
         <div class="row">
             <div class="col-sm-12">
@@ -144,23 +144,23 @@
                         <th>Position</th>
                     </tr>
                     </thead>
-                    <tr ng-repeat="q in ctrl.questions | orderBy:'position'">
-                        <td><span ng-bind="q.sectionName"></span></td>
-                        <td><span ng-bind="q.questionText"></span></td>
-                        <td><span ng-bind="q.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>
+                    <tr ng-repeat="qi in ctrl.questionInfos | orderBy:'position'">
+                        <td><span ng-bind="qi.question.sectionName"></span></td>
+                        <td><span ng-bind="qi.question.questionText"></span></td>
+                        <td><span ng-bind="qi.question.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>
                         <td>
-                            <waltz-markdown text="q.helpText">
+                            <waltz-markdown text="qi.question.helpText">
                             </waltz-markdown>
                         </td>
                         <td>
-                            <waltz-boolean-renderer value="q.isMandatory">
+                            <waltz-boolean-renderer value="qi.question.isMandatory">
                             </waltz-boolean-renderer>
                         </td>
                         <td>
-                            <waltz-boolean-renderer value="q.allowComment">
+                            <waltz-boolean-renderer value="qi.question.allowComment">
                             </waltz-boolean-renderer>
                         </td>
-                        <td><span ng-bind="q.position"></span></td>
+                        <td><span ng-bind="qi.question.position"></span></td>
                     </tr>
                 </table>
             </div>

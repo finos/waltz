@@ -24,7 +24,7 @@ const initialState = {
     isUserInstanceRecipient: false,
     instanceCanBeEdited: false,
     surveyInstance: {},
-    surveyQuestions: [],
+    surveyQuestionInfos: [],
     surveyResponses: {},
     user: {}
 };
@@ -75,7 +75,7 @@ function controller($state,
 
     surveyQuestionStore
         .findForInstance(id)
-        .then(qs => vm.surveyQuestions = groupQuestions(qs));
+        .then(qis => vm.surveyQuestionInfos = groupQuestions(qis));
 
     Promise
         .all([userService.whoami(), surveyInstanceStore.findRecipients(id)])

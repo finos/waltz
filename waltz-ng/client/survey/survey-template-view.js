@@ -23,7 +23,7 @@ const initialState = {
     template: {},
     issuedAndCompletedRuns: [],
     draftRuns: [],
-    questions: [],
+    questionInfos: [],
     runCompletionRates: {}
 };
 
@@ -89,7 +89,7 @@ function controller($stateParams,
 
     surveyQuestionStore
         .findForTemplate(templateId)
-        .then(qs => vm.questions = qs);
+        .then(qis => vm.questionInfos = qis);
 
     vm.markTemplateAsActive = () => {
         surveyTemplateStore.updateStatus(templateId, {
