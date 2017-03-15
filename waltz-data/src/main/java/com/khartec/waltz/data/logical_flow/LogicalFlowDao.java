@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.logical_flow;
 
+import com.khartec.waltz.data.EntityNameUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
@@ -34,16 +35,25 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static org.jooq.impl.DSL.inline;
+import static java.util.Optional.ofNullable;
 
 
 @Repository
 public class LogicalFlowDao {
 
-    public static final com.khartec.waltz.schema.tables.Application sourceAppAlias = APPLICATION.as("sourceAppAlias");
-    public static final com.khartec.waltz.schema.tables.Application targetAppAlias = APPLICATION.as("targetAppAlias");
+    private static final Field<String> SOURCE_NAME_FIELD = EntityNameUtilities.mkEntityNameField(
+            LOGICAL_FLOW.SOURCE_ENTITY_ID,
+            LOGICAL_FLOW.SOURCE_ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+
+
+    private static final Field<String> TARGET_NAME_FIELD = EntityNameUtilities.mkEntityNameField(
+            LOGICAL_FLOW.TARGET_ENTITY_ID,
+            LOGICAL_FLOW.TARGET_ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+
 
     public static final RecordMapper<Record, LogicalFlow> TO_DOMAIN_MAPPER = r -> {
         LogicalFlowRecord record = r.into(LogicalFlowRecord.class);
@@ -53,12 +63,12 @@ public class LogicalFlowDao {
                 .source(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(record.getSourceEntityKind()))
                         .id(record.getSourceEntityId())
-                        .name(r.getValue(sourceAppAlias.NAME))
+                        .name(ofNullable(r.getValue(SOURCE_NAME_FIELD)))
                         .build())
                 .target(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(record.getTargetEntityKind()))
                         .id(record.getTargetEntityId())
-                        .name(r.getValue(targetAppAlias.NAME))
+                        .name(ofNullable(r.getValue(TARGET_NAME_FIELD)))
                         .build())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
@@ -151,17 +161,11 @@ public class LogicalFlowDao {
 
     // -- HELPERS ---
 
-    private SelectOnConditionStep<Record> baseQuery() {
+    private SelectJoinStep<Record> baseQuery() {
         return dsl
                 .select(LOGICAL_FLOW.fields())
-                .select(sourceAppAlias.NAME, targetAppAlias.NAME)
-                .from(LOGICAL_FLOW)
-                .innerJoin(sourceAppAlias)
-                .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(sourceAppAlias.ID)
-                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name()))))
-                .innerJoin(targetAppAlias)
-                .on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(targetAppAlias.ID)
-                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name()))));
+                .select(SOURCE_NAME_FIELD, TARGET_NAME_FIELD)
+                .from(LOGICAL_FLOW);
     }
 
 }

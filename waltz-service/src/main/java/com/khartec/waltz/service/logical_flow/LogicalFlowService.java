@@ -183,7 +183,7 @@ public class LogicalFlowService {
                 flow.target(),
                 username,
                 Operation.REMOVE));
-        dataTypeUsageService.recalculateForApplications(affectedEntityRefs.toArray(new EntityReference[affectedEntityRefs.size()]));
+        dataTypeUsageService.recalculateForApplications(affectedEntityRefs);
 
         return deleted;
     }

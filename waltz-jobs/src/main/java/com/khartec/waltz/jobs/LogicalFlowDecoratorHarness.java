@@ -31,7 +31,7 @@ import java.sql.SQLException;
 /**
  * Created by dwatkins on 03/09/2016.
  */
-public class DataFlowDecoratorHarness {
+public class LogicalFlowDecoratorHarness {
 
     public static void main(String[] args) throws SQLException {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);

@@ -27,6 +27,7 @@ function setup(module) {
         .component('waltzAppCentricFlowTable', require('./app-centric-flow-table/app-centric-flow-table'))
         .component('waltzLogicalFlowDiagram', require('./boingy-graph/boingy-graph'))
         .component('waltzLogicalFlowTypeEditor', require('./edit/logical-flow-type-editor'))
+        .component('waltzLogicalFlowCounterpartSelector', require('./edit/logical-flow-counterpart-selector'))
         .component('waltzLogicalFlowsTabgroup', require('./logical-flows-tabgroup/logical-flows-tabgroup'))
         .component('waltzLogicalFlowsTabgroupSection', require('./logical-flows-tabgroup-section/logical-flows-tabgroup-section'))
         .component('waltzLogicalFlowTable', require('./../components/logical-flow-table/logical-flow-table'))

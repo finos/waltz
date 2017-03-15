@@ -27,7 +27,6 @@ import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
-import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -53,22 +52,23 @@ public class AuthoritativeSourceService {
     private static final Logger LOG = LoggerFactory.getLogger(AuthoritativeSourceService.class);
 
     private final AuthoritativeSourceDao authoritativeSourceDao;
-    private final LogicalFlowDecoratorRatingsService ratingService;
+    private final AuthSourceRatingCalculator ratingCalculator;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
     private final OrganisationalUnitService organisationalUnitService;
 
 
     @Autowired
     public AuthoritativeSourceService(AuthoritativeSourceDao authoritativeSourceDao,
-                                      LogicalFlowDecoratorRatingsService ratingService,
-                                      DataTypeIdSelectorFactory dataTypeIdSelectorFactory, OrganisationalUnitService organisationalUnitService) {
+                                      AuthSourceRatingCalculator ratingCalculator,
+                                      DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
+                                      OrganisationalUnitService organisationalUnitService) {
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao must not be null");
-        checkNotNull(ratingService, "ratingService cannot be null");
+        checkNotNull(ratingCalculator, "ratingCalculator cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
         checkNotNull(organisationalUnitService, "organisationalUnitService cannot be null");
 
         this.authoritativeSourceDao = authoritativeSourceDao;
-        this.ratingService = ratingService;
+        this.ratingCalculator = ratingCalculator;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
         this.organisationalUnitService = organisationalUnitService;
     }
@@ -97,14 +97,14 @@ public class AuthoritativeSourceService {
     public int update(long id, AuthoritativenessRating rating) {
         int updateCount = authoritativeSourceDao.update(id, rating);
         AuthoritativeSource updatedAuthSource = getById(id);
-        ratingService.updateRatingsForAuthSource(updatedAuthSource.dataType(), updatedAuthSource.parentReference());
+        ratingCalculator.update(updatedAuthSource.dataType(), updatedAuthSource.parentReference());
         return updateCount;
     }
 
 
     public int insert(EntityReference parentRef, String dataTypeCode, Long appId, AuthoritativenessRating rating) {
         int insertedCount = authoritativeSourceDao.insert(parentRef, dataTypeCode, appId, rating);
-        ratingService.updateRatingsForAuthSource(dataTypeCode, parentRef);
+        ratingCalculator.update(dataTypeCode, parentRef);
         return insertedCount;
     }
 
@@ -112,7 +112,7 @@ public class AuthoritativeSourceService {
     public int remove(long id) {
         AuthoritativeSource authSourceToDelete = getById(id);
         int deletedCount = authoritativeSourceDao.remove(id);
-        ratingService.updateRatingsForAuthSource(authSourceToDelete.dataType(), authSourceToDelete.parentReference());
+        ratingCalculator.update(authSourceToDelete.dataType(), authSourceToDelete.parentReference());
         return deletedCount;
     }
 
@@ -124,7 +124,7 @@ public class AuthoritativeSourceService {
 
     public boolean recalculateAllFlowRatings() {
         findAll()
-                .forEach(authSource -> ratingService.updateRatingsForAuthSource(
+                .forEach(authSource -> ratingCalculator.update(
                         authSource.dataType(),
                         authSource.parentReference()));
 

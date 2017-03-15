@@ -27,9 +27,9 @@ import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.ImmutableTallyPack;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.tally.TallyPack;
-import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
 import com.khartec.waltz.schema.tables.DataType;
 import com.khartec.waltz.schema.tables.LogicalFlow;
+import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.Unchecked;
@@ -43,6 +43,7 @@ import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.JooqUtilities.safeGet;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -209,11 +210,12 @@ public class LogicalFlowStatsDao {
                 .fetchAny();
 
         return ImmutableLogicalFlowMeasures.builder()
-                .inbound(counts.getValue(inboundCount).doubleValue())
-                .outbound(counts.getValue(outboundCount).doubleValue())
-                .intra(counts.getValue(intraCount).doubleValue())
+                .inbound(safeGet(counts, inboundCount, BigDecimal.ZERO).doubleValue())
+                .outbound(safeGet(counts, outboundCount, BigDecimal.ZERO).doubleValue())
+                .intra(safeGet(counts, intraCount, BigDecimal.ZERO).doubleValue())
                 .build();
     }
+
 
 
     // -- App Counts

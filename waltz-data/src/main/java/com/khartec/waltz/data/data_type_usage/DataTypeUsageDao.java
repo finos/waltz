@@ -60,9 +60,6 @@ public class DataTypeUsageDao {
     private final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
     private final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
 
-    private final Condition bothApps = lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-            .and(lf.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
-
     private final Field<String> originatorUsageKindField = val(UsageKind.ORIGINATOR.name());
     private final Field<String> consumerDistributorCaseField = DSL
             .when(lf.SOURCE_ENTITY_ID.eq(app.ID),
@@ -278,7 +275,6 @@ public class DataTypeUsageDao {
                     tx,
                     mkFlowWithTypesForConsumerDistributors(appIdSelector));
 
-
             insertUsages(
                     tx,
                     mkOriginatorUsagesToInsertSelector(appIdSelector));
@@ -367,8 +363,7 @@ public class DataTypeUsageDao {
                 .from(lf)
                 .innerJoin(app)
                 .on(app.ID.eq(lf.SOURCE_ENTITY_ID)
-                        .or(app.ID.eq(lf.TARGET_ENTITY_ID))
-                        .and(bothApps))
+                        .or(app.ID.eq(lf.TARGET_ENTITY_ID)))
                 .innerJoin(lfd)
                 .on(lfd.LOGICAL_FLOW_ID.eq(lf.ID))
                 .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))

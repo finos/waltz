@@ -52,7 +52,7 @@ function enrichAndGroupFlows(app, flows = [], decorators = []) {
         .filter(f => f.target.id === app.id || f.source.id === app.id)
         .map(f => ({ ...f, direction: f.target.id === app.id ? 'Incoming' : 'Outgoing'}))
         .map(f => ({ ...f, decorator: dataTypeDecoratorsByFlowId[f.id]}))
-        .map(f => ({ ...f, app: f.direction === 'Incoming' ? f.source : f.target}))
+        .map(f => ({ ...f, counterpart: f.direction === 'Incoming' ? f.source : f.target}))
         .sortBy('direction')
         .groupBy('direction')
         .value();

@@ -40,8 +40,7 @@ $animation-speed: 0.2s;
 }
 
 
-.waltz-fade-if.ng-enter,
-.waltz-fade-if.ng-leave {
+.waltz-fade-if.ng-enter {
     -webkit-transition: opacity ease-in-out $animation-speed;
     -moz-transition: opacity ease-in-out $animation-speed;
     -ms-transition: opacity ease-in-out $animation-speed;

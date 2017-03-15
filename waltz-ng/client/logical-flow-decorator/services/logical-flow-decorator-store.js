@@ -22,7 +22,7 @@ import {checkIsApplicationIdSelector, checkIsIdSelector} from "../../common/chec
 function service($http,
                  baseUrl) {
 
-    const BASE = `${baseUrl}/data-flow-decorator`;
+    const BASE = `${baseUrl}/logical-flow-decorator`;
 
     const findBySelectorAndKind = (selector, kind = 'DATA_TYPE') => {
         checkIsApplicationIdSelector(selector);

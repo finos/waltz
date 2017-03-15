@@ -11,9 +11,10 @@
  */
 
 .wdfd-node {
-    circle {
+    .wdfd-glyph {
         fill-opacity: 0.4;
     }
+
     text {
         fill: #555;
         font-size: x-small;
@@ -23,7 +24,7 @@
     &:hover {
         cursor: pointer;
 
-        circle {
+        .wdfd-glyph {
             fill-opacity: 0.9;
         }
 
@@ -50,32 +51,32 @@
 
 
 .wdfd-extra-node {
-  text {
-    font-style: italic;
-  }
-  circle{
-    fill: #a8a8a8;
-    stroke: #525252;
-  }
+    text {
+        font-style: italic;
+    }
+    .wdfd-glyph{
+        fill: #a8a8a8;
+        stroke: #525252;
+    }
 }
 
 
 .waltz-capability-node-member {
-  circle {
-    fill: green;
-    stroke: #004d00;
-  }
+    .wdfd-glyph {
+        fill: green;
+        stroke: #004d00;
+    }
 }
 
 
 .waltz-capability-node-non-member {
-  text {
-    font-style: italic;
-  }
+    text {
+        font-style: italic;
+    }
 
-  circle{
-    fill: #a8a8a8;
-    stroke: #525252;
-  }
+    .wdfd-glyph{
+        fill: #a8a8a8;
+        stroke: #525252;
+    }
 }
 

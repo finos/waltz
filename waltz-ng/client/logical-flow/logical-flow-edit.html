@@ -18,7 +18,7 @@
         <div class="row">
             <div class="col-md-12">
                 <!-- SLOPE DIAGRAM -->
-                <waltz-source-and-target-graph entity-ref="ctrl.entityRef"
+                <waltz-source-and-target-graph entity-ref="ctrl.primaryRef"
                                                logical-flows="ctrl.flows"
                                                decorators="ctrl.dataFlowDecorators"
                                                tweakers="ctrl.flowTweakers">
@@ -54,7 +54,7 @@
                             </li>
 
                             <li>
-                                Add Applications
+                                Add Applications / Actors
                                 <ul>
                                     <li>
                                         <a class="clickable"
@@ -70,7 +70,6 @@
                                     </li>
                                 </ul>
                             </li>
-
                         </ul>
 
                         <hr>
@@ -82,40 +81,46 @@
                     </div>
                 </div>
                 <div class="col-sm-7">
-                    <div ng-if="ctrl.mode === 'addSource'">
-                        <h4>
-                            <waltz-icon name="arrow-up">
-                            </waltz-icon>
-                            Add Upstream Source
-                        </h4>
-                        <waltz-basic-app-selector on-add="ctrl.addSource"
-                                                  on-cancel="ctrl.cancel">
-
-                        </waltz-basic-app-selector>
-                        <div class="small text-muted waltz-paragraph">
-                            Applications which
-                            <i ng-bind="ctrl.app.name"></i>
-                            either pulls or receives data from are known as upstream sources.
-                        </div>
+                    <div ng-if="ctrl.mode === 'addSource'"
+                         class="waltz-fade-if">
+                        <waltz-logical-flow-counterpart-selector all-actors="ctrl.allActors"
+                                                                 on-add-application="ctrl.addSourceApplication"
+                                                                 on-add-actor="ctrl.addSourceActor"
+                                                                 on-cancel="ctrl.cancel">
+                            <heading>
+                                <waltz-icon name="arrow-down"></waltz-icon>
+                                Add Upstream Source
+                            </heading>
+                            <help>
+                                Applications / Actors which
+                                <i ng-bind="ctrl.app.name"></i>
+                                either pulls or receives data from are known as upstream sources.
+                            </help>
+                        </waltz-logical-flow-counterpart-selector>
                     </div>
 
-                    <div ng-if="ctrl.mode === 'addTarget'">
-                        <h4>
-                            <waltz-icon name="arrow-down">
-                            </waltz-icon>
-                            Add Downstream Target
-                        </h4>
-                        <waltz-basic-app-selector on-add="ctrl.addTarget"
-                                                  on-cancel="ctrl.cancel">
-                        </waltz-basic-app-selector>
-                        <div class="small text-muted waltz-paragraph">
-                            Applications which either receive or pull data from
-                            <i ng-bind="ctrl.app.name"></i>
-                            are known as downstream targets.
-                        </div>
+
+                    <div ng-if="ctrl.mode === 'addTarget'"
+                         class="waltz-fade-if">
+                        <waltz-logical-flow-counterpart-selector all-actors="ctrl.allActors"
+                                                                 on-add-application="ctrl.addTargetApplication"
+                                                                 on-add-actor="ctrl.addTargetActor"
+                                                                 on-cancel="ctrl.cancel">
+                            <heading>
+                                <waltz-icon name="arrow-down"></waltz-icon>
+                                Add Downstream Target
+                            </heading>
+                            <help>
+                                Applications which either receive or pull data from
+                                <i ng-bind="ctrl.app.name"></i>
+                                are known as downstream targets.
+                            </help>
+                        </waltz-logical-flow-counterpart-selector>
                     </div>
 
-                    <div ng-if="ctrl.mode === 'editCounterpart'">
+
+                    <div ng-if="ctrl.mode === 'editCounterpart'"
+                         class="waltz-fade-if">
                         <waltz-logical-flow-type-editor flow="ctrl.selectedFlow"
                                                         decorators="ctrl.selectedDecorators"
                                                         all-data-types="ctrl.dataTypes"
@@ -126,7 +131,8 @@
                         </waltz-logical-flow-type-editor>
                     </div>
 
-                    <div ng-if="ctrl.mode === 'editDataTypeUsage'">
+                    <div ng-if="ctrl.mode === 'editDataTypeUsage'"
+                         class="waltz-fade-if">
                         <waltz-app-data-type-usage-editor primary-entity="ctrl.app"
                                                           type="ctrl.selectedDataType"
                                                           on-save="ctrl.saveUsages"

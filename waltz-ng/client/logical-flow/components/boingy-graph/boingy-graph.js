@@ -21,11 +21,9 @@ import {lineWithArrowPath, responsivefy} from '../../../common/d3-utils';
 import {event, select} from 'd3-selection';
 import {forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter} from 'd3-force';
 import {drag} from 'd3-drag';
+import {symbol, symbolWye} from 'd3-shape';
 import {zoom, zoomIdentity} from 'd3-zoom';
-
-
 import 'd3-selection-multi';
-
 import _ from "lodash";
 
 
@@ -107,11 +105,22 @@ function addNodeLabel(selection) {
 
 
 function addNodeCircle(selection) {
+    const actorSymbol = symbol()
+        .size(128)
+        .type(symbolWye);
+
     selection
+        .filter(d => d.kind === 'APPLICATION')
         .append('circle')
-        .attr("r", 6)
-        .append("title")
-        .text(d => d.name);
+        .attr("class", "wdfd-glyph")
+        .attr("r", 6);
+
+    selection
+        .filter(d => d.kind === 'ACTOR')
+        .append("path")
+        .attr("class", "wdfd-glyph")
+        .attr("d", actorSymbol);
+
 }
 
 

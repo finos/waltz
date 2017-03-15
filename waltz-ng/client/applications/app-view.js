@@ -21,7 +21,7 @@ import {
     loadChangeLog,
     loadDatabases,
     loadDataFlows,
-    loadDataFlowDecorators,
+    loadLogicalFlowDecorators,
     loadDataTypeUsages,
     loadInvolvements,
     loadServers,
@@ -203,7 +203,7 @@ function controller($q,
             loadSoftwareCatalog(softwareCatalogStore, id, vm),
             loadDatabases(databaseStore, id, vm),
             loadDataTypeUsages(dataTypeUsageStore, id, vm),
-            loadDataFlowDecorators(logicalFlowDecoratorStore, id, vm),
+            loadLogicalFlowDecorators(logicalFlowDecoratorStore, id, vm),
 
             physicalSpecificationStore
                 .findByEntityReference(entityReference)

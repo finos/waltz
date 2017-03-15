@@ -23,4 +23,11 @@ export function loadDataTypes(dataTypeService, vm) {
 }
 
 
+export function loadActors(actorStore, vm) {
+    return actorStore
+        .findAll()
+        .then(xs => vm.allActors = xs);
+}
+
+
 
