@@ -21,6 +21,7 @@
         </div>
     </div>
 
+    <!-- POPUP -->
     <div ng-if="$ctrl.selected"
          ng-style="{
             top: ($ctrl.selected.y) + 'px',
@@ -29,7 +30,8 @@
          }"
          class="wsatp-popup waltz-fade-if">
         <h4>
-            <span ng-bind="$ctrl.selected.app.name"></span>
+            <waltz-entity-icon-label entity-ref="$ctrl.selected.entity">
+            </waltz-entity-icon-label>
             <a class="clickable pull-right small"
                style="color: blue"
                ng-click="$ctrl.selected = null">
@@ -38,11 +40,13 @@
             </a>
         </h4>
 
-
-        <a ui-sref="main.app.view ({ id: $ctrl.selected.app.id })">
-            &raquo; More about
-            <span ng-bind='$ctrl.selected.app.name'></span>
-        </a>
+        <div>
+            <waltz-entity-link entity-ref="{
+                    kind: $ctrl.selected.entity.kind,
+                    id: $ctrl.selected.entity.id,
+                    name: 'More about ' + $ctrl.selected.entity.name + '&raquo;'}">
+            </waltz-entity-link>
+        </div>
 
         <hr>
 

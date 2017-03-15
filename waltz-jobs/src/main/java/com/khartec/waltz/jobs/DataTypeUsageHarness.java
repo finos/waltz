@@ -18,7 +18,10 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.data_type_usage.DataTypeUsageDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.DSLContext;
@@ -30,13 +33,15 @@ public class DataTypeUsageHarness {
     public static void main(String[] args) {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        DataTypeUsageService service = ctx.getBean(DataTypeUsageService.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
         DataTypeUsageDao dao = ctx.getBean(DataTypeUsageDao.class);
+        DataTypeUsageService svc = ctx.getBean(DataTypeUsageService.class);
+
+        svc.recalculateForApplications(ListUtilities.newArrayList(EntityReference.mkRef(EntityKind.APPLICATION,22704)));
 
 
         long st = System.currentTimeMillis();
-        service.recalculateForAllApplications();
+//        service.recalculateForAllApplications();
         System.out.println("Took "+ (System.currentTimeMillis() - st));
     }
 

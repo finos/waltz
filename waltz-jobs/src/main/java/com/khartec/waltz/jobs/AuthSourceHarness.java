@@ -19,12 +19,8 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
-import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 
@@ -37,18 +33,11 @@ public class AuthSourceHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         AuthoritativeSourceDao dao = ctx.getBean(AuthoritativeSourceDao.class);
-        DataTypeIdSelectorFactory dtSelectorFactory = ctx.getBean(DataTypeIdSelectorFactory.class);
 
-        IdSelectionOptions dtSelectionOptions = IdSelectionOptions.mkOpts(
-                EntityReference.mkRef(
-                        EntityKind.DATA_TYPE,
-                        5000),
-                HierarchyQueryScope.EXACT);
+        AuthoritativeSourceService authoritativeSourceService = ctx.getBean(AuthoritativeSourceService.class);
 
-
-        System.out.println(dao.calculateConsumersForDataTypeIdSelector(dtSelectorFactory.apply(dtSelectionOptions)));
-
-
+        boolean done = authoritativeSourceService.recalculateAllFlowRatings();
+        System.out.println("RC: "+done);
 
 
     }

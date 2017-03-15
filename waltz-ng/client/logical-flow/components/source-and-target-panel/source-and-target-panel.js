@@ -42,15 +42,15 @@ const initialState = {
 const template = require('./source-and-target-panel.html');
 
 
-function calcPhysicalFlows(physicalFlows, specifications, appRef, type, entityRef) {
+function calcPhysicalFlows(physicalFlows, specifications, counterpartEntity, type, entityRef) {
     const specs = type === 'source' ? specifications.consumes : specifications.produces;
     const specsById = _.keyBy(specs, 'id');
 
     return _.chain(physicalFlows)
         .map(pf => Object.assign({}, pf, { specification: specsById[pf.specificationId] }))
         .filter(pf => type === 'source'
-            ? pf.target.id ==  entityRef.id && pf.specification.owningEntity.id === appRef.id
-            : pf.target.id ==  appRef.id && pf.specification.owningEntity.id === entityRef.id)
+            ? pf.target.id ==  entityRef.id && pf.specification.owningEntity.id === counterpartEntity.id
+            : pf.target.id ==  counterpartEntity.id && pf.specification.owningEntity.id === entityRef.id)
         .value();
 }
 
@@ -91,22 +91,23 @@ function mkTypeInfo(decorators = []) {
 }
 
 
-function calculateSourceAndTargetFlowsByAppId(app, logical = []) {
-    if (! app) return {};
+function calculateSourceAndTargetFlowsByEntity(entity, logical = []) {
+    if (! entity) return {};
 
-    const sourceFlowsByAppId = _.chain(logical)
-        .filter(f => f.target.id === app.id)
+
+    const sourceFlowsByEntityId = _.chain(logical)
+        .filter(f => f.target.id === entity.id && f.target.kind === entity.kind)
         .reduce((acc, f) => { acc[f.source.id] = f.id; return acc; }, {})
         .value();
 
-    const targetFlowsByAppId = _.chain(logical)
-        .filter(f => f.source.id === app.id)
+    const targetFlowsByEntityId = _.chain(logical)
+        .filter(f => f.source.id === entity.id && f.source.kind === entity.kind)
         .reduce((acc, f) => { acc[f.target.id] = f.id; return acc; }, {})
         .value();
 
     return {
-        sourceFlowsByAppId,
-        targetFlowsByAppId
+        sourceFlowsByEntityId,
+        targetFlowsByEntityId
     };
 }
 
@@ -208,33 +209,33 @@ function controller($element, $timeout, $window) {
 
         if (changes.logicalFlows || changes.decorators) vm.filteredFlowData = vm.showAll();
 
-        const keyedLogicalFlows = calculateSourceAndTargetFlowsByAppId(
+        const keyedLogicalFlows = calculateSourceAndTargetFlowsByEntity(
             vm.entityRef,
             vm.logicalFlows);
 
-        function select(app, type, flowId, evt) {
+        function select(entity, type, flowId, evt) {
             const typeInfoByFlowId = mkTypeInfo(vm.decorators);
             const types = typeInfoByFlowId[flowId] || [];
             return {
                 type,
                 types,
-                physicalFlows: calcPhysicalFlows(vm.physicalFlows, vm.physicalSpecifications, app, type, vm.entityRef),
-                app,
+                physicalFlows: calcPhysicalFlows(vm.physicalFlows, vm.physicalSpecifications, entity, type, vm.entityRef),
+                entity,
                 y: evt.layerY
             };
         }
 
         const baseTweakers = {
             source: {
-                onSelect: (app, evt) => $timeout(() => {
-                    const flowId = keyedLogicalFlows.sourceFlowsByAppId[app.id];
-                    vm.selected = select(app, 'source', flowId, evt);
+                onSelect: (entity, evt) => $timeout(() => {
+                    const flowId = keyedLogicalFlows.sourceFlowsByEntityId[entity.id];
+                    vm.selected = select(entity, 'source', flowId, evt);
                 })
             },
             target: {
-                onSelect: (app, evt) => $timeout(() => {
-                    const flowId = keyedLogicalFlows.targetFlowsByAppId[app.id];
-                    vm.selected = select(app, 'target', flowId, evt);
+                onSelect: (entity, evt) => $timeout(() => {
+                    const flowId = keyedLogicalFlows.targetFlowsByEntityId[entity.id];
+                    vm.selected = select(entity, 'target', flowId, evt);
                 })
             },
             type: {

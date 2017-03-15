@@ -71,37 +71,37 @@
                         <hr>
 
                         <!-- APP-INFO -->
-                        <div ng-show="$ctrl.selectedApplication != null">
+                        <div ng-show="$ctrl.selectedNode != null">
                             <h5>
-                                <span ng-bind="$ctrl.selectedApplication.name"></span>
+                                <waltz-entity-icon-label entity-ref="$ctrl.selectedNode"></waltz-entity-icon-label>
                                 <span class="pull-right clickable"
-                                      ng-click="$ctrl.dismissSelectedApplication()">
+                                      ng-click="$ctrl.dismissSelectedNode()">
                                     <a class="clickable">&#10006;</a>
                                 </span>
                             </h5>
                             <div>
-                                <a ng-click="$ctrl.isolate($ctrl.selectedApplication)"
+                                <a ng-click="$ctrl.isolate($ctrl.selectedNode)"
                                    class="clickable">
                                     <waltz-icon name="crosshairs"></waltz-icon>
                                     Isolate
                                 </a>
                                 <span class="small text-muted">
-                                    - show only this application and it's neighbours
+                                    - show only this <span ng-bind="$ctrl.selectedNode.kind | toDisplayName:'entity'"></span> and it's neighbours
                                 </span>
                             </div>
 
                             <hr>
 
-                            <waltz-app-centric-flow-table app="$ctrl.selectedApplication"
+                            <waltz-app-centric-flow-table app="$ctrl.selectedNode"
                                                           flows="$ctrl.flowData.flows"
                                                           decorators="$ctrl.flowData.decorators"
                                                           on-select="$ctrl.refocusApp">
                             </waltz-app-centric-flow-table>
 
                             <div>
-                                <a ui-sref="main.app.view ({id: $ctrl.selectedApplication.id })">
-                                    Go to application &raquo;
-                                </a>
+                                See more on
+                                <waltz-entity-link entity-ref="$ctrl.selectedNode"></waltz-entity-link>
+                                &raquo;
                             </div>
 
                         </div>

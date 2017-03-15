@@ -31,6 +31,7 @@ import org.jooq.impl.DSL;
 import java.sql.Date;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
 
@@ -120,6 +121,23 @@ public class JooqUtilities {
                 fieldToTally,
                 recordsInScopeCondition)
         .fetch(TO_LONG_TALLY);
+    }
+
+
+    /**
+     * Attempts to read the value of the field (f)
+     * from the record (r).  If the value is null
+     * then the default (dflt) values is returned.
+     * @param r Record
+     * @param f Field to read
+     * @param dflt  Default value to return if field-value is null
+     * @param <T>  Type of the field-value
+     * @return
+     */
+    public static <T> T safeGet(Record r, Field<T> f, T dflt) {
+        return Optional
+                .ofNullable(r.getValue(f))
+                .orElse(dflt);
     }
 
 

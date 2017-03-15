@@ -50,7 +50,8 @@ const defaultOptions = {
 
 const initialState = {
     applications: [],
-    selectedApplication: null,
+    selectedNode: null,
+    isolatedNode: null,
     boingyEverShown: false,
     dataTypes: [],
     enrichedDataTypeCounts: [],
@@ -96,21 +97,21 @@ function mkTypeFilterFn(decorators = []) {
 }
 
 
-function mkIsolatedAppFilterFn(isolatedApp) {
-    return isolatedApp
-        ? f => f.source.id === isolatedApp.id || f.target.id === isolatedApp.id
+function mkIsolatedNodeFilterFn(isolatedNode) {
+    return isolatedNode
+        ? f => f.source.id === isolatedNode.id || f.target.id === isolatedNode.id
         : f => true;
 }
 
 
 function buildFlowFilter(filterOptions = defaultFilterOptions,
-                         isolatedApp,
+                         isolatedNode,
                          appIds = [],
                          flowDecorators = []) {
     const typeFilterFn = mkTypeFilterFn(flowDecorators);
     const scopeFilterFn = mkScopeFilterFn(appIds, filterOptions.scope);
-    const isolatedAppFilterFn = mkIsolatedAppFilterFn(isolatedApp);
-    return f => typeFilterFn(f) && scopeFilterFn(f) && isolatedAppFilterFn(f);
+    const isolatedNodeFilterFn = mkIsolatedNodeFilterFn(isolatedNode);
+    return f => typeFilterFn(f) && scopeFilterFn(f) && isolatedNodeFilterFn(f);
 }
 
 
@@ -127,13 +128,13 @@ function calculateFlowData(allFlows = [],
                            applications = [],
                            allDecorators = [],
                            filterOptions = defaultFilterOptions,
-                           isolatedApp) {
+                           isolatedNode) {
     // note order is important.  We need to find decorators first
     const decoratorFilterFn = buildDecoratorFilter(filterOptions);
     const decorators = _.filter(allDecorators, decoratorFilterFn);
 
     const appIds = _.map(applications, "id");
-    const flowFilterFn = buildFlowFilter(filterOptions, isolatedApp, appIds, decorators);
+    const flowFilterFn = buildFlowFilter(filterOptions, isolatedNode, appIds, decorators);
     const flows = _.filter(allFlows, flowFilterFn);
 
     const entities = calculateEntities(flows);
@@ -154,14 +155,14 @@ function getDataTypeIds(decorators = []) {
 function prepareGraphTweakers(logicalFlowUtilityService,
                               applications = [],
                               decorators = [],
-                              appSelectFn = (d) => console.log("dftg: no appSelectFn given", d))
+                              nodeSelectFn = (d) => console.log("dftg: no nodeSelectFn given", d))
 {
     const appIds = _.map(applications, 'id');
     const tweakers = logicalFlowUtilityService.buildGraphTweakers(appIds, decorators);
 
     const dfltNodeEnter = tweakers.node.enter;
     const nodeEnter = selection => selection
-        .on('click.app-select', appSelectFn)
+        .on('click.node-select', nodeSelectFn)
         .call(dfltNodeEnter);
 
     tweakers.node.enter = nodeEnter;
@@ -203,13 +204,13 @@ function controller($scope,
             vm.applications,
             vm.flowData.decorators,
             filterOptions,
-            vm.isolatedApplication);
+            vm.isolatedNode);
 
         vm.graphTweakers = prepareGraphTweakers(
             logicalFlowUtilityService,
             vm.applications,
             vm.filteredFlowData.decorators,
-            app => $scope.$applyAsync(() => vm.selectedApplication = app));
+            node => $scope.$applyAsync(() => vm.selectedNode = node));
     };
 
     vm.loadDetail = () => {
@@ -231,23 +232,23 @@ function controller($scope,
         vm.onTabChange(tabName, index);
     };
 
-    vm.isolate = (app) => {
+    vm.isolate = (node) => {
         unpinAll();
-        vm.isolatedApplication = app;
+        vm.isolatedNode = node;
         vm.filterChanged();
     };
 
-    vm.dismissSelectedApplication = () => {
+    vm.dismissSelectedNode = () => {
         unpinAll();
-        vm.isolatedApplication = null;
-        vm.selectedApplication = null;
+        vm.isolatedNode = null;
+        vm.selectedNode = null;
         vm.filterChanged();
     };
 
-    vm.refocusApp = app => {
-        vm.selectedApplication = app;
-        vm.isolate(app);
-    }
+    vm.refocusNode = node => {
+        vm.selectedNode = node;
+        vm.isolate(node);
+    };
 
 }
 

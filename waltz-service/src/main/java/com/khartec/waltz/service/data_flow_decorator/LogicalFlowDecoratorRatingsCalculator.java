@@ -1,0 +1,168 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016  Khartec Ltd.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.khartec.waltz.service.data_flow_decorator;
+
+import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
+import com.khartec.waltz.data.data_type.DataTypeDao;
+import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
+import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
+import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
+import com.khartec.waltz.model.datatype.DataType;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.service.application.ApplicationService;
+import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceResolver;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+
+import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.isEmpty;
+import static com.khartec.waltz.common.SetUtilities.map;
+import static com.khartec.waltz.model.utils.IdUtilities.indexById;
+import static java.util.stream.Collectors.toList;
+
+@Service
+public class LogicalFlowDecoratorRatingsCalculator {
+
+    private final ApplicationService applicationService;
+    private final AuthoritativeSourceDao authoritativeSourceDao;
+    private final LogicalFlowDao logicalFlowDao;
+    private final DataTypeDao dataTypeDao;
+
+
+    @Autowired
+    public LogicalFlowDecoratorRatingsCalculator(ApplicationService applicationService,
+                                                 AuthoritativeSourceDao authoritativeSourceDao,
+                                                 LogicalFlowDao logicalFlowDao,
+                                                 DataTypeDao dataTypeDao) {
+        checkNotNull(applicationService, "applicationService cannot be null");
+        checkNotNull(authoritativeSourceDao, "authoritativeSourceDao cannot be null");
+        checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
+        checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
+
+        this.applicationService = applicationService;
+        this.authoritativeSourceDao = authoritativeSourceDao;
+        this.logicalFlowDao = logicalFlowDao;
+        this.dataTypeDao = dataTypeDao;
+    }
+
+
+    public Collection<LogicalFlowDecorator> calculate(Collection<LogicalFlowDecorator> decorators) {
+
+        List<LogicalFlow> flows = loadFlows(decorators)
+                .stream()
+                .filter(f -> f.target().kind() == EntityKind.APPLICATION && f.source().kind() == EntityKind.APPLICATION)
+                .collect(toList());
+        
+        if (isEmpty(flows)) return Collections.emptyList();
+
+        List<Application> targetApps = loadTargetApplications(flows);
+        List<DataType> dataTypes = dataTypeDao.getAll();
+
+        Map<Long, DataType> typesById = indexById(dataTypes);
+        Map<Long, LogicalFlow> flowsById = indexById(flows);
+        Map<Long, Application> targetAppsById = indexById(targetApps);
+
+        AuthoritativeSourceResolver resolver = createResolver(targetApps);
+
+        return map(
+                decorators,
+                decorator -> {
+                    if (decorator.decoratorEntity().kind() != EntityKind.DATA_TYPE) {
+                        return decorator;
+                    } else {
+                        AuthoritativenessRating rating = lookupRating(
+                                typesById,
+                                flowsById,
+                                targetAppsById,
+                                resolver,
+                                decorator);
+                        return ImmutableLogicalFlowDecorator
+                                .copyOf(decorator)
+                                .withRating(rating);
+                    }
+                });
+    }
+
+
+    private List<Application> loadTargetApplications(List<LogicalFlow> flows) {
+        Set<Long> targetApplicationIds = map(
+                flows,
+                df -> df.target().id());
+
+        return applicationService
+                .findByIds(targetApplicationIds);
+    }
+
+
+    private List<LogicalFlow> loadFlows(Collection<LogicalFlowDecorator> decorators) {
+        Set<Long> dataFlowIds = map(decorators, d -> d.dataFlowId());
+        return logicalFlowDao.findByFlowIds(dataFlowIds);
+    }
+
+
+    private AuthoritativeSourceResolver createResolver(Collection<Application> targetApps) {
+        Set<Long> orgIds = map(targetApps, app -> app.organisationalUnitId());
+
+        List<AuthoritativeRatingVantagePoint> authoritativeRatingVantagePoints =
+                authoritativeSourceDao.findAuthoritativeRatingVantagePoints(orgIds);
+
+        AuthoritativeSourceResolver resolver = new AuthoritativeSourceResolver(authoritativeRatingVantagePoints);
+        return resolver;
+    }
+
+
+    private AuthoritativenessRating lookupRating(Map<Long, DataType> typesById,
+                                                 Map<Long, LogicalFlow> flowsById,
+                                                 Map<Long, Application> targetAppsById,
+                                                 AuthoritativeSourceResolver resolver,
+                                                 LogicalFlowDecorator decorator) {
+        LogicalFlow flow = flowsById.get(decorator.dataFlowId());
+
+        EntityReference vantagePoint = lookupVantagePoint(targetAppsById, flow);
+        EntityReference source = flow.source();
+        String dataTypeCode = lookupDataTypeCode(typesById, decorator);
+
+        return resolver.resolve(vantagePoint, source, dataTypeCode);
+    }
+
+
+    private EntityReference lookupVantagePoint(Map<Long, Application> targetAppsById, LogicalFlow flow) {
+        Application targetApp = targetAppsById.get(flow.target().id());
+        long targetOrgUnitId = targetApp.organisationalUnitId();
+
+        return EntityReference.mkRef(
+                EntityKind.ORG_UNIT,
+                targetOrgUnitId);
+    }
+
+
+    private String lookupDataTypeCode(Map<Long, DataType> typesById, LogicalFlowDecorator decorator) {
+        long dataTypeId = decorator.decoratorEntity().id();
+        return typesById.get(dataTypeId).code();
+    }
+
+
+}

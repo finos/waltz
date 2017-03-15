@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.service.usage_info;
 
+import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
@@ -39,10 +40,11 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.ArrayUtilities.mapToList;
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.map;
+import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.model.usage_info.UsageInfoUtilities.mkChangeSet;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
@@ -119,7 +121,7 @@ public class DataTypeUsageService {
             String dataTypeCode,
             List<UsageInfo> usages) {
 
-        Collection<UsageInfo> base = map(
+        Collection<UsageInfo> base = CollectionUtilities.map(
                 dataTypeUsageDao.findForEntityAndDataType(entityReference, dataTypeCode),
                 dtu -> dtu.usage());
 
@@ -140,18 +142,27 @@ public class DataTypeUsageService {
     }
 
 
-    public boolean recalculateForApplications(EntityReference... refs) {
+    public boolean recalculateForApplications(Collection<EntityReference> refs) {
         checkNotNull(refs, "refs cannot be null");
-        Select<Record1<Long>> idSelector = convertApplicationRefsToIdSelector(refs);
-        return dataTypeUsageDao.recalculateForAppIdSelector(idSelector);
+        Set<Long> appIds = refs
+                .stream()
+                .filter(r -> r.kind() == EntityKind.APPLICATION)
+                .map(r -> r.id())
+                .collect(Collectors.toSet());
+
+        if (isEmpty(appIds)) {
+            return true;
+        } else {
+            Select<Record1<Long>> idSelector = convertApplicationIdsToIdSelector(appIds);
+            return dataTypeUsageDao.recalculateForAppIdSelector(idSelector);
+        }
     }
 
 
-    private Select<Record1<Long>> convertApplicationRefsToIdSelector(EntityReference[] refs) {
-
+    private Select<Record1<Long>> convertApplicationIdsToIdSelector(Set<Long> appIds) {
         return DSL.select(APPLICATION.ID)
                 .from(APPLICATION)
-                .where(APPLICATION.ID.in(mapToList(refs, r -> r.id())));
+                .where(APPLICATION.ID.in(appIds));
     }
 
 }

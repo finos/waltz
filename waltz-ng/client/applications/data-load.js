@@ -126,7 +126,7 @@ export function loadDataTypeUsages(dataTypeUsageStore, appId, vm) {
 }
 
 
-export function loadDataFlowDecorators(store, appId, vm) {
+export function loadLogicalFlowDecorators(store, appId, vm) {
     const selector = {
         entityReference: { id: appId, kind: 'APPLICATION'},
         scope: 'EXACT'

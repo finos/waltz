@@ -17,10 +17,10 @@
  */
 
 import _ from "lodash";
-import {loadDataTypes} from "./registration-utils";
+import {loadDataTypes, loadActors} from "./registration-utils";
 import {
     loadDataFlows,
-    loadDataFlowDecorators} from "../applications/data-load";
+    loadLogicalFlowDecorators} from "../applications/data-load";
 
 
 function vetoMove(isDirty) {
@@ -39,8 +39,8 @@ function loadDataTypeUsages(dataTypeUsageStore, appId, vm) {
 }
 
 
-function notifyIllegalFlow(notification, targetApp, flowApp) {
-    if (targetApp.id === flowApp.id) {
+function notifyIllegalFlow(notification, primaryApp, counterpartRef) {
+    if (primaryApp.id === counterpartRef.id && counterpartRef.kind === 'APPLICATION') {
         notification.warning("An application may not link to itself.");
         return true;
     }
@@ -56,26 +56,17 @@ const initialState = {
     flows: [],
     isDirty: false,
     mode: '', // editCounterpart | editDataTypeUsage
-    selectedApp: null,
+    selectedCounterpart: null,
     selectedDecorators: null,
     selectedFlow: null,
     selectedUsages: []
 };
 
 
-function mkAppRef(app) {
-    return {
-        id: app.id,
-        name: app.name,
-        kind: 'APPLICATION'
-    };
-}
-
-
 function mkNewFlow(source, target) {
     return {
-        source: mkAppRef(source),
-        target: mkAppRef(target)
+        source,
+        target
     };
 }
 
@@ -101,6 +92,7 @@ function mkAddFlowCommand(flow) {
 
 function controller($scope,
                     application,
+                    actorStore,
                     dataTypeService,
                     dataTypeUsageStore,
                     logicalFlowDecoratorStore,
@@ -111,7 +103,7 @@ function controller($scope,
     const vm = _.defaultsDeep(this, initialState);
     vm.app = application;
 
-    vm.entityRef = {
+    vm.primaryRef = {
         kind: 'APPLICATION',
         id: application.id,
         name: application.name
@@ -119,23 +111,23 @@ function controller($scope,
 
     const reload = () => {
         loadDataFlows(logicalFlowStore, primaryAppId, vm);
-        loadDataFlowDecorators(logicalFlowDecoratorStore, primaryAppId, vm);
+        loadLogicalFlowDecorators(logicalFlowDecoratorStore, primaryAppId, vm);
         loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm);
         vm.cancel();
     };
 
-    const selectSourceApp = (selection) => {
-        selectApp(selection, { source: { id: selection.id }});
+    const selectSource = (selection) => {
+        selectCounterpart(selection, { source: { id: selection.id }});
     };
 
-    const selectTargetApp = (selection) => {
-        selectApp(selection, { target: { id: selection.id }});
+    const selectTarget = (selection) => {
+        selectCounterpart(selection, { target: { id: selection.id }});
     };
 
-    const selectApp = (selection, flowSelectionPredicate) => {
+    const selectCounterpart = (selection, flowSelectionPredicate) => {
         if (vetoMove(vm.isDirty)) { return; }
         vm.setMode('editCounterpart');
-        vm.selectedApp = selection;
+        vm.selectedCounterpart = selection;
         vm.selectedFlow = _.find(vm.flows, flowSelectionPredicate);
         vm.selectedDecorators = vm.selectedFlow
             ? _.filter(vm.dataFlowDecorators, { dataFlowId: vm.selectedFlow.id })
@@ -148,7 +140,7 @@ function controller($scope,
         vm.selectedUsages = _.chain(vm.dataTypeUsages)
             .filter({ dataTypeCode: type.code })
             .map('usage')
-            .value()
+            .value();
     };
 
     const updateDecorators = (command) => {
@@ -159,13 +151,13 @@ function controller($scope,
     };
 
     vm.flowTweakers = {
-        source: { onSelect: a => $scope.$applyAsync(() => selectSourceApp(a)) },
-        target: { onSelect: a => $scope.$applyAsync(() => selectTargetApp(a)) },
+        source: { onSelect: a => $scope.$applyAsync(() => selectSource(a)) },
+        target: { onSelect: a => $scope.$applyAsync(() => selectTarget(a)) },
         type: { onSelect: a => $scope.$applyAsync(() => selectType(a)) }
     };
 
     vm.cancel = () => {
-        vm.selectedApp = null;
+        vm.selectedCounterpart = null;
         vm.selectedDecorators = null;
         vm.selectedFlow = null;
         vm.isDirty = false;
@@ -194,21 +186,39 @@ function controller($scope,
     vm.saveUsages = (usages = []) => {
         const dataTypeCode = vm.selectedDataType.code;
         dataTypeUsageStore
-            .save(vm.entityRef, dataTypeCode, usages)
+            .save(vm.primaryRef, dataTypeCode, usages)
             .then(() => reload())
             .then(() => notification.success('Data usage updated'));
     };
 
-    vm.addSource = (srcApp) => {
-        if (notifyIllegalFlow(notification, application, srcApp)) return;
-        addFlow(vm.flows, mkNewFlow(srcApp, application));
-        selectSourceApp(srcApp);
+    const addSource = (kind, entity) => {
+        const counterpartRef = { id: entity.id, kind, name: entity.name };
+        if (notifyIllegalFlow(notification, vm.primaryRef, counterpartRef)) return;
+        addFlow(vm.flows, mkNewFlow(counterpartRef, vm.primaryRef));
+        selectSource(entity);
     };
 
-    vm.addTarget = (targetApp) => {
-        if (notifyIllegalFlow(notification, application, targetApp)) return;
-        addFlow(vm.flows, mkNewFlow(application, targetApp));
-        selectTargetApp(targetApp);
+    const addTarget = (kind, entity) => {
+        const counterpartRef = { id: entity.id, kind, name: entity.name };
+        if (notifyIllegalFlow(notification, vm.primaryRef, counterpartRef)) return;
+        addFlow(vm.flows, mkNewFlow(vm.primaryRef, counterpartRef));
+        selectTarget(entity);
+    };
+
+    vm.addSourceApplication = (srcApp) => {
+        addSource('APPLICATION', srcApp);
+    };
+
+    vm.addSourceActor = (actor) => {
+        addSource('ACTOR', actor);
+    };
+
+    vm.addTargetApplication = (targetApp) => {
+        addTarget('APPLICATION', targetApp);
+    };
+
+    vm.addTargetActor = (actor) => {
+        addTarget('ACTOR', actor);
     };
 
     vm.setDirtyChange = (dirty) => vm.isDirty = dirty;
@@ -222,6 +232,7 @@ function controller($scope,
 
     // -- BOOT
     loadDataTypes(dataTypeService, vm);
+    loadActors(actorStore, vm);
     reload();
 
 }
@@ -230,6 +241,7 @@ function controller($scope,
 controller.$inject = [
     '$scope',
     'application',
+    'ActorStore',
     'DataTypeService',
     'DataTypeUsageStore',
     'LogicalFlowDecoratorStore',

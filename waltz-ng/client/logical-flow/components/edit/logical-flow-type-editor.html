@@ -3,12 +3,10 @@
         <div class="col-md-11">
 
             <h4>
-                Datatypes sent from:
-                <span style="font-style: italic"
-                      ng-bind="$ctrl.flow.source.name"></span>
-                to:
-                <span style="font-style: italic"
-                      ng-bind="$ctrl.flow.target.name"></span>
+                <i>Datatypes sent from:</i>
+                <waltz-entity-icon-label entity-ref="$ctrl.flow.source"></waltz-entity-icon-label>
+                <i style="padding: 4px"> to:</i>
+                <waltz-entity-icon-label entity-ref="$ctrl.flow.target"></waltz-entity-icon-label>
             </h4>
 
             <!-- DATA TYPE OPTIONS -->

@@ -18,29 +18,46 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.DSLContext;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-public class LogicalFlowStatsHarness {
+import java.util.List;
+
+import static com.khartec.waltz.model.EntityReference.mkRef;
+
+public class LogicalFlowHarness {
     public static void main(String[] args) throws ParseException {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
-        LogicalFlowService service = ctx.getBean(LogicalFlowService.class);
+        LogicalFlowDao dao = ctx.getBean(LogicalFlowDao.class);
+        ApplicationIdSelectorFactory factory = ctx.getBean(ApplicationIdSelectorFactory.class);
 
         IdSelectionOptions options = IdSelectionOptions.mkOpts(
-                EntityReference.mkRef(EntityKind.ORG_UNIT, 50L),
+                mkRef(EntityKind.ORG_UNIT, 20),
                 HierarchyQueryScope.CHILDREN);
 
-        service.calculateStats(options);
-        System.out.println("--done");
+        LogicalFlow app2appFlow = dao.findByFlowId(28940);
+        LogicalFlow app2actorFlow = dao.findByFlowId(28941);
+
+
+        System.out.println("-- App 2 App");
+        System.out.println(app2appFlow);
+        System.out.println("-- App 2 Actor");
+        System.out.println(app2actorFlow);
+
+        List<LogicalFlow> flows = dao.findByEntityReference(mkRef(EntityKind.APPLICATION, 22406));
+        System.out.println("-- flows");
+        flows.forEach(System.out::println);
+
 
     }
 }

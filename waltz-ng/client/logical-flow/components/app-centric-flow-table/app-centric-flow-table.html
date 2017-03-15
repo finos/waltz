@@ -2,7 +2,7 @@
     <thead>
         <tr>
             <th>Direction</th>
-            <th>Application</th>
+            <th>Node</th>
             <th>Type</th>
             <th></th>
         </tr>
@@ -17,10 +17,9 @@
             </td>
 
             <td class="waltz-visibility-parent">
-                <a ng-click="$ctrl.onSelect(flow.app)"
+                <a ng-click="$ctrl.onSelect(flow.counterpart)"
                    class="clickable">
-                    <span ng-bind="flow.app.name">
-                    </span>
+                    <waltz-entity-icon-label entity-ref="flow.counterpart"></waltz-entity-icon-label>
                 </a>
             </td>
 
