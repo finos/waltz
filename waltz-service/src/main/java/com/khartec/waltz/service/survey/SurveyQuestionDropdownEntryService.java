@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -33,7 +31,7 @@ public class SurveyQuestionDropdownEntryService {
 
 
     public boolean saveEntries(long questionId, List<SurveyQuestionDropdownEntry> entries) {
-        checkNotEmpty(entries, "entries cannot be empty");
+        checkNotNull(entries, "entries cannot be null");
 
         List<SurveyQuestionDropdownEntry> sanitisedEntries = entries.stream()
                 .map(e -> ImmutableSurveyQuestionDropdownEntry.copyOf(e)

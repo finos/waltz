@@ -64,7 +64,7 @@ public class SurveyQuestionDropdownEntryDao {
 
 
     public void saveEntries(long questionId, List<SurveyQuestionDropdownEntry> entries) {
-        checkNotEmpty(entries, "entries cannot be empty");
+        checkNotNull(entries, "entries cannot be null");
 
         dsl.transaction(config -> {
             DSLContext tx = DSL.using(config);

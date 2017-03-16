@@ -15,5 +15,5 @@ import java.util.Optional;
 public abstract class SurveyQuestionInfo {
 
     public abstract SurveyQuestion question();
-    public abstract Optional<List<SurveyQuestionDropdownEntry>> dropdownEntries();
+    public abstract List<SurveyQuestionDropdownEntry> dropdownEntries();
 }

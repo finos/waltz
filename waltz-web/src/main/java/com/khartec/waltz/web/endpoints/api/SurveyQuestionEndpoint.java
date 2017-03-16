@@ -120,7 +120,7 @@ public class SurveyQuestionEndpoint implements Endpoint {
         if (questionInfo.question().fieldType() == SurveyQuestionFieldType.DROPDOWN) {
             return surveyQuestionDropdownEntryService.saveEntries(
                     questionId,
-                    questionInfo.dropdownEntries().orElse(null));
+                    questionInfo.dropdownEntries());
         }
 
         return false;
