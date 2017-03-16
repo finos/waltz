@@ -1,5 +1,32 @@
 <div>
-    <table class="table table-condensed">
+    <div class="text-muted small"
+         style="margin-bottom: 15px">
+        <div ng-if="$ctrl.editor === 'TABULAR'">
+            <span>
+                Please add values for dropdown options
+            </span>
+            <a class="clickable pull-right"
+               ng-click="$ctrl.showBulkEditor()">
+                bulk editor
+                <waltz-icon name="folder-o"></waltz-icon>
+            </a>
+        </div>
+
+        <div ng-if="$ctrl.editor === 'BULK'">
+            <span>
+                Please add values for dropdown options, each option on a separate line
+            </span>
+            <a class="clickable pull-right"
+               ng-click="$ctrl.showTabularEditor()">
+                tabular editor
+                <waltz-icon name="table"></waltz-icon>
+            </a>
+        </div>
+    </div>
+
+
+    <table class="table table-condensed"
+           ng-if="$ctrl.editor === 'TABULAR'">
         <tbody>
         <tr ng-repeat="entry in $ctrl.entries | orderBy:'position'"
             class="waltz-visibility-parent">
@@ -46,4 +73,13 @@
         </tr>
         </tbody>
     </table>
+
+
+    <textarea ng-if="$ctrl.editor === 'BULK'"
+              rows="8"
+              cols="95"
+              ng-model="$ctrl.bulkEntriesString"
+              ng-model-options="{debounce: 300}"
+              ng-change="$ctrl.bulkEntriesChanged()">
+    </textarea>
 </div>

@@ -147,9 +147,6 @@
                     <div ng-if="ctrl.selectedQuestionInfo.question.fieldType === 'DROPDOWN'"
                          class="col-sm-7 col-sm-offset-3"
                          style="background-color: #F8F9F9; margin-top:10px;">
-                        <span class="text-muted small">
-                            Please add values for dropdown options
-                        </span>
                         <waltz-survey-dropdown-editor entries="ctrl.selectedQuestionInfo.dropdownEntries"
                                                       on-change="ctrl.updateEntries">
                         </waltz-survey-dropdown-editor>

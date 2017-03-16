@@ -29,6 +29,8 @@ const bindings = {
 const initialState = {
     creatingEntry: false,
     entries: [],
+    bulkEntriesString: null,
+    editor: 'TABULAR',
     newEntry: null,
     onSave: () => console.log("default onSave ")
 };
@@ -37,10 +39,20 @@ const initialState = {
 const template = require('./survey-dropdown-editor.html');
 
 
+function createEntriesString(entries = []) {
+    return _.chain(entries)
+        .map('value')
+        .join("\n");
+}
+
+
 function controller() {
     const vm = this;
 
-    vm.$onInit = () => initialiseData(vm, initialState);
+    vm.$onInit = () => {
+        initialiseData(vm, initialState);
+        vm.bulkEntriesString = createEntriesString(vm.entries);
+    };
 
     const notifyChanges = () => {
         invokeFunction(vm.onChange, vm.entries);
@@ -62,13 +74,38 @@ function controller() {
     };
 
     vm.updateValue = (entryId, data) => {
-        const entry = _.find(vm.entries, e => e.id === entryId);
+        //entry id is likely to be undefined and cannot be relied upon (when we have new entries)
+        const entry = _.find(vm.entries, e => e.value === data.oldVal);
         entry.value = data.newVal;
         notifyChanges();
     };
 
     vm.removeEntry = (entry) => {
-        _.remove(vm.entries, e => e.id === entry.id);
+        _.remove(vm.entries, e => e.value === entry.value);
+        notifyChanges();
+    };
+
+    vm.showTabularEditor = () => {
+        vm.editor = 'TABULAR'
+    };
+
+    vm.showBulkEditor = () => {
+        vm.bulkEntriesString = createEntriesString(vm.entries);
+        vm.editor = 'BULK';
+    };
+
+    vm.bulkEntriesChanged = () => {
+        const newEntries = _.chain(vm.bulkEntriesString)
+            .trim()
+            .split("\n")
+            .uniq()
+            .map(s => ({
+                id: null,
+                value: s,
+                position: null
+            }))
+            .value();
+        vm.entries = newEntries;
         notifyChanges();
     };
 }
