@@ -39,11 +39,21 @@ require('./thirdparty-setup')(waltzApp);
 function hrefSanitizer($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(/^\s*(mailto|https?|sip|chrome-extension):/);
 }
-
 hrefSanitizer.$inject = ['$compileProvider'];
 
 
-waltzApp.config(hrefSanitizer);
+function configureNotification(notificationProvider) {
+    notificationProvider.setOptions({
+        positionX: 'right',
+        positionY: 'bottom'
+    });
+}
+configureNotification.$inject = ['NotificationProvider'];
+
+
+waltzApp
+    .config(hrefSanitizer)
+    .config(configureNotification);
 
 
 waltzApp.run([
