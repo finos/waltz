@@ -2,8 +2,9 @@ package com.khartec.waltz.model.survey;
 
 public enum SurveyQuestionFieldType {
 
-    TEXT,
-    TEXTAREA,
+    BOOLEAN,
+    DROPDOWN,
     NUMBER,
-    BOOLEAN
+    TEXT,
+    TEXTAREA
 }

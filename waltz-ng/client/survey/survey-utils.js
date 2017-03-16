@@ -20,18 +20,18 @@
 import _ from 'lodash';
 
 
-export function groupQuestions(questions = []) {
-    const sections = _.chain(questions)
-        .map(q => q.sectionName || "Other")
+export function groupQuestions(questionInfos = []) {
+    const sections = _.chain(questionInfos)
+        .map(q => q.question.sectionName || "Other")
         .uniq()
         .value();
 
-    const groupedQuestions = _.groupBy(questions, q => q.sectionName || "Other");
+    const groupedQuestionInfos = _.groupBy(questionInfos, q => q.question.sectionName || "Other");
 
     return _.map(sections, s => {
         return {
             'sectionName': s,
-            'questions': groupedQuestions[s]
+            'questionInfos': groupedQuestionInfos[s]
         }
     });
 }

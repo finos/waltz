@@ -84,55 +84,54 @@
               class="form-horizontal waltz-survey-form"
               role="form"
               novalidate>
-            <div ng-repeat="groupedQuestion in ctrl.surveyQuestions">
+            <div ng-repeat="groupedQuestion in ctrl.surveyQuestionInfos">
 
                 <h4 ng-bind="groupedQuestion.sectionName"
                     class="text-muted"></h4>
                 <hr>
-
-                <div ng-repeat="question in groupedQuestion.questions"
+                <div ng-repeat="qi in groupedQuestion.questionInfos"
                      class="form-group">
-                    <label for="{{ question.id }}"
+                    <label for="{{ qi.question.id }}"
                            class="col-sm-5 control-label">
-                        <span ng-bind="question.questionText">
+                        <span ng-bind="qi.question.questionText">
                         </span>
-                            <span ng-if="question.isMandatory"
+                            <span ng-if="qi.question.isMandatory"
                                   class="text-danger">
                             *
                         </span>
                         <!-- help text -->
-                        <waltz-markdown text="question.helpText"
+                        <waltz-markdown text="qi.question.helpText"
                                         class='small text-muted'>
                         </waltz-markdown>
                     </label>
-                    <div ng-switch="question.fieldType"
+                    <div ng-switch="qi.question.fieldType"
                          class="col-sm-7">
                         <!-- input control -->
                         <!-- text -->
                         <input ng-switch-when="TEXT"
                                type="text"
-                               id="{{ question.id }}"
-                               ng-model="ctrl.surveyResponses[question.id].stringResponse"
-                               ng-required="question.isMandatory"
-                               ng-blur="ctrl.saveResponse(question.id)"
+                               id="{{ qi.question.id }}"
+                               ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
+                               ng-required="qi.question.isMandatory"
+                               ng-blur="ctrl.saveResponse(qi.question.id)"
                                class="form-control"/>
                         <!-- number -->
                         <input ng-switch-when="NUMBER"
                                type="number"
-                               id="{{ question.id }}"
+                               id="{{ qi.question.id }}"
                                placeholder="please enter a number"
-                               ng-model="ctrl.surveyResponses[question.id].numberResponse"
-                               ng-required="question.isMandatory"
-                               ng-blur="ctrl.saveResponse(question.id)"
+                               ng-model="ctrl.surveyResponses[qi.question.id].numberResponse"
+                               ng-required="qi.question.isMandatory"
+                               ng-blur="ctrl.saveResponse(qi.question.id)"
                                class="form-control"/>
                         <!-- boolean -->
                         <div ng-switch-when="BOOLEAN">
                             <label>
-                                <input name="{{ question.id }}"
+                                <input name="{{ qi.question.id }}"
                                        type="radio"
-                                       ng-model="ctrl.surveyResponses[question.id].booleanResponse"
-                                       ng-required="question.isMandatory"
-                                       ng-change="ctrl.saveResponse(question.id)"
+                                       ng-model="ctrl.surveyResponses[qi.question.id].booleanResponse"
+                                       ng-required="qi.question.isMandatory"
+                                       ng-change="ctrl.saveResponse(qi.question.id)"
                                        value="true"/>
                                 Yes
                             </label>
@@ -140,40 +139,49 @@
                             &nbsp;
                             &nbsp;
                             <label>
-                                <input name="{{ question.id }}"
+                                <input name="{{ qi.question.id }}"
                                        type="radio"
-                                       ng-model="ctrl.surveyResponses[question.id].booleanResponse"
-                                       ng-required="question.isMandatory"
-                                       ng-change="ctrl.saveResponse(question.id)"
+                                       ng-model="ctrl.surveyResponses[qi.question.id].booleanResponse"
+                                       ng-required="qi.question.isMandatory"
+                                       ng-change="ctrl.saveResponse(qi.question.id)"
                                        value="false"/>
                                 No
                             </label>
                             &nbsp;
                             &nbsp;
                             &nbsp;
-                            <label ng-if="! question.isMandatory">
-                                <input name="{{ question.id }}"
+                            <label ng-if="! qi.question.isMandatory">
+                                <input name="{{ qi.question.id }}"
                                        type="radio"
-                                       ng-model="ctrl.surveyResponses[question.id].booleanResponse"
-                                       ng-change="ctrl.saveResponse(question.id)"
+                                       ng-model="ctrl.surveyResponses[qi.question.id].booleanResponse"
+                                       ng-change="ctrl.saveResponse(qi.question.id)"
                                        value="null"/>
                                 N/a
                             </label>
                         </div>
                         <!-- textarea -->
                         <textarea ng-switch-when="TEXTAREA"
-                                  id="{{ question.id }}"
-                                  ng-model="ctrl.surveyResponses[question.id].stringResponse"
-                                  ng-required="question.isMandatory"
-                                  ng-blur="ctrl.saveResponse(question.id)"
+                                  id="{{ qi.question.id }}"
+                                  ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
+                                  ng-required="qi.question.isMandatory"
+                                  ng-blur="ctrl.saveResponse(qi.question.id)"
                                   rows="4"
                                   class="form-control">
                         </textarea>
+                        <!-- dropdown -->
+                        <select ng-switch-when="DROPDOWN"
+                                id="{{ qi.question.id }}"
+                                ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
+                                ng-required="qi.question.isMandatory"
+                                ng-blur="ctrl.saveResponse(qi.question.id)"
+                                ng-options="entry.value as entry.value for entry in qi.dropdownEntries | orderBy:'position'"
+                                class="form-control">
+                        </select>
                         <!-- comment -->
-                        <waltz-editable-field ng-if="question.allowComment"
+                        <waltz-editable-field ng-if="qi.question.allowComment"
                                               fieldType="textarea"
-                                              initial-val="ctrl.surveyResponses[question.id].comment"
-                                              item-id="question.id"
+                                              initial-val="ctrl.surveyResponses[qi.question.id].comment"
+                                              item-id="qi.question.id"
                                               on-save="ctrl.saveComment"
                                               button-label="Comment"
                                               class="small text-muted">

@@ -97,7 +97,7 @@
 
     <waltz-section name="Survey Response"
                    ng-if="ctrl.surveyInstance.status === 'COMPLETED'">
-        <div ng-repeat="groupedQuestion in ctrl.surveyQuestions">
+        <div ng-repeat="groupedQuestion in ctrl.surveyQuestionInfos">
             <br ng-hide="$first">
 
             <h4 ng-bind="groupedQuestion.sectionName"
@@ -105,27 +105,27 @@
                 class="text-muted">
             </h4>
 
-            <div ng-repeat="question in groupedQuestion.questions">
+            <div ng-repeat="qi in groupedQuestion.questionInfos">
                 <div class="row">
                     <div class="col-sm-5">
-                        <div ng-bind="question.questionText"
+                        <div ng-bind="qi.question.questionText"
                              class="text-muted">
                         </div>
                     </div>
                     <div class="col-sm-7">
                         <div style="border-bottom: 1px dotted #ddd; margin-bottom: 1em">
-                            <div ng-if="question.fieldType === 'BOOLEAN'">
-                                <waltz-boolean-renderer value="ctrl.answers[question.id].answer">
+                            <div ng-if="qi.question.fieldType === 'BOOLEAN'">
+                                <waltz-boolean-renderer value="ctrl.answers[qi.question.id].answer">
                                 </waltz-boolean-renderer>
                             </div>
                             <div ng-if="question.fieldType !== 'BOOLEAN'">
-                                <span ng-bind="ctrl.answers[question.id].answer">
+                                <span ng-bind="ctrl.answers[qi.question.id].answer">
                                 </span>
                             </div>
                             <div class='small text-muted'
-                                 ng-if="ctrl.answers[question.id].comment">
+                                 ng-if="ctrl.answers[qi.question.id].comment">
                                 <strong>Comment:</strong>
-                                <span ng-bind="ctrl.answers[question.id].comment"></span>
+                                <span ng-bind="ctrl.answers[qi.question.id].comment"></span>
                             </div>
                         </div>
                     </div>

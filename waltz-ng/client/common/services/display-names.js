@@ -249,10 +249,11 @@ export const surveyRunStatusNames = {
 
 
 export const surveyQuestionFieldTypeNames = {
-    TEXT: 'Text',
-    TEXTAREA: 'Text Area',
+    BOOLEAN: 'Boolean',
+    DROPDOWN: 'Dropdown',
     NUMBER: 'Number',
-    BOOLEAN: 'Boolean'
+    TEXT: 'Text',
+    TEXTAREA: 'Text Area'
 };
 
 

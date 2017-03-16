@@ -64,13 +64,12 @@ function controller($stateParams,
 
     surveyQuestionStore
         .findForInstance(id)
-        .then(questions => vm.surveyQuestions = groupQuestions(questions));
+        .then(qis => vm.surveyQuestionInfos = groupQuestions(qis));
 
     surveyInstanceStore
         .findResponses(id)
         .then(responses => {
             vm.answers = indexResponses(responses);
-            global.xs = vm.answers
             loadParticipants(responses);
         });
 }
