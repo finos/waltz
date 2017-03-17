@@ -27,6 +27,7 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.search.OrganisationalUnitSearchDao;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -166,8 +167,13 @@ public class OrganisationalUnitService {
 
 
     public List<OrganisationalUnit> search(String query) {
+        return search(query, EntitySearchOptions.mkForEntity(EntityKind.ORG_UNIT));
+    }
+
+
+    public List<OrganisationalUnit> search(String query, EntitySearchOptions options) {
         if (isEmpty(query)) return emptyList();
-        return organisationalUnitSearchDao.search(query);
+        return organisationalUnitSearchDao.search(query, options);
     }
 
 

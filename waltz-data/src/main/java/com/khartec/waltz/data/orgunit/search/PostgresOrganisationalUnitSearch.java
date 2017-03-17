@@ -21,6 +21,7 @@ package com.khartec.waltz.data.orgunit.search;
 import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -43,12 +44,12 @@ public class PostgresOrganisationalUnitSearch implements FullTextSearch<Organisa
             "  || setweight(to_tsvector(description), 'D')\n" +
             "  @@ plainto_tsquery(?)\n" +
             "ORDER BY rank DESC\n" +
-            "LIMIT 20;\n";
+            "LIMIT ?;\n";
 
 
     @Override
-    public List<OrganisationalUnit> search(DSLContext dsl, String terms) {
-        Result<Record> records = dsl.fetch(QUERY, terms, terms);
+    public List<OrganisationalUnit> search(DSLContext dsl, String terms, EntitySearchOptions options) {
+        Result<Record> records = dsl.fetch(QUERY, terms, terms, options.limit());
         return records.map(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
     }
 

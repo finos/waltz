@@ -30,12 +30,14 @@ import com.khartec.waltz.model.actor.ImmutableActorChangeCommand;
 import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.command.ImmutableCommandResponse;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class ActorService {
@@ -95,6 +97,14 @@ public class ActorService {
 
 
     public List<EntityReference> search(String query) {
-        return actorSearchDao.search(query);
+        List<Actor> actors = search(query, EntitySearchOptions.mkForEntity(EntityKind.ACTOR));
+        return actors.stream()
+                .map(a -> a.entityReference())
+                .collect(toList());
+    }
+
+
+    public List<Actor> search(String query, EntitySearchOptions options) {
+        return actorSearchDao.search(query, options);
     }
 }

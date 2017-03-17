@@ -22,6 +22,7 @@ import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.measurable.MeasurableDao;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.measurable.Measurable;
 import org.jooq.DSLContext;
 
@@ -34,7 +35,7 @@ import static java.util.Collections.emptyList;
 public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, DatabaseVendorSpecific {
 
     @Override
-    public List<Measurable> search(DSLContext dsl, String query) {
+    public List<Measurable> search(DSLContext dsl, String query, EntitySearchOptions options) {
         List<String> terms = mkTerms(query);
 
         if (terms.isEmpty()) {
@@ -44,7 +45,7 @@ public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, Da
         return dsl
                 .selectFrom(MEASURABLE)
                 .where(JooqUtilities.MSSQL.mkContains(terms))
-                .limit(20)
+                .limit(options.limit())
                 .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
     }
 

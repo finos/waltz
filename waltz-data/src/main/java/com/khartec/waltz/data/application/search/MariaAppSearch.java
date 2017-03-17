@@ -23,6 +23,7 @@ import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
@@ -52,19 +53,20 @@ public class MariaAppSearch implements FullTextSearch<Application>, DatabaseVend
 
 
     @Override
-    public List<Application> search(DSLContext dsl, String terms) {
+    public List<Application> search(DSLContext dsl, String terms, EntitySearchOptions options) {
         List<String> tokens = map(mkTerms(terms), t -> t.toLowerCase());
 
         return dsl
                 .select(APPLICATION.fields())
                 .from(APPLICATION)
                 .where("MATCH(name, description, asset_code, parent_asset_code) AGAINST (?)", terms)
-                .unionAll(DSL.selectDistinct(APPLICATION.fields())
+                .union(DSL.selectDistinct(APPLICATION.fields())
                                 .from(APPLICATION)
                                 .innerJoin(ENTITY_ALIAS)
                                 .on(ENTITY_ALIAS.ID.eq(APPLICATION.ID)
                                         .and(ENTITY_ALIAS.KIND.eq(EntityKind.APPLICATION.name())))
                                 .where(DSL.lower(ENTITY_ALIAS.ALIAS).in(tokens)))
+                .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
     }
 

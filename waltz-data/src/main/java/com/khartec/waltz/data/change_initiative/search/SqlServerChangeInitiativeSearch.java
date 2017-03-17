@@ -23,6 +23,7 @@ import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.DSLContext;
 
 import java.util.Collections;
@@ -34,7 +35,7 @@ import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE
 public class SqlServerChangeInitiativeSearch implements FullTextSearch<ChangeInitiative>, DatabaseVendorSpecific {
 
     @Override
-    public List<ChangeInitiative> search(DSLContext dsl, String query) {
+    public List<ChangeInitiative> search(DSLContext dsl, String query, EntitySearchOptions options) {
         List<String> terms = mkTerms(query);
         if (terms.isEmpty()) {
             return Collections.emptyList();
@@ -43,7 +44,7 @@ public class SqlServerChangeInitiativeSearch implements FullTextSearch<ChangeIni
         return dsl.select(CHANGE_INITIATIVE.fields())
                 .from(CHANGE_INITIATIVE)
                 .where(JooqUtilities.MSSQL.mkContains(terms))
-                .limit(20)
+                .limit(options.limit())
                 .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
     }
 

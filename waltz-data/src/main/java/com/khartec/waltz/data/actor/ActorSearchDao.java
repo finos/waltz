@@ -21,6 +21,8 @@ package com.khartec.waltz.data.actor;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.actor.Actor;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -51,7 +53,7 @@ public class ActorSearchDao {
     }
 
 
-    public List<EntityReference> search(String query) {
+    public List<Actor> search(String query, EntitySearchOptions options) {
         if (length(query) < 3) {
             return emptyList();
         }
@@ -65,7 +67,7 @@ public class ActorSearchDao {
                             terms,
                             t -> s.indexOf(t) > -1);
                 })
-                .map(actor -> EntityReference.mkRef(EntityKind.ACTOR, actor.id().get(), actor.name(), actor.description()))
+                .limit(options.limit())
                 .collect(toList());
     }
 }

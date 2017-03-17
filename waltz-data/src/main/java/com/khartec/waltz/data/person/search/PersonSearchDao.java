@@ -21,6 +21,7 @@ package com.khartec.waltz.data.person.search;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.UnsupportedSearcher;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.person.Person;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -44,12 +45,12 @@ public class PersonSearchDao {
     }
 
 
-    public List<Person> search(String terms) {
+    public List<Person> search(String terms, EntitySearchOptions options) {
         if (StringUtilities.isEmpty(terms)) {
             return Collections.emptyList();
         }
 
-        return searcher.search(dsl, terms);
+        return searcher.search(dsl, terms, options);
     }
 
 

@@ -21,6 +21,7 @@ package com.khartec.waltz.data.measurable.search;
 import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.measurable.MeasurableDao;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.measurable.Measurable;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -43,12 +44,12 @@ public class PostgresMeasurableSearch implements FullTextSearch<Measurable>, Dat
             + "     || setweight(to_tsvector(coalesce(external_id, '')), 'A') "
             + "     @@ plainto_tsquery(?)"
             + " ORDER BY rank DESC"
-            + " LIMIT 20";
+            + " LIMIT ?";
 
 
     @Override
-    public List<Measurable> search(DSLContext dsl, String terms) {
-        Result<Record> records = dsl.fetch(SEARCH_POSTGRES, terms, terms);
+    public List<Measurable> search(DSLContext dsl, String terms, EntitySearchOptions options) {
+        Result<Record> records = dsl.fetch(SEARCH_POSTGRES, terms, terms, options.limit());
         return records.map(MeasurableDao.TO_DOMAIN_MAPPER);
     }
 

@@ -95,7 +95,7 @@ public class FlowGenerator {
                         .mapToObj(i -> {
                             EntityReference target = randomAppPick(apps, randomPick(orgUnits).id().get());
                             return ImmutableLogicalFlow.builder()
-                                    .source(a.toEntityReference())
+                                    .source(a.entityReference())
                                     .target(target)
                                     .lastUpdatedBy("admin")
                                     .build();
@@ -125,6 +125,6 @@ public class FlowGenerator {
         List<Application> appsForOU = apps.stream()
                 .filter(a -> a.organisationalUnitId() == orgUnitId)
                 .collect(toList());
-        return randomPick(appsForOU).toEntityReference();
+        return randomPick(appsForOU).entityReference();
     }
 }

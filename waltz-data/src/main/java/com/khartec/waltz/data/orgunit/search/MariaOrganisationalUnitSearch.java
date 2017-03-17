@@ -21,6 +21,7 @@ package com.khartec.waltz.data.orgunit.search;
 import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -39,12 +40,12 @@ public class MariaOrganisationalUnitSearch implements FullTextSearch<Organisatio
             + " WHERE\n"
             + "  MATCH(name, description)\n"
             + "  AGAINST (?)\n"
-            + " LIMIT 20";
+            + " LIMIT ?";
 
 
     @Override
-    public List<OrganisationalUnit> search(DSLContext dsl, String terms) {
-        Result<Record> records = dsl.fetch(QUERY, terms);
+    public List<OrganisationalUnit> search(DSLContext dsl, String terms, EntitySearchOptions options) {
+        Result<Record> records = dsl.fetch(QUERY, terms, options.limit());
         return records.map(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
     }
 

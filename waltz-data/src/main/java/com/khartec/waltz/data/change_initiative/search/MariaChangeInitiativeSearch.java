@@ -22,6 +22,7 @@ import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -36,11 +37,11 @@ public class MariaChangeInitiativeSearch implements FullTextSearch<ChangeInitiat
             + " WHERE\n"
             + "  MATCH(name, description, external_id)\n"
             + "  AGAINST (?)\n"
-            + " LIMIT 20";
+            + " LIMIT ?";
 
     @Override
-    public List<ChangeInitiative> search(DSLContext dsl, String terms) {
-        Result<Record> records = dsl.fetch(QUERY, terms);
+    public List<ChangeInitiative> search(DSLContext dsl, String terms, EntitySearchOptions options) {
+        Result<Record> records = dsl.fetch(QUERY, terms, options.limit());
         return records.map(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
     }
 

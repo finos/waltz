@@ -20,6 +20,8 @@ package com.khartec.waltz.service.person;
 
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.data.person.search.PersonSearchDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.person.ImmutablePerson;
 import com.khartec.waltz.model.person.Person;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +77,12 @@ public class PersonService {
 
 
     public List<Person> search(String query) {
-        return personSearchDao.search(query);
+        return search(query, EntitySearchOptions.mkForEntity(EntityKind.PERSON));
+    }
+
+
+    public List<Person> search(String query, EntitySearchOptions options) {
+        return personSearchDao.search(query, options);
     }
 
 

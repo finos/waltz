@@ -20,10 +20,7 @@ package com.khartec.waltz.model.orgunit;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.DescriptionProvider;
-import com.khartec.waltz.model.IdProvider;
-import com.khartec.waltz.model.NameProvider;
-import com.khartec.waltz.model.ParentIdProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -33,5 +30,16 @@ public abstract class OrganisationalUnit implements
         IdProvider,
         ParentIdProvider,
         NameProvider,
-        DescriptionProvider {
+        DescriptionProvider,
+        WaltzEntity {
+
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.ORG_UNIT)
+                .id(id().get())
+                .name(name())
+                .description(description())
+                .build();
+    }
 }

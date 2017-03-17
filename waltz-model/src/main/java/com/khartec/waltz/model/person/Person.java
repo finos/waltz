@@ -20,7 +20,7 @@ package com.khartec.waltz.model.person;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.IdProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 import java.util.Optional;
@@ -28,7 +28,7 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutablePerson.class)
 @JsonDeserialize(as = ImmutablePerson.class)
-public abstract class Person implements IdProvider {
+public abstract class Person implements IdProvider, WaltzEntity {
 
     public abstract String employeeId();
     public abstract String displayName();
@@ -45,5 +45,13 @@ public abstract class Person implements IdProvider {
     @Value.Default
     public String userId() { //TODO change as part of 247
         return email();
+    }
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.PERSON)
+                .id(id().get())
+                .name(displayName())
+                .build();
     }
 }

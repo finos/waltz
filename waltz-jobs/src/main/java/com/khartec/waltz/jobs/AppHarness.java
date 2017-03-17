@@ -19,8 +19,10 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.application.search.SqlServerAppSearch;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -44,7 +46,7 @@ public class AppHarness {
         // P & S Gorilla
 
         List<Application> jimmy = new SqlServerAppSearch()
-                .search(dsl, "Water & Vole");
+                .search(dsl, "Water & Vole", EntitySearchOptions.mkForEntity(EntityKind.APPLICATION));
 
         System.out.println(jimmy);
 //        ApplicationService applicationService = ctx.getBean(ApplicationService.class);

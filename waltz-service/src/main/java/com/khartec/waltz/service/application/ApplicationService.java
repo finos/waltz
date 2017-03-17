@@ -31,6 +31,7 @@ import com.khartec.waltz.model.application.AppRegistrationRequest;
 import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -96,7 +97,12 @@ public class ApplicationService {
 
 
     public List<Application> search(String query) {
-        return appSearchDao.search(query);
+        return search(query, EntitySearchOptions.mkForEntity(EntityKind.APPLICATION));
+    }
+
+
+    public List<Application> search(String query, EntitySearchOptions options) {
+        return appSearchDao.search(query, options);
     }
 
 

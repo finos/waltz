@@ -20,10 +20,7 @@ package com.khartec.waltz.model.actor;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.DescriptionProvider;
-import com.khartec.waltz.model.IdProvider;
-import com.khartec.waltz.model.LastUpdatedProvider;
-import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -33,7 +30,17 @@ public abstract class Actor implements
         IdProvider,
         NameProvider,
         DescriptionProvider,
-        LastUpdatedProvider {
+        LastUpdatedProvider,
+        WaltzEntity {
 
     public abstract boolean isExternal();
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.ACTOR)
+                .id(id().get())
+                .name(name())
+                .description(description())
+                .build();
+    }
 }
