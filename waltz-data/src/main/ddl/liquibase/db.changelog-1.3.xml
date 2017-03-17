@@ -335,8 +335,17 @@
         <comment>1815: update last_updated_by to empty</comment>
         <sql>
             UPDATE logical_flow_decorator set
-            last_updated_by = ''
+            last_updated_by = 'Unknown'
         </sql>
+    </changeSet>
+
+    <changeSet id="20170317-1815-3"
+               author="kamransaleem">
+        <comment>1815: update last_updated_by on logical_flow-decorator to be non-nullable</comment>
+
+        <addNotNullConstraint columnDataType="${name.type}"
+                              columnName="last_updated_by"
+                              tableName="logical_flow_decorator"/>
     </changeSet>
 
 
