@@ -43,6 +43,7 @@ import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.map;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityKind.APPLICATION;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
@@ -171,6 +172,8 @@ public class LogicalFlowDecoratorService {
                         .provenance("waltz")
                         .dataFlowId(flowId)
                         .decoratorEntity(ref)
+                        .lastUpdatedBy(username)
+                        .lastUpdatedAt(nowUtc())
                         .build());
 
         Collection decorators = requiresRating

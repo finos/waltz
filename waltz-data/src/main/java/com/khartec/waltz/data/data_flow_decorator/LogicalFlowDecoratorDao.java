@@ -33,6 +33,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -59,6 +60,8 @@ public class LogicalFlowDecoratorDao {
                         .build())
                 .rating(AuthoritativenessRating.valueOf(record.getRating()))
                 .provenance(record.getProvenance())
+                .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
+                .lastUpdatedBy(record.getLastUpdatedBy())
                 .build();
     };
 
@@ -69,6 +72,8 @@ public class LogicalFlowDecoratorDao {
         r.setLogicalFlowId(d.dataFlowId());
         r.setProvenance(d.provenance());
         r.setRating(d.rating().name());
+        r.setLastUpdatedAt(Timestamp.valueOf(d.lastUpdatedAt()));
+        r.setLastUpdatedBy(d.lastUpdatedBy());
         return r;
     };
 

@@ -313,4 +313,31 @@
         </createTable>
     </changeSet>
 
+
+    <!-- 1815 -->
+    <changeSet id="20170317-1815-1"
+               author="kamransaleem">
+        <comment>1815: Add last_updated to logical_flow_decorator</comment>
+        <addColumn tableName="logical_flow_decorator">
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20170317-1815-2"
+               author="kamransaleem">
+        <comment>1815: update last_updated_by to empty</comment>
+        <sql>
+            UPDATE logical_flow_decorator set
+            last_updated_by = ''
+        </sql>
+    </changeSet>
+
+
 </databaseChangeLog>
