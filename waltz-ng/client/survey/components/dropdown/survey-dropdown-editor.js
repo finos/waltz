@@ -49,10 +49,7 @@ function createEntriesString(entries = []) {
 function controller() {
     const vm = this;
 
-    vm.$onInit = () => {
-        initialiseData(vm, initialState);
-        vm.bulkEntriesString = createEntriesString(vm.entries);
-    };
+    vm.$onInit = () => { initialiseData(vm, initialState); };
 
     const notifyChanges = () => {
         invokeFunction(vm.onChange, vm.entries);
@@ -63,7 +60,7 @@ function controller() {
     };
 
     vm.saveNewEntry = (entry) => {
-        vm.entries.push(entry);
+        vm.entries = _.concat(vm.entries, [entry]);
         vm.newEntry = null;
         vm.creatingEntry = false;
         notifyChanges();
@@ -75,13 +72,23 @@ function controller() {
 
     vm.updateValue = (entryId, data) => {
         //entry id is likely to be undefined and cannot be relied upon (when we have new entries)
-        const entry = _.find(vm.entries, e => e.value === data.oldVal);
-        entry.value = data.newVal;
+        vm.entries = _.map(vm.entries, e => {
+            if(e.value === data.oldVal) {
+                return {
+                    id: e.id,
+                    value: data.newVal,
+                    position: e.position
+                }
+            } else {
+                return e;
+            }
+        });
+
         notifyChanges();
     };
 
     vm.removeEntry = (entry) => {
-        _.remove(vm.entries, e => e.value === entry.value);
+        vm.entries = _.reject(vm.entries, e => e.value === entry.value);
         notifyChanges();
     };
 
