@@ -22,6 +22,7 @@ import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.DSLContext;
 
@@ -34,7 +35,7 @@ import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_
 public class SqlServerOrganisationalUnitSearch implements FullTextSearch<OrganisationalUnit>, DatabaseVendorSpecific {
 
     @Override
-    public List<OrganisationalUnit> search(DSLContext dsl, String query) {
+    public List<OrganisationalUnit> search(DSLContext dsl, String query, EntitySearchOptions options) {
         List<String> terms = mkTerms(query);
         if (terms.isEmpty()) {
             return Collections.emptyList();
@@ -42,7 +43,7 @@ public class SqlServerOrganisationalUnitSearch implements FullTextSearch<Organis
         return dsl.select(ORGANISATIONAL_UNIT.fields())
                 .from(ORGANISATIONAL_UNIT)
                 .where(JooqUtilities.MSSQL.mkContains(terms))
-                .limit(20)
+                .limit(options.limit())
                 .fetch(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
     }
 }

@@ -24,6 +24,7 @@ import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 
@@ -40,7 +41,7 @@ import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 public class SqlServerAppSearch implements FullTextSearch<Application>, DatabaseVendorSpecific {
 
     @Override
-    public List<Application> search(DSLContext dsl, String query) {
+    public List<Application> search(DSLContext dsl, String query, EntitySearchOptions options) {
         List<String> terms = mkTerms(query);
 
         if (terms.isEmpty()) {
@@ -59,13 +60,13 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
                 .on(ENTITY_ALIAS.ID.eq(APPLICATION.ID))
                 .where(aliasCondition)
                 .orderBy(APPLICATION.NAME)
-                .limit(20)
+                .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
 
         List<Application> appsViaFullText = dsl.select(APPLICATION.fields())
                 .from(APPLICATION)
                 .where(JooqUtilities.MSSQL.mkContains(terms))
-                .limit(20)
+                .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
 
         return new ArrayList<>(union(appsViaAlias, appsViaFullText));

@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data;
 
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public class UnsupportedSearcher<T> implements FullTextSearch<T> {
 
 
     @Override
-    public List<T> search(DSLContext dsl, String terms) {
+    public List<T> search(DSLContext dsl, String terms, EntitySearchOptions options) {
         LOG.error("Search not supported/implemented for database dialect: " + dialect);
         return emptyList();
     }

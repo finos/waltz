@@ -26,11 +26,13 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.entiy_relationship.EntityRelationship;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public class ChangeInitiativeService {
@@ -66,7 +68,12 @@ public class ChangeInitiativeService {
 
 
     public Collection<ChangeInitiative> search(String query) {
-        return searchDao.search(query);
+        return search(query, EntitySearchOptions.mkForEntity(EntityKind.CHANGE_INITIATIVE));
+    }
+
+
+    public Collection<ChangeInitiative> search(String query, EntitySearchOptions options) {
+        return searchDao.search(query, options);
     }
 
 

@@ -34,8 +34,18 @@ public abstract class Measurable implements
         ParentIdProvider,
         ExternalIdProvider,
         LastUpdatedProvider,
-        ProvenanceProvider {
+        ProvenanceProvider,
+        WaltzEntity {
 
     public abstract long categoryId();
     public abstract boolean concrete();
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.MEASURABLE)
+                .id(id().get())
+                .name(name())
+                .description(description())
+                .build();
+    }
 }

@@ -37,7 +37,8 @@ public abstract class ChangeInitiative implements
         NameProvider,
         IdProvider,
         DescriptionProvider,
-        ProvenanceProvider {
+        ProvenanceProvider,
+        WaltzEntity {
 
     public abstract ChangeInitiativeKind kind();
     public abstract LifecyclePhase lifecyclePhase();
@@ -47,4 +48,12 @@ public abstract class ChangeInitiative implements
     public abstract Date startDate();
     public abstract Date endDate();
 
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.CHANGE_INITIATIVE)
+                .id(id().get())
+                .name(name())
+                .description(description())
+                .build();
+    }
 }

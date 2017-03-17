@@ -21,6 +21,7 @@ package com.khartec.waltz.data.person.search;
 import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.person.PersonDao;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.person.Person;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -36,12 +37,12 @@ public class MariaPersonSearch implements FullTextSearch<Person>, DatabaseVendor
             + " WHERE\n"
             + " MATCH(display_name, user_principal_name, title)\n"
             + " AGAINST (?)\n"
-            + " LIMIT 20";
+            + " LIMIT ?";
 
 
     @Override
-    public List<Person> search(DSLContext dsl, String terms) {
-        Result<Record> records = dsl.fetch(QUERY, terms);
+    public List<Person> search(DSLContext dsl, String terms, EntitySearchOptions options) {
+        Result<Record> records = dsl.fetch(QUERY, terms, options.limit());
         return records.map(PersonDao.personMapper);
     }
 

@@ -21,8 +21,10 @@ package com.khartec.waltz.service.measurable;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable.search.MeasurableSearchDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.measurable.Measurable;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -81,8 +83,14 @@ public class MeasurableService {
 
 
     public Collection<Measurable> search(String query) {
-        return measurableSearchDao.search(query);
+        return search(query, EntitySearchOptions.mkForEntity(EntityKind.MEASURABLE));
     }
+
+
+    public Collection<Measurable> search(String query, EntitySearchOptions options) {
+        return measurableSearchDao.search(query, options);
+    }
+
 
     public Collection<Measurable> findByExternalId(String extId) {
         return measurableDao.findByExternalId(extId);

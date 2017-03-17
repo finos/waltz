@@ -35,7 +35,8 @@ public abstract class Application implements
         IdProvider,
         NameProvider,
         DescriptionProvider,
-        ProvenanceProvider {
+        ProvenanceProvider,
+        WaltzEntity {
 
     public abstract Optional<String> assetCode();
     public abstract Optional<String> parentAssetCode();
@@ -54,12 +55,12 @@ public abstract class Application implements
     @Value.Default
     public Criticality businessCriticality() { return Criticality.UNKNOWN; }
 
-
-    public EntityReference toEntityReference() {
+    public EntityReference entityReference() {
         return ImmutableEntityReference.builder()
                 .kind(EntityKind.APPLICATION)
                 .id(id().get())
                 .name(name())
+                .description(description())
                 .build();
     }
 }

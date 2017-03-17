@@ -22,6 +22,7 @@ import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -45,12 +46,12 @@ public class PostgresAppSearch implements FullTextSearch<Application>, DatabaseV
             + "     || setweight(to_tsvector(coalesce(parent_asset_code, '')), 'A') "
             + "     @@ plainto_tsquery(?)"
             + " ORDER BY rank DESC"
-            + " LIMIT 20";
+            + " LIMIT ?";
 
 
     @Override
-    public List<Application> search(DSLContext dsl, String terms) {
-        Result<Record> records = dsl.fetch(SEARCH_POSTGRES, terms, terms);
+    public List<Application> search(DSLContext dsl, String terms, EntitySearchOptions options) {
+        Result<Record> records = dsl.fetch(SEARCH_POSTGRES, terms, terms, options.limit());
         return records.map(ApplicationDao.TO_DOMAIN_MAPPER);
     }
 

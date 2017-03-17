@@ -22,6 +22,7 @@ import com.khartec.waltz.data.DatabaseVendorSpecific;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.person.PersonDao;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.person.Person;
 import org.jooq.DSLContext;
 
@@ -34,7 +35,7 @@ import static com.khartec.waltz.schema.tables.Person.PERSON;
 public class SqlServerPersonSearch implements FullTextSearch<Person>, DatabaseVendorSpecific {
 
     @Override
-    public List<Person> search(DSLContext dsl, String query) {
+    public List<Person> search(DSLContext dsl, String query, EntitySearchOptions options) {
         List<String> terms = mkTerms(query);
         if (terms.isEmpty()) {
             return Collections.emptyList();
@@ -43,7 +44,7 @@ public class SqlServerPersonSearch implements FullTextSearch<Person>, DatabaseVe
         return dsl.select(PERSON.fields())
                 .from(PERSON)
                 .where(JooqUtilities.MSSQL.mkContains(terms))
-                .limit(20)
+                .limit(options.limit())
                 .fetch(PersonDao.personMapper);
     }
 }

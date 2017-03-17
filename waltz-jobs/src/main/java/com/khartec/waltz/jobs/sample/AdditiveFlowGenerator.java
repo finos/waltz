@@ -74,7 +74,7 @@ public class AdditiveFlowGenerator {
                     if(referenceApplication.organisationalUnitId().equals(orgUnitId)){
                         return Optional.of(ImmutableLogicalFlow.builder()
                                 .source(a.applicationReference())
-                                .target(referenceApplication.toEntityReference())
+                                .target(referenceApplication.entityReference())
                                 .build());
                     } else {
                         return Optional.<LogicalFlow>empty();
@@ -90,7 +90,7 @@ public class AdditiveFlowGenerator {
                 .mapToObj(i -> {
                     EntityReference target = randomAppPick(apps, randomPick(orgUnits).id().get());
                     return ImmutableLogicalFlow.builder()
-                            .source(referenceApplication.toEntityReference())
+                            .source(referenceApplication.entityReference())
                             .target(target)
                             .build();
                 })
@@ -103,7 +103,7 @@ public class AdditiveFlowGenerator {
                     EntityReference source = randomAppPick(apps, randomPick(orgUnits).id().get());
                     return ImmutableLogicalFlow.builder()
                             .source(source)
-                            .target(referenceApplication.toEntityReference())
+                            .target(referenceApplication.entityReference())
                             .build();
                 })
                 .collect(toSet());
@@ -134,6 +134,6 @@ public class AdditiveFlowGenerator {
         List<Application> appsForOU = apps.stream()
                 .filter(a -> a.organisationalUnitId() == orgUnitId)
                 .collect(toList());
-        return randomPick(appsForOU).toEntityReference();
+        return randomPick(appsForOU).entityReference();
     }
 }
