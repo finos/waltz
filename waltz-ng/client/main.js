@@ -41,19 +41,7 @@ function hrefSanitizer($compileProvider) {
 }
 hrefSanitizer.$inject = ['$compileProvider'];
 
-
-function configureNotification(notificationProvider) {
-    notificationProvider.setOptions({
-        positionX: 'right',
-        positionY: 'bottom'
-    });
-}
-configureNotification.$inject = ['NotificationProvider'];
-
-
-waltzApp
-    .config(hrefSanitizer)
-    .config(configureNotification);
+waltzApp.config(hrefSanitizer);
 
 
 waltzApp.run([

@@ -61,11 +61,24 @@ showdownSetup.$inject  = [
 ];
 
 
+function configureNotification(notificationProvider) {
+    notificationProvider.setOptions({
+        positionX: 'right',
+        positionY: 'bottom'
+    });
+}
+
+configureNotification.$inject = [
+    'NotificationProvider'
+];
+
+
 function setup(module) {
     module
         .config(uiSelectSetup)
         .config(authProviderSetup)
-        .config(showdownSetup);
+        .config(showdownSetup)
+        .config(configureNotification);
 
     // for formly setup see: `formly/index.js`
 }
