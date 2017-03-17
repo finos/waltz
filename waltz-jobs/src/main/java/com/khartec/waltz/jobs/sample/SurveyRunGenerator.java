@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -140,6 +141,7 @@ public class SurveyRunGenerator {
                             record.setNumberResponse(questionResponse.numberResponse().map(BigDecimal::valueOf).orElse(null));
                             record.setStringResponse(questionResponse.stringResponse().orElse(null));
                             record.setComment(r.questionResponse().comment().orElse(null));
+                            record.setLastUpdatedAt(Timestamp.valueOf(nowUtc()));
 
                             return record;
                         })

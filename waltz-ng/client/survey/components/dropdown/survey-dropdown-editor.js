@@ -29,6 +29,8 @@ const bindings = {
 const initialState = {
     creatingEntry: false,
     entries: [],
+    bulkEntriesString: null,
+    editor: 'TABULAR',
     newEntry: null,
     onSave: () => console.log("default onSave ")
 };
@@ -37,10 +39,17 @@ const initialState = {
 const template = require('./survey-dropdown-editor.html');
 
 
+function createEntriesString(entries = []) {
+    return _.chain(entries)
+        .map('value')
+        .join("\n");
+}
+
+
 function controller() {
     const vm = this;
 
-    vm.$onInit = () => initialiseData(vm, initialState);
+    vm.$onInit = () => { initialiseData(vm, initialState); };
 
     const notifyChanges = () => {
         invokeFunction(vm.onChange, vm.entries);
@@ -51,7 +60,7 @@ function controller() {
     };
 
     vm.saveNewEntry = (entry) => {
-        vm.entries.push(entry);
+        vm.entries = _.concat(vm.entries, [entry]);
         vm.newEntry = null;
         vm.creatingEntry = false;
         notifyChanges();
@@ -62,13 +71,48 @@ function controller() {
     };
 
     vm.updateValue = (entryId, data) => {
-        const entry = _.find(vm.entries, e => e.id === entryId);
-        entry.value = data.newVal;
+        //entry id is likely to be undefined and cannot be relied upon (when we have new entries)
+        vm.entries = _.map(vm.entries, e => {
+            if(e.value === data.oldVal) {
+                return {
+                    id: e.id,
+                    value: data.newVal,
+                    position: e.position
+                }
+            } else {
+                return e;
+            }
+        });
+
         notifyChanges();
     };
 
     vm.removeEntry = (entry) => {
-        _.remove(vm.entries, e => e.id === entry.id);
+        vm.entries = _.reject(vm.entries, e => e.value === entry.value);
+        notifyChanges();
+    };
+
+    vm.showTabularEditor = () => {
+        vm.editor = 'TABULAR'
+    };
+
+    vm.showBulkEditor = () => {
+        vm.bulkEntriesString = createEntriesString(vm.entries);
+        vm.editor = 'BULK';
+    };
+
+    vm.bulkEntriesChanged = () => {
+        const newEntries = _.chain(vm.bulkEntriesString)
+            .trim()
+            .split("\n")
+            .uniq()
+            .map(s => ({
+                id: null,
+                value: s,
+                position: null
+            }))
+            .value();
+        vm.entries = newEntries;
         notifyChanges();
     };
 }
