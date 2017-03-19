@@ -15,45 +15,35 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import _ from 'lodash';
-import {initialiseData} from '../../common';
 
 
-/**
- * @name waltz-abridged
- *
- * @description
- * This component ...
- */
-
-
-const bindings = {};
-
-
-const initialState = {};
-
-
-const template = require('./abridged.html');
-
-
-function controller() {
-    const vm = initialiseData(this, initialState);
-    console.log('abridged - init');
+export function toGraphId(datum) {
+    return `${datum.kind}/${datum.id}`;
 }
 
 
-controller.$inject = [];
+export function toGraphNode(node) {
+    return {
+        id: toGraphId(node),
+        data: node
+    };
+}
 
 
-const component = {
-    template,
-    bindings,
-    controller,
-    transclude: true
-};
+export function toGraphFlow(flow) {
+    return {
+        id: toGraphId(flow),
+        source: toGraphId(flow.source),
+        target: toGraphId(flow.target),
+        data: flow
+    };
+}
 
 
-export default component;
-
-
+export function mkModel(nodes = [], flows = []) {
+    return {
+        nodes: _.map(nodes, toGraphNode),
+        flows: _.map(flows, toGraphFlow)
+    };
+}

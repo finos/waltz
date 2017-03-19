@@ -1,0 +1,39 @@
+@import "d3-context-menu";
+
+.waltz-flow-diagram {
+    path {
+        shape-rendering: auto;
+    }
+
+    .wfd-active {
+        opacity: 0.9 !important;
+        rect {
+            stroke-width: 1.5;
+        }
+    }
+
+    .wfd-flow {
+        path {
+            stroke: #8d8899;
+            fill: #c7c0d5;
+        }
+    }
+
+    .wfd-node {
+        opacity: 1;
+        transition: opacity 300ms;
+        rect {
+            fill: #eee;
+            stroke: #aaa;
+            transition: stroke-width 300ms;
+        }
+        &,.wfd-title {
+            font-size: xx-small;
+            fill: $waltz-font-color;
+        }
+        &:hover {
+            cursor: move;
+        }
+    }
+}
+

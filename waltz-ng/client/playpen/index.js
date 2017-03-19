@@ -27,9 +27,13 @@ import playpenView4 from "./4/playpen4";
 export default () => {
 
     const module = angular.module('waltz.playpen', []);
+
+    module
+        .service('FlowDiagramState', require('./3/flow-diagram-state'));
+
     module
         .component('waltzSvgManipulator', require('./4/svg-manipulator'))
-        .component('waltzAbridged', require('./3/abridged'));
+        .component('waltzFlowDiagram', require('./3/flow-diagram'));
 
     module.config([
         '$stateProvider',
@@ -50,7 +54,7 @@ export default () => {
                     views: { 'content@': playpenView2 }
                 })
                 .state('main.playpen.3', {
-                    url: '/3/{id:int}',
+                    url: '/3',
                     views: { 'content@': playpenView3 }
                 })
                 .state('main.playpen.4', {

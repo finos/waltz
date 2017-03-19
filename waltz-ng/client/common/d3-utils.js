@@ -73,13 +73,23 @@ export function lineWithArrowPath(selection) {
 }
 
 
-export function mkLineWithArrowPath(x1, y1, x2, y2) {
+/**
+ *
+ * @param x1
+ * @param y1
+ * @param x2
+ * @param y2
+ * @param arrowLoc  (0.1 = nr target, 1 = center, 1.9 = nr source)
+ * @returns {string}
+ */
+export function mkLineWithArrowPath(x1, y1, x2, y2, arrowLoc = 0.2) {
     const dx = x2 - x1;
     const dy = y2 - y1;
-    const theta = Math.atan2(dy, dx); //+ Math.PI / 7.85,  // (rotate marker)
+    const theta = Math.atan2(dy, dx); // (rotate marker)
     const d90 = Math.PI / 2;
-    const dtxs = x2 - 16 * Math.cos(theta);  // val is how far 'back'
-    const dtys = y2 - 16 * Math.sin(theta);
+    const l = Math.sqrt(dx*dx + dy*dy) * arrowLoc - 7;
+    const dtxs = x2 - l/2 * Math.cos(theta);  // val is how far 'back'
+    const dtys = y2 - l/2 * Math.sin(theta);
     return `M${x1},${y1} 
             l${dx} ${dy}
             M${dtxs},${dtys}
