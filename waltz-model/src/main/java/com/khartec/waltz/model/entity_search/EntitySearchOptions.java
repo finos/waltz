@@ -16,6 +16,12 @@ public abstract class EntitySearchOptions {
     }
 
 
+    @Value.Default
+    public String userId() {
+        return "UNKNOWN";
+    }
+
+
     public static EntitySearchOptions mkForEntity(EntityKind entityKind) {
         return ImmutableEntitySearchOptions.builder()
                 .entityKinds(ListUtilities.newArrayList(entityKind))

@@ -9,6 +9,7 @@ import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.entity_search.EntitySearchService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,38 +23,30 @@ public class EntitySearchHarness {
                 .entityKinds(ListUtilities.newArrayList(
                         EntityKind.ACTOR,
                         EntityKind.APPLICATION,
+                        EntityKind.APP_GROUP,
                         EntityKind.CHANGE_INITIATIVE,
                         EntityKind.ORG_UNIT,
                         EntityKind.MEASURABLE,
                         EntityKind.PERSON))
+                .userId("admin")
                 .build();
 
-        System.out.println("-------------------");
-        System.out.println("Searching for 'cat'");
-        System.out.println("-------------------");
-        printResults(searchService.search("cat", searchOptions));
+        String[] searchTerms = {
+                "cat",
+                "admin",
+                "test",
+                "enhance",
+                "ceo",
+                "equities"
+        };
 
-        System.out.println("-------------------");
-        System.out.println("Searching for 'admin'");
-        System.out.println("-------------------");
-        printResults(searchService.search("admin", searchOptions));
-
-        System.out.println("-------------------");
-        System.out.println("Searching for 'enhance'");
-        System.out.println("-------------------");
-        printResults(searchService.search("enhance", searchOptions));
-
-        System.out.println("-------------------");
-        System.out.println("Searching for 'ceo'");
-        System.out.println("-------------------");
-        printResults(searchService.search("ceo", searchOptions));
-
-
-        System.out.println("-------------------");
-        System.out.println("Searching for 'equities'");
-        System.out.println("-------------------");
-        printResults(searchService.search("equities", searchOptions));
-
+        Arrays.stream(searchTerms)
+                .forEach(term -> {
+                    System.out.println("-------------------");
+                    System.out.printf("Searching for '%s'\n", term);
+                    System.out.println("-------------------");
+                    printResults(searchService.search(term, searchOptions));
+                });
     }
 
 

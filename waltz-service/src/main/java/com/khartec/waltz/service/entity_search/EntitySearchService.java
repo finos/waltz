@@ -6,6 +6,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.WaltzEntity;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.service.actor.ActorService;
+import com.khartec.waltz.service.app_group.AppGroupService;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
 import com.khartec.waltz.service.measurable.MeasurableService;
@@ -29,6 +30,7 @@ public class EntitySearchService {
     private final DBExecutorPoolInterface dbExecutorPool;
     private final ActorService actorService;
     private final ApplicationService applicationService;
+    private final AppGroupService appGroupService;
     private final ChangeInitiativeService changeInitiativeService;
     private final MeasurableService measurableService;
     private final OrganisationalUnitService organisationalUnitService;
@@ -39,6 +41,7 @@ public class EntitySearchService {
     public EntitySearchService(DBExecutorPoolInterface dbExecutorPool,
                                ActorService actorService,
                                ApplicationService applicationService,
+                               AppGroupService appGroupService,
                                ChangeInitiativeService changeInitiativeService,
                                MeasurableService measurableService,
                                OrganisationalUnitService organisationalUnitService,
@@ -46,6 +49,7 @@ public class EntitySearchService {
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(actorService, "actorService cannot be null");
         checkNotNull(applicationService, "applicationService cannot be null");
+        checkNotNull(appGroupService, "appGroupService cannot be null");
         checkNotNull(changeInitiativeService, "changeInitiativeService cannot be null");
         checkNotNull(measurableService, "measurableService cannot be null");
         checkNotNull(organisationalUnitService, "organisationalUnitService cannot be null");
@@ -54,6 +58,7 @@ public class EntitySearchService {
         this.actorService = actorService;
         this.dbExecutorPool = dbExecutorPool;
         this.applicationService = applicationService;
+        this.appGroupService = appGroupService;
         this.changeInitiativeService = changeInitiativeService;
         this.measurableService = measurableService;
         this.organisationalUnitService = organisationalUnitService;
@@ -84,6 +89,8 @@ public class EntitySearchService {
                 return () -> actorService.search(terms, options);
             case APPLICATION:
                 return () -> applicationService.search(terms, options);
+            case APP_GROUP:
+                return () -> appGroupService.search(terms, options);
             case CHANGE_INITIATIVE:
                 return () -> changeInitiativeService.search(terms, options);
             case MEASURABLE:
