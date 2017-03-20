@@ -15,42 +15,26 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { variableScale } from '../../common/colors';
 
 
-const initData = {
-    candidateSpecifications: [],
-    visible: true,
-    current: null,
-    currentSelection: {
-        description: "Tiger Actor",
-        id: 21,
-        kind: "ACTOR",
-        name: "Tiger"
-    }
-};
+function service($http, BaseApiUrl) {
+    const BASE = `${BaseApiUrl}/entity-search`;
 
 
-function controller() {
-    const vm = Object.assign(this, initData);
+    const search = (query, options) => $http
+        .post(`${BASE}/${query}`, options)
+        .then(result => result.data);
 
-    vm.select = (ss) => {
-        console.log(ss);
-    }
+    return {
+        search
+    };
 }
 
 
-controller.$inject = [
+service.$inject = [
+    '$http',
+    'BaseApiUrl',
 ];
 
 
-const view = {
-    template: require('./playpen1.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;
+export default service;

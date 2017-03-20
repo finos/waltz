@@ -54,11 +54,14 @@ public class ActorSearchDao {
 
 
     public List<Actor> search(String query, EntitySearchOptions options) {
+        checkNotNull(query, "query cannot be null");
+        checkNotNull(options, "options cannot be null");
+
         if (length(query) < 3) {
             return emptyList();
         }
 
-        List<String> terms = StringUtilities.mkTerms(query);
+        List<String> terms = StringUtilities.mkTerms(query.toLowerCase());
         return actorDao.findAll()
                 .stream()
                 .filter(actor -> {
