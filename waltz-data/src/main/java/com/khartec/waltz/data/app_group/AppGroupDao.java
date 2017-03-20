@@ -22,6 +22,7 @@ import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupKind;
 import com.khartec.waltz.model.app_group.AppGroupMemberRole;
 import com.khartec.waltz.model.app_group.ImmutableAppGroup;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.schema.tables.records.ApplicationGroupRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static com.khartec.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
@@ -105,6 +107,36 @@ public class AppGroupDao {
                 .where(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name()))
                 .fetch(TO_DOMAIN);
     }
+
+
+    public List<AppGroup> search(String terms, EntitySearchOptions options) {
+        checkNotNull(terms, "terms cannot be null");
+        checkNotNull(options, "options cannot be null");
+
+        Condition searchCondition = APPLICATION_GROUP.NAME.like("%" + terms + "%");
+
+        Select<Record> publicGroups = dsl.select(APPLICATION_GROUP.fields())
+                .from(APPLICATION_GROUP)
+                .where(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
+                        .and(searchCondition));
+
+
+        Select<Record1<Long>> userGroupIds = DSL.select(APPLICATION_GROUP_MEMBER.GROUP_ID)
+                .from(APPLICATION_GROUP_MEMBER)
+                .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(options.userId())
+                        .and(APPLICATION_GROUP_MEMBER.ROLE.eq(AppGroupMemberRole.OWNER.name())));
+
+        Select<Record> privateGroups = dsl.select(APPLICATION_GROUP.fields())
+                .from(APPLICATION_GROUP)
+                .where(APPLICATION_GROUP.ID.in(userGroupIds)
+                        .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name()))
+                        .and(searchCondition));
+
+        return publicGroups
+                .unionAll(privateGroups)
+                .fetch(TO_DOMAIN);
+    }
+
 
     public int update(AppGroup appGroup) {
         return dsl.update(APPLICATION_GROUP)

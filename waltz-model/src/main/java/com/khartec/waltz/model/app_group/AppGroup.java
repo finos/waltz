@@ -20,17 +20,24 @@ package com.khartec.waltz.model.app_group;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.DescriptionProvider;
-import com.khartec.waltz.model.IdProvider;
-import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableAppGroup.class)
 @JsonDeserialize(as = ImmutableAppGroup.class)
-public abstract class AppGroup implements IdProvider, NameProvider, DescriptionProvider {
+public abstract class AppGroup implements IdProvider, NameProvider, DescriptionProvider, WaltzEntity {
 
     public abstract AppGroupKind kind();
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.APP_GROUP)
+                .id(id().get())
+                .name(name())
+                .description(description())
+                .build();
+    }
 
 }

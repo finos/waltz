@@ -34,6 +34,7 @@ import com.khartec.waltz.model.app_group.*;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.entiy_relationship.EntityRelationship;
 import com.khartec.waltz.model.entiy_relationship.ImmutableEntityRelationship;
 import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
@@ -123,6 +124,14 @@ public class AppGroupService {
 
     public List<AppGroup> findPrivateGroupsByOwner(String ownerId) {
         return appGroupDao.findPrivateGroupsByOwner(ownerId);
+    }
+
+
+    public List<AppGroup> search(String terms, EntitySearchOptions options) {
+        checkNotNull(terms, "terms cannot be null");
+        checkNotNull(options, "options cannot be null");
+
+        return appGroupDao.search(terms, options);
     }
 
 
