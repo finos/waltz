@@ -11,14 +11,17 @@
 
     <waltz-section name="foo">
 
+        <waltz-app-selector model="ctrl.newSource"
+                            on-select="ctrl.select">
+        </waltz-app-selector>
 
-        <waltz-pie-table x-data="ctrl.data"
-                         config="ctrl.config"
-                         title="Dummy"
-                         subTitle="Pie"
-                         icon="rocket"
-                         selectedSegmentKey="">
-        </waltz-pie-table>
+        <br>
+
+        <waltz-entity-selector current-selection="ctrl.currentSelection"
+                               on-select="ctrl.select"
+                               entity-kinds="['APPLICATION', 'ACTOR']">
+
+        </waltz-entity-selector>
 
 
     </waltz-section>

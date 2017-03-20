@@ -1,5 +1,7 @@
 package com.khartec.waltz.model.entity_search;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
 import org.immutables.value.Value;
@@ -7,6 +9,8 @@ import org.immutables.value.Value;
 import java.util.List;
 
 @Value.Immutable
+@JsonSerialize(as = ImmutableEntitySearchOptions.class)
+@JsonDeserialize(as = ImmutableEntitySearchOptions.class)
 public abstract class EntitySearchOptions {
     public abstract List<EntityKind> entityKinds();
 

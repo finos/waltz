@@ -1,0 +1,28 @@
+<div>
+    <ui-select ng-model="$ctrl.currentSelection"
+               on-select="$ctrl.select($item)"
+               theme="bootstrap">
+
+        <ui-select-match placeholder="Search...">
+            <waltz-icon fixed-width="true"
+                        name="{{ $select.selected.kind | toIconName:'entity' }}">
+            </waltz-icon>
+            <span ng-bind-html="$select.selected.name"></span>
+        </ui-select-match>
+
+        <ui-select-choices repeat="entity in $ctrl.entities | orderBy:'kind' track by $ctrl.mkTracker(entity) "
+                           refresh="$ctrl.refresh($select.search)"
+                           refresh-delay="300">
+
+            <waltz-icon fixed-width="true"
+                        name="{{ entity.kind | toIconName:'entity' }}">
+            </waltz-icon>
+
+            <span ng-bind-html="entity.name | highlight: $select.search"></span>
+
+            <small style="display: block"
+                   ng-bind-html="entity.description | highlight: $select.search"></small>
+
+        </ui-select-choices>
+    </ui-select>
+</div>

@@ -23,7 +23,11 @@ export default () => {
     const module = angular.module('waltz.entity', []);
 
     module
+        .service('EntitySearchStore', require('./services/entity-search-store'));
+
+    module
         .component('waltzEntityHierarchyNavigator', require('./components/entity-hierarchy-navigator/entity-hierarchy-navigator'))
+        .component('waltzEntitySelector', require('./components/entity-selector/entity-selector'))
         .component('waltzImmediateHierarchyNavigator', require('./components/immediate-hierarchy-navigator/immediate-hierarchy-navigator'));
 
     return module.name;
