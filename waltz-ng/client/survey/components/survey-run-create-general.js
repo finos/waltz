@@ -25,14 +25,60 @@ const bindings = {
 };
 
 
-const initialState = {};
+const exactScope = {
+    value: 'EXACT',
+    name: 'Exact'
+};
+
+
+const childrenScope = {
+    value: 'CHILDREN',
+    name: 'Children'
+};
+
+
+const initialState = {
+    allowedEntityKinds: [], // TODO initialise here after #1798
+    allowedScopes: {
+        'APP_GROUP': [exactScope],
+        'ORG_UNIT': [exactScope, childrenScope],
+        'MEASURABLE': [exactScope, childrenScope]
+    }
+};
 
 
 const template = require('./survey-run-create-general.html');
 
 
+// TODO remove after #1798
+function filterAllowedEntityKinds(entityKind) {
+    const appGroup = {
+        value: 'APP_GROUP',
+        name: 'Application Group'
+    };
+
+    if (entityKind === 'CHANGE_INITIATIVE') {
+        return [appGroup];
+    }
+    return [appGroup, {
+        value: 'ORG_UNIT',
+        name: 'Org Unit'
+    },{
+        value: 'MEASURABLE',
+        name: 'Measurable'
+    }];
+}
+
+
 function controller(appGroupStore, involvementKindStore) {
     const vm = initialiseData(this, initialState);
+
+    vm.$onChanges = () => {
+        if (vm.surveyTemplate) {
+            // TODO remove after #1798
+            vm.allowedEntityKinds = filterAllowedEntityKinds(vm.surveyTemplate.targetEntityKind);
+        }
+    };
 
     Promise
         .all([appGroupStore.findPublicGroups(), appGroupStore.findPrivateGroups()])
@@ -47,9 +93,17 @@ function controller(appGroupStore, involvementKindStore) {
         }
     );
 
+    vm.onSelectorEntityKindChange = () => {
+        vm.surveyRun.selectorEntity = null;
+    };
+
+    vm.onSelectorEntitySelect = (entity) => {
+        vm.surveyRun.selectorEntity = entity;
+    };
+
     vm.onSubmit = () => {
         vm.onSave(this.surveyRun);
-    }
+    };
 }
 
 
