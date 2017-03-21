@@ -40,11 +40,15 @@ const initialState = {
 function controller(entitySearchStore) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
+    vm.$onChanges = (changes) => {
         vm.options = {
             entityKinds: vm.entityKinds,
             limit: vm.limit
         };
+
+        if (changes.entityKinds) {
+            vm.entities = [];
+        }
 
         if (vm.currentSelection) {
             vm.refresh(vm.currentSelection.name, vm.options);
