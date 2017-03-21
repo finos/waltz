@@ -29,9 +29,6 @@ export default () => {
     const module = angular.module('waltz.playpen', []);
 
     module
-        .service('FlowDiagramState', require('./3/flow-diagram-state'));
-
-    module
         .component('waltzSvgManipulator', require('./4/svg-manipulator'))
         .component('waltzFlowDiagram', require('./3/flow-diagram'));
 

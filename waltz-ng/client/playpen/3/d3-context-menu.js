@@ -60,16 +60,34 @@ export function d3ContextMenu(menu, opts) {
 
         selectAll('.d3-context-menu')
             .html('');
-        const list = selectAll('.d3-context-menu')
+        var list = selectAll('.d3-context-menu')
+            .on('contextmenu', function(d) {
+                select('.d3-context-menu').style('display', 'none');
+                event.preventDefault();
+                event.stopPropagation();
+            })
             .append('ul');
+
         list.selectAll('li')
             .data(typeof menu === 'function' ? menu(data) : menu)
             .enter()
             .append('li')
-            .html((d) => (typeof d.title === 'string')
-                    ? d.title
-                    : d.title(data))
+            .classed('is-divider', d => d.divider)
+            .classed('is-disabled', d => d.disabled)
+            .classed('is-header', d => !d.action)
+            .classed('is-action', d => d.action != null)
+            .html((d) => {
+                if (d.divider) {
+                    return '<hr>';
+                }
+                if (!d.title) {
+                    console.error('No title attribute set. Check the spelling of your options.');
+                }
+                return (typeof d.title === 'string') ? d.title : d.title(data);
+            })
             .on('click', (d, i) => {
+                if (d.disabled) return; // do nothing if disabled
+                if (!d.action) return; // headers have no "action"
                 const result = d.action(elem, data, index);
                 select('.d3-context-menu')
                     .style('display', 'none');

@@ -17,59 +17,117 @@
  */
 
 import _ from 'lodash';
+import {toGraphId} from './flow-diagram-utils';
 
 
 const initialState = {
-    costs: []
+    layout: {},
+    nodes: [],
+    flows: [],
+    visibility: {
+        popup: false
+    },
+    popup: {
+        title: '',
+        description: '',
+    }
 };
 
+function convertFlowsToOptions(flows = [], node, isUpstream) {
+    const counterpart = isUpstream
+        ? 'source'
+        : 'target';
 
-function controller($stateParams, $timeout) {
+    const self = isUpstream
+        ? 'target'
+        : 'source';
+
+    return _
+        .chain(flows)
+        .filter(f => f[self].id === node.data.id)
+        .map(f => Object.assign({}, f, { kind: 'LOGICAL_FLOW' }))
+        .map(f => {
+            return {
+                entity: f[counterpart],
+                commands: [
+                    { command: 'ADD_NODE', payload: f[counterpart] },
+                    { command: 'ADD_FLOW', payload: f }
+                ]
+            };
+        })
+        .value();
+}
+
+
+function mkPopupParams(node, isUpstream, options) {
+    const direction = isUpstream
+        ? 'upstream'
+        : 'downstream';
+    const popup = {
+        title: `Add ${direction} node to ${node.data.name}`,
+        description: `Select an ${direction} node from the list below: `,
+        options
+    };
+    return popup;
+}
+
+
+function prepareAddFlowPopup(node, isUpstream = true, logicalFlowStore) {
+    if (!node || !logicalFlowStore) return;
+
+    return logicalFlowStore
+        .findByEntityReference(node.data)
+        .then(flows => convertFlowsToOptions(flows, node, isUpstream))
+        .then(options => mkPopupParams(node, isUpstream, options ));
+}
+
+
+function controller($q, $state, $timeout, logicalFlowStore) {
     const vm = Object.assign(this, initialState);
 
-    vm.nodes = [
-        { kind: 'APPLICATION', id: 12, name: "ian" },
-        { kind: 'APPLICATION', id: 13, name: "ivy" }
-    ];
+    let sendCommands = null;
 
-    vm.flows = [
-        {
-            kind: 'LOGICAL_FLOW',
-            id: 40,
-            source: { kind: 'APPLICATION', id: 12 },
-            target: { kind: 'APPLICATION', id: 13 }
-        }
-    ];
-
-    vm.layout = {
-        'APPLICATION/12': { x: 140, y: 10 },
-        'APPLICATION/13': { x: 440, y: 50 }
-    };
 
     vm.contextMenus = {
         node: (d) => {
             return [
                 {
-                    title: (d) => `Add Downsteam target to ${d.data.name}`,
-                    action: function(elm, d, i) {
-                        const dt = new Date();
-                        const node = { kind: 'APPLICATION', id: ""+dt, name: "Settlements Service" };
-                        const flow = { kind: 'LOGICAL_FLOW', id: "f/"+dt, source: d.data, target : node}
+                    title: (d) => `Add Upstream source to ${d.data.name}`,
+                    action: (elm, d, i) => {
+                        $timeout(() => {
+                            prepareAddFlowPopup(d, true, logicalFlowStore)
+                                .then(popup => {
+                                    vm.popup = popup;
+                                    vm.visibility.popup = true;
+                                });
+                        });
+                    }
+                }, {
+                    title: (d) => `Add Downstream target from ${d.data.name}`,
+                    action: (elm, d, i) => {
+                        $timeout(() => {
+                            prepareAddFlowPopup(d, false, logicalFlowStore)
+                                .then(popup => {
+                                    vm.popup = popup;
+                                    vm.visibility.popup = true;
+                                });
+                        });
+                    }
+                }, {
+                    divider: true
+                }, {
+                    title: (d) => `Remove ${d.data.name}`,
+                    action: (elm, d, i) => {
                         return [
-                            { command: 'ADD_NODE', payload: node },
-                            { command: 'ADD_FLOW', payload: flow }
+                            { command: 'REMOVE_NODE', payload: d }
                         ];
                     }
                 }, {
-                    title: (d) => `Add Upstream source from ${d.data.name}`,
-                    action: function(elm, d, i) {
-                        const dt = new Date();
-                        const node = { kind: 'APPLICATION', id: ""+dt, name: "Payments Service" };
-                        const flow = { kind: 'LOGICAL_FLOW', id: "f/"+dt, target: d.data, source : node}
-                        return [
-                            { command: 'ADD_NODE', payload: node },
-                            { command: 'ADD_FLOW', payload: flow }
-                        ];
+                    divider: true
+                }, {
+                    title: (d) => `Go to ${d.data.name}`,
+                    action: (elm, d, i) => {
+                        $state.go('main.app.view', {id: d.data.id })
                     }
                 }
             ]
@@ -78,30 +136,89 @@ function controller($stateParams, $timeout) {
             return [
                 {
                     title: (d) => `Add Application`,
-                    action: function(elm, d, i) {
-                        const dt = new Date();
-                        const node = { kind: 'APPLICATION', id: ""+dt, name: "Pricing Engine" };
-                        return [
-                            { command: 'ADD_NODE', payload: node },
-                        ];
+                    action: function (elm, d, i) {
+                        $timeout(() => vm.visibility.popup = true);
                     }
                 }
             ]
         }
-    }
+    };
+
+
+    vm.issueCommands = (commands) => {
+        sendCommands(commands);
+        vm.visibility.popup = false;
+    };
+
 
     vm.addNode = () => {
         const dt = new Date();
-        const node = { kind: 'APPLICATION', id: ""+dt, name: "Please work" };
-        const commands = [ { command: 'ADD_NODE', payload: node }];
+        const node1 = { kind: 'APPLICATION', id: "a" + dt, name: "Node A" };
+        const node2 = { kind: 'APPLICATION', id: "b" + dt, name: "Node B" };
+        const node3 = { kind: 'ACTOR', id: "c" + dt, name: "Actor C" };
+        const node4 = { kind: 'APPLICATION', id: "d" + dt, name: "Node D" };
+        const node5 = { kind: 'APPLICATION', id: "e" + dt, name: "Node E" };
+        const node6 = { kind: 'ACTOR', id: "f" + dt, name: "Actor F" };
+        const flow12 = { kind: 'LOGICAL_FLOW', id: "f1" + dt, source: node1, target: node2 };
+        const flow13 = { kind: 'LOGICAL_FLOW', id: "f2" + dt, source: node1, target: node3 };
+        const flow34 = { kind: 'LOGICAL_FLOW', id: "f3" + dt, source: node3, target: node4 };
+        const flow46 = { kind: 'LOGICAL_FLOW', id: "f4" + dt, source: node4, target: node6 };
+        const flow56 = { kind: 'LOGICAL_FLOW', id: "f5" + dt, source: node5, target: node6 };
+        const commands = [
+            { command: 'ADD_NODE', payload: node1 },
+            { command: 'ADD_NODE', payload: node2 },
+            { command: 'ADD_NODE', payload: node3 },
+            { command: 'ADD_NODE', payload: node4 },
+            { command: 'ADD_NODE', payload: node5 },
+            { command: 'ADD_NODE', payload: node6 },
+            { command: 'ADD_FLOW', payload: flow12 },
+            { command: 'ADD_FLOW', payload: flow13 },
+            { command: 'ADD_FLOW', payload: flow34 },
+            { command: 'ADD_FLOW', payload: flow46 },
+            { command: 'ADD_FLOW', payload: flow56 }
+        ];
+        sendCommands(commands);
+        vm.visibility.popup = false;
+    };
 
-    }
+    vm.onDiagramInit = (d) => {
+        sendCommands = d.processCommands;
+
+        const birman = { kind: 'APPLICATION', id: 22253, name: "Birman"};
+        const cassowary = { kind: 'APPLICATION', id: 22666, name: "Cassowary"};
+        const secrets = { kind: 'PHYSICAL_SPECIFICATION', id: 25091, name: "Secrets"};
+        const architect = { kind: 'ACTOR', id: 1, name: "Architect"};
+
+        const birmanSpec = { id: 16593, kind: 'PHYSICAL_SPECIFICATION', name: 'transfer-holdings.tsv' };
+
+        const birmanToCassowary = { kind: 'FLOW', id: 45482, source: birman, target: cassowary };
+        const cassowaryToSecrets = { kind: 'FLOW', id: 1, source: cassowary, target: secrets };
+        const secretsToArchitect = { kind: 'FLOW', id: 2, source: secrets, target: architect };
+        const birmanToCassowaryDecoration = { kind: 'PHYSICAL_FLOW', id: 25092, logicalFlowId: 40, specification: birmanSpec };
+
+        sendCommands([
+            { command: 'ADD_NODE', payload: birman },
+            { command: 'ADD_NODE', payload: cassowary },
+            { command: 'ADD_NODE', payload: secrets },
+            { command: 'ADD_NODE', payload: architect },
+            { command: 'ADD_FLOW', payload: birmanToCassowary },
+            { command: 'ADD_FLOW', payload: cassowaryToSecrets },
+            { command: 'ADD_FLOW', payload: secretsToArchitect },
+            { command: 'DECORATE_FLOW', payload: birmanToCassowaryDecoration }
+        ]);
+    };
+
+    vm.onDismissMenu = () => {
+        vm.visibility.popup = false;
+    };
 }
 
 
 controller.$inject = [
-    '$stateParams',
-    '$timeout'
+    '$q',
+    '$state',
+    '$timeout',
+    'LogicalFlowStore'
 ];
 
 
@@ -115,48 +232,3 @@ const view = {
 
 
 export default view;
-//
-//
-//
-//
-// const nodeMenu = [
-//     {
-//         title: (d) => `Add upstream source to ${d.data.name}`,
-//         action: function(elm, d, i) {
-//             const dt = new Date();
-//             state.model.nodes.push({ id: 'APPLICATION/'+dt, data: { kind: 'APPLICATION', id: 14, name: "Settlements Service" }});
-//             state.model.flows.push({ id: 'LOGICAL_FLOW/'+dt, source:'APPLICATION/'+dt , target: d.id, data: { kind: 'LOGICAL_FLOW', id: 1214 }});
-//             const pos = Object.assign({}, layoutFor(d));
-//             console.log(event)
-//             pos.x = layoutFor(d).x + event.layerX;
-//             pos.y = layoutFor(d).y + event.layerY;
-//             state.layout['APPLICATION/'+dt] = pos;
-//             draw();
-//             return 'foo'
-//         }
-//     }, {
-//         title: (d) => `Add downstream flow from ${d.data.name}`,
-//         action: function(elm, d, i) {
-//             const dt = new Date();
-//             state.model.nodes.push({ id: 'APPLICATION/'+dt, data: { kind: 'APPLICATION', id: 14, name: "Confirmations Engine" }});
-//             state.model.flows.push({ id: 'LOGICAL_FLOW/'+dt, source: d.id, target: 'APPLICATION/'+dt, data: { kind: 'LOGICAL_FLOW', id: 1214 }});
-//             const pos = Object.assign({}, layoutFor(d));
-//             pos.x += 70;
-//             pos.y += 70;
-//             state.layout['APPLICATION/'+dt] = pos;
-//             draw();
-//         }
-//     }
-// ];
-//
-//
-// const canvasMenu = [
-//     {
-//         title: 'Add Node',
-//         action: function(elm, d, i) {
-//             const dt = new Date();
-//             state.model.nodes.push({ id: 'APPLICATION/'+dt, data: { kind: 'APPLICATION', id: 14, name: "Trade Booking System" }});
-//             draw();
-//         }
-//     }
-// ];

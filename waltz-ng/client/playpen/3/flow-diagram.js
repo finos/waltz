@@ -22,8 +22,9 @@ import {drag} from 'd3-drag';
 import {initialiseData} from '../../common';
 import {mkLineWithArrowPath, responsivefy} from '../../common/d3-utils';
 import {d3ContextMenu} from './d3-context-menu';
-import {mkModel, toGraphFlow, toGraphNode, toGraphId} from './flow-diagram-utils';
+import {mkModel, toGraphFlow, toGraphNode, toGraphId, toGraphDecoration, toNodeShape} from './flow-diagram-utils';
 import angular from 'angular';
+
 
 /**
  * @name waltz-flow-diagram
@@ -37,7 +38,8 @@ const bindings = {
     nodes: '<',
     flows: '<',
     layout: '<',
-    contextMenus: '<'
+    contextMenus: '<',
+    onInitialise: '<'
 };
 
 
@@ -58,27 +60,17 @@ const styles = {
 
 const dimensions = {
     svg: {
-        w: 1200,
-        h: 900
-    },
-    node: {
-        h: 40,
-        w: 90,
-        rx: 3,
-        ry: 3,
-        title: {
-            dx: 3,
-            dy: 12
-        }
+        w: 1000,
+        h: 500
     }
 };
-
 
 
 const state = {
     model: {
         nodes: [],
-        flows: []
+        flows: [],
+        flowDecorations: []
     },
     layout: {
         // id -> { x, y }
@@ -90,6 +82,16 @@ const state = {
     },
     contextMenus: null
 };
+
+
+
+function drawNodeShape(selection) {
+    return selection
+        .append('path')
+        .attr('d', d => toNodeShape(d.data).path)
+        .attr('stroke', '#ccc')
+        .attr('fill', '#eee');
+}
 
 
 
@@ -115,7 +117,6 @@ function dragEnded(d) {
 }
 
 
-
 function layoutFor(d) {
     const dflt = { x: 0, y: 0 };
 
@@ -133,6 +134,8 @@ function layoutFor(d) {
 
 
 const processCommands = (resp = []) => {
+    const model = state.model;
+
     _.forEach(resp, cmd => {
         switch (cmd.command) {
             case 'MOVE_NODE':
@@ -140,15 +143,44 @@ const processCommands = (resp = []) => {
                 layoutFor(cmd.payload.node).y += cmd.payload.dy;
                 break;
             case 'ADD_NODE':
-                state.model.nodes = _.concat(state.model.nodes, [ toGraphNode(cmd.payload) ]);
-                const initialPosition = {
-                    x: _.random(100, dimensions.svg.w - 200),
-                    y: _.random(100, dimensions.svg.h - 200)
-                };
-                state.layout[toGraphId(cmd.payload)] = initialPosition;
+                const node = cmd.payload;
+                const graphNode = toGraphNode(node);
+                const existingIds = _.map(model.nodes, "id");
+                if (_.includes(existingIds, graphNode.id)) {
+                    console.log('Ignoring request to re-add node', node);
+                } else {
+                    state.model.nodes = _.concat(model.nodes, [ graphNode ]);
+                    const initialPosition = {
+                        x: _.random(100, dimensions.svg.w - 200),
+                        y: _.random(100, dimensions.svg.h - 200)
+                    };
+                    state.layout[graphNode.id] = initialPosition;
+                }
                 break;
             case 'ADD_FLOW':
-                state.model.flows = _.concat(state.model.flows, [ toGraphFlow(cmd.payload) ]);
+                const flow = cmd.payload;
+                const graphFlow = toGraphFlow(flow);
+                const existingIds = _.map(model.flows, "id");
+                console.log(existingIds, graphFlow.id);
+                if (_.includes(existingIds, graphFlow.id)) {
+                    console.log('Ignoring request to add duplicate flow');
+                } else {
+                    model.flows = _.concat(model.flows, [graphFlow]);
+                }
+                break;
+            case 'DECORATE_FLOW':
+                const decoration = cmd.payload;
+                const graphDecoration = toGraphDecoration(decoration);
+                const existingIds = _.map(model.flowDecorations, "id");
+                if (_.includes(existingIds, graphDecoration.id)) {
+                    console.log('Ignoring request to add duplicate flow');
+                } else {
+                    state.model.flowDecorations = _.concat(model.flowDecorations, [graphDecoration]);
+                }
+                break;
+            case 'REMOVE_NODE':
+                model.flows = _.reject(model.flows, f => f.source === cmd.payload.id || f.target === cmd.payload.id);
+                model.nodes = _.reject(model.nodes, n => n.id === cmd.payload.id);
                 break;
             default:
                 console.log('WFD: unknown command', cmd);
@@ -160,11 +192,15 @@ const processCommands = (resp = []) => {
 
 
 function drawNodes(nodes = [], group) {
-    if (!group || _.isEmpty(nodes)) return;
+    if (!group) return;
 
     const nodeElems = group
         .selectAll(`.${styles.NODE}`)
         .data(nodes, d => d.id);
+
+    nodeElems
+        .exit()
+        .remove();
 
     const newNodeElems = nodeElems
         .enter()
@@ -182,29 +218,35 @@ function drawNodes(nodes = [], group) {
             .on("drag", dragged)
             .on("end", dragEnded));
 
-    newNodeElems
-        .append('rect')
-        .attr('width', dimensions.node.w)
-        .attr('height', dimensions.node.h)
-        .attr('rx', dimensions.node.rx)
-        .attr('ry', dimensions.node.ry);
-
+    newNodeElems.call(drawNodeShape);
 
     newNodeElems
         .append('text')
-        .text(d => d.data.name)
         .classed(styles.TITLE, true)
-        .attr('dx', dimensions.node.title.dx)
-        .attr('dy', dimensions.node.title.dy);
+        .text(d => toNodeShape(d.data).icon)
+        .attr('font-family', 'FontAwesome')
+        .attr('dx', d => toNodeShape(d.data).title.dx)
+        .attr('dy', d => toNodeShape(d.data).title.dy);
+
+    newNodeElems
+        .append('text')
+        .classed(styles.TITLE, true)
+        .text(d => d.data.name)
+        .attr('dx', d => toNodeShape(d.data).title.dx + 14)
+        .attr('dy', d => toNodeShape(d.data).title.dy);
 }
 
 
 function drawFlows(flows = [], group) {
-    if (!group || _.isEmpty(flows)) return;
+    if (!group) return;
 
     const linkElems = group
         .selectAll(`.${styles.FLOW}`)
         .data(flows, d => d.id);
+
+    linkElems
+        .exit()
+        .remove();
 
     const newLinkElems = linkElems
         .enter()
@@ -218,11 +260,11 @@ function drawFlows(flows = [], group) {
         .merge(linkElems)
         .selectAll('path')
         .attr('d', d => mkLineWithArrowPath(
-            layoutFor(d.source).x + (dimensions.node.w / 2),
-            layoutFor(d.source).y + (dimensions.node.h / 2),
-            layoutFor(d.target).x + (dimensions.node.w / 2),
-            layoutFor(d.target).y + (dimensions.node.h / 2),
-            1 /* arrow in center */));
+            layoutFor(d.source).x + (toNodeShape(d.data).cx),
+            layoutFor(d.source).y + (toNodeShape(d.data).cy),
+            layoutFor(d.target).x + (toNodeShape(d.data).cx),
+            layoutFor(d.target).y + (toNodeShape(d.data).cy),
+            0.8 /* arrow in center */));
 }
 
 
@@ -270,15 +312,17 @@ function controller($element) {
                 state.contextMenus.canvas,
                 { onClose: processCommands }));
         destroyResizeListener = responsivefy(state.groups.svg);
+
         vm.$onChanges();
     };
 
     vm.$onChanges = (c) => {
-        console.log('oC', c)
-
         state.model = mkModel(vm.nodes, vm.flows);
         state.layout = angular.copy(vm.layout);
         state.contextMenus = vm.contextMenus;
+        if (_.isFunction(vm.onInitialise)) {
+            vm.onInitialise({ processCommands });
+        }
         draw();
     };
 

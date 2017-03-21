@@ -41,9 +41,76 @@ export function toGraphFlow(flow) {
 }
 
 
+export function toGraphDecoration(decoration) {
+    return {
+        id: toGraphId(decoration),
+        flow: toGraphId({ kind: 'LOGICAL_FLOW', id: decoration.logicalFlowId }),
+        data: decoration
+    };
+}
+
+
 export function mkModel(nodes = [], flows = []) {
     return {
         nodes: _.map(nodes, toGraphNode),
         flows: _.map(flows, toGraphFlow)
     };
 }
+
+// -- shapes
+
+const paperShape = {
+    path: 'M0,0 L90,0 L100,10 L100,40 L0,40 z',
+    cx: 50,
+    cy: 20,
+    title: {
+        dx: 6,
+        dy: 12
+    }
+};
+
+
+const trapezoidShape = {
+    path: 'M0,0 L100,0 L95,40 L5,40 z',
+    cx: 50,
+    cy: 20,
+    title: {
+        dx: 6,
+        dy: 12
+    }
+};
+
+
+const rectShape = {
+    path: 'M0,0 L100,0 L100,40 L0,40 z',
+    cx: 50,
+    cy: 20,
+    title: {
+        dx: 4,
+        dy: 12
+    }
+};
+
+
+const shapes = {
+    PHYSICAL_SPECIFICATION: Object.assign({}, paperShape, { icon: '\uf016' }),
+    ACTOR: Object.assign({}, trapezoidShape, { icon: '\uf2be'}),
+    APPLICATION: Object.assign({}, rectShape, { icon: '\uf108' }),
+    DEFAULT: Object.assign({}, rectShape, { icon: '\uf096' })
+};
+
+
+/**
+ * Given a nodes model element (node.data) will return
+ * an object describing a shape which represents the node.
+ * The object contains `{ path: '', cx, cy, title: { dx, dy } }`
+ * where cx,cy are the center points of the shape.  Title dx,dy
+ * give offsets to locate the title in an appropriate position.
+ *
+ * @param data
+ * @returns {*}
+ */
+export function toNodeShape(data) {
+    return shapes[data.kind] || shapes['DEFAULT'];
+}
+
