@@ -10,7 +10,7 @@
 
     <div class="waltz-page-summary waltz-page-summary-attach">
 
-        <waltz-survey-run-create-general ng-if="ctrl.step === 'GENERAL'"
+        <waltz-survey-run-create-general ng-show="ctrl.step === 'GENERAL'"
                                          survey-template="ctrl.surveyTemplate"
                                          survey-run="ctrl.surveyRun"
                                          on-save="ctrl.onSaveGeneral">

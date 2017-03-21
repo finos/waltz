@@ -21,11 +21,3 @@ import _ from "lodash";
 export function containsAll(xs = [], ys = []) {
     return _.every(ys, y => _.includes(xs, y));
 }
-
-
-export function areDifferent(arrayA = [], arrayB = []) {
-    return !(
-        _.isEmpty(_.difference(arrayA, arrayB))
-        && _.isEmpty(_.difference(arrayB, arrayA))
-    );
-}

@@ -17,7 +17,6 @@
  */
 
 import {initialiseData, invokeFunction} from "../../../common";
-import {areDifferent} from "../../../common/list-utils";
 
 
 const bindings = {
@@ -47,11 +46,8 @@ function controller(entitySearchStore) {
             limit: vm.limit
         };
 
-        if (changes.entityKinds
-                && !changes.entityKinds.isFirstChange()
-                && areDifferent(changes.entityKinds.currentValue, changes.entityKinds.previousValue)) {
-           vm.entities = [];
-           vm.currentSelection = null;
+        if (changes.entityKinds) {
+            vm.entities = [];
         }
 
         if (vm.currentSelection) {
