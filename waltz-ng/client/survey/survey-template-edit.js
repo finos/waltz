@@ -39,6 +39,9 @@ const initialState = {
     },{
         name: 'Application',
         value: 'APPLICATION'
+    },{
+        name: 'Person',
+        value: 'PERSON'
     }],
     selectedQuestionInfo: {},
     surveyQuestionInfos: [],

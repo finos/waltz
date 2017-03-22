@@ -16,31 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const personHome = {
-    url: 'person',
-    views: {'content@': require('./person-home') }
-};
 
-const personView = {
-    url: '/:empId',
-    views: {'content@': require('./person-view') }
-};
+function controller($state,
+                    $stateParams,
+                    personStore) {
 
-const personViewByPersonId = {
-    url: '/id/:id',
-    views: {'content@': require('./person-id-view') }
-};
+    const personId = $stateParams.id;
 
-
-function setup($stateProvider) {
-
-    $stateProvider
-        .state('main.person', personHome)
-        .state('main.person.view', personView)
-        .state('main.person.id', personViewByPersonId);
+    personStore.getById(personId)
+        .then(p => $state.go('main.person.view', { empId: p.employeeId }, { location: false }));
 }
 
-setup.$inject = ['$stateProvider'];
+
+controller.$inject = [
+    '$state',
+    '$stateParams',
+    'PersonStore'
+];
 
 
-export default setup;
+export default  {
+    controller,
+    controllerAs: 'ctrl'
+};

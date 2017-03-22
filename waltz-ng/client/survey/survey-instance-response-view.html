@@ -119,7 +119,8 @@
                                     <waltz-boolean-renderer value="ctrl.answers[qi.question.id].answer">
                                     </waltz-boolean-renderer>
                                 </div>
-                                <div ng-switch-when="APPLICATION">
+                                <div ng-switch-when="APPLICATION|PERSON"
+                                     ng-switch-when-separator="|">
                                     <waltz-entity-link entity-ref="ctrl.answers[qi.question.id].answer">
                                     </waltz-entity-link>
                                 </div>
