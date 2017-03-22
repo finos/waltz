@@ -99,6 +99,17 @@ function controller($state,
         );
     };
 
+    vm.saveEntityRespone = (questionId, entity) => {
+        vm.surveyResponses[questionId] = {
+            entityResponse: {
+                id: entity.id,
+                kind: entity.kind,
+                name: entity.name
+            }
+        };
+        vm.saveResponse(questionId);
+    };
+
     vm.saveComment = (questionId, valObj) => {
         if (! vm.surveyResponses[questionId]) {
             vm.surveyResponses[questionId] = {};

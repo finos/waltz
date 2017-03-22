@@ -1,7 +1,8 @@
 <div>
     <ui-select ng-model="$ctrl.currentSelection"
                on-select="$ctrl.select($item)"
-               theme="bootstrap">
+               theme="bootstrap"
+               ng-required="$ctrl.required">
 
         <ui-select-match placeholder="Search...">
             <waltz-icon fixed-width="true"

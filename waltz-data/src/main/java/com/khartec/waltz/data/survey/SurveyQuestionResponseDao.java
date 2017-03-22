@@ -1,9 +1,13 @@
 package com.khartec.waltz.data.survey;
 
 
+import com.khartec.waltz.data.EntityNameUtilities;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.survey.ImmutableSurveyInstanceQuestionResponse;
 import com.khartec.waltz.model.survey.ImmutableSurveyQuestionResponse;
 import com.khartec.waltz.model.survey.SurveyInstanceQuestionResponse;
+import com.khartec.waltz.model.survey.SurveyQuestionResponse;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionResponseRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.ifEmpty;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
@@ -23,8 +28,21 @@ import static org.jooq.impl.DSL.*;
 @Repository
 public class SurveyQuestionResponseDao {
 
+    private static final Field<String> entityNameField = EntityNameUtilities.mkEntityNameField(
+            SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
+            SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_KIND,
+            newArrayList(EntityKind.APPLICATION));
+
     private static final RecordMapper<Record, SurveyInstanceQuestionResponse> TO_DOMAIN_MAPPER = r -> {
         SurveyQuestionResponseRecord record = r.into(SURVEY_QUESTION_RESPONSE);
+
+        Optional<EntityReference> entityReference = Optional.empty();
+        if(record.getEntityResponseId() != null && record.getEntityResponseKind() != null) {
+            entityReference = Optional.of(EntityReference.mkRef(
+                    EntityKind.valueOf(record.getEntityResponseKind()),
+                    record.getEntityResponseId(),
+                    r.getValue(entityNameField)));
+        }
 
         return ImmutableSurveyInstanceQuestionResponse.builder()
                 .surveyInstanceId(record.getSurveyInstanceId())
@@ -36,6 +54,7 @@ public class SurveyQuestionResponseDao {
                         .stringResponse(Optional.ofNullable(record.getStringResponse()))
                         .numberResponse(Optional.ofNullable(record.getNumberResponse()).map(BigDecimal::doubleValue))
                         .booleanResponse(Optional.ofNullable(record.getBooleanResponse()))
+                        .entityResponse(entityReference)
                         .build())
                 .build();
     };
@@ -53,7 +72,9 @@ public class SurveyQuestionResponseDao {
 
 
     public List<SurveyInstanceQuestionResponse> findForInstance(long surveyInstanceId) {
-        return dsl.selectFrom(SURVEY_QUESTION_RESPONSE)
+        return dsl.select(SURVEY_QUESTION_RESPONSE.fields())
+                .select(entityNameField)
+                .from(SURVEY_QUESTION_RESPONSE)
                 .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -61,6 +82,7 @@ public class SurveyQuestionResponseDao {
 
     public List<SurveyInstanceQuestionResponse> findForSurveyRun(long surveyRunId) {
         return dsl.select(SURVEY_QUESTION_RESPONSE.fields())
+                .select(entityNameField)
                 .from(SURVEY_QUESTION_RESPONSE)
                 .innerJoin(SURVEY_INSTANCE)
                 .on(SURVEY_INSTANCE.ID.eq(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID))
@@ -91,22 +113,26 @@ public class SurveyQuestionResponseDao {
 
 
     private SurveyQuestionResponseRecord mkRecord(SurveyInstanceQuestionResponse response) {
-        SurveyQuestionResponseRecord record = dsl.newRecord(SURVEY_QUESTION_RESPONSE);
+        SurveyQuestionResponse questionResponse = response.questionResponse();
+        Optional<EntityReference> entityResponse = questionResponse.entityResponse();
 
+        SurveyQuestionResponseRecord record = dsl.newRecord(SURVEY_QUESTION_RESPONSE);
         record.setSurveyInstanceId(response.surveyInstanceId());
-        record.setQuestionId(response.questionResponse().questionId());
+        record.setQuestionId(questionResponse.questionId());
         record.setPersonId(response.personId());
         record.setLastUpdatedAt(Timestamp.valueOf(response.lastUpdatedAt()));
-        record.setComment(response.questionResponse().comment()
+        record.setComment(questionResponse.comment()
                             .map(c -> ifEmpty(c, null))
                             .orElse(null));
-        record.setStringResponse(response.questionResponse().stringResponse()
+        record.setStringResponse(questionResponse.stringResponse()
                                     .map(s -> ifEmpty(s, null))
                                     .orElse(null));
-        record.setNumberResponse(response.questionResponse().numberResponse()
+        record.setNumberResponse(questionResponse.numberResponse()
                                     .map(BigDecimal::valueOf)
                                     .orElse(null));
-        record.setBooleanResponse(response.questionResponse().booleanResponse().orElse(null));
+        record.setBooleanResponse(questionResponse.booleanResponse().orElse(null));
+        record.setEntityResponseKind(entityResponse.map(er -> er.kind().name()).orElse(null));
+        record.setEntityResponseId(entityResponse.map(er -> er.id()).orElse(null));
 
         return record;
     }

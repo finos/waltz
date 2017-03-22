@@ -97,7 +97,7 @@ function controller(appGroupStore, involvementKindStore) {
         vm.surveyRun.selectorEntity = null;
     };
 
-    vm.onSelectorEntitySelect = (entity) => {
+    vm.onSelectorEntitySelect = (itemId, entity) => {
         vm.surveyRun.selectorEntity = entity;
     };
 

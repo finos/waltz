@@ -349,4 +349,20 @@
     </changeSet>
 
 
+    <!-- 1727 -->
+    <changeSet id="20170321-1727-1"
+               author="kamransaleem">
+        <comment>1727: Support question type entity</comment>
+        <addColumn tableName="survey_question_response">
+            <column name="entity_response_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="entity_response_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
