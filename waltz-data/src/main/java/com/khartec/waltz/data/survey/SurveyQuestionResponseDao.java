@@ -7,6 +7,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.survey.ImmutableSurveyInstanceQuestionResponse;
 import com.khartec.waltz.model.survey.ImmutableSurveyQuestionResponse;
 import com.khartec.waltz.model.survey.SurveyInstanceQuestionResponse;
+import com.khartec.waltz.model.survey.SurveyQuestionResponse;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionResponseRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,28 +113,26 @@ public class SurveyQuestionResponseDao {
 
 
     private SurveyQuestionResponseRecord mkRecord(SurveyInstanceQuestionResponse response) {
-        SurveyQuestionResponseRecord record = dsl.newRecord(SURVEY_QUESTION_RESPONSE);
+        SurveyQuestionResponse questionResponse = response.questionResponse();
+        Optional<EntityReference> entityResponse = questionResponse.entityResponse();
 
+        SurveyQuestionResponseRecord record = dsl.newRecord(SURVEY_QUESTION_RESPONSE);
         record.setSurveyInstanceId(response.surveyInstanceId());
-        record.setQuestionId(response.questionResponse().questionId());
+        record.setQuestionId(questionResponse.questionId());
         record.setPersonId(response.personId());
         record.setLastUpdatedAt(Timestamp.valueOf(response.lastUpdatedAt()));
-        record.setComment(response.questionResponse().comment()
+        record.setComment(questionResponse.comment()
                             .map(c -> ifEmpty(c, null))
                             .orElse(null));
-        record.setStringResponse(response.questionResponse().stringResponse()
+        record.setStringResponse(questionResponse.stringResponse()
                                     .map(s -> ifEmpty(s, null))
                                     .orElse(null));
-        record.setNumberResponse(response.questionResponse().numberResponse()
+        record.setNumberResponse(questionResponse.numberResponse()
                                     .map(BigDecimal::valueOf)
                                     .orElse(null));
-        record.setBooleanResponse(response.questionResponse().booleanResponse().orElse(null));
-
-        if(response.questionResponse().entityResponse().isPresent()) {
-            EntityReference entityReference = response.questionResponse().entityResponse().get();
-            record.setEntityResponseKind(entityReference.kind().name());
-            record.setEntityResponseId(entityReference.id());
-        }
+        record.setBooleanResponse(questionResponse.booleanResponse().orElse(null));
+        record.setEntityResponseKind(entityResponse.map(er -> er.kind().name()).orElse(null));
+        record.setEntityResponseId(entityResponse.map(er -> er.id()).orElse(null));
 
         return record;
     }
