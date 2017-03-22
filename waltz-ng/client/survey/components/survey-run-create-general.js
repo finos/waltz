@@ -41,6 +41,7 @@ const initialState = {
     allowedEntityKinds: [], // TODO initialise here after #1798
     allowedScopes: {
         'APP_GROUP': [exactScope],
+        'CHANGE_INITIATIVE': [exactScope],
         'ORG_UNIT': [exactScope, childrenScope],
         'MEASURABLE': [exactScope, childrenScope]
     }
@@ -58,7 +59,10 @@ function filterAllowedEntityKinds(entityKind) {
     };
 
     if (entityKind === 'CHANGE_INITIATIVE') {
-        return [appGroup];
+        return [appGroup, {
+            value: 'CHANGE_INITIATIVE',
+            name: 'Change Initiative'
+        }];
     }
     return [appGroup, {
         value: 'ORG_UNIT',

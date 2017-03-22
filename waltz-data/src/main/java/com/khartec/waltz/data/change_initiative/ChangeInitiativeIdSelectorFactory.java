@@ -11,6 +11,8 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 
 @Service
@@ -26,6 +28,8 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
         switch (options.entityReference().kind()) {
             case APP_GROUP:
                 return mkForAppGroup(options);
+            case CHANGE_INITIATIVE:
+                return mkForChangeInitiative(options);
             default:
                 throw new UnsupportedOperationException("Cannot create Change Initiatives selector from kind: "+options.entityReference().kind());
         }
@@ -41,6 +45,12 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
                 throw new UnsupportedOperationException("Cannot create Change Initiative selector from "
                         + options.entityReference().kind().name() + " with scope: " + options.scope());
         }
+    }
+
+
+    private Select<Record1<Long>> mkForChangeInitiative(IdSelectionOptions options) {
+        checkTrue(options.scope() == EXACT, "Can only create selector for exact matches if given a change initiative ref");
+        return DSL.select(DSL.val(options.entityReference().id()));
     }
 
 
