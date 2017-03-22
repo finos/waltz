@@ -249,6 +249,7 @@ export const surveyRunStatusNames = {
 
 
 export const surveyQuestionFieldTypeNames = {
+    APPLICATION: 'Application',
     BOOLEAN: 'Boolean',
     DROPDOWN: 'Dropdown',
     NUMBER: 'Number',

@@ -177,6 +177,14 @@
                                 ng-options="entry.value as entry.value for entry in qi.dropdownEntries | orderBy:'position'"
                                 class="form-control">
                         </select>
+                        <!-- application -->
+                        <waltz-entity-selector ng-switch-when="APPLICATION"
+                                               item-id="qi.question.id"
+                                               required="qi.question.isMandatory"
+                                               current-selection="ctrl.surveyResponses[qi.question.id].entityResponse"
+                                               on-select="ctrl.saveEntityRespone"
+                                               entity-kinds="['APPLICATION']">
+                        </waltz-entity-selector>
                         <!-- comment -->
                         <waltz-editable-field ng-if="qi.question.allowComment"
                                               fieldType="textarea"

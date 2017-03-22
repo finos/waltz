@@ -21,9 +21,11 @@ import {initialiseData, invokeFunction} from "../../../common";
 
 const bindings = {
     currentSelection: '<',
-    onSelect: '<',
     entityKinds: '<',
-    limit: '<'
+    itemId: '<',
+    limit: '<',
+    onSelect: '<',
+    required: '<'
 };
 
 
@@ -33,7 +35,8 @@ const template = require('./entity-selector.html');
 const initialState = {
     entities: [],
     limit: 20,
-    entityKinds: []
+    entityKinds: [],
+    required: false
 };
 
 
@@ -64,7 +67,7 @@ function controller(entitySearchStore) {
             });
     };
 
-    vm.select = (item) => invokeFunction(vm.onSelect, item);
+    vm.select = (item) => invokeFunction(vm.onSelect, vm.itemId, item);
 
     vm.mkTracker = (item) => item.kind + "_" + item.id;
 

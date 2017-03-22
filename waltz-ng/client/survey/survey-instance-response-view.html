@@ -114,14 +114,21 @@
                     </div>
                     <div class="col-sm-7">
                         <div style="border-bottom: 1px dotted #ddd; margin-bottom: 1em">
-                            <div ng-if="qi.question.fieldType === 'BOOLEAN'">
-                                <waltz-boolean-renderer value="ctrl.answers[qi.question.id].answer">
-                                </waltz-boolean-renderer>
+                            <div ng-switch="qi.question.fieldType">
+                                <div ng-switch-when="BOOLEAN">
+                                    <waltz-boolean-renderer value="ctrl.answers[qi.question.id].answer">
+                                    </waltz-boolean-renderer>
+                                </div>
+                                <div ng-switch-when="APPLICATION">
+                                    <waltz-entity-link entity-ref="ctrl.answers[qi.question.id].answer">
+                                    </waltz-entity-link>
+                                </div>
+                                <div ng-switch-default>
+                                    <span ng-bind="ctrl.answers[qi.question.id].answer">
+                                    </span>
+                                </div>
                             </div>
-                            <div ng-if="qi.question.fieldType !== 'BOOLEAN'">
-                                <span ng-bind="ctrl.answers[qi.question.id].answer">
-                                </span>
-                            </div>
+
                             <div class='small text-muted'
                                  ng-if="ctrl.answers[qi.question.id].comment">
                                 <strong>Comment:</strong>

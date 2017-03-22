@@ -24,7 +24,7 @@ function indexResponses(rs = []) {
         .map('questionResponse')
         .map(qr => ({
             questionId: qr.questionId,
-            answer: qr.stringResponse || qr.numberResponse || qr.booleanResponse,
+            answer: qr.stringResponse || qr.numberResponse || qr.booleanResponse || qr.entityResponse,
             comment: qr.comment
         }))
         .keyBy('questionId')
