@@ -31,7 +31,7 @@ public class SurveyQuestionResponseDao {
     private static final Field<String> entityNameField = EntityNameUtilities.mkEntityNameField(
             SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
             SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_KIND,
-            newArrayList(EntityKind.APPLICATION));
+            newArrayList(EntityKind.APPLICATION, EntityKind.PERSON));
 
     private static final RecordMapper<Record, SurveyInstanceQuestionResponse> TO_DOMAIN_MAPPER = r -> {
         SurveyQuestionResponseRecord record = r.into(SURVEY_QUESTION_RESPONSE);

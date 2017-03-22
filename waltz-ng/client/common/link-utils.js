@@ -49,6 +49,9 @@ export function kindToViewState(kind) {
     if (kind === 'ENTITY_STATISTIC') {
         return "main.entity-statistic.view";
     }
+    if (kind === 'PERSON') {
+        return "main.person.id";
+    }
     if (kind === 'PROCESS') {
         return "main.process.view";
     }

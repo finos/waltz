@@ -253,6 +253,7 @@ export const surveyQuestionFieldTypeNames = {
     BOOLEAN: 'Boolean',
     DROPDOWN: 'Dropdown',
     NUMBER: 'Number',
+    PERSON: 'Person',
     TEXT: 'Text',
     TEXTAREA: 'Text Area'
 };

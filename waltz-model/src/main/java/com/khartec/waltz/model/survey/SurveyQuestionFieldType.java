@@ -6,6 +6,7 @@ public enum SurveyQuestionFieldType {
     BOOLEAN,
     DROPDOWN,
     NUMBER,
+    PERSON,
     TEXT,
     TEXTAREA
 }
