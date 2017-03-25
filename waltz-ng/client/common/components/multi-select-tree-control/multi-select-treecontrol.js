@@ -19,6 +19,7 @@
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
 import {buildHierarchies, switchToParentIds} from "../../../common/hierarchy-utils";
+import {preventDefault, stopPropagation} from "../../browser-utils"
 
 
 const bindings = {
@@ -106,14 +107,14 @@ function controller() {
 
     vm.onNodeCheck = (id) => {
         invokeFunction(vm.onCheck, id);
-        event.preventDefault();
-        event.stopPropagation();
+        preventDefault(event);
+        stopPropagation(event);
     };
 
     vm.onNodeUncheck = (id) => {
         invokeFunction(vm.onUncheck, id);
-        event.preventDefault();
-        event.stopPropagation();
+        preventDefault(event);
+        stopPropagation(event);
     };
 
     vm.$onChanges = changes => {
