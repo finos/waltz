@@ -16,31 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import angular from 'angular';
 
+export default () => {
 
-const initialState = {
+    const module = angular.module('waltz.flow-diagram', []);
+
+    module
+        .component('waltzFlowDiagram', require('./components/diagram/flow-diagram'))
+        .component('waltzFlowDiagramEditor', require('./components/editor/flow-diagram-editor'));
+
+    return module.name;
 };
-
-
-function controller() {
-    const vm = Object.assign(this, initialState);
-
-
-}
-
-
-controller.$inject = [
-];
-
-
-const view = {
-    template: require('./playpen3.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;

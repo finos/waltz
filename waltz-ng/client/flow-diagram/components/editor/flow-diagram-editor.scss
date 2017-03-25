@@ -1,0 +1,18 @@
+.waltz-flow-diagram-editor {
+    .pop {
+        position: absolute;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        padding: 4px 12px 8px 12px;
+        min-width: 40%;
+        left: 40px;
+        top: 30px;
+        z-index: 1000;
+        background-color: rgba(245, 245, 245, 0.8);
+    }
+
+    .dim svg {
+        background-color: #fafafa;
+        filter: blur(0.8px);
+    }
+}

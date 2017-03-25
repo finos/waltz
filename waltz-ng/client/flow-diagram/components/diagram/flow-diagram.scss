@@ -1,0 +1,83 @@
+@import "../../../../style/variables";
+
+
+$annotation-color: #a4a2a6;
+
+
+.waltz-flow-diagram {
+    path {
+        shape-rendering: auto;
+    }
+
+    .wfd-active {
+        opacity: 0.8 !important;
+        path {
+            stroke-width: 1.5;
+        }
+    }
+
+    .wfd-flow {
+        path {
+            stroke: #8d8899;
+            fill: #c7c0d5;
+        }
+    }
+
+    .wfd-node {
+        @extend .no-text-select;
+        opacity: 0.9;
+        transition: opacity 300ms;
+        &,.wfd-title {
+            font-size: xx-small;
+            fill: $waltz-font-color;
+        }
+        &:hover {
+            cursor: move;
+        }
+    }
+
+    .wfd-subject {
+        path {
+            fill: #fff1dc;
+            stroke: #ffe26f;
+        }
+    }
+
+    .wfd-annotation {
+
+        &:hover circle {
+            stroke-opacity: 1;
+            stroke: darken($annotation-color, 20);
+            cursor: move;
+        }
+
+        circle {
+            fill: none;
+            stroke: #ccc;
+            stroke-opacity: 0;
+            transition: stroke-opacity 600ms;
+            stroke-dasharray: 5,4;
+            pointer-events: visible;
+        }
+
+        path {
+            fill: none;
+            stroke: $annotation-color;
+            stroke-dasharray: 2,2;
+        }
+
+        text {
+            font-size: 0.6em;
+            fill: darken($annotation-color, 20);
+        }
+    }
+
+    .wfd-flow-bucket {
+        @extend .no-text-select;
+        circle {
+            fill: #fff;
+            stroke: #ccc;
+        }
+    }
+}
+

@@ -99,3 +99,44 @@ export function mkLineWithArrowPath(x1, y1, x2, y2, arrowLoc = 0.2) {
                 ,${(dtys + 3.5 * Math.sin(d90 - theta) - 10 * Math.sin(theta))}
             z`;
 }
+
+
+
+export function wrapText(selection, width) {
+    selection.each(function(d) {
+        const textElem = select(this);
+        const words = textElem
+            .text()
+            .split(/\s+/)
+            .reverse();
+        let line = [];
+        let lineNumber = 0;
+        const lineHeight = 1.1;
+        const y = textElem.attr('y');
+        const dy = 0.1;
+        let word;
+
+        let tspan = textElem
+            .text(null)
+            .append("tspan")
+            .attr("x", 0)
+            .attr("y", y);
+
+        while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+                lineNumber++;
+                line.pop();
+                tspan.text(line.join(" "));
+                line = [word];
+                tspan = textElem
+                    .append("tspan")
+                    .attr("x", 0)
+                    // .attr("y", y)
+                    .attr("y", lineNumber * lineHeight + dy + "em")
+                    .text(word);
+            }
+        }
+    });
+}

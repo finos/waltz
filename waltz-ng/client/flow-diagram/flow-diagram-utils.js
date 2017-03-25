@@ -41,76 +41,74 @@ export function toGraphFlow(flow) {
 }
 
 
-export function toGraphDecoration(decoration) {
-    return {
-        id: toGraphId(decoration),
-        flow: toGraphId({ kind: 'LOGICAL_FLOW', id: decoration.logicalFlowId }),
-        data: decoration
-    };
-}
-
-
 export function mkModel(nodes = [], flows = []) {
     return {
         nodes: _.map(nodes, toGraphNode),
-        flows: _.map(flows, toGraphFlow)
+        flows: _.map(flows, toGraphFlow),
+        decorations: {}
     };
 }
 
 // -- shapes
 
 const paperShape = {
-    path: 'M0,0 L90,0 L100,10 L100,40 L0,40 z',
+    path: 'M0,0 L90,0 L100,10 L100,20 L0,20 z',
     cx: 50,
-    cy: 20,
+    cy: 10,
     title: {
         dx: 6,
-        dy: 12
+        dy: 13
     }
 };
 
 
-const trapezoidShape = {
-    path: 'M0,0 L100,0 L95,40 L5,40 z',
-    cx: 50,
-    cy: 20,
-    title: {
-        dx: 6,
-        dy: 12
-    }
-};
+function mkTrapezoidShape(widthHint) {
+    return {
+        path: `M0,0 L${widthHint},0 L${widthHint - 5},20 L5,20 z`,
+        cx: widthHint / 2,
+        cy: 10,
+        title: {
+            dx: 8,
+            dy: 13
+        }
+    };
+}
 
 
-const rectShape = {
-    path: 'M0,0 L100,0 L100,40 L0,40 z',
-    cx: 50,
-    cy: 20,
-    title: {
-        dx: 4,
-        dy: 12
-    }
-};
+function mkRectShape(widthHint) {
+    const shape = {
+        path: `M0,0 L${widthHint},0 L${widthHint},20 L0,20 z`,
+        cx: widthHint / 2,
+        cy: 10,
+        title: {
+            dx: 4,
+            dy: 13
+        }
+    };
+    return shape
+}
 
 
 const shapes = {
-    PHYSICAL_SPECIFICATION: Object.assign({}, paperShape, { icon: '\uf016' }),
-    ACTOR: Object.assign({}, trapezoidShape, { icon: '\uf2be'}),
-    APPLICATION: Object.assign({}, rectShape, { icon: '\uf108' }),
-    DEFAULT: Object.assign({}, rectShape, { icon: '\uf096' })
+    ACTOR: (widthHint = 100) => Object.assign({}, mkTrapezoidShape(widthHint), { icon: '\uf2be'}),
+    APPLICATION: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: '\uf108' }),
+    DEFAULT: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: '\uf096' })
 };
 
 
 /**
- * Given a nodes model element (node.data) will return
+ * Given a nodes model element kind (node.data.kind) will return
  * an object describing a shape which represents the node.
  * The object contains `{ path: '', cx, cy, title: { dx, dy } }`
  * where cx,cy are the center points of the shape.  Title dx,dy
  * give offsets to locate the title in an appropriate position.
  *
- * @param data
+ * @param kind
  * @returns {*}
  */
-export function toNodeShape(data) {
-    return shapes[data.kind] || shapes['DEFAULT'];
+export function toNodeShape(d, widthHint = 100) {
+    const kind = _.isObject(d) ? d.kind : d;
+    const mkShapeFn = shapes[kind];
+    return mkShapeFn(widthHint);
 }
 

@@ -29,8 +29,8 @@ export default () => {
     const module = angular.module('waltz.playpen', []);
 
     module
-        .component('waltzSvgManipulator', require('./4/svg-manipulator'))
-        .component('waltzFlowDiagram', require('./3/flow-diagram'));
+        .component('waltzSvgManipulator', require('./4/svg-manipulator'));
+
 
     module.config([
         '$stateProvider',

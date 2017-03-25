@@ -74,6 +74,7 @@ const dependencies = [
     require('./entity-statistics')(),
     require('./entity-tags')(),
     require('./examples')(),
+    require('./flow-diagram')(),
     require('./formly')(),
     require('./history')(),
     require('./involvement')(),

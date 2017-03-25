@@ -1,0 +1,33 @@
+<div class="waltz-flow-diagram-editor">
+
+    <div class="pop waltz-fade-if"
+         ng-if="$ctrl.visibility.addLogicalFlowPopup">
+        <h4 ng-bind="$ctrl.popup.title"></h4>
+        <p ng-bind="$ctrl.popup.description"></p>
+        <ul>
+            <li ng-repeat="option in $ctrl.popup.options | orderBy: 'entity.name'">
+                <a ng-click="$ctrl.issueCommands(option.commands)"
+                   class='clickable'>
+                    <waltz-entity-icon-label entity-ref="option.entity"></waltz-entity-icon-label>
+                </a>
+            </li>
+        </ul>
+
+        <hr>
+
+        <a class='clickable'
+           ng-click="$ctrl.onDismissPopup()">
+            Cancel
+        </a>
+    </div>
+
+    <div ng-class="{ 'dim' : $ctrl.visibility.popup }">
+        <waltz-flow-diagram nodes="$ctrl.nodes"
+                            flows="$ctrl.flows"
+                            layout="$ctrl.layout"
+                            on-initialise="$ctrl.onDiagramInit"
+                            context-menus="$ctrl.contextMenus">
+        </waltz-flow-diagram>
+
+    </div>
+</div>
