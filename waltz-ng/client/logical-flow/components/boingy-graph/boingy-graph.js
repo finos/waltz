@@ -186,7 +186,7 @@ function setup(vizElem) {
         .append('svg')
         .attr("width", width)
         .attr("height", height)
-        .attr('viewBox', `0 0 ${width} ${height}`)
+        .attr('viewBox', `0 0 ${width} ${height}`);
 
     const destroyResizeListener = responsivefy(svg);
 

@@ -1,0 +1,50 @@
+$context-background: #f2f2f2;
+
+
+.d3-context-menu {
+    position: absolute;
+    display: none;
+    background-color: $context-background;
+    border-radius: 4px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    min-width: 150px;
+    border: 1px solid #d4d4d4;
+    z-index:1200;
+
+    ul {
+        list-style-type: none;
+        margin: 4px 0;
+        padding: 0;
+        cursor: default;
+
+        li {
+            padding: 4px 16px;
+
+            &.is-action:hover {
+                background-color: #4677f8;
+                color: #fefefe;
+            }
+
+            &.is-disabled,
+            &.is-disabled:hover {
+                background-color: $context-background;
+                color: #888;
+                cursor: not-allowed;
+            }
+
+            &.is-divider {
+                padding: 0;
+                &:hover {
+                    background-color: $context-background;
+                }
+                hr {
+                    padding: 0;
+                    margin: 4px 0;
+                    border-top: 1px solid rgba(0, 0, 0, 0.1);
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+                }
+            }
+        }
+    }
+}

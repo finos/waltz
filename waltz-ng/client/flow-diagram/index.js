@@ -16,44 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from '../../common';
+import angular from 'angular';
 
+export default () => {
 
-/**
- * @name waltz-abridged
- *
- * @description
- * This component ...
- */
+    const module = angular.module('waltz.flow-diagram', []);
 
+    module
+        .component('waltzFlowDiagram', require('./components/diagram/flow-diagram'))
+        .component('waltzFlowDiagramEditor', require('./components/editor/flow-diagram-editor'));
 
-const bindings = {};
-
-
-const initialState = {};
-
-
-const template = require('./abridged.html');
-
-
-function controller() {
-    const vm = initialiseData(this, initialState);
-    console.log('abridged - init');
-}
-
-
-controller.$inject = [];
-
-
-const component = {
-    template,
-    bindings,
-    controller,
-    transclude: true
+    return module.name;
 };
-
-
-export default component;
-
-

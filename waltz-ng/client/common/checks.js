@@ -171,7 +171,6 @@ export function ensureNotNull(x, message) {
     }
 }
 
-
 export function ensureIsNumber(x, message) {
     const num = Number(x);
     if (_.isNaN(num)) {

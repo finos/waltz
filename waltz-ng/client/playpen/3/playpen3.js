@@ -20,18 +20,29 @@ import _ from 'lodash';
 
 
 const initialState = {
-    costs: []
 };
 
 
-function controller($stateParams) {
+function toNode(d, kind = 'APPLICATION') {
+    return {
+        name: d.name,
+        id: d.id,
+        description: d.description || '',
+        kind
+    };
+}
+
+function controller($stateParams, applicationStore) {
     const vm = Object.assign(this, initialState);
-    console.log($stateParams)
+    applicationStore
+        .getById($stateParams.id)
+        .then(a => vm.nodes = [toNode(a)]);
 }
 
 
 controller.$inject = [
     '$stateParams',
+    'ApplicationStore'
 ];
 
 

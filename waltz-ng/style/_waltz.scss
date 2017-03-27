@@ -27,6 +27,7 @@
 @import "../client/entity-statistics/directives/entity-statistic";
 @import "../client/entity-statistics/components/entity-statistic-summary-card";
 @import "../client/entity-statistics/components/history-chart/entity-statistic-history-chart";
+@import "../client/flow-diagram/flow-diagram";
 @import "../client/logical-flow/components/app-centric-flow-table/app-centric-flow-table";
 @import "../client/logical-flow/components/boingy-graph/boingy-graph";
 @import "../client/logical-flow/components/logical-flows-tabgroup/logical-flows-tabgroup";
@@ -113,7 +114,12 @@ textarea {
 
 
 .no-text-select {
-  user-select: none;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
 }
 
 
