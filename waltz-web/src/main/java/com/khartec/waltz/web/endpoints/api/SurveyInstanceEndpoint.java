@@ -2,12 +2,15 @@ package com.khartec.waltz.web.endpoints.api;
 
 
 import com.khartec.waltz.model.survey.*;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.survey.SurveyInstanceService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
@@ -21,13 +24,17 @@ public class SurveyInstanceEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "survey-instance");
 
     private final SurveyInstanceService surveyInstanceService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public SurveyInstanceEndpoint(SurveyInstanceService surveyInstanceService) {
+    public SurveyInstanceEndpoint(SurveyInstanceService surveyInstanceService,
+                                  UserRoleService userRoleService) {
         checkNotNull(surveyInstanceService, "surveyInstanceService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.surveyInstanceService = surveyInstanceService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -79,11 +86,19 @@ public class SurveyInstanceEndpoint implements Endpoint {
         };
 
         DatumRoute<Integer> updateStatusRoute =
-                (req, res) -> surveyInstanceService.updateStatus(
-                        getUsername(req),
-                        getId(req),
-                        readBody(req, SurveyInstanceStatusChangeCommand.class)
-                );
+                (req, res) -> {
+                    SurveyInstanceStatusChangeCommand command = readBody(req, SurveyInstanceStatusChangeCommand.class);
+
+                    if (command.newStatus() != SurveyInstanceStatus.COMPLETED) {
+                        ensureUserHasAdminRights(req);
+                    }
+
+                    return surveyInstanceService.updateStatus(
+                            getUsername(req),
+                            getId(req),
+                            command
+                    );
+                };
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
@@ -93,5 +108,10 @@ public class SurveyInstanceEndpoint implements Endpoint {
         getForList(findResponsesPath, findResponsesRoute);
         putForDatum(saveResponsePath, saveResponseRoute);
         postForDatum(updateStatusPath, updateStatusRoute);
+    }
+
+
+    private void ensureUserHasAdminRights(Request request) {
+        requireRole(userRoleService, request, Role.SURVEY_ADMIN);
     }
 }

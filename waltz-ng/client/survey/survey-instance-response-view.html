@@ -16,6 +16,14 @@
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-section-actions>
+            <a class="btn btn-danger btn-xs"
+               waltz-has-role="SURVEY_ADMIN"
+               ng-if="ctrl.surveyInstance.status === 'COMPLETED'"
+               ng-click="ctrl.markAsInProgress()">
+                Mark as In Progress
+            </a>
+        </waltz-section-actions>
         <div class="row">
             <div class="col-sm-12">
                 <waltz-markdown text="ctrl.surveyRun.description">
