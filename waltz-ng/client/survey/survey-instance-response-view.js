@@ -32,7 +32,9 @@ function indexResponses(rs = []) {
 }
 
 
-function controller($stateParams,
+function controller($state,
+                    $stateParams,
+                    notification,
                     personStore,
                     surveyInstanceStore,
                     surveyRunStore,
@@ -48,11 +50,11 @@ function controller($stateParams,
             return surveyRunStore
                 .getById(surveyInstance.surveyRunId)
         })
-        .then(sr => vm.surveyRun = sr)
+        .then(sr => vm.surveyRun = sr);
 
 
     const loadParticipants = responses => {
-        vm.participants = []
+        vm.participants = [];
         _.chain(responses)
             .map('personId')
             .uniq()
@@ -72,11 +74,27 @@ function controller($stateParams,
             vm.answers = indexResponses(responses);
             loadParticipants(responses);
         });
+
+    vm.markAsInProgress = () => {
+        if (confirm('Are you sure you want this survey to be marked as In Progress? ' +
+                    'This will enable participants to edit and re-submit their responses.')) {
+            surveyInstanceStore.updateStatus(
+                vm.surveyInstance.id,
+                {newStatus: 'IN_PROGRESS'}
+            )
+            .then(result => {
+                notification.success('Survey response marked as In Progress');
+                $state.reload();
+            });
+        }
+    };
 }
 
 
 controller.$inject = [
+    '$state',
     '$stateParams',
+    'Notification',
     'PersonStore',
     'SurveyInstanceStore',
     'SurveyRunStore',
