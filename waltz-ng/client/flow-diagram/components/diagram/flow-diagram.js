@@ -75,7 +75,7 @@ const styles = {
 const dimensions = {
     svg: {
         w: 1000,
-        h: 500
+        h: 540
     },
     flowBucket: {
         r: 10
@@ -186,6 +186,7 @@ function layoutFor(graphNode) {
 
 
 function processCommand(command, payload, model) {
+    console.log("wFD - processing command: ", command, payload, model);
     switch (command) {
         case 'MOVE_NODE':
             const layout = layoutFor(payload.graphNode);
@@ -198,7 +199,7 @@ function processCommand(command, payload, model) {
             payload.annotation.dy += payload.dy;
             break;
 
-        case 'ADD_ANNOTATION':
+        case 'ADD_ANNOTATION': // { id, note, }
             const existingIds = _.map(model.annotations, "id");
             if (_.includes(existingIds, payload.id)) {
                 console.log('Ignoring request to re-add annotation', payload);
@@ -275,6 +276,7 @@ function processCommand(command, payload, model) {
             break;
     }
 }
+
 
 function processCommands(commands = []) {
     _.forEach(commands, cmd => processCommand(cmd.command, cmd.payload, state.model));

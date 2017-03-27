@@ -112,3 +112,55 @@ export function toNodeShape(d, widthHint = 100) {
     return mkShapeFn(widthHint);
 }
 
+
+
+
+export function createSampleDiagram() {
+    const birman = { kind: 'APPLICATION', id: 22253, name: "Birman"};
+    const bear = { kind: 'APPLICATION', id: 22276, name: "Bear"};
+    const cassowary = { kind: 'APPLICATION', id: 22666, name: "Cassowary"};
+    const architect = { kind: 'ACTOR', id: 1, name: "Architect with a very long name"};
+
+    const bearToBirman = { kind: 'LOGICAL_FLOW', id: 45878, source: bear, target: birman };
+    const birmanToCassowary = { kind: 'LOGICAL_FLOW', id: 45482, source: birman, target: cassowary };
+    const cassowaryToArchitect = { kind: 'LOGICAL_FLOW', id: 1, source: cassowary, target: architect };
+
+    const secrets = { kind: 'PHYSICAL_SPECIFICATION', id: 25091, name: "Secrets"};
+    const transferHoldings = { id: 16593, kind: 'PHYSICAL_SPECIFICATION', name: 'transfer-holdings.tsv' };
+    const transferPurchases = { id: 16594, kind: 'PHYSICAL_SPECIFICATION', name: 'transfer-purchases.tsv' };
+
+    const birmanPhysicalFlow1 = { kind: 'PHYSICAL_FLOW', id: 25092, specification: transferHoldings };
+    const birmanPhysicalFlow2 = { kind: 'PHYSICAL_FLOW', id: 25092, specification: transferPurchases };
+    const cassowaryPhysicalFlow = { kind: 'PHYSICAL_FLOW', id: 25091, specification: secrets };
+
+    const birmanToCassowaryDecoration1 = { ref: { id: 45482, kind: 'LOGICAL_FLOW' }, decoration: birmanPhysicalFlow1 };
+    const birmanToCassowaryDecoration2 = { ref: { id: 45482, kind: 'LOGICAL_FLOW' }, decoration: birmanPhysicalFlow2 };
+    const cassowaryToArchitectDecoration = { ref: { id: 1, kind: 'LOGICAL_FLOW' }, decoration: cassowaryPhysicalFlow };
+
+    const bearAnnotation = {
+        id: 2, ref: {id: 22276, kind: 'APPLICATION' },
+        note: "However you choose to use LOOPY, hopefully it can give you not just the software tools, but also the mental tools to understand the complex systems of the world around us. It's a hot mess out there. ",
+        dy: 37, dx: -62 };
+
+    const architectAnnotation = {
+        id: 1, ref: {id: 1, kind: 'ACTOR' },
+        note: "An architect, probably very clever",
+        dy: 37, dx: -62 };
+
+    return [
+        { command: 'ADD_NODE', payload: birman },
+        { command: 'ADD_NODE', payload: cassowary },
+        { command: 'ADD_NODE', payload: architect },
+        { command: 'ADD_NODE', payload: bear },
+
+        { command: 'ADD_FLOW', payload: birmanToCassowary },
+        { command: 'ADD_FLOW', payload: cassowaryToArchitect },
+        { command: 'ADD_FLOW', payload: bearToBirman },
+
+        { command: 'ADD_DECORATION', payload: birmanToCassowaryDecoration1 },
+        { command: 'ADD_DECORATION', payload: birmanToCassowaryDecoration2 },
+        { command: 'ADD_DECORATION', payload: cassowaryToArchitectDecoration },
+        { command: 'ADD_ANNOTATION', payload: bearAnnotation },
+        { command: 'ADD_ANNOTATION', payload: architectAnnotation }
+    ];
+}

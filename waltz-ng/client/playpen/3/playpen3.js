@@ -23,14 +23,26 @@ const initialState = {
 };
 
 
-function controller() {
+function toNode(d, kind = 'APPLICATION') {
+    return {
+        name: d.name,
+        id: d.id,
+        description: d.description || '',
+        kind
+    };
+}
+
+function controller($stateParams, applicationStore) {
     const vm = Object.assign(this, initialState);
-
-
+    applicationStore
+        .getById($stateParams.id)
+        .then(a => vm.nodes = [toNode(a)]);
 }
 
 
 controller.$inject = [
+    '$stateParams',
+    'ApplicationStore'
 ];
 
 

@@ -1,7 +1,8 @@
 <div class="waltz-flow-diagram-editor">
 
+    <!-- ADD FLOW POPUP -->
     <div class="pop waltz-fade-if"
-         ng-if="$ctrl.visibility.addLogicalFlowPopup">
+         ng-if="$ctrl.visibility.logicalFlowPopup">
         <h4 ng-bind="$ctrl.popup.title"></h4>
         <p ng-bind="$ctrl.popup.description"></p>
         <ul>
@@ -21,6 +22,32 @@
         </a>
     </div>
 
+    <!-- ADD ANNOTATION POPUP -->
+    <div class="pop waltz-fade-if"
+         ng-if="$ctrl.visibility.annotationPopup">
+        <h4 ng-bind="$ctrl.popup.title"></h4>
+        <p ng-bind="$ctrl.popup.description"></p>
+        <div>
+            <textarea cols="50"
+                      rows="5"
+                      placeholder="Description ..."
+                      ng-model="$ctrl.popup.note">
+            </textarea>
+        </div>
+        <hr>
+
+        <a class="btn btn-success clickable"
+           ng-click="$ctrl.issueCommands($ctrl.popup.mkAddAnnotationCommand($ctrl.popup.note))">
+            Add
+        </a>
+        <a class='clickable'
+           ng-click="$ctrl.onDismissPopup()">
+            Cancel
+        </a>
+    </div>
+
+
+    <!-- EDITOR -->
     <div ng-class="{ 'dim' : $ctrl.visibility.popup }">
         <waltz-flow-diagram nodes="$ctrl.nodes"
                             flows="$ctrl.flows"

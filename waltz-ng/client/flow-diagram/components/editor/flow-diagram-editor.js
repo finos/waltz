@@ -18,7 +18,7 @@
 
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
-
+import {createSampleDiagram} from '../../flow-diagram-utils';
 
 /**
  * @name waltz-flow-diagram-editor
@@ -28,16 +28,23 @@ import {initialiseData} from '../../../common';
  */
 
 
-const bindings = {};
+const bindings = {
+    nodes: '<',
+    flows: '<'
+};
 
 
 const initialState = {
-    layout: { positions: {}, shapes: {}, subject: 'APPLICATION/22253' },
+    layout: {
+        positions: {},
+        shapes: {},
+        subject: 'APPLICATION/22253'
+    },
     nodes: [],
     flows: [],
     visibility: {
-        addLogicalFlowPopup: false,
-        addAnnotationPopup: false
+        logicalFlowPopup: false,
+        annotationPopup: false
     },
     popup: {
         title: '',
@@ -48,56 +55,6 @@ const initialState = {
 
 const template = require('./flow-diagram-editor.html');
 
-
-function createSampleDiagram() {
-    const birman = { kind: 'APPLICATION', id: 22253, name: "Birman"};
-    const bear = { kind: 'APPLICATION', id: 22276, name: "Bear"};
-    const cassowary = { kind: 'APPLICATION', id: 22666, name: "Cassowary"};
-    const architect = { kind: 'ACTOR', id: 1, name: "Architect with a very long name"};
-
-    const bearToBirman = { kind: 'LOGICAL_FLOW', id: 45878, source: bear, target: birman };
-    const birmanToCassowary = { kind: 'LOGICAL_FLOW', id: 45482, source: birman, target: cassowary };
-    const cassowaryToArchitect = { kind: 'LOGICAL_FLOW', id: 1, source: cassowary, target: architect };
-
-    const secrets = { kind: 'PHYSICAL_SPECIFICATION', id: 25091, name: "Secrets"};
-    const transferHoldings = { id: 16593, kind: 'PHYSICAL_SPECIFICATION', name: 'transfer-holdings.tsv' };
-    const transferPurchases = { id: 16594, kind: 'PHYSICAL_SPECIFICATION', name: 'transfer-purchases.tsv' };
-
-    const birmanPhysicalFlow1 = { kind: 'PHYSICAL_FLOW', id: 25092, specification: transferHoldings };
-    const birmanPhysicalFlow2 = { kind: 'PHYSICAL_FLOW', id: 25092, specification: transferPurchases };
-    const cassowaryPhysicalFlow = { kind: 'PHYSICAL_FLOW', id: 25091, specification: secrets };
-
-    const birmanToCassowaryDecoration1 = { ref: { id: 45482, kind: 'LOGICAL_FLOW' }, decoration: birmanPhysicalFlow1 };
-    const birmanToCassowaryDecoration2 = { ref: { id: 45482, kind: 'LOGICAL_FLOW' }, decoration: birmanPhysicalFlow2 };
-    const cassowaryToArchitectDecoration = { ref: { id: 1, kind: 'LOGICAL_FLOW' }, decoration: cassowaryPhysicalFlow };
-
-    const bearAnnotation = {
-        id: 2, ref: {id: 22276, kind: 'APPLICATION' },
-        note: "However you choose to use LOOPY, hopefully it can give you not just the software tools, but also the mental tools to understand the complex systems of the world around us. It's a hot mess out there. ",
-        dy: 37, dx: -62 };
-
-    const architectAnnotation = {
-        id: 1, ref: {id: 1, kind: 'ACTOR' },
-        note: "An architect, probably very clever",
-        dy: 37, dx: -62 };
-
-    return [
-        { command: 'ADD_NODE', payload: birman },
-        { command: 'ADD_NODE', payload: cassowary },
-        { command: 'ADD_NODE', payload: architect },
-        { command: 'ADD_NODE', payload: bear },
-
-        { command: 'ADD_FLOW', payload: birmanToCassowary },
-        { command: 'ADD_FLOW', payload: cassowaryToArchitect },
-        { command: 'ADD_FLOW', payload: bearToBirman },
-
-        { command: 'ADD_DECORATION', payload: birmanToCassowaryDecoration1 },
-        { command: 'ADD_DECORATION', payload: birmanToCassowaryDecoration2 },
-        { command: 'ADD_DECORATION', payload: cassowaryToArchitectDecoration },
-        { command: 'ADD_ANNOTATION', payload: bearAnnotation },
-        { command: 'ADD_ANNOTATION', payload: architectAnnotation }
-    ];
-}
 
 
 function convertFlowsToOptions(flows = [], node, isUpstream) {
@@ -126,19 +83,22 @@ function convertFlowsToOptions(flows = [], node, isUpstream) {
 }
 
 
-function prepareAddFlowPopup(node, isUpstream = true, logicalFlowStore) {
-    if (!node || !logicalFlowStore) return;
+function prepareAddFlowPopup(graphNode, isUpstream = true, logicalFlowStore) {
+    if (!graphNode || !logicalFlowStore) return;
 
     return logicalFlowStore
-        .findByEntityReference(node.data)
-        .then(flows => convertFlowsToOptions(flows, node, isUpstream))
+        .findByEntityReference(graphNode.data)
+        .then(flows => convertFlowsToOptions(flows, graphNode, isUpstream))
         .then(options => {
+            const description = isUpstream
+                ? 'Select an upstream node from the list below:'
+                : 'Select a downstream node from the list belows:';
             const direction = isUpstream
-                ? 'upstream'
-                : 'downstream';
+                ? 'Upstream'
+                : 'Downstream';
             const popup = {
-                title: `Add ${direction} node to ${node.data.name}`,
-                description: `Select an ${direction} node from the list below: `,
+                title: `Add ${direction} node to ${graphNode.data.name}`,
+                description,
                 options
             };
             return popup;
@@ -146,10 +106,27 @@ function prepareAddFlowPopup(node, isUpstream = true, logicalFlowStore) {
 }
 
 
-function prepareAddAnnotationPopup(node) {
-    if (!node) return;
+function prepareAddAnnotationPopup(graphNode) {
+    if (!graphNode) return;
 
-    return { title: `Add annotation to ${node.data.name}`, description: ''}
+    return {
+        title: `Add annotation to ${graphNode.data.name}`,
+        description: '',
+        mkAddAnnotationCommand: (note) => {
+            return [
+                {
+                    command: 'ADD_ANNOTATION',
+                    payload: {
+                        dx: 40,
+                        dy: 40,
+                        id: new Date().getUTCMilliseconds(),
+                        note,
+                        ref: { id: graphNode.data.id, kind: graphNode.data.kind }
+                    }
+                }
+            ];
+        }
+    }
 }
 
 
@@ -163,7 +140,7 @@ function mkNodeMenu($state, $timeout, logicalFlowStore, vm) {
                         prepareAddFlowPopup(d, true, logicalFlowStore)
                             .then(popup => {
                                 vm.popup = popup;
-                                vm.visibility.addLogicalFlowPopup = true;
+                                vm.visibility.logicalFlowPopup = true;
                             });
                     });
                 }
@@ -174,7 +151,7 @@ function mkNodeMenu($state, $timeout, logicalFlowStore, vm) {
                         prepareAddFlowPopup(d, false, logicalFlowStore)
                             .then(popup => {
                                 vm.popup = popup;
-                                vm.visibility.addLogicalFlowPopup = true;
+                                vm.visibility.logicalFlowPopup = true;
                             });
                     });
                 }
@@ -182,9 +159,9 @@ function mkNodeMenu($state, $timeout, logicalFlowStore, vm) {
                 title: (d) => `Add annotation to ${d.data.name}`,
                 action: (elm, d, i) => {
                     $timeout(() => {
-                        const popup = prepareAddAnnotationPopup(d)
+                        const popup = prepareAddAnnotationPopup(d);
                         vm.popup = popup;
-                        vm.visibility.addAnnotationPopup = true;
+                        vm.visibility.annotationPopup = true;
                     });
                 }
             }, {
@@ -249,33 +226,9 @@ function mkCanvasMenu() {
     return (d) => {
         return [
             {
-                title: (d) => `Add Some Application`,
+                title: (d) => `Add some applications`,
                 action: function (elm, d, i) {
-                    const dt = new Date();
-                    const node1 = { kind: 'APPLICATION', id: "a" + dt, name: "Node A" };
-                    const node2 = { kind: 'APPLICATION', id: "b" + dt, name: "Node B" };
-                    const node3 = { kind: 'ACTOR', id: "c" + dt, name: "Actor C" };
-                    const node4 = { kind: 'APPLICATION', id: "d" + dt, name: "Node D" };
-                    const node5 = { kind: 'APPLICATION', id: "e" + dt, name: "Node E" };
-                    const node6 = { kind: 'ACTOR', id: "f" + dt, name: "Actor F" };
-                    const flow12 = { kind: 'LOGICAL_FLOW', id: "f1" + dt, source: node1, target: node2 };
-                    const flow13 = { kind: 'LOGICAL_FLOW', id: "f2" + dt, source: node1, target: node3 };
-                    const flow34 = { kind: 'LOGICAL_FLOW', id: "f3" + dt, source: node3, target: node4 };
-                    const flow46 = { kind: 'LOGICAL_FLOW', id: "f4" + dt, source: node4, target: node6 };
-                    const flow56 = { kind: 'LOGICAL_FLOW', id: "f5" + dt, source: node5, target: node6 };
-                    return [
-                        { command: 'ADD_NODE', payload: node1 },
-                        { command: 'ADD_NODE', payload: node2 },
-                        { command: 'ADD_NODE', payload: node3 },
-                        { command: 'ADD_NODE', payload: node4 },
-                        { command: 'ADD_NODE', payload: node5 },
-                        { command: 'ADD_NODE', payload: node6 },
-                        { command: 'ADD_FLOW', payload: flow12 },
-                        { command: 'ADD_FLOW', payload: flow13 },
-                        { command: 'ADD_FLOW', payload: flow34 },
-                        { command: 'ADD_FLOW', payload: flow46 },
-                        { command: 'ADD_FLOW', payload: flow56 }
-                    ];
+                    return createSampleDiagram();
                 }
             }
         ]
@@ -283,7 +236,7 @@ function mkCanvasMenu() {
 }
 
 
-function controller($q, $state, $timeout, logicalFlowStore) {
+function controller($state, $timeout, logicalFlowStore) {
     const vm = initialiseData(this, initialState);
 
     let sendCommands = null;
@@ -301,20 +254,18 @@ function controller($q, $state, $timeout, logicalFlowStore) {
     };
 
     vm.onDismissPopup = () => {
-        vm.visibility.addLogicalFlowPopup = false;
-        vm.visibility.addAnnotationPopup = false;
+        vm.visibility.logicalFlowPopup = false;
+        vm.visibility.annotationPopup = false;
     };
 
     vm.onDiagramInit = (d) => {
         sendCommands = d.processCommands;
-        sendCommands(createSampleDiagram());
     };
 
 }
 
 
 controller.$inject = [
-    '$q',
     '$state',
     '$timeout',
     'LogicalFlowStore'
