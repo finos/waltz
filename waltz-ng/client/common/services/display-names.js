@@ -226,6 +226,16 @@ export const lifecycleStatusNames = {
 };
 
 
+export const relationshipKindNames = {
+    'HAS': 'Has',
+    'DEPRECATES': 'Deprecates',
+    'LOOSELY_RELATES_TO': 'Loosely Relates To',
+    'PARTICIPATES_IN': 'Participates In',
+    'RELATES_TO': 'Relates To',
+    'SUPPORTS': 'Supports'
+};
+
+
 export const surveyInstanceStatusNames = {
     'COMPLETED': 'Completed',
     'EXPIRED': 'Expired',

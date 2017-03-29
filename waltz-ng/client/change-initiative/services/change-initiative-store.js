@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import {checkIsEntityRelationshipChangeCommand} from "../../common/checks";
+
 
 function service($http, BaseApiUrl) {
 
@@ -42,11 +43,20 @@ function service($http, BaseApiUrl) {
             .then(r => r.data);
 
 
+    const changeRelationship = (id, cmd) => {
+        checkIsEntityRelationshipChangeCommand(cmd);
+        return $http
+            .post(`${BASE}/id/${id}/entity-relationship`, cmd)
+            .then(r => r.data);
+    };
+
+
     return {
         findByRef,
         findRelatedForId,
         getById,
-        search
+        search,
+        changeRelationship
     }
 }
 

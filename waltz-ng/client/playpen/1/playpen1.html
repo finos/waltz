@@ -11,17 +11,13 @@
 
     <waltz-section name="foo">
 
-        <waltz-app-selector model="ctrl.newSource"
-                            on-select="ctrl.select">
-        </waltz-app-selector>
-
-        <br>
-
-        <waltz-entity-selector current-selection="ctrl.currentSelection"
-                               on-select="ctrl.select"
-                               entity-kinds="['APPLICATION', 'ACTOR']">
-
-        </waltz-entity-selector>
+        <waltz-related-entity-editor parent-entity-ref="ctrl.parentEntityRef"
+                                   current-relationships="ctrl.currentRelationships"
+                                   target-entity-kind="ctrl.targetEntityKind"
+                                   allowed-relationships="ctrl.allowedRelationships"
+                                   on-add="ctrl.onAdd"
+                                   on-remove="ctrl.onRemove">
+        </waltz-related-entity-editor>
 
 
     </waltz-section>

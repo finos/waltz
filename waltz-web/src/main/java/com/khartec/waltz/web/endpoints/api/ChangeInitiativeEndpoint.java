@@ -18,19 +18,22 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.entiy_relationship.EntityRelationship;
+import com.khartec.waltz.model.entiy_relationship.EntityRelationshipChangeCommand;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -39,12 +42,17 @@ public class ChangeInitiativeEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "change-initiative");
 
     private final ChangeInitiativeService service;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public ChangeInitiativeEndpoint(ChangeInitiativeService service) {
-        Checks.checkNotNull(service, "service cannot be null");
+    public ChangeInitiativeEndpoint(ChangeInitiativeService service,
+                                    UserRoleService userRoleService) {
+        checkNotNull(service, "service cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
+
         this.service = service;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -55,6 +63,7 @@ public class ChangeInitiativeEndpoint implements Endpoint {
         String getRelationshipsForIdPath = mkPath(getByIdPath, "related");
         String findForRefPath = mkPath(BASE_URL, "ref", ":kind", ":id");
         String searchPath = mkPath(BASE_URL, "search", ":query");
+        String changeEntityRelationshipPath = mkPath(BASE_URL, "id", ":id", "entity-relationship");
 
         DatumRoute<ChangeInitiative> getByIdRoute = (request, response) ->
                 service.getById(getId(request));
@@ -68,10 +77,30 @@ public class ChangeInitiativeEndpoint implements Endpoint {
         ListRoute<ChangeInitiative> searchRoute = (request, response) ->
                 service.search(request.params("query"));
 
+        DatumRoute<Boolean> changeEntityRelationshipRoute = (request, response) -> changeEntityRelationship(request);
+
+
         getForDatum(getByIdPath, getByIdRoute);
         getForList(getRelationshipsForIdPath, getRelationshipsForIdRoute);
         getForList(findForRefPath, findForRefRoute);
         getForList(searchPath, searchRoute);
-
+        postForDatum(changeEntityRelationshipPath, changeEntityRelationshipRoute);
     }
+
+
+    private Boolean changeEntityRelationship(Request request) throws java.io.IOException {
+        requireRole(userRoleService, request, Role.CHANGE_INITIATIVE_EDITOR);
+
+        EntityRelationshipChangeCommand command = readBody(request, EntityRelationshipChangeCommand.class);
+        switch (command.operation()) {
+            case ADD:
+                return service.addEntityRelationship(getId(request), command);
+            case REMOVE:
+                return service.removeEntityRelationship(getId(request), command);
+            default:
+                throw new UnsupportedOperationException("Command operation: "
+                        + command.operation() + " is not supported");
+        }
+    }
+
 }

@@ -15,10 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import _ from "lodash";
 import apiCheck from "api-check";
-import {notEmpty} from './index';
+import {notEmpty} from "./index";
 
 
 const myApiCheck = apiCheck({ verbose: false });
@@ -96,6 +95,13 @@ const createPhysicalFlowCommandShape = {
 };
 
 
+const entityRelationshipChangeCommandShape = {
+    operation: apiCheck.string,
+    entityReference: myApiCheck.shape(entityRefShape),
+    relationship: apiCheck.string
+};
+
+
 // -- CHECKERS
 
 const check = (test, x) => myApiCheck.throw(test, x);
@@ -133,6 +139,11 @@ export const checkIsCreateActorCommand = cmd =>
 
 export const checkIsCreateInvolvementKindCommand = ref =>
     check(myApiCheck.shape(createInvolvementKindCommandShape), ref);
+
+
+export const checkIsEntityRelationshipChangeCommand = ref => {
+    check(myApiCheck.shape(entityRelationshipChangeCommandShape), ref);
+};
 
 
 export const checkIsStringList = xs =>

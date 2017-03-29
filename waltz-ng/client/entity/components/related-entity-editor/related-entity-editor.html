@@ -1,0 +1,90 @@
+<div class="row">
+    <div class="col-md-6">
+        <div ng-if="$ctrl.currentRelationships.length > 0">
+
+            <p class="waltz-paragraph">
+                Current
+                <span ng-bind="$ctrl.targetEntityDisplayName"></span>
+                and their relation to
+                <waltz-entity-link entity-ref="$ctrl.parentEntityRef"></waltz-entity-link>.
+            </p>
+            <p class="waltz-paragraph text-muted">
+                Please use the search field to the right to locate
+                <span ng-bind="$ctrl.targetEntityDisplayName"></span>
+                to create a relationship.
+            </p>
+
+            <div class="waltz-scroll-region" style="height: 530px">
+                <table class="table table-striped table-condensed">
+                    <thead>
+                    <tr>
+                        <th>Entity</th>
+                        <th>Relationship</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tr ng-repeat="rel in $ctrl.currentRelationships | orderBy:'entity.name'"
+                        class="waltz-visibility-parent">
+
+                        <td>
+                            <waltz-entity-link entity-ref="rel.entity">
+                            </waltz-entity-link>
+                        </td>
+                        <td>
+                            <span ng-bind="rel.relationship | toDisplayName:'relationshipKind'">
+                            </span>
+                        </td>
+                        <td>
+                            <span class="waltz-visibility-child-50">
+                                <a ng-click="$ctrl.onRemove(rel)"
+                                   class="clickable">
+                                    Remove
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <waltz-no-data ng-if="$ctrl.currentRelationships.length ==0">
+            <message>
+                <waltz-icon name="warning"></waltz-icon>
+                <strong>No relationships exist.</strong>
+                Please use the search field on the right to start adding relationships.
+            </message>
+        </waltz-no-data>
+
+    </div>
+    <div class="col-md-6">
+
+        <p class="waltz-paragraph">
+            Use the search box below to locate
+            <span ng-bind="$ctrl.targetEntityDisplayName"></span>
+            and create relationships.
+        </p>
+
+        <br />
+
+        <waltz-entity-selector on-select="$ctrl.onEntitySelect"
+                               current-selection="$ctrl.currentRelationship.entity"
+                               entity-kinds="[$ctrl.targetEntityKind]">
+        </waltz-entity-selector>
+
+        <br />
+
+        <select ng-model="$ctrl.currentRelationship.relationship"
+                ng-options="rel.value as rel.name for rel in $ctrl.allowedRelationships"
+                class="form-control">
+        </select>
+
+        <br />
+
+        <button class="btn btn-info btn-small"
+                ng-disabled="!$ctrl.isCurrentRelationshipValid()"
+                ng-click="$ctrl.onRelationshipAdd()">
+            Add
+        </button>
+
+    </div>
+</div>

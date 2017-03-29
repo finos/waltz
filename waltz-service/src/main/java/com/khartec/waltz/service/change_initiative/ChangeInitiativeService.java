@@ -18,21 +18,25 @@
 
 package com.khartec.waltz.service.change_initiative;
 
-import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.data.change_initiative.search.ChangeInitiativeSearchDao;
 import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.entiy_relationship.EntityRelationship;
+import com.khartec.waltz.model.entiy_relationship.EntityRelationshipChangeCommand;
+import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
+import com.khartec.waltz.service.entity_relationship.EntityRelationshipUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
+
+import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityKind.CHANGE_INITIATIVE;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 
 @Service
 public class ChangeInitiativeService {
@@ -47,9 +51,9 @@ public class ChangeInitiativeService {
             ChangeInitiativeSearchDao searchDao,
             EntityRelationshipDao relationshipDao) {
 
-        Checks.checkNotNull(baseDao, "baseDao cannot be null");
-        Checks.checkNotNull(searchDao, "searchDao cannot be null");
-        Checks.checkNotNull(relationshipDao, "relationshipDao cannot be null");
+        checkNotNull(baseDao, "baseDao cannot be null");
+        checkNotNull(searchDao, "searchDao cannot be null");
+        checkNotNull(relationshipDao, "relationshipDao cannot be null");
 
         this.baseDao = baseDao;
         this.searchDao = searchDao;
@@ -68,7 +72,7 @@ public class ChangeInitiativeService {
 
 
     public Collection<ChangeInitiative> search(String query) {
-        return search(query, EntitySearchOptions.mkForEntity(EntityKind.CHANGE_INITIATIVE));
+        return search(query, EntitySearchOptions.mkForEntity(CHANGE_INITIATIVE));
     }
 
 
@@ -80,8 +84,42 @@ public class ChangeInitiativeService {
     public Collection<EntityRelationship> getRelatedEntitiesForId(long id) {
         EntityReference ref = ImmutableEntityReference.builder()
                 .id(id)
-                .kind(EntityKind.CHANGE_INITIATIVE)
+                .kind(CHANGE_INITIATIVE)
                 .build();
         return relationshipDao.findRelationshipsInvolving(ref);
     }
+
+
+    public boolean addEntityRelationship(long changeInitiativeId,
+                                         EntityRelationshipChangeCommand command) {
+        checkNotNull(command, "command cannot be null");
+
+        return relationshipDao.save(mkEntityRelationship(changeInitiativeId, command)) == 1;
+    }
+
+
+    public boolean removeEntityRelationship(long changeInitiativeId,
+                                            EntityRelationshipChangeCommand command) {
+        checkNotNull(command, "command cannot be null");
+
+        return relationshipDao.remove(mkEntityRelationship(changeInitiativeId, command)) == 1;
+    }
+
+
+    private EntityRelationship mkEntityRelationship(long changeInitiativeId, EntityRelationshipChangeCommand command) {
+        EntityReference entityReference = command.entityReference();
+        RelationshipKind relationship = command.relationship();
+
+        return EntityRelationshipUtilities.mkEntityRelationship(
+                mkRef(CHANGE_INITIATIVE, changeInitiativeId),
+                entityReference,
+                relationship)
+                .orElseThrow(() -> new RuntimeException(String.format(
+                        "Could not build a valid relationship for kind: %s between %s and %s",
+                        relationship,
+                        CHANGE_INITIATIVE,
+                        entityReference.kind()
+                )));
+    }
+
 }

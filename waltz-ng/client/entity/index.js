@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import angular from 'angular';
+import angular from "angular";
 
 
 export default () => {
@@ -28,7 +27,8 @@ export default () => {
     module
         .component('waltzEntityHierarchyNavigator', require('./components/entity-hierarchy-navigator/entity-hierarchy-navigator'))
         .component('waltzEntitySelector', require('./components/entity-selector/entity-selector'))
-        .component('waltzImmediateHierarchyNavigator', require('./components/immediate-hierarchy-navigator/immediate-hierarchy-navigator'));
+        .component('waltzImmediateHierarchyNavigator', require('./components/immediate-hierarchy-navigator/immediate-hierarchy-navigator'))
+        .component('waltzRelatedEntityEditor', require('./components/related-entity-editor/related-entity-editor'));
 
     return module.name;
 };

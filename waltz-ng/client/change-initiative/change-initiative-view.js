@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+import {groupRelationships, enrichRelationships} from "./change-initiative-utils";
 import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
 import * as _ from "lodash";
 
@@ -34,6 +34,7 @@ const initialState = {
 
 function controller($q,
                     $stateParams,
+                    applicationStore,
                     appGroupStore,
                     bookmarkStore,
                     changeInitiativeStore,
@@ -53,21 +54,25 @@ function controller($q,
 
     const loadRelatedEntities = (id, rels = []) => {
 
-        const relatedByKind = _.chain(rels)
-            .flatMap(rel => ([rel.a, rel.b]))
-            .reject(ref => ref.kind === 'CHANGE_INITIATIVE' && ref.id === id)
-            .groupBy('kind', 'id')
-            .mapValues(vs => _.map(vs, 'id'))
-            .value();
+        const relationships = groupRelationships(id, rels);
+
+        const appGroupIds = _.map(relationships.APP_GROUP, 'entity.id');
 
         const promises = [
-            appGroupStore.findByIds(relatedByKind.APP_GROUP)
+            appGroupStore.findByIds(appGroupIds),
+            applicationStore.findBySelector({
+                entityReference: vm.entityRef,
+                scope: 'EXACT'
+            })
         ];
 
         return $q
             .all(promises)
-            .then(([appGroups]) => {
-                return {appGroups}
+            .then(([appGroups, apps]) => {
+                const appGroupRelationships = enrichRelationships(relationships.APP_GROUP, appGroups);
+                const appRelationships = enrichRelationships(relationships.APPLICATION, apps);
+
+                return {appGroupRelationships, appRelationships}
             });
 
     };
@@ -123,6 +128,7 @@ function controller($q,
 controller.$inject = [
     '$q',
     '$stateParams',
+    'ApplicationStore',
     'AppGroupStore',
     'BookmarkStore',
     'ChangeInitiativeStore',

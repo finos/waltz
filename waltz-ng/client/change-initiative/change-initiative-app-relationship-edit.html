@@ -1,0 +1,23 @@
+<div>
+
+    <waltz-page-header name="Edit related applications"
+                       icon="desktop">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><waltz-entity-link entity-ref="ctrl.entityRef"></waltz-entity-link></li>
+            <li>Edit related applications</li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+
+        <waltz-related-entity-editor parent-entity-ref="ctrl.entityRef"
+                                     current-relationships="ctrl.currentRelationships"
+                                     target-entity-kind="'APPLICATION'"
+                                     allowed-relationships="ctrl.allowedRelationships"
+                                     on-add="ctrl.onAdd"
+                                     on-remove="ctrl.onRemove">
+        </waltz-related-entity-editor>
+    </div>
+
+</div>
