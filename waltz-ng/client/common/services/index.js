@@ -34,6 +34,7 @@ import {
     lifecyclePhaseDisplayNames,
     lifecycleStatusNames,
     orgUnitKindNames,
+    relationshipKindNames,
     rollupKindNames,
     severityNames,
     surveyInstanceStatusNames,
@@ -126,6 +127,7 @@ export default (module) => {
         .register('lifecycleStatus', lifecycleStatusNames)
         .register('orgUnitKind', orgUnitKindNames)
         .register('rating', authSourceRatingNames)
+        .register('relationshipKind', relationshipKindNames)
         .register('rollupKind', rollupKindNames)
         .register('severity', severityNames)
         .register('surveyInstanceStatus', surveyInstanceStatusNames)

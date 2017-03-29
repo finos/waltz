@@ -18,15 +18,55 @@
 
 package com.khartec.waltz.model.entiy_relationship;
 
-/**
- * Created by dwatkins on 24/04/2016.
- */
+import com.khartec.waltz.model.EntityKind;
+import org.jooq.lambda.tuple.Tuple2;
+
+import java.util.Collections;
+import java.util.Set;
+
+import static com.khartec.waltz.common.SetUtilities.fromArray;
+import static com.khartec.waltz.model.EntityKind.*;
+import static org.jooq.lambda.tuple.Tuple.tuple;
+
+
 public enum RelationshipKind {
 
-    HAS,
-    PARTICIPATES_IN,
-    LOOSELY_RELATES_TO,
-    RELATES_TO,
-    SUPPORTS
+    HAS(Collections.emptySet()),
+
+    DEPRECATES(fromArray(
+            tuple(CHANGE_INITIATIVE, APPLICATION)
+    )),
+
+    LOOSELY_RELATES_TO(fromArray(
+            tuple(MEASURABLE, MEASURABLE)
+    )),
+
+    PARTICIPATES_IN(fromArray(
+            tuple(APPLICATION, PROCESS),
+            tuple(APPLICATION, CHANGE_INITIATIVE)
+    )),
+
+    RELATES_TO(fromArray(
+            tuple(APP_GROUP, CHANGE_INITIATIVE),
+            tuple(MEASURABLE, MEASURABLE)
+    )),
+
+    SUPPORTS(fromArray(
+            tuple(APPLICATION, CHANGE_INITIATIVE),
+            tuple(MEASURABLE, PROCESS)
+    ));
+
+
+    private Set<Tuple2<EntityKind, EntityKind>> allowedEntityKinds;
+
+
+    RelationshipKind(Set<Tuple2<EntityKind, EntityKind>> allowedEntityKinds) {
+        this.allowedEntityKinds = allowedEntityKinds;
+    }
+
+
+    public Set<Tuple2<EntityKind, EntityKind>> getAllowedEntityKinds() {
+        return this.allowedEntityKinds;
+    }
 
 }

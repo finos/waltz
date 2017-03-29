@@ -15,15 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import _ from "lodash";
-import {
-    criticalityDisplayNames,
-    investmentRatingNames,
-    lifecyclePhaseDisplayNames,
-    applicationKindDisplayNames
-} from "../../common/services/display-names";
-
+import {mapToDisplayNames} from "../application-utils";
 
 const bindings = {
     applications: '<',
@@ -31,19 +24,12 @@ const bindings = {
 };
 
 
-function processApps(apps = []) {
-    return _.chain(apps || [])
-        .map(a => Object.assign(
+function mkGridData(apps = []) {
+    return _.map(apps || [], a => Object.assign(
             {},
             a,
-            {
-                kind: applicationKindDisplayNames[a.kind] || a.kind,
-                overallRating: investmentRatingNames[a.overallRating] || a.overallRating,
-                businessCriticality: criticalityDisplayNames[a.businessCriticality] || a.businessCriticality,
-                riskRating: criticalityDisplayNames[a.riskRating] || a.riskRating,
-                lifecyclePhase: lifecyclePhaseDisplayNames[a.lifecyclePhase] || a.lifecyclePhase
-            }))
-        .value();
+            mapToDisplayNames(a))
+    );
 }
 
 
@@ -61,11 +47,11 @@ const columnDefs = [
                        </div>`
     },
     { field: 'assetCode'},
-    { field: 'kind'},
-    { field: 'overallRating'},
-    { field: 'riskRating'},
-    { field: 'businessCriticality'},
-    { field: 'lifecyclePhase'}
+    { field: 'kindDisplay', name: 'Kind'},
+    { field: 'overallRatingDisplay', name: 'Overall Rating'},
+    { field: 'riskRatingDisplay', name: 'Risk Rating'},
+    { field: 'businessCriticalityDisplay', name: 'Business Criticality'},
+    { field: 'lifecyclePhaseDisplay', name: 'Lifecycle Phase'}
 ];
 
 
@@ -75,7 +61,7 @@ function controller() {
 
     vm.columnDefs = columnDefs;
 
-    vm.$onChanges= () => vm.gridData = processApps(vm.applications);
+    vm.$onChanges= () => vm.gridData = mkGridData(vm.applications);
 }
 
 

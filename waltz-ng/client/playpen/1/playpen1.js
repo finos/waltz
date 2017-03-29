@@ -15,28 +15,44 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { variableScale } from '../../common/colors';
 
 
 const initData = {
-    candidateSpecifications: [],
-    visible: true,
-    current: null,
-    currentSelection: {
-        description: "Tiger Actor",
-        id: 21,
-        kind: "ACTOR",
-        name: "Tiger"
-    }
+    parentEntityRef: {
+        description: "Change Regional Reporting",
+        id: 14,
+        kind: "CHANGE_INITIATIVE",
+        name: "Change Regional Reporting"
+    },
+    currentRelationships: [
+        {
+            entity: { kind: "APPLICATION", id: 1, name: "app 1" },
+            relationship: "SUPPORTS"
+        },
+        {
+            entity: { kind: "APPLICATION", id: 2, name: "app 2" },
+            relationship: "DEPRECATES"
+        },
+        {
+            entity: { kind: "APPLICATION", id: 3, name: "app 3" },
+            relationship: "PARTICIPATES_IN"
+        },
+    ],
+    targetEntityKind: 'APPLICATION',
+    allowedRelationships: ['DEPRECATES', 'SUPPORTS', 'PARTICIPATES_IN']
 };
 
 
 function controller() {
     const vm = Object.assign(this, initData);
 
-    vm.select = (ss) => {
-        console.log(ss);
-    }
+    vm.onAdd = (entityRef) => {
+        console.log(entityRef);
+    };
+
+    vm.onRemove = (entityRef) => {
+        console.log(entityRef);
+    };
 }
 
 

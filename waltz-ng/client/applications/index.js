@@ -39,7 +39,8 @@ export default () => {
         .component('waltzAppsSection', require('./components/apps-section/apps-section'))
         .component('waltzAppSummary', require('./components/app-summary'))
         .component('waltzAppTable', require('./components/app-table'))
-        .component('waltzAppCostsSection', require('./components/app-costs-section/app-costs-section'));
+        .component('waltzAppCostsSection', require('./components/app-costs-section/app-costs-section'))
+        .component('waltzRelatedAppsSection', require('./components/related-apps-section/related-apps-section'));
 
     return module.name;
 };

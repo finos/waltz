@@ -15,35 +15,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package com.khartec.waltz.model.user;
-
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-
-public enum Role {
-    ADMIN,
-    APP_EDITOR,
-    ANONYMOUS,
-    AUTHORITATIVE_SOURCE_EDITOR,
-    BETA_TESTER,
-    BOOKMARK_EDITOR,
-    CAPABILITY_EDITOR,
-    CHANGE_INITIATIVE_EDITOR,
-    LINEAGE_EDITOR,
-    LOGICAL_DATA_FLOW_EDITOR,
-    ORG_UNIT_EDITOR,
-    RATING_EDITOR,
-    SURVEY_ADMIN
-    ;
+import {
+    criticalityDisplayNames,
+    investmentRatingNames,
+    lifecyclePhaseDisplayNames,
+    applicationKindDisplayNames
+} from "../common/services/display-names";
 
 
-    public static Set<String> allNames() {
-        return Stream
-                .of(Role.values())
-                .map(r -> r.name())
-                .collect(Collectors.toSet());
+export function mapToDisplayNames(app) {
+    return {
+        kindDisplay: applicationKindDisplayNames[app.kind] || app.kind,
+        overallRatingDisplay: investmentRatingNames[app.overallRating] || app.overallRating,
+        businessCriticalityDisplay: criticalityDisplayNames[app.businessCriticality] || app.businessCriticality,
+        riskRatingDisplay: criticalityDisplayNames[app.riskRating] || app.riskRating,
+        lifecyclePhaseDisplay: lifecyclePhaseDisplayNames[app.lifecyclePhase] || app.lifecyclePhase
     }
 }

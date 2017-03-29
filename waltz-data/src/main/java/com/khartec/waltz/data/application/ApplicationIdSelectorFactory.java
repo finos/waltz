@@ -37,6 +37,7 @@ import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
+import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
@@ -57,7 +58,7 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
     private final Application app = APPLICATION.as("app");
     private final ApplicationGroupEntry appGroup = APPLICATION_GROUP_ENTRY.as("appgrp");
-    private final EntityRelationship relationship = EntityRelationship.ENTITY_RELATIONSHIP.as("relationship");
+    private final EntityRelationship relationship = ENTITY_RELATIONSHIP.as("relationship");
     private final Involvement involvement = INVOLVEMENT.as("involvement");
     private final MeasurableRating measurableRating = MEASURABLE_RATING.as("m_rating");
     private final Person person = PERSON.as("per");
@@ -90,6 +91,8 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 return mkForAppGroup(ref, options.scope());
             case APPLICATION:
                 return mkForApplication(ref, options.scope());
+            case CHANGE_INITIATIVE:
+                return mkForChangeInitiative(ref, options.scope());
             case DATA_TYPE:
                 return mkForDataType(options);
             case MEASURABLE:
@@ -118,6 +121,27 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     private Select<Record1<Long>> mkForApplication(EntityReference ref, HierarchyQueryScope scope) {
         checkTrue(scope == EXACT, "Can only create selector for exact matches if given an app ref");
         return DSL.select(DSL.val(ref.id()));
+    }
+
+
+    private Select<Record1<Long>> mkForChangeInitiative(EntityReference ref, HierarchyQueryScope scope) {
+        checkTrue(scope == EXACT, "Can only create selector for exact matches if given a change initiative");
+
+        Select<Record1<Long>> appToCi = DSL.selectDistinct(ENTITY_RELATIONSHIP.ID_A)
+                .from(ENTITY_RELATIONSHIP)
+                .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APPLICATION.name()))
+                .and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()))
+                .and(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()));
+
+        Select<Record1<Long>> ciToApp = DSL.selectDistinct(ENTITY_RELATIONSHIP.ID_B)
+                .from(ENTITY_RELATIONSHIP)
+                .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.APPLICATION.name()))
+                .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
+                .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()));
+
+
+        return appToCi
+                .union(ciToApp);
     }
 
 

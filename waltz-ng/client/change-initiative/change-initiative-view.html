@@ -99,11 +99,20 @@
     </waltz-involved-people-section>
 
 
+    <!-- RELATED APPS -->
+    <waltz-related-apps-section app-relationships="ctrl.related.appRelationships"
+                                edit-role="CHANGE_INITIATIVE_EDITOR"
+                                parent-entity-ref="ctrl.entityRef"
+                                source-data-ratings="ctrl.sourceDataRatings">
+    </waltz-related-apps-section>
+
+
+    <!-- RELATED APP GROUPS -->
     <waltz-section icon="object-group"
                    name="Related App Groups">
         <div class="row">
             <div class="col-md-12">
-                <div ng-if="ctrl.related.appGroups.length > 0">
+                <div ng-if="ctrl.related.appGroupRelationships.length > 0">
                     <table class="table table-condensed small">
                         <thead>
                         <tr>
@@ -113,23 +122,23 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="group in ctrl.related.appGroups">
+                        <tr ng-repeat="appGroupRel in ctrl.related.appGroupRelationships">
                             <td>
-                                <a ui-sref="main.app-group.view ({id: group.id})">
-                                    <span ng-bind="group.name"></span>
+                                <a ui-sref="main.app-group.view ({id: appGroupRel.entity.id})">
+                                    <span ng-bind="appGroupRel.entity.name"></span>
                                 </a>
                             </td>
                             <td>
-                                <span ng-bind="group.kind"></span>
+                                <span ng-bind="appGroupRel.entity.kind"></span>
                             </td>
                             <td>
-                                <span ng-bind="group.description | limitTo: 50"></span>
+                                <span ng-bind="appGroupRel.entity.description | limitTo: 50"></span>
                             </td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
-                <waltz-no-data ng-if="ctrl.related.appGroups.length == 0">
+                <waltz-no-data ng-if="ctrl.related.appGroupRelationships.length == 0">
                     <message>
                         <strong>No Groups have been associated with this change initiative</strong>
                     </message>

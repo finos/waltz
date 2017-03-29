@@ -59,6 +59,14 @@ export function kindToViewState(kind) {
 }
 
 
+export function kindToBaseState(kind) {
+    if (kind === 'CHANGE_INITIATIVE') {
+        return "main.change-initiative";
+    }
+    throw "Unable to convert kind: "+kind+ " to a ui-base state";
+}
+
+
 /**
  * Creates a column def to render an entity link
  *
