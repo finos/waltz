@@ -172,6 +172,7 @@ public class SurveyRunService {
                                         .build())
                                 .person(p)
                                 .build()))
+                .distinct()
                 .collect(toList());
     }
 
