@@ -38,7 +38,16 @@ const childrenScope = {
 
 
 const initialState = {
-    allowedEntityKinds: [], // TODO initialise here after #1798
+    allowedEntityKinds: [{
+        value: 'APP_GROUP',
+        name: 'Application Group'
+    },{
+        value: 'ORG_UNIT',
+        name: 'Org Unit'
+    },{
+        value: 'MEASURABLE',
+        name: 'Measurable'
+    }],
     allowedScopes: {
         'APP_GROUP': [exactScope],
         'CHANGE_INITIATIVE': [exactScope],
@@ -51,38 +60,9 @@ const initialState = {
 const template = require('./survey-run-create-general.html');
 
 
-// TODO remove after #1798
-function filterAllowedEntityKinds(entityKind) {
-    const appGroup = {
-        value: 'APP_GROUP',
-        name: 'Application Group'
-    };
-
-    if (entityKind === 'CHANGE_INITIATIVE') {
-        return [appGroup, {
-            value: 'CHANGE_INITIATIVE',
-            name: 'Change Initiative'
-        }];
-    }
-    return [appGroup, {
-        value: 'ORG_UNIT',
-        name: 'Org Unit'
-    },{
-        value: 'MEASURABLE',
-        name: 'Measurable'
-    }];
-}
-
 
 function controller(appGroupStore, involvementKindStore) {
     const vm = initialiseData(this, initialState);
-
-    vm.$onChanges = () => {
-        if (vm.surveyTemplate) {
-            // TODO remove after #1798
-            vm.allowedEntityKinds = filterAllowedEntityKinds(vm.surveyTemplate.targetEntityKind);
-        }
-    };
 
     Promise
         .all([appGroupStore.findPublicGroups(), appGroupStore.findPrivateGroups()])
