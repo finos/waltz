@@ -9,7 +9,10 @@
         </ol>
     </waltz-page-header>
 
-    <waltz-section name="foo">
+    <waltz-section name="foo non collapsible" collapsible="false">
+    </waltz-section>
+
+    <waltz-section name="foo" collapsible="true">
 
         <waltz-related-entity-editor parent-entity-ref="ctrl.parentEntityRef"
                                    current-relationships="ctrl.currentRelationships"
@@ -21,6 +24,8 @@
 
 
     </waltz-section>
+
+
 
 
 </div>

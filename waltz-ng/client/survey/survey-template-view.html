@@ -81,8 +81,11 @@
                     </td>
                     <td><span ng-bind="r.status | toDisplayName:'surveyRunStatus'"></span></td>
                     <td>
-                        <div uib-popover="{{ctrl.runCompletionRates[r.id].text}}" popover-trigger="mouseenter">
-                            <uib-progress max="ctrl.runCompletionRates[r.id].totalCount">
+                        <div uib-popover="{{ctrl.runCompletionRates[r.id].text}}"
+                             popover-trigger="mouseenter">
+                            <uib-progress max="ctrl.runCompletionRates[r.id].totalCount"
+                                          animate="false"
+                                          class="waltz-survey-progress">
                                 <uib-bar value="ctrl.runCompletionRates[r.id].completedCount"
                                          ng-bind="ctrl.runCompletionRates[r.id].completedCount"
                                          type="success">
