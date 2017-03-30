@@ -365,4 +365,14 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 1874 -->
+    <changeSet id="20170330-1874-1"
+               author="rovats">
+        <comment>1874: Prevent duplicate survey template names</comment>
+        <addUniqueConstraint columnNames="name"
+                             constraintName="unique_name"
+                             tableName="survey_template"/>
+    </changeSet>
+
 </databaseChangeLog>
