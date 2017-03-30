@@ -132,6 +132,10 @@
                                     <waltz-entity-link entity-ref="ctrl.answers[qi.question.id].answer">
                                     </waltz-entity-link>
                                 </div>
+                                <div ng-switch-when="NUMBER">
+                                    <span ng-bind="ctrl.answers[qi.question.id].answer | number">
+                                    </span>
+                                </div>
                                 <div ng-switch-default>
                                     <span ng-bind="ctrl.answers[qi.question.id].answer">
                                     </span>
