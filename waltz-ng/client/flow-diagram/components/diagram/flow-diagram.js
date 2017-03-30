@@ -633,7 +633,8 @@ function controller($element) {
 
         state.groups
             .svg
-            .call(myZoom);
+            .call(myZoom)
+            .on('dblclick.zoom', null);
 
         vm.$onChanges();
     };
