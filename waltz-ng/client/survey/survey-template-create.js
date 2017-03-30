@@ -42,6 +42,8 @@ function controller($state,
             .then(templateId => {
                 notification.success('Survey template created successfully');
                 $state.go('main.survey.template.edit', {id: templateId});
+            }, errorResponse => {
+                notification.error('Failed to create survey template, ensure that the template name is unique');
             });
     }
 }
