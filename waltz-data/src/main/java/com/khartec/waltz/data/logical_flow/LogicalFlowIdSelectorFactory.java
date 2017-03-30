@@ -31,8 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 
 
 @Service
@@ -89,7 +90,8 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
 
         return DSL.select(LOGICAL_FLOW.ID)
                 .from(LOGICAL_FLOW)
-                .where(sourceCondition.or(targetCondition));
+                .where(sourceCondition.or(targetCondition))
+                .and(NOT_REMOVED);
     }
 
 
@@ -101,7 +103,8 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(appId)
                         .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(appId)
-                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .and(NOT_REMOVED);
     }
 
 
@@ -111,7 +114,8 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
         return DSL.select(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID)
                 .from(LOGICAL_FLOW_DECORATOR)
                 .where(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector)
-                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())));
+                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
+                .and(NOT_REMOVED);
 
     }
 }

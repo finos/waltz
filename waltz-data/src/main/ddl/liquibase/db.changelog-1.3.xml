@@ -234,7 +234,8 @@
 
 
     <!-- 236 -->
-    <changeSet id="20170311-236-1" author="davidwatkins73">
+    <changeSet id="20170311-236-1"
+               author="davidwatkins73">
         <comment>236: Create entity tag table</comment>
         <createTable tableName="entity_tag"
                      remarks="Allows for association of zero or more tags with entities">
@@ -360,6 +361,20 @@
             </column>
             <column name="entity_response_kind"
                     type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <!-- 1888 -->
+    <changeSet id="20170329-1888-1"
+               author="davidwatkins73">
+        <comment>1888: Logical Flows soft delete</comment>
+        <addColumn tableName="logical_flow">
+            <column name="removed"
+                    type="boolean"
+                    defaultValueBoolean="false">
                 <constraints nullable="true"/>
             </column>
         </addColumn>

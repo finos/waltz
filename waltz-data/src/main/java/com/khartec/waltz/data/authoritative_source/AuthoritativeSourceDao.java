@@ -198,14 +198,6 @@ public class AuthoritativeSourceDao {
     }
 
 
-    public List<AuthoritativeSource> findByEntityReferences(EntityKind kind, List<Long> ids) {
-        return baseSelect()
-                .where(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(kind.name()))
-                .and(AUTHORITATIVE_SOURCE.PARENT_ID.in(ids))
-                .fetch(TO_AUTH_SOURCE_MAPPER);
-    }
-
-
     public List<AuthoritativeRatingVantagePoint> findAuthoritativeRatingVantagePoints(Set<Long> orgIds) {
         return dsl.select(
                     ENTITY_HIERARCHY.ID,
@@ -264,6 +256,8 @@ public class AuthoritativeSourceDao {
                 .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
                 .and(au.DATA_TYPE.in(dataTypeCodeSelector));
 
+        Condition notRemoved = lf.REMOVED.isFalse();
+
         Field<Long> authSourceIdField = au.ID.as("auth_source_id");
         Field<Long> applicationIdField = app.ID.as("application_id");
         Field<String> applicationNameField = app.NAME.as("application_name");
@@ -278,6 +272,7 @@ public class AuthoritativeSourceDao {
                 .innerJoin(eh).on(hierarchyJoin)
                 .innerJoin(app).on(appJoin)
                 .where(condition)
+                .and(notRemoved)
                 .orderBy(au.ID, app.NAME)
                 .fetch();
 

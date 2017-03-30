@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
@@ -283,7 +284,8 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 .from(LOGICAL_FLOW)
                 .innerJoin(LOGICAL_FLOW_DECORATOR)
                 .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
-                .where(dsl.renderInlined(condition));
+                .where(dsl.renderInlined(condition))
+                .and(NOT_REMOVED);
     }
 
 }
