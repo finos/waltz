@@ -5,13 +5,19 @@
 
             <div class="waltz-visibility-parent waltz-section-header-title">
 
-                <waltz-twistie
-                    collapsed="$ctrl.collapsed"
-                    toggle-expansion="$ctrl.expand">
+                <waltz-twistie ng-if="$ctrl.collapsible"
+                               collapsed="$ctrl.collapsed"
+                               toggle-expansion="$ctrl.expand">
                 </waltz-twistie>
 
-                <span ng-click="$ctrl.expand(!$ctrl.collapsed)"
-                      class="clickable">
+                <span ng-if="! $ctrl.collapsible"
+                      class="text-muted">
+                    <waltz-icon name="chevron-down">
+                    </waltz-icon>
+                </span>
+
+                <span ng-click="$ctrl.collapsible && $ctrl.expand(!$ctrl.collapsed)"
+                      ng-class="{ clickable: $ctrl.collapsible }">
                     <waltz-icon name="{{ $ctrl.icon }}"></waltz-icon>
                     <span ng-bind="$ctrl.name"></span>
 
