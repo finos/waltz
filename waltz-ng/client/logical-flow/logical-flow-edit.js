@@ -71,16 +71,6 @@ function mkNewFlow(source, target) {
 }
 
 
-function addFlow(flows, flow) {
-    const alreadyRegistered = _.some(
-        flows,
-        f => f.source.id === flow.source.id && f.target.id === flow.targetId);
-
-    if (! alreadyRegistered) {
-        flows.push(flow);
-    }
-}
-
 
 function mkAddFlowCommand(flow) {
     return {
@@ -107,6 +97,20 @@ function controller($scope,
         kind: 'APPLICATION',
         id: application.id,
         name: application.name
+    };
+
+    const addFlow = (flows, flow) => {
+        const alreadyRegistered = _.some(
+            flows,
+            f => f.source.id === flow.source.id && f.target.id === flow.targetId);
+
+        if (! alreadyRegistered) {
+            return logicalFlowStore.addFlow(mkAddFlowCommand(flow))
+                .then(savedFlow => flows.push(savedFlow))
+                .then(reload);
+        } else {
+            return Promise.resolve();
+        }
     };
 
     const reload = () => {
@@ -194,15 +198,15 @@ function controller($scope,
     const addSource = (kind, entity) => {
         const counterpartRef = { id: entity.id, kind, name: entity.name };
         if (notifyIllegalFlow(notification, vm.primaryRef, counterpartRef)) return;
-        addFlow(vm.flows, mkNewFlow(counterpartRef, vm.primaryRef));
-        selectSource(entity);
+        addFlow(vm.flows, mkNewFlow(counterpartRef, vm.primaryRef))
+            .then(() => selectSource(entity));
     };
 
     const addTarget = (kind, entity) => {
         const counterpartRef = { id: entity.id, kind, name: entity.name };
         if (notifyIllegalFlow(notification, vm.primaryRef, counterpartRef)) return;
-        addFlow(vm.flows, mkNewFlow(vm.primaryRef, counterpartRef));
-        selectTarget(entity);
+        addFlow(vm.flows, mkNewFlow(vm.primaryRef, counterpartRef))
+            .then(() => selectTarget(entity));
     };
 
     vm.addSourceApplication = (srcApp) => {

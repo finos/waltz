@@ -16,24 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.logical_flow;
+package com.khartec.waltz.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
+public interface IsRemovedProvider {
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableLogicalFlow.class)
-@JsonDeserialize(as = ImmutableLogicalFlow.class)
-public abstract class LogicalFlow implements
-        IdProvider,
-        ProvenanceProvider,
-        LastUpdatedProvider,
-        IsRemovedProvider {
-
-    public abstract EntityReference source();
-    public abstract EntityReference target();
+    @Value.Default
+    default boolean isRemoved() {
+        return false;
+    }
 
 }

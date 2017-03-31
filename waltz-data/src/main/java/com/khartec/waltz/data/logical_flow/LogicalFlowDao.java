@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.Optional.ofNullable;
@@ -70,6 +71,7 @@ public class LogicalFlowDao {
                         .id(record.getTargetEntityId())
                         .name(ofNullable(r.getValue(TARGET_NAME_FIELD)))
                         .build())
+                .isRemoved(record.getRemoved())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .provenance(record.getProvenance())
@@ -86,8 +88,12 @@ public class LogicalFlowDao {
         record.setLastUpdatedBy(flow.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(flow.lastUpdatedAt()));
         record.setProvenance(flow.provenance());
+        record.setRemoved(flow.isRemoved());
         return record;
     };
+
+
+    public static final Condition NOT_REMOVED = LOGICAL_FLOW.REMOVED.isFalse();
 
 
     private final DSLContext dsl;
@@ -104,6 +110,7 @@ public class LogicalFlowDao {
         return baseQuery()
                 .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(ref.id()))
                 .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id()))
+                .and(NOT_REMOVED)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -112,27 +119,49 @@ public class LogicalFlowDao {
         return baseQuery()
                 .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(source.id()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(target.id()))
+                .and(NOT_REMOVED)
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
-    @Deprecated
-    // replace with a method that delete for a single flowId
-    public int removeFlows(List<Long> flowIds) {
-        return dsl.deleteFrom(LOGICAL_FLOW)
-                .where(LOGICAL_FLOW.ID.in(flowIds))
+    public int removeFlow(Long flowId, String user) {
+        return dsl.update(LOGICAL_FLOW)
+                .set(LOGICAL_FLOW.REMOVED, true)
+                .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
+                .set(LOGICAL_FLOW.LAST_UPDATED_BY, user)
+                .where(LOGICAL_FLOW.ID.eq(flowId))
                 .execute();
     }
 
 
     public LogicalFlow addFlow(LogicalFlow flow) {
-        LogicalFlowRecord record = TO_RECORD_MAPPER.apply(flow, dsl);
+        if (restoreFlow(flow)) {
+            return findBySourceAndTarget(flow.source(), flow.target());
+        } else {
+            LogicalFlowRecord record = TO_RECORD_MAPPER.apply(flow, dsl);
+            record.store();
+            return ImmutableLogicalFlow
+                    .copyOf(flow)
+                    .withId(record.getId());
+        }
+    }
 
-        record.store();
 
-        return ImmutableLogicalFlow
-                .copyOf(flow)
-                .withId(record.getId());
+    /**
+     * Attempt to restore a flow.  The id is ignored and only source and target
+     * are used. Return's true if the flow has been successfully restored or
+     * false if no matching (removed) flow was found.
+     * @param flow
+     * @return
+     */
+    private boolean restoreFlow(LogicalFlow flow) {
+        return dsl.update(LOGICAL_FLOW)
+                .set(LOGICAL_FLOW.REMOVED, false)
+                .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(flow.source().id()))
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(flow.source().kind().name()))
+                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(flow.target().id()))
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(flow.target().kind().name()))
+                .execute() == 1;
     }
 
 
@@ -147,14 +176,15 @@ public class LogicalFlowDao {
     public List<LogicalFlow> findByFlowIds(Collection<Long> dataFlowIds) {
         return baseQuery()
                 .where(LOGICAL_FLOW.ID.in(dataFlowIds))
+                .and(NOT_REMOVED)
                 .fetch(TO_DOMAIN_MAPPER);
     }
-
 
 
     public List<LogicalFlow> findBySelector(Select<Record1<Long>> flowIdSelector) {
         return baseQuery()
                 .where(LOGICAL_FLOW.ID.in(flowIdSelector))
+                .and(NOT_REMOVED)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

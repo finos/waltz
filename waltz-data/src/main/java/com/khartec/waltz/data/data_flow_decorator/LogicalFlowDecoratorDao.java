@@ -41,6 +41,7 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.stream.Collectors.toList;
@@ -105,6 +106,7 @@ public class LogicalFlowDecoratorDao {
                         .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(nodeKind.name())))
                 .or(LOGICAL_FLOW.TARGET_ENTITY_ID.in(nodeIdSelector)
                         .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(nodeKind.name())))
+                .and(NOT_REMOVED)
                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorEntityKind.name()))
                 .fetch(TO_DECORATOR_MAPPER);
     }
@@ -121,7 +123,10 @@ public class LogicalFlowDecoratorDao {
         return dsl
                 .select(LOGICAL_FLOW_DECORATOR.fields())
                 .from(LOGICAL_FLOW_DECORATOR)
+                .innerJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
                 .where(dsl.renderInlined(condition))
+                .and(NOT_REMOVED)
                 .fetch(TO_DECORATOR_MAPPER);
     }
 
@@ -143,6 +148,7 @@ public class LogicalFlowDecoratorDao {
                 .from(LOGICAL_FLOW_DECORATOR)
                 .innerJoin(LOGICAL_FLOW)
                 .on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
+                .and(NOT_REMOVED)
                 .where(dsl.renderInlined(condition))
                 .fetch(TO_DECORATOR_MAPPER);
     }
@@ -169,6 +175,7 @@ public class LogicalFlowDecoratorDao {
                 .innerJoin(LOGICAL_FLOW)
                 .on(dsl.renderInlined(dataFlowJoinCondition))
                 .where(dsl.renderInlined(condition))
+                .and(NOT_REMOVED)
                 .groupBy(groupingFields)
                 .fetch(r -> {
                     EntityKind decoratorEntityKind = EntityKind.valueOf(r.getValue(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND));

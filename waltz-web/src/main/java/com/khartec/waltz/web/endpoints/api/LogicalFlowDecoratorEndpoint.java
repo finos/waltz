@@ -42,9 +42,7 @@ import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
-/**
- * Created by dwatkins on 30/08/2016.
- */
+
 @Service
 public class LogicalFlowDecoratorEndpoint implements Endpoint {
 

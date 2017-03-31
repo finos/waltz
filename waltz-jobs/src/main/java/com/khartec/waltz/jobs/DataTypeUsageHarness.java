@@ -18,14 +18,19 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.data_type_usage.DataTypeUsageDao;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.List;
+
+import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class DataTypeUsageHarness {
@@ -37,11 +42,13 @@ public class DataTypeUsageHarness {
         DataTypeUsageDao dao = ctx.getBean(DataTypeUsageDao.class);
         DataTypeUsageService svc = ctx.getBean(DataTypeUsageService.class);
 
-        svc.recalculateForApplications(ListUtilities.newArrayList(EntityReference.mkRef(EntityKind.APPLICATION,22704)));
-
 
         long st = System.currentTimeMillis();
-//        service.recalculateForAllApplications();
+
+        dao.recalculateForAllApplications();
+        List<DataTypeUsage> usages = svc.findForDataTypeSelector(mkOpts(mkRef(EntityKind.DATA_TYPE, 1000), HierarchyQueryScope.CHILDREN));
+        System.out.println(usages);
+
         System.out.println("Took "+ (System.currentTimeMillis() - st));
     }
 
