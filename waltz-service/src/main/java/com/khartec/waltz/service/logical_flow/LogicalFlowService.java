@@ -19,7 +19,6 @@
 package com.khartec.waltz.service.logical_flow;
 
 import com.khartec.waltz.common.FunctionUtilities;
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
@@ -177,7 +176,7 @@ public class LogicalFlowService {
     public int removeFlow(Long flowId, String username) {
         LogicalFlow logicalFlow = logicalFlowDao.findByFlowId(flowId);
 
-        int deleted = logicalFlowDao.removeFlows(ListUtilities.newArrayList(flowId));
+        int deleted = logicalFlowDao.removeFlow(flowId, username);
 
         Set<EntityReference> affectedEntityRefs = SetUtilities.fromArray(logicalFlow.source(), logicalFlow.target());
 

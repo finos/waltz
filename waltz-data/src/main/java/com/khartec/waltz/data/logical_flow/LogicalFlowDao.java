@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.Optional.ofNullable;
@@ -123,10 +124,12 @@ public class LogicalFlowDao {
     }
 
 
-    public int removeFlows(List<Long> flowIds) {
+    public int removeFlow(Long flowId, String user) {
         return dsl.update(LOGICAL_FLOW)
                 .set(LOGICAL_FLOW.REMOVED, true)
-                .where(LOGICAL_FLOW.ID.in(flowIds))
+                .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
+                .set(LOGICAL_FLOW.LAST_UPDATED_BY, user)
+                .where(LOGICAL_FLOW.ID.eq(flowId))
                 .execute();
     }
 
@@ -152,7 +155,8 @@ public class LogicalFlowDao {
      * @return
      */
     private boolean restoreFlow(LogicalFlow flow) {
-        return dsl.update(LOGICAL_FLOW).set(LOGICAL_FLOW.REMOVED, false)
+        return dsl.update(LOGICAL_FLOW)
+                .set(LOGICAL_FLOW.REMOVED, false)
                 .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(flow.source().id()))
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(flow.source().kind().name()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(flow.target().id()))
