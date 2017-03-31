@@ -27,7 +27,6 @@ import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.ImmutableTallyPack;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.tally.TallyPack;
-import com.khartec.waltz.schema.tables.DataType;
 import com.khartec.waltz.schema.tables.LogicalFlow;
 import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
 import org.jooq.*;
@@ -57,15 +56,15 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class LogicalFlowStatsDao {
 
     private final DSLContext dsl;
-
     private static final LogicalFlow lf = LOGICAL_FLOW.as("lf");
-    private static final com.khartec.waltz.schema.tables.DataType dt = DataType.DATA_TYPE.as("dt");
-    private static final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR.as("lfd");
 
+    private static final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR.as("lfd");
 
     private static final Condition BOTH_APPS =
             lf.SOURCE_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name()))
                 .and(lf.TARGET_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name())));
+
+    private static final Condition NOT_REMOVED = lf.REMOVED.isFalse();
 
     private final DBExecutorPoolInterface dbExecutorPool;
 
@@ -130,9 +129,11 @@ public class LogicalFlowStatsDao {
                 .otherwise(inline("INBOUND"));
         Field<String> flowType = DSL.field("flow_type", String.class);
 
-        Condition condition = sourceAppId.isNotNull()
+        Condition condition = sourceAppId
+                .isNotNull()
                 .or(targetAppId.isNotNull())
-                .and(BOTH_APPS);
+                .and(BOTH_APPS)
+                .and(NOT_REMOVED);
 
         Result<Record3<Long, String, Integer>> records = dsl.select(
                     lfd.DECORATOR_ENTITY_ID,
@@ -207,6 +208,7 @@ public class LogicalFlowStatsDao {
                 .leftJoin(targetApp)
                     .on(targetAppId.eq(lf.TARGET_ENTITY_ID))
                 .where(BOTH_APPS)
+                .and(NOT_REMOVED)
                 .fetchAny();
 
         return ImmutableLogicalFlowMeasures.builder()
@@ -226,7 +228,8 @@ public class LogicalFlowStatsDao {
         Condition condition = fieldToCount
                 .notIn(appIdSelector)
                 .and(feederField.in(appIdSelector))
-                .and(BOTH_APPS);
+                .and(BOTH_APPS)
+                .and(NOT_REMOVED);
 
         return dsl.select(DSL.countDistinct(fieldToCount))
                 .from(lf)

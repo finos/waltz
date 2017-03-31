@@ -19,6 +19,7 @@
 package com.khartec.waltz.service.logical_flow;
 
 import com.khartec.waltz.common.FunctionUtilities;
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
@@ -46,12 +47,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 
 
@@ -165,34 +163,33 @@ public class LogicalFlowService {
     }
 
 
-    @Deprecated
-    // Replace with a method that removes for a single flowId
-    public int removeFlows(List<Long> flowIds, String username) {
-        List<LogicalFlow> logicalFlows = logicalFlowDao.findByFlowIds(flowIds);
+    /**
+     * Removes the given logical flow and creates an audit log entry.
+     * The removal is a soft removal. After the removal usage stats are recalculated
+     *
+     * todo: #WALTZ-1894 for cleanup task
+     *
+     * @param flowId
+     * @param username
+     * @return
+     */
+    public int removeFlow(Long flowId, String username) {
+        LogicalFlow logicalFlow = logicalFlowDao.findByFlowId(flowId);
 
-        int deleted = logicalFlowDao.removeFlows(flowIds);
-        logicalFlowDecoratorService.deleteAllDecoratorsForFlowIds(flowIds);
+        int deleted = logicalFlowDao.removeFlow(flowId, username);
 
-        Set<EntityReference> affectedEntityRefs = logicalFlows.stream()
-                .flatMap(df -> Stream.of(df.source(), df.target()))
-                .collect(Collectors.toSet());
+        Set<EntityReference> affectedEntityRefs = SetUtilities.fromArray(logicalFlow.source(), logicalFlow.target());
 
-        logicalFlows.forEach(flow -> auditFlowChange(
+        auditFlowChange(
                 "removed",
-                flow.source(),
-                flow.target(),
+                logicalFlow.source(),
+                logicalFlow.target(),
                 username,
-                Operation.REMOVE));
+                Operation.REMOVE);
+
         dataTypeUsageService.recalculateForApplications(affectedEntityRefs);
 
         return deleted;
-    }
-
-
-    public int removeFlow(long flowId, String username) {
-        LogicalFlow logicalFlow = logicalFlowDao.findByFlowId(flowId);
-        ensureNoAssociatedPhysicalFlows(logicalFlow);
-        return removeFlows(newArrayList(flowId), username);
     }
 
 

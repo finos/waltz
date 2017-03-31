@@ -59,6 +59,7 @@ public class DataTypeUsageDao {
     private final com.khartec.waltz.schema.tables.LogicalFlow lf = LOGICAL_FLOW.as("lf");
     private final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
     private final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
+    private final Condition NOT_REMOVED = lf.REMOVED.isFalse();
 
     private final Field<String> originatorUsageKindField = val(UsageKind.ORIGINATOR.name());
     private final Field<String> consumerDistributorCaseField = DSL
@@ -370,6 +371,7 @@ public class DataTypeUsageDao {
                 .innerJoin(dt)
                 .on(dt.ID.eq(lfd.DECORATOR_ENTITY_ID))
                 .where(app.ID.in(appIdSelector))
+                .and(NOT_REMOVED)
                 .asTable("cons_dist");
     }
 
@@ -408,7 +410,8 @@ public class DataTypeUsageDao {
 
 
     public Map<Long, Collection<EntityReference>> findForUsageKindByDataTypeIdSelector(UsageKind kind, Select<Record1<Long>> dataTypeIdSelector) {
-        Result<Record3<Long, Long, String>> records = dsl.select(dt.ID, dtu.ENTITY_ID, app.NAME)
+        Result<Record3<Long, Long, String>> records = dsl
+                .select(dt.ID, dtu.ENTITY_ID, app.NAME)
                 .from(dtu)
                 .innerJoin(app)
                 .on(dtu.ENTITY_ID.eq(app.ID))

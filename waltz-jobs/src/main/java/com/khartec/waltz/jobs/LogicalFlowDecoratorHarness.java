@@ -38,10 +38,11 @@ public class LogicalFlowDecoratorHarness {
 
         LogicalFlowDecoratorService service = ctx.getBean(LogicalFlowDecoratorService.class);
 
-        EntityReference dataType = EntityReference.mkRef(EntityKind.DATA_TYPE, 8000);
+        EntityReference dataType = EntityReference.mkRef(EntityKind.DATA_TYPE, 1000);
         IdSelectionOptions options = IdSelectionOptions.mkOpts(dataType, HierarchyQueryScope.CHILDREN);
 
         service.findBySelector(options).forEach(System.out::println);
+        System.out.println("--done");
 
 
     }
