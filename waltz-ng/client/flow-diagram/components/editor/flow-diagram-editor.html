@@ -56,5 +56,13 @@
                             context-menus="$ctrl.contextMenus">
         </waltz-flow-diagram>
 
+        <button class="btn btn-danger" ng-click="$ctrl.getState()">
+            Get State
+        </button>
+
+        <pre ng-bind="$ctrl.state | json">
+
+        </pre>
+
     </div>
 </div>
