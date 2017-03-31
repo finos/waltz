@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableSurveyInstanceRecipientCreateCommand.class)
-@JsonDeserialize(as = ImmutableSurveyInstanceRecipientCreateCommand.class)
-public abstract class SurveyInstanceRecipientCreateCommand {
+@JsonSerialize(as = ImmutableSurveyInstanceRecipientUpdateCommand.class)
+@JsonDeserialize(as = ImmutableSurveyInstanceRecipientUpdateCommand.class)
+public abstract class SurveyInstanceRecipientUpdateCommand {
 
-    public abstract Long surveyInstanceId();
+    public abstract Long instanceRecipientId();
     public abstract Long personId();
 
 }

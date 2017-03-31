@@ -64,6 +64,16 @@ public class SurveyInstanceRecipientDao {
     }
 
 
+    public boolean update(SurveyInstanceRecipientUpdateCommand command) {
+        checkNotNull(command, "command cannot be null");
+
+        return dsl.update(SURVEY_INSTANCE_RECIPIENT)
+                .set(SURVEY_INSTANCE_RECIPIENT.PERSON_ID, command.personId())
+                .where(SURVEY_INSTANCE_RECIPIENT.ID.eq(command.instanceRecipientId()))
+                .execute() == 1;
+    }
+
+
     public int deleteForSurveyRun(long surveyRunId) {
         Select<Record1<Long>> surveyInstanceIdSelector = dsl.select(SURVEY_INSTANCE.ID)
                 .from(SURVEY_INSTANCE)

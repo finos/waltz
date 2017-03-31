@@ -151,4 +151,19 @@ public class SurveyInstanceService {
 
         return surveyInstanceDao.findBySurveyInstanceIdSelector(selector);
     }
+
+
+    public boolean updateRecipient(SurveyInstanceRecipientUpdateCommand command) {
+        checkNotNull(command, "command cannot be null");
+
+        return surveyInstanceRecipientDao.update(command);
+    }
+
+
+    public long addRecipient(SurveyInstanceRecipientCreateCommand command) {
+        checkNotNull(command, "command cannot be null");
+
+        return surveyInstanceRecipientDao.create(command);
+    }
+
 }
