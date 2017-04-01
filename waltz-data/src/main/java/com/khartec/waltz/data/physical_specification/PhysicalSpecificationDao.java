@@ -20,32 +20,28 @@ package com.khartec.waltz.data.physical_specification;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableProduceConsumeGroup;
-import com.khartec.waltz.model.ProduceConsumeGroup;
 import com.khartec.waltz.model.physical_specification.DataFormatKind;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.schema.tables.records.PhysicalSpecificationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
-import static java.util.Collections.emptyList;
 import static org.jooq.impl.DSL.*;
 
 @Repository
@@ -100,23 +96,30 @@ public class PhysicalSpecificationDao {
     }
 
 
-    public ProduceConsumeGroup<PhysicalSpecification> findByEntityReference(EntityReference ref) {
+    public Set<PhysicalSpecification> findByEntityReference(EntityReference ref) {
 
-        List<Tuple2<String, PhysicalSpecification>> results = findByProducerEntityReferenceQuery(ref)
-                .unionAll(findByConsumerEntityReferenceQuery(ref))
-                .fetch(r -> Tuple.tuple(
-                        r.getValue("relationship", String.class),
-                        TO_DOMAIN_MAPPER.map(r)));
+        Condition isOwnerCondition = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(ref.id())
+                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(ref.kind().name()));
 
-        Map<String, Collection<PhysicalSpecification>> groupedResults = groupBy(
-                t -> t.v1, // relationship
-                t -> t.v2, // specification
-                results);
+        Condition isSourceCondition = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(ref.id())
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name()))
+                .and(NOT_REMOVED);
 
-        return ImmutableProduceConsumeGroup.<PhysicalSpecification>builder()
-                .produces(groupedResults.getOrDefault("producer", emptyList()))
-                .consumes(groupedResults.getOrDefault("consumer", emptyList()))
-                .build();
+        Condition isTargetCondition = LOGICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id())
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()))
+                .and(NOT_REMOVED);
+
+        return dsl.select(PHYSICAL_SPECIFICATION.fields())
+                .select(owningEntityNameField)
+                .from(PHYSICAL_SPECIFICATION)
+                .innerJoin(PHYSICAL_FLOW).on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
+                .innerJoin(LOGICAL_FLOW).on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
+                .where(isOwnerCondition)
+                .or(isTargetCondition)
+                .or(isSourceCondition)
+                .fetch(TO_DOMAIN_MAPPER)
+                .stream()
+                .collect(Collectors.toSet());
     }
 
 
@@ -151,18 +154,21 @@ public class PhysicalSpecificationDao {
     }
 
 
-    private Select<Record> findByProducerEntityReferenceQuery(EntityReference ref) {
+    private Select<Record> findByProducerEntityReferenceQuery(EntityReference producer) {
         return dsl
                 .select(DSL.value("producer").as("relationship"))
                 .select(PHYSICAL_SPECIFICATION.fields())
                 .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
-                .where(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(ref.id()))
-                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(ref.kind().name()));
+                .innerJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
+                .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(producer.id()))
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(producer.kind().name()));
+
     }
 
 
-    private Select<Record> findByConsumerEntityReferenceQuery(EntityReference ref) {
+    private Select<Record> findByConsumerEntityReferenceQuery(EntityReference consumer) {
         return dsl
                 .select(DSL.value("consumer").as("relationship"))
                 .select(PHYSICAL_SPECIFICATION.fields())
@@ -170,8 +176,10 @@ public class PhysicalSpecificationDao {
                 .from(PHYSICAL_SPECIFICATION)
                 .innerJoin(PHYSICAL_FLOW)
                 .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
-                .where(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id()))
-                .and(PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()));
+                .innerJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
+                .where(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(consumer.id()))
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(consumer.kind().name()));
     }
 
 

@@ -1,6 +1,6 @@
 <div>
 
-    <waltz-page-header name="{{ ctrl.perspective.definition.kindA }} x {{ ctrl.perspective.definition.kindB }} "
+    <waltz-page-header name="Playpen 4"
                        small="Perspective"
                        icon="rocket">
         <ol class="waltz-breadcrumbs">
@@ -10,33 +10,17 @@
     </waltz-page-header>
 
 
-    <style>
-        .side-scroller {
-            overflow-y: hidden;
-            overflow-x: auto;
-        }
-    </style>
+    <waltz-section name="Hello"
+                   id="">
 
-    <div class="waltz-page-summary waltz-page-summary-attach">
 
-        blah blah
-    </div>
-
-    <br>
-
-    <waltz-section name="{{pb.definition.name}}"
-                   id=""
-                   ng-repeat="pb in ctrl.perspectiveBlocks | orderBy:'name'">
-        <p ng-bind="pb.definition.description"></p>
-
-        <div class="side-scroller">
-            <waltz-perspective-grid existing-overrides="pb.overrides"
-                                    pending-overrides="[]"
-                                    perspective-definition="pb.definition"
-                                    measurables="ctrl.measurables"
-                                    measurable-ratings="ctrl.measurableRatings">
-            </waltz-perspective-grid>
-        </div>
+       <waltz-physical-data-section primary-ref='ctrl.entityRef'
+                                    physical-flows="ctrl.physicalFlows"
+                                    logical-flows="ctrl.logicalFlows"
+                                    specifications="ctrl.specifications"
+                                    on-initialise="ctrl.onInitialise"
+                                    on-change="ctrl.onChange">
+       </waltz-physical-data-section>
 
     </waltz-section>
 

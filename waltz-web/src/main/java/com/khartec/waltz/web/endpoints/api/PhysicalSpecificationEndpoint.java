@@ -18,7 +18,6 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.ProduceConsumeGroup;
 import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
@@ -101,7 +100,7 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
                 (request, response) -> specificationService.findBySelector(readIdSelectionOptionsFromBody(request));
 
 
-        DatumRoute<ProduceConsumeGroup<PhysicalSpecification>> findByAppRoute =
+        ListRoute<PhysicalSpecification> findByAppRoute =
                 (request, response) -> specificationService.findByEntityReference(getEntityReference(request));
 
         DatumRoute<PhysicalSpecification> getByIdRoute =
@@ -111,7 +110,7 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         getForList(findByConsumerAppIdPath, findByConsumerAppIdRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
 
-        getForDatum(findByAppPath, findByAppRoute);
+        getForList(findByAppPath, findByAppRoute);
         getForDatum(getByIdPath, getByIdRoute);
 
         deleteForDatum(deletePath, this::deleteSpecification);

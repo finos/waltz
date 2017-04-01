@@ -48,15 +48,15 @@ public class PhysicalSpecificationSelectorFactory implements IdSelectorFactory {
 
     private Select<Record1<Long>> mkForPhysicalFlow(IdSelectionOptions options) {
         ensureScopeIsExact(options);
-        long flowId = options.entityReference().id();
+        long physicalFlowId = options.entityReference().id();
         return DSL.select(PHYSICAL_SPECIFICATION.ID)
                 .from(PHYSICAL_SPECIFICATION)
                 .innerJoin(PHYSICAL_FLOW)
                 .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
                 .innerJoin(PHYSICAL_FLOW_LINEAGE)
                 .on(PHYSICAL_FLOW_LINEAGE.CONTRIBUTOR_FLOW_ID.eq(PHYSICAL_FLOW.ID))
-                .where(PHYSICAL_FLOW_LINEAGE.DESCRIBED_FLOW_ID.eq(flowId)
-                        .or(PHYSICAL_FLOW_LINEAGE.CONTRIBUTOR_FLOW_ID.eq(flowId)));
+                .where(PHYSICAL_FLOW_LINEAGE.DESCRIBED_FLOW_ID.eq(physicalFlowId)
+                        .or(PHYSICAL_FLOW_LINEAGE.CONTRIBUTOR_FLOW_ID.eq(physicalFlowId)));
     }
 
 }

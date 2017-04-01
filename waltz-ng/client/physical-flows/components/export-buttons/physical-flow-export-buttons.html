@@ -2,9 +2,6 @@
      uib-dropdown>
 
     <button type="button"
-            ng-disabled="$ctrl.producesCount == 0
-                        && $ctrl.consumesCount == 0
-                        && $ctrl.unusedCount == 0"
             class="btn btn-xs btn-primary"
             uib-dropdown-toggle>
         <waltz-icon name="cloud-download"></waltz-icon>
@@ -17,7 +14,6 @@
         <li role="menuitem">
             <a href=""
                ng-click="$ctrl.exportProduces()"
-               ng-hide="$ctrl.producesCount == 0"
                class="small">
                 <waltz-icon name="download"></waltz-icon>
                 Produces
@@ -26,7 +22,6 @@
         <li role="menuitem">
             <a href=""
                ng-click="$ctrl.exportConsumes()"
-               ng-hide="$ctrl.consumesCount == 0"
                class="small">
                 <waltz-icon name="download"></waltz-icon>
                 Consumes
@@ -35,7 +30,6 @@
         <li role="menuitem">
             <a href=""
                ng-click="$ctrl.exportUnused()"
-               ng-hide="$ctrl.unusedCount == 0"
                class="small">
                 <waltz-icon name="download"></waltz-icon>
                 Unused

@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -64,7 +65,7 @@ public class PhysicalSpecificationService {
     }
 
 
-    public ProduceConsumeGroup<PhysicalSpecification> findByEntityReference(EntityReference ref) {
+    public Set<PhysicalSpecification> findByEntityReference(EntityReference ref) {
         return specificationDao.findByEntityReference(ref);
     }
 
@@ -87,7 +88,6 @@ public class PhysicalSpecificationService {
     public Collection<PhysicalSpecification> findBySelector(IdSelectionOptions options) {
         Select<Record1<Long>> selector = selectorFactory.apply(options);
         return specificationDao.findBySelector(selector);
-
     }
 
 

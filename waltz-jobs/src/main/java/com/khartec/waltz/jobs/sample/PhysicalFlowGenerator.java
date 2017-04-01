@@ -21,6 +21,7 @@ package com.khartec.waltz.jobs.sample;
 import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.physical_flow.FrequencyKind;
 import com.khartec.waltz.model.physical_flow.TransportKind;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
@@ -28,7 +29,7 @@ import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple;
-import org.jooq.lambda.tuple.Tuple3;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -41,6 +42,7 @@ import static com.khartec.waltz.common.CollectionUtilities.randomPick;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
@@ -49,6 +51,7 @@ import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPE
 public class PhysicalFlowGenerator {
 
     private static final Random rnd = new Random();
+    private static final String provenance = "DEMO";
 
 
     public static void main(String[] args) {
@@ -61,30 +64,34 @@ public class PhysicalFlowGenerator {
                 .from(PHYSICAL_SPECIFICATION)
                 .fetch(PhysicalSpecificationDao.TO_DOMAIN_MAPPER);
 
-        List<Tuple3<Long, Long, Long>> allLogicalFLows = dsl.select(LOGICAL_FLOW.ID, LOGICAL_FLOW.SOURCE_ENTITY_ID, LOGICAL_FLOW.TARGET_ENTITY_ID)
+        List<Tuple2<Long, EntityReference>> allLogicalFLows = dsl.select(
+                LOGICAL_FLOW.ID,
+                LOGICAL_FLOW.SOURCE_ENTITY_ID,
+                LOGICAL_FLOW.SOURCE_ENTITY_KIND)
                 .from(LOGICAL_FLOW)
                 .fetch(r -> Tuple.tuple(
                         r.getValue(LOGICAL_FLOW.ID),
-                        r.getValue(LOGICAL_FLOW.SOURCE_ENTITY_ID),
-                        r.getValue(LOGICAL_FLOW.TARGET_ENTITY_ID)));
+                        mkRef(EntityKind.valueOf(r.getValue(LOGICAL_FLOW.SOURCE_ENTITY_KIND)),
+                                r.getValue(LOGICAL_FLOW.SOURCE_ENTITY_ID))));
 
-        Map<Long, Collection<Long>> targetsBySourceApp = groupBy(
+        Map<EntityReference, Collection<Long>> flowIdsBySource = groupBy(
                 t -> t.v2(),
-                t -> t.v3(),
+                t -> t.v1(),
                 allLogicalFLows);
 
         System.out.println("---removing demo records");
         dsl.deleteFrom(PHYSICAL_FLOW)
-                .where(PHYSICAL_FLOW.PROVENANCE.eq("DEMO"))
+                .where(PHYSICAL_FLOW.PROVENANCE.eq(provenance))
                 .execute();
 
         final int flowBatchSize = 100000;
         List<PhysicalFlowRecord> flowBatch = new ArrayList<PhysicalFlowRecord>((int) (flowBatchSize * 1.2));
 
         for (PhysicalSpecification spec : specifications) {
-            Collection<Long> targetIds = targetsBySourceApp.get(spec.owningEntity().id());
-            if (!isEmpty(targetIds)) {
-                List<PhysicalFlowRecord> physicalFlowRecords = mkPhysicalFlowRecords(spec, new LinkedList<>(targetIds));
+            Collection<Long> flowIds = flowIdsBySource.get(spec.owningEntity());
+            if (!isEmpty(flowIds)) {
+
+                List<PhysicalFlowRecord> physicalFlowRecords = mkPhysicalFlowRecords(spec, new LinkedList<>(flowIds));
                 flowBatch.addAll(physicalFlowRecords);
             }
 
@@ -102,17 +109,15 @@ public class PhysicalFlowGenerator {
     }
 
 
-    private static List<PhysicalFlowRecord> mkPhysicalFlowRecords(PhysicalSpecification spec, List<Long> targetIds) {
+    private static List<PhysicalFlowRecord> mkPhysicalFlowRecords(PhysicalSpecification spec, List<Long> flowIds) {
 
-        return IntStream.range(0, targetIds.size() - 1)
+        return IntStream.range(0, flowIds.size() - 1)
                 .mapToObj(i -> {
-                    Long targetId = targetIds.remove(rnd.nextInt(targetIds.size() - 1));
-
+                    Long flowId = flowIds.remove(rnd.nextInt(flowIds.size() - 1));
                     PhysicalFlowRecord record = new PhysicalFlowRecord();
                     record.setSpecificationId(spec.id().get());
-                    record.setTargetEntityId(targetId);
-                    record.setTargetEntityKind(EntityKind.APPLICATION.name());
-                    record.setDescription("Description: " + spec + " - " + targetId.toString());
+                    record.setLogicalFlowId(flowId);
+                    record.setDescription("Description: " + spec + " - " + flowId.toString());
                     record.setProvenance("DEMO");
                     record.setBasisOffset(randomPick(newArrayList(0, 0, 0, 0, 1, 1, 2, -1)));
                     record.setTransport(ArrayUtilities.randomPick(TransportKind.values()).name());

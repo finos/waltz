@@ -33,7 +33,9 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.isEmpty;
 import static com.khartec.waltz.common.StringUtilities.mkTerms;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Actor.ACTOR;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static java.util.Collections.emptyList;
@@ -53,7 +55,7 @@ public class PhysicalFlowSearchDao {
 
     /**
      * A report is a physical flow which goes to an
-     * actor
+     * external actor
      * @param query
      * @return
      */
@@ -79,13 +81,18 @@ public class PhysicalFlowSearchDao {
                 .from(PHYSICAL_FLOW)
                 .innerJoin(PHYSICAL_SPECIFICATION)
                 .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
+                .innerJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
                 .innerJoin(ACTOR)
-                .on(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(ACTOR.ID).and(ACTOR.IS_EXTERNAL.eq(true)))
-                .where(PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
+                .on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(ACTOR.ID).and(ACTOR.IS_EXTERNAL.eq(true)))
+                .where(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
                 .and(termMatcher)
                 .fetch()
                 .stream()
-                .map(r -> EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, r.value1(), r.value2()))
+                .map(r -> mkRef(
+                        EntityKind.PHYSICAL_FLOW,
+                        r.value1(),
+                        r.value2()))
                 .collect(Collectors.toList());
     }
 

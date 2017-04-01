@@ -17,9 +17,6 @@
  */
 
 const bindings = {
-    consumesCount: '<',
-    producesCount: '<',
-    unusedCount: '<',
     exportConsumes: '<',
     exportProduces: '<',
     exportUnused: '<'

@@ -134,12 +134,6 @@ function controller($q,
         vm.physicalFlowUnusedSpecificationsExportFn = e.exportUnusedSpecificationsFn;
     };
 
-    vm.onPhysicalFlowsChange = (e) => {
-        vm.physicalFlowsProducesCount = e.producesCount;
-        vm.physicalFlowsConsumesCount = e.consumesCount;
-        vm.physicalFlowsUnusedSpecificationsCount = e.unusedSpecificationsCount;
-    };
-
     vm.exportPhysicalFlowProduces = () => {
         vm.physicalFlowProducesExportFn();
     };
