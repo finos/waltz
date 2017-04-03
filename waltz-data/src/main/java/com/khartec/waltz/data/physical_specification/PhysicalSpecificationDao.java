@@ -39,6 +39,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
@@ -60,7 +61,7 @@ public class PhysicalSpecificationDao {
         return ImmutablePhysicalSpecification.builder()
                 .id(record.getId())
                 .externalId(record.getExternalId())
-                .owningEntity(EntityReference.mkRef(
+                .owningEntity(mkRef(
                         EntityKind.valueOf(record.getOwningEntityKind()),
                         record.getOwningEntityId(),
                         r.getValue(owningEntityNameField)))
@@ -81,18 +82,6 @@ public class PhysicalSpecificationDao {
     public PhysicalSpecificationDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
         this.dsl = dsl;
-    }
-
-
-    public List<PhysicalSpecification> findByProducer(EntityReference ref) {
-        return findByProducerEntityReferenceQuery(ref)
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
-
-    public List<PhysicalSpecification> findByConsumer(EntityReference ref) {
-        return findByConsumerEntityReferenceQuery(ref)
-                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -151,35 +140,6 @@ public class PhysicalSpecificationDao {
         return dsl.select(specUsed)
                 .fetchOne(specUsed);
 
-    }
-
-
-    private Select<Record> findByProducerEntityReferenceQuery(EntityReference producer) {
-        return dsl
-                .select(DSL.value("producer").as("relationship"))
-                .select(PHYSICAL_SPECIFICATION.fields())
-                .select(owningEntityNameField)
-                .from(PHYSICAL_SPECIFICATION)
-                .innerJoin(LOGICAL_FLOW)
-                .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
-                .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(producer.id()))
-                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(producer.kind().name()));
-
-    }
-
-
-    private Select<Record> findByConsumerEntityReferenceQuery(EntityReference consumer) {
-        return dsl
-                .select(DSL.value("consumer").as("relationship"))
-                .select(PHYSICAL_SPECIFICATION.fields())
-                .select(owningEntityNameField)
-                .from(PHYSICAL_SPECIFICATION)
-                .innerJoin(PHYSICAL_FLOW)
-                .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
-                .innerJoin(LOGICAL_FLOW)
-                .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
-                .where(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(consumer.id()))
-                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(consumer.kind().name()));
     }
 
 

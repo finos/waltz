@@ -33,6 +33,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlowLineage.PHYSICAL_FLOW_LINEAGE;
@@ -173,17 +174,25 @@ public class PhysicalFlowDao {
     }
 
 
-    private Select<Record> findByProducerEntityReferenceQuery(EntityReference ref) {
+    private Select<Record> findByProducerEntityReferenceQuery(EntityReference producer) {
 
-        Condition isSource = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(ref.id())
-                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(ref.kind().name()));
+        Condition isOwner = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(producer.id())
+                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(producer.kind().name()));
+
+        Condition isSender = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(producer.id())
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(producer.kind().name()))
+                .and(NOT_REMOVED);
+
+        Condition isProducer = isOwner.or(isSender);
 
         return dsl
                 .select(PHYSICAL_FLOW.fields())
                 .from(PHYSICAL_FLOW)
                 .innerJoin(PHYSICAL_SPECIFICATION)
                 .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
-                .where(dsl.renderInlined(isSource));
+                .innerJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
+                .where(dsl.renderInlined(isProducer));
     }
 
 
@@ -191,7 +200,7 @@ public class PhysicalFlowDao {
 
         Condition matchesLogicalFlow = LOGICAL_FLOW.TARGET_ENTITY_ID.eq(consumer.id())
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(consumer.kind().name()))
-                .and(LOGICAL_FLOW.REMOVED.isFalse());
+                .and(NOT_REMOVED);
 
         return dsl
                 .select(PHYSICAL_FLOW.fields())

@@ -18,7 +18,7 @@
         <div>
             <waltz-physical-flow-edit-overview source-entity="ctrl.sourceEntity"
                                                specification="ctrl.specification"
-                                               target-entity="ctrl.targetEntity"
+                                               target-logical-flow="ctrl.targetLogicalFlow"
                                                flow-attributes="ctrl.flowAttributes"
                                                on-specification-focus="ctrl.focusSpecification"
                                                on-flow-attributes-focus="ctrl.focusFlowAttributes"
@@ -36,17 +36,14 @@
         </waltz-physical-flow-attribute-editor>
 
 
-        <waltz-physical-flow-edit-target-entity ng-if="ctrl.visibility.editor === 'TARGET-ENTITY'"
-                                                current="ctrl.targetEntity"
-                                                existing-targets="ctrl.existingTargets"
-                                                owning-entity="ctrl.sourceEntity"
-                                                on-dismiss="ctrl.editorDismiss"
-                                                on-change="ctrl.targetChanged">
-        </waltz-physical-flow-edit-target-entity>
+        <waltz-physical-flow-edit-target-logical-flow ng-if="ctrl.visibility.editor === 'TARGET-LOGICAL-FLOW'"
+                                                      outbound-logical-flows="ctrl.outboundLogicalFlows"
+                                                      on-change="ctrl.targetChanged">
+        </waltz-physical-flow-edit-target-logical-flow>
 
         <waltz-physical-flow-edit-specification ng-if="ctrl.visibility.editor === 'SPECIFICATION'"
                                                 owning-entity="ctrl.sourceEntity"
-                                                candidates="ctrl.candidateSpecifications.produces"
+                                                candidates="ctrl.existingSpecifications"
                                                 current="ctrl.specification"
                                                 on-dismiss="ctrl.editorDismiss"
                                                 on-change="ctrl.specificationChanged">
@@ -124,5 +121,7 @@
         </div>
 
     </div>
+
+    <pre>{{ ctrl.targetLogicalFlow | json }}</pre>
 
 </div>

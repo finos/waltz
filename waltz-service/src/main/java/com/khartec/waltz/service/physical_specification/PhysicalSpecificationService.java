@@ -35,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -67,16 +66,6 @@ public class PhysicalSpecificationService {
 
     public Set<PhysicalSpecification> findByEntityReference(EntityReference ref) {
         return specificationDao.findByEntityReference(ref);
-    }
-
-
-    public List<PhysicalSpecification> findByProducer(EntityReference ref) {
-        return specificationDao.findByProducer(ref);
-    }
-
-
-    public Collection<PhysicalSpecification> findByConsumer(EntityReference ref) {
-        return specificationDao.findByConsumer(ref);
     }
 
 

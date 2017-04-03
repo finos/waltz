@@ -18,40 +18,38 @@
 
 import {initialiseData} from "../../../common";
 
+
 const bindings = {
-    sourceEntity: '<',
-    specification: '<',
-    targetLogicalFlow: '<',
-    flowAttributes: '<',
-    onSpecificationFocus: '<',
-    onFlowAttributesFocus: '<',
-    onTargetFocus: '<'
+    outboundLogicalFlows: '<',  // [ <entityRef>... ]
+    onChange: '<'
 };
 
 
-const template = require('./physical-flow-edit-overview.html');
+const template = require('./physical-flow-edit-target-logical-flow.html');
 
 
 const initialState = {
-    onSpecificationFocus: () => console.log("No onSpecificationFocus handler defined for physical-flow-edit-overview"),
-    onFlowAttributesFocus: () => console.log("No onFlowAttributesFocus handler defined for physical-flow-edit-overview"),
-    onTargetFocus: () => console.log("No onTargetFocus handler defined for physical-flow-edit-overview")
+    outboundLogicalFlows: [],
+    onChange: (f) => console.log('pfetlf::onChange', f)
 };
 
 
 function controller() {
-    const vm = initialiseData(this, initialState);
+    initialiseData(this, initialState);
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    'ActorStore'
+];
 
 
 const component = {
-    template,
     bindings,
+    template,
     controller
 };
 
 
 export default component;
+
