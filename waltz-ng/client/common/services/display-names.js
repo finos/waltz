@@ -269,6 +269,12 @@ export const surveyQuestionFieldTypeNames = {
 };
 
 
+export const issuanceDisplayNames = {
+    GROUP: 'Group',
+    INDIVIDUAL: 'Individual'
+};
+
+
 /**
  * Used to convert a map of ( { code -> displayName }
  * @param lookups

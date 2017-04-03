@@ -31,6 +31,7 @@ import {
     entityNames,
     entityStatisticCategoryDisplayNames,
     investmentRatingNames,
+    issuanceDisplayNames,
     lifecyclePhaseDisplayNames,
     lifecycleStatusNames,
     orgUnitKindNames,
@@ -123,6 +124,7 @@ export default (module) => {
         .register('entityStatistic', entityStatisticCategoryDisplayNames)
         .register('frequencyKind', frequencyKindNames)
         .register('investmentRating', investmentRatingNames)
+        .register('issuance', issuanceDisplayNames)
         .register('lifecyclePhase', lifecyclePhaseDisplayNames)
         .register('lifecycleStatus', lifecycleStatusNames)
         .register('orgUnitKind', orgUnitKindNames)
