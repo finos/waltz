@@ -78,11 +78,8 @@
                         <tr ng-repeat="r in ctrl.recipients | orderBy:'person.name'"
                             class="waltz-visibility-parent">
                             <td width="70%">
-                                <waltz-editable-field on-save="ctrl.saveRecipient"
-                                                      field-type="person"
-                                                      initial-val="r.person"
-                                                      item-id="r.instanceRecipientId">
-                                </waltz-editable-field>
+                                <waltz-entity-link entity-ref="r.person">
+                                </waltz-entity-link>
                             </td>
                             <td>
                                 <button class="btn btn-danger btn-xs"
@@ -127,7 +124,7 @@
                     ng-if="ctrl.surveyRun.issuanceKind === 'INDIVIDUAL'">
                     <li ng-repeat="r in ctrl.recipients | orderBy:'person.name'">
 
-                        <waltz-editable-field on-save="ctrl.saveRecipient"
+                        <waltz-editable-field on-save="ctrl.editRecipient"
                                               field-type="person"
                                               initial-val="r.person"
                                               item-id="r.instanceRecipientId">

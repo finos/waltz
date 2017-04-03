@@ -10,6 +10,7 @@ import org.immutables.value.Value;
 public abstract class SurveyInstanceRecipientUpdateCommand {
 
     public abstract Long instanceRecipientId();
+    public abstract Long surveyInstanceId();
     public abstract Long personId();
 
 }

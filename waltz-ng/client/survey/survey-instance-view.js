@@ -39,9 +39,10 @@ function mkRecipientIdAndEntity(instanceRecipientId, person) {
 }
 
 
-function mkUpdateRecipientCommand(instanceRecipientId, person) {
+function mkUpdateRecipientCommand(instanceRecipientId, person, surveyInstanceId) {
     return {
         instanceRecipientId,
+        surveyInstanceId,
         personId: person.id,
     }
 }
@@ -70,8 +71,8 @@ function controller($stateParams,
     };
 
 
-    vm.saveRecipient = (instanceRecipientId, data) => {
-        const cmd = mkUpdateRecipientCommand(instanceRecipientId, data.newVal);
+    vm.editRecipient = (instanceRecipientId, data) => {
+        const cmd = mkUpdateRecipientCommand(instanceRecipientId, data.newVal, vm.surveyInstance.id);
         surveyInstanceStore
             .updateRecipient(vm.surveyInstance.id, cmd)
             .then(result => {

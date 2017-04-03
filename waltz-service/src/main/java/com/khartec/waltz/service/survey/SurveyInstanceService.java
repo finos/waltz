@@ -163,7 +163,12 @@ public class SurveyInstanceService {
     public boolean updateRecipient(SurveyInstanceRecipientUpdateCommand command) {
         checkNotNull(command, "command cannot be null");
 
-        return surveyInstanceRecipientDao.update(command);
+        boolean delete = surveyInstanceRecipientDao.delete(command.instanceRecipientId());
+        long id = surveyInstanceRecipientDao.create(ImmutableSurveyInstanceRecipientCreateCommand.builder()
+                .personId(command.personId())
+                .surveyInstanceId(command.surveyInstanceId())
+                .build());
+        return delete && id > 0;
     }
 
 
