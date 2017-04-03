@@ -82,6 +82,12 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const deleteRecipient = (id, instanceRecipientId) => {
+        return $http
+            .delete(`${base}/${id}/recipient/${instanceRecipientId}`,)
+            .then(result => result.data);
+    };
+
     return {
         getById,
         findByEntityReference,
@@ -92,7 +98,8 @@ function store($http, baseApiUrl) {
         saveResponse,
         updateStatus,
         updateRecipient,
-        addRecipient
+        addRecipient,
+        deleteRecipient
     };
 }
 

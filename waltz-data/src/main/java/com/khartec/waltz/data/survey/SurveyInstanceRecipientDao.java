@@ -74,6 +74,14 @@ public class SurveyInstanceRecipientDao {
     }
 
 
+    public boolean delete(long surveyInstanceRecipientId) {
+
+        return dsl.deleteFrom(SURVEY_INSTANCE_RECIPIENT)
+                .where(SURVEY_INSTANCE_RECIPIENT.ID.eq(surveyInstanceRecipientId))
+                .execute() == 1;
+    }
+
+
     public int deleteForSurveyRun(long surveyRunId) {
         Select<Record1<Long>> surveyInstanceIdSelector = dsl.select(SURVEY_INSTANCE.ID)
                 .from(SURVEY_INSTANCE)

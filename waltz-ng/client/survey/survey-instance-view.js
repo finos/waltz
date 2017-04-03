@@ -22,7 +22,8 @@ const initialState = {
     surveyInstance: {},
     surveyRun: {},
     recipients: [],
-    addingRecipient: false
+    addingRecipient: false,
+    newRecipient: null
 };
 
 
@@ -54,11 +55,8 @@ function mkCreateRecipientCommand(surveyInstanceId, person) {
 }
 
 
-function controller($state,
-                    $stateParams,
-                    $q,
+function controller($stateParams,
                     notification,
-                    personStore,
                     surveyInstanceStore,
                     surveyRunStore) {
 
@@ -84,14 +82,38 @@ function controller($state,
             });
     };
 
-    vm.addRecipient = (itemId, entity) => {
+    vm.startNewRecipient = () => {
+        vm.addingRecipient = true;
+    };
+
+    vm.cancelNewRecipient = () => {
+        vm.addingRecipient = false;
+    };
+
+    vm.addRecipient = () => {
+
         surveyInstanceStore
-            .addRecipient(vm.surveyInstance.id, mkCreateRecipientCommand(vm.surveyInstance.id, entity))
+            .addRecipient(vm.surveyInstance.id, mkCreateRecipientCommand(vm.surveyInstance.id, vm.newRecipient))
             .then(result => {
                 if(result) {
                     loadRecipients();
                     notification.success("Recipient added");
                     vm.addingRecipient = false;
+                }
+            });
+    };
+
+    vm.selectNewRecipient = (itemId, entity) => {
+        vm.newRecipient = entity;
+    };
+
+    vm.removeRecipient = (recipient) => {
+        surveyInstanceStore
+            .deleteRecipient(vm.surveyInstance.id, recipient.instanceRecipientId)
+            .then(result => {
+                if(result) {
+                    loadRecipients();
+                    notification.success("Recipient deleted");
                 }
             });
     };
@@ -111,14 +133,10 @@ function controller($state,
 
 
 controller.$inject = [
-    '$state',
     '$stateParams',
-    '$q',
     'Notification',
-    'PersonStore',
     'SurveyInstanceStore',
     'SurveyRunStore',
-    'SurveyQuestionStore'
 ];
 
 
@@ -127,5 +145,6 @@ const view = {
     controllerAs: 'ctrl',
     template: require('./survey-instance-view.html')
 };
+
 
 export default view;

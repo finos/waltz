@@ -153,6 +153,13 @@ public class SurveyInstanceService {
     }
 
 
+    public long addRecipient(SurveyInstanceRecipientCreateCommand command) {
+        checkNotNull(command, "command cannot be null");
+
+        return surveyInstanceRecipientDao.create(command);
+    }
+
+
     public boolean updateRecipient(SurveyInstanceRecipientUpdateCommand command) {
         checkNotNull(command, "command cannot be null");
 
@@ -160,10 +167,8 @@ public class SurveyInstanceService {
     }
 
 
-    public long addRecipient(SurveyInstanceRecipientCreateCommand command) {
-        checkNotNull(command, "command cannot be null");
-
-        return surveyInstanceRecipientDao.create(command);
+    public boolean delete(long surveyInstanceRecipientId) {
+        return surveyInstanceRecipientDao.delete(surveyInstanceRecipientId);
     }
 
 }
