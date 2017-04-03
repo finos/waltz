@@ -42,15 +42,12 @@ const initialState = {
 const template = require('./source-and-target-panel.html');
 
 
-function calcPhysicalFlows(physicalFlows, specifications, counterpartEntity, type, entityRef) {
-    const specs = type === 'source' ? specifications.consumes : specifications.produces;
-    const specsById = _.keyBy(specs, 'id');
+function calcPhysicalFlows(physicalFlows = [], specifications = [], logicalFlowId) {
+    const specsById = _.keyBy(specifications, 'id');
 
     return _.chain(physicalFlows)
+        .filter(pf => pf.logicalFlowId === logicalFlowId)
         .map(pf => Object.assign({}, pf, { specification: specsById[pf.specificationId] }))
-        .filter(pf => type === 'source'
-            ? pf.target.id ==  entityRef.id && pf.specification.owningEntity.id === counterpartEntity.id
-            : pf.target.id ==  counterpartEntity.id && pf.specification.owningEntity.id === entityRef.id)
         .value();
 }
 
@@ -91,17 +88,17 @@ function mkTypeInfo(decorators = []) {
 }
 
 
-function calculateSourceAndTargetFlowsByEntity(entity, logical = []) {
-    if (! entity) return {};
+function calculateSourceAndTargetFlowsByEntity(primaryEntity, logical = []) {
+    if (! primaryEntity) return {};
 
 
     const sourceFlowsByEntityId = _.chain(logical)
-        .filter(f => f.target.id === entity.id && f.target.kind === entity.kind)
+        .filter(f => f.target.id === primaryEntity.id && f.target.kind === primaryEntity.kind)
         .reduce((acc, f) => { acc[f.source.id] = f.id; return acc; }, {})
         .value();
 
     const targetFlowsByEntityId = _.chain(logical)
-        .filter(f => f.source.id === entity.id && f.source.kind === entity.kind)
+        .filter(f => f.source.id === primaryEntity.id && f.source.kind === primaryEntity.kind)
         .reduce((acc, f) => { acc[f.target.id] = f.id; return acc; }, {})
         .value();
 
@@ -149,44 +146,28 @@ function toIcon(count = 0) {
 
 
 function mkTweakers(tweakers = {},
-                    entityRef = null,
                     physicalFlows = [],
-                    physicalSpecifications = { consumes: [], produces: []}) {
+                    logicalFlows = []) {
 
-    const allSpecs = _.concat(physicalSpecifications.produces, physicalSpecifications.consumes);
-    const specsById = _.keyBy(allSpecs, 'id');
+    const toIdentifier = (entRef) => `${entRef.kind}/${entRef.id}`;
 
-    const flows = _.map(physicalFlows, pf => {
-        return {
-            source: specsById[pf.specificationId].owningEntity,
-            target: pf.target
-        };
-    });
+    const logicalFlowsById = _.keyBy(logicalFlows, 'id');
 
-    const flowsBySourceEntity = nest()
-        .key(f => f.source.kind)
-        .key(f => f.source.id)
-        .object(flows);
 
-    const flowsByTargetEntity = nest()
-        .key(f => f.target.kind)
-        .key(f => f.target.id)
-        .object(flows);
+    const countPhysicalFlows = (direction) =>
+        _.countBy(physicalFlows, pf => {
+            const logicalFlow = logicalFlowsById[pf.logicalFlowId];
+            return logicalFlow
+                ? toIdentifier(logicalFlow[direction])
+                : null;
+        });
 
-    const getSourceCount = (ref) => {
-        const possibleFlows = _.get(flowsBySourceEntity, `${ref.kind}.${ref.id}`, []);
-        const actualFlows = _.filter(possibleFlows, f => f.target.id === entityRef.id && f.target.kind === entityRef.kind)
-        return actualFlows.length;
-    };
+    const sourceCounts = countPhysicalFlows('source');
+    const targetCounts = countPhysicalFlows('target');
 
-    const getTargetCount = (ref) => {
-        const possibleFlows = _.get(flowsByTargetEntity, `${ref.kind}.${ref.id}`, []);
-        const actualFlows = _.filter(possibleFlows, f => f.source.id === entityRef.id && f.source.kind === entityRef.kind)
-        return actualFlows.length;
-    };
 
-    tweakers.source.icon = (appRef) => toIcon(getSourceCount(appRef));
-    tweakers.target.icon = (appRef) => toIcon(getTargetCount(appRef));
+    tweakers.source.icon = (appRef) => toIcon(sourceCounts[toIdentifier(appRef)]);
+    tweakers.target.icon = (appRef) => toIcon(targetCounts[toIdentifier(appRef)]);
 
     return Object.assign({} , tweakers);
 }
@@ -213,13 +194,16 @@ function controller($element, $timeout, $window) {
             vm.entityRef,
             vm.logicalFlows);
 
-        function select(entity, type, flowId, evt) {
+        function select(entity, type, logicalFlowId, evt) {
             const typeInfoByFlowId = mkTypeInfo(vm.decorators);
-            const types = typeInfoByFlowId[flowId] || [];
+            const types = typeInfoByFlowId[logicalFlowId] || [];
             return {
                 type,
                 types,
-                physicalFlows: calcPhysicalFlows(vm.physicalFlows, vm.physicalSpecifications, entity, type, vm.entityRef),
+                physicalFlows: calcPhysicalFlows(
+                    vm.physicalFlows,
+                    vm.physicalSpecifications,
+                    logicalFlowId),
                 entity,
                 y: evt.layerY
             };
@@ -266,9 +250,8 @@ function controller($element, $timeout, $window) {
 
         vm.tweakers = mkTweakers(
             baseTweakers,
-            vm.entityRef,
             vm.physicalFlows,
-            vm.physicalSpecifications);
+            vm.logicalFlows);
     };
 }
 
