@@ -404,7 +404,7 @@
                              primaryKey="true"
                              primaryKeyName="physical_spec_defn_pkey"/>
             </column>
-            <column name="spec_id"
+            <column name="specification_id"
                     type="${id.type}">
                 <constraints nullable="false"/>
             </column>
