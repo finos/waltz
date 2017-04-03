@@ -390,4 +390,134 @@
                              tableName="survey_template"/>
     </changeSet>
 
+
+    <!-- 1907 -->
+    <changeSet id="20170403-1907-1"
+               author="rovats">
+        <comment>1907: Physical Spec Definition: create tables</comment>
+        <createTable tableName="physical_spec_defn"
+                     remarks="Stores physical spec definition records">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="physical_spec_defn_pkey"/>
+            </column>
+            <column name="spec_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version"
+                    type="${version.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_current"
+                    type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delimiter"
+                    type="CHAR(1)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="type"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20170403-1907-2"
+               author="rovats">
+        <comment>1907: Physical Spec Definition: create tables</comment>
+        <createTable tableName="physical_spec_defn_file"
+                     remarks="Stores physical spec definition files">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="physical_spec_defn_file_pkey"/>
+            </column>
+            <column name="spec_defn_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_data"
+                    type="${blob.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20170403-1907-3"
+               author="rovats">
+        <comment>1907: Physical Spec Definition: create tables</comment>
+        <createTable tableName="physical_spec_defn_field"
+                     remarks="Stores physical spec definition fields">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="physical_spec_defn_field_pkey"/>
+            </column>
+            <column name="spec_defn_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position"
+                    type="${int.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
