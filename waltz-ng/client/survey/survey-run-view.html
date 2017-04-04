@@ -26,18 +26,33 @@
         <table class="table">
             <thead>
             <tr>
-                <th>Id</th>
-                <th>Status</th>
                 <th>Entity</th>
+                <th>Status</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
             <tr ng-repeat="instance in ctrl.surveyInstances">
-                <td><a class='clickable'
+                <td>
+                    <waltz-entity-link entity-ref="instance.surveyEntity">
+                    </waltz-entity-link>
+                </td>
+                <td>
+                    <span ng-bind="instance.status | toDisplayName:'surveyInstanceStatus'">
+                    </span>
+                </td>
+                <td>
+                    <a class='clickable'
+                       ui-sref="main.survey.instance.response.view ({id: instance.id })"
+                       ng-if="instance.status === 'COMPLETED' || instance.status === 'EXPIRED'">
+                        view response
+                    </a>
+                    <a class='clickable'
                        ui-sref="main.survey.instance.view ({id: instance.id })"
-                       ng-bind="instance.id"></a></td>
-                <td><span ng-bind="instance.status | toDisplayName:'surveyInstanceStatus'"></span></td>
-                <td><waltz-entity-link entity-ref="instance.surveyEntity"></waltz-entity-link></td>
+                       ng-if="instance.status === 'NOT_STARTED'">
+                        edit recipients
+                    </a>
+                </td>
             </tr>
             </tbody>
         </table>

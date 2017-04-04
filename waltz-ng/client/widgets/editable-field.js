@@ -42,6 +42,11 @@ const initialState = {
 function controller($timeout) {
     const vm = initialiseData(this, initialState);
 
+    vm.$onChanges = () => {
+        if(vm.initialVal) {
+            vm.newVal = vm.initialVal;
+        }
+    };
 
     const saveComplete = () => {
         vm.saving = false;
@@ -84,6 +89,11 @@ function controller($timeout) {
         vm.editing = false;
         vm.saving = false;
         vm.errorMessage = "";
+    };
+
+
+    vm.entitySelect = (itemId, entity) => {
+        vm.newVal = entity;
     };
 
 }
