@@ -30,6 +30,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -54,6 +55,7 @@ public class PhysicalFlowDao {
                 .description(record.getDescription())
                 .logicalFlowId(record.getLogicalFlowId())
                 .transport(TransportKind.valueOf(record.getTransport()))
+                .specificationDefinitionId(Optional.ofNullable(record.getSpecificationDefinitionId()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .build();
