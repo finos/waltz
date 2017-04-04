@@ -54,7 +54,7 @@ export default () => {
                     views: { 'content@': playpenView3 }
                 })
                 .state('main.playpen.4', {
-                    url: '/4?{id:int}&{perspective:int}',
+                    url: '/4',
                     views: { 'content@': playpenView4 }
                 })
         }

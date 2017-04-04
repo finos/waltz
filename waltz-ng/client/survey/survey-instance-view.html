@@ -1,0 +1,139 @@
+<div>
+    <waltz-page-header icon="wpforms"
+                       name="{{ ctrl.surveyRun.name }}"
+                       small="Instance">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>
+                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity"></waltz-entity-link>
+            </li>
+            <li>Surveys</li>
+            <li>
+                <span ng-bind="ctrl.surveyRun.name"></span>
+                <!--todo: make this a link-->
+            </li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-sm-12">
+                <waltz-markdown text="ctrl.surveyRun.description">
+                </waltz-markdown>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Survey Subject
+            </div>
+            <div class="col-sm-10">
+                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
+                </waltz-entity-link>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Status
+            </div>
+            <div class="col-sm-10"
+                 ng-bind="ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Due
+            </div>
+            <div class="col-sm-4">
+                <waltz-from-now timestamp="ctrl.surveyRun.dueDate"></waltz-from-now>
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Issued
+            </div>
+            <div class="col-sm-4">
+                <waltz-from-now timestamp="ctrl.surveyRun.issuedOn"></waltz-from-now>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Issued to
+            </div>
+            <div class="col-sm-10">
+                <span ng-bind="ctrl.surveyRun.issuanceKind | toDisplayName:'issuance'"></span>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Recipients
+            </div>
+            <div class="col-sm-5">
+                <!-- For groups -->
+                <table class="table table-condensed"
+                       ng-if="ctrl.surveyRun.issuanceKind === 'GROUP'">
+                    <tbody>
+                        <tr ng-repeat="r in ctrl.recipients | orderBy:'person.name'"
+                            class="waltz-visibility-parent">
+                            <td width="70%">
+                                <waltz-entity-link entity-ref="r.person">
+                                </waltz-entity-link>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger btn-xs"
+                                        ng-if="ctrl.recipients.length > 1"
+                                        ng-click="ctrl.removeRecipient(r)">
+                                    remove
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="70%">
+                                <button class="btn btn-primary btn-xs"
+                                        ng-if="ctrl.addingRecipient === false"
+                                        ng-click="ctrl.startNewRecipient()">
+                                    Add
+                                </button>
+                                <div ng-if="ctrl.addingRecipient === true">
+                                    <waltz-entity-selector on-select="ctrl.selectNewRecipient"
+                                                           entity-kinds="['PERSON']"
+                                                           initial-val="ctrl.newRecipient">
+                                    </waltz-entity-selector>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn btn-success btn-sm"
+                                        ng-if="ctrl.addingRecipient === true"
+                                        ng-click="ctrl.addRecipient()">
+                                    Save
+                                </button>
+                                <button class="btn btn-default btn-sm"
+                                        ng-if="ctrl.addingRecipient === true"
+                                        ng-click="ctrl.cancelNewRecipient()">
+                                    Cancel
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- For individuals -->
+                <ul class="list-unstyled list-inline"
+                    ng-if="ctrl.surveyRun.issuanceKind === 'INDIVIDUAL'">
+                    <li ng-repeat="r in ctrl.recipients | orderBy:'person.name'">
+
+                        <waltz-editable-field on-save="ctrl.editRecipient"
+                                              field-type="person"
+                                              initial-val="r.person"
+                                              item-id="r.instanceRecipientId">
+                        </waltz-editable-field>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+
+</div>

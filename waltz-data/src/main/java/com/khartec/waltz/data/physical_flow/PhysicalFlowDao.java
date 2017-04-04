@@ -18,9 +18,6 @@
 
 package com.khartec.waltz.data.physical_flow;
 
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.data.EntityNameUtilities;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.physical_flow.FrequencyKind;
 import com.khartec.waltz.model.physical_flow.ImmutablePhysicalFlow;
@@ -36,21 +33,14 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalFlowLineage.PHYSICAL_FLOW_LINEAGE;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
-import static org.jooq.impl.DSL.notExists;
-import static org.jooq.impl.DSL.selectFrom;
 
 
 @Repository
 public class PhysicalFlowDao {
-
-
-    public static final Field<String> targetEntityNameField = EntityNameUtilities.mkEntityNameField(
-            PHYSICAL_FLOW.TARGET_ENTITY_ID,
-            PHYSICAL_FLOW.TARGET_ENTITY_KIND,
-            ListUtilities.newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR)).as("target_name_field");
 
 
     public static final RecordMapper<Record, PhysicalFlow> TO_DOMAIN_MAPPER = r -> {
@@ -62,11 +52,7 @@ public class PhysicalFlowDao {
                 .basisOffset(record.getBasisOffset())
                 .frequency(FrequencyKind.valueOf(record.getFrequency()))
                 .description(record.getDescription())
-                .target(
-                        EntityReference.mkRef(
-                                EntityKind.valueOf(record.getTargetEntityKind()),
-                                record.getTargetEntityId(),
-                                r.getValue(targetEntityNameField)))
+                .logicalFlowId(record.getLogicalFlowId())
                 .transport(TransportKind.valueOf(record.getTransport()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
@@ -138,8 +124,7 @@ public class PhysicalFlowDao {
                 .and(PHYSICAL_FLOW.BASIS_OFFSET.eq(flow.basisOffset()))
                 .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().name()))
                 .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport().name()))
-                .and(PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(flow.target().kind().name()))
-                .and(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(flow.target().id()));
+                .and(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(flow.logicalFlowId()));
 
         return findByCondition(sameFlow);
     }
@@ -148,8 +133,6 @@ public class PhysicalFlowDao {
     public int delete(long flowId) {
         return dsl.delete(PHYSICAL_FLOW)
                 .where(PHYSICAL_FLOW.ID.eq(flowId))
-                .and(notExists(selectFrom(PHYSICAL_FLOW_LINEAGE)
-                        .where(PHYSICAL_FLOW_LINEAGE.CONTRIBUTOR_FLOW_ID.eq(flowId))))
                 .execute();
     }
 
@@ -157,7 +140,6 @@ public class PhysicalFlowDao {
     private List<PhysicalFlow> findByCondition(Condition condition) {
         return dsl
                 .select(PHYSICAL_FLOW.fields())
-                .select(targetEntityNameField)
                 .from(PHYSICAL_FLOW)
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
@@ -169,8 +151,7 @@ public class PhysicalFlowDao {
         checkFalse(flow.id().isPresent(), "flow must not have an id");
 
         PhysicalFlowRecord record = dsl.newRecord(PHYSICAL_FLOW);
-        record.setTargetEntityKind(flow.target().kind().name());
-        record.setTargetEntityId(flow.target().id());
+        record.setLogicalFlowId(flow.logicalFlowId());
 
         record.setFrequency(flow.frequency().name());
         record.setTransport(flow.transport().name());
@@ -188,50 +169,57 @@ public class PhysicalFlowDao {
     }
 
 
-    private Select<Record> findByProducerEntityReferenceQuery(EntityReference ref) {
+    private Select<Record> findByProducerEntityReferenceQuery(EntityReference producer) {
 
-        Condition isSource = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(ref.id())
-                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(ref.kind().name()));
+        Condition isOwner = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(producer.id())
+                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(producer.kind().name()));
 
+        Condition isSender = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(producer.id())
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(producer.kind().name()))
+                .and(NOT_REMOVED);
+
+        Condition isProducer = isOwner.or(isSender);
 
         return dsl
                 .select(PHYSICAL_FLOW.fields())
-                .select(targetEntityNameField)
                 .from(PHYSICAL_FLOW)
                 .innerJoin(PHYSICAL_SPECIFICATION)
                 .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
-                .where(dsl.renderInlined(isSource));
+                .innerJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
+                .where(dsl.renderInlined(isProducer));
     }
 
 
-    private Select<Record> findByConsumerEntityReferenceQuery(EntityReference ref) {
+    private Select<Record> findByConsumerEntityReferenceQuery(EntityReference consumer) {
 
-        Condition isTarget = PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name())
-                .and(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id()));
+        Condition matchesLogicalFlow = LOGICAL_FLOW.TARGET_ENTITY_ID.eq(consumer.id())
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(consumer.kind().name()))
+                .and(NOT_REMOVED);
 
         return dsl
                 .select(PHYSICAL_FLOW.fields())
-                .select(targetEntityNameField)
                 .from(PHYSICAL_FLOW)
-                .where(dsl.renderInlined(isTarget));
+                .innerJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
+                .where(dsl.renderInlined(matchesLogicalFlow));
     }
 
 
     private Select<Record> findByProducerAndConsumerEntityReferenceQuery(EntityReference producer, EntityReference consumer) {
 
-        Condition isSource = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(producer.id())
-                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(producer.kind().name()));
-
-        Condition isTarget = PHYSICAL_FLOW.TARGET_ENTITY_KIND.eq(consumer.kind().name())
-                .and(PHYSICAL_FLOW.TARGET_ENTITY_ID.eq(consumer.id()));
+        Condition matchesLogicalFlow = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(producer.id())
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(consumer.kind().name()))
+                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(consumer.id()))
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(consumer.kind().name()))
+                .and(LOGICAL_FLOW.REMOVED.isFalse());
 
         return dsl
                 .select(PHYSICAL_FLOW.fields())
-                .select(targetEntityNameField)
                 .from(PHYSICAL_FLOW)
-                .innerJoin(PHYSICAL_SPECIFICATION)
-                .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
-                .where(dsl.renderInlined(isSource.and(isTarget)));
+                .innerJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
+                .where(dsl.renderInlined(matchesLogicalFlow));
     }
 
 }

@@ -36,6 +36,11 @@ const instanceBaseState = {
 };
 
 
+const instanceResponseBaseState = {
+    url: '/{id:int}/response'
+};
+
+
 const runCreateState = {
     url: '/template/{id:int}/new-run',
     views: {'content@': require('./survey-run-create')}
@@ -43,7 +48,7 @@ const runCreateState = {
 
 
 const runViewState = {
-    url: '/run/{id:int}',
+    url: '/{id:int}',
     views: {'content@': require('./survey-run-view')}
 };
 
@@ -56,12 +61,19 @@ const instanceUserState = {
 
 const instanceViewState = {
     url: '/{id:int}/view',
+    views: {'content@': require('./survey-instance-view')}
+};
+
+
+
+const instanceResponseViewState = {
+    url: '/view',
     views: {'content@': require('./survey-instance-response-view')}
 };
 
 
-const instanceEditState = {
-    url: '/{id:int}/edit',
+const instanceResponseEditState = {
+    url: '/edit',
     views: {'content@': require('./survey-instance-response-edit')}
 };
 
@@ -98,8 +110,10 @@ function setup($stateProvider) {
         .state('main.survey.run.view', runViewState)
         .state('main.survey.instance', instanceBaseState)
         .state('main.survey.instance.user', instanceUserState)
-        .state('main.survey.instance.edit', instanceEditState)
         .state('main.survey.instance.view', instanceViewState)
+        .state('main.survey.instance.response', instanceResponseBaseState)
+        .state('main.survey.instance.response.edit', instanceResponseEditState)
+        .state('main.survey.instance.response.view', instanceResponseViewState)
         .state('main.survey.template', templateBaseState)
         .state('main.survey.template.list', templateListState)
         .state('main.survey.template.create', templateCreateState)

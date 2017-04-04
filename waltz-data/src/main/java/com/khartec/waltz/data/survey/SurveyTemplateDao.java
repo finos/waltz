@@ -3,9 +3,9 @@ package com.khartec.waltz.data.survey;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.survey.ImmutableSurveyTemplate;
+import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.survey.SurveyTemplate;
 import com.khartec.waltz.model.survey.SurveyTemplateChangeCommand;
-import com.khartec.waltz.model.survey.SurveyTemplateStatus;
 import com.khartec.waltz.schema.tables.records.SurveyTemplateRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -33,7 +33,7 @@ public class SurveyTemplateDao {
                 .targetEntityKind(EntityKind.valueOf(record.getTargetEntityKind()))
                 .ownerId(record.getOwnerId())
                 .createdAt(record.getCreatedAt().toLocalDateTime())
-                .status(SurveyTemplateStatus.valueOf(record.getStatus()))
+                .status(ReleaseLifecycleStatus.valueOf(record.getStatus()))
                 .build();
     };
 
@@ -78,8 +78,8 @@ public class SurveyTemplateDao {
     public List<SurveyTemplate> findAll(long ownerId) {
         return dsl.select()
                 .from(SURVEY_TEMPLATE)
-                .where(SURVEY_TEMPLATE.STATUS.eq(SurveyTemplateStatus.ACTIVE.name()))
-                .or(SURVEY_TEMPLATE.STATUS.eq(SurveyTemplateStatus.DRAFT.name())
+                .where(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
+                .or(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.DRAFT.name())
                         .and(SURVEY_TEMPLATE.OWNER_ID.eq(ownerId)))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -109,7 +109,7 @@ public class SurveyTemplateDao {
     }
 
 
-    public int updateStatus(long templateId, SurveyTemplateStatus newStatus) {
+    public int updateStatus(long templateId, ReleaseLifecycleStatus newStatus) {
         checkNotNull(newStatus, "newStatus cannot be null");
 
         return dsl.update(SURVEY_TEMPLATE)

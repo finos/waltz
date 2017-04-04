@@ -35,10 +35,10 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW_LINEAGE;
 import static com.khartec.waltz.schema.tables.Attestation.ATTESTATION;
 
 
+@Deprecated
 @Repository
 public class AttestationDao {
 
@@ -126,30 +126,6 @@ public class AttestationDao {
                     .where(isImpliedLineageAttestation)
                     .execute();
 
-            Select<Record7<String, Long, String, String, Timestamp, String, String>> described = DSL.select(
-                    DSL.val(EntityKind.PHYSICAL_FLOW.name()).as("entity_kind"),
-                    PHYSICAL_FLOW_LINEAGE.DESCRIBED_FLOW_ID.as("entity_id"),
-                    DSL.val(AttestationType.IMPLICIT.name()).as("attestation_type"),
-                    PHYSICAL_FLOW_LINEAGE.LAST_UPDATED_BY.as("attested_by"),
-                    PHYSICAL_FLOW_LINEAGE.LAST_UPDATED_AT.as("attested_at"),
-                    (DSL.val("Implied by lineage creation, described by contributing flow: ")
-                            .concat(PHYSICAL_FLOW_LINEAGE.CONTRIBUTOR_FLOW_ID)).as("attestation_type"),
-                    DSL.val(provenance).as("provenance"))
-                    .from(PHYSICAL_FLOW_LINEAGE);
-
-            Select<Record7<String, Long, String, String, Timestamp, String, String>> contributed = DSL.select(
-                    DSL.val(EntityKind.PHYSICAL_FLOW.name()).as("entity_kind"),
-                    PHYSICAL_FLOW_LINEAGE.CONTRIBUTOR_FLOW_ID.as("entity_id"),
-                    DSL.val(AttestationType.IMPLICIT.name()).as("attestation_type"),
-                    PHYSICAL_FLOW_LINEAGE.LAST_UPDATED_BY.as("attested_by"),
-                    PHYSICAL_FLOW_LINEAGE.LAST_UPDATED_AT.as("attested_at"),
-                    (DSL.val("Implied by lineage creation as a contributor to describe flow: ")
-                            .concat(PHYSICAL_FLOW_LINEAGE.DESCRIBED_FLOW_ID)).as("attestation_type"),
-                    DSL.val(provenance).as("provenance"))
-                    .from(PHYSICAL_FLOW_LINEAGE);
-
-            insertAttestations(tx, described);
-            insertAttestations(tx, contributed);
         });
 
         return true;

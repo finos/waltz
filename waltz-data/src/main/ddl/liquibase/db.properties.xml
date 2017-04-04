@@ -24,6 +24,9 @@
                    logicalFilePath="db.changelog-1.0.xml">
 
     <!-- PRIMITIVES -->
+    <property name="blob.type" value="varbinary(max)" dbms="mssql"></property>
+    <property name="blob.type" value="longblob" dbms="mysql"></property>
+
     <property name="clob.type" value="clob" dbms="oracle"></property>
     <property name="clob.type" value="text" dbms="mssql"></property>
     <property name="clob.type" value="longtext" dbms="mysql"></property>
@@ -60,6 +63,7 @@
     <property name="tag.type" value="VARCHAR(255)"></property>
     <property name="provenance.type" value="VARCHAR(64)"></property>
     <property name="rag.type" value="CHAR(1)"></property>
+    <property name="version.type" value="VARCHAR(64)"></property>
     <property name="weight.type" value="${int.type}"></property>
 
 </databaseChangeLog>

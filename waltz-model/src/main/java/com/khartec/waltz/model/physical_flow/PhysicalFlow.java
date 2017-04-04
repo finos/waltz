@@ -39,7 +39,7 @@ public abstract class PhysicalFlow implements
         ProvenanceProvider,
         LastUpdatedProvider {
 
-    public abstract EntityReference target();
+    public abstract long logicalFlowId();
 
     public abstract long specificationId();
 

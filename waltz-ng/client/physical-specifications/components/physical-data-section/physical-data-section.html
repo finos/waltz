@@ -6,60 +6,30 @@
         <div class="col-md-12">
             <h4>Produces</h4>
 
-            <div class="row"
-                 ng-if="$ctrl.produces.length > 10">
-
-                <br>
-
-                <div class="col-md-6">
-                    <waltz-search-control min-characters="3"
-                                          delay="250"
-                                          on-query="$ctrl.filterProduces"
-                                          placeholder-text="Search producers...">
-                    </waltz-search-control>
-                </div>
-            </div>
-
-            <br>
-
-            <waltz-grid column-defs="$ctrl.produceColumnDefs"
-                        row-data="$ctrl.filteredProduces"
+            <waltz-grid-with-search column-defs="$ctrl.produceColumnDefs"
+                        entries="$ctrl.produces"
                         on-initialise="$ctrl.onProducesGridInitialise"
                         class="small">
-            </waltz-grid>
+            </waltz-grid-with-search>
         </div>
     </div>
 
+    <hr>
 
     <div class="row"
          ng-if="$ctrl.consumes.length > 0">
-
-        <br>
-
         <div class="col-md-12">
             <h4>Consumes</h4>
 
-            <div class="row"
-                 ng-if="$ctrl.consumes.length > 10">
-                <br>
-                <div class="col-md-6">
-                    <waltz-search-control min-characters="3"
-                                          delay="250"
-                                          on-query="$ctrl.filterConsumes"
-                                          placeholder-text="Search consumers...">
-                    </waltz-search-control>
-                </div>
-            </div>
-
-            <br>
-
-            <waltz-grid column-defs="$ctrl.consumeColumnDefs"
-                        row-data="$ctrl.filteredConsumes"
-                        on-initialise="$ctrl.onConsumesGridInitialise"
-                        class="small">
-            </waltz-grid>
+            <waltz-grid-with-search column-defs="$ctrl.consumeColumnDefs"
+                                    entries="$ctrl.consumes"
+                                    on-initialise="$ctrl.onConsumesGridInitialise"
+                                    class="small">
+            </waltz-grid-with-search>
         </div>
     </div>
+
+
 
 
     <waltz-no-data ng-if="$ctrl.produces.length == 0 && $ctrl.consumes.length == 0">

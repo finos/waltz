@@ -34,7 +34,7 @@
                 <tbody>
                 <tr ng-repeat="incompleteSurvey in ctrl.surveys.incomplete">
                     <td>
-                        <a ui-sref="main.survey.instance.edit ({ id: incompleteSurvey.surveyInstance.id })">
+                        <a ui-sref="main.survey.instance.response.edit ({ id: incompleteSurvey.surveyInstance.id })">
                             <span ng-bind="incompleteSurvey.surveyRun.name"></span>
                         </a>
                     </td>
@@ -80,7 +80,7 @@
                 <tbody>
                 <tr ng-repeat="completedSurvey in ctrl.surveys.complete">
                     <td>
-                        <a ui-sref="main.survey.instance.view ({ id: completedSurvey.surveyInstance.id })">
+                        <a ui-sref="main.survey.instance.response.view ({ id: completedSurvey.surveyInstance.id })">
                             <span ng-bind="completedSurvey.surveyRun.name"></span>
                         </a>
                     </td>

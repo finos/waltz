@@ -67,7 +67,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findBySelectorPath = mkPath(BASE_URL, "selector");
         String findStatsPath = mkPath(BASE_URL, "stats");
-
+        String getByIdPath = mkPath(BASE_URL, ":id");
         String removeFlowPath = mkPath(BASE_URL, ":id");
         String addFlowPath = mkPath(BASE_URL);
 
@@ -80,12 +80,13 @@ public class LogicalFlowEndpoint implements Endpoint {
         DatumRoute<LogicalFlowStatistics> findStatsRoute = (request, response)
                 -> logicalFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
 
+        DatumRoute<LogicalFlow> getByIdRoute = (request, response)
+                -> logicalFlowService.getById(getId(request));
 
         getForList(findByEntityPath, getByEntityRef);
+        getForDatum(getByIdPath, getByIdRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
-
         postForDatum(findStatsPath, findStatsRoute);
-
         deleteForDatum(removeFlowPath, this::removeFlowRoute);
         postForDatum(addFlowPath, this::addFlowRoute);
     }

@@ -566,7 +566,6 @@ function controller($element, $window, dataTypeService) {
     const svgSections = prepareGraph(svg);
 
     const render = () => {
-
         if (! vm.entityRef) { return; }
 
         baseDimensions.graph.width = $element

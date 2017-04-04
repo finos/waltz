@@ -94,7 +94,7 @@ public class AttestationService {
         PhysicalSpecification spec = physicalSpecificationDao.getById(physicalFlow.specificationId());
         boolean specAttestation = attest(PHYSICAL_SPECIFICATION, spec.id().get(), IMPLICIT, username, comments + "  Due to attesation of physical flow: " + physicalFlow);
 
-        LogicalFlow logical = logicalFlowDao.findBySourceAndTarget(spec.owningEntity(), physicalFlow.target());
+        LogicalFlow logical = logicalFlowDao.findByFlowId(physicalFlow.logicalFlowId());
         boolean logicalAttestation = attest(LOGICAL_DATA_FLOW, logical.id().get(), IMPLICIT, username, comments + "  Due to attesation of physical flow: " + physicalFlow);
 
         return physicalAttestation && specAttestation && logicalAttestation;

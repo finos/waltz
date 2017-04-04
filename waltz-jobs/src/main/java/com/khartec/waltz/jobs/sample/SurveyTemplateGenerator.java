@@ -2,6 +2,7 @@ package com.khartec.waltz.jobs.sample;
 
 
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.survey.SurveyQuestionService;
@@ -33,7 +34,7 @@ public class SurveyTemplateGenerator {
             dsl.deleteFrom(SURVEY_QUESTION).execute();
 
             SurveyTemplateStatusChangeCommand statusChangeCommand = ImmutableSurveyTemplateStatusChangeCommand.builder()
-                    .newStatus(SurveyTemplateStatus.ACTIVE)
+                    .newStatus(ReleaseLifecycleStatus.ACTIVE)
                     .build();
 
             SurveyTemplateChangeCommand appSurvey = mkAppSurvey();

@@ -3,7 +3,7 @@
         <tr>
             <td class="wpfo-entity-col wpfo-owning-entity">
                 <div>
-                    <waltz-entity-link entity-ref="$ctrl.specification.owningEntity"></waltz-entity-link>
+                    <waltz-entity-link entity-ref="$ctrl.logicalFlow.source"></waltz-entity-link>
                 </div>
             </td>
             <td class="wpfo-arrow-col">
@@ -42,11 +42,11 @@
             </td>
             <td class="wpfo-entity-col wpfo-target-entity"
                 ng-class="{
-                    'wpfo-entity-application' : $ctrl.physicalFlow.target.kind == 'APPLICATION',
-                    'wpfo-entity-actor' : $ctrl.physicalFlow.target.kind == 'ACTOR'
+                    'wpfo-entity-application' : $ctrl.logicalFlow.target.kind == 'APPLICATION',
+                    'wpfo-entity-actor' : $ctrl.logicalFlow.target.kind == 'ACTOR'
                 }">
                 <div>
-                    <waltz-entity-link entity-ref="$ctrl.physicalFlow.target"></waltz-entity-link>
+                    <waltz-entity-link entity-ref="$ctrl.logicalFlow.target"></waltz-entity-link>
                 </div>
             </td>
         </tr>

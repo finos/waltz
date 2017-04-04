@@ -135,7 +135,7 @@ public class LogicalFlowDao {
 
 
     public LogicalFlow addFlow(LogicalFlow flow) {
-        if (restoreFlow(flow)) {
+        if (restoreFlow(flow, flow.lastUpdatedBy())) {
             return findBySourceAndTarget(flow.source(), flow.target());
         } else {
             LogicalFlowRecord record = TO_RECORD_MAPPER.apply(flow, dsl);
@@ -154,13 +154,26 @@ public class LogicalFlowDao {
      * @param flow
      * @return
      */
-    private boolean restoreFlow(LogicalFlow flow) {
+    private boolean restoreFlow(LogicalFlow flow, String username) {
         return dsl.update(LOGICAL_FLOW)
                 .set(LOGICAL_FLOW.REMOVED, false)
+                .set(LOGICAL_FLOW.LAST_UPDATED_BY, username)
+                .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
                 .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(flow.source().id()))
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(flow.source().kind().name()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(flow.target().id()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(flow.target().kind().name()))
+                .execute() == 1;
+    }
+
+
+    public boolean restoreFlow(long logicalFlowId, String username) {
+        return dsl
+                .update(LOGICAL_FLOW)
+                .set(LOGICAL_FLOW.REMOVED, false)
+                .set(LOGICAL_FLOW.LAST_UPDATED_BY, username)
+                .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
+                .where(LOGICAL_FLOW.ID.eq(logicalFlowId))
                 .execute() == 1;
     }
 

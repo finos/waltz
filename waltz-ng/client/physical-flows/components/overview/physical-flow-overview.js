@@ -17,6 +17,7 @@
  */
 
 const bindings = {
+    logicalFlow: '<',
     specification: '<',
     physicalFlow: '<'
 };

@@ -31,22 +31,6 @@ function store($http, baseApiUrl) {
     };
 
 
-    const findByProducerEntityReference = (ref) => {
-        checkIsEntityRef(ref);
-        return $http
-            .get(`${base}/application/${ref.kind}/${ref.id}/produces`)
-            .then(r => r.data);
-    };
-
-
-    const findByConsumerEntityReference = (ref) => {
-        checkIsEntityRef(ref);
-        return $http
-            .get(`${base}/application/${ref.kind}/${ref.id}/consumes`)
-            .then(r => r.data);
-    };
-
-
     const findBySelector = (options) => {
         checkIsIdSelector(options);
         return $http
@@ -67,8 +51,6 @@ function store($http, baseApiUrl) {
 
     return {
         findByEntityReference,
-        findByProducerEntityReference,
-        findByConsumerEntityReference,
         findBySelector,
         getById,
         deleteById
