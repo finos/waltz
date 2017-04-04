@@ -6,6 +6,7 @@ import com.khartec.waltz.data.survey.SurveyTemplateDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.survey.*;
@@ -67,7 +68,7 @@ public class SurveyTemplateService {
                 .targetEntityKind(command.targetEntityKind())
                 .ownerId(owner.id().get())
                 .createdAt(DateTimeUtilities.nowUtc())
-                .status(SurveyTemplateStatus.DRAFT)
+                .status(ReleaseLifecycleStatus.DRAFT)
                 .build());
 
         changeLogService.write(
