@@ -606,7 +606,7 @@
                 last_updated_by,
                 last_updated_at,
                 removed)
-            SELECT
+            SELECT DISTINCT
                 ps.owning_entity_kind AS source_entity_kind,
                 ps.owning_entity_id AS source_entity_id,
                 pf.target_entity_kind AS target_entity_kind,
@@ -664,6 +664,32 @@
         <addNotNullConstraint tableName="physical_flow"
                               columnName="logical_flow_id"
                               columnDataType="${id.type}"/>
+    </changeSet>
+
+    <changeSet id="20170404-1881-8a"
+               author="davidwatkins73"
+               dbms="mssql">
+        <comment>1881: Remove indexes before removing columns</comment>
+        <dropIndex tableName="physical_flow"
+                   indexName="idx_target_entity"/>
+    </changeSet>
+
+    <changeSet id="20170404-1881-8b"
+               author="davidwatkins73"
+               dbms="mssql">
+        <comment>1881: Remove default values before removing columns</comment>
+        <dropDefaultValue columnDataType="${enum.type}"
+                          columnName="target_entity_kind"
+                          tableName="physical_flow"/>
+    </changeSet>
+
+    <changeSet id="20170404-1881-8c"
+               author="davidwatkins73"
+               dbms="mssql">
+        <comment>1881: Remove default values before removing columns</comment>
+        <dropDefaultValue columnDataType="${id.type}"
+                          columnName="target_entity_id"
+                          tableName="physical_flow"/>
     </changeSet>
 
     <changeSet id="20170331-1881-8"
