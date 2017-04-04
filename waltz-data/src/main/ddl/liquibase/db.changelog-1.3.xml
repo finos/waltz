@@ -708,4 +708,16 @@
     </changeSet>
 
 
+    <!-- 1916 -->
+    <changeSet id="20170404-1916-1"
+               author="rovats">
+        <comment>1916: Unique names required for unique names</comment>
+        <dropUniqueConstraint tableName="survey_template"
+                              constraintName="unique_name"
+                              uniqueColumns="name" />
+        <addUniqueConstraint columnNames="name"
+                             constraintName="survey_template_unique_name"
+                             tableName="survey_template"/>
+    </changeSet>
+
 </databaseChangeLog>
