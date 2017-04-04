@@ -20,7 +20,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.survey.SurveyTemplate;
 import com.khartec.waltz.model.survey.SurveyTemplateChangeCommand;
-import com.khartec.waltz.model.survey.SurveyTemplateStatusChangeCommand;
+import com.khartec.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.survey.SurveyTemplateService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -87,7 +87,7 @@ public class SurveyTemplateEndpoint implements Endpoint {
                     return surveyTemplateService.updateStatus(
                             getUsername(req),
                             getId(req),
-                            readBody(req, SurveyTemplateStatusChangeCommand.class));
+                            readBody(req, ReleaseLifecycleStatusChangeCommand.class));
                 };
 
         getForList(BASE_URL, findAllRoute);

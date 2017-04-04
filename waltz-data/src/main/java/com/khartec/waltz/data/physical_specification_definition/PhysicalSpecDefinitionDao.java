@@ -1,5 +1,6 @@
 package com.khartec.waltz.data.physical_specification_definition;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinition;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinition;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDefn.PHYSICAL_SPEC_DEFN;
 
 @Repository
@@ -101,9 +103,21 @@ public class PhysicalSpecDefinitionDao {
     }
 
 
-    public int markExistingActiveAsObsolete(long specificationId) {
+    public int updateStatus(long specDefinitionId, ReleaseLifecycleStatus newStatus, String userName) {
+        return dsl.update(PHYSICAL_SPEC_DEFN)
+                .set(PHYSICAL_SPEC_DEFN.STATUS, newStatus.name())
+                .set(PHYSICAL_SPEC_DEFN.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
+                .set(PHYSICAL_SPEC_DEFN.LAST_UPDATED_BY, userName)
+                .where(PHYSICAL_SPEC_DEFN.ID.eq(specDefinitionId))
+                .execute();
+    }
+
+
+    public int markExistingActiveAsObsolete(long specificationId, String userName) {
         return dsl.update(PHYSICAL_SPEC_DEFN)
                 .set(PHYSICAL_SPEC_DEFN.STATUS, ReleaseLifecycleStatus.OBSOLETE.name())
+                .set(PHYSICAL_SPEC_DEFN.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
+                .set(PHYSICAL_SPEC_DEFN.LAST_UPDATED_BY, userName)
                 .where(PHYSICAL_SPEC_DEFN.SPECIFICATION_ID.eq(specificationId))
                 .and(PHYSICAL_SPEC_DEFN.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
                 .execute();

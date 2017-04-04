@@ -3,10 +3,7 @@ package com.khartec.waltz.service.survey;
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.data.survey.SurveyTemplateDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.ReleaseLifecycleStatus;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.survey.*;
@@ -102,7 +99,7 @@ public class SurveyTemplateService {
     }
 
 
-    public int updateStatus(String userName, long templateId, SurveyTemplateStatusChangeCommand command) {
+    public int updateStatus(String userName, long templateId, ReleaseLifecycleStatusChangeCommand command) {
         checkNotNull(command, "command cannot be null");
 
         int result = surveyTemplateDao.updateStatus(templateId, command.newStatus());
