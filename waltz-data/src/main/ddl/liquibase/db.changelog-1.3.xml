@@ -520,4 +520,192 @@
         </createTable>
     </changeSet>
 
+
+    <!-- 1881 -->
+    <changeSet id="20170331-1881-1"
+               author="davidwatkins73">
+        <comment>1881: Add logical flow id column to physical flow</comment>
+        <addColumn tableName="physical_flow">
+            <column name="logical_flow_id" type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20170331-1881-2"
+               author="davidwatkins73">
+        <comment>1881: remove flows where sender no longer exists</comment>
+        <sql>
+            DELETE pf
+            FROM physical_flow pf
+                INNER JOIN physical_specification ps
+                    ON pf.specification_id = ps.id
+            WHERE
+                ps.owning_entity_id NOT IN (SELECT id FROM application)
+                AND ps.owning_entity_kind = 'APPLICATION';
+        </sql>
+    </changeSet>
+
+    <changeSet id="20170331-1881-3"
+               author="davidwatkins73">
+        <comment>1881: remove flows where target no longer exists</comment>
+        <sql>
+            DELETE pf
+            FROM physical_flow pf
+            WHERE
+                pf.target_entity_id NOT IN (SELECT id FROM application)
+                AND pf.target_entity_kind = 'APPLICATION';
+        </sql>
+    </changeSet>
+
+    <changeSet id="20170331-1881-4a"
+               author="davidwatkins73"
+               dbms="mysql">
+        <comment>1881: link physical flows to logical (iteration 1)</comment>
+        <sql>
+            UPDATE physical_flow pf
+                INNER JOIN physical_specification ps
+                    ON ps.id = pf.specification_id
+                INNER JOIN logical_flow lf
+                    ON pf.target_entity_id = lf.target_entity_id
+                    AND pf.target_entity_kind = lf.target_entity_kind
+                    AND ps.owning_entity_id = lf.source_entity_id
+                    AND ps.owning_entity_kind = lf.source_entity_kind
+            SET pf.logical_flow_id = lf.id;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20170331-1881-4b"
+               author="davidwatkins73"
+               dbms="mssql">
+        <comment>1881: link physical flows to logical (iteration 1)</comment>
+        <sql>
+            UPDATE pf
+                SET pf.logical_flow_id = lf.id
+            FROM physical_flow pf
+                INNER JOIN physical_specification ps
+                    ON ps.id = pf.specification_id
+                INNER JOIN logical_flow lf
+                    ON pf.target_entity_id = lf.target_entity_id
+                    AND pf.target_entity_kind = lf.target_entity_kind
+                    AND ps.owning_entity_id = lf.source_entity_id
+                    AND ps.owning_entity_kind = lf.source_entity_kind;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20170331-1881-5"
+               author="davidwatkins73">
+        <comment>1881: create missing logical flows (and mark them as removed)</comment>
+        <sql>
+            INSERT INTO logical_flow (
+                source_entity_kind,
+                source_entity_id,
+                target_entity_kind,
+                target_entity_id,
+                provenance,
+                last_updated_by,
+                last_updated_at,
+                removed)
+            SELECT DISTINCT
+                ps.owning_entity_kind AS source_entity_kind,
+                ps.owning_entity_id AS source_entity_id,
+                pf.target_entity_kind AS target_entity_kind,
+                pf.target_entity_id AS target_entity_id,
+                pf.provenance AS provenance,
+                pf.last_updated_by AS last_updated_by,
+                pf.last_updated_at AS last_updated_at,
+                1 as removed
+            FROM physical_flow pf
+                INNER JOIN physical_specification ps
+                    ON ps.id = pf.specification_id
+            WHERE
+                pf.logical_flow_id IS NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20170331-1881-6a"
+               author="davidwatkins73"
+               dbms="mysql">
+        <comment>1881: link physical flows to logical (iteration 2)</comment>
+        <sql>
+            UPDATE physical_flow pf
+                INNER JOIN physical_specification ps
+                    ON ps.id = pf.specification_id
+                INNER JOIN logical_flow lf
+                    ON pf.target_entity_id = lf.target_entity_id
+                    AND pf.target_entity_kind = lf.target_entity_kind
+                    AND ps.owning_entity_id = lf.source_entity_id
+                    AND ps.owning_entity_kind = lf.source_entity_kind
+            SET pf.logical_flow_id = lf.id;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20170331-1881-6b"
+               author="davidwatkins73"
+               dbms="mssql">
+        <comment>1881: link physical flows to logical (iteration 2)</comment>
+        <sql>
+            UPDATE pf
+                SET pf.logical_flow_id = lf.id
+            FROM physical_flow pf
+                INNER JOIN physical_specification ps
+                    ON ps.id = pf.specification_id
+                INNER JOIN logical_flow lf
+                    ON pf.target_entity_id = lf.target_entity_id
+                    AND pf.target_entity_kind = lf.target_entity_kind
+                    AND ps.owning_entity_id = lf.source_entity_id
+                    AND ps.owning_entity_kind = lf.source_entity_kind;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20170331-1881-7"
+               author="davidwatkins73">
+        <comment>1881: tighten constraint on logical_flow_id column</comment>
+        <addNotNullConstraint tableName="physical_flow"
+                              columnName="logical_flow_id"
+                              columnDataType="${id.type}"/>
+    </changeSet>
+
+    <changeSet id="20170404-1881-8a"
+               author="davidwatkins73"
+               dbms="mssql">
+        <comment>1881: Remove indexes before removing columns</comment>
+        <dropIndex tableName="physical_flow"
+                   indexName="idx_target_entity"/>
+    </changeSet>
+
+    <changeSet id="20170404-1881-8b"
+               author="davidwatkins73"
+               dbms="mssql">
+        <comment>1881: Remove default values before removing columns</comment>
+        <dropDefaultValue columnDataType="${enum.type}"
+                          columnName="target_entity_kind"
+                          tableName="physical_flow"/>
+    </changeSet>
+
+    <changeSet id="20170404-1881-8c"
+               author="davidwatkins73"
+               dbms="mssql">
+        <comment>1881: Remove default values before removing columns</comment>
+        <dropDefaultValue columnDataType="${id.type}"
+                          columnName="target_entity_id"
+                          tableName="physical_flow"/>
+    </changeSet>
+
+    <changeSet id="20170331-1881-8"
+               author="davidwatkins73">
+        <comment>1881: remove target columns from physical_flow</comment>
+        <dropColumn tableName="physical_flow"
+                    columnName="target_entity_kind"/>
+        <dropColumn tableName="physical_flow"
+                    columnName="target_entity_id"/>
+    </changeSet>
+
+    <changeSet id="20170331-1881-9"
+               author="davidwatkins73">
+        <comment>1881: remove physical lineage table, to be replaced by flow diagrams</comment>
+        <dropTable tableName="physical_flow_lineage"/>
+    </changeSet>
+
+
 </databaseChangeLog>

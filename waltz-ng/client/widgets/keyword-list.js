@@ -49,7 +49,6 @@ function controller() {
     vm.$onInit = () => initialiseData(vm, initialState);
 
     vm.$onChanges = (c) => {
-        console.log('keyword-list - oc', vm);
     };
 
 

@@ -26,16 +26,16 @@ import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.logical_flow.*;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
+import com.khartec.waltz.service.data_type.DataTypeService;
+import com.khartec.waltz.service.settings.SettingsService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -44,6 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
@@ -51,12 +52,15 @@ import java.util.function.Supplier;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 
 
 @Service
 public class LogicalFlowService {
 
     private static final String PROVENANCE = "waltz";
+    private static final String DEFAULT_DATATYPE_CODE_SETTING_NAME = "settings.data-type.default-code";
+
 
     private final ApplicationIdSelectorFactory appIdSelectorFactory;
     private final ChangeLogService changeLogService;
@@ -67,6 +71,8 @@ public class LogicalFlowService {
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
     private final LogicalFlowStatsDao logicalFlowStatsDao;
     private final PhysicalFlowDao physicalFlowDao;
+    private final SettingsService settingsService;
+    private final DataTypeService dataTypeService;
 
 
     @Autowired
@@ -78,7 +84,9 @@ public class LogicalFlowService {
                               LogicalFlowDao logicalFlowDao,
                               LogicalFlowStatsDao logicalFlowStatsDao,
                               LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory,
-                              PhysicalFlowDao physicalFlowDao) {
+                              PhysicalFlowDao physicalFlowDao,
+                              SettingsService settingsService,
+                              DataTypeService dataTypeService) {
         checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
@@ -88,6 +96,8 @@ public class LogicalFlowService {
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
         checkNotNull(logicalFlowIdSelectorFactory, "logicalFlowIdSelectorFactory cannot be null");
         checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
+        checkNotNull(settingsService, "settingsService cannot be null");
+        checkNotNull(dataTypeService, "dataTypeService cannot be null");
 
         this.appIdSelectorFactory = appIdSelectorFactory;
         this.changeLogService = changeLogService;
@@ -98,6 +108,8 @@ public class LogicalFlowService {
         this.logicalFlowDao = logicalFlowDao;
         this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
         this.physicalFlowDao = physicalFlowDao;
+        this.settingsService = settingsService;
+        this.dataTypeService = dataTypeService;
     }
 
 
@@ -266,4 +278,36 @@ public class LogicalFlowService {
         changeLogService.write(logEntry.withParentReference(target));
     }
 
+
+    public boolean restoreFlow(long logicalFlowId, String username) {
+        return logicalFlowDao.restoreFlow(logicalFlowId, username);
+    }
+
+
+    public void createDefaultFlow(EntityReference source, EntityReference target, String username) {
+        Optional<String> defaultDataTypeCode = settingsService.getValue(DEFAULT_DATATYPE_CODE_SETTING_NAME);
+        if(!defaultDataTypeCode.isPresent()) {
+            throw new IllegalStateException("No default datatype code  (" + DEFAULT_DATATYPE_CODE_SETTING_NAME + ") in settings table");
+        }
+
+        // we need to create a flow with an unknown data type
+        AddLogicalFlowCommand newFlow = ImmutableAddLogicalFlowCommand.builder()
+                .source(source)
+                .target(target)
+                .build();
+
+        LogicalFlow logicalFlow = addFlow(newFlow, username);
+
+        // add decorators
+        DataType defaultDataType = dataTypeService.getByCode(defaultDataTypeCode.get());
+        EntityReference dataTypeRef = mkRef(
+                EntityKind.DATA_TYPE,
+                defaultDataType.id().get(),
+                defaultDataType.name());
+        logicalFlowDecoratorService.addDecorators(
+                logicalFlow.id().get(),
+                SetUtilities.fromArray(dataTypeRef),
+                username);
+
+    }
 }

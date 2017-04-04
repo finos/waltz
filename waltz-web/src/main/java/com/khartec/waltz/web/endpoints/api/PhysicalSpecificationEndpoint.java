@@ -18,7 +18,6 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.ProduceConsumeGroup;
 import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
@@ -59,20 +58,6 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findByProducerAppPath = mkPath(
-                BASE_URL,
-                "application",
-                ":kind",
-                ":id",
-                "produces");
-
-        String findByConsumerAppIdPath = mkPath(
-                BASE_URL,
-                "application",
-                ":kind",
-                ":id",
-                "consumes");
-
         String findByAppPath = mkPath(
                 BASE_URL,
                 "application",
@@ -91,27 +76,18 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         String deletePath = mkPath(BASE_URL,
                 ":id");
 
-        ListRoute<PhysicalSpecification> findByProducerAppRoute =
-                (request, response) -> specificationService.findByProducer(getEntityReference(request));
-
-        ListRoute<PhysicalSpecification> findByConsumerAppIdRoute =
-                (request, response) -> specificationService.findByConsumer(getEntityReference(request));
-
         ListRoute<PhysicalSpecification> findBySelectorRoute =
                 (request, response) -> specificationService.findBySelector(readIdSelectionOptionsFromBody(request));
 
-
-        DatumRoute<ProduceConsumeGroup<PhysicalSpecification>> findByAppRoute =
+        ListRoute<PhysicalSpecification> findByAppRoute =
                 (request, response) -> specificationService.findByEntityReference(getEntityReference(request));
 
         DatumRoute<PhysicalSpecification> getByIdRoute =
                 (request, response) -> specificationService.getById(getId(request));
 
-        getForList(findByProducerAppPath, findByProducerAppRoute);
-        getForList(findByConsumerAppIdPath, findByConsumerAppIdRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
 
-        getForDatum(findByAppPath, findByAppRoute);
+        getForList(findByAppPath, findByAppRoute);
         getForDatum(getByIdPath, getByIdRoute);
 
         deleteForDatum(deletePath, this::deleteSpecification);

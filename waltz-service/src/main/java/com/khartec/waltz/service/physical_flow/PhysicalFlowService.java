@@ -18,29 +18,22 @@
 
 package com.khartec.waltz.service.physical_flow;
 
-import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowSearchDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.command.CommandOutcome;
-import com.khartec.waltz.model.datatype.DataType;
-import com.khartec.waltz.model.logical_flow.AddLogicalFlowCommand;
-import com.khartec.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
+import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
-import com.khartec.waltz.service.data_type.DataTypeService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
-import com.khartec.waltz.service.settings.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +46,7 @@ import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 
 
 @Service
@@ -61,41 +55,27 @@ public class PhysicalFlowService {
     private final PhysicalFlowDao physicalFlowDao;
     private final PhysicalSpecificationDao physicalSpecificationDao;
     private final ChangeLogService changeLogService;
-    private final LogicalFlowService dataFlowService;
-    private final LogicalFlowDecoratorService logicalFlowDecoratorService;
-    private final DataTypeService dataTypeService;
-    private final SettingsService settingsService;
+    private final LogicalFlowService logicalFlowService;
     private final PhysicalFlowSearchDao searchDao;
 
-    private final static String DEFAULT_DATATYPE_CODE_SETTING_NAME = "settings.data-type.default-code";
-    private final static String PROVENANCE = "waltz";
 
     @Autowired
     public PhysicalFlowService(ChangeLogService changeLogService,
-                               LogicalFlowService dataFlowService,
-                               LogicalFlowDecoratorService logicalFlowDecoratorService,
-                               DataTypeService dataTypeService,
+                               LogicalFlowService logicalFlowService,
                                PhysicalFlowDao physicalDataFlowDao,
                                PhysicalSpecificationDao physicalSpecificationDao,
-                               SettingsService settingsService,
                                PhysicalFlowSearchDao searchDao) {
 
         checkNotNull(changeLogService, "changeLogService cannot be null");
-        checkNotNull(dataFlowService, "dataFlowService cannot be null");
-        checkNotNull(logicalFlowDecoratorService, "dataFlowDecoratorService cannot be null");
-        checkNotNull(dataTypeService, "dataTypeService cannot be null");
+        checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalDataFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
-        checkNotNull(settingsService, "settingsService cannot be null");
         checkNotNull(searchDao, "searchDao cannot be null");
 
         this.changeLogService = changeLogService;
-        this.dataFlowService = dataFlowService;
-        this.logicalFlowDecoratorService = logicalFlowDecoratorService;
-        this.dataTypeService = dataTypeService;
+        this.logicalFlowService = logicalFlowService;
         this.physicalFlowDao = physicalDataFlowDao;
         this.physicalSpecificationDao = physicalSpecificationDao;
-        this.settingsService = settingsService;
         this.searchDao = searchDao;
     }
 
@@ -139,12 +119,14 @@ public class PhysicalFlowService {
     public PhysicalFlowDeleteCommandResponse delete(PhysicalFlowDeleteCommand command, String username) {
         checkNotNull(command, "command cannot be null");
 
-        PhysicalFlow flow = physicalFlowDao.getById(command.flowId());
+        PhysicalFlow physicalFlow = physicalFlowDao.getById(command.flowId());
+        LogicalFlow logicalFlow = logicalFlowService.getById(physicalFlow.logicalFlowId());
+
         CommandOutcome commandOutcome = CommandOutcome.SUCCESS;
         String responseMessage = null;
         boolean isSpecificationUnused = false;
 
-        if (flow == null) {
+        if (physicalFlow == null) {
             commandOutcome = CommandOutcome.FAILURE;
             responseMessage = "Flow not found";
         } else {
@@ -154,42 +136,42 @@ public class PhysicalFlowService {
                 commandOutcome = CommandOutcome.FAILURE;
                 responseMessage = "This flow cannot be deleted as it is being used in a lineage";
             } else {
-                isSpecificationUnused = !physicalSpecificationDao.isUsed(flow.specificationId());
+                isSpecificationUnused = !physicalSpecificationDao.isUsed(physicalFlow.specificationId());
             }
         }
 
 
         // log changes against source and target entities
         if (commandOutcome == CommandOutcome.SUCCESS) {
-            PhysicalSpecification specification = physicalSpecificationDao.getById(flow.specificationId());
+            PhysicalSpecification specification = physicalSpecificationDao.getById(physicalFlow.specificationId());
 
             logChange(username,
-                    specification.owningEntity(),
+                    logicalFlow.source(),
                     String.format("Physical flow: %s, from: %s, to: %s removed.",
                             specification.name(),
-                            specification.owningEntity().safeName(),
-                            flow.target().safeName()),
+                            logicalFlow.source().safeName(),
+                            logicalFlow.target().safeName()),
                     Operation.REMOVE);
 
             logChange(username,
-                    flow.target(),
+                    logicalFlow.target(),
                     String.format("Physical flow: %s, from: %s removed.",
                             specification.name(),
-                            specification.owningEntity().safeName()),
+                            logicalFlow.source().safeName()),
                     Operation.REMOVE);
 
             logChange(username,
-                    specification.owningEntity(),
+                    logicalFlow.source(),
                     String.format("Physical flow: %s, to: %s removed.",
                             specification.name(),
-                            flow.target().safeName()),
+                            logicalFlow.target().safeName()),
                     Operation.REMOVE);
         }
 
 
         return ImmutablePhysicalFlowDeleteCommandResponse.builder()
                 .originalCommand(command)
-                .entityReference(EntityReference.mkRef(PHYSICAL_FLOW, command.flowId()))
+                .entityReference(mkRef(PHYSICAL_FLOW, command.flowId()))
                 .outcome(commandOutcome)
                 .message(Optional.ofNullable(responseMessage))
                 .isSpecificationUnused(isSpecificationUnused)
@@ -202,7 +184,7 @@ public class PhysicalFlowService {
         checkNotNull(username, "username cannot be null");
 
         //check we have a logical data flow
-        ensureLogicalDataFlow(command.specification().owningEntity(), command.targetEntity(), username);
+        LogicalFlow logicalFlow = ensureLogicalDataFlowExists(command.logicalFlowId(), username);
 
         long specId = command
                 .specification()
@@ -218,7 +200,7 @@ public class PhysicalFlowService {
                 .frequency(command.flowAttributes().frequency())
                 .transport(command.flowAttributes().transport())
                 .description(mkSafe(command.flowAttributes().description()))
-                .target(command.targetEntity())
+                .logicalFlowId(command.logicalFlowId())
                 .lastUpdatedBy(username)
                 .lastUpdatedAt(nowUtc())
                 .build();
@@ -230,75 +212,53 @@ public class PhysicalFlowService {
                     .originalCommand(command)
                     .outcome(CommandOutcome.FAILURE)
                     .message("Duplicate with existing flow")
-                    .entityReference(EntityReference.mkRef(PHYSICAL_FLOW, byAttributesAndSpecification.get(0).id().get()))
+                    .entityReference(mkRef(PHYSICAL_FLOW, byAttributesAndSpecification.get(0).id().get()))
                     .build();
         }
 
-        long flowId = physicalFlowDao.create(flow);
+        long physicalFlowId = physicalFlowDao.create(flow);
 
         logChange(username,
-                command.specification().owningEntity(),
+                logicalFlow.source(),
                 String.format("Added physical flow (%s) to: %s",
                         command.specification().name(),
-                        command.targetEntity().safeName()),
+                        logicalFlow.target().safeName()),
                 Operation.ADD);
 
         logChange(username,
-                command.targetEntity(),
+                logicalFlow.target(),
                 String.format("Added physical flow (%s) from: %s",
                         command.specification().name(),
-                        command.specification().owningEntity().safeName()),
+                        logicalFlow.source().safeName()),
                 Operation.ADD);
 
         logChange(username,
-                EntityReference.mkRef(PHYSICAL_SPECIFICATION, specId),
+                mkRef(PHYSICAL_SPECIFICATION, specId),
                 String.format("Added physical flow (%s) from: %s, to %s",
                         command.specification().name(),
-                        command.specification().owningEntity().safeName(),
-                        command.targetEntity().safeName()),
+                        logicalFlow.source().safeName(),
+                        logicalFlow.target().safeName()),
                 Operation.ADD);
 
         return ImmutablePhysicalFlowCreateCommandResponse.builder()
                 .originalCommand(command)
                 .outcome(CommandOutcome.SUCCESS)
-                .entityReference(EntityReference.mkRef(PHYSICAL_FLOW, flowId))
+                .entityReference(mkRef(PHYSICAL_FLOW, physicalFlowId))
                 .build();
     }
 
 
-    private void ensureLogicalDataFlow(EntityReference source, EntityReference target, String username) {
-        // only ensure logical flow if both entities are applications
-        if(!(source.kind().equals(EntityKind.APPLICATION)
-                && target.kind().equals(EntityKind.APPLICATION))) {
-            return;
+    private LogicalFlow ensureLogicalDataFlowExists(long logicalFlowId, String username) {
+        LogicalFlow logicalFlow = logicalFlowService.getById(logicalFlowId);
+        if (logicalFlow == null) {
+            throw new IllegalArgumentException("Unknown logical flow: " + logicalFlowId);
         } else {
-            LogicalFlow logicalFlow = dataFlowService.findBySourceAndTarget(source, target);
-
-            if(logicalFlow == null) {
-                Optional<String> defaultDataTypeCode = settingsService.getValue(DEFAULT_DATATYPE_CODE_SETTING_NAME);
-                if(!defaultDataTypeCode.isPresent()) {
-                    throw new IllegalStateException("No default datatype code  (" + DEFAULT_DATATYPE_CODE_SETTING_NAME + ") in settings table");
-                }
-
-                // we need to create a flow with an unknown data type
-                AddLogicalFlowCommand newFlow = ImmutableAddLogicalFlowCommand.builder()
-                        .source(source)
-                        .target(target)
-                        .build();
-                logicalFlow = dataFlowService.addFlow(newFlow, username);
-
-                // add decorators
-                DataType defaultDataType = dataTypeService.getByCode(defaultDataTypeCode.get());
-                EntityReference dataTypeRef = EntityReference.mkRef(
-                        EntityKind.DATA_TYPE,
-                        defaultDataType.id().get(),
-                        defaultDataType.name());
-                logicalFlowDecoratorService.addDecorators(
-                        logicalFlow.id().get(),
-                        SetUtilities.fromArray(dataTypeRef),
-                        username);
+            if (logicalFlow.isRemoved()) {
+                logicalFlowService.restoreFlow(logicalFlowId, username);
+                return ImmutableLogicalFlow.copyOf(logicalFlow).withIsRemoved(false);
             }
         }
+        return logicalFlow;
     }
 
 

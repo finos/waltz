@@ -35,8 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -64,18 +64,8 @@ public class PhysicalSpecificationService {
     }
 
 
-    public ProduceConsumeGroup<PhysicalSpecification> findByEntityReference(EntityReference ref) {
+    public Set<PhysicalSpecification> findByEntityReference(EntityReference ref) {
         return specificationDao.findByEntityReference(ref);
-    }
-
-
-    public List<PhysicalSpecification> findByProducer(EntityReference ref) {
-        return specificationDao.findByProducer(ref);
-    }
-
-
-    public Collection<PhysicalSpecification> findByConsumer(EntityReference ref) {
-        return specificationDao.findByConsumer(ref);
     }
 
 
@@ -87,7 +77,6 @@ public class PhysicalSpecificationService {
     public Collection<PhysicalSpecification> findBySelector(IdSelectionOptions options) {
         Select<Record1<Long>> selector = selectorFactory.apply(options);
         return specificationDao.findBySelector(selector);
-
     }
 
 

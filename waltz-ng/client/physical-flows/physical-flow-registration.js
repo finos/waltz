@@ -26,11 +26,11 @@ const template = require('./physical-flow-registration.html');
 
 const initialState = {
     cancelLink: '#/',
-    candidateSpecifications: [],
+    existingSpecifications: [],
     flowAttributes: null,
     sourceEntity: null,
     specification: null,
-    targetEntity: null,
+    targetLogicalFlow: null,
     existingTargets: [],
     existingFlowsByTarget: {},
     similarFlows: [],
@@ -56,20 +56,20 @@ function loadEntity(entityRef, appStore, actorStore) {
                 .getById(entityRef.id)
                 .then(actor => Object.assign({}, actor, { kind: 'ACTOR' }));
         default:
-            throw "Unsupported owningEntity (kind): " + entityRef
+            throw "Unsupported owningEntity (kind): " + entityRef;
     }
 }
 
 
-function validate(specification, flowAttributes, targetEntity) {
+function validate(specification, flowAttributes, targetLogicalFlow) {
 
     const messages = [];
     messages.push(specification ? null : "Missing specification. ");
     messages.push(flowAttributes ? null : "Missing attributes. ");
-    messages.push(targetEntity ? null : "Missing target. ");
+    messages.push(targetLogicalFlow ? null : "Missing target. ");
 
     return {
-        canSave: specification && flowAttributes && targetEntity,
+        canSave: specification && flowAttributes && targetLogicalFlow,
         messages: _.reject(messages, m => m == null)
     };
 }
@@ -100,7 +100,6 @@ function controller(
 
     const vm = initialiseData(this, initialState);
 
-
     vm.similarFlowDefs = [
         { field: 'specification.name', displayName: 'Name', width: "10%" },
         { field: 'specification.format', displayName: 'Format', width: "10%", cellFilter: 'toDisplayName:"dataFormatKind"' },
@@ -122,8 +121,8 @@ function controller(
 
     const doValidation = () => {
         vm.visibility.similarFlows = false;
-        vm.similarFlows = findSimilarFlows(vm.specification, vm.flowAttributes, vm.targetEntity, vm.existingFlowsByTarget);
-        return validate(vm.specification, vm.flowAttributes, vm.targetEntity);
+        // vm.similarFlows = findSimilarFlows(vm.specification, vm.flowAttributes, vm.targetEntity, vm.existingFlowsByTarget);
+        return validate(vm.specification, vm.flowAttributes, vm.targetLogicalFlow);
     };
 
     vm.focusSpecification = () => {
@@ -135,7 +134,7 @@ function controller(
     };
 
     vm.focusTarget = () => {
-        vm.visibility.editor = 'TARGET-ENTITY';
+        vm.visibility.editor = 'TARGET-LOGICAL-FLOW';
     };
 
     vm.attributesChanged = (attributes) => {
@@ -143,8 +142,8 @@ function controller(
         vm.editorDismiss();
     };
 
-    vm.targetChanged = (target) => {
-        vm.targetEntity = target;
+    vm.targetChanged = (logicalFlow) => {
+        vm.targetLogicalFlow = logicalFlow;
         vm.editorDismiss();
     };
 
@@ -166,7 +165,7 @@ function controller(
             const cmd = {
                 specification: vm.specification,
                 flowAttributes: vm.flowAttributes,
-                targetEntity: { id: vm.targetEntity.id, kind: vm.targetEntity.kind }
+                logicalFlowId: vm.targetLogicalFlow.id
             };
             physicalFlowStore
                 .create(cmd)
@@ -191,36 +190,16 @@ function controller(
 
     specificationStore
         .findByEntityReference(sourceEntityRef)
-        .then(specs => vm.candidateSpecifications = specs);
+        .then(specs => vm.existingSpecifications = specs);
 
-    physicalFlowStore
-        .findByProducerEntityReference(sourceEntityRef)
-        .then(flows =>
-            _.chain(flows)
-                .groupBy(i => i.target.kind + "_" + i.target.id)
-                .value()
-        ).then(flowsByTarget => vm.existingFlowsByTarget = flowsByTarget);
-
-    const existingLogicalTargetPromise = logicalFlowStore
-        .findByEntityReference(sourceEntityRef.kind, sourceEntityRef.id)
-        .then(flows => _.chain(flows)
-            .map('target')
-            .uniqBy(r => r.kind + r.id)
-            .value());
-
-    const existingPhysicalTargetPromise = physicalFlowStore
+    logicalFlowStore
         .findByEntityReference(sourceEntityRef)
-        .then(flows => _.chain(flows)
-            .map('target')
-            .uniqBy(r => r.kind + r.id)
-            .value());
-
-    $q.all([existingLogicalTargetPromise, existingPhysicalTargetPromise])
-        .then(([logical = [], physical = []]) =>
-            _.chain(logical)
-                .concat(physical)
-                .uniqBy(r => r.kind + r.id).value())
-        .then(targets => vm.existingTargets = targets);
+        .then(flows =>
+            vm.outboundLogicalFlows = _
+                .chain(flows)
+                .filter(f => f.source.kind === sourceEntityRef.kind && f.source.id === sourceEntityRef.id)
+                .orderBy('target.name')
+                .value());
 
 }
 

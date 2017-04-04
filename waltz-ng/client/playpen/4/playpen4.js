@@ -16,25 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash';
-import {mkOverrides} from '../../perspective/perpective-utilities';
 
 
 const initialState = {
-
+    physicalFlows: [],
+    specifications: [],
+    onInitialise: () => console.log('init'),
+    onChange: () => console.log('change')
 };
 
 
 function controller($q,
                     $stateParams,
-                    perspectiveDefinitionStore,
-                    perspectiveRatingStore,
-                    measurableStore,
-                    measurableRatingStore) {
+                    physicalSpecificationStore,
+                    physicalFlowStore,
+                    logicalFlowStore) {
 
     const vm = Object.assign(this, initialState);
 
     const entityReference = {
-        id: $stateParams.id,
+        id: 23068,
         kind: 'APPLICATION'
     };
 
@@ -43,68 +44,40 @@ function controller($q,
         scope: 'EXACT'
     };
 
-    const defnPromise = perspectiveDefinitionStore
-        .findAll()
-        .then(ps => {
-            vm.perspectives = ps;
-        });
-
-
-    const ratingPromise = perspectiveRatingStore
-        .findForEntity(entityReference)
-        .then(rs => {
-            vm.perspectiveRatings = rs;
-        });
-
-
-    const measurablePromise = measurableStore
-        .findMeasurablesBySelector(idSelector)
-        .then(measurables => vm.measurables = measurables);
-
-    measurableRatingStore
-        .findByAppSelector(idSelector)
-        .then(ratings => vm.measurableRatings = ratings);
-
-    defnPromise
-        .then(() => ratingPromise)
-        .then(() => measurablePromise)
-        .then(() => {
-            vm.perspectiveBlocks = _
-                .chain(vm.perspectives)
-                .map(p => {
-                    return {
-                        definition: p,
-                        measurablesX: _.filter(vm.measurables, { categoryId: p.categoryX }),
-                        measurablesY: _.filter(vm.measurables, { categoryId: p.categoryY })
-                    };
-                })
-                .filter(pb => pb.measurablesX.length > 0 && pb.measurablesY.length > 0)
-                .map(pb => {
-                    const relevantMeasurableIds = _.union(_.map(pb.measurablesX, "id"), _.map(pb.measurablesY, "id"));
-                    const relevantRatings = _.filter(vm.perspectiveRatings, r => {
-                        const xRelevant = _.includes(relevantMeasurableIds, r.value.measurableX);
-                        const yRelevant = _.includes(relevantMeasurableIds, r.value.measurableY);
-                        return xRelevant && yRelevant;
-                    });
-                    const overrides = mkOverrides(relevantRatings);
-                    const result = Object.assign({}, pb, { overrides });
-                    return result;
-                })
-                .value();
+    physicalSpecificationStore
+        .findByEntityReference(entityReference)
+        .then(x => {
+            console.log('specs', x);
+            return x;
         })
+        .then(specs => vm.specifications = specs);
 
+    physicalFlowStore
+        .findByEntityReference(entityReference)
+        .then(x => {
+            console.log('pfs', x);
+            return x;
+        })
+        .then(pfs => vm.physicalFlows = pfs);
 
+    logicalFlowStore
+        .findByEntityReference(entityReference)
+        .then(x => {
+            console.log('lfs', x);
+            return x;
+        })
+        .then(xs => vm.logicalFlows = xs);
 
+    vm.entityRef = entityReference;
 }
 
 
 controller.$inject = [
     '$q',
     '$stateParams',
-    'PerspectiveDefinitionStore',
-    'PerspectiveRatingStore',
-    'MeasurableStore',
-    'MeasurableRatingStore'
+    'PhysicalSpecificationStore',
+    'PhysicalFlowStore',
+    'LogicalFlowStore'
 ];
 
 

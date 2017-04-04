@@ -74,9 +74,6 @@
             </a>
 
             <waltz-physical-flow-export-buttons ng-if="ctrl.dataTab == 1"
-                                                consumes-count="ctrl.physicalFlowsConsumesCount"
-                                                produces-count="ctrl.physicalFlowsProducesCount"
-                                                unused-count="ctrl.physicalFlowsUnusedSpecificationsCount"
                                                 export-consumes="ctrl.exportPhysicalFlowConsumes"
                                                 export-produces="ctrl.exportPhysicalFlowProduces"
                                                 export-unused="exportPhysicalFlowUnusedSpecifications">
@@ -177,13 +174,15 @@
             <uib-tab index="1"
                      select="ctrl.dataTab = 1"
                      heading="Physical Flow Detail">
-                <br>
-                <waltz-physical-data-section specifications="ctrl.physicalSpecifications"
-                                             ng-if="ctrl.dataTab == 1"
-                                             on-initialise="ctrl.onPhysicalFlowsInitialise"
-                                             on-change="ctrl.onPhysicalFlowsChange"
-                                             physical-flows="ctrl.physicalFlows">
-                </waltz-physical-data-section>
+                <div ng-if="ctrl.dataTab == 1">
+                    <br>
+                    <waltz-physical-data-section specifications="ctrl.physicalSpecifications"
+                                                 logical-flows="ctrl.flows"
+                                                 primary-ref="ctrl.entityRef"
+                                                 on-initialise="ctrl.onPhysicalFlowsInitialise"
+                                                 physical-flows="ctrl.physicalFlows">
+                    </waltz-physical-data-section>
+                </div>
             </uib-tab>
             <uib-tab index="2"
                      select="ctrl.dataTab = 2"

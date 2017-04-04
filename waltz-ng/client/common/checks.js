@@ -91,7 +91,7 @@ const createInvolvementKindCommandShape = {
 const createPhysicalFlowCommandShape = {
     specification: myApiCheck.shape(specificationShape),
     flowAttributes: myApiCheck.shape(flowAttributesShape),
-    targetEntity: myApiCheck.shape(entityRefShape)
+    logicalFlowId: apiCheck.number
 };
 
 

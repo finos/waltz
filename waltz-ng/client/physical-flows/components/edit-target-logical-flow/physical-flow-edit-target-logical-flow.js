@@ -16,19 +16,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.physical_flow_lineage;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.command.Command;
-import org.immutables.value.Value;
+import {initialiseData} from "../../../common";
 
 
-@Value.Immutable
-@JsonSerialize(as = ImmutablePhysicalFlowLineageRemoveCommand.class)
-@JsonDeserialize(as = ImmutablePhysicalFlowLineageRemoveCommand.class)
-public abstract class PhysicalFlowLineageRemoveCommand implements Command {
+const bindings = {
+    outboundLogicalFlows: '<',  // [ <entityRef>... ]
+    onChange: '<'
+};
 
-    public abstract long describedFlowId();
-    public abstract long contributingFlowId();
+
+const template = require('./physical-flow-edit-target-logical-flow.html');
+
+
+const initialState = {
+    outboundLogicalFlows: [],
+    onChange: (f) => console.log('pfetlf::onChange', f)
+};
+
+
+function controller() {
+    initialiseData(this, initialState);
 }
+
+
+controller.$inject = [
+    'ActorStore'
+];
+
+
+const component = {
+    bindings,
+    template,
+    controller
+};
+
+
+export default component;
+

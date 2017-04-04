@@ -2,13 +2,13 @@
 
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.specification.name }}"
-                       small="{{ ctrl.specification.owningEntity.name }} &rarr; {{ ctrl.physicalFlow.target.name }}"
+                       small="{{ ctrl.logicalFlow.source.name }} &rarr; {{ ctrl.logicalFlow.target.name }}"
                        tour="ctrl.tour"
                        icon="qrcode">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>
-                <waltz-entity-link entity-ref="ctrl.specification.owningEntity"></waltz-entity-link>
+                <waltz-entity-link entity-ref="ctrl.logicalFlow.source"></waltz-entity-link>
             </li>
             <li ng-bind="ctrl.specification.name"></li>
         </ol>
@@ -35,6 +35,7 @@
 
 
         <waltz-physical-flow-overview physical-flow="ctrl.physicalFlow"
+                                      logical-flow="ctrl.logicalFlow"
                                       specification="ctrl.specification">
         </waltz-physical-flow-overview>
 
@@ -54,139 +55,6 @@
     </div>
 
     <br>
-
-    <!-- LINEAGE -->
-    <waltz-section name="Lineage"
-                   icon="exchange"
-                   small="Contributing flows"
-                   id="lineage-section">
-
-        <div class="waltz-section-actions">
-            <div waltz-has-role="LINEAGE_EDITOR">
-                <a ui-sref="main.physical-flow-lineage.edit ({id: ctrl.physicalFlow.id})"
-                   class="btn btn-xs btn-primary">
-                    <waltz-icon name="edit"></waltz-icon>
-                    <span ng-if="ctrl.lineage.length == 0">
-                        Create Lineage
-                    </span>
-                    <span ng-if="ctrl.lineage.length > 0">
-                        Edit Lineage
-                    </span>
-                </a>
-            </div>
-
-            <button type="button"
-                    ng-disabled="ctrl.lineage.length == 0 "
-                    ng-click="ctrl.exportLineage()"
-                    class="btn btn-xs btn-primary">
-                <waltz-icon name="cloud-download"></waltz-icon>
-                Export
-            </button>
-        </div>
-
-
-        <div ng-if="ctrl.lineage.length > 0">
-
-            <!-- BOINGY -->
-            <div class="row" >
-                <div class="col-sm-8"
-                     style="border-right: 1px solid #eee;">
-                    <waltz-logical-flow-diagram data="ctrl.graph.data"
-                                                tweakers="ctrl.graph.tweakers">
-                    </waltz-logical-flow-diagram>
-                </div>
-                <div class="col-md-4"
-                     ng-if="ctrl.selected.entity">
-                    <h4>
-                        <waltz-entity-icon-label entity-ref="ctrl.selected.entity">
-                        </waltz-entity-icon-label>
-                        <small>Flows</small>
-                    </h4>
-
-                    <div ng-if="ctrl.selected.incoming.length > 0">
-                        <h5>Incoming</h5>
-                        <table class="table table-condensed small table-hover">
-                            <thead>
-                            <tr>
-                                <th style="width: 60%">Name</th>
-                                <th style="width: 40%">Source</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="r in ctrl.selected.incoming | orderBy:['specification.name', 'sourceEntity.name']"
-                                uib-popover-html="ctrl.preparePopover(r)"
-                                popover-trigger="mouseenter"
-                                popover-placement="left">
-                                <td class="force-wrap">
-                                    <span ng-bind="r.specification.name"></span>
-                                </td>
-                                <td class="force-wrap">
-                                    <waltz-entity-icon-label ng-click="ctrl.selectEntity(r.sourceEntity)"
-                                                             class="waltz-action-link"
-                                                             entity-ref="r.sourceEntity">
-                                    </waltz-entity-icon-label>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div ng-if="ctrl.selected.outgoing.length > 0">
-                        <h5>Outgoing</h5>
-                        <table class="table table-condensed small table-hover">
-                            <thead>
-                            <tr>
-                                <th style="width: 60%">Name</th>
-                                <th style="width: 40%">Target</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="r in ctrl.selected.outgoing | orderBy:['specification.name', 'targetEntity.name']"
-                                uib-popover-html="ctrl.preparePopover(r)"
-                                popover-trigger="mouseenter"
-                                popover-placement="left">
-                                <td class="force-wrap">
-                                    <span ng-bind="r.specification.name"></span>
-                                </td>
-                                <td class="force-wrap">
-                                    <waltz-entity-icon-label ng-click="ctrl.selectEntity(r.targetEntity)"
-                                                             class="waltz-action-link"
-                                                             entity-ref="r.targetEntity">
-                                    </waltz-entity-icon-label>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <hr>
-
-            <!-- TABLE -->
-            <div class="row" >
-                <div class="col-sm-12">
-                    <waltz-physical-flow-lineage-panel lineage="ctrl.lineage"
-                                                       on-initialise="ctrl.onLineagePanelInitialise">
-                    </waltz-physical-flow-lineage-panel>
-                </div>
-            </div>
-
-        </div>
-
-        <div ng-if="ctrl.lineage.length == 0">
-            <div class="row" >
-                <div class="col-sm-12">
-                    <waltz-no-data>
-                        <message>
-                            <strong>No lineage</strong> defined for this flow.
-                        </message>
-                    </waltz-no-data>
-                </div>
-            </div>
-        </div>
-    </waltz-section>
-
 
     <!-- MENTIONS -->
     <waltz-section name="Mentions"
