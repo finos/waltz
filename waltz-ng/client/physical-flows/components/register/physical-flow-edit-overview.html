@@ -74,21 +74,23 @@
 
             <td class="wpfo-entity-col wpfo-target-entity"
                 ng-class="{
-                    'wpfo-entity-application' : $ctrl.physicalFlow.target.kind == 'APPLICATION',
-                    'wpfo-entity-actor' : $ctrl.physicalFlow.target.kind == 'ACTOR'
+                    'wpfo-entity-application' : $ctrl.targetLogicalFlow.target.kind == 'APPLICATION',
+                    'wpfo-entity-actor' : $ctrl.targetLogicalFlow.target.kind == 'ACTOR'
                 }">
                 <div class="clickable wpfeo-highlight-on-hover"
                      ng-class="{
-                            'wpfeo-okay': $ctrl.targetEntity,
-                            'wpfeo-missing': !$ctrl.targetEntity
+                            'wpfeo-okay': $ctrl.targetLogicalFlow,
+                            'wpfeo-missing': !$ctrl.targetLogicalFlow
                          }"
                      ng-click="$ctrl.onTargetFocus()">
-                    <span ng-if="!$ctrl.targetEntity">
+                    <span ng-if="!$ctrl.targetLogicalFlow">
                         <code>Specify Target</code>
                     </span>
-                    <waltz-entity-icon-label entity-ref="$ctrl.targetEntity"></waltz-entity-icon-label>
+                    <waltz-entity-icon-label entity-ref="$ctrl.targetLogicalFlow.target"></waltz-entity-icon-label>
                 </div>
             </td>
+
+
         </tr>
     </table>
 </div>

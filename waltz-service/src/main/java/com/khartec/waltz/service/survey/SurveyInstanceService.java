@@ -151,4 +151,29 @@ public class SurveyInstanceService {
 
         return surveyInstanceDao.findBySurveyInstanceIdSelector(selector);
     }
+
+
+    public long addRecipient(SurveyInstanceRecipientCreateCommand command) {
+        checkNotNull(command, "command cannot be null");
+
+        return surveyInstanceRecipientDao.create(command);
+    }
+
+
+    public boolean updateRecipient(SurveyInstanceRecipientUpdateCommand command) {
+        checkNotNull(command, "command cannot be null");
+
+        boolean delete = surveyInstanceRecipientDao.delete(command.instanceRecipientId());
+        long id = surveyInstanceRecipientDao.create(ImmutableSurveyInstanceRecipientCreateCommand.builder()
+                .personId(command.personId())
+                .surveyInstanceId(command.surveyInstanceId())
+                .build());
+        return delete && id > 0;
+    }
+
+
+    public boolean delete(long surveyInstanceRecipientId) {
+        return surveyInstanceRecipientDao.delete(surveyInstanceRecipientId);
+    }
+
 }

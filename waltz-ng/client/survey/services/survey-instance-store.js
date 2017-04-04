@@ -70,6 +70,24 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const updateRecipient = (id, command) => {
+        return $http
+            .put(`${base}/${id}/recipient`, command)
+            .then(result => result.data);
+    };
+
+    const addRecipient = (id, command) => {
+        return $http
+            .post(`${base}/${id}/recipient`, command)
+            .then(result => result.data);
+    };
+
+    const deleteRecipient = (id, instanceRecipientId) => {
+        return $http
+            .delete(`${base}/${id}/recipient/${instanceRecipientId}`,)
+            .then(result => result.data);
+    };
+
     return {
         getById,
         findByEntityReference,
@@ -78,7 +96,10 @@ function store($http, baseApiUrl) {
         findRecipients,
         findResponses,
         saveResponse,
-        updateStatus
+        updateStatus,
+        updateRecipient,
+        addRecipient,
+        deleteRecipient
     };
 }
 

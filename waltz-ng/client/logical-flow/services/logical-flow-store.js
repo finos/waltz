@@ -23,6 +23,10 @@ function service($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/logical-flow`;
 
     // --- FINDERS ---
+    const getById = (id) => $http
+        .get(`${BASE}/${id}`)
+        .then(r => r.data);
+
     const findBySelector = (options) => {
         checkIsIdSelector(options);
         return $http
@@ -74,6 +78,7 @@ function service($http, BaseApiUrl) {
         calculateStats,
         countByDataType,
         removeFlow,
+        getById,
         addFlow
     };
 }

@@ -33,7 +33,7 @@ function setup() {
         .component('waltzPhysicalFlowEditOverview', require('./components/register/physical-flow-edit-overview'))
         .component("waltzPhysicalFlowEditSpecification", require('./components/register/physical-flow-edit-specification'))
         .component('waltzPhysicalFlowTable', require('./components/flow-table/physical-flow-table'))
-        .component('waltzPhysicalFlowEditTargetEntity', require('./components/edit-target-entity/physical-flow-edit-target-entity'))
+        .component('waltzPhysicalFlowEditTargetLogicalFlow', require('./components/edit-target-logical-flow/physical-flow-edit-target-logical-flow'))
         .component('waltzPhysicalFlowExportButtons', require('./components/export-buttons/physical-flow-export-buttons'))
         .component('waltzPhysicalFlowAttributeEditor', require('./components/attribute-editor/physical-flow-attribute-editor'));
 

@@ -21,7 +21,7 @@ import {initialiseData} from "../../../common";
 const bindings = {
     sourceEntity: '<',
     specification: '<',
-    targetEntity: '<',
+    targetLogicalFlow: '<',
     flowAttributes: '<',
     onSpecificationFocus: '<',
     onFlowAttributesFocus: '<',

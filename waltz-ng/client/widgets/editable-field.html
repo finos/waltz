@@ -1,6 +1,11 @@
 <div class="waltz-visibility-parent">
     <div ng-if="! $ctrl.editing">
-        <span ng-bind="$ctrl.initialVal"></span>
+        <span ng-if="$ctrl.fieldType != 'person'"
+              ng-bind="$ctrl.initialVal">
+        </span>
+        <waltz-entity-link ng-if="$ctrl.fieldType == 'person'"
+                           entity-ref="$ctrl.newVal">
+        </waltz-entity-link>
 
         <a ng-click="$ctrl.edit()"
                 class="btn btn-xs waltz-visibility-child-30">
@@ -28,6 +33,14 @@
                    ng-model="$ctrl.newVal"
                    class="input-sm"
                    style="height: auto">
+        </div>
+
+        <div ng-if="$ctrl.fieldType == 'person'">
+            <waltz-entity-selector current-selection="$ctrl.newVal"
+                                   on-select="$ctrl.entitySelect"
+                                   entity-kinds="['PERSON']"
+                                   item-id="$ctrl.itemId">
+            </waltz-entity-selector>
         </div>
 
         <div style="margin-top: 4px">

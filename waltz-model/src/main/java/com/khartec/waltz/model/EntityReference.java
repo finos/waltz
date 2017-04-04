@@ -28,12 +28,22 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntityReference.class)
 @JsonDeserialize(as = ImmutableEntityReference.class)
+/**
+ * Represents a generic entity reference.  Note that the optional name
+ * and description fields are not used in equals/hashcode computations.
+ */
 public abstract class EntityReference {
 
     public abstract EntityKind kind();
     public abstract long id();
+
+
+    @Value.Auxiliary
     public abstract Optional<String> name();
+
+    @Value.Auxiliary
     public abstract Optional<String> description();
+
 
     public String safeName() {
         String idStr = "[" + id() +"]";
@@ -41,6 +51,7 @@ public abstract class EntityReference {
                 .map(n -> n + " " + idStr)
                 .orElse(idStr);
     }
+
 
     public static <T extends NameProvider & IdProvider & DescriptionProvider> EntityReference fromEntity(T entity, EntityKind kind) {
         Long id = entity.id()
@@ -67,5 +78,7 @@ public abstract class EntityReference {
                 .description(Optional.ofNullable(description))
                 .build();
     }
+
+
 
 }

@@ -17,50 +17,78 @@
  */
 
 import _ from "lodash";
-import {combineFlowData, enrichConsumes} from "../../utilities";
-import {initialiseData, termSearch} from "../../../common";
+import {initialiseData} from "../../../common";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/link-utils";
 
 
 const bindings = {
+    primaryRef: '<',
     physicalFlows: '<',
     specifications: '<',
-    onInitialise: '<',
-    onChange: '<'
+    logicalFlows: '<',
+    onInitialise: '<'
 };
 
 
 const initialState = {
+    primaryRef: null,  // entityReference
     physicalFlows: [],
+    logicalFlows: [],
     specifications: [],
-    onInitialise: (e) => {},
-    onChange: (e) => {}
+    onInitialise: (e) => {}
 };
 
 
 const template = require('./physical-data-section.html');
 
 
-function mkData(specifications = { produces: [], consumes: [] },
-                physicalFlows = [])
+/**
+ * Given an enriched flow returns a boolean indicating
+ * if any enriched fields are missing
+ * @param f
+ */
+const isIncomplete = f => !f.logicalFlow ||  !f.specification;
+
+
+/**
+ * Takes a entityReference and returns a new function which takes an
+ * enriched flow and returns true if the entity is consuming the flow
+ * or false if it is producing the flow
+ * @param entityRef
+ * @private
+ */
+const _isConsumer = (entityRef) => (f) => {
+    const target = f.logicalFlow.target;
+    return target.id === entityRef.id && target.kind === entityRef.kind;
+};
+
+
+function mkData(primaryRef,
+                specifications = { produces: [], consumes: [] },
+                physicalFlows = [],
+                logicalFlows = [])
 {
+    if (!primaryRef) return [];
 
-    const ownedData = combineFlowData(
-        specifications.produces,
-        physicalFlows);
+    const specsById = _.keyBy(specifications, 'id');
+    const logicalById = _.keyBy(logicalFlows, 'id');
 
-    const produces = _.filter(ownedData, p => p.physicalFlow != null);
+    const enrichFlow = (pf) => {
+        return {
+            physicalFlow: pf,
+            logicalFlow: logicalById[pf.logicalFlowId],
+            specification: specsById[pf.specificationId]
+        };
+    };
 
-    const consumes = enrichConsumes(
-        specifications.consumes,
-        physicalFlows);
-
-    const unusedSpecifications = _.chain(ownedData)
-        .filter(p => !p.physicalFlow)
-        .map('specification')
+    const [consumes, produces] = _
+        .chain(physicalFlows)
+        .map(enrichFlow)
+        .reject(isIncomplete)
+        .partition(_isConsumer(primaryRef))
         .value();
 
-    return { produces, consumes, unusedSpecifications };
+    return { consumes, produces };
 }
 
 
@@ -70,18 +98,18 @@ function controller() {
 
     vm.produceColumnDefs = [
         Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
-        { field: 'specification.externalId', displayName: 'Ext. Id', width: "8%" },
-        Object.assign(mkEntityLinkGridCell('Receiver(s)', 'targetRef', 'left'), { width: "15%" }),
+        { field: 'specification.externalId', displayName: 'Ext. Id', width: "10%" },
+        Object.assign(mkEntityLinkGridCell('Receiver(s)', 'logicalFlow.target', 'left'), { width: "15%" }),
         { field: 'specification.format', displayName: 'Format', width: "8%", cellFilter: 'toDisplayName:"dataFormatKind"' },
-        { field: 'physicalFlow.transport', displayName: 'Transport', width: "10%", cellFilter: 'toDisplayName:"transportKind"' },
-        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "9%", cellFilter: 'toDisplayName:"frequencyKind"' },
-        { field: 'specification.description', displayName: 'Description', width: "30%" }
+        { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%", cellFilter: 'toDisplayName:"transportKind"' },
+        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "10%", cellFilter: 'toDisplayName:"frequencyKind"' },
+        { field: 'specification.description', displayName: 'Description', width: "23%" }
     ];
 
     vm.consumeColumnDefs = [
-        Object.assign(mkEntityLinkGridCell('Source Application', 'sourceRef', 'none'), { width: "15%"} ),
         Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
         { field: 'specification.externalId', displayName: 'Ext. Id', width: "10%" },
+        Object.assign(mkEntityLinkGridCell('Source', 'logicalFlow.source', 'left'), { width: "15%"} ),
         { field: 'specification.format', displayName: 'Format', width: "8%", cellFilter: 'toDisplayName:"dataFormatKind"' },
         { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%", cellFilter: 'toDisplayName:"transportKind"' },
         { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "10%", cellFilter: 'toDisplayName:"frequencyKind"' },
@@ -94,33 +122,8 @@ function controller() {
         { field: 'description', displayName: 'Description' }
     ];
 
-    const produceFields = _.map(vm.produceColumnDefs, 'field');
-
-    const consumeFields = _.map(vm.consumeColumnDefs, 'field');
-
     vm.$onChanges = () => {
-        Object.assign(vm, mkData(vm.specifications, vm.physicalFlows));
-        vm.filterProduces("");
-        vm.filterConsumes("");
-    };
-
-    function notifyChange() {
-        // callback
-        vm.onChange({
-            producesCount: _.size(vm.filteredProduces),
-            consumesCount: _.size(vm.filteredConsumes),
-            unusedSpecificationsCount: _.size(vm.unusedSpecifications)
-        });
-    }
-
-    vm.filterProduces = (query) => {
-        vm.filteredProduces = termSearch(vm.produces, query, produceFields);
-        notifyChange();
-    };
-
-    vm.filterConsumes = (query) => {
-        vm.filteredConsumes = termSearch(vm.consumes, query, consumeFields);
-        notifyChange();
+        Object.assign(vm, mkData(vm.primaryRef, vm.specifications, vm.physicalFlows, vm.logicalFlows));
     };
 
     vm.onProducesGridInitialise = (e) => {

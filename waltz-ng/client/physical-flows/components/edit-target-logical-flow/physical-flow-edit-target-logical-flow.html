@@ -1,0 +1,23 @@
+<div class="waltz-physical-flow-edit-target-entity">
+
+    <div class="row">
+        <div class="col-md-12"
+             style="border-right: 1px solid #ccc">
+            <h4>
+                Select from existing targets
+            </h4>
+            <ul class="list-unstyled"
+                style="margin-left: 16px"
+                ng-if="$ctrl.outboundLogicalFlows.length > 0">
+                <li ng-repeat="flow in $ctrl.outboundLogicalFlows">
+                    <a ng-click="$ctrl.onChange(flow)"
+                       class="clickable">
+                        <waltz-entity-icon-label entity-ref="flow.target">
+                        </waltz-entity-icon-label>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
