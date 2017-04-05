@@ -3,10 +3,7 @@ package com.khartec.waltz.service.physical_specification_definition;
 import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefinitionDao;
 import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefinitionFieldDao;
 import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefinitionSampleFileDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.ReleaseLifecycleStatus;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinition;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinition;
@@ -104,5 +101,32 @@ public class PhysicalSpecDefinitionService {
 
     public List<PhysicalSpecDefinition> findForSpecification(long specificationId) {
         return physicalSpecDefinitionDao.findForSpecification(specificationId);
+    }
+
+
+    public int updateStatus(String userName, long specDefinitionId, ReleaseLifecycleStatusChangeCommand command) {
+        checkNotNull(userName, "userName cannot be null");
+        checkNotNull(command, "command cannot be null");
+
+        PhysicalSpecDefinition specDefinition = physicalSpecDefinitionDao.getById(specDefinitionId);
+
+        checkNotNull(specDefinition, "specDefinition cannot be null");
+
+        if (command.newStatus() == ReleaseLifecycleStatus.ACTIVE) {
+            physicalSpecDefinitionDao.markExistingActiveAsObsolete(specDefinition.specificationId(), userName);
+        }
+
+        int result = physicalSpecDefinitionDao.updateStatus(specDefinitionId, command.newStatus(), userName);
+
+        changeLogService.write(
+                ImmutableChangeLog.builder()
+                        .operation(Operation.UPDATE)
+                        .userId(userName)
+                        .parentReference(mkRef(EntityKind.PHYSICAL_SPECIFICATION, specDefinition.specificationId()))
+                        .message("Spec Definition Id: " + specDefinitionId
+                                + " status changed to " + command.newStatus())
+                        .build());
+
+        return result;
     }
 }

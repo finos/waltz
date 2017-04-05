@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.common;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +32,11 @@ public class DateTimeUtilities {
 
     public static LocalDateTime nowUtc() {
         return LocalDateTime.now(UTC);
+    }
+
+
+    public static Timestamp nowUtcTimestamp() {
+        return Timestamp.valueOf(nowUtc());
     }
 
 
