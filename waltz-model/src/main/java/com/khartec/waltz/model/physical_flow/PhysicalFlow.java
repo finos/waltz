@@ -20,8 +20,13 @@ package com.khartec.waltz.model.physical_flow;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.IdProvider;
+import com.khartec.waltz.model.LastUpdatedProvider;
+import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
+
+import java.util.Optional;
 
 
 /**
@@ -49,4 +54,6 @@ public abstract class PhysicalFlow implements
     public abstract int basisOffset();
 
     public abstract TransportKind transport();
+
+    public abstract Optional<Long> specificationDefinitionId();
 }

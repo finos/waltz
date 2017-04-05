@@ -740,4 +740,17 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 1922 -->
+    <changeSet id="20170404-1922-1"
+               author="rovats">
+        <comment>1922: Physical Flow: add (optional) definition id fkey</comment>
+        <addColumn tableName="physical_flow">
+            <column name="specification_definition_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
