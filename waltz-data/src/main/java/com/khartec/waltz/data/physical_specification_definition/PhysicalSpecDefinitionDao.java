@@ -110,6 +110,7 @@ public class PhysicalSpecDefinitionDao {
                 .set(PHYSICAL_SPEC_DEFN.LAST_UPDATED_AT, nowUtcTimestamp())
                 .set(PHYSICAL_SPEC_DEFN.LAST_UPDATED_BY, userName)
                 .where(PHYSICAL_SPEC_DEFN.ID.eq(specDefinitionId))
+                .and(PHYSICAL_SPEC_DEFN.STATUS.ne(newStatus.name()))
                 .execute();
     }
 
