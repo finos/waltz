@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+import angular from "angular";
 
 export default () => {
 
@@ -29,7 +29,8 @@ export default () => {
 
     module
         .component('waltzFlowDiagram', require('./components/diagram/flow-diagram'))
-        .component('waltzFlowDiagramEditor', require('./components/editor/flow-diagram-editor'));
+        .component('waltzFlowDiagramEditor', require('./components/editor/flow-diagram-editor'))
+        .component('waltzDiagramsPanel', require('./components/diagrams-panel/diagrams-panel'));
 
     return module.name;
 };
