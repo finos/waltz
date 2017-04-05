@@ -16,20 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+function store($http, base) {
+    const BASE = `${base}/flow-diagram-annotation`;
 
-export default () => {
+    return {};
+}
 
-    const module = angular.module('waltz.flow-diagram', []);
 
-    module
-        .service('FlowDiagramStore', require('./services/flow-diagram-store'))
-        .service('FlowDiagramAnnotationStore', require('./services/flow-diagram-annotation-store'))
-        .service('FlowDiagramEntityStore', require('./services/flow-diagram-entity-store'));
+store.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
 
-    module
-        .component('waltzFlowDiagram', require('./components/diagram/flow-diagram'))
-        .component('waltzFlowDiagramEditor', require('./components/editor/flow-diagram-editor'));
 
-    return module.name;
-};
+export default store;

@@ -35,8 +35,8 @@ function controller($q,
     const vm = Object.assign(this, initialState);
 
     const entityReference = {
-        id: 23068,
-        kind: 'APPLICATION'
+        id: 1,
+        kind: 'FLOW_DIAGRAM'
     };
 
     const idSelector = {
@@ -77,7 +77,10 @@ controller.$inject = [
     '$stateParams',
     'PhysicalSpecificationStore',
     'PhysicalFlowStore',
-    'LogicalFlowStore'
+    'LogicalFlowStore',
+    'FlowDiagramAnnotationStore',
+    'FlowDiagramEntityStore',
+    'FlowDiagramStore'
 ];
 
 
