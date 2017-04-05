@@ -240,6 +240,7 @@ function controller($state, $timeout, logicalFlowStore) {
     const vm = initialiseData(this, initialState);
 
     let sendCommands = null;
+    let getState = null;
 
     vm.contextMenus = {
         node: mkNodeMenu($state, $timeout, logicalFlowStore, vm),
@@ -260,7 +261,13 @@ function controller($state, $timeout, logicalFlowStore) {
 
     vm.onDiagramInit = (d) => {
         sendCommands = d.processCommands;
+        getState = d.getState;
     };
+
+    vm.getState = () => {
+        vm.state = getState();
+    };
+
 
 }
 

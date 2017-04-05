@@ -186,7 +186,7 @@ function layoutFor(graphNode) {
 
 
 function processCommand(command, payload, model) {
-    console.log("wFD - processing command: ", command, payload, model);
+    //console.log("wFD - processing command: ", command, payload, model);
     switch (command) {
         case 'MOVE_NODE':
             const layout = layoutFor(payload.graphNode);
@@ -644,7 +644,17 @@ function controller($element) {
         state.layout = angular.copy(vm.layout);
         state.contextMenus = vm.contextMenus;
         if (_.isFunction(vm.onInitialise)) {
-            vm.onInitialise({ processCommands });
+            const configuration = {
+                processCommands,
+                getState: () => {
+                    return {
+                        model: angular.copy(state.model),
+                        positions: angular.copy(state.layout.positions),
+                        subject: angular.copy(state.layout.subject)
+                    };
+                }
+            };
+            vm.onInitialise(configuration);
         }
         draw();
     };

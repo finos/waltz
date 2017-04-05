@@ -16,20 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+package com.khartec.waltz.model.flow_diagram;
 
-export default () => {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdProvider;
+import org.immutables.value.Value;
 
-    const module = angular.module('waltz.flow-diagram', []);
+@Value.Immutable
+@JsonSerialize(as = ImmutableFlowDiagramAnnotation.class)
+@JsonDeserialize(as = ImmutableFlowDiagramAnnotation.class)
+public abstract class FlowDiagramAnnotation implements IdProvider {
 
-    module
-        .service('FlowDiagramStore', require('./services/flow-diagram-store'))
-        .service('FlowDiagramAnnotationStore', require('./services/flow-diagram-annotation-store'))
-        .service('FlowDiagramEntityStore', require('./services/flow-diagram-entity-store'));
+    public abstract long diagramId();
+    public abstract EntityReference entityReference();
+    public abstract String note();
 
-    module
-        .component('waltzFlowDiagram', require('./components/diagram/flow-diagram'))
-        .component('waltzFlowDiagramEditor', require('./components/editor/flow-diagram-editor'));
-
-    return module.name;
-};
+}
