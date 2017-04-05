@@ -1,7 +1,9 @@
 package com.khartec.waltz.jobs;
 
 
+import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.physical_specification_definition.*;
+import com.khartec.waltz.model.ImmutableReleaseLifecycleStatusChangeCommand;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionFieldService;
 import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionSampleFileService;
@@ -47,6 +49,11 @@ public class PhysicalSpecDefinitionHarness {
 
         System.out.println(sampleFileService.findForSpecDefinition(defId));
 
-        definitionService.delete(userName, defId);
+//        definitionService.delete(userName, defId);
+
+        definitionService.updateStatus(userName, defId, ImmutableReleaseLifecycleStatusChangeCommand.builder()
+                .newStatus(ReleaseLifecycleStatus.ACTIVE)
+                .build());
+
     }
 }
