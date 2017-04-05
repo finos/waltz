@@ -146,22 +146,24 @@ function controller($q,
         .then(bs => vm.bookmarks = bs);
 
     // spec definitions
-    const specDefPromise = specPromise
+    specPromise
         .then(() => physicalSpecDefinitionStore.findForSpecificationId(vm.physicalFlow.specificationId))
-        .then(specDefs => vm.specDefinitions = specDefs)
-        .then(() => vm.selectedSpecDefinition.def
-                        = getSelectedSpecDefinition(vm.specDefinitions, vm.physicalFlow.specificationDefinitionId));
+        .then(specDefs => vm.selectedSpecDefinition.def
+                        = getSelectedSpecDefinition(specDefs, vm.physicalFlow.specificationDefinitionId))
+        .then(() => {
+            if (vm.selectedSpecDefinition.def) {
+                const specDefFieldPromise = physicalSpecDefinitionFieldStore
+                    .findForSpecDefinitionId(vm.selectedSpecDefinition.def.id);
 
-    const specDefFieldPromise = specDefPromise
-        .then(() => physicalSpecDefinitionFieldStore.findForSpecDefinitionId(vm.selectedSpecDefinition.def.id));
+                const specDefSampleFilePromise = physicalSpecDefinitionSampleFileStore
+                    .findForSpecDefinitionId(vm.selectedSpecDefinition.def.id);
 
-    const specDefSampleFilePromise = specDefPromise
-        .then(() => physicalSpecDefinitionSampleFileStore.findForSpecDefinitionId(vm.selectedSpecDefinition.def.id));
-
-    $q.all([specDefFieldPromise, specDefSampleFilePromise])
-        .then(([fields, file]) => {
-            vm.selectedSpecDefinition.fields = fields;
-            vm.selectedSpecDefinition.sampleFile = file;
+                $q.all([specDefFieldPromise, specDefSampleFilePromise])
+                    .then(([fields, file]) => {
+                        vm.selectedSpecDefinition.fields = fields;
+                        vm.selectedSpecDefinition.sampleFile = file;
+                    });
+            }
         });
 
     // tour
