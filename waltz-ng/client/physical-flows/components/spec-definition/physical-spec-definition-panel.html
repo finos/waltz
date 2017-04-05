@@ -1,0 +1,153 @@
+<div>
+    <uib-tabset ng-if="$ctrl.specDefinition.def"
+                active="active">
+
+        <!-- GENERAL -->
+        <uib-tab index="0"
+                 heading="General">
+            <div class="row">
+                <br>
+                <div class="col-sm-2 waltz-display-field-label">
+                    Type
+                </div>
+                <div class="col-sm-4">
+                    <span ng-bind="$ctrl.specDefinition.def.type | toDisplayName: 'physicalSpecDefinitionType'"></span>
+                </div>
+                <div class="col-sm-2 waltz-display-field-label">
+                    Delimiter
+                </div>
+                <div class="col-sm-4">
+                    <span ng-bind="$ctrl.specDefinition.def.delimiter"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <br>
+                <div class="col-sm-2 waltz-display-field-label">
+                    Version
+                </div>
+                <div class="col-sm-4">
+                    <span ng-bind="$ctrl.specDefinition.def.version"></span>
+                </div>
+                <div class="col-sm-2 waltz-display-field-label">
+                    Status
+                </div>
+                <div class="col-sm-4">
+                    <span ng-bind="$ctrl.specDefinition.def.status | toDisplayName: 'releaseLifecycleStatus'"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <br>
+                <div class="col-sm-2 waltz-display-field-label">
+                    Created
+                </div>
+                <div class="col-sm-4">
+                    <waltz-from-now timestamp="$ctrl.specDefinition.def.createdAt">
+                    </waltz-from-now>
+                </div>
+                <div class="col-sm-2 waltz-display-field-label">
+                    Created By
+                </div>
+                <div class="col-sm-4">
+                    <span ng-bind="$ctrl.specDefinition.def.createdBy"></span>
+                </div>
+            </div>
+
+            <div class="row"
+                 style="margin-bottom:20px;">
+                <br>
+                <div class="col-sm-2 waltz-display-field-label">
+                    Updated
+                </div>
+                <div class="col-sm-4">
+                    <waltz-from-now timestamp="$ctrl.specDefinition.def.lastUpdatedAt">
+                    </waltz-from-now>
+                </div>
+                <div class="col-sm-2 waltz-display-field-label">
+                    Updated By
+                </div>
+                <div class="col-sm-4">
+                    <span ng-bind="$ctrl.specDefinition.def.lastUpdatedBy"></span>
+                </div>
+            </div>
+        </uib-tab>
+
+        <!-- FIELDS -->
+        <uib-tab index="1"
+                 heading="Fields">
+            <br>
+            <table class="table table-condensed table-striped">
+                <colgroup>
+                    <col width="30%">
+                    <col width="20%">
+                    <col width="50%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="field in $ctrl.specDefinition.fields | orderBy:'position'">
+                    <td>
+                        <span ng-bind="field.name">
+                        </span>
+                    </td>
+                    <td>
+                        <span ng-bind="field.type | toDisplayName: 'physicalSpecDefinitionFieldType'">
+                        </span>
+                    </td>
+                    <td>
+                        <span ng-bind="field.description">
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </uib-tab>
+
+        <!-- SAMPLE FILE -->
+        <uib-tab index="2"
+                 heading="Sample File">
+            <br>
+            <div ng-if="$ctrl.specDefinition.sampleFile">
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Name
+                    </div>
+                    <div class="col-sm-4">
+                        <span ng-bind="$ctrl.specDefinition.sampleFile.name"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <br>
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Sample Data
+                    </div>
+                    <div class="col-sm-10">
+                        <div ng-bind="$ctrl.specDefinition.sampleFile.fileData"
+                             class="waltz-scroll-region-350"
+                             style="white-space: pre;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <waltz-no-data ng-if="! $ctrl.specDefinition.sampleFile">
+                <message>
+                    <strong>No sample file</strong> uploaded for this physical specification definition.
+                </message>
+            </waltz-no-data>
+        </uib-tab>
+    </uib-tabset>
+
+    <waltz-no-data ng-if="! $ctrl.specDefinition.def">
+        <message>
+            <strong>No definitions</strong> for this physical specification.
+        </message>
+    </waltz-no-data>
+</div>

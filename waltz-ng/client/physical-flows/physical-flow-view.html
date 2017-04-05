@@ -90,6 +90,21 @@
     </waltz-section>
 
 
+    <!-- SPEC DEFINITION -->
+    <waltz-section name="Specification Definition"
+                   icon="file-code-o"
+                   id="specification-definition-section">
+
+        <div class="row">
+            <div class="col-sm-12">
+                <waltz-physical-spec-definition-panel spec-definition="ctrl.selectedSpecDefinition">
+                </waltz-physical-spec-definition-panel>
+            </div>
+        </div>
+
+    </waltz-section>
+
+
     <!-- BOOKMARKS -->
     <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
                              entity-id="{{ ctrl.specification.id }}"

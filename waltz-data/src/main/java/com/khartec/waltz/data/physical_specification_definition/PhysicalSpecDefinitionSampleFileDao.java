@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -50,10 +51,10 @@ public class PhysicalSpecDefinitionSampleFileDao {
     }
 
 
-    public List<PhysicalSpecDefinitionSampleFile> findForSpecDefinition(long specDefinitionId) {
+    public Optional<PhysicalSpecDefinitionSampleFile> findForSpecDefinition(long specDefinitionId) {
         return dsl.selectFrom(PHYSICAL_SPEC_DEFN_SAMPLE_FILE)
                 .where(PHYSICAL_SPEC_DEFN_SAMPLE_FILE.SPEC_DEFN_ID.eq(specDefinitionId))
-                .fetch(TO_DOMAIN_MAPPER);
+                .fetchOptional(TO_DOMAIN_MAPPER);
     }
 
 

@@ -35,12 +35,14 @@ import {
     lifecyclePhaseDisplayNames,
     lifecycleStatusNames,
     orgUnitKindNames,
+    physicalSpecDefinitionFieldTypeNames,
+    physicalSpecDefinitionTypeNames,
     relationshipKindNames,
     rollupKindNames,
     severityNames,
     surveyInstanceStatusNames,
     surveyRunStatusNames,
-    surveyTemplateStatusNames,
+    releaseLifecycleStatusNames,
     surveyQuestionFieldTypeNames,
     usageKindDisplayNames,
     transportKindNames,
@@ -128,13 +130,15 @@ export default (module) => {
         .register('lifecyclePhase', lifecyclePhaseDisplayNames)
         .register('lifecycleStatus', lifecycleStatusNames)
         .register('orgUnitKind', orgUnitKindNames)
+        .register('physicalSpecDefinitionFieldType', physicalSpecDefinitionFieldTypeNames)
+        .register('physicalSpecDefinitionType', physicalSpecDefinitionTypeNames)
         .register('rating', authSourceRatingNames)
         .register('relationshipKind', relationshipKindNames)
         .register('rollupKind', rollupKindNames)
         .register('severity', severityNames)
         .register('surveyInstanceStatus', surveyInstanceStatusNames)
         .register('surveyRunStatus', surveyRunStatusNames)
-        .register('surveyTemplateStatus', surveyTemplateStatusNames)
+        .register('releaseLifecycleStatus', releaseLifecycleStatusNames)
         .register('surveyQuestionFieldType', surveyQuestionFieldTypeNames)
         .register('usageKind', usageKindDisplayNames)
         .register('transportKind', transportKindNames)

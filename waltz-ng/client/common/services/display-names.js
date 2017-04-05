@@ -226,6 +226,20 @@ export const lifecycleStatusNames = {
 };
 
 
+export const physicalSpecDefinitionFieldTypeNames = {
+    DATE: 'Date',
+    DECIMAL: 'Decimal',
+    INTEGER: 'Integer',
+    STRING: 'String',
+    BOOLEAN: 'Boolean'
+};
+
+
+export const physicalSpecDefinitionTypeNames = {
+    DELIMITED: 'Delimited'
+};
+
+
 export const relationshipKindNames = {
     'HAS': 'Has',
     'DEPRECATES': 'Deprecates',
@@ -244,7 +258,7 @@ export const surveyInstanceStatusNames = {
 };
 
 
-export const surveyTemplateStatusNames = {
+export const releaseLifecycleStatusNames = {
     DRAFT: 'Draft',
     ACTIVE: 'Active',
     OBSOLETE: 'Obsolete'
