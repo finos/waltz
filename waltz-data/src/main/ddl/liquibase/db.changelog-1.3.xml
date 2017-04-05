@@ -762,7 +762,6 @@
                      remarks="The flow diagram table represents the metadata and layout data associated with a flow diagram">
             <column name="id"
                     autoIncrement="true"
-
                     type="${id.type}">
                 <constraints nullable="false"
                              primaryKey="true"
