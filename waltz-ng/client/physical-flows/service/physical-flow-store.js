@@ -89,6 +89,14 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
 
 
+    const updateSpecDefinitionId = (flowId, command) => {
+        return $http
+            .post(`${base}/id/${flowId}/spec-definition`, command)
+            .then(r => r.data);
+    };
+
+
+
     return {
         findBySpecificationId,
         findByEntityReference,
@@ -98,7 +106,8 @@ function store($http, baseApiUrl) {
         getById,
         searchReports,
         create,
-        deleteById
+        deleteById,
+        updateSpecDefinitionId
     };
 }
 

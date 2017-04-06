@@ -16,15 +16,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {initialiseData, invokeFunction} from "../../../common";
+
+
 const bindings = {
-    specDefinition: '<'
+    specDefinition: '<',
+    selectableDefinitions: '<',
+    onDefinitionSelect: '<'
+};
+
+
+const initialState = {
+    specDefinition: {},
+    selectableDefinitions: [],
+    onDefinitionSelect: (def) => console.log('psdp::onDefinitionSelect', def)
 };
 
 
 const template = require('./physical-spec-definition-panel.html');
 
 
+function controller() {
+    const vm = initialiseData(this, initialState);
+
+    vm.definitionSelected =
+        (def) => invokeFunction(vm.onDefinitionSelect, def);
+}
+
+
 const component = {
+    controller,
     template,
     bindings
 };
