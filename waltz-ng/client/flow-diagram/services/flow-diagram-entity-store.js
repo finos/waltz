@@ -20,7 +20,18 @@
 function store($http, base) {
     const BASE = `${base}/flow-diagram-entity`;
 
-    return {};
+    const findByDiagramId = (id) => $http
+        .get(`${BASE}/id/${id}`)
+        .then(r => r.data);
+
+    const findByEntityReference = (ref) => $http
+        .get(`${BASE}/entity/${ref.kind}/${ref.id}`)
+        .then(r => r.data);
+
+    return {
+        findByDiagramId,
+        findByEntityReference
+    };
 }
 
 

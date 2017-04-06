@@ -18,45 +18,35 @@
 
 
 const initData = {
-    parentEntityRef: {
-        description: "Change Regional Reporting",
-        id: 14,
-        kind: "CHANGE_INITIATIVE",
-        name: "Change Regional Reporting"
-    },
-    currentRelationships: [
-        {
-            entity: { kind: "APPLICATION", id: 1, name: "app 1" },
-            relationship: "SUPPORTS"
-        },
-        {
-            entity: { kind: "APPLICATION", id: 2, name: "app 2" },
-            relationship: "DEPRECATES"
-        },
-        {
-            entity: { kind: "APPLICATION", id: 3, name: "app 3" },
-            relationship: "PARTICIPATES_IN"
-        },
-    ],
-    targetEntityKind: 'APPLICATION',
-    allowedRelationships: ['DEPRECATES', 'SUPPORTS', 'PARTICIPATES_IN']
+    entityRef: {
+        id: 1,
+        name: 'Persian - 0',
+        kind: 'APPLICATION'
+    }
 };
 
 
-function controller() {
+function controller($q, flowDiagramStore, flowDiagramEntityStore) {
     const vm = Object.assign(this, initData);
 
-    vm.onAdd = (entityRef) => {
-        console.log(entityRef);
-    };
+    const promises = [
+        flowDiagramStore.findByEntityReference(vm.entityRef),
+        flowDiagramEntityStore.findByEntityReference(vm.entityRef)
+    ];
 
-    vm.onRemove = (entityRef) => {
-        console.log(entityRef);
-    };
+    $q.all(promises)
+        .then(([flowDiagrams, flowDiagramEntities]) => {
+
+        vm.flowDiagrams = flowDiagrams;
+        vm.flowDiagramEntities = flowDiagramEntities;
+    });
 }
 
 
 controller.$inject = [
+    '$q',
+    'FlowDiagramStore',
+    'FlowDiagramEntityStore'
 ];
 
 

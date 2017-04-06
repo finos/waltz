@@ -14,13 +14,10 @@
 
     <waltz-section name="foo" collapsible="true">
 
-        <waltz-related-entity-editor parent-entity-ref="ctrl.parentEntityRef"
-                                   current-relationships="ctrl.currentRelationships"
-                                   target-entity-kind="ctrl.targetEntityKind"
-                                   allowed-relationships="ctrl.allowedRelationships"
-                                   on-add="ctrl.onAdd"
-                                   on-remove="ctrl.onRemove">
-        </waltz-related-entity-editor>
+        <waltz-diagrams-panel entity-ref="ctrl.entityRef"
+                                      flow-diagrams="ctrl.flowDiagrams"
+                                      flow-diagram-entities="ctrl.flowDiagramEntities">
+        </waltz-diagrams-panel>
 
 
     </waltz-section>
