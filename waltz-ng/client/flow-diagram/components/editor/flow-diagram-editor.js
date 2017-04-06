@@ -63,7 +63,7 @@ function convertFlowsToOptions(flows = [], node, isUpstream) {
     return _
         .chain(flows)
         .filter(f => f[self].id === node.data.id)
-        .map(f => Object.assign({}, f, { kind: 'LOGICAL_FLOW' }))
+        .map(f => Object.assign({}, f, { kind: 'LOGICAL_DATA_FLOW' }))
         .map(f => {
             return {
                 entity: f[counterpart],

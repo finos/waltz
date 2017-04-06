@@ -36,33 +36,29 @@ function toNode(d, kind = 'APPLICATION') {
 }
 
 function controller($stateParams,
-                    applicationStore,
-                    flowDiagramAnnotationStore,
-                    flowDiagramEntityStore,
-                    flowDiagramStore,
                     flowDiagramStateService) {
     const vm = Object.assign(this, initialState);
-    applicationStore
-        .getById($stateParams.id)
-        .then(a => vm.nodes = [toNode(a)]);
+
+    // flowDiagramStateService.reset();
+
+    flowDiagramStateService
+        .load($stateParams.id)
 
 
-    flowDiagramAnnotationStore
-        .findByDiagramId(2)
-        .then(xs => vm.initialModel = Object.assign({}, vm.initialModel, { annotations: xs }));
+        // .then(() => {
+        //     setTimeout(() => {
+        //         // flowDiagramStateService.reset();
+        //         flowDiagramStateService.processCommands([])
+        //     }, 5000);
+        // })
 
-    console.log("c1", flowDiagramStateService.getState())
+
 }
 
 
 controller.$inject = [
     '$stateParams',
-    'ApplicationStore',
-    'FlowDiagramAnnotationStore',
-    'FlowDiagramEntityStore',
-    'FlowDiagramStore',
     'FlowDiagramStateService'
-
 ];
 
 

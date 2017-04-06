@@ -32,6 +32,10 @@ public abstract class FlowDiagramEntity {
 
     public abstract Optional<Long> diagramId();
     public abstract EntityReference entityReference();
-    public abstract boolean isNotable();
+
+    @Value.Default
+    public boolean isNotable() {
+        return false;
+    }
 
 }

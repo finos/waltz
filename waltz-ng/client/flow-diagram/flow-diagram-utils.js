@@ -149,14 +149,14 @@ export function toNodeShape(d, widthHint = 100) {
 
 
 export function createSampleDiagram(commandProcessor) {
-    const birman = { kind: 'APPLICATION', id: 23068, name: "23068"};
-    const bear = { kind: 'APPLICATION', id: 22276, name: "Bear"};
-    const cassowary = { kind: 'APPLICATION', id: 22666, name: "Cassowary"};
+    const mastiff = { kind: 'APPLICATION', id: 23068, name: "23068"};
+    const camel = { kind: 'APPLICATION', id: 23061, name: "Camel"};
+    const wolfhound = { kind: 'APPLICATION', id: 23062, name: "Irish Wolfhound"};
     const architect = { kind: 'ACTOR', id: 1, name: "Architect with a very long name"};
 
-    const bearToBirman = { kind: 'LOGICAL_FLOW', id: 45878, source: bear, target: birman };
-    const birmanToCassowary = { kind: 'LOGICAL_FLOW', id: 45482, source: birman, target: cassowary };
-    const cassowaryToArchitect = { kind: 'LOGICAL_FLOW', id: 1, source: cassowary, target: architect };
+    const frogToMastiff = { kind: 'LOGICAL_FLOW', id: 45878, source: camel, target: mastiff };
+    const mastiffToWolfhound = { kind: 'LOGICAL_FLOW', id: 45482, source: mastiff, target: wolfhound };
+    const wolfhoundToArchitect = { kind: 'LOGICAL_FLOW', id: 1, source: wolfhound, target: architect };
 
     const secrets = { kind: 'PHYSICAL_SPECIFICATION', id: 25091, name: "Secrets"};
     const transferHoldings = { id: 16593, kind: 'PHYSICAL_SPECIFICATION', name: 'transfer-holdings.tsv' };
@@ -166,40 +166,16 @@ export function createSampleDiagram(commandProcessor) {
     const birmanPhysicalFlow2 = { kind: 'PHYSICAL_FLOW', id: 25092, specification: transferPurchases };
     const cassowaryPhysicalFlow = { kind: 'PHYSICAL_FLOW', id: 25091, specification: secrets };
 
-    const birmanToCassowaryDecoration1 = { ref: { id: 45482, kind: 'LOGICAL_FLOW' }, decoration: birmanPhysicalFlow1 };
-    const birmanToCassowaryDecoration2 = { ref: { id: 45482, kind: 'LOGICAL_FLOW' }, decoration: birmanPhysicalFlow2 };
-    const cassowaryToArchitectDecoration = { ref: { id: 1, kind: 'LOGICAL_FLOW' }, decoration: cassowaryPhysicalFlow };
-
-    const bearAnnotation = {
+    const camelAnnotation = {
         id: 2,
         kind: 'ANNOTATION',
-        entityReference: {id: 22276, kind: 'APPLICATION' },
+        entityReference: camel,
         note: "However you choose to use LOOPY, hopefully it can give you not just the software tools, but also the mental tools to understand the complex systems of the world around us. It's a hot mess out there. "
     };
 
-    const architectAnnotation = {
-        id: 1,
-        kind: 'ANNOTATION',
-        entityReference: {id: 1, kind: 'ACTOR' },
-        note: "An architect, probably very clever"
-    };
-
     commandProcessor([
-        { command: 'ADD_NODE', payload: birman },
-        { command: 'ADD_NODE', payload: cassowary },
-        { command: 'ADD_NODE', payload: architect },
-        { command: 'ADD_NODE', payload: bear },
-
-        { command: 'ADD_FLOW', payload: birmanToCassowary },
-        { command: 'ADD_FLOW', payload: cassowaryToArchitect },
-        { command: 'ADD_FLOW', payload: bearToBirman },
-
-        { command: 'ADD_DECORATION', payload: birmanToCassowaryDecoration1 },
-        { command: 'ADD_DECORATION', payload: birmanToCassowaryDecoration2 },
-        { command: 'ADD_DECORATION', payload: cassowaryToArchitectDecoration },
-
-        { command: 'ADD_ANNOTATION', payload: architectAnnotation },
-        { command: 'ADD_ANNOTATION', payload: bearAnnotation }
+        { command: 'ADD_NODE', payload: camel },
+        { command: 'ADD_ANNOTATION', payload: camelAnnotation }
     ]);
 
     commandProcessor(mkMoves());
