@@ -44,7 +44,7 @@ public class PhysicalSpecDefinitionHarness {
 
         sampleFileService.create(defId, ImmutablePhysicalSpecDefinitionSampleFileCreateCommand.builder()
                 .name("SampleFile_1.txt")
-                .fileData("1,2,3")
+                .fileData("1,2,3\n4,5,6\n7,8,9")
                 .build());
 
         System.out.println(sampleFileService.findForSpecDefinition(defId));

@@ -26,7 +26,10 @@ function setup() {
         .config(require('./routes'));
 
     module
-        .service('PhysicalFlowStore', require('./service/physical-flow-store'));
+        .service('PhysicalFlowStore', require('./service/physical-flow-store'))
+        .service('PhysicalSpecDefinitionStore', require('./service/physical-spec-definition-store'))
+        .service('PhysicalSpecDefinitionFieldStore', require('./service/physical-spec-definition-field-store'))
+        .service('PhysicalSpecDefinitionSampleFileStore', require('./service/physical-spec-definition-sample-file-store'));
 
     module
         .component('waltzPhysicalFlowOverview', require('./components/overview/physical-flow-overview'))
@@ -35,7 +38,8 @@ function setup() {
         .component('waltzPhysicalFlowTable', require('./components/flow-table/physical-flow-table'))
         .component('waltzPhysicalFlowEditTargetLogicalFlow', require('./components/edit-target-logical-flow/physical-flow-edit-target-logical-flow'))
         .component('waltzPhysicalFlowExportButtons', require('./components/export-buttons/physical-flow-export-buttons'))
-        .component('waltzPhysicalFlowAttributeEditor', require('./components/attribute-editor/physical-flow-attribute-editor'));
+        .component('waltzPhysicalFlowAttributeEditor', require('./components/attribute-editor/physical-flow-attribute-editor'))
+        .component('waltzPhysicalSpecDefinitionPanel', require('./components/spec-definition/physical-spec-definition-panel'));
 
     return module.name;
 }

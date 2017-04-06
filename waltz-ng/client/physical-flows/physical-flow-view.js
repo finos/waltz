@@ -17,6 +17,7 @@
  */
 
 import {initialiseData} from "../common";
+import _ from "lodash";
 
 
 const template = require('./physical-flow-view.html');
@@ -33,6 +34,7 @@ const initialState = {
         outgoing: []
     },
     specification: null,
+    selectedSpecDefinition: {},
     tour: []
 };
 
@@ -90,14 +92,29 @@ function navigateToLastView($state, historyStore) {
 }
 
 
-function controller($state,
+function getSelectedSpecDefinition(specDefinitions = [], selectedSpecDefId = null) {
+    if (selectedSpecDefId) {
+        const defsById = _.keyBy(specDefinitions, 'id');
+        return defsById[selectedSpecDefId];
+    } else {
+        // find the active definition
+        return _.find(specDefinitions, d => d.status === 'ACTIVE');
+    }
+}
+
+
+function controller($q,
+                    $state,
                     $stateParams,
                     bookmarkStore,
                     historyStore,
-                    notification,
-                    physicalSpecificationStore,
-                    physicalFlowStore,
                     logicalFlowStore,
+                    notification,
+                    physicalFlowStore,
+                    physicalSpecDefinitionStore,
+                    physicalSpecDefinitionFieldStore,
+                    physicalSpecDefinitionSampleFileStore,
+                    physicalSpecificationStore,
                     tourService)
 {
     const vm = initialiseData(this, initialState);
@@ -128,11 +145,33 @@ function controller($state,
         })
         .then(bs => vm.bookmarks = bs);
 
+    // spec definitions
+    specPromise
+        .then(() => physicalSpecDefinitionStore.findForSpecificationId(vm.physicalFlow.specificationId))
+        .then(specDefs => vm.selectedSpecDefinition.def
+                        = getSelectedSpecDefinition(specDefs, vm.physicalFlow.specificationDefinitionId))
+        .then(() => {
+            if (vm.selectedSpecDefinition.def) {
+                const specDefFieldPromise = physicalSpecDefinitionFieldStore
+                    .findForSpecDefinitionId(vm.selectedSpecDefinition.def.id);
 
+                const specDefSampleFilePromise = physicalSpecDefinitionSampleFileStore
+                    .findForSpecDefinitionId(vm.selectedSpecDefinition.def.id);
+
+                $q.all([specDefFieldPromise, specDefSampleFilePromise])
+                    .then(([fields, file]) => {
+                        vm.selectedSpecDefinition.fields = fields;
+                        vm.selectedSpecDefinition.sampleFile = file;
+                    });
+            }
+        });
+
+    // tour
     specPromise
         .then(() => tourService.initialiseForKey('main.physical-flow.view', true))
         .then(tour => vm.tour = tour)
         .then(() => addToHistory(historyStore, vm.physicalFlow, vm.specification));
+
 
     const deleteSpecification = () => {
         physicalSpecificationStore.deleteById(vm.specification.id)
@@ -173,14 +212,18 @@ function controller($state,
 
 
 controller.$inject = [
+    '$q',
     '$state',
     '$stateParams',
     'BookmarkStore',
     'HistoryStore',
-    'Notification',
-    'PhysicalSpecificationStore',
-    'PhysicalFlowStore',
     'LogicalFlowStore',
+    'Notification',
+    'PhysicalFlowStore',
+    'PhysicalSpecDefinitionStore',
+    'PhysicalSpecDefinitionFieldStore',
+    'PhysicalSpecDefinitionSampleFileStore',
+    'PhysicalSpecificationStore',
     'TourService'
 ];
 

@@ -7,7 +7,7 @@ import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDef
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -47,7 +47,7 @@ public class PhysicalSpecDefinitionSampleFileService {
     }
 
 
-    public List<PhysicalSpecDefinitionSampleFile> findForSpecDefinition(long specDefinitionId) {
+    public Optional<PhysicalSpecDefinitionSampleFile> findForSpecDefinition(long specDefinitionId) {
         return dao.findForSpecDefinition(specDefinitionId);
     }
 }
