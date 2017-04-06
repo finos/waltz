@@ -42,6 +42,7 @@ public class FlowDiagramAnnotationDao {
     private static final RecordMapper<Record, FlowDiagramAnnotation> TO_DOMAIN_MAPPER = r -> {
         FlowDiagramAnnotationRecord record = r.into(FLOW_DIAGRAM_ANNOTATION);
         return ImmutableFlowDiagramAnnotation.builder()
+                .annotationId(record.getAnnotationId())
                 .diagramId(record.getDiagramId())
                 .entityReference(mkRef(
                         EntityKind.valueOf(record.getEntityKind()),

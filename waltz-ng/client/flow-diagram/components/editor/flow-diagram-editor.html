@@ -22,7 +22,7 @@
         </a>
     </div>
 
-    <!-- ADD ANNOTATION POPUP -->
+    <!-- ANNOTATION POPUP -->
     <div class="pop waltz-fade-if"
          ng-if="$ctrl.visibility.annotationPopup">
         <h4 ng-bind="$ctrl.popup.title"></h4>
@@ -37,7 +37,7 @@
         <hr>
 
         <a class="btn btn-success clickable"
-           ng-click="$ctrl.issueCommands($ctrl.popup.mkAddAnnotationCommand($ctrl.popup.note))">
+           ng-click="$ctrl.issueCommands($ctrl.popup.mkCommand($ctrl.popup.note))">
             Add
         </a>
         <a class='clickable'
@@ -51,18 +51,28 @@
     <div ng-class="{ 'dim' : $ctrl.visibility.popup }">
         <waltz-flow-diagram nodes="$ctrl.nodes"
                             flows="$ctrl.flows"
+                            annotations="$ctrl.annotations"
                             layout="$ctrl.layout"
                             on-initialise="$ctrl.onDiagramInit"
                             context-menus="$ctrl.contextMenus">
         </waltz-flow-diagram>
 
-        <button class="btn btn-danger" ng-click="$ctrl.getState()">
-            Get State
-        </button>
 
-        <pre ng-bind="$ctrl.state | json">
-
-        </pre>
+        <div class="row">
+            <div class="col-md-4">
+                <button class="btn btn-danger"
+                        ng-click="$ctrl.getState()">
+                    Get State
+                </button>
+                <pre ng-bind="$ctrl.state | json"></pre>
+            </div>
+            <div class="col-md-4">
+                <pre ng-bind="$ctrl.workingModel | json"></pre>
+            </div>
+            <div class="col-md-4">
+                <pre ng-bind="$ctrl.initialModel | json"></pre>
+            </div>
+        </div>
 
     </div>
 </div>

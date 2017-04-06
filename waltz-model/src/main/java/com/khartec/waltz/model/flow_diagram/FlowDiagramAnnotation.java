@@ -21,15 +21,17 @@ package com.khartec.waltz.model.flow_diagram;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdProvider;
 import org.immutables.value.Value;
+
+import java.util.Optional;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableFlowDiagramAnnotation.class)
 @JsonDeserialize(as = ImmutableFlowDiagramAnnotation.class)
-public abstract class FlowDiagramAnnotation implements IdProvider {
+public abstract class FlowDiagramAnnotation {
 
-    public abstract long diagramId();
+    public abstract String annotationId();
+    public abstract Optional<Long> diagramId();
     public abstract EntityReference entityReference();
     public abstract String note();
 

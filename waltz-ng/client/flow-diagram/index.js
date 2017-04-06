@@ -25,7 +25,9 @@ export default () => {
     module
         .service('FlowDiagramStore', require('./services/flow-diagram-store'))
         .service('FlowDiagramAnnotationStore', require('./services/flow-diagram-annotation-store'))
-        .service('FlowDiagramEntityStore', require('./services/flow-diagram-entity-store'));
+        .service('FlowDiagramEntityStore', require('./services/flow-diagram-entity-store'))
+        .service('FlowDiagramStateService', require('./services/flow-diagram-state-service'))
+        ;
 
     module
         .component('waltzFlowDiagram', require('./components/diagram/flow-diagram'))

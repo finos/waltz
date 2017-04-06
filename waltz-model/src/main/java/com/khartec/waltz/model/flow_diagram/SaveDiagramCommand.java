@@ -18,20 +18,30 @@
 
 package com.khartec.waltz.model.flow_diagram;
 
+/**
+ * Created by dwatkins on 06/04/2017.
+ */
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
+import java.util.List;
 import java.util.Optional;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableFlowDiagramEntity.class)
-@JsonDeserialize(as = ImmutableFlowDiagramEntity.class)
-public abstract class FlowDiagramEntity {
+@JsonSerialize(as = ImmutableSaveDiagramCommand.class)
+@JsonDeserialize(as = ImmutableSaveDiagramCommand.class)
+public abstract class SaveDiagramCommand implements Command, NameProvider, DescriptionProvider {
 
     public abstract Optional<Long> diagramId();
-    public abstract EntityReference entityReference();
-    public abstract boolean isNotable();
 
+    public abstract String layoutData();
+
+    public abstract List<FlowDiagramEntity> entities();
+
+    public abstract List<FlowDiagramAnnotation> annotations();
 }

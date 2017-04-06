@@ -17,6 +17,7 @@
  */
 
 import _ from 'lodash';
+import angular from 'angular';
 import {initialiseData} from '../../../common';
 import {createSampleDiagram} from '../../flow-diagram-utils';
 
@@ -30,18 +31,11 @@ import {createSampleDiagram} from '../../flow-diagram-utils';
 
 const bindings = {
     nodes: '<',
-    flows: '<'
+    initialModel: '<'
 };
 
 
 const initialState = {
-    layout: {
-        positions: {},
-        shapes: {},
-        subject: 'APPLICATION/22253'
-    },
-    nodes: [],
-    flows: [],
     visibility: {
         logicalFlowPopup: false,
         annotationPopup: false
@@ -112,16 +106,39 @@ function prepareAddAnnotationPopup(graphNode) {
     return {
         title: `Add annotation to ${graphNode.data.name}`,
         description: '',
-        mkAddAnnotationCommand: (note) => {
+        mkCommand: (note) => {
             return [
                 {
                     command: 'ADD_ANNOTATION',
                     payload: {
-                        dx: 40,
-                        dy: 40,
-                        id: new Date().getUTCMilliseconds(),
+                        id: `D12_${+new Date()}`,
+                        kind: 'ANNOTATION',
                         note,
-                        ref: { id: graphNode.data.id, kind: graphNode.data.kind }
+                        entityReference: { id: graphNode.data.id, kind: graphNode.data.kind }
+                    }
+                }
+            ];
+        }
+    }
+}
+
+
+function prepareUpdateAnnotationPopup(graphNode) {
+    console.log('puap', graphNode)
+    if (!graphNode) return;
+
+
+    return {
+        title: `Update annotation`,
+        description: '',
+        note: _.get(graphNode, 'data.note') || "",
+        mkCommand: (note) => {
+            return [
+                {
+                    command: 'UPDATE_ANNOTATION',
+                    payload: {
+                        id: graphNode.id,
+                        note,
                     }
                 }
             ];
@@ -168,11 +185,8 @@ function mkNodeMenu($state, $timeout, logicalFlowStore, vm) {
                 divider: true
             }, {
                 title: (d) => `Remove ${d.data.name}`,
-                action: (elm, d, i) => {
-                    return [
-                        { command: 'REMOVE_NODE', payload: d }
-                    ];
-                }
+                action: (elm, d, i) =>
+                    vm.issueCommands([{command: 'REMOVE_NODE', payload: d}])
             }, {
                 divider: true
             }, {
@@ -197,24 +211,26 @@ function mkFlowBucketMenu() {
 }
 
 
-function mkAnnotationMenu() {
+function mkAnnotationMenu(commandProcessor, $timeout, vm) {
     return (d) => {
         return [
             {
                 title: 'Edit',
                 action: (elm, d, i) => {
-                    return [
-                        { command: 'UPDATE_ANNOTATION', payload: { annotation: d, text: 'Hello World' } }
-                    ];
+                    $timeout(() => {
+                        const popup = prepareUpdateAnnotationPopup(d);
+                        vm.popup = popup;
+                        vm.visibility.annotationPopup = true;
+                    });
+
+
                 }
             },
             { divider: true },
             {
                 title: 'Remove',
                 action: (elm, d, i) => {
-                    return [
-                        { command: 'REMOVE_ANNOTATION', payload: d }
-                    ];
+                    commandProcessor([{ command: 'REMOVE_ANNOTATION', payload: d }]);
                 }
             },
         ];
@@ -222,13 +238,13 @@ function mkAnnotationMenu() {
 }
 
 
-function mkCanvasMenu() {
+function mkCanvasMenu(commandProcessor) {
     return (d) => {
         return [
             {
                 title: (d) => `Add some applications`,
                 action: function (elm, d, i) {
-                    return createSampleDiagram();
+                    return createSampleDiagram(commandProcessor);
                 }
             }
         ]
@@ -236,21 +252,21 @@ function mkCanvasMenu() {
 }
 
 
-function controller($state, $timeout, logicalFlowStore) {
+function controller($state,
+                    $timeout,
+                    logicalFlowStore,
+                    flowDiagramStateService) {
     const vm = initialiseData(this, initialState);
-
-    let sendCommands = null;
-    let getState = null;
 
     vm.contextMenus = {
         node: mkNodeMenu($state, $timeout, logicalFlowStore, vm),
-        flowBucket: mkFlowBucketMenu(),
-        annotation: mkAnnotationMenu(),
-        canvas: mkCanvasMenu()
+        flowBucket: mkFlowBucketMenu(flowDiagramStateService.processCommands),
+        annotation: mkAnnotationMenu(flowDiagramStateService.processCommands, $timeout, vm),
+        canvas: mkCanvasMenu(flowDiagramStateService.processCommands)
     };
 
     vm.issueCommands = (commands) => {
-        sendCommands(commands);
+        flowDiagramStateService.processCommands(commands);
         vm.onDismissPopup();
     };
 
@@ -260,14 +276,17 @@ function controller($state, $timeout, logicalFlowStore) {
     };
 
     vm.onDiagramInit = (d) => {
-        sendCommands = d.processCommands;
-        getState = d.getState;
     };
 
     vm.getState = () => {
-        vm.state = getState();
+        vm.state = flowDiagramStateService.getState();
     };
 
+    vm.$onChanges = (c) => {
+        if (c.initialModel) {
+            vm.workingModel = angular.copy(vm.initialModel);
+        }
+    };
 
 }
 
@@ -275,9 +294,9 @@ function controller($state, $timeout, logicalFlowStore) {
 controller.$inject = [
     '$state',
     '$timeout',
-    'LogicalFlowStore'
+    'LogicalFlowStore',
+    'FlowDiagramStateService'
 ];
-
 
 
 const component = {

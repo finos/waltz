@@ -49,6 +49,39 @@ export function mkModel(nodes = [], flows = []) {
     };
 }
 
+
+function initialiseShape(state, graphNode) {
+    if (!_.isObject(graphNode)) throw "Cannot initialise shape without an object, was given: " + graphNode;
+    const shape = toNodeShape(_.get(graphNode, 'data.kind', 'DEFAULT'));
+    state.layout.shapes[graphNode.id] = shape;
+    return shape;
+}
+
+
+function initialisePosition(state, graphNodeId) {
+    const position =  { x: 0, y: 0 };
+    state.layout.positions[graphNodeId] = position;
+    return position;
+}
+
+
+export function positionFor(state, graphNode) {
+    const id = _.isString(graphNode)
+        ? graphNode
+        : graphNode.id;
+
+    return state.layout.positions[id] || initialisePosition(state, id);
+}
+
+
+export function shapeFor(state, graphNode) {
+    const id = _.isString(graphNode)
+        ? graphNode
+        : graphNode.id;
+
+    return state.layout.shapes[id] || initialiseShape(state, graphNode);
+}
+
 // -- shapes
 
 const paperShape = {
@@ -115,8 +148,8 @@ export function toNodeShape(d, widthHint = 100) {
 
 
 
-export function createSampleDiagram() {
-    const birman = { kind: 'APPLICATION', id: 22253, name: "Birman"};
+export function createSampleDiagram(commandProcessor) {
+    const birman = { kind: 'APPLICATION', id: 23068, name: "23068"};
     const bear = { kind: 'APPLICATION', id: 22276, name: "Bear"};
     const cassowary = { kind: 'APPLICATION', id: 22666, name: "Cassowary"};
     const architect = { kind: 'ACTOR', id: 1, name: "Architect with a very long name"};
@@ -138,16 +171,20 @@ export function createSampleDiagram() {
     const cassowaryToArchitectDecoration = { ref: { id: 1, kind: 'LOGICAL_FLOW' }, decoration: cassowaryPhysicalFlow };
 
     const bearAnnotation = {
-        id: 2, ref: {id: 22276, kind: 'APPLICATION' },
-        note: "However you choose to use LOOPY, hopefully it can give you not just the software tools, but also the mental tools to understand the complex systems of the world around us. It's a hot mess out there. ",
-        dy: 37, dx: -62 };
+        id: 2,
+        kind: 'ANNOTATION',
+        entityReference: {id: 22276, kind: 'APPLICATION' },
+        note: "However you choose to use LOOPY, hopefully it can give you not just the software tools, but also the mental tools to understand the complex systems of the world around us. It's a hot mess out there. "
+    };
 
     const architectAnnotation = {
-        id: 1, ref: {id: 1, kind: 'ACTOR' },
-        note: "An architect, probably very clever",
-        dy: 37, dx: -62 };
+        id: 1,
+        kind: 'ANNOTATION',
+        entityReference: {id: 1, kind: 'ACTOR' },
+        note: "An architect, probably very clever"
+    };
 
-    return [
+    commandProcessor([
         { command: 'ADD_NODE', payload: birman },
         { command: 'ADD_NODE', payload: cassowary },
         { command: 'ADD_NODE', payload: architect },
@@ -160,7 +197,53 @@ export function createSampleDiagram() {
         { command: 'ADD_DECORATION', payload: birmanToCassowaryDecoration1 },
         { command: 'ADD_DECORATION', payload: birmanToCassowaryDecoration2 },
         { command: 'ADD_DECORATION', payload: cassowaryToArchitectDecoration },
-        { command: 'ADD_ANNOTATION', payload: bearAnnotation },
-        { command: 'ADD_ANNOTATION', payload: architectAnnotation }
-    ];
+
+        { command: 'ADD_ANNOTATION', payload: architectAnnotation },
+        { command: 'ADD_ANNOTATION', payload: bearAnnotation }
+    ]);
+
+    commandProcessor(mkMoves());
+}
+
+
+function mkMoves() {
+    const positions = {
+        "APPLICATION/23068": {
+            "x": 389.3717041015625,
+            "y": 261.9740295410156
+        },
+        "APPLICATION/22666": {
+            "x": 578.7292175292969,
+            "y": 316.3544006347656
+        },
+        "ACTOR/1": {
+            "x": 743.9626770019531,
+            "y": 389.3429260253906
+        },
+        "APPLICATION/22276": {
+            "x": 210.69439697265625,
+            "y": 227.21038818359375
+        },
+        "ANNOTATION/1": {
+            "x": 16.83001708984375,
+            "y": -97.26809692382812
+        },
+        "ANNOTATION/2": {
+            "x": -19.187301635742188,
+            "y": 99.41787719726562
+        }
+    };
+
+    return _.map(positions, (v, k) => {
+        return {
+            command: 'SET_POSITION',
+            payload: {
+                x: v.x,
+                y: v.y,
+                id: k
+            }
+        }
+    })
+
+
 }
