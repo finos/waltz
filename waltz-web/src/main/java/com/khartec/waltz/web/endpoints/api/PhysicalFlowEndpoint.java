@@ -102,6 +102,12 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
         String createPath = BASE_URL;
 
+        String updateSpecDefinitionIdPath = mkPath(
+                BASE_URL,
+                "id",
+                ":id",
+                "spec-definition");
+
 
         ListRoute<PhysicalFlow> findByEntityRefRoute =
                 (request, response) -> physicalFlowService.findByEntityReference(getEntityReference(request));
@@ -133,6 +139,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         getForList(findBySpecificationIdPath, findBySpecificationIdRoute);
         getForList(searchReportsPath, searchReportsRoute);
         postForDatum(createPath, this::createFlow);
+        postForDatum(updateSpecDefinitionIdPath, this::updateSpecDefinitionId);
 
         deleteForDatum(deletePath, this::deleteFlow);
     }
@@ -146,6 +153,18 @@ public class PhysicalFlowEndpoint implements Endpoint {
         PhysicalFlowCreateCommandResponse cmdResponse = physicalFlowService.create(command, username);
 
         return cmdResponse;
+    }
+
+
+    private int updateSpecDefinitionId(Request request, Response response) throws IOException {
+        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        String username = getUsername(request);
+        long flowId = getId(request);
+
+        PhysicalFlowSpecDefinitionChangeCommand command
+                = readBody(request, PhysicalFlowSpecDefinitionChangeCommand.class);
+
+        return physicalFlowService.updateSpecDefinitionId(username, flowId, command);
     }
 
 

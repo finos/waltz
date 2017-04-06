@@ -35,6 +35,7 @@ const initialState = {
     },
     specification: null,
     selectedSpecDefinition: {},
+    selectableSpecDefinitions: [],
     tour: []
 };
 
@@ -103,6 +104,15 @@ function getSelectedSpecDefinition(specDefinitions = [], selectedSpecDefId = nul
 }
 
 
+function getSelectableSpecDefinitions(specDefinitions = [], selectedSpecDef) {
+    if (selectedSpecDef) {
+        return _.filter(specDefinitions, sd => sd.id !== selectedSpecDef.id);
+    }
+
+    return specDefinitions;
+}
+
+
 function controller($q,
                     $state,
                     $stateParams,
@@ -146,10 +156,12 @@ function controller($q,
         .then(bs => vm.bookmarks = bs);
 
     // spec definitions
-    specPromise
-        .then(() => physicalSpecDefinitionStore.findForSpecificationId(vm.physicalFlow.specificationId))
-        .then(specDefs => vm.selectedSpecDefinition.def
-                        = getSelectedSpecDefinition(specDefs, vm.physicalFlow.specificationDefinitionId))
+    const loadSpecDefinitions = () => physicalSpecDefinitionStore
+        .findForSpecificationId(vm.physicalFlow.specificationId)
+        .then(specDefs => {
+            vm.selectedSpecDefinition.def = getSelectedSpecDefinition(specDefs, vm.physicalFlow.specificationDefinitionId);
+            vm.selectableSpecDefinitions = getSelectableSpecDefinitions(specDefs, vm.selectedSpecDefinition.def);
+        })
         .then(() => {
             if (vm.selectedSpecDefinition.def) {
                 const specDefFieldPromise = physicalSpecDefinitionFieldStore
@@ -165,6 +177,9 @@ function controller($q,
                     });
             }
         });
+
+    specPromise
+        .then(() => loadSpecDefinitions());
 
     // tour
     specPromise
@@ -206,6 +221,20 @@ function controller($q,
             physicalFlowStore
                 .deleteById(flowId)
                 .then(r => handleDeleteFlowResponse(r));
+        }
+    };
+
+    vm.updateSpecDefinitionId = (newSpecDef) => {
+        if (confirm('Are you sure you want to change the specification definition version used by this flow ?')) {
+            physicalFlowStore
+                .updateSpecDefinitionId(flowId, {
+                    newSpecDefinitionId: newSpecDef.id
+                })
+                .then(r => {
+                    vm.physicalFlow.specificationDefinitionId = newSpecDef.id;
+                    loadSpecDefinitions();
+                    notification.success('Specification definition version updated successfully');
+                });
         }
     };
 }

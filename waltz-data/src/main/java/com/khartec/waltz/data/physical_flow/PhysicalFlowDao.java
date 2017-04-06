@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.physical_flow;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.physical_flow.FrequencyKind;
 import com.khartec.waltz.model.physical_flow.ImmutablePhysicalFlow;
@@ -34,6 +35,7 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
@@ -168,6 +170,20 @@ public class PhysicalFlowDao {
 
         record.store();
         return record.getId();
+    }
+
+
+    public int updateSpecDefinition(String userName, long flowId, long newSpecDefinitionId) {
+        checkNotNull(userName, "userName cannot be null");
+
+        return dsl.update(PHYSICAL_FLOW)
+                .set(PHYSICAL_FLOW.SPECIFICATION_DEFINITION_ID, newSpecDefinitionId)
+                .set(PHYSICAL_FLOW.LAST_UPDATED_BY, userName)
+                .set(PHYSICAL_FLOW.LAST_UPDATED_AT, nowUtcTimestamp())
+                .where(PHYSICAL_FLOW.ID.eq(flowId))
+                .and(PHYSICAL_FLOW.SPECIFICATION_DEFINITION_ID.isNull()
+                        .or(PHYSICAL_FLOW.SPECIFICATION_DEFINITION_ID.ne(newSpecDefinitionId)))
+                .execute();
     }
 
 

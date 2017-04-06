@@ -14,22 +14,6 @@
                     <span ng-bind="$ctrl.specDefinition.def.type | toDisplayName: 'physicalSpecDefinitionType'"></span>
                 </div>
                 <div class="col-sm-2 waltz-display-field-label">
-                    Delimiter
-                </div>
-                <div class="col-sm-4">
-                    <span ng-bind="$ctrl.specDefinition.def.delimiter"></span>
-                </div>
-            </div>
-
-            <div class="row">
-                <br>
-                <div class="col-sm-2 waltz-display-field-label">
-                    Version
-                </div>
-                <div class="col-sm-4">
-                    <span ng-bind="$ctrl.specDefinition.def.version"></span>
-                </div>
-                <div class="col-sm-2 waltz-display-field-label">
                     Status
                 </div>
                 <div class="col-sm-4">
@@ -40,17 +24,35 @@
             <div class="row">
                 <br>
                 <div class="col-sm-2 waltz-display-field-label">
-                    Created
+                    Version
                 </div>
-                <div class="col-sm-4">
-                    <waltz-from-now timestamp="$ctrl.specDefinition.def.createdAt">
-                    </waltz-from-now>
-                </div>
-                <div class="col-sm-2 waltz-display-field-label">
-                    Created By
-                </div>
-                <div class="col-sm-4">
-                    <span ng-bind="$ctrl.specDefinition.def.createdBy"></span>
+                <div class="col-sm-10">
+                    <span ng-bind="$ctrl.specDefinition.def.version"></span>
+                    <span ng-if="$ctrl.specDefinition.def.status === 'ACTIVE'">
+                        - <i>Current</i>
+                    </span>
+                    <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                        <div class="btn-group"
+                             uib-dropdown
+                             is-open="status.isopen">
+                            -
+                            <a class="clickable"
+                               uib-dropdown-toggle
+                               ng-id="$ctrl.selectableDefinitions.length > 0">
+                                link to a different version <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu"
+                                uib-dropdown-menu
+                                role="menu">
+                                <li ng-repeat="def in $ctrl.selectableDefinitions | orderBy: 'createdAt':true"
+                                    role="menuitem">
+                                    <a class="clickable"
+                                       ng-bind="def.version"
+                                       ng-click="$ctrl.definitionSelected(def)"></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -58,17 +60,20 @@
                  style="margin-bottom:20px;">
                 <br>
                 <div class="col-sm-2 waltz-display-field-label">
-                    Updated
+                    Created By
                 </div>
                 <div class="col-sm-4">
-                    <waltz-from-now timestamp="$ctrl.specDefinition.def.lastUpdatedAt">
+                    <span ng-bind="$ctrl.specDefinition.def.createdBy"></span>,
+                    <waltz-from-now timestamp="$ctrl.specDefinition.def.createdAt">
                     </waltz-from-now>
                 </div>
                 <div class="col-sm-2 waltz-display-field-label">
                     Updated By
                 </div>
                 <div class="col-sm-4">
-                    <span ng-bind="$ctrl.specDefinition.def.lastUpdatedBy"></span>
+                    <span ng-bind="$ctrl.specDefinition.def.lastUpdatedBy"></span>,
+                    <waltz-from-now timestamp="$ctrl.specDefinition.def.lastUpdatedAt">
+                    </waltz-from-now>
                 </div>
             </div>
         </uib-tab>
@@ -131,7 +136,7 @@
                     <div class="col-sm-10">
                         <div ng-bind="$ctrl.specDefinition.sampleFile.fileData"
                              class="waltz-scroll-region-350"
-                             style="white-space: pre;">
+                             style="white-space: pre;font-family: monospace">
                         </div>
                     </div>
                 </div>

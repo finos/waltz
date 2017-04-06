@@ -248,6 +248,30 @@ public class PhysicalFlowService {
     }
 
 
+    public int updateSpecDefinitionId(String userName, long flowId, PhysicalFlowSpecDefinitionChangeCommand command) {
+        checkNotNull(userName, "userName cannot be null");
+        checkNotNull(command, "command cannot be null");
+
+        int updateCount = physicalFlowDao.updateSpecDefinition(userName, flowId, command.newSpecDefinitionId());
+
+        if (updateCount > 0) {
+            logChange(userName,
+                    mkRef(PHYSICAL_FLOW, flowId),
+                    String.format("Physical flow id: %d specification definition id changed to: %d",
+                            flowId,
+                            command.newSpecDefinitionId()),
+                    Operation.UPDATE);
+        }
+
+        return updateCount;
+    }
+
+
+    public Collection<EntityReference> searchReports(String query) {
+        return searchDao.searchReports(query);
+    }
+
+
     private LogicalFlow ensureLogicalDataFlowExists(long logicalFlowId, String username) {
         LogicalFlow logicalFlow = logicalFlowService.getById(logicalFlowId);
         if (logicalFlow == null) {
@@ -277,10 +301,5 @@ public class PhysicalFlowService {
                 .build();
 
         changeLogService.write(logEntry);
-    }
-
-
-    public Collection<EntityReference> searchReports(String query) {
-        return searchDao.searchReports(query);
     }
 }

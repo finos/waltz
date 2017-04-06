@@ -94,10 +94,11 @@
     <waltz-section name="Specification Definition"
                    icon="file-code-o"
                    id="specification-definition-section">
-
         <div class="row">
             <div class="col-sm-12">
-                <waltz-physical-spec-definition-panel spec-definition="ctrl.selectedSpecDefinition">
+                <waltz-physical-spec-definition-panel spec-definition="ctrl.selectedSpecDefinition"
+                                                      selectable-definitions="ctrl.selectableSpecDefinitions"
+                                                      on-definition-select="ctrl.updateSpecDefinitionId">
                 </waltz-physical-spec-definition-panel>
             </div>
         </div>
