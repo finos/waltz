@@ -27,9 +27,15 @@ function store($http, base) {
         .get(`${BASE}/entity/${ref.kind}/${ref.id}`)
         .then(r => r.data);
 
+    // diagram -> diagramId
+    const save = (diagram) => $http
+        .post(BASE, diagram)
+        .then(r => r.data);
+
     return {
         getById,
-        findByEntityReference
+        findByEntityReference,
+        save
     };
 }
 

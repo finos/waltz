@@ -111,7 +111,7 @@ function prepareAddAnnotationPopup(graphNode) {
                 {
                     command: 'ADD_ANNOTATION',
                     payload: {
-                        id: `D12_${+new Date()}`,
+                        id: +new Date(),
                         kind: 'ANNOTATION',
                         note,
                         entityReference: { id: graphNode.data.id, kind: graphNode.data.kind }
@@ -278,8 +278,9 @@ function controller($state,
     vm.onDiagramInit = (d) => {
     };
 
-    vm.getState = () => {
-        vm.state = flowDiagramStateService.getState();
+    vm.doSave = () => {
+        flowDiagramStateService.save()
+            .then(r => vm.saveResp = r)
     };
 
     vm.$onChanges = (c) => {

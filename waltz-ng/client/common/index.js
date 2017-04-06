@@ -36,6 +36,12 @@ export function mkSafe(xs = []) {
 }
 
 
+export function ifPresent(obj, fn, dflt) {
+    return obj
+        ? fn(obj)
+        : dflt;
+}
+
 /**
  * Takes an array and groups by a key extraction function, processing values
  * with a value transformation function.

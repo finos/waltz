@@ -61,16 +61,14 @@
         <div class="row">
             <div class="col-md-4">
                 <button class="btn btn-danger"
-                        ng-click="$ctrl.getState()">
-                    Get State
+                        ng-click="$ctrl.doSave()">
+                    Prepare Save
                 </button>
-                <pre ng-bind="$ctrl.state | json"></pre>
+                <pre ng-bind="$ctrl.saveResp | json"></pre>
             </div>
             <div class="col-md-4">
-                <pre ng-bind="$ctrl.workingModel | json"></pre>
             </div>
             <div class="col-md-4">
-                <pre ng-bind="$ctrl.initialModel | json"></pre>
             </div>
         </div>
 
