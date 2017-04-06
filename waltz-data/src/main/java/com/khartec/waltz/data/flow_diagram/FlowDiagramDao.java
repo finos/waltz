@@ -28,7 +28,9 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.FlowDiagram.FLOW_DIAGRAM;
@@ -47,6 +49,19 @@ public class FlowDiagramDao {
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .build();
+    };
+
+
+    public static final Function<FlowDiagram, FlowDiagramRecord> TO_RECORD_MAPPER = fd -> {
+        FlowDiagramRecord record = new FlowDiagramRecord();
+
+        fd.id().ifPresent(record::setId);
+        record.setName(fd.name());
+        record.setDescription(fd.description());
+        record.setLayoutData(fd.layoutData());
+        record.setLastUpdatedBy(fd.lastUpdatedBy());
+        record.setLastUpdatedAt(Timestamp.valueOf(fd.lastUpdatedAt()));
+        return record;
     };
 
 
@@ -77,6 +92,22 @@ public class FlowDiagramDao {
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(ref.id()))
                 .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(ref.kind().name()))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public long create(FlowDiagram flowDiagram) {
+        FlowDiagramRecord record = TO_RECORD_MAPPER.apply(flowDiagram);
+        return dsl.insertInto(FLOW_DIAGRAM)
+                .set(record)
+                .returning(FLOW_DIAGRAM.ID)
+                .fetchOne()
+                .getId();
+    }
+
+
+    public boolean update(FlowDiagram flowDiagram) {
+        FlowDiagramRecord record = TO_RECORD_MAPPER.apply(flowDiagram);
+        return dsl.executeUpdate(record) == 1;
     }
 
 }

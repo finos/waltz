@@ -20,6 +20,7 @@ package com.khartec.waltz.data.flow_diagram;
 
 
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.flow_diagram.FlowDiagramAnnotation;
 import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagramAnnotation;
 import com.khartec.waltz.schema.tables.records.FlowDiagramAnnotationRecord;
@@ -30,10 +31,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_ANNOTATION;
+import static java.util.stream.Collectors.toList;
 
 @Repository
 public class FlowDiagramAnnotationDao {
@@ -49,6 +52,20 @@ public class FlowDiagramAnnotationDao {
                         record.getEntityId()))
                 .note(record.getNote())
                 .build();
+    };
+
+
+    public static final Function<FlowDiagramAnnotation, FlowDiagramAnnotationRecord> TO_RECORD_MAPPER = a -> {
+        EntityReference entity = a.entityReference();
+
+        FlowDiagramAnnotationRecord record = new FlowDiagramAnnotationRecord();
+        record.setAnnotationId(a.annotationId());
+        record.setDiagramId(a.diagramId().get());
+        record.setEntityId(entity.id());
+        record.setEntityKind(entity.kind().name());
+        record.setNote(a.note());
+
+        return record;
     };
 
 
@@ -69,4 +86,20 @@ public class FlowDiagramAnnotationDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
+    public int[] createAnnotations(List<FlowDiagramAnnotation> annotations) {
+        List<FlowDiagramAnnotationRecord> records = annotations.stream()
+                .map(TO_RECORD_MAPPER::apply)
+                .collect(toList());
+
+        return dsl.batchInsert(records)
+                .execute();
+    }
+
+
+    public int deleteForDiagram(long diagramId) {
+        return dsl.deleteFrom(FLOW_DIAGRAM_ANNOTATION)
+                .where(FLOW_DIAGRAM_ANNOTATION.DIAGRAM_ID.eq(diagramId))
+                .execute();
+    }
 }
