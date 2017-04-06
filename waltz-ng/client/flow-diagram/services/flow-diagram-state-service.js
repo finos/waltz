@@ -16,12 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash';
-import {randomPick} from '../../common';
+import {randomPick, ifPresent} from '../../common';
 import {toGraphFlow, toGraphNode, toGraphId, positionFor} from '../flow-diagram-utils';
 
 
 let state = {
     model: {
+        diagramId: null,
         nodes: [],
         flows: [],
         decorations: {},
@@ -36,8 +37,53 @@ let state = {
 
 
 
+function prepareSaveCmd(state) {
+    console.log('----save', state);
 
-function service() {
+    const entities = _.map(state.model.nodes, n => {
+        return {
+            entityReference: n.data,
+            isNotable: false
+        };
+    });
+
+    const layoutData = {
+        positions: state.layout.positions,
+        diagramTransform: ifPresent(
+            state.layout.diagramTransform,
+            x => x.toString(),
+            "translate(0,0) scale(0)")
+    };
+
+    const annotations = _.map(state.model.annotations, a => {
+        return {
+            entityReference: a.data.entityReference,
+            note: a.data.note,
+            annotationId: a.data.id
+        }
+    });
+
+
+
+    return {
+        diagramId: state.diagramId,
+        name: 'Test',
+        description: 'Test Diagram',
+        entities,
+        annotations,
+        layoutData: JSON.stringify(layoutData)
+    };
+}
+
+
+
+function service(flowDiagramStore) {
+
+    const save = () => {
+        const cmd = prepareSaveCmd(state);
+        return flowDiagramStore.save(cmd)
+            .then(id => state.diagramId = id)
+    };
 
     const processCommand = (state, commandObject) => {
         console.log("wFD - processing command: ", commandObject, state);
@@ -53,12 +99,6 @@ function service() {
                 position.x += payload.dx;
                 position.y += payload.dy;
                 break;
-
-            // case 'MOVE_ANNOTATION':
-            //     const position = positionFor(state, payload.id);
-            //     position.x += payload.dx;
-            //     position.y += payload.dy;
-            //     break;
 
             case 'UPDATE_ANNOTATION':
                 const newNote = payload.note;
@@ -164,11 +204,13 @@ function service() {
     return {
         processCommands,
         getState,
-        onChange
+        onChange,
+        save
     }
 }
 
 service.$inject = [
+    'FlowDiagramStore'
 ];
 
 
