@@ -32,11 +32,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
+import static java.util.stream.Collectors.toList;
 
 
 @Repository
@@ -58,6 +60,19 @@ public class FlowDiagramEntityDao {
                         r.getValue(ENTITY_NAME_FIELD)))
                 .isNotable(record.getIsNotable())
                 .build();
+    };
+
+
+    public static final Function<FlowDiagramEntity, FlowDiagramEntityRecord> TO_RECORD_MAPPER = fde -> {
+        EntityReference entityRef = fde.entityReference();
+
+        FlowDiagramEntityRecord record = new FlowDiagramEntityRecord();
+        record.setDiagramId(fde.diagramId().get());
+        record.setEntityId(entityRef.id());
+        record.setEntityKind(entityRef.kind().name());
+        record.setIsNotable(fde.isNotable());
+
+        return record;
     };
 
 
@@ -91,4 +106,21 @@ public class FlowDiagramEntityDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
+    public int[] createEntities(List<FlowDiagramEntity> entities) {
+        List<FlowDiagramEntityRecord> records = entities
+                .stream()
+                .map(TO_RECORD_MAPPER::apply)
+                .collect(toList());
+
+        return dsl.batchInsert(records)
+                .execute();
+    }
+
+
+    public int deleteForDiagram(long diagramId) {
+        return dsl.deleteFrom(FLOW_DIAGRAM_ENTITY)
+                .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
+                .execute();
+    }
 }

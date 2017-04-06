@@ -29,9 +29,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class FlowDiagramEndpoint implements Endpoint {
@@ -52,20 +50,21 @@ public class FlowDiagramEndpoint implements Endpoint {
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String saveDiagramPath = mkPath(BASE_URL);
 
+
         DatumRoute<FlowDiagram> getByIdRoute = (req, res)
                 -> flowDiagramService.getById(getId(req));
         ListRoute<FlowDiagram> findByEntityRoute = (req, res)
                 -> flowDiagramService.findByEntityReference(getEntityReference(req));
         DatumRoute<Long> saveDiagramRoute = (req, res)
-                -> flowDiagramService.save(
+                //todo: limit to role
+                ->  flowDiagramService.save(
                         readBody(req, SaveDiagramCommand.class),
                         getUsername(req));
 
+
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityPath, findByEntityRoute);
-
         postForDatum(saveDiagramPath, saveDiagramRoute);
-
     }
 
 
