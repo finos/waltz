@@ -23,10 +23,7 @@ import {zoom} from 'd3-zoom';
 import {initialiseData} from '../../../common';
 import {mkLineWithArrowPath, responsivefy, wrapText} from '../../../common/d3-utils';
 import {d3ContextMenu} from '../../../common/d3-context-menu';
-import {mkModel, toGraphFlow, toGraphNode, toGraphId, toNodeShape} from '../../flow-diagram-utils';
-import angular from 'angular';
-
-
+import {toGraphId, toNodeShape, shapeFor, positionFor} from '../../flow-diagram-utils';
 
 
 /**
@@ -35,11 +32,6 @@ import angular from 'angular';
  * @description
  * This component ...
  */
-
-const logState = _
-    .throttle(
-        () => console.log('draw', state),
-        400);
 
 
 const bindings = {
@@ -91,32 +83,25 @@ const dimensions = {
 };
 
 
-const state = {
-    model: {
-        nodes: [],
-        flows: [],
-        decorations: {},
-        annotations: []
-    },
-    layout: {
-        positions: {}, // gid -> {  x, y }
-        shapes: {}, // gid -> { path, cx, cy, etc} }
-        subject: null
-    },
-    groups: {
-        svg: null,
-        nodes: null,
-        flows: null
-    },
-    contextMenus: null
+const groups = {
+    svg: null,
+    nodes: null,
+    flows: null
 };
 
 
+const contextMenus = {
+    annotation: null,
+    canvas: null,
+    flowBucket: null,
+    node: null
+};
 
-function drawNodeShape(selection) {
+
+function drawNodeShape(selection, state) {
     return selection
         .attr('d', d => {
-            const path = layoutFor(d).shape.path
+            const path = shapeFor(state, d).path
             return path;
         })
         .attr('stroke', '#ccc')
@@ -131,21 +116,14 @@ function dragStarted(d) {
 }
 
 
-function nodeDragged(d) {
-    const cmd = {
-        command: 'MOVE_NODE',
-        payload: { graphNode: d, dx: event.dx, dy: event.dy }
+function dragger(commandProcessor) {
+    return (d) => {
+        const cmd = {
+            command: 'MOVE',
+            payload: {id: d.id, dx: event.dx, dy: event.dy}
+        };
+        commandProcessor([cmd]);
     };
-    processCommands([ cmd ]);
-}
-
-
-function annotationDragged(d) {
-    const cmd = {
-        command: 'MOVE_ANNOTATION',
-        payload: { annotation: d, dx: event.dx, dy: event.dy }
-    };
-    processCommands([ cmd ]);
 }
 
 
@@ -155,141 +133,12 @@ function dragEnded(d) {
 }
 
 
-function initialiseShape(graphNode) {
-    if (!_.isObject(graphNode)) throw "Cannot initialise shape without an object, was given: " + graphNode;
-    const shape = toNodeShape(_.get(graphNode, 'data.kind', 'DEFAULT'));
-    state.layout.shapes[graphNode.id] = shape;
-    return shape;
-}
-
-
-function initialisePosition(graphNodeId) {
-    const position =  { x: 0, y: 0 };
-    state.layout.positions[graphNodeId] = position;
-    return position;
-}
-
-
-function layoutFor(graphNode) {
-    const id = _.isString(graphNode)
-        ? graphNode
-        : graphNode.id;
-
-    const position = state.layout.positions[id] || initialisePosition(id);
-    const shape = state.layout.shapes[id] || initialiseShape(graphNode);
-
-    return {
-        position,
-        shape
-    };
-}
-
-
-function processCommand(command, payload, model) {
-    //console.log("wFD - processing command: ", command, payload, model);
-    switch (command) {
-        case 'MOVE_NODE':
-            const layout = layoutFor(payload.graphNode);
-            layout.position.x += payload.dx;
-            layout.position.y += payload.dy;
-            break;
-
-        case 'MOVE_ANNOTATION':
-            payload.annotation.dx += payload.dx;
-            payload.annotation.dy += payload.dy;
-            break;
-
-        case 'ADD_ANNOTATION': // { id, note, }
-            const existingIds = _.map(model.annotations, "id");
-            if (_.includes(existingIds, payload.id)) {
-                console.log('Ignoring request to re-add annotation', payload);
-            } else {
-                model.annotations = _.concat(model.annotations || [], [payload]);
-            }
-            break;
-
-        case 'UPDATE_ANNOTATION':
-            const newText = payload.text;
-            const annotation = payload.annotation;
-            annotation.note = newText;
-            break;
-
-        case 'ADD_NODE':
-            const graphNode = toGraphNode(payload);
-            const existingIds = _.map(model.nodes, "id");
-            if (_.includes(existingIds, graphNode.id)) {
-                console.log('Ignoring request to re-add node', payload);
-            } else {
-                model.nodes = _.concat(model.nodes || [], [ graphNode ]);
-                const moveCmd = {
-                    graphNode,
-                    dx: _.random(100, dimensions.svg.w - 200),
-                    dy: _.random(100, dimensions.svg.h - 200)
-                };
-                processCommands([
-                    { command: 'MOVE_NODE', payload: moveCmd}
-                ]);
-            }
-            break;
-
-        case 'ADD_FLOW':
-            const graphFlow = toGraphFlow(payload);
-            const existingIds = _.map(model.flows, "id");
-            if (_.includes(existingIds, graphFlow.id)) {
-                console.log('Ignoring request to add duplicate flow', payload);
-            } else {
-                model.flows = _.concat(model.flows || [], [graphFlow]);
-            }
-            break;
-
-        case 'ADD_DECORATION':
-            const payload = payload;
-            const refId = toGraphId(payload.ref);
-            const decorationNode = toGraphNode(payload.decoration);
-            const currentDecorations = model.decorations[refId] || [];
-            const existingIds = _.map(model.flows, "id");
-            if (_.includes(existingIds, decorationNode.id)) {
-                console.log('Ignoring request to add duplicate decoration');
-            } else {
-                model.decorations[refId] = _.concat(currentDecorations, [decorationNode]);
-            }
-            break;
-
-        case 'REMOVE_NODE':
-            const flowIdsToRemove = _.chain(model.flows)
-                .filter(f => f.source === payload.id || f.target === payload.id)
-                .map('id')
-                .value();
-            model.flows = _.reject(model.flows, f => _.includes(flowIdsToRemove, f.id));
-            model.nodes = _.reject(model.nodes, n => n.id === payload.id);
-            model.annotations = _.reject(model.annotations, a => toGraphId(a.ref) === payload.id);
-            _.forEach(flowIdsToRemove, id => model.decorations[id] = []);
-            break;
-
-        case 'REMOVE_ANNOTATION':
-            console.log('ra1', model.annotations.length)
-            model.annotations = _.reject(model.annotations, a => a.id === payload.id );
-            console.log('ra2', model.annotations.length)
-            break;
-        default:
-            console.log('WFD: unknown command', command);
-            break;
-    }
-}
-
-
-function processCommands(commands = []) {
-    _.forEach(commands, cmd => processCommand(cmd.command, cmd.payload, state.model));
-    draw();
-}
-
-
-function drawNodes(nodes = [], group) {
+function drawNodes(state, group, commandProcessor) {
     if (!group) return;
 
     const nodeElems = group
         .selectAll(`.${styles.NODE}`)
-        .data(nodes, d => d.id);
+        .data(state.model.nodes || [], d => d.id);
 
     nodeElems
         .exit()
@@ -300,23 +149,20 @@ function drawNodes(nodes = [], group) {
         .append('g')
         .classed(styles.NODE, true)
         .on('contextmenu', d3ContextMenu(
-            state.contextMenus.node,
-            { onClose: processCommands }))
+            contextMenus.node))
         .call(drag()
             .on("start", dragStarted)
-            .on("drag", nodeDragged)
+            .on("drag", dragger(commandProcessor))
             .on("end", dragEnded));
 
     // position and setup drag and drop
 
     newNodeElems
         .merge(nodeElems)
-        .classed(styles.SUBJECT, d => d.id === state.layout.subject)
         .attr('transform', d => {
-            const position = layoutFor(d).position;
+            const position = positionFor(state, d);
             return `translate(${position.x}, ${position.y})`;
         });
-
 
     // draw shape
 
@@ -326,7 +172,7 @@ function drawNodes(nodes = [], group) {
     nodeElems
         .merge(newNodeElems)
         .selectAll('path')
-        .call(drawNodeShape);
+        .call(drawNodeShape, state);
 
     // icon
 
@@ -334,21 +180,21 @@ function drawNodes(nodes = [], group) {
         .append('text')
         .classed(styles.TITLE_ICON, true)
         .attr('font-family', 'FontAwesome')
-        .text(d => layoutFor(d).shape.icon);
+        .text(d => shapeFor(state, d).icon);
 
     nodeElems
         .merge(newNodeElems)
         .selectAll(`.${styles.TITLE_ICON}`)
-        .attr('dx', d => layoutFor(d).shape.title.dx)
-        .attr('dy', d => layoutFor(d).shape.title.dy);
+        .attr('dx', d => shapeFor(state, d).title.dx)
+        .attr('dy', d => shapeFor(state, d).title.dy);
 
     // title
 
     newNodeElems
         .append('text')
         .classed(styles.TITLE, true)
-        .attr('dx', d => layoutFor(d).shape.title.dx + 14)
-        .attr('dy', d => layoutFor(d).shape.title.dy);
+        .attr('dx', d => shapeFor(state, d).title.dx + 14)
+        .attr('dy', d => shapeFor(state, d).title.dy);
 
     nodeElems
         .merge(newNodeElems)
@@ -362,12 +208,12 @@ function drawNodes(nodes = [], group) {
 }
 
 
-function drawFlows(flows = [], group) {
+function drawFlows(state, group) {
     if (!group) return;
 
     const linkElems = group
         .selectAll(`.${styles.FLOW}`)
-        .data(flows, d => d.id);
+        .data(state.model.flows || [], d => d.id);
 
     linkElems
         .exit()
@@ -386,14 +232,11 @@ function drawFlows(flows = [], group) {
         .merge(linkElems)
         .selectAll(`.${styles.FLOW_ARROW}`)
         .attr('d', d => {
-            const sourceLayout = layoutFor(d.source);
-            const targetLayout = layoutFor(d.target);
+            const sourcePos = positionFor(state, d.source);
+            const targetPos = positionFor(state, d.target);
 
-            const sourcePos = sourceLayout.position;
-            const targetPos = targetLayout.position;
-
-            const sourceShape = sourceLayout.shape;
-            const targetShape = targetLayout.shape;
+            const sourceShape = shapeFor(state, d.source);
+            const targetShape = shapeFor(state, d.target);
 
             return mkLineWithArrowPath(
                 sourcePos.x + sourceShape.cx,
@@ -405,11 +248,11 @@ function drawFlows(flows = [], group) {
 }
 
 
-function drawFlowBuckets(flows = [], group) {
+function drawFlowBuckets(state, group) {
     if (! group) return;
 
     const relevantFlows = _.filter(
-        flows,
+        state.model.flows || [],
         f => f.data.kind === 'LOGICAL_FLOW');
 
     const bucketElems = group
@@ -425,8 +268,7 @@ function drawFlowBuckets(flows = [], group) {
         .append('g')
         .classed(styles.FLOW_BUCKET, true)
         .on('contextmenu', d3ContextMenu(
-            state.contextMenus.flowBucket,
-            { onClose: processCommands }));
+            contextMenus.flowBucket));
 
     newBucketElems
         .append('circle');
@@ -452,14 +294,11 @@ function drawFlowBuckets(flows = [], group) {
         .merge(bucketElems)
         .attr('transform', d => {
             // position buckets near center of line
-            const sourceLayout = layoutFor(d.source);
-            const targetLayout = layoutFor(d.target);
+            const sourcePos = positionFor(state, d.source);
+            const targetPos = positionFor(state, d.target);
 
-            const sourcePos = sourceLayout.position;
-            const targetPos = targetLayout.position;
-
-            const sourceShape = sourceLayout.shape;
-            const targetShape = targetLayout.shape;
+            const sourceShape = shapeFor(state, d.source);
+            const targetShape = shapeFor(state, d.target);
 
             const sx = sourcePos.x + sourceShape.cx;
             const sy = sourcePos.y + sourceShape.cy;
@@ -481,20 +320,19 @@ function drawFlowBuckets(flows = [], group) {
 }
 
 
-function drawAnnotations(annotations = [], group) {
+function drawAnnotations(state, group, commandProcessor) {
     if (!group) return;
 
     const annotationElems = group
         .selectAll(`.${styles.ANNOTATION}`)
-        .data(annotations, d => d.id);
+        .data(state.model.annotations || [], d => d.id);
 
     const newAnnotationElems = annotationElems
         .enter()
         .append('g')
         .classed(styles.ANNOTATION, true)
         .on('contextmenu', d3ContextMenu(
-            state.contextMenus.annotation,
-            { onClose: processCommands }));
+            contextMenus.annotation));
 
     annotationElems
         .exit()
@@ -508,13 +346,15 @@ function drawAnnotations(annotations = [], group) {
         .merge(newAnnotationElems)
         .selectAll('path')
         .attr('d', d => {
-            const subject = layoutFor(toGraphId(d.ref));
-            const bar = dimensions.annotation.text.w * (d.dx > 0 ? 1 : -1);
-            const sx = subject.position.x + subject.shape.cx;
-            const sy = subject.position.y + subject.shape.cy;
+            const subjectPosition = positionFor(state, toGraphId(d.data.entityReference));
+            const subjectShape = shapeFor(state, toGraphId(d.data.entityReference));
+            const annotationPosition = positionFor(state, d.id);
+            const bar = dimensions.annotation.text.w * (annotationPosition.x > 0 ? 1 : -1);
+            const sx = subjectPosition.x + subjectShape.cx;
+            const sy = subjectPosition.y + subjectShape.cy;
             return `
                 M${sx},${sy}
-                l${d.dx},${d.dy}
+                l${annotationPosition.x},${annotationPosition.y}
                 l${bar},0
             `;
         });
@@ -526,7 +366,7 @@ function drawAnnotations(annotations = [], group) {
         .attr('draggy', 10)
         .call(drag()
             .on("start", dragStarted)
-            .on("drag", annotationDragged)
+            .on("drag", dragger(commandProcessor))
             .on("end", dragEnded));
 
     annotationElems
@@ -534,9 +374,11 @@ function drawAnnotations(annotations = [], group) {
         .selectAll('circle')
         .attr('r', dimensions.annotation.circle.r)
         .each(function(d) {
-            const subject = layoutFor(toGraphId(d.ref));
-            const cx = subject.position.x + d.dx + subject.shape.cx;
-            const cy = subject.position.y + d.dy + subject.shape.cy;
+            const subjectPosition = positionFor(state, toGraphId(d.data.entityReference));
+            const subjectShape = shapeFor(state, toGraphId(d.data.entityReference));
+            const annotationPosition = positionFor(state, d.id);
+            const cx = subjectPosition.x + annotationPosition.x + subjectShape.cx;
+            const cy = subjectPosition.y + annotationPosition.y + subjectShape.cy;
             select(this)
                 .attr('cx', cx)
                 .attr('cy', cy);
@@ -550,24 +392,33 @@ function drawAnnotations(annotations = [], group) {
         .merge(newAnnotationElems)
         .selectAll('text')
         .each(function(d) {
-            const subject = layoutFor(toGraphId(d.ref));
-            const bar = d.dx > 0 ? 10 : dimensions.annotation.text.w * -1;
-            const x = subject.position.x + d.dx + bar + subject.shape.cx;
-            const y = subject.position.y + d.dy + 18;
+            const subjectPosition = positionFor(state, toGraphId(d.data.entityReference));
+            const subjectShape = shapeFor(state, toGraphId(d.data.entityReference));
+            const annotationPosition = positionFor(state, d.id);
+            const bar = annotationPosition.x > 0 ? 10 : dimensions.annotation.text.w * -1;
+            const x = subjectPosition.x + annotationPosition.x + bar + subjectShape.cx;
+            const y = subjectPosition.y + annotationPosition.y + 18;
             select(this)
                 .attr('transform', `translate(${x}, ${y})`);
         })
-        .text(d => d.note)
+        .text(d => d.data.note)
         .call(wrapText, dimensions.annotation.text.w - 5);
 }
 
 
-function draw() {
-    logState();
-    drawFlows(state.model.flows, state.groups.flows);
-    drawNodes(state.model.nodes, state.groups.nodes);
-    drawFlowBuckets(state.model.flows, state.groups.flows);
-    drawAnnotations(state.model.annotations, state.groups.annotations);
+function draw(state, commandProcessor = () => console.log('no command processor given')) {
+    console.log('draw', state);
+
+    if (state.layout.diagramTransform) {
+        groups
+            .container
+            .attr("transform", state.layout.diagramTransform);
+    }
+
+    drawFlows(state, groups.flows, commandProcessor);
+    drawNodes(state, groups.nodes, commandProcessor);
+    drawFlowBuckets(state, groups.flows, commandProcessor);
+    drawAnnotations(state, groups.annotations, commandProcessor);
 }
 
 
@@ -603,60 +454,54 @@ function prepareGroups(holder) {
 }
 
 
-function controller($element) {
+function setupDragAndZoom(commandProcessor) {
+    function zoomed() {
+        const t = event.transform;
+        commandProcessor([{ command: 'TRANSFORM_DIAGRAM', payload: t }]);
+    }
+
+    const myZoom = zoom()
+        .scaleExtent([1 / 4, 2])
+        .on("zoom", zoomed);
+
+    groups.svg
+        .call(myZoom)
+        .on('dblclick.zoom', null);
+}
+
+
+function controller($element, flowDiagramStateService) {
     const vm = this;
     let destroyResizeListener = null;
 
     vm.$onInit = () => {
         initialiseData(vm, initialState);
         const holder = $element.find('div')[0];
-        state.groups = prepareGroups(holder);
-        state.groups
+        Object.assign(groups, prepareGroups(holder));
+        groups
             .svg
             .on('contextmenu', d3ContextMenu(
-                state.contextMenus.canvas,
-                { onClose: processCommands }));
+                contextMenus.canvas));
 
+        destroyResizeListener = responsivefy(groups.svg);
 
-        destroyResizeListener = responsivefy(state.groups.svg);
-
-        function zoomed() {
-            const t = event.transform;
-            state.groups
-                .container
-                .attr("transform", t);
-        }
-
-        const myZoom = zoom()
-            .scaleExtent([1 / 4, 2])
-            .on("zoom", zoomed);
-
-        state.groups
-            .svg
-            .call(myZoom)
-            .on('dblclick.zoom', null);
+        setupDragAndZoom(flowDiagramStateService.processCommands);
 
         vm.$onChanges();
     };
 
+    flowDiagramStateService.onChange(() => draw(
+        flowDiagramStateService.getState(),
+        flowDiagramStateService.processCommands));
+
     vm.$onChanges = (c) => {
-        state.model = mkModel(vm.nodes, vm.flows);
-        state.layout = angular.copy(vm.layout);
-        state.contextMenus = vm.contextMenus;
+        Object.assign(contextMenus, vm.contextMenus || {});
         if (_.isFunction(vm.onInitialise)) {
-            const configuration = {
-                processCommands,
-                getState: () => {
-                    return {
-                        model: angular.copy(state.model),
-                        positions: angular.copy(state.layout.positions),
-                        subject: angular.copy(state.layout.subject)
-                    };
-                }
-            };
-            vm.onInitialise(configuration);
+            vm.onInitialise({});
         }
-        draw();
+        draw(
+            flowDiagramStateService.getState(),
+            flowDiagramStateService.processCommands);
     };
 
     vm.$onDestroy = () => {
@@ -666,7 +511,8 @@ function controller($element) {
 
 
 controller.$inject = [
-    '$element'
+    '$element',
+    'FlowDiagramStateService'
 ];
 
 

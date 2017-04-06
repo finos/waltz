@@ -19,7 +19,13 @@
 function store($http, base) {
     const BASE = `${base}/flow-diagram-annotation`;
 
-    return {};
+    const findByDiagramId = (id) => $http
+        .get(`${BASE}/diagram/${id}`)
+        .then(r => r.data);
+
+    return {
+        findByDiagramId
+    };
 }
 
 

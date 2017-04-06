@@ -21,6 +21,7 @@ package com.khartec.waltz.service.flow_diagram;
 import com.khartec.waltz.data.flow_diagram.FlowDiagramDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.flow_diagram.FlowDiagram;
+import com.khartec.waltz.model.flow_diagram.SaveDiagramCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,16 @@ public class FlowDiagramService {
     public List<FlowDiagram> findByEntityReference(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
         return flowDiagramDao.findByEntityReference(ref);
+    }
+
+
+    public long save(SaveDiagramCommand saveDiagramCommand, String username) {
+        checkNotNull(saveDiagramCommand, "saveDiagramCommand cannot be null");
+        checkNotNull(username, "username cannot be null");
+
+        System.out.println("Saving "+saveDiagramCommand + " for " + username);
+
+        return 1;
     }
 
 }

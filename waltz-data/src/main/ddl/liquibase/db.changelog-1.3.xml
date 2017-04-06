@@ -850,4 +850,39 @@
         </createTable>
     </changeSet>
 
+
+    <!-- 1929 -->
+    <changeSet id="20170406-1929-1"
+               author="davidwatkins73">
+        <comment>1929: Annotation id's need to be allocated up front, therefore changing to guid</comment>
+        <dropTable tableName="flow_diagram_annotation"/>
+        <createTable tableName="flow_diagram_annotation"
+                     remarks="Annotations associated with a specific flow diagram">
+            <column name="annotation_id"
+                    type="${guid.type}">
+            </column>
+            <column name="diagram_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="note"
+                    type="${longvarchar.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="flow_diagram_annotation"
+                       constraintName="flow_diagram_annotation_pkey"
+                       columnNames="diagram_id, annotation_id"/>
+
+    </changeSet>
+
 </databaseChangeLog>
