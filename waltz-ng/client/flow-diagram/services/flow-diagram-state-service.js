@@ -19,8 +19,7 @@ import _ from 'lodash';
 import {randomPick, ifPresent} from '../../common';
 import {toGraphFlow, toGraphNode, toGraphId, positionFor} from '../flow-diagram-utils';
 
-
-let state = {
+const initialState = {
     model: {
         diagramId: null,
         nodes: [],
@@ -36,16 +35,30 @@ let state = {
 };
 
 
+let state = _.cloneDeep(initialState);
+
 
 function prepareSaveCmd(state) {
-    console.log('----save', state);
-
-    const entities = _.map(state.model.nodes, n => {
+    const nodes = _.map(state.model.nodes, n => {
         return {
-            entityReference: n.data,
+            entityReference: {
+                id: n.data.id,
+                kind: n.data.kind
+            },
             isNotable: false
         };
     });
+
+    const flows = _.map(state.model.flows, f => {
+        return {
+            entityReference: {
+                kind: f.data.kind,
+                id: f.data.id
+            }
+        };
+    });
+
+    const entities = _.concat(nodes, flows);
 
     const layoutData = {
         positions: state.layout.positions,
@@ -63,8 +76,6 @@ function prepareSaveCmd(state) {
         }
     });
 
-
-
     return {
         diagramId: state.diagramId,
         name: 'Test',
@@ -76,13 +87,98 @@ function prepareSaveCmd(state) {
 }
 
 
+function service(
+    $q,
+    flowDiagramStore,
+    flowDiagramAnnotationStore,
+    flowDiagramEntityStore,
+    logicalFlowStore)
+{
 
-function service(flowDiagramStore) {
+    const reset = () => {
+        state = _.cloneDeep(initialState);
+    };
 
     const save = () => {
         const cmd = prepareSaveCmd(state);
         return flowDiagramStore.save(cmd)
             .then(id => state.diagramId = id)
+    };
+
+    const load = (id) => {
+        const diagramRef = { id: id, kind: 'FLOW_DIAGRAM'};
+        const diagramSelector = { entityReference: diagramRef, scope: 'EXACT' };
+
+        const diagramPromise = flowDiagramStore.getById(id);
+        const annotationPromise =flowDiagramAnnotationStore.findByDiagramId(id);
+        const entityPromise = flowDiagramEntityStore.findByDiagramId(id);
+        const logicalFlowPromise = logicalFlowStore.findBySelector(diagramSelector);
+
+        return $q
+            .all([diagramPromise, annotationPromise, entityPromise, logicalFlowPromise])
+            .then(([d, annotations, entityNodes, logicalFlows]) => {
+                const logicalFlowsById = _.keyBy(logicalFlows, 'id');
+                const mkFlowCommands = _
+                    .chain(entityNodes)
+                    .filter(node => node.entityReference.kind === 'LOGICAL_DATA_FLOW')
+                    .map(node => {
+                        const logicalFlow = logicalFlowsById[node.entityReference.id];
+                        console.log('lf', logicalFlow, node)
+                        return {
+                            command: 'ADD_FLOW',
+                            payload: Object.assign({}, logicalFlow, {kind: 'LOGICAL_DATA_FLOW'} )
+                        }
+                    })
+                    .value();
+
+                const mkNodeCommands = _
+                    .chain(entityNodes)
+                    .filter(ent => _.includes(['APPLICATION', 'ACTOR'], ent.entityReference.kind))
+                    .map(ent => {
+                        return {
+                            command: 'ADD_NODE',
+                            payload: {
+                                id: ent.entityReference.id,
+                                kind: ent.entityReference.kind,
+                                name: ent.entityReference.name,
+                                isNotable: ent.isNotable
+                            }
+                        }
+                    })
+                    .value();
+
+                const mkAnnotationCommands = _.map(annotations, ann => {
+                    return {
+                        command: 'ADD_ANNOTATION',
+                        payload: {
+                            kind: 'ANNOTATION',
+                            id: ann.annotationId,
+                            entityReference: ann.entityReference,
+                            note: ann.note,
+
+                        }
+                    }
+                });
+
+                const moveCommands = _.map(
+                    JSON.parse(d.layoutData).positions,
+                    (p, k) => {
+                        return {
+                            command: 'MOVE',
+                            payload: {
+                                id: k,
+                                dx: p.x,
+                                dy: p.y
+                            }
+                        }
+                    });
+
+                state.diagramId = id;
+                processCommands(mkNodeCommands);
+                processCommands(mkFlowCommands);
+                processCommands(mkAnnotationCommands);
+                processCommands(moveCommands);
+            });
     };
 
     const processCommand = (state, commandObject) => {
@@ -201,16 +297,24 @@ function service(flowDiagramStore) {
 
     const onChange = (callback) => listener = callback;
 
+
     return {
         processCommands,
         getState,
         onChange,
-        save
-    }
+        save,
+        load,
+        reset
+    };
 }
 
+
 service.$inject = [
-    'FlowDiagramStore'
+    '$q',
+    'FlowDiagramStore',
+    'FlowDiagramAnnotationStore',
+    'FlowDiagramEntityStore',
+    'LogicalFlowStore'
 ];
 
 

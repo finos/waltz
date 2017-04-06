@@ -107,6 +107,7 @@ export const entityNames = {
     DATA_TYPE: 'Data Type',
     END_USER_APPLICATION: 'End User App',
     ENTITY_STATISTIC: 'Statistic',
+    FLOW_DIAGRAM: 'Flow Diagram',
     INVOLVEMENT: 'Involvement',
     LOGICAL_DATA_FLOW: "Logical Data Flow",
     ORG_UNIT: 'Org Unit',

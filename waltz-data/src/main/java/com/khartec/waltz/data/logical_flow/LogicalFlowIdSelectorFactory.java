@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 
@@ -65,6 +66,8 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return wrapAppIdSelector(options);
             case DATA_TYPE:
                 return mkForDataType(options);
+            case FLOW_DIAGRAM:
+                return mkForFlowDiagram(options);
             case MEASURABLE:
                 return wrapAppIdSelector(options);
             case ORG_UNIT:
@@ -78,6 +81,17 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: " + options);
         }
     }
+
+    private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL.select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .innerJoin(FLOW_DIAGRAM_ENTITY)
+                .on(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(LOGICAL_FLOW.ID))
+                .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.LOGICAL_DATA_FLOW.name()))
+                .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id()));
+    }
+
 
     private Select<Record1<Long>> wrapAppIdSelector(IdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
