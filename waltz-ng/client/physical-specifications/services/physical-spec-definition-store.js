@@ -27,8 +27,15 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const create = (specId, command) => {
+        return $http
+            .post(`${base}/specification/${specId}`, command)
+            .then(r => r.data);
+    };
+
     return {
-        findForSpecificationId
+        findForSpecificationId,
+        create
     };
 }
 

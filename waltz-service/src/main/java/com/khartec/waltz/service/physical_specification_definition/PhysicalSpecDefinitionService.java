@@ -51,11 +51,15 @@ public class PhysicalSpecDefinitionService {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(command, "command cannot be null");
 
+        if (command.status() == ReleaseLifecycleStatus.ACTIVE) {
+            physicalSpecDefinitionDao.markExistingActiveAsDeprecated(specificationId, userName);
+        }
+
         long defId = physicalSpecDefinitionDao.create(
                 ImmutablePhysicalSpecDefinition.builder()
                         .specificationId(specificationId)
                         .version(command.version())
-                        .status(ReleaseLifecycleStatus.DRAFT)
+                        .status(command.status())
                         .delimiter(command.delimiter())
                         .type(command.type())
                         .provenance("waltz")
@@ -113,7 +117,7 @@ public class PhysicalSpecDefinitionService {
         checkNotNull(specDefinition, "specDefinition cannot be null");
 
         if (command.newStatus() == ReleaseLifecycleStatus.ACTIVE) {
-            physicalSpecDefinitionDao.markExistingActiveAsObsolete(specDefinition.specificationId(), userName);
+            physicalSpecDefinitionDao.markExistingActiveAsDeprecated(specDefinition.specificationId(), userName);
         }
 
         int result = physicalSpecDefinitionDao.updateStatus(specDefinitionId, command.newStatus(), userName);

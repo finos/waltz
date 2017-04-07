@@ -1,6 +1,6 @@
 <div>
     <uib-tabset ng-if="$ctrl.specDefinition.def"
-                active="1">
+                active="$ctrl.defaultActiveTabIndex">
 
         <!-- GENERAL -->
         <uib-tab index="0"
@@ -35,12 +35,13 @@
                         <div class="btn-group"
                              uib-dropdown
                              is-open="status.isopen">
-                            -
-                            <a class="clickable"
-                               uib-dropdown-toggle
-                               ng-id="$ctrl.selectableDefinitions.length > 0">
-                                link to a different version <span class="caret"></span>
-                            </a>
+                            <span ng-if="$ctrl.selectableDefinitions.length > 0">
+                                -
+                                <a class="clickable"
+                                   uib-dropdown-toggle>
+                                    link to a different version <span class="caret"></span>
+                                </a>
+                            </span>
                             <ul class="dropdown-menu"
                                 uib-dropdown-menu
                                 role="menu">

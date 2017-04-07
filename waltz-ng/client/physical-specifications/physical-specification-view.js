@@ -32,7 +32,13 @@ const initialState = {
     createReportForm: {
         name: ""
     },
-    selectedFlow: null
+    selectedFlow: null,
+    selectedSpecDefinition: {},
+    specDefinitions: [],
+    specDefinitionCreate: {
+        creating: false,
+        createStatus: null
+    }
 };
 
 
@@ -71,13 +77,17 @@ function setupGraphTweakers(application) {
 }
 
 
-function controller($state,
+function controller($q,
                     $stateParams,
                     applicationStore,
                     bookmarkStore,
                     historyStore,
+                    notification,
                     orgUnitStore,
                     physicalFlowLineageStore,
+                    physicalSpecDefinitionStore,
+                    physicalSpecDefinitionFieldStore,
+                    physicalSpecDefinitionSampleFileStore,
                     physicalSpecificationStore,
                     physicalFlowStore)
 {
@@ -104,6 +114,13 @@ function controller($state,
     physicalFlowStore
         .findBySpecificationId(specId)
         .then(physicalFlows => vm.physicalFlows = physicalFlows);
+
+
+    const loadSpecDefinitions = () => physicalSpecDefinitionStore
+        .findForSpecificationId(specId)
+        .then(specDefs => vm.specDefinitions = specDefs);
+
+    loadSpecDefinitions();
 
 
     bookmarkStore
@@ -156,17 +173,62 @@ function controller($state,
             .then(mentions => vm.selectedFlow = Object.assign({}, vm.selectedFlow, { mentions }))
     };
 
+
+    vm.selectSpecDefinition = (def) => {
+        const specDefFieldPromise = physicalSpecDefinitionFieldStore
+            .findForSpecDefinitionId(def.id);
+
+        const specDefSampleFilePromise = physicalSpecDefinitionSampleFileStore
+            .findForSpecDefinitionId(def.id);
+
+        $q.all([specDefFieldPromise, specDefSampleFilePromise])
+            .then(([fields, file]) => {
+                vm.selectedSpecDefinition.def = def;
+                vm.selectedSpecDefinition.fields = fields;
+                vm.selectedSpecDefinition.sampleFile = file;
+            });
+    };
+
+
+    vm.showCreateSpecDefinition = (status) => {
+        vm.specDefinitionCreate.creating = true;
+        vm.specDefinitionCreate.status = status;
+    };
+
+
+    vm.hideCreateSpecDefinition = () => {
+        vm.specDefinitionCreate.creating = false;
+        vm.specDefinitionCreate.status = null;
+    };
+
+
+    vm.createSpecDefinition = (specDef) => {
+        physicalSpecDefinitionStore
+            .create(specId, specDef.def)
+            .then(specDefId => physicalSpecDefinitionFieldStore
+                .createFields(specDefId, specDef.fields))
+            .then(r => {
+                notification.success('Specification definition created successfully');
+                loadSpecDefinitions();
+                vm.hideCreateSpecDefinition();
+            });
+    };
+
 }
 
 
 controller.$inject = [
-    '$state',
+    '$q',
     '$stateParams',
     'ApplicationStore',
     'BookmarkStore',
     'HistoryStore',
+    'Notification',
     'OrgUnitStore',
     'PhysicalFlowLineageStore',
+    'PhysicalSpecDefinitionStore',
+    'PhysicalSpecDefinitionFieldStore',
+    'PhysicalSpecDefinitionSampleFileStore',
     'PhysicalSpecificationStore',
     'PhysicalFlowStore'
 ];

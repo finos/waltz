@@ -27,8 +27,15 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const createFields = (specDefId, commands) => {
+        return $http
+            .post(`${base}/spec-definition/${specDefId}/fields`, commands)
+            .then(r => r.data);
+    };
+
     return {
-        findForSpecDefinitionId
+        findForSpecDefinitionId,
+        createFields
     };
 }
 

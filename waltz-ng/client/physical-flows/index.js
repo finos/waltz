@@ -26,10 +26,7 @@ function setup() {
         .config(require('./routes'));
 
     module
-        .service('PhysicalFlowStore', require('./service/physical-flow-store'))
-        .service('PhysicalSpecDefinitionStore', require('./service/physical-spec-definition-store'))
-        .service('PhysicalSpecDefinitionFieldStore', require('./service/physical-spec-definition-field-store'))
-        .service('PhysicalSpecDefinitionSampleFileStore', require('./service/physical-spec-definition-sample-file-store'));
+        .service('PhysicalFlowStore', require('./service/physical-flow-store'));
 
     module
         .component('waltzPhysicalFlowOverview', require('./components/overview/physical-flow-overview'))

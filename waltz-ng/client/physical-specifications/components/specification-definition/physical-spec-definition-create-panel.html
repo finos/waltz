@@ -1,0 +1,163 @@
+<div>
+    <div ng-if="$ctrl.visibility === 'FORM'">
+        <form name="specDefCreateForm"
+              class="form-horizontal"
+              role="form"
+              novalidate>
+
+            <div class="form-group">
+                <label for="fields"
+                       class="col-sm-2 control-label">
+                    Fields
+                </label>
+                <div class="col-sm-10">
+                <textarea id="fields"
+                          required
+                          class="form-control"
+                          placeholder="Enter tab separated field data (one per line) in the following format: &#10;Name    Type    Description
+                                       &#10;All three columns are mandatory.
+                                       &#10;Example:&#10;Field1    INTEGER    description for field 1&#10;Field2    DATE    description for field 2
+                                       &#10;Allowed values for 'Type' are: DATE, DECIMAL, INTEGER, STRING, BOOLEAN
+"
+                          ng-model="$ctrl.specDefFields.rawData"
+                          rows="10">
+                </textarea>
+                </div>
+            </div>
+
+            <div class="form-group" style="padding-top: 10px">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="button"
+                            ng-disabled="specDefCreateForm.$invalid"
+                            ng-click="$ctrl.preview()"
+                            class="btn btn-warning">
+                        Preview
+                    </button>
+                    &nbsp;
+                    <a class="clickable"
+                       ng-click="$ctrl.onCancel()">
+                        <span>Cancel</span>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div ng-if="$ctrl.visibility === 'PREVIEW'">
+        <form name="specDefPreviewForm"
+              class="form-horizontal"
+              role="form"
+              novalidate>
+            <div class="form-group">
+                <label for="version"
+                       class="col-sm-2 control-label">
+                    Version
+                </label>
+                <div class="col-sm-10">
+                    <input type="text"
+                           id="version"
+                           maxlength="64"
+                           required
+                           class="form-control"
+                           placeholder="Version of this specification definition"
+                           ng-model="$ctrl.specDefinition.def.version">
+                    </input>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="delimiter"
+                       class="col-sm-2 control-label">
+                    Delimiter
+                </label>
+                <div class="col-sm-10">
+                    <input type="text"
+                           id="delimiter"
+                           maxlength="1"
+                           class="form-control"
+                           placeholder="Version of this specification definition"
+                           ng-model="$ctrl.specDefinition.def.delimiter">
+                    </input>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">
+                    Status
+                </label>
+                <div class="col-sm-10">
+                    <span ng-bind="$ctrl.specDefinition.def.status | toDisplayName: 'releaseLifecycleStatus'"
+                          style="margin-top: 20px;"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">
+                    Fields
+                </label>
+                <div class="col-sm-10">
+                    <table class="table table-condensed table-striped">
+                        <colgroup>
+                            <col width="20%">
+                            <col width="10%">
+                            <col width="30%">
+                            <col width="40%">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Errors</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="fieldData in $ctrl.specDefFields.parsedData | orderBy:'position'">
+                            <td>
+                                <span ng-bind="fieldData.field.name">
+                                </span>
+                            </td>
+                            <td>
+                                <span ng-bind="fieldData.field.type">
+                                </span>
+                            </td>
+                            <td>
+                                <span ng-bind="fieldData.field.description">
+                                </span>
+                            </td>
+                            <td>
+                                <div ng-repeat="error in fieldData.errors">
+                                    <span ng-bind="error"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="form-group" style="padding-top: 10px">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="button"
+                            ng-disabled="specDefPreviewForm.$invalid || $ctrl.specDefFields.hasErrors"
+                            ng-click="$ctrl.submit()"
+                            class="btn btn-success">
+                        Submit
+                    </button>
+                    &nbsp;
+                    <a class="clickable"
+                       ng-click="$ctrl.showForm()">
+                        <span>Back</span>
+                    </a>
+                    &nbsp;
+                    <a class="clickable"
+                       ng-click="$ctrl.onCancel()">
+                        <span>Cancel</span>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <hr>
+</div>
