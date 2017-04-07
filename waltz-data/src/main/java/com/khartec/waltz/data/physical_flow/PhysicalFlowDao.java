@@ -18,7 +18,6 @@
 
 package com.khartec.waltz.data.physical_flow;
 
-import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.physical_flow.FrequencyKind;
 import com.khartec.waltz.model.physical_flow.ImmutablePhysicalFlow;
@@ -230,7 +229,7 @@ public class PhysicalFlowDao {
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(consumer.kind().name()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(consumer.id()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(consumer.kind().name()))
-                .and(LOGICAL_FLOW.REMOVED.isFalse());
+                .and(LOGICAL_FLOW.IS_REMOVED.isFalse());
 
         return dsl
                 .select(PHYSICAL_FLOW.fields())
