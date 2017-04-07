@@ -43,9 +43,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
-import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
-import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
-import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
+import static com.khartec.waltz.model.EntityKind.*;
 import static com.khartec.waltz.model.attestation.AttestationType.IMPLICIT;
 
 
@@ -125,6 +123,11 @@ public class AttestationService {
 
     public boolean recalculateForPhysicalFlowLineage() {
         return attestationDao.recalculateForPhysicalFlowLineage();
+    }
+
+
+    public boolean recalculateForLogicalFlowDecorators() {
+        return attestationDao.recalculateForLogicalFlowDecorators();
     }
 
 

@@ -46,14 +46,22 @@ function controller(notification,
         complexityStore
             .recalculateAll()
             .then(() => notification.success('Complexity recalculated'));
-    }
+    };
 
     vm.recalcLineageAttestations = () => {
         notification.info('Lineage attestation recalculation requested');
         attestationStore
             .recalculateForLineage()
             .then(() => notification.success('Lineage attestation recalculated'));
-    }
+    };
+
+
+    vm.recalcLogicalFlowDecoratorAttestations = () => {
+        notification.info('Logical flow decorator attestation recalculation requested');
+        attestationStore
+            .recalculateForLogicalFlowDecorators()
+            .then(() => notification.success('Logical flow decorator attestation recalculated'));
+    };
 }
 
 

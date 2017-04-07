@@ -32,13 +32,17 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityKind.valueOf;
+import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.Attestation.ATTESTATION;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 
 
-@Deprecated
 @Repository
 public class AttestationDao {
 
@@ -48,12 +52,24 @@ public class AttestationDao {
     public static final RecordMapper<AttestationRecord, Attestation> TO_ATTESTATION_MAPPER = record -> {
         EntityKind entityKind = Enum.valueOf(EntityKind.class, record.getEntityKind());
 
+        EntityReference attestingEntityRef = null;
+        Long attestingEntityId = record.getAttestingEntityId();
+        String attestingEntityKindStr = record.getAttestingEntityKind();
+
+        if (attestingEntityId != null
+                && attestingEntityKindStr != null) {
+            attestingEntityRef = mkRef(
+                    valueOf(attestingEntityKindStr),
+                    attestingEntityId);
+        }
+
         return ImmutableAttestation.builder()
                 .id(record.getId())
-                .entityReference(EntityReference.mkRef(entityKind, record.getEntityId()))
+                .entityReference(mkRef(entityKind, record.getEntityId()))
                 .attestationType(Enum.valueOf(AttestationType.class, record.getAttestationType()))
                 .attestedBy(record.getAttestedBy())
                 .attestedAt(record.getAttestedAt().toLocalDateTime())
+                .attestingEntityReference(Optional.ofNullable(attestingEntityRef))
                 .comments(record.getComments())
                 .provenance(record.getProvenance())
                 .build();
@@ -71,6 +87,8 @@ public class AttestationDao {
         record.setComments(at.comments());
         record.setProvenance(at.provenance());
         at.id().ifPresent(record::setId);
+        at.attestingEntityReference().ifPresent(e -> record.setAttestingEntityId(e.id()));
+        at.attestingEntityReference().ifPresent(e -> record.setAttestingEntityKind(e.kind().name()));
 
         return record;
     };
@@ -132,10 +150,47 @@ public class AttestationDao {
     }
 
 
-    private void insertAttestations(DSLContext tx,
-                                    Select<Record7<String, Long, String, String, Timestamp, String, String>> attesationsSelector) {
+    public boolean recalculateForLogicalFlowDecorators() {
+        final String provenance = "logical flow decoration";
 
-        //insert into attestation(entity_kind, entity_id, attestation_type, attested_by, attested_at, comments, provenance)
+        dsl.transaction(configuration -> {
+            DSLContext tx = DSL.using(configuration);
+
+            Condition isImpliedDecoratorAttestation = ATTESTATION.ENTITY_KIND.eq(EntityKind.LOGICAL_DATA_FLOW.name())
+                    .and(ATTESTATION.ATTESTATION_TYPE.eq(AttestationType.IMPLICIT.name()))
+                    .and(ATTESTATION.ATTESTING_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+                    .and(ATTESTATION.PROVENANCE.eq(provenance));
+
+            // clear existing attestations
+            tx.deleteFrom(ATTESTATION)
+                    .where(isImpliedDecoratorAttestation)
+                    .execute();
+
+            Select<Record9<String, Long, String, String, Timestamp, String, String, Long, String>> select = DSL.select(
+                    DSL.val(EntityKind.LOGICAL_DATA_FLOW.name()).as("entity_kind"),
+                    LOGICAL_FLOW.ID.as("entity_id"),
+                    DSL.val("IMPLICIT").as("attestation_type"),
+                    LOGICAL_FLOW_DECORATOR.LAST_UPDATED_BY,
+                    LOGICAL_FLOW_DECORATOR.LAST_UPDATED_AT,
+                    DSL.val("Attestation by logical flow decoration").as("comments"),
+                    DSL.val(provenance).as("provenance"),
+                    LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.as("attesting_entity_id"),
+                    LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.as("attesting_entity_kind"))
+                    .from(LOGICAL_FLOW_DECORATOR)
+                    .innerJoin(LOGICAL_FLOW)
+                    .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID));
+
+            insertAttestations(tx, select);
+        });
+
+        return true;
+    }
+
+
+    private void insertAttestations(DSLContext tx,
+                                    Select<Record9<String, Long, String, String, Timestamp, String, String, Long, String>> attesationsSelector) {
+
+        //insert into attestation(entity_kind, entity_id, attestation_type, attested_by, attested_at, comments, provenance, attesting_entity_id, attesting_entity_kind)
         tx.insertInto(ATTESTATION)
                 .columns(ATTESTATION.ENTITY_KIND,
                         ATTESTATION.ENTITY_ID,
@@ -143,7 +198,9 @@ public class AttestationDao {
                         ATTESTATION.ATTESTED_BY,
                         ATTESTATION.ATTESTED_AT,
                         ATTESTATION.COMMENTS,
-                        ATTESTATION.PROVENANCE)
+                        ATTESTATION.PROVENANCE,
+                        ATTESTATION.ATTESTING_ENTITY_ID,
+                        ATTESTATION.ATTESTING_ENTITY_KIND)
                 .select(attesationsSelector)
                 .execute();
     }

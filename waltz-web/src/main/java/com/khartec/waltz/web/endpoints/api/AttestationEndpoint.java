@@ -30,9 +30,7 @@ import spark.Request;
 import spark.Response;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.requireRole;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
@@ -60,6 +58,7 @@ public class AttestationEndpoint implements Endpoint {
     public void register() {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String calculateForLineagePath = mkPath(BASE_URL, "calculate-all", "lineage");
+        String calculateForLogicalDecorators = mkPath(BASE_URL, "calculate-all", "logical-flow-decorator");
 
 
         getForList(
@@ -67,12 +66,19 @@ public class AttestationEndpoint implements Endpoint {
                 (request, response) -> attestationService.findForEntity(getEntityReference(request)));
 
         getForDatum(calculateForLineagePath, this::calculateForLineageRoute);
+        getForDatum(calculateForLogicalDecorators, this::calculateForLogicalFlowDecoratorsRoute);
     }
 
 
-    private Boolean calculateForLineageRoute(Request request, Response response) {
+    private boolean calculateForLineageRoute(Request request, Response response) {
         requireRole(userRoleService, request, Role.ADMIN);
         return attestationService.recalculateForPhysicalFlowLineage();
+    }
+
+
+    private boolean calculateForLogicalFlowDecoratorsRoute(Request request, Response response) {
+        requireRole(userRoleService, request, Role.ADMIN);
+        return attestationService.recalculateForLogicalFlowDecorators();
     }
 
 }

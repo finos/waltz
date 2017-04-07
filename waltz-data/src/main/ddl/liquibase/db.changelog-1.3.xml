@@ -896,4 +896,21 @@
                       newColumnName="is_removed" />
     </changeSet>
 
+
+    <!-- 1816 -->
+    <changeSet id="20170407-1816-1"
+               author="kamransaleem">
+        <comment>1816: Attesting entity for implicit attestations</comment>
+        <addColumn tableName="attestation">
+            <column name="attesting_entity_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="attesting_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
