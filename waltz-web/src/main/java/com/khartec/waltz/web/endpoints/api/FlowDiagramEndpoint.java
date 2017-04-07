@@ -21,6 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.flow_diagram.FlowDiagram;
 import com.khartec.waltz.model.flow_diagram.SaveDiagramCommand;
 import com.khartec.waltz.service.flow_diagram.FlowDiagramService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.user.Role.LINEAGE_EDITOR;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -36,11 +38,16 @@ public class FlowDiagramEndpoint implements Endpoint {
 
     private static final String BASE_URL = mkPath("api", "flow-diagram");
     private final FlowDiagramService flowDiagramService;
+    private final UserRoleService userRoleService;
 
     @Autowired
-    public FlowDiagramEndpoint(FlowDiagramService flowDiagramService) {
+    public FlowDiagramEndpoint(FlowDiagramService flowDiagramService,
+                               UserRoleService userRoleService) {
         checkNotNull(flowDiagramService, "flowDiagramService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
+
         this.flowDiagramService = flowDiagramService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -56,10 +63,12 @@ public class FlowDiagramEndpoint implements Endpoint {
         ListRoute<FlowDiagram> findByEntityRoute = (req, res)
                 -> flowDiagramService.findByEntityReference(getEntityReference(req));
         DatumRoute<Long> saveDiagramRoute = (req, res)
-                //todo: limit to role
-                ->  flowDiagramService.save(
-                        readBody(req, SaveDiagramCommand.class),
-                        getUsername(req));
+                ->  {
+            requireRole(userRoleService, req, LINEAGE_EDITOR);
+            return flowDiagramService.save(
+                    readBody(req, SaveDiagramCommand.class),
+                    getUsername(req));
+        };
 
 
         getForDatum(getByIdPath, getByIdRoute);

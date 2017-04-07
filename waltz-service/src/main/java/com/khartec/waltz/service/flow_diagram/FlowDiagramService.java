@@ -23,6 +23,7 @@ import com.khartec.waltz.data.flow_diagram.FlowDiagramDao;
 import com.khartec.waltz.data.flow_diagram.FlowDiagramEntityDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.flow_diagram.*;
+import org.jooq.exception.InvalidResultException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -79,12 +80,16 @@ public class FlowDiagramService {
                 .lastUpdatedAt(nowUtc())
                 .build();
 
-        Long diagramId = null;
+        Long diagramId;
 
         if (diagram.id().isPresent()) {
             // update
             diagramId = diagram.id().get();
-            flowDiagramDao.update(diagram);
+
+            if(!flowDiagramDao.update(diagram)) {
+                throw new InvalidResultException("Could not update diagram with Id: " + diagramId);
+            }
+
             flowDiagramEntityDao.deleteForDiagram(diagramId);
             flowDiagramAnnotationDao.deleteForDiagram(diagramId);
         } else {
