@@ -20,10 +20,7 @@ package com.khartec.waltz.model.physical_flow;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.DescriptionProvider;
-import com.khartec.waltz.model.IdProvider;
-import com.khartec.waltz.model.LastUpdatedProvider;
-import com.khartec.waltz.model.ProvenanceProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 import java.util.Optional;
@@ -40,6 +37,7 @@ import java.util.Optional;
 @JsonDeserialize(as = ImmutablePhysicalFlow.class)
 public abstract class PhysicalFlow implements
         IdProvider,
+        IsRemovedProvider,
         DescriptionProvider,
         ProvenanceProvider,
         LastUpdatedProvider {

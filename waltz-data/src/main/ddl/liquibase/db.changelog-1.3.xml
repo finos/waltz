@@ -896,4 +896,42 @@
                       newColumnName="is_removed" />
     </changeSet>
 
+
+    <!-- 1949 -->
+    <changeSet id="20170407-1949-1"
+               author="kamransaleem">
+        <comment>1949: Application soft delete</comment>
+        <addColumn tableName="application">
+            <column name="is_removed"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20170407-1949-2"
+               author="kamransaleem">
+        <comment>1949: Physical Flow soft delete</comment>
+        <addColumn tableName="physical_flow">
+            <column name="is_removed"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20170407-1949-3"
+               author="kamransaleem">
+        <comment>1949: Physical Flow Specification soft delete</comment>
+        <addColumn tableName="physical_specification">
+            <column name="is_removed"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
