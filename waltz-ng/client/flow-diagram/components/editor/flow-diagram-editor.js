@@ -19,7 +19,7 @@
 import _ from 'lodash';
 import angular from 'angular';
 import {initialiseData} from '../../../common';
-import {createSampleDiagram} from '../../flow-diagram-utils';
+import {createSampleDiagram, toGraphId} from '../../flow-diagram-utils';
 
 /**
  * @name waltz-flow-diagram-editor
@@ -65,11 +65,16 @@ function convertFlowsToOptions(flows = [], node, isUpstream) {
         .filter(f => f[self].id === node.data.id)
         .map(f => Object.assign({}, f, { kind: 'LOGICAL_DATA_FLOW' }))
         .map(f => {
+            const counterpartEntity = f[counterpart];
+            const baseEntity = f[self];
+            const dx = _.random(-80, 80);
+            const dy = _.random(50, 80) * (isUpstream ? -1 : 1);
             return {
-                entity: f[counterpart],
+                entity: counterpartEntity,
                 commands: [
-                    { command: 'ADD_NODE', payload: f[counterpart] },
-                    { command: 'ADD_FLOW', payload: f }
+                    { command: 'ADD_NODE', payload: counterpartEntity },
+                    { command: 'ADD_FLOW', payload: f },
+                    { command: 'MOVE', payload: { id: toGraphId(counterpartEntity), refId: toGraphId(baseEntity), dx, dy } }
                 ]
             };
         })
@@ -107,14 +112,24 @@ function prepareAddAnnotationPopup(graphNode) {
         title: `Add annotation to ${graphNode.data.name}`,
         description: '',
         mkCommand: (note) => {
+            const id = +new Date();
+            const graphId = 'ANNOTATION/'+id;
             return [
                 {
                     command: 'ADD_ANNOTATION',
                     payload: {
-                        id: +new Date(),
+                        id: id,
                         kind: 'ANNOTATION',
                         note,
                         entityReference: { id: graphNode.data.id, kind: graphNode.data.kind }
+                    }
+                },
+                {
+                    command: 'MOVE',
+                    payload: {
+                        id: graphId,
+                        dx: 30,
+                        dy: 30
                     }
                 }
             ];
@@ -124,9 +139,7 @@ function prepareAddAnnotationPopup(graphNode) {
 
 
 function prepareUpdateAnnotationPopup(graphNode) {
-    console.log('puap', graphNode)
     if (!graphNode) return;
-
 
     return {
         title: `Update annotation`,
