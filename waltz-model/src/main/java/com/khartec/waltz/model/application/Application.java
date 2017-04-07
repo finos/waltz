@@ -33,6 +33,7 @@ import java.util.Optional;
 @JsonDeserialize(as = ImmutableApplication.class)
 public abstract class Application implements
         IdProvider,
+        IsRemovedProvider,
         NameProvider,
         DescriptionProvider,
         ProvenanceProvider,

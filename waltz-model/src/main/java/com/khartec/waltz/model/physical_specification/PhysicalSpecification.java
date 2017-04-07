@@ -35,6 +35,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutablePhysicalSpecification.class)
 public abstract class PhysicalSpecification implements
         IdProvider,
+        IsRemovedProvider,
         ExternalIdProvider,
         NameProvider,
         DescriptionProvider,

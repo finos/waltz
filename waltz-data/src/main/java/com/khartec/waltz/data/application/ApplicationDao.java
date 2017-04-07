@@ -58,6 +58,7 @@ public class ApplicationDao {
                 .assetCode(Optional.ofNullable(appRecord.getAssetCode()))
                 .parentAssetCode(Optional.ofNullable(appRecord.getParentAssetCode()))
                 .id(appRecord.getId())
+                .isRemoved(appRecord.getIsRemoved())
                 .organisationalUnitId(appRecord.getOrganisationalUnitId())
                 .kind(readEnum(appRecord.getKind(), ApplicationKind.class, (s) -> ApplicationKind.IN_HOUSE))
                 .lifecyclePhase(readEnum(appRecord.getLifecyclePhase(), LifecyclePhase.class, (s) -> LifecyclePhase.DEVELOPMENT))
@@ -207,6 +208,7 @@ public class ApplicationDao {
         record.setOverallRating(application.overallRating().name());
         record.setProvenance(application.provenance());
         record.setBusinessCriticality(application.businessCriticality().name());
+        record.setIsRemoved(application.isRemoved());
 
         Condition condition = APPLICATION.ID.eq(application.id().get());
 

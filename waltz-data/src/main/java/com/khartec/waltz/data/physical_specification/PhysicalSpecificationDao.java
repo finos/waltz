@@ -71,6 +71,7 @@ public class PhysicalSpecificationDao {
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .provenance(record.getProvenance())
+                .isRemoved(record.getIsRemoved())
                 .build();
     };
 
@@ -157,6 +158,7 @@ public class PhysicalSpecificationDao {
         record.setFormat(specification.format().name());
         record.setLastUpdatedAt(Timestamp.valueOf(specification.lastUpdatedAt()));
         record.setLastUpdatedBy(specification.lastUpdatedBy());
+        record.setIsRemoved(specification.isRemoved());
         record.setProvenance("waltz");
 
         record.store();
