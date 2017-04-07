@@ -19,6 +19,7 @@ import _ from 'lodash';
 import {randomPick, ifPresent} from '../../common';
 import {toGraphFlow, toGraphNode, toGraphId, positionFor} from '../flow-diagram-utils';
 
+
 const initialState = {
     model: {
         diagramId: null,
@@ -87,6 +88,75 @@ function prepareSaveCmd(state) {
 }
 
 
+function loadDiagram(commandProcessor, diagram, annotations, entityNodes, logicalFlows) {
+    const layoutData = JSON.parse(diagram.layoutData);
+    const logicalFlowsById = _.keyBy(logicalFlows, 'id');
+    const mkFlowCommands = _
+        .chain(entityNodes)
+        .filter(node => node.entityReference.kind === 'LOGICAL_DATA_FLOW')
+        .map(node => {
+            const logicalFlow = logicalFlowsById[node.entityReference.id];
+            return {
+                command: 'ADD_FLOW',
+                payload: Object.assign({}, logicalFlow, {kind: 'LOGICAL_DATA_FLOW'} )
+            }
+        })
+        .value();
+
+    const mkNodeCommands = _
+        .chain(entityNodes)
+        .filter(ent => _.includes(['APPLICATION', 'ACTOR'], ent.entityReference.kind))
+        .map(ent => {
+            return {
+                command: 'ADD_NODE',
+                payload: {
+                    id: ent.entityReference.id,
+                    kind: ent.entityReference.kind,
+                    name: ent.entityReference.name,
+                    isNotable: ent.isNotable
+                }
+            }
+        })
+        .value();
+
+    const mkAnnotationCommands = _.map(annotations, ann => {
+        return {
+            command: 'ADD_ANNOTATION',
+            payload: {
+                kind: 'ANNOTATION',
+                id: ann.annotationId,
+                entityReference: ann.entityReference,
+                note: ann.note,
+            }
+        }
+    });
+
+    const moveCommands = _.map(
+        layoutData.positions,
+        (p, k) => {
+            return {
+                command: 'MOVE',
+                payload: {
+                    id: k,
+                    dx: p.x,
+                    dy: p.y
+                }
+            }
+        });
+
+    const transformCommands = [{
+        command: 'TRANSFORM_DIAGRAM',
+        payload: layoutData.diagramTransform
+    }];
+
+    commandProcessor(mkNodeCommands);
+    commandProcessor(mkFlowCommands);
+    commandProcessor(mkAnnotationCommands);
+    commandProcessor(moveCommands);
+    commandProcessor(transformCommands);
+}
+
+
 function service(
     $q,
     flowDiagramStore,
@@ -109,6 +179,9 @@ function service(
         const diagramRef = { id: id, kind: 'FLOW_DIAGRAM'};
         const diagramSelector = { entityReference: diagramRef, scope: 'EXACT' };
 
+        reset();
+        state.diagramId = id;
+
         const diagramPromise = flowDiagramStore.getById(id);
         const annotationPromise =flowDiagramAnnotationStore.findByDiagramId(id);
         const entityPromise = flowDiagramEntityStore.findByDiagramId(id);
@@ -116,68 +189,8 @@ function service(
 
         return $q
             .all([diagramPromise, annotationPromise, entityPromise, logicalFlowPromise])
-            .then(([d, annotations, entityNodes, logicalFlows]) => {
-                const logicalFlowsById = _.keyBy(logicalFlows, 'id');
-                const mkFlowCommands = _
-                    .chain(entityNodes)
-                    .filter(node => node.entityReference.kind === 'LOGICAL_DATA_FLOW')
-                    .map(node => {
-                        const logicalFlow = logicalFlowsById[node.entityReference.id];
-                        console.log('lf', logicalFlow, node)
-                        return {
-                            command: 'ADD_FLOW',
-                            payload: Object.assign({}, logicalFlow, {kind: 'LOGICAL_DATA_FLOW'} )
-                        }
-                    })
-                    .value();
-
-                const mkNodeCommands = _
-                    .chain(entityNodes)
-                    .filter(ent => _.includes(['APPLICATION', 'ACTOR'], ent.entityReference.kind))
-                    .map(ent => {
-                        return {
-                            command: 'ADD_NODE',
-                            payload: {
-                                id: ent.entityReference.id,
-                                kind: ent.entityReference.kind,
-                                name: ent.entityReference.name,
-                                isNotable: ent.isNotable
-                            }
-                        }
-                    })
-                    .value();
-
-                const mkAnnotationCommands = _.map(annotations, ann => {
-                    return {
-                        command: 'ADD_ANNOTATION',
-                        payload: {
-                            kind: 'ANNOTATION',
-                            id: ann.annotationId,
-                            entityReference: ann.entityReference,
-                            note: ann.note,
-
-                        }
-                    }
-                });
-
-                const moveCommands = _.map(
-                    JSON.parse(d.layoutData).positions,
-                    (p, k) => {
-                        return {
-                            command: 'MOVE',
-                            payload: {
-                                id: k,
-                                dx: p.x,
-                                dy: p.y
-                            }
-                        }
-                    });
-
-                state.diagramId = id;
-                processCommands(mkNodeCommands);
-                processCommands(mkFlowCommands);
-                processCommands(mkAnnotationCommands);
-                processCommands(moveCommands);
+            .then(([diagram, annotations, entityNodes, logicalFlows]) => {
+                loadDiagram(processCommands, diagram, annotations, entityNodes, logicalFlows);
             });
     };
 
@@ -190,12 +203,27 @@ function service(
                 state = _.defaultsDeep({}, { layout: { diagramTransform : payload }}, state);
                 break;
 
+            /* MOVE
+                payload = { dx, dy, id, refId? }
+                - dx = delta x
+                - dy = delta y
+                - id = identifier of item to move
+                - refId? = if specified, move is relative to the current position of this item
+             */
             case 'MOVE':
-                const position = positionFor(state, payload);
-                position.x += payload.dx;
-                position.y += payload.dy;
+                const startPosition = payload.refId
+                    ? positionFor(state, payload.refId)
+                    : positionFor(state, payload.id);
+                const endPosition = positionFor(state, payload.id);
+                endPosition.x = startPosition.x + payload.dx;
+                endPosition.y = startPosition.y + payload.dy;
                 break;
 
+            /* UPDATE_ANNOTATION
+                payload = { note, id }
+                - note = text to use in the annotation
+                - id = annotation identifier
+             */
             case 'UPDATE_ANNOTATION':
                 const newNote = payload.note;
                 const payloadId = payload.id;
@@ -210,9 +238,6 @@ function service(
                     console.log('Ignoring request to re-add annotation', payload);
                 } else {
                     model.annotations = _.concat(model.annotations || [], [ annotationNode ]);
-                    const pos = positionFor(state, annotationNode);
-                    pos.x = randomPick([_.random(30, 70), _.random(-30, -70)]);
-                    pos.y = randomPick([_.random(30, 70), _.random(-30, -70)]);
                 }
                 break;
 
@@ -223,14 +248,7 @@ function service(
                     console.log('Ignoring request to re-add node', payload);
                 } else {
                     model.nodes = _.concat(model.nodes || [], [ graphNode ]);
-                    const moveCmd = {
-                        graphNode,
-                        dx: _.random(100, 600),
-                        dy: _.random(100, 400)
-                    };
-                    processCommands([
-                        { command: 'MOVE_NODE', payload: moveCmd}
-                    ]);
+                    listener(state)
                 }
                 break;
 
