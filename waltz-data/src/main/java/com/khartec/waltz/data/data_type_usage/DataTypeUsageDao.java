@@ -45,10 +45,10 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.limit;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static org.jooq.impl.DSL.*;
 
 @Repository
@@ -59,7 +59,7 @@ public class DataTypeUsageDao {
     private final com.khartec.waltz.schema.tables.LogicalFlow lf = LOGICAL_FLOW.as("lf");
     private final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
     private final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
-    private final Condition NOT_REMOVED = lf.REMOVED.isFalse();
+    private final Condition NOT_REMOVED = lf.IS_REMOVED.isFalse();
 
     private final Field<String> originatorUsageKindField = val(UsageKind.ORIGINATOR.name());
     private final Field<String> consumerDistributorCaseField = DSL

@@ -71,7 +71,7 @@ public class LogicalFlowDao {
                         .id(record.getTargetEntityId())
                         .name(ofNullable(r.getValue(TARGET_NAME_FIELD)))
                         .build())
-                .isRemoved(record.getRemoved())
+                .isRemoved(record.getIsRemoved())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .provenance(record.getProvenance())
@@ -88,12 +88,12 @@ public class LogicalFlowDao {
         record.setLastUpdatedBy(flow.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(flow.lastUpdatedAt()));
         record.setProvenance(flow.provenance());
-        record.setRemoved(flow.isRemoved());
+        record.setIsRemoved(flow.isRemoved());
         return record;
     };
 
 
-    public static final Condition NOT_REMOVED = LOGICAL_FLOW.REMOVED.isFalse();
+    public static final Condition NOT_REMOVED = LOGICAL_FLOW.IS_REMOVED.isFalse();
 
 
     private final DSLContext dsl;
@@ -126,7 +126,7 @@ public class LogicalFlowDao {
 
     public int removeFlow(Long flowId, String user) {
         return dsl.update(LOGICAL_FLOW)
-                .set(LOGICAL_FLOW.REMOVED, true)
+                .set(LOGICAL_FLOW.IS_REMOVED, true)
                 .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
                 .set(LOGICAL_FLOW.LAST_UPDATED_BY, user)
                 .where(LOGICAL_FLOW.ID.eq(flowId))
@@ -156,7 +156,7 @@ public class LogicalFlowDao {
      */
     private boolean restoreFlow(LogicalFlow flow, String username) {
         return dsl.update(LOGICAL_FLOW)
-                .set(LOGICAL_FLOW.REMOVED, false)
+                .set(LOGICAL_FLOW.IS_REMOVED, false)
                 .set(LOGICAL_FLOW.LAST_UPDATED_BY, username)
                 .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
                 .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(flow.source().id()))
@@ -170,7 +170,7 @@ public class LogicalFlowDao {
     public boolean restoreFlow(long logicalFlowId, String username) {
         return dsl
                 .update(LOGICAL_FLOW)
-                .set(LOGICAL_FLOW.REMOVED, false)
+                .set(LOGICAL_FLOW.IS_REMOVED, false)
                 .set(LOGICAL_FLOW.LAST_UPDATED_BY, username)
                 .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
                 .where(LOGICAL_FLOW.ID.eq(logicalFlowId))

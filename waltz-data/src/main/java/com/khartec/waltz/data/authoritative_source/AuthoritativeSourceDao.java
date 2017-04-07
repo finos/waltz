@@ -22,8 +22,10 @@ import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.authoritativesource.*;
+import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
+import com.khartec.waltz.model.authoritativesource.ImmutableAuthoritativeRatingVantagePoint;
+import com.khartec.waltz.model.authoritativesource.ImmutableAuthoritativeSource;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.schema.tables.*;
 import com.khartec.waltz.schema.tables.DataType;
@@ -39,15 +41,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.*;
+import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 
@@ -256,7 +259,7 @@ public class AuthoritativeSourceDao {
                 .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
                 .and(au.DATA_TYPE.in(dataTypeCodeSelector));
 
-        Condition notRemoved = lf.REMOVED.isFalse();
+        Condition notRemoved = lf.IS_REMOVED.isFalse();
 
         Field<Long> authSourceIdField = au.ID.as("auth_source_id");
         Field<Long> applicationIdField = app.ID.as("application_id");

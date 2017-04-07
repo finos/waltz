@@ -64,7 +64,7 @@ public class LogicalFlowStatsDao {
             lf.SOURCE_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name()))
                 .and(lf.TARGET_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name())));
 
-    private static final Condition NOT_REMOVED = lf.REMOVED.isFalse();
+    private static final Condition NOT_REMOVED = lf.IS_REMOVED.isFalse();
 
     private final DBExecutorPoolInterface dbExecutorPool;
 
