@@ -261,6 +261,7 @@ export const surveyInstanceStatusNames = {
 export const releaseLifecycleStatusNames = {
     DRAFT: 'Draft',
     ACTIVE: 'Active',
+    DEPRECATED: 'Deprecated',
     OBSOLETE: 'Obsolete'
 };
 

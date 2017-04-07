@@ -27,6 +27,7 @@ public class PhysicalSpecDefinitionHarness {
                 specId,
                 ImmutablePhysicalSpecDefinitionChangeCommand.builder()
                         .version("1.0")
+                        .status(ReleaseLifecycleStatus.DRAFT)
                         .delimiter(",")
                         .type(PhysicalSpecDefinitionType.DELIMITED)
                         .build());

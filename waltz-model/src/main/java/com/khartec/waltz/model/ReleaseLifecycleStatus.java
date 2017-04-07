@@ -4,6 +4,7 @@ public enum ReleaseLifecycleStatus {
 
     DRAFT,
     ACTIVE,
+    DEPRECATED,
     OBSOLETE
 
 }

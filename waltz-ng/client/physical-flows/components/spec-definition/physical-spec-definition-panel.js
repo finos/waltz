@@ -20,6 +20,7 @@ import {initialiseData, invokeFunction} from "../../../common";
 
 
 const bindings = {
+    defaultActiveTabIndex: '<',
     specDefinition: '<',
     selectableDefinitions: '<',
     onDefinitionSelect: '<'
@@ -27,6 +28,7 @@ const bindings = {
 
 
 const initialState = {
+    defaultActiveTabIndex: 1,
     specDefinition: {},
     selectableDefinitions: [],
     onDefinitionSelect: (def) => console.log('psdp::onDefinitionSelect', def)

@@ -94,6 +94,15 @@
     <waltz-section name="Specification Definition"
                    icon="file-code-o"
                    id="specification-definition-section">
+        <waltz-section-actions>
+            <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                <a ui-sref="main.physical-specification.view ({id: ctrl.specification.id})"
+                   class="btn btn-xs btn-primary">
+                    Manage
+                </a>
+            </div>
+        </waltz-section-actions>
+
         <div class="row">
             <div class="col-sm-12">
                 <waltz-physical-spec-definition-panel spec-definition="ctrl.selectedSpecDefinition"

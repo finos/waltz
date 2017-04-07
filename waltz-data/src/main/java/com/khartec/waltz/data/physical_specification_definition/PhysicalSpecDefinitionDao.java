@@ -115,9 +115,9 @@ public class PhysicalSpecDefinitionDao {
     }
 
 
-    public int markExistingActiveAsObsolete(long specificationId, String userName) {
+    public int markExistingActiveAsDeprecated(long specificationId, String userName) {
         return dsl.update(PHYSICAL_SPEC_DEFN)
-                .set(PHYSICAL_SPEC_DEFN.STATUS, ReleaseLifecycleStatus.OBSOLETE.name())
+                .set(PHYSICAL_SPEC_DEFN.STATUS, ReleaseLifecycleStatus.DEPRECATED.name())
                 .set(PHYSICAL_SPEC_DEFN.LAST_UPDATED_AT, nowUtcTimestamp())
                 .set(PHYSICAL_SPEC_DEFN.LAST_UPDATED_BY, userName)
                 .where(PHYSICAL_SPEC_DEFN.SPECIFICATION_ID.eq(specificationId))

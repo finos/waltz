@@ -25,73 +25,95 @@
 
     <br>
 
-    <!-- CONSUMERS -->
-    <waltz-section name="Consumers"
-                   small="Physical Flows"
-                   id="specification-consumers-section">
-        <waltz-physical-specification-consumers physical-flows="ctrl.physicalFlows"
-                                                on-flow-select="ctrl.onFlowSelect">
-        </waltz-physical-specification-consumers>
 
-        <div ng-if="ctrl.selectedFlow != null">
-            <hr>
-            <h5>
-                Physical flow of
-                <mark ng-bind="ctrl.specification.name"></mark>
-                from
-                <mark ng-bind="ctrl.specification.owningEntity.name"></mark>
-                to
-                <mark ng-bind="ctrl.selectedFlow.flow.target.name"></mark>
-            </h5>
+    <!-- SPEC DEFINITIONS -->
+    <waltz-section name="Definitions"
+                   small="( {{ ctrl.specDefinitions.length }} )"
+                   icon="file-code-o"
+                   id="specification-definition-section">
 
-            <uib-tabset active="active">
-                <!-- LINEAGE -->
-                <uib-tab ng-if="ctrl.selectedFlow.lineage.length > 0"
-                         index="0"
-                         heading="Lineage">
-                    <div class="row" >
-                        <div class="col-md-12">
-                            <br>
-                            <p class="small text-muted"><!-- TODO: need text --></p>
-                            <br>
-                            <waltz-physical-flow-lineage-panel lineage="ctrl.selectedFlow.lineage">
+        <waltz-section-actions>
+            <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                <div class="btn-group"
+                     uib-dropdown
+                     is-open="status.isopen">
+                    <button type="button"
+                            class="btn btn-xs btn-primary"
+                            uib-dropdown-toggle
+                            ng-disabled="ctrl.selectableSpecDefinitions.length == 0">
+                        Add New <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu"
+                        uib-dropdown-menu
+                        role="menu">
+                        <li role="menuitem">
+                            <a class="clickable"
+                               ng-click="ctrl.showCreateSpecDefinition('ACTIVE')">
+                                Active - <i>Current</i>
+                            </a>
+                        </li>
+                        <li role="menuitem">
+                            <a class="clickable"
+                               ng-click="ctrl.showCreateSpecDefinition('DRAFT')">
+                                Draft - <i>Future</i>
+                            </a>
+                        </li>
+                        <li role="menuitem">
+                            <a class="clickable"
+                               ng-click="ctrl.showCreateSpecDefinition('DEPRECATED')">
+                                Deprecated - <i>Historic</i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </waltz-section-actions>
 
-                            </waltz-physical-flow-lineage-panel>
+        <waltz-physical-spec-definition-create-panel ng-if="ctrl.specDefinitionCreate.creating"
+                                                     status="ctrl.specDefinitionCreate.status"
+                                                     on-submit="ctrl.createSpecDefinition"
+                                                     on-cancel="ctrl.hideCreateSpecDefinition">
+        </waltz-physical-spec-definition-create-panel>
 
-                            <hr>
-
-                            <div waltz-has-role="LINEAGE_EDITOR">
-                                <a ui-sref="main.physical-flow-lineage.edit ({id: ctrl.selectedFlow.flow.id})" class="btn btn-sm btn-primary">
-                                    <waltz-icon name="edit"></waltz-icon>
-                                    Edit Lineage
-                                </a>
-                                <hr>
-                            </div>
-
-                            <waltz-logical-flow-diagram data="{ flows: ctrl.selectedFlow.lineageFlows, entities: ctrl.selectedFlow.lineageEntities }"
-                                                        tweakers="ctrl.graphTweakers">
-                            </waltz-logical-flow-diagram>
-
-                        </div>
-                    </div>
-                </uib-tab>
-
-                <!-- MENTIONS -->
-                <uib-tab ng-if="ctrl.selectedFlow.mentions.length > 0"
-                         index="1"
-                         heading="Mentions">
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <waltz-physical-specification-mentions mentions="ctrl.selectedFlow.mentions">
-                            </waltz-physical-specification-mentions>
-                        </div>
-                    </div>
-
-                </uib-tab>
-            </uib-tabset>
+        <div class="row"
+             ng-if="ctrl.specDefinitions.length > 0">
+            <div class="col-sm-4">
+                <table class="table table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th>Version</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="def in ctrl.specDefinitions | orderBy: 'createdAt':true">
+                        <td>
+                            <a ng-bind="def.version"
+                               ng-click="ctrl.selectSpecDefinition(def)"
+                               class="clickable">
+                            </a>
+                        </td>
+                        <td>
+                            <span ng-bind="def.status | toDisplayName:'releaseLifecycleStatus'">
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-8"
+                 ng-if="ctrl.selectedSpecDefinition.def">
+                <waltz-physical-spec-definition-panel spec-definition="ctrl.selectedSpecDefinition"
+                                                      default-active-tab-index="0">
+                </waltz-physical-spec-definition-panel>
+            </div>
         </div>
 
+        <waltz-no-data ng-if="ctrl.specDefinitions.length == 0">
+            <message>
+                <strong>No definitions</strong> for this physical specification.
+            </message>
+        </waltz-no-data>
     </waltz-section>
 
 
