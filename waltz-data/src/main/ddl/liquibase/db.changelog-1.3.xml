@@ -888,7 +888,7 @@
 
     <!-- 1950 -->
     <changeSet id="20170407-1950-1"
-               author="davidwatkins73">
+               author="kamransaleem">
         <comment>1950: Logical Flows rename removed column</comment>
         <renameColumn tableName="logical_flow"
                       columnDataType="boolean"
