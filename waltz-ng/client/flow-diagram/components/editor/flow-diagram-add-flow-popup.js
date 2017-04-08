@@ -29,7 +29,8 @@ import {toGraphId} from '../../flow-diagram-utils';
 
 
 const bindings = {
-    flows: '<',
+    logicalFlows: '<',
+    existingEntities: '<',
     node: '<',
     isUpstream: '<',
     commandProcessor: '<',
@@ -37,40 +38,80 @@ const bindings = {
 };
 
 
-const initialState = {};
+const initialState = {
+    logicalFlows: [],
+    existingEntities: [],
+    node: null,
+    isUpstream: true,
+    commandProcessor: () => console.log('wdafp: default command processor'),
+    onDismiss: () => console.log('wdafp: default on-dismiss'),
+};
 
 
 const template = require('./flow-diagram-add-flow-popup.html');
 
 
+function sameRef(r1, r2) {
+    return r1.kind === r2.kind && r1.id === r2.id;
+}
 
-function convertFlowsToOptions(flows = [], node, isUpstream) {
-    const counterpart = isUpstream
+
+function convertFlowsToOptions(logicalFlows = [], node, isUpstream, existingEntities = []) {
+    const counterpartPropName = isUpstream
         ? 'source'
         : 'target';
 
-    const self = isUpstream
+    const selfPropName = isUpstream
         ? 'target'
         : 'source';
 
     return _
-        .chain(flows)
-        .filter(f => f[self].id === node.id)
+        .chain(logicalFlows)
+        .filter(f => f[selfPropName].id === node.id)
         .map(f => Object.assign({}, f, { kind: 'LOGICAL_DATA_FLOW' }))
         .map(f => {
-            const counterpartEntity = f[counterpart];
-            const baseEntity = f[self];
-            const dx = _.random(-80, 80);
-            const dy = _.random(50, 80) * (isUpstream ? -1 : 1);
+            const counterpartEntity = f[counterpartPropName];
+            const baseEntity = f[selfPropName];
+
+            if (sameRef(counterpartEntity, baseEntity)) return null;
+
+            const flowExists = _.some(existingEntities, ref => sameRef(ref, f));
+            const counterpartExists = _.some(existingEntities, ref => sameRef(ref, counterpartEntity));
+
+
+            const commands = [];
+
+            if (!counterpartExists) {
+                commands.push({
+                    command: 'ADD_NODE',
+                    payload: counterpartEntity });
+
+                const dx = _.random(-80, 80);
+                const dy = _.random(50, 80) * (isUpstream ? -1 : 1);
+
+                commands.push({
+                    command: 'MOVE',
+                    payload: {
+                        id: toGraphId(counterpartEntity),
+                        refId: toGraphId(baseEntity),
+                        dx,
+                        dy
+                    } });
+            }
+
+            if (! flowExists) {
+                commands.push({
+                    command: 'ADD_FLOW',
+                    payload: f });
+            }
+
             return {
                 entity: counterpartEntity,
-                commands: [
-                    { command: 'ADD_NODE', payload: counterpartEntity },
-                    { command: 'ADD_FLOW', payload: f },
-                    { command: 'MOVE', payload: { id: toGraphId(counterpartEntity), refId: toGraphId(baseEntity), dx, dy } }
-                ]
+                disabled: flowExists,
+                commands
             };
         })
+        .filter(opt => opt != null)
         .value();
 }
 
@@ -90,7 +131,7 @@ function controller() {
 
         vm.description = description;
         vm.title = `Add ${direction} node for ${vm.node.name}`;
-        vm.options = convertFlowsToOptions(vm.flows, vm.node, vm.isUpstream);
+        vm.options = convertFlowsToOptions(vm.logicalFlows, vm.node, vm.isUpstream, vm.existingEntities);
     };
 
 }

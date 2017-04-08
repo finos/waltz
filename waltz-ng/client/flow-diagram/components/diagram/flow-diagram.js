@@ -323,7 +323,6 @@ function drawFlowBuckets(state, group) {
 function drawAnnotations(state, group, commandProcessor) {
     if (!group) return;
 
-    console.log(state.model.annotations, '0000')
     const annotationElems = group
         .selectAll(`.${styles.ANNOTATION}`)
         .data(state.model.annotations || [], d => d.id);
@@ -347,7 +346,6 @@ function drawAnnotations(state, group, commandProcessor) {
         .merge(newAnnotationElems)
         .selectAll('path')
         .attr('d', d => {
-            console.log('path', d)
             const subjectPosition = positionFor(state, toGraphId(d.data.entityReference));
             const subjectShape = shapeFor(state, toGraphId(d.data.entityReference));
             const annotationPosition = positionFor(state, d.id);
@@ -394,7 +392,6 @@ function drawAnnotations(state, group, commandProcessor) {
         .merge(newAnnotationElems)
         .selectAll('text')
         .each(function(d) {
-            console.log('ann', d)
             const subjectPosition = positionFor(state, toGraphId(d.data.entityReference));
             const subjectShape = shapeFor(state, toGraphId(d.data.entityReference));
             const annotationPosition = positionFor(state, d.id);
@@ -410,7 +407,7 @@ function drawAnnotations(state, group, commandProcessor) {
 
 
 function draw(state, commandProcessor = () => console.log('no command processor given')) {
-    console.log('draw', state);
+    //console.log('draw', state);
 
     if (state.layout.diagramTransform) {
         groups

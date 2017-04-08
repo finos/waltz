@@ -323,10 +323,17 @@ function service(
 
     const onChange = (callback) => listener = callback;
 
+    const getAllEntities = () => {
+        const toRef = d => ({ kind: d.data.kind, id: d.data.id });
+        const nodes = _.map(state.model.nodes, toRef);
+        const flows = _.map(state.model.flows, toRef);
+        return _.concat(nodes, flows);
+    };
 
     return {
         processCommands,
         getState,
+        getAllEntities,
         onChange,
         save,
         load,

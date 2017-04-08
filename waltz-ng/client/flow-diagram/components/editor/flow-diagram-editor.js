@@ -51,15 +51,16 @@ const template = require('./flow-diagram-editor.html');
 
 
 
-function prepareAddFlowPopup(graphNode, isUpstream = true, logicalFlowStore) {
+function prepareAddFlowPopup(graphNode, isUpstream = true, logicalFlowStore, flowDiagramStateService) {
     if (!graphNode || !logicalFlowStore) return;
 
     return logicalFlowStore
         .findByEntityReference(graphNode.data)
         .then(flows => {
             const popup = {
-                flows,
+                logicalFlows: flows,
                 node: graphNode.data,
+                existingEntities: flowDiagramStateService.getAllEntities(),
                 isUpstream
             };
             return popup;
@@ -87,14 +88,14 @@ function prepareUpdateAnnotationPopup(graphNode) {
 }
 
 
-function mkNodeMenu($state, $timeout, logicalFlowStore, vm) {
+function mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateService) {
     return (d) => {
         return [
             {
                 title: (d) => `Add upstream source to ${d.data.name}`,
                 action: (elm, d, i) => {
                     $timeout(() => {
-                        prepareAddFlowPopup(d, true, logicalFlowStore)
+                        prepareAddFlowPopup(d, true, logicalFlowStore, flowDiagramStateService)
                             .then(popup => {
                                 vm.popup = popup;
                                 vm.visibility.logicalFlowPopup = true;
@@ -105,7 +106,7 @@ function mkNodeMenu($state, $timeout, logicalFlowStore, vm) {
                 title: (d) => `Add downstream target from ${d.data.name}`,
                 action: (elm, d, i) => {
                     $timeout(() => {
-                        prepareAddFlowPopup(d, false, logicalFlowStore)
+                        prepareAddFlowPopup(d, false, logicalFlowStore, flowDiagramStateService)
                             .then(popup => {
                                 vm.popup = popup;
                                 vm.visibility.logicalFlowPopup = true;
@@ -200,7 +201,7 @@ function controller($state,
     const vm = initialiseData(this, initialState);
 
     vm.contextMenus = {
-        node: mkNodeMenu($state, $timeout, logicalFlowStore, vm),
+        node: mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateService),
         flowBucket: mkFlowBucketMenu(flowDiagramStateService.processCommands),
         annotation: mkAnnotationMenu(flowDiagramStateService.processCommands, $timeout, vm),
         canvas: mkCanvasMenu(flowDiagramStateService.processCommands)
@@ -230,6 +231,8 @@ function controller($state,
             vm.workingModel = angular.copy(vm.initialModel);
         }
     };
+
+
 
 }
 
