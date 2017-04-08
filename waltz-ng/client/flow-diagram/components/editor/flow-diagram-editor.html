@@ -4,8 +4,9 @@
     <div class="pop waltz-fade-if"
          ng-if="$ctrl.visibility.logicalFlowPopup">
         <waltz-flow-diagram-add-flow-popup on-dismiss="$ctrl.onDismissPopup"
-                                           flows="$ctrl.popup.flows"
+                                           logical-flows="$ctrl.popup.logicalFlows"
                                            node="$ctrl.popup.node"
+                                           existing-entities="$ctrl.popup.existingEntities"
                                            is-upstream="$ctrl.popup.isUpstream"
                                            command-processor="$ctrl.issueCommands">
 

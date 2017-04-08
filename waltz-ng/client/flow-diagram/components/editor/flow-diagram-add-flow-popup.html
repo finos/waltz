@@ -2,10 +2,16 @@
 <p ng-bind="$ctrl.description"></p>
 <ul>
     <li ng-repeat="option in $ctrl.options | orderBy: 'entity.name'">
-        <a ng-click="$ctrl.commandProcessor(option.commands)"
-           class='clickable'>
+        <span ng-if="option.disabled"
+              class="text-muted">
             <waltz-entity-icon-label entity-ref="option.entity"></waltz-entity-icon-label>
-        </a>
+        </span>
+        <span ng-if="! option.disabled">
+            <a ng-click="$ctrl.commandProcessor(option.commands)"
+               class='clickable'>
+                <waltz-entity-icon-label entity-ref="option.entity"></waltz-entity-icon-label>
+            </a>
+        </span>
     </li>
 </ul>
 
