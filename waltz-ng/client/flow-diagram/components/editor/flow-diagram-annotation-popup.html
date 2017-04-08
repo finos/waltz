@@ -1,0 +1,19 @@
+<h4 ng-bind="$ctrl.title"></h4>
+<p ng-bind="$ctrl.description"></p>
+<div>
+    <textarea cols="50"
+              rows="5"
+              placeholder="Description ..."
+              ng-model="$ctrl.note">
+    </textarea>
+</div>
+<hr>
+
+<a class="btn btn-success clickable"
+   ng-click="$ctrl.send()"
+   ng-bind="$ctrl.actionLabel">
+</a>
+<a class='clickable'
+   ng-click="$ctrl.onDismiss()">
+    Cancel
+</a>

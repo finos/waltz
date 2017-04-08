@@ -1,0 +1,17 @@
+<h4 ng-bind="$ctrl.title"></h4>
+<p ng-bind="$ctrl.description"></p>
+<ul>
+    <li ng-repeat="option in $ctrl.options | orderBy: 'entity.name'">
+        <a ng-click="$ctrl.commandProcessor(option.commands)"
+           class='clickable'>
+            <waltz-entity-icon-label entity-ref="option.entity"></waltz-entity-icon-label>
+        </a>
+    </li>
+</ul>
+
+<hr>
+
+<a class='clickable'
+   ng-click="$ctrl.onDismiss()">
+    Cancel
+</a>
