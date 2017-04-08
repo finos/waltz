@@ -28,6 +28,7 @@ import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 
@@ -48,5 +49,7 @@ public abstract class Attestation implements IdProvider, ProvenanceProvider
 
     @Nullable
     public abstract String comments();
+
+    public abstract Optional<EntityReference> attestingEntityReference();
 
 }

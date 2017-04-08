@@ -38,9 +38,17 @@ export default [
         };
 
 
+        const recalculateForLogicalFlowDecorators = () => {
+            return $http
+                .get(`${BASE}/calculate-all/logical-flow-decorator`)
+                .then(result => result.data);
+        };
+
+
         return {
             findForEntity,
-            recalculateForLineage
+            recalculateForLineage,
+            recalculateForLogicalFlowDecorators
         };
     }
 ];
