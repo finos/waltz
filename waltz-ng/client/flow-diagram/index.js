@@ -31,6 +31,8 @@ export default () => {
 
     module
         .component('waltzFlowDiagram', require('./components/diagram/flow-diagram'))
+        .component('waltzFlowDiagramAddFlowPopup', require('./components/editor/flow-diagram-add-flow-popup'))
+        .component('waltzFlowDiagramAnnotationPopup', require('./components/editor/flow-diagram-annotation-popup'))
         .component('waltzFlowDiagramEditor', require('./components/editor/flow-diagram-editor'))
         .component('waltzDiagramsPanel', require('./components/diagrams-panel/diagrams-panel'));
 

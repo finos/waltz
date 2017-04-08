@@ -3,47 +3,23 @@
     <!-- ADD FLOW POPUP -->
     <div class="pop waltz-fade-if"
          ng-if="$ctrl.visibility.logicalFlowPopup">
-        <h4 ng-bind="$ctrl.popup.title"></h4>
-        <p ng-bind="$ctrl.popup.description"></p>
-        <ul>
-            <li ng-repeat="option in $ctrl.popup.options | orderBy: 'entity.name'">
-                <a ng-click="$ctrl.issueCommands(option.commands)"
-                   class='clickable'>
-                    <waltz-entity-icon-label entity-ref="option.entity"></waltz-entity-icon-label>
-                </a>
-            </li>
-        </ul>
+        <waltz-flow-diagram-add-flow-popup on-dismiss="$ctrl.onDismissPopup"
+                                           flows="$ctrl.popup.flows"
+                                           node="$ctrl.popup.node"
+                                           is-upstream="$ctrl.popup.isUpstream"
+                                           command-processor="$ctrl.issueCommands">
 
-        <hr>
-
-        <a class='clickable'
-           ng-click="$ctrl.onDismissPopup()">
-            Cancel
-        </a>
+        </waltz-flow-diagram-add-flow-popup>
     </div>
 
     <!-- ANNOTATION POPUP -->
     <div class="pop waltz-fade-if"
          ng-if="$ctrl.visibility.annotationPopup">
-        <h4 ng-bind="$ctrl.popup.title"></h4>
-        <p ng-bind="$ctrl.popup.description"></p>
-        <div>
-            <textarea cols="50"
-                      rows="5"
-                      placeholder="Description ..."
-                      ng-model="$ctrl.popup.note">
-            </textarea>
-        </div>
-        <hr>
+        <waltz-flow-diagram-annotation-popup on-dismiss="$ctrl.onDismissPopup"
+                                             annotation="$ctrl.popup.annotation"
+                                             command-processor="$ctrl.issueCommands">
 
-        <a class="btn btn-success clickable"
-           ng-click="$ctrl.issueCommands($ctrl.popup.mkCommand($ctrl.popup.note))">
-            Add
-        </a>
-        <a class='clickable'
-           ng-click="$ctrl.onDismissPopup()">
-            Cancel
-        </a>
+        </waltz-flow-diagram-annotation-popup>
     </div>
 
 
@@ -60,9 +36,9 @@
 
         <div class="row">
             <div class="col-md-4">
-                <button class="btn btn-danger"
+                <button class="btn btn-success"
                         ng-click="$ctrl.doSave()">
-                    Prepare Save
+                    Save
                 </button>
                 <pre ng-bind="$ctrl.saveResp | json"></pre>
             </div>

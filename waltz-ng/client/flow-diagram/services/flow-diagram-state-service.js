@@ -70,8 +70,9 @@ function prepareSaveCmd(state) {
     };
 
     const annotations = _.map(state.model.annotations, a => {
+        const ref = a.data.entityReference;
         return {
-            entityReference: a.data.entityReference,
+            entityReference: { kind: ref.kind, id: ref.id },
             note: a.data.note,
             annotationId: a.data.id
         }
@@ -225,10 +226,17 @@ function service(
                 - id = annotation identifier
              */
             case 'UPDATE_ANNOTATION':
-                const newNote = payload.note;
-                const payloadId = payload.id;
-                const annotationNode = _.find(model.annotations, {id: payloadId})
-                annotationNode.data.note = newNote;
+                model.annotations = _.map(
+                    model.annotations,
+                    ann =>{
+                        if (ann.id !== payload.id) {
+                            return ann;
+                        } else {
+                            const updatedAnn = Object.assign({}, ann);
+                            updatedAnn.data.note = payload.note;
+                            return updatedAnn;
+                        }
+                    });
                 break;
 
             case 'ADD_ANNOTATION':
@@ -282,9 +290,9 @@ function service(
                     .value();
                 model.flows = _.reject(model.flows, f => _.includes(flowIdsToRemove, f.id));
                 model.nodes = _.reject(model.nodes, n => n.id === payload.id);
-                model.annotations = _.reject(model.annotations, a => {
-                    return toGraphId(a.data.entityReference) === payload.id;
-                });
+                model.annotations = _.reject(
+                    model.annotations,
+                    a => toGraphId(a.data.entityReference) === payload.id);
                 _.forEach(flowIdsToRemove, id => model.decorations[id] = []);
                 break;
 

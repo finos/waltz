@@ -51,54 +51,16 @@ const template = require('./flow-diagram-editor.html');
 
 
 
-function convertFlowsToOptions(flows = [], node, isUpstream) {
-    const counterpart = isUpstream
-        ? 'source'
-        : 'target';
-
-    const self = isUpstream
-        ? 'target'
-        : 'source';
-
-    return _
-        .chain(flows)
-        .filter(f => f[self].id === node.data.id)
-        .map(f => Object.assign({}, f, { kind: 'LOGICAL_DATA_FLOW' }))
-        .map(f => {
-            const counterpartEntity = f[counterpart];
-            const baseEntity = f[self];
-            const dx = _.random(-80, 80);
-            const dy = _.random(50, 80) * (isUpstream ? -1 : 1);
-            return {
-                entity: counterpartEntity,
-                commands: [
-                    { command: 'ADD_NODE', payload: counterpartEntity },
-                    { command: 'ADD_FLOW', payload: f },
-                    { command: 'MOVE', payload: { id: toGraphId(counterpartEntity), refId: toGraphId(baseEntity), dx, dy } }
-                ]
-            };
-        })
-        .value();
-}
-
-
 function prepareAddFlowPopup(graphNode, isUpstream = true, logicalFlowStore) {
     if (!graphNode || !logicalFlowStore) return;
 
     return logicalFlowStore
         .findByEntityReference(graphNode.data)
-        .then(flows => convertFlowsToOptions(flows, graphNode, isUpstream))
-        .then(options => {
-            const description = isUpstream
-                ? 'Select an upstream node from the list below:'
-                : 'Select a downstream node from the list belows:';
-            const direction = isUpstream
-                ? 'Upstream'
-                : 'Downstream';
+        .then(flows => {
             const popup = {
-                title: `Add ${direction} node to ${graphNode.data.name}`,
-                description,
-                options
+                flows,
+                node: graphNode.data,
+                isUpstream
             };
             return popup;
         });
@@ -109,32 +71,10 @@ function prepareAddAnnotationPopup(graphNode) {
     if (!graphNode) return;
 
     return {
-        title: `Add annotation to ${graphNode.data.name}`,
-        description: '',
-        mkCommand: (note) => {
-            const id = +new Date();
-            const graphId = 'ANNOTATION/'+id;
-            return [
-                {
-                    command: 'ADD_ANNOTATION',
-                    payload: {
-                        id: id,
-                        kind: 'ANNOTATION',
-                        note,
-                        entityReference: { id: graphNode.data.id, kind: graphNode.data.kind }
-                    }
-                },
-                {
-                    command: 'MOVE',
-                    payload: {
-                        id: graphId,
-                        dx: 30,
-                        dy: 30
-                    }
-                }
-            ];
+        annotation: {
+            entityReference: { kind: graphNode.data.kind, id: graphNode.data.id }
         }
-    }
+    };
 }
 
 
@@ -142,21 +82,8 @@ function prepareUpdateAnnotationPopup(graphNode) {
     if (!graphNode) return;
 
     return {
-        title: `Update annotation`,
-        description: '',
-        note: _.get(graphNode, 'data.note') || "",
-        mkCommand: (note) => {
-            return [
-                {
-                    command: 'UPDATE_ANNOTATION',
-                    payload: {
-                        id: graphNode.id,
-                        note,
-                    }
-                }
-            ];
-        }
-    }
+        annotation: graphNode.data
+    };
 }
 
 
@@ -268,7 +195,8 @@ function mkCanvasMenu(commandProcessor) {
 function controller($state,
                     $timeout,
                     logicalFlowStore,
-                    flowDiagramStateService) {
+                    flowDiagramStateService,
+                    notification) {
     const vm = initialiseData(this, initialState);
 
     vm.contextMenus = {
@@ -294,6 +222,7 @@ function controller($state,
     vm.doSave = () => {
         flowDiagramStateService.save()
             .then(r => vm.saveResp = r)
+            .then(() => notification.success('Saved'))
     };
 
     vm.$onChanges = (c) => {
@@ -309,7 +238,8 @@ controller.$inject = [
     '$state',
     '$timeout',
     'LogicalFlowStore',
-    'FlowDiagramStateService'
+    'FlowDiagramStateService',
+    'Notification'
 ];
 
 
