@@ -270,6 +270,10 @@ function service(
                 }
                 break;
 
+            case 'REMOVE_FLOW':
+                model.flows = _.reject(model.flows, f => f.id === payload.id);
+                break;
+
             case 'ADD_DECORATION':
                 const payload = payload;
                 const refId = toGraphId(payload.ref);
