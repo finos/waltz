@@ -141,12 +141,16 @@ function mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateServ
 }
 
 
-function mkFlowBucketMenu() {
+function mkFlowBucketMenu(commandProcessor) {
     return (d) => {
         return [
             { title: 'hello'},
             { divider: true },
-            { title: 'bucket'},
+            {
+                title: 'Remove Flow',
+                action: (elm, d, i) =>
+                    commandProcessor([{command: 'REMOVE_FLOW', payload: d}])
+            },
         ];
     };
 }
