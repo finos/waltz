@@ -32,7 +32,6 @@ const initialState = {
     createReportForm: {
         name: ""
     },
-    selectedFlow: null,
     selectedSpecDefinition: {},
     specDefinitions: [],
     specDefinitionCreate: {
@@ -52,31 +51,6 @@ const addToHistory = (historyStore, spec) => {
 };
 
 
-function setupGraphTweakers(application) {
-    return {
-        node: {
-            update: (selection) => {
-                selection
-                    .select('circle')
-                    .attr({
-                        'fill': d => d.id === application.id
-                            ? green
-                            : grey,
-                        'stroke': d => d.id === application.id
-                            ? green.darker()
-                            : grey.darker(),
-                        'r': d => d.id === application.id
-                            ? 15
-                            : 10
-                    });
-            },
-            exit: () => {},
-            enter: () => {}
-        }
-    };
-}
-
-
 function controller($q,
                     $stateParams,
                     applicationStore,
@@ -84,7 +58,6 @@ function controller($q,
                     historyStore,
                     notification,
                     orgUnitStore,
-                    physicalFlowLineageStore,
                     physicalSpecDefinitionStore,
                     physicalSpecDefinitionFieldStore,
                     physicalSpecDefinitionSampleFileStore,
@@ -108,7 +81,6 @@ function controller($q,
         .then(app => vm.owningEntity = app)
         .then(app => orgUnitStore.getById(app.organisationalUnitId))
         .then(ou => vm.organisationalUnit = ou)
-        .then(() => vm.graphTweakers = setupGraphTweakers(vm.owningEntity))
         .then(() => addToHistory(historyStore, vm.specification));
 
     physicalFlowStore
@@ -126,52 +98,6 @@ function controller($q,
     bookmarkStore
         .findByParent(ref)
         .then(bs => vm.bookmarks = bs);
-
-
-
-    vm.onFlowSelect = (flow) => {
-        vm.selectedFlow = {
-            flow,
-            mentions: [],
-            lineage: []
-        };
-
-        physicalFlowLineageStore
-            .findByPhysicalFlowId(flow.id)
-            .then(lineage => {
-                const lineageFlows =_.map(
-                    lineage,
-                    (x) => {
-                        return {
-                            id: x.flow.id,
-                            source: x.sourceEntity,
-                            target: x.targetEntity
-                        };
-                    });
-
-                const lineageEntities = _.chain(lineage)
-                    .flatMap(
-                        x => [
-                            vm.owningEntity,
-                            x.sourceEntity,
-                            x.targetEntity])
-                    .uniqBy('id')
-                    .value();
-
-                vm.selectedFlow = Object.assign(
-                    {},
-                    vm.selectedFlow,
-                    {
-                        lineage,
-                        lineageFlows,
-                        lineageEntities
-                    });
-            });
-
-        physicalFlowLineageStore
-            .findContributionsByPhysicalFlowId(flow.id)
-            .then(mentions => vm.selectedFlow = Object.assign({}, vm.selectedFlow, { mentions }))
-    };
 
 
     vm.selectSpecDefinition = (def) => {
@@ -211,6 +137,8 @@ function controller($q,
                 notification.success('Specification definition created successfully');
                 loadSpecDefinitions();
                 vm.hideCreateSpecDefinition();
+            }, r => {
+                notification.error("Failed to create specification definition. Ensure that 'version' is unique");
             });
     };
 
@@ -225,7 +153,6 @@ controller.$inject = [
     'HistoryStore',
     'Notification',
     'OrgUnitStore',
-    'PhysicalFlowLineageStore',
     'PhysicalSpecDefinitionStore',
     'PhysicalSpecDefinitionFieldStore',
     'PhysicalSpecDefinitionSampleFileStore',
