@@ -21,7 +21,7 @@ package com.khartec.waltz.jobs.sample;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.LifecyclePhase;
-import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
+import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.schema.tables.records.ChangeInitiativeRecord;
 import com.khartec.waltz.schema.tables.records.EntityRelationshipRecord;
 import com.khartec.waltz.schema.tables.records.InvolvementRecord;

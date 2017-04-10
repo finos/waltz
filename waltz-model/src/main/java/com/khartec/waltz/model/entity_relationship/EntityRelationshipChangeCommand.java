@@ -1,4 +1,4 @@
-package com.khartec.waltz.model.entiy_relationship;
+package com.khartec.waltz.model.entity_relationship;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

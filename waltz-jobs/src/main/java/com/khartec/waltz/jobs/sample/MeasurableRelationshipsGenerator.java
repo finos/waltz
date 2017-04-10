@@ -22,7 +22,7 @@ import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
+import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.schema.tables.records.EntityRelationshipRecord;
 import com.khartec.waltz.service.DIConfiguration;

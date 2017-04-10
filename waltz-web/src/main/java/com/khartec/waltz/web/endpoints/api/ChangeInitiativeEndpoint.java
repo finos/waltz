@@ -19,8 +19,8 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
-import com.khartec.waltz.model.entiy_relationship.EntityRelationship;
-import com.khartec.waltz.model.entiy_relationship.EntityRelationshipChangeCommand;
+import com.khartec.waltz.model.entity_relationship.EntityRelationship;
+import com.khartec.waltz.model.entity_relationship.EntityRelationshipChangeCommand;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
 import com.khartec.waltz.service.user.UserRoleService;

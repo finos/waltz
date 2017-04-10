@@ -4,7 +4,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.entity_hierarchy.AbstractIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
+import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
