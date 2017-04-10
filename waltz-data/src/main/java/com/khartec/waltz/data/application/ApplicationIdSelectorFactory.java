@@ -23,7 +23,7 @@ import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
+import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.schema.tables.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;

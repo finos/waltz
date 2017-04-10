@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.entiy_relationship;
+package com.khartec.waltz.model.entity_relationship;
 
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -25,7 +25,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
-import static com.khartec.waltz.model.entiy_relationship.RelationshipKind.HAS;
+import static com.khartec.waltz.model.entity_relationship.RelationshipKind.HAS;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntityRelationship.class)

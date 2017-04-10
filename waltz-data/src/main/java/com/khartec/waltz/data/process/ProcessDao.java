@@ -22,7 +22,7 @@ import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.FindEntityReferencesByIdSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
+import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.model.process.ImmutableProcess;
 import com.khartec.waltz.model.process.Process;
 import com.khartec.waltz.schema.tables.EntityRelationship;

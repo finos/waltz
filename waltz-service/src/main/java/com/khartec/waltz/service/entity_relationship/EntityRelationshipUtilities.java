@@ -2,9 +2,9 @@ package com.khartec.waltz.service.entity_relationship;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entiy_relationship.EntityRelationship;
-import com.khartec.waltz.model.entiy_relationship.ImmutableEntityRelationship;
-import com.khartec.waltz.model.entiy_relationship.RelationshipKind;
+import com.khartec.waltz.model.entity_relationship.EntityRelationship;
+import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
+import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 

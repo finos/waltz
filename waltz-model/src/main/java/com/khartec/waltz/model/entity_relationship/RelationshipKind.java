@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.entiy_relationship;
+package com.khartec.waltz.model.entity_relationship;
 
 import com.khartec.waltz.model.EntityKind;
 import org.jooq.lambda.tuple.Tuple2;
