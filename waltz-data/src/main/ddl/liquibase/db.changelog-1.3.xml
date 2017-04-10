@@ -952,4 +952,14 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 1959 -->
+    <changeSet id="20170410-1959-1"
+               author="rovats">
+        <comment>1959: Spec definition: Add unique constraint on version</comment>
+        <addUniqueConstraint columnNames="version"
+                             constraintName="phy_spec_defn_unique_version"
+                             tableName="physical_spec_defn"/>
+    </changeSet>
+
 </databaseChangeLog>
