@@ -860,6 +860,7 @@
                      remarks="Annotations associated with a specific flow diagram">
             <column name="annotation_id"
                     type="${guid.type}">
+                <constraints nullable="false"/>
             </column>
             <column name="diagram_id"
                     type="${id.type}">
