@@ -38,7 +38,8 @@ const bindings = {
 const initialState = {
     visibility: {
         logicalFlowPopup: false,
-        annotationPopup: false
+        annotationPopup: false,
+        physicalFlowPopup: false
     },
     popup: {
         title: '',
@@ -51,7 +52,7 @@ const template = require('./flow-diagram-editor.html');
 
 
 
-function prepareAddFlowPopup(graphNode, isUpstream = true, logicalFlowStore, flowDiagramStateService) {
+function prepareAddLogicalFlowPopup(graphNode, isUpstream = true, logicalFlowStore, flowDiagramStateService) {
     if (!graphNode || !logicalFlowStore) return;
 
     return logicalFlowStore
@@ -95,7 +96,7 @@ function mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateServ
                 title: (d) => `Add upstream source to ${d.data.name}`,
                 action: (elm, d, i) => {
                     $timeout(() => {
-                        prepareAddFlowPopup(d, true, logicalFlowStore, flowDiagramStateService)
+                        prepareAddLogicalFlowPopup(d, true, logicalFlowStore, flowDiagramStateService)
                             .then(popup => {
                                 vm.popup = popup;
                                 vm.visibility.logicalFlowPopup = true;
@@ -106,7 +107,7 @@ function mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateServ
                 title: (d) => `Add downstream target from ${d.data.name}`,
                 action: (elm, d, i) => {
                     $timeout(() => {
-                        prepareAddFlowPopup(d, false, logicalFlowStore, flowDiagramStateService)
+                        prepareAddLogicalFlowPopup(d, false, logicalFlowStore, flowDiagramStateService)
                             .then(popup => {
                                 vm.popup = popup;
                                 vm.visibility.logicalFlowPopup = true;
@@ -141,15 +142,71 @@ function mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateServ
 }
 
 
-function mkFlowBucketMenu(commandProcessor) {
+function preparePhysicalFlowPopup(
+    $q,
+    logicalFlow,
+    physicalFlowStore,
+    physicalSpecificationStore,
+    flowDiagramStateService)
+{
+    const selector = {
+        entityReference: { id: logicalFlow.id, kind: logicalFlow.kind },
+        scope: 'EXACT'
+    };
+
+    const physFlowPromise = physicalFlowStore.findByLogicalFlowId(logicalFlow.id);
+    const physSpecPromise = physicalSpecificationStore.findBySelector(selector);
+
+    return $q
+        .all([physFlowPromise, physSpecPromise])
+        .then(([physicalFlows = [], physicalSpecifications = []]) => {
+            const popup = {
+                physicalFlows,
+                physicalSpecifications,
+                existingEntities: flowDiagramStateService.getAllEntities()
+            };
+            return popup;
+        })
+
+}
+
+
+function mkFlowBucketMenu($q, $timeout, vm, flowDiagramStateService, physicalFlowStore, physicalSpecificationStore) {
     return (d) => {
         return [
-            { title: 'hello'},
+            {
+                title: 'Add annotation',
+                action: (elm, d, i) => {
+                    $timeout(() => {
+                        const popup = prepareAddAnnotationPopup(d);
+                        vm.popup = popup;
+                        vm.visibility.annotationPopup = true;
+                    });
+                }
+            },
+            {
+                title: 'Define physical flows',
+                action: (elm, logicalFlowNode, i) => {
+                    $timeout(() => {
+                        preparePhysicalFlowPopup(
+                            $q,
+                            logicalFlowNode.data,
+                            physicalFlowStore,
+                            physicalSpecificationStore,
+                            flowDiagramStateService)
+                            .then(popup => {
+                                vm.popup = popup;
+                                vm.visibility.physicalFlowPopup = true;
+                            });
+                    });
+
+                }
+            },
             { divider: true },
             {
                 title: 'Remove Flow',
                 action: (elm, d, i) =>
-                    commandProcessor([{command: 'REMOVE_FLOW', payload: d}])
+                    flowDiagramStateService.processCommands([{command: 'REMOVE_FLOW', payload: d}])
             },
         ];
     };
@@ -167,8 +224,6 @@ function mkAnnotationMenu(commandProcessor, $timeout, vm) {
                         vm.popup = popup;
                         vm.visibility.annotationPopup = true;
                     });
-
-
                 }
             },
             { divider: true },
@@ -197,16 +252,19 @@ function mkCanvasMenu(commandProcessor) {
 }
 
 
-function controller($state,
+function controller($q,
+                    $state,
                     $timeout,
-                    logicalFlowStore,
                     flowDiagramStateService,
+                    logicalFlowStore,
+                    physicalFlowStore,
+                    physicalSpecificationStore,
                     notification) {
     const vm = initialiseData(this, initialState);
 
     vm.contextMenus = {
         node: mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateService),
-        flowBucket: mkFlowBucketMenu(flowDiagramStateService.processCommands),
+        flowBucket: mkFlowBucketMenu($q, $timeout, vm,  flowDiagramStateService, physicalFlowStore, physicalSpecificationStore),
         annotation: mkAnnotationMenu(flowDiagramStateService.processCommands, $timeout, vm),
         canvas: mkCanvasMenu(flowDiagramStateService.processCommands)
     };
@@ -217,8 +275,9 @@ function controller($state,
     };
 
     vm.onDismissPopup = () => {
-        vm.visibility.logicalFlowPopup = false;
         vm.visibility.annotationPopup = false;
+        vm.visibility.logicalFlowPopup = false;
+        vm.visibility.physicalFlowPopup = false;
     };
 
     vm.onDiagramInit = (d) => {
@@ -236,18 +295,20 @@ function controller($state,
         }
     };
 
-
-
 }
 
 
 controller.$inject = [
+    '$q',
     '$state',
     '$timeout',
-    'LogicalFlowStore',
     'FlowDiagramStateService',
+    'LogicalFlowStore',
+    'PhysicalFlowStore',
+    'PhysicalSpecificationStore',
     'Notification'
 ];
+
 
 
 const component = {

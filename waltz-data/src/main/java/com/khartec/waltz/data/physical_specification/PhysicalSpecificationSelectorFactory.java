@@ -20,6 +20,7 @@ package com.khartec.waltz.data.physical_specification;
 
 import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.model.IdSelectionOptions;
+import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -39,6 +40,8 @@ public class PhysicalSpecificationSelectorFactory implements IdSelectorFactory {
         switch(options.entityReference().kind()) {
             case PHYSICAL_FLOW:
                 return mkForPhysicalFlow(options);
+            case LOGICAL_DATA_FLOW:
+                return mkForLogicalFlow(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: "+options);
         }
@@ -48,11 +51,27 @@ public class PhysicalSpecificationSelectorFactory implements IdSelectorFactory {
     private Select<Record1<Long>> mkForPhysicalFlow(IdSelectionOptions options) {
         ensureScopeIsExact(options);
         long physicalFlowId = options.entityReference().id();
-        return DSL.select(PHYSICAL_SPECIFICATION.ID)
+        Condition matchOnPhysFlowId = PHYSICAL_FLOW.ID.eq(physicalFlowId);
+        return selectViaPhysicalFlowJoin(matchOnPhysFlowId);
+
+    }
+
+
+    private Select<Record1<Long>> mkForLogicalFlow(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        long logicalFlowId = options.entityReference().id();
+        Condition matchOnLogicalFlowId = PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId);
+        return selectViaPhysicalFlowJoin(matchOnLogicalFlowId);
+    }
+
+
+    private Select<Record1<Long>> selectViaPhysicalFlowJoin(Condition condition) {
+        return DSL
+                .select(PHYSICAL_SPECIFICATION.ID)
                 .from(PHYSICAL_SPECIFICATION)
                 .innerJoin(PHYSICAL_FLOW)
                 .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
-                .where(PHYSICAL_FLOW.ID.eq(physicalFlowId));
+                .where(condition);
     }
 
 }

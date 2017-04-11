@@ -1,0 +1,26 @@
+<h4 ng-bind="$ctrl.title"></h4>
+<p ng-bind="$ctrl.description"></p>
+
+<h5>Relevant Flows:</h5>
+<table class="table table-condensed small table-striped">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Details</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="flow in $ctrl.flows">
+        <td><span ng-bind="flow.specification.name"></span></td>
+        <td><span ng-bind="flow.detail"></span></td>
+        <td><span>Mark as relevant</span></td>
+    </tr>
+    </tbody>
+</table>
+<hr>
+
+<a class='clickable'
+   ng-click="$ctrl.onDismiss()">
+    Cancel
+</a>

@@ -54,6 +54,13 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+
+    const findByLogicalFlowId = (id) => {
+        return $http
+            .get(`${base}/logical-flow/${id}`)
+            .then(r => r.data);
+    };
+
     const getById = (id) => {
         return $http
             .get(`${base}/id/${id}`)
@@ -99,6 +106,7 @@ function store($http, baseApiUrl) {
 
     return {
         findBySpecificationId,
+        findByLogicalFlowId,
         findByEntityReference,
         findByProducerEntityReference,
         findByConsumerEntityReference,

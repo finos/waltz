@@ -48,7 +48,7 @@ const initialState = {
 };
 
 
-const template = require('./flow-diagram-add-flow-popup.html');
+const template = require('./flow-diagram-logical-flow-popup.html');
 
 
 function sameRef(r1, r2) {
