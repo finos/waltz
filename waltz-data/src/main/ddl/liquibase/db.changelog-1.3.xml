@@ -994,4 +994,16 @@
         </createIndex>
     </changeSet>
 
+
+    <!-- 1928 -->
+    <changeSet author="dwatkins"
+               id="20170411-1928-1">
+        <comment>1928: Add index to flow_diagram</comment>
+        <createIndex indexName="idx_fda_diagram_id"
+                     tableName="flow_diagram_annotation"
+                     unique="false">
+            <column name="diagram_id" type="${long.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
