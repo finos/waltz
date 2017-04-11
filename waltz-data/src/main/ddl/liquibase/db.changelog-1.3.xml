@@ -962,4 +962,36 @@
                              tableName="physical_spec_defn"/>
     </changeSet>
 
+
+    <!-- 1974 -->
+    <changeSet author="rovats"
+               id="20170411-1974-1">
+        <comment>1974: Add indexes on Physical Spec Definition tables</comment>
+        <createIndex indexName="idx_psd_specification_id"
+                     tableName="physical_spec_defn"
+                     unique="false">
+            <column name="specification_id" type="${long.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="rovats"
+               id="20170411-1974-2">
+        <comment>1974: Add indexes on Physical Spec Definition tables</comment>
+        <createIndex indexName="idx_psdf_spec_defn_id"
+                     tableName="physical_spec_defn_field"
+                     unique="false">
+            <column name="spec_defn_id" type="${long.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="rovats"
+               id="20170411-1974-3">
+        <comment>1974: Add indexes on Physical Spec Definition tables</comment>
+        <createIndex indexName="idx_psdsf_spec_defn_id"
+                     tableName="physical_spec_defn_sample_file"
+                     unique="false">
+            <column name="spec_defn_id" type="${long.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
