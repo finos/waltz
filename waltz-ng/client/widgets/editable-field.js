@@ -24,6 +24,7 @@ const bindings = {
     initialVal: '<',
     onSave: '<',
     fieldType: '@',
+    dateFormat: '@',
     itemId: '<',
     buttonLabel: '@'
 };
@@ -39,12 +40,19 @@ const initialState = {
 };
 
 
+function mkNewVal(initialVal, fieldType) {
+    return initialVal && fieldType === 'date' ?
+        new Date(initialVal)
+        : initialVal;
+}
+
+
 function controller($timeout) {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
-        if(vm.initialVal) {
-            vm.newVal = vm.initialVal;
+        if (vm.initialVal) {
+            vm.newVal = mkNewVal(vm.initialVal, vm.fieldType);
         }
     };
 
@@ -81,7 +89,7 @@ function controller($timeout) {
 
     vm.edit = () => {
         vm.editing = true;
-        vm.newVal = vm.initialVal;
+        vm.newVal = mkNewVal(vm.initialVal, vm.fieldType);
     };
 
 

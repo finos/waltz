@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.DateChangeCommand;
 import com.khartec.waltz.model.IdCommandResponse;
 import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.model.user.Role;
@@ -69,6 +70,7 @@ public class SurveyRunEndpoint implements Endpoint {
         String generateSurveyRunRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String createSurveyRunInstancesAndRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String updateSurveyRunStatusPath = mkPath(BASE_URL, ":id", "status");
+        String updateSurveyRunDueDatePath = mkPath(BASE_URL, ":id", "due-date");
         String getSurveyRunCompletionRate = mkPath(BASE_URL, ":id", "completion-rate");
 
         DatumRoute<SurveyRun> getByIdRoute = (req, res) ->
@@ -117,6 +119,18 @@ public class SurveyRunEndpoint implements Endpoint {
                     surveyRunStatusChangeCommand.newStatus());
         };
 
+        DatumRoute<Integer> surveyRunUpdateDueDateRoute = (req, res) -> {
+            ensureUserHasAdminRights(req);
+
+            res.type(WebUtilities.TYPE_JSON);
+            DateChangeCommand command = readBody(req, DateChangeCommand.class);
+
+            return surveyRunService.updateSurveyRunDueDate(
+                    WebUtilities.getUsername(req),
+                    getId(req),
+                    command);
+        };
+
         ListRoute<SurveyInstanceRecipient> generateSurveyRunRecipientsRoute = (request, response) -> {
             ensureUserHasAdminRights(request);
 
@@ -143,6 +157,7 @@ public class SurveyRunEndpoint implements Endpoint {
         putForDatum(surveyRunUpdatePath, surveyRunUpdateRoute);
         postForDatum(createSurveyRunInstancesAndRecipientsPath, createSurveyRunInstancesAndRecipientsRoute);
         putForDatum(updateSurveyRunStatusPath, surveyRunUpdateStatusRoute);
+        putForDatum(updateSurveyRunDueDatePath, surveyRunUpdateDueDateRoute);
         getForDatum(getSurveyRunCompletionRate, getSurveyRunCompletionRateRoute);
     }
 

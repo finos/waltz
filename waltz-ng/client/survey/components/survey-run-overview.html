@@ -26,6 +26,21 @@
             </waltz-markdown>
         </div>
     </div>
+    <div waltz-has-role="SURVEY_ADMIN">
+        <br>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Due
+            </div>
+            <div class="col-sm-4">
+                <waltz-editable-field on-save="$ctrl.updateDueDate"
+                                      field-type="date"
+                                      date-format="dd-MM-yyyy"
+                                      initial-val="$ctrl.run.dueDate">
+                </waltz-editable-field>
+            </div>
+        </div>
+    </div>
     <br>
     <div class="row">
         <div class="col-sm-2 waltz-display-field-label">

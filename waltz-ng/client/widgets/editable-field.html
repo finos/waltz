@@ -1,11 +1,19 @@
 <div class="waltz-visibility-parent">
     <div ng-if="! $ctrl.editing">
-        <span ng-if="$ctrl.fieldType != 'person'"
-              ng-bind="$ctrl.initialVal">
+        <span ng-switch="$ctrl.fieldType">
+            <span ng-switch-when="person">
+                <waltz-entity-link entity-ref="$ctrl.newVal">
+                </waltz-entity-link>
+            </span>
+            <span ng-switch-when="date">
+                <span ng-bind="$ctrl.initialVal | date:'{{ $ctrl.dateFormat }}'">
+                </span>
+            </span>
+            <span ng-switch-default>
+                <span ng-bind="$ctrl.initialVal">
+                </span>
+            </span>
         </span>
-        <waltz-entity-link ng-if="$ctrl.fieldType == 'person'"
-                           entity-ref="$ctrl.newVal">
-        </waltz-entity-link>
 
         <a ng-click="$ctrl.edit()"
                 class="btn btn-xs waltz-visibility-child-30">
@@ -16,31 +24,37 @@
 
     <div ng-if="$ctrl.editing" style="border-radius: 3px; border: 1px solid #eee; background-color: #fafafa; padding: 10px">
 
-        <div ng-if="$ctrl.fieldType == 'text'">
+        <div ng-if="$ctrl.fieldType === 'text'">
             <input type="text"
                    ng-model="$ctrl.newVal"
                    class="form-control input-sm">
         </div>
 
-        <div ng-if="$ctrl.fieldType == 'textarea'">
+        <div ng-if="$ctrl.fieldType === 'textarea'">
             <textarea ng-model="$ctrl.newVal"
                       class="form-control input-sm">
             </textarea>
         </div>
 
-        <div ng-if="$ctrl.fieldType == 'boolean'">
+        <div ng-if="$ctrl.fieldType === 'boolean'">
             <input type="checkbox"
                    ng-model="$ctrl.newVal"
                    class="input-sm"
                    style="height: auto">
         </div>
 
-        <div ng-if="$ctrl.fieldType == 'person'">
+        <div ng-if="$ctrl.fieldType === 'person'">
             <waltz-entity-selector current-selection="$ctrl.newVal"
                                    on-select="$ctrl.entitySelect"
                                    entity-kinds="['PERSON']"
                                    item-id="$ctrl.itemId">
             </waltz-entity-selector>
+        </div>
+
+        <div ng-if="$ctrl.fieldType === 'date'">
+            <waltz-date-picker-form-input place-holder="{{ $ctrl.dateFormat }}"
+                                          format="{{ $ctrl.dateFormat }}"
+                                          model="$ctrl.newVal"/>
         </div>
 
         <div style="margin-top: 4px">
