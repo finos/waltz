@@ -48,6 +48,14 @@ public class DateTimeUtilities {
     }
 
 
+    public static java.sql.Date toSqlDate(LocalDate localDate) {
+        if (localDate == null) {
+            return null;
+        }
+        return java.sql.Date.valueOf(localDate);
+    }
+
+
     public static LocalDate toLocalDate(Date date) {
         if (date == null) {
             return null;

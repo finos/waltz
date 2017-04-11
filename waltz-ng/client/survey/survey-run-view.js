@@ -17,9 +17,11 @@
  */
 
 import template from './survey-run-view.html';
+import {timeFormat} from "d3-time-format";
 
 
 function controller($stateParams,
+                    notification,
                     surveyInstanceStore,
                     surveyRunStore,
                     surveyTemplateStore) {
@@ -27,7 +29,7 @@ function controller($stateParams,
     const id = $stateParams.id;
     const vm = this;
 
-    surveyRunStore
+    const loadSurveyRun = () => surveyRunStore
         .getById(id)
         .then(sr => {
             vm.surveyRun = sr;
@@ -36,15 +38,29 @@ function controller($stateParams,
         })
         .then(t => vm.surveyTemplate = t);
 
+    loadSurveyRun();
+
     surveyInstanceStore
         .findForSurveyRun(id)
         .then(xs => vm.surveyInstances = xs);
 
+    vm.updateDueDate = (newVal) => {
+        surveyRunStore.updateDueDate(id, {
+            newDateVal: newVal ? timeFormat('%Y-%m-%d')(newVal) : null
+        })
+        .then(r => {
+                notification.success('Survey run due date updated successfully');
+                loadSurveyRun();
+            },
+            r => notification.error('Failed to update survey run due date')
+        );
+    };
 
 }
 
 controller.$inject = [
     '$stateParams',
+    'Notification',
     'SurveyInstanceStore',
     'SurveyRunStore',
     'SurveyTemplateStore',

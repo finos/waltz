@@ -64,6 +64,12 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const updateDueDate = (id, command) => {
+        return $http
+            .put(`${base}/${id}/due-date`, command)
+            .then(r => r.data);
+    };
+
     const generateSurveyRunRecipients = (id) => {
         return $http
             .get(`${base}/${id}/recipients`)
@@ -88,6 +94,7 @@ function store($http, baseApiUrl) {
         findForUser,
         update,
         updateStatus,
+        updateDueDate,
         generateSurveyRunRecipients,
         createSurveyRunInstancesAndRecipients,
         getCompletionRate

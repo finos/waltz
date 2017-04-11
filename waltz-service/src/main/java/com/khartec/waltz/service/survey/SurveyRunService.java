@@ -136,10 +136,28 @@ public class SurveyRunService {
 
         changeLogService.write(
                 ImmutableChangeLog.builder()
-                        .operation(Operation.ADD)
+                        .operation(Operation.UPDATE)
                         .userId(userName)
                         .parentReference(EntityReference.mkRef(EntityKind.SURVEY_RUN, surveyRunId))
                         .message("Survey Run: status changed to " + newStatus)
+                        .build());
+
+        return result;
+    }
+
+
+    public int updateSurveyRunDueDate(String userName, long surveyRunId, DateChangeCommand command) {
+        checkNotNull(userName, "userName cannot be null");
+        checkNotNull(command, "command cannot be null");
+
+        int result = surveyRunDao.updateDueDate(surveyRunId, command.newDateVal().orElse(null));
+
+        changeLogService.write(
+                ImmutableChangeLog.builder()
+                        .operation(Operation.UPDATE)
+                        .userId(userName)
+                        .parentReference(EntityReference.mkRef(EntityKind.SURVEY_RUN, surveyRunId))
+                        .message("Survey Run: due date changed to " + command.newDateVal().orElse(null))
                         .build());
 
         return result;

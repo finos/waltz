@@ -13,10 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.common.StringUtilities.join;
 import static com.khartec.waltz.common.StringUtilities.splitThenMap;
 import static com.khartec.waltz.schema.Tables.*;
@@ -128,6 +131,14 @@ public class SurveyRunDao {
 
         return dsl.update(SURVEY_RUN)
                 .set(SURVEY_RUN.STATUS, newStatus.name())
+                .where(SURVEY_RUN.ID.eq(surveyRunId))
+                .execute();
+    }
+
+
+    public int updateDueDate(long surveyRunId, LocalDate newDueDate) {
+        return dsl.update(SURVEY_RUN)
+                .set(SURVEY_RUN.DUE_DATE, toSqlDate(newDueDate))
                 .where(SURVEY_RUN.ID.eq(surveyRunId))
                 .execute();
     }

@@ -23,17 +23,35 @@
  * This component ...
  */
 
+import {initialiseData, invokeFunction} from "../../common";
+
 
 const bindings = {
     template: '<',
-    run: '<'
+    run: '<',
+    onUpdateDueDate: '<'
+};
+
+
+const initialState = {
+    onUpdateDueDate: () => console.log("SRO: No on-update-due-date method provided")
 };
 
 
 const template = require('./survey-run-overview.html');
 
 
+function controller() {
+    const vm = initialiseData(this, initialState);
+
+    vm.updateDueDate = (itemId, data) => {
+        invokeFunction(vm.onUpdateDueDate, data.newVal);
+    };
+}
+
+
 const component = {
+    controller,
     template,
     bindings
 };
