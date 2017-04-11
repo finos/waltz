@@ -994,4 +994,23 @@
         </createIndex>
     </changeSet>
 
+
+    <!-- 1979 -->
+    <changeSet author="rovats"
+               id="20170411-1979-1">
+        <comment>1979: Logical Flows: Mark as is_removed where source/target doesn't exist</comment>
+        <sql>
+            UPDATE logical_flow set
+                is_removed = 1
+            WHERE (
+                (source_entity_kind = 'APPLICATION'
+                    AND source_entity_id not in (select id from application))
+                OR
+                (target_entity_kind = 'APPLICATION'
+                    AND target_entity_id not in (select id from application))
+            )
+            AND is_removed = 0
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
