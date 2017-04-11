@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -114,6 +115,11 @@ public class PhysicalFlowDao {
 
     public List<PhysicalFlow> findBySpecificationId(long specificationId) {
         return findByCondition(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specificationId));
+    }
+
+
+    public Collection<PhysicalFlow> findByLogicalFlowId(long logicalFlowId) {
+        return findByCondition(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId));
     }
 
 
@@ -240,5 +246,6 @@ public class PhysicalFlowDao {
                 .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
                 .where(dsl.renderInlined(matchesLogicalFlow));
     }
+
 
 }

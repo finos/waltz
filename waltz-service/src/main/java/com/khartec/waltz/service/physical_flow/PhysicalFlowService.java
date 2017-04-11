@@ -111,6 +111,11 @@ public class PhysicalFlowService {
     }
 
 
+    public Collection<PhysicalFlow> findByLogicalFlowId(long logicalFlowId) {
+        return physicalFlowDao.findByLogicalFlowId(logicalFlowId);
+    }
+
+
     public PhysicalFlow getById(long id) {
         return physicalFlowDao.getById(id);
     }
@@ -302,4 +307,5 @@ public class PhysicalFlowService {
 
         changeLogService.write(logEntry);
     }
+
 }

@@ -85,6 +85,11 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 "specification",
                 ":id");
 
+        String findByLogicalFlowIdPath = mkPath(
+                BASE_URL,
+                "logical-flow",
+                ":id");
+
         String getByIdPath = mkPath(
                 BASE_URL,
                 "id",
@@ -123,6 +128,11 @@ public class PhysicalFlowEndpoint implements Endpoint {
                         .findBySpecificationId(
                                 getId(request));
 
+        ListRoute<PhysicalFlow> findByLogicalFlowIdRoute =
+                (request, response) -> physicalFlowService
+                        .findByLogicalFlowId(
+                                getId(request));
+
         ListRoute<EntityReference> searchReportsRoute =
                 (request, response) -> physicalFlowService
                         .searchReports(
@@ -137,6 +147,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         getForList(findByProducerEntityRefPath, findByProducerEntityRefRoute);
         getForList(findByConsumerEntityRefPath, findByConsumerEntityRefRoute);
         getForList(findBySpecificationIdPath, findBySpecificationIdRoute);
+        getForList(findByLogicalFlowIdPath, findByLogicalFlowIdRoute);
         getForList(searchReportsPath, searchReportsRoute);
         postForDatum(createPath, this::createFlow);
         postForDatum(updateSpecDefinitionIdPath, this::updateSpecDefinitionId);

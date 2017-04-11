@@ -1,16 +1,26 @@
 <div class="waltz-flow-diagram-editor">
 
-    <!-- ADD FLOW POPUP -->
+    <!-- LOGICAL FLOW POPUP -->
     <div class="pop waltz-fade-if"
          ng-if="$ctrl.visibility.logicalFlowPopup">
-        <waltz-flow-diagram-add-flow-popup on-dismiss="$ctrl.onDismissPopup"
-                                           logical-flows="$ctrl.popup.logicalFlows"
-                                           node="$ctrl.popup.node"
-                                           existing-entities="$ctrl.popup.existingEntities"
-                                           is-upstream="$ctrl.popup.isUpstream"
-                                           command-processor="$ctrl.issueCommands">
+        <waltz-flow-diagram-logical-flow-popup on-dismiss="$ctrl.onDismissPopup"
+                                               logical-flows="$ctrl.popup.logicalFlows"
+                                               node="$ctrl.popup.node"
+                                               existing-entities="$ctrl.popup.existingEntities"
+                                               is-upstream="$ctrl.popup.isUpstream"
+                                               command-processor="$ctrl.issueCommands">
+        </waltz-flow-diagram-logical-flow-popup>
+    </div>
 
-        </waltz-flow-diagram-add-flow-popup>
+    <!-- PHYSICAL FLOW POPUP -->
+    <div class="pop waltz-fade-if"
+         ng-if="$ctrl.visibility.physicalFlowPopup">
+        <waltz-flow-diagram-physical-flow-popup on-dismiss="$ctrl.onDismissPopup"
+                                                physical-flows="$ctrl.popup.physicalFlows"
+                                                physical-specifications="$ctrl.popup.physicalSpecifications"
+                                                existing-entities="$ctrl.popup.existingEntities"
+                                                command-processor="$ctrl.issueCommands">
+        </waltz-flow-diagram-physical-flow-popup>
     </div>
 
     <!-- ANNOTATION POPUP -->
