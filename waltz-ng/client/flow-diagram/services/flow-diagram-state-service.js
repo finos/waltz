@@ -167,7 +167,7 @@ function restoreDiagram(
                 }
             }
         }
-    })
+    });
 
     const moveCommands = _.map(
         layoutData.positions,
