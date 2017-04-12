@@ -27,7 +27,7 @@
                     <td>
                         <a ng-bind="row.surveyRun.name"
                            class="clickable"
-                           ui-sref="main.survey.instance.view ({id: row.surveyInstance.id })"></a>
+                           ui-sref="main.survey.instance.response.view ({id: row.surveyInstance.id })"></a>
                     </td>
                     <td><span ng-bind="row.surveyRun.description"></span></td>
                     <td><waltz-from-now timestamp="row.surveyRun.issuedOn"></waltz-from-now></td>
