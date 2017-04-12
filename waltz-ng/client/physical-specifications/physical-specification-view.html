@@ -7,9 +7,11 @@
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>
-                <a ui-sref="main.app.view ({ id: ctrl.owningApp.id })">
-                    <span ng-bind="ctrl.owningEntity.name"></span>
-                </a>
+                <waltz-entity-link entity-ref="{
+                        id: ctrl.owningEntity.id,
+                        kind: 'APPLICATION',
+                        name: ctrl.owningEntity.name }">
+                </waltz-entity-link>
             </li>
             <li ng-bind="ctrl.specification.name"></li>
         </ol>
