@@ -21,7 +21,7 @@ import {initialiseData} from '../../../common';
 import {toGraphId} from '../../flow-diagram-utils';
 
 /**
- * @name waltz-flow-diagram-add-flow-popup
+ * @name waltz-flow-diagram-logical-flow-popup
  *
  * @description
  * This component ...
@@ -43,8 +43,8 @@ const initialState = {
     existingEntities: [],
     node: null,
     isUpstream: true,
-    commandProcessor: () => console.log('wdafp: default command processor'),
-    onDismiss: () => console.log('wdafp: default on-dismiss'),
+    commandProcessor: () => console.log('wdlfp: default command processor'),
+    onDismiss: () => console.log('wdlfp: default on-dismiss'),
 };
 
 

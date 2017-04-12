@@ -19,9 +19,11 @@
 package com.khartec.waltz.service.physical_flow;
 
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
+import com.khartec.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowSearchDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ChangeLog;
@@ -34,6 +36,8 @@ import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecifica
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +61,7 @@ public class PhysicalFlowService {
     private final ChangeLogService changeLogService;
     private final LogicalFlowService logicalFlowService;
     private final PhysicalFlowSearchDao searchDao;
+    private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory;
 
 
     @Autowired
@@ -64,13 +69,16 @@ public class PhysicalFlowService {
                                LogicalFlowService logicalFlowService,
                                PhysicalFlowDao physicalDataFlowDao,
                                PhysicalSpecificationDao physicalSpecificationDao,
-                               PhysicalFlowSearchDao searchDao) {
+                               PhysicalFlowSearchDao searchDao,
+                               PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory) {
+        this.physicalFlowIdSelectorFactory = physicalFlowIdSelectorFactory;
 
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalDataFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
         checkNotNull(searchDao, "searchDao cannot be null");
+        checkNotNull(physicalFlowIdSelectorFactory, "physicalFlowIdSelectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
         this.logicalFlowService = logicalFlowService;
@@ -113,6 +121,12 @@ public class PhysicalFlowService {
 
     public Collection<PhysicalFlow> findByLogicalFlowId(long logicalFlowId) {
         return physicalFlowDao.findByLogicalFlowId(logicalFlowId);
+    }
+
+
+    public Collection<PhysicalFlow> findBySelector(IdSelectionOptions idSelectionOptions) {
+        Select<Record1<Long>> selector = physicalFlowIdSelectorFactory.apply(idSelectionOptions);
+        return physicalFlowDao.findBySelector(selector);
     }
 
 

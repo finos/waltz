@@ -293,7 +293,7 @@ function mkScale(items, dimensions) {
 
     return scalePoint()
         .domain(_.chain(items)
-            .sortBy(a => a.name.toLowerCase())
+            .sortBy(a => _.toLower(a.name))
             .map('id')
             .value())
         .range(range);

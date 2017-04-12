@@ -161,6 +161,7 @@ function preparePhysicalFlowPopup(
         .all([physFlowPromise, physSpecPromise])
         .then(([physicalFlows = [], physicalSpecifications = []]) => {
             const popup = {
+                logicalFlow,
                 physicalFlows,
                 physicalSpecifications,
                 existingEntities: flowDiagramStateService.getAllEntities()

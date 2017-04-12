@@ -12,10 +12,12 @@
         </waltz-flow-diagram-logical-flow-popup>
     </div>
 
+
     <!-- PHYSICAL FLOW POPUP -->
     <div class="pop waltz-fade-if"
          ng-if="$ctrl.visibility.physicalFlowPopup">
         <waltz-flow-diagram-physical-flow-popup on-dismiss="$ctrl.onDismissPopup"
+                                                logical-flow="$ctrl.popup.logicalFlow"
                                                 physical-flows="$ctrl.popup.physicalFlows"
                                                 physical-specifications="$ctrl.popup.physicalSpecifications"
                                                 existing-entities="$ctrl.popup.existingEntities"
@@ -23,13 +25,13 @@
         </waltz-flow-diagram-physical-flow-popup>
     </div>
 
+
     <!-- ANNOTATION POPUP -->
     <div class="pop waltz-fade-if"
          ng-if="$ctrl.visibility.annotationPopup">
         <waltz-flow-diagram-annotation-popup on-dismiss="$ctrl.onDismissPopup"
                                              annotation="$ctrl.popup.annotation"
                                              command-processor="$ctrl.issueCommands">
-
         </waltz-flow-diagram-annotation-popup>
     </div>
 
@@ -43,7 +45,6 @@
                             on-initialise="$ctrl.onDiagramInit"
                             context-menus="$ctrl.contextMenus">
         </waltz-flow-diagram>
-
 
         <div class="row">
             <div class="col-md-4">
