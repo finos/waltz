@@ -1,22 +1,24 @@
 <h4 ng-bind="$ctrl.title"></h4>
 <p ng-bind="$ctrl.description"></p>
-<ul>
-    <li ng-repeat="option in $ctrl.options | orderBy: 'entity.name'">
-        <span ng-if="option.disabled"
-              class="text-muted">
-            <waltz-entity-icon-label entity-ref="option.entity"></waltz-entity-icon-label>
-        </span>
-        <span ng-if="! option.disabled">
-            <a ng-click="$ctrl.commandProcessor(option.commands)"
-               class='clickable'>
-                <waltz-entity-icon-label entity-ref="option.entity"></waltz-entity-icon-label>
-            </a>
-        </span>
-    </li>
-</ul>
+<table class="table table-condensed small">
+    <tr ng-repeat="flow in $ctrl.flows | orderBy: 'entity.name'">
+        <td>
+            <label>
+                <input type="checkbox"
+                       ng-model="flow.used">
+                <waltz-entity-icon-label entity-ref="flow.counterpartEntity">
+                </waltz-entity-icon-label>
+            </label>
+        </td>
+    </tr>
+</table>
 
 <hr>
 
+<button class="btn btn-success"
+        ng-click="$ctrl.update()">
+    Update
+</button>
 <a class='clickable'
    ng-click="$ctrl.onDismiss()">
     Cancel
