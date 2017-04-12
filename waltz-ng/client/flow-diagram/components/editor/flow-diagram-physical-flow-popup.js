@@ -21,7 +21,7 @@ import {initialiseData} from '../../../common';
 import {toGraphId} from '../../flow-diagram-utils';
 
 /**
- * @name waltz-flow-diagram-add-flow-popup
+ * @name waltz-flow-diagram-physical-flow-popup
  *
  * @description
  * This component ...
@@ -29,6 +29,7 @@ import {toGraphId} from '../../flow-diagram-utils';
 
 
 const bindings = {
+    logicalFlow: '<',
     physicalFlows: '<',
     physicalSpecifications: '<',
     existingEntities: '<',
@@ -40,10 +41,8 @@ const bindings = {
 const initialState = {
     logicalFlows: [],
     existingEntities: [],
-    node: null,
-    isUpstream: true,
-    commandProcessor: () => console.log('wdafp: default command processor'),
-    onDismiss: () => console.log('wdafp: default on-dismiss'),
+    commandProcessor: () => console.log('wdpfp: default command processor'),
+    onDismiss: () => console.log('wdpfp: default on-dismiss'),
 };
 
 
@@ -55,14 +54,24 @@ function sameRef(r1, r2) {
 }
 
 
-function prepareFlows(physicalFlows = [], physicalSpecifications = [], existingEntities = []) {
-    const specById = _.keyBy(physicalSpecifications, 'id');
-    return _.map(physicalFlows, f => {
-        return {
-            flow: f,
-            specification: specById[f.specificationId]
-        }
-    })
+function prepareFlows(
+    physicalFlows = [],
+    physicalSpecifications = [],
+    existingEntities = [])
+{
+    const specsById = _.keyBy(physicalSpecifications, 'id');
+    return _.chain(physicalFlows)
+        .map(f => {
+            const currentlyUsed = _.some(existingEntities, existing => sameRef(existing, { kind: 'PHYSICAL_FLOW', id: f.id }))
+            return {
+                used: currentlyUsed,
+                existing: currentlyUsed,
+                physicalFlow: f,
+                specification: specsById[f.specificationId]
+            };
+        })
+        .sortBy('specification.name')
+        .value();
 }
 
 
@@ -73,17 +82,54 @@ function controller() {
 
     vm.$onChanges = (c) => {
         const description = "Define the physical flows";
-
         vm.description = description;
         vm.title = `Define Physical Flows`;
-
-
-        console.log(vm.existingEntities)
-        console.log(vm.physicalFlows)
-        console.log(vm.physicalSpecifications)
-
-        vm.flows = prepareFlows(vm.physicalFlows, vm.physicalSpecifications, vm.existingEntities);
+        vm.flows = prepareFlows(
+            vm.physicalFlows,
+            vm.physicalSpecifications,
+            vm.existingEntities);
     };
+
+    vm.update = () => {
+        const additions = _.filter(vm.flows, f => ! f.existing && f.used);
+        const removals = _.filter(vm.flows, f => f.existing && ! f.used);
+
+        const additionCommands = _.map(additions, f => {
+            return {
+                command: 'ADD_DECORATION',
+                payload: {
+                    ref: {
+                        id: vm.logicalFlow.id,
+                        kind: vm.logicalFlow.kind
+                    },
+                    decoration: {
+                        id: f.physicalFlow.id,
+                        kind: 'PHYSICAL_FLOW'
+                    }
+                }
+            };
+        });
+
+        const removalCommands = _.map(removals, f => {
+            return {
+                command: 'REMOVE_DECORATION',
+                payload: {
+                    ref: {
+                        id: vm.logicalFlow.id,
+                        kind: vm.logicalFlow.kind
+                    },
+                    decoration: {
+                        id: f.physicalFlow.id,
+                        kind: 'PHYSICAL_FLOW'
+                    }
+                }
+            };
+        });
+
+
+        vm.commandProcessor(additionCommands);
+        vm.commandProcessor(removalCommands);
+    }
 
 }
 

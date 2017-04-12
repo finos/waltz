@@ -39,27 +39,41 @@ const initialState = {
 let state = _.cloneDeep(initialState);
 
 
+function toRef(d) {
+    return {
+        kind: d.data.kind,
+        id: d.data.id
+    };
+}
+
+
 function prepareSaveCmd(state) {
     const nodes = _.map(state.model.nodes, n => {
         return {
-            entityReference: {
-                id: n.data.id,
-                kind: n.data.kind
-            },
+            entityReference: toRef(n),
             isNotable: false
         };
     });
 
     const flows = _.map(state.model.flows, f => {
         return {
-            entityReference: {
-                kind: f.data.kind,
-                id: f.data.id
-            }
+            entityReference: toRef(f)
         };
     });
 
-    const entities = _.concat(nodes, flows);
+    const decorations = _
+        .chain(state.model.decorations)
+        .values()
+        .flatten()
+        .map(d => {
+            return {
+                entityReference: toRef(d),
+                isNotable: false
+            };
+        })
+        .value();
+
+    const entities = _.concat(nodes, flows, decorations);
 
     const layoutData = {
         positions: state.layout.positions,
@@ -89,10 +103,17 @@ function prepareSaveCmd(state) {
 }
 
 
-function loadDiagram(commandProcessor, diagram, annotations, entityNodes, logicalFlows) {
+function restoreDiagram(
+    commandProcessor,
+    diagram,
+    annotations = [],
+    entityNodes = [],
+    logicalFlows = [],
+    physicalFlows = [])
+{
     const layoutData = JSON.parse(diagram.layoutData);
     const logicalFlowsById = _.keyBy(logicalFlows, 'id');
-    const mkFlowCommands = _
+    const flowCommands = _
         .chain(entityNodes)
         .filter(node => node.entityReference.kind === 'LOGICAL_DATA_FLOW')
         .map(node => {
@@ -104,7 +125,7 @@ function loadDiagram(commandProcessor, diagram, annotations, entityNodes, logica
         })
         .value();
 
-    const mkNodeCommands = _
+    const nodeCommands = _
         .chain(entityNodes)
         .filter(ent => _.includes(['APPLICATION', 'ACTOR'], ent.entityReference.kind))
         .map(ent => {
@@ -120,7 +141,7 @@ function loadDiagram(commandProcessor, diagram, annotations, entityNodes, logica
         })
         .value();
 
-    const mkAnnotationCommands = _.map(annotations, ann => {
+    const annotationCommands = _.map(annotations, ann => {
         return {
             command: 'ADD_ANNOTATION',
             payload: {
@@ -131,6 +152,22 @@ function loadDiagram(commandProcessor, diagram, annotations, entityNodes, logica
             }
         }
     });
+
+    const decorationCommands = _.map(physicalFlows, pf => {
+        return {
+            command: 'ADD_DECORATION',
+            payload: {
+                ref: {
+                    kind: 'LOGICAL_DATA_FLOW',
+                    id: pf.logicalFlowId
+                },
+                decoration: {
+                    kind: 'PHYSICAL_FLOW',
+                    id: pf.id
+                }
+            }
+        }
+    })
 
     const moveCommands = _.map(
         layoutData.positions,
@@ -150,11 +187,12 @@ function loadDiagram(commandProcessor, diagram, annotations, entityNodes, logica
         payload: layoutData.diagramTransform
     }];
 
-    commandProcessor(mkNodeCommands);
-    commandProcessor(mkFlowCommands);
-    commandProcessor(mkAnnotationCommands);
+    commandProcessor(nodeCommands);
+    commandProcessor(flowCommands);
+    commandProcessor(annotationCommands);
     commandProcessor(moveCommands);
     commandProcessor(transformCommands);
+    commandProcessor(decorationCommands);
 }
 
 
@@ -163,7 +201,8 @@ function service(
     flowDiagramStore,
     flowDiagramAnnotationStore,
     flowDiagramEntityStore,
-    logicalFlowStore)
+    logicalFlowStore,
+    physicalFlowStore)
 {
 
     const reset = () => {
@@ -187,11 +226,12 @@ function service(
         const annotationPromise =flowDiagramAnnotationStore.findByDiagramId(id);
         const entityPromise = flowDiagramEntityStore.findByDiagramId(id);
         const logicalFlowPromise = logicalFlowStore.findBySelector(diagramSelector);
+        const physicalFlowPromise = physicalFlowStore.findBySelector(diagramSelector);
 
         return $q
-            .all([diagramPromise, annotationPromise, entityPromise, logicalFlowPromise])
-            .then(([diagram, annotations, entityNodes, logicalFlows]) => {
-                loadDiagram(processCommands, diagram, annotations, entityNodes, logicalFlows);
+            .all([diagramPromise, annotationPromise, entityPromise, logicalFlowPromise, physicalFlowPromise])
+            .then(([diagram, annotations, entityNodes, logicalFlows, physicalFlows]) => {
+                restoreDiagram(processCommands, diagram, annotations, entityNodes, logicalFlows, physicalFlows);
             });
     };
 
@@ -279,11 +319,24 @@ function service(
                 const refId = toGraphId(payload.ref);
                 const decorationNode = toGraphNode(payload.decoration);
                 const currentDecorations = model.decorations[refId] || [];
-                const existingIds = _.map(model.flows, "id");
+                const existingIds = _.map(currentDecorations, "id");
                 if (_.includes(existingIds, decorationNode.id)) {
                     console.log('Ignoring request to add duplicate decoration');
                 } else {
                     model.decorations[refId] = _.concat(currentDecorations, [decorationNode]);
+                }
+                break;
+
+            case 'REMOVE_DECORATION':
+                const payload = payload;
+                const refId = toGraphId(payload.ref);
+                const decorationNode = toGraphNode(payload.decoration);
+                const currentDecorations = model.decorations[refId] || [];
+                const existingIds = _.map(currentDecorations, "id");
+                if (_.includes(existingIds, decorationNode.id)) {
+                    model.decorations[refId] = _.reject(currentDecorations, d => d.id === decorationNode.id);
+                } else {
+                    console.log('Ignoring request to removed unknown decoration');
                 }
                 break;
 
@@ -331,7 +384,17 @@ function service(
         const toRef = d => ({ kind: d.data.kind, id: d.data.id });
         const nodes = _.map(state.model.nodes, toRef);
         const flows = _.map(state.model.flows, toRef);
-        return _.concat(nodes, flows);
+        const decorations = _
+            .chain(state.model.decorations)
+            .values()
+            .flatten()
+            .map(toRef)
+            .value();
+
+        return _.concat(
+            nodes,
+            flows,
+            decorations);
     };
 
     return {
@@ -351,7 +414,8 @@ service.$inject = [
     'FlowDiagramStore',
     'FlowDiagramAnnotationStore',
     'FlowDiagramEntityStore',
-    'LogicalFlowStore'
+    'LogicalFlowStore',
+    'PhysicalFlowStore'
 ];
 
 

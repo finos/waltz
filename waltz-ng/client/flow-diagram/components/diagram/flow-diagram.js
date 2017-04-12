@@ -56,6 +56,7 @@ const styles = {
     FLOWS: 'wfd-flows',
     FLOW_ARROW: 'wfd-flow-arrow',
     FLOW_BUCKET: 'wfd-flow-bucket',
+    FLOW_BUCKETS: 'wfd-flow-buckets',
     NODE: 'wfd-node',
     NODES: 'wfd-nodes',
     SUBJECT: 'wfd-subject',
@@ -273,12 +274,16 @@ function drawFlowBuckets(state, group) {
     newBucketElems
         .append('circle');
 
-    newBucketElems
+    const newBucketTextElems = newBucketElems
         .append('text')
         .classed('fa-fw', true)
         .attr('font-family', 'FontAwesome')
         .attr('dx', -6)
-        .attr('dy', 5)
+        .attr('dy', 5);
+
+    group
+        .selectAll('text')
+        .merge(newBucketTextElems)
         .text(d => {
             const decorationCount = _.size(state.model.decorations[d.id]);
             if (decorationCount === 0) {
@@ -289,6 +294,7 @@ function drawFlowBuckets(state, group) {
                 return "\uf0c5"; // many
             }
         });
+
 
     newBucketElems
         .merge(bucketElems)
@@ -359,7 +365,6 @@ function drawAnnotations(state, group, commandProcessor) {
             `;
         });
 
-
     // joint
     newAnnotationElems
         .append('circle')
@@ -417,7 +422,7 @@ function draw(state, commandProcessor = () => console.log('no command processor 
 
     drawFlows(state, groups.flows, commandProcessor);
     drawNodes(state, groups.nodes, commandProcessor);
-    drawFlowBuckets(state, groups.flows, commandProcessor);
+    drawFlowBuckets(state, groups.flowBuckets, commandProcessor);
     drawAnnotations(state, groups.annotations, commandProcessor);
 }
 
@@ -440,6 +445,10 @@ function prepareGroups(holder) {
         .append('g')
         .classed(styles.FLOWS, true);
 
+    const flowBuckets = container
+        .append('g')
+        .classed(styles.FLOW_BUCKETS, true);
+
     const nodes = container
         .append('g')
         .classed(styles.NODES, true);
@@ -449,6 +458,7 @@ function prepareGroups(holder) {
         container,
         annotations,
         flows,
+        flowBuckets,
         nodes
     };
 }

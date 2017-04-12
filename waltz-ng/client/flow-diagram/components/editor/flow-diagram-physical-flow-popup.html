@@ -1,25 +1,49 @@
 <h4 ng-bind="$ctrl.title"></h4>
+
 <p ng-bind="$ctrl.description"></p>
 
 <h5>Relevant Flows:</h5>
-<table class="table table-condensed small table-striped">
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th>Details</th>
-        <th>Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr ng-repeat="flow in $ctrl.flows">
-        <td><span ng-bind="flow.specification.name"></span></td>
-        <td><span ng-bind="flow.detail"></span></td>
-        <td><span>Mark as relevant</span></td>
-    </tr>
-    </tbody>
-</table>
+
+<form>
+    <table class="table table-condensed small">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Details</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="flow in $ctrl.flows"
+            class="waltz-visibility-parent">
+            <td>
+                <label>
+                    <input type="checkbox"
+                           id="flow_${flow.physicalFlow.id}"
+                           ng-model="flow.used">
+                    <span ng-bind="flow.specification.name">
+                    </span>
+                </label>
+            </td>
+            <td>
+                <div class="small">
+                    <span ng-bind="flow.specification.format | toDisplayName:'dataFormatKind'"></span>
+                    ,
+                    <span ng-bind="flow.physicalFlow.frequency | toDisplayName:'frequencyKind'"></span>
+                    ,
+                    <span ng-bind="flow.physicalFlow.transport | toDisplayName:'transportKind'"></span>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+
 <hr>
 
+<button class="btn btn-success"
+        ng-click="$ctrl.update()">
+    Update
+</button>
 <a class='clickable'
    ng-click="$ctrl.onDismiss()">
     Cancel
