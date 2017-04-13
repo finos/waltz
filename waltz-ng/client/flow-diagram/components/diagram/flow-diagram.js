@@ -281,6 +281,19 @@ function drawFlowBuckets(state, group) {
         .attr('dx', -6)
         .attr('dy', 5);
 
+    newBucketElems
+        .merge(bucketElems)
+        .attr('transform', d => {
+            // position buckets near center of line
+            const p = determineBucketPosition(state, d);
+            return `translate(${p.x},${p.y})`;
+        })
+        .selectAll('circle')
+        .attr('r', d => _.size(state.model.decorations[d.id]) > 0
+            ? dimensions.flowBucket.r * 1.5
+            : dimensions.flowBucket.r );
+
+
     group
         .selectAll('text')
         .merge(newBucketTextElems)
@@ -294,35 +307,30 @@ function drawFlowBuckets(state, group) {
                 return "\uf0c5"; // many
             }
         });
+}
 
 
-    newBucketElems
-        .merge(bucketElems)
-        .attr('transform', d => {
-            // position buckets near center of line
-            const sourcePos = positionFor(state, d.source);
-            const targetPos = positionFor(state, d.target);
+function determineBucketPosition(state, flow) {
+    const sourcePos = positionFor(state, flow.source);
+    const targetPos = positionFor(state, flow.target);
 
-            const sourceShape = shapeFor(state, d.source);
-            const targetShape = shapeFor(state, d.target);
+    const sourceShape = shapeFor(state, flow.source);
+    const targetShape = shapeFor(state, flow.target);
 
-            const sx = sourcePos.x + sourceShape.cx;
-            const sy = sourcePos.y + sourceShape.cy;
-            const tx = targetPos.x + targetShape.cx;
-            const ty = targetPos.y + targetShape.cy;
+    const sx = sourcePos.x + sourceShape.cx;
+    const sy = sourcePos.y + sourceShape.cy;
+    const tx = targetPos.x + targetShape.cx;
+    const ty = targetPos.y + targetShape.cy;
 
-            const dx = tx - sx;
-            const dy = ty - sy;
+    const dx = tx - sx;
+    const dy = ty - sy;
 
-            const cx = sx + (dx / 1.8);
-            const cy = sy + (dy / 1.8);
+    const cx = sx + (dx / 1.8);
+    const cy = sy + (dy / 1.8);
 
-            return `translate(${cx},${cy})`;
-        })
-        .selectAll('circle')
-        .attr('r', d => _.size(state.model.decorations[d.id]) > 0
-            ? dimensions.flowBucket.r * 1.5
-            : dimensions.flowBucket.r );
+    return {
+        x: cx, y: cy
+    };
 }
 
 
@@ -348,19 +356,37 @@ function drawAnnotations(state, group, commandProcessor) {
     newAnnotationElems
         .append('path');
 
-    annotationElems
+    const allLines = annotationElems
         .merge(newAnnotationElems)
-        .selectAll('path')
-        .attr('d', d => {
-            const subjectPosition = positionFor(state, toGraphId(d.data.entityReference));
-            const subjectShape = shapeFor(state, toGraphId(d.data.entityReference));
+        .selectAll('path');
+
+    const determineAnnotationGeometry = (state, d) => {
+        const ref = d.data.entityReference;
+        if (ref.kind === 'LOGICAL_DATA_FLOW') {
+            const flowId = toGraphId(ref);
+            const flow = _.find(state.model.flows, { id: flowId });
+            return {
+                subjectPosition: determineBucketPosition(state, flow),
+                subjectShape: { cx: 0, cy: 0},
+                annotationPosition: positionFor(state, d.id)
+            };
+        } else {
+            const subjectPosition = positionFor(state, toGraphId(ref));
+            const subjectShape = shapeFor(state, toGraphId(ref));
             const annotationPosition = positionFor(state, d.id);
-            const bar = dimensions.annotation.text.w * (annotationPosition.x > 0 ? 1 : -1);
-            const sx = subjectPosition.x + subjectShape.cx;
-            const sy = subjectPosition.y + subjectShape.cy;
+            return { subjectPosition, subjectShape, annotationPosition };
+        }
+    };
+
+    allLines
+        .attr('d', d => {
+            const p = determineAnnotationGeometry(state, d);
+            const bar = dimensions.annotation.text.w * (p.annotationPosition.x > 0 ? 1 : -1);
+            const sx = p.subjectPosition.x + p.subjectShape.cx;
+            const sy = p.subjectPosition.y + p.subjectShape.cy;
             return `
                 M${sx},${sy}
-                l${annotationPosition.x},${annotationPosition.y}
+                l${p.annotationPosition.x},${p.annotationPosition.y}
                 l${bar},0
             `;
         });
@@ -379,11 +405,9 @@ function drawAnnotations(state, group, commandProcessor) {
         .selectAll('circle')
         .attr('r', dimensions.annotation.circle.r)
         .each(function(d) {
-            const subjectPosition = positionFor(state, toGraphId(d.data.entityReference));
-            const subjectShape = shapeFor(state, toGraphId(d.data.entityReference));
-            const annotationPosition = positionFor(state, d.id);
-            const cx = subjectPosition.x + annotationPosition.x + subjectShape.cx;
-            const cy = subjectPosition.y + annotationPosition.y + subjectShape.cy;
+            const p = determineAnnotationGeometry(state, d);
+            const cx = p.subjectPosition.x + p.annotationPosition.x + p.subjectShape.cx;
+            const cy = p.subjectPosition.y + p.annotationPosition.y + p.subjectShape.cy;
             select(this)
                 .attr('cx', cx)
                 .attr('cy', cy);
@@ -397,12 +421,10 @@ function drawAnnotations(state, group, commandProcessor) {
         .merge(newAnnotationElems)
         .selectAll('text')
         .each(function(d) {
-            const subjectPosition = positionFor(state, toGraphId(d.data.entityReference));
-            const subjectShape = shapeFor(state, toGraphId(d.data.entityReference));
-            const annotationPosition = positionFor(state, d.id);
-            const bar = annotationPosition.x > 0 ? 10 : dimensions.annotation.text.w * -1;
-            const x = subjectPosition.x + annotationPosition.x + bar + subjectShape.cx;
-            const y = subjectPosition.y + annotationPosition.y + 18;
+            const p = determineAnnotationGeometry(state, d);
+            const bar = p.annotationPosition.x > 0 ? 10 : dimensions.annotation.text.w * -1;
+            const x = p.subjectPosition.x + p.annotationPosition.x + bar + p.subjectShape.cx;
+            const y = p.subjectPosition.y + p.annotationPosition.y + 18;
             select(this)
                 .attr('transform', `translate(${x}, ${y})`);
         })
