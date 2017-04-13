@@ -28,7 +28,7 @@ const bindings = {
     flowDiagramEntities: '<',
 };
 
-const template = require('./diagrams-panel.html');
+const template = require('./flow-diagrams-panel.html');
 
 
 const initialState = {
