@@ -57,12 +57,40 @@ const initialState = {
 };
 
 
+function mkAllowedEntityKinds(entityKind) {
+    const selectors = [{
+        value: 'APP_GROUP',
+        name: 'Application Group'
+    },{
+        value: 'ORG_UNIT',
+        name: 'Org Unit'
+    },{
+        value: 'MEASURABLE',
+        name: 'Measurable'
+    }];
+
+    if (entityKind === 'CHANGE_INITIATIVE') {
+        selectors.push({
+            value: 'CHANGE_INITIATIVE',
+            name: 'Change Initiative'
+        });
+    }
+    return selectors;
+}
+
+
 const template = require('./survey-run-create-general.html');
 
 
 
 function controller(appGroupStore, involvementKindStore) {
     const vm = initialiseData(this, initialState);
+
+    vm.$onChanges = () => {
+        if (vm.surveyTemplate) {
+            vm.allowedEntityKinds = mkAllowedEntityKinds(vm.surveyTemplate.targetEntityKind);
+        }
+    };
 
     Promise
         .all([appGroupStore.findPublicGroups(), appGroupStore.findPrivateGroups()])
