@@ -88,11 +88,12 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="def in ctrl.specDefinitions | orderBy: 'createdAt':true">
+                    <tr ng-repeat="def in ctrl.specDefinitions | orderBy: 'createdAt':true"
+                        class="clickable"
+                        ng-class="{ 'waltz-highlighted-row' : def.id === ctrl.selectedSpecDefinition.def.id }"
+                        ng-click="ctrl.selectSpecDefinition(def)">
                         <td>
-                            <a ng-bind="def.version"
-                               ng-click="ctrl.selectSpecDefinition(def)"
-                               class="clickable">
+                            <a ng-bind="def.version">
                             </a>
                         </td>
                         <td>
