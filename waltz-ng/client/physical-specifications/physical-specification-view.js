@@ -17,7 +17,7 @@
  */
 
 import {initialiseData} from "../common";
-import {green, grey} from "../common/colors";
+import _ from 'lodash';
 
 
 const template = require('./physical-specification-view.html');
@@ -90,15 +90,17 @@ function controller($q,
 
     const loadSpecDefinitions = () => physicalSpecDefinitionStore
         .findForSpecificationId(specId)
-        .then(specDefs => vm.specDefinitions = specDefs);
+        .then(specDefs => vm.specDefinitions = specDefs)
+        .then(specDefs => {
+            const activeSpec = _.find(specDefs, { status: 'ACTIVE'});
+            if (activeSpec) vm.selectSpecDefinition(activeSpec);
+        });
 
     loadSpecDefinitions();
-
 
     bookmarkStore
         .findByParent(ref)
         .then(bs => vm.bookmarks = bs);
-
 
     vm.selectSpecDefinition = (def) => {
         const specDefFieldPromise = physicalSpecDefinitionFieldStore

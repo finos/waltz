@@ -335,3 +335,11 @@ a.subtle-link:hover {
     border-radius: 2px;
     font-style: italic;
 }
+
+.waltz-highlighted-row {
+    background-color: $waltz-selected-item-bg-color;
+
+    &:hover {
+        background-color: darken($waltz-selected-item-bg-color, 2) !important;
+    }
+}
