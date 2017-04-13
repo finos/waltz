@@ -311,6 +311,9 @@ function service(
                 break;
 
             case 'REMOVE_FLOW':
+                model.annotations = _.reject(
+                    model.annotations,
+                    a => toGraphId(a.data.entityReference) === payload.id);
                 model.flows = _.reject(model.flows, f => f.id === payload.id);
                 break;
 
@@ -349,7 +352,12 @@ function service(
                 model.nodes = _.reject(model.nodes, n => n.id === payload.id);
                 model.annotations = _.reject(
                     model.annotations,
-                    a => toGraphId(a.data.entityReference) === payload.id);
+                    a => {
+                        const annotationEntityRef = toGraphId(a.data.entityReference);
+                        const isDirectAnnotation = annotationEntityRef === payload.id;
+                        const isFlowAnnotation = _.includes(flowIdsToRemove, annotationEntityRef);
+                        return isDirectAnnotation || isFlowAnnotation;
+                    });
                 _.forEach(flowIdsToRemove, id => model.decorations[id] = []);
                 break;
 
