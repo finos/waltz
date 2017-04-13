@@ -1,4 +1,9 @@
 # Khartec - Waltz
+
+In a nutshell Waltz allows you to visualize and define your organisation's technology landscape. Think of it like a structured Wiki for your architecture.
+
+[Learn more](http://www.waltz-technology.com/)
+
 [![Build Status](https://travis-ci.org/khartec/waltz.svg?branch=master)](https://travis-ci.org/khartec/waltz)
 
 ## Technology Stack
