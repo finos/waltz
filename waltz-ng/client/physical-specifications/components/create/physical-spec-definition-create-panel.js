@@ -119,7 +119,7 @@ function controller() {
             .value();
 
         vm.specDefFields.parsedData = _.map(lines, (line, index) => {
-            const fieldData = parseFieldLine(line, index + 1, vm.allowedTypesMap);
+            const fieldData = parseFieldLine(line, index + 1);
             if (fieldData.errors.length > 0) {
                 vm.specDefFields.hasErrors = true;
             }
