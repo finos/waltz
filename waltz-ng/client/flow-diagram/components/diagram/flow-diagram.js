@@ -486,7 +486,11 @@ function prepareGroups(holder) {
 }
 
 
-function setupDragAndZoom(commandProcessor) {
+/**
+ * Pan and zoom only enabled if ctrl or meta key is held down.
+ * @param commandProcessor
+ */
+function setupPanAndZoom(commandProcessor) {
     function zoomed() {
         const t = event.transform;
         commandProcessor([{ command: 'TRANSFORM_DIAGRAM', payload: t }]);
@@ -496,9 +500,20 @@ function setupDragAndZoom(commandProcessor) {
         .scaleExtent([1 / 4, 2])
         .on("zoom", zoomed);
 
-    groups.svg
-        .call(myZoom)
-        .on('dblclick.zoom', null);
+
+    select('body').on('keyup.zoom', () => {
+        groups.svg
+            .on('.zoom', null);
+    });
+
+    select('body').on('keydown.zoom', () => {
+        const active = event.metaKey || event.ctrlKey;
+        if (active) {
+            groups.svg
+                .call(myZoom)
+                .on('dblclick.zoom', null);
+        }
+    });
 }
 
 
@@ -517,7 +532,7 @@ function controller($element, flowDiagramStateService) {
 
         destroyResizeListener = responsivefy(groups.svg);
 
-        setupDragAndZoom(flowDiagramStateService.processCommands);
+        setupPanAndZoom(flowDiagramStateService.processCommands);
 
         vm.$onChanges();
     };
