@@ -18,7 +18,9 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.command.CommandResponse;
+import com.khartec.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
@@ -68,6 +70,11 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
                 BASE_URL,
                 "selector");
 
+        String searchPath = mkPath(
+                BASE_URL,
+                "search",
+                ":query");
+
         String getByIdPath = mkPath(
                 BASE_URL,
                 "id",
@@ -82,12 +89,20 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         ListRoute<PhysicalSpecification> findByAppRoute =
                 (request, response) -> specificationService.findByEntityReference(getEntityReference(request));
 
+        ListRoute<EntityReference> searchRoute =
+                (request, response) -> specificationService.search(
+                        request.params("query"),
+                        ImmutableEntitySearchOptions.builder()
+                                .userId(getUsername(request))
+                                .build());
+
         DatumRoute<PhysicalSpecification> getByIdRoute =
                 (request, response) -> specificationService.getById(getId(request));
 
         postForList(findBySelectorPath, findBySelectorRoute);
 
         getForList(findByAppPath, findByAppRoute);
+        getForList(searchPath, searchRoute);
         getForDatum(getByIdPath, getByIdRoute);
 
         deleteForDatum(deletePath, this::deleteSpecification);

@@ -46,7 +46,7 @@ function controller($timeout,
                     changeInitiativeStore,
                     measurableStore,
                     personStore,
-                    physicalFlowStore,
+                    physicalSpecificationStore,
                     orgUnitStore) {
     const searchResults = {
         show: false
@@ -72,10 +72,8 @@ function controller($timeout,
             handleSearch(query, measurableStore, 'measurables');
             handleSearch(query, orgUnitStore, 'orgUnits');
             handleSearch(query, actorStore, 'actors');
+            handleSearch(query, physicalSpecificationStore, 'specifications');
 
-            physicalFlowStore
-                .searchReports(query)
-                .then(xs => searchResults.reports = xs || []);
         }
     };
 
@@ -97,7 +95,7 @@ controller.$inject = [
     'ChangeInitiativeStore',
     'MeasurableStore',
     'PersonStore',
-    'PhysicalFlowStore',
+    'PhysicalSpecificationStore',
     'OrgUnitStore'
 ];
 

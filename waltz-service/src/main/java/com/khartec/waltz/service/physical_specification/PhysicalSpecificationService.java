@@ -20,12 +20,14 @@ package com.khartec.waltz.service.physical_specification;
 
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationSelectorFactory;
+import com.khartec.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.command.ImmutableCommandResponse;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -35,10 +37,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static java.util.Collections.emptyList;
 
 
 @Service
@@ -46,20 +51,24 @@ public class PhysicalSpecificationService {
 
     private final ChangeLogService changeLogService;
     private final PhysicalSpecificationDao specificationDao;
+    private final PhysicalSpecificationSearchDao specificationSearchDao;
     private final PhysicalSpecificationSelectorFactory selectorFactory;
 
 
     @Autowired
     public PhysicalSpecificationService(ChangeLogService changeLogService,
                                         PhysicalSpecificationDao specificationDao,
+                                        PhysicalSpecificationSearchDao specificationSearchDao, 
                                         PhysicalSpecificationSelectorFactory selectorFactory)
     {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(specificationDao, "specificationDao cannot be null");
+        checkNotNull(specificationSearchDao, "specificationSearchDao cannot be null");
         checkNotNull(selectorFactory, "selectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
         this.specificationDao = specificationDao;
+        this.specificationSearchDao = specificationSearchDao;
         this.selectorFactory = selectorFactory;
     }
 
@@ -115,6 +124,13 @@ public class PhysicalSpecificationService {
                 .message(Optional.ofNullable(responseMessage))
                 .build();
     }
+
+
+    public List<EntityReference> search(String query, EntitySearchOptions options) {
+        if (isEmpty(query)) return emptyList();
+        return specificationSearchDao.search(query, options);
+    }
+
 
 
     private void logChange(String userId,

@@ -33,6 +33,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -181,6 +184,13 @@ public class JooqUtilities {
 
         return DSL.when(endOfLifeDateField.lt(currentDate()), inline(EndOfLifeStatus.END_OF_LIFE.name()))
                 .otherwise(inline(EndOfLifeStatus.NOT_END_OF_LIFE.name()));
+    }
+
+
+    public static Condition mkBasicTermSearch(Field<String> field, List<String> terms) {
+        Function<String, Condition> mapper = (term) -> field.likeIgnoreCase("%"+term+"%");
+        BinaryOperator<Condition> combiner = (a, b) -> a.and(b);
+        return terms.stream().collect(Collectors.reducing(DSL.trueCondition(), mapper, combiner));
     }
 
 }
