@@ -80,7 +80,7 @@ function parseField(fieldSplit = [], position, allowedTypesMap = {}) {
         }
 
         if (! allowedTypesMap[fieldData.field.type]) {
-            fieldData.errors.push('Type is in valid');
+            fieldData.errors.push('Type is invalid');
         }
     }
 
@@ -112,7 +112,7 @@ function controller() {
     };
 
     vm.showForm = () => {
-      vm.visibility = 'FORM';
+        vm.visibility = 'FORM';
     };
 
     vm.submit = () => {

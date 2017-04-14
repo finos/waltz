@@ -6,21 +6,35 @@
               novalidate>
 
             <div class="form-group">
-                <label for="fields"
-                       class="col-sm-2 control-label">
-                    Fields
-                </label>
+                <div class="col-sm-2">
+                    <label for="fields"
+                           class="control-label">
+                        Fields
+                    </label>
+                    <div class="help-block">
+                        Enter <b>tab</b> separated field data (one per line) in the following format:
+                        <br>
+                        <code>Name    Type    Description</code>
+                        <br>
+                        Allowed values for 'Type' are:
+                        <br>
+                        DATE, DECIMAL, INTEGER, STRING, BOOLEAN
+                        <br>
+                        <b>Example:</b>
+                        <pre style="font-size: xx-small;">
+Field1&#9;INTEGER&#9;description for field 1
+Field2&#9;DATE&#9;description for field 2
+                        </pre>
+
+                    </div>
+                </div>
                 <div class="col-sm-10">
                 <textarea id="fields"
                           required
                           class="form-control"
-                          placeholder="Enter tab separated field data (one per line) in the following format: &#10;Name    Type    Description
-                                       &#10;All three columns are mandatory.
-                                       &#10;Example:&#10;Field1    INTEGER    description for field 1&#10;Field2    DATE    description for field 2
-                                       &#10;Allowed values for 'Type' are: DATE, DECIMAL, INTEGER, STRING, BOOLEAN
-"
+                          placeholder="Paste your field definitions here.  You can simply cut n' paste from a spreadsheet"
                           ng-model="$ctrl.specDefFields.rawData"
-                          rows="10">
+                          rows="12">
                 </textarea>
                 </div>
             </div>
@@ -71,13 +85,16 @@
                     Delimiter
                 </label>
                 <div class="col-sm-10">
-                    <input type="text"
-                           id="delimiter"
-                           maxlength="1"
-                           class="form-control"
-                           placeholder="Version of this specification definition"
-                           ng-model="$ctrl.specDefinition.def.delimiter">
-                    </input>
+                    <select id='delimiter'
+                            ng-model="$ctrl.specDefinition.def.delimiter">
+                        <option ng-value="'&#9;'" selected>Tab</option>
+                        <option ng-value="','">Comma ( , )</option>
+                        <option ng-value="'|'">Pipe ( | )</option>
+                        <option ng-value="';'">Semicolon ( ; )</option>
+                        <option ng-value="':'">Colon ( : )</option>
+                        <option ng-value="'#'">Hash ( # )</option>
+                        <option ng-value="'?'">Other</option>
+                    </select>
                 </div>
             </div>
 
@@ -96,7 +113,7 @@
                     Fields
                 </label>
                 <div class="col-sm-10">
-                    <table class="table table-condensed table-striped">
+                    <table class="table table-condensed">
                         <colgroup>
                             <col width="20%">
                             <col width="10%">
@@ -125,7 +142,7 @@
                                 <span ng-bind="fieldData.field.description">
                                 </span>
                             </td>
-                            <td>
+                            <td ng-class="{ 'bg-danger' : fieldData.errors.length > 0 }">
                                 <div ng-repeat="error in fieldData.errors">
                                     <span ng-bind="error"></span>
                                 </div>
