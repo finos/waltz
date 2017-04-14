@@ -170,20 +170,23 @@
 
             <hr>
 
-            <!-- REPORTS -->
+            <!-- SPECIFICATIONS -->
             <h5>
-                <waltz-icon name="sitemap"></waltz-icon>
-                Reports
+                <waltz-icon name="qrcode"></waltz-icon>
+                Specifications
             </h5>
-            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.reports.length > 10 }">
+            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.specifications.length > 10 }">
                 <ul class="list-unstyled">
-                    <li ng-repeat="result in $ctrl.results.reports">
-                        <a ui-sref="main.physical-flow.view ({id: result.id})"
+                    <li ng-repeat="result in $ctrl.results.specifications">
+                        <a ui-sref="main.physical-specification.view ({id: result.id})"
                            ng-click="$ctrl.dismiss()">
                             <span ng-bind="result.name"></span>
                         </a>
+                        <span class="small"
+                              ng-bind="result.description | limitTo:60"></span>
+                        <span ng-if="result.description.length > 60">...</span>
                     </li>
-                    <li ng-show="$ctrl.results.reports.length == 0"
+                    <li ng-show="$ctrl.results.specifications.length == 0"
                         class="text-muted">
                         No results...
                     </li>

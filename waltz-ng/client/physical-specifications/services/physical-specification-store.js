@@ -44,6 +44,11 @@ function store($http, baseApiUrl) {
         .then(r => r.data);
 
 
+    const search = (terms) => $http
+        .get(`${base}/search/${terms}`)
+        .then(r => r.data);
+
+
     const deleteById = (id) => $http
             .delete(`${base}/${id}`)
             .then(r => r.data);
@@ -53,7 +58,8 @@ function store($http, baseApiUrl) {
         findByEntityReference,
         findBySelector,
         getById,
-        deleteById
+        deleteById,
+        search
     };
 }
 
