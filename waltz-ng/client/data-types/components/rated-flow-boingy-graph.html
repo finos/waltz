@@ -18,37 +18,45 @@
                     Select one of the following ratings:
 
                     <div class="wffoo-scopes">
-                        <label>
-                            <input type="checkbox"
-                                   ng-model='$ctrl.filterOptions.showPrimary'
-                                   ng-change="$ctrl.filterChanged()">
-                            Primary -
-                            <span class="text-muted">Only show flows with a Primary rating</span>
-                        </label>
+                        <div>
+                            <label>
+                                <input type="checkbox"
+                                       ng-model='$ctrl.filterOptions.showPrimary'
+                                       ng-change="$ctrl.filterChanged()">
+                                Primary -
+                                <span class="text-muted">Only show flows with a Primary rating</span>
+                            </label>
+                        </div>
 
-                        <label>
-                            <input type="checkbox"
-                                   ng-model='$ctrl.filterOptions.showSecondary'
-                                   ng-change="$ctrl.filterChanged()">
-                            Secondary -
-                            <span class="text-muted">Only show flows with a Secondary rating</span>
-                        </label>
+                        <div>
+                            <label>
+                                <input type="checkbox"
+                                       ng-model='$ctrl.filterOptions.showSecondary'
+                                       ng-change="$ctrl.filterChanged()">
+                                Secondary -
+                                <span class="text-muted">Only show flows with a Secondary rating</span>
+                            </label>
+                        </div>
 
-                        <label>
-                            <input type="checkbox"
-                                   ng-model='$ctrl.filterOptions.showDiscouraged'
-                                   ng-change="$ctrl.filterChanged()">
-                            Discouraged -
-                            <span class="text-muted">Only show flows with a Discouraged rating</span>
-                        </label>
+                        <div>
+                            <label>
+                                <input type="checkbox"
+                                       ng-model='$ctrl.filterOptions.showDiscouraged'
+                                       ng-change="$ctrl.filterChanged()">
+                                Discouraged -
+                                <span class="text-muted">Only show flows with a Discouraged rating</span>
+                            </label>
+                        </div>
 
-                        <label style="border-bottom: 1px dotted #ccc; margin-bottom: 4px; padding-bottom: 4px;">
-                            <input type="checkbox"
-                                   ng-model='$ctrl.filterOptions.showNoOpinion'
-                                   ng-change="$ctrl.filterChanged()">
-                            No opinion -
-                            <span class="text-muted">Only show flows with an unknown rating</span>
-                        </label>
+                        <div>
+                            <label style="border-bottom: 1px dotted #ccc; margin-bottom: 4px; padding-bottom: 4px;">
+                                <input type="checkbox"
+                                       ng-model='$ctrl.filterOptions.showNoOpinion'
+                                       ng-change="$ctrl.filterChanged()">
+                                No opinion -
+                                <span class="text-muted">Only show flows with an unknown rating</span>
+                            </label>
+                        </div>
 
                         <a class="clickable"
                            ng-click="$ctrl.showAll()">
