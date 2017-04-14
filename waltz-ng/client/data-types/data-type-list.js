@@ -31,8 +31,7 @@ const initialState = {
 function controller($state,
                     dataTypes,
                     staticPanelStore,
-                    svgStore,
-                    lineageStore) {
+                    svgStore) {
 
     const vm = initialiseData(this, initialState);
 
@@ -58,11 +57,6 @@ function controller($state,
         vm.exportLineageReports = api.export;
     };
 
-
-    lineageStore
-        .findAllLineageReports()
-        .then(lineageReports => vm.lineageReports = lineageReports);
-
 }
 
 
@@ -70,8 +64,7 @@ controller.$inject = [
     '$state',
     'dataTypes',
     'StaticPanelStore',
-    'SvgDiagramStore',
-    'PhysicalFlowLineageStore'
+    'SvgDiagramStore'
 ];
 
 
