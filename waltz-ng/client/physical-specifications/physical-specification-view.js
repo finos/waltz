@@ -54,6 +54,7 @@ function controller($q,
                     $stateParams,
                     applicationStore,
                     bookmarkStore,
+                    changeLogStore,
                     historyStore,
                     logicalFlowStore,
                     notification,
@@ -90,6 +91,10 @@ function controller($q,
     logicalFlowStore
         .findBySelector({ entityReference: ref, scope: 'EXACT'})
         .then(logicalFlows => vm.logicalFlowsById = _.keyBy(logicalFlows, 'id'));
+
+    changeLogStore
+        .findByEntityReference(ref)
+        .then(changeLogs => vm.changeLogs = changeLogs);
 
     const loadSpecDefinitions = () => physicalSpecDefinitionStore
         .findForSpecificationId(specId)
@@ -153,6 +158,7 @@ controller.$inject = [
     '$stateParams',
     'ApplicationStore',
     'BookmarkStore',
+    'ChangeLogStore',
     'HistoryStore',
     'LogicalFlowStore',
     'Notification',

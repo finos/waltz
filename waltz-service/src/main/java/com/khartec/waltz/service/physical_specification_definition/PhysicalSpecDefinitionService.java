@@ -72,7 +72,7 @@ public class PhysicalSpecDefinitionService {
                         .operation(Operation.ADD)
                         .userId(userName)
                         .parentReference(mkRef(EntityKind.PHYSICAL_SPECIFICATION, specificationId))
-                        .message("Spec Definition Id: " + defId + " added")
+                        .message("Spec Definition Version: " + command.version() + " added")
                         .build());
 
         return defId;
