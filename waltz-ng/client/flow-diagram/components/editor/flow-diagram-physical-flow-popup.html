@@ -4,7 +4,15 @@
 
 <h5>Relevant Flows:</h5>
 
-<form>
+<div ng-show="$ctrl.flows.length > 6">
+    <input type="search"
+           placeholder="Filter.."
+           ng-model="$ctrl.qry"
+           class="form-control waltz-search-control">
+    <br>
+</div>
+
+<div ng-class="{ 'waltz-scroll-region-250' : $ctrl.flows.length > 6 }">
     <table class="table table-condensed small">
         <thead>
         <tr>
@@ -13,7 +21,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="flow in $ctrl.flows"
+        <tr ng-repeat="flow in $ctrl.flows | filter: $ctrl.qry"
             class="waltz-visibility-parent">
             <td>
                 <label>
@@ -36,7 +44,7 @@
         </tr>
         </tbody>
     </table>
-</form>
+</div>
 
 <hr>
 

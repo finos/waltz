@@ -1,17 +1,27 @@
 <h4 ng-bind="$ctrl.title"></h4>
 <p ng-bind="$ctrl.description"></p>
-<table class="table table-condensed small">
-    <tr ng-repeat="flow in $ctrl.flows | orderBy: 'entity.name'">
-        <td>
-            <label>
-                <input type="checkbox"
-                       ng-model="flow.used">
-                <waltz-entity-icon-label entity-ref="flow.counterpartEntity">
-                </waltz-entity-icon-label>
-            </label>
-        </td>
-    </tr>
-</table>
+<div ng-show="$ctrl.flows.length > 6">
+    <input ng-model="$ctrl.qry"
+           type="search"
+           placeholder="Filter..."
+           class="form-control form-search">
+    <br>
+</div>
+
+<div ng-class="{ 'waltz-scroll-region-250' : $ctrl.flows.length > 6}">
+    <table class="table table-condensed small">
+        <tr ng-repeat="flow in $ctrl.flows | orderBy: 'entity.name' | filter: $ctrl.qry">
+            <td>
+                <label>
+                    <input type="checkbox"
+                           ng-model="flow.used">
+                    <waltz-entity-icon-label entity-ref="flow.counterpartEntity">
+                    </waltz-entity-icon-label>
+                </label>
+            </td>
+        </tr>
+    </table>
+</div>
 
 <hr>
 
