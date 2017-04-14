@@ -46,9 +46,6 @@ function service($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
-    const findBySpecificationId = (specId) => $http
-        .get(`${BASE}/specification/${specId}`)
-        .then(result => result.data);
 
     // --- STATS ---
     const calculateStats = (options) => {
@@ -72,7 +69,6 @@ function service($http, BaseApiUrl) {
         .then(r => r.data);
 
     return {
-        findBySpecificationId,
         findBySelector,
         findByEntityReference,
         calculateStats,

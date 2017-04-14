@@ -35,8 +35,7 @@ function setup() {
         .component('waltzPhysicalFlowTable', require('./components/flow-table/physical-flow-table'))
         .component('waltzPhysicalFlowEditTargetLogicalFlow', require('./components/edit-target-logical-flow/physical-flow-edit-target-logical-flow'))
         .component('waltzPhysicalFlowExportButtons', require('./components/export-buttons/physical-flow-export-buttons'))
-        .component('waltzPhysicalFlowAttributeEditor', require('./components/attribute-editor/physical-flow-attribute-editor'))
-        .component('waltzPhysicalSpecDefinitionPanel', require('./components/spec-definition/physical-spec-definition-panel'));
+        .component('waltzPhysicalFlowAttributeEditor', require('./components/attribute-editor/physical-flow-attribute-editor'));
 
     return module.name;
 }

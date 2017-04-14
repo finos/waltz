@@ -28,10 +28,12 @@ function setup() {
 
     module
         .component('waltzPhysicalDataSection', require('./components/physical-data-section/physical-data-section'))
-        .component('waltzPhysicalSpecDefinitionCreatePanel', require('./components/specification-definition/physical-spec-definition-create-panel'))
+        .component('waltzPhysicalSpecDefinitionCreatePanel', require('./components/create/physical-spec-definition-create-panel'))
         .component('waltzPhysicalSpecificationOverview', require('./components/overview/physical-specification-overview'))
         .component('waltzPhysicalSpecificationConsumers', require('./components/specification-consumers/physical-specification-consumers'))
-        .component('waltzPhysicalSpecificationMentions', require('./components/mentions/physical-specification-mentions'));
+        .component('waltzPhysicalSpecificationMentions', require('./components/mentions/physical-specification-mentions'))
+        .component('waltzPhysicalSpecDefinitionPanel', require('./components/spec-definition/physical-spec-definition-panel'));
+
 
     module
         .service('PhysicalSpecificationStore', require('./services/physical-specification-store'))

@@ -35,6 +35,7 @@ import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 
 
 @Service
@@ -76,11 +77,24 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return wrapAppIdSelector(options);
             case PROCESS:
                 return wrapAppIdSelector(options);
+            case PHYSICAL_SPECIFICATION:
+                return mkForPhysicalSpecification(options);
 
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: " + options);
         }
     }
+
+    private Select<Record1<Long>> mkForPhysicalSpecification(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL.select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .innerJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(options.entityReference().id()))
+                .and(NOT_REMOVED);
+    }
+
 
     private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
         ensureScopeIsExact(options);

@@ -28,7 +28,6 @@ const bindings = {
 
 
 const initialState = {
-    defaultActiveTabIndex: 1,
     specDefinition: {},
     selectableDefinitions: [],
     onDefinitionSelect: (def) => console.log('psdp::onDefinitionSelect', def)
