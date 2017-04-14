@@ -29,7 +29,7 @@
 
 
     <!-- SPEC DEFINITIONS -->
-    <waltz-section name="Definitions"
+    <waltz-section name="Specification Definitions"
                    small="( {{ ctrl.specDefinitions.length }} )"
                    icon="file-code-o"
                    id="specification-definition-section">
@@ -41,82 +41,67 @@
                      is-open="status.isopen">
                     <button type="button"
                             class="btn btn-xs btn-primary"
-                            uib-dropdown-toggle
+                            ng-click="ctrl.showCreateSpecDefinition()"
                             ng-disabled="ctrl.selectableSpecDefinitions.length == 0">
-                        Add New <span class="caret"></span>
+                        Add New Definition
                     </button>
-                    <ul class="dropdown-menu"
-                        uib-dropdown-menu
-                        role="menu">
-                        <li role="menuitem">
-                            <a class="clickable"
-                               ng-click="ctrl.showCreateSpecDefinition('ACTIVE')">
-                                Active - <i>Current</i>
-                            </a>
-                        </li>
-                        <li role="menuitem">
-                            <a class="clickable"
-                               ng-click="ctrl.showCreateSpecDefinition('DRAFT')">
-                                Draft - <i>Future</i>
-                            </a>
-                        </li>
-                        <li role="menuitem">
-                            <a class="clickable"
-                               ng-click="ctrl.showCreateSpecDefinition('DEPRECATED')">
-                                Deprecated - <i>Historic</i>
-                            </a>
-                        </li>
-                    </ul>
                 </div>
             </div>
         </waltz-section-actions>
 
-        <waltz-physical-spec-definition-create-panel ng-if="ctrl.specDefinitionCreate.creating"
-                                                     status="ctrl.specDefinitionCreate.status"
-                                                     on-submit="ctrl.createSpecDefinition"
-                                                     on-cancel="ctrl.hideCreateSpecDefinition">
-        </waltz-physical-spec-definition-create-panel>
-
-        <div class="row"
-             ng-if="ctrl.specDefinitions.length > 0">
-            <div class="col-sm-4">
-                <table class="table table-condensed table-hover">
-                    <thead>
-                    <tr>
-                        <th>Version</th>
-                        <th>Status</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="def in ctrl.specDefinitions | orderBy: 'createdAt':true"
-                        class="clickable"
-                        ng-class="{ 'waltz-highlighted-row' : def.id === ctrl.selectedSpecDefinition.def.id }"
-                        ng-click="ctrl.selectSpecDefinition(def)">
-                        <td>
-                            <a ng-bind="def.version">
-                            </a>
-                        </td>
-                        <td>
-                            <span ng-bind="def.status | toDisplayName:'releaseLifecycleStatus'">
-                            </span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-sm-8"
-                 ng-if="ctrl.selectedSpecDefinition.def">
-                <waltz-physical-spec-definition-panel spec-definition="ctrl.selectedSpecDefinition"
-                                                      default-active-tab-index="0">
-                </waltz-physical-spec-definition-panel>
-            </div>
+        <div ng-if="ctrl.specDefinitionCreate.creating"
+             class="waltz-fade-if">
+            <waltz-physical-spec-definition-create-panel status="ctrl.specDefinitionCreate.status"
+                                                         on-submit="ctrl.createSpecDefinition"
+                                                         on-cancel="ctrl.hideCreateSpecDefinition">
+            </waltz-physical-spec-definition-create-panel>
         </div>
 
-        <waltz-no-data ng-if="ctrl.specDefinitions.length == 0">
-            <message>
-                <strong>No definitions</strong> for this physical specification.
-            </message>
-        </waltz-no-data>
+        <div ng-if="! ctrl.specDefinitionCreate.creating"
+             class="waltz-fade-if">
+            <div class="row"
+                 ng-if="ctrl.specDefinitions.length > 0">
+                <div class="col-sm-4">
+                    <table class="table table-condensed table-hover">
+                        <thead>
+                        <tr>
+                            <th>Version</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="def in ctrl.specDefinitions | orderBy: 'createdAt':true"
+                            class="clickable"
+                            ng-class="{ 'waltz-highlighted-row' : def.id === ctrl.selectedSpecDefinition.def.id }"
+                            ng-click="ctrl.selectSpecDefinition(def)">
+                            <td>
+                                <a ng-bind="def.version">
+                                </a>
+                            </td>
+                            <td>
+                            <span ng-bind="def.status | toDisplayName:'releaseLifecycleStatus'">
+                            </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm-8"
+                     ng-if="ctrl.selectedSpecDefinition.def">
+                    <waltz-physical-spec-definition-panel spec-definition="ctrl.selectedSpecDefinition"
+                                                          default-active-tab-index="0">
+                    </waltz-physical-spec-definition-panel>
+                </div>
+            </div>
+
+            <waltz-no-data ng-if="ctrl.specDefinitions.length == 0">
+                <message>
+                    <strong>No definitions</strong> for this physical specification.
+                </message>
+            </waltz-no-data>
+        </div>
+
+
     </waltz-section>
 
 
@@ -145,6 +130,50 @@
                 <strong>No flow diagrams</strong> for this physical specification.
             </message>
         </waltz-no-data>
+    </waltz-section>
+
+
+    <!-- ASSOCIATED FLOWS -->
+    <waltz-section icon='link'
+                   ng-if="ctrl.physicalFlows.length > 0"
+                   id="specification-usage-section"
+                   name="Usage"
+                   small="Associated Flows">
+        <p>This specification is associated with the following physical flows:</p>
+
+        <table class="table table-condensed small">
+            <thead>
+            <tr>
+                <th>From</th>
+                <th>To</th>
+                <th>Frequency</th>
+                <th>Transport</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="flow in ctrl.physicalFlows">
+                <td>
+                    <a ng-bind="ctrl.logicalFlowsById[flow.logicalFlowId].source.name"
+                       class="clickable"
+                       ui-sref="main.physical-flow.view ({id: flow.id })">
+
+                    </a>
+                </td>
+                <td>
+                    <a ng-bind="ctrl.logicalFlowsById[flow.logicalFlowId].target.name"
+                       class="clickable"
+                       ui-sref="main.physical-flow.view ({id: flow.id })">
+                    </a>
+                </td>
+                <td>
+                    <span ng-bind="flow.frequency | toDisplayName:'frequencyKind'"></span>
+                </td>
+                <td>
+                    <span ng-bind="flow.transport | toDisplayName:'transportKind'"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </waltz-section>
 
 

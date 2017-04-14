@@ -35,8 +35,7 @@ const initialState = {
     selectedSpecDefinition: {},
     specDefinitions: [],
     specDefinitionCreate: {
-        creating: false,
-        createStatus: null
+        creating: false
     }
 };
 
@@ -56,6 +55,7 @@ function controller($q,
                     applicationStore,
                     bookmarkStore,
                     historyStore,
+                    logicalFlowStore,
                     notification,
                     orgUnitStore,
                     physicalSpecDefinitionStore,
@@ -87,6 +87,9 @@ function controller($q,
         .findBySpecificationId(specId)
         .then(physicalFlows => vm.physicalFlows = physicalFlows);
 
+    logicalFlowStore
+        .findBySelector({ entityReference: ref, scope: 'EXACT'})
+        .then(logicalFlows => vm.logicalFlowsById = _.keyBy(logicalFlows, 'id'));
 
     const loadSpecDefinitions = () => physicalSpecDefinitionStore
         .findForSpecificationId(specId)
@@ -118,15 +121,13 @@ function controller($q,
     };
 
 
-    vm.showCreateSpecDefinition = (status) => {
+    vm.showCreateSpecDefinition = () => {
         vm.specDefinitionCreate.creating = true;
-        vm.specDefinitionCreate.status = status;
     };
 
 
     vm.hideCreateSpecDefinition = () => {
         vm.specDefinitionCreate.creating = false;
-        vm.specDefinitionCreate.status = null;
     };
 
 
@@ -153,6 +154,7 @@ controller.$inject = [
     'ApplicationStore',
     'BookmarkStore',
     'HistoryStore',
+    'LogicalFlowStore',
     'Notification',
     'OrgUnitStore',
     'PhysicalSpecDefinitionStore',

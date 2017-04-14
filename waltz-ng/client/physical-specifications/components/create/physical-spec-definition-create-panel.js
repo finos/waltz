@@ -28,13 +28,6 @@ const bindings = {
 
 
 const initialState = {
-    allowedTypesMap: {
-        DATE: true,
-        DECIMAL: true,
-        INTEGER: true,
-        STRING: true,
-        BOOLEAN: true
-    },
     status: null,
     specDefinition: {
         def: {
@@ -42,31 +35,55 @@ const initialState = {
             type: 'DELIMITED'
         }
     },
-    visibility: 'FORM',
     specDefFields: {},
     onCancel: () => console.log('psdcp::onCancel'),
     onSubmit: (specDef) => console.log('psdcp::onSubmit', specDef)
 };
 
+const allowedTypes= ['DATE', 'DECIMAL', 'INTEGER', 'STRING', 'BOOLEAN'];
 
 const template = require('./physical-spec-definition-create-panel.html');
 
 
-function parseField(fieldSplit = [], position, allowedTypesMap = {}) {
-    const fieldData = {
-        field: null,
-        errors: []
-    };
-    if (fieldSplit.length !== 3) {
-        fieldData.errors.push('Make sure all three columns: Name, Type and Description are populated');
-    } else {
-        fieldData.field = {
-            name: _.trim(fieldSplit[0]),
-            type: _.trim(fieldSplit[1]),
-            description: _.trim(fieldSplit[2]),
+function attemptSplit(line, position) {
+    /* TEST STRINGS
+Field1	INTEGER	description for field 1
+Field2	DATE	description for field 2
+Field 3 and a bit  DECIMAL	fooobaa for the win
+Field 4 and a bit, STRING,	more text	, and more
+Field 5 and a bit,STRING,desc
+     */
+
+    const atoms = _.split(line, /[,\W]+/);
+    if (atoms.length > 2) {
+        const words = _.chain(atoms)
+            .map(w => w.trim())
+            .filter(w => w.length > 0)
+            .value();
+        const typePos = _.findIndex(words, w => _.includes(allowedTypes, w));
+        const name =_.join(_.take(words, typePos), " ");
+        const type = words[typePos];
+        const description = _.join(_.drop(words, typePos + 1), " ");
+        return {
+            name,
+            type,
+            description,
             position
         };
+    }
+}
 
+
+
+
+function parseFieldLine(line = [], position) {
+    const fieldData = {
+        field: attemptSplit(line, position),
+        errors: []
+    };
+    if (! fieldData.field) {
+        fieldData.errors.push('Make sure all three columns: Name, Type and Description are populated');
+    } else {
         if (_.isEmpty(fieldData.field.name)) {
             fieldData.errors.push('Name must be defined');
         }
@@ -79,7 +96,7 @@ function parseField(fieldSplit = [], position, allowedTypesMap = {}) {
             fieldData.errors.push('Description must be defined');
         }
 
-        if (! allowedTypesMap[fieldData.field.type]) {
+        if (! _.includes(allowedTypes, fieldData.field.type)) {
             fieldData.errors.push('Type is invalid');
         }
     }
@@ -97,22 +114,18 @@ function controller() {
         vm.specDefFields.hasErrors = false;
         vm.specDefFields.parsedData = [];
 
-        const lines = _.split(vm.specDefFields.rawData, '\n');
+        const lines = _.chain(vm.specDefFields.rawData)
+            .split('\n')
+            .value();
 
         vm.specDefFields.parsedData = _.map(lines, (line, index) => {
-            const fieldSplit = _.split(line, '\t');
-            const fieldData = parseField(fieldSplit, index + 1, vm.allowedTypesMap);
+            const fieldData = parseFieldLine(line, index + 1);
             if (fieldData.errors.length > 0) {
                 vm.specDefFields.hasErrors = true;
             }
             return fieldData;
         });
-        vm.visibility = 'PREVIEW';
         vm.specDefinition.def.status = vm.status;
-    };
-
-    vm.showForm = () => {
-        vm.visibility = 'FORM';
     };
 
     vm.submit = () => {
