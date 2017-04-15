@@ -35,11 +35,7 @@ import {toGraphId, toNodeShape, shapeFor, positionFor} from '../../flow-diagram-
 
 
 const bindings = {
-    nodes: '<',
-    flows: '<',
-    layout: '<',
-    contextMenus: '<',
-    onInitialise: '<'
+    contextMenus: '<'
 };
 
 
@@ -67,8 +63,8 @@ const styles = {
 
 const dimensions = {
     svg: {
-        w: 1000,
-        h: 540
+        w: 1100,
+        h: 600
     },
     flowBucket: {
         r: 10
@@ -149,12 +145,15 @@ function drawNodes(state, group, commandProcessor) {
         .enter()
         .append('g')
         .classed(styles.NODE, true)
-        .on('contextmenu', d3ContextMenu(
-            contextMenus.node))
         .call(drag()
             .on("start", dragStarted)
             .on("drag", dragger(commandProcessor))
             .on("end", dragEnded));
+
+    if (contextMenus.node) {
+        newNodeElems
+            .on('contextmenu', d3ContextMenu(contextMenus.node))
+    }
 
     // position and setup drag and drop
 
@@ -267,9 +266,12 @@ function drawFlowBuckets(state, group) {
     const newBucketElems = bucketElems
         .enter()
         .append('g')
-        .classed(styles.FLOW_BUCKET, true)
-        .on('contextmenu', d3ContextMenu(
-            contextMenus.flowBucket));
+        .classed(styles.FLOW_BUCKET, true);
+
+    if (contextMenus.flowBucket) {
+        newBucketElems
+            .on('contextmenu', d3ContextMenu(contextMenus.flowBucket));
+    }
 
     newBucketElems
         .append('circle');
@@ -344,9 +346,12 @@ function drawAnnotations(state, group, commandProcessor) {
     const newAnnotationElems = annotationElems
         .enter()
         .append('g')
-        .classed(styles.ANNOTATION, true)
-        .on('contextmenu', d3ContextMenu(
-            contextMenus.annotation));
+        .classed(styles.ANNOTATION, true);
+
+    if (contextMenus.annotation) {
+        newAnnotationElems
+            .on('contextmenu', d3ContextMenu(contextMenus.annotation));
+    }
 
     annotationElems
         .exit()
@@ -442,8 +447,8 @@ function draw(state, commandProcessor = () => console.log('no command processor 
             .attr("transform", state.layout.diagramTransform);
     }
 
-    drawFlows(state, groups.flows, commandProcessor);
     drawNodes(state, groups.nodes, commandProcessor);
+    drawFlows(state, groups.flows, commandProcessor);
     drawFlowBuckets(state, groups.flowBuckets, commandProcessor);
     drawAnnotations(state, groups.annotations, commandProcessor);
 }
@@ -457,7 +462,8 @@ function prepareGroups(holder) {
         .attr('viewBox', `0 0 ${dimensions.svg.w} ${dimensions.svg.h}`);
 
     const container = svg
-        .append('g');
+        .append('g')
+        .attr('transform', 'translate(0,0) scale(1)');
 
     const annotations = container
         .append("g")
@@ -525,10 +531,13 @@ function controller($element, flowDiagramStateService) {
         initialiseData(vm, initialState);
         const holder = $element.find('div')[0];
         Object.assign(groups, prepareGroups(holder));
-        groups
-            .svg
-            .on('contextmenu', d3ContextMenu(
-                contextMenus.canvas));
+
+        if (contextMenus.canvas) {
+            groups
+                .svg
+                .on('contextmenu', d3ContextMenu(
+                    contextMenus.canvas));
+        }
 
         destroyResizeListener = responsivefy(groups.svg);
 
@@ -543,9 +552,6 @@ function controller($element, flowDiagramStateService) {
 
     vm.$onChanges = (c) => {
         Object.assign(contextMenus, vm.contextMenus || {});
-        if (_.isFunction(vm.onInitialise)) {
-            vm.onInitialise({});
-        }
         draw(
             flowDiagramStateService.getState(),
             flowDiagramStateService.processCommands);

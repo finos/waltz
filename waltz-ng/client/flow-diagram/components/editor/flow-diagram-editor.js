@@ -30,8 +30,6 @@ import {createSampleDiagram, toGraphId} from '../../flow-diagram-utils';
 
 
 const bindings = {
-    nodes: '<',
-    initialModel: '<'
 };
 
 

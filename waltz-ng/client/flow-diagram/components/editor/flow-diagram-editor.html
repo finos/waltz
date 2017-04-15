@@ -38,12 +38,7 @@
 
     <!-- EDITOR -->
     <div ng-class="{ 'dim' : $ctrl.visibility.popup }">
-        <waltz-flow-diagram nodes="$ctrl.nodes"
-                            flows="$ctrl.flows"
-                            annotations="$ctrl.annotations"
-                            layout="$ctrl.layout"
-                            on-initialise="$ctrl.onDiagramInit"
-                            context-menus="$ctrl.contextMenus">
+        <waltz-flow-diagram context-menus="$ctrl.contextMenus">
         </waltz-flow-diagram>
 
         <div class="row">
@@ -55,6 +50,7 @@
                 <pre ng-bind="$ctrl.saveResp | json"></pre>
             </div>
             <div class="col-md-4">
+                <pre>{{ $ctrl.nodes | json }}</pre>
             </div>
             <div class="col-md-4">
             </div>

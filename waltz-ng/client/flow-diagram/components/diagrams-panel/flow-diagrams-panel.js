@@ -23,10 +23,10 @@ import {initialiseData} from "../../../common";
 
 
 const bindings = {
-    entityRef: '<',
     flowDiagrams: '<',
     flowDiagramEntities: '<',
 };
+
 
 const template = require('./flow-diagrams-panel.html');
 
@@ -35,49 +35,50 @@ const initialState = {
     flowDiagrams: [],
     flowDiagramEntities: [],
     diagrams: [],
+    visibility: {
+        diagram: false
+    }
 };
 
 
-const dateCell = {
-    field: 'lastUpdatedAt',
-    displayName: 'Last Updated',
-    enableFiltering: false,
-    cellTemplate: '<div class="ui-grid-cell-contents">\n     ' +
-                    '<waltz-from-now timestamp="COL_FIELD" days-only="true"></waltz-from-now>\n' +
-                  '</div>',
-    width: '15%'
-};
 
-
-function controller() {
+function controller(flowDiagramStateService) {
     const vm = initialiseData(this, initialState);
-
-    vm.diagramColumnDefs = [
-        { field: 'name', displayName: 'Name', width: "20%" },
-        { field: 'description', displayName: 'Description', width: "40%" },
-        { field: 'lastUpdatedBy', displayName: 'Editor', width: "15%" },
-        dateCell,
-        { field: 'notable', displayName: 'Notable', width: "10%", sort: { direction: 'desc', priority: 0 }},
-
-    ];
 
     vm.$onChanges = () => {
         if(vm.flowDiagrams && vm.flowDiagramEntities) {
             const flowEntitiesDiagramId = _.keyBy(vm.flowDiagramEntities, 'diagramId');
-            vm.diagrams = _.map(vm.flowDiagrams, d => Object.assign(
-                {},
-                d,
-                { notable: flowEntitiesDiagramId[d.id].isNotable || false }
-            ));
+            vm.diagrams = _.map(
+                vm.flowDiagrams,
+                d => Object.assign(
+                    {},
+                    d,
+                    { notable: flowEntitiesDiagramId[d.id].isNotable || false }));
         }
-
     };
 
+    vm.onDiagramSelect = (diagram) => {
+        vm.visibility.diagram = true;
+        vm.selectedDiagram = diagram;
+        flowDiagramStateService.reset()
+        flowDiagramStateService
+            .load(diagram.id)
+            .then(() => console.log('loaded'))
+    };
+
+    vm.onDiagramDismiss = () => {
+        vm.visibility.diagram = false;
+        vm.selectedDiagram = null;
+        flowDiagramStateService.reset();
+    };
+
+    vm.contextMenus = {};
 
 }
 
 
 controller.$inject = [
+    'FlowDiagramStateService'
 ];
 
 

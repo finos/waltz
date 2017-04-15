@@ -1,6 +1,53 @@
-<div>
-    <waltz-grid-with-search column-defs="$ctrl.diagramColumnDefs"
-                            entries="$ctrl.diagrams"
-                            class="small">
-    </waltz-grid-with-search>
+<div class="row">
+    <div class="col-md-2">
+        <style>
+            .waltz-info-block {
+                border: 1px solid #ccc;
+                background-color: #eee;
+                border-radius: 3px;
+                padding: 2px 5px 2px 5px;
+                margin-bottom: 2px;
+                font-size: x-small;
+            }
+
+            .waltz-info-block:hover {
+                background-color: #fafafa;
+            }
+
+            .waltz-info-block.active {
+                background-color: #fdfdfd;
+            }
+        </style>
+
+        <h5>Diagrams</h5>
+        <div ng-class="{ 'waltz-scroll-region-400' : $ctrl.diagrams.length > 8 }">
+            <div class="waltz-info-block clickable"
+                 ng-class="{ 'active': $ctrl.selectedDiagram.id === diagram.id }"
+                 ng-click="$ctrl.onDiagramSelect(diagram)"
+                 ng-repeat="diagram in $ctrl.diagrams">
+                <a ng-bind="diagram.name"></a>
+                <div class="small">
+                    <waltz-last-updated entity="diagram">
+                    </waltz-last-updated>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-10">
+        <div ng-if="$ctrl.visibility.diagram">
+            <waltz-flow-diagram context-menus="$ctrl.contextMenus">
+            </waltz-flow-diagram>
+            <span class="pull-right">
+                <span ng-bind="$ctrl.selectedDiagram.name"></span>
+                -
+                <waltz-last-updated class='small'
+                                    entity="$ctrl.selectedDiagram">
+                </waltz-last-updated>
+            </span>
+            <div class="help-block small">
+                This diagram may be moved and resized by holding down ctrl and dragging and/or zooming.
+            </div>
+        </div>
+    </div>
+
 </div>
