@@ -80,7 +80,7 @@ function prepareSaveCmd(state) {
         diagramTransform: ifPresent(
             state.layout.diagramTransform,
             x => x.toString(),
-            "translate(0,0) scale(0)")
+            "translate(0,0) scale(1)")
     };
 
     const annotations = _.map(state.model.annotations, a => {

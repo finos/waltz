@@ -36,7 +36,10 @@ const initialState = {
     specification: null,
     selectedSpecDefinition: {},
     selectableSpecDefinitions: [],
-    tour: []
+    tour: [],
+    visibility: {
+        diagramEditor: false
+    }
 };
 
 
@@ -76,8 +79,11 @@ function removeFromHistory(historyStore, flow, spec) {
 }
 
 
-function loadBookmarks(bookmarkStore, entityRef) {
-    if(!bookmarkStore || !entityRef) return null;
+function loadBookmarks(bookmarkStore, id) {
+    const entityRef = {
+        kind: 'PHYSICAL_SPECIFICATION',
+        id
+    };
     return bookmarkStore
         .findByParent(entityRef);
 }
@@ -113,10 +119,29 @@ function getSelectableSpecDefinitions(specDefinitions = [], selectedSpecDef) {
 }
 
 
+function loadFlowDiagrams(flowId, $q, flowDiagramStore, flowDiagramEntityStore) {
+    const ref = {
+        id: flowId,
+        kind: 'PHYSICAL_FLOW'
+    };
+
+    const promises = [
+        flowDiagramStore.findByEntityReference(ref),
+        flowDiagramEntityStore.findByEntityReference(ref)
+    ];
+    return $q
+        .all(promises)
+        .then(([flowDiagrams, flowDiagramEntities]) => ({ flowDiagrams, flowDiagramEntities }));
+}
+
+
 function controller($q,
                     $state,
                     $stateParams,
                     bookmarkStore,
+                    flowDiagramStore,
+                    flowDiagramEntityStore,
+                    flowDiagramStateService,
                     historyStore,
                     logicalFlowStore,
                     notification,
@@ -146,14 +171,11 @@ function controller($q,
         .then(spec => vm.specification = spec);
 
     specPromise
-        .then(() =>  {
-            const specRef = {
-                kind: 'PHYSICAL_SPECIFICATION',
-                id: vm.specification.id
-            };
-            return loadBookmarks(bookmarkStore, specRef)
-        })
+        .then(() => loadBookmarks(bookmarkStore, vm.specification.id))
         .then(bs => vm.bookmarks = bs);
+
+    loadFlowDiagrams(flowId, $q, flowDiagramStore, flowDiagramEntityStore)
+        .then(r => Object.assign(vm, r));
 
     // spec definitions
     const loadSpecDefinitions = () => physicalSpecDefinitionStore
@@ -237,6 +259,38 @@ function controller($q,
                 });
         }
     };
+
+    vm.showCreateDiagram = () => {
+        vm.visibility.diagramEditor = true;
+        flowDiagramStateService
+            .reset();
+
+        const source = Object.assign({}, vm.logicalFlow.source, { isNotable: true });
+        const target = Object.assign({}, vm.logicalFlow.target, { isNotable: true });
+        const logicalFlow = Object.assign({}, vm.logicalFlow, { kind: 'LOGICAL_DATA_FLOW'});
+        const physicalFlow = Object.assign({}, vm.physicalFlow, { kind: 'PHYSICAL_FLOW'});
+        const annotation = {
+            id: +new Date()+'',
+            kind: 'ANNOTATION',
+            entityReference: logicalFlow,
+            note: `${vm.specification.name} is sent ${vm.physicalFlow.frequency} via ${vm.physicalFlow.transport}`
+        };
+
+        flowDiagramStateService.processCommands([
+            { command: 'ADD_NODE', payload: source },
+            { command: 'ADD_NODE', payload: target },
+            { command: 'ADD_FLOW', payload: logicalFlow },
+            { command: 'ADD_DECORATION', payload: { ref: logicalFlow, decoration: physicalFlow }},
+            { command: 'ADD_ANNOTATION', payload: annotation},
+            { command: 'MOVE', payload: { id: `ANNOTATION/${annotation.id}`, dx: 100, dy: -50 }},
+            { command: 'MOVE', payload: { id: `APPLICATION/${source.id}`, dx: 300, dy: 200 }},
+            { command: 'MOVE', payload: { id: `APPLICATION/${target.id}`, dx: 400, dy: 300 }},
+        ]);
+    };
+
+    vm.dismissCreateDiagram = () => {
+        vm.visibility.diagramEditor = false;
+    };
 }
 
 
@@ -245,6 +299,9 @@ controller.$inject = [
     '$state',
     '$stateParams',
     'BookmarkStore',
+    'FlowDiagramStore',
+    'FlowDiagramEntityStore',
+    'FlowDiagramStateService',
     'HistoryStore',
     'LogicalFlowStore',
     'Notification',

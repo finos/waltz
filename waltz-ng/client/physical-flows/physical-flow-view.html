@@ -121,18 +121,39 @@
                    icon="picture-o"
                    id="specification-flow-diagram-section">
 
-        Diagrams ids will need to resolved by restricting diagram_entities by physical_flow id
+        <waltz-section-actions ng-hide="ctrl.visibility.diagramEditor">
+            <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                <button class="btn btn-xs btn-primary" ng-click="ctrl.showCreateDiagram()">
+                    Create
+                </button>
+            </div>
+        </waltz-section-actions>
 
-        <br>
-        Show a clickable list of diagrams which allows diagrams to be displayed inline
+        <div ng-if="! ctrl.visibility.diagramEditor"
+             class="waltz-fade-if">
+            <div ng-if="ctrl.flowDiagrams.length > 0">
+                <waltz-flow-diagrams-panel flow-diagrams="ctrl.flowDiagrams"
+                                           flow-diagram-entities="ctrl.flowDiagramEntities">
+                </waltz-flow-diagrams-panel>
+            </div>
 
-        <waltz-flow-diagrams-panel></waltz-flow-diagrams-panel>
+            <waltz-no-data ng-if="ctrl.flowDiagrams.length == 0">
+                <message>
+                    <strong>No flow diagrams</strong> for this physical specification.
+                </message>
+            </waltz-no-data>
+        </div>
 
-        <waltz-no-data ng-if="ctrl.flowDiagrams.length == 0">
-            <message>
-                <strong>No flow diagrams</strong> for this physical specification.
-            </message>
-        </waltz-no-data>
+        <div ng-if="ctrl.visibility.diagramEditor" class="waltz-fade-if">
+            <h4>New Diagram</h4>
+            <waltz-flow-diagram-editor>
+            </waltz-flow-diagram-editor>
+            <a class='clickable'
+               ng-click="ctrl.dismissCreateDiagram()">
+                Cancel
+            </a>
+        </div>
+
     </waltz-section>
 
 
