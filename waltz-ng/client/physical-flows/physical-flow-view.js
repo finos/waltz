@@ -276,16 +276,22 @@ function controller($q,
             note: `${vm.specification.name} is sent ${vm.physicalFlow.frequency} via ${vm.physicalFlow.transport}`
         };
 
-        flowDiagramStateService.processCommands([
+        const modelCommands = [
             { command: 'ADD_NODE', payload: source },
             { command: 'ADD_NODE', payload: target },
             { command: 'ADD_FLOW', payload: logicalFlow },
             { command: 'ADD_DECORATION', payload: { ref: logicalFlow, decoration: physicalFlow }},
-            { command: 'ADD_ANNOTATION', payload: annotation},
+            { command: 'ADD_ANNOTATION', payload: annotation}
+        ];
+
+        const moveCommands = [
             { command: 'MOVE', payload: { id: `ANNOTATION/${annotation.id}`, dx: 100, dy: -50 }},
             { command: 'MOVE', payload: { id: `APPLICATION/${source.id}`, dx: 300, dy: 200 }},
             { command: 'MOVE', payload: { id: `APPLICATION/${target.id}`, dx: 400, dy: 300 }},
-        ]);
+        ];
+
+        flowDiagramStateService.processCommands(modelCommands);
+        setTimeout(() => flowDiagramStateService.processCommands(moveCommands), 0);
     };
 
     vm.dismissCreateDiagram = () => {
