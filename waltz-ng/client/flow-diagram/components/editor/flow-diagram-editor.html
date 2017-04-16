@@ -1,4 +1,4 @@
-<div class="waltz-flow-diagram-editor">
+<div class="waltz-flow-diagram-editor row">
 
     <!-- LOGICAL FLOW POPUP -->
     <div class="wfde-pop waltz-fade-if"
@@ -37,24 +37,47 @@
 
 
     <!-- EDITOR -->
-    <div ng-class="{ 'wfde-dim' : $ctrl.visibility.anyPopup }">
-        <waltz-flow-diagram context-menus="$ctrl.contextMenus">
-        </waltz-flow-diagram>
+    <div class="col-md-2">
+        <h5>Flow Diagram Editor</h5>
 
-        <div class="row">
-            <div class="col-md-4">
-                <button class="btn btn-success"
-                        ng-click="$ctrl.doSave()">
-                    Save
-                </button>
-                <pre ng-bind="$ctrl.saveResp | json"></pre>
-            </div>
-            <div class="col-md-4">
-                <pre>{{ $ctrl.nodes | json }}</pre>
-            </div>
-            <div class="col-md-4">
-            </div>
+        <form>
+            <label>Title</label>
+            <input type="text"
+                   class="form-control input-sm"
+                   ng-model="$ctrl.title"
+                   ng-change="$ctrl.onTitleChange($ctrl.title)">
+        </form>
+        <hr>
+
+        <div class="small">
+            <strong>Instructions:</strong>
+            Use the context menu (typically <i>right mouse button</i>) to display menu options:
+            <ul class="small"
+                style="padding-left: 14px">
+                <li>Use add/remove upstream/downstream nodes to illustrate the basic logical flows</li>
+                <li>Add annotations to describe in more detail what is happening</li>
+                <li>Decorate flows by describing the associated physical flows</li>
+            </ul>
+
         </div>
 
+        <hr>
+
+        <button class="btn btn-sm btn-success"
+                ng-click="$ctrl.doSave()">
+            Save
+        </button>
+        &nbsp;
+        <a ng-click="$ctrl.onCancel()"
+           class="clickable">
+            Cancel
+        </a>
+    </div>
+
+    <div class="col-md-10">
+        <div ng-class="{ 'wfde-dim' : $ctrl.visibility.anyPopup }">
+            <waltz-flow-diagram context-menus="$ctrl.contextMenus">
+            </waltz-flow-diagram>
+        </div>
     </div>
 </div>

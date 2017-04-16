@@ -19,17 +19,52 @@
             }
         </style>
 
-        <h5>Diagrams</h5>
-        <div ng-class="{ 'waltz-scroll-region-400' : $ctrl.diagrams.length > 8 }">
-            <div class="waltz-info-block clickable"
-                 ng-class="{ 'active': $ctrl.selectedDiagram.id === diagram.id }"
-                 ng-click="$ctrl.onDiagramSelect(diagram)"
-                 ng-repeat="diagram in $ctrl.diagrams">
-                <a ng-bind="diagram.name"></a>
-                <div class="small">
-                    <waltz-last-updated entity="diagram">
-                    </waltz-last-updated>
+        <div ng-if="! $ctrl.selectedDiagram"
+             class="waltz-fade-if">
+            <h5>Diagrams</h5>
+            <input type="search"
+                   placeholder="Filter..."
+                   ng-if="$ctrl.diagrams.length > 5"
+                   class="form-search form-control input-sm"
+                   ng-model="$ctrl.qry">
+            <div ng-class="{
+                'waltz-scroll-region-400' : $ctrl.diagrams.length > 9
+            }">
+                <div class="waltz-info-block clickable"
+                     ng-class="{ 'active': $ctrl.selectedDiagram.id === diagram.id }"
+                     ng-click="$ctrl.onDiagramSelect(diagram)"
+                     ng-repeat="diagram in $ctrl.diagrams | filter: $ctrl.qry | orderBy: 'name'">
+                    <a ng-bind="diagram.name"></a>
+                    <div class="small">
+                        <waltz-last-updated entity="diagram">
+                        </waltz-last-updated>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <div ng-if="$ctrl.selectedDiagram"
+             class="waltz-fade-if">
+            <h5 ng-bind="$ctrl.selectedDiagram.name"></h5>
+            <waltz-last-updated class='small'
+                                entity="$ctrl.selectedDiagram">
+            </waltz-last-updated>
+
+            <hr>
+
+            <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                <button class="btn btn-xs btn-primary">
+                    Edit
+                </button>
+            </div>
+            <a class='clickable'
+               ng-click="$ctrl.selectedDiagram = null">
+                Cancel
+            </a>
+            <hr>
+
+            <div class="help-block small small">
+                This diagram may be moved and resized by holding down <kbd>ctrl</kbd> and dragging and/or zooming.
             </div>
         </div>
     </div>
@@ -37,16 +72,6 @@
         <div ng-if="$ctrl.visibility.diagram">
             <waltz-flow-diagram context-menus="$ctrl.contextMenus">
             </waltz-flow-diagram>
-            <span class="pull-right">
-                <span ng-bind="$ctrl.selectedDiagram.name"></span>
-                -
-                <waltz-last-updated class='small'
-                                    entity="$ctrl.selectedDiagram">
-                </waltz-last-updated>
-            </span>
-            <div class="help-block small">
-                This diagram may be moved and resized by holding down <kbd>ctrl</kbd> and dragging and/or zooming.
-            </div>
         </div>
     </div>
 
