@@ -87,6 +87,13 @@ const groups = {
 };
 
 
+const DEFAULT_CONTEXT_MENUS = {
+    annotation: null,
+    canvas: null,
+    flowBucket: null,
+    node: null
+};
+
 const contextMenus = {
     annotation: null,
     canvas: null,
@@ -148,12 +155,11 @@ function drawNodes(state, group, commandProcessor) {
         .call(drag()
             .on("start", dragStarted)
             .on("drag", dragger(commandProcessor))
-            .on("end", dragEnded));
+            .on("end", dragEnded))
+        .on('contextmenu', contextMenus.node
+            ? d3ContextMenu(contextMenus.node)
+            : null);
 
-    if (contextMenus.node) {
-        newNodeElems
-            .on('contextmenu', d3ContextMenu(contextMenus.node))
-    }
 
     // position and setup drag and drop
 
@@ -201,7 +207,7 @@ function drawNodes(state, group, commandProcessor) {
         .selectAll(`.${styles.TITLE}`)
         .text(d => d.data.name)
         .each(function(d) {
-            // update shape to accomodate label
+            // update shape to accommodate label
             const labelWidth = Math.max(this.getComputedTextLength() + 32, 60);
             state.layout.shapes[d.id] = toNodeShape(d.data, labelWidth);
         });
@@ -266,12 +272,10 @@ function drawFlowBuckets(state, group) {
     const newBucketElems = bucketElems
         .enter()
         .append('g')
-        .classed(styles.FLOW_BUCKET, true);
-
-    if (contextMenus.flowBucket) {
-        newBucketElems
-            .on('contextmenu', d3ContextMenu(contextMenus.flowBucket));
-    }
+        .classed(styles.FLOW_BUCKET, true)
+        .on('contextmenu', contextMenus.flowBucket
+            ? d3ContextMenu(contextMenus.flowBucket)
+            : null);
 
     newBucketElems
         .append('circle');
@@ -346,12 +350,10 @@ function drawAnnotations(state, group, commandProcessor) {
     const newAnnotationElems = annotationElems
         .enter()
         .append('g')
-        .classed(styles.ANNOTATION, true);
-
-    if (contextMenus.annotation) {
-        newAnnotationElems
-            .on('contextmenu', d3ContextMenu(contextMenus.annotation));
-    }
+        .classed(styles.ANNOTATION, true)
+        .on('contextmenu', contextMenus.annotation
+            ? d3ContextMenu(contextMenus.annotation)
+            : null);
 
     annotationElems
         .exit()
@@ -523,6 +525,7 @@ function setupPanAndZoom(commandProcessor) {
 }
 
 
+
 function controller($element, flowDiagramStateService) {
     const vm = this;
     let destroyResizeListener = null;
@@ -532,12 +535,11 @@ function controller($element, flowDiagramStateService) {
         const holder = $element.find('div')[0];
         Object.assign(groups, prepareGroups(holder));
 
-        if (contextMenus.canvas) {
-            groups
-                .svg
-                .on('contextmenu', d3ContextMenu(
-                    contextMenus.canvas));
-        }
+        groups
+            .svg
+            .on('contextmenu', contextMenus.canvas
+                ? d3ContextMenu(contextMenus.canvas)
+                : null);
 
         destroyResizeListener = responsivefy(groups.svg);
 
@@ -551,7 +553,7 @@ function controller($element, flowDiagramStateService) {
         flowDiagramStateService.processCommands));
 
     vm.$onChanges = (c) => {
-        Object.assign(contextMenus, vm.contextMenus || {});
+        Object.assign(contextMenus, DEFAULT_CONTEXT_MENUS, vm.contextMenus || {});
         draw(
             flowDiagramStateService.getState(),
             flowDiagramStateService.processCommands);

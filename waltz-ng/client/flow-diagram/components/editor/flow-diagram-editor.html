@@ -1,7 +1,7 @@
 <div class="waltz-flow-diagram-editor">
 
     <!-- LOGICAL FLOW POPUP -->
-    <div class="pop waltz-fade-if"
+    <div class="wfde-pop waltz-fade-if"
          ng-if="$ctrl.visibility.logicalFlowPopup">
         <waltz-flow-diagram-logical-flow-popup on-dismiss="$ctrl.onDismissPopup"
                                                logical-flows="$ctrl.popup.logicalFlows"
@@ -14,7 +14,7 @@
 
 
     <!-- PHYSICAL FLOW POPUP -->
-    <div class="pop waltz-fade-if"
+    <div class="wfde-pop waltz-fade-if"
          ng-if="$ctrl.visibility.physicalFlowPopup">
         <waltz-flow-diagram-physical-flow-popup on-dismiss="$ctrl.onDismissPopup"
                                                 logical-flow="$ctrl.popup.logicalFlow"
@@ -27,7 +27,7 @@
 
 
     <!-- ANNOTATION POPUP -->
-    <div class="pop waltz-fade-if"
+    <div class="wfde-pop waltz-fade-if"
          ng-if="$ctrl.visibility.annotationPopup">
         <waltz-flow-diagram-annotation-popup on-dismiss="$ctrl.onDismissPopup"
                                              annotation="$ctrl.popup.annotation"
@@ -37,7 +37,7 @@
 
 
     <!-- EDITOR -->
-    <div ng-class="{ 'dim' : $ctrl.visibility.popup }">
+    <div ng-class="{ 'wfde-dim' : $ctrl.visibility.anyPopup }">
         <waltz-flow-diagram context-menus="$ctrl.contextMenus">
         </waltz-flow-diagram>
 

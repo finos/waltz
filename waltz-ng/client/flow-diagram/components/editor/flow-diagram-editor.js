@@ -98,6 +98,7 @@ function mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateServ
                             .then(popup => {
                                 vm.popup = popup;
                                 vm.visibility.logicalFlowPopup = true;
+                                vm.visibility.anyPopup = true;
                             });
                     });
                 }
@@ -109,6 +110,7 @@ function mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateServ
                             .then(popup => {
                                 vm.popup = popup;
                                 vm.visibility.logicalFlowPopup = true;
+                                vm.visibility.anyPopup = true;
                             });
                     });
                 }
@@ -180,6 +182,7 @@ function mkFlowBucketMenu($q, $timeout, vm, flowDiagramStateService, physicalFlo
                         const popup = prepareAddAnnotationPopup(d);
                         vm.popup = popup;
                         vm.visibility.annotationPopup = true;
+                        vm.visibility.anyPopup = true;
                     });
                 }
             },
@@ -196,6 +199,7 @@ function mkFlowBucketMenu($q, $timeout, vm, flowDiagramStateService, physicalFlo
                             .then(popup => {
                                 vm.popup = popup;
                                 vm.visibility.physicalFlowPopup = true;
+                                vm.visibility.anyPopup = true;
                             });
                     });
 
@@ -222,6 +226,7 @@ function mkAnnotationMenu(commandProcessor, $timeout, vm) {
                         const popup = prepareUpdateAnnotationPopup(d);
                         vm.popup = popup;
                         vm.visibility.annotationPopup = true;
+                        vm.visibility.anyPopup = true;
                     });
                 }
             },
@@ -277,6 +282,7 @@ function controller($q,
         vm.visibility.annotationPopup = false;
         vm.visibility.logicalFlowPopup = false;
         vm.visibility.physicalFlowPopup = false;
+        vm.visibility.anyPopup = false;
     };
 
     vm.onDiagramInit = (d) => {
