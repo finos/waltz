@@ -31,6 +31,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.FlowDiagram.FLOW_DIAGRAM;
@@ -84,14 +85,18 @@ public class FlowDiagramDao {
 
 
     public List<FlowDiagram> findByEntityReference(EntityReference ref) {
+        // cannot do a select distinct as LAYOUT is a clob
         return dsl
-                .selectDistinct(FLOW_DIAGRAM.fields())
+                .select(FLOW_DIAGRAM.fields())
                 .from(FLOW_DIAGRAM)
                 .innerJoin(FLOW_DIAGRAM_ENTITY)
                 .on(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(FLOW_DIAGRAM.ID))
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(ref.id()))
                 .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(ref.kind().name()))
-                .fetch(TO_DOMAIN_MAPPER);
+                .fetch(TO_DOMAIN_MAPPER)
+                .stream()
+                .distinct()
+                .collect(Collectors.toList());
     }
 
 
@@ -107,6 +112,7 @@ public class FlowDiagramDao {
 
     public boolean update(FlowDiagram flowDiagram) {
         FlowDiagramRecord record = TO_RECORD_MAPPER.apply(flowDiagram);
+        record.changed(FLOW_DIAGRAM.ID, false);
         return dsl.executeUpdate(record) == 1;
     }
 
