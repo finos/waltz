@@ -260,15 +260,12 @@ function controller($q,
         }
     };
 
-    vm.showCreateDiagram = () => {
-        vm.visibility.diagramEditor = true;
-        flowDiagramStateService
-            .reset();
-
+    vm.createFlowDiagramCommands = () => {
         const source = Object.assign({}, vm.logicalFlow.source, { isNotable: true });
         const target = Object.assign({}, vm.logicalFlow.target, { isNotable: true });
         const logicalFlow = Object.assign({}, vm.logicalFlow, { kind: 'LOGICAL_DATA_FLOW'});
         const physicalFlow = Object.assign({}, vm.physicalFlow, { kind: 'PHYSICAL_FLOW'});
+        const title = `${source.name} sends ${vm.specification.name} to ${target.name}`;
         const annotation = {
             id: +new Date()+'',
             kind: 'ANNOTATION',
@@ -281,7 +278,8 @@ function controller($q,
             { command: 'ADD_NODE', payload: target },
             { command: 'ADD_FLOW', payload: logicalFlow },
             { command: 'ADD_DECORATION', payload: { ref: logicalFlow, decoration: physicalFlow }},
-            { command: 'ADD_ANNOTATION', payload: annotation}
+            { command: 'ADD_ANNOTATION', payload: annotation },
+            { command: 'SET_TITLE', payload: title }
         ];
 
         const moveCommands = [
@@ -290,13 +288,9 @@ function controller($q,
             { command: 'MOVE', payload: { id: `APPLICATION/${target.id}`, dx: 400, dy: 300 }},
         ];
 
-        flowDiagramStateService.processCommands(modelCommands);
-        setTimeout(() => flowDiagramStateService.processCommands(moveCommands), 0);
-    };
+        return _.concat(modelCommands, moveCommands);
+    }
 
-    vm.dismissCreateDiagram = () => {
-        vm.visibility.diagramEditor = false;
-    };
 }
 
 

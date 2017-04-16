@@ -30,6 +30,7 @@ import {createSampleDiagram, toGraphId} from '../../flow-diagram-utils';
 
 
 const bindings = {
+    onCancel: '<'
 };
 
 
@@ -285,9 +286,6 @@ function controller($q,
         vm.visibility.anyPopup = false;
     };
 
-    vm.onDiagramInit = (d) => {
-    };
-
     vm.doSave = () => {
         flowDiagramStateService.save()
             .then(r => vm.saveResp = r)
@@ -295,11 +293,15 @@ function controller($q,
     };
 
     vm.$onChanges = (c) => {
-        if (c.initialModel) {
-            vm.workingModel = angular.copy(vm.initialModel);
-        }
+        vm.title = flowDiagramStateService.getState().model.title
     };
 
+    vm.onTitleChange = (t) => {
+        flowDiagramStateService.processCommands([{
+            command: 'SET_TITLE',
+            payload: t
+        }]);
+    }
 }
 
 

@@ -94,8 +94,8 @@ function prepareSaveCmd(state) {
 
     return {
         diagramId: state.diagramId,
-        name: 'Test',
-        description: 'Test Diagram',
+        name: state.model.title,
+        description: '',
         entities,
         annotations,
         layoutData: JSON.stringify(layoutData)
@@ -242,6 +242,10 @@ function service(
         switch (commandObject.command) {
             case 'TRANSFORM_DIAGRAM':
                 state = _.defaultsDeep({}, { layout: { diagramTransform : payload }}, state);
+                break;
+
+            case 'SET_TITLE':
+                model.title = payload;
                 break;
 
             /* MOVE

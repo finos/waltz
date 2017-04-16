@@ -35,7 +35,8 @@ export default () => {
         .component('waltzFlowDiagramPhysicalFlowPopup', require('./components/editor/flow-diagram-physical-flow-popup'))
         .component('waltzFlowDiagramAnnotationPopup', require('./components/editor/flow-diagram-annotation-popup'))
         .component('waltzFlowDiagramEditor', require('./components/editor/flow-diagram-editor'))
-        .component('waltzFlowDiagramsPanel', require('./components/diagrams-panel/flow-diagrams-panel'));
+        .component('waltzFlowDiagramsPanel', require('./components/diagrams-panel/flow-diagrams-panel'))
+        .component('waltzFlowDiagramsSection', require('./components/section/flow-diagrams-section'));
 
     return module.name;
 };
