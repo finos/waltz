@@ -1,5 +1,6 @@
 <div class="row waltz-fade-if"
      ng-if="! $ctrl.visibility.editor">
+
     <div class="col-md-2">
         <style>
             .waltz-info-block {
@@ -20,7 +21,7 @@
             }
         </style>
 
-        <div ng-if="! $ctrl.selectedDiagram"
+        <div ng-if="! $ctrl.selected.diagram"
              class="waltz-fade-if">
             <h5>Diagrams</h5>
             <input type="search"
@@ -45,32 +46,81 @@
             <a class="clickable"
                ng-click="$ctrl.createDiagram()">
                 <waltz-icon name="plus"></waltz-icon>
-                Create
+                Create new diagram
             </a>
         </div>
 
-        <div ng-if="$ctrl.selectedDiagram"
+        <div ng-if="$ctrl.selected.diagram"
              class="waltz-fade-if small">
 
             <!-- TITLE -->
-            <strong ng-bind="$ctrl.selectedDiagram.name"></strong>
+            <strong ng-bind="$ctrl.selected.diagram.name"></strong>
             <waltz-last-updated class='small'
-                                entity="$ctrl.selectedDiagram">
+                                entity="$ctrl.selected.diagram">
             </waltz-last-updated>
+
+            <div ng-if="$ctrl.selected.node != null"
+                 class="waltz-fade-if">
+                <hr>
+                <div>
+                    <waltz-entity-link entity-ref="$ctrl.selected.node">
+                    </waltz-entity-link>
+                </div>
+            </div>
+            <div ng-if="$ctrl.selected.flowBucket != null"
+                 class="waltz-fade-if">
+                <hr>
+                <div>
+                    <!-- FLOW -->
+                    <strong>
+                        Flow:
+                    </strong>
+                    <div>
+                        <waltz-entity-link entity-ref="$ctrl.selected.flowBucket.flow.source">
+                        </waltz-entity-link>
+                    </div>
+                    <div style="margin-left: 16px">
+                        to
+                    </div>
+                    <div>
+                        <waltz-entity-link entity-ref="$ctrl.selected.flowBucket.flow.target">
+                        </waltz-entity-link>
+                    </div>
+
+                    <!-- FLOW DETAIL -->
+                    <div style="padding-top: 16px">
+                        <strong>
+                            Details:
+                        </strong>
+                        <div class="small"
+                             style="margin-bottom: 4px; border-top: 1px solid #eee; color: #555"
+                             ng-repeat="decoration in $ctrl.selected.flowBucket.decorations">
+                            <a ui-sref="main.physical-flow.view ({id: decoration.flow.id })">
+                                <strong ng-bind="decoration.specification.name"></strong>
+                            </a>
+                            <div ng-bind="decoration.flow.frequency | toDisplayName:'frequencyKind'"></div>
+                        </div>
+
+                        <div ng-if=" $ctrl.selected.flowBucket.decorations.length == 0">
+                            No additional detail
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <hr>
 
             <!-- ACTIONS -->
             <div>
                 <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                    <button class="btn btn-sm btn-primary"
+                    <button class="btn btn-xs btn-primary"
                             ng-click="$ctrl.editDiagram()">
                         Edit
                     </button>
                 </div>
                 &nbsp;
                 <a class='clickable'
-                   ng-click="$ctrl.selectedDiagram = null">
+                   ng-click="$ctrl.selected.diagram = null">
                     Show List
                 </a>
             </div>
@@ -87,7 +137,8 @@
     </div>
     <div class="col-md-10">
         <div ng-if="$ctrl.visibility.diagram">
-            <waltz-flow-diagram context-menus="$ctrl.contextMenus">
+            <waltz-flow-diagram context-menus="$ctrl.contextMenus"
+                                click-handlers="$ctrl.clickHandlers">
             </waltz-flow-diagram>
         </div>
     </div>
