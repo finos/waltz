@@ -1,4 +1,5 @@
-<div class="row">
+<div class="row waltz-fade-if"
+     ng-if="! $ctrl.visibility.editor">
     <div class="col-md-2">
         <style>
             .waltz-info-block {
@@ -27,9 +28,8 @@
                    ng-if="$ctrl.diagrams.length > 5"
                    class="form-search form-control input-sm"
                    ng-model="$ctrl.qry">
-            <div ng-class="{
-                'waltz-scroll-region-400' : $ctrl.diagrams.length > 9
-            }">
+            <div ng-class="{ 'waltz-scroll-region-400' : $ctrl.diagrams.length > 9 }"
+                 style="padding-bottom: 6px">
                 <div class="waltz-info-block clickable"
                      ng-class="{ 'active': $ctrl.selectedDiagram.id === diagram.id }"
                      ng-click="$ctrl.onDiagramSelect(diagram)"
@@ -41,30 +41,47 @@
                     </div>
                 </div>
             </div>
+
+            <a class="clickable"
+               ng-click="$ctrl.createDiagram()">
+                <waltz-icon name="plus"></waltz-icon>
+                Create
+            </a>
         </div>
 
         <div ng-if="$ctrl.selectedDiagram"
-             class="waltz-fade-if">
-            <h5 ng-bind="$ctrl.selectedDiagram.name"></h5>
+             class="waltz-fade-if small">
+
+            <!-- TITLE -->
+            <strong ng-bind="$ctrl.selectedDiagram.name"></strong>
             <waltz-last-updated class='small'
                                 entity="$ctrl.selectedDiagram">
             </waltz-last-updated>
 
             <hr>
 
-            <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                <button class="btn btn-xs btn-primary">
-                    Edit
-                </button>
+            <!-- ACTIONS -->
+            <div>
+                <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                    <button class="btn btn-sm btn-primary"
+                            ng-click="$ctrl.editDiagram()">
+                        Edit
+                    </button>
+                </div>
+                &nbsp;
+                <a class='clickable'
+                   ng-click="$ctrl.selectedDiagram = null">
+                    Show List
+                </a>
             </div>
-            <a class='clickable'
-               ng-click="$ctrl.selectedDiagram = null">
-                Cancel
-            </a>
+
             <hr>
 
+            <!-- HELP -->
             <div class="help-block small small">
-                This diagram may be moved and resized by holding down <kbd>ctrl</kbd> and dragging and/or zooming.
+                This diagram may be moved and resized by holding down
+                <kbd>ctrl</kbd>
+                and dragging and/or zooming.
             </div>
         </div>
     </div>
@@ -74,5 +91,14 @@
             </waltz-flow-diagram>
         </div>
     </div>
+</div>
+<div class="row waltz-fade-if"
+     ng-if="$ctrl.visibility.editor">
+    <div ng-if="$ctrl.visibility.editor"
+         class="waltz-fade-if col-md-12">
+        <waltz-flow-diagram-editor on-cancel="$ctrl.dismissDiagramEditor">
+        </waltz-flow-diagram-editor>
+    </div>
 
 </div>
+

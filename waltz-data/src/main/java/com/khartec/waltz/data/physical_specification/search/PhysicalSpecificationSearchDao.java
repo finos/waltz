@@ -72,6 +72,7 @@ public class PhysicalSpecificationSearchDao {
                 .from(PHYSICAL_SPECIFICATION)
                 .where(likeName)
                 .or(likeDesc)
+                .orderBy(PHYSICAL_SPECIFICATION.NAME)
                 .limit(options.limit())
                 .fetch(r -> mkRef(
                         EntityKind.PHYSICAL_SPECIFICATION,

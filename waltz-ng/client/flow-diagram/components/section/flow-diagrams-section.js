@@ -31,49 +31,29 @@ import {initialiseData} from '../../../common';
 const bindings = {
     flowDiagrams: '<',
     flowDiagramEntities: '<',
-    createDiagramCommands: '<'
+    createDiagramCommands: '<',
+    reload: '<'
 };
 
 
 const initialState = {
-    visibility: {
-        editor: false
-    }
 };
 
 
 const template = require('./flow-diagrams-section.html');
 
 
-function controller(flowDiagramStateService) {
+function controller() {
     const vm = this;
 
     vm.$onInit = () => initialiseData(vm, initialState);
 
     vm.$onChanges = (c) => {
-
     };
-
-
-    vm.showCreateDiagram = () => {
-        vm.visibility.editor = true;
-        flowDiagramStateService
-            .reset();
-
-
-        flowDiagramStateService.processCommands(vm.createDiagramCommands() || []);
-        setTimeout(() => flowDiagramStateService.processCommands([]), 0);
-    };
-
-    vm.dismissCreateDiagram = () => {
-        vm.visibility.editor = false;
-    };
-
 }
 
 
 controller.$inject = [
-    'FlowDiagramStateService'
 ];
 
 
