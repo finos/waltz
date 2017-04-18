@@ -35,11 +35,29 @@ import {toGraphId, toNodeShape, shapeFor, positionFor} from '../../flow-diagram-
 
 
 const bindings = {
-    contextMenus: '<'
+    contextMenus: '<',
+    clickHandlers: '<'
 };
 
 
 const initialState = {};
+
+
+const DEFAULT_CONTEXT_MENUS = {
+    annotation: null,
+    canvas: null,
+    flowBucket: null,
+    node: null
+};
+
+
+const DEFAULT_CLICK_HANDLER = (d) => console.log('wfd: default on-click handler', d);
+
+
+const DEFAULT_CLICK_HANDLERS  = {
+    node: DEFAULT_CLICK_HANDLER,
+    flowBucket: DEFAULT_CLICK_HANDLER
+};
 
 
 const template = require('./flow-diagram.html');
@@ -87,19 +105,8 @@ const groups = {
 };
 
 
-const DEFAULT_CONTEXT_MENUS = {
-    annotation: null,
-    canvas: null,
-    flowBucket: null,
-    node: null
-};
-
-const contextMenus = {
-    annotation: null,
-    canvas: null,
-    flowBucket: null,
-    node: null
-};
+const contextMenus = Object.assign({}, DEFAULT_CONTEXT_MENUS);
+const clickHandlers = Object.assign({}, DEFAULT_CLICK_HANDLERS);
 
 
 function drawNodeShape(selection, state) {
@@ -148,17 +155,26 @@ function drawNodes(state, group, commandProcessor) {
         .exit()
         .remove();
 
+    const dragHandler = drag()
+        .on("start", dragStarted)
+        .on("drag", dragger(commandProcessor))
+        .on("end", dragEnded);
+
+    const contextMenu = contextMenus.node
+        ? d3ContextMenu(contextMenus.node)
+        : null;
+
+    const clickHandler = (d) => {
+        clickHandlers.node(d);
+    };
+
     const newNodeElems = nodeElems
         .enter()
         .append('g')
         .classed(styles.NODE, true)
-        .call(drag()
-            .on("start", dragStarted)
-            .on("drag", dragger(commandProcessor))
-            .on("end", dragEnded))
-        .on('contextmenu', contextMenus.node
-            ? d3ContextMenu(contextMenus.node)
-            : null);
+        .on('click.node', clickHandler)
+        .on('contextmenu', contextMenu)
+        .call(dragHandler);
 
 
     // position and setup drag and drop
@@ -275,7 +291,8 @@ function drawFlowBuckets(state, group) {
         .classed(styles.FLOW_BUCKET, true)
         .on('contextmenu', contextMenus.flowBucket
             ? d3ContextMenu(contextMenus.flowBucket)
-            : null);
+            : null)
+        .on('click.flowBucket', clickHandlers.flowBucket);
 
     newBucketElems
         .append('circle');
@@ -554,6 +571,7 @@ function controller($element, flowDiagramStateService) {
 
     vm.$onChanges = (c) => {
         Object.assign(contextMenus, DEFAULT_CONTEXT_MENUS, vm.contextMenus || {});
+        Object.assign(clickHandlers, DEFAULT_CLICK_HANDLERS, vm.clickHandlers || {});
         draw(
             flowDiagramStateService.getState(),
             flowDiagramStateService.processCommands);

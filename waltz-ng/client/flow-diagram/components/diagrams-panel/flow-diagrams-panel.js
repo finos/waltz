@@ -26,7 +26,7 @@ const bindings = {
     flowDiagrams: '<',
     flowDiagramEntities: '<',
     createDiagramCommands: '<',
-    reload: '<'
+    reload: '<',
 };
 
 
@@ -42,12 +42,29 @@ const initialState = {
     visibility: {
         diagram: false,
         editor: false
+    },
+    selected: {
+        diagram: null,
+        node: null,
+        flowBucket: null
     }
 };
 
 
+function toRef(d) {
+    return {
+        id: d.id,
+        kind: d.kind,
+        name: d.name
+    };
+}
 
-function controller(flowDiagramStateService) {
+function controller(
+    $timeout,
+    flowDiagramStateService,
+    physicalFlowStore,
+    physicalSpecificationStore)
+{
     const vm = initialiseData(this, initialState);
 
     const showReadOnlyDiagram = () => {
@@ -65,6 +82,70 @@ function controller(flowDiagramStateService) {
         vm.visibility.editor = false;
     };
 
+    const clearSelections = () => {
+        vm.selected.diagram = null;
+        vm.selected.node = null;
+        vm.selected.flowBucket = null;
+    };
+
+    const showNodeDetail = (d) => {
+        $timeout(() => {
+            vm.selected.node = d.data;
+            vm.selected.flowBucket = null;
+        }, 0);
+    };
+
+    const showFlowBucketDetail = (d) => {
+        $timeout(() => {
+            vm.selected.node = null;
+            vm.selected.flowBucket = {
+                flow: d.data,
+                decorations: []
+            };
+
+            const state = flowDiagramStateService.getState();
+            const decorations  = state.model.decorations[d.id];
+
+            if (_.isEmpty(decorations)) {
+                return;
+            } else {
+                const selector = {
+                    entityReference: toRef(d.data),
+                    scope: 'EXACT'
+                };
+
+                const tmp = { flows: [], specs: []};
+
+                const flowPromise = physicalFlowStore
+                    .findBySelector(selector)
+                    .then(flows => tmp.flows = flows);
+
+                const specPromise = physicalSpecificationStore
+                    .findBySelector(selector)
+                    .then(specs => tmp.specs = specs);
+
+                flowPromise
+                    .then(() => specPromise)
+                    .then(() => {
+                        const flowsById = _.keyBy(tmp.flows, 'id');
+                        const specsById = _.keyBy(tmp.specs, 'id');
+
+                        vm.selected.flowBucket.decorations = _
+                            .chain(decorations)
+                            .map(d => {
+                                const flow = flowsById[d.data.id];
+                                return flow
+                                    ? { specification: specsById[flow.specificationId], flow }
+                                    : null;
+                            })
+                            .reject(d => d === null)
+                            .value();
+
+                    });
+            }
+        }, 0);
+    };
+
     vm.$onChanges = () => {
         if(vm.flowDiagrams && vm.flowDiagramEntities) {
             const flowEntitiesDiagramId = _.keyBy(vm.flowDiagramEntities, 'diagramId');
@@ -79,7 +160,8 @@ function controller(flowDiagramStateService) {
 
     vm.onDiagramSelect = (diagram) => {
         showReadOnlyDiagram();
-        vm.selectedDiagram = diagram;
+        clearSelections();
+        vm.selected.diagram = diagram;
         flowDiagramStateService.reset()
         flowDiagramStateService
             .load(diagram.id)
@@ -88,7 +170,7 @@ function controller(flowDiagramStateService) {
 
     vm.onDiagramDismiss = () => {
         hideDiagram();
-        vm.selectedDiagram = null;
+        clearSelections();
         flowDiagramStateService.reset();
     };
 
@@ -107,24 +189,31 @@ function controller(flowDiagramStateService) {
     vm.editDiagram = () => {
         showEditableDiagram();
         flowDiagramStateService.processCommands([
-            { command: 'SET_TITLE', payload: vm.selectedDiagram.name }
+            { command: 'SET_TITLE', payload: vm.selected.diagram.name }
         ]);
     };
 
-
     vm.dismissDiagramEditor = () => {
         hideDiagram();
-        vm.selectedDiagram = null;
+        clearSelections();
+
         flowDiagramStateService
             .reset();
         vm.reload();
     };
 
+    vm.clickHandlers = {
+        node: showNodeDetail,
+        flowBucket: showFlowBucketDetail
+    };
 }
 
 
 controller.$inject = [
-    'FlowDiagramStateService'
+    '$timeout',
+    'FlowDiagramStateService',
+    'PhysicalFlowStore',
+    'PhysicalSpecificationStore'
 ];
 
 

@@ -33,7 +33,11 @@ $annotation-color: #a4a2a6;
         }
         &:hover {
             cursor: move;
+            path {
+                stroke: #999;
+            }
         }
+
     }
 
     .wfd-subject {
@@ -77,6 +81,12 @@ $annotation-color: #a4a2a6;
         circle {
             fill: #fff;
             stroke: #ccc;
+        }
+
+        &:hover circle {
+            stroke-opacity: 1;
+            stroke: darken($annotation-color, 20);
+            cursor: pointer;
         }
     }
 }
