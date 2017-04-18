@@ -232,7 +232,8 @@ export const physicalSpecDefinitionFieldTypeNames = {
     DECIMAL: 'Decimal',
     INTEGER: 'Integer',
     STRING: 'String',
-    BOOLEAN: 'Boolean'
+    BOOLEAN: 'Boolean',
+    ENUM: 'Enum'
 };
 
 
