@@ -7,6 +7,7 @@ public enum PhysicalSpecDefinitionFieldType {
     DECIMAL,
     INTEGER,
     STRING,
-    BOOLEAN
+    BOOLEAN,
+    ENUM
 
 }

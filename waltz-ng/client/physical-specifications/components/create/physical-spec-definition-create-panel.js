@@ -40,7 +40,7 @@ const initialState = {
     onSubmit: (specDef) => console.log('psdcp::onSubmit', specDef)
 };
 
-const allowedTypes= ['DATE', 'DECIMAL', 'INTEGER', 'STRING', 'BOOLEAN'];
+const allowedTypes= ['DATE', 'DECIMAL', 'INTEGER', 'STRING', 'BOOLEAN', 'ENUM'];
 
 const template = require('./physical-spec-definition-create-panel.html');
 
@@ -52,6 +52,7 @@ Field2	DATE	description for field 2
 Field 3 and a bit  DECIMAL	fooobaa for the win
 Field 4 and a bit, STRING,	more text	, and more
 Field 5 and a bit,STRING,desc
+ any, ENUM hfsjkhs jhdjsah jsah d
      */
 
     const atoms = _.split(line, /[,\W]+/);
