@@ -28,7 +28,7 @@ const viewState = {
 
 
 const registrationState = {
-    url: 'physical-flow/registration/{kind:string}/{id:int}',
+    url: 'physical-flow/registration/{kind:string}/{id:int}?{targetLogicalFlowId:int}',
     views: {'content@': require('./physical-flow-registration') },
 };
 

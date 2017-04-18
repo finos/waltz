@@ -136,7 +136,7 @@ function prepareUpdateCommands(flows = [], existingEntities = [], isUpstream, ba
 }
 
 
-function controller() {
+function controller($state) {
     const vm = this;
 
     vm.$onInit = () => initialiseData(vm, initialState);
@@ -152,6 +152,9 @@ function controller() {
         vm.description = description;
         vm.title = `Add ${direction} nodes for ${vm.node.name}`;
         vm.flows = mkFlows(vm.logicalFlows, vm.node, vm.isUpstream, vm.existingEntities);
+        vm.logicalFlowAdditionUrl = $state.href(
+            'main.logical-flow.edit',
+            {kind: vm.node.kind, id: vm.node.id });
     };
 
     vm.update = () => {
@@ -162,7 +165,9 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    '$state',
+];
 
 
 const component = {
