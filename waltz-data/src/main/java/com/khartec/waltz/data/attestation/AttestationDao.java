@@ -38,7 +38,7 @@ import java.util.function.Function;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityKind.valueOf;
 import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Attestation.ATTESTATION;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 
@@ -129,21 +129,38 @@ public class AttestationDao {
     }
 
 
-    public boolean recalculateForPhysicalFlowLineage() {
-        final String provenance = "lineage";
+    public boolean recalculateForFlowDiagrams() {
+        final String provenance = "flow diagram";
 
         dsl.transaction(configuration -> {
             DSLContext tx = DSL.using(configuration);
 
-            Condition isImpliedLineageAttestation = ATTESTATION.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())
-                    .and(ATTESTATION.ATTESTATION_TYPE.eq(AttestationType.IMPLICIT.name()))
+            Condition isImpliedFlowDiagramAttestation = ATTESTATION.ATTESTATION_TYPE.eq(AttestationType.IMPLICIT.name())
                     .and(ATTESTATION.PROVENANCE.eq(provenance));
 
             // clear existing attestations
             tx.deleteFrom(ATTESTATION)
-                    .where(isImpliedLineageAttestation)
+                    .where(isImpliedFlowDiagramAttestation)
                     .execute();
 
+            Select<Record9<String, Long, String, String, Timestamp, String, String, Long, String>> entities = DSL.select(
+                    FLOW_DIAGRAM_ENTITY.ENTITY_KIND,
+                    FLOW_DIAGRAM_ENTITY.ENTITY_ID,
+                    DSL.val(AttestationType.IMPLICIT.name()).as("attestation_type"),
+                    FLOW_DIAGRAM.LAST_UPDATED_BY.as("attested_by"),
+                    FLOW_DIAGRAM.LAST_UPDATED_AT.as("attested_at"),
+                    DSL.val("Attested by flow diagram inclusion").as("comments"),
+                    DSL.val(provenance).as("provenance"),
+                    FLOW_DIAGRAM.ID.as("attesting_entity_id"),
+                    DSL.val(EntityKind.FLOW_DIAGRAM.name()).as("attesting_entity_id"))
+                    .from(FLOW_DIAGRAM_ENTITY)
+                    .innerJoin(FLOW_DIAGRAM)
+                    .on(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(FLOW_DIAGRAM.ID))
+                    .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.in(
+                            EntityKind.LOGICAL_DATA_FLOW.name(),
+                            EntityKind.PHYSICAL_FLOW.name()));
+
+            insertAttestations(tx, entities);
         });
 
         return true;

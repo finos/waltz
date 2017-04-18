@@ -31,9 +31,9 @@ export default [
         };
 
 
-        const recalculateForLineage = () => {
+        const recalculateForFlowDiagrams = () => {
             return $http
-                .get(`${BASE}/calculate-all/lineage`)
+                .get(`${BASE}/calculate-all/flow-diagram`)
                 .then(result => result.data);
         };
 
@@ -47,7 +47,7 @@ export default [
 
         return {
             findForEntity,
-            recalculateForLineage,
+            recalculateForFlowDiagrams,
             recalculateForLogicalFlowDecorators
         };
     }

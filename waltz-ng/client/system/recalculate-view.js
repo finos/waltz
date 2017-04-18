@@ -48,11 +48,11 @@ function controller(notification,
             .then(() => notification.success('Complexity recalculated'));
     };
 
-    vm.recalcLineageAttestations = () => {
-        notification.info('Lineage attestation recalculation requested');
+    vm.recalcFlowDiagramAttestations = () => {
+        notification.info('Flow diagram recalculation requested');
         attestationStore
-            .recalculateForLineage()
-            .then(() => notification.success('Lineage attestation recalculated'));
+            .recalculateForFlowDiagrams()
+            .then(() => notification.success('Flow diagram attestation recalculated'));
     };
 
 
