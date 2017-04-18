@@ -126,7 +126,6 @@ function controller() {
             }
             return fieldData;
         });
-        vm.specDefinition.def.status = vm.status;
     };
 
     vm.submit = () => {
