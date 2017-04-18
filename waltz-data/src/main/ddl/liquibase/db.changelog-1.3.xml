@@ -1024,4 +1024,18 @@
             AND is_removed = 0
         </sql>
     </changeSet>
+
+
+    <!-- 2013 -->
+    <changeSet id="20170418-2013-1"
+               author="kamransaleem">
+        <comment>2013: Spec definition: Change unique constraint to spec id, version</comment>
+        <dropUniqueConstraint tableName="physical_spec_defn"
+                              constraintName="phy_spec_defn_unique_version"
+                              uniqueColumns="version" />
+
+        <addUniqueConstraint columnNames="specification_id, version"
+                             constraintName="phy_spec_defn_unique_version"
+                             tableName="physical_spec_defn"/>
+    </changeSet>
 </databaseChangeLog>
