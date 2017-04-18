@@ -3,14 +3,8 @@
                icon="picture-o"
                id="specification-flow-diagram-section">
 
-    <waltz-section-actions>
-        <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-        </div>
-    </waltz-section-actions>
-
-    <div ng-if="! $ctrl.visibility.editor"
-         class="waltz-fade-if">
-        <div ng-if="$ctrl.flowDiagrams.length > 0">
+    <div class="waltz-fade-if">
+        <div>
             <waltz-flow-diagrams-panel flow-diagrams="$ctrl.flowDiagrams"
                                        flow-diagram-entities="$ctrl.flowDiagramEntities"
                                        create-diagram-commands="$ctrl.createDiagramCommands"
@@ -18,11 +12,6 @@
             </waltz-flow-diagrams-panel>
         </div>
 
-        <waltz-no-data ng-if="$ctrl.flowDiagrams.length == 0">
-            <message>
-                <strong>No flow diagrams</strong> for this physical specification.
-            </message>
-        </waltz-no-data>
     </div>
 
 </waltz-section>

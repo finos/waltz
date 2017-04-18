@@ -1,155 +1,178 @@
-<div class="row waltz-fade-if"
-     ng-if="! $ctrl.visibility.editor">
-
-    <div class="col-md-2">
-        <style>
-            .waltz-info-block {
-                border: 1px solid #ccc;
-                background-color: #eee;
-                border-radius: 3px;
-                padding: 2px 5px 2px 5px;
-                margin-bottom: 2px;
-                font-size: x-small;
-            }
-
-            .waltz-info-block:hover {
-                background-color: #fafafa;
-            }
-
-            .waltz-info-block.active {
-                background-color: #fdfdfd;
-            }
-        </style>
-
-        <div ng-if="! $ctrl.selected.diagram"
-             class="waltz-fade-if">
-            <h5>Diagrams</h5>
-            <input type="search"
-                   placeholder="Filter..."
-                   ng-if="$ctrl.diagrams.length > 5"
-                   class="form-search form-control input-sm"
-                   ng-model="$ctrl.qry">
-            <div ng-class="{ 'waltz-scroll-region-400' : $ctrl.diagrams.length > 9 }"
-                 style="padding-bottom: 6px">
-                <div class="waltz-info-block clickable"
-                     ng-class="{ 'active': $ctrl.selectedDiagram.id === diagram.id }"
-                     ng-click="$ctrl.onDiagramSelect(diagram)"
-                     ng-repeat="diagram in $ctrl.diagrams | filter: $ctrl.qry | orderBy: 'name'">
-                    <a ng-bind="diagram.name"></a>
-                    <div class="small">
-                        <waltz-last-updated entity="diagram">
-                        </waltz-last-updated>
-                    </div>
-                </div>
-            </div>
-
+<waltz-no-data ng-if="$ctrl.diagrams.length == 0 && !$ctrl.visibility.editor">
+    <message>
+        <strong>No flow diagrams</strong> for this physical specification.
+        <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+            <br>
             <a class="clickable"
                ng-click="$ctrl.createDiagram()">
                 <waltz-icon name="plus"></waltz-icon>
                 Create new diagram
             </a>
         </div>
+    </message>
+</waltz-no-data>
 
-        <div ng-if="$ctrl.selected.diagram"
-             class="waltz-fade-if small">
 
-            <!-- TITLE -->
-            <strong ng-bind="$ctrl.selected.diagram.name"></strong>
-            <waltz-last-updated class='small'
-                                entity="$ctrl.selected.diagram">
-            </waltz-last-updated>
+<div ng-if="$ctrl.diagrams.length > 0 || $ctrl.visibility.editor">
+    <div class="row waltz-fade-if"
+         ng-if="! $ctrl.visibility.editor">
 
-            <div ng-if="$ctrl.selected.node != null"
+        <div class="col-md-2">
+            <style>
+                .waltz-info-block {
+                    border: 1px solid #ccc;
+                    background-color: #eee;
+                    border-radius: 3px;
+                    padding: 2px 5px 2px 5px;
+                    margin-bottom: 2px;
+                    font-size: x-small;
+                }
+
+                .waltz-info-block:hover {
+                    background-color: #fafafa;
+                }
+
+                .waltz-info-block.active {
+                    background-color: #fdfdfd;
+                }
+            </style>
+
+            <div ng-if="! $ctrl.selected.diagram"
                  class="waltz-fade-if">
-                <hr>
-                <div>
-                    <waltz-entity-link entity-ref="$ctrl.selected.node">
-                    </waltz-entity-link>
-                </div>
-            </div>
-            <div ng-if="$ctrl.selected.flowBucket != null"
-                 class="waltz-fade-if">
-                <hr>
-                <div>
-                    <!-- FLOW -->
-                    <strong>
-                        Flow:
-                    </strong>
-                    <div>
-                        <waltz-entity-link entity-ref="$ctrl.selected.flowBucket.flow.source">
-                        </waltz-entity-link>
-                    </div>
-                    <div style="margin-left: 16px">
-                        to
-                    </div>
-                    <div>
-                        <waltz-entity-link entity-ref="$ctrl.selected.flowBucket.flow.target">
-                        </waltz-entity-link>
-                    </div>
-
-                    <!-- FLOW DETAIL -->
-                    <div style="padding-top: 16px">
-                        <strong>
-                            Details:
-                        </strong>
-                        <div class="small"
-                             style="margin-bottom: 4px; border-top: 1px solid #eee; color: #555"
-                             ng-repeat="decoration in $ctrl.selected.flowBucket.decorations">
-                            <a ui-sref="main.physical-flow.view ({id: decoration.flow.id })">
-                                <strong ng-bind="decoration.specification.name"></strong>
-                            </a>
-                            <div ng-bind="decoration.flow.frequency | toDisplayName:'frequencyKind'"></div>
-                        </div>
-
-                        <div ng-if=" $ctrl.selected.flowBucket.decorations.length == 0">
-                            No additional detail
+                <h5>Diagrams</h5>
+                <input type="search"
+                       placeholder="Filter..."
+                       ng-if="$ctrl.diagrams.length > 5"
+                       class="form-search form-control input-sm"
+                       ng-model="$ctrl.qry">
+                <div ng-class="{ 'waltz-scroll-region-400' : $ctrl.diagrams.length > 9 }"
+                     style="padding-bottom: 6px">
+                    <div class="waltz-info-block clickable"
+                         ng-class="{ 'active': $ctrl.selectedDiagram.id === diagram.id }"
+                         ng-click="$ctrl.onDiagramSelect(diagram)"
+                         ng-repeat="diagram in $ctrl.diagrams | filter: $ctrl.qry | orderBy: 'name'">
+                        <a ng-bind="diagram.name"></a>
+                        <div class="small">
+                            <waltz-last-updated entity="diagram">
+                            </waltz-last-updated>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <hr>
-
-            <!-- ACTIONS -->
-            <div>
                 <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                    <button class="btn btn-xs btn-primary"
-                            ng-click="$ctrl.editDiagram()">
-                        Edit
-                    </button>
+                    <hr>
+                    <a class="clickable"
+                       ng-click="$ctrl.createDiagram()">
+                        <waltz-icon name="plus"></waltz-icon>
+                        Create new diagram
+                    </a>
                 </div>
-                &nbsp;
-                <a class='clickable'
-                   ng-click="$ctrl.selected.diagram = null">
-                    Show List
-                </a>
             </div>
 
-            <hr>
+            <div ng-if="$ctrl.selected.diagram"
+                 class="waltz-fade-if small">
 
-            <!-- HELP -->
-            <div class="help-block small small">
-                This diagram may be moved and resized by holding down
-                <kbd>ctrl</kbd>
-                and dragging and/or zooming.
+                <!-- TITLE -->
+                <strong ng-bind="$ctrl.selected.diagram.name"></strong>
+                <waltz-last-updated class='small'
+                                    entity="$ctrl.selected.diagram">
+                </waltz-last-updated>
+
+                <div ng-if="$ctrl.selected.node != null"
+                     class="waltz-fade-if">
+                    <hr>
+                    <div>
+                        <waltz-entity-link entity-ref="$ctrl.selected.node">
+                        </waltz-entity-link>
+                    </div>
+                </div>
+                <div ng-if="$ctrl.selected.flowBucket != null"
+                     class="waltz-fade-if">
+                    <hr>
+                    <div>
+                        <!-- FLOW -->
+                        <strong>
+                            Flow:
+                        </strong>
+                        <div>
+                            <waltz-entity-link entity-ref="$ctrl.selected.flowBucket.flow.source">
+                            </waltz-entity-link>
+                        </div>
+                        <div style="margin-left: 16px">
+                            to
+                        </div>
+                        <div>
+                            <waltz-entity-link entity-ref="$ctrl.selected.flowBucket.flow.target">
+                            </waltz-entity-link>
+                        </div>
+
+                        <!-- FLOW DETAIL -->
+                        <div style="padding-top: 16px">
+                            <strong>
+                                Details:
+                            </strong>
+                            <div class="small"
+                                 style="margin-bottom: 4px; border-top: 1px solid #eee; color: #555"
+                                 ng-repeat="decoration in $ctrl.selected.flowBucket.decorations">
+                                <a ui-sref="main.physical-flow.view ({id: decoration.flow.id })">
+                                    <strong ng-bind="decoration.specification.name"></strong>
+                                </a>
+                                <div ng-bind="decoration.flow.frequency | toDisplayName:'frequencyKind'"></div>
+                            </div>
+
+                            <div ng-if=" $ctrl.selected.flowBucket.decorations.length == 0">
+                                No additional detail
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- ACTIONS -->
+                <div>
+                    <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                        <button class="btn btn-xs btn-primary"
+                                ng-click="$ctrl.editDiagram()">
+                            Edit
+                        </button>
+                    </div>
+                    &nbsp;
+                    <a class='clickable'
+                       ng-click="$ctrl.selected.diagram = null">
+                        Show diagram list
+                    </a>
+                </div>
+
+                <hr>
+
+                <!-- HELP -->
+                <div class="help-block small small">
+                    This diagram may be moved and resized by holding down
+                    <kbd>ctrl</kbd>
+                    and dragging and/or zooming.
+                </div>
+            </div>
+        </div>
+        <div class="col-md-10">
+            <div ng-if="$ctrl.visibility.diagram">
+                <waltz-flow-diagram context-menus="$ctrl.contextMenus"
+                                    click-handlers="$ctrl.clickHandlers">
+                </waltz-flow-diagram>
             </div>
         </div>
     </div>
-    <div class="col-md-10">
-        <div ng-if="$ctrl.visibility.diagram">
-            <waltz-flow-diagram context-menus="$ctrl.contextMenus"
-                                click-handlers="$ctrl.clickHandlers">
-            </waltz-flow-diagram>
-        </div>
-    </div>
-</div>
-<div class="row waltz-fade-if"
-     ng-if="$ctrl.visibility.editor">
-    <div ng-if="$ctrl.visibility.editor"
-         class="waltz-fade-if col-md-12">
-        <waltz-flow-diagram-editor on-cancel="$ctrl.dismissDiagramEditor">
-        </waltz-flow-diagram-editor>
-    </div>
 
+    <div class="row waltz-fade-if"
+         ng-if="$ctrl.visibility.editor">
+        <div ng-if="$ctrl.visibility.editor"
+             class="waltz-fade-if col-md-12">
+            <waltz-flow-diagram-editor on-cancel="$ctrl.dismissDiagramEditor">
+            </waltz-flow-diagram-editor>
+        </div>
+
+    </div>
 </div>
+
+
 
