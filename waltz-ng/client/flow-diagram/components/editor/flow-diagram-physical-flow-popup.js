@@ -18,7 +18,6 @@
 
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
-import {toGraphId} from '../../flow-diagram-utils';
 
 /**
  * @name waltz-flow-diagram-physical-flow-popup
@@ -75,7 +74,7 @@ function prepareFlows(
 }
 
 
-function controller() {
+function controller($state) {
     const vm = this;
 
     vm.$onInit = () => initialiseData(vm, initialState);
@@ -88,6 +87,15 @@ function controller() {
             vm.physicalFlows,
             vm.physicalSpecifications,
             vm.existingEntities);
+
+        vm.physicalFlowRegisterUrl = $state.href(
+            'main.physical-flow.registration',
+            {
+                kind: vm.logicalFlow.source.kind,
+                id: vm.logicalFlow.source.id,
+                targetLogicalFlowId: vm.logicalFlow.id
+            });
+
     };
 
     vm.update = () => {
@@ -134,7 +142,9 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    '$state'
+];
 
 
 const component = {

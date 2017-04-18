@@ -116,6 +116,13 @@ function controller(
         kind: $stateParams.kind
     };
 
+    const targetFlowId = $stateParams.targetLogicalFlowId;
+    if (targetFlowId) {
+        logicalFlowStore
+            .getById(targetFlowId)
+            .then(logicalFlow => vm.targetChanged(logicalFlow));
+    }
+
     const viewState = kindToViewState(sourceEntityRef.kind);
     vm.cancelLink = $state.href(viewState, { id: sourceEntityRef.id });
 
