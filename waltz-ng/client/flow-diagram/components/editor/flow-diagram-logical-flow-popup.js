@@ -43,8 +43,8 @@ const initialState = {
     existingEntities: [],
     node: null,
     isUpstream: true,
-    commandProcessor: () => console.log('wdlfp: default command processor'),
-    onDismiss: () => console.log('wdlfp: default on-dismiss'),
+    commandProcessor: () => console.log('wfdlfp: default command processor'),
+    onDismiss: () => console.log('wfdlfp: default on-dismiss'),
 };
 
 
