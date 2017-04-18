@@ -25,6 +25,8 @@ import {initialiseData} from "../../../common";
 const bindings = {
     flowDiagrams: '<',
     flowDiagramEntities: '<',
+    createDiagramCommands: '<',
+    reload: '<'
 };
 
 
@@ -35,8 +37,11 @@ const initialState = {
     flowDiagrams: [],
     flowDiagramEntities: [],
     diagrams: [],
+    createDiagramCommands: () => ([]),
+    reload: () => console.log('wfdp:reload - default (do nothing) handler'),
     visibility: {
-        diagram: false
+        diagram: false,
+        editor: false
     }
 };
 
@@ -44,6 +49,21 @@ const initialState = {
 
 function controller(flowDiagramStateService) {
     const vm = initialiseData(this, initialState);
+
+    const showReadOnlyDiagram = () => {
+        vm.visibility.diagram = true;
+        vm.visibility.editor = false;
+    };
+
+    const showEditableDiagram = () => {
+        vm.visibility.diagram = false;
+        vm.visibility.editor = true;
+    };
+
+    const hideDiagram = () => {
+        vm.visibility.diagram = false;
+        vm.visibility.editor = false;
+    };
 
     vm.$onChanges = () => {
         if(vm.flowDiagrams && vm.flowDiagramEntities) {
@@ -58,7 +78,7 @@ function controller(flowDiagramStateService) {
     };
 
     vm.onDiagramSelect = (diagram) => {
-        vm.visibility.diagram = true;
+        showReadOnlyDiagram();
         vm.selectedDiagram = diagram;
         flowDiagramStateService.reset()
         flowDiagramStateService
@@ -67,12 +87,38 @@ function controller(flowDiagramStateService) {
     };
 
     vm.onDiagramDismiss = () => {
-        vm.visibility.diagram = false;
+        hideDiagram();
         vm.selectedDiagram = null;
         flowDiagramStateService.reset();
     };
 
     vm.contextMenus = {};
+
+    vm.createDiagram = () => {
+        flowDiagramStateService
+            .reset();
+
+        showEditableDiagram();
+
+        flowDiagramStateService.processCommands(vm.createDiagramCommands() || []);
+        setTimeout(() => flowDiagramStateService.processCommands([]), 0);
+    };
+
+    vm.editDiagram = () => {
+        showEditableDiagram();
+        flowDiagramStateService.processCommands([
+            { command: 'SET_TITLE', payload: vm.selectedDiagram.name }
+        ]);
+    };
+
+
+    vm.dismissDiagramEditor = () => {
+        hideDiagram();
+        vm.selectedDiagram = null;
+        flowDiagramStateService
+            .reset();
+        vm.reload();
+    };
 
 }
 

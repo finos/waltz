@@ -174,8 +174,13 @@ function controller($q,
         .then(() => loadBookmarks(bookmarkStore, vm.specification.id))
         .then(bs => vm.bookmarks = bs);
 
-    loadFlowDiagrams(flowId, $q, flowDiagramStore, flowDiagramEntityStore)
-        .then(r => Object.assign(vm, r));
+
+    vm.loadFlowDiagrams = () => {
+        loadFlowDiagrams(flowId, $q, flowDiagramStore, flowDiagramEntityStore)
+            .then(r => Object.assign(vm, r));
+    };
+
+    vm.loadFlowDiagrams();
 
     // spec definitions
     const loadSpecDefinitions = () => physicalSpecDefinitionStore
@@ -289,7 +294,7 @@ function controller($q,
         ];
 
         return _.concat(modelCommands, moveCommands);
-    }
+    };
 
 }
 

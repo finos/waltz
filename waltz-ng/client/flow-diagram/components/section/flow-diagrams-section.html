@@ -5,25 +5,6 @@
 
     <waltz-section-actions>
         <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                <span ng-if="! $ctrl.visibility.editor"
-                      class="waltz-fade-if">
-                    <button class="btn btn-xs btn-primary"
-                            ng-click="$ctrl.showCreateDiagram()">
-                        Create
-                    </button>
-                </span>
-            <span ng-if="$ctrl.visibility.editor"
-                  class="waltz-fade-if">
-                <button class="btn btn-xs btn-success"
-                        ng-click="$ctrl.saveFlowDiagram()">
-                    Save
-                </button>
-                &nbsp;
-                <a class="clickable"
-                   ng-click="$ctrl.dismissCreateDiagram()">
-                    Cancel
-                </a>
-            </span>
         </div>
     </waltz-section-actions>
 
@@ -31,7 +12,9 @@
          class="waltz-fade-if">
         <div ng-if="$ctrl.flowDiagrams.length > 0">
             <waltz-flow-diagrams-panel flow-diagrams="$ctrl.flowDiagrams"
-                                       flow-diagram-entities="$ctrl.flowDiagramEntities">
+                                       flow-diagram-entities="$ctrl.flowDiagramEntities"
+                                       create-diagram-commands="$ctrl.createDiagramCommands"
+                                       reload="$ctrl.reload">
             </waltz-flow-diagrams-panel>
         </div>
 
@@ -40,12 +23,6 @@
                 <strong>No flow diagrams</strong> for this physical specification.
             </message>
         </waltz-no-data>
-    </div>
-
-    <div ng-if="$ctrl.visibility.editor"
-         class="waltz-fade-if">
-        <waltz-flow-diagram-editor on-cancel="$ctrl.dismissCreateDiagram">
-        </waltz-flow-diagram-editor>
     </div>
 
 </waltz-section>
