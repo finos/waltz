@@ -163,10 +163,9 @@ function controller(
         showReadOnlyDiagram();
         clearSelections();
         vm.selected.diagram = diagram;
-        flowDiagramStateService.reset()
+        flowDiagramStateService.reset();
         flowDiagramStateService
-            .load(diagram.id)
-            .then(() => console.log('loaded'))
+            .load(diagram.id);
     };
 
     vm.onDiagramDismiss = () => {

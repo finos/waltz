@@ -20,16 +20,14 @@
         <div class="col-md-2">
             <style>
                 .waltz-info-block {
-                    border: 1px solid #ccc;
-                    background-color: #eee;
-                    border-radius: 3px;
+                    border-bottom: 1px solid #ccc;
                     padding: 2px 5px 2px 5px;
                     margin-bottom: 2px;
                     font-size: x-small;
                 }
 
                 .waltz-info-block:hover {
-                    background-color: #fafafa;
+                    background-color: #f6f6f6;
                 }
 
                 .waltz-info-block.active {
@@ -60,7 +58,7 @@
                 </div>
 
                 <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                    <hr>
+                    <br>
                     <a class="clickable"
                        ng-click="$ctrl.createDiagram()">
                         <waltz-icon name="plus"></waltz-icon>
@@ -73,10 +71,19 @@
                  class="waltz-fade-if small">
 
                 <!-- TITLE -->
-                <strong ng-bind="$ctrl.selected.diagram.name"></strong>
-                <waltz-last-updated class='small'
-                                    entity="$ctrl.selected.diagram">
-                </waltz-last-updated>
+                <div>
+                    <strong ng-bind="$ctrl.selected.diagram.name"></strong>
+                    <br>
+                    <waltz-last-updated class='small'
+                                        entity="$ctrl.selected.diagram">
+                    </waltz-last-updated>
+                    <br>
+                    <a ui-sref="main.flow-diagram.view ({id: $ctrl.selected.diagram.id })"
+                       class="clickable small">
+                        Permalink
+                    </a>
+                </div>
+
 
                 <div ng-if="$ctrl.selected.node != null"
                      class="waltz-fade-if">
