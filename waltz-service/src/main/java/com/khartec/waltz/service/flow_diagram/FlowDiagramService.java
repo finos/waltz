@@ -142,4 +142,10 @@ public class FlowDiagramService {
         return flowDiagramAnnotationDao.createAnnotations(annotations);
     }
 
+
+    public boolean deleteById(long id) {
+        flowDiagramAnnotationDao.deleteForDiagram(id);
+        flowDiagramEntityDao.deleteForDiagram(id);
+        return flowDiagramDao.deleteById(id);
+    }
 }
