@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../common";
+import {initialiseData} from '../common';
 import {toGraphId} from '../flow-diagram/flow-diagram-utils';
 import _ from 'lodash';
 
@@ -71,6 +71,11 @@ function loadFlowDiagrams(specId, $q, flowDiagramStore, flowDiagramEntityStore) 
         .all(promises)
         .then(([flowDiagrams, flowDiagramEntities]) => ({ flowDiagrams, flowDiagramEntities }));
 }
+
+
+function mkReleaseLifecycleStatusChangeCommand(newStatus) {
+    return { newStatus };
+};
 
 
 function controller($q,
@@ -162,16 +167,13 @@ function controller($q,
             });
     };
 
-
     vm.showCreateSpecDefinition = () => {
         vm.specDefinitionCreate.creating = true;
     };
 
-
     vm.hideCreateSpecDefinition = () => {
         vm.specDefinitionCreate.creating = false;
     };
-
 
     vm.createSpecDefinition = (specDef) => {
         physicalSpecDefinitionStore
@@ -232,6 +234,45 @@ function controller($q,
         ];
 
         return _.concat(nodeCommands, flowCommands, physFlowCommands, moveCommands, titleCommands);
+    };
+
+    vm.deleteSpec = (specDef) => {
+        physicalSpecDefinitionStore
+            .deleteSpecification(specDef.id)
+            .then(result => {
+                if (result) {
+                    notification.success(`Deleted version ${specDef.version}`);
+                    loadSpecDefinitions();
+                } else {
+                    notification.error(`Could not delete version ${specDef.version}`);
+                }
+            })
+    };
+
+    vm.activateSpec = (specDef) => {
+        physicalSpecDefinitionStore
+            .updateStatus(specDef.id, mkReleaseLifecycleStatusChangeCommand('ACTIVE'))
+            .then(result => {
+                if (result) {
+                    notification.success(`Marked version ${specDef.version} as active`);
+                    loadSpecDefinitions();
+                } else {
+                    notification.error(`Could not mark version ${specDef.version} as active`);
+                }
+            })
+    };
+
+    vm.markSpecObsolete = (specDef) => {
+        physicalSpecDefinitionStore
+            .updateStatus(specDef.id, mkReleaseLifecycleStatusChangeCommand('OBSOLETE'))
+            .then(result => {
+                if (result) {
+                    notification.success(`Marked version ${specDef.version} as obsolete`);
+                    loadSpecDefinitions();
+                } else {
+                    notification.error(`Could not mark version ${specDef.version} as obsolete`);
+                }
+            })
     };
 
 }

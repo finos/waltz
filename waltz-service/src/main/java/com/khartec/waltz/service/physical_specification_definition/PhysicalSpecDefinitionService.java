@@ -3,7 +3,10 @@ package com.khartec.waltz.service.physical_specification_definition;
 import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefinitionDao;
 import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefinitionFieldDao;
 import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefinitionSampleFileDao;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.ReleaseLifecycleStatus;
+import com.khartec.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinition;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinition;
@@ -108,7 +111,7 @@ public class PhysicalSpecDefinitionService {
     }
 
 
-    public int updateStatus(String userName, long specDefinitionId, ReleaseLifecycleStatusChangeCommand command) {
+    public boolean updateStatus(String userName, long specDefinitionId, ReleaseLifecycleStatusChangeCommand command) {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(command, "command cannot be null");
 
@@ -131,6 +134,6 @@ public class PhysicalSpecDefinitionService {
                                 + " status changed to " + command.newStatus())
                         .build());
 
-        return result;
+        return result == 1;
     }
 }

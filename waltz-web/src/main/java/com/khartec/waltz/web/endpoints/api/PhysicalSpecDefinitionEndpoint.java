@@ -1,7 +1,6 @@
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.physical_flow.ImmutablePhysicalFlowSpecDefinitionChangeCommand;
-import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionChangeCommand;
+import com.khartec.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinition;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionChangeCommand;
 import com.khartec.waltz.model.user.Role;
@@ -15,8 +14,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class PhysicalSpecDefinitionEndpoint implements Endpoint {
@@ -43,6 +41,8 @@ public class PhysicalSpecDefinitionEndpoint implements Endpoint {
     public void register() {
         String findForSpecificationPath = mkPath(BASE_URL, "specification", ":id");
         String createPath = mkPath(BASE_URL, "specification", ":id");
+        String updateStatusPath = mkPath(BASE_URL, "specification", ":id", "status");
+        String deletePath = mkPath(BASE_URL, "specification", ":id");
 
         ListRoute<PhysicalSpecDefinition> findForSpecificationRoute =
                 (req, res) -> specDefinitionService.findForSpecification(getId(req));
@@ -56,7 +56,27 @@ public class PhysicalSpecDefinitionEndpoint implements Endpoint {
                     readBody(req, PhysicalSpecDefinitionChangeCommand.class));
         };
 
+        DatumRoute<Boolean> updateStatusRoute = (req, res) -> {
+            requireRole(userRoleService, req, Role.LOGICAL_DATA_FLOW_EDITOR);
+
+            return specDefinitionService.updateStatus(
+                    getUsername(req),
+                    getId(req),
+                    readBody(req, ReleaseLifecycleStatusChangeCommand.class));
+        };
+
+        DatumRoute<Integer> deleteRoute = (req, res) -> {
+            requireRole(userRoleService, req, Role.LOGICAL_DATA_FLOW_EDITOR);
+
+            return specDefinitionService.delete(
+                    getUsername(req),
+                    getId(req));
+        };
+
+
         getForList(findForSpecificationPath, findForSpecificationRoute);
         postForDatum(createPath, createRoute);
+        putForDatum(updateStatusPath, updateStatusRoute);
+        deleteForDatum(deletePath, deleteRoute);
     }
 }

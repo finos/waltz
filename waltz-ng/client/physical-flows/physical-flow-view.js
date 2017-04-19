@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../common";
-import _ from "lodash";
+import {initialiseData} from '../common';
+import _ from 'lodash';
 
 
 const template = require('./physical-flow-view.html');
