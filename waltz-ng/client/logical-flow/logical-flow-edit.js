@@ -80,7 +80,8 @@ function mkAddFlowCommand(flow) {
 }
 
 
-function controller($scope,
+function controller($q,
+                    $scope,
                     application,
                     actorStore,
                     dataTypeService,
@@ -114,10 +115,12 @@ function controller($scope,
     };
 
     const reload = () => {
-        loadDataFlows(logicalFlowStore, primaryAppId, vm);
-        loadLogicalFlowDecorators(logicalFlowDecoratorStore, primaryAppId, vm);
-        loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm);
         vm.cancel();
+        return $q.all([
+            loadDataFlows(logicalFlowStore, primaryAppId, vm),
+            loadLogicalFlowDecorators(logicalFlowDecoratorStore, primaryAppId, vm),
+            loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm)
+        ]);
     };
 
     const selectSource = (selection) => {
@@ -243,6 +246,7 @@ function controller($scope,
 
 
 controller.$inject = [
+    '$q',
     '$scope',
     'application',
     'ActorStore',
