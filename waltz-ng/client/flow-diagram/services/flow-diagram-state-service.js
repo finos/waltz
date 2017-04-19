@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash';
-import {randomPick, ifPresent} from '../../common';
-import {toGraphFlow, toGraphNode, toGraphId, positionFor} from '../flow-diagram-utils';
+import {ifPresent} from '../../common';
+import {positionFor, toGraphFlow, toGraphId, toGraphNode} from '../flow-diagram-utils';
 
 
 const initialState = {

@@ -73,10 +73,9 @@ function loadFlowDiagrams(specId, $q, flowDiagramStore, flowDiagramEntityStore) 
 }
 
 
-const mkReleaseLifecycleStatusChangeCommand = (newStatus) => {
+function mkReleaseLifecycleStatusChangeCommand(newStatus) {
     return { newStatus };
 };
-
 
 
 function controller($q,
@@ -168,16 +167,13 @@ function controller($q,
             });
     };
 
-
     vm.showCreateSpecDefinition = () => {
         vm.specDefinitionCreate.creating = true;
     };
 
-
     vm.hideCreateSpecDefinition = () => {
         vm.specDefinitionCreate.creating = false;
     };
-
 
     vm.createSpecDefinition = (specDef) => {
         physicalSpecDefinitionStore

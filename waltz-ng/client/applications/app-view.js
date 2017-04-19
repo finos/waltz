@@ -15,19 +15,19 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from "lodash";
+import _ from 'lodash';
 import {
     loadAuthSources,
     loadChangeLog,
     loadDatabases,
     loadDataFlows,
-    loadLogicalFlowDecorators,
     loadDataTypeUsages,
     loadInvolvements,
+    loadLogicalFlowDecorators,
     loadServers,
     loadSoftwareCatalog,
     loadSourceDataRatings
-} from "./data-load";
+} from './data-load';
 
 
 const initialState = {
