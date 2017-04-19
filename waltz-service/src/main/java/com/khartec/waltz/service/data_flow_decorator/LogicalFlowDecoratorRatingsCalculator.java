@@ -32,10 +32,13 @@ import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.isEmpty;
@@ -45,6 +48,8 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 public class LogicalFlowDecoratorRatingsCalculator {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowDecoratorRatingsCalculator.class);
 
     private final ApplicationService applicationService;
     private final AuthoritativeSourceDao authoritativeSourceDao;
@@ -87,23 +92,29 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
         AuthoritativeSourceResolver resolver = createResolver(targetApps);
 
-        return map(
-                decorators,
-                decorator -> {
-                    if (decorator.decoratorEntity().kind() != EntityKind.DATA_TYPE) {
-                        return decorator;
-                    } else {
-                        AuthoritativenessRating rating = lookupRating(
-                                typesById,
-                                flowsById,
-                                targetAppsById,
-                                resolver,
-                                decorator);
-                        return ImmutableLogicalFlowDecorator
-                                .copyOf(decorator)
-                                .withRating(rating);
+        return decorators.stream()
+                .map(decorator -> {
+                    try {
+                        if (decorator.decoratorEntity().kind() != EntityKind.DATA_TYPE) {
+                            return decorator;
+                        } else {
+                            AuthoritativenessRating rating = lookupRating(
+                                    typesById,
+                                    flowsById,
+                                    targetAppsById,
+                                    resolver,
+                                    decorator);
+                            return ImmutableLogicalFlowDecorator
+                                    .copyOf(decorator)
+                                    .withRating(rating);
+                        }
+                    } catch (Exception e) {
+                        LOG.warn("Failed to calculate rating for decorator: {}, reason: {}", decorator, e.getMessage());
+                        return null;
                     }
-                });
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 
 
