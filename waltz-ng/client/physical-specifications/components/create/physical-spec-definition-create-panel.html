@@ -7,7 +7,7 @@
         <div class="form-group">
             <label for="version"
                    class="col-sm-3 control-label">
-                Version
+                Version <span class="text-danger">*</span>
             </label>
             <div class="col-sm-9">
                 <input type="text"
@@ -24,7 +24,7 @@
         <div class="form-group">
             <label for="delimiter"
                    class="col-sm-3 control-label">
-                Delimiter
+                Delimiter <span class="text-danger">*</span>
             </label>
             <div class="col-sm-9">
                 <select id='delimiter'
@@ -43,7 +43,7 @@
         <div class="form-group">
             <label class="col-sm-3 control-label"
                    for="status">
-                Status
+                Status <span class="text-danger">*</span>
             </label>
             <div class="col-sm-9">
                 <select id="status"
@@ -68,7 +68,7 @@
                  style="text-align: right">
                 <label for="fields"
                        class="control-label">
-                    Fields
+                    Fields <span class="text-danger">*</span>
                 </label>
                 <div class="help-block">
                     Enter <b>tab</b> separated field data (one per line) in the following format:
@@ -143,6 +143,24 @@ Field2&#9;DATE&#9;description for field 2
                     </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-3"
+                 style="text-align: right">
+                <label for="fields"
+                       class="control-label">
+                    Sample Data
+                </label>
+            </div>
+            <div class="col-sm-9">
+                <textarea id="sampleData"
+                          class="form-control"
+                          placeholder="Enter sample data for this definition here.  Confidential data should be obfuscated."
+                          ng-model="$ctrl.specDefinition.sampleData"
+                          rows="10">
+                </textarea>
             </div>
         </div>
 
