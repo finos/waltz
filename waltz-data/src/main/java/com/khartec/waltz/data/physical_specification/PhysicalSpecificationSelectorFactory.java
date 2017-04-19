@@ -19,11 +19,13 @@
 package com.khartec.waltz.data.physical_specification;
 
 import com.khartec.waltz.data.IdSelectorFactory;
+import com.khartec.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -34,6 +36,16 @@ import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPE
 @Service
 public class PhysicalSpecificationSelectorFactory implements IdSelectorFactory {
 
+    private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory;
+
+
+    @Autowired
+    public PhysicalSpecificationSelectorFactory(PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory) {
+        checkNotNull(physicalFlowIdSelectorFactory, "physicalFlowIdSelectorFactory cannot be null");
+        this.physicalFlowIdSelectorFactory = physicalFlowIdSelectorFactory;
+    }
+
+
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
@@ -42,9 +54,19 @@ public class PhysicalSpecificationSelectorFactory implements IdSelectorFactory {
                 return mkForPhysicalFlow(options);
             case LOGICAL_DATA_FLOW:
                 return mkForLogicalFlow(options);
+            case FLOW_DIAGRAM:
+                return mkForFlowDiagram(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: "+options);
         }
+    }
+
+
+    private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        Select<Record1<Long>> flowSelector = physicalFlowIdSelectorFactory.apply(options);
+        Condition condition = PHYSICAL_FLOW.ID.in(flowSelector);
+        return selectViaPhysicalFlowJoin(condition);
     }
 
 

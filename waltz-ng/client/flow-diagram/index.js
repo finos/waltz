@@ -36,7 +36,12 @@ export default () => {
         .component('waltzFlowDiagramAnnotationPopup', require('./components/editor/flow-diagram-annotation-popup'))
         .component('waltzFlowDiagramEditor', require('./components/editor/flow-diagram-editor'))
         .component('waltzFlowDiagramsPanel', require('./components/diagrams-panel/flow-diagrams-panel'))
-        .component('waltzFlowDiagramsSection', require('./components/section/flow-diagrams-section'));
+        .component('waltzFlowDiagramsSection', require('./components/section/flow-diagrams-section'))
+        ;
+
+    module
+        .config(require('./routes'))
+        ;
 
     return module.name;
 };

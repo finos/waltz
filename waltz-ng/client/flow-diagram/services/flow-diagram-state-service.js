@@ -187,12 +187,18 @@ function restoreDiagram(
         payload: layoutData.diagramTransform
     }];
 
+    const titleCommands = [{
+        command: 'SET_TITLE',
+        payload: diagram.name
+    }];
+
     commandProcessor(nodeCommands);
     commandProcessor(flowCommands);
     commandProcessor(annotationCommands);
     commandProcessor(moveCommands);
     commandProcessor(transformCommands);
     commandProcessor(decorationCommands);
+    commandProcessor(titleCommands);
 }
 
 
@@ -233,7 +239,8 @@ function service(
             .all([diagramPromise, annotationPromise, entityPromise, logicalFlowPromise, physicalFlowPromise])
             .then(([diagram, annotations, entityNodes, logicalFlows, physicalFlows]) => {
                 restoreDiagram(processCommands, diagram, annotations, entityNodes, logicalFlows, physicalFlows);
-            });
+            })
+            .then(() => getState());
     };
 
     const processCommand = (state, commandObject) => {

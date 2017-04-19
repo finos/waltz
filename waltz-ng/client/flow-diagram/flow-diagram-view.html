@@ -1,0 +1,84 @@
+<!-- HEADER -->
+<waltz-page-header name="{{ ctrl.diagram.name }}"
+                   icon="picture-o"
+                   tour="ctrl.tour"
+                   small="Flow Diagram">
+    <ol class="waltz-breadcrumbs">
+        <li><a ui-sref="main">Home</a></li>
+        <li><span>Flow Diagrams</span></li>
+        <li><span ng-bind="ctrl.diagram.name"></span></li>
+    </ol>
+</waltz-page-header>
+
+
+<div class="waltz-page-summary-attach waltz-page-summary">
+    <div class="row">
+        <div class="col-md-12">
+            <waltz-flow-diagram click-handlers="ctrl.clickHandlers">
+            </waltz-flow-diagram>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- HELP -->
+            <div class="help-block small small">
+                This diagram may be moved and resized by holding down
+                <kbd>ctrl</kbd>
+                and dragging and/or zooming.
+            </div>
+            <br>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-condensed small">
+                <thead>
+                <tr>
+                    <th>Source</th>
+                    <th>Target</th>
+                    <th>Transport</th>
+                    <th>Frequency</th>
+                    <th>Specification</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="flow in ctrl.physicalFlows"
+                    ng-class="{ 'waltz-highlighted-row' : ctrl.highlightIds.indexOf(flow.id) > -1}" >
+                    <td>
+                        <div ng-class="{
+                                'waltz-highlighted-row' : ctrl.highlightIds.indexOf(ctrl.logicalFlowsById[flow.logicalFlowId].source.id) > -1
+                            }">
+                            <waltz-entity-link entity-ref="ctrl.logicalFlowsById[flow.logicalFlowId].source">
+                            </waltz-entity-link>
+                        </div>
+                    </td>
+                    <td>
+                        <div ng-class="{
+                                'waltz-highlighted-row' : ctrl.highlightIds.indexOf(ctrl.logicalFlowsById[flow.logicalFlowId].target.id) > -1
+                            }">
+                            <waltz-entity-link entity-ref="ctrl.logicalFlowsById[flow.logicalFlowId].target">
+                            </waltz-entity-link>
+                        </div>
+                    </td>
+                    <td><span ng-bind="flow.transport | toDisplayName:'transportKind'"></span></td>
+                    <td><span ng-bind="flow.frequency | toDisplayName:'frequencyKind'"></span></td>
+                    <td>
+                        <a ui-sref='main.physical-flow.view ({id: flow.id})'
+                           class="clickable"
+                           ng-bind="ctrl.physicalSpecificationsById[flow.specificationId].name">
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+
+
+</div>
