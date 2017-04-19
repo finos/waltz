@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {notEmpty} from "../common";
+import {notEmpty} from '../common';
 
 
 function hasInvolvements(involvements) {
@@ -57,11 +57,6 @@ function controller($scope,
         $scope.$applyAsync(() => {
             viewService.loadAllCosts();
         });
-    };
-
-
-    vm.lineageTableInitialised = (api) => {
-        vm.exportLineageReports = api.export;
     };
 
 

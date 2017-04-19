@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
+import _ from 'lodash';
 
 
 const initModel = {
@@ -87,7 +87,6 @@ function service($q,
                  involvementKindService,
                  logicalFlowViewService,
                  personStore,
-                 physicalFlowLineageStore,
                  sourceDataRatingStore,
                  techStatsService) {
 
@@ -235,13 +234,6 @@ function service($q,
     }
 
 
-    function loadLineageReports(personId) {
-        return physicalFlowLineageStore
-            .findLineageReportsBySelector(toSelector(personId))
-            .then(lineageReports => state.model.lineageReports = lineageReports);
-    }
-
-
     // --- MAIN LOADERS
 
     function loadFirstWave(empId) {
@@ -271,8 +263,7 @@ function service($q,
             .all([
                 loadTechStats(personId),
                 loadComplexity(personId),
-                loadChangeInitiatives(employeeId),
-                loadLineageReports(personId)
+                loadChangeInitiatives(employeeId)
             ]);
     }
 
@@ -329,7 +320,6 @@ service.$inject = [
     'InvolvementKindService',
     'LogicalFlowViewService',
     'PersonStore',
-    'PhysicalFlowLineageStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService'
 ];
