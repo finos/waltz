@@ -55,6 +55,7 @@ public class FlowDiagramEndpoint implements Endpoint {
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String findForSelectorPath = mkPath(BASE_URL, "selector");
         String saveDiagramPath = mkPath(BASE_URL);
 
 
@@ -62,6 +63,8 @@ public class FlowDiagramEndpoint implements Endpoint {
                 -> flowDiagramService.getById(getId(req));
         ListRoute<FlowDiagram> findByEntityRoute = (req, res)
                 -> flowDiagramService.findByEntityReference(getEntityReference(req));
+        ListRoute<FlowDiagram> findForSelectorRoute = (req, res)
+                -> flowDiagramService.findForSelector(readIdSelectionOptionsFromBody(req));
         DatumRoute<Long> saveDiagramRoute = (req, res)
                 ->  {
             requireRole(userRoleService, req, LINEAGE_EDITOR);
@@ -70,9 +73,9 @@ public class FlowDiagramEndpoint implements Endpoint {
                     getUsername(req));
         };
 
-
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityPath, findByEntityRoute);
+        postForList(findForSelectorPath, findForSelectorRoute);
         postForDatum(saveDiagramPath, saveDiagramRoute);
     }
 

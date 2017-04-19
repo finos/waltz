@@ -207,6 +207,7 @@ function service(
 
     const reset = () => {
         state = _.cloneDeep(initialState);
+        if (listener) listener(state);
     };
 
     const save = () => {

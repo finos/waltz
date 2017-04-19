@@ -17,6 +17,7 @@
  */
 
 import {initialiseData} from "../common";
+import {toGraphId} from '../flow-diagram/flow-diagram-utils';
 import _ from 'lodash';
 
 
@@ -50,11 +51,35 @@ const addToHistory = (historyStore, spec) => {
 };
 
 
+
+function loadFlowDiagrams(specId, $q, flowDiagramStore, flowDiagramEntityStore) {
+    const ref = {
+        id: specId,
+        kind: 'PHYSICAL_SPECIFICATION'
+    };
+
+    const selector = {
+        entityReference: ref,
+        scope: 'EXACT'
+    };
+
+    const promises = [
+        flowDiagramStore.findForSelector(selector),
+        flowDiagramEntityStore.findForSelector(selector)
+    ];
+    return $q
+        .all(promises)
+        .then(([flowDiagrams, flowDiagramEntities]) => ({ flowDiagrams, flowDiagramEntities }));
+}
+
+
 function controller($q,
                     $stateParams,
                     applicationStore,
                     bookmarkStore,
                     changeLogStore,
+                    flowDiagramStore,
+                    flowDiagramEntityStore,
                     historyStore,
                     logicalFlowStore,
                     notification,
@@ -90,7 +115,10 @@ function controller($q,
 
     logicalFlowStore
         .findBySelector({ entityReference: ref, scope: 'EXACT'})
-        .then(logicalFlows => vm.logicalFlowsById = _.keyBy(logicalFlows, 'id'));
+        .then(logicalFlows => {
+            vm.logicalFlows = logicalFlows;
+            vm.logicalFlowsById = _.keyBy(logicalFlows, 'id')
+        });
 
     changeLogStore
         .findByEntityReference(ref)
@@ -105,6 +133,15 @@ function controller($q,
         });
 
     loadSpecDefinitions();
+
+
+    vm.loadFlowDiagrams = () => {
+        loadFlowDiagrams(specId, $q, flowDiagramStore, flowDiagramEntityStore)
+            .then(r => Object.assign(vm, r));
+    };
+
+    vm.loadFlowDiagrams();
+
 
     bookmarkStore
         .findByParent(ref)
@@ -150,6 +187,53 @@ function controller($q,
             });
     };
 
+    vm.createFlowDiagramCommands = () => {
+        const nodeCommands = _
+            .chain(vm.logicalFlows)
+            .map(f => { return [f.source, f.target]; })
+            .flatten()
+            .uniqBy(toGraphId)
+            .map(a => ({ command: 'ADD_NODE', payload: a }))
+            .value();
+
+        const flowCommands = _.map(
+            vm.logicalFlows,
+            f => ({ command: 'ADD_FLOW', payload: Object.assign({}, f, { kind: 'LOGICAL_DATA_FLOW' } )}));
+
+        const moveCommands = _.map(
+            nodeCommands,
+            (nc, idx) => {
+                return {
+                    command: 'MOVE',
+                    payload: {
+                        id : toGraphId(nc.payload),
+                        dx: 50 + (110 * (idx % 8)),
+                        dy: 10 + (50 * (idx / 8))
+                    }
+                };
+            });
+
+        const physFlowCommands = _.map(
+            vm.physicalFlows,
+            pf => {
+                return {
+                    command: 'ADD_DECORATION',
+                    payload: {
+                        ref: { kind: 'LOGICAL_DATA_FLOW', id: pf.logicalFlowId },
+                        decoration: Object.assign({}, pf, { kind: 'PHYSICAL_FLOW' })
+                    }
+                };
+            });
+
+        const title = `${vm.specification.name} Flows`;
+
+        const titleCommands = [
+            { commands: 'SET_TITLE', payload: title }
+        ];
+
+        return _.concat(nodeCommands, flowCommands, physFlowCommands, moveCommands, titleCommands);
+    };
+
 }
 
 
@@ -159,6 +243,8 @@ controller.$inject = [
     'ApplicationStore',
     'BookmarkStore',
     'ChangeLogStore',
+    'FlowDiagramStore',
+    'FlowDiagramEntityStore',
     'HistoryStore',
     'LogicalFlowStore',
     'Notification',

@@ -19,8 +19,12 @@
 package com.khartec.waltz.service.flow_diagram;
 
 import com.khartec.waltz.data.flow_diagram.FlowDiagramEntityDao;
+import com.khartec.waltz.data.flow_diagram.FlowDiagramIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.flow_diagram.FlowDiagramEntity;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,12 +37,17 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class FlowDiagramEntityService {
 
     private final FlowDiagramEntityDao flowDiagramEntityDao;
+    private final FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory;
 
 
     @Autowired
-    public FlowDiagramEntityService(FlowDiagramEntityDao flowDiagramEntityDao) {
+    public FlowDiagramEntityService(FlowDiagramEntityDao flowDiagramEntityDao,
+                                    FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory) {
         checkNotNull(flowDiagramEntityDao, "flowDiagramEntityDao cannot be null");
+        checkNotNull(flowDiagramIdSelectorFactory, "flowDiagramIdSelectorFactory cannot be null");
+
         this.flowDiagramEntityDao = flowDiagramEntityDao;
+        this.flowDiagramIdSelectorFactory = flowDiagramIdSelectorFactory;
     }
 
 
@@ -50,6 +59,13 @@ public class FlowDiagramEntityService {
     public List<FlowDiagramEntity> findByEntityReference(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
         return flowDiagramEntityDao.findForEntity(ref);
+    }
+
+
+    public List<FlowDiagramEntity> findForSelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        Select<Record1<Long>> selector = flowDiagramIdSelectorFactory.apply(options);
+        return flowDiagramEntityDao.findForSelector(selector);
     }
 
 }
