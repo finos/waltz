@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../common";
+import {initialiseData} from '../common';
 import _ from 'lodash';
 
 
@@ -48,6 +48,12 @@ const addToHistory = (historyStore, spec) => {
         'main.physical-specification.view',
         { id: spec.id });
 };
+
+
+const mkReleaseLifecycleStatusChangeCommand = (newStatus) => {
+    return { newStatus };
+};
+
 
 
 function controller($q,
@@ -148,6 +154,45 @@ function controller($q,
             }, r => {
                 notification.error("Failed to create specification definition. Ensure that 'version' is unique");
             });
+    };
+
+    vm.deleteSpec = (specDef) => {
+        physicalSpecDefinitionStore
+            .deleteSpecification(specDef.id)
+            .then(result => {
+                if (result) {
+                    notification.success(`Deleted version ${specDef.version}`);
+                    loadSpecDefinitions();
+                } else {
+                    notification.error(`Could not delete version ${specDef.version}`);
+                }
+            })
+    };
+
+    vm.activateSpec = (specDef) => {
+        physicalSpecDefinitionStore
+            .updateStatus(specDef.id, mkReleaseLifecycleStatusChangeCommand('ACTIVE'))
+            .then(result => {
+                if (result) {
+                    notification.success(`Marked version ${specDef.version} as active`);
+                    loadSpecDefinitions();
+                } else {
+                    notification.error(`Could not mark version ${specDef.version} as active`);
+                }
+            })
+    };
+
+    vm.markSpecObsolete = (specDef) => {
+        physicalSpecDefinitionStore
+            .updateStatus(specDef.id, mkReleaseLifecycleStatusChangeCommand('OBSOLETE'))
+            .then(result => {
+                if (result) {
+                    notification.success(`Marked version ${specDef.version} as obsolete`);
+                    loadSpecDefinitions();
+                } else {
+                    notification.error(`Could not mark version ${specDef.version} as obsolete`);
+                }
+            })
     };
 
 }

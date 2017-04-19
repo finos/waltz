@@ -67,11 +67,12 @@
                         <tr>
                             <th>Version</th>
                             <th>Status</th>
+                            <th></th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr ng-repeat="def in ctrl.specDefinitions | orderBy: 'createdAt':true"
-                            class="clickable"
+                            class="clickable waltz-visibility-parent"
                             ng-class="{ 'waltz-highlighted-row' : def.id === ctrl.selectedSpecDefinition.def.id }"
                             ng-click="ctrl.selectSpecDefinition(def)">
                             <td>
@@ -79,8 +80,28 @@
                                 </a>
                             </td>
                             <td>
-                            <span ng-bind="def.status | toDisplayName:'releaseLifecycleStatus'">
-                            </span>
+                                <span ng-bind="def.status | toDisplayName:'releaseLifecycleStatus'">
+                                </span>
+                            </td>
+                            <td>
+                                <a ng-if="def.status === 'DEPRECATED' || def.status === 'DRAFT'"
+                                   ng-click="ctrl.activateSpec(def)"
+                                   class="btn btn-xs waltz-visibility-child-30">
+                                    <waltz-icon name="check"></waltz-icon>
+                                    <span class="small">activate</span>
+                                </a>
+                                <a ng-if="def.status === 'DEPRECATED'"
+                                   ng-click="ctrl.markSpecObsolete(def)"
+                                   class="btn btn-xs waltz-visibility-child-30">
+                                    <waltz-icon name="archive"></waltz-icon>
+                                    <span class="small">mark obsolete</span>
+                                </a>
+                                <a ng-if="def.status === 'DRAFT'"
+                                   ng-click="ctrl.deleteSpec(def)"
+                                   class="btn btn-xs waltz-visibility-child-30">
+                                    <waltz-icon name="trash-o"></waltz-icon>
+                                    <span class="small">delete</span>
+                                </a>
                             </td>
                         </tr>
                         </tbody>

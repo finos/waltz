@@ -33,9 +33,24 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const updateStatus = (specId, command) => {
+        return $http
+            .put(`${base}/specification/${specId}/status`, command)
+            .then(r => r.data);
+    };
+
+    const deleteSpecification = (specId) => {
+        return $http
+            .delete(`${base}/specification/${specId}`)
+            .then(r => r.data);
+    };
+
+
     return {
         findForSpecificationId,
-        create
+        create,
+        updateStatus,
+        deleteSpecification
     };
 }
 
