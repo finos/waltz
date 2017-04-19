@@ -23,6 +23,10 @@ function store($http, base) {
         .get(`${BASE}/id/${id}`)
         .then(r => r.data);
 
+    const deleteForId = (id) => $http
+        .delete(`${BASE}/id/${id}`)
+        .then(r => r.data);
+
     const findByEntityReference = (ref) => $http
         .get(`${BASE}/entity/${ref.kind}/${ref.id}`)
         .then(r => r.data);
@@ -38,6 +42,7 @@ function store($http, base) {
 
     return {
         getById,
+        deleteForId,
         findByEntityReference,
         findForSelector,
         save

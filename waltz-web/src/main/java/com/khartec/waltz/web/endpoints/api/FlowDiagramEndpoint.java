@@ -54,6 +54,7 @@ public class FlowDiagramEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String deleteByIdPath = mkPath(BASE_URL, "id", ":id");
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findForSelectorPath = mkPath(BASE_URL, "selector");
         String saveDiagramPath = mkPath(BASE_URL);
@@ -72,11 +73,14 @@ public class FlowDiagramEndpoint implements Endpoint {
                     readBody(req, SaveDiagramCommand.class),
                     getUsername(req));
         };
+        DatumRoute<Boolean> deleteByIdRoute = (req, res)
+                -> flowDiagramService.deleteById(getId(req));
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityPath, findByEntityRoute);
         postForList(findForSelectorPath, findForSelectorRoute);
         postForDatum(saveDiagramPath, saveDiagramRoute);
+        deleteForDatum(deleteByIdPath, deleteByIdRoute);
     }
 
 

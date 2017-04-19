@@ -62,6 +62,8 @@ function toRef(d) {
 function controller(
     $timeout,
     flowDiagramStateService,
+    flowDiagramStore,
+    notification,
     physicalFlowStore,
     physicalSpecificationStore)
 {
@@ -140,7 +142,6 @@ function controller(
                             })
                             .reject(d => d === null)
                             .value();
-
                     });
             }
         }, 0);
@@ -206,12 +207,25 @@ function controller(
         node: showNodeDetail,
         flowBucket: showFlowBucketDetail
     };
+
+    vm.deleteDiagram = (id) => {
+        flowDiagramStore
+            .deleteForId(id)
+            .then(() => {
+                vm.reload();
+                clearSelections();
+                flowDiagramStateService.reset();
+                notification.warning('Diagram deleted');
+            });
+    };
 }
 
 
 controller.$inject = [
     '$timeout',
     'FlowDiagramStateService',
+    'FlowDiagramStore',
+    'Notification',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore'
 ];

@@ -123,4 +123,11 @@ public class FlowDiagramDao {
         return dsl.executeUpdate(record) == 1;
     }
 
+
+    public boolean deleteById(long id) {
+        return dsl
+                .delete(FLOW_DIAGRAM)
+                .where(FLOW_DIAGRAM.ID.eq(id))
+                .execute() == 1;
+    }
 }

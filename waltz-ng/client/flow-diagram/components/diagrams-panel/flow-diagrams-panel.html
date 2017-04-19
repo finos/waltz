@@ -132,16 +132,46 @@
                 <!-- ACTIONS -->
                 <div>
                     <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                        <button class="btn btn-xs btn-primary"
-                                ng-click="$ctrl.editDiagram()">
-                            Edit
-                        </button>
+                        <!-- CONTROLS -->
+                        <div ng-if="! $ctrl.visibility.deletePrompt"
+                             class="waltz-fade-if">
+                            <button class="btn btn-xs btn-primary"
+                                    ng-click="$ctrl.editDiagram()">
+                                Edit
+                            </button>
+                            &nbsp;
+                            <button class="btn btn-xs btn-danger"
+                                    ng-click="$ctrl.visibility.deletePrompt = true">
+                                Delete
+                            </button>
+                        </div>
+
+                        <!-- DELETE PROMPT -->
+                        <div ng-if="$ctrl.visibility.deletePrompt"
+                             class="waltz-fade-if alert-warning"
+                             style="padding: 4px">
+                            <strong>Are you sure you want to delete this diagram ?</strong>
+                            <br>
+                            <a class="btn btn-xs btn-danger"
+                                    ng-click="$ctrl.deleteDiagram($ctrl.selected.diagram.id)">
+                                Yes
+                            </a>
+                            &nbsp;
+                            <a class="btn btn-xs btn-primary"
+                                    ng-click="$ctrl.visibility.deletePrompt = false">
+                                Cancel
+                            </a>
+                        </div>
                     </div>
-                    &nbsp;
-                    <a class='clickable'
-                       ng-click="$ctrl.selected.diagram = null">
-                        Show diagram list
-                    </a>
+                    <div ng-if="! $ctrl.visibility.deletePrompt"
+                         class="waltz-fade-if">
+                        <br>
+                        <a class='clickable'
+                           ng-click="$ctrl.selected.diagram = null">
+                            Show diagram list
+                        </a>
+                    </div>
+
                 </div>
 
                 <hr>
