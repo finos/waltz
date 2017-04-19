@@ -16,10 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import angular from 'angular';
 import {initialiseData} from '../../../common';
-import {createSampleDiagram, toGraphId} from '../../flow-diagram-utils';
 
 /**
  * @name waltz-flow-diagram-editor
@@ -130,13 +127,6 @@ function mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateServ
                 title: (d) => `Remove ${d.data.name}`,
                 action: (elm, d, i) =>
                     vm.issueCommands([{command: 'REMOVE_NODE', payload: d}])
-            }, {
-                divider: true
-            }, {
-                title: (d) => `Go to ${d.data.name}`,
-                action: (elm, d, i) => {
-                    $state.go('main.app.view', {id: d.data.id })
-                }
             }
         ]
     }
@@ -243,20 +233,6 @@ function mkAnnotationMenu(commandProcessor, $timeout, vm) {
 }
 
 
-function mkCanvasMenu(commandProcessor) {
-    return (d) => {
-        return [
-            {
-                title: (d) => `Add some applications`,
-                action: function (elm, d, i) {
-                    return createSampleDiagram(commandProcessor);
-                }
-            }
-        ]
-    };
-}
-
-
 function controller($q,
                     $state,
                     $timeout,
@@ -271,7 +247,6 @@ function controller($q,
         node: mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateService),
         flowBucket: mkFlowBucketMenu($q, $timeout, vm,  flowDiagramStateService, physicalFlowStore, physicalSpecificationStore),
         annotation: mkAnnotationMenu(flowDiagramStateService.processCommands, $timeout, vm),
-        canvas: mkCanvasMenu(flowDiagramStateService.processCommands)
     };
 
     vm.issueCommands = (commands) => {
