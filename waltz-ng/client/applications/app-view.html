@@ -52,24 +52,11 @@
 
 
     <!-- FLOW DIAGRAMS -->
-    <waltz-section name="Flow Diagrams"
-                   small="( {{ ctrl.flowDiagrams.length }} )"
-                   icon="picture-o"
-                   id="specification-flow-diagram-section">
-
-        Diagrams ids will need to resolved by restricting diagram_entities by app id
-
-        <br>
-        Show a clickable list of diagrams which allows diagrams to be displayed inline
-
-        <waltz-flow-diagrams-panel></waltz-flow-diagrams-panel>
-
-        <waltz-no-data ng-if="ctrl.flowDiagrams.length == 0">
-            <message>
-                <strong>No flow diagrams</strong> for this physical specification.
-            </message>
-        </waltz-no-data>
-    </waltz-section>
+    <waltz-flow-diagrams-section flow-diagrams="ctrl.flowDiagrams"
+                                 flow-diagram-entities="ctrl.flowDiagramEntities"
+                                 create-diagram-commands="ctrl.createFlowDiagramCommands"
+                                 reload="ctrl.loadFlowDiagrams">
+    </waltz-flow-diagrams-section>
 
 
     <!-- DATA TYPES & FLOWS -->

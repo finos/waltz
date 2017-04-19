@@ -19,6 +19,7 @@ import _ from 'lodash';
 
 
 export function toGraphId(datum) {
+    if (_.isString(datum)) return datum;
     return `${datum.kind}/${datum.id}`;
 }
 

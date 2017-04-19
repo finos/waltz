@@ -70,6 +70,29 @@ const addToHistory = (historyStore, app) => {
 };
 
 
+
+function loadFlowDiagrams(appId, $q, flowDiagramStore, flowDiagramEntityStore) {
+    const ref = {
+        id: appId,
+        kind: 'APPLICATION'
+    };
+
+    const selector = {
+        entityReference: ref,
+        scope: 'EXACT'
+    };
+
+    const promises = [
+        flowDiagramStore.findForSelector(selector),
+        flowDiagramEntityStore.findForSelector(selector)
+    ];
+    return $q
+        .all(promises)
+        .then(([flowDiagrams, flowDiagramEntities]) => ({ flowDiagrams, flowDiagramEntities }));
+}
+
+
+
 function controller($q,
                     $state,
                     $stateParams,
@@ -83,6 +106,8 @@ function controller($q,
                     dataTypeUsageStore,
                     entityStatisticStore,
                     entityTagStore,
+                    flowDiagramStore,
+                    flowDiagramEntityStore,
                     historyStore,
                     involvementStore,
                     logicalFlowDecoratorStore,
@@ -99,7 +124,8 @@ function controller($q,
                     softwareCatalogStore,
                     sourceDataRatingStore,
                     surveyInstanceStore,
-                    surveyRunStore) {
+                    surveyRunStore)
+{
 
     const id = $stateParams.id;
     const entityReference = { id, kind: 'APPLICATION' };
@@ -166,6 +192,11 @@ function controller($q,
     }
 
 
+    vm.loadFlowDiagrams = () => {
+        loadFlowDiagrams(id, $q, flowDiagramStore, flowDiagramEntityStore)
+            .then(r => Object.assign(vm, r));
+    };
+
     function loadSecondWave() {
         const promises = [
             bookmarkStore.findByParent(entityReference)
@@ -181,7 +212,9 @@ function controller($q,
 
             measurableStore
                 .findMeasurablesRelatedToPath(entityReference)
-                .then(ms => vm.measurables = ms)
+                .then(ms => vm.measurables = ms),
+
+            vm.loadFlowDiagrams()
         ];
 
         return $q.all(promises);
@@ -251,6 +284,32 @@ function controller($q,
 
     // load everything in priority order
     loadAll();
+
+
+
+    vm.createFlowDiagramCommands = () => {
+        const app = Object.assign({}, vm.app, { kind: 'APPLICATION' });
+        const title = `${app.name} flows`;
+        const annotation = {
+            id: +new Date()+'',
+            kind: 'ANNOTATION',
+            entityReference: app,
+            note: `${app.name} data flows`
+        };
+
+        const modelCommands = [
+            { command: 'ADD_NODE', payload: app },
+            { command: 'ADD_ANNOTATION', payload: annotation },
+            { command: 'SET_TITLE', payload: title }
+        ];
+
+        const moveCommands = [
+            { command: 'MOVE', payload: { id: `ANNOTATION/${annotation.id}`, dx: 100, dy: -50 }},
+            { command: 'MOVE', payload: { id: `APPLICATION/${app.id}`, dx: 300, dy: 200 }},
+        ];
+
+        return _.concat(modelCommands, moveCommands);
+    };
 }
 
 
@@ -268,6 +327,8 @@ controller.$inject = [
     'DataTypeUsageStore',
     'EntityStatisticStore',
     'EntityTagStore',
+    'FlowDiagramStore',
+    'FlowDiagramEntityStore',
     'HistoryStore',
     'InvolvementStore',
     'LogicalFlowDecoratorStore',

@@ -22,9 +22,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.flow_diagram.FlowDiagram;
 import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagram;
 import com.khartec.waltz.schema.tables.records.FlowDiagramRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -97,6 +95,15 @@ public class FlowDiagramDao {
                 .stream()
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+
+    public List<FlowDiagram> findForSelector(Select<Record1<Long>> selector) {
+        return dsl
+                .select(FLOW_DIAGRAM.fields())
+                .from(FLOW_DIAGRAM)
+                .where(FLOW_DIAGRAM.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
