@@ -152,7 +152,7 @@ public class AttestationDao {
                     DSL.val("Attested by flow diagram inclusion").as("comments"),
                     DSL.val(provenance).as("provenance"),
                     FLOW_DIAGRAM.ID.as("attesting_entity_id"),
-                    DSL.val(EntityKind.FLOW_DIAGRAM.name()).as("attesting_entity_id"))
+                    DSL.val(EntityKind.FLOW_DIAGRAM.name()).as("attesting_entity_kind"))
                     .from(FLOW_DIAGRAM_ENTITY)
                     .innerJoin(FLOW_DIAGRAM)
                     .on(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(FLOW_DIAGRAM.ID))
