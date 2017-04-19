@@ -178,8 +178,22 @@ function controller($q,
     vm.createSpecDefinition = (specDef) => {
         physicalSpecDefinitionStore
             .create(specId, specDef.def)
-            .then(specDefId => physicalSpecDefinitionFieldStore
-                .createFields(specDefId, specDef.fields))
+            .then(specDefId => {
+                const fieldsPromise = physicalSpecDefinitionFieldStore
+                    .createFields(specDefId, specDef.fields);
+
+                if (specDef.sampleData) {
+                    const sampleDataPromise = physicalSpecDefinitionSampleFileStore
+                        .create(specDefId, {
+                            name: vm.specification.name,
+                            fileData: specDef.sampleData
+                        });
+
+                    return $q.all([fieldsPromise, sampleDataPromise]);
+                } else {
+                    return fieldsPromise;
+                }
+            })
             .then(r => {
                 notification.success('Specification definition created successfully');
                 loadSpecDefinitions();
