@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
-import {aggregatePeopleInvolvements} from "../../involvement/involvement-utils";
+import _ from 'lodash';
+import {aggregatePeopleInvolvements} from '../../involvement/involvement-utils';
 
 
 function mkRef(orgUnitId) {
@@ -154,13 +154,6 @@ function loadChangeLogs(store, ref, holder = {}) {
 }
 
 
-function loadLineageReports(store, selector, holder) {
-    return store
-        .findLineageReportsBySelector(selector)
-        .then(lineageReports => holder.lineageReports = lineageReports);
-}
-
-
 function loadMeasurables(store, selector, holder) {
     return store
         .findMeasurablesBySelector(selector)
@@ -197,7 +190,6 @@ function service($q,
                  measurableCategoryStore,
                  measurableRatingStore,
                  orgUnitStore,
-                 physicalFlowLineageStore,
                  sourceDataRatingStore,
                  techStatsService) {
 
@@ -245,8 +237,7 @@ function service($q,
             loadInvolvement(involvementStore, orgUnitId, rawData),
             loadAuthSources(authSourcesStore, orgUnitId, rawData),
             loadComplexity(complexityStore, orgUnitId, rawData),
-            loadEntityStatisticDefinitions(entityStatisticStore, selector, rawData),
-            loadLineageReports(physicalFlowLineageStore, selector, rawData)
+            loadEntityStatisticDefinitions(entityStatisticStore, selector, rawData)
         ]);
     }
 
@@ -327,7 +318,6 @@ service.$inject = [
     'MeasurableCategoryStore',
     'MeasurableRatingStore',
     'OrgUnitStore',
-    'PhysicalFlowLineageStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService',
 ];

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
+import _ from 'lodash';
 
 
 const initialState = {
@@ -62,7 +62,6 @@ function controller($scope,
                     measurableStore,
                     measurableCategoryStore,
                     measurableRatingStore,
-                    physicalFlowLineageStore,
                     sourceDataRatingStore,
                     technologyStatsService,
                     userService) {
@@ -143,10 +142,6 @@ function controller($scope,
         .whoami()
         .then(u => vm.user = u);
 
-    physicalFlowLineageStore
-        .findLineageReportsBySelector(idSelector)
-        .then(lineageReports => vm.lineageReports = lineageReports);
-
     entityStatisticStore
         .findAllActiveDefinitions()
         .then(definitions => vm.entityStatisticDefinitions = definitions);
@@ -170,10 +165,6 @@ function controller($scope,
     vm.loadFlowDetail = () => logicalFlowViewService
         .loadDetail()
         .then(flowData => vm.dataFlows = flowData);
-
-    vm.lineageTableInitialised = (api) => {
-        vm.exportLineageReports = api.export;
-    };
 
     vm.loadRatingsDetail = () => {
         return vm.measurableRatingsDetail
@@ -209,7 +200,6 @@ controller.$inject = [
     'MeasurableStore',
     'MeasurableCategoryStore',
     'MeasurableRatingStore',
-    'PhysicalFlowLineageStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService',
     'UserService'

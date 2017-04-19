@@ -18,8 +18,8 @@
 
 import _ from 'lodash';
 import {initialiseData} from '../common';
-import {populateParents, getParents} from '../common/hierarchy-utils';
-import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
+import {getParents, populateParents} from '../common/hierarchy-utils';
+import {aggregatePeopleInvolvements} from '../involvement/involvement-utils';
 
 
 const initialState = {
@@ -51,7 +51,6 @@ function controller($q,
                     measurableStore,
                     measurableCategoryStore,
                     measurableRatingStore,
-                    physicalFlowLineageStore,
                     sourceDataRatingStore,
                     technologyStatsService) {
 
@@ -114,9 +113,6 @@ function controller($q,
 
     const loadWave3 = () =>
         $q.all([
-            physicalFlowLineageStore
-                .findLineageReportsBySelector(childrenSelector)
-                .then(lineageReports => vm.lineageReports = lineageReports),
             entityStatisticStore
                 .findAllActiveDefinitions()
                 .then(statDefinitions => vm.entityStatisticDefinitions = statDefinitions),
@@ -183,7 +179,6 @@ controller.$inject = [
     'MeasurableStore',
     'MeasurableCategoryStore',
     'MeasurableRatingStore',
-    'PhysicalFlowLineageStore',
     'SourceDataRatingStore',
     'TechnologyStatisticsService'
 ];
