@@ -48,7 +48,7 @@ export const entityIconNames = {
     MEASURABLE: 'puzzle-piece',
     ORG_UNIT: 'sitemap',
     PERSON: 'user',
-    PHYSICAL_SPECIFICATION: 'qrcode',
+    PHYSICAL_SPECIFICATION: 'file-text',
     PHYSICAL_FLOW: 'qrcode',
     PROCESS: 'code-fork',
     SERVER: 'server',
