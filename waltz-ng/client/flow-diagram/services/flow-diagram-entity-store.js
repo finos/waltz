@@ -28,9 +28,14 @@ function store($http, base) {
         .get(`${BASE}/entity/${ref.kind}/${ref.id}`)
         .then(r => r.data);
 
+    const findForSelector = (options) => $http
+        .post(`${BASE}/selector`, options)
+        .then(r => r.data);
+
     return {
         findByDiagramId,
-        findByEntityReference
+        findByEntityReference,
+        findForSelector
     };
 }
 

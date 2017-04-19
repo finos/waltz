@@ -126,32 +126,13 @@
     </waltz-section>
 
 
+
     <!-- FLOW DIAGRAMS -->
-    <waltz-section name="Flow Diagrams"
-                   small="( {{ ctrl.flowDiagrams.length }} )"
-                   icon="picture-o"
-                   id="specification-flow-diagram-section">
-
-        Diagrams ids will need to resolved via physical flows by joining diagram_entities to physical_flow restricted by
-        the specification_id.
-
-        <br>
-        Show a clickable list of diagrams which allows diagrams to be displayed inline
-
-        <br>
-        <br>
-        Problems: Spec is never directly notable, and can only provide one entity-ref to this control,
-        therefore difficult to figure out whether this spec is notable in a list of diagrams.
-        #1989
-
-        <waltz-flow-diagrams-panel></waltz-flow-diagrams-panel>
-
-        <waltz-no-data ng-if="ctrl.flowDiagrams.length == 0">
-            <message>
-                <strong>No flow diagrams</strong> for this physical specification.
-            </message>
-        </waltz-no-data>
-    </waltz-section>
+    <waltz-flow-diagrams-section flow-diagrams="ctrl.flowDiagrams"
+                                 flow-diagram-entities="ctrl.flowDiagramEntities"
+                                 create-diagram-commands="ctrl.createFlowDiagramCommands"
+                                 reload="ctrl.loadFlowDiagrams">
+    </waltz-flow-diagrams-section>
 
 
     <!-- ASSOCIATED FLOWS -->

@@ -13,7 +13,7 @@
                 <div class="col-sm-10">
                     <span ng-bind="$ctrl.specDefinition.def.version"></span>
                     <span ng-if="$ctrl.specDefinition.def.status === 'ACTIVE'">
-                        - <i>Current</i>
+                        - <i>Latest</i>
                     </span>
                     <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
                         <div class="btn-group"
@@ -32,8 +32,11 @@
                                 <li ng-repeat="def in $ctrl.selectableDefinitions | orderBy: 'createdAt':true"
                                     role="menuitem">
                                     <a class="clickable"
-                                       ng-bind="def.version"
-                                       ng-click="$ctrl.definitionSelected(def)"></a>
+                                       ng-click="$ctrl.definitionSelected(def)">
+                                        <span ng-bind="def.version"></span>
+                                        -
+                                        <span ng-bind="def.status | toDisplayName: 'releaseLifecycleStatus'"></span>
+                                    </a>
                                 </li>
                             </ul>
                         </div>

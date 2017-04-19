@@ -57,7 +57,7 @@ public class AttestationEndpoint implements Endpoint {
     @Override
     public void register() {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
-        String calculateForLineagePath = mkPath(BASE_URL, "calculate-all", "lineage");
+        String calculateForFlowDiagramsPath = mkPath(BASE_URL, "calculate-all", "flow-diagram");
         String calculateForLogicalDecorators = mkPath(BASE_URL, "calculate-all", "logical-flow-decorator");
 
 
@@ -65,14 +65,14 @@ public class AttestationEndpoint implements Endpoint {
                 findForEntityPath,
                 (request, response) -> attestationService.findForEntity(getEntityReference(request)));
 
-        getForDatum(calculateForLineagePath, this::calculateForLineageRoute);
+        getForDatum(calculateForFlowDiagramsPath, this::calculateForFlowDiagramsRoute);
         getForDatum(calculateForLogicalDecorators, this::calculateForLogicalFlowDecoratorsRoute);
     }
 
 
-    private boolean calculateForLineageRoute(Request request, Response response) {
+    private boolean calculateForFlowDiagramsRoute(Request request, Response response) {
         requireRole(userRoleService, request, Role.ADMIN);
-        return attestationService.recalculateForPhysicalFlowLineage();
+        return attestationService.recalculateForFlowDiagrams();
     }
 
 

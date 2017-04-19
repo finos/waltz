@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -48,15 +49,18 @@ public class FlowDiagramEntityEndpoint implements Endpoint {
     public void register() {
         String findByDiagramIdPath = mkPath(BASE_URL, "id", ":id");
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String findForSelectorPath = mkPath(BASE_URL, "selector");
 
         ListRoute<FlowDiagramEntity> findByDiagramIdRoute = (req, res)
                 -> flowDiagramEntityService.findByDiagramId(getId(req));
-
+        ListRoute<FlowDiagramEntity> findForSelectorRoute = (req, res)
+                -> flowDiagramEntityService.findForSelector(readIdSelectionOptionsFromBody(req));
         ListRoute<FlowDiagramEntity> findByEntityRoute = (req, res)
                 -> flowDiagramEntityService.findByEntityReference(getEntityReference(req));
 
         getForList(findByDiagramIdPath, findByDiagramIdRoute);
         getForList(findByEntityPath, findByEntityRoute);
+        postForList(findForSelectorPath, findForSelectorRoute);
     }
 
 }

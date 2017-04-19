@@ -121,8 +121,8 @@ public class AttestationService {
     }
 
 
-    public boolean recalculateForPhysicalFlowLineage() {
-        return attestationDao.recalculateForPhysicalFlowLineage();
+    public boolean recalculateForFlowDiagrams() {
+        return attestationDao.recalculateForFlowDiagrams();
     }
 
 
