@@ -46,7 +46,16 @@ function createEntriesString(entries = []) {
 }
 
 
-function controller() {
+function mkEntry(id, position, value) {
+    return {
+        id,
+        value,
+        position
+    };
+}
+
+
+function controller(notification) {
     const vm = this;
 
     vm.$onInit = () => { initialiseData(vm, initialState); };
@@ -55,12 +64,22 @@ function controller() {
         invokeFunction(vm.onChange, vm.entries);
     };
 
+    const valueExists = (value) => {
+        return _.find(vm.entries, e => e.value == value) !== undefined;
+    };
+
     vm.startNewEntry = () => {
         vm.creatingEntry = true;
     };
 
     vm.saveNewEntry = (entry) => {
-        vm.entries = _.concat(vm.entries, [entry]);
+        const newEntry = mkEntry(null, null, entry.value);
+
+        if (!valueExists(newEntry.value)) {
+            vm.entries = _.concat(vm.entries, [entry]);
+        } else {
+            notification.warning(`\'${entry.value}\' already exists, will not add`)
+        }
         vm.newEntry = null;
         vm.creatingEntry = false;
         notifyChanges();
@@ -72,17 +91,18 @@ function controller() {
 
     vm.updateValue = (entryId, data) => {
         //entry id is likely to be undefined and cannot be relied upon (when we have new entries)
-        vm.entries = _.map(vm.entries, e => {
-            if(e.value === data.oldVal) {
-                return {
-                    id: e.id,
-                    value: data.newVal,
-                    position: e.position
+        if (!valueExists(data.newVal)) {
+            vm.entries = _.map(vm.entries, e => {
+                if(e.value === data.oldVal) {
+                    return mkEntry(e.id, e.position, data.newVal);
+                } else {
+                    return e;
                 }
-            } else {
-                return e;
-            }
-        });
+            });
+        } else {
+            notification.warning(`\'${data.newVal}\' already exists, will not add`)
+        }
+
 
         notifyChanges();
     };
@@ -106,11 +126,7 @@ function controller() {
             .trim()
             .split("\n")
             .uniq()
-            .map(s => ({
-                id: null,
-                value: s,
-                position: null
-            }))
+            .map(s => mkEntry(null, null, s))
             .value();
         vm.entries = newEntries;
         notifyChanges();
@@ -118,7 +134,9 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    'Notification'
+];
 
 
 const component = {
