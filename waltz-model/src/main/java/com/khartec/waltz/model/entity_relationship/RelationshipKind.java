@@ -54,6 +54,30 @@ public enum RelationshipKind {
     SUPPORTS(fromArray(
             tuple(APPLICATION, CHANGE_INITIATIVE),
             tuple(MEASURABLE, PROCESS)
+    )),
+
+    APPLICATION_NEW(fromArray(
+            tuple(CHANGE_INITIATIVE, APPLICATION)
+    )),
+
+    APPLICATION_FUNCTIONAL_CHANGE(fromArray(
+            tuple(CHANGE_INITIATIVE, APPLICATION)
+    )),
+
+    APPLICATION_DECOMMISSIONED(fromArray(
+            tuple(CHANGE_INITIATIVE, APPLICATION)
+    )),
+
+    APPLICATION_NFR_CHANGE(fromArray(
+            tuple(CHANGE_INITIATIVE, APPLICATION)
+    )),
+
+    DATA_PUBLISHER(fromArray(
+            tuple(CHANGE_INITIATIVE, APPLICATION)
+    )),
+
+    DATA_CONSUMER(fromArray(
+            tuple(CHANGE_INITIATIVE, APPLICATION)
     ));
 
 

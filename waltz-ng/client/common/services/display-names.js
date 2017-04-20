@@ -248,7 +248,13 @@ export const relationshipKindNames = {
     'LOOSELY_RELATES_TO': 'Loosely Relates To',
     'PARTICIPATES_IN': 'Participates In',
     'RELATES_TO': 'Relates To',
-    'SUPPORTS': 'Supports'
+    'SUPPORTS': 'Supports',
+    'APPLICATION_NEW': 'Application - new',
+    'APPLICATION_FUNCTIONAL_CHANGE': 'Application - functional change',
+    'APPLICATION_DECOMMISSIONED': 'Application - decommissioned',
+    'APPLICATION_NFR_CHANGE': 'Application - NFR change',
+    'DATA_PUBLISHER': 'Data publisher',
+    'DATA_CONSUMER': 'Data consumer'
 };
 
 
