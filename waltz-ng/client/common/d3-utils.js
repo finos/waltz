@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {perhaps} from './index';
 import {select} from 'd3-selection';
 import _ from 'lodash';
 
@@ -125,7 +126,8 @@ export function wrapText(selection, width) {
         while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width) {
+            const computedLength = perhaps(() => tspan.node().getComputedTextLength(), 150);
+            if (computedLength > width) {
                 lineNumber++;
                 line.pop();
                 tspan.text(line.join(" "));

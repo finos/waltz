@@ -20,7 +20,7 @@ import _ from 'lodash';
 import {select, event} from 'd3-selection';
 import {drag} from 'd3-drag';
 import {zoom} from 'd3-zoom';
-import {initialiseData} from '../../../common';
+import {initialiseData, perhaps} from '../../../common';
 import {mkLineWithArrowPath, responsivefy, wrapText} from '../../../common/d3-utils';
 import {d3ContextMenu} from '../../../common/d3-context-menu';
 import {toGraphId, toNodeShape, shapeFor, positionFor} from '../../flow-diagram-utils';
@@ -223,8 +223,10 @@ function drawNodes(state, group, commandProcessor) {
         .selectAll(`.${styles.TITLE}`)
         .text(d => d.data.name)
         .each(function(d) {
+            const self = this;
+            const computedLength = perhaps(() => self.getComputedTextLength(), 10);
             // update shape to accommodate label
-            const labelWidth = Math.max(this.getComputedTextLength() + 32, 60);
+            const labelWidth = Math.max(computedLength + 32, 60);
             state.layout.shapes[d.id] = toNodeShape(d.data, labelWidth);
         });
 }
@@ -458,7 +460,7 @@ function drawAnnotations(state, group, commandProcessor) {
 
 
 function draw(state, commandProcessor = () => console.log('no command processor given')) {
-    //console.log('draw', state);
+    // console.log('draw', state);
 
     if (state.layout.diagramTransform) {
         groups
