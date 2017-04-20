@@ -2,6 +2,7 @@
 
 - [Application Groups](app_groups/app_groups.md)
 - [Logical Flows](logical_flows/logical_flows.md)
+- [Flow Diagrams](flow_diagrams/flow_diagram.md)
 - [Measurables](measurables/measurables.md)
 - [Entity Relationship](entity_relationship/entity_relationship.md)
 - [Organisational Units](org_units/org_units.md)
