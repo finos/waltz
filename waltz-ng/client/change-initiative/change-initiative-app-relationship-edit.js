@@ -22,14 +22,23 @@ const initialState = {
     parentEntityRef: null,
     currentRelationships: [],
     allowedRelationships: [{
-        value: 'DEPRECATES',
-        name: 'Deprecates'
+        value: 'APPLICATION_NEW',
+        name: 'Application - new'
     }, {
-        value: 'SUPPORTS',
-        name: 'Supports'
+        value: 'APPLICATION_FUNCTIONAL_CHANGE',
+        name: 'Application - functional change'
     }, {
-        value: 'PARTICIPATES_IN',
-        name: 'Participates In'
+        value: 'APPLICATION_DECOMMISSIONED',
+        name: 'Application - decommissioned'
+    }, {
+        value: 'APPLICATION_NFR_CHANGE',
+        name: 'Application - NFR change'
+    }, {
+        value: 'DATA_PUBLISHER',
+        name: 'Data publisher'
+    }, {
+        value: 'DATA_CONSUMER',
+        name: 'Data consumer'
     }]
 };
 
