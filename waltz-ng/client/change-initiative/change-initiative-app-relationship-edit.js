@@ -22,15 +22,6 @@ const initialState = {
     parentEntityRef: null,
     currentRelationships: [],
     allowedRelationships: [{
-        value: 'DEPRECATES',
-        name: 'Deprecates'
-    }, {
-        value: 'SUPPORTS',
-        name: 'Supports'
-    }, {
-        value: 'PARTICIPATES_IN',
-        name: 'Participates In'
-    }, {
         value: 'APPLICATION_NEW',
         name: 'Application - new'
     }, {
