@@ -135,7 +135,7 @@ function controller($state,
             )
             .then(result => {
                 notification.success('Survey response submitted successfully');
-                $state.go('main.survey.instance.view', {id: id});
+                $state.go('main.survey.instance.response.view', {id: id});
             });
         }
     };
