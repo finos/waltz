@@ -19,12 +19,19 @@ import _ from 'lodash';
 import {groupQuestions} from './survey-utils';
 
 
+function extractAnswer(response = {}) {
+    return !_.isNil(response.booleanResponse)
+            ? response.booleanResponse
+            : (response.stringResponse || response.numberResponse || response.entityResponse)
+}
+
+
 function indexResponses(rs = []) {
     return _.chain(rs)
         .map('questionResponse')
         .map(qr => ({
             questionId: qr.questionId,
-            answer: qr.stringResponse || qr.numberResponse || qr.booleanResponse || qr.entityResponse,
+            answer: extractAnswer(qr),
             comment: qr.comment
         }))
         .keyBy('questionId')
