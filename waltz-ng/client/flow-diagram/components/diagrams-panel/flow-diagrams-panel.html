@@ -175,7 +175,7 @@
                         <br>
                         <a class='clickable'
                            ng-click="$ctrl.selected.diagram = null">
-                            Show diagram list
+                            &laquo; Back to list
                         </a>
                     </div>
 
@@ -191,7 +191,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-10">
+        <div class="col-md-10" style="border-left: 1px solid #ddd">
             <div ng-if="$ctrl.visibility.diagram">
                 <waltz-flow-diagram context-menus="$ctrl.contextMenus"
                                     click-handlers="$ctrl.clickHandlers">
