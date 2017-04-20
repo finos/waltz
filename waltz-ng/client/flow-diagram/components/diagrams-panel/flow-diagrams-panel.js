@@ -184,6 +184,8 @@ function controller(
 
         flowDiagramStateService.processCommands(vm.createDiagramCommands() || []);
         setTimeout(() => flowDiagramStateService.processCommands([]), 0);
+
+        notification.warning("Flow diagrams are not automatically saved.  Remember to save your work.")
     };
 
     vm.editDiagram = () => {
@@ -191,6 +193,7 @@ function controller(
         flowDiagramStateService.processCommands([
             { command: 'SET_TITLE', payload: vm.selected.diagram.name }
         ]);
+        notification.warning("Flow diagrams are not automatically saved.  Remember to save your work.")
     };
 
     vm.dismissDiagramEditor = () => {
