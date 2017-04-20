@@ -372,6 +372,9 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
             "font-family": "FontAwesome"
         });
 
+    newLabels
+        .append('title');
+
     labels
         .merge(newLabels)
         .classed('wsat-hover', (d) => highlighted === d.id)
@@ -386,6 +389,10 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
             .selectAll('.wsat-icon')
             .attr("fill", d => tweakers.icon(d).color)
             .text((d) => tweakers.icon(d).code || '');
+
+        labels.merge(newLabels)
+            .selectAll('title')
+            .text((d) => tweakers.icon(d).description || '');
     }
 
     labels

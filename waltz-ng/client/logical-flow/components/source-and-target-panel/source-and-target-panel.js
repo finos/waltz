@@ -124,21 +124,25 @@ function toIcon(count = 0) {
         case 0:
             return {
                 code: iconCodes.questionCircle,
+                description: 'No physical files specified',
                 color: '#c66'
             };
         case 1:
             return {
                 code: iconCodes.file,
+                description: 'One linked physical files',
                 color: '#000'
             };
         case 2:
             return {
                 code: iconCodes.files,
+                description: 'Two linked physical files',
                 color: '#000'
             };
         default:
             return {
                 code: iconCodes.folder,
+                description: 'Several linked physical files',
                 color: '#000'
             };
     }
