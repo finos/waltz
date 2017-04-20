@@ -4,7 +4,16 @@
 
 Surveys allow for the collection of ad-hoc data within 
 the overall structure of Waltz.  Surveys are focused on a 
-specific entity type (e.g. APPLICATION) and  
+specific entity type (e.g. APPLICATION, CHANGE_INITIATIVE) 
+and issued to users matching a given set of roles describing 
+their involvement with the entity.  The set of target entities
+for the survey is derived from a Waltz selection mechanism 
+(e.g. apps under a specific organisational unit, apps performing
+a specific function etc.).
+
+![Screenshot 1](survey_screenshot.png)
+
+![Screenshot 2](survey_edit_screenshot.png)
 
 ## Model
 
