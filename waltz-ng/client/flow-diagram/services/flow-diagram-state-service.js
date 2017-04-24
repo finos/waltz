@@ -202,6 +202,32 @@ function restoreDiagram(
 }
 
 
+function addDecoration(payload, model) {
+    const refId = toGraphId(payload.ref);
+    const decorationNode = toGraphNode(payload.decoration);
+    const currentDecorations = model.decorations[refId] || [];
+    const existingIds = _.map(currentDecorations, "id");
+    if (_.includes(existingIds, decorationNode.id)) {
+        console.log('Ignoring request to add duplicate decoration');
+    } else {
+        model.decorations[refId] = _.concat(currentDecorations, [decorationNode]);
+    }
+}
+
+
+function removeDecoration(payload, model) {
+    const refOfRemovedDecoration = toGraphId(payload.ref);
+    const decorationNodeToRemove = toGraphNode(payload.decoration);
+    const currentDecorations = model.decorations[refOfRemovedDecoration] || [];
+    const existingIds = _.map(currentDecorations, "id");
+    if (_.includes(existingIds, decorationNodeToRemove.id)) {
+        model.decorations[refOfRemovedDecoration] = _.reject(currentDecorations, d => d.id === decorationNodeToRemove.id);
+    } else {
+        console.log('Ignoring request to removed unknown decoration');
+    }
+}
+
+
 function service(
     $q,
     flowDiagramStore,
@@ -293,8 +319,8 @@ function service(
 
             case 'ADD_ANNOTATION':
                 const annotationNode = toGraphNode(payload);
-                const existingIds = _.map(model.annotations, "id");
-                if (_.includes(existingIds, payload.id)) {
+                const existingAnnotationIds = _.map(model.annotations, "id");
+                if (_.includes(existingAnnotationIds, payload.id)) {
                     console.log('Ignoring request to re-add annotation', payload);
                 } else {
                     model.annotations = _.concat(model.annotations || [], [ annotationNode ]);
@@ -303,8 +329,8 @@ function service(
 
             case 'ADD_NODE':
                 const graphNode = toGraphNode(payload);
-                const existingIds = _.map(model.nodes, "id");
-                if (_.includes(existingIds, graphNode.id)) {
+                const existingNodeIds = _.map(model.nodes, "id");
+                if (_.includes(existingNodeIds, graphNode.id)) {
                     console.log('Ignoring request to re-add node', payload);
                 } else {
                     model.nodes = _.concat(model.nodes || [], [ graphNode ]);
@@ -314,8 +340,8 @@ function service(
 
             case 'ADD_FLOW':
                 const graphFlow = toGraphFlow(payload);
-                const existingIds = _.map(model.flows, "id");
-                if (_.includes(existingIds, graphFlow.id)) {
+                const existingFlowIds = _.map(model.flows, "id");
+                if (_.includes(existingFlowIds, graphFlow.id)) {
                     console.log('Ignoring request to add duplicate flow', payload);
                 } else {
                     model.flows = _.concat(model.flows || [], [graphFlow]);
@@ -330,29 +356,11 @@ function service(
                 break;
 
             case 'ADD_DECORATION':
-                const payload = payload;
-                const refId = toGraphId(payload.ref);
-                const decorationNode = toGraphNode(payload.decoration);
-                const currentDecorations = model.decorations[refId] || [];
-                const existingIds = _.map(currentDecorations, "id");
-                if (_.includes(existingIds, decorationNode.id)) {
-                    console.log('Ignoring request to add duplicate decoration');
-                } else {
-                    model.decorations[refId] = _.concat(currentDecorations, [decorationNode]);
-                }
+                addDecoration(payload, model);
                 break;
 
             case 'REMOVE_DECORATION':
-                const payload = payload;
-                const refId = toGraphId(payload.ref);
-                const decorationNode = toGraphNode(payload.decoration);
-                const currentDecorations = model.decorations[refId] || [];
-                const existingIds = _.map(currentDecorations, "id");
-                if (_.includes(existingIds, decorationNode.id)) {
-                    model.decorations[refId] = _.reject(currentDecorations, d => d.id === decorationNode.id);
-                } else {
-                    console.log('Ignoring request to removed unknown decoration');
-                }
+                removeDecoration(payload, model);
                 break;
 
             case 'REMOVE_NODE':
@@ -388,6 +396,7 @@ function service(
         return state;
     };
 
+    // used to notify listeners of state changes
     let listener = () => {};
 
     const processCommands = (commands = []) => {
