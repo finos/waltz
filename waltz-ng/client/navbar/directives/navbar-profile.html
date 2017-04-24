@@ -76,19 +76,6 @@
             <li style="margin: 4px"
                 ui-sref-active="side-active"
                 class="no-overflow">
-                <span waltz-has-role="ADMIN">
-                    <a ui-sref="main.system.list">
-                        <waltz-icon class='text-muted small'
-                                    fixed-width="true"
-                                    name="wrench"></waltz-icon>
-                        System Admin
-                    </a>
-                </span>
-            </li>
-
-            <li style="margin: 4px"
-                ui-sref-active="side-active"
-                class="no-overflow">
                 <span>
                     <a ui-sref="main.survey.instance.user">
                         <waltz-icon class='text-muted small'
@@ -99,6 +86,18 @@
                 </span>
             </li>
 
+            <li style="margin: 4px"
+                ui-sref-active="side-active"
+                class="no-overflow">
+                <span waltz-has-role="ADMIN">
+                    <a ui-sref="main.system.list">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="wrench"></waltz-icon>
+                        System Admin
+                    </a>
+                </span>
+            </li>
         </ul>
 
         <script type="text/ng-template" id="navbar/modal-login.html">
