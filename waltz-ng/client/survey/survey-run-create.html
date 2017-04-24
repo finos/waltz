@@ -33,6 +33,11 @@
             <br/>
             <br/>
             Please click <a ng-click="ctrl.generateEmail()" class="clickable">here</a> to generate survey invitation email.
+            <br/>
+            <br/>
+            <a ui-sref="main.survey.template.view ({id: ctrl.surveyTemplate.id })">
+                &laquo; Back to <strong ng-bind="ctrl.surveyTemplate.name"></strong> template
+            </a>
         </div>
 
     </div>
