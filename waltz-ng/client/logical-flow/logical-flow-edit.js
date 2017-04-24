@@ -17,10 +17,18 @@
  */
 
 import _ from "lodash";
-import {loadDataTypes, loadActors} from "./registration-utils";
+import {
+    loadActors,
+    loadDataTypes
+} from "./registration-utils";
+
 import {
     loadDataFlows,
-    loadLogicalFlowDecorators} from "../applications/data-load";
+    loadLogicalFlowDecorators,
+    loadPhysicalFlows
+} from "../applications/data-load";
+
+import { mkTweakers } from './components/source-and-target-graph/source-and-target-utilities';
 
 
 function vetoMove(isDirty) {
@@ -33,7 +41,7 @@ function vetoMove(isDirty) {
 
 
 function loadDataTypeUsages(dataTypeUsageStore, appId, vm) {
-    dataTypeUsageStore
+    return dataTypeUsageStore
         .findForEntity('APPLICATION', appId)
         .then(usages => vm.dataTypeUsages = usages);
 }
@@ -56,6 +64,7 @@ const initialState = {
     flows: [],
     isDirty: false,
     mode: '', // editCounterpart | editDataTypeUsage
+    physicalFlows: [],
     selectedCounterpart: null,
     selectedDecorators: null,
     selectedFlow: null,
@@ -88,7 +97,8 @@ function controller($q,
                     dataTypeUsageStore,
                     logicalFlowDecoratorStore,
                     logicalFlowStore,
-                    notification) {
+                    notification,
+                    physicalFlowStore) {
     const primaryAppId = application.id;
 
     const vm = _.defaultsDeep(this, initialState);
@@ -119,7 +129,8 @@ function controller($q,
         return $q.all([
             loadDataFlows(logicalFlowStore, primaryAppId, vm),
             loadLogicalFlowDecorators(logicalFlowDecoratorStore, primaryAppId, vm),
-            loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm)
+            loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm),
+            loadPhysicalFlows(physicalFlowStore, vm.primaryRef, vm)
         ]);
     };
 
@@ -157,12 +168,6 @@ function controller($q,
             .then(() => notification.success('Data flow updated'));
     };
 
-    vm.flowTweakers = {
-        source: { onSelect: a => $scope.$applyAsync(() => selectSource(a)) },
-        target: { onSelect: a => $scope.$applyAsync(() => selectTarget(a)) },
-        type: { onSelect: a => $scope.$applyAsync(() => selectType(a)) }
-    };
-
     vm.cancel = () => {
         vm.selectedCounterpart = null;
         vm.selectedDecorators = null;
@@ -183,11 +188,16 @@ function controller($q,
     };
 
     vm.deleteFlow = (flow) => {
-        logicalFlowStore
-            .removeFlow(flow.id)
-            .then(reload)
-            .then(() => notification.warning('Data flow removed'))
-            .catch(e => notification.error(_.split(e.data.message, '/')[0] || "System error, please contact support"));
+        const hasPhysicalFlow = _.some(vm.physicalFlows, { logicalFlowId: flow.id });
+        if (!hasPhysicalFlow) {
+            logicalFlowStore
+                .removeFlow(flow.id)
+                .then(reload)
+                .then(() => notification.warning('Data flow removed'))
+                .catch(e => notification.error(_.split(e.data.message, '/')[0] || "System error, please contact support"));
+        } else {
+            notification.warning(`This data flow has associated physical flows, please check and remove those first`)
+        }
     };
 
     vm.saveUsages = (usages = []) => {
@@ -240,7 +250,18 @@ function controller($q,
     // -- BOOT
     loadDataTypes(dataTypeService, vm);
     loadActors(actorStore, vm);
-    reload();
+    reload().then(data => {
+        const baseTweakers = {
+            source: { onSelect: a => $scope.$applyAsync(() => selectSource(a)) },
+            target: { onSelect: a => $scope.$applyAsync(() => selectTarget(a)) },
+            type: { onSelect: a => $scope.$applyAsync(() => selectType(a)) }
+        };
+
+        vm.flowTweakers = mkTweakers(
+            baseTweakers,
+            vm.physicalFlows,
+            vm.flows);
+    });
 
 }
 
@@ -254,7 +275,8 @@ controller.$inject = [
     'DataTypeUsageStore',
     'LogicalFlowDecoratorStore',
     'LogicalFlowStore',
-    'Notification'
+    'Notification',
+    'PhysicalFlowStore'
 ];
 
 

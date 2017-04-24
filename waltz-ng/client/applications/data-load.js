@@ -47,6 +47,13 @@ export function loadDataFlows(dataFlowStore, id, vm) {
 }
 
 
+export function loadPhysicalFlows(physicalFlowStore, entityReference, vm) {
+    return physicalFlowStore
+        .findByEntityReference(entityReference)
+        .then(xs => vm.physicalFlows = xs);
+}
+
+
 export function loadChangeLog(changeLogStore, ref, vm) {
     changeLogStore
         .findByEntityReference(ref, CHANGE_LOG_LIMIT)
