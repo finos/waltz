@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from "lodash";
+import {initialiseData} from "../../common";
+
 
 const bindings = {
     stats: '<',
@@ -22,11 +25,29 @@ const bindings = {
 };
 
 
+const initialState = {
+    stats: {
+
+    },
+    hasAnyData: false
+};
+
+
 const template = require('./technology-summary-section.html');
 
 
 function controller() {
+    const vm = initialiseData(this, initialState);
 
+    vm.$onChanges = () => {
+        if (vm.stats) {
+            const hasServerStats = (vm.stats.serverStats && !_.isEmpty(vm.stats.serverStats.environmentCounts));
+            const hasDbStats = (vm.stats.databaseStats && !_.isEmpty(vm.stats.databaseStats.environmentCounts));
+            const hasSwStats = (vm.stats.softwareStats && !_.isEmpty(vm.stats.softwareStats.vendorCounts));
+
+            vm.hasAnyData = hasServerStats || hasDbStats || hasSwStats;
+        }
+    };
 }
 
 
