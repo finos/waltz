@@ -5,7 +5,7 @@ Waltz configuration properties can be defined in:
 
 
 JNDI properties take precedence over properties in waltz.properties.
-
+    
 And example of a JNDI property defined in Tomcat `conf/context.xml`:
 
 `<Environment name="database.password.jndi"

@@ -1,0 +1,35 @@
+flow_diagram as fd
+----
+id long PK
+name varchar
+description varchar
+layout_data json
+last_updated
+
+
+flow_diagram_annotation
+----
+id long PK
+diagram_id long FK >- fd.id
+entity_ref entity_reference
+note varchar
+
+flow_diagram_entity
+----
+diagram_id long PK FK >- fd.id
+entity_ref "entity_reference" PK
+is_notable boolean
+
+
+
+
+[settings]
+Position 9 -4
+
+[layout]
+flow_diagram_annotation 365 218
+
+flow_diagram_entity 360 39
+
+flow_diagram 61 31
+
