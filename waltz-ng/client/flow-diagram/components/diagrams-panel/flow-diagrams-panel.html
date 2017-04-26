@@ -1,7 +1,7 @@
 <waltz-no-data ng-if="$ctrl.diagrams.length == 0 && !$ctrl.visibility.editor">
     <message>
         <strong>No flow diagrams</strong> for this physical specification.
-        <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+        <div waltz-has-role="LINEAGE_EDITOR">
             <br>
             <a class="clickable"
                ng-click="$ctrl.createDiagram()">
@@ -57,7 +57,7 @@
                     </div>
                 </div>
 
-                <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                <div waltz-has-role="LINEAGE_EDITOR">
                     <br>
                     <a class="clickable"
                        ng-click="$ctrl.createDiagram()">
@@ -138,7 +138,7 @@
 
                 <!-- ACTIONS -->
                 <div>
-                    <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                    <div waltz-has-role="LINEAGE_EDITOR">
                         <!-- CONTROLS -->
                         <div ng-if="! $ctrl.visibility.deletePrompt"
                              class="waltz-fade-if">

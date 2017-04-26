@@ -45,14 +45,6 @@ function controller($stateParams,
         .load($stateParams.id)
 
 
-        // .then(() => {
-        //     setTimeout(() => {
-        //         // flowDiagramStateService.reset();
-        //         flowDiagramStateService.processCommands([])
-        //     }, 5000);
-        // })
-
-
 }
 
 
