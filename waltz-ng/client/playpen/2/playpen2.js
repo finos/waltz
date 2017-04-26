@@ -37,45 +37,47 @@ function calculateBoundingRect(clientRect, referenceElement) {
 
 
 function controller(notification,
+                    svgDiagramStore,
                     $element) {
 
     const vm = Object.assign(this, {});
 
+    svgDiagramStore
+        .findByGroup('ORG_UNIT')
+        .then(x => {
+            const diagram = x[0]
+            document
+                .getElementById('holder')
+                .innerHTML = diagram.svg;
+
+            select('#holder svg')
+                .append('rect')
+                .attr('id', 'highlighter')
+                .attr('stroke', 'red');
+
+            vm.annotate();
+            return x;
+        });
+
     const highlight = (elem) => {
 
-        const dimensions = calculateBoundingRect(
-            elem.getBoundingClientRect(),
-            document.getElementById('graphic'));
-
-        select('#highlighter')
-            .attr('x', dimensions.x)
-            .attr('y', dimensions.y)
-            .attr('width', dimensions.width)
-            .attr('height', dimensions.height);
+        console.log(elem)
+        // const dimensions = calculateBoundingRect(
+        //     elem.getBoundingClientRect(),
+        //     document.getElementById('holder'));
+        //
+        // select('#highlighter')
+        //     .attr('x', dimensions.x)
+        //     .attr('y', dimensions.y)
+        //     .attr('width', dimensions.width)
+        //     .attr('height', dimensions.height);
     };
 
     vm.annotate = () => {
 
-        selectAll('g')
-            .each(function(g) {
-                const dimensions = calculateBoundingRect(
-                    select(this)
-                        .node()
-                        .getBoundingClientRect(),
-                    document
-                        .getElementById('graphic'));
 
-                select(this)
-                    .insert('rect', ":first-child")
-                    .attr('visibility', 'hidden')
-                    .style('pointer-events', 'fill')
-                    .attr('x', dimensions.x)
-                    .attr('y', dimensions.y)
-                    .attr('width', dimensions.width)
-                    .attr('height', dimensions.height);
-            });
 
-        document.getElementById('graphic').onmousemove =
+        document.getElementById('holder').onmousemove =
             e => {
                 const mx = e.clientX;
                 const my = e.clientY;
@@ -91,6 +93,7 @@ function controller(notification,
 
 controller.$inject = [
     'Notification',
+    'SvgDiagramStore',
     '$element'
 ];
 
