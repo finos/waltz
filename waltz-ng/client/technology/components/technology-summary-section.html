@@ -6,7 +6,13 @@
                                      entities="['SERVER', 'DATABASE', 'SOFTWARE']">
     </waltz-source-data-section-addon>
 
-
-    <waltz-group-technology-summary stats="$ctrl.stats">
+    <waltz-group-technology-summary stats="$ctrl.stats"
+                                    ng-if="$ctrl.hasAnyData">
     </waltz-group-technology-summary>
+
+    <waltz-no-data ng-if="! $ctrl.hasAnyData">
+        <message>
+            <strong>No associated technology found</strong>
+        </message>
+    </waltz-no-data>
 </waltz-section>
