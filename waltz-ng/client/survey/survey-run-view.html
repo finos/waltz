@@ -50,7 +50,7 @@
                     </a>
                     <a class='clickable'
                        ui-sref="main.survey.instance.view ({id: instance.id })"
-                       ng-if="instance.status === 'NOT_STARTED'">
+                       ng-if="instance.status === 'NOT_STARTED' || instance.status === 'IN_PROGRESS'">
                         edit recipients
                     </a>
                 </td>
