@@ -13,7 +13,7 @@
 
 
     <properties>
-        <jooq.version>3.7.4</jooq.version>
+        <jooq.version>3.9.2</jooq.version>
         <liquibase.maven.version>3.5.1</liquibase.maven.version>
     </properties>
 
@@ -32,6 +32,7 @@
                 <jooq.dialect>MARIADB</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>
                 <jooq.database>org.jooq.util.mariadb.MariaDBDatabase</jooq.database>
+                <database.catalog></database.catalog> <!-- only required for MSSQL -->
             </properties>
         </profile>
 
@@ -156,12 +157,9 @@
                     <generator>
                         <database>
                             <name>${jooq.database}</name>
-                            <schemata>
-                                <schema>
-                                    <inputSchema>${database.schema}</inputSchema>
-                                    <outputSchemaToDefault>true</outputSchemaToDefault>
-                                </schema>
-                            </schemata>
+                            <inputSchema>${database.schema}</inputSchema>
+                            <inputCatalog>${database.catalog}</inputCatalog>
+                            <outputSchemaToDefault>true</outputSchemaToDefault>
                         </database>
 
                         <target>
