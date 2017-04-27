@@ -88,7 +88,7 @@ function findSimilarFlows(specification, flowAttributes, targetEntity, existingF
 
 
 function controller(
-    $q,
+    $scope,
     $state,
     $stateParams,
     actorStore,
@@ -96,9 +96,11 @@ function controller(
     logicalFlowStore,
     notification,
     physicalFlowStore,
-    specificationStore) {
+    specificationStore,
+    preventNavigationService) {
 
     const vm = initialiseData(this, initialState);
+    preventNavigationService.setupWarningDialog($scope, () => isDirty());
 
     vm.similarFlowDefs = [
         { field: 'specification.name', displayName: 'Name', width: "10%" },
@@ -130,6 +132,10 @@ function controller(
         vm.visibility.similarFlows = false;
         // vm.similarFlows = findSimilarFlows(vm.specification, vm.flowAttributes, vm.targetEntity, vm.existingFlowsByTarget);
         return validate(vm.specification, vm.flowAttributes, vm.targetLogicalFlow);
+    };
+
+    const isDirty = () => {
+        return vm.specification || vm.flowAttributes || vm.targetLogicalFlow;
     };
 
     vm.focusSpecification = () => {
@@ -183,6 +189,10 @@ function controller(
                         notification.warning(resp.message + ", redirected to existing.")
                     }
                     if(resp.entityReference) {
+                        //clear variables
+                        vm.specification = null;
+                        vm.flowAttributes = null;
+                        vm.targetLogicalFlow = null;
                         $state.go('main.physical-flow.view', {id: resp.entityReference.id});
                     }
                 })
@@ -191,6 +201,7 @@ function controller(
             notification.warning("Cannot save: <br> - " + messages);
         }
     };
+
 
     loadEntity(sourceEntityRef, applicationStore, actorStore)
         .then(ent => vm.sourceEntity = ent);
@@ -212,7 +223,7 @@ function controller(
 
 
 controller.$inject = [
-    '$q',
+    '$scope',
     '$state',
     '$stateParams',
     'ActorStore',
@@ -221,6 +232,7 @@ controller.$inject = [
     'Notification',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore',
+    'PreventNavigationService'
 ];
 
 

@@ -59,6 +59,8 @@ import {
     usageKindIconNames
 } from "./icon-names";
 
+import preventNavigationService from './prevent-navigation-service';
+
 
 const displayNameService = new BaseLookupService();
 const iconNameService = new BaseLookupService();
@@ -109,6 +111,7 @@ export default (module) => {
         .service('DisplayNameService', () => displayNameService)
         .service('IconNameService', () => iconNameService)
         .service('DescriptionService', () => descriptionService)
+        .service('PreventNavigationService', preventNavigationService)
         ;
 
     displayNameService
