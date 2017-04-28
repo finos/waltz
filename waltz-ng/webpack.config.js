@@ -24,8 +24,7 @@ function isExternal(module) {
 
 module.exports = {
     entry: {
-        app: './client/main.js',
-        vendor: []
+        app: './client/main.js'
     },
     devtool: 'cheap-source-map',
     output: {
