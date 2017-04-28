@@ -26,7 +26,8 @@ const bindings = {
     fieldType: '@',
     dateFormat: '@',
     itemId: '<',
-    buttonLabel: '@'
+    buttonLabel: '@',
+    editRole: '@'
 };
 
 

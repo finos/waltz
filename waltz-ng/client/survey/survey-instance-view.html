@@ -83,6 +83,7 @@
                             </td>
                             <td>
                                 <button class="btn btn-danger btn-xs"
+                                        waltz-has-role="SURVEY_ADMIN"
                                         ng-if="ctrl.recipients.length > 1"
                                         ng-click="ctrl.removeRecipient(r)">
                                     remove
@@ -92,6 +93,7 @@
                         <tr>
                             <td width="70%">
                                 <button class="btn btn-primary btn-xs"
+                                        waltz-has-role="SURVEY_ADMIN"
                                         ng-if="ctrl.addingRecipient === false"
                                         ng-click="ctrl.startNewRecipient()">
                                     Add
@@ -125,6 +127,7 @@
                     <li ng-repeat="r in ctrl.recipients | orderBy:'person.name'">
 
                         <waltz-editable-field on-save="ctrl.editRecipient"
+                                              edit-role="SURVEY_ADMIN"
                                               field-type="person"
                                               initial-val="r.person"
                                               item-id="r.instanceRecipientId">

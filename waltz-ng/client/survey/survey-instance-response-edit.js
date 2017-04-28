@@ -49,7 +49,9 @@ function indexResponses(responses = []) {
 }
 
 
-function controller($state,
+
+function controller($location,
+                    $state,
                     $stateParams,
                     notification,
                     surveyInstanceStore,
@@ -91,6 +93,11 @@ function controller($state,
     surveyInstanceStore
         .findResponses(id)
         .then(rs => vm.surveyResponses = indexResponses(rs));
+
+
+    vm.surveyInstanceLink = encodeURIComponent(
+        _.replace($location.absUrl(), '#' + $location.url(), '')
+        + $state.href('main.survey.instance.view', {id: id}));
 
     vm.saveResponse = (questionId) => {
         surveyInstanceStore.saveResponse(
@@ -143,6 +150,7 @@ function controller($state,
 }
 
 controller.$inject = [
+    '$location',
     '$state',
     '$stateParams',
     'Notification',

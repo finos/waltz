@@ -73,6 +73,12 @@
                        ng-bind="recipient.displayName">
                     </a><span ng-hide="$last">, </span>
                 </span>
+                <br>
+                <a href="mailto:{{ctrl.surveyRun.contactEmail}}?Subject={{ctrl.surveyRun.name}} (Instance: {{ctrl.surveyInstance.id}})&body=Survey Instance: {{ctrl.surveyInstanceLink}}%0D%0A%0D%0APlease add the following participants to this survey instance:%0D%0A%0D%0A"
+                   ng-if="ctrl.isUserInstanceRecipient && ctrl.instanceCanBeEdited"
+                   class="clickable">
+                    <strong>+Request more participants</strong>
+                </a>
             </div>
         </div>
     </div>
