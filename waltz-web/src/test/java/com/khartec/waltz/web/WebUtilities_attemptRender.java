@@ -23,11 +23,13 @@ import org.slf4j.LoggerFactory;
 import spark.RequestResponseFactory;
 import spark.Response;
 
+import javax.servlet.http.HttpServletResponse;
+
 public class WebUtilities_attemptRender {
 
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(WebUtilities_attemptRender.class);
 
-    private Response resp = RequestResponseFactory.create(null);
+    private Response resp = RequestResponseFactory.create((HttpServletResponse) null);
 
 
     @Test(expected = IllegalArgumentException.class)
