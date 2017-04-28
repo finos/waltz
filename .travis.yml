@@ -1,11 +1,10 @@
 language:
   - java
-  - node_js
 
 jdk: oraclejdk8
 
-node_js:
-  - "4.4.x"
+env:
+  - NODE_VERSION="node"
 
 script:
   - mvn clean package -Pwaltz-mariadb,travis-mariadb
@@ -22,6 +21,7 @@ install: true
 
 before_install:
   - mysql -u root -e "create database IF NOT EXISTS waltz CHARACTER SET='utf8';"
+  - nvm install $NODE_VERSION
   - npm install npm -g
 
 # Enable caching of dependencies
