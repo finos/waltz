@@ -22,6 +22,7 @@ const template = require('./flow-diagram-view.html');
 
 
 function controller(
+    $q,
     $stateParams,
     $timeout,
     flowDiagramStateService,
@@ -57,22 +58,29 @@ function controller(
         scope: 'EXACT'
     };
 
-    physicalFlowStore
-        .findBySelector(selector)
-        .then(xs => vm.physicalFlows = xs);
+    const physicalFlowPromise = physicalFlowStore
+        .findBySelector(selector);
 
-    physicalSpecificationStore
+    const physicalSpecPromise = physicalSpecificationStore
         .findBySelector(selector)
         .then(xs => {
-            vm.physicalSpecifications = xs;
-            vm.physicalSpecificationsById = _.keyBy(xs, 'id');
+            return xs;
         });
 
-    logicalFlowStore
-        .findBySelector(selector)
-        .then(xs => {
-            vm.logicalFlows = xs;
-            vm.logicalFlowsById = _.keyBy(xs, 'id');
+    const logicalFlowPromise = logicalFlowStore
+        .findBySelector(selector);
+
+    $q.all([logicalFlowPromise, physicalFlowPromise, physicalSpecPromise])
+        .then(([logicalFlows, physicalFlows, physicalSpecs]) => {
+            const physicalFlowsByLogicalId = _.groupBy(physicalFlows, 'logicalFlowId');
+            vm.physicalSpecificationsById = _.keyBy(physicalSpecs, 'id');
+            vm.physicalFlows = physicalFlows;
+            vm.flows = _.map(logicalFlows, f => {
+                return {
+                    logicalFlow: f,
+                    physicalFlows: physicalFlowsByLogicalId[f.id] || [],
+                }
+            });
         });
 
 
@@ -81,19 +89,14 @@ function controller(
             () => vm.highlightIds = [d.data.id],
             0),
         flowBucket: d => $timeout(
-            () => {
-                vm.highlightIds = _
-                    .chain(vm.physicalFlows)
-                    .filter({ logicalFlowId: d.data.id })
-                    .map('id')
-                    .value();
-            },
+            () => vm.highlightIds = [d.data.id],
             0)
     };
 
 }
 
 controller.$inject = [
+    '$q',
     '$stateParams',
     '$timeout',
     'FlowDiagramStateService',
