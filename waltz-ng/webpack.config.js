@@ -53,21 +53,49 @@ module.exports = {
         })
     ],
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.jsx?$/,
-                loader: 'babel',
+                loader: 'babel-loader',
                 exclude: /node_modules/
-            },
-            { test: /\.scss$/, loader: 'style!css!sass' },
-            { test: /\.css$/, loader: 'style!css' },
-            { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=8192' },
-            { test: /\.png$/, loader: 'url-loader?mimetype=image/png&limit=16384' },
-            { test: /\.html?$/, loader: 'html-loader' },
-            { test: /\.woff(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=8192&minetype=application/font-woff' },
-            { test: /\.woff2(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=8192&minetype=application/font-woff2' }
+            }, {
+                test: /\.scss$/,
+                use: ['style-loader', 'css-loader', 'sass-loader']
+            }, {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
+            }, {
+                test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                loader: 'url-loader',
+                options: {
+                    limit: 8192
+                }
+            }, {
+                test: /\.png$/,
+                loader: 'url-loader',
+                options: {
+                    mimetype: 'image/png',
+                    limit: 16384
+                }
+            }, {
+                test: /\.html?$/,
+                loader: 'html-loader'
+            }, {
+                test: /\.woff(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                loader: 'url-loader',
+                options: {
+                    mimetype: 'application/font-woff',
+                    limit: 8192
+                }
+            }, {
+                test: /\.woff2(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                loader: 'url-loader',
+                options: {
+                    mimetype: 'application/font-woff2',
+                    limit: 8192
+                }
+            }
         ],
-        noParse: []
     }
 
 };
