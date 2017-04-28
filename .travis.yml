@@ -5,7 +5,7 @@ language:
 jdk: oraclejdk8
 
 node_js:
-  - "4.4.x"
+  - "node"
 
 script:
   - mvn clean package -Pwaltz-mariadb,travis-mariadb
