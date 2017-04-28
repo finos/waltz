@@ -52,7 +52,7 @@ public abstract class ChangeInitiative implements
         return ImmutableEntityReference.builder()
                 .kind(EntityKind.CHANGE_INITIATIVE)
                 .id(id().get())
-                .name(name())
+                .name(name() + externalId().map(extId -> " (" + extId + ")").orElse(""))
                 .description(description())
                 .build();
     }
