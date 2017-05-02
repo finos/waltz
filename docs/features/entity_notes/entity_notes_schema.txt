@@ -1,0 +1,31 @@
+entity_note
+----
+entity_ref PK
+note_type_id PK FK -< entity_note_type.id
+note_text
+provenance
+last_updated
+
+
+entity_note_type
+----
+id PK
+applicable_entity_kinds string_array NULL
+name
+description
+
+
+
+
+[settings]
+Position 99 60
+
+[layout]
+entity_note_type 331 314
+
+
+entity_note 33 45
+
+
+
+physical_spec_data_type_usage

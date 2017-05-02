@@ -5,6 +5,7 @@
 - [Flow Diagrams](flow_diagrams/flow_diagram.md)
 - [Measurables](measurables/measurables.md)
 - [Entity Relationship](entity_relationship/entity_relationship.md)
+- [Entity Notes](entity_notes/entity_notes.md)
 - [Organisational Units](org_units/org_units.md)
 - [Perspectives](perspectives/perspectives.md)
 - [Physical Flows](physical_flows/physical_flows.md)
