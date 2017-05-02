@@ -25,6 +25,11 @@ function service($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const clone = (id) => {
+        return $http.post(`${BASE}/${id}/clone`)
+            .then(result => result.data);
+    };
+
     const getById = (id) => {
         return $http.get(`${BASE}/${id}`)
             .then(result => result.data);
@@ -48,6 +53,7 @@ function service($http, baseUrl) {
 
     return {
         create,
+        clone,
         getById,
         findAll,
         update,

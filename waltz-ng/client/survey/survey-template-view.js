@@ -28,7 +28,8 @@ const initialState = {
 };
 
 
-function controller($stateParams,
+function controller($state,
+                    $stateParams,
                     notification,
                     personStore,
                     surveyQuestionStore,
@@ -110,10 +111,21 @@ function controller($stateParams,
             notification.success('Survey template successfully marked as Obsolete');
         })
     };
+
+    vm.cloneTemplate = () => {
+        if (confirm('Are you sure you want to clone this template?')) {
+            surveyTemplateStore.clone(templateId)
+                .then(newTemplateId => {
+                    notification.success('Survey template cloned successfully');
+                    $state.go('main.survey.template.view', {id: newTemplateId});
+                });
+        }
+    }
 }
 
 
 controller.$inject = [
+    '$state',
     '$stateParams',
     'Notification',
     'PersonStore',

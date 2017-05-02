@@ -58,6 +58,7 @@ public class SurveyTemplateEndpoint implements Endpoint {
     public void register() {
         String getByIdPath = mkPath(BASE_URL, ":id");
         String updateStatusPath = mkPath(BASE_URL, ":id", "status");
+        String clonePath = mkPath(BASE_URL, ":id", "clone");
 
         DatumRoute<SurveyTemplate> getByIdRoute = (request, response) ->
                 surveyTemplateService.getById(getId(request));
@@ -90,9 +91,18 @@ public class SurveyTemplateEndpoint implements Endpoint {
                             readBody(req, ReleaseLifecycleStatusChangeCommand.class));
                 };
 
+        DatumRoute<Long> cloneRoute =
+                (req, res) -> {
+                    ensureUserHasAdminRights(req);
+                    return surveyTemplateService.clone(
+                            getUsername(req),
+                            getId(req));
+        };
+
         getForList(BASE_URL, findAllRoute);
         getForDatum(getByIdPath, getByIdRoute);
         postForDatum(BASE_URL, createRoute);
+        postForDatum(clonePath, cloneRoute);
         putForDatum(BASE_URL, updateRoute);
         putForDatum(updateStatusPath, updateStatusRoute);
     }

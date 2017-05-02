@@ -2,6 +2,7 @@ package com.khartec.waltz.service.survey;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.person.PersonDao;
+import com.khartec.waltz.data.survey.SurveyQuestionDao;
 import com.khartec.waltz.data.survey.SurveyTemplateDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
@@ -22,18 +24,22 @@ public class SurveyTemplateService {
 
     private final PersonDao personDao;
     private final SurveyTemplateDao surveyTemplateDao;
+    private final SurveyQuestionDao surveyQuestionDao;
 
     @Autowired
     public SurveyTemplateService(ChangeLogService changeLogService,
                                  PersonDao personDao,
-                                 SurveyTemplateDao surveyTemplateDao) {
+                                 SurveyTemplateDao surveyTemplateDao,
+                                 SurveyQuestionDao surveyQuestionDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(surveyTemplateDao, "surveyTemplateDao cannot be null");
+        checkNotNull(surveyQuestionDao, "surveyQuestionDao cannot be null");
 
         this.changeLogService = changeLogService;
         this.personDao = personDao;
         this.surveyTemplateDao = surveyTemplateDao;
+        this.surveyQuestionDao = surveyQuestionDao;
     }
 
 
@@ -115,5 +121,33 @@ public class SurveyTemplateService {
         }
 
         return result;
+    }
+
+
+    public long clone(String userName, long sourceTemplateId) {
+        checkNotNull(userName, "userName cannot be null");
+
+        SurveyTemplate sourceTemplate = surveyTemplateDao.getById(sourceTemplateId);
+        checkNotNull(sourceTemplate, "sourceTemplate cannot be null");
+
+        // clone template properties
+        SurveyTemplateChangeCommand templateChangeCommand = ImmutableSurveyTemplateChangeCommand.builder()
+                .name(sourceTemplate.name() + " - (clone)")
+                .description(sourceTemplate.description())
+                .targetEntityKind(sourceTemplate.targetEntityKind())
+                .build();
+
+        long newTemplateId = create(userName, templateChangeCommand);
+
+        // clone questions
+        List<SurveyQuestion> sourceQuestions = surveyQuestionDao.findForTemplate(sourceTemplateId);
+
+        sourceQuestions.stream()
+                .map(sq -> ImmutableSurveyQuestion.copyOf(sq)
+                        .withId(Optional.empty())
+                        .withSurveyTemplateId(newTemplateId))
+                .forEach(surveyQuestionDao::create);
+
+        return newTemplateId;
     }
 }

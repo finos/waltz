@@ -18,6 +18,11 @@
                ui-sref="main.survey.template.edit ({id: ctrl.template.id })">
                 Edit
             </a>
+            <a class="btn btn-primary btn-xs"
+               waltz-has-role="SURVEY_ADMIN"
+               ng-click="ctrl.cloneTemplate()">
+                Clone
+            </a>
             <a class="btn btn-success btn-xs"
                waltz-has-role="SURVEY_ADMIN"
                ng-if="ctrl.template.status !== 'ACTIVE'"
