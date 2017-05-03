@@ -9,6 +9,10 @@
                 <span ng-bind="$ctrl.initialVal | date:'{{ $ctrl.dateFormat }}'">
                 </span>
             </span>
+            <span ng-switch-when="textarea">
+                <waltz-markdown text="$ctrl.initialVal">
+                </waltz-markdown>
+            </span>
             <span ng-switch-default>
                 <span ng-bind="$ctrl.initialVal">
                 </span>

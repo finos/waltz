@@ -1,3 +1,4 @@
+
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,25 +17,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const bindings = {
-    text: '<'
-};
+
+function store($http, BaseApiUrl) {
+
+    const BASE = `${BaseApiUrl}/entity-named-note-type`;
 
 
-const template = '<span ng-if="$ctrl.text" class="waltz-markdown" markdown-to-html="$ctrl.text"></span>';
+    const findAll = () =>
+        $http.get(BASE)
+            .then(result => result.data);
 
+    const create = (cmd) =>
+        $http.post(BASE, cmd)
+            .then(result => result.data);
 
-function controller() {
+    const update = (id, cmd) =>
+        $http.put(`${BASE}/${id}`, cmd)
+            .then(result => result.data);
+
+    const remove = (id) =>
+        $http.delete(`${BASE}/${id}`)
+            .then(result => result.data);
+
+    return {
+        findAll,
+        create,
+        update,
+        remove
+    };
 }
 
 
-const component = {
-    bindings,
-    template,
-    controller
-};
+store.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
 
 
-export default component;
-
-
+export default store;

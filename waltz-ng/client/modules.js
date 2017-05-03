@@ -71,6 +71,7 @@ const dependencies = [
     require('./databases')(),
     require('./end-user-apps')(),
     require('./entity')(),
+    require('./entity-named-note')(),
     require('./entity-statistics')(),
     require('./entity-tags')(),
     require('./examples')(),
