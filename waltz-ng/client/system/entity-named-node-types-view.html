@@ -1,0 +1,105 @@
+<div>
+
+    <waltz-page-header icon="sticky-note" name="Entity Named Note Types">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.system.list">System Admin</a></li>
+            <li>Settings</li>
+        </ol>
+    </waltz-page-header>
+
+
+    <div class='waltz-page-summary waltz-page-summary-attach'>
+        <form class="form-inline">
+            <div class="form-group">
+                <label>Search</label>
+                <input type="search" class="form-control" placeholder="Filter..." ng-model="searchQuery">
+            </div>
+        </form>
+        <hr>
+        <div class="waltz-user-admin-scroll">
+            <table class="table table-condensed">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Applicable Entity Kinds</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="noteType in ctrl.noteTypes | orderBy:'name' | filter:searchQuery"
+                    class="waltz-visibility-parent">
+                    <td>
+                        <waltz-editable-field on-save="ctrl.updateName"
+                                              field-type="text"
+                                              initial-val="noteType.name"
+                                              item-id="noteType.id">
+                        </waltz-editable-field>
+                    </td>
+                    <td align="left">
+                        <waltz-editable-field on-save="ctrl.updateDescription"
+                                              field-type="textarea"
+                                              initial-val="noteType.description"
+                                              item-id="noteType.id">
+                        </waltz-editable-field>
+                    </td>
+                    <td align="left">
+                        <waltz-editable-field on-save="ctrl.updateApplicableEntityKinds"
+                                              field-type="text"
+                                              initial-val="noteType.applicableEntityKinds"
+                                              item-id="noteType.id">
+                        </waltz-editable-field>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-sm"
+                                ng-click="ctrl.deleteNoteType(noteType.id)">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button class="btn btn-primary btn-sm"
+                                ng-if="ctrl.creatingNoteType === false"
+                                ng-click="ctrl.startNewNoteType()">
+                            Add
+                        </button>
+                        <div ng-if="ctrl.creatingNoteType === true">
+                            <input type="text"
+                                   ng-model="ctrl.newNoteType.name"
+                                   class="form-control input-sm">
+                        </div>
+                    </td>
+                    <td>
+                        <div ng-if="ctrl.creatingNoteType === true">
+                            <textarea ng-model="ctrl.newNoteType.description"
+                                      class="form-control input-sm">
+                            </textarea>
+                        </div>
+                    </td>
+                    <td>
+                        <div ng-if="ctrl.creatingNoteType === true">
+                            <input type="text"
+                                   ng-model="ctrl.newNoteType.applicableEntityKinds"
+                                   class="form-control input-sm">
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-success btn-sm"
+                                ng-if="ctrl.creatingNoteType === true"
+                                ng-click="ctrl.saveNewNoteType()">
+                            Save
+                        </button>
+                        <button class="btn btn-default btn-sm"
+                                ng-if="ctrl.creatingNoteType === true"
+                                ng-click="ctrl.cancelNewNoteType()">
+                            Cancel
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

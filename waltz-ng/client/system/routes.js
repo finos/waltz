@@ -59,6 +59,12 @@ const actorsState = {
 };
 
 
+const entityNamedNodeTypesState = {
+    url: '/entity-named-note-types',
+    views: { 'content@': require('./entity-named-node-types-view') }
+};
+
+
 const involvementKindsState = {
     url: '/involvement-kinds',
     views: { 'content@': require('./involvement-kinds-view') }
@@ -85,6 +91,7 @@ function setupRoutes($stateProvider) {
         .state('main.system.hierarchies', hierarchiesState)
         .state('main.system.orphans', orphansState)
         .state('main.system.actors', actorsState)
+        .state('main.system.entity-named-note-types', entityNamedNodeTypesState)
         .state('main.system.involvement-kinds', involvementKindsState)
         .state('main.system.perspectives', perspectivesState)
         .state('main.system.static-panels', staticPanelsState)

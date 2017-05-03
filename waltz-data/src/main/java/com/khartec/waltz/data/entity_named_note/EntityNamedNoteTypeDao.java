@@ -91,6 +91,7 @@ public class EntityNamedNoteTypeDao {
 
         Select anyUsageOfType = DSL
                 .select(ENTITY_NAMED_NOTE.ENTITY_ID)
+                .from(ENTITY_NAMED_NOTE)
                 .where(ENTITY_NAMED_NOTE.NAMED_NOTE_TYPE_ID.eq(id));
 
         return dsl

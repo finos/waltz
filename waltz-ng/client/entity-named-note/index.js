@@ -16,25 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const bindings = {
-    text: '<'
+import angular from 'angular';
+
+
+export default () => {
+
+    const module = angular.module('waltz.entity.named-note', []);
+
+    module
+        .service('EntityNamedNoteTypeStore', require('./services/entity-named-note-type-store'))
+        .service('EntityNamedNoteTypeService', require('./services/entity-named-note-type-service'));
+
+    return module.name;
 };
-
-
-const template = '<span ng-if="$ctrl.text" class="waltz-markdown" markdown-to-html="$ctrl.text"></span>';
-
-
-function controller() {
-}
-
-
-const component = {
-    bindings,
-    template,
-    controller
-};
-
-
-export default component;
-
-
