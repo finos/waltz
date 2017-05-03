@@ -59,8 +59,8 @@ const controller = function(applicationStore,
         {
             className: 'row',
             fieldGroup: [
-                { className: 'col-xs-8', fieldGroup: [nameField, aliasesField, tagsField] },
-                { className: 'col-xs-4', fieldGroup: [assetCodeField, parentAssetCodeField, orgUnitField] }
+                { className: 'col-xs-8', fieldGroup: [nameField, orgUnitField] },
+                { className: 'col-xs-4', fieldGroup: [assetCodeField, parentAssetCodeField] }
             ]
         }, {
             className: 'row',
