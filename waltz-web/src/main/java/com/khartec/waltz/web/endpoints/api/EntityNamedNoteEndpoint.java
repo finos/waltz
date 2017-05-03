@@ -4,6 +4,7 @@ import com.khartec.waltz.model.entity_named_note.EntityNamedNote;
 import com.khartec.waltz.model.entity_named_note.ImmutableEntityNamedNote;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +13,7 @@ import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
+@Service
 public class EntityNamedNoteEndpoint implements Endpoint {
 
     private static final String BASE = mkPath("api", "entity-named-note");

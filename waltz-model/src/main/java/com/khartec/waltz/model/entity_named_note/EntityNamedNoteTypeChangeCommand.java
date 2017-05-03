@@ -16,43 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model;
+package com.khartec.waltz.model.entity_named_note;
 
-public enum EntityKind {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.EntityKind;
+import org.immutables.value.Value;
 
-    APPLICATION,
-    APP_GROUP,
-    APP_RATING,
-    ASSET_COST,
-    ATTESTATION,
-    AUTHORITATIVE_SOURCE,
-    BOOKMARK,
-    XX_CAPABILITY,
-    CHANGE_INITIATIVE,
-    DATABASE,
-    DATA_TYPE,
-    END_USER_APPLICATION,
-    ENTITY_HIERARCHY,
-    ENTITY_NAMED_NOTE,
-    ENTITY_NAMED_NOTE_TYPE,
-    ENTITY_STATISTIC,
-    FLOW_DIAGRAM,
-    INVOLVEMENT,
-    INVOLVEMENT_KIND,
-    ACTOR,
-    LOGICAL_DATA_FLOW,
-    MEASURABLE,
-    MEASURABLE_RATING,
-    ORG_UNIT,
-    PERFORMANCE_METRIC_PACK,
-    PERSON,
-    PHYSICAL_SPECIFICATION,
-    PHYSICAL_FLOW,
-    PROCESS,
-    SERVER,
-    SOFTWARE,
-    SURVEY_INSTANCE,
-    SURVEY_RUN,
-    SURVEY_TEMPLATE,
-    SYSTEM
+import java.util.Optional;
+import java.util.Set;
+
+
+@Value.Immutable
+@JsonSerialize(as = ImmutableEntityNamedNoteTypeChangeCommand.class)
+@JsonDeserialize(as = ImmutableEntityNamedNoteTypeChangeCommand.class)
+public abstract class EntityNamedNoteTypeChangeCommand {
+    public abstract Optional<Set<EntityKind>> applicableEntityKinds();
+    public abstract Optional<String> name();
+    public abstract Optional<String> description();
 }
