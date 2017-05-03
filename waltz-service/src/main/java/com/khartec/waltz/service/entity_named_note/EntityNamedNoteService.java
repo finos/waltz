@@ -18,9 +18,14 @@
 
 package com.khartec.waltz.service.entity_named_note;
 
-import com.khartec.waltz.data.entity_named_note.EntityNamedNodeDao;
-import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.data.entity_named_note.EntityNamedNoteDao;
+import com.khartec.waltz.data.entity_named_note.EntityNamedNoteTypeDao;
+import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.changelog.ChangeLog;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.entity_named_note.EntityNamedNodeType;
 import com.khartec.waltz.model.entity_named_note.EntityNamedNote;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,18 +36,84 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 @Service
 public class EntityNamedNoteService {
 
-    private final EntityNamedNodeDao entityNamedNodeDao;
+    private final EntityNamedNoteDao entityNamedNoteDao;
+    private final EntityNamedNoteTypeDao entityNamedNodeTypeDao;
+    private final ChangeLogService changeLogService;
 
 
     @Autowired
-    public EntityNamedNoteService(EntityNamedNodeDao entityNamedNodeDao) {
-        checkNotNull(entityNamedNodeDao, "entityNamedNodeDao cannot be null");
-        this.entityNamedNodeDao = entityNamedNodeDao;
+    public EntityNamedNoteService(EntityNamedNoteDao entityNamedNoteDao,
+                                  EntityNamedNoteTypeDao entityNamedNodeTypeDao,
+                                  ChangeLogService changeLogService) {
+        checkNotNull(entityNamedNoteDao, "entityNamedNoteDao cannot be null");
+        checkNotNull(entityNamedNodeTypeDao, "entityNamedNodeTypeDao cannot be null");
+        checkNotNull(changeLogService, "changeLogService cannot be null");
+        this.entityNamedNoteDao = entityNamedNoteDao;
+        this.entityNamedNodeTypeDao = entityNamedNodeTypeDao;
+        this.changeLogService = changeLogService;
     }
 
 
     public List<EntityNamedNote> findByEntityReference(EntityReference ref) {
-        return entityNamedNodeDao.findByEntityReference(ref);
+        return entityNamedNoteDao.findByEntityReference(ref);
+    }
+
+
+    public boolean save(EntityReference ref, long namedNoteTypeId, String noteText, String username) {
+        checkNotNull(ref, "ref cannot be null");
+
+        EntityNamedNodeType type = entityNamedNodeTypeDao.getById(namedNoteTypeId);
+
+        if (type == null) {
+            checkNotNull(type, "associated note type cannot be found");
+        }
+
+        boolean rc = entityNamedNoteDao.save(
+                ref,
+                namedNoteTypeId,
+                noteText,
+                LastUpdate.mkForUser(username));
+
+        if (rc) {
+            logMsg(ref, username, Operation.UPDATE, "Updated note: " + type.name());
+        }
+        return rc;
+    }
+
+
+    public boolean remove(EntityReference ref, long namedNoteTypeId, String username) {
+        EntityNamedNodeType type = entityNamedNodeTypeDao.getById(namedNoteTypeId);
+
+        boolean rc = entityNamedNoteDao.remove(ref, namedNoteTypeId);
+        if (rc && type != null) {
+            logMsg(ref, username, Operation.REMOVE, "Removed note: " + type.name());
+        }
+
+        return rc;
+    }
+
+
+    public boolean remove(EntityReference ref, String username) {
+        boolean rc = entityNamedNoteDao.remove(ref);
+
+        if (rc) {
+            logMsg(ref, username, Operation.REMOVE, "Removed all notes");
+        }
+
+        return rc;
+    }
+
+
+    private void logMsg(EntityReference ref, String username, Operation op, String msg) {
+        ChangeLog logEntry = ImmutableChangeLog
+                .builder()
+                .userId(username)
+                .parentReference(ref)
+                .operation(op)
+                .message(msg)
+                .severity(Severity.INFORMATION)
+                .build();
+        changeLogService.write(logEntry);
     }
 
 }

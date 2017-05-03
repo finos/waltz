@@ -139,4 +139,10 @@ public class EntityNamedNoteTypeDao {
         return record.update() == 1;
     }
 
+    public EntityNamedNodeType getById(long namedNoteTypeId) {
+        return dsl.selectFrom(ENTITY_NAMED_NOTE_TYPE)
+                .where(ENTITY_NAMED_NOTE_TYPE.ID.eq(namedNoteTypeId))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
 }

@@ -129,6 +129,29 @@ public class WebUtilities {
     }
 
 
+    public static void requireEditRoleForEntity(UserRoleService userRoleService,
+                                                Request req,
+                                                EntityKind kind) {
+        switch (kind) {
+            case APPLICATION:
+                requireRole(userRoleService, req, Role.APP_EDITOR);
+                break;
+            case CHANGE_INITIATIVE:
+                requireRole(userRoleService, req, Role.CHANGE_INITIATIVE_EDITOR);
+                break;
+            case MEASURABLE:
+                requireRole(userRoleService, req, Role.CAPABILITY_EDITOR);
+                break;
+            case ORG_UNIT:
+                requireRole(userRoleService, req, Role.ORG_UNIT_EDITOR);
+                break;
+            default:
+                requireRole(userRoleService, req, Role.ADMIN);
+                break;
+        }
+    }
+
+
     public static void requireRole(UserRoleService userRoleService,
                                    Request request,
                                    Role... requiredRoles) {
