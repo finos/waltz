@@ -64,9 +64,7 @@ public class EntityNamedNoteService {
 
         EntityNamedNodeType type = entityNamedNodeTypeDao.getById(namedNoteTypeId);
 
-        if (type == null) {
-            checkNotNull(type, "associated note type cannot be found");
-        }
+        checkNotNull(type, "associated note type cannot be found");
 
         boolean rc = entityNamedNoteDao.save(
                 ref,
