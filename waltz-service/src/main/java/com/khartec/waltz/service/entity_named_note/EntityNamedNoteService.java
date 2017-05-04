@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
 @Service
@@ -65,6 +66,7 @@ public class EntityNamedNoteService {
         EntityNamedNodeType type = entityNamedNodeTypeDao.getById(namedNoteTypeId);
 
         checkNotNull(type, "associated note type cannot be found");
+        checkFalse(type.isReadOnly(), "cannot update a read-only named note");
 
         boolean rc = entityNamedNoteDao.save(
                 ref,

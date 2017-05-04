@@ -146,4 +146,18 @@
                        tableName="physical_spec_data_type"/>
     </changeSet>
 
+
+    <!-- 2143 -->
+    <changeSet id="20170504-2143-1"
+               author="davidwatkins73">
+        <comment>2143: Add read only flag to entity note types</comment>
+        <addColumn tableName="entity_named_note_type">
+            <column name="is_readonly"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

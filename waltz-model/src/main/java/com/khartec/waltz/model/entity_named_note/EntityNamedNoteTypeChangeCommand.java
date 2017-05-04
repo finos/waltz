@@ -34,4 +34,5 @@ public abstract class EntityNamedNoteTypeChangeCommand {
     public abstract Optional<Set<EntityKind>> applicableEntityKinds();
     public abstract Optional<String> name();
     public abstract Optional<String> description();
+    public abstract Optional<Boolean> isReadOnly();
 }
