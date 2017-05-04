@@ -77,6 +77,16 @@
                             <span ng-bind-html="ctrl.changeInitiative.description"></span>
                         </div>
                     </div>
+
+                    <br>
+                    <waltz-entity-named-notes-panel notes="ctrl.namedNotes"
+                                                    all-note-types="ctrl.namedNoteTypes"
+                                                    parent-entity-ref="ctrl.entityRef"
+                                                    on-create="ctrl.saveNamedNote"
+                                                    on-edit="ctrl.saveNamedNote"
+                                                    on-delete="ctrl.deleteNamedNote"
+                                                    edit-role="CHANGE_INITIATIVE_EDITOR">
+                    </waltz-entity-named-notes-panel>
                 </div>
             </div>
         </div>

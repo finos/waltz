@@ -68,6 +68,7 @@ const descriptionService = new BaseLookupService();
 
 
 function loadFromServer(dataTypeService,
+                        entityNamedNoteTypeService,
                         involvementKindService,
                         measurableCategoryStore) {
     dataTypeService
@@ -102,6 +103,14 @@ function loadFromServer(dataTypeService,
             const indexedById = _.keyBy(results, 'id');
             displayNameService.register('measurableCategory', _.mapValues(indexedById, 'name'));
             descriptionService.register('measurableCategory', _.mapValues(indexedById, 'description'));
+        });
+
+    entityNamedNoteTypeService
+        .loadNoteTypes()
+        .then(results => {
+            const indexedById = _.keyBy(results, 'id');
+            displayNameService.register('entityNamedNoteType', _.mapValues(indexedById, 'name'));
+            descriptionService.register('entityNamedNoteType', _.mapValues(indexedById, 'description'));
         })
 }
 
@@ -160,6 +169,7 @@ export default (module) => {
 
     loadFromServer.$inject = [
         'DataTypeService',
+        'EntityNamedNoteTypeService',
         'InvolvementKindService',
         'MeasurableCategoryStore'
     ];

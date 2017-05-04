@@ -2,6 +2,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.StringChangeCommand;
 import com.khartec.waltz.model.entity_named_note.EntityNamedNote;
 import com.khartec.waltz.service.entity_named_note.EntityNamedNoteService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -58,10 +59,11 @@ public class EntityNamedNoteEndpoint implements Endpoint {
         DatumRoute<Boolean> saveRoute = (req, res) -> {
             EntityReference ref = getEntityReference(req);
             ensureHasPermission(ref.kind(), req);
+            StringChangeCommand command = readBody(req, StringChangeCommand.class);
             return entityNamedNoteService.save(
                     ref,
                     getLong(req,"noteTypeId"),
-                    readBody(req, String.class),
+                    command.newStringVal().orElse(null),
                     getUsername(req));
         };
 
