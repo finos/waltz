@@ -111,4 +111,39 @@
         </sql>
     </changeSet>
 
+
+    <!-- 2103 -->
+    <changeSet id="20170504-2103-1"
+               author="davidwatkins73">
+        <comment>2103: Physical Specification data-type decorations</comment>
+        <createTable tableName="physical_spec_data_type"
+                     remarks="Decorates physical specs with data types">
+            <column name="specification_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_type_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="specification_id, data_type_id"
+                       constraintName="physical_spec_data_type_pkey"
+                       tableName="physical_spec_data_type"/>
+    </changeSet>
+
 </databaseChangeLog>
