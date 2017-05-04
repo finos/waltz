@@ -138,7 +138,7 @@ public class EntityNamedNoteTypeDao {
         command.applicableEntityKinds()
                 .ifPresent(kinds -> record.setApplicableEntityKinds(join(kinds, SEPARATOR)));
         command.isReadOnly()
-                .ifPresent(readOnly -> record.setIsReadonly(false));
+                .ifPresent(readOnly -> record.setIsReadonly(readOnly));
 
         return record.update() == 1;
     }

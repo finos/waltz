@@ -37,7 +37,7 @@ const initialState = {
     saving: false,
     fieldType: 'text',
     buttonLabel: 'Edit',
-    onSave: () => console.log("WETF: No on-save method provided")
+    onSave: () => console.log("WEF: No on-save method provided")
 };
 
 
