@@ -25,7 +25,11 @@ export default () => {
 
     module
         .service('EntityNamedNoteTypeStore', require('./services/entity-named-note-type-store'))
-        .service('EntityNamedNoteTypeService', require('./services/entity-named-note-type-service'));
+        .service('EntityNamedNoteTypeService', require('./services/entity-named-note-type-service'))
+        .service('EntityNamedNoteStore', require('./services/entity-named-note-store'));
+
+    module
+        .component('waltzEntityNamedNotesPanel', require('./components/entity-named-notes-panel'));
 
     return module.name;
 };

@@ -23,6 +23,8 @@ const initialState = {
     bookmarks: [],
     changeInitiative: {},
     involvements: [],
+    namedNotes: [],
+    namedNoteTypes: [],
     sourceDataRatings: [],
     surveyInstances: [],
     surveyRuns: [],
@@ -38,8 +40,11 @@ function controller($q,
                     appGroupStore,
                     bookmarkStore,
                     changeInitiativeStore,
+                    entityNamedNoteStore,
+                    entityNamedNoteTypeService,
                     historyStore,
                     involvementStore,
+                    notification,
                     sourceDataRatingStore,
                     surveyInstanceStore,
                     surveyRunStore) {
@@ -91,6 +96,17 @@ function controller($q,
         });
 
 
+    const loadNamedNotes =
+        () => entityNamedNoteStore
+            .findByEntityReference(vm.entityRef)
+            .then(notes => vm.namedNotes = notes);
+
+    loadNamedNotes();
+
+    entityNamedNoteTypeService
+        .loadNoteTypes()
+        .then(noteTypes => vm.namedNoteTypes = noteTypes);
+
     sourceDataRatingStore
         .findAll()
         .then(rs => vm.sourceDataRatings = rs);
@@ -122,6 +138,33 @@ function controller($q,
     $q.all(involvementPromises)
         .then(([relations, people]) => aggregatePeopleInvolvements(relations, people))
         .then(involvements => vm.involvements = involvements);
+
+
+    vm.saveNamedNote = (note) => {
+        entityNamedNoteStore
+            .save(vm.entityRef, note.namedNoteTypeId, {newStringVal: note.noteText })
+            .then(rc => {
+                if (rc) {
+                    notification.success('Note saved successfully');
+                    loadNamedNotes();
+                } else {
+                    notification.error('Failed to save note');
+                }
+            })
+    };
+
+    vm.deleteNamedNote = (note) => {
+        entityNamedNoteStore
+            .remove(vm.entityRef, note.namedNoteTypeId)
+            .then(rc => {
+                if (rc) {
+                    notification.success('Note deleted successfully');
+                    loadNamedNotes();
+                } else {
+                    notification.error('Failed to delete note');
+                }
+            })
+    }
 }
 
 
@@ -132,8 +175,11 @@ controller.$inject = [
     'AppGroupStore',
     'BookmarkStore',
     'ChangeInitiativeStore',
+    'EntityNamedNoteStore',
+    'EntityNamedNoteTypeService',
     'HistoryStore',
     'InvolvementStore',
+    'Notification',
     'SourceDataRatingStore',
     'SurveyInstanceStore',
     'SurveyRunStore'

@@ -1,0 +1,82 @@
+<div class="waltz-entity-named-notes">
+    <a class="clickable"
+       ng-if="! $ctrl.visibility.notes && $ctrl.notes.length > 0"
+       ng-click="$ctrl.showNotes()">
+        Show more &raquo;
+    </a>
+
+    <div ng-if="$ctrl.visibility.notes || $ctrl.creatingNote">
+        <div class="row wenn-note"
+             ng-repeat="note in $ctrl.notes">
+            <div class="col-sm-3 waltz-display-field-label">
+                <div ng-bind="note.namedNoteTypeId | toDisplayName:'entityNamedNoteType'">
+                </div>
+                <waltz-markdown class="small text-muted"
+                                text="note.namedNoteTypeId | toDescription:'entityNamedNoteType'">
+                </waltz-markdown>
+            </div>
+            <div class="col-sm-5">
+                <waltz-editable-field on-save="$ctrl.updateNote"
+                                      field-type="textarea"
+                                      initial-val="note.noteText"
+                                      item-id="note.namedNoteTypeId"
+                                      edit-role="{{ $ctrl.editRole }}">
+                </waltz-editable-field>
+            </div>
+            <div class="col-sm-2">
+                <waltz-last-updated class='small'
+                                    entity="note">
+                </waltz-last-updated>
+            </div>
+            <div class="col-sm-1">
+                <button class="btn btn-danger btn-sm"
+                        waltz-has-role="{{ $ctrl.editRole }}"
+                        ng-click="$ctrl.deleteNote(note)">
+                    Delete
+                </button>
+            </div>
+        </div>
+
+        <!-- ADD NEW -->
+        <div class="row"
+             ng-if="$ctrl.creatableNoteTypes.length > 0"
+             style="padding-left: 10px;">
+            <div class="col-sm-3">
+                <div ng-if="$ctrl.creatingNote === true">
+                    <select class="form-control input-sm"
+                            placeholder="Note Type"
+                            ng-options="noteType.id as noteType.name for noteType in $ctrl.creatableNoteTypes"
+                            ng-model="$ctrl.newNote.namedNoteTypeId">
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-5">
+                <div ng-if="$ctrl.creatingNote === true">
+                    <textarea class="form-control input-sm"
+                              placeholder="Note Text (markdown is supported)"
+                              ng-model="$ctrl.newNote.noteText">
+                    </textarea>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <button class="btn btn-success btn-sm"
+                        ng-if="$ctrl.creatingNote === true"
+                        ng-disabled="! $ctrl.newNote.namedNoteTypeId || ! $ctrl.newNote.noteText"
+                        ng-click="$ctrl.saveNewNote()">
+                    Save
+                </button>
+                <button class="btn btn-default btn-sm"
+                        ng-if="$ctrl.creatingNote === true"
+                        ng-click="$ctrl.cancelNewNote()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <a class="clickable"
+       ng-if="$ctrl.creatableNoteTypes.length > 0 && ! $ctrl.creatingNote && ($ctrl.notes.length === 0 || $ctrl.visibility.notes)"
+       ng-click="$ctrl.startNewNote()">
+        +Add Note
+    </a>
+</div>
