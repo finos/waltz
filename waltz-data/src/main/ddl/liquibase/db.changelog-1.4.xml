@@ -123,7 +123,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="data_type_id"
-                    type="${enum.type}">
+                    type="${id.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="provenance"
