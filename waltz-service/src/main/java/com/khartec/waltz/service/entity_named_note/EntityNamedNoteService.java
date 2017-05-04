@@ -84,8 +84,16 @@ public class EntityNamedNoteService {
     public boolean remove(EntityReference ref, long namedNoteTypeId, String username) {
         EntityNamedNodeType type = entityNamedNodeTypeDao.getById(namedNoteTypeId);
 
+        if (type == null) {
+            // nothing to do
+            return false;
+        }
+
+        checkFalse(type.isReadOnly(), "Cannot remove a read only note");
+
         boolean rc = entityNamedNoteDao.remove(ref, namedNoteTypeId);
-        if (rc && type != null) {
+
+        if (rc) {
             logMsg(ref, username, Operation.REMOVE, "Removed note: " + type.name());
         }
 
