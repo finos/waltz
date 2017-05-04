@@ -42,7 +42,6 @@ public enum RelationshipKind {
     )),
 
     PARTICIPATES_IN(fromArray(
-            tuple(APPLICATION, PROCESS),
             tuple(APPLICATION, CHANGE_INITIATIVE)
     )),
 
@@ -52,8 +51,7 @@ public enum RelationshipKind {
     )),
 
     SUPPORTS(fromArray(
-            tuple(APPLICATION, CHANGE_INITIATIVE),
-            tuple(MEASURABLE, PROCESS)
+            tuple(APPLICATION, CHANGE_INITIATIVE)
     )),
 
     APPLICATION_NEW(fromArray(

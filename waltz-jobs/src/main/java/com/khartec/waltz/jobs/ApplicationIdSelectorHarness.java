@@ -47,7 +47,7 @@ public class ApplicationIdSelectorHarness {
         ApplicationService applicationService = ctx.getBean(ApplicationService.class);
 
         IdSelectionOptions options = IdSelectionOptions.mkOpts(
-                EntityReference.mkRef(EntityKind.PROCESS, 1L),
+                EntityReference.mkRef(EntityKind.MEASURABLE, 1L),
                 HierarchyQueryScope.EXACT);
 
 

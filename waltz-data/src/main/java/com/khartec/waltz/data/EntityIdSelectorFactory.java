@@ -22,7 +22,6 @@ import com.khartec.waltz.model.EntityIdSelectionOptions;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.schema.tables.EntityRelationship;
 import com.khartec.waltz.schema.tables.Involvement;
 import com.khartec.waltz.schema.tables.Person;
@@ -68,11 +67,8 @@ public abstract class EntityIdSelectorFactory implements Function<EntityIdSelect
                 return mkForAppGroup(ref, options.scope());
             case PERSON:
                 return mkForPerson(desiredKind, ref, options.scope());
-            case PROCESS:
-                return mkForProcess(desiredKind, ref, options.scope());
             case ORG_UNIT:
                 return mkForOrgUnit(ref, options.scope());
-
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: "+ref.kind());
         }
@@ -137,24 +133,6 @@ public abstract class EntityIdSelectorFactory implements Function<EntityIdSelect
                 .from(involvement)
                 .where(involvement.ENTITY_KIND.eq(desiredKind.name()))
                 .and(involvement.EMPLOYEE_ID.eq(employeeId));
-    }
-
-
-    private Select<Record1<Long>> mkForProcess(EntityKind desiredKind, EntityReference ref, HierarchyQueryScope scope) {
-        switch (scope) {
-            case EXACT:
-                return dsl.select(relationship.ID_A)
-                        .from(relationship)
-                        .where(relationship.KIND_A.eq(desiredKind.name()))
-                        .and(relationship.RELATIONSHIP.eq(RelationshipKind.PARTICIPATES_IN.name()))
-                        .and(relationship.KIND_B.eq(EntityKind.PROCESS.name()))
-                        .and(relationship.ID_B.eq(ref.id()));
-
-            default:
-                throw new UnsupportedOperationException("Querying for appIds related to processes using (scope: '"
-                        + scope
-                        + "') not supported");
-        }
     }
 
 }
