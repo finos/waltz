@@ -40,7 +40,6 @@ import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_S
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
-import static com.khartec.waltz.schema.tables.Process.PROCESS;
 import static java.util.stream.Collectors.toList;
 import static org.jooq.impl.DSL.val;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -70,7 +69,6 @@ public class EntityNameUtilities {
         MAPPINGS.put(EntityKind.ORG_UNIT, tuple(ORGANISATIONAL_UNIT, ORGANISATIONAL_UNIT.ID, ORGANISATIONAL_UNIT.NAME));
         MAPPINGS.put(EntityKind.PERSON, tuple(PERSON, PERSON.ID, PERSON.DISPLAY_NAME));
         MAPPINGS.put(EntityKind.PHYSICAL_SPECIFICATION, tuple(PHYSICAL_SPECIFICATION, PHYSICAL_SPECIFICATION.ID, PHYSICAL_SPECIFICATION.NAME));
-        MAPPINGS.put(EntityKind.PROCESS, tuple(PROCESS, PROCESS.ID, PROCESS.NAME));
     }
 
 

@@ -23,7 +23,6 @@ import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.schema.tables.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -45,7 +44,6 @@ import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
-import static com.khartec.waltz.schema.tables.Process.PROCESS;
 
 @Service
 public class ApplicationIdSelectorFactory implements IdSelectorFactory {
@@ -102,8 +100,6 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 return mkForOrgUnit(ref, options.scope());
             case PERSON:
                 return mkForPerson(ref, options.scope());
-            case PROCESS:
-                return mkForProcess(ref, options.scope());
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
@@ -143,37 +139,6 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
         return appToCi
                 .union(ciToApp);
-    }
-
-
-    private Select<Record1<Long>> mkForProcess(EntityReference ref, HierarchyQueryScope scope) {
-        switch (scope) {
-            case EXACT:
-                SelectSelectStep<Record1<Long>> exactProcessIdSelector = dsl.select(DSL.val(ref.id()));
-                return mkForProcess(exactProcessIdSelector);
-            case CHILDREN:
-                SelectConditionStep<Record1<Long>> childProcessIdSelector = dsl.select(PROCESS.ID)
-                        .from(PROCESS)
-                        .where(PROCESS.LEVEL_1.eq(ref.id())
-                                .or(PROCESS.LEVEL_2.eq(ref.id()))
-                                .or(PROCESS.LEVEL_3.eq(ref.id())));
-                return mkForProcess(childProcessIdSelector);
-
-            default:
-                throw new UnsupportedOperationException("Querying for appIds related to processes using (scope: '"
-                        + scope
-                        + "') not supported");
-        }
-    }
-
-
-    private Select<Record1<Long>> mkForProcess(Select<Record1<Long>> processIdSelector) {
-        return dsl.select(relationship.ID_A)
-                .from(relationship)
-                .where(relationship.KIND_A.eq(EntityKind.APPLICATION.name()))
-                .and(relationship.RELATIONSHIP.eq(RelationshipKind.PARTICIPATES_IN.name()))
-                .and(relationship.KIND_B.eq(EntityKind.PROCESS.name()))
-                .and(relationship.ID_B.in(processIdSelector));
     }
 
 

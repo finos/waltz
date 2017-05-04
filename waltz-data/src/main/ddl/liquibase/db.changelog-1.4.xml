@@ -91,4 +91,24 @@
         </createTable>
     </changeSet>
 
+
+    <!-- 2126 -->
+    <changeSet id="20170503-2126-1"
+               author="davidwatkins73">
+        <comment>2126: remove PROCESS entity kind value</comment>
+        <sql>
+            DELETE FROM entity_hierarchy
+                WHERE kind='PROCESS';
+
+            DELETE FROM entity_relationship
+                WHERE kind_a='PROCESS' OR kind_b='PROCESS';
+
+            DELETE FROM bookmark
+                WHERE parent_kind='PROCESS';
+
+            DELETE FROM change_log
+                WHERE parent_kind='PROCESS' OR child_kind='PROCESS';
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

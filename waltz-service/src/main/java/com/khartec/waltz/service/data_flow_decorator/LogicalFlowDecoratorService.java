@@ -104,7 +104,6 @@ public class LogicalFlowDecoratorService {
             case APPLICATION:
             case APP_GROUP:
             case ORG_UNIT:
-            case PROCESS:
             case PERSON:
                 Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
                 return logicalFlowDecoratorDao.findByEntityIdSelectorAndKind(APPLICATION, selector, decoratorEntityKind);
@@ -125,7 +124,6 @@ public class LogicalFlowDecoratorService {
             case MEASURABLE:
             case ORG_UNIT:
             case PERSON:
-            case PROCESS:
                 return findByAppIdSelector(options);
             case DATA_TYPE:
                 return findByDataTypeIdSelector(options);
