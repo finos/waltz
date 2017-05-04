@@ -54,6 +54,11 @@ function controller($q,
             .then(() => loadNoteTypes());
     };
 
+    vm.updateIsReadOnly = (id, change) => {
+        return update(id, { isReadOnly: change.newVal })
+            .then(() => loadNoteTypes());
+    };
+
     vm.updateApplicableEntityKinds = (id, change) => {
         if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
         return update(id, { applicableEntityKinds: splitEntityKinds(change.newVal) })
@@ -69,10 +74,11 @@ function controller($q,
             .create({
                 name: vm.newNoteType.name,
                 description: vm.newNoteType.description,
-                applicableEntityKinds: splitEntityKinds(vm.newNoteType.applicableEntityKinds)
+                applicableEntityKinds: splitEntityKinds(vm.newNoteType.applicableEntityKinds),
+                isReadOnly: vm.newNoteType.isReadOnly
             })
-            .then(id => {
-                notification.success('Created');
+            .then(() => {
+                notification.success('Created new note type: '+ vm.newNoteType.name);
                 vm.creatingNoteType = false;
                 vm.newNoteType = {};
                 loadNoteTypes();
