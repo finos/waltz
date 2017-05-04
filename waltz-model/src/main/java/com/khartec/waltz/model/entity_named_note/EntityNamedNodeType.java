@@ -13,7 +13,11 @@ import java.util.Set;
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntityNamedNodeType.class)
 @JsonDeserialize(as = ImmutableEntityNamedNodeType.class)
-public abstract class EntityNamedNodeType implements IdProvider, NameProvider, DescriptionProvider {
-
+public abstract class EntityNamedNodeType implements
+        IdProvider,
+        NameProvider,
+        DescriptionProvider
+{
     public abstract Set<EntityKind> applicableEntityKinds();
+    public abstract boolean isReadOnly();
 }

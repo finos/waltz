@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
 @Service
@@ -65,6 +66,7 @@ public class EntityNamedNoteService {
         EntityNamedNodeType type = entityNamedNodeTypeDao.getById(namedNoteTypeId);
 
         checkNotNull(type, "associated note type cannot be found");
+        checkFalse(type.isReadOnly(), "cannot update a read-only named note");
 
         boolean rc = entityNamedNoteDao.save(
                 ref,
@@ -82,8 +84,16 @@ public class EntityNamedNoteService {
     public boolean remove(EntityReference ref, long namedNoteTypeId, String username) {
         EntityNamedNodeType type = entityNamedNodeTypeDao.getById(namedNoteTypeId);
 
+        if (type == null) {
+            // nothing to do
+            return false;
+        }
+
+        checkFalse(type.isReadOnly(), "Cannot remove a read only note");
+
         boolean rc = entityNamedNoteDao.remove(ref, namedNoteTypeId);
-        if (rc && type != null) {
+
+        if (rc) {
             logMsg(ref, username, Operation.REMOVE, "Removed note: " + type.name());
         }
 
