@@ -84,6 +84,9 @@ function controller(
         vm.visibility.editor = false;
     };
 
+    const loadVisibility = () =>
+        vm.visibility.layers = flowDiagramStateService.getState().visibility.layers;
+
     const clearSelections = () => {
         vm.selected.diagram = null;
         vm.selected.node = null;
@@ -166,7 +169,7 @@ function controller(
         flowDiagramStateService.reset();
         flowDiagramStateService
             .load(diagram.id)
-            .then(() => vm.layers = flowDiagramStateService.getState().visibility.layers);
+            .then(loadVisibility);
     };
 
     vm.onDiagramDismiss = () => {
@@ -229,7 +232,7 @@ function controller(
             payload: layer
         };
         flowDiagramStateService.processCommands([cmd]);
-        vm.layers = flowDiagramStateService.getState().visibility.layers;
+        loadVisibility();
     }
 }
 
