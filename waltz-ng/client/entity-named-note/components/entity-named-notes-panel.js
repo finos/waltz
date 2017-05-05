@@ -35,7 +35,10 @@ const bindings = {
 const initialState = {
     creatingNote: false,
     creatableNoteTypes: [],
+    expandedNotes: {},
     newNote: {},
+    baseLabelText: 'Show Additional Notes',
+    labelText: 'Show Additional Notes',
     visibility: {
         notes: false
     }
@@ -50,9 +53,23 @@ function controller() {
             const existingNotesByTypeId = _.keyBy(vm.notes, 'namedNoteTypeId');
 
             vm.creatableNoteTypes = _.chain(vm.allNoteTypes)
+                .filter(nt => !nt.isReadOnly)
                 .filter(nt => !existingNotesByTypeId[nt.id])
                 .filter(nt => nt.applicableEntityKinds.indexOf(vm.parentEntityRef.kind) !== -1)
                 .value();
+
+            vm.noteTypesById = _.keyBy(vm.allNoteTypes, 'id');
+
+            if (vm.notes.length === 0) {
+                vm.visibility.notes = false;
+            } else {
+                const noteTitles = _.chain(vm.notes)
+                    .map(n => vm.noteTypesById[n.namedNoteTypeId])
+                    .map(nt => nt.name)
+                    .value();
+
+                vm.labelText = vm.baseLabelText + ': ' + _.truncate(_.join(noteTitles, ', '), { length: 200 });
+            }
         }
     };
 
@@ -86,6 +103,12 @@ function controller() {
             invokeFunction(vm.onDelete, note);
         }
     };
+
+    vm.expandNote =
+        (note) => vm.expandedNotes[note.namedNoteTypeId] = true;
+
+    vm.collapseNote =
+        (note) => vm.expandedNotes[note.namedNoteTypeId] = false;
 }
 
 
