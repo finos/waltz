@@ -49,11 +49,24 @@ authProviderSetup.$inject = [
 
 
 function showdownSetup($showdownProvider) {
-    $showdownProvider.setOption('headerLevelStart', 6);
-    $showdownProvider.setOption('simplifiedAutoLink', true);
+    const customExtensions = () => {
+        const tableStyle = {
+            type: 'output',
+            regex: /<table>/g,
+            replace: '<table class="table table-condensed table-striped table-bordered">'
+        };
+
+        return [tableStyle];
+    };
+
+    $showdownProvider.loadExtension(customExtensions);
+
     $showdownProvider.setOption('sanitize', true);
+    $showdownProvider.setOption('simplifiedAutoLink', true);
     $showdownProvider.setOption('excludeTrailingPunctuationFromURLs', true);
-    $showdownProvider.setOption('simpleLineBreaks', true);
+    $showdownProvider.setOption('strikethrough', true);
+    $showdownProvider.setOption('tables', true);
+    $showdownProvider.setOption('tasklists', true);
 }
 
 showdownSetup.$inject  = [
