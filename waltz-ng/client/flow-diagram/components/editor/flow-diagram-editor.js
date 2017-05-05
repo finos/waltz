@@ -234,13 +234,15 @@ function mkAnnotationMenu(commandProcessor, $timeout, vm) {
 
 
 function controller($q,
+                    $scope,
                     $state,
                     $timeout,
                     flowDiagramStateService,
                     logicalFlowStore,
+                    notification,
                     physicalFlowStore,
                     physicalSpecificationStore,
-                    notification) {
+                    preventNavigationService) {
     const vm = initialiseData(this, initialState);
 
     vm.contextMenus = {
@@ -248,6 +250,8 @@ function controller($q,
         flowBucket: mkFlowBucketMenu($q, $timeout, vm,  flowDiagramStateService, physicalFlowStore, physicalSpecificationStore),
         annotation: mkAnnotationMenu(flowDiagramStateService.processCommands, $timeout, vm),
     };
+
+    preventNavigationService.setupWarningDialog($scope, () => flowDiagramStateService.isDirty());
 
     vm.issueCommands = (commands) => {
         flowDiagramStateService.processCommands(commands);
@@ -282,15 +286,16 @@ function controller($q,
 
 controller.$inject = [
     '$q',
+    '$scope',
     '$state',
     '$timeout',
     'FlowDiagramStateService',
     'LogicalFlowStore',
+    'Notification',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore',
-    'Notification'
+    'PreventNavigationService'
 ];
-
 
 
 const component = {

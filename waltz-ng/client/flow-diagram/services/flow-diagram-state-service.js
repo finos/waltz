@@ -21,6 +21,7 @@ import {positionFor, toGraphFlow, toGraphId, toGraphNode} from '../flow-diagram-
 
 
 const initialState = {
+    dirty: false,
     model: {
         diagramId: null,
         nodes: [],
@@ -245,7 +246,10 @@ function service(
     const save = () => {
         const cmd = prepareSaveCmd(state);
         return flowDiagramStore.save(cmd)
-            .then(id => state.diagramId = id)
+            .then(id => {
+                state.diagramId = id;
+                state.dirty = false;
+            });
     };
 
     const load = (id) => {
@@ -265,6 +269,7 @@ function service(
             .all([diagramPromise, annotationPromise, entityPromise, logicalFlowPromise, physicalFlowPromise])
             .then(([diagram, annotations, entityNodes, logicalFlows, physicalFlows]) => {
                 restoreDiagram(processCommands, diagram, annotations, entityNodes, logicalFlows, physicalFlows);
+                state.dirty = false;
             })
             .then(() => getState());
     };
@@ -393,6 +398,7 @@ function service(
                 console.log('WFD: unknown command', commandObject);
                 break;
         }
+        state.dirty = true;
         return state;
     };
 
@@ -426,11 +432,14 @@ function service(
             decorations);
     };
 
+    const isDirty = () => state.dirty;
+
     return {
         processCommands,
         getState,
         getAllEntities,
         onChange,
+        isDirty,
         save,
         load,
         reset
