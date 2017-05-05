@@ -35,6 +35,7 @@ const bindings = {
 const initialState = {
     creatingNote: false,
     creatableNoteTypes: [],
+    editingNotes: {},
     expandedNotes: {},
     newNote: {},
     baseLabelText: 'Show Additional Notes',
@@ -92,11 +93,24 @@ function controller() {
         vm.visibility.notes = true;
     };
 
+    vm.startEditNote = (note) => {
+        vm.editingNotes[note.namedNoteTypeId] = {
+            noteTextVal: note.noteText
+        };
+    };
+
+    vm.cancelEditNote = (note) => {
+        vm.editingNotes[note.namedNoteTypeId] = null;
+    };
+
     vm.updateNote =
-        (noteTypeId, change) => invokeFunction(vm.onEdit, {
-            namedNoteTypeId: noteTypeId,
-            noteText: change.newVal
-        });
+        (note) => {
+            invokeFunction(vm.onEdit, {
+                namedNoteTypeId: note.namedNoteTypeId,
+                noteText: vm.editingNotes[note.namedNoteTypeId].noteTextVal
+            });
+            vm.editingNotes[note.namedNoteTypeId] = null;
+        };
 
     vm.deleteNote = (note) => {
         if (confirm('Are you sure you want to delete this note?')) {

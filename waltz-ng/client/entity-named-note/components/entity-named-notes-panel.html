@@ -30,18 +30,27 @@
                                     text="note.namedNoteTypeId | toDescription:'entityNamedNoteType'">
                     </waltz-markdown>
                     <br>
-                    <br>
-                    <waltz-last-updated class="small"
-                                        entity="note">
-                    </waltz-last-updated>
-                    <div ng-if="! $ctrl.noteTypesById[note.namedNoteTypeId].isReadOnly">
+                    <div ng-if="! $ctrl.noteTypesById[note.namedNoteTypeId].isReadOnly"
+                         waltz-has-role="{{ $ctrl.editRole }}">
+                        <br>
+                        <a class="clickable"
+                           ng-click="$ctrl.startEditNote(note)">
+                            <waltz-icon name="pencil"></waltz-icon>
+                            Edit
+                        </a>
+                        &nbsp;&nbsp;
                         <a class="clickable"
                            ng-click="$ctrl.deleteNote(note)">
                             <waltz-icon name="trash"></waltz-icon>
                             Delete
                         </a>
                     </div>
+                    <br>
+                    <waltz-last-updated class="small"
+                                        entity="note">
+                    </waltz-last-updated>
                     <div ng-if="note.noteText.length > 1500">
+                        <br>
                         <a class="clickable"
                            ng-if="! $ctrl.expandedNotes[note.namedNoteTypeId]"
                            ng-click="$ctrl.expandNote(note)">
@@ -58,19 +67,30 @@
                 </td>
                 <td align="left">
                     <div ng-class="{ 'waltz-scroll-region-350': note.noteText.length > 1500 && ! $ctrl.expandedNotes[note.namedNoteTypeId] }">
-                        <waltz-editable-field ng-if="! $ctrl.noteTypesById[note.namedNoteTypeId].isReadOnly"
-                                              on-save="$ctrl.updateNote"
-                                              field-type="textarea"
-                                              initial-val="note.noteText"
-                                              item-id="note.namedNoteTypeId"
-                                              edit-role="{{ $ctrl.editRole }}">
-                        </waltz-editable-field>
-                        <waltz-markdown ng-if="$ctrl.noteTypesById[note.namedNoteTypeId].isReadOnly"
+                        <textarea class="form-control input-sm"
+                                  ng-if="$ctrl.editingNotes[note.namedNoteTypeId]"
+                                  rows="6"
+                                  placeholder="Markdown is supported"
+                                  ng-model="$ctrl.editingNotes[note.namedNoteTypeId].noteTextVal">
+                        </textarea>
+                        <waltz-markdown ng-if="! $ctrl.editingNotes[note.namedNoteTypeId]"
                                         text="note.noteText">
                         </waltz-markdown>
                     </div>
                 </td>
                 <td>
+                    <div ng-if="$ctrl.editingNotes[note.namedNoteTypeId]">
+                        <button class="btn btn-success btn-xs"
+                                ng-disabled="! $ctrl.editingNotes[note.namedNoteTypeId].noteTextVal"
+                                ng-click="$ctrl.updateNote(note)">
+                            &nbsp;&nbsp;Save&nbsp;
+                        </button>
+                        <br>
+                        <a class="btn btn-xs"
+                           ng-click="$ctrl.cancelEditNote(note)">
+                            Cancel
+                        </a>
+                    </div>
                 </td>
             </tr>
 
@@ -108,6 +128,7 @@
     </div>
 
     <a class="clickable"
+       waltz-has-role="{{ $ctrl.editRole }}"
        ng-if="$ctrl.creatableNoteTypes.length > 0 && ! $ctrl.creatingNote && ($ctrl.notes.length === 0 || $ctrl.visibility.notes)"
        ng-click="$ctrl.startNewNote()">
         +Add Note
