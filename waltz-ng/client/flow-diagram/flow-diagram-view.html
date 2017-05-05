@@ -86,11 +86,28 @@
                 and dragging and/or zooming.
             </div>
             <br>
+            <div>
+                <h5>Toggle Layers</h5>
+                <div class="small">
+                    <waltz-toggle style='display:block'
+                                  label-on="Annotations"
+                                  label-off="Annotations"
+                                  state="ctrl.layers.annotations"
+                                  on-toggle="ctrl.toggleLayer('annotations')">
+                    </waltz-toggle>
+                    <waltz-toggle style='display:block'
+                                  label-on="Physical Flows"
+                                  label-off="Physical Flows"
+                                  state="ctrl.layers.flowBuckets"
+                                  on-toggle="ctrl.toggleLayer('flowBuckets')">
+                    </waltz-toggle>
+                </div>
+                <div class="help-block small small">
+                    Toggle the layers to show more/less detail.
+                </div>
+            </div>
+
         </div>
     </div>
-
-
-
-
 
 </div>

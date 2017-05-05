@@ -33,6 +33,12 @@ const initialState = {
         positions: {}, // gid -> {  x, y }
         shapes: {}, // gid -> { path, cx, cy, etc} }
         diagramTransform: null
+    },
+    visibility: {
+        layers: {
+            flowBuckets: true,
+            annotations: true
+        }
     }
 };
 
@@ -392,6 +398,14 @@ function service(
 
             case 'SET_POSITION':
                 state.layout.positions[payload.id] = { x: payload.x, y: payload.y };
+                break;
+
+            case 'SHOW_LAYER':
+                state.visibility.layers[payload] = true;
+                break;
+
+            case 'HIDE_LAYER':
+                state.visibility.layers[payload] = false;
                 break;
 
             default:

@@ -165,7 +165,8 @@ function controller(
         vm.selected.diagram = diagram;
         flowDiagramStateService.reset();
         flowDiagramStateService
-            .load(diagram.id);
+            .load(diagram.id)
+            .then(() => vm.layers = flowDiagramStateService.getState().visibility.layers);
     };
 
     vm.onDiagramDismiss = () => {
@@ -220,6 +221,16 @@ function controller(
                 notification.warning('Diagram deleted');
             });
     };
+
+    vm.toggleLayer = (layer) => {
+        const currentlyVisible = flowDiagramStateService.getState().visibility.layers[layer];
+        const cmd = {
+            command: currentlyVisible ? 'HIDE_LAYER' : 'SHOW_LAYER',
+            payload: layer
+        };
+        flowDiagramStateService.processCommands([cmd]);
+        vm.layers = flowDiagramStateService.getState().visibility.layers;
+    }
 }
 
 
