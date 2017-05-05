@@ -41,7 +41,7 @@
                             Delete
                         </a>
                     </div>
-                    <div ng-if="note.noteText.length > 1000">
+                    <div ng-if="note.noteText.length > 1500">
                         <a class="clickable"
                            ng-if="! $ctrl.expandedNotes[note.namedNoteTypeId]"
                            ng-click="$ctrl.expandNote(note)">
@@ -57,7 +57,7 @@
                     </div>
                 </td>
                 <td align="left">
-                    <div ng-class="{ 'waltz-scroll-region-350': note.noteText.length > 1000 && ! $ctrl.expandedNotes[note.namedNoteTypeId] }">
+                    <div ng-class="{ 'waltz-scroll-region-350': note.noteText.length > 1500 && ! $ctrl.expandedNotes[note.namedNoteTypeId] }">
                         <waltz-editable-field ng-if="! $ctrl.noteTypesById[note.namedNoteTypeId].isReadOnly"
                                               on-save="$ctrl.updateNote"
                                               field-type="textarea"
