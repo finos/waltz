@@ -84,6 +84,9 @@ function controller(
         vm.visibility.editor = false;
     };
 
+    const loadVisibility = () =>
+        vm.visibility.layers = flowDiagramStateService.getState().visibility.layers;
+
     const clearSelections = () => {
         vm.selected.diagram = null;
         vm.selected.node = null;
@@ -165,7 +168,8 @@ function controller(
         vm.selected.diagram = diagram;
         flowDiagramStateService.reset();
         flowDiagramStateService
-            .load(diagram.id);
+            .load(diagram.id)
+            .then(loadVisibility);
     };
 
     vm.onDiagramDismiss = () => {
@@ -220,6 +224,16 @@ function controller(
                 notification.warning('Diagram deleted');
             });
     };
+
+    vm.toggleLayer = (layer) => {
+        const currentlyVisible = flowDiagramStateService.getState().visibility.layers[layer];
+        const cmd = {
+            command: currentlyVisible ? 'HIDE_LAYER' : 'SHOW_LAYER',
+            payload: layer
+        };
+        flowDiagramStateService.processCommands([cmd]);
+        loadVisibility();
+    }
 }
 
 

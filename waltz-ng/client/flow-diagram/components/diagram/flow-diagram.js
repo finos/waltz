@@ -459,6 +459,15 @@ function drawAnnotations(state, group, commandProcessor) {
 }
 
 
+/**
+ * Toggles layers by setting their css display style
+ */
+function enableLayers(visibility, groups) {
+    groups.flowBuckets.style('display', visibility.flowBuckets ? 'initial' : 'none');
+    groups.annotations.style('display', visibility.annotations ? 'initial' : 'none');
+}
+
+
 function draw(state, commandProcessor = () => console.log('no command processor given')) {
     // console.log('draw', state);
 
@@ -472,6 +481,8 @@ function draw(state, commandProcessor = () => console.log('no command processor 
     drawFlows(state, groups.flows, commandProcessor);
     drawFlowBuckets(state, groups.flowBuckets, commandProcessor);
     drawAnnotations(state, groups.annotations, commandProcessor);
+
+    enableLayers(state.visibility.layers, groups);
 }
 
 

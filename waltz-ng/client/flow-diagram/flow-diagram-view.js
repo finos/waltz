@@ -16,9 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash';
-
+import {initialiseData} from '../common';
 
 const template = require('./flow-diagram-view.html');
+
+const initialState = {
+    visibility: {}
+};
 
 
 function controller(
@@ -32,11 +36,15 @@ function controller(
     physicalFlowStore,
     physicalSpecificationStore)
 {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
     const diagramId = $stateParams.id;
 
+    const loadVisibility = () =>
+        vm.visibility.layers = flowDiagramStateService.getState().visibility.layers;
+
     flowDiagramStateService
-        .load(diagramId);
+        .load(diagramId)
+        .then(loadVisibility);
 
     flowDiagramStore
         .getById(diagramId)
@@ -92,6 +100,16 @@ function controller(
             () => vm.highlightIds = [d.data.id],
             0)
     };
+
+    vm.toggleLayer = (layer) => {
+        const currentlyVisible = flowDiagramStateService.getState().visibility.layers[layer];
+        const cmd = {
+            command: currentlyVisible ? 'HIDE_LAYER' : 'SHOW_LAYER',
+            payload: layer
+        };
+        flowDiagramStateService.processCommands([cmd]);
+        loadVisibility();
+    }
 
 }
 
