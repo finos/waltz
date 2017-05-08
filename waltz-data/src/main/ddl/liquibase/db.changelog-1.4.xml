@@ -160,4 +160,26 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 2118 -->
+    <changeSet id="20170508-2118-1"
+               author="rovats">
+        <comment>2118: Due date at survey instance level</comment>
+        <addColumn tableName="survey_instance">
+            <column name="due_date"
+                    type="DATE">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20170508-2118-2"
+               author="rovats">
+        <comment>2118: Due date at survey instance level</comment>
+        <sql>
+            UPDATE survey_instance SET
+                due_date = (SELECT due_date FROM survey_run WHERE id = survey_instance.survey_run_id)
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

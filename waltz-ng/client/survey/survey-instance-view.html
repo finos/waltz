@@ -47,7 +47,13 @@
                 Due
             </div>
             <div class="col-sm-4">
-                <waltz-from-now timestamp="ctrl.surveyRun.dueDate"></waltz-from-now>
+                <waltz-editable-field on-save="ctrl.updateDueDate"
+                                      field-type="date"
+                                      date-format="dd-MM-yyyy"
+                                      initial-val="ctrl.surveyInstance.dueDate"
+                                      item-id="ctrl.surveyInstance.id"
+                                      edit-role="SURVEY_ADMIN">
+                </waltz-editable-field>
             </div>
             <div class="col-sm-2 waltz-display-field-label">
                 Issued

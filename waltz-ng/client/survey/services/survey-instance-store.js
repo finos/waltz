@@ -66,8 +66,14 @@ function store($http, baseApiUrl) {
 
     const updateStatus = (id, command) => {
         return $http
-            .post(`${base}/${id}/status`, command)
+            .put(`${base}/${id}/status`, command)
             .then(result => result.data);
+    };
+
+    const updateDueDate = (id, command) => {
+        return $http
+            .put(`${base}/${id}/due-date`, command)
+            .then(r => r.data);
     };
 
     const updateRecipient = (id, command) => {
@@ -97,6 +103,7 @@ function store($http, baseApiUrl) {
         findResponses,
         saveResponse,
         updateStatus,
+        updateDueDate,
         updateRecipient,
         addRecipient,
         deleteRecipient
