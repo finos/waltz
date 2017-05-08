@@ -159,8 +159,9 @@ public class PhysicalSpecDefinitionService {
         ReleaseLifecycleStatus currentStatus = specDefinition.status();
 
         List<ReleaseLifecycleStatus> validTransitionStates = stateTransitions.get(currentStatus);
-        if(!validTransitionStates.contains(newStatus)) {
+        if(validTransitionStates == null || !validTransitionStates.contains(newStatus)) {
             throw new IllegalStateException(String.format("Transition from %s to %s is not valid", currentStatus, newStatus));
         }
     }
+
 }
