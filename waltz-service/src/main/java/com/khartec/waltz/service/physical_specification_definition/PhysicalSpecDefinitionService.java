@@ -15,10 +15,14 @@ import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.ReleaseLifecycleStatus.*;
 
 @Service
 public class PhysicalSpecDefinitionService {
@@ -28,6 +32,8 @@ public class PhysicalSpecDefinitionService {
     private final PhysicalSpecDefinitionDao physicalSpecDefinitionDao;
     private final PhysicalSpecDefinitionFieldDao physicalSpecDefinitionFieldDao;
     private final PhysicalSpecDefinitionSampleFileDao physicalSpecDefinitionSampleFileDao;
+    private final Map<ReleaseLifecycleStatus, List<ReleaseLifecycleStatus>> stateTransitions;
+
 
 
     @Autowired
@@ -44,6 +50,14 @@ public class PhysicalSpecDefinitionService {
         this.physicalSpecDefinitionDao = physicalSpecDefinitionDao;
         this.physicalSpecDefinitionFieldDao = physicalSpecDefinitionFieldDao;
         this.physicalSpecDefinitionSampleFileDao = physicalSpecDefinitionSampleFileDao;
+
+        // initialise valid state transitions
+        // Hashmap as follows: <currenctState, List of valid transition states>
+        stateTransitions = new HashMap<>();
+        stateTransitions.put(DRAFT, newArrayList(ACTIVE));
+        stateTransitions.put(ACTIVE, newArrayList(DEPRECATED));
+        stateTransitions.put(DEPRECATED, newArrayList(ACTIVE, OBSOLETE));
+        stateTransitions.put(OBSOLETE, newArrayList());
     }
 
 
@@ -54,7 +68,7 @@ public class PhysicalSpecDefinitionService {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(command, "command cannot be null");
 
-        if (command.status() == ReleaseLifecycleStatus.ACTIVE) {
+        if (command.status() == ACTIVE) {
             physicalSpecDefinitionDao.markExistingActiveAsDeprecated(specificationId, userName);
         }
 
@@ -119,7 +133,9 @@ public class PhysicalSpecDefinitionService {
 
         checkNotNull(specDefinition, "specDefinition cannot be null");
 
-        if (command.newStatus() == ReleaseLifecycleStatus.ACTIVE) {
+        ensureNewStatusIsValid(specDefinition, command.newStatus());
+
+        if (command.newStatus() == ACTIVE) {
             physicalSpecDefinitionDao.markExistingActiveAsDeprecated(specDefinition.specificationId(), userName);
         }
 
@@ -136,4 +152,16 @@ public class PhysicalSpecDefinitionService {
 
         return result == 1;
     }
+
+
+    private void ensureNewStatusIsValid(PhysicalSpecDefinition specDefinition,
+                                        ReleaseLifecycleStatus newStatus) {
+        ReleaseLifecycleStatus currentStatus = specDefinition.status();
+
+        List<ReleaseLifecycleStatus> validTransitionStates = stateTransitions.get(currentStatus);
+        if(validTransitionStates == null || !validTransitionStates.contains(newStatus)) {
+            throw new IllegalStateException(String.format("Transition from %s to %s is not valid", currentStatus, newStatus));
+        }
+    }
+
 }
