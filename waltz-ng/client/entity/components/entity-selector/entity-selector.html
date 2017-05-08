@@ -1,4 +1,4 @@
-<div>
+<div class="waltz-entity-selector">
     <ui-select ng-model="$ctrl.currentSelection"
                on-select="$ctrl.select($item)"
                theme="bootstrap"
@@ -6,9 +6,12 @@
 
         <ui-select-match placeholder="Search...">
             <waltz-icon fixed-width="true"
+                        class="wes-selected-icon"
                         name="{{ $select.selected.kind | toIconName:'entity' }}">
             </waltz-icon>
-            <span ng-bind-html="$select.selected.name"></span>
+            <span ng-bind-html="$select.selected.name"
+                  class="wes-selected-name">
+            </span>
         </ui-select-match>
 
         <ui-select-choices repeat="entity in $ctrl.entities | orderBy:'kind' track by $ctrl.mkTracker(entity) "
