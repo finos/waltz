@@ -9,15 +9,20 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE_RECIPIENT;
+import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
 import static java.util.Optional.ofNullable;
 
 @Repository
@@ -40,6 +45,7 @@ public class SurveyInstanceDao {
                         record.getEntityId(),
                         r.getValue(ENTITY_NAME_FIELD)))
                 .status(SurveyInstanceStatus.valueOf(record.getStatus()))
+                .dueDate(Optional.ofNullable(record.getDueDate()).map(Date::toLocalDate))
                 .submittedAt(ofNullable(record.getSubmittedAt()).map(Timestamp::toLocalDateTime).orElse(null))
                 .submittedBy(record.getSubmittedBy())
                 .build();
@@ -93,6 +99,7 @@ public class SurveyInstanceDao {
         record.setEntityKind(command.entityReference().kind().name());
         record.setEntityId(command.entityReference().id());
         record.setStatus(command.status().name());
+        record.setDueDate(command.dueDate().map(Date::valueOf).orElse(null));
 
         record.store();
         return record.getId();
@@ -113,6 +120,22 @@ public class SurveyInstanceDao {
                 .set(SURVEY_INSTANCE.STATUS, newStatus.name())
                 .where(SURVEY_INSTANCE.STATUS.notEqual(newStatus.name())
                         .and(SURVEY_INSTANCE.ID.eq(instanceId)))
+                .execute();
+    }
+
+
+    public int updateDueDate(long instanceId, LocalDate newDueDate) {
+        return dsl.update(SURVEY_INSTANCE)
+                .set(SURVEY_INSTANCE.DUE_DATE, toSqlDate(newDueDate))
+                .where(SURVEY_INSTANCE.ID.eq(instanceId))
+                .execute();
+    }
+
+
+    public int updateDueDateForSurveyRun(long surveyRunId, LocalDate newDueDate) {
+        return dsl.update(SURVEY_INSTANCE)
+                .set(SURVEY_INSTANCE.DUE_DATE, toSqlDate(newDueDate))
+                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
                 .execute();
     }
 

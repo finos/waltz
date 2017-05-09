@@ -1,12 +1,14 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
+import com.khartec.waltz.model.DateChangeCommand;
 import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.survey.SurveyInstanceService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
+import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String findResponsesPath = mkPath(BASE_URL, ":id", "responses");
         String saveResponsePath = mkPath(BASE_URL, ":id", "response");
         String updateStatusPath = mkPath(BASE_URL, ":id", "status");
+        String updateDueDatePath = mkPath(BASE_URL, ":id", "due-date");
         String recipientPath = mkPath(BASE_URL, ":id", "recipient");
         String deleteRecipientPath = mkPath(BASE_URL, ":id", "recipient", ":instanceRecipientId");
 
@@ -102,6 +105,19 @@ public class SurveyInstanceEndpoint implements Endpoint {
                     );
                 };
 
+        DatumRoute<Integer> updateDueDateRoute = (req, res) -> {
+            ensureUserHasAdminRights(req);
+
+            res.type(WebUtilities.TYPE_JSON);
+            DateChangeCommand command = readBody(req, DateChangeCommand.class);
+
+            return surveyInstanceService.updateDueDate(
+                    WebUtilities.getUsername(req),
+                    getId(req),
+                    command);
+        };
+
+
         DatumRoute<Boolean> updateRecipientRoute =
                 (req, res) -> {
                     ensureUserHasAdminRights(req);
@@ -134,7 +150,8 @@ public class SurveyInstanceEndpoint implements Endpoint {
         getForList(findRecipientsPath, findRecipientsRoute);
         getForList(findResponsesPath, findResponsesRoute);
         putForDatum(saveResponsePath, saveResponseRoute);
-        postForDatum(updateStatusPath, updateStatusRoute);
+        putForDatum(updateStatusPath, updateStatusRoute);
+        putForDatum(updateDueDatePath, updateDueDateRoute);
         putForDatum(recipientPath, updateRecipientRoute);
         postForDatum(recipientPath, addRecipientRoute);
         deleteForDatum(deleteRecipientPath, deleteRecipientRoute);

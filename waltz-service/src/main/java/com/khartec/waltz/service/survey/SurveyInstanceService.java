@@ -6,10 +6,7 @@ import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.data.survey.SurveyInstanceDao;
 import com.khartec.waltz.data.survey.SurveyInstanceRecipientDao;
 import com.khartec.waltz.data.survey.SurveyQuestionResponseDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.survey.*;
@@ -19,6 +16,7 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -133,12 +131,32 @@ public class SurveyInstanceService {
 
             changeLogService.write(
                     ImmutableChangeLog.builder()
-                            .operation(Operation.ADD)
+                            .operation(Operation.UPDATE)
                             .userId(userName)
                             .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
                             .message("Survey Instance: status changed to " + command.newStatus())
                             .build());
         }
+
+        return result;
+    }
+
+
+    public int updateDueDate(String userName, long instanceId, DateChangeCommand command) {
+        checkNotNull(userName, "userName cannot be null");
+        checkNotNull(command, "command cannot be null");
+
+        LocalDate newDueDate = command.newDateVal().orElse(null);
+
+        int result = surveyInstanceDao.updateDueDate(instanceId, newDueDate);
+
+        changeLogService.write(
+                ImmutableChangeLog.builder()
+                        .operation(Operation.UPDATE)
+                        .userId(userName)
+                        .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
+                        .message("Survey Instance: due date changed to " + newDueDate)
+                        .build());
 
         return result;
     }

@@ -18,6 +18,7 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -150,17 +151,20 @@ public class SurveyRunService {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(command, "command cannot be null");
 
-        int result = surveyRunDao.updateDueDate(surveyRunId, command.newDateVal().orElse(null));
+        LocalDate newDueDate = command.newDateVal().orElse(null);
+
+        int surveyRunResult = surveyRunDao.updateDueDate(surveyRunId, newDueDate);
+        int surveyInstanceResult = surveyInstanceDao.updateDueDateForSurveyRun(surveyRunId, newDueDate);
 
         changeLogService.write(
                 ImmutableChangeLog.builder()
                         .operation(Operation.UPDATE)
                         .userId(userName)
                         .parentReference(EntityReference.mkRef(EntityKind.SURVEY_RUN, surveyRunId))
-                        .message("Survey Run: due date changed to " + command.newDateVal().orElse(null))
+                        .message("Survey Run: due date changed to " + newDueDate)
                         .build());
 
-        return result;
+        return surveyRunResult + surveyInstanceResult;
     }
 
 
@@ -187,6 +191,7 @@ public class SurveyRunService {
                                         .surveyEntity(e.getKey())
                                         .surveyRunId(surveyRun.id().get())
                                         .status(SurveyInstanceStatus.NOT_STARTED)
+                                        .dueDate(surveyRun.dueDate())
                                         .build())
                                 .person(p)
                                 .build()))
@@ -247,6 +252,7 @@ public class SurveyRunService {
                 .surveyRunId(surveyInstance.surveyRunId())
                 .entityReference(surveyInstance.surveyEntity())
                 .status(surveyInstance.status())
+                .dueDate(surveyInstance.dueDate())
                 .build());
     }
 

@@ -38,22 +38,29 @@ function controller($stateParams,
         })
         .then(t => vm.surveyTemplate = t);
 
-    loadSurveyRun();
+    const loadInstances = () => {
+        surveyInstanceStore
+            .findForSurveyRun(id)
+            .then(xs => vm.surveyInstances = xs);
+    };
 
-    surveyInstanceStore
-        .findForSurveyRun(id)
-        .then(xs => vm.surveyInstances = xs);
+    loadSurveyRun();
+    loadInstances();
 
     vm.updateDueDate = (newVal) => {
-        surveyRunStore.updateDueDate(id, {
-            newDateVal: newVal ? timeFormat('%Y-%m-%d')(newVal) : null
-        })
-        .then(r => {
-                notification.success('Survey run due date updated successfully');
-                loadSurveyRun();
-            },
-            r => notification.error('Failed to update survey run due date')
-        );
+        if (confirm('This will update the due date of all the instances under this run. ' +
+                    'Are you sure you want to continue?')) {
+            surveyRunStore.updateDueDate(id, {
+                newDateVal: newVal ? timeFormat('%Y-%m-%d')(newVal) : null
+            })
+                .then(r => {
+                        notification.success('Survey run due date updated successfully');
+                        loadSurveyRun();
+                        loadInstances();
+                    },
+                    r => notification.error('Failed to update survey run due date')
+                );
+        }
     };
 
 }

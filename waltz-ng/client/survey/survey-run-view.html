@@ -29,6 +29,7 @@
             <tr>
                 <th>Entity</th>
                 <th>Status</th>
+                <th>Due</th>
                 <th></th>
             </tr>
             </thead>
@@ -43,6 +44,10 @@
                     </span>
                 </td>
                 <td>
+                    <waltz-from-now timestamp="instance.dueDate">
+                    </waltz-from-now>
+                </td>
+                <td>
                     <a class='clickable'
                        ui-sref="main.survey.instance.response.view ({id: instance.id })"
                        ng-if="instance.status === 'COMPLETED' || instance.status === 'EXPIRED'">
@@ -51,7 +56,7 @@
                     <a class='clickable'
                        ui-sref="main.survey.instance.view ({id: instance.id })"
                        ng-if="instance.status === 'NOT_STARTED' || instance.status === 'IN_PROGRESS'">
-                        edit recipients
+                        edit
                     </a>
                 </td>
             </tr>

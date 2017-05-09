@@ -17,6 +17,7 @@
  */
 import _ from 'lodash';
 import { initialiseData } from '../common'
+import { timeFormat } from "d3-time-format";
 
 const initialState = {
     surveyInstance: {},
@@ -63,6 +64,17 @@ function controller($stateParams,
 
     const vm = initialiseData(this, initialState);
     const id = $stateParams.id;
+
+    const loadInstanceAndRun = () => {
+        surveyInstanceStore
+            .getById(id)
+            .then(surveyInstance => {
+                vm.surveyInstance = surveyInstance;
+                return surveyRunStore
+                    .getById(surveyInstance.surveyRunId)
+            })
+            .then(sr => vm.surveyRun = sr);
+    };
 
     const loadRecipients = () => {
         return surveyInstanceStore
@@ -119,16 +131,19 @@ function controller($stateParams,
             });
     };
 
-    // load data
-    surveyInstanceStore
-        .getById(id)
-        .then(surveyInstance => {
-            vm.surveyInstance = surveyInstance;
-            return surveyRunStore
-                .getById(surveyInstance.surveyRunId)
+    vm.updateDueDate = (instanceId, change) => {
+        surveyInstanceStore.updateDueDate(instanceId, {
+            newDateVal: change.newVal ? timeFormat('%Y-%m-%d')(change.newVal) : null
         })
-        .then(sr => vm.surveyRun = sr);
+        .then(r => {
+                notification.success('Survey instance due date updated successfully');
+                loadInstanceAndRun();
+            },
+            r => notification.error('Failed to update survey instance due date')
+        );
+    };
 
+    loadInstanceAndRun();
     loadRecipients();
 }
 
