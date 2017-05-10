@@ -16,6 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {checkIsEntityInvolvementChangeCommand} from '../../common/checks';
+
+
 export default [
     '$http',
     'BaseApiUrl',
@@ -54,13 +57,22 @@ export default [
                 .then(result => result.data);
 
 
+        const changeInvolvement = (entityRef, cmd) => {
+            checkIsEntityInvolvementChangeCommand(cmd);
+            return $http
+                .post(`${BASE}/entity/${entityRef.kind}/${entityRef.id}`, cmd)
+                .then(r => r.data);
+        };
+
+
         return {
             findAppsForEmployeeId,
             findEndUserAppsByIdSelector,
             findByEmployeeId,
             findByEntityReference,
             findChangeInitiativesForEmployeeId,
-            findPeopleByEntityReference
+            findPeopleByEntityReference,
+            changeInvolvement
         };
     }
 ];

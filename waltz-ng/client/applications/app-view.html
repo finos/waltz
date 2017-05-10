@@ -46,7 +46,11 @@
 
 
     <!-- INVOLVED PEOPLE -->
-    <waltz-involved-people-section involvements="ctrl.peopleInvolvements"
+    <waltz-involved-people-section id="people-section"
+                                   entity-ref="ctrl.entityRef"
+                                   involvements="ctrl.peopleInvolvements"
+                                   on-add="ctrl.onAddInvolvement"
+                                   on-remove="ctrl.onRemoveInvolvement"
                                    source-data-ratings="ctrl.sourceDataRatings">
     </waltz-involved-people-section>
 

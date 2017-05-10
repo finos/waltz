@@ -22,20 +22,20 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
+import com.khartec.waltz.model.involvement.EntityInvolvementChangeCommand;
 import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.involvement.InvolvementService;
+import com.khartec.waltz.service.user.UserRoleService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readEntityIdOptionsFromBody;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class InvolvementEndpoint implements Endpoint {
@@ -43,11 +43,14 @@ public class InvolvementEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "involvement");
 
     private final InvolvementService service;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public InvolvementEndpoint(InvolvementService service) {
+    public InvolvementEndpoint(InvolvementService service,
+                               UserRoleService userRoleService) {
         this.service = service;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -61,6 +64,7 @@ public class InvolvementEndpoint implements Endpoint {
         String findAllEndUserAppsBySelectorPath = mkPath(BASE_URL, "end-user-application");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findPeopleByEntityRefPath = mkPath(findByEntityRefPath, "people");
+        String updateForEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
 
 
         ListRoute<Involvement> findByEmployeeRoute = (request, response) -> {
@@ -97,6 +101,7 @@ public class InvolvementEndpoint implements Endpoint {
             return service.findPeopleByEntityReference(entityReference);
         };
 
+        DatumRoute<Boolean> updateForEntityRefRoute = (request, response) -> updateEntityInvolvement(request);
 
         getForList(findByEmployeePath, findByEmployeeRoute);
         getForList(findDirectAppsByEmployeePath, findDirectAppsByEmployeeRoute);
@@ -105,5 +110,24 @@ public class InvolvementEndpoint implements Endpoint {
         postForList(findAllEndUserAppsBySelectorPath, findAllEndUserAppsBySelectorRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findPeopleByEntityRefPath, findPeopleByEntityRefRoute);
+        postForDatum(updateForEntityRefPath, updateForEntityRefRoute);
     }
+
+
+    private Boolean updateEntityInvolvement(Request request) throws java.io.IOException {
+        EntityReference entityReference = getEntityReference(request);
+        requireEditRoleForEntity(userRoleService, request, entityReference.kind());
+        EntityInvolvementChangeCommand command = readBody(request, EntityInvolvementChangeCommand.class);
+
+        switch (command.operation()) {
+            case ADD:
+                return service.addEntityInvolvement(entityReference, command);
+            case REMOVE:
+                return service.removeEntityInvolvement(entityReference, command);
+            default:
+                throw new UnsupportedOperationException("Command operation: "
+                        + command.operation() + " is not supported");
+        }
+    }
+
 }

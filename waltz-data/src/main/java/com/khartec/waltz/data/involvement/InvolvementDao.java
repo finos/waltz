@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
@@ -70,6 +71,17 @@ public class InvolvementDao {
                         .build())
                 .provenance(involvementRecord.getProvenance())
                 .build();
+    };
+
+
+    private final Function<Involvement, InvolvementRecord> TO_RECORD_MAPPER = inv -> {
+        InvolvementRecord record = new InvolvementRecord();
+        record.setEntityKind(inv.entityReference().kind().name());
+        record.setEntityId(inv.entityReference().id());
+        record.setEmployeeId(inv.employeeId());
+        record.setKindId(inv.kindId());
+        record.setProvenance(inv.provenance());
+        return record;
     };
 
 
@@ -193,6 +205,42 @@ public class InvolvementDao {
                 .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
                 .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
+    }
+
+
+    public int save(Involvement involvement) {
+        return ! exists(involvement)
+                ? dsl.executeInsert(TO_RECORD_MAPPER.apply(involvement))
+                : 0;
+    }
+
+
+    public int remove(Involvement involvement) {
+
+        return exists(involvement)
+                ? dsl.deleteFrom(INVOLVEMENT)
+                    .where(involvementRecordSelectCondition(involvement))
+                    .execute()
+                : 0;
+    }
+
+
+    private boolean exists(Involvement involvement) {
+
+        int count = dsl.fetchCount(DSL.select(INVOLVEMENT.fields())
+                        .from(INVOLVEMENT)
+                        .where(involvementRecordSelectCondition(involvement)));
+        return count > 0;
+    }
+
+
+    private Condition involvementRecordSelectCondition(Involvement involvement) {
+        Condition condition = INVOLVEMENT.ENTITY_KIND.eq(involvement.entityReference().kind().name())
+                .and(INVOLVEMENT.ENTITY_ID.eq(involvement.entityReference().id()))
+                .and(INVOLVEMENT.EMPLOYEE_ID.eq(involvement.employeeId()))
+                .and(INVOLVEMENT.KIND_ID.eq(involvement.kindId()))
+                .and(INVOLVEMENT.PROVENANCE.eq(involvement.provenance()));
+        return condition;
     }
 
 }

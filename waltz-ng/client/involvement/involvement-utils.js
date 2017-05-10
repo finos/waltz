@@ -22,12 +22,24 @@ import _ from "lodash";
 export function aggregatePeopleInvolvements(involvements, people) {
     const involvementsByPerson = _.chain(involvements)
         .groupBy('employeeId')
-        .mapValues(xs => _.map(xs, 'kindId'))
+        .mapValues(xs => _.map(xs, x => ({
+            kindId: x.kindId,
+            provenance: x.provenance
+        })))
         .value();
 
     return _.chain(people)
             .map(person => ({person, involvements: involvementsByPerson[person.employeeId]}))
             .uniqBy(i => i.person.id)
             .value();
+}
+
+
+export function mkChangeCommand(operation, personEntityRef, involvementKindId) {
+    return {
+        operation,
+        personEntityRef,
+        involvementKindId
+    };
 }
 

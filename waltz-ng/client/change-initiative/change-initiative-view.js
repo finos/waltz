@@ -19,6 +19,9 @@ import {groupRelationships, enrichRelationships} from "./change-initiative-utils
 import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
 import * as _ from "lodash";
 
+import template from './change-initiative-view.html';
+
+
 const initialState = {
     bookmarks: [],
     changeInitiative: {},
@@ -43,6 +46,7 @@ function controller($q,
                     entityNamedNoteStore,
                     entityNamedNoteTypeService,
                     historyStore,
+                    involvedSectionService,
                     involvementStore,
                     notification,
                     sourceDataRatingStore,
@@ -87,6 +91,9 @@ function controller($q,
         .getById(id)
         .then(ci => {
             vm.changeInitiative = ci;
+            vm.entityRef.name = vm.changeInitiative.name;
+            vm.entityRef.description = vm.changeInitiative.description;
+
             historyStore
                 .put(
                     ci.name,
@@ -131,14 +138,20 @@ function controller($q,
         .findByEntityReference(vm.entityRef)
         .then(surveyInstances => vm.surveyInstances = _.filter(surveyInstances, {'status': 'COMPLETED'}));
 
-    const involvementPromises = [
-        involvementStore.findByEntityReference('CHANGE_INITIATIVE', id),
-        involvementStore.findPeopleByEntityReference('CHANGE_INITIATIVE', id)
-    ];
-    $q.all(involvementPromises)
-        .then(([relations, people]) => aggregatePeopleInvolvements(relations, people))
-        .then(involvements => vm.involvements = involvements);
+    const loadInvolvements = () => {
+        const involvementPromises = [
+            involvementStore.findByEntityReference('CHANGE_INITIATIVE', id),
+            involvementStore.findPeopleByEntityReference('CHANGE_INITIATIVE', id)
+        ];
+        $q.all(involvementPromises)
+            .then(([relations, people]) => {
+                return aggregatePeopleInvolvements(relations, people)
+            })
+            .then(involvements => vm.involvements = involvements);
 
+    };
+
+    loadInvolvements();
 
     vm.saveNamedNote = (note) => {
         entityNamedNoteStore
@@ -164,7 +177,19 @@ function controller($q,
                     notification.error('Failed to delete note');
                 }
             })
-    }
+    };
+
+    vm.onAddInvolvement = (entityInvolvement) => {
+
+        involvedSectionService.addInvolvement(vm.entityRef, entityInvolvement)
+            .then(_ => loadInvolvements());
+    };
+
+    vm.onRemoveInvolvement = (entityInvolvement) => {
+
+        involvedSectionService.removeInvolvement(vm.entityRef, entityInvolvement)
+            .then(_ => loadInvolvements());
+    };
 }
 
 
@@ -178,6 +203,7 @@ controller.$inject = [
     'EntityNamedNoteStore',
     'EntityNamedNoteTypeService',
     'HistoryStore',
+    'InvolvedSectionService',
     'InvolvementStore',
     'Notification',
     'SourceDataRatingStore',
@@ -187,7 +213,7 @@ controller.$inject = [
 
 
 const page = {
-    template: require('./change-initiative-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

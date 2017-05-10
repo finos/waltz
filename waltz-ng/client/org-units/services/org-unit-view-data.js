@@ -290,13 +290,19 @@ function service($q,
                 .then(rs => rawData.measurableRatingsDetail = rs);
     };
 
+
+    function loadInvolvements(orgUnitId) {
+        return loadInvolvement(involvementStore, orgUnitId, rawData);
+    }
+
     return {
         data: rawData,
         loadAll,
         loadAllCosts,
         loadFlowDetail,
         loadOrgUnitDescendants,
-        loadRatingsDetail
+        loadRatingsDetail,
+        loadInvolvements
     };
 
 }

@@ -20,11 +20,13 @@ package com.khartec.waltz.service.involvement;
 
 import com.khartec.waltz.data.end_user_app.EndUserAppIdSelectorFactory;
 import com.khartec.waltz.data.involvement.InvolvementDao;
+import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.EntityIdSelectionOptions;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
+import com.khartec.waltz.model.involvement.EntityInvolvementChangeCommand;
 import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.person.Person;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,15 +44,21 @@ public class InvolvementService {
 
 
     private final InvolvementDao dao;
+    private final PersonDao personDao;
     private EndUserAppIdSelectorFactory endUserAppIdSelectorFactory;
 
 
     @Autowired
-    public InvolvementService(InvolvementDao dao, EndUserAppIdSelectorFactory endUserAppIdSelectorFactory) {
+    public InvolvementService(InvolvementDao dao,
+                              EndUserAppIdSelectorFactory endUserAppIdSelectorFactory,
+                              PersonDao personDao) {
         checkNotNull(dao, "dao must not be null");
         checkNotNull(endUserAppIdSelectorFactory, "endUserAppIdSelectorFactory cannot be null");
+        checkNotNull(personDao, "personDao cannot be null");
+
         this.dao = dao;
         this.endUserAppIdSelectorFactory = endUserAppIdSelectorFactory;
+        this.personDao = personDao;
     }
 
 
@@ -94,6 +102,35 @@ public class InvolvementService {
     public Collection<ChangeInitiative> findDirectChangeInitiativesByEmployeeId(String employeeId) {
         checkNotEmpty(employeeId, "employeeId cannot be empty");
         return time("IS.findDirectChangeInitiativesByEmployeeId", () -> dao.findDirectChangeInitiativesByEmployeeId(employeeId));
+    }
+
+
+    public boolean addEntityInvolvement(EntityReference entityReference,
+                                        EntityInvolvementChangeCommand command) {
+        Involvement involvement = mkInvolvement(entityReference, command);
+        return dao.save(involvement) == 1;
+    }
+
+
+    public boolean removeEntityInvolvement(EntityReference entityReference,
+                                           EntityInvolvementChangeCommand command) {
+        Involvement involvement = mkInvolvement(entityReference, command);
+        return dao.remove(involvement) == 1;
+    }
+
+
+    private Involvement mkInvolvement(EntityReference entityReference,
+                                      EntityInvolvementChangeCommand command) {
+        checkNotNull(entityReference, "entityReference cannot be null");
+        checkNotNull(command, "command cannot be null");
+
+        Person person = personDao.getById(command.personEntityRef().id());
+
+        return Involvement.mkInvolvement(
+                entityReference,
+                person.employeeId(),
+                command.involvementKindId(),
+                "waltz");
     }
 
 }

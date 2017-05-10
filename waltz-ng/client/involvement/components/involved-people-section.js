@@ -19,21 +19,32 @@
 import _ from "lodash";
 import {initialiseData} from "../../common";
 
+import template from './involved-people-section.html';
+
 
 const bindings = {
+    entityRef: '<',
     involvements: '<',
-    sourceDataRatings: '<'
+    involvementKinds: '<',
+    sourceDataRatings: '<',
+
+    onAdd: '<',
+    onRemove: '<'
 };
 
 
-const template = require('./involved-people-section.html');
-
-
 const initialState = {
+    allowedInvolvements: [],
+    currentInvolvements: [],
     involvements: [],
     gridData: [],
     gridDataCount: 0,
-    exportGrid: () => {}
+    exportGrid: () => {},
+    visibility: {
+        editor: false
+    },
+    onAdd: () => console.log("default onAdd handler for involved-people-section"),
+    onRemove: () => console.log("default onRemove handler for involved-people-section")
 };
 
 
@@ -41,7 +52,7 @@ function mkGridData(involvements = [], displayNameService) {
     return _.chain(involvements)
         .map(inv => {
             const roles = _.join(
-                _.map(inv.involvements, ik => displayNameService.lookup('involvementKind', ik)),
+                _.map(inv.involvements, ik => displayNameService.lookup('involvementKind', ik.kindId)),
                 ', '
             );
 
@@ -54,12 +65,43 @@ function mkGridData(involvements = [], displayNameService) {
 }
 
 
+function mkEntityRef(person) {
+    if (person) {
+        return {
+            id: person.id,
+            name: person.displayName,
+            kind: 'PERSON'
+        };
+    }
+    return person;
+}
+
+
+function mkCurrentInvolvements(involvements = []) {
+    return _.chain(involvements)
+        .flatMap(i => {
+            const personEntityRef = mkEntityRef(i.person);
+            return _.map(i.involvements, inv => ({
+                entity: personEntityRef,
+                involvement: +inv.kindId,
+                isReadOnly: inv.provenance !== 'waltz'
+            }));
+        })
+        .value();
+}
+
+
 function controller(displayNameService) {
 
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (changes) => {
         vm.gridData = mkGridData(vm.involvements, displayNameService);
+        vm.currentInvolvements = mkCurrentInvolvements(vm.involvements);
+
+        vm.allowedInvolvements = _.map(
+            displayNameService.getAllByType('involvementKind'),
+            (name, id) => ({ value: +id, name }));
     };
 
     vm.columnDefs = [
@@ -79,6 +121,10 @@ function controller(displayNameService) {
 
     vm.onGridChange = (e) => {
         vm.gridDataCount = e.entriesCount;
+    };
+
+    vm.editMode = (editMode) => {
+        vm.visibility.editor = editMode;
     };
 }
 
