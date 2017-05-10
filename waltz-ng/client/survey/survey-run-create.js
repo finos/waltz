@@ -36,6 +36,7 @@ const template = require('./survey-run-create.html');
 
 
 function controller($document,
+                    $interval,
                     $location,
                     $state,
                     $stateParams,
@@ -81,10 +82,12 @@ function controller($document,
     vm.generateEmail = () => {
         const document = $document[0];
         const iframeHack = document.createElement("IFRAME");
+        iframeHack.style.width = "0px";
+        iframeHack.style.height = "0px";
 
         iframeHack.src = vm.surveyEmailHref;
         document.body.appendChild(iframeHack);
-        document.body.removeChild(iframeHack);
+        $interval(() => document.body.removeChild(iframeHack), 100, 1);
     };
 
     vm.onSaveGeneral = (surveyRun) => {
@@ -137,6 +140,7 @@ function controller($document,
 
 controller.$inject = [
     '$document',
+    '$interval',
     '$location',
     '$state',
     '$stateParams',
