@@ -148,6 +148,8 @@ public class SurveyInstanceService {
 
         LocalDate newDueDate = command.newDateVal().orElse(null);
 
+        checkNotNull(newDueDate, "newDueDate cannot be null");
+
         int result = surveyInstanceDao.updateDueDate(instanceId, newDueDate);
 
         changeLogService.write(

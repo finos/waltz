@@ -22,6 +22,7 @@ import {initialiseData} from "../../../common";
 const bindings = {
     id: '@',
     placeHolder: '@',
+    required: '@',
     format: '@',
     model: '='
 };

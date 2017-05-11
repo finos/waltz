@@ -22,7 +22,7 @@ public abstract class SurveyRun implements IdProvider, NameProvider, Description
     public abstract IdSelectionOptions selectionOptions();
     public abstract Set<Long> involvementKindIds();
     public abstract Optional<LocalDate> issuedOn();
-    public abstract Optional<LocalDate> dueDate();
+    public abstract LocalDate dueDate();
     public abstract SurveyIssuanceKind issuanceKind();
     public abstract Long ownerId();
     public abstract String contactEmail();

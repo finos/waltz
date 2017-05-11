@@ -10,7 +10,6 @@ import org.immutables.value.Value;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableSurveyInstance.class)
@@ -20,7 +19,7 @@ public abstract class SurveyInstance implements IdProvider {
     public abstract Long surveyRunId();
     public abstract EntityReference surveyEntity();
     public abstract SurveyInstanceStatus status();
-    public abstract Optional<LocalDate> dueDate();
+    public abstract LocalDate dueDate();
 
     @Nullable
     public abstract LocalDateTime submittedAt();

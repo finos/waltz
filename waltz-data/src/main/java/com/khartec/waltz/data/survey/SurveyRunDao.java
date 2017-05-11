@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +45,7 @@ public class SurveyRunDao {
                         ID_SEPARATOR,
                         Long::valueOf))
                 .issuedOn(Optional.ofNullable(record.getIssuedOn()).map(Date::toLocalDate))
-                .dueDate(Optional.ofNullable(record.getDueDate()).map(Date::toLocalDate))
+                .dueDate(record.getDueDate().toLocalDate())
                 .issuanceKind(SurveyIssuanceKind.valueOf(record.getIssuanceKind()))
                 .ownerId(record.getOwnerId())
                 .contactEmail(record.getContactEmail())

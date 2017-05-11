@@ -75,6 +75,7 @@
             </label>
             <div class="col-sm-10">
                 <waltz-date-picker-form-input id="dueDate"
+                                              required="true"
                                               place-holder="yyyy-MM-dd"
                                               format="yyyy-MM-dd"
                                               model="$ctrl.surveyRun.dueDate"/>
@@ -104,6 +105,7 @@
             </label>
             <div class="col-sm-10">
                 <waltz-entity-selector current-selection="$ctrl.surveyRun.selectorEntity"
+                                       required="true"
                                        on-select="$ctrl.onSelectorEntitySelect"
                                        entity-kinds="[$ctrl.surveyRun.selectorEntityKind]">
                 </waltz-entity-selector>

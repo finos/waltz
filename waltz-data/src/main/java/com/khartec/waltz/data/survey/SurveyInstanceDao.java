@@ -13,7 +13,6 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
@@ -22,7 +21,6 @@ import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE_RECIPIENT;
-import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
 import static java.util.Optional.ofNullable;
 
 @Repository
@@ -45,7 +43,7 @@ public class SurveyInstanceDao {
                         record.getEntityId(),
                         r.getValue(ENTITY_NAME_FIELD)))
                 .status(SurveyInstanceStatus.valueOf(record.getStatus()))
-                .dueDate(Optional.ofNullable(record.getDueDate()).map(Date::toLocalDate))
+                .dueDate(record.getDueDate().toLocalDate())
                 .submittedAt(ofNullable(record.getSubmittedAt()).map(Timestamp::toLocalDateTime).orElse(null))
                 .submittedBy(record.getSubmittedBy())
                 .build();
