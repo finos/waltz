@@ -560,19 +560,31 @@
                                tableName="person"/>
     </changeSet>
 
-    <changeSet author="dwatkins" id="20151130-mod-3" dbms="mysql">
+    <changeSet author="dwatkins"
+               id="20151130-mod-3"
+               dbms="mysql"
+               context="!exclude-ft">
         <sql> CREATE FULLTEXT INDEX people_content_ft_idx ON person (display_name, user_principal_name, title) </sql>
     </changeSet>
 
-    <changeSet author="dwatkins" id="20151130-mod-4" dbms="mysql">
+    <changeSet author="dwatkins"
+               id="20151130-mod-4"
+               dbms="mysql"
+               context="!exclude-ft">
         <sql> CREATE FULLTEXT INDEX application_content_ft_idx ON application (name, description, asset_code, parent_asset_code) </sql>
     </changeSet>
 
-    <changeSet author="dwatkins" id="20151130-mod-5" dbms="mysql">
+    <changeSet author="dwatkins"
+               id="20151130-mod-5"
+               dbms="mysql"
+               context="!exclude-ft">
         <sql> CREATE FULLTEXT INDEX capability_content_ft_idx ON capability (name, description) </sql>
     </changeSet>
 
-    <changeSet author="dwatkins" id="20151130-mod-6" dbms="mysql">
+    <changeSet author="dwatkins"
+               id="20151130-mod-6"
+               dbms="mysql"
+               context="!exclude-ft">
         <sql> CREATE FULLTEXT INDEX organisational_unit_content_ft_idx ON organisational_unit (name, description) </sql>
     </changeSet>
 
@@ -973,7 +985,8 @@
 
     <changeSet author="dwatkins"
                dbms="mssql"
-               id="20160317-105-1">
+               id="20160317-105-1"
+               context="!exclude-ft">
         <sql>
             CREATE FULLTEXT CATALOG WaltzFTS
             WITH ACCENT_SENSITIVITY = OFF;
@@ -982,7 +995,8 @@
 
     <changeSet author="dwatkins"
                dbms="mssql"
-               id="20160317-105-2">
+               id="20160317-105-2"
+               context="!exclude-ft">
         <sql>
             CREATE FULLTEXT INDEX ON application
             (name, description, asset_code)
@@ -994,7 +1008,8 @@
 
     <changeSet author="dwatkins"
                dbms="mssql"
-               id="20160317-105-3">
+               id="20160317-105-3"
+               context="!exclude-ft">
         <sql>
             CREATE FULLTEXT INDEX ON capability
             (name, description)
@@ -1007,7 +1022,8 @@
 
     <changeSet author="dwatkins"
                dbms="mssql"
-               id="20160317-105-4">
+               id="20160317-105-4"
+               context="!exclude-ft">
         <sql>
             CREATE FULLTEXT INDEX ON person
             (display_name, title, email, user_principal_name, department_name)
@@ -1020,7 +1036,8 @@
 
     <changeSet author="dwatkins"
                dbms="mssql"
-               id="20160317-105-5">
+               id="20160317-105-5"
+               context="!exclude-ft">
         <sql>
             CREATE FULLTEXT INDEX ON organisational_unit
             (name, description)
@@ -1384,7 +1401,8 @@
 
     <changeSet author="dwatkins"
                id="20160520-154-2"
-               dbms="mysql">
+               dbms="mysql"
+               context="!exclude-ft">
         <sql>
             CREATE FULLTEXT INDEX change_initiative_content_ft_idx ON change_initiative (name, description, external_id)
         </sql>
@@ -1393,7 +1411,8 @@
 
     <changeSet author="dwatkins"
                dbms="mssql"
-               id="20160520-154-3">
+               id="20160520-154-3"
+               context="!exclude-ft">
         <sql>
             CREATE FULLTEXT INDEX ON change_initiative
             (name, description, external_id)

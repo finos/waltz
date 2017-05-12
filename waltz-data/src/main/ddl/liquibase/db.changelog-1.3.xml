@@ -183,7 +183,8 @@
     <!-- 1721 -->
     <changeSet id="20170309-1721-1"
                author="rovats"
-               dbms="mssql">
+               dbms="mssql"
+               context="!exclude-ft">
         <comment>1721: Remove capability tables from full text index</comment>
         <sql>
             DROP FULLTEXT INDEX ON capability
