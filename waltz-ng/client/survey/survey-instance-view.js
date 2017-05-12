@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
-import { initialiseData } from '../common'
-import { timeFormat } from "d3-time-format";
+import _ from "lodash";
+import {initialiseData} from "../common";
+import {timeFormat} from "d3-time-format";
 
 const initialState = {
     surveyInstance: {},
@@ -132,15 +132,19 @@ function controller($stateParams,
     };
 
     vm.updateDueDate = (instanceId, change) => {
-        surveyInstanceStore.updateDueDate(instanceId, {
-            newDateVal: change.newVal ? timeFormat('%Y-%m-%d')(change.newVal) : null
-        })
-        .then(r => {
-                notification.success('Survey instance due date updated successfully');
-                loadInstanceAndRun();
-            },
-            r => notification.error('Failed to update survey instance due date')
-        );
+        if (!change.newVal) {
+            notification.error('Due date cannot be blank');
+        } else {
+            surveyInstanceStore.updateDueDate(instanceId, {
+                newDateVal: timeFormat('%Y-%m-%d')(change.newVal)
+            })
+                .then(r => {
+                        notification.success('Survey instance due date updated successfully');
+                        loadInstanceAndRun();
+                    },
+                    r => notification.error('Failed to update survey instance due date')
+                );
+        }
     };
 
     loadInstanceAndRun();

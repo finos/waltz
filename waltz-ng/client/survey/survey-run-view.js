@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './survey-run-view.html';
+import template from "./survey-run-view.html";
 import {timeFormat} from "d3-time-format";
 
 
@@ -48,21 +48,24 @@ function controller($stateParams,
     loadInstances();
 
     vm.updateDueDate = (newVal) => {
-        if (confirm('This will update the due date of all the instances under this run. ' +
+        if (!newVal) {
+            notification.error('Due date cannot be blank');
+        } else {
+            if (confirm('This will update the due date of all the instances under this run. ' +
                     'Are you sure you want to continue?')) {
-            surveyRunStore.updateDueDate(id, {
-                newDateVal: newVal ? timeFormat('%Y-%m-%d')(newVal) : null
-            })
-                .then(r => {
-                        notification.success('Survey run due date updated successfully');
-                        loadSurveyRun();
-                        loadInstances();
-                    },
-                    r => notification.error('Failed to update survey run due date')
-                );
+                surveyRunStore.updateDueDate(id, {
+                    newDateVal: timeFormat('%Y-%m-%d')(newVal)
+                })
+                    .then(r => {
+                            notification.success('Survey run due date updated successfully');
+                            loadSurveyRun();
+                            loadInstances();
+                        },
+                        r => notification.error('Failed to update survey run due date')
+                    );
+            }
         }
     };
-
 }
 
 controller.$inject = [

@@ -153,6 +153,8 @@ public class SurveyRunService {
 
         LocalDate newDueDate = command.newDateVal().orElse(null);
 
+        checkNotNull(newDueDate, "newDueDate cannot be null");
+
         int surveyRunResult = surveyRunDao.updateDueDate(surveyRunId, newDueDate);
         int surveyInstanceResult = surveyInstanceDao.updateDueDateForSurveyRun(surveyRunId, newDueDate);
 

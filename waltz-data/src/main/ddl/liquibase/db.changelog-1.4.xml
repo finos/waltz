@@ -182,4 +182,42 @@
         </sql>
     </changeSet>
 
+
+    <!-- 2160 -->
+    <changeSet id="20170511-2160-1"
+               author="rovats">
+        <comment>2160: Survey: Make due date mandatory</comment>
+        <sql>
+            UPDATE survey_run SET
+                due_date = '2018-12-31'
+            WHERE due_date is null
+        </sql>
+    </changeSet>
+
+    <changeSet id="20170511-2160-2"
+               author="rovats">
+        <comment>2160: Survey: Make due date mandatory</comment>
+        <addNotNullConstraint tableName="survey_run"
+                              columnName="due_date"
+                              columnDataType="DATE"/>
+    </changeSet>
+
+    <changeSet id="20170511-2160-3"
+               author="rovats">
+        <comment>2160: Survey: Make due date mandatory</comment>
+        <sql>
+            UPDATE survey_instance SET
+                due_date = '2018-12-31'
+            WHERE due_date is null
+        </sql>
+    </changeSet>
+
+    <changeSet id="20170511-2160-4"
+               author="rovats">
+        <comment>2160: Survey: Make due date mandatory</comment>
+        <addNotNullConstraint tableName="survey_instance"
+                              columnName="due_date"
+                              columnDataType="DATE"/>
+    </changeSet>
+
 </databaseChangeLog>
