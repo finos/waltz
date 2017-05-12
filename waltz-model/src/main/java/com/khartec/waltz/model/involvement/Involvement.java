@@ -39,4 +39,18 @@ public abstract class Involvement implements ProvenanceProvider {
         return "waltz";
     }
 
+
+    public static Involvement mkInvolvement(
+            EntityReference entityRef,
+            String employeeId,
+            int involvementKindId,
+            String provenance) {
+
+        return ImmutableInvolvement.builder()
+                .entityReference(entityRef)
+                .employeeId(employeeId)
+                .kindId(involvementKindId)
+                .provenance(provenance)
+                .build();
+    }
 }

@@ -128,7 +128,10 @@
     <!-- PEOPLE -->
     <waltz-involved-people-section
         id="people-section"
+        entity-ref="ctrl.entityRef"
         involvements="ctrl.viewData.involvements"
+        on-add="ctrl.onAddInvolvement"
+        on-remove="ctrl.onRemoveInvolvement"
         source-data-ratings="ctrl.viewData.sourceDataRatings">
     </waltz-involved-people-section>
 

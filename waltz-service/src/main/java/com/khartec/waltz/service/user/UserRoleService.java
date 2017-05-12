@@ -19,6 +19,7 @@
 package com.khartec.waltz.service.user;
 
 import com.khartec.waltz.data.user.UserRoleDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.user.ImmutableUser;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.model.user.User;
@@ -31,6 +32,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.fromArray;
+import static com.khartec.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind;
 
 /**
  * Created by dwatkins on 30/03/2016.

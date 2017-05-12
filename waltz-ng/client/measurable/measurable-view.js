@@ -21,6 +21,8 @@ import {initialiseData} from '../common';
 import {getParents, populateParents} from '../common/hierarchy-utils';
 import {aggregatePeopleInvolvements} from '../involvement/involvement-utils';
 
+import template from './measurable-view.html';
+
 
 const initialState = {
 
@@ -46,6 +48,7 @@ function controller($q,
                     complexityStore,
                     entityStatisticStore,
                     historyStore,
+                    involvedSectionService,
                     involvementStore,
                     logicalFlowViewService,
                     measurableStore,
@@ -72,6 +75,7 @@ function controller($q,
                     vm.allMeasurables = all;
                     const withParents = populateParents(all);
                     vm.measurable = _.find(withParents, { id });
+                    vm.entityReference.name = vm.measurable.name;
                     vm.parents = getParents(vm.measurable);
                     vm.children = _.chain(all)
                         .filter({ parentId: id })
@@ -79,6 +83,7 @@ function controller($q,
                         .value();
                 }),
         ]);
+
 
     const loadWave2 = () =>
         $q.all([
@@ -103,12 +108,8 @@ function controller($q,
             bookmarkStore
                 .findByParent(ref)
                 .then(bookmarks => vm.bookmarks = bookmarks),
-            $q.all([
-                involvementStore.findByEntityReference('MEASURABLE', id),
-                involvementStore.findPeopleByEntityReference('MEASURABLE', id)
-            ]).then(([involvements, people]) =>
-                vm.peopleInvolvements = aggregatePeopleInvolvements(involvements, people)
-            )
+
+            loadInvolvements()
         ]);
 
     const loadWave3 = () =>
@@ -138,6 +139,14 @@ function controller($q,
             logHistory(vm.measurable, historyStore)
         ]);
 
+    const loadInvolvements = () => {
+        return $q.all([
+            involvementStore.findByEntityReference('MEASURABLE', id),
+            involvementStore.findPeopleByEntityReference('MEASURABLE', id)
+        ]).then(([involvements, people]) =>
+            vm.peopleInvolvements = aggregatePeopleInvolvements(involvements, people)
+        );
+    };
 
     // -- BOOT ---
 
@@ -160,6 +169,19 @@ function controller($q,
         .loadDetail()
         .then(flowView => vm.logicalFlowView = flowView);
 
+
+    vm.onAddInvolvement = (entityInvolvement) => {
+
+        involvedSectionService.addInvolvement(vm.entityReference, entityInvolvement)
+            .then(_ => loadInvolvements());
+    };
+
+    vm.onRemoveInvolvement = (entityInvolvement) => {
+
+        involvedSectionService.removeInvolvement(vm.entityReference, entityInvolvement)
+            .then(_ => loadInvolvements());
+    };
+
 }
 
 
@@ -174,6 +196,7 @@ controller.$inject = [
     'ComplexityStore',
     'EntityStatisticStore',
     'HistoryStore',
+    'InvolvedSectionService',
     'InvolvementStore',
     'LogicalFlowViewService',
     'MeasurableStore',
@@ -185,7 +208,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./measurable-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

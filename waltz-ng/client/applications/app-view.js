@@ -29,6 +29,8 @@ import {
     loadSourceDataRatings
 } from './data-load';
 
+import template from './app-view.html';
+
 
 const initialState = {
     app: {},
@@ -109,6 +111,7 @@ function controller($q,
                     flowDiagramStore,
                     flowDiagramEntityStore,
                     historyStore,
+                    involvedSectionService,
                     involvementStore,
                     logicalFlowDecoratorStore,
                     logicalFlowStore,
@@ -280,6 +283,7 @@ function controller($q,
 
     function postLoadActions() {
         addToHistory(historyStore, vm.app);
+        vm.entityRef.name = vm.app.name;
     }
 
     // load everything in priority order
@@ -310,6 +314,20 @@ function controller($q,
 
         return _.concat(modelCommands, moveCommands);
     };
+
+
+    vm.onAddInvolvement = (entityInvolvement) => {
+
+        involvedSectionService.addInvolvement(vm.entityRef, entityInvolvement)
+            .then(() => loadInvolvements($q, involvementStore, id, vm));
+    };
+
+
+    vm.onRemoveInvolvement = (entityInvolvement) => {
+
+        involvedSectionService.removeInvolvement(vm.entityRef, entityInvolvement)
+            .then(() => loadInvolvements($q, involvementStore, id, vm));
+    };
 }
 
 
@@ -330,6 +348,7 @@ controller.$inject = [
     'FlowDiagramStore',
     'FlowDiagramEntityStore',
     'HistoryStore',
+    'InvolvedSectionService',
     'InvolvementStore',
     'LogicalFlowDecoratorStore',
     'LogicalFlowStore',
@@ -350,7 +369,7 @@ controller.$inject = [
 
 
 export default  {
-    template: require('./app-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

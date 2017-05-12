@@ -5,6 +5,17 @@
                    id="involved-people-section">
 
         <waltz-section-actions>
+            <button xxwaltz-has-role-for-entity="$ctrl.entityRef.kind"
+                    ng-click="$ctrl.editMode(true)"
+                    class="btn btn-xs btn-primary"
+                    ng-if="$ctrl.visibility.editor === false">
+                Edit
+            </button>
+            <button ng-click="$ctrl.editMode(false)"
+                    class="btn btn-xs btn-primary"
+                    ng-if="$ctrl.visibility.editor === true">
+                Done
+            </button>
             <button ng-click="$ctrl.exportGrid()"
                     class="btn btn-xs btn-primary"
                     ng-disabled="$ctrl.gridDataCount == 0">
@@ -17,29 +28,45 @@
             </button>
         </waltz-section-actions>
 
+
         <waltz-source-data-overlay visible="$ctrl.sourceDataOverlay"
                                    ratings="$ctrl.sourceDataRatings"
                                    entities="['INVOLVEMENT']">
         </waltz-source-data-overlay>
 
-        <div ng-if="$ctrl.gridData.length > 0">
-            <waltz-grid-with-search column-defs="$ctrl.columnDefs"
-                                    entries="$ctrl.gridData"
-                                    search-placeholder-text="Search people..."
-                                    on-initialise="$ctrl.onGridInitialise"
-                                    on-change="$ctrl.onGridChange">
-            </waltz-grid-with-search>
+
+        <!-- Viewer -->
+        <div ng-if="$ctrl.visibility.editor === false">
+            <div ng-if="$ctrl.gridData.length > 0">
+                <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                                        entries="$ctrl.gridData"
+                                        search-placeholder-text="Search people..."
+                                        on-initialise="$ctrl.onGridInitialise"
+                                        on-change="$ctrl.onGridChange">
+                </waltz-grid-with-search>
+            </div>
+
+
+            <waltz-no-data ng-if="$ctrl.involvements.length == 0">
+                <message>
+                    <strong>
+                        No people
+                    </strong>
+                    have been associated.
+                </message>
+            </waltz-no-data>
         </div>
 
 
-        <waltz-no-data ng-if="$ctrl.involvements.length == 0">
-            <message>
-                <strong>
-                    No people
-                </strong>
-                have been associated.
-            </message>
-        </waltz-no-data>
+        <!-- Editor -->
+        <waltz-entity-involvement-editor ng-if="$ctrl.visibility.editor === true"
+                                         parent-entity-ref="$ctrl.entityRef"
+                                         current-involvements="$ctrl.currentInvolvements"
+                                         target-entity-kind="'PERSON'"
+                                         allowed-involvements="$ctrl.allowedInvolvements"
+                                         on-add="$ctrl.onAdd"
+                                         on-remove="$ctrl.onRemove">
+        </waltz-entity-involvement-editor>
 
     </waltz-section>
 </div>

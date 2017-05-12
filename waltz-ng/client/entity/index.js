@@ -17,18 +17,27 @@
  */
 import angular from "angular";
 
+import entitySearchStore from './services/entity-search-store';
+
+import entityHierarchyNavigator from './components/entity-hierarchy-navigator/entity-hierarchy-navigator';
+import entityInvolvementEditor from './components/entity-involvement-editor/entity-involvement-editor';
+import entitySelector from './components/entity-selector/entity-selector';
+import immediateHierarchyNavigator from './components/immediate-hierarchy-navigator/immediate-hierarchy-navigator';
+import relatedEntityEditor from './components/related-entity-editor/related-entity-editor';
+
 
 export default () => {
     const module = angular.module('waltz.entity', []);
 
     module
-        .service('EntitySearchStore', require('./services/entity-search-store'));
+        .service('EntitySearchStore', entitySearchStore);
 
     module
-        .component('waltzEntityHierarchyNavigator', require('./components/entity-hierarchy-navigator/entity-hierarchy-navigator'))
-        .component('waltzEntitySelector', require('./components/entity-selector/entity-selector'))
-        .component('waltzImmediateHierarchyNavigator', require('./components/immediate-hierarchy-navigator/immediate-hierarchy-navigator'))
-        .component('waltzRelatedEntityEditor', require('./components/related-entity-editor/related-entity-editor'));
+        .component('waltzEntityHierarchyNavigator', entityHierarchyNavigator)
+        .component('waltzEntityInvolvementEditor', entityInvolvementEditor)
+        .component('waltzEntitySelector', entitySelector)
+        .component('waltzImmediateHierarchyNavigator', immediateHierarchyNavigator)
+        .component('waltzRelatedEntityEditor', relatedEntityEditor);
 
     return module.name;
 };

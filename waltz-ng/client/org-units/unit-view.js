@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from './unit-view.html';
+
 
 const addToHistory = (historyStore, orgUnit) => {
     if (! orgUnit) { return; }
@@ -39,6 +41,7 @@ function controller($stateParams,
                     viewDataService,
                     assetCostStore,
                     historyStore,
+                    involvedSectionService,
                     tourService) {
 
     const id = $stateParams.id;
@@ -50,7 +53,8 @@ function controller($stateParams,
     viewDataService
         .loadAll(id)
         .then(() => addToHistory(historyStore, vm.viewData.orgUnit))
-        .then(() => initTour(tourService, vm));
+        .then(() => initTour(tourService, vm))
+        .then(() => vm.entityRef.name = vm.viewData.orgUnit.name);
 
 
     // -- INTERACTIONS ---
@@ -70,6 +74,18 @@ function controller($stateParams,
     vm.loadRatingsDetail = () => {
         return viewDataService.loadRatingsDetail(id);
     };
+
+    vm.onAddInvolvement = (entityInvolvement) => {
+
+        involvedSectionService.addInvolvement(vm.entityRef, entityInvolvement)
+            .then(() => viewDataService.loadInvolvements(id));
+    };
+
+    vm.onRemoveInvolvement = (entityInvolvement) => {
+
+        involvedSectionService.removeInvolvement(vm.entityRef, entityInvolvement)
+            .then(() => viewDataService.loadInvolvements(id));
+    };
 }
 
 
@@ -79,12 +95,13 @@ controller.$inject = [
     'OrgUnitViewDataService',
     'AssetCostStore',
     'HistoryStore',
+    'InvolvedSectionService',
     'TourService'
 ];
 
 
 export default {
-    template: require('./unit-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

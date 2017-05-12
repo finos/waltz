@@ -47,6 +47,7 @@ import static com.khartec.waltz.common.Checks.checkAll;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ObjectUtilities.firstNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind;
 
 public class WebUtilities {
 
@@ -132,23 +133,10 @@ public class WebUtilities {
     public static void requireEditRoleForEntity(UserRoleService userRoleService,
                                                 Request req,
                                                 EntityKind kind) {
-        switch (kind) {
-            case APPLICATION:
-                requireRole(userRoleService, req, Role.APP_EDITOR);
-                break;
-            case CHANGE_INITIATIVE:
-                requireRole(userRoleService, req, Role.CHANGE_INITIATIVE_EDITOR);
-                break;
-            case MEASURABLE:
-                requireRole(userRoleService, req, Role.CAPABILITY_EDITOR);
-                break;
-            case ORG_UNIT:
-                requireRole(userRoleService, req, Role.ORG_UNIT_EDITOR);
-                break;
-            default:
-                requireRole(userRoleService, req, Role.ADMIN);
-                break;
-        }
+        requireRole(
+                userRoleService,
+                req,
+                getRequiredRoleForEntityKind(kind));
     }
 
 

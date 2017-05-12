@@ -18,15 +18,21 @@
 
 import angular from 'angular';
 
+import involvedPeopleSection from './components/involved-people-section';
+
+import involvedSectionService from './services/involved-section-service';
+import involvementStore from './services/involvement-store';
+
 
 export default () => {
     const module = angular.module('waltz.involvement', []);
 
     module
-        .component('waltzInvolvedPeopleSection', require('./components/involved-people-section'));
+        .component('waltzInvolvedPeopleSection', involvedPeopleSection);
 
     module
-        .service('InvolvementStore', require('./services/involvement-store'));
+        .service('InvolvedSectionService', involvedSectionService)
+        .service('InvolvementStore', involvementStore);
 
     return module.name;
 };

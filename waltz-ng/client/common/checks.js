@@ -88,6 +88,13 @@ const createInvolvementKindCommandShape = {
 };
 
 
+const entityInvolvementChangeCommandShape = {
+    operation: apiCheck.string,
+    personEntityRef: myApiCheck.shape(entityRefShape),
+    involvementKindId: apiCheck.number
+};
+
+
 const createPhysicalFlowCommandShape = {
     specification: myApiCheck.shape(specificationShape),
     flowAttributes: myApiCheck.shape(flowAttributesShape),
@@ -139,6 +146,11 @@ export const checkIsCreateActorCommand = cmd =>
 
 export const checkIsCreateInvolvementKindCommand = ref =>
     check(myApiCheck.shape(createInvolvementKindCommandShape), ref);
+
+
+export const checkIsEntityInvolvementChangeCommand = ref => {
+    check(myApiCheck.shape(entityInvolvementChangeCommandShape), ref);
+};
 
 
 export const checkIsEntityRelationshipChangeCommand = ref => {
