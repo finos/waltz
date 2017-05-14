@@ -5,7 +5,7 @@
                    id="involved-people-section">
 
         <waltz-section-actions>
-            <button xxwaltz-has-role-for-entity="$ctrl.entityRef.kind"
+            <button waltz-has-role-for-entity-kind="{{$ctrl.entityRef.kind}}"
                     ng-click="$ctrl.editMode(true)"
                     class="btn btn-xs btn-primary"
                     ng-if="$ctrl.visibility.editor === false">

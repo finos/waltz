@@ -20,6 +20,18 @@
 import angular from 'angular';
 
 
+import userAgentInfoStore from './services/user-agent-info-store';
+import userService from './services/user-service';
+import userStore from './services/user-store';
+import userPreferenceStore from './services/user-preference-store';
+import userPreferenceService from './services/user-preference-service';
+
+import hasRole from './directives/has-role';
+import hasRoleForEntityKind from './directives/has-role-for-entity-kind';
+import unlessRole from './directives/unless-role';
+import ifAnonymous from './directives/if-anonymous';
+
+
 export default () => {
     const module = angular.module('waltz.user', []);
 
@@ -27,16 +39,17 @@ export default () => {
         .config(require('./routes'));
 
     module
-        .service('UserAgentInfoStore', require('./services/user-agent-info-store'))
-        .service('UserService', require('./services/user-service'))
-        .service('UserStore', require('./services/user-store'))
-        .service('UserPreferenceStore', require('./services/user-preference-store'))
-        .service('UserPreferenceService', require('./services/user-preference-service'));
+        .service('UserAgentInfoStore', userAgentInfoStore)
+        .service('UserService', userService)
+        .service('UserStore', userStore)
+        .service('UserPreferenceStore', userPreferenceStore)
+        .service('UserPreferenceService', userPreferenceService);
 
     module
-        .directive('waltzHasRole', require('./directives/has-role'))
-        .directive('waltzUnlessRole', require('./directives/unless-role'))
-        .directive('waltzIfAnonymous', require('./directives/if-anonymous'));
+        .directive('waltzHasRole', hasRole)
+        .directive('waltzHasRoleForEntityKind', hasRoleForEntityKind)
+        .directive('waltzUnlessRole', unlessRole)
+        .directive('waltzIfAnonymous', ifAnonymous);
 
     return module.name;
 };
