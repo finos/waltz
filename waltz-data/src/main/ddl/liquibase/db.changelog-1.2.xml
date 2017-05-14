@@ -405,7 +405,8 @@
     <!-- 1307: Add Measurables to FT Index -->
     <changeSet author="dwatkins"
                id="20170104-1307-1"
-               dbms="mysql">
+               dbms="mysql"
+               context="!exclude-ft">
         <sql>
             CREATE FULLTEXT INDEX measurable_content_ft_idx
             ON measurable (name, description, external_id)
@@ -414,7 +415,8 @@
 
     <changeSet author="dwatkins"
                id="20170104-1307-1"
-               dbms="mssql">
+               dbms="mssql"
+               context="!exclude-ft">
         <sql>
             CREATE FULLTEXT INDEX ON measurable
             (name, description, external_id)
