@@ -175,6 +175,7 @@ public class EntityHierarchyService {
 
     private List<EntityHierarchyItem> convertFlatNodesToHierarchyItems(EntityKind kind, Collection<FlatNode<Long, Long>> flatNodes) {
         Forest<Long, Long> forest = HierarchyUtilities.toForest(flatNodes);
+        Node<Long, Long> r = forest.getAllNodes().get(811L);
         Map<Long, Integer> idToLevel = HierarchyUtilities.assignDepths(forest);
 
         return forest.getAllNodes()
@@ -193,12 +194,15 @@ public class EntityHierarchyService {
 
 
     private Stream<EntityHierarchyItem> streamSelf(EntityKind kind, Map<Long, Integer> idToLevel, Node<Long, Long> node) {
-        return Stream.of(ImmutableEntityHierarchyItem.builder()
-                .id(node.getId())
-                .parentId(node.getId())
-                .level(idToLevel.get(node.getId()))
+        Long nodeId = node.getId();
+        Integer level = idToLevel.get(nodeId);
+        ImmutableEntityHierarchyItem selfAsEntityHierarchyItem = ImmutableEntityHierarchyItem.builder()
+                .id(nodeId)
+                .parentId(nodeId)
+                .level(level)
                 .kind(kind)
-                .build());
+                .build();
+        return Stream.of(selfAsEntityHierarchyItem);
     }
 
 

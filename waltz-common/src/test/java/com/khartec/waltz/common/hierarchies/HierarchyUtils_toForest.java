@@ -58,6 +58,15 @@ public class HierarchyUtils_toForest {
         assertEquals(1, maybeF.get().getChildren().size());
     }
 
+    @Test
+    public void selfRef() {
+        Forest<Void, String> forest = HierarchyUtilities.toForest(SampleData.SELF_REFERENCE);
+        System.out.println(forest);
+        System.out.println(forest.getRootNodes());
+        System.out.println(HierarchyUtilities.assignDepths(forest));
+        forest.getAllNodes().entrySet().forEach(e -> System.out.println(HierarchyUtilities.parents(e.getValue())));
+    }
+
 
     private Optional<Node<Void, String>> find(Collection<Node<Void, String>> trees, String id) {
         return trees.stream()

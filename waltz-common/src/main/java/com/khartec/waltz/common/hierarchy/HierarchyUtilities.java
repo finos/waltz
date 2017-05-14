@@ -19,6 +19,7 @@
 package com.khartec.waltz.common.hierarchy;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.ListUtilities;
 import org.pcollections.HashTreePMap;
 import org.pcollections.PMap;
@@ -42,18 +43,23 @@ public class HierarchyUtilities {
      * @return
      */
     public static <T, K> Forest<T, K> toForest(Collection<FlatNode<T, K>> flatNodes) {
-        List<K> rootNodeIds = flatNodes.stream()
-                .filter(n -> !n.getParentId().isPresent())
+        Collection<FlatNode<T, K>> sanitizedFlatNodes = sanitizeFlatNodes(flatNodes);
+
+        List<K> rootNodeIds = sanitizedFlatNodes
+                .stream()
+                .filter(n -> ! n.getParentId().isPresent())
                 .map(n -> n.getId())
                 .collect(Collectors.toList());
 
-        Map<K, Node<T, K>> allById = flatNodes.stream()
+        Map<K, Node<T, K>> allById = sanitizedFlatNodes
+                .stream()
                 .collect(toMap(
                         n -> n.getId(),
                         n -> new Node<>(n.getId(), n.getData()),
                         (n1, n2) -> n1));
 
-        flatNodes.stream()
+        sanitizedFlatNodes
+                .stream()
                 .filter(n -> n.getParentId().isPresent())
                 .forEach(n -> {
                     Node<T, K> parent = allById.get(n.getParentId().get());
@@ -66,7 +72,8 @@ public class HierarchyUtilities {
                     node.setParent(parent);
                 });
 
-        Set<Node<T, K>> rootNodes = rootNodeIds.stream()
+        Set<Node<T, K>> rootNodes = rootNodeIds
+                .stream()
                 .map(id -> allById.get(id))
                 .collect(Collectors.toSet());
 
@@ -74,11 +81,22 @@ public class HierarchyUtilities {
     }
 
 
+    private static <T, K> Collection<FlatNode<T, K>> sanitizeFlatNodes(Collection<FlatNode<T, K>> flatNodes) {
+        return CollectionUtilities.map(flatNodes, n ->
+                    n.getParentId()
+                        .map(pId -> pId.equals(n.getId())
+                                ? new FlatNode<>(n.getId(), Optional.empty(), n.getData())
+                                : n)
+                        .orElse(n));
+    }
+
+
     public static <T, K> boolean hasCycle(Forest<T, K> forest) {
         Checks.checkNotNull(forest, "forest must not be null");
         PMap<K, Node<T, K>> seen = HashTreePMap.empty();
 
-        return forest.getAllNodes()
+        return forest
+                .getAllNodes()
                 .values()
                 .stream()
                 .anyMatch(node -> hasCycle(node, seen));
@@ -117,27 +135,9 @@ public class HierarchyUtilities {
         return parents;
     }
 
-    public static <T,K> List<T> flatten(Node<T, K> node) {
-        List<T> ts = new ArrayList<>(1 + node.getChildren().size());
-        return flatten(node, ts);
-    }
-
-    private static <T, K> List<T> flatten(Node<T, K> node, List<T> acc) {
-        acc.add(node.getData());
-        for (Node<T, K> child : node.getChildren()) {
-            flatten(child, acc);
-        }
-        return acc;
-    }
-
 
     public static <T, K> Map<K, Integer> assignDepths(Forest<T, K> forest) {
         return assignDepths(forest.getRootNodes(), 1);
-    }
-
-
-    public static <T, K> Map<K, Integer> assignDepths(Collection<Node<T, K>> rootNodes) {
-        return assignDepths(rootNodes, 1);
     }
 
 

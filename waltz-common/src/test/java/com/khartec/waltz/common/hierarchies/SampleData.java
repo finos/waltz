@@ -46,4 +46,11 @@ public class SampleData {
             new FlatNode<>("c", of("a"), null)
     );
 
+
+    public static List<FlatNode<Void, String>> SELF_REFERENCE = ListUtilities.newArrayList(
+            new FlatNode<>("a", of("a"), null),
+            new FlatNode<>("b", of("a"), null),
+            new FlatNode<>("c", of("a"), null)
+    );
+
 }
