@@ -37,6 +37,9 @@ export function kindToViewState(kind) {
     if (kind === 'DATA_TYPE') {
         return "main.data-type.view";
     }
+    if (kind === 'FLOW_DIAGRAM') {
+        return "main.flow-diagram.view";
+    }
     if (kind === 'MEASURABLE') {
         return "main.measurable.view";
     }
