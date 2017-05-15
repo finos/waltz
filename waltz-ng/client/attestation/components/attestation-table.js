@@ -17,6 +17,7 @@
  */
 
 import {initialiseData} from "../../common";
+import {mkEntityLinkGridCell} from "../../common/link-utils";
 
 const bindings = {
     entries: '<',
@@ -43,7 +44,7 @@ function controller() {
         {
             field: 'comments',
             name: 'Comments',
-            width: '70%'
+            width: '50%'
         },
         {
             field: 'attestedBy',
@@ -56,7 +57,8 @@ function controller() {
             name: 'Timestamp',
             width: '10%',
             cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>'
-        }
+        },
+        Object.assign(mkEntityLinkGridCell('Attesting Entity', 'attestingEntityReference'), { width: "20%" })
     ];
 
 }
