@@ -206,6 +206,7 @@ function controller(
             { command: 'CLONE', payload: 'Copy of ' + vm.selected.diagram.name }
         ]);
         notification.warning("Flow diagrams are not automatically saved.  Remember to save your work.")
+        notification.warning("You have cloned an existing diagram.  Remember to change it's name.")
     };
 
     vm.dismissDiagramEditor = () => {
