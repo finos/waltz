@@ -293,6 +293,11 @@ function service(
                 model.title = payload;
                 break;
 
+            case 'CLONE':
+                model.title = payload;
+                state.diagramId = null;
+                break;
+
             /* MOVE
                 payload = { dx, dy, id, refId? }
                 - dx = delta x
