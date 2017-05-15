@@ -39,6 +39,7 @@ public class FlowDiagramIdSelectorFactory implements IdSelectorFactory {
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         switch(options.entityReference().kind()) {
+            case ACTOR:
             case APPLICATION:
             case LOGICAL_DATA_FLOW:
             case PHYSICAL_FLOW:
