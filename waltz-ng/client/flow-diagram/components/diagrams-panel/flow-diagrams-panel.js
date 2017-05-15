@@ -200,6 +200,14 @@ function controller(
         notification.warning("Flow diagrams are not automatically saved.  Remember to save your work.")
     };
 
+    vm.editDiagramCopy = () => {
+        showEditableDiagram();
+        flowDiagramStateService.processCommands([
+            { command: 'CLONE', payload: 'Copy of ' + vm.selected.diagram.name }
+        ]);
+        notification.warning("Flow diagrams are not automatically saved.  Remember to save your work.")
+    };
+
     vm.dismissDiagramEditor = () => {
         hideDiagram();
         clearSelections();
