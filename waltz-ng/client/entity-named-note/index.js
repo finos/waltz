@@ -18,15 +18,18 @@
 
 import angular from 'angular';
 
+import * as entityNamedNoteStore from './services/entity-named-note-store';
+import * as entityNamedNoteTypeStore from './services/entity-named-note-type-store';
+
 
 export default () => {
 
     const module = angular.module('waltz.entity.named-note', []);
 
     module
-        .service('EntityNamedNoteTypeStore', require('./services/entity-named-note-type-store'))
-        .service('EntityNamedNoteTypeService', require('./services/entity-named-note-type-service'))
-        .service('EntityNamedNoteStore', require('./services/entity-named-note-store'));
+        .service(entityNamedNoteStore.serviceName, entityNamedNoteStore.store)
+        .service(entityNamedNoteTypeStore.serviceName, entityNamedNoteTypeStore.store)
+        .service('EntityNamedNoteTypeService', require('./services/entity-named-note-type-service'));
 
     module
         .component('waltzEntityNamedNotesPanel', require('./components/entity-named-notes-panel'));

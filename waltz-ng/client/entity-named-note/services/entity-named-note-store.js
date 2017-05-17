@@ -19,7 +19,7 @@
 
 import {checkIsEntityRef} from "../../common/checks";
 
-function store($http, BaseApiUrl) {
+export function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/entity-named-note`;
 
@@ -44,7 +44,7 @@ function store($http, BaseApiUrl) {
     return {
         findByEntityReference,
         save,
-        remove
+        remove,
     };
 }
 
@@ -55,4 +55,23 @@ store.$inject = [
 ];
 
 
-export default store;
+export const serviceName = 'EntityNamedNoteStore';
+
+
+export const EntityNamedNoteStore_API = {
+    findByEntityReference: {
+        serviceName,
+        serviceFnName: 'findByEntityReference',
+        description: 'finds entity named notes by entity reference'
+    },
+    save: {
+        serviceName,
+        serviceFnName: 'save',
+        description: 'saves an entity named note'
+    },
+    remove: {
+        serviceName,
+        serviceFnName: 'remove',
+        description: 'removes an entity named note'
+    }
+};
