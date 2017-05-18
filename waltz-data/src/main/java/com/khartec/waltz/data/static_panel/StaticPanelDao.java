@@ -81,7 +81,7 @@ public class StaticPanelDao {
 
     public boolean update(StaticPanel panel) {
         StaticPanelRecord record = mkRecord(panel);
-        return record.update() == 1;
+        return dsl.executeUpdate(record) == 1;
     }
 
 
