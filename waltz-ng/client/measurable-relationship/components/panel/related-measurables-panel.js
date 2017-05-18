@@ -53,6 +53,7 @@ const initialState = {
 const template = require('./related-measurables-panel.html');
 
 const DEFAULT_SELECTION_FILTER_FN = (m) => true;
+
 const DEFAULT_RELATIONSHIP_FORM = {
     description: '',
     relationshipKind: "STRONGLY_RELATES_TO",
