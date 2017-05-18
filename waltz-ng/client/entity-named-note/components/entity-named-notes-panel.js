@@ -70,7 +70,7 @@ function controller($q, serviceBroker, notification) {
         };
 
         return serviceBroker
-            .loadViewData(CORE_API.EntityNamedNoteTypeStore.findAll, [], options)
+            .loadAppData(CORE_API.EntityNamedNoteTypeStore.findAll, [], options)
             .then(result => vm.allNoteTypes = result.data);
     };
 
