@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
 import {enrichServerStats} from "../../../server-info/services/server-utilities";
 import {calcPortfolioCost} from "../../../asset-cost/services/asset-cost-utilities";
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
@@ -70,6 +70,13 @@ function controller() {
         if (c.serverStats) vm.enrichedServerStats = enrichServerStats(vm.serverStats);
         if (c.children || c.measurable) vm.childRefs = prepareChildRefs(vm.children, vm.measurable);
         if (c.parents || c.measurable) vm.parentRefs = prepareParentRefs(vm.parents, vm.measurable);
+
+        if (vm.measurable) {
+            vm.parentEntityRef = {
+                kind: 'MEASURABLE',
+                id: vm.measurable.id
+            };
+        }
     };
 }
 

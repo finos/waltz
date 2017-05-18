@@ -1,13 +1,12 @@
 import _ from "lodash";
 import {initialiseData} from "../../common";
-import {CORE_API, getApiReference} from '../../common/services/core-api-utils';
+import {CORE_API, getApiReference} from "../../common/services/core-api-utils";
 
-import template from './entity-named-notes-panel.html';
+import template from "./entity-named-notes-panel.html";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    editRole: '@'
+    parentEntityRef: '<'
 };
 
 
@@ -57,7 +56,7 @@ function controller($q, serviceBroker, notification) {
         const options = {
             force,
             cacheRefreshListener: cacheRefreshListener
-        }
+        };
 
         return serviceBroker
             .loadViewData(CORE_API.EntityNamedNoteStore.findByEntityReference, [vm.parentEntityRef], options)
@@ -68,7 +67,7 @@ function controller($q, serviceBroker, notification) {
     const loadNoteTypes = () => {
         const options = {
             cacheRefreshListener: cacheRefreshListener
-        }
+        };
 
         return serviceBroker
             .loadViewData(CORE_API.EntityNamedNoteTypeStore.findAll, [], options)
