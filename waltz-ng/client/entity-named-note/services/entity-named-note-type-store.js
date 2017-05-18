@@ -18,7 +18,7 @@
  */
 
 
-function store($http, BaseApiUrl) {
+export function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/entity-named-note-type`;
 
@@ -54,4 +54,28 @@ store.$inject = [
 ];
 
 
-export default store;
+export const serviceName = 'EntityNamedNoteTypeStore';
+
+
+export const EntityNamedNoteTypeStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'finds all entity named note types'
+    },
+    create: {
+        serviceName,
+        serviceFnName: 'create',
+        description: 'creates an entity named note type'
+    },
+    update: {
+        serviceName,
+        serviceFnName: 'update',
+        description: 'updates an entity named note type'
+    },
+    remove: {
+        serviceName,
+        serviceFnName: 'remove',
+        description: 'removes an entity named note type'
+    }
+};

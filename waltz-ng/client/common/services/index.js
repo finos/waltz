@@ -60,6 +60,7 @@ import {
 } from "./icon-names";
 
 import preventNavigationService from './prevent-navigation-service';
+import serviceBroker from './service-broker';
 
 
 const displayNameService = new BaseLookupService();
@@ -121,7 +122,7 @@ export default (module) => {
         .service('IconNameService', () => iconNameService)
         .service('DescriptionService', () => descriptionService)
         .service('PreventNavigationService', preventNavigationService)
-        ;
+        .service('ServiceBroker', serviceBroker);
 
     displayNameService
         .register('applicationKind', applicationKindDisplayNames)
@@ -153,8 +154,7 @@ export default (module) => {
         .register('releaseLifecycleStatus', releaseLifecycleStatusNames)
         .register('surveyQuestionFieldType', surveyQuestionFieldTypeNames)
         .register('usageKind', usageKindDisplayNames)
-        .register('transportKind', transportKindNames)
-        ;
+        .register('transportKind', transportKindNames);
 
     iconNameService
         .register('bookmark', bookmarkIconNames)
@@ -163,8 +163,7 @@ export default (module) => {
         .register('entityStatistic', entityStatisticCategoryIconNames)
         .register('severity', severityIconNames)
         .register('rag', ragIconNames)
-        .register('usageKind', usageKindIconNames)
-        ;
+        .register('usageKind', usageKindIconNames);
 
 
     loadFromServer.$inject = [
@@ -174,5 +173,16 @@ export default (module) => {
         'MeasurableCategoryStore'
     ];
 
-    module.run(loadFromServer);
+
+    function configServiceBroker($rootScope, serviceBroker) {
+        $rootScope.$on('$stateChangeSuccess', () => {
+            serviceBroker.resetViewData();
+        });
+    }
+
+    configServiceBroker.$inject = ['$rootScope', 'ServiceBroker'];
+
+    module
+        .run(loadFromServer)
+        .run(configServiceBroker);
 };
