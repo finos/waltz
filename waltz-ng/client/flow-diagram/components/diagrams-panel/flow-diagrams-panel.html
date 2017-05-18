@@ -142,10 +142,27 @@
                         <!-- CONTROLS -->
                         <div ng-if="! $ctrl.visibility.deletePrompt"
                              class="waltz-fade-if">
-                            <button class="btn btn-xs btn-primary"
-                                    ng-click="$ctrl.editDiagram()">
-                                Edit
-                            </button>
+                            <div class="btn-group"
+                                 uib-dropdown>
+                                <button class="btn btn-xs btn-primary"
+                                        ng-click="$ctrl.editDiagram()">
+                                    Edit
+                                </button>
+                                <button type="button"
+                                        class="btn btn-xs btn-primary"
+                                        uib-dropdown-toggle>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul uib-dropdown-menu
+                                    role="menu">
+                                    <li role="menuitem">
+                                        <a class="clickable"
+                                           ng-click="$ctrl.editDiagramCopy()">
+                                            a copy
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                             &nbsp;
                             <button class="btn btn-xs btn-danger"
                                     ng-click="$ctrl.visibility.deletePrompt = true">

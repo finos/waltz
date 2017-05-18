@@ -1,34 +1,12 @@
-/*
- * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 import _ from "lodash";
-import {initialiseData, invokeFunction} from "../../common";
+import {initialiseData} from "../../common";
+import {CORE_API, getApiReference} from "../../common/services/core-api-utils";
 
-const template = require('./entity-named-notes-panel.html');
+import template from "./entity-named-notes-panel.html";
 
 
 const bindings = {
-    notes: '<',
-    allNoteTypes: '<',
-    parentEntityRef: '<',
-    editRole: '@',
-    onCreate: '<',
-    onEdit: '<',
-    onDelete: '<'
+    parentEntityRef: '<'
 };
 
 
@@ -40,38 +18,105 @@ const initialState = {
     newNote: {},
     baseLabelText: 'Show Additional Notes',
     labelText: 'Show Additional Notes',
-    visibility: {
-        notes: false
-    }
+    visibility: {notes: false}
 };
 
 
-function controller() {
+function controller($q, serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
-        if (vm.notes && vm.allNoteTypes && vm.parentEntityRef) {
-            const existingNotesByTypeId = _.keyBy(vm.notes, 'namedNoteTypeId');
-
-            vm.creatableNoteTypes = _.chain(vm.allNoteTypes)
-                .filter(nt => !nt.isReadOnly)
-                .filter(nt => !existingNotesByTypeId[nt.id])
-                .filter(nt => nt.applicableEntityKinds.indexOf(vm.parentEntityRef.kind) !== -1)
-                .value();
-
-            vm.noteTypesById = _.keyBy(vm.allNoteTypes, 'id');
-
-            if (vm.notes.length === 0) {
-                vm.visibility.notes = false;
-            } else {
-                const noteTitles = _.chain(vm.notes)
-                    .map(n => vm.noteTypesById[n.namedNoteTypeId])
-                    .map(nt => nt.name)
-                    .value();
-
-                vm.labelText = vm.baseLabelText + ': ' + _.truncate(_.join(noteTitles, ', '), { length: 200 });
-            }
+        if (vm.parentEntityRef) {
+            loadAll();
         }
+    };
+
+    const postLoad = () => {
+        const existingNotesByTypeId = _.keyBy(vm.notes, 'namedNoteTypeId');
+
+        vm.creatableNoteTypes = _.chain(vm.allNoteTypes)
+            .filter(nt => !nt.isReadOnly)
+            .filter(nt => !existingNotesByTypeId[nt.id])
+            .filter(nt => nt.applicableEntityKinds.indexOf(vm.parentEntityRef.kind) !== -1)
+            .value();
+
+        vm.noteTypesById = _.keyBy(vm.allNoteTypes, 'id');
+        if (vm.notes.length === 0) {
+            vm.visibility.notes = false;
+        } else {
+            const noteTitles = _.chain(vm.notes)
+                .map(n => vm.noteTypesById[n.namedNoteTypeId])
+                .map(nt => nt.name).value();
+
+            vm.labelText = vm.baseLabelText + ': ' + _.truncate(_.join(noteTitles, ', '), {length: 200});
+        }
+    };
+
+    const loadNamedNotes = (force = false) => {
+        const options = {
+            force,
+            cacheRefreshListener: cacheRefreshListener
+        };
+
+        return serviceBroker
+            .loadViewData(CORE_API.EntityNamedNoteStore.findByEntityReference, [vm.parentEntityRef], options)
+            .then(result => vm.notes = result.data)
+            .catch(error => notification.error('Failed to load data: ', error));
+    };
+
+    const loadNoteTypes = () => {
+        const options = {
+            cacheRefreshListener: cacheRefreshListener
+        };
+
+        return serviceBroker
+            .loadViewData(CORE_API.EntityNamedNoteTypeStore.findAll, [], options)
+            .then(result => vm.allNoteTypes = result.data);
+    };
+
+    const loadAll = (force = false) => {
+        return $q
+            .all([loadNamedNotes(force), loadNoteTypes()])
+            .then(() => postLoad());
+    };
+
+    const cacheRefreshListener = (e) => {
+        if (e.eventType === 'REFRESH'
+            && getApiReference(e.serviceName, e.serviceFnName) === CORE_API.EntityNamedNoteStore.findByEntityReference) {
+
+            loadNamedNotes()
+                .then(postLoad);
+        }
+    };
+
+    const saveNote = (note) => {
+        const params = [vm.parentEntityRef, note.namedNoteTypeId, {newStringVal: note.noteText}];
+
+        return serviceBroker
+            .execute(CORE_API.EntityNamedNoteStore.save,
+                params)
+            .then(rc => {
+                if (rc) {
+                    notification.success('Note saved successfully');
+                    loadNamedNotes(true);
+                } else {
+                    notification.error('Failed to save note');
+                }
+            });
+    };
+
+    const deleteNote = (note) => {
+        const params = [vm.parentEntityRef, note.namedNoteTypeId];
+
+        return serviceBroker.execute(CORE_API.EntityNamedNoteStore.remove, params)
+            .then(rc => {
+                if (rc) {
+                    notification.success('Note deleted successfully');
+                    loadNamedNotes(true);
+                } else {
+                    notification.error('Failed to delete note');
+                }
+            })
     };
 
     vm.showNotes = () => {
@@ -87,46 +132,48 @@ function controller() {
     };
 
     vm.saveNewNote = () => {
-        invokeFunction(vm.onCreate, Object.assign({}, vm.newNote));
-        vm.newNote = {};
-        vm.creatingNote = false;
-        vm.visibility.notes = true;
+        return saveNote(vm.newNote).then(() => {
+            vm.newNote = {};
+            vm.creatingNote = false;
+            vm.visibility.notes = true;
+        });
     };
 
     vm.startEditNote = (note) => {
-        vm.editingNotes[note.namedNoteTypeId] = {
-            noteTextVal: note.noteText
-        };
+        vm.editingNotes[note.namedNoteTypeId] = {noteTextVal: note.noteText};
     };
 
     vm.cancelEditNote = (note) => {
         vm.editingNotes[note.namedNoteTypeId] = null;
     };
 
-    vm.updateNote =
-        (note) => {
-            invokeFunction(vm.onEdit, {
-                namedNoteTypeId: note.namedNoteTypeId,
-                noteText: vm.editingNotes[note.namedNoteTypeId].noteTextVal
-            });
-            vm.editingNotes[note.namedNoteTypeId] = null;
+    vm.updateNote = (note) => {
+        const newNote = {
+            namedNoteTypeId: note.namedNoteTypeId,
+            noteText: vm.editingNotes[note.namedNoteTypeId].noteTextVal
         };
+        saveNote(newNote).then(() => {
+            vm.editingNotes[note.namedNoteTypeId] = null;
+        });
+    };
 
     vm.deleteNote = (note) => {
         if (confirm('Are you sure you want to delete this note?')) {
-            invokeFunction(vm.onDelete, note);
+            deleteNote(note);
         }
     };
 
-    vm.expandNote =
-        (note) => vm.expandedNotes[note.namedNoteTypeId] = true;
+    vm.expandNote = (note) => vm.expandedNotes[note.namedNoteTypeId] = true;
 
-    vm.collapseNote =
-        (note) => vm.expandedNotes[note.namedNoteTypeId] = false;
+    vm.collapseNote = (note) => vm.expandedNotes[note.namedNoteTypeId] = false;
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    '$q',
+    'ServiceBroker',
+    'Notification'
+];
 
 
 const component = {

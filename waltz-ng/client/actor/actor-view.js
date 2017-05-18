@@ -54,10 +54,34 @@ function addToHistory(historyStore, actor) {
 }
 
 
-function controller($stateParams,
+function loadFlowDiagrams(id, $q, flowDiagramStore, flowDiagramEntityStore) {
+    const ref = {
+        id: id,
+        kind: 'ACTOR'
+    };
+
+    const selector = {
+        entityReference: ref,
+        scope: 'EXACT'
+    };
+
+    const promises = [
+        flowDiagramStore.findForSelector(selector),
+        flowDiagramEntityStore.findForSelector(selector)
+    ];
+    return $q
+        .all(promises)
+        .then(([flowDiagrams, flowDiagramEntities]) => ({ flowDiagrams, flowDiagramEntities }));
+}
+
+
+function controller($q,
+                    $stateParams,
                     actorStore,
                     bookmarkStore,
                     changeLogStore,
+                    flowDiagramStore,
+                    flowDiagramEntityStore,
                     historyStore,
                     physicalFlowStore,
                     physicalSpecificationStore,
@@ -93,6 +117,10 @@ function controller($stateParams,
         .findByEntityReference('ACTOR', id)
         .then(log => vm.log = log);
 
+    loadFlowDiagrams(id, $q, flowDiagramStore, flowDiagramEntityStore)
+        .then(r => Object.assign(vm, r));
+
+
     vm.onPhysicalFlowsInitialise = (e) => {
         vm.physicalFlowProducesExportFn = e.exportProducesFn;
         vm.physicalFlowConsumesExportFn = e.exportConsumesFn;
@@ -117,15 +145,41 @@ function controller($stateParams,
         vm.physicalFlowUnusedSpecificationsExportFn();
     };
 
+    vm.createFlowDiagramCommands = () => {
+        const actor = Object.assign({}, vm.actor, { kind: 'ACTOR' });
+        const title = `${actor.name} flows`;
+        const annotation = {
+            id: +new Date()+'',
+            kind: 'ANNOTATION',
+            entityReference: actor,
+            note: `${actor.name} data flows`
+        };
+
+        const modelCommands = [
+            { command: 'ADD_NODE', payload: actor },
+            { command: 'ADD_ANNOTATION', payload: annotation },
+            { command: 'SET_TITLE', payload: title }
+        ];
+
+        const moveCommands = [
+            { command: 'MOVE', payload: { id: `ANNOTATION/${annotation.id}`, dx: 100, dy: -50 }},
+            { command: 'MOVE', payload: { id: `APPLICATION/${actor.id}`, dx: 300, dy: 200 }},
+        ];
+
+        return _.concat(modelCommands, moveCommands);
+    };
 
 }
 
 
 controller.$inject = [
+    '$q',
     '$stateParams',
     'ActorStore',
     'BookmarkStore',
     'ChangeLogStore',
+    'FlowDiagramStore',
+    'FlowDiagramEntityStore',
     'HistoryStore',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore',

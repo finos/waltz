@@ -16,23 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+import angular from "angular";
 
-import * as entityNamedNoteStore from './services/entity-named-note-store';
-import * as entityNamedNoteTypeStore from './services/entity-named-note-type-store';
+import playpenView5 from "./playpen5";
 
 
 export default () => {
 
-    const module = angular.module('waltz.entity.named-note', []);
+    const module = angular.module('waltz.playpen5', []);
 
-    module
-        .service(entityNamedNoteStore.serviceName, entityNamedNoteStore.store)
-        .service(entityNamedNoteTypeStore.serviceName, entityNamedNoteTypeStore.store)
-        .service('EntityNamedNoteTypeService', require('./services/entity-named-note-type-service'));
-
-    module
-        .component('waltzEntityNamedNotesPanel', require('./components/entity-named-notes-panel'));
+    module.config([
+        '$stateProvider',
+        ($stateProvider) => {
+            $stateProvider
+                .state('main.playpen.5', {
+                    url: '/5',
+                    views: { 'content@': playpenView5 }
+                })
+        }
+    ]);
 
     return module.name;
+
 };

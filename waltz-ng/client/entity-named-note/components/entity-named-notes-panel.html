@@ -31,7 +31,7 @@
                     </waltz-markdown>
                     <br>
                     <div ng-if="! $ctrl.noteTypesById[note.namedNoteTypeId].isReadOnly"
-                         waltz-has-role="{{ $ctrl.editRole }}">
+                         waltz-has-role-for-entity-kind="{{ $ctrl.parentEntityRef.kind }}">
                         <br>
                         <a class="clickable"
                            ng-click="$ctrl.startEditNote(note)">
@@ -128,7 +128,7 @@
     </div>
 
     <a class="clickable"
-       waltz-has-role="{{ $ctrl.editRole }}"
+       waltz-has-role-for-entity-kind="{{ $ctrl.parentEntityRef.kind }}"
        ng-if="$ctrl.creatableNoteTypes.length > 0 && ! $ctrl.creatingNote && ($ctrl.notes.length === 0 || $ctrl.visibility.notes)"
        ng-click="$ctrl.startNewNote()">
         +Add Note

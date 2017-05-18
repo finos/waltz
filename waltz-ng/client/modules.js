@@ -96,6 +96,7 @@ const dependencies = [
     require('./physical-flows')(),
     require('./physical-specifications')(),
     require('./playpen')(),
+    require('./playpen/5')(),
     require('./profile')(),
     require('./ratings')(),
     require('./server-info')(),

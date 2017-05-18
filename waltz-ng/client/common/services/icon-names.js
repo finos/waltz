@@ -43,6 +43,7 @@ export const entityIconNames = {
     DATA_TYPE: 'qrcode',
     END_USER_APPLICATION: 'table',
     ENTITY_STATISTIC: 'pie-chart',
+    FLOW_DIAGRAM: 'picture-o',
     INVOLVEMENT: 'share-alt-square',
     LOGICAL_DATA_FLOW: "random",
     MEASURABLE: 'puzzle-piece',

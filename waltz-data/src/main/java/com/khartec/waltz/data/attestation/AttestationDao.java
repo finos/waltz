@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.attestation;
 
+import com.khartec.waltz.data.EntityNameUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.attestation.Attestation;
@@ -36,10 +37,13 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityKind.valueOf;
 import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM;
+import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.Attestation.ATTESTATION;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 
 
@@ -48,8 +52,13 @@ public class AttestationDao {
 
     private final DSLContext dsl;
 
+    private static final Field<String> ATTESTING_ENTITY_NAME_FIELD = EntityNameUtilities.mkEntityNameField(
+            ATTESTATION.ATTESTING_ENTITY_ID,
+            ATTESTATION.ATTESTING_ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR, EntityKind.DATA_TYPE, EntityKind.FLOW_DIAGRAM));
 
-    public static final RecordMapper<AttestationRecord, Attestation> TO_ATTESTATION_MAPPER = record -> {
+    public static final RecordMapper<Record, Attestation> TO_ATTESTATION_MAPPER = r -> {
+        AttestationRecord record = r.into(AttestationRecord.class);
         EntityKind entityKind = Enum.valueOf(EntityKind.class, record.getEntityKind());
 
         EntityReference attestingEntityRef = null;
@@ -60,7 +69,8 @@ public class AttestationDao {
                 && attestingEntityKindStr != null) {
             attestingEntityRef = mkRef(
                     valueOf(attestingEntityKindStr),
-                    attestingEntityId);
+                    attestingEntityId,
+                    r.getValue(ATTESTING_ENTITY_NAME_FIELD));
         }
 
         return ImmutableAttestation.builder()
@@ -104,7 +114,10 @@ public class AttestationDao {
     public List<Attestation> findForEntity(EntityReference reference) {
         checkNotNull(reference, "reference cannot be null");
 
-        return dsl.selectFrom(ATTESTATION)
+        return dsl
+                .select(ATTESTATION.fields())
+                .select(ATTESTING_ENTITY_NAME_FIELD)
+                .from(ATTESTATION)
                 .where(ATTESTATION.ENTITY_KIND.eq(reference.kind().name())
                         .and(ATTESTATION.ENTITY_ID.eq(reference.id())))
                 .fetch(TO_ATTESTATION_MAPPER);
