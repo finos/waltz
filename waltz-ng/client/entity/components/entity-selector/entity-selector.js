@@ -17,6 +17,7 @@
  */
 
 import {initialiseData, invokeFunction} from "../../../common";
+import _ from 'lodash';
 
 
 const bindings = {
@@ -25,7 +26,8 @@ const bindings = {
     itemId: '<',
     limit: '<',
     onSelect: '<',
-    required: '<'
+    required: '<',
+    selectionFilter: '<'
 };
 
 
@@ -36,7 +38,8 @@ const initialState = {
     entities: [],
     limit: 20,
     entityKinds: [],
-    required: false
+    required: false,
+    selectionFilter: (x) => true
 };
 
 
@@ -63,7 +66,9 @@ function controller(entitySearchStore) {
         if (!query) return;
         return entitySearchStore.search(query, vm.options)
             .then((entities) => {
-                vm.entities = entities;
+                vm.entities = vm.selectionFilter
+                    ? _.filter(entities, vm.selectionFilter)
+                    : entities;
             });
     };
 

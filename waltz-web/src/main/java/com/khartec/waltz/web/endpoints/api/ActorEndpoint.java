@@ -49,7 +49,7 @@ public class ActorEndpoint implements Endpoint {
     private static final String BASE_URL = WebUtilities.mkPath("api", "actor");
 
     private final ActorService service;
-    private UserRoleService userRoleService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired

@@ -86,6 +86,7 @@ const dependencies = [
     require('./measurable')(),
     require('./measurable-category')(),
     require('./measurable-rating')(),
+    require('./measurable-relationship')(),
     require('./navbar')(),
     require('./org-units')(),
     require('./orphan')(),

@@ -15,38 +15,62 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from 'lodash';
 
 
 const initData = {
-    entityRef: {
-        id: 1,
-        name: 'Persian - 0',
-        kind: 'APPLICATION'
-    }
+    id: 3035,
 };
 
 
-function controller($q, flowDiagramStore, flowDiagramEntityStore) {
+function controller(
+    $q,
+    measurableCategoryStore,
+    measurableRelationshipStore,
+    measurableStore)
+{
     const vm = Object.assign(this, initData);
 
     const promises = [
-        flowDiagramStore.findByEntityReference(vm.entityRef),
-        flowDiagramEntityStore.findByEntityReference(vm.entityRef)
+        measurableCategoryStore.findAll(),
+        measurableRelationshipStore.findForMeasurable(vm.id),
+        measurableStore.findAll()
     ];
 
-    $q.all(promises)
-        .then(([flowDiagrams, flowDiagramEntities]) => {
 
-        vm.flowDiagrams = flowDiagrams;
-        vm.flowDiagramEntities = flowDiagramEntities;
-    });
+    $q.all(promises)
+        .then(([categories, relationships, measurables]) => {
+            vm.categories = categories;
+            vm.relationships = relationships;
+            vm.measurables = measurables;
+            vm.measurable = _.find(measurables, { id: vm.id });
+        });
+
+    const reloadRelationships = () => {
+        measurableRelationshipStore
+            .findForMeasurable(vm.id)
+            .then(rs => vm.relationships = rs);
+    };
+
+    vm.saveRelationship = d => {
+        const savePromise = measurableRelationshipStore.save(d);
+        savePromise.then(reloadRelationships);
+        return savePromise;
+    };
+
+    vm.removeRelationship = d => {
+        const removePromise = measurableRelationshipStore.remove(d.measurableA, d.measurableB);
+        removePromise.then(reloadRelationships)
+        return removePromise;
+    };
 }
 
 
 controller.$inject = [
     '$q',
-    'FlowDiagramStore',
-    'FlowDiagramEntityStore'
+    'MeasurableCategoryStore',
+    'MeasurableRelationshipStore',
+    'MeasurableStore'
 ];
 
 

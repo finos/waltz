@@ -1,0 +1,59 @@
+$outer-node-fill: #f0fff1;
+
+.waltz-related-measurables-viz {
+    text {
+        filter: url('#waltz-outline'); // defined in common-svg-defs
+    }
+    circle {
+        filter: url('#waltz-glow'); // defined in common-svg-defs
+        stroke-width: 1.4;
+    }
+    .wrmv-outer-node {
+        &:hover {
+            cursor: pointer;
+            circle {
+                stroke-width: 2;
+            }
+        }
+        &.has-relationships {
+            circle {
+                stroke: #9ed18f;
+                fill: $outer-node-fill;
+                &:hover {
+                    fill: darken($outer-node-fill, 1.8)
+                }
+            }
+        }
+        &.no-relationships {
+            circle {
+                stroke: #999;
+                fill: #fafafa;
+            }
+            text {
+                fill: #666;
+            }
+        }
+        .detail {
+            font-size: small;
+        }
+        .name {
+            //font-size:;
+        }
+    }
+
+    .wrmv-center-node {
+        .name {
+        }
+        .detail {
+            font-size: small;
+            fill: #666;
+        }
+        circle {
+            stroke: #8997a1;
+            fill: #fafafa;
+        }
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}

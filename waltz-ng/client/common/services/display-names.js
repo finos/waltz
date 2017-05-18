@@ -298,6 +298,12 @@ export const issuanceDisplayNames = {
 };
 
 
+export const measurableRelationshipKindNames = {
+    STRONGLY_RELATES_TO: 'Strongly relates to',
+    WEAKLY_RELATES_TO: 'Weakly relates to',
+};
+
+
 /**
  * Used to convert a map of ( { code -> displayName }
  * @param lookups
