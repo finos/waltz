@@ -95,7 +95,7 @@
         <br />
 
         <select ng-model="$ctrl.currentInvolvement.involvement"
-                ng-options="rel.value as rel.name for rel in $ctrl.allowedInvolvements"
+                ng-options="rel.value as rel.name for rel in $ctrl.allowedInvolvements | orderBy:'name'"
                 class="form-control">
         </select>
 
