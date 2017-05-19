@@ -124,7 +124,7 @@ public class InvolvementKindDao {
         checkNotNull(command, "command cannot be null");
         checkOptionalIsPresent(command.lastUpdate(), "lastUpdate must be present");
 
-        InvolvementKindRecord record = dsl.newRecord(INVOLVEMENT_KIND);
+        InvolvementKindRecord record = new InvolvementKindRecord();
         record.setId(command.id());
         record.changed(INVOLVEMENT_KIND.ID, false);
 
@@ -135,8 +135,7 @@ public class InvolvementKindDao {
         record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));
         record.setLastUpdatedBy(lastUpdate.by());
 
-        int count = record.update();
-        return count == 1;
+        return dsl.executeUpdate(record) == 1;
     }
 
 

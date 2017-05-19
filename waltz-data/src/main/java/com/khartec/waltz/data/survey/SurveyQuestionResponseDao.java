@@ -105,9 +105,9 @@ public class SurveyQuestionResponseDao {
                 .fetchOne(Record1::value1);
 
         if (responseExists) {
-            record.update();
+            dsl.executeUpdate(record);
         } else {
-            record.insert();
+            dsl.executeInsert(record);
         }
     }
 

@@ -127,7 +127,7 @@ public class EntityNamedNoteTypeDao {
 
 
     public boolean update(long id, EntityNamedNoteTypeChangeCommand command) {
-        EntityNamedNoteTypeRecord record = dsl.newRecord(ENTITY_NAMED_NOTE_TYPE);
+        EntityNamedNoteTypeRecord record = new EntityNamedNoteTypeRecord();
         record.set(ENTITY_NAMED_NOTE_TYPE.ID, id);
         record.changed(ENTITY_NAMED_NOTE_TYPE.ID, false);
 
@@ -140,7 +140,7 @@ public class EntityNamedNoteTypeDao {
         command.isReadOnly()
                 .ifPresent(readOnly -> record.setIsReadonly(readOnly));
 
-        return record.update() == 1;
+        return dsl.executeUpdate(record) == 1;
     }
 
     public EntityNamedNodeType getById(long namedNoteTypeId) {
