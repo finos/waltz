@@ -144,7 +144,7 @@ function service($injector) {
 
     const loadViewData = (target,
                           targetParams = [],
-                          options) => {
+                          options = { force: false }) => {
 
         return loadData($injector,
                         vm.viewData,
@@ -156,8 +156,7 @@ function service($injector) {
 
     const loadAppData = (target,
                          targetParams = [],
-                         options) => {
-
+                         options= { force: false }) => {
         return loadData($injector,
                         vm.appData,
                         vm.appDataCacheRefreshListeners,

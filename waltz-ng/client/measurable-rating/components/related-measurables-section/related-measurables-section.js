@@ -11,6 +11,7 @@ import {initialiseData} from '../../../common';
 
 
 const bindings = {
+    parentEntityRef: '<',
     stats: '<',
     measurables: '<',
     categories: '<'

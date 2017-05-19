@@ -11,12 +11,7 @@
 
     <waltz-section name="foo" collapsible="true">
 
-        <waltz-related-measurables-panel categories="ctrl.categories"
-                                         measurables="ctrl.measurables"
-                                         relationships="ctrl.relationships"
-                                         measurable="ctrl.measurable"
-                                         on-save="ctrl.saveRelationship"
-                                         on-remove="ctrl.removeRelationship">
+        <waltz-related-measurables-panel parent-entity-ref='ctrl.parentEntityRef'>
         </waltz-related-measurables-panel>
 
     </waltz-section>

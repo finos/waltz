@@ -121,6 +121,7 @@ function calculatePositionOfOuterNode(angle) {
 
 
 function drawCenterGroup(group, measurable, category) {
+    if (!group) return;
     const centerGroup = group
         .selectAll(`.${styles.centerNode}`)
         .data([measurable], d => d.id)
@@ -157,6 +158,8 @@ function drawCenterGroup(group, measurable, category) {
 
 
 function drawOuterNodes(group, categories = [], relatedByCategory = {}, deltaAngle, handlers) {
+    if (!group) return;
+
     const outerNodes = group
         .selectAll(`.${styles.outerNode}`)
         .data(categories, d => d.id);
@@ -223,6 +226,8 @@ function drawOuterNodes(group, categories = [], relatedByCategory = {}, deltaAng
 
 
 function drawBridges(group, categories = [], deltaAngle) {
+    if (!group) return;
+
     return group
         .selectAll(`.${styles.bridge}`)
         .data(categories, d => d.id)
@@ -246,8 +251,6 @@ function draw(groups, data, handlers) {
     if (! groups) return;
     if (! data.category) return;
     if (! data.categories) return;
-
-    console.log('draw', groups, data);
 
     const categoriesById = _.keyBy(data.categories, 'id');
     const deltaAngle = i => i * (Math.PI * 2) / data.categories.length + angleOffset;

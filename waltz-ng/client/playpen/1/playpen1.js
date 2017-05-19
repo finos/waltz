@@ -23,55 +23,18 @@ const initData = {
 };
 
 
-function controller(
-    $q,
-    measurableCategoryStore,
-    measurableRelationshipStore,
-    measurableStore)
+function controller()
 {
     const vm = Object.assign(this, initData);
 
-    const promises = [
-        measurableCategoryStore.findAll(),
-        measurableRelationshipStore.findForMeasurable(vm.id),
-        measurableStore.findAll()
-    ];
-
-
-    $q.all(promises)
-        .then(([categories, relationships, measurables]) => {
-            vm.categories = categories;
-            vm.relationships = relationships;
-            vm.measurables = measurables;
-            vm.measurable = _.find(measurables, { id: vm.id });
-        });
-
-    const reloadRelationships = () => {
-        measurableRelationshipStore
-            .findForMeasurable(vm.id)
-            .then(rs => vm.relationships = rs);
-    };
-
-    vm.saveRelationship = d => {
-        const savePromise = measurableRelationshipStore.save(d);
-        savePromise.then(reloadRelationships);
-        return savePromise;
-    };
-
-    vm.removeRelationship = d => {
-        const removePromise = measurableRelationshipStore.remove(d.measurableA, d.measurableB);
-        removePromise.then(reloadRelationships)
-        return removePromise;
+    vm.parentEntityRef = {
+        id: vm.id,
+        kind: 'MEASURABLE'
     };
 }
 
 
-controller.$inject = [
-    '$q',
-    'MeasurableCategoryStore',
-    'MeasurableRelationshipStore',
-    'MeasurableStore'
-];
+controller.$inject = [];
 
 
 const view = {

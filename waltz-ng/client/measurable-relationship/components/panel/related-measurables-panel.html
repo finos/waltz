@@ -1,4 +1,28 @@
-<div class="row">
+<div class="row"
+     ng-if="$ctrl.relationships.length == 0 && ! $ctrl.showAnyway">
+    <div class="col-sm-12">
+        <waltz-no-data>
+            <message>
+                <div>
+                    No explicit relationships defined to other viewpoints.
+                </div>
+                <div waltz-has-role="CAPABILITY_EDITOR">
+                    <div>
+                        <waltz-icon name="warning"></waltz-icon>
+                        <strong>You</strong> have permission to create relationships.
+                        <a ng-click="$ctrl.showAnyway = true"
+                           class="clickable">
+                            Show this
+                        </a>
+                        section to make changes.
+                    </div>
+                </div>
+            </message>
+        </waltz-no-data>
+    </div>
+</div>
+<div class="row"
+     ng-if="$ctrl.relationships.length > 0 || $ctrl.showAnyway">
     <div class="col-sm-5">
         <!-- VISUALISATION -->
         <waltz-related-measurables-viz categories="$ctrl.categories"
@@ -29,7 +53,7 @@
         <div ng-if="$ctrl.gridData.length > 0"
              class="waltz-fade-if small">
             <div ng-class="{ 'waltz-scroll-region-300' : $ctrl.gridData.length > 10 }">
-                <table class="table table-condensed table-hover small">
+                <table class="table table-condensed table-hover">
                     <colgroup>
                         <col width="33%">
                         <col width="30%">
@@ -148,7 +172,8 @@
                         ng-click="$ctrl.removeRow()">
                     Delete
                 </button>
-                <a ng-click="$ctrl.clearRow()">
+                <a ng-click="$ctrl.clearRow()"
+                   class="clickable">
                     Dismiss
                 </a>
                 <hr>

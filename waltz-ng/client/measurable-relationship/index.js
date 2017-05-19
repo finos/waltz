@@ -16,17 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
-
+import * as measurableRelationshipStore from './services/measurable-relationship-store';
 
 export default () => {
     const module = angular.module('waltz.measurable.relationship', []);
 
-    // module
-    //     .config(require('./routes'))
-    //     ;
-
     module
-        .service('MeasurableRelationshipStore', require('./services/measurable-relationship-store'))
+        .service(measurableRelationshipStore.serviceName, measurableRelationshipStore.store)
         ;
 
     module

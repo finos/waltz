@@ -18,14 +18,14 @@
 
 
 import angular from 'angular';
-
+import * as categoryStore from './services/measurable-category-store';
 
 export default () => {
 
     const module = angular.module('waltz.measurable-category', []);
 
     module
-        .service('MeasurableCategoryStore', require('./services/measurable-category-store'));
+        .service(categoryStore.serviceName, categoryStore.store);
 
     return module.name;
 };

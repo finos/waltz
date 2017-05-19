@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function store($http, base) {
+export function store($http, base) {
     const BASE = `${base}/measurable-relationship`;
 
     const findForMeasurable = (id) => $http
@@ -45,4 +45,26 @@ store.$inject = [
 ];
 
 
-export default store;
+
+
+
+export const serviceName = 'MeasurableRelationshipStore';
+
+
+export const MeasurableRelationshipStore_API = {
+    findByMeasurable: {
+        serviceName,
+        serviceFnName: 'findForMeasurable',
+        description: 'finds relationships by given measurable id'
+    },
+    save: {
+        serviceName,
+        serviceFnName: 'save',
+        description: 'saves an entity named note'
+    },
+    remove: {
+        serviceName,
+        serviceFnName: 'remove',
+        description: 'removes an entity named note'
+    }
+};

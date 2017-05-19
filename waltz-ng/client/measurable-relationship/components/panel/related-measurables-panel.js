@@ -19,6 +19,8 @@
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
 import {toOptions, measurableRelationshipKindNames}  from '../../../common/services/display-names';
+import {CORE_API} from '../../../common/services/core-api-utils';
+import template from './related-measurables-panel.html';
 
 
 /**
@@ -30,12 +32,7 @@ import {toOptions, measurableRelationshipKindNames}  from '../../../common/servi
 
 
 const bindings = {
-    categories: '<',
-    measurable: '<',
-    measurables: '<',
-    relationships: '<',
-    onSave: '<',
-    onRemove: '<'
+    parentEntityRef: '<'
 };
 
 
@@ -44,19 +41,16 @@ const initialState = {
     categories: [],
     measurable: null,
     measurables: [],
-    relationships: [],
-    onSave: (d) => Promise.resolve(console.log('wrmp:onSave - default impl', d)),
-    onRemove: (d) => Promise.resolve(console.log('wrmp:onRemove - default impl', d))
+    relationships: []
 };
 
 
-const template = require('./related-measurables-panel.html');
 
 const DEFAULT_SELECTION_FILTER_FN = (m) => true;
 
 const DEFAULT_RELATIONSHIP_FORM = {
     description: '',
-    relationshipKind: "STRONGLY_RELATES_TO",
+    relationshipKind: { code: "STRONGLY_RELATES_TO" },
     measurable: null
 };
 
@@ -117,27 +111,27 @@ function mkGridData(id,
 }
 
 
-function controller($timeout, notification) {
+function controller($q, $timeout, serviceBroker, notification) {
     const vm = this;
 
-    vm.$onInit = () => initialiseData(vm, initialState);
-
-    const calcGridData = () => mkGridData(
-        vm.measurable.id,
-        vm.relationships,
-        vm.measurables,
-        vm.categories,
-        vm.selectedCategory);
-
-    vm.$onChanges = (c) => {
-        if (vm.measurable && vm.measurables) {
-            vm.relatedByCategory = categorizeRelationships(
-                vm.relationships,
-                vm.measurables,
-                vm.measurable.id);
-            vm.gridData = calcGridData();
-        }
+    const calcRelatedData = () => {
+        return categorizeRelationships(
+            vm.relationships,
+            vm.measurables,
+            vm.measurable.id);
     };
+
+    const calcGridData = () => {
+        return mkGridData(
+            vm.measurable.id,
+            vm.relationships,
+            vm.measurables,
+            vm.categories,
+            vm.selectedCategory);
+    };
+
+
+    // -- INTERACT --
 
     vm.selectCategory = (c) => $timeout(() => {
         vm.selectedCategory = c;
@@ -220,7 +214,7 @@ function controller($timeout, notification) {
                 relationshipKind: form.relationshipKind,
                 description: form.description
             };
-            vm.onSave(submission)
+            save(submission)
                 .then(() => {
                     notification.success("Relationship saved");
                     vm.cancelEditor();
@@ -232,7 +226,7 @@ function controller($timeout, notification) {
     };
 
     vm.removeRow = () => {
-        vm.onRemove(vm.selectedRow.relationship)
+        remove(vm.selectedRow.relationship)
             .then(() => {
                 notification.success("Relationship removed");
                 vm.clearRow();
@@ -248,14 +242,66 @@ function controller($timeout, notification) {
             description: relationship.description,
             measurableA: vm.selectedRow.measurableA,
             measurableB: vm.selectedRow.measurableB,
-            relationshipKind: relationship.relationshipKind,
+            relationshipKind: { code: relationship.relationshipKind },
         };
-    }
+    };
+
+
+    // -- API --
+
+    const loadRelationships = () => {
+        serviceBroker
+            .loadViewData(CORE_API.MeasurableRelationshipStore.findByMeasurable, [vm.measurable.id], { force: true })
+            .then(r => {
+                vm.relationships = r.data;
+                vm.relatedByCategory = calcRelatedData();
+                vm.gridData = calcGridData();
+            });
+    };
+
+    const loadAll = () => {
+        const promises = [
+            serviceBroker.loadAppData(CORE_API.MeasurableCategoryStore.findAll).then(r => r.data),
+            serviceBroker.loadViewData(CORE_API.MeasurableStore.findAll).then(r => r.data)
+        ];
+        return $q
+            .all(promises)
+            .then(([categories, measurables]) => {
+                vm.categories = categories;
+                vm.measurables = measurables;
+                vm.measurable = _.find(measurables, { id: vm.parentEntityRef.id });
+            })
+            .then(loadRelationships)
+
+    };
+
+    const save = d => {
+        return serviceBroker
+            .execute(CORE_API.MeasurableRelationshipStore.save, [d])
+            .then(loadRelationships)
+            .then(vm.clearRow);
+
+    };
+
+    const remove = d => {
+        return serviceBroker
+            .execute(CORE_API.MeasurableRelationshipStore.remove, [d.measurableA, d.measurableB])
+            .then(loadRelationships);
+    };
+
+    // -- BOOT --
+
+    vm.$onInit = () => {
+        initialiseData(vm, initialState);
+        loadAll();
+    };
 }
 
 
 controller.$inject = [
+    '$q',
     '$timeout',
+    'ServiceBroker',
     'Notification'
 ];
 

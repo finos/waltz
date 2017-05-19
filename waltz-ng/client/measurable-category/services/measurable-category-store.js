@@ -19,7 +19,7 @@
 import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks'
 
 
-function store($http, baseApiUrl) {
+export function store($http, baseApiUrl) {
     const baseUrl = `${baseApiUrl}/measurable-category`;
 
     const findAll = () => $http
@@ -40,4 +40,19 @@ function store($http, baseApiUrl) {
 
 store.$inject = ['$http', 'BaseApiUrl'];
 
-export default store;
+
+export const serviceName = 'MeasurableCategoryStore';
+
+
+export const MeasurableCategoryStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'finds all categories'
+    },
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'retrieves a single category'
+    }
+};
