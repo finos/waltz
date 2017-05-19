@@ -20,11 +20,17 @@
 
 import {EntityNamedNoteStore_API as EntityNamedNoteStore} from '../../entity-named-note/services/entity-named-note-store';
 import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from '../../entity-named-note/services/entity-named-note-type-store';
+import {MeasurableStore_API as MeasurableStore} from '../../measurable/services/measurable-store';
+import {MeasurableCategoryStore_API as MeasurableCategoryStore} from '../../measurable-category/services/measurable-category-store';
+import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from '../../measurable-relationship/services/measurable-relationship-store';
 
 
 export const CORE_API = {
     EntityNamedNoteStore,
-    EntityNamedNoteTypeStore
+    EntityNamedNoteTypeStore,
+    MeasurableStore,
+    MeasurableCategoryStore,
+    MeasurableRelationshipStore,
 };
 
 

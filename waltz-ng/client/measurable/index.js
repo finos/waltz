@@ -17,6 +17,7 @@
  */
 
 import angular from 'angular';
+import * as measurableStore from './services/measurable-store';
 
 
 export default () => {
@@ -28,7 +29,7 @@ export default () => {
         .component('waltzMeasurableTree', require('./components/tree/measurable-tree'));
 
     module
-        .service('MeasurableStore', require('./services/measurable-store'));
+        .service(measurableStore.serviceName, measurableStore.store);
 
     module
         .config(require('./routes'));

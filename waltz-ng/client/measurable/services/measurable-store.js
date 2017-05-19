@@ -18,7 +18,7 @@
 import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks'
 
 
-function store($http, baseApiUrl) {
+export function store($http, baseApiUrl) {
     const baseUrl = `${baseApiUrl}/measurable`;
 
     const findAll = () => $http
@@ -59,4 +59,34 @@ function store($http, baseApiUrl) {
 
 store.$inject = ['$http', 'BaseApiUrl'];
 
-export default store;
+
+export const serviceName = 'MeasurableStore';
+
+
+export const MeasurableStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'findAll'
+    },
+    findByExternalId: {
+        serviceName,
+        serviceFnName: 'findByExternalId',
+        description: 'saves an entity named note'
+    },
+    search: {
+        serviceName,
+        serviceFnName: 'search',
+        description: 'executes search'
+    },
+    findMeasurablesRelatedToPath: {
+        serviceName,
+        serviceFnName: 'findMeasurablesRelatedToPath',
+        description: 'executes findMeasurablesRelatedToPath'
+    },
+    findMeasurablesBySelector: {
+        serviceName,
+        serviceFnName: 'findMeasurablesBySelector',
+        description: 'executes findMeasurablesBySelector'
+    }
+};

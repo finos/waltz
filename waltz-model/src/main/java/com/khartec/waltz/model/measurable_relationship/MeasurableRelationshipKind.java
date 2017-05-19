@@ -15,35 +15,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
 
+package com.khartec.waltz.model.measurable_relationship;
 
-const initData = {
-    id: 3035,
-};
-
-
-function controller()
-{
-    const vm = Object.assign(this, initData);
-
-    vm.parentEntityRef = {
-        id: vm.id,
-        kind: 'MEASURABLE'
-    };
+/**
+ * Created by dwatkins on 16/05/2017.
+ */
+public enum MeasurableRelationshipKind {
+    WEAKLY_RELATES_TO,
+    STRONGLY_RELATES_TO
 }
-
-
-controller.$inject = [];
-
-
-const view = {
-    template: require('./playpen1.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;

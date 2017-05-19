@@ -15,35 +15,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import angular from "angular";
+import * as measurableRelationshipStore from './services/measurable-relationship-store';
 
+export default () => {
+    const module = angular.module('waltz.measurable.relationship', []);
 
-const initData = {
-    id: 3035,
+    module
+        .service(measurableRelationshipStore.serviceName, measurableRelationshipStore.store)
+        ;
+
+    module
+        .component('waltzRelatedMeasurablesPanel', require('./components/panel/related-measurables-panel'))
+        .component('waltzRelatedMeasurablesViz', require('./components/viz/related-measurables-viz'))
+        ;
+
+    return module.name;
 };
-
-
-function controller()
-{
-    const vm = Object.assign(this, initData);
-
-    vm.parentEntityRef = {
-        id: vm.id,
-        kind: 'MEASURABLE'
-    };
-}
-
-
-controller.$inject = [];
-
-
-const view = {
-    template: require('./playpen1.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;

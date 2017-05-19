@@ -24,13 +24,7 @@ const bindings = {};
 
 const template = require('./common-svg-defs.html');
 
-
-function controller($element) {
-
-    const defs = select($element[0])
-        .select('svg')
-        .append('defs');
-
+function addArrowMarkers(defs) {
     const markers = [
         { name: 'arrowhead' , color: '#666' },
         { name: 'arrowhead-PRIMARY' , color: 'green' },
@@ -54,6 +48,85 @@ function controller($element) {
         .attr('fill', d => rgb(d.color).brighter(1.5).toString())
         .append('path')
         .attr('d', 'M 0,0 V 8 L8,4 Z'); // this is actual shape for arrowhead
+}
+
+
+function addGlowFilter(defs) {
+    // taken from: https://www.visualcinnamon.com/2016/06/glow-filter-d3-visualization.html
+    const filter = defs
+        .append("filter")
+        .attr("id","waltz-glow");
+    filter
+        .append("feGaussianBlur")
+        .attr("stdDeviation","3.5")
+        .attr("result","coloredBlur");
+
+    const feMerge = filter
+        .append("feMerge");
+    feMerge
+        .append("feMergeNode")
+        .attr("in","coloredBlur");
+    feMerge
+        .append("feMergeNode")
+        .attr("in","SourceGraphic");
+}
+
+
+const outlineMatrix = `
+     0 0 0 0 0
+     0 0 0 0 0
+     0 0 0 0 0
+     0 0 0 1 0`;
+
+
+function addOutliner(defs) {
+    const filter = defs
+        .append("filter")
+        .attr("id","waltz-outline");
+
+    filter.append('feFlood')
+        .attr('flood-color', '#fff')
+        .attr('result', 'base');
+
+    filter.append('feMorphology')
+        .attr('result', 'bigger')
+        .attr('in', 'SourceGraphic')
+        .attr('operator', 'dilate')
+        .attr('radius', 3);
+
+    filter.append('feColorMatrix')
+        .attr('result', 'mask')
+        .attr('in', 'bigger')
+        .attr('type', 'matrix')
+        .attr('values', outlineMatrix);
+
+    filter.append('feComposite')
+        .attr('result', 'drop')
+        .attr('in', 'base')
+        .attr('in2', 'mask')
+        .attr('operator', 'in');
+
+    filter.append('feGaussianBlur')
+        .attr('result', 'blur')
+        .attr('in', 'drop')
+        .attr('stdDeviation', 3);
+
+    filter.append('feBlend')
+        .attr('in', 'SourceGraphic')
+        .attr('in2', 'blur')
+        .attr('mode', 'normal');
+}
+
+
+function controller($element) {
+
+    const defs = select($element[0])
+        .select('svg')
+        .append('defs');
+
+    addArrowMarkers(defs);
+    addGlowFilter(defs);
+    addOutliner(defs);
 }
 
 

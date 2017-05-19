@@ -9,16 +9,10 @@
         </ol>
     </waltz-page-header>
 
-    <waltz-section name="foo non collapsible" collapsible="false">
-    </waltz-section>
-
     <waltz-section name="foo" collapsible="true">
 
-        <waltz-diagrams-panel entity-ref="ctrl.entityRef"
-                                      flow-diagrams="ctrl.flowDiagrams"
-                                      flow-diagram-entities="ctrl.flowDiagramEntities">
-        </waltz-diagrams-panel>
-
+        <waltz-related-measurables-panel parent-entity-ref='ctrl.parentEntityRef'>
+        </waltz-related-measurables-panel>
 
     </waltz-section>
 

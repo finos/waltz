@@ -47,7 +47,8 @@ import {
     usageKindDisplayNames,
     transportKindNames,
     frequencyKindNames,
-    dataFormatKindNames
+    dataFormatKindNames,
+    measurableRelationshipKindNames
 } from "./display-names";
 import {
     bookmarkIconNames,
@@ -145,6 +146,7 @@ export default (module) => {
         .register('issuance', issuanceDisplayNames)
         .register('lifecyclePhase', lifecyclePhaseDisplayNames)
         .register('lifecycleStatus', lifecycleStatusNames)
+        .register('measurableRelationshipKind', measurableRelationshipKindNames)
         .register('orgUnitKind', orgUnitKindNames)
         .register('physicalSpecDefinitionFieldType', physicalSpecDefinitionFieldTypeNames)
         .register('physicalSpecDefinitionType', physicalSpecDefinitionTypeNames)
