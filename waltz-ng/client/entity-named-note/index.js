@@ -21,6 +21,8 @@ import angular from 'angular';
 import * as entityNamedNoteStore from './services/entity-named-note-store';
 import * as entityNamedNoteTypeStore from './services/entity-named-note-type-store';
 
+import entityNamedNotesPanel from './components/entity-named-notes-panel';
+
 
 export default () => {
 
@@ -28,11 +30,10 @@ export default () => {
 
     module
         .service(entityNamedNoteStore.serviceName, entityNamedNoteStore.store)
-        .service(entityNamedNoteTypeStore.serviceName, entityNamedNoteTypeStore.store)
-        .service('EntityNamedNoteTypeService', require('./services/entity-named-note-type-service'));
+        .service(entityNamedNoteTypeStore.serviceName, entityNamedNoteTypeStore.store);
 
     module
-        .component('waltzEntityNamedNotesPanel', require('./components/entity-named-notes-panel'));
+        .component('waltzEntityNamedNotesPanel', entityNamedNotesPanel);
 
     return module.name;
 };

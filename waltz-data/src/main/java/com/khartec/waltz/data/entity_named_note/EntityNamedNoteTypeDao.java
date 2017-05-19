@@ -143,6 +143,7 @@ public class EntityNamedNoteTypeDao {
         return dsl.executeUpdate(record) == 1;
     }
 
+
     public EntityNamedNodeType getById(long namedNoteTypeId) {
         return dsl.selectFrom(ENTITY_NAMED_NOTE_TYPE)
                 .where(ENTITY_NAMED_NOTE_TYPE.ID.eq(namedNoteTypeId))

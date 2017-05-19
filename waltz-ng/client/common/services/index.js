@@ -61,6 +61,7 @@ import {
 
 import preventNavigationService from './prevent-navigation-service';
 import serviceBroker from './service-broker';
+import {CORE_API} from './core-api-utils';
 
 
 const displayNameService = new BaseLookupService();
@@ -69,9 +70,9 @@ const descriptionService = new BaseLookupService();
 
 
 function loadFromServer(dataTypeService,
-                        entityNamedNoteTypeService,
                         involvementKindService,
-                        measurableCategoryStore) {
+                        measurableCategoryStore,
+                        serviceBroker) {
     dataTypeService
         .loadDataTypes()
         .then(results => {
@@ -106,13 +107,15 @@ function loadFromServer(dataTypeService,
             descriptionService.register('measurableCategory', _.mapValues(indexedById, 'description'));
         });
 
-    entityNamedNoteTypeService
-        .loadNoteTypes()
-        .then(results => {
-            const indexedById = _.keyBy(results, 'id');
+    serviceBroker
+        .loadAppData(
+            CORE_API.EntityNamedNoteTypeStore.findAll,
+            [])
+        .then(result => {
+            const indexedById = _.keyBy(result.data, 'id');
             displayNameService.register('entityNamedNoteType', _.mapValues(indexedById, 'name'));
             descriptionService.register('entityNamedNoteType', _.mapValues(indexedById, 'description'));
-        })
+        });
 }
 
 
@@ -168,9 +171,9 @@ export default (module) => {
 
     loadFromServer.$inject = [
         'DataTypeService',
-        'EntityNamedNoteTypeService',
         'InvolvementKindService',
-        'MeasurableCategoryStore'
+        'MeasurableCategoryStore',
+        'ServiceBroker'
     ];
 
 

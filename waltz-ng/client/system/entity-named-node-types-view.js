@@ -18,6 +18,10 @@
 
 import _ from "lodash";
 import {initialiseData} from "../common";
+import {CORE_API, getApiReference} from '../common/services/core-api-utils';
+
+import template from './entity-named-node-types-view.html';
+
 
 const initialState = {
     noteTypes: [],
@@ -32,37 +36,37 @@ function splitEntityKinds(entityKinds) {
 
 
 function controller($q,
-                    entityNamedNoteTypeService,
-                    notification) {
+                    notification,
+                    serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
     function update(id, change) {
-        return entityNamedNoteTypeService.update(id, change)
-            .then(() => notification.success('Updated'));
+        return serviceBroker
+            .execute(CORE_API.EntityNamedNoteTypeStore.update, [id, change])
+            .then(() => {
+                loadNoteTypes(true);
+                notification.success('Updated');
+            });
     }
 
     vm.updateName = (id, change) => {
         if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
-        return update(id, { name: change.newVal })
-            .then(() => loadNoteTypes());
+        return update(id, { name: change.newVal });
     };
 
     vm.updateDescription = (id, change) => {
         if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
-        return update(id, { description: change.newVal })
-            .then(() => loadNoteTypes());
+        return update(id, { description: change.newVal });
     };
 
     vm.updateIsReadOnly = (id, change) => {
-        return update(id, { isReadOnly: change.newVal })
-            .then(() => loadNoteTypes());
+        return update(id, { isReadOnly: change.newVal });
     };
 
     vm.updateApplicableEntityKinds = (id, change) => {
         if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
-        return update(id, { applicableEntityKinds: splitEntityKinds(change.newVal) })
-            .then(() => loadNoteTypes());
+        return update(id, { applicableEntityKinds: splitEntityKinds(change.newVal) });
     };
 
     vm.startNewNoteType = () => {
@@ -70,31 +74,31 @@ function controller($q,
     };
 
     vm.saveNewNoteType = () => {
-        entityNamedNoteTypeService
-            .create({
-                name: vm.newNoteType.name,
-                description: vm.newNoteType.description,
-                applicableEntityKinds: splitEntityKinds(vm.newNoteType.applicableEntityKinds),
-                isReadOnly: vm.newNoteType.isReadOnly
-            })
+        const params = [{
+            name: vm.newNoteType.name,
+            description: vm.newNoteType.description,
+            applicableEntityKinds: splitEntityKinds(vm.newNoteType.applicableEntityKinds),
+            isReadOnly: vm.newNoteType.isReadOnly
+        }];
+
+        return serviceBroker
+            .execute(CORE_API.EntityNamedNoteTypeStore.create, params)
             .then(() => {
                 notification.success('Created new note type: '+ vm.newNoteType.name);
                 vm.creatingNoteType = false;
                 vm.newNoteType = {};
-                loadNoteTypes();
+                loadNoteTypes(true);
             });
-
-
     };
 
     vm.deleteNoteType = (id) => {
         if (confirm('Are you sure you want to delete this note type?')) {
-            entityNamedNoteTypeService
-                .remove(id)
-                .then(r => {
-                    if (r) {
+            return serviceBroker
+                .execute(CORE_API.EntityNamedNoteTypeStore.remove, [id])
+                .then((r) => {
+                    if (r.data) {
                         notification.success('Deleted');
-                        loadNoteTypes();
+                        loadNoteTypes(true);
                     } else {
                         notification.error('Failed to delete, ensure that note type is not being used');
                     }
@@ -107,13 +111,28 @@ function controller($q,
     };
 
 
-    function loadNoteTypes() {
-        entityNamedNoteTypeService
-            .loadNoteTypes()
-            .then(noteTypes => {
-                vm.noteTypes = noteTypes;
+    function loadNoteTypes(force = false) {
+        const options = {
+            force,
+            cacheRefreshListener: cacheRefreshListener
+        };
+
+        serviceBroker
+            .loadAppData(
+                CORE_API.EntityNamedNoteTypeStore.findAll,
+                [],
+                options)
+            .then(result => {
+                vm.noteTypes = result.data;
             });
     }
+
+    const cacheRefreshListener = (e) => {
+        if (e.eventType === 'REFRESH'
+            && getApiReference(e.serviceName, e.serviceFnName) === CORE_API.EntityNamedNoteTypeStore.findAll) {
+            loadNoteTypes();
+        }
+    };
 
     loadNoteTypes();
 }
@@ -121,13 +140,13 @@ function controller($q,
 
 controller.$inject = [
     '$q',
-    'EntityNamedNoteTypeService',
-    'Notification'
+    'Notification',
+    'ServiceBroker'
 ];
 
 
 export default {
-    template: require('./entity-named-node-types-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

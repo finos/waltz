@@ -100,10 +100,10 @@ function loadData($injector,
                   cacheRefreshListenersMap,
                   target,
                   targetParams = [],
-                  options) {
+                  options = {}) {
 
     const {serviceName, serviceFnName} = target;
-    const {force, cacheRefreshListener} = options;
+    const {force = false, cacheRefreshListener} = options;
 
     const service = $injector.get(serviceName);
     const cacheKey = createKey(serviceName, serviceFnName, targetParams);
