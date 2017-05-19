@@ -72,7 +72,7 @@ function controller() {
         if (c.parents || c.measurable) vm.parentRefs = prepareParentRefs(vm.parents, vm.measurable);
 
         if (vm.measurable) {
-            vm.parentEntityRef = {
+            vm.entityRef = {
                 kind: 'MEASURABLE',
                 id: vm.measurable.id
             };

@@ -27,7 +27,6 @@ export default () => {
         .config(require('./routes'));
 
     module
-        .directive('waltzAppOverview', require('./directives/app-overview'))
         .directive('waltzAppOverviewSection', require('./directives/app-overview-section'))
         .directive('waltzAppSelector', require('./directives/app-selector'))
         .directive('waltzAssetCodeExplorer', require('./directives/asset-code-explorer'))
@@ -36,6 +35,7 @@ export default () => {
     module
         .component('waltzAppsByInvestmentPie', require('./components/apps-by-investment-pie'))
         .component('waltzAppsByLifecyclePhasePie', require('./components/apps-by-lifecycle-phase-pie'))
+        .component('waltzAppOverview', require('./components/app-overview'))
         .component('waltzAppsSection', require('./components/apps-section/apps-section'))
         .component('waltzAppSummary', require('./components/app-summary'))
         .component('waltzAppTable', require('./components/app-table'))
