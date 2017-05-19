@@ -4,7 +4,7 @@
          ng-if="$ctrl.produces.length > 0">
 
         <div class="col-md-12">
-            <h4>Produces</h4>
+            <h4>Produces (<span ng-bind="$ctrl.produces.length"></span>)</h4>
 
             <waltz-grid-with-search column-defs="$ctrl.produceColumnDefs"
                         entries="$ctrl.produces"
@@ -19,7 +19,7 @@
     <div class="row"
          ng-if="$ctrl.consumes.length > 0">
         <div class="col-md-12">
-            <h4>Consumes</h4>
+            <h4>Consumes (<span ng-bind="$ctrl.consumes.length"></span>)</h4>
 
             <waltz-grid-with-search column-defs="$ctrl.consumeColumnDefs"
                                     entries="$ctrl.consumes"
