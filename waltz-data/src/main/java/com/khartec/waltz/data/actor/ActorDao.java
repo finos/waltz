@@ -128,7 +128,7 @@ public class ActorDao {
         checkNotNull(command, "command cannot be null");
         checkOptionalIsPresent(command.lastUpdate(), "lastUpdate must be present");
 
-        ActorRecord record = dsl.newRecord(ACTOR);
+        ActorRecord record = new ActorRecord();
         record.setId(command.id());
         record.changed(ACTOR.ID, false);
 
@@ -140,8 +140,7 @@ public class ActorDao {
         record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));
         record.setLastUpdatedBy(lastUpdate.by());
 
-        int count = record.update();
-        return count == 1;
+        return dsl.executeUpdate(record) == 1;
     }
 
 

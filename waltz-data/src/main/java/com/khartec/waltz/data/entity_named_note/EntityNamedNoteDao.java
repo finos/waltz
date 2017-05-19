@@ -89,10 +89,10 @@ public class EntityNamedNoteDao {
         record.setLastUpdatedBy(lastUpdate.by());
         record.setProvenance("waltz");
 
-        if (record.update() == 1) {
+        if (dsl.executeUpdate(record) == 1) {
             return true;
         } else {
-            return record.insert() == 1;
+            return dsl.executeInsert(record) == 1;
         }
     }
 
