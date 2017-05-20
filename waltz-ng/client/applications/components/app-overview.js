@@ -18,8 +18,9 @@
 
 import _ from "lodash";
 
+import template from "./app-overview.html";
 
-const BINDINGS = {
+const bindings = {
     app: '<',
     tags: '<',
     aliases: '<',
@@ -40,6 +41,15 @@ const initialState = {
 
 function controller($state) {
     const vm = _.defaultsDeep(this, initialState);
+
+    vm.$onChanges = () => {
+        if (vm.app && vm.app.id) {
+            vm.entityRef = {
+                kind: 'APPLICATION',
+                id: vm.app.id
+            };
+        }
+    };
 
     vm.showAliasEditor = () => vm.visibility.aliasEditor = true;
     vm.showTagEditor = () => vm.visibility.tagEditor = true;
@@ -66,15 +76,12 @@ function controller($state) {
 controller.$inject = ['$state'];
 
 
-const directive = {
-    restrict: 'E',
-    replace: false,
-    scope: {},
-    bindToController: BINDINGS,
-    controller,
-    controllerAs: 'ctrl',
-    template: require('./app-overview.html')
+const component = {
+    template,
+    bindings,
+    controller
 };
 
 
-export default () => directive;
+export default component;
+

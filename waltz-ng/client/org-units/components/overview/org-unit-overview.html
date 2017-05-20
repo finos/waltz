@@ -4,9 +4,17 @@
     <div class="row">
 
         <div class="col-sm-12 ">
-            <div ng-bind="$ctrl.orgUnit.description"></div>
+            <waltz-markdown text="$ctrl.orgUnit.description">
+            </waltz-markdown>
 
-            <br>
+            <span ng-if="$ctrl.orgUnit.description">
+                <br/>
+                <br>
+            </span>
+
+            <waltz-entity-named-notes-panel parent-entity-ref="$ctrl.entityRef">
+            </waltz-entity-named-notes-panel>
+            <hr/>
 
             <div class="container-fluid">
 

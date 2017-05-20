@@ -39,19 +39,26 @@ function controller() {
     const vm = this;
 
     vm.$onChanges = () => {
-        if(vm.allDataTypes) {
+        if (vm.allDataTypes) {
             const roots = buildHierarchies(vm.allDataTypes);
             const node = findNode(roots, vm.dataTypeId);
             vm.dataType = node;
             vm.parents = getParents(node);
         }
 
-        if(vm.complexity) {
+        if (vm.complexity) {
             vm.complexitySummary = calcComplexitySummary(vm.complexity);
         }
 
-        if(vm.serverStats) {
+        if (vm.serverStats) {
             enrichServerStats(vm.serverStats);
+        }
+
+        if (vm.dataTypeId) {
+           vm.entityRef = {
+               kind: 'DATA_TYPE',
+               id: vm.dataTypeId
+           }
         }
     };
 

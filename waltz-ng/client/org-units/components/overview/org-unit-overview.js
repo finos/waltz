@@ -69,6 +69,13 @@ function controller() {
         vm.portfolioCostStr = calcPortfolioCost(vm.totalCost);
         vm.enrichedServerStats = enrichServerStats(vm.serverStats);
         vm.descendantsTree = buildTree(vm.orgUnitDescendants, vm.orgUnit);
+
+        if (vm.orgUnit) {
+            vm.entityRef = {
+                kind: 'ORG_UNIT',
+                id: vm.orgUnit.id
+            };
+        }
     };
 }
 
