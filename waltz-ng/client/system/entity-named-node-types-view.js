@@ -40,6 +40,7 @@ function controller($q,
                     serviceBroker) {
 
     const vm = initialiseData(this, initialState);
+    const componentId = 'entity-named-note-types-view';
 
     function update(id, change) {
         return serviceBroker
@@ -114,7 +115,10 @@ function controller($q,
     function loadNoteTypes(force = false) {
         const options = {
             force,
-            cacheRefreshListener: cacheRefreshListener
+            cacheRefreshListener: {
+                componentId,
+                fn: cacheRefreshListener
+            }
         };
 
         serviceBroker

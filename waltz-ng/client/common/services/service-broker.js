@@ -46,19 +46,6 @@ function createKey(serviceName, serviceFnName, targetParams) {
 }
 
 
-function isNamedFunction(fn) {
-    return _.isFunction(fn)
-        && !_.isEmpty(fn.prototype.constructor.name);
-}
-
-
-function ensureNamedFunction(fn, errorMessage) {
-    if (!isNamedFunction(fn)) {
-        throw errorMessage;
-    }
-}
-
-
 function mkCacheValue(promise) {
     return {
         promise,
@@ -68,14 +55,16 @@ function mkCacheValue(promise) {
 
 
 function notifyListeners(cacheKey, cacheRefreshListenersMap, target, targetParams, eventType) {
-    const listeners = cacheRefreshListenersMap.get(cacheKey) || [];
-    const detail = {
-        eventType,
-        serviceName: target.serviceName,
-        serviceFnName: target.serviceFnName,
-        params: targetParams
+    const listeners = cacheRefreshListenersMap.get(cacheKey);
+    if (listeners) {
+        const detail = {
+            eventType,
+            serviceName: target.serviceName,
+            serviceFnName: target.serviceFnName,
+            params: targetParams
+        };
+        listeners.forEach((f) => f(detail));
     }
-    listeners.forEach(f => f(detail));
 }
 
 
@@ -88,9 +77,11 @@ function invokeServiceFunction(service, serviceName, serviceFnName, targetParams
 
 function registerCacheRefreshListener(cacheRefreshListenersMap, cacheKey, cacheRefreshListener) {
     if (!cacheRefreshListenersMap.has(cacheKey)) {
-        cacheRefreshListenersMap.set(cacheKey, new Set());
+        cacheRefreshListenersMap.set(cacheKey, new Map());
     }
-    cacheRefreshListenersMap.get(cacheKey).add(cacheRefreshListener);
+    cacheRefreshListenersMap
+        .get(cacheKey)
+        .set(cacheRefreshListener.componentId, cacheRefreshListener.fn);
 }
 
 
@@ -118,9 +109,6 @@ function loadData($injector,
 
     // register cache refresh listener
     if (cacheRefreshListener) {
-        const errorMessage = serviceName + "." + serviceFnName + " cacheRefreshListener must be a non-anonymous function!";
-        ensureNamedFunction(cacheRefreshListener, errorMessage);
-
         registerCacheRefreshListener(cacheRefreshListenersMap, cacheKey, cacheRefreshListener);
     }
 

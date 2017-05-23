@@ -24,6 +24,7 @@ const initialState = {
 
 function controller($q, serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
+    const componentId = 'entity-named-notes-panel';
 
     vm.$onChanges = () => {
         if (vm.parentEntityRef) {
@@ -55,7 +56,10 @@ function controller($q, serviceBroker, notification) {
     const loadNamedNotes = (force = false) => {
         const options = {
             force,
-            cacheRefreshListener: cacheRefreshListener
+            cacheRefreshListener: {
+                componentId,
+                fn: cacheRefreshListener
+            }
         };
 
         return serviceBroker
@@ -66,7 +70,10 @@ function controller($q, serviceBroker, notification) {
 
     const loadNoteTypes = () => {
         const options = {
-            cacheRefreshListener: cacheRefreshListener
+            cacheRefreshListener: {
+                componentId,
+                fn: cacheRefreshListener
+            }
         };
 
         return serviceBroker
