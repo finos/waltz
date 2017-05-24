@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from '../common';
-import {toGraphId} from '../flow-diagram/flow-diagram-utils';
-import _ from 'lodash';
+import {initialiseData} from "../common";
+import {toGraphId} from "../flow-diagram/flow-diagram-utils";
+import _ from "lodash";
 
 
 const template = require('./physical-specification-view.html');
@@ -102,6 +102,8 @@ function controller($q,
         kind: 'PHYSICAL_SPECIFICATION',
         id: specId
     };
+
+    vm.entityReference = ref;
 
     // -- LOAD ---
 

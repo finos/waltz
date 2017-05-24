@@ -72,6 +72,26 @@ const flowAttributesShape = {
     basisOffset: apiCheck.number,
 };
 
+const componentShape = {
+    template: apiCheck.string,
+    controller: apiCheck.func,
+    bindings: apiCheck.object
+};
+
+const componentDefinitionShape = {
+    id: apiCheck.string,
+    component: myApiCheck.shape(componentShape)
+};
+
+const storeDefinitionShape = {
+    serviceName: apiCheck.string,
+    store: myApiCheck.func
+};
+
+const serviceDefinitionShape = {
+    serviceName: apiCheck.string,
+    service: myApiCheck.func
+};
 
 // -- COMMANDS --
 
@@ -157,6 +177,17 @@ export const checkIsEntityRelationshipChangeCommand = ref => {
     check(myApiCheck.shape(entityRelationshipChangeCommandShape), ref);
 };
 
+export const checkIsComponentDefinition = (def) => {
+    check(myApiCheck.shape(componentDefinitionShape), def);
+};
+
+export const checkIsStoreDefinition = (def) => {
+    check(myApiCheck.shape(storeDefinitionShape), def);
+};
+
+export const checkIsServiceDefinition = (def) => {
+    check(myApiCheck.shape(serviceDefinitionShape), def);
+};
 
 export const checkIsStringList = xs =>
     check(myApiCheck.arrayOf(apiCheck.string), xs);

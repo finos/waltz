@@ -18,19 +18,23 @@
  *
  */
 
-import {EntityNamedNoteStore_API as EntityNamedNoteStore} from '../../entity-named-note/services/entity-named-note-store';
-import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from '../../entity-named-note/services/entity-named-note-type-store';
-import {MeasurableStore_API as MeasurableStore} from '../../measurable/services/measurable-store';
-import {MeasurableCategoryStore_API as MeasurableCategoryStore} from '../../measurable-category/services/measurable-category-store';
-import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from '../../measurable-relationship/services/measurable-relationship-store';
+import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
+import {EntityNamedNoteStore_API as EntityNamedNoteStore} from "../../entity-named-note/services/entity-named-note-store";
+import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../entity-named-note/services/entity-named-note-type-store";
+import {MeasurableStore_API as MeasurableStore} from "../../measurable/services/measurable-store";
+import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../measurable-category/services/measurable-category-store";
+import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from "../../measurable-relationship/services/measurable-relationship-store";
+import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
 
 
 export const CORE_API = {
+    DataTypeStore,
     EntityNamedNoteStore,
     EntityNamedNoteTypeStore,
     MeasurableStore,
     MeasurableCategoryStore,
     MeasurableRelationshipStore,
+    PhysicalSpecDataTypeStore
 };
 
 

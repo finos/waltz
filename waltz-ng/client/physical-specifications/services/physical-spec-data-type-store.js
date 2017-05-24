@@ -17,17 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function store($http, BaseApiUrl) {
+export function store($http, BaseApiUrl) {
 
-    const BASE = `${BaseApiUrl}/data-types`;
+    const BASE = `${BaseApiUrl}/physical-spec-data-type`;
 
-    const findAll = () =>
-        $http.get(BASE)
+    const findBySpecificationId = (id) => {
+        return $http.get(`${BASE}/specification/${id}`)
             .then(result => result.data);
+    };
 
+    const findBySpecificationSelector = (options) => {
+        return $http.post(`${BASE}/specification/selector`, options)
+            .then(result => result.data);
+    };
 
     return {
-        findAll
+        findBySpecificationId,
+        findBySpecificationSelector
     };
 }
 
@@ -38,19 +44,18 @@ store.$inject = [
 ];
 
 
-const serviceName = 'DataTypeStore';
+export const serviceName = 'PhysicalSpecDataTypeStore';
 
 
-export const DataTypeStore_API = {
-    findAll: {
+export const PhysicalSpecDataTypeStore_API = {
+    findBySpecificationId: {
         serviceName,
-        serviceFnName: 'findAll',
-        description: 'finds all data types'
+        serviceFnName: 'findBySpecificationId',
+        description: 'finds data types for a given specification id'
+    },
+    findBySpecificationSelector: {
+        serviceName,
+        serviceFnName: 'findBySpecificationSelector',
+        description: 'finds data types for a given specification id selector'
     }
-};
-
-
-export default {
-    store,
-    serviceName
 };
