@@ -33,6 +33,7 @@ const bindings = {
 
 const initialState = {
     visibility: {
+        disjointNodePopup: false,
         logicalFlowPopup: false,
         annotationPopup: false,
         physicalFlowPopup: false
@@ -128,6 +129,26 @@ function mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateServ
                 action: (elm, d, i) =>
                     vm.issueCommands([{command: 'REMOVE_NODE', payload: d}])
             }
+        ]
+    }
+}
+
+
+function mkDisjointNodeMenu($timeout, vm, flowDiagramStateService) {
+    return (d) => {
+        return [
+            {
+                title: (d) => 'Add an actor or application',
+                action: (elm, d, i) => {
+                    $timeout(() => {
+                        const popup = {
+                            existingEntities: flowDiagramStateService.getAllEntities(),
+                        };
+                        vm.popup = popup;
+                        vm.visibility.disjointNodePopup = true;
+                    });
+                }
+            },
         ]
     }
 }
@@ -246,6 +267,7 @@ function controller($q,
     const vm = initialiseData(this, initialState);
 
     vm.contextMenus = {
+        canvas: mkDisjointNodeMenu($timeout, vm, flowDiagramStateService),
         node: mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateService),
         flowBucket: mkFlowBucketMenu($q, $timeout, vm,  flowDiagramStateService, physicalFlowStore, physicalSpecificationStore),
         annotation: mkAnnotationMenu(flowDiagramStateService.processCommands, $timeout, vm),
@@ -260,6 +282,7 @@ function controller($q,
 
     vm.onDismissPopup = () => {
         vm.visibility.annotationPopup = false;
+        vm.visibility.disjointNodePopup = false;
         vm.visibility.logicalFlowPopup = false;
         vm.visibility.physicalFlowPopup = false;
         vm.visibility.anyPopup = false;
