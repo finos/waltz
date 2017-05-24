@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from '../common';
-import _ from 'lodash';
+import {initialiseData} from "../common";
+import _ from "lodash";
 
 
 const template = require('./physical-flow-view.html');
@@ -119,15 +119,11 @@ function getSelectableSpecDefinitions(specDefinitions = [], selectedSpecDef) {
 }
 
 
-function loadFlowDiagrams(flowId, $q, flowDiagramStore, flowDiagramEntityStore) {
-    const ref = {
-        id: flowId,
-        kind: 'PHYSICAL_FLOW'
-    };
+function loadFlowDiagrams(flowRef, $q, flowDiagramStore, flowDiagramEntityStore) {
 
     const promises = [
-        flowDiagramStore.findByEntityReference(ref),
-        flowDiagramEntityStore.findByEntityReference(ref)
+        flowDiagramStore.findByEntityReference(flowRef),
+        flowDiagramEntityStore.findByEntityReference(flowRef)
     ];
     return $q
         .all(promises)
@@ -154,6 +150,11 @@ function controller($q,
     const vm = initialiseData(this, initialState);
 
     const flowId = $stateParams.id;
+    vm.entityReference = {
+        id: flowId,
+        kind: 'PHYSICAL_FLOW'
+    };
+
 
     // -- LOAD ---
 
@@ -175,7 +176,7 @@ function controller($q,
 
 
     vm.loadFlowDiagrams = () => {
-        loadFlowDiagrams(flowId, $q, flowDiagramStore, flowDiagramEntityStore)
+        loadFlowDiagrams(vm.entityReference, $q, flowDiagramStore, flowDiagramEntityStore)
             .then(r => Object.assign(vm, r));
     };
 

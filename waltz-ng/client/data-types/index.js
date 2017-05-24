@@ -16,7 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+import angular from "angular";
+import {registerStore} from "../common/module-utils";
+import dataTypeStore from "./services/data-type-store";
 
 
 export default () => {
@@ -24,8 +26,9 @@ export default () => {
 
     module.config(require('./routes'));
 
+    registerStore(module, dataTypeStore);
+
     module
-        .service('DataTypeStore', require('./services/data-type-store'))
         .service('DataTypeService', require('./services/data-type-service'))
         .service('DataTypeViewDataService', require('./services/data-type-view-data'));
 

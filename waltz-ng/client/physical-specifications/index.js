@@ -16,7 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+import angular from "angular";
+import {registerComponent} from "../common/module-utils";
+import * as physicalSpecDataTypeStore from "./services/physical-spec-data-type-store";
+import dataTypeList from "./components/data-type/physical-spec-data-type-list";
+import dataTypeSection from "./components/data-type/physical-spec-data-type-section";
 
 
 function setup() {
@@ -25,6 +29,9 @@ function setup() {
 
     module
         .config(require('./routes'));
+
+    registerComponent(module, dataTypeList);
+    registerComponent(module, dataTypeSection);
 
     module
         .component('waltzPhysicalDataSection', require('./components/physical-data-section/physical-data-section'))
@@ -37,9 +44,11 @@ function setup() {
 
     module
         .service('PhysicalSpecificationStore', require('./services/physical-specification-store'))
+        .service(physicalSpecDataTypeStore.serviceName, physicalSpecDataTypeStore.store)
         .service('PhysicalSpecDefinitionStore', require('./services/physical-spec-definition-store'))
         .service('PhysicalSpecDefinitionFieldStore', require('./services/physical-spec-definition-field-store'))
         .service('PhysicalSpecDefinitionSampleFileStore', require('./services/physical-spec-definition-sample-file-store'));
+
 
     return module.name;
 }

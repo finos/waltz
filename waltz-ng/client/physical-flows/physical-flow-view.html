@@ -103,8 +103,12 @@
             </div>
         </waltz-section-actions>
 
+        <waltz-physical-spec-data-type-list parent-entity-ref="ctrl.entityReference">
+        </waltz-physical-spec-data-type-list>
+
         <div class="row">
             <div class="col-sm-12">
+                <label>Current Definition</label>
                 <waltz-physical-spec-definition-panel spec-definition="ctrl.selectedSpecDefinition"
                                                       selectable-definitions="ctrl.selectableSpecDefinitions"
                                                       on-definition-select="ctrl.updateSpecDefinitionId">
