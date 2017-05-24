@@ -36,6 +36,16 @@
     </div>
 
 
+    <!-- DISJOINT NODE POPUP -->
+    <div class="wfde-pop waltz-fade-if"
+         ng-if="$ctrl.visibility.disjointNodePopup">
+        <waltz-flow-diagram-node-popup on-dismiss="$ctrl.onDismissPopup"
+                                       existing-entities="$ctrl.popup.existingEntities"
+                                       command-processor="$ctrl.issueCommands">
+        </waltz-flow-diagram-node-popup>
+    </div>
+
+
     <!-- EDITOR -->
     <div class="col-md-2">
         <h5>Flow Diagram Editor</h5>

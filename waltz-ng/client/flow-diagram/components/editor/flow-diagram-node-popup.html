@@ -1,0 +1,23 @@
+<h4>Add a new node</h4>
+<div>
+    <p class="small text-muted">
+        Nodes that already exist in the diagram will not appear in search
+    </p>
+</div>
+
+<div>
+    <waltz-entity-selector on-select="$ctrl.onNodeSelected"
+                           entity-kinds="['APPLICATION', 'ACTOR']"
+                           selection-filter="$ctrl.nodeSelectionFilter">
+    </waltz-entity-selector>
+</div>
+<hr>
+
+<a class="btn btn-success clickable"
+   ng-click="$ctrl.send()">
+    Add
+</a>
+<a class='clickable'
+   ng-click="$ctrl.onDismiss()">
+    Cancel
+</a>
