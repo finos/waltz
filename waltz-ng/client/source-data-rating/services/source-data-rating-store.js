@@ -18,10 +18,9 @@
 
 let loaderPromise = null;
 
-function service($http, baseUrl) {
+export function store($http, baseUrl) {
 
     const BASE = `${baseUrl}/source-data-rating`;
-
 
     const findAll = (force = false) => {
         if (loaderPromise && ! force) return loaderPromise;
@@ -38,7 +37,16 @@ function service($http, baseUrl) {
     };
 }
 
-service.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = ['$http', 'BaseApiUrl'];
 
 
-export default service;
+export const serviceName = 'SourceDataRatingStore';
+
+
+export const SourceDataRatingStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'retrieve all source data ratings'
+    },
+};

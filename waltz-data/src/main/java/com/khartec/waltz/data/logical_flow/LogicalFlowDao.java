@@ -108,8 +108,7 @@ public class LogicalFlowDao {
 
     public List<LogicalFlow> findByEntityReference(EntityReference ref) {
         return baseQuery()
-                .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(ref.id()))
-                .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id()))
+                .where(isSourceOrTargetCondition(ref))
                 .and(NOT_REMOVED)
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -117,8 +116,8 @@ public class LogicalFlowDao {
 
     public LogicalFlow findBySourceAndTarget(EntityReference source, EntityReference target) {
         return baseQuery()
-                .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(source.id()))
-                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(target.id()))
+                .where(isSourceCondition(source))
+                .and(isTargetCondition(target))
                 .and(NOT_REMOVED)
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
@@ -203,6 +202,22 @@ public class LogicalFlowDao {
 
 
     // -- HELPERS ---
+
+    private Condition isSourceOrTargetCondition(EntityReference ref) {
+        return isSourceCondition(ref)
+                .or(isTargetCondition(ref));
+    }
+
+    private Condition isTargetCondition(EntityReference ref) {
+        return LOGICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id())
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()));
+    }
+
+    private Condition isSourceCondition(EntityReference ref) {
+        return LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(ref.id())
+                    .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name()));
+    }
+
 
     private SelectJoinStep<Record> baseQuery() {
         return dsl

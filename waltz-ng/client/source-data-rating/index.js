@@ -17,6 +17,8 @@
  */
 
 import angular from 'angular';
+import * as sourceDataRatingStore from './services/source-data-rating-store';
+import {registerStore} from '../common/module-utils';
 
 
 export default () => {
@@ -25,8 +27,7 @@ export default () => {
     module
         .config(require('./routes'));
 
-    module
-        .service('SourceDataRatingStore', require('./services/source-data-rating-store'));
+    registerStore(module, sourceDataRatingStore);
 
     module
         .directive('waltzSourceDataInfo', require('./directives/source-data-info'))

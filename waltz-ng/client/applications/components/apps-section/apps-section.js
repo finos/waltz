@@ -18,12 +18,12 @@
 
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
+import {CORE_API} from '../../../common/services/core-api-utils';
 
 
 const bindings = {
-    apps: '<',
-    endUserApps: '<',
-    sourceDataRatings: '<',
+    parentEntityRef: '<',
+    scope: '@'
 };
 
 
@@ -37,13 +37,53 @@ const initialState = {
 const template = require('./apps-section.html');
 
 
+const DEFAULT_APP_SETTINGS = {
+    management: 'End User',
+    kind: 'EUC',
+    overallRating: 'Z'
+};
+
+
 function combine(apps = [], endUserApps = []) {
     return _.concat(apps, endUserApps);
 }
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    const refresh = () => {
+        vm.combinedApps = combine(vm.apps, vm.endUserApps);
+    };
+
+    vm.$onInit = () => {
+        const selectorOptions = {
+            entityReference: vm.parentEntityRef,
+            scope: vm.scope
+        };
+
+        serviceBroker
+            .loadAppData(CORE_API.SourceDataRatingStore.findAll, [])
+            .then(r => vm.sourceDataRatings = r.data);
+
+        serviceBroker
+            .loadViewData(CORE_API.ApplicationStore.findBySelector, [selectorOptions])
+            .then(r => r.data)
+            .then(apps => vm.apps = _.map(
+                apps,
+                a => _.assign(a, { management: 'IT' })))
+            .then(refresh);
+
+        if (vm.parentEntityRef.kind === 'ORG_UNIT') {
+            serviceBroker
+                .loadViewData(CORE_API.EndUserAppStore.findBySelector, [selectorOptions])
+                .then(r => r.data)
+                .then(endUserApps => vm.endUserApps = _.map(
+                    endUserApps,
+                    a => _.assign(a, { platform: a.kind }, DEFAULT_APP_SETTINGS)))
+                .then(refresh);
+        }
+    };
 
     vm.$onChanges = () => {
         vm.combinedApps = combine(vm.apps, vm.endUserApps);
@@ -55,7 +95,9 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    'ServiceBroker'
+];
 
 
 const component = {

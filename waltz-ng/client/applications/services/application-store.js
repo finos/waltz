@@ -17,7 +17,7 @@
  */
 
 
-function service($http, BaseApiUrl) {
+export function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/app`;
 
 
@@ -86,10 +86,60 @@ function service($http, BaseApiUrl) {
 }
 
 
-service.$inject = [
+store.$inject = [
     '$http',
     'BaseApiUrl',
 ];
 
 
-export default service;
+export const serviceName = 'ApplicationStore';
+
+
+export const ApplicationStore_API = {
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'retrieve a single app (or null) given an id'
+    },
+    getAppTagsById: {
+        serviceName,
+        serviceFnName: 'getAppTagsById',
+        description: 'find tags for the given app'
+    },
+    findRelatedById: {
+        serviceName,
+        serviceFnName: 'findRelatedById',
+        description: 'find related apps for the given app id'
+    },
+    findByIds: {
+        serviceName,
+        serviceFnName: 'findByIds',
+        description: 'find apps for the given list of app ids'
+    },
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'find apps for the given selector options'
+    },
+    countByOrganisationalUnit: {
+        serviceName,
+        serviceFnName: 'countByOrganisationalUnit',
+        description: 'returns number of apps in the given ou'
+    },
+    registerNewApp: {
+        serviceName,
+        serviceFnName: 'registerNewApp',
+        description: 'registers a new application'
+    },
+    search: {
+        serviceName,
+        serviceFnName: 'search',
+        description: 'find apps for the given search terms'
+    },
+    update: {
+        serviceName,
+        serviceFnName: 'update',
+        description: 'updates an application'
+    }
+};
+

@@ -18,23 +18,29 @@
  *
  */
 
+import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
 import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
+import {EndUserAppStore_API as EndUserAppStore} from "../../end-user-apps/services/end-user-app-store";
 import {EntityNamedNoteStore_API as EntityNamedNoteStore} from "../../entity-named-note/services/entity-named-note-store";
 import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../entity-named-note/services/entity-named-note-type-store";
 import {MeasurableStore_API as MeasurableStore} from "../../measurable/services/measurable-store";
 import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../measurable-category/services/measurable-category-store";
 import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from "../../measurable-relationship/services/measurable-relationship-store";
 import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
+import {SourceDataRatingStore_API as SourceDataRatingStore} from "../../source-data-rating/services/source-data-rating-store";
 
 
 export const CORE_API = {
+    ApplicationStore,
     DataTypeStore,
+    EndUserAppStore,
     EntityNamedNoteStore,
     EntityNamedNoteTypeStore,
     MeasurableStore,
     MeasurableCategoryStore,
     MeasurableRelationshipStore,
-    PhysicalSpecDataTypeStore
+    PhysicalSpecDataTypeStore,
+    SourceDataRatingStore
 };
 
 

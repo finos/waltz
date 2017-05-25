@@ -39,6 +39,11 @@ function controller(
     const vm = initialiseData(this, initialState);
     const diagramId = $stateParams.id;
 
+    vm.entityReference = {
+        id: diagramId,
+        kind: 'FLOW_DIAGRAM'
+    };
+
     const loadVisibility = () =>
         vm.visibility.layers = flowDiagramStateService.getState().visibility.layers;
 
