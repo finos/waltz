@@ -31,9 +31,15 @@ export function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
+    const save = (specId, command) => {
+        return $http.post(`${BASE}/specification/${specId}`, command)
+            .then(result => result.data);
+    };
+
     return {
         findBySpecificationId,
-        findBySpecificationSelector
+        findBySpecificationSelector,
+        save
     };
 }
 
@@ -57,5 +63,10 @@ export const PhysicalSpecDataTypeStore_API = {
         serviceName,
         serviceFnName: 'findBySpecificationSelector',
         description: 'finds data types for a given specification id selector'
+    },
+    save: {
+        serviceName,
+        serviceFnName: 'save',
+        description: 'saves (inserts/deletes) data types for a given specification id'
     }
 };
