@@ -29,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
@@ -56,9 +58,17 @@ public class PhysicalSpecificationSelectorFactory implements IdSelectorFactory {
                 return mkForLogicalFlow(options);
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
+            case PHYSICAL_SPECIFICATION:
+                return mkForSpecification(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: "+options);
         }
+    }
+
+
+    private Select<Record1<Long>> mkForSpecification(IdSelectionOptions options) {
+        checkTrue(options.scope() == EXACT, "Can only create selector for exact matches if given a spec ref");
+        return DSL.select(DSL.val(options.entityReference().id()));
     }
 
 

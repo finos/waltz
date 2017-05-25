@@ -17,14 +17,16 @@ const initialState = {
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const selectorOptions = {
-        entityReference: vm.parentEntityRef,
-        scope: 'EXACT'
-    };
+    vm.$onChanges = () => {
+        const selectorOptions = {
+            entityReference: vm.parentEntityRef,
+            scope: 'EXACT'
+        };
 
-    serviceBroker
-        .loadViewData(CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector, [selectorOptions])
-        .then(result => vm.specDataTypes = result.data);
+        serviceBroker
+            .loadViewData(CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector, [selectorOptions])
+            .then(result => vm.specDataTypes = result.data);
+    };
 }
 
 
