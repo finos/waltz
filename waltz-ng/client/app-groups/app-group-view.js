@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash';
-
+import {CORE_API} from '../common/services/core-api-utils';
 
 const initialState = {
     applications: [],
@@ -49,8 +49,8 @@ const initialState = {
 function controller($scope,
                     $q,
                     $stateParams,
+                    serviceBroker,
                     appGroupStore,
-                    appStore,
                     assetCostViewService,
                     bookmarkStore,
                     changeInitiativeStore,
@@ -119,16 +119,16 @@ function controller($scope,
         })
         .then(groupDetail => _.map(groupDetail.applications, 'id'))
         .then(appIds => $q.all([
-            appStore.findByIds(appIds),
+            serviceBroker.loadViewData(CORE_API.ApplicationStore.findBySelector, [ idSelector ]),
             complexityStore.findBySelector(id, 'APP_GROUP', 'EXACT'),
             technologyStatsService.findBySelector(id, 'APP_GROUP', 'EXACT')
         ]))
         .then(([
-            apps,
+            appsResponse,
             complexity,
             techStats
         ]) => {
-            vm.applications = _.map(apps, a => _.assign(a, {management: 'IT'}));
+            vm.applications = _.map(appsResponse.data, a => _.assign(a, {management: 'IT'}));
             vm.complexity = complexity;
             vm.techStats = techStats;
         })
@@ -187,8 +187,8 @@ controller.$inject = [
     '$scope',
     '$q',
     '$stateParams',
+    'ServiceBroker',
     'AppGroupStore',
-    'ApplicationStore',
     'AssetCostViewService',
     'BookmarkStore',
     'ChangeInitiativeStore',

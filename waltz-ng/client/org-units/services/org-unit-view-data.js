@@ -18,7 +18,7 @@
 
 import _ from 'lodash';
 import {aggregatePeopleInvolvements} from '../../involvement/involvement-utils';
-
+import {CORE_API} from '../../common/services/core-api-utils';
 
 function mkRef(orgUnitId) {
     return {
@@ -55,11 +55,11 @@ function loadImmediateHierarchy(store, id, holder) {
 }
 
 
-function loadApps(store, selector, holder) {
-    return store
-        .findBySelector(selector)
-        .then(apps => _.map(
-            apps,
+function loadApps(serviceBroker, selector, holder) {
+    return serviceBroker
+        .loadViewData(CORE_API.ApplicationStore.findBySelector, [selector])
+        .then(r => _.map(
+            r.data,
             a => _.assign(a, { management: 'IT' })))
         .then(apps => holder.apps = apps);
 }
@@ -95,23 +95,6 @@ function loadAuthSources(store, id, holder) {
 }
 
 
-function loadEndUserApps(store, selector, holder) {
-    return store
-        .findBySelector(selector)
-        .then(apps => _.map(
-                apps,
-                a => _.assign(
-                    a,
-                    {
-                        management: 'End User',
-                        platform: a.kind,
-                        kind: 'EUC',
-                        overallRating: 'Z'
-                    })))
-        .then(apps => holder.endUserApps = apps);
-}
-
-
 function loadComplexity(store, id, holder) {
     return store
         .findBySelector(id, 'ORG_UNIT', 'CHILDREN')
@@ -133,10 +116,10 @@ function loadBookmarks(store, id, holder) {
 }
 
 
-function loadSourceDataRatings(store, holder) {
-    return store
-        .findAll()
-        .then(r => holder.sourceDataRatings = r);
+function loadSourceDataRatings(serviceBroker, holder) {
+    return serviceBroker
+        .loadViewData(CORE_API.SourceDataRatingStore.findAll, [])
+        .then(r => holder.sourceDataRatings = r.data);
 }
 
 
@@ -176,13 +159,12 @@ function loadMeasurableRatings(store, selector, holder) {
 
 
 function service($q,
-                 appStore,
+                 serviceBroker,
                  assetCostViewService,
                  authSourcesStore,
                  bookmarkStore,
                  changeLogStore,
                  complexityStore,
-                 endUserAppStore,
                  entityStatisticStore,
                  involvementStore,
                  logicalFlowViewService,
@@ -190,7 +172,6 @@ function service($q,
                  measurableCategoryStore,
                  measurableRatingStore,
                  orgUnitStore,
-                 sourceDataRatingStore,
                  techStatsService) {
 
     const rawData = {};
@@ -220,7 +201,7 @@ function service($q,
         return $q.all([
             loadOrgUnit(orgUnitStore, orgUnitId, rawData),
             loadImmediateHierarchy(orgUnitStore, orgUnitId, rawData),
-            loadApps(appStore, selector, rawData),
+            loadApps(serviceBroker, selector, rawData),
             loadMeasurables(measurableStore, selector, rawData),
             loadMeasurableCategories(measurableCategoryStore, rawData),
             loadMeasurableRatings(measurableRatingStore, selector, rawData),
@@ -243,10 +224,7 @@ function service($q,
 
 
     function loadThirdWave(orgUnitId) {
-        const selector = mkSelector(orgUnitId);
-
         return $q.all([
-            loadEndUserApps(endUserAppStore, selector, rawData),
             loadBookmarks(bookmarkStore, orgUnitId, rawData),
             loadTechStats(techStatsService, orgUnitId, rawData),
         ]);
@@ -256,7 +234,7 @@ function service($q,
     function loadFourthWave(orgUnitId) {
         const ref = mkRef(orgUnitId);
         return $q.all([
-            loadSourceDataRatings(sourceDataRatingStore, rawData),
+            loadSourceDataRatings(serviceBroker, rawData),
             loadChangeLogs(changeLogStore, ref, rawData)
         ]);
     }
@@ -310,13 +288,12 @@ function service($q,
 
 service.$inject = [
     '$q',
-    'ApplicationStore',
+    'ServiceBroker',
     'AssetCostViewService',
     'AuthSourcesStore',
     'BookmarkStore',
     'ChangeLogStore',
     'ComplexityStore',
-    'EndUserAppStore',
     'EntityStatisticStore',
     'InvolvementStore',
     'LogicalFlowViewService',
@@ -324,7 +301,6 @@ service.$inject = [
     'MeasurableCategoryStore',
     'MeasurableRatingStore',
     'OrgUnitStore',
-    'SourceDataRatingStore',
     'TechnologyStatisticsService',
 ];
 

@@ -22,6 +22,7 @@ import {getParents, populateParents} from '../common/hierarchy-utils';
 import {aggregatePeopleInvolvements} from '../involvement/involvement-utils';
 
 import template from './measurable-view.html';
+import {CORE_API} from '../common/services/core-api-utils';
 
 
 const initialState = {
@@ -41,7 +42,7 @@ function logHistory(measurable, historyStore) {
 function controller($q,
                     $scope,
                     $stateParams,
-                    applicationStore,
+                    serviceBroker,
                     assetCostViewService,
                     bookmarkStore,
                     changeLogStore,
@@ -54,7 +55,6 @@ function controller($q,
                     measurableStore,
                     measurableCategoryStore,
                     measurableRatingStore,
-                    sourceDataRatingStore,
                     technologyStatsService) {
 
     const id = $stateParams.id;
@@ -99,9 +99,8 @@ function controller($q,
             measurableRatingStore
                 .statsForRelatedMeasurables(id)
                 .then(rs => vm.relatedStats = rs),
-            applicationStore
-                .findBySelector(childrenSelector)
-                .then(apps => vm.applications = apps),
+            serviceBroker.loadViewData(CORE_API.ApplicationStore.findBySelector, [childrenSelector])
+                .then(r => vm.applications = r.data),
             logicalFlowViewService
                 .initialise(childrenSelector)
                 .then(flowView => vm.logicalFlowView = flowView),
@@ -130,9 +129,8 @@ function controller($q,
 
     const loadWave4 = () =>
         $q.all([
-            sourceDataRatingStore
-                .findAll()
-                .then(sourceDataRatings => vm.sourceDataRatings = sourceDataRatings),
+            serviceBroker.loadAppData(CORE_API.SourceDataRatingStore.findAll, [])
+                .then(r => vm.sourceDataRatings = r.data),
             changeLogStore
                 .findByEntityReference(ref)
                 .then(changeLogs => vm.changeLogs = changeLogs),
@@ -189,7 +187,7 @@ controller.$inject = [
     '$q',
     '$scope',
     '$stateParams',
-    'ApplicationStore',
+    'ServiceBroker',
     'AssetCostViewService',
     'BookmarkStore',
     'ChangeLogStore',
@@ -202,7 +200,6 @@ controller.$inject = [
     'MeasurableStore',
     'MeasurableCategoryStore',
     'MeasurableRatingStore',
-    'SourceDataRatingStore',
     'TechnologyStatisticsService'
 ];
 
