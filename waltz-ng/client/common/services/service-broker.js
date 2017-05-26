@@ -18,11 +18,12 @@
  *
  */
 
-import _ from 'lodash';
-import moment from 'moment';
-import stringify from 'json-stable-stringify';
+import _ from "lodash";
+import moment from "moment";
+import stringify from "json-stable-stringify";
 
-import {initialiseData} from '../../common'
+import {initialiseData} from "../../common";
+import {checkIsArray, checkIsServiceBrokerOptions, checkIsServiceBrokerTarget} from "../checks";
 
 const initialState = {
     viewData: new Map(),
@@ -85,13 +86,19 @@ function registerCacheRefreshListener(cacheRefreshListenersMap, cacheKey, cacheR
 }
 
 
+function performChecks(target, targetParams, options) {
+    checkIsServiceBrokerTarget(target, 'target must have the correct properties');
+    checkIsArray(targetParams, 'targetParams must be an array');
+    checkIsServiceBrokerOptions(options, 'options must have the correct properties');
+}
+
 
 function loadData($injector,
                   cache,
                   cacheRefreshListenersMap,
                   target,
                   targetParams = [],
-                  options = {}) {
+                  options) {
 
     const {serviceName, serviceFnName} = target;
     const {force = false, cacheRefreshListener} = options;
@@ -134,6 +141,8 @@ function service($injector) {
                           targetParams = [],
                           options = { force: false }) => {
 
+        performChecks(target, targetParams, options);
+
         return loadData($injector,
                         vm.viewData,
                         vm.viewDataCacheRefreshListeners,
@@ -144,7 +153,10 @@ function service($injector) {
 
     const loadAppData = (target,
                          targetParams = [],
-                         options= { force: false }) => {
+                         options = { force: false }) => {
+
+        performChecks(target, targetParams, options);
+
         return loadData($injector,
                         vm.appData,
                         vm.appDataCacheRefreshListeners,
@@ -155,7 +167,10 @@ function service($injector) {
 
     const execute = (target,
                      targetParams = [],
-                     options) => {
+                     options = {}) => {
+
+        performChecks(target, targetParams, options);
+
         const {serviceName, serviceFnName} = target;
         const service = $injector.get(serviceName);
         const serviceFn = getFunction(service, serviceName, serviceFnName);
