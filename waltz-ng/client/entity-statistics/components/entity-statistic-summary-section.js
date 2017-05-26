@@ -17,12 +17,12 @@
  */
 
 import {resetData} from "../../common";
+import {CORE_API} from "../../common/services/core-api-utils";
+import {mkSelectionOptions} from "../../common/selector-utils";
 
 
 const bindings = {
-    name: '@',
-    definitions: '<',
-    parentRef: '<'
+    parentEntityRef: '<'
 };
 
 
@@ -38,8 +38,12 @@ const initData = {
 const template = require('./entity-statistic-summary-section.html');
 
 
-function controller(entityStatisticStore) {
+function controller(serviceBroker) {
     const vm = resetData(this, initData);
+
+    serviceBroker
+        .loadAppData(CORE_API.EntityStatisticStore.findAllActiveDefinitions, [])
+        .then(result => vm.definitions = result.data);
 
     vm.onDefinitionSelection = (d) => {
         vm.activeDefinition = d;
@@ -48,12 +52,13 @@ function controller(entityStatisticStore) {
             vm.activeSummary = vm.summaries[d.id];
         } else {
             vm.loading = true;
-            entityStatisticStore
-                .findStatTallies([d.id], { entityReference: vm.parentRef, scope: 'CHILDREN' })
-                .then(summaries => {
+            const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
+            serviceBroker
+                .loadViewData(CORE_API.EntityStatisticStore.findStatTallies, [[d.id], selectionOptions])
+                .then(result => {
                     vm.loading = false;
-                    vm.summaries[d.id] = summaries[0];
-                    vm.activeSummary = summaries[0];
+                    vm.summaries[d.id] = result.data[0];
+                    vm.activeSummary = result.data[0];
                 });
         }
     };
@@ -61,7 +66,7 @@ function controller(entityStatisticStore) {
 
 
 controller.$inject = [
-    'EntityStatisticStore'
+    'ServiceBroker'
 ];
 
 

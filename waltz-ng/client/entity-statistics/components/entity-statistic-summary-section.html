@@ -1,5 +1,5 @@
 <div>
-    <waltz-section name="{{ $ctrl.name }}"
+    <waltz-section name="Indicators"
                    icon="pie-chart"
                    id="entity-statistics-section">
 
@@ -42,7 +42,7 @@
                      class="waltz-fade-if">
                     <waltz-entity-statistic-summary-card summary="$ctrl.activeSummary"
                                                          definition="$ctrl.activeDefinition"
-                                                         parent-ref="$ctrl.parentRef"
+                                                         parent-ref="$ctrl.parentEntityRef"
                                                          sub-title="{{$ctrl.activeDefinition.category | toDisplayName:'entityStatistic'}}">
                     </waltz-entity-statistic-summary-card>
                 </div>

@@ -18,6 +18,7 @@
 import _ from "lodash";
 import {resetData} from "../common";
 import {kindToViewState} from "../common/link-utils";
+import {mkSelectionOptions} from "../common/selector-utils";
 import {hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload} from "./utilities";
 
 
@@ -106,10 +107,7 @@ function controller($q,
     }
 
     function loadHistory() {
-        const selector = {
-            scope: 'CHILDREN',
-            entityReference: vm.parentRef
-        };
+        const selector = mkSelectionOptions(vm.parentRef);
 
         entityStatisticStore
             .calculateHistoricStatTally(vm.statistic.definition, selector, vm.duration)
@@ -131,10 +129,7 @@ function controller($q,
         vm.parentRef = entityReference;
 
 
-        const selector = {
-            scope: 'CHILDREN',
-            entityReference
-        };
+        const selector = mkSelectionOptions(entityReference);
 
         entityStatisticStore
             .calculateStatTally(vm.statistic.definition, selector)

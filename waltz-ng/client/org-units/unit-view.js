@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './unit-view.html';
+import template from "./unit-view.html";
 
 
 const addToHistory = (historyStore, orgUnit) => {
@@ -39,7 +39,6 @@ function initTour(tourService, holder = {}) {
 function controller($stateParams,
                     $scope,
                     viewDataService,
-                    assetCostStore,
                     historyStore,
                     involvedSectionService,
                     tourService) {
@@ -93,7 +92,6 @@ controller.$inject = [
     '$stateParams',
     '$scope',
     'OrgUnitViewDataService',
-    'AssetCostStore',
     'HistoryStore',
     'InvolvedSectionService',
     'TourService'

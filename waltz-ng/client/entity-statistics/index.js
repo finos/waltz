@@ -17,8 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-
+import angular from "angular";
+import {registerStore} from "../common/module-utils";
+import entityStatisticStore from "./services/entity-statistic-store";
 
 export default () => {
 
@@ -27,8 +28,9 @@ export default () => {
     module
         .config(require('./routes'));
 
+    registerStore(module, entityStatisticStore);
+
     module
-        .service('EntityStatisticStore', require('./services/entity-statistic-store'))
         .service('EntityStatisticUtilities', require('./services/entity-statistics-utilities'));
 
     module

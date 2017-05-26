@@ -132,10 +132,8 @@
 
 
     <!-- INDICATORS -->
-    <waltz-entity-statistic-summary-section name="Indicators"
-                                            ng-if="ctrl.hasInvolvements"
-                                            definitions="ctrl.entityStatisticDefinitions"
-                                            parent-ref="ctrl.entityRef">
+    <waltz-entity-statistic-summary-section parent-entity-ref="ctrl.entityRef"
+                                            ng-if="ctrl.hasInvolvements">
     </waltz-entity-statistic-summary-section>
 
 

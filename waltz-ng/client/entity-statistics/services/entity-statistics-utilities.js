@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
 
 
 /**
@@ -33,6 +33,7 @@ function filterBySameMeasurableCategory(all, id) {
 
 
 function utils(appGroupStore,
+               flowDiagramStore,
                measurableStore,
                orgUnitStore) {
 
@@ -49,6 +50,10 @@ function utils(appGroupStore,
             case 'ORG_UNIT':
                 return orgUnitStore
                     .findAll();
+            case 'FLOW_DIAGRAM':
+                return flowDiagramStore
+                    .getById(id)
+                    .then(fd => [fd]);
             default :
                 throw `esu: Cannot create hierarchy for kind - ${kind}`;
         }
@@ -62,6 +67,7 @@ function utils(appGroupStore,
 
 utils.$inject = [
     'AppGroupStore',
+    'FlowDiagramStore',
     'MeasurableStore',
     'OrgUnitStore'
 ];

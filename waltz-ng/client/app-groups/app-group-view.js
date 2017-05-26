@@ -16,10 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {CORE_API} from '../common/services/core-api-utils';
+import _ from "lodash";
+import {CORE_API} from "../common/services/core-api-utils";
 
-import template from './app-group-view.html';
+import template from "./app-group-view.html";
 
 
 const initialState = {
@@ -30,7 +30,6 @@ const initialState = {
     changeInitiatives: [],
     complexity: [],
     dataFlows : null,
-    entityStatisticDefinitions: [],
     flowOptions: null,
     groupDetail: null,
     initiallySelectedIds: [],
@@ -58,7 +57,6 @@ function controller($scope,
                     bookmarkStore,
                     changeLogStore,
                     complexityStore,
-                    entityStatisticStore,
                     historyStore,
                     logicalFlowViewService,
                     measurableStore,
@@ -136,10 +134,6 @@ function controller($scope,
         .whoami()
         .then(u => vm.user = u);
 
-    entityStatisticStore
-        .findAllActiveDefinitions()
-        .then(definitions => vm.entityStatisticDefinitions = definitions);
-
 
     // -- INTERACT ---
 
@@ -187,7 +181,6 @@ controller.$inject = [
     'BookmarkStore',
     'ChangeLogStore',
     'ComplexityStore',
-    'EntityStatisticStore',
     'HistoryStore',
     'LogicalFlowViewService',
     'MeasurableStore',
