@@ -28,6 +28,7 @@ import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../meas
 import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from "../../measurable-relationship/services/measurable-relationship-store";
 import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
 import {SourceDataRatingStore_API as SourceDataRatingStore} from "../../source-data-rating/services/source-data-rating-store";
+import {TechnologyStatisticsService_API as TechnologyStatisticsService} from "../../technology/services/technology-statistics-service";
 
 
 export const CORE_API = {
@@ -40,12 +41,11 @@ export const CORE_API = {
     MeasurableCategoryStore,
     MeasurableRelationshipStore,
     PhysicalSpecDataTypeStore,
-    SourceDataRatingStore
+    SourceDataRatingStore,
+    TechnologyStatisticsService
 };
 
 
 export function getApiReference(serviceName, serviceFnName) {
     return CORE_API[serviceName][serviceFnName];
 }
-
-

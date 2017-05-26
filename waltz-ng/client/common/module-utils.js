@@ -20,5 +20,5 @@ export const registerService = (module, serviceDefinition) => {
     ensureNotNull(module, 'must provide a module');
     checkIsServiceDefinition(serviceDefinition);
 
-    module.service(serviceDefinition.id, serviceDefinition.service);
+    module.service(serviceDefinition.serviceName, serviceDefinition.service);
 };

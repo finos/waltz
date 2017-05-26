@@ -54,8 +54,7 @@ function controller($q,
                     logicalFlowViewService,
                     measurableStore,
                     measurableCategoryStore,
-                    measurableRatingStore,
-                    technologyStatsService) {
+                    measurableRatingStore) {
 
     const id = $stateParams.id;
     const ref = { id, kind: 'MEASURABLE' };
@@ -122,9 +121,6 @@ function controller($q,
             assetCostViewService
                 .initialise(childrenSelector, 2016)
                 .then(costs => vm.assetCostData = costs),
-            technologyStatsService
-                .findBySelector(childrenSelector)
-                .then(techStats => vm.techStats = techStats)
         ]);
 
     const loadWave4 = () =>
@@ -199,8 +195,7 @@ controller.$inject = [
     'LogicalFlowViewService',
     'MeasurableStore',
     'MeasurableCategoryStore',
-    'MeasurableRatingStore',
-    'TechnologyStatisticsService'
+    'MeasurableRatingStore'
 ];
 
 

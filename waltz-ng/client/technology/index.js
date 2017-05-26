@@ -16,10 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
+import {registerService} from '../common/module-utils';
+import * as TechnologyStatisticsService from './services/technology-statistics-service';
 
 
 export default () => {
     const module = angular.module('waltz.technology', []);
+
+    registerService(module, TechnologyStatisticsService);
 
     module
         .directive('waltzTechnologySection', require('./directives/technology-section'));
@@ -29,8 +33,6 @@ export default () => {
         .component('waltzTechnologySummaryPies', require('./components/technology-summary-pies'))
         .component('waltzTechnologySummarySection', require('./components/technology-summary-section'));
 
-    module
-        .service('TechnologyStatisticsService', require('./services/technology-statistics-service'));
 
     return module.name;
 };

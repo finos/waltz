@@ -102,13 +102,6 @@ function loadComplexity(store, id, holder) {
 }
 
 
-function loadTechStats(service, id, holder) {
-    return service
-        .findBySelector(id, 'ORG_UNIT', 'CHILDREN')
-        .then(r => holder.techStats = r);
-}
-
-
 function loadBookmarks(store, id, holder) {
     return store
         .findByParent({id, kind: 'ORG_UNIT'})
@@ -171,8 +164,7 @@ function service($q,
                  measurableStore,
                  measurableCategoryStore,
                  measurableRatingStore,
-                 orgUnitStore,
-                 techStatsService) {
+                 orgUnitStore) {
 
     const rawData = {};
 
@@ -226,7 +218,6 @@ function service($q,
     function loadThirdWave(orgUnitId) {
         return $q.all([
             loadBookmarks(bookmarkStore, orgUnitId, rawData),
-            loadTechStats(techStatsService, orgUnitId, rawData),
         ]);
     }
 
@@ -300,8 +291,7 @@ service.$inject = [
     'MeasurableStore',
     'MeasurableCategoryStore',
     'MeasurableRatingStore',
-    'OrgUnitStore',
-    'TechnologyStatisticsService',
+    'OrgUnitStore'
 ];
 
 

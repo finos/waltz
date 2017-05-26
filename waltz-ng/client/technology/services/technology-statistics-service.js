@@ -18,7 +18,7 @@
 import _ from 'lodash';
 
 
-function service($q,
+export function service($q,
                  serverInfoStore,
                  databaseStore,
                  softwareCatalogStore) {
@@ -53,6 +53,7 @@ function service($q,
     }
 }
 
+
 service.$inject = [
     '$q',
     'ServerInfoStore',
@@ -61,4 +62,13 @@ service.$inject = [
 ];
 
 
-export default service;
+export const serviceName = 'TechnologyStatisticsService';
+
+
+export const TechnologyStatisticsService_API = {
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'find stats for the given app selector'
+    },
+};

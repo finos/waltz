@@ -17,18 +17,17 @@
  */
 import _ from "lodash";
 import {initialiseData} from "../../common";
+import {CORE_API} from '../../common/services/core-api-utils';
 
 
 const bindings = {
-    stats: '<',
-    sourceDataRatings: '<'
+    parentEntityRef: '<',
+    scope: '@'
 };
 
 
 const initialState = {
-    stats: {
-
-    },
+    stats: {},
     hasAnyData: false
 };
 
@@ -36,22 +35,38 @@ const initialState = {
 const template = require('./technology-summary-section.html');
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
-        if (vm.stats) {
-            const hasServerStats = (vm.stats.serverStats && !_.isEmpty(vm.stats.serverStats.environmentCounts));
-            const hasDbStats = (vm.stats.databaseStats && !_.isEmpty(vm.stats.databaseStats.environmentCounts));
-            const hasSwStats = (vm.stats.softwareStats && !_.isEmpty(vm.stats.softwareStats.vendorCounts));
+    vm.$onInit = () => {
+        const selector = {
+            entityReference: vm.parentEntityRef,
+            scope: vm.scope
+        };
 
-            vm.hasAnyData = hasServerStats || hasDbStats || hasSwStats;
-        }
+        serviceBroker
+            .loadAppData(CORE_API.SourceDataRatingStore.findAll)
+            .then(r => vm.sourceDataRatings = r.data);
+
+        serviceBroker
+            .loadViewData(CORE_API.TechnologyStatisticsService.findBySelector, [selector])
+            .then(r => {
+                vm.stats = r.data;
+                const {serverStats = {}, databaseStats = {}, softwareStats = {}} = vm.stats;
+
+                const hasServerStats = (serverStats && !_.isEmpty(serverStats.environmentCounts));
+                const hasDbStats = (databaseStats && !_.isEmpty(databaseStats.environmentCounts));
+                const hasSwStats = (softwareStats && !_.isEmpty(softwareStats.vendorCounts));
+
+                vm.hasAnyData = hasServerStats || hasDbStats || hasSwStats;
+            });
     };
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    'ServiceBroker'
+];
 
 
 const component = {

@@ -87,8 +87,7 @@ function service($q,
                  involvementKindService,
                  logicalFlowViewService,
                  personStore,
-                 sourceDataRatingStore,
-                 techStatsService) {
+                 sourceDataRatingStore) {
 
     const state = { model: initModel };
 
@@ -214,12 +213,6 @@ function service($q,
     }
 
 
-    function loadTechStats(personId) {
-        return techStatsService
-            .findBySelector(personId, 'PERSON', 'CHILDREN')
-            .then(stats => state.model.techStats = stats);
-    }
-
     function loadSourceDataRatings()
     {
         return sourceDataRatingStore
@@ -261,7 +254,6 @@ function service($q,
         const personId = state.model.person.id;
         return $q
             .all([
-                loadTechStats(personId),
                 loadComplexity(personId),
                 loadChangeInitiatives(employeeId)
             ]);
@@ -320,8 +312,7 @@ service.$inject = [
     'InvolvementKindService',
     'LogicalFlowViewService',
     'PersonStore',
-    'SourceDataRatingStore',
-    'TechnologyStatisticsService'
+    'SourceDataRatingStore'
 ];
 
 export default service;
