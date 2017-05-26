@@ -34,7 +34,7 @@
                        ng-model="userFilterQuery"
                        ng-minlength="3">
                 <div class="text-danger"
-                     ng-if="ctrl.users.length > ctrl.countAllowedWithoutFilter && !userFilterQuery">
+                     ng-if="ctrl.users.length > ctrl.numAllowedWithoutFilter && !userFilterQuery">
                     <br>
                     Too many results, please enter at least 3 characters to filter
                 </div>
@@ -62,7 +62,7 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="user in ctrl.users | orderBy:'userName' | filter:userFilterQuery"
-                    ng-if="ctrl.users.length <= ctrl.countAllowedWithoutFilter || userFilterQuery"
+                    ng-if="ctrl.users.length <= ctrl.numAllowedWithoutFilter || userFilterQuery"
                     ng-click="ctrl.userSelected(user)"
                     ng-class="{ 'waltz-user-admin-selected' : user == ctrl.selectedUser }">
                     <td>

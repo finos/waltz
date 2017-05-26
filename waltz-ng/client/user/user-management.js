@@ -22,7 +22,7 @@ import {initialiseData} from "../common";
 
 
 const initialState = {
-    countAllowedWithoutFilter: 100
+    numAllowedWithoutFilter: 100
 };
 
 
