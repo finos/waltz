@@ -18,10 +18,17 @@
  */
 
 import _ from "lodash";
+import {initialiseData} from "../common";
+
+
+const initialState = {
+    numAllowedWithoutFilter: 100
+};
+
 
 function controller(userStore) {
 
-    const vm = this;
+    const vm =  initialiseData(this, initialState);
 
     userStore.findAll().then(users => vm.users = users);
 
