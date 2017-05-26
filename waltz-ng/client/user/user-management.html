@@ -57,6 +57,7 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="user in ctrl.users | orderBy:'userName' | filter:userQuery"
+                    ng-if="userQuery"
                     ng-click="ctrl.userSelected(user)"
                     ng-class="{ 'waltz-user-admin-selected' : user == ctrl.selectedUser }">
                     <td>
