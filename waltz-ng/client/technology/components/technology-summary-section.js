@@ -76,4 +76,10 @@ const component = {
 };
 
 
-export default component;
+const id = "waltzTechnologySummarySection";
+
+
+export default {
+    id,
+    component
+};

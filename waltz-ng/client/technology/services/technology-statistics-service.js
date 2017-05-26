@@ -18,7 +18,7 @@
 import _ from 'lodash';
 
 
-export function service($q,
+function service($q,
                  serverInfoStore,
                  databaseStore,
                  softwareCatalogStore) {
@@ -50,7 +50,7 @@ export function service($q,
 
     return {
         findBySelector
-    }
+    };
 }
 
 
@@ -62,7 +62,13 @@ service.$inject = [
 ];
 
 
-export const serviceName = 'TechnologyStatisticsService';
+const serviceName = 'TechnologyStatisticsService';
+
+
+export default {
+    service,
+    serviceName
+};
 
 
 export const TechnologyStatisticsService_API = {

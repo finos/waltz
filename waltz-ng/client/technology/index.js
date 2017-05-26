@@ -16,8 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
-import {registerService} from '../common/module-utils';
-import * as TechnologyStatisticsService from './services/technology-statistics-service';
+import {registerService, registerComponents} from '../common/module-utils';
+import TechnologyStatisticsService from './services/technology-statistics-service';
+import TechnologySummarySection from './components/technology-summary-section';
+import GroupTechnologySummary from './components/group-technology-summary';
+import TechnologySummaryPies from './components/technology-summary-pies';
 
 
 export default () => {
@@ -25,14 +28,14 @@ export default () => {
 
     registerService(module, TechnologyStatisticsService);
 
+    registerComponents(module, [
+        GroupTechnologySummary,
+        TechnologySummaryPies,
+        TechnologySummarySection
+    ]);
+
     module
         .directive('waltzTechnologySection', require('./directives/technology-section'));
-
-    module
-        .component('waltzGroupTechnologySummary', require('./components/group-technology-summary'))
-        .component('waltzTechnologySummaryPies', require('./components/technology-summary-pies'))
-        .component('waltzTechnologySummarySection', require('./components/technology-summary-section'));
-
 
     return module.name;
 };

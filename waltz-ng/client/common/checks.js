@@ -74,7 +74,7 @@ const flowAttributesShape = {
 
 const componentShape = {
     template: apiCheck.string,
-    controller: apiCheck.func,
+    controller: apiCheck.func.optional,
     bindings: apiCheck.object
 };
 
