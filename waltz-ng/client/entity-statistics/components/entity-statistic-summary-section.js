@@ -70,11 +70,12 @@ controller.$inject = [
 ];
 
 
-const component = {
-    template,
-    controller,
-    bindings
+export default {
+    component: {
+        template,
+        bindings,
+        controller
+    },
+    id: 'waltzEntityStatisticSummarySection'
 };
 
-
-export default component;

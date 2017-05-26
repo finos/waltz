@@ -21,9 +21,19 @@ export const registerStore = (module, storeDefinition) => {
 };
 
 
+export const registerStores = (module, storeDefinitions = []) => {
+    storeDefinitions.forEach(defn => registerStore(module, defn));
+};
+
+
 export const registerService = (module, serviceDefinition) => {
     ensureNotNull(module, 'must provide a module');
     checkIsServiceDefinition(serviceDefinition);
 
     module.service(serviceDefinition.serviceName, serviceDefinition.service);
+};
+
+
+export const registerServices = (module, serviceDefinitions = []) => {
+    serviceDefinitions.forEach(defn => registerService(module, defn));
 };

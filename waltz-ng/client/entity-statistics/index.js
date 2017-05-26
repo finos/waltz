@@ -18,8 +18,9 @@
  */
 
 import angular from "angular";
-import {registerStore} from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
 import entityStatisticStore from "./services/entity-statistic-store";
+import entityStatisticSummarySection from "./components/entity-statistic-summary-section";
 
 export default () => {
 
@@ -28,7 +29,9 @@ export default () => {
     module
         .config(require('./routes'));
 
-    registerStore(module, entityStatisticStore);
+    registerStores(module, [
+        entityStatisticStore
+    ]);
 
     module
         .service('EntityStatisticUtilities', require('./services/entity-statistics-utilities'));
@@ -39,12 +42,15 @@ export default () => {
         .directive('waltzEntityStatisticPercentageRenderer', require('./directives/entity-statistic-percentage-renderer'))
         .directive('waltzEntityStatisticNumericRenderer', require('./directives/entity-statistic-numeric-renderer'));
 
+    registerComponents(module, [
+        entityStatisticSummarySection
+    ]);
+
     module
         .component('waltzDurationSelector', require('./components/duration-selector'))
         .component('waltzEntityStatisticDetailTable', require('./components/entity-statistic-detail-table'))
         .component('waltzEntityStatisticDetailPanel', require('./components/entity-statistic-detail-panel'))
         .component('waltzEntityStatisticSummaryCard', require('./components/entity-statistic-summary-card'))
-        .component('waltzEntityStatisticSummarySection', require('./components/entity-statistic-summary-section'))
         .component('waltzEntityStatisticHistoryChart', require('./components/history-chart/entity-statistic-history-chart'))
         .component('waltzEntityStatisticHistoryPanel', require('./components/history-panel/entity-statistic-history-panel'))
         .component('waltzEntityStatisticTree', require('./components/entity-statistic-tree'))
