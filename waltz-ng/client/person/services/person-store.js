@@ -72,4 +72,44 @@ store.$inject = [
 ];
 
 
-export default store;
+const serviceName = 'PersonStore';
+
+
+export const PersonStore_API = {
+    getByEmployeeId: {
+        serviceName,
+        serviceFnName: 'getByEmployeeId',
+        description: 'get person by employee id'
+    },
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'get person by id'
+    },
+    findByUserId: {
+        serviceName,
+        serviceFnName: 'findByUserId',
+        description: 'find person by user id'
+    },
+    findDirects: {
+        serviceName,
+        serviceFnName: 'findDirects',
+        description: 'find direct reports for person'
+    },
+    findManagers: {
+        serviceName,
+        serviceFnName: 'findManagers',
+        description: 'find managers for person'
+    },
+    search: {
+        serviceName,
+        serviceFnName: 'search',
+        description: 'search for people'
+    }
+};
+
+
+export default {
+    store,
+    serviceName
+};

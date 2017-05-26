@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const initData = {
-    results: []
-};
+//todo: make this a component (KS)
+
+import {CORE_API} from '../../common/services/core-api-utils';
 
 
 const BINDINGS = {
@@ -26,20 +26,27 @@ const BINDINGS = {
 };
 
 
-function controller(changeInitiativeStore) {
+const initData = {
+    results: []
+};
+
+
+function controller(serviceBroker) {
     const vm = Object.assign(this, initData);
 
     vm.refresh = (query) => {
         if (!query) return;
-        return changeInitiativeStore
-            .search(query)
-            .then((results) => vm.results = results);
+        serviceBroker
+            .execute(CORE_API.ChangeInitiativeStore.search, [query])
+            .then(result => vm.results = result.data);
     };
 
 }
 
 
-controller.$inject = ['ChangeInitiativeStore'];
+controller.$inject = [
+    'ServiceBroker'
+];
 
 
 const directive = {

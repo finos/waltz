@@ -18,6 +18,8 @@
 
 import _ from 'lodash';
 
+import template from './app-group-view.html';
+
 
 const initialState = {
     applications: [],
@@ -53,7 +55,6 @@ function controller($scope,
                     appStore,
                     assetCostViewService,
                     bookmarkStore,
-                    changeInitiativeStore,
                     changeLogStore,
                     complexityStore,
                     entityStatisticStore,
@@ -106,10 +107,6 @@ function controller($scope,
     bookmarkStore
         .findByParent({ id , kind: 'APP_GROUP'})
         .then(bookmarks => vm.bookmarks = bookmarks);
-
-    changeInitiativeStore
-        .findByRef("APP_GROUP", id)
-        .then(list => vm.changeInitiatives = list);
 
     appGroupStore.getById(id)
         .then(groupDetail => vm.groupDetail = groupDetail)
@@ -191,7 +188,6 @@ controller.$inject = [
     'ApplicationStore',
     'AssetCostViewService',
     'BookmarkStore',
-    'ChangeInitiativeStore',
     'ChangeLogStore',
     'ComplexityStore',
     'EntityStatisticStore',
@@ -207,7 +203,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./app-group-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

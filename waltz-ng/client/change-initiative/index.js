@@ -18,18 +18,26 @@
 
 import angular from 'angular';
 
+import {registerComponent, registerStore} from '../common/module-utils';
+
+import changeInitiativeStore from './services/change-initiative-store';
+import changeInitiativeSelector from './directives/change-initiative-selector';
+import changeInitiativeTable from './components/change-initiative-table/change-initiative-table';
+import changeInitiativeSection from './components/change-initiative-section/change-initiative-section';
+
 
 function setup() {
     const module = angular.module('waltz.change.initiative', []);
     module
         .config(require('./routes'));
 
-    module
-        .service('ChangeInitiativeStore', require('./services/change-initiative-store'));
+    registerStore(module, changeInitiativeStore);
 
     module
-        .directive('waltzChangeInitiativeTable', require('./directives/change-initiative-table'))
-        .directive("waltzChangeInitiativeSelector", require("./directives/change-initiative-selector"));
+        .directive("waltzChangeInitiativeSelector", changeInitiativeSelector);
+
+    registerComponent(module, changeInitiativeTable);
+    registerComponent(module, changeInitiativeSection);
 
     return module.name;
 }

@@ -17,6 +17,9 @@
  */
 
 import _ from "lodash";
+import {CORE_API} from '../common/services/core-api-utils';
+
+import template from './app-group-edit.html';
 
 
 const initialState = {
@@ -39,6 +42,7 @@ function setup(groupDetail) {
     };
 }
 
+
 function handleError(e) {
     alert(e.data.message);
 }
@@ -49,13 +53,12 @@ function controller($q,
                     $stateParams,
                     appGroupStore,
                     appStore,
-                    changeInitiativeStore,
                     logicalFlowStore,
-                    notification) {
+                    notification,
+                    serviceBroker) {
 
     const { id }  = $stateParams;
     const vm = Object.assign(this, initialState);
-
 
 
     appGroupStore.getById(id)
@@ -157,9 +160,9 @@ function controller($q,
         .then(cis => vm.changeInitiatives = cis)
         .then(() => notification.warning('Removed Change Initiative: ' + changeInitiative.name));
 
-    changeInitiativeStore
-        .findByRef('APP_GROUP', id)
-        .then(cis => vm.changeInitiatives = cis);
+    serviceBroker
+        .loadViewData(CORE_API.ChangeInitiativeStore.findByRef, ['APP_GROUP', id])
+        .then(result => vm.changeInitiatives = result.data);
 
 }
 
@@ -169,14 +172,14 @@ controller.$inject = [
     '$stateParams',
     'AppGroupStore',
     'ApplicationStore',
-    'ChangeInitiativeStore',
     'LogicalFlowStore',
-    'Notification'
+    'Notification',
+    'ServiceBroker'
 ];
 
 
 export default {
-    template: require('./app-group-edit.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

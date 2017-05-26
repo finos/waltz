@@ -15,9 +15,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import * as _ from "lodash";
+import {CORE_API} from '../common/services/core-api-utils';
+
 import {groupRelationships, enrichRelationships} from "./change-initiative-utils";
 import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
-import * as _ from "lodash";
 
 import template from './change-initiative-view.html';
 
@@ -40,10 +42,10 @@ function controller($q,
                     applicationStore,
                     appGroupStore,
                     bookmarkStore,
-                    changeInitiativeStore,
                     historyStore,
                     involvedSectionService,
                     involvementStore,
+                    serviceBroker,
                     sourceDataRatingStore,
                     surveyInstanceStore,
                     surveyRunStore) {
@@ -81,10 +83,10 @@ function controller($q,
 
     };
 
-
-    changeInitiativeStore
-        .getById(id)
-        .then(ci => {
+    serviceBroker
+        .loadViewData(CORE_API.ChangeInitiativeStore.getById, [id])
+        .then(result => {
+            const ci = result.data;
             vm.changeInitiative = ci;
             vm.entityRef.name = vm.changeInitiative.name;
             vm.entityRef.description = vm.changeInitiative.description;
@@ -97,7 +99,6 @@ function controller($q,
                     { id: ci.id });
         });
 
-
     sourceDataRatingStore
         .findAll()
         .then(rs => vm.sourceDataRatings = rs);
@@ -108,9 +109,9 @@ function controller($q,
         .then(bs => vm.bookmarks = bs);
 
 
-    changeInitiativeStore
-        .findRelatedForId(id)
-        .then(rels => loadRelatedEntities(id, rels))
+    serviceBroker
+        .loadViewData(CORE_API.ChangeInitiativeStore.findRelatedForId, [id])
+        .then(result => loadRelatedEntities(id, result.data))
         .then(related => vm.related = related);
 
     surveyRunStore
@@ -157,10 +158,10 @@ controller.$inject = [
     'ApplicationStore',
     'AppGroupStore',
     'BookmarkStore',
-    'ChangeInitiativeStore',
     'HistoryStore',
     'InvolvedSectionService',
     'InvolvementStore',
+    'ServiceBroker',
     'SourceDataRatingStore',
     'SurveyInstanceStore',
     'SurveyRunStore'

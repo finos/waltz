@@ -15,8 +15,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {groupRelationships, enrichRelationships} from "./change-initiative-utils";
-import * as _ from "lodash";
+import _ from 'lodash';
+import {CORE_API} from '../common/services/core-api-utils';
+
+import {groupRelationships, enrichRelationships} from './change-initiative-utils';
+
+import template from './change-initiative-app-relationship-edit.html';
+
 
 const initialState = {
     parentEntityRef: null,
@@ -54,8 +59,8 @@ function mkChangeCommand(operation, entityRef, relKind) {
 
 function controller($stateParams,
                     applicationStore,
-                    changeInitiativeStore,
-                    notification) {
+                    notification,
+                    serviceBroker) {
 
     const {id} = $stateParams;
     const vm = Object.assign(this, initialState);
@@ -84,44 +89,49 @@ function controller($stateParams,
         });
     };
 
-    const loadRelationships = () => {
-        return changeInitiativeStore
-            .findRelatedForId(id)
-            .then(rels => loadRelatedEntities(id, rels))
+    const loadRelationships = (force = false) => {
+        serviceBroker
+            .loadViewData(CORE_API.ChangeInitiativeStore.findRelatedForId, [id], { force })
+            .then(result => loadRelatedEntities(id, result.data))
             .then(curRels => vm.currentRelationships = curRels);
     };
 
 
     vm.$onInit = () => {
-        changeInitiativeStore.getById(id)
-            .then(ci => vm.entityRef.name = ci.name);
+        serviceBroker
+            .loadViewData(CORE_API.ChangeInitiativeStore.getById, [id])
+            .then(result => vm.entityRef.name = result.data.name);
         loadRelationships();
     };
 
 
     vm.onAdd = (entityRel) => {
-
-        changeInitiativeStore.changeRelationship(id, mkChangeCommand('ADD', entityRel.entity, entityRel.relationship))
+        serviceBroker
+            .execute(
+                CORE_API.ChangeInitiativeStore.changeRelationship,
+                [id, mkChangeCommand('ADD', entityRel.entity, entityRel.relationship)])
             .then(result => {
-                if(result) {
+                if(result.data) {
                     notification.success("Relationship added successfully");
                 } else {
                     notification.warning("Failed to add relationship")
                 }
-                loadRelationships();
+                loadRelationships(true);
             });
     };
 
     vm.onRemove = (entityRel) => {
-
-        changeInitiativeStore.changeRelationship(id, mkChangeCommand('REMOVE', entityRel.entity, entityRel.relationship))
+        serviceBroker
+            .execute(
+                CORE_API.ChangeInitiativeStore.changeRelationship,
+                [id, mkChangeCommand('REMOVE', entityRel.entity, entityRel.relationship)])
             .then(result => {
-                if(result) {
+                if(result.data) {
                     notification.success("Relationship removed successfully");
                 } else {
                     notification.warning("Failed to remove relationship")
                 }
-                loadRelationships();
+                loadRelationships(true);
             });
     };
 }
@@ -130,13 +140,13 @@ function controller($stateParams,
 controller.$inject = [
     '$stateParams',
     'ApplicationStore',
-    'ChangeInitiativeStore',
-    'Notification'
+    'Notification',
+    'ServiceBroker'
 ];
 
 
 const page = {
-    template: require('./change-initiative-app-relationship-edit.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };
