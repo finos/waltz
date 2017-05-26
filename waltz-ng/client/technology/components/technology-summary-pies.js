@@ -32,4 +32,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    id: 'waltzTechnologySummaryPies',
+    component
+};

@@ -63,7 +63,6 @@ function controller($scope,
                     measurableCategoryStore,
                     measurableRatingStore,
                     sourceDataRatingStore,
-                    technologyStatsService,
                     userService) {
 
     const { id }  = $stateParams;
@@ -121,16 +120,13 @@ function controller($scope,
         .then(appIds => $q.all([
             serviceBroker.loadViewData(CORE_API.ApplicationStore.findBySelector, [ idSelector ]),
             complexityStore.findBySelector(id, 'APP_GROUP', 'EXACT'),
-            technologyStatsService.findBySelector(id, 'APP_GROUP', 'EXACT')
         ]))
         .then(([
             appsResponse,
-            complexity,
-            techStats
+            complexity
         ]) => {
             vm.applications = _.map(appsResponse.data, a => _.assign(a, {management: 'IT'}));
             vm.complexity = complexity;
-            vm.techStats = techStats;
         })
         .then(result => Object.assign(vm, result))
         .then(() => sourceDataRatingStore.findAll())
@@ -201,7 +197,6 @@ controller.$inject = [
     'MeasurableCategoryStore',
     'MeasurableRatingStore',
     'SourceDataRatingStore',
-    'TechnologyStatisticsService',
     'UserService'
 ];
 

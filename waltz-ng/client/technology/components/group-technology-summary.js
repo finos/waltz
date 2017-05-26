@@ -137,4 +137,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    id: 'waltzGroupTechnologySummary',
+    component
+};
