@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.physical_specification;
 
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
-import com.khartec.waltz.data.physical_specification.PhysicalSpecificationSelectorFactory;
+import com.khartec.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
 import com.khartec.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
@@ -52,24 +52,24 @@ public class PhysicalSpecificationService {
     private final ChangeLogService changeLogService;
     private final PhysicalSpecificationDao specificationDao;
     private final PhysicalSpecificationSearchDao specificationSearchDao;
-    private final PhysicalSpecificationSelectorFactory selectorFactory;
+    private final PhysicalSpecificationIdSelectorFactory idSelectorFactory;
 
 
     @Autowired
     public PhysicalSpecificationService(ChangeLogService changeLogService,
                                         PhysicalSpecificationDao specificationDao,
-                                        PhysicalSpecificationSearchDao specificationSearchDao, 
-                                        PhysicalSpecificationSelectorFactory selectorFactory)
+                                        PhysicalSpecificationSearchDao specificationSearchDao,
+                                        PhysicalSpecificationIdSelectorFactory idSelectorFactory)
     {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(specificationDao, "specificationDao cannot be null");
         checkNotNull(specificationSearchDao, "specificationSearchDao cannot be null");
-        checkNotNull(selectorFactory, "selectorFactory cannot be null");
+        checkNotNull(idSelectorFactory, "idSelectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
         this.specificationDao = specificationDao;
         this.specificationSearchDao = specificationSearchDao;
-        this.selectorFactory = selectorFactory;
+        this.idSelectorFactory = idSelectorFactory;
     }
 
 
@@ -84,7 +84,7 @@ public class PhysicalSpecificationService {
 
 
     public Collection<PhysicalSpecification> findBySelector(IdSelectionOptions options) {
-        Select<Record1<Long>> selector = selectorFactory.apply(options);
+        Select<Record1<Long>> selector = idSelectorFactory.apply(options);
         return specificationDao.findBySelector(selector);
     }
 

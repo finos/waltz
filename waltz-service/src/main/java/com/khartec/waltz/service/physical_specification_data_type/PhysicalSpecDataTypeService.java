@@ -1,6 +1,6 @@
 package com.khartec.waltz.service.physical_specification_data_type;
 
-import com.khartec.waltz.data.physical_specification.PhysicalSpecificationSelectorFactory;
+import com.khartec.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
 import com.khartec.waltz.data.physical_specification_data_type.PhysicalSpecDataTypeDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -29,20 +29,20 @@ public class PhysicalSpecDataTypeService {
 
     private final ChangeLogService changeLogService;
     private final PhysicalSpecDataTypeDao physicalSpecDataTypeDao;
-    private final PhysicalSpecificationSelectorFactory specificationSelectorFactory;
+    private final PhysicalSpecificationIdSelectorFactory specificationIdSelectorFactory;
 
 
     @Autowired
     public PhysicalSpecDataTypeService(ChangeLogService changeLogService,
                                        PhysicalSpecDataTypeDao physicalSpecDataTypeDao,
-                                       PhysicalSpecificationSelectorFactory specificationSelectorFactory) {
+                                       PhysicalSpecificationIdSelectorFactory specificationIdSelectorFactory) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(physicalSpecDataTypeDao, "physicalSpecDataTypeDao cannot be null");
-        checkNotNull(specificationSelectorFactory, "specificationSelectorFactory cannot be null");
+        checkNotNull(specificationIdSelectorFactory, "specificationIdSelectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
         this.physicalSpecDataTypeDao = physicalSpecDataTypeDao;
-        this.specificationSelectorFactory = specificationSelectorFactory;
+        this.specificationIdSelectorFactory = specificationIdSelectorFactory;
     }
 
 
@@ -54,7 +54,7 @@ public class PhysicalSpecDataTypeService {
     public List<PhysicalSpecificationDataType> findBySpecificationIdSelector(IdSelectionOptions selectionOptions) {
         checkNotNull(selectionOptions, "selectionOptions cannot be null");
 
-        Select<Record1<Long>> selector = specificationSelectorFactory.apply(selectionOptions);
+        Select<Record1<Long>> selector = specificationIdSelectorFactory.apply(selectionOptions);
         return physicalSpecDataTypeDao.findBySpecificationIdSelector(selector);
     }
 
