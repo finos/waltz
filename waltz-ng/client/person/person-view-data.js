@@ -29,7 +29,6 @@ const initModel = {
         all: []
     },
     apps: [],
-    changeInitiatives: [],
     complexity: [],
     assetCostData: {},
     serverStats: null,
@@ -40,7 +39,6 @@ const initModel = {
         flowOverlay: false,
         costOverlay: false,
         applicationOverlay: false,
-        changeInitiativeOverlay: false
     }
 };
 
@@ -185,13 +183,6 @@ function service($q,
     }
 
 
-    function loadChangeInitiatives(employeeId) {
-        return involvementStore
-            .findChangeInitiativesForEmployeeId(employeeId)
-            .then(list => state.model.changeInitiatives = list);
-    }
-
-
     function loadCostStats(personId) {
         return assetCostViewService
             .initialise(toSelector(personId), 2016)
@@ -255,7 +246,6 @@ function service($q,
         return $q
             .all([
                 loadComplexity(personId),
-                loadChangeInitiatives(employeeId)
             ]);
     }
 

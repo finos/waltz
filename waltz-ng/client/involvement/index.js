@@ -17,9 +17,9 @@
  */
 
 import angular from 'angular';
+import {registerStore} from '../common/module-utils';
 
 import involvedPeopleSection from './components/involved-people-section';
-
 import involvedSectionService from './services/involved-section-service';
 import involvementStore from './services/involvement-store';
 
@@ -31,8 +31,9 @@ export default () => {
         .component('waltzInvolvedPeopleSection', involvedPeopleSection);
 
     module
-        .service('InvolvedSectionService', involvedSectionService)
-        .service('InvolvementStore', involvementStore);
+        .service('InvolvedSectionService', involvedSectionService);
+
+    registerStore(module, involvementStore);
 
     return module.name;
 };

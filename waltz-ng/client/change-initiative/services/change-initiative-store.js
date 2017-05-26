@@ -18,7 +18,7 @@
 import {checkIsEntityRelationshipChangeCommand} from "../../common/checks";
 
 
-function service($http, BaseApiUrl) {
+function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/change-initiative`;
 
@@ -60,6 +60,42 @@ function service($http, BaseApiUrl) {
     }
 }
 
-service.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = ['$http', 'BaseApiUrl'];
 
-export default service;
+
+const serviceName = 'ChangeInitiativeStore';
+
+
+export const ChangeInitiativeStore_API = {
+    findByRef: {
+        serviceName,
+        serviceFnName: 'findByRef',
+        description: 'finds change initiatives by an entity reference'
+    },
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'get a change initiative by id'
+    },
+    findRelatedForId: {
+        serviceName,
+        serviceFnName: 'findRelatedForId',
+        description: 'find related change initiatives related to one with supplied id'
+    },
+    search: {
+        serviceName,
+        serviceFnName: 'search',
+        description: 'search change initiatives'
+    },
+    changeRelationship: {
+        serviceName,
+        serviceFnName: 'changeRelationship',
+        description: 'change relationship between a change initiative and entity reference'
+    }
+};
+
+
+export default {
+    store,
+    serviceName
+};

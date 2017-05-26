@@ -19,60 +19,107 @@
 import {checkIsEntityInvolvementChangeCommand} from '../../common/checks';
 
 
-export default [
-    '$http',
-    'BaseApiUrl',
-    ($http, BaseApiUrl) => {
+function store($http, BaseApiUrl) {
 
-        const BASE = `${BaseApiUrl}/involvement`;
+    const BASE = `${BaseApiUrl}/involvement`;
 
 
-        const findAppsForEmployeeId = (employeeId) =>
-            $http.get(`${BASE}/employee/${employeeId}/applications`)
-                .then(result => result.data);
+    const findAppsForEmployeeId = (employeeId) =>
+        $http.get(`${BASE}/employee/${employeeId}/applications`)
+            .then(result => result.data);
 
 
-        const findEndUserAppsByIdSelector = (options) => $http
-            .post(`${BASE}/end-user-application`, options)
+    const findEndUserAppsByIdSelector = (options) => $http
+        .post(`${BASE}/end-user-application`, options)
+        .then(r => r.data);
+
+
+    const findChangeInitiativesForEmployeeId = (employeeId) =>
+        $http.get(`${BASE}/employee/${employeeId}/change-initiative/direct`)
+            .then(result => result.data);
+
+
+    const findByEmployeeId = (employeeId) =>
+        $http.get(`${BASE}/employee/${employeeId}`)
+            .then(result => result.data);
+
+
+    const findByEntityReference = (kind, id) =>
+        $http.get(`${BASE}/entity/${kind}/${id}`)
+            .then(result => result.data);
+
+
+    const findPeopleByEntityReference = (kind, id) =>
+        $http.get(`${BASE}/entity/${kind}/${id}/people`)
+            .then(result => result.data);
+
+
+    const changeInvolvement = (entityRef, cmd) => {
+        checkIsEntityInvolvementChangeCommand(cmd);
+        return $http
+            .post(`${BASE}/entity/${entityRef.kind}/${entityRef.id}`, cmd)
             .then(r => r.data);
+    };
 
 
-        const findChangeInitiativesForEmployeeId = (employeeId) =>
-            $http.get(`${BASE}/employee/${employeeId}/change-initiative/direct`)
-                .then(result => result.data);
+    return {
+        findAppsForEmployeeId,
+        findEndUserAppsByIdSelector,
+        findByEmployeeId,
+        findByEntityReference,
+        findChangeInitiativesForEmployeeId,
+        findPeopleByEntityReference,
+        changeInvolvement
+    };
+}
 
 
-        const findByEmployeeId = (employeeId) =>
-            $http.get(`${BASE}/employee/${employeeId}`)
-                .then(result => result.data);
+store.$inject = ['$http', 'BaseApiUrl'];
 
 
-        const findByEntityReference = (kind, id) =>
-            $http.get(`${BASE}/entity/${kind}/${id}`)
-                .then(result => result.data);
+const serviceName = 'InvolvementStore';
 
 
-        const findPeopleByEntityReference = (kind, id) =>
-            $http.get(`${BASE}/entity/${kind}/${id}/people`)
-                .then(result => result.data);
-
-
-        const changeInvolvement = (entityRef, cmd) => {
-            checkIsEntityInvolvementChangeCommand(cmd);
-            return $http
-                .post(`${BASE}/entity/${entityRef.kind}/${entityRef.id}`, cmd)
-                .then(r => r.data);
-        };
-
-
-        return {
-            findAppsForEmployeeId,
-            findEndUserAppsByIdSelector,
-            findByEmployeeId,
-            findByEntityReference,
-            findChangeInitiativesForEmployeeId,
-            findPeopleByEntityReference,
-            changeInvolvement
-        };
+export const InvolvementStore_API = {
+    findAppsForEmployeeId: {
+        serviceName,
+        serviceFnName: 'findAppsForEmployeeId',
+        description: 'finds apps by employee id'
+    },
+    findEndUserAppsByIdSelector: {
+        serviceName,
+        serviceFnName: 'findEndUserAppsByIdSelector',
+        description: 'finds end user apps by app id selector'
+    },
+    findByEmployeeId: {
+        serviceName,
+        serviceFnName: 'findByEmployeeId',
+        description: 'find involvements by employee id'
+    },
+    findByEntityReference: {
+        serviceName,
+        serviceFnName: 'findByEntityReference',
+        description: 'find involvements by entity reference'
+    },
+    findChangeInitiativesForEmployeeId: {
+        serviceName,
+        serviceFnName: 'findChangeInitiativesForEmployeeId',
+        description: 'find change initiatives by employee id'
+    },
+    findPeopleByEntityReference: {
+        serviceName,
+        serviceFnName: 'findPeopleByEntityReference',
+        description: 'find people by involved entity reference'
+    },
+    changeInvolvement: {
+        serviceName,
+        serviceFnName: 'changeInvolvement',
+        description: 'change person involvement for a given entity reference'
     }
-];
+};
+
+
+export default {
+    store,
+    serviceName
+};

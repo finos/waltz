@@ -78,14 +78,25 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
 
     public Collection<ChangeInitiative> findForEntityReference(EntityReference ref) {
 
-        return dsl.select(CHANGE_INITIATIVE.fields())
+        Select<Record> refSideA = dsl.select(CHANGE_INITIATIVE.fields())
                 .from(CHANGE_INITIATIVE)
                 .innerJoin(ENTITY_RELATIONSHIP)
                 .on(ENTITY_RELATIONSHIP.ID_B.eq(CHANGE_INITIATIVE.ID))
                 .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()))
-                .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
+                .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()));
+
+        Select<Record> refSideB = dsl.select(CHANGE_INITIATIVE.fields())
+                .from(CHANGE_INITIATIVE)
+                .innerJoin(ENTITY_RELATIONSHIP)
+                .on(ENTITY_RELATIONSHIP.ID_A.eq(CHANGE_INITIATIVE.ID))
+                .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name()))
+                .and(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()))
+                .and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()));
+
+        return refSideA.union(refSideB)
                 .fetch(TO_DOMAIN_MAPPER);
+
     }
 
 

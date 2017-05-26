@@ -44,25 +44,8 @@
 
 
     <!-- CHANGE INITIATIVES -->
-    <waltz-section name="Change Initiatives"
-                   id="change-initiatives-section"
-                   icon="paper-plane-o">
-
-        <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
-                                         entities="['CHANGE_INITIATIVE', 'INVOLVEMENT']">
-        </waltz-source-data-section-addon>
-
-        <waltz-change-initiative-table ng-if='ctrl.changeInitiatives.length > 0'
-                                       list="ctrl.changeInitiatives">
-        </waltz-change-initiative-table>
-
-        <waltz-no-data ng-if="ctrl.changeInitiatives.length == 0">
-            <message>
-                <strong>This person is not associated with any Change Initiatives</strong>
-            </message>
-        </waltz-no-data>
-
-    </waltz-section>
+    <waltz-change-initiative-section parent-entity-ref="ctrl.entityRef">
+    </waltz-change-initiative-section>
 
 
     <!-- APPS -->
