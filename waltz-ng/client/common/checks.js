@@ -74,7 +74,7 @@ const flowAttributesShape = {
 
 const componentShape = {
     template: apiCheck.string,
-    controller: apiCheck.func,
+    controller: apiCheck.func.optional,
     bindings: apiCheck.object
 };
 
@@ -91,6 +91,21 @@ const storeDefinitionShape = {
 const serviceDefinitionShape = {
     serviceName: apiCheck.string,
     service: myApiCheck.func
+};
+
+const serviceBrokerTargetShape = {
+    serviceName: apiCheck.string,
+    serviceFnName: apiCheck.string
+};
+
+const serviceBrokerCacheRefreshListenerShape = {
+    componentId: apiCheck.string,
+    fn: myApiCheck.func
+};
+
+const serviceBrokerOptionsShape = {
+    force: apiCheck.bool.optional,
+    cacheRefreshListener: myApiCheck.shape(serviceBrokerCacheRefreshListenerShape).optional
 };
 
 // -- COMMANDS --
@@ -187,6 +202,14 @@ export const checkIsStoreDefinition = (def) => {
 
 export const checkIsServiceDefinition = (def) => {
     check(myApiCheck.shape(serviceDefinitionShape), def);
+};
+
+export const checkIsServiceBrokerTarget = (target) => {
+    check(myApiCheck.shape(serviceBrokerTargetShape), target);
+};
+
+export const checkIsServiceBrokerOptions = (options) => {
+    check(myApiCheck.shape(serviceBrokerOptionsShape), options);
 };
 
 export const checkIsStringList = xs =>

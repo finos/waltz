@@ -17,6 +17,7 @@
  */
 
 import _ from 'lodash';
+import {CORE_API} from '../common/services/core-api-utils';
 
 import template from './app-group-view.html';
 
@@ -51,8 +52,8 @@ const initialState = {
 function controller($scope,
                     $q,
                     $stateParams,
+                    serviceBroker,
                     appGroupStore,
-                    appStore,
                     assetCostViewService,
                     bookmarkStore,
                     changeLogStore,
@@ -64,7 +65,6 @@ function controller($scope,
                     measurableCategoryStore,
                     measurableRatingStore,
                     sourceDataRatingStore,
-                    technologyStatsService,
                     userService) {
 
     const { id }  = $stateParams;
@@ -116,18 +116,15 @@ function controller($scope,
         })
         .then(groupDetail => _.map(groupDetail.applications, 'id'))
         .then(appIds => $q.all([
-            appStore.findByIds(appIds),
+            serviceBroker.loadViewData(CORE_API.ApplicationStore.findBySelector, [ idSelector ]),
             complexityStore.findBySelector(id, 'APP_GROUP', 'EXACT'),
-            technologyStatsService.findBySelector(id, 'APP_GROUP', 'EXACT')
         ]))
         .then(([
-            apps,
-            complexity,
-            techStats
+            appsResponse,
+            complexity
         ]) => {
-            vm.applications = _.map(apps, a => _.assign(a, {management: 'IT'}));
+            vm.applications = _.map(appsResponse.data, a => _.assign(a, {management: 'IT'}));
             vm.complexity = complexity;
-            vm.techStats = techStats;
         })
         .then(result => Object.assign(vm, result))
         .then(() => sourceDataRatingStore.findAll())
@@ -184,8 +181,8 @@ controller.$inject = [
     '$scope',
     '$q',
     '$stateParams',
+    'ServiceBroker',
     'AppGroupStore',
-    'ApplicationStore',
     'AssetCostViewService',
     'BookmarkStore',
     'ChangeLogStore',
@@ -197,7 +194,6 @@ controller.$inject = [
     'MeasurableCategoryStore',
     'MeasurableRatingStore',
     'SourceDataRatingStore',
-    'TechnologyStatisticsService',
     'UserService'
 ];
 

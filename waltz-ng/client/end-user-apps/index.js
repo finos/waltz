@@ -17,14 +17,14 @@
  */
 
 import angular from 'angular';
-
+import * as endUserAppStore from './services/end-user-app-store';
+import {registerStore} from '../common/module-utils';
 
 export default () => {
 
     const module = angular.module('waltz.end.user.apps', []);
 
-    module
-        .service('EndUserAppStore', require('./services/end-user-app-store'));
+    registerStore(module, endUserAppStore);
 
     return module.name;
 };

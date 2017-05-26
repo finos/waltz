@@ -7,11 +7,15 @@ import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
+import static java.util.stream.Collectors.toList;
 
 @Repository
 public class PhysicalSpecDataTypeDao {
@@ -25,6 +29,17 @@ public class PhysicalSpecDataTypeDao {
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .build();
+    };
+
+
+    private static final Function<PhysicalSpecificationDataType, PhysicalSpecDataTypeRecord> TO_RECORD_MAPPER = sdt -> {
+        PhysicalSpecDataTypeRecord r = new PhysicalSpecDataTypeRecord();
+        r.setSpecificationId(sdt.specificationId());
+        r.setDataTypeId(sdt.dataTypeId());
+        r.setProvenance(sdt.provenance());
+        r.setLastUpdatedAt(Timestamp.valueOf(sdt.lastUpdatedAt()));
+        r.setLastUpdatedBy(sdt.lastUpdatedBy());
+        return r;
     };
 
 
@@ -50,5 +65,29 @@ public class PhysicalSpecDataTypeDao {
         return dsl.selectFrom(PHYSICAL_SPEC_DATA_TYPE)
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.in(specIdSelector))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public int[] addDataTypes(Collection<PhysicalSpecificationDataType> specificationDataTypes) {
+        checkNotNull(specificationDataTypes, "specificationDataTypes cannot be null");
+
+        List<PhysicalSpecDataTypeRecord> records = specificationDataTypes.stream()
+                .map(TO_RECORD_MAPPER)
+                .collect(toList());
+
+        return dsl.batchInsert(records)
+                .execute();
+    }
+
+
+    public int[] removeDataTypes(Collection<PhysicalSpecificationDataType> specificationDataTypes) {
+        checkNotNull(specificationDataTypes, "specificationDataTypes cannot be null");
+
+        List<PhysicalSpecDataTypeRecord> records = specificationDataTypes.stream()
+                .map(TO_RECORD_MAPPER)
+                .collect(toList());
+
+        return dsl.batchDelete(records)
+                .execute();
     }
 }

@@ -38,6 +38,7 @@ import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
@@ -62,6 +63,7 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     private final MeasurableRating measurableRating = MEASURABLE_RATING.as("m_rating");
     private final Person person = PERSON.as("per");
     private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("phier");
+    private final FlowDiagramEntity flowDiagram = FLOW_DIAGRAM_ENTITY.as("flowdiag");
 
 
     @Autowired
@@ -94,6 +96,8 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 return mkForChangeInitiative(ref, options.scope());
             case DATA_TYPE:
                 return mkForDataType(options);
+            case FLOW_DIAGRAM:
+                return mkForFlowDiagram(options);
             case MEASURABLE:
                 return mkForMeasurable(options);
             case ORG_UNIT:
@@ -103,6 +107,14 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
+    }
+
+    private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL.select(flowDiagram.ENTITY_ID)
+                .from(flowDiagram)
+                .where(flowDiagram.DIAGRAM_ID.eq(options.entityReference().id()))
+                .and(flowDiagram.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
     }
 
 

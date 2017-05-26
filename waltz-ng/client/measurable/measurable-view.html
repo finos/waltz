@@ -100,8 +100,8 @@
 
 
     <!-- APPS -->
-    <waltz-apps-section apps="ctrl.applications"
-                        source-data-ratings="ctrl.sourceDataRatings">
+    <waltz-apps-section parent-entity-ref="ctrl.entityReference"
+                        scope="CHILDREN">
     </waltz-apps-section>
 
 
@@ -114,8 +114,8 @@
 
 
     <!-- TECHNOLOGIES -->
-    <waltz-technology-summary-section stats="ctrl.techStats"
-                                      source-data-ratings="ctrl.sourceDataRatings">
+    <waltz-technology-summary-section parent-entity-ref='ctrl.entityReference'
+                                      scope="CHILDREN">
     </waltz-technology-summary-section>
 
 

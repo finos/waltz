@@ -50,8 +50,9 @@ function service($q,
 
     return {
         findBySelector
-    }
+    };
 }
+
 
 service.$inject = [
     '$q',
@@ -61,4 +62,19 @@ service.$inject = [
 ];
 
 
-export default service;
+const serviceName = 'TechnologyStatisticsService';
+
+
+export default {
+    service,
+    serviceName
+};
+
+
+export const TechnologyStatisticsService_API = {
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'find stats for the given app selector'
+    },
+};

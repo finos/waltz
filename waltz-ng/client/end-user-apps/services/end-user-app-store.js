@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function service($http, baseUrl) {
+export function store($http, baseUrl) {
 
     const BASE = `${baseUrl}/end-user-application`;
 
@@ -36,7 +36,22 @@ function service($http, baseUrl) {
     };
 }
 
-service.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = ['$http', 'BaseApiUrl'];
 
 
-export default service;
+export const serviceName = 'EndUserAppStore';
+
+
+export const EndUserAppStore_API = {
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'find EUC apps by org unit selector'
+    },
+    countByOrganisationalUnit: {
+        serviceName,
+        serviceFnName: 'countByOrganisationalUnit',
+        description: 'count EUC apps across all OUs'
+    }
+};
+

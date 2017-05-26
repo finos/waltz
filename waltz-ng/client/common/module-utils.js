@@ -8,6 +8,11 @@ export const registerComponent = (module, componentDefinition) => {
 };
 
 
+export const registerComponents = (module, componentDefinitions = []) => {
+    componentDefinitions.forEach(defn => registerComponent(module, defn));
+};
+
+
 export const registerStore = (module, storeDefinition) => {
     ensureNotNull(module, 'must provide a module');
     checkIsStoreDefinition(storeDefinition);
@@ -20,5 +25,5 @@ export const registerService = (module, serviceDefinition) => {
     ensureNotNull(module, 'must provide a module');
     checkIsServiceDefinition(serviceDefinition);
 
-    module.service(serviceDefinition.id, serviceDefinition.service);
+    module.service(serviceDefinition.serviceName, serviceDefinition.service);
 };

@@ -18,8 +18,10 @@
  *
  */
 
+import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
 import {ChangeInitiativeStore_API as ChangeInitiativeStore} from "../../change-initiative/services/change-initiative-store";
 import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
+import {EndUserAppStore_API as EndUserAppStore} from "../../end-user-apps/services/end-user-app-store";
 import {EntityNamedNoteStore_API as EntityNamedNoteStore} from "../../entity-named-note/services/entity-named-note-store";
 import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../entity-named-note/services/entity-named-note-type-store";
 import {InvolvementStore_API as InvolvementStore} from "../../involvement/services/involvement-store";
@@ -28,11 +30,15 @@ import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../meas
 import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from "../../measurable-relationship/services/measurable-relationship-store";
 import {PersonStore_API as PersonStore} from "../../person/services/person-store";
 import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
+import {SourceDataRatingStore_API as SourceDataRatingStore} from "../../source-data-rating/services/source-data-rating-store";
+import {TechnologyStatisticsService_API as TechnologyStatisticsService} from "../../technology/services/technology-statistics-service";
 
 
 export const CORE_API = {
+    ApplicationStore,
     ChangeInitiativeStore,
     DataTypeStore,
+    EndUserAppStore,
     EntityNamedNoteStore,
     EntityNamedNoteTypeStore,
     InvolvementStore,
@@ -40,12 +46,12 @@ export const CORE_API = {
     MeasurableCategoryStore,
     MeasurableRelationshipStore,
     PersonStore,
-    PhysicalSpecDataTypeStore
+    PhysicalSpecDataTypeStore,
+    SourceDataRatingStore,
+    TechnologyStatisticsService
 };
 
 
 export function getApiReference(serviceName, serviceFnName) {
     return CORE_API[serviceName][serviceFnName];
 }
-
-
