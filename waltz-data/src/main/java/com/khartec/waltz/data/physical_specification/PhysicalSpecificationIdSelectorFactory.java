@@ -36,13 +36,13 @@ import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPE
 
 
 @Service
-public class PhysicalSpecificationSelectorFactory implements IdSelectorFactory {
+public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory {
 
     private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory;
 
 
     @Autowired
-    public PhysicalSpecificationSelectorFactory(PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory) {
+    public PhysicalSpecificationIdSelectorFactory(PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory) {
         checkNotNull(physicalFlowIdSelectorFactory, "physicalFlowIdSelectorFactory cannot be null");
         this.physicalFlowIdSelectorFactory = physicalFlowIdSelectorFactory;
     }
