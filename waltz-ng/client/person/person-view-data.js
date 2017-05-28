@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
 const initModel = {
@@ -33,7 +33,6 @@ const initModel = {
     assetCostData: {},
     serverStats: null,
     dataFlows: [],
-    entityStatisticDefinitions: [],
     visibility: {
         techOverlay: false,
         flowOverlay: false,
@@ -80,7 +79,6 @@ function buildAppInvolvementSummary(apps = [], involvements = [], involvementKin
 function service($q,
                  assetCostViewService,
                  complexityStore,
-                 entityStatisticStore,
                  involvementStore,
                  involvementKindService,
                  logicalFlowViewService,
@@ -211,12 +209,6 @@ function service($q,
             .then(ratings => state.model.sourceDataRatings = ratings);
     }
 
-    function loadEntityStatistics() {
-        return entityStatisticStore
-            .findAllActiveDefinitions()
-            .then(defns => state.model.entityStatisticDefinitions = defns);
-    }
-
 
     // --- MAIN LOADERS
 
@@ -252,8 +244,7 @@ function service($q,
 
     function loadFourthWave() {
         return $q.all([
-            loadSourceDataRatings(),
-            loadEntityStatistics()
+            loadSourceDataRatings()
         ]);
     }
 
@@ -297,7 +288,6 @@ service.$inject = [
     '$q',
     'AssetCostViewService',
     'ComplexityStore',
-    'EntityStatisticStore',
     'InvolvementStore',
     'InvolvementKindService',
     'LogicalFlowViewService',

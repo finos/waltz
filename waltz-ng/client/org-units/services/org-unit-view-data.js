@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {aggregatePeopleInvolvements} from '../../involvement/involvement-utils';
-import {CORE_API} from '../../common/services/core-api-utils';
+import _ from "lodash";
+import {aggregatePeopleInvolvements} from "../../involvement/involvement-utils";
+import {CORE_API} from "../../common/services/core-api-utils";
 
 function mkRef(orgUnitId) {
     return {
@@ -116,13 +116,6 @@ function loadSourceDataRatings(serviceBroker, holder) {
 }
 
 
-function loadEntityStatisticDefinitions(store, selector, holder) {
-    return store
-        .findAllActiveDefinitions(selector)
-        .then(r => holder.entityStatisticDefinitions = r);
-}
-
-
 function loadChangeLogs(store, ref, holder = {}) {
     return store
         .findByEntityReference(ref)
@@ -203,14 +196,11 @@ function service($q,
 
 
     function loadSecondWave(orgUnitId) {
-        const selector = mkSelector(orgUnitId);
-
         return $q.all([
             initialiseDataFlows(logicalFlowViewService, orgUnitId, rawData),
             loadInvolvement(involvementStore, orgUnitId, rawData),
             loadAuthSources(authSourcesStore, orgUnitId, rawData),
-            loadComplexity(complexityStore, orgUnitId, rawData),
-            loadEntityStatisticDefinitions(entityStatisticStore, selector, rawData)
+            loadComplexity(complexityStore, orgUnitId, rawData)
         ]);
     }
 

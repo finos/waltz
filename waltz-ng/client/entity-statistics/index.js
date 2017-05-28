@@ -17,8 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-
+import angular from "angular";
+import {registerComponents, registerStores} from "../common/module-utils";
+import entityStatisticStore from "./services/entity-statistic-store";
+import entityStatisticSummarySection from "./components/entity-statistic-summary-section";
 
 export default () => {
 
@@ -27,8 +29,11 @@ export default () => {
     module
         .config(require('./routes'));
 
+    registerStores(module, [
+        entityStatisticStore
+    ]);
+
     module
-        .service('EntityStatisticStore', require('./services/entity-statistic-store'))
         .service('EntityStatisticUtilities', require('./services/entity-statistics-utilities'));
 
     module
@@ -37,12 +42,15 @@ export default () => {
         .directive('waltzEntityStatisticPercentageRenderer', require('./directives/entity-statistic-percentage-renderer'))
         .directive('waltzEntityStatisticNumericRenderer', require('./directives/entity-statistic-numeric-renderer'));
 
+    registerComponents(module, [
+        entityStatisticSummarySection
+    ]);
+
     module
         .component('waltzDurationSelector', require('./components/duration-selector'))
         .component('waltzEntityStatisticDetailTable', require('./components/entity-statistic-detail-table'))
         .component('waltzEntityStatisticDetailPanel', require('./components/entity-statistic-detail-panel'))
         .component('waltzEntityStatisticSummaryCard', require('./components/entity-statistic-summary-card'))
-        .component('waltzEntityStatisticSummarySection', require('./components/entity-statistic-summary-section'))
         .component('waltzEntityStatisticHistoryChart', require('./components/history-chart/entity-statistic-history-chart'))
         .component('waltzEntityStatisticHistoryPanel', require('./components/history-panel/entity-statistic-history-panel'))
         .component('waltzEntityStatisticTree', require('./components/entity-statistic-tree'))

@@ -22,7 +22,7 @@ import {checkIsEntityRef} from "../../common/checks";
 function store($http, BaseApiUrl) {
     const BASE = `${ BaseApiUrl }/entity-statistic`;
 
-    const findAllActiveDefinitions = (options) => $http
+    const findAllActiveDefinitions = () => $http
         .get(`${ BASE }/definition`)
         .then(r => r.data);
 
@@ -91,4 +91,55 @@ store.$inject = [
 ];
 
 
-export default store;
+const serviceName = 'EntityStatisticStore';
+
+
+export const EntityStatisticStore_API = {
+    findAllActiveDefinitions: {
+        serviceName,
+        serviceFnName: 'findAllActiveDefinitions',
+        description: 'finds all active entity statistic definitions'
+    },
+    findStatDefinition: {
+        serviceName,
+        serviceFnName: 'findStatDefinition',
+        description: 'finds entity statistic definition for a given id'
+    },
+    findStatsForEntity: {
+        serviceName,
+        serviceFnName: 'findStatsForEntity',
+        description: 'finds entity statistic for a given entity reference'
+    },
+    findStatValuesByIdSelector: {
+        serviceName,
+        serviceFnName: 'findStatValuesByIdSelector',
+        description: 'finds entity statistic values by app id selector'
+    },
+    findRelatedStatDefinitions: {
+        serviceName,
+        serviceFnName: 'findRelatedStatDefinitions',
+        description: 'finds related entity statistic definitions for a given stat id'
+    },
+    findStatTallies: {
+        serviceName,
+        serviceFnName: 'findStatTallies',
+        description: 'finds entity statistic tallies for a list of stat ids and an app id selector'
+    },
+    calculateStatTally: {
+        serviceName,
+        serviceFnName: 'calculateStatTally',
+        description: 'calculates entity statistic tallies for a statistic definition and app id selector'
+    },
+    calculateHistoricStatTally: {
+        serviceName,
+        serviceFnName: 'calculateHistoricStatTally',
+        description: 'calculates historic entity statistic tallies for a statistic definition and app id selector'
+    }
+};
+
+
+export default {
+    store,
+    serviceName
+};
+

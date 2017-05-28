@@ -16,13 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from '../common';
-import {getParents, populateParents} from '../common/hierarchy-utils';
-import {aggregatePeopleInvolvements} from '../involvement/involvement-utils';
+import _ from "lodash";
+import {initialiseData} from "../common";
+import {getParents, populateParents} from "../common/hierarchy-utils";
+import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
 
-import template from './measurable-view.html';
-import {CORE_API} from '../common/services/core-api-utils';
+import template from "./measurable-view.html";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
@@ -47,7 +47,6 @@ function controller($q,
                     bookmarkStore,
                     changeLogStore,
                     complexityStore,
-                    entityStatisticStore,
                     historyStore,
                     involvedSectionService,
                     involvementStore,
@@ -112,9 +111,6 @@ function controller($q,
 
     const loadWave3 = () =>
         $q.all([
-            entityStatisticStore
-                .findAllActiveDefinitions()
-                .then(statDefinitions => vm.entityStatisticDefinitions = statDefinitions),
             complexityStore
                 .findBySelector(childrenSelector)
                 .then(complexity => vm.complexity = complexity),
@@ -188,7 +184,6 @@ controller.$inject = [
     'BookmarkStore',
     'ChangeLogStore',
     'ComplexityStore',
-    'EntityStatisticStore',
     'HistoryStore',
     'InvolvedSectionService',
     'InvolvementStore',
