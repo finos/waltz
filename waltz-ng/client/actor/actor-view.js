@@ -79,7 +79,6 @@ function controller($q,
                     $stateParams,
                     actorStore,
                     bookmarkStore,
-                    changeLogStore,
                     flowDiagramStore,
                     flowDiagramEntityStore,
                     historyStore,
@@ -112,10 +111,6 @@ function controller($q,
     sourceDataRatingStore
         .findAll()
         .then(sdrs => vm.sourceDataRatings = sdrs);
-
-    changeLogStore
-        .findByEntityReference('ACTOR', id)
-        .then(log => vm.log = log);
 
     loadFlowDiagrams(id, $q, flowDiagramStore, flowDiagramEntityStore)
         .then(r => Object.assign(vm, r));
@@ -177,7 +172,6 @@ controller.$inject = [
     '$stateParams',
     'ActorStore',
     'BookmarkStore',
-    'ChangeLogStore',
     'FlowDiagramStore',
     'FlowDiagramEntityStore',
     'HistoryStore',

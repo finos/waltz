@@ -15,10 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
 import {
     loadAuthSources,
-    loadChangeLog,
     loadDatabases,
     loadDataFlows,
     loadDataTypeUsages,
@@ -27,9 +26,9 @@ import {
     loadServers,
     loadSoftwareCatalog,
     loadSourceDataRatings
-} from './data-load';
+} from "./data-load";
 
-import template from './app-view.html';
+import template from "./app-view.html";
 
 
 const initialState = {
@@ -42,7 +41,6 @@ const initialState = {
     dataTypes: [],
     dataTypeUsages: [],
     flows: [],
-    log: [],
     ouAuthSources: [],
     organisationalUnit: null,
     peopleInvolvements: [],
@@ -103,7 +101,6 @@ function controller($q,
                     aliasStore,
                     authSourcesStore,
                     bookmarkStore,
-                    changeLogStore,
                     databaseStore,
                     dataTypeUsageStore,
                     entityStatisticStore,
@@ -262,8 +259,7 @@ function controller($q,
         ];
 
         return $q.all(promises)
-            .then(() => loadChangeLog(changeLogStore, entityReference, vm))
-            .then(() => loadSourceDataRatings(sourceDataRatingStore, vm))
+            .then(() => loadSourceDataRatings(sourceDataRatingStore, vm));
     }
 
     function loadFourthWave() {
@@ -340,7 +336,6 @@ controller.$inject = [
     'AliasStore',
     'AuthSourcesStore',
     'BookmarkStore',
-    'ChangeLogStore',
     'DatabaseStore',
     'DataTypeUsageStore',
     'EntityStatisticStore',

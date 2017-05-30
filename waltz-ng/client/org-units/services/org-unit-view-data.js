@@ -116,13 +116,6 @@ function loadSourceDataRatings(serviceBroker, holder) {
 }
 
 
-function loadChangeLogs(store, ref, holder = {}) {
-    return store
-        .findByEntityReference(ref)
-        .then(changeLogs => holder.changeLogs = changeLogs);
-}
-
-
 function loadMeasurables(store, selector, holder) {
     return store
         .findMeasurablesBySelector(selector)
@@ -149,9 +142,7 @@ function service($q,
                  assetCostViewService,
                  authSourcesStore,
                  bookmarkStore,
-                 changeLogStore,
                  complexityStore,
-                 entityStatisticStore,
                  involvementStore,
                  logicalFlowViewService,
                  measurableStore,
@@ -213,10 +204,8 @@ function service($q,
 
 
     function loadFourthWave(orgUnitId) {
-        const ref = mkRef(orgUnitId);
         return $q.all([
-            loadSourceDataRatings(serviceBroker, rawData),
-            loadChangeLogs(changeLogStore, ref, rawData)
+            loadSourceDataRatings(serviceBroker, rawData)
         ]);
     }
 
@@ -273,9 +262,7 @@ service.$inject = [
     'AssetCostViewService',
     'AuthSourcesStore',
     'BookmarkStore',
-    'ChangeLogStore',
     'ComplexityStore',
-    'EntityStatisticStore',
     'InvolvementStore',
     'LogicalFlowViewService',
     'MeasurableStore',

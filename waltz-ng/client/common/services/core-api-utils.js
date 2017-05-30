@@ -20,6 +20,7 @@
 
 import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
 import {ChangeInitiativeStore_API as ChangeInitiativeStore} from "../../change-initiative/services/change-initiative-store";
+import {ChangeLogStore_API as ChangeLogStore} from "../../change-log/services/change-log-store";
 import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
 import {EndUserAppStore_API as EndUserAppStore} from "../../end-user-apps/services/end-user-app-store";
 import {EntityNamedNoteStore_API as EntityNamedNoteStore} from "../../entity-named-note/services/entity-named-note-store";
@@ -38,6 +39,7 @@ import {TechnologyStatisticsService_API as TechnologyStatisticsService} from "..
 export const CORE_API = {
     ApplicationStore,
     ChangeInitiativeStore,
+    ChangeLogStore,
     DataTypeStore,
     EndUserAppStore,
     EntityNamedNoteStore,

@@ -21,7 +21,6 @@ import _ from "lodash";
 
 function service($q,
                  appStore,
-                 changeLogStore,
                  dataTypeUsageStore,
                  dataTypeService,
                  bookmarkStore,
@@ -64,14 +63,7 @@ function service($q,
                 Object.assign(rawData, r);
             })
             .then(() => loadAll2(dataTypeId))
-            .then(() => loadChangeLog(entityReference, rawData))
-            .then(() => rawData)
-    }
-
-    function loadChangeLog(ref, holder = {}) {
-        return changeLogStore
-            .findByEntityReference(ref)
-            .then(changes => holder.changeLogs = changes);
+            .then(() => rawData);
     }
 
     function loadAll2(dataTypeId) {
@@ -138,7 +130,6 @@ function service($q,
 service.$inject = [
     '$q',
     'ApplicationStore',
-    'ChangeLogStore',
     'DataTypeUsageStore',
     'DataTypeService',
     'BookmarkStore',

@@ -17,24 +17,44 @@
  */
 
 import {initialiseData} from "../../common";
+import {CORE_API} from "../../common/services/core-api-utils";
 
 
 const bindings = {
-    entries: '<',
-    entityReference: '<'
+    parentEntityRef: '<',
+    userName: '<'
 };
 
+
+const initialState = {
+    entries: []
+};
 
 const template = require('./change-log-section.html');
 
 
-function controller() {
-    const vm = initialiseData(this);
+function controller(serviceBroker) {
+    const vm = initialiseData(this, initialState);
+
+    if (vm.parentEntityRef) {
+        serviceBroker
+            .loadViewData(CORE_API.ChangeLogStore.findByEntityReference, [vm.parentEntityRef])
+            .then(result => vm.entries = result.data);
+    } else if (vm.userName) {
+        serviceBroker
+            .loadViewData(CORE_API.ChangeLogStore.findForUserName, [vm.userName])
+            .then(result => vm.entries = result.data);
+    }
 
     vm.changeLogTableInitialised = (api) => {
         vm.exportChangeLog = () => api.exportFn("change-log.csv");
     };
 }
+
+
+controller.$inject = [
+    'ServiceBroker'
+];
 
 
 const component = {
