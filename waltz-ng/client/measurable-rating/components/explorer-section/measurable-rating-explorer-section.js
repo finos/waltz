@@ -71,7 +71,8 @@ function preparePie(ratings = [],
             size: 130,
             onSelect,
             colorProvider: (d) => ragColorScale(d.data.key),
-            labelProvider: (d) => ragNames[d.key] || d.key
+            labelProvider: (d) => ragNames[d.key] ? ragNames[d.key].name : d.key,
+            descriptionProvider: (d) => ragNames[d.key] ? ragNames[d.key].description : d.key
         }
     };
 }
@@ -99,7 +100,7 @@ function prepareTableData(ratings = [],
 const ratingCellTemplate = `
     <div class="ui-grid-cell-contents">
         <waltz-rating-indicator-cell rating="row.entity.rating.rating" 
-                                     label="COL_FIELD">
+                                     label="COL_FIELD.name">
         </waltz-rating-indicator-cell>
     </div>`;
 
