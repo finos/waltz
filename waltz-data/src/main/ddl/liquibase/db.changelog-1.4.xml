@@ -272,4 +272,29 @@
                        tableName="measurable_relationship"/>
     </changeSet>
 
+
+    <!-- 2231 -->
+    <changeSet id="20170530-2231-1"
+               author="kamransaleem">
+        <comment>2231: Add description columns for measurable category ratings</comment>
+        <addColumn tableName="measurable_category">
+            <column name="rating_desc_r"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="rating_desc_a"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="rating_desc_g"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="rating_desc_z"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
