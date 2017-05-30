@@ -26,7 +26,8 @@ div.waltz-tabs {
             background: #fff;
             border-color: #ccc;
             border-bottom: none;
-            cursor:default
+            cursor:default;
+            border-top: 3px solid #e36209;
         }
 
         &:disabled + label {
@@ -59,4 +60,10 @@ div.waltz-tabs {
             display: block;
         }
     }
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+    border-top: 2px solid #e36209;
 }
