@@ -16,7 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+import angular from "angular";
+import {registerStores} from "../common/module-utils";
+import changeLogStore from "./services/change-log-store";
 
 export default () => {
     const module = angular.module('waltz.change.log', []);
@@ -24,8 +26,9 @@ export default () => {
     module
         .config(require('./routes'));
 
-    module
-        .service('ChangeLogStore', require('./services/change-log-store'));
+    registerStores(module, [
+        changeLogStore
+    ]);
 
     module
         .component('waltzChangeLogSection', require('./components/change-log-section'))

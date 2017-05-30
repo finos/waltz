@@ -82,7 +82,6 @@ function controller($q,
                     $stateParams,
                     applicationStore,
                     bookmarkStore,
-                    changeLogStore,
                     flowDiagramStore,
                     flowDiagramEntityStore,
                     historyStore,
@@ -126,10 +125,6 @@ function controller($q,
             vm.logicalFlows = logicalFlows;
             vm.logicalFlowsById = _.keyBy(logicalFlows, 'id')
         });
-
-    changeLogStore
-        .findByEntityReference(ref)
-        .then(changeLogs => vm.changeLogs = changeLogs);
 
     const loadSpecDefinitions = () => physicalSpecDefinitionStore
         .findForSpecificationId(specId)
@@ -299,7 +294,6 @@ controller.$inject = [
     '$stateParams',
     'ApplicationStore',
     'BookmarkStore',
-    'ChangeLogStore',
     'FlowDiagramStore',
     'FlowDiagramEntityStore',
     'HistoryStore',

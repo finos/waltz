@@ -54,13 +54,6 @@ export function loadPhysicalFlows(physicalFlowStore, entityReference, vm) {
 }
 
 
-export function loadChangeLog(changeLogStore, ref, vm) {
-    changeLogStore
-        .findByEntityReference(ref, CHANGE_LOG_LIMIT)
-        .then(log => vm.log = log);
-}
-
-
 export function loadSourceDataRatings(sourceDataRatingStore, vm) {
     sourceDataRatingStore
         .findAll()

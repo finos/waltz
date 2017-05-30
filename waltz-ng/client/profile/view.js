@@ -17,7 +17,6 @@
  */
 
 const initialState = {
-    changes: [],
     contribution: {
         score: 0,
         directScores: [],
@@ -33,7 +32,6 @@ const initialState = {
 
 controller.$inject = [
     '$stateParams',
-    'ChangeLogStore',
     'PersonStore',
     'UserContributionStore',
     'UserStore'
@@ -41,7 +39,6 @@ controller.$inject = [
 
 
 function controller($stateParams,
-                    changeLogStore,
                     personStore,
                     userContributionStore,
                     userStore) {
@@ -71,10 +68,6 @@ function controller($stateParams,
     personPromise
         .then(loadManagerAndDirects);
 
-
-    changeLogStore
-        .findForUserName(userId)
-        .then(cs => vm.changes = cs);
 
     userStore
         .findForUserId(userId)

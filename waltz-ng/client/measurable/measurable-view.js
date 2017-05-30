@@ -45,7 +45,6 @@ function controller($q,
                     serviceBroker,
                     assetCostViewService,
                     bookmarkStore,
-                    changeLogStore,
                     complexityStore,
                     historyStore,
                     involvedSectionService,
@@ -123,9 +122,6 @@ function controller($q,
         $q.all([
             serviceBroker.loadAppData(CORE_API.SourceDataRatingStore.findAll, [])
                 .then(r => vm.sourceDataRatings = r.data),
-            changeLogStore
-                .findByEntityReference(ref)
-                .then(changeLogs => vm.changeLogs = changeLogs),
             logHistory(vm.measurable, historyStore)
         ]);
 
@@ -182,7 +178,6 @@ controller.$inject = [
     'ServiceBroker',
     'AssetCostViewService',
     'BookmarkStore',
-    'ChangeLogStore',
     'ComplexityStore',
     'HistoryStore',
     'InvolvedSectionService',

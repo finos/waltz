@@ -55,7 +55,6 @@ function controller($scope,
                     appGroupStore,
                     assetCostViewService,
                     bookmarkStore,
-                    changeLogStore,
                     complexityStore,
                     historyStore,
                     logicalFlowViewService,
@@ -126,9 +125,7 @@ function controller($scope,
         })
         .then(result => Object.assign(vm, result))
         .then(() => sourceDataRatingStore.findAll())
-        .then((sourceDataRatings) => vm.sourceDataRatings = sourceDataRatings)
-        .then(() => changeLogStore.findByEntityReference(vm.entityRef))
-        .then(changeLogs => vm.changeLogs = changeLogs);
+        .then((sourceDataRatings) => vm.sourceDataRatings = sourceDataRatings);
 
     userService
         .whoami()
@@ -179,7 +176,6 @@ controller.$inject = [
     'AppGroupStore',
     'AssetCostViewService',
     'BookmarkStore',
-    'ChangeLogStore',
     'ComplexityStore',
     'HistoryStore',
     'LogicalFlowViewService',
