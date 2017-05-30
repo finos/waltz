@@ -18,6 +18,7 @@
 
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
+import {CORE_API} from '../../../common/services/core-api-utils';
 import {mkLinkGridCell} from '../../../common/link-utils';
 import {ragColorScale} from '../../../common/colors';
 
@@ -30,27 +31,28 @@ import {ragColorScale} from '../../../common/colors';
  * all the ratings and their associated applications.
  */
 
+import template from './measurable-rating-explorer-section.html';
+
 
 const bindings = {
+    parentEntityRef: '<',
+    scope: '<',
     applications: '<',
     measurableCategory: '<',
-    measurables: '<',
-    ratings: '<',
     ragNames: '<',
     sourceDataRatings: '<'
 };
 
 
 const initialState = {
+    measurables: [],
     query: '',
     pie: null,
+    ratings: [],
     visibility: {
         ratingOverlay: false
     }
 };
-
-
-const template = require('./measurable-rating-explorer-section.html');
 
 
 function preparePie(ratings = [],
@@ -135,7 +137,7 @@ function prepareColumnDefs(measurableCategory, measurables) {
 }
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const onSelect = (d) => {
@@ -152,7 +154,21 @@ function controller() {
             vm.measurableCategory.ragNames);
     };
 
+
+    vm.$onInit = () => {
+        serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll, [])
+            .then(result => vm.measurables = result.data);
+    };
+
     vm.$onChanges = (c) => {
+        if(vm.parentEntityRef && vm.scope) {
+            const selector = { entityReference: vm.parentEntityRef, scope: vm.scope };
+            serviceBroker
+                .loadViewData(CORE_API.MeasurableRatingStore.findByMeasurableSelector, [selector])
+                .then(r => vm.ratings = r.data);
+        }
+
+
         if (vm.measurableCategory && vm.measurables) {
             vm.columnDefs = prepareColumnDefs(
                 vm.measurableCategory,
@@ -183,7 +199,7 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = ['ServiceBroker'];
 
 
 const component = {

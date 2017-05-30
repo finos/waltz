@@ -100,4 +100,61 @@ function store($http, baseApiUrl) {
 
 store.$inject = ['$http', 'BaseApiUrl'];
 
-export default store;
+
+const serviceName = 'MeasurableRatingStore';
+
+
+export const MeasurableRatingStore_API = {
+    findByMeasurableSelector: {
+        serviceName,
+        serviceFnName: 'findByMeasurableSelector',
+        description: 'finds measurables by measurable selector'
+    },
+    findByAppSelector: {
+        serviceName,
+        serviceFnName: 'findByAppSelector',
+        description: 'finds measurables by app selector'
+    },
+    findForEntityReference: {
+        serviceName,
+        serviceFnName: 'findForEntityReference',
+        description: 'find measurables for an entity reference'
+    },
+    countByMeasurable: {
+        serviceName,
+        serviceFnName: 'countByMeasurable',
+        description: 'return a count by measurable'
+    },
+    statsByAppSelector: {
+        serviceName,
+        serviceFnName: 'statsByAppSelector',
+        description: 'return measurable stats by app selector'
+    },
+    statsForRelatedMeasurables: {
+        serviceName,
+        serviceFnName: 'statsForRelatedMeasurables',
+        description: 'return stats for related measurables'
+    },
+    create: {
+        serviceName,
+        serviceFnName: 'create',
+        description: 'create a measurable'
+    },
+    update: {
+        serviceName,
+        serviceFnName: 'update',
+        description: 'update a measurable'
+    },
+    remove: {
+        serviceName,
+        serviceFnName: 'remove',
+        description: 'remove a measurable'
+    }
+
+};
+
+
+export default {
+    serviceName,
+    store
+}
