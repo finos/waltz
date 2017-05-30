@@ -27,7 +27,8 @@ const bindings = {
 
 
 const initialState = {
-    entries: []
+    entries: [],
+    entriesLoaded: false
 };
 
 const template = require('./change-log-section.html');
@@ -36,15 +37,22 @@ const template = require('./change-log-section.html');
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    if (vm.parentEntityRef) {
-        serviceBroker
-            .loadViewData(CORE_API.ChangeLogStore.findByEntityReference, [vm.parentEntityRef])
-            .then(result => vm.entries = result.data);
-    } else if (vm.userName) {
-        serviceBroker
-            .loadViewData(CORE_API.ChangeLogStore.findForUserName, [vm.userName])
-            .then(result => vm.entries = result.data);
-    }
+    vm.loadEntries = () => {
+        const dataLoadHandler = (result) => {
+            vm.entries = result.data;
+            vm.entriesLoaded = true;
+        };
+
+        if (vm.parentEntityRef) {
+            serviceBroker
+                .loadViewData(CORE_API.ChangeLogStore.findByEntityReference, [vm.parentEntityRef])
+                .then(dataLoadHandler);
+        } else if (vm.userName) {
+            serviceBroker
+                .loadViewData(CORE_API.ChangeLogStore.findForUserName, [vm.userName])
+                .then(dataLoadHandler);
+        }
+    };
 
     vm.changeLogTableInitialised = (api) => {
         vm.exportChangeLog = () => api.exportFn("change-log.csv");

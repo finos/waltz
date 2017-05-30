@@ -15,23 +15,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from "lodash";
+import {checkIsEntityRef} from "../../common/checks";
 
 
 function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/change-log`;
 
-    const findByEntityReference = (kind, id, limit = 30) => {
-        let ref = null;
-        if (_.isObject(kind)) {
-            ref = kind;
-            limit = id || 30;
-        } else {
-            console.log('DEPRECATED:change-log-store: use entity-ref not kind and id (#1290)');
-            ref = {kind, id};
-        }
-
+    const findByEntityReference = (ref, limit = 30) => {
+        checkIsEntityRef(ref);
         return $http
             .get(`${BASE}/${ref.kind}/${ref.id}`, {params: {limit}})
             .then(result => result.data);
@@ -60,12 +52,12 @@ export const ChangeLogStore_API = {
     findByEntityReference: {
         serviceName,
         serviceFnName: 'findByEntityReference',
-        description: 'finds change log entries for a given entity reference'
+        description: 'finds change log entries for a given entity reference and limit (default: 30)'
     },
     findForUserName: {
         serviceName,
         serviceFnName: 'findForUserName',
-        description: 'finds change log entries for a given user name'
+        description: 'finds change log entries for a given user name and limit (default: no limit)'
     }
 };
 

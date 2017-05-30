@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,9 +15,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import {CORE_API} from "../common/services/core-api-utils";
+
 
 function controller(accessLogStore,
-                    changeLogStore) {
+                    serviceBroker) {
 
     const vm = this;
 
@@ -34,9 +35,9 @@ function controller(accessLogStore,
                 .findForUserName(userName, 500)
                 .then(logs => vm.accesslogs = logs);
 
-            changeLogStore
-                .findForUserName(userName, 500)
-                .then(logs => vm.changeLogs = logs);
+            serviceBroker
+                .loadViewData(CORE_API.ChangeLogStore.findForUserName, [vm.userName, 500])
+                .then(result => vm.changeLogs = result.data);
         }
 
     };
@@ -98,7 +99,7 @@ function controller(accessLogStore,
 
 controller.$inject = [
     'AccessLogStore',
-    'ChangeLogStore',
+    'ServiceBroker',
 ];
 
 
