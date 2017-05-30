@@ -17,6 +17,8 @@
  */
 
 import _ from "lodash";
+import {initialiseData} from "../common";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
@@ -26,13 +28,13 @@ const initialState = {
 
 
 function controller($stateParams,
-                    changeLogStore) {
+                    serviceBroker) {
 
-    const vm = _.defaultsDeep(this);
+    const vm = initialiseData(this, initialState);
 
     const entityRef = {
         kind: $stateParams.kind,
-        id: $stateParams.id,
+        id: _.toNumber($stateParams.id),
         name: $stateParams.name
     };
 
@@ -40,17 +42,17 @@ function controller($stateParams,
         vm.exportChangeLog = () => api.exportFn("change-log.csv");
     };
 
-
     vm.entityRef = entityRef;
-    changeLogStore
-        .findByEntityReference(entityRef.kind, entityRef.id)
-        .then(rs => vm.entries = rs);
+
+    serviceBroker
+        .loadViewData(CORE_API.ChangeLogStore.findByEntityReference, [vm.entityRef])
+        .then(result => vm.entries = result.data);
 }
 
 
 controller.$inject = [
     '$stateParams',
-    'ChangeLogStore'
+    'ServiceBroker'
 ];
 
 
