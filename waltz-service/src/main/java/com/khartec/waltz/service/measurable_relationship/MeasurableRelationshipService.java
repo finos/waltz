@@ -18,43 +18,31 @@
 
 package com.khartec.waltz.service.measurable_relationship;
 
-import com.khartec.waltz.data.measurable_relationship.MeasurableRelationshipDao;
 import com.khartec.waltz.model.measurable_relationship.MeasurableRelationship;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
-
-import static com.khartec.waltz.common.Checks.checkFalse;
-import static com.khartec.waltz.common.Checks.checkNotNull;
 
 @Service
 public class MeasurableRelationshipService {
 
-    private final MeasurableRelationshipDao measurableRelationshipDao;
 
 
-    @Autowired
-    public MeasurableRelationshipService(MeasurableRelationshipDao measurableRelationshipDao) {
-        checkNotNull(measurableRelationshipDao, "measurableRelationshipDao cannot be null");
-
-        this.measurableRelationshipDao = measurableRelationshipDao;
+    public MeasurableRelationshipService() {
     }
 
 
     public List<MeasurableRelationship> findForMeasurable(long measurableId) {
-        return measurableRelationshipDao.findForMeasurable(measurableId);
+        return Collections.emptyList();
     }
 
 
     public int remove(long measurable1, long measurable2) {
-        checkFalse(measurable1 == measurable2, "Cannot relate a measurable to itself");
-        return measurableRelationshipDao.remove(measurable1, measurable2);
+        return 0;
     }
 
     public boolean save(MeasurableRelationship measurableRelationship) {
-        checkNotNull(measurableRelationship, "measurableRelationship cannot be null");
-        return measurableRelationshipDao.save(measurableRelationship);
-
+        return false;
     }
 }
