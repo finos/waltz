@@ -16,6 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
+import {registerStores} from '../common/module-utils';
+
+import measurableRatingStore from './services/measurable-rating-store';
 
 
 export default () => {
@@ -25,9 +28,9 @@ export default () => {
         .config(require('./routes'))
         ;
 
-    module
-        .service('MeasurableRatingStore', require('./services/measurable-rating-store'))
-        ;
+
+    registerStores(module, [measurableRatingStore]);
+
 
     module
         .component('waltzAssociatedPerspectives', require('./components/associated-perspectives/associated-perspectives'))
@@ -39,6 +42,7 @@ export default () => {
         .component('waltzMeasurableRatingsBrowserSection', require('./components/browser-section/measurable-ratings-browser-section'))
         .component('waltzRelatedMeasurablesSection', require('./components/related-measurables-section/related-measurables-section'))
         ;
+
 
     return module.name;
 };

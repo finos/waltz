@@ -22,37 +22,54 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
+
 @Value.Immutable
 @JsonSerialize(as = ImmutableRagNames.class)
 @JsonDeserialize(as = ImmutableRagNames.class)
 public abstract class RagNames {
 
     @Value.Default
-    public String R() {
-        return "Poor";
+    public RagName R() {
+        return ImmutableRagName.builder()
+                .rating(RagRating.R)
+                .name("Poor")
+                .build();
     }
 
 
     @Value.Default
-    public String A() {
-        return "Adequate";
+    public RagName A() {
+        return ImmutableRagName.builder()
+                .rating(RagRating.A)
+                .name("Adequate")
+                .build();
     }
 
 
     @Value.Default
-    public String G() {
-        return "Good";
+    public RagName G() {
+        return ImmutableRagName.builder()
+                .rating(RagRating.G)
+                .name("Good")
+                .build();
     }
 
 
     @Value.Default
-    public String Z() {
-        return "Unknown";
+    public RagName Z() {
+        return ImmutableRagName.builder()
+                .rating(RagRating.Z)
+                .name("Unknown")
+                .build();
     }
 
 
     @Value.Default
-    public String X() {
-        return "Not Applicable";
+    public RagName X() {
+        return ImmutableRagName.builder()
+                .rating(RagRating.X)
+                .name("Not Applicable")
+                .build();
     }
+
 }

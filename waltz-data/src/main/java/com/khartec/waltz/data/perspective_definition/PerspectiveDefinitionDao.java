@@ -22,7 +22,9 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.perspective.ImmutablePerspectiveDefinition;
 import com.khartec.waltz.model.perspective.PerspectiveDefinition;
 import com.khartec.waltz.model.rating.ImmutableRagNames;
+import com.khartec.waltz.model.rating.RagName;
 import com.khartec.waltz.model.rating.RagNames;
+import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.schema.tables.records.PerspectiveDefinitionRecord;
 import org.jooq.DSLContext;
 import org.jooq.RecordMapper;
@@ -35,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static com.khartec.waltz.model.rating.RagName.mkRagName;
 import static com.khartec.waltz.schema.tables.PerspectiveDefinition.PERSPECTIVE_DEFINITION;
 
 @Repository
@@ -42,11 +45,11 @@ public class PerspectiveDefinitionDao {
 
     private static final RecordMapper<PerspectiveDefinitionRecord, PerspectiveDefinition> TO_DOMAIN_MAPPER = r -> {
         RagNames ragNames = ImmutableRagNames.builder()
-                .R(r.getRatingNameR())
-                .A(r.getRatingNameA())
-                .G(r.getRatingNameG())
-                .Z(r.getRatingNameZ())
-                .X(r.getRatingNameX())
+                .R(mkRagName(RagRating.R, r.getRatingNameR(), null))
+                .A(mkRagName(RagRating.A, r.getRatingNameA(), null))
+                .G(mkRagName(RagRating.G, r.getRatingNameG(), null))
+                .Z(mkRagName(RagRating.Z, r.getRatingNameZ(), null))
+                .X(mkRagName(RagRating.X, r.getRatingNameX(), null))
                 .build();
 
         return ImmutablePerspectiveDefinition.builder()
@@ -99,11 +102,11 @@ public class PerspectiveDefinitionDao {
             record.setName(perspectiveDefinition.name());
             record.setCategoryX(perspectiveDefinition.categoryX());
             record.setCategoryY(perspectiveDefinition.categoryY());
-            record.setRatingNameR(ragNames.R());
-            record.setRatingNameA(ragNames.A());
-            record.setRatingNameG(ragNames.G());
-            record.setRatingNameZ(ragNames.Z());
-            record.setRatingNameX(ragNames.X());
+            record.setRatingNameR(ragNames.R().name());
+            record.setRatingNameA(ragNames.A().name());
+            record.setRatingNameG(ragNames.G().name());
+            record.setRatingNameZ(ragNames.Z().name());
+            record.setRatingNameX(ragNames.X().name());
             record.setDescription(mkSafe(perspectiveDefinition.description()));
 
             return record.insert() == 1;
