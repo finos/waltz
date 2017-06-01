@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
-import {initialiseData} from '../common';
+import _ from "lodash";
+import {initialiseData} from "../common";
+import {CORE_API} from "../common/services/core-api-utils";
+import {downloadTextFile} from "../common/file-utils";
 
 const template = require('./flow-diagram-view.html');
 
@@ -25,16 +27,54 @@ const initialState = {
 };
 
 
+function prepareDataForExport(flows = []) {
+    const columnNames = [[
+        "Source",
+        "Target",
+        "Transport",
+        "Frequency",
+        "Specification",
+        "Data Types"
+    ]];
+
+    const exportData = _.flatMap(flows, f => {
+        if (f.physicalFlows.length > 0) {
+            return _.map(f.physicalFlows, pf => [
+                f.logicalFlow.source.name,
+                f.logicalFlow.target.name,
+                pf.transportName,
+                pf.frequencyName,
+                pf.specificationName,
+                _.join(_.map(pf.specificationDataTypes, 'dataTypeName'), ";")
+            ]);
+        } else {
+            return [[
+                f.logicalFlow.source.name,
+                f.logicalFlow.target.name,
+                "",
+                "",
+                "",
+                ""
+            ]];
+        }
+    });
+
+    return columnNames.concat(exportData);
+}
+
+
 function controller(
     $q,
     $stateParams,
     $timeout,
+    displayNameService,
     flowDiagramStateService,
     flowDiagramStore,
     flowDiagramEntityStore,
     logicalFlowStore,
     physicalFlowStore,
-    physicalSpecificationStore)
+    physicalSpecificationStore,
+    serviceBroker)
 {
     const vm = initialiseData(this, initialState);
     const diagramId = $stateParams.id;
@@ -80,20 +120,45 @@ function controller(
             return xs;
         });
 
+    const physicalSpecDataTypesPromise = serviceBroker
+        .loadViewData(CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector, [selector])
+        .then(result => result.data);
+
     const logicalFlowPromise = logicalFlowStore
         .findBySelector(selector);
 
-    $q.all([logicalFlowPromise, physicalFlowPromise, physicalSpecPromise])
-        .then(([logicalFlows, physicalFlows, physicalSpecs]) => {
-            const physicalFlowsByLogicalId = _.groupBy(physicalFlows, 'logicalFlowId');
-            vm.physicalSpecificationsById = _.keyBy(physicalSpecs, 'id');
-            vm.physicalFlows = physicalFlows;
+    $q.all([logicalFlowPromise, physicalFlowPromise, physicalSpecPromise, physicalSpecDataTypesPromise])
+        .then(([logicalFlows, physicalFlows, physicalSpecs, physicalSpecDataTypes]) => {
+            const physicalSpecsById = _.keyBy(physicalSpecs, 'id');
+            const physicalSpecDataTypesBySpecId =
+                _.chain(physicalSpecDataTypes)
+                    .map(psdt => Object.assign(
+                        {},
+                        psdt,
+                        { dataTypeName: displayNameService.lookup('dataType', psdt.dataTypeId) }))
+                    .groupBy('specificationId')
+                    .value();
+            const enhancedPhysicalFlows = _.map(physicalFlows, pf => Object.assign(
+                {},
+                pf,
+                {
+                    transportName: displayNameService.lookup('transportKind', pf.transport),
+                    frequencyName: displayNameService.lookup('frequencyKind', pf.frequency),
+                    specificationName: physicalSpecsById[pf.specificationId]
+                                        ? physicalSpecsById[pf.specificationId].name
+                                        : "-",
+                    specificationDataTypes: physicalSpecDataTypesBySpecId[pf.specificationId] || []
+                }));
+            const enhancedPhysicalFlowsByLogicalId = _.groupBy(enhancedPhysicalFlows, 'logicalFlowId');
+
             vm.flows = _.map(logicalFlows, f => {
                 return {
                     logicalFlow: f,
-                    physicalFlows: physicalFlowsByLogicalId[f.id] || [],
+                    physicalFlows: enhancedPhysicalFlowsByLogicalId[f.id] || [],
                 }
             });
+
+            prepareDataForExport(vm.flows);
         });
 
 
@@ -114,7 +179,12 @@ function controller(
         };
         flowDiagramStateService.processCommands([cmd]);
         loadVisibility();
-    }
+    };
+
+    vm.exportDiagramTable = () => {
+        const dataRows = prepareDataForExport(vm.flows);
+        downloadTextFile(dataRows, ",", vm.diagram.name + "_flows.csv");
+    };
 
 }
 
@@ -122,12 +192,14 @@ controller.$inject = [
     '$q',
     '$stateParams',
     '$timeout',
+    'DisplayNameService',
     'FlowDiagramStateService',
     'FlowDiagramStore',
     'FlowDiagramEntityStore',
     'LogicalFlowStore',
     'PhysicalFlowStore',
-    'PhysicalSpecificationStore'
+    'PhysicalSpecificationStore',
+    'ServiceBroker'
 ];
 
 const view = {

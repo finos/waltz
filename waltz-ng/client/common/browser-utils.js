@@ -35,3 +35,9 @@ export function preventDefault(e) {
     e.returnValue = false;
     if(e.preventDefault)  e.preventDefault();
 }
+
+
+export function isIE() {
+    const match = navigator.userAgent.search(/(?:Edge|MSIE|Trident\/.*; rv:)/);
+    return match !== -1;
+}
