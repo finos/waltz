@@ -30,7 +30,6 @@ const initData = {
         values: []
     },
     relatedDefinitions: null,
-    bookmarks: [],
     summaries: [],
     directs: [],
     duration: 'MONTH',
@@ -45,7 +44,7 @@ const initData = {
 };
 
 
-const template = require('./person-entity-statistic-view.html');
+import template from './person-entity-statistic-view.html';
 
 
 
@@ -60,7 +59,6 @@ function controller($q,
                     $state,
                     $stateParams,
                     applicationStore,
-                    bookmarkStore,
                     entityStatisticStore,
                     orgUnitStore,
                     personStore) {
@@ -72,19 +70,16 @@ function controller($q,
     const personPromise = personStore
         .getById(personId);
 
-    const statRef = {
+    vm.statRef = {
         id: statId,
         kind: 'ENTITY_STATISTIC'
     };
-
-    bookmarkStore
-        .findByParent(statRef)
-        .then(bs => vm.bookmarks = bs);
 
     const definitionPromise = entityStatisticStore
         .findRelatedStatDefinitions(statId)
         .then(ds => vm.relatedDefinitions = ds)
         .then(ds => vm.statistic.definition = ds.self)
+        .then(() => vm.statRef = Object.assign(vm.statRef, { name: vm.statistic.definition.name }))
         .then(() => vm.visibility.related = hasRelatedDefinitions(vm.relatedDefinitions));
 
     const allDefinitionsPromise = entityStatisticStore
@@ -198,7 +193,6 @@ controller.$inject = [
     '$state',
     '$stateParams',
     'ApplicationStore',
-    'BookmarkStore',
     'EntityStatisticStore',
     'OrgUnitStore',
     'PersonStore'

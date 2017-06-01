@@ -93,11 +93,8 @@
 
 
     <!-- BOOKMARKS -->
-    <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
-                             kind="APP_GROUP"
-                             source-data-ratings="ctrl.sourceDataRatings"
-                             entity-id="{{ ctrl.groupDetail.appGroup.id }}"
-                             parent-name="{{ ctrl.groupDetail.appGroup.name }}">
+    <waltz-bookmarks-section parent-entity-ref="ctrl.entityRef"
+                             source-data-ratings="ctrl.sourceDataRatings">
     </waltz-bookmarks-section>
 
 

@@ -21,6 +21,8 @@ import {kindToViewState} from "../common/link-utils";
 import {mkSelectionOptions} from "../common/selector-utils";
 import {hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload} from "./utilities";
 
+import template from './entity-statistic-view.html';
+
 
 const initData = {
     allDefinitions: [],
@@ -56,7 +58,6 @@ function controller($q,
                     $state,
                     $stateParams,
                     applicationStore,
-                    bookmarkStore,
                     entityStatisticUtilities,
                     entityStatisticStore,
                     orgUnitStore) {
@@ -66,19 +67,16 @@ function controller($q,
     const entityKind = $stateParams.kind;
     const entityId = $stateParams.id;
 
-    const statRef = {
+    vm.statRef = {
         id: statId,
         kind: 'ENTITY_STATISTIC'
     };
-
-    bookmarkStore
-        .findByParent(statRef)
-        .then(bs => vm.bookmarks = bs);
 
     const definitionPromise = entityStatisticStore
         .findRelatedStatDefinitions(statId)
         .then(ds => vm.relatedDefinitions = ds)
         .then(ds => vm.statistic.definition = ds.self)
+        .then(() => vm.statRef = Object.assign(vm.statRef, { name: vm.statistic.definition.name }))
         .then(() => vm.visibility.related = hasRelatedDefinitions(vm.relatedDefinitions));
 
     const navItemPromise = entityStatisticUtilities
@@ -185,7 +183,6 @@ controller.$inject = [
     '$state',
     '$stateParams',
     'ApplicationStore',
-    'BookmarkStore',
     'EntityStatisticUtilities',
     'EntityStatisticStore',
     'OrgUnitStore'
@@ -193,7 +190,7 @@ controller.$inject = [
 
 
 const view = {
-    template: require('./entity-statistic-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

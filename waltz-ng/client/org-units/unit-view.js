@@ -53,7 +53,7 @@ function controller($stateParams,
         .loadAll(id)
         .then(() => addToHistory(historyStore, vm.viewData.orgUnit))
         .then(() => initTour(tourService, vm))
-        .then(() => vm.entityRef.name = vm.viewData.orgUnit.name);
+        .then(() => vm.entityRef = Object.assign(vm.entityRef, {name: vm.viewData.orgUnit.name}));
 
 
     // -- INTERACTIONS ---

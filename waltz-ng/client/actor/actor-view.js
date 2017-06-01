@@ -18,7 +18,7 @@
 
 import {initialiseData} from "../common";
 
-const template = require('./actor-view.html');
+import template from './actor-view.html';
 
 
 const initialState = {
@@ -78,7 +78,6 @@ function loadFlowDiagrams(id, $q, flowDiagramStore, flowDiagramEntityStore) {
 function controller($q,
                     $stateParams,
                     actorStore,
-                    bookmarkStore,
                     flowDiagramStore,
                     flowDiagramEntityStore,
                     historyStore,
@@ -89,24 +88,22 @@ function controller($q,
     const vm = initialiseData(this, initialState);
 
     const id = $stateParams.id;
-    const entityRef = { kind: 'ACTOR', id };
-    Object.assign(vm, { id, entityRef });
+    vm.entityRef = { kind: 'ACTOR', id };
+    Object.assign(vm, { id, entityRef: vm.entityRef });
 
     actorStore
         .getById(id)
         .then(a => vm.actor = a)
+        .then(() => vm.entityRef = Object.assign(vm.entityRef, { name: vm.actor.name }))
         .then(() => addToHistory(historyStore, vm.actor));
 
     physicalFlowStore
-        .findByEntityReference(entityRef)
+        .findByEntityReference(vm.entityRef)
         .then(flows => vm.physicalFlows = flows);
 
     physicalSpecificationStore
-        .findByEntityReference(entityRef)
+        .findByEntityReference(vm.entityRef)
         .then(specs => vm.physicalSpecifications = specs);
-
-    bookmarkStore.findByParent(entityRef)
-        .then(bookmarks => vm.bookmarks = bookmarks);
 
     sourceDataRatingStore
         .findAll()
@@ -171,7 +168,6 @@ controller.$inject = [
     '$q',
     '$stateParams',
     'ActorStore',
-    'BookmarkStore',
     'FlowDiagramStore',
     'FlowDiagramEntityStore',
     'HistoryStore',

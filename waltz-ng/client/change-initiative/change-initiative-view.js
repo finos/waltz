@@ -25,7 +25,6 @@ import template from './change-initiative-view.html';
 
 
 const initialState = {
-    bookmarks: [],
     changeInitiative: {},
     involvements: [],
     sourceDataRatings: [],
@@ -41,7 +40,6 @@ function controller($q,
                     $stateParams,
                     applicationStore,
                     appGroupStore,
-                    bookmarkStore,
                     historyStore,
                     involvedSectionService,
                     involvementStore,
@@ -88,8 +86,11 @@ function controller($q,
         .then(result => {
             const ci = result.data;
             vm.changeInitiative = ci;
-            vm.entityRef.name = vm.changeInitiative.name;
-            vm.entityRef.description = vm.changeInitiative.description;
+            vm.entityRef = Object.assign(vm.entityRef,
+                                        {
+                                            name: vm.changeInitiative.name,
+                                            description: vm.changeInitiative.description
+                                        });
 
             historyStore
                 .put(
@@ -102,12 +103,6 @@ function controller($q,
     sourceDataRatingStore
         .findAll()
         .then(rs => vm.sourceDataRatings = rs);
-
-
-    bookmarkStore
-        .findByParent({kind: 'CHANGE_INITIATIVE', id})
-        .then(bs => vm.bookmarks = bs);
-
 
     serviceBroker
         .loadViewData(CORE_API.ChangeInitiativeStore.findRelatedForId, [id])
@@ -157,7 +152,6 @@ controller.$inject = [
     '$stateParams',
     'ApplicationStore',
     'AppGroupStore',
-    'BookmarkStore',
     'HistoryStore',
     'InvolvedSectionService',
     'InvolvementStore',

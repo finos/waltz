@@ -6,7 +6,7 @@
                    class="waltz-bookmark-section">
         <waltz-section-actions>
             <a waltz-has-role="BOOKMARK_EDITOR"
-               ui-sref="main.bookmarks.edit ({ entityId: $ctrl.entityId, kind: $ctrl.kind, parentName:$ctrl.parentName })"
+               ui-sref="main.bookmarks.edit ({ entityId: $ctrl.parentEntityRef.id, kind: $ctrl.parentEntityRef.kind, parentName:$ctrl.parentEntityRef.name })"
                class="btn btn-xs btn-primary">
                 Edit
             </a>
@@ -96,7 +96,7 @@
             <message>
                 <strong>No bookmarks</strong>
                 for this
-                <span ng-bind="$ctrl.kind | toDisplayName:'entity' | lowercase">
+                <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName:'entity' | lowercase">
                 </span>
             </message>
         </waltz-no-data>

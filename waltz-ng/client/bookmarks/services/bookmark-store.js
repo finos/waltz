@@ -42,6 +42,34 @@ function store($http, baseApiUrl) {
 
 }
 
+
 store.$inject = ['$http', 'BaseApiUrl'];
 
-export default store;
+
+const serviceName = 'BookmarkStore';
+
+
+export const BookmarkStore_API = {
+    save: {
+        serviceName,
+        serviceFnName: 'save',
+        description: 'save a bookmark'
+    },
+    findByParent: {
+        serviceName,
+        serviceFnName: 'findByParent',
+        description: 'find by parent entity reference'
+    },
+    remove: {
+        serviceName,
+        serviceFnName: 'remove',
+        description: 'remove a bookmark'
+    }
+};
+
+
+export default {
+    serviceName,
+    store
+};
+

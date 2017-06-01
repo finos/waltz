@@ -21,7 +21,7 @@ import {toGraphId} from "../flow-diagram/flow-diagram-utils";
 import _ from "lodash";
 
 
-const template = require('./physical-specification-view.html');
+import template from './physical-specification-view.html';
 
 
 const initialState = {
@@ -81,7 +81,6 @@ function mkReleaseLifecycleStatusChangeCommand(newStatus) {
 function controller($q,
                     $stateParams,
                     applicationStore,
-                    bookmarkStore,
                     flowDiagramStore,
                     flowDiagramEntityStore,
                     historyStore,
@@ -113,6 +112,7 @@ function controller($q,
         .then(app => vm.owningEntity = app)
         .then(app => orgUnitStore.getById(app.organisationalUnitId))
         .then(ou => vm.organisationalUnit = ou)
+        .then(() => vm.entityReference = Object.assign(vm.entityReference, { name: vm.specification.name }))
         .then(() => addToHistory(historyStore, vm.specification));
 
     physicalFlowStore
@@ -144,10 +144,6 @@ function controller($q,
 
     vm.loadFlowDiagrams();
 
-
-    bookmarkStore
-        .findByParent(ref)
-        .then(bs => vm.bookmarks = bs);
 
     vm.selectSpecDefinition = (def) => {
         const specDefFieldPromise = physicalSpecDefinitionFieldStore
@@ -293,7 +289,6 @@ controller.$inject = [
     '$q',
     '$stateParams',
     'ApplicationStore',
-    'BookmarkStore',
     'FlowDiagramStore',
     'FlowDiagramEntityStore',
     'HistoryStore',

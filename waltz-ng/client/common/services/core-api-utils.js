@@ -19,6 +19,7 @@
  */
 
 import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
+import {BookmarkStore_API as BookmarkStore} from "../../bookmarks/services/bookmark-store";
 import {ChangeInitiativeStore_API as ChangeInitiativeStore} from "../../change-initiative/services/change-initiative-store";
 import {ChangeLogStore_API as ChangeLogStore} from "../../change-log/services/change-log-store";
 import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
@@ -39,6 +40,7 @@ import {TechnologyStatisticsService_API as TechnologyStatisticsService} from "..
 
 export const CORE_API = {
     ApplicationStore,
+    BookmarkStore,
     ChangeInitiativeStore,
     ChangeLogStore,
     DataTypeStore,

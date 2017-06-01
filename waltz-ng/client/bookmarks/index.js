@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -19,6 +18,11 @@
 
 import angular from 'angular';
 
+import {registerComponent, registerStore} from '../common/module-utils';
+
+import bookmarkStore from './services/bookmark-store';
+import bookmarksSection from './components/bookmarks-section/bookmarks-section';
+
 export default () => {
 
     const module = angular.module('waltz.bookmarks', []);
@@ -28,12 +32,12 @@ export default () => {
     module
         .config(require('./routes'));
 
-    module
-        .service('BookmarkStore', require('./services/bookmark-store'));
+    registerStore(module, bookmarkStore);
 
     module
-        .component('waltzBookmarkKinds', require('./components/bookmark-kinds/bookmark-kinds'))
-        .component('waltzBookmarksSection', require('./components/bookmarks-section/bookmarks-section'));
+        .component('waltzBookmarkKinds', require('./components/bookmark-kinds/bookmark-kinds'));
+
+    registerComponent(module, bookmarksSection)
 
     return module.name;
 };

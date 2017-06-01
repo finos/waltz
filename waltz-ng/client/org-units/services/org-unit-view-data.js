@@ -102,13 +102,6 @@ function loadComplexity(store, id, holder) {
 }
 
 
-function loadBookmarks(store, id, holder) {
-    return store
-        .findByParent({id, kind: 'ORG_UNIT'})
-        .then(r => holder.bookmarks = r);
-}
-
-
 function loadSourceDataRatings(serviceBroker, holder) {
     return serviceBroker
         .loadViewData(CORE_API.SourceDataRatingStore.findAll, [])
@@ -141,7 +134,6 @@ function service($q,
                  serviceBroker,
                  assetCostViewService,
                  authSourcesStore,
-                 bookmarkStore,
                  complexityStore,
                  involvementStore,
                  logicalFlowViewService,
@@ -161,9 +153,8 @@ function service($q,
         reset(rawData);
         return loadFirstWave(orgUnitId)
             .then(() => loadSecondWave(orgUnitId))
-            .then(() => loadThirdWave(orgUnitId))
             .then(() => rawData.combinedApps = _.concat(rawData.apps, rawData.endUserApps))
-            .then(() => loadFourthWave(orgUnitId))
+            .then(() => loadThirdWave(orgUnitId))
             .then(() => rawData);
     }
 
@@ -197,13 +188,6 @@ function service($q,
 
 
     function loadThirdWave(orgUnitId) {
-        return $q.all([
-            loadBookmarks(bookmarkStore, orgUnitId, rawData),
-        ]);
-    }
-
-
-    function loadFourthWave(orgUnitId) {
         return $q.all([
             loadSourceDataRatings(serviceBroker, rawData)
         ]);
@@ -261,7 +245,6 @@ service.$inject = [
     'ServiceBroker',
     'AssetCostViewService',
     'AuthSourcesStore',
-    'BookmarkStore',
     'ComplexityStore',
     'InvolvementStore',
     'LogicalFlowViewService',

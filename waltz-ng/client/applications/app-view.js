@@ -100,7 +100,6 @@ function controller($q,
                     assetCostStore,
                     aliasStore,
                     authSourcesStore,
-                    bookmarkStore,
                     databaseStore,
                     dataTypeUsageStore,
                     entityStatisticStore,
@@ -199,9 +198,6 @@ function controller($q,
 
     function loadSecondWave() {
         const promises = [
-            bookmarkStore.findByParent(entityReference)
-                .then(bookmarks => vm.bookmarks = bookmarks),
-
             measurableCategoryStore
                 .findAll()
                 .then(cs => vm.measurableCategories = cs),
@@ -279,7 +275,7 @@ function controller($q,
 
     function postLoadActions() {
         addToHistory(historyStore, vm.app);
-        vm.entityRef.name = vm.app.name;
+        vm.entityRef = Object.assign(vm.entityRef, {name: vm.app.name});
     }
 
     // load everything in priority order
@@ -335,7 +331,6 @@ controller.$inject = [
     'AssetCostStore',
     'AliasStore',
     'AuthSourcesStore',
-    'BookmarkStore',
     'DatabaseStore',
     'DataTypeUsageStore',
     'EntityStatisticStore',
