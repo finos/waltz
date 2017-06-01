@@ -23,7 +23,6 @@ function service($q,
                  appStore,
                  dataTypeUsageStore,
                  dataTypeService,
-                 bookmarkStore,
                  sourceDataRatingStore,
                  authSourcesStore,
                  orgUnitStore
@@ -77,7 +76,6 @@ function service($q,
         };
 
         const bulkPromise = $q.all([
-            bookmarkStore.findByParent({id: dataTypeId, kind: 'DATA_TYPE'}),
             sourceDataRatingStore.findAll(),
             dataTypeUsageStore.findForUsageKindByDataTypeIdSelector('ORIGINATOR', selector),
             dataTypeUsageStore.findForUsageKindByDataTypeIdSelector('DISTRIBUTOR', selector)
@@ -85,7 +83,6 @@ function service($q,
 
         const prepareRawDataPromise = bulkPromise
             .then(([
-                bookmarks,
                 sourceDataRatings,
                 flowOriginators,
                 flowDistributors
@@ -93,7 +90,6 @@ function service($q,
 
                 const r = {
                     dataTypeId,
-                    bookmarks,
                     sourceDataRatings,
                     flowOriginators,
                     flowDistributors
@@ -132,7 +128,6 @@ service.$inject = [
     'ApplicationStore',
     'DataTypeUsageStore',
     'DataTypeService',
-    'BookmarkStore',
     'SourceDataRatingStore',
     'AuthSourcesStore',
     'OrgUnitStore'

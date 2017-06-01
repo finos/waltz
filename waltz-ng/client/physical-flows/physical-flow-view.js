@@ -20,11 +20,10 @@ import {initialiseData} from "../common";
 import _ from "lodash";
 
 
-const template = require('./physical-flow-view.html');
+import template from './physical-flow-view.html';
 
 
 const initialState = {
-    bookmarks: [],
     mentions: [],
     mentionsExportFn: () => {},
     physicalFlow: null,
@@ -79,16 +78,6 @@ function removeFromHistory(historyStore, flow, spec) {
 }
 
 
-function loadBookmarks(bookmarkStore, id) {
-    const entityRef = {
-        kind: 'PHYSICAL_SPECIFICATION',
-        id
-    };
-    return bookmarkStore
-        .findByParent(entityRef);
-}
-
-
 function navigateToLastView($state, historyStore) {
     const lastHistoryItem = historyStore.getAll()[0];
     if (lastHistoryItem) {
@@ -134,7 +123,6 @@ function loadFlowDiagrams(flowRef, $q, flowDiagramStore, flowDiagramEntityStore)
 function controller($q,
                     $state,
                     $stateParams,
-                    bookmarkStore,
                     flowDiagramStore,
                     flowDiagramEntityStore,
                     historyStore,
@@ -169,10 +157,6 @@ function controller($q,
     const specPromise = physicalFlowPromise
         .then(physicalFlow => physicalSpecificationStore.getById(physicalFlow.specificationId))
         .then(spec => vm.specification = spec);
-
-    specPromise
-        .then(() => loadBookmarks(bookmarkStore, vm.specification.id))
-        .then(bs => vm.bookmarks = bs);
 
 
     vm.loadFlowDiagrams = () => {
@@ -303,7 +287,6 @@ controller.$inject = [
     '$q',
     '$state',
     '$stateParams',
-    'BookmarkStore',
     'FlowDiagramStore',
     'FlowDiagramEntityStore',
     'HistoryStore',

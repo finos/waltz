@@ -17,13 +17,14 @@
  */
 
 import _ from "lodash";
+import {CORE_API} from '../../../common/services/core-api-utils';
 import {initialiseData,isEmpty} from "../../../common";
 
+import template from './bookmarks-section.html';
+
+
 const bindings = {
-    bookmarks: '<',
-    entityId: '@',
-    kind: '@', // entity-kind - not bookmark kind !
-    parentName: '@',
+    parentEntityRef: '<',
     sourceDataRatings: '<',
     showFilter: '@'
 };
@@ -34,9 +35,6 @@ const initialState = {
     bookmarkKind: null,
     showFilter: false
 };
-
-
-const template = require('./bookmarks-section.html');
 
 
 function filterBookmarks(bookmarks = [], kind = null) {
@@ -52,12 +50,15 @@ function filterBookmarks(bookmarks = [], kind = null) {
 }
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
-        if(vm.bookmarks) {
-            vm.filteredBookmarks = filterBookmarks(vm.bookmarks, vm.bookmarkKind);
+    vm.$onInit = () => {
+        if(vm.parentEntityRef) {
+            serviceBroker
+                .loadViewData(CORE_API.BookmarkStore.findByParent, [vm.parentEntityRef])
+                .then(r => vm.bookmarks = r.data)
+                .then(() => vm.filteredBookmarks = filterBookmarks(vm.bookmarks, vm.bookmarkKind));
         }
     };
 
@@ -68,7 +69,7 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = ['ServiceBroker'];
 
 
 const component = {
@@ -78,4 +79,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: 'waltzBookmarksSection'
+};

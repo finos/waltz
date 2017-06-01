@@ -89,11 +89,8 @@
 
 
     <!-- BOOKMARKS -->
-    <waltz-bookmarks-section bookmarks="ctrl.bookmarks"
-                             kind="CHANGE_INITIATIVE"
-                             source-data-ratings="ctrl.sourceDataRatings"
-                             entity-id="{{ ctrl.changeInitiative.id }}"
-                             parent-name="{{ ctrl.changeInitiative.name }}">
+    <waltz-bookmarks-section parent-entity-ref="ctrl.entityRef"
+                             source-data-ratings="ctrl.sourceDataRatings">
     </waltz-bookmarks-section>
 
 

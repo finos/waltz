@@ -18,7 +18,7 @@
 
 import {initialiseData} from "../common";
 
-const template = require('./data-type-view.html');
+import template from './data-type-view.html';
 
 
 const initialState = {
@@ -38,7 +38,8 @@ function controller($scope,
 
     const entityReference = {
         kind: 'DATA_TYPE',
-        id: dataType.id
+        id: dataType.id,
+        name: dataType.name
     };
 
 

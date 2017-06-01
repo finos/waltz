@@ -100,7 +100,6 @@ function controller($q,
                     assetCostStore,
                     aliasStore,
                     authSourcesStore,
-                    bookmarkStore,
                     databaseStore,
                     dataTypeUsageStore,
                     entityStatisticStore,
@@ -199,9 +198,6 @@ function controller($q,
 
     function loadSecondWave() {
         const promises = [
-            bookmarkStore.findByParent(entityReference)
-                .then(bookmarks => vm.bookmarks = bookmarks),
-
             measurableCategoryStore
                 .findAll()
                 .then(cs => vm.measurableCategories = cs),
@@ -335,7 +331,6 @@ controller.$inject = [
     'AssetCostStore',
     'AliasStore',
     'AuthSourcesStore',
-    'BookmarkStore',
     'DatabaseStore',
     'DataTypeUsageStore',
     'EntityStatisticStore',

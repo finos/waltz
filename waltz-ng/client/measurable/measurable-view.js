@@ -44,7 +44,6 @@ function controller($q,
                     $stateParams,
                     serviceBroker,
                     assetCostViewService,
-                    bookmarkStore,
                     complexityStore,
                     historyStore,
                     involvedSectionService,
@@ -101,9 +100,6 @@ function controller($q,
             logicalFlowViewService
                 .initialise(childrenSelector)
                 .then(flowView => vm.logicalFlowView = flowView),
-            bookmarkStore
-                .findByParent(ref)
-                .then(bookmarks => vm.bookmarks = bookmarks),
 
             loadInvolvements()
         ]);
@@ -177,7 +173,6 @@ controller.$inject = [
     '$stateParams',
     'ServiceBroker',
     'AssetCostViewService',
-    'BookmarkStore',
     'ComplexityStore',
     'HistoryStore',
     'InvolvedSectionService',

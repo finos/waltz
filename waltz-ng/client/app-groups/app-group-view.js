@@ -25,7 +25,6 @@ import template from "./app-group-view.html";
 const initialState = {
     applications: [],
     assetCostData: null,
-    bookmarks: [],
     capabilities: [],
     changeInitiatives: [],
     complexity: [],
@@ -54,7 +53,6 @@ function controller($scope,
                     serviceBroker,
                     appGroupStore,
                     assetCostViewService,
-                    bookmarkStore,
                     complexityStore,
                     historyStore,
                     logicalFlowViewService,
@@ -101,13 +99,10 @@ function controller($scope,
         .initialise(idSelector, 2016)
         .then(costs => vm.assetCostData = costs);
 
-    bookmarkStore
-        .findByParent({ id , kind: 'APP_GROUP'})
-        .then(bookmarks => vm.bookmarks = bookmarks);
-
     appGroupStore.getById(id)
         .then(groupDetail => vm.groupDetail = groupDetail)
         .then(groupDetail => {
+            vm.entityRef.name = groupDetail.appGroup.name;
             historyStore.put(groupDetail.appGroup.name, 'APP_GROUP', 'main.app-group.view', { id });
             return groupDetail;
         })
@@ -175,7 +170,6 @@ controller.$inject = [
     'ServiceBroker',
     'AppGroupStore',
     'AssetCostViewService',
-    'BookmarkStore',
     'ComplexityStore',
     'HistoryStore',
     'LogicalFlowViewService',
