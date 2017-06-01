@@ -48,10 +48,7 @@ function controller($q,
                     historyStore,
                     involvedSectionService,
                     involvementStore,
-                    logicalFlowViewService,
-                    measurableStore,
-                    measurableCategoryStore,
-                    measurableRatingStore) {
+                    logicalFlowViewService) {
 
     const id = $stateParams.id;
     const ref = { id, kind: 'MEASURABLE' };
@@ -59,15 +56,16 @@ function controller($q,
 
     const vm = initialiseData(this, initialState);
     vm.entityReference = ref;
+    vm.scope = childrenSelector.scope;
 
 
     // -- LOAD ---
 
     const loadWave1 = () =>
         $q.all([
-            measurableStore
-                .findAll()
-                .then(all => {
+            serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll, [])
+                .then(result => {
+                    const all = result.data;
                     vm.allMeasurables = all;
                     const withParents = populateParents(all);
                     vm.measurable = _.find(withParents, { id });
@@ -80,22 +78,19 @@ function controller($q,
                 }),
         ]);
 
-
     const loadWave2 = () =>
         $q.all([
-            measurableCategoryStore
-                .findAll()
-                .then(cs => {
+            serviceBroker.loadAppData(CORE_API.MeasurableCategoryStore.findAll, [])
+                .then(result => {
+                    const cs = result.data;
                     vm.measurableCategories = cs;
                     vm.measurableCategory = _.find(cs, { id: vm.measurable.categoryId });
                 }),
-            measurableRatingStore
-                .findByMeasurableSelector(childrenSelector)
-                .then(rs => vm.ratings = rs),
-            measurableRatingStore
-                .statsForRelatedMeasurables(id)
-                .then(rs => vm.relatedStats = rs),
-            serviceBroker.loadViewData(CORE_API.ApplicationStore.findBySelector, [childrenSelector])
+            serviceBroker
+                .loadViewData(CORE_API.MeasurableRatingStore.statsForRelatedMeasurables, [id])
+                .then(r => vm.relatedStats = r.data),
+            serviceBroker
+                .loadViewData(CORE_API.ApplicationStore.findBySelector, [childrenSelector])
                 .then(r => vm.applications = r.data),
             logicalFlowViewService
                 .initialise(childrenSelector)
@@ -177,10 +172,7 @@ controller.$inject = [
     'HistoryStore',
     'InvolvedSectionService',
     'InvolvementStore',
-    'LogicalFlowViewService',
-    'MeasurableStore',
-    'MeasurableCategoryStore',
-    'MeasurableRatingStore'
+    'LogicalFlowViewService'
 ];
 
 

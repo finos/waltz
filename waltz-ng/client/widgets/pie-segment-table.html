@@ -18,7 +18,10 @@
         ng-class="{
             'wpst-selected': $ctrl.selectedSegmentKey === r.key,
             'clickable' : $ctrl.config.onSelect
-        }">
+        }"
+        uib-tooltip="{{ $ctrl.config.descriptionProvider(r) }}"
+        tooltip-append-to-body="true"
+        tooltip-placement="right">
         <td>
             <div class='wpst-indicator-cell'
                  ng-style="{

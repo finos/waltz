@@ -28,9 +28,10 @@ import {EntityNamedNoteStore_API as EntityNamedNoteStore} from "../../entity-nam
 import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../entity-named-note/services/entity-named-note-type-store";
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
 import {InvolvementStore_API as InvolvementStore} from "../../involvement/services/involvement-store";
-import {MeasurableStore_API as MeasurableStore} from "../../measurable/services/measurable-store";
 import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../measurable-category/services/measurable-category-store";
+import {MeasurableRatingStore_API as MeasurableRatingStore} from "../../measurable-rating/services/measurable-rating-store";
 import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from "../../measurable-relationship/services/measurable-relationship-store";
+import {MeasurableStore_API as MeasurableStore} from "../../measurable/services/measurable-store";
 import {PersonStore_API as PersonStore} from "../../person/services/person-store";
 import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
 import {SourceDataRatingStore_API as SourceDataRatingStore} from "../../source-data-rating/services/source-data-rating-store";
@@ -48,9 +49,10 @@ export const CORE_API = {
     EntityNamedNoteTypeStore,
     EntityStatisticStore,
     InvolvementStore,
-    MeasurableStore,
     MeasurableCategoryStore,
+    MeasurableRatingStore,
     MeasurableRelationshipStore,
+    MeasurableStore,
     PersonStore,
     PhysicalSpecDataTypeStore,
     SourceDataRatingStore,
