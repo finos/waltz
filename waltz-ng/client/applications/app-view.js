@@ -275,7 +275,7 @@ function controller($q,
 
     function postLoadActions() {
         addToHistory(historyStore, vm.app);
-        vm.entityRef = Object.assign(vm.entityRef, {name: vm.app.name});
+        vm.entityRef = Object.assign({}, vm.entityRef, {name: vm.app.name});
     }
 
     // load everything in priority order
