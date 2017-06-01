@@ -87,7 +87,7 @@ function controller($q,
 
     const vm = initialiseData(this, initialState);
 
-    const id = +$stateParams.id;
+    const id = $stateParams.id;
     vm.entityRef = { kind: 'ACTOR', id };
     Object.assign(vm, { id, entityRef: vm.entityRef });
 
