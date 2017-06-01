@@ -94,7 +94,7 @@ function controller($q,
     actorStore
         .getById(id)
         .then(a => vm.actor = a)
-        .then(() => vm.entityRef.name = vm.actor.name)
+        .then(() => vm.entityRef = Object.assign(vm.entityRef, { name: vm.actor.name }))
         .then(() => addToHistory(historyStore, vm.actor));
 
     physicalFlowStore

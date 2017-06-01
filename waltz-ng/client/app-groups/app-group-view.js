@@ -102,7 +102,7 @@ function controller($scope,
     appGroupStore.getById(id)
         .then(groupDetail => vm.groupDetail = groupDetail)
         .then(groupDetail => {
-            vm.entityRef.name = groupDetail.appGroup.name;
+            vm.entityRef = Object.assign(vm.entityRef, {name: groupDetail.appGroup.name});
             historyStore.put(groupDetail.appGroup.name, 'APP_GROUP', 'main.app-group.view', { id });
             return groupDetail;
         })

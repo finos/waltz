@@ -86,8 +86,11 @@ function controller($q,
         .then(result => {
             const ci = result.data;
             vm.changeInitiative = ci;
-            vm.entityRef.name = vm.changeInitiative.name;
-            vm.entityRef.description = vm.changeInitiative.description;
+            vm.entityRef = Object.assign(vm.entityRef,
+                                        {
+                                            name: vm.changeInitiative.name,
+                                            description: vm.changeInitiative.description
+                                        });
 
             historyStore
                 .put(

@@ -112,7 +112,7 @@ function controller($q,
         .then(app => vm.owningEntity = app)
         .then(app => orgUnitStore.getById(app.organisationalUnitId))
         .then(ou => vm.organisationalUnit = ou)
-        .then(() => vm.entityReference.name = vm.specification.name)
+        .then(() => vm.entityReference = Object.assign(vm.entityReference, { name: vm.specification.name }))
         .then(() => addToHistory(historyStore, vm.specification));
 
     physicalFlowStore

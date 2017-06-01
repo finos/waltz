@@ -71,7 +71,7 @@ function controller($q,
                     vm.allMeasurables = all;
                     const withParents = populateParents(all);
                     vm.measurable = _.find(withParents, { id });
-                    vm.entityReference.name = vm.measurable.name;
+                    vm.entityReference = Object.assign(vm.entityReference, { name: vm.measurable.name});
                     vm.parents = getParents(vm.measurable);
                     vm.children = _.chain(all)
                         .filter({ parentId: id })
