@@ -109,11 +109,11 @@
                         </a>
                     </td>
                     <td>
-                        <ul class="list-inline"
+                        <ul class="waltz-keyword-list"
                             ng-if="physicalFlow.specificationDataTypes.length > 0">
-                            <li ng-repeat="specDataType in physicalFlow.specificationDataTypes">
-                                <span ng-bind="specDataType.dataTypeName"
-                                      class="label label-info">
+                            <li ng-repeat="specDataType in physicalFlow.specificationDataTypes"
+                                class="wkl-keyword">
+                                <span ng-bind="specDataType.dataTypeName">
                                 </span>
                             </li>
                         </ul>
