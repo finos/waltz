@@ -76,7 +76,7 @@ function controller($q,
         .findRelatedStatDefinitions(statId)
         .then(ds => vm.relatedDefinitions = ds)
         .then(ds => vm.statistic.definition = ds.self)
-        .then(() => vm.statRef = Object.assign(vm.statRef, { name: vm.statistic.definition.name }))
+        .then(() => vm.statRef = Object.assign({}, vm.statRef, { name: vm.statistic.definition.name }))
         .then(() => vm.visibility.related = hasRelatedDefinitions(vm.relatedDefinitions));
 
     const navItemPromise = entityStatisticUtilities
