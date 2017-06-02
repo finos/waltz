@@ -1,9 +1,9 @@
 <label>Data Types</label>
 <div ng-if="$ctrl.specDataTypes.length > 0">
-    <ul class="list-inline">
-        <li ng-repeat="specDataType in $ctrl.specDataTypes">
-            <span ng-bind="specDataType.dataTypeId  | toDisplayName:'dataType'"
-                  class="label label-info">
+    <ul class="waltz-keyword-list small">
+        <li ng-repeat="specDataType in $ctrl.specDataTypes"
+            class="wkl-keyword">
+            <span ng-bind="specDataType.dataTypeId  | toDisplayName:'dataType'">
             </span>
         </li>
     </ul>
