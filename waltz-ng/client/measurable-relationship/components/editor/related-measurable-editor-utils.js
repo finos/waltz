@@ -15,35 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
 
 
-const initData = {
-    id: 134,
-};
-
-
-function controller()
-{
-    const vm = Object.assign(this, initData);
-
-    vm.parentEntityRef = {
-        id: vm.id,
-        kind: 'MEASURABLE'
-    };
-}
-
-
-controller.$inject = [];
-
-
-const view = {
-    template: require('./playpen1.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;
+export const availableRelationshipKinds = [
+    { code: 'RELATES_TO', label: 'Relates To' },
+    { code: 'LOOSELY_RELATES_TO', label: 'Loosely Relates To' },
+];

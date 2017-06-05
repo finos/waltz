@@ -18,8 +18,10 @@
 
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
-import {toOptions, measurableRelationshipKindNames}  from '../../../common/services/display-names';
+import {sameRef} from '../../../common/entity-utils';
 import {CORE_API} from '../../../common/services/core-api-utils';
+import {entityNames} from '../../../common/services/display-names';
+
 import template from './related-measurables-panel.html';
 
 
@@ -27,7 +29,9 @@ import template from './related-measurables-panel.html';
  * @name waltz-related-measurables-panel
  *
  * @description
- * This component ...
+ * This component displays entities related to a given measurable.
+ * If the user has 'CAPABILITY_EDITOR' role then edit facilities
+ * are provided.
  */
 
 
@@ -36,17 +40,21 @@ const bindings = {
 };
 
 
-
 const initialState = {
     categories: [],
     measurable: null,
     measurables: [],
-    relationships: []
+    relationships: [],
+    visibility: {
+        editor: false,
+        createEditor: false,
+        updateEditor: false,
+    }
 };
 
 
-
 const DEFAULT_SELECTION_FILTER_FN = (m) => true;
+
 
 const DEFAULT_RELATIONSHIP_FORM = {
     description: '',
@@ -55,54 +63,42 @@ const DEFAULT_RELATIONSHIP_FORM = {
 };
 
 
-function categorizeRelationships(relationships = [], measurables = [], id) {
-    const measurablesById = _.keyBy(measurables, 'id');
-    return _
-        .chain(relationships)
-        .map(reln => id === reln.measurableA
-            ? reln.measurableB
-            : reln.measurableA) // counterpart
-        .map(counterpartId => measurablesById[counterpartId])
-        .groupBy(measurable => measurable.categoryId)
-        .value();
-}
-
-
 function mkGridData(id,
                     relationships = [],
                     measurables = [],
                     categories = [],
-                    selectedCategory)
+                    rowFilterFn = (x) => true)
 {
     const measurablesById = _.keyBy(measurables, 'id');
     const categoriesById = _.keyBy(categories, 'id');
-    return _.chain(relationships)
+
+    const toGenericCell = r => {
+        return Object.assign({}, r, { type: entityNames[r.kind] });
+    };
+
+    const toMeasurableCell = r => {
+        const c = categoriesById[measurablesById[r.id].categoryId];
+        return Object.assign({}, r, { type: c.name });
+    };
+
+    return _
+        .chain(relationships)
+        .filter(rowFilterFn)
         .map(r => {
-            const outbound = r.measurableA === id;
-            const measurableA = measurablesById[r.measurableA];
-            const measurableB = measurablesById[r.measurableB];
-            const categoryA = categoriesById[measurableA.categoryId];
-            const categoryB = categoriesById[measurableB.categoryId];
+            const outbound = r.a.id === id && r.a.kind === 'MEASURABLE';
+            const src = r.a.kind === 'MEASURABLE'
+                ? toMeasurableCell(r.a)
+                : toGenericCell(r.a);
 
-            const counterpart = Object.assign({}, outbound ? measurableB : measurableA, { kind: 'MEASURABLE' });
-
-            if (selectedCategory) {
-                if (outbound && measurableB.categoryId !== selectedCategory.id) {
-                    return null;
-                }
-                if (!outbound && measurableA.categoryId !== selectedCategory.id) {
-                    return null;
-                }
-            }
+            const targ = r.b.kind === 'MEASURABLE'
+                ? toMeasurableCell(r.b)
+                : toGenericCell(r.b);
 
             return {
                 outbound,
-                measurableA,
-                measurableB,
-                categoryA,
-                categoryB,
-                relationship: r,
-                counterpart
+                a: src,
+                b: targ,
+                relationship: r
             };
         })
         .filter(r => r !== null)
@@ -114,147 +110,114 @@ function mkGridData(id,
 function controller($q, $timeout, serviceBroker, notification) {
     const vm = this;
 
-    const calcRelatedData = () => {
-        return categorizeRelationships(
-            vm.relationships,
-            vm.measurables,
-            vm.measurable.id);
-    };
-
     const calcGridData = () => {
         return mkGridData(
             vm.measurable.id,
             vm.relationships,
             vm.measurables,
             vm.categories,
-            vm.selectedCategory);
+            vm.selectionFilterFn);
     };
 
 
     // -- INTERACT --
 
+    vm.refresh = ()=> {
+        vm.cancelEditor();
+        loadRelationships()
+            .then(() => {
+                if (vm.selectedRow) {
+                    vm.selectedRow = _.find(vm.gridData || [], row => {
+                        const sameSrc = sameRef(vm.selectedRow.a, row.a);
+                        const sameTarg = sameRef(vm.selectedRow.b, row.b);
+                        const sameRelKind = vm.selectedRow.relationship.relationship === row.relationship.relationship;
+                        return sameSrc && sameTarg && sameRelKind;
+                    });
+                }
+            });
+    };
+
     vm.selectCategory = (c) => $timeout(() => {
         vm.selectedCategory = c;
-        vm.gridData = calcGridData(c);
         vm.selectedRow = null;
-        const validMeasurableIds = _
-            .chain(vm.measurables)
-            .filter(m => m.categoryId === c.id)
-            .map('id')
-            .value();
-
-        vm.selectionFilterFn = m => m && _.includes(validMeasurableIds, m.id);
+        vm.selectionFilterFn = c.relationshipFilter;
+        vm.gridData = calcGridData(c);
+        vm.cancelEditor();
     });
 
     vm.clearCategory = () => $timeout(() => {
         vm.selectedCategory = null;
         vm.selectedRow = null;
-        vm.gridData = calcGridData();
         vm.selectionFilterFn = DEFAULT_SELECTION_FILTER_FN;
+        vm.gridData = calcGridData();
     });
 
     vm.selectRow = (r) => {
         if (r === vm.selectedRow) {
-            vm.clearRow(); // toggle
+            vm.clearRowSelection(); // toggle
         } else {
             vm.selectedRow = r;
         }
         vm.cancelEditor();
     };
 
-    vm.clearRow = () => {
+    vm.clearRowSelection = () => {
         vm.selectedRow = null;
     };
 
     vm.isSelected = (row) => {
         if (vm.selectedRow) {
-            const sameA = row.measurableA.id === vm.selectedRow.measurableA.id;
-            const sameB = row.measurableB.id === vm.selectedRow.measurableB.id;
+            const sameA = sameRef(row.a, vm.selectedRow.a);
+            const sameB = sameRef(row.b, vm.selectedRow.b);
             return sameA && sameB;
         } else {
             return false;
         }
     };
 
-    vm.beginNewRelationship = () => {
-        if (vm.relationshipForm) return; // nothing to do
-        vm.selectedRow = null;
-        vm.relationshipForm = Object.assign(
-            {},
-            DEFAULT_RELATIONSHIP_FORM,
-            { measurableA: vm.measurable, mode :'CREATE' });
-    };
-
-    vm.cancelEditor = () => {
-        vm.relationshipForm = null;
-    };
-
-    vm.onMeasurableSelection = (correlationId, m) => vm.relationshipForm.measurableB = m;
-
-    vm.selectionFilterFn = DEFAULT_SELECTION_FILTER_FN;
-
-    vm.relationshipKinds = toOptions(measurableRelationshipKindNames);
-
-    vm.isFormValid = () => {
-        const form = vm.relationshipForm;
-
-        const hasMeasurable = form.measurableA != null && form.measurableB != null;
-        const hasKind = form.relationshipKind != null;
-        const notSelf = hasMeasurable && form.measurableA.id != form.measurableB.id;
-
-        return hasMeasurable && hasKind && notSelf;
-    };
-
-    vm.submit = () => {
-        if (vm.isFormValid()) {
-            const form = vm.relationshipForm;
-            const submission = {
-                measurableA: form.measurableA.id,
-                measurableB: form.measurableB.id,
-                relationshipKind: form.relationshipKind,
-                description: form.description
-            };
-            save(submission)
+    vm.removeRelationship = (rel) => {
+        if (confirm('Are you sure you want to delete this relationship ?')) {
+            remove(rel)
                 .then(() => {
-                    notification.success("Relationship saved");
-                    vm.cancelEditor();
+                    notification.warning('Relationship removed');
+                    vm.clearRowSelection();
+                    loadRelationships();
                 })
                 .catch(e => {
-                    notification.error("Could not save because: "+e.message);
+                    notification.error("Relationship could not be removed", e)
                 });
         }
     };
 
-    vm.removeRow = () => {
-        remove(vm.selectedRow.relationship)
-            .then(() => {
-                notification.success("Relationship removed");
-                vm.clearRow();
-            })
-            .catch(e => {
-                notification.error("Could not remove because: "+e.message);
-            });
+    vm.beginNewRelationship = () => {
+        vm.visibility.editor = true;
+        vm.visibility.createEditor = true;
+        vm.visibility.updateEditor = false;
     };
 
-    vm.editRow = () => {
-        const relationship = vm.selectedRow.relationship;
-        vm.relationshipForm = {
-            description: relationship.description,
-            measurableA: vm.selectedRow.measurableA,
-            measurableB: vm.selectedRow.measurableB,
-            relationshipKind: { code: relationship.relationshipKind },
-        };
+    vm.cancelEditor = () => {
+        vm.visibility.editor = false;
+        vm.visibility.createEditor = false;
+        vm.visibility.updateEditor = false;
     };
+
+    vm.updateExistingRelationship = () => {
+        vm.visibility.editor = true;
+        vm.visibility.createEditor = false;
+        vm.visibility.updateEditor = true;
+    };
+
+
+    vm.selectionFilterFn = DEFAULT_SELECTION_FILTER_FN;
 
 
     // -- API --
 
     const loadRelationships = () => {
-        serviceBroker
+        return serviceBroker
             .loadViewData(CORE_API.MeasurableRelationshipStore.findByMeasurable, [vm.measurable.id], { force: true })
             .then(r => {
                 vm.relationships = r.data;
-                vm.relatedByCategory = calcRelatedData();
                 vm.gridData = calcGridData();
             });
     };
@@ -275,18 +238,9 @@ function controller($q, $timeout, serviceBroker, notification) {
 
     };
 
-    const save = d => {
+    const remove = (rel) => {
         return serviceBroker
-            .execute(CORE_API.MeasurableRelationshipStore.save, [d])
-            .then(loadRelationships)
-            .then(vm.clearRow);
-
-    };
-
-    const remove = d => {
-        return serviceBroker
-            .execute(CORE_API.MeasurableRelationshipStore.remove, [d.measurableA, d.measurableB])
-            .then(loadRelationships);
+            .execute(CORE_API.MeasurableRelationshipStore.remove, [rel])
     };
 
     // -- BOOT --

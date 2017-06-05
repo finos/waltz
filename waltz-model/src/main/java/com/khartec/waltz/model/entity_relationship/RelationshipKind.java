@@ -38,7 +38,9 @@ public enum RelationshipKind {
     )),
 
     LOOSELY_RELATES_TO(fromArray(
-            tuple(MEASURABLE, MEASURABLE)
+            tuple(MEASURABLE, MEASURABLE),
+            tuple(MEASURABLE, CHANGE_INITIATIVE),
+            tuple(CHANGE_INITIATIVE, MEASURABLE)
     )),
 
     PARTICIPATES_IN(fromArray(
@@ -47,7 +49,9 @@ public enum RelationshipKind {
 
     RELATES_TO(fromArray(
             tuple(APP_GROUP, CHANGE_INITIATIVE),
-            tuple(MEASURABLE, MEASURABLE)
+            tuple(MEASURABLE, MEASURABLE),
+            tuple(MEASURABLE, CHANGE_INITIATIVE),
+            tuple(CHANGE_INITIATIVE, MEASURABLE)
     )),
 
     SUPPORTS(fromArray(

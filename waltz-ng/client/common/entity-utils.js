@@ -15,35 +15,27 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
 
+import {checkIsEntityRef} from './checks';
 
-const initData = {
-    id: 134,
-};
-
-
-function controller()
-{
-    const vm = Object.assign(this, initData);
-
-    vm.parentEntityRef = {
-        id: vm.id,
-        kind: 'MEASURABLE'
-    };
+export function sameRef(r1, r2) {
+    checkIsEntityRef(r1);
+    checkIsEntityRef(r2);
+    return r1.kind === r2.kind && r1.id === r2.id;
 }
 
 
-controller.$inject = [];
 
+export function toEntityRef(obj, kind = obj.kind) {
+    const ref = {
+        id: obj.id,
+        kind,
+        name: obj.name,
+        description: obj.description
+    };
 
-const view = {
-    template: require('./playpen1.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
+    checkIsEntityRef(ref);
 
+    return ref;
+}
 
-export default view;

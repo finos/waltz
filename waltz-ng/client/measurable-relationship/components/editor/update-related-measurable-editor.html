@@ -1,0 +1,49 @@
+<h4>Update Relationship</h4>
+
+<!-- NEW RELATIONSHIP FORM -->
+<div>
+    <div class="small">
+
+        <form>
+
+            <!-- KIND -->
+            <div class="form-group">
+                <label>
+                    Relationship Kind
+                </label>
+                <select ng-model="$ctrl.form.relationshipKind"
+                        ng-options="relationshipKind.code as relationshipKind.label for relationshipKind in $ctrl.availableRelationshipKinds"
+                        class="form-control">
+                </select>
+            </div>
+
+
+            <!-- DESCRIPTION -->
+            <div class="form-group">
+                <label class="control-label">
+                    Description
+                </label>
+                <textarea class='form-control'
+                          ng-model="$ctrl.form.description"
+                          placeholder="Please provide any additional details here"
+                          rows="6">
+                </textarea>
+            </div>
+
+            <hr>
+
+            <!-- ACTION BUTTONS -->
+            <button class="btn btn-xs btn-success"
+                    ng-click="$ctrl.submit()"
+                    ng-disabled="!$ctrl.isFormValid()">
+                Save
+            </button>
+            <a class="clickable"
+               ng-click="$ctrl.onCancel()">
+                Cancel
+            </a>
+
+        </form>
+
+    </div>
+</div>

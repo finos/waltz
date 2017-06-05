@@ -51,9 +51,7 @@ const initialState = {
 const template = require('./flow-diagram-logical-flow-popup.html');
 
 
-function sameRef(r1, r2) {
-    return r1.kind === r2.kind && r1.id === r2.id;
-}
+
 
 
 function mkFlows(logicalFlows = [], node, isUpstream, existingEntities = []) {

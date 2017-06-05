@@ -1,0 +1,85 @@
+<h4>
+    Create New Relationship to
+    <span ng-bind="$ctrl.counterpartType"></span>
+</h4>
+
+<!-- NEW RELATIONSHIP FORM -->
+<div>
+    <div class="small">
+
+        <form>
+
+            <!-- KIND -->
+            <div class="form-group">
+                <label>Relationship Kind</label>
+                <select ng-model="$ctrl.form.relationshipKind"
+                        ng-options="relationshipKind.code as relationshipKind.label for relationshipKind in $ctrl.availableRelationshipKinds"
+                        class="form-control">
+                </select>
+                <div class="help-block">
+                    The relationship kind describes the nature of the relationship between the entities.
+                </div>
+            </div>
+
+
+            <!-- CHANGE INITIATIVE ... or ... -->
+            <div class="form-group"
+                 ng-if="$ctrl.visibility.changeInitiativeSelector">
+                <label class="control-label">Related Change Initiative</label>
+                <waltz-entity-selector entity-kinds="['CHANGE_INITIATIVE']"
+                                       on-select="$ctrl.onChangeInitiativeSelection"
+                                       required='true'
+                                       selection-filter="$ctrl.selectionFilterFn">
+                </waltz-entity-selector>
+                <div class="help-block">
+                    Search for the change initiative you wish to associate.  You may search by name or code.
+                </div>
+            </div>
+
+
+            <!-- ... MEASURABLE -->
+            <div class="form-group"
+                 ng-if="$ctrl.visibility.measurableSelector">
+                <label class="control-label">
+                    Related
+                    <span ng-bind="$ctrl.counterpartType"></span>
+                </label>
+                <treecontrol class="tree-light"
+                             tree-model="$ctrl.nodes"
+                             options="$ctrl.treeOptions"
+                             on-selection="$ctrl.onMeasurableSelection(node)"
+                             order-by="'-name'">
+                    <span>{{ node.name }}</span>
+                </treecontrol>
+                <div class="help-block">
+                    Select the <span ng-bind="$ctrl.counterpartType"></span> entity you wish to associate.
+                </div>
+            </div>
+
+
+            <!-- DESCRIPTION -->
+            <div class="form-group">
+                <label class="control-label">Description</label>
+                <textarea class='form-control'
+                          ng-model="$ctrl.form.description"
+                          placeholder="Please provide any additional details here"
+                          rows="6">
+                </textarea>
+            </div>
+
+            <hr>
+
+            <!-- ACTION BUTTONS -->
+            <button class="btn btn-xs btn-success"
+                    ng-click="$ctrl.submit()"
+                    ng-disabled="! $ctrl.isFormValid()">
+                Save
+            </button>
+            <a class="clickable" ng-click="$ctrl.onCancel()">
+                Cancel
+            </a>
+
+        </form>
+
+    </div>
+</div>

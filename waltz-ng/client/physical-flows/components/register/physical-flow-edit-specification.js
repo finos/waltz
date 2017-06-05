@@ -17,7 +17,8 @@
  */
 
 import _ from "lodash";
-import {initialiseData, toEntityRef} from "../../../common";
+import {initialiseData} from "../../../common";
+import {toEntityRef} from '../../../common/entity-utils';
 import {toOptions, dataFormatKindNames} from "../../../common/services/display-names";
 
 

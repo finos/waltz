@@ -86,7 +86,6 @@ function calculateExpandedNodes(nodes = [], ratingsById = {}) {
 
 function prepareTree(nodes = []) {
     return switchToParentIds(buildHierarchies(nodes));
-
 }
 
 function controller() {

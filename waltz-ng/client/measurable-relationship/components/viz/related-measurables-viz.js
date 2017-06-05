@@ -17,25 +17,28 @@
  */
 
 import _ from 'lodash';
-import {initialiseData} from '../../../common';
-import {responsivefy} from '../../../common/d3-utils';
-import {stopPropagation} from '../../../common/browser-utils';
 import {select, event} from 'd3-selection';
 
+import {determineCounterpart, sanitizeRelationships} from '../../measurable-relationship-utils';
+import {initialiseData} from '../../../common';
+import {stopPropagation} from '../../../common/browser-utils';
+import {responsivefy} from '../../../common/d3-utils';
+import {CORE_API} from "../../../common/services/core-api-utils";
+
+import template from './related-measurables-viz.html';
 
 /**
  * @name waltz-related-measurables-viz
  *
  * @description
- * This component ...
+ * This component shows a simple spider diagram which depicts the number of explicit connections
+ * from the central measurable to other measurables and change initiatives.  Measurables
+ * are split out into separate buckets based upon their category.
  */
 
-
 const bindings = {
-    categories: '<',
-    measurables: '<',
     measurable: '<',
-    relatedByCategory: '<',
+    relationships: '<',
     onCategorySelect: '<',
     onCategoryClear: '<'
 };
@@ -45,13 +48,10 @@ const initialState = {
     categories: [],
     measurables: [],
     measurable: null,
-    relatedByCategory: {},
+    relationships: {},
     onCategorySelect: (c) => console.log('wrmv: default on-category-select', c),
     onCategoryClear: (c) => console.log('wrmv: default on-category-clear')
 };
-
-
-const template = require('./related-measurables-viz.html');
 
 
 const dimensions = {
@@ -75,8 +75,8 @@ const dimensions = {
     }
 };
 
-
-const angleOffset = 0.3;
+// initial angle, set to make label overlaps less likely
+const angleOffset = -0.7;
 
 
 const styles = {
@@ -157,12 +157,12 @@ function drawCenterGroup(group, measurable, category) {
 }
 
 
-function drawOuterNodes(group, categories = [], relatedByCategory = {}, deltaAngle, handlers) {
+function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
     if (!group) return;
 
     const outerNodes = group
         .selectAll(`.${styles.outerNode}`)
-        .data(categories, d => d.id);
+        .data(buckets, d => d.id);
 
     const newOuterNodes = outerNodes
         .enter()
@@ -195,14 +195,14 @@ function drawOuterNodes(group, categories = [], relatedByCategory = {}, deltaAng
 
     outerNodes
         .merge(newOuterNodes)
-        .classed(styles.hasRelationships, d => (relatedByCategory[d.id] || []).length > 0)
-        .classed(styles.noRelationships, d => (relatedByCategory[d.id] || []).length === 0);
+        .classed(styles.hasRelationships, d => d.count > 0)
+        .classed(styles.noRelationships, d => d.count === 0);
 
     outerNodes
         .merge(newOuterNodes)
         .selectAll(`circle`)
         .attr('r', d => {
-            const hasRelationships = (relatedByCategory[d.id] || []).length > 0;
+            const hasRelationships = d.count > 0;
             const scaleFactor = hasRelationships
                 ? 1
                 : 0.8;
@@ -213,8 +213,7 @@ function drawOuterNodes(group, categories = [], relatedByCategory = {}, deltaAng
         .merge(newOuterNodes)
         .selectAll(`.${styles.nodeDetail}`)
         .text(d => {
-            const count = (relatedByCategory[d.id] || []).length;
-            return count ? count : '-'
+            return d.count ? d.count : '-'
         })
         .attr('text-anchor', 'middle')
         .attr('dy', dimensions.nodeDescription.dy);
@@ -247,17 +246,68 @@ function drawBridges(group, categories = [], deltaAngle) {
 }
 
 
+function mkBuckets(categories = [], measurables = [], measurable, relationships = []) {
+
+    if (! measurable) return [];
+
+    const measurablesByCategory = _.groupBy(measurables, m => m.categoryId);
+    const measurablesById = _.keyBy(measurables, m => m.id);
+
+    const counterparts = _.map(relationships, r => determineCounterpart(measurable.id, r));
+
+    const countsById = _.countBy(counterparts, c =>  {
+        if (c.kind === 'MEASURABLE') {
+            const counterpartMeasurable = measurablesById[c.id];
+            return 'MEASURABLE_CATEGORY/'+counterpartMeasurable.categoryId;
+        } else {
+            return c.kind;
+        }
+    });
+
+    const buckets = _
+        .chain(categories)
+        .map(c => {
+            const relatedMeasurableIds = _.map(measurablesByCategory[c.id] || [], m => m.id);
+            const filter = er => {
+                const counterpart = determineCounterpart(measurable.id, er);
+                return counterpart.kind === 'MEASURABLE' && _.includes(relatedMeasurableIds, counterpart.id);
+            };
+
+            const id = 'MEASURABLE_CATEGORY/'+c.id;
+
+            return {
+                id,
+                name: c.name,
+                relationshipFilter: filter,
+                count: countsById[id] || 0
+            };
+        })
+        .orderBy('name')
+        .value();
+
+    buckets.push({
+        id: 'CHANGE_INITIATIVE',
+        name: 'Change Initiatives',
+        relationshipFilter: er => 'CHANGE_INITIATIVE' === determineCounterpart(measurable.id, er).kind,
+        count: countsById['CHANGE_INITIATIVE'],
+    });
+
+    return buckets;
+}
+
+
 function draw(groups, data, handlers) {
     if (! groups) return;
     if (! data.category) return;
     if (! data.categories) return;
 
-    const categoriesById = _.keyBy(data.categories, 'id');
-    const deltaAngle = i => i * (Math.PI * 2) / data.categories.length + angleOffset;
+    const buckets = mkBuckets(data.categories, data.measurables, data.measurable, data.relationships);
 
-    drawCenterGroup(groups.centerNodes, data.measurable, categoriesById[data.measurable.categoryId]);
-    drawOuterNodes(groups.outerNodes, data.categories, data.relatedByCategory, deltaAngle, handlers);
-    drawBridges(groups.bridges, data.categories, deltaAngle);
+    const deltaAngle = i => i * (Math.PI * 2) / buckets.length + angleOffset;
+
+    drawCenterGroup(groups.centerNodes, data.measurable, data.category);
+    drawOuterNodes(groups.outerNodes, buckets, deltaAngle, handlers);
+    drawBridges(groups.bridges, buckets, deltaAngle);
 }
 
 
@@ -269,33 +319,49 @@ function mkHandlers(vm) {
 }
 
 
-function controller($element) {
+function mkData(vm) {
+    const data = {};
+    data.categories = vm.categories || [];
+    data.measurables = vm.measurables || [];
+    data.relationships = sanitizeRelationships(vm.relationships || [], data.measurables, data.categories);
+    if (vm.measurable) {
+        data.measurable = vm.measurable;
+        data.category = _.find(vm.categories || [], {id: vm.measurable.categoryId});
+    }
+    return data;
+}
+
+
+function controller($element, $q, serviceBroker) {
     const vm = this;
 
-    let destroyResizeListener = () => {
+    const loadData = () => {
+        const p1 = serviceBroker
+            .loadViewData(CORE_API.MeasurableStore.findAll)
+            .then(r => vm.measurables = r.data);
+
+        const p2 = serviceBroker
+            .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+            .then(r => vm.categories = r.data);
+
+        return $q.all([p1, p2]);
     };
+
+    let destroyResizeListener = () => {};
     let groups = {};
-    let data = {};
 
     vm.$onInit = () => {
         initialiseData(vm, initialState);
         const holder = $element.find('svg')[0];
         groups = prepareGroups(holder, vm.onCategoryClear);
-
         destroyResizeListener = responsivefy(groups.svg);
 
-        draw(groups, data, mkHandlers(vm));
+        loadData()
+            .then(() => draw(groups, mkData(vm), mkHandlers(vm)));
     };
 
     vm.$onChanges = (c) => {
-        data.categories = vm.categories || [];
-        data.measurables = vm.measurables || [];
-        data.relatedByCategory = vm.relatedByCategory || {};
-        if (vm.measurable) {
-            data.measurable = vm.measurable;
-            data.category = _.find(vm.categories || [], {id: vm.measurable.categoryId});
-        }
-        draw(groups, data, mkHandlers(vm));
+        draw(groups, mkData(vm), mkHandlers(vm));
     };
 
     vm.$onDestroy = () => {
@@ -305,7 +371,9 @@ function controller($element) {
 
 
 controller.$inject = [
-    '$element'
+    '$element',
+    '$q',
+    'ServiceBroker'
 ];
 
 

@@ -66,7 +66,7 @@ public class EntityNamedNoteService {
         EntityNamedNodeType type = entityNamedNodeTypeDao.getById(namedNoteTypeId);
 
         checkNotNull(type, "associated note type cannot be found");
-        checkFalse(type.isReadOnly(), "cannot update a read-only named note");
+        checkFalse(type.isReadOnly(), "cannot save a read-only named note");
 
         boolean rc = entityNamedNoteDao.save(
                 ref,

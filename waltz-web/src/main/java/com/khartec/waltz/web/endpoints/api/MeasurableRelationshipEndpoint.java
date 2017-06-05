@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.measurable_relationship.ImmutableMeasurableRelationship;
-import com.khartec.waltz.model.measurable_relationship.MeasurableRelationship;
-import com.khartec.waltz.model.measurable_relationship.MeasurableRelationshipKind;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.entity_relationship.*;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.measurable_relationship.MeasurableRelationshipService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -32,8 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -61,42 +63,85 @@ public class MeasurableRelationshipEndpoint implements Endpoint {
     public void register() {
 
         String findForMeasurablePath = mkPath(BASE_URL, "measurable", ":id");
-        String removeRelationshipPath = mkPath(BASE_URL, ":measurableA", ":measurableB");
-        String saveRelationshipPath = mkPath(BASE_URL, ":measurableA", ":measurableB", ":kind");
+        String removeRelationshipPath = mkPath(BASE_URL, ":kindA", ":idA", ":kindB", ":idB", ":relationshipKind");
+        String updateRelationshipPath = mkPath(BASE_URL, ":kindA", ":idA", ":kindB", ":idB", ":relationshipKind");
+        String createRelationshipPath = mkPath(BASE_URL, ":kindA", ":idA", ":kindB", ":idB", ":relationshipKind");
 
-        ListRoute<MeasurableRelationship> findForMeasurableRoute = (request, response)
+
+        ListRoute<EntityRelationship> findForMeasurableRoute = (request, response)
                 -> measurableRelationshipService.findForMeasurable(getId(request));
 
-        DatumRoute<Integer> removeRelationshipRoute = (request, response) ->{
+        DatumRoute<Boolean> removeRelationshipRoute = (request, response) ->{
             requireRole(userRoleService, request, Role.CAPABILITY_EDITOR);
-            return measurableRelationshipService.remove(
-                    getLong(request, "measurableA"),
-                    getLong(request, "measurableB"));
+            EntityRelationshipKey command = readRelationshipKeyFromRequest(request);
+            return measurableRelationshipService.remove(command);
         };
 
-
-        DatumRoute<Boolean> saveRelationshipRoute = (request, response) -> {
+        DatumRoute<Boolean> createRelationshipRoute = (request, response) -> {
             requireRole(userRoleService, request, Role.CAPABILITY_EDITOR);
-            MeasurableRelationshipKind kind = readEnum(
-                    request,
-                    "kind",
-                    MeasurableRelationshipKind.class,
-                    (s) -> MeasurableRelationshipKind.STRONGLY_RELATES_TO);
-            MeasurableRelationship measurableRelationship = ImmutableMeasurableRelationship.builder()
-                    .measurableA(getLong(request, "measurableA"))
-                    .measurableB(getLong(request, "measurableB"))
-                    .relationshipKind(kind)
+            EntityRelationship relationship = ImmutableEntityRelationship.builder()
+                    .a(getEntityReferenceA(request))
+                    .b(getEntityReferenceB(request))
+                    .relationship(getRelationshipKind(request))
                     .description(request.body())
-                    .provenance("waltz")
                     .lastUpdatedBy(getUsername(request))
                     .build();
-            return measurableRelationshipService.save(measurableRelationship);
+            return measurableRelationshipService.create(relationship);
+        };
+
+        DatumRoute<Boolean> updateRelationshipRoute = (request, response) -> {
+            requireRole(userRoleService, request, Role.CAPABILITY_EDITOR);
+            EntityRelationshipKey key = readRelationshipKeyFromRequest(request);
+            UpdateEntityRelationshipParams params = readBody(request, UpdateEntityRelationshipParams.class);
+            return measurableRelationshipService.update(key, params, getUsername(request));
         };
 
 
         getForList(findForMeasurablePath, findForMeasurableRoute);
         deleteForDatum(removeRelationshipPath, removeRelationshipRoute);
-        postForDatum(saveRelationshipPath, saveRelationshipRoute);
+        putForDatum(updateRelationshipPath, updateRelationshipRoute);
+        postForDatum(createRelationshipPath, createRelationshipRoute);
+    }
+
+
+    // --- HELPERS ---
+
+    private EntityRelationshipKey readRelationshipKeyFromRequest(Request request) {
+        return ImmutableEntityRelationshipKey.builder()
+                        .a(getEntityReferenceA(request))
+                        .b(getEntityReferenceB(request))
+                        .relationshipKind(getRelationshipKind(request))
+                        .build();
+    }
+
+
+    private RelationshipKind getRelationshipKind(Request request) {
+        return readEnum(
+                request,
+                "relationshipKind",
+                RelationshipKind.class,
+                s -> RelationshipKind.RELATES_TO);
+    }
+
+
+    private EntityReference getEntityReferenceA(Request request) {
+        return getReference("A", request);
+    }
+
+
+    private EntityReference getEntityReferenceB(Request request) {
+        return getReference("B", request);
+    }
+
+
+    private EntityReference getReference(String qualifier, Request request) {
+        EntityKind kind = readEnum(
+                request,
+                "kind" + qualifier,
+                EntityKind.class,
+                s -> null);
+        long id = getLong(request, "id" + qualifier);
+        return mkRef(kind, id);
     }
 
 }

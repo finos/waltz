@@ -22,12 +22,11 @@ import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.data.change_initiative.search.ChangeInitiativeSearchDao;
 import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.entity_relationship.EntityRelationship;
 import com.khartec.waltz.model.entity_relationship.EntityRelationshipChangeCommand;
 import com.khartec.waltz.model.entity_relationship.RelationshipKind;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.service.entity_relationship.EntityRelationshipUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,10 +81,7 @@ public class ChangeInitiativeService {
 
 
     public Collection<EntityRelationship> getRelatedEntitiesForId(long id) {
-        EntityReference ref = ImmutableEntityReference.builder()
-                .id(id)
-                .kind(CHANGE_INITIATIVE)
-                .build();
+        EntityReference ref = mkRef(CHANGE_INITIATIVE, id);
         return relationshipDao.findRelationshipsInvolving(ref);
     }
 
@@ -101,8 +97,7 @@ public class ChangeInitiativeService {
     public boolean removeEntityRelationship(long changeInitiativeId,
                                             EntityRelationshipChangeCommand command) {
         checkNotNull(command, "command cannot be null");
-
-        return relationshipDao.remove(mkEntityRelationship(changeInitiativeId, command)) == 1;
+        return relationshipDao.remove(mkEntityRelationship(changeInitiativeId, command));
     }
 
 
