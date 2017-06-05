@@ -161,7 +161,7 @@ function controller($q,
 
         const moveCommands = [
             { command: 'MOVE', payload: { id: `ANNOTATION/${annotation.id}`, dx: 100, dy: -50 }},
-            { command: 'MOVE', payload: { id: `APPLICATION/${actor.id}`, dx: 300, dy: 200 }},
+            { command: 'MOVE', payload: { id: `ACTOR/${actor.id}`, dx: 300, dy: 200 }},
         ];
 
         return _.concat(modelCommands, moveCommands);
