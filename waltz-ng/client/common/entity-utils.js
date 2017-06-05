@@ -25,6 +25,10 @@ export function sameRef(r1, r2) {
 }
 
 
+export function refToString(r) {
+    return `${r.kind}/${r.id}`;
+}
+
 
 export function toEntityRef(obj, kind = obj.kind) {
     const ref = {
