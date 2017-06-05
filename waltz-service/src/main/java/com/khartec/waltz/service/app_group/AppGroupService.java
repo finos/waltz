@@ -267,7 +267,7 @@ public class AppGroupService {
 
     private void verifyUserCanUpdateGroup(String userId, long groupId) throws InsufficientPrivelegeException {
         if (!appGroupMemberDao.canUpdate(groupId, userId)) {
-            throw new InsufficientPrivelegeException(userId + " cannot update group: " + groupId);
+            throw new InsufficientPrivelegeException(userId + " cannot save group: " + groupId);
         }
     }
 

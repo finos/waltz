@@ -76,10 +76,10 @@ public class ActorEndpoint implements Endpoint {
         getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute );
 
         // create
-        postForDatum(mkPath(BASE_URL, "update"), this::createRoute);
+        postForDatum(mkPath(BASE_URL, "save"), this::createRoute);
 
-        // update
-        putForDatum(mkPath(BASE_URL, "update"), this::updateRoute);
+        // save
+        putForDatum(mkPath(BASE_URL, "save"), this::updateRoute);
 
         // delete
         deleteForDatum(mkPath(BASE_URL, ":id"), this::deleteRoute);

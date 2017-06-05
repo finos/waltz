@@ -16,25 +16,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {checkIsEntityRef} from '../../common/checks';
+
 export function store($http, base) {
     const BASE = `${base}/measurable-relationship`;
 
-    const findForMeasurable = (id) => $http
+    const findByMeasurable = (id) => $http
         .get(`${BASE}/measurable/${id}`)
         .then(r => r.data);
 
-    const remove = (idA, idB) => $http
-        .delete(`${BASE}/${idA}/${idB}`)
-        .then(r => r.data);
+    const remove = (d) => {
+        checkIsEntityRef(d.a);
+        checkIsEntityRef(d.b);
+        const url = `${BASE}/${d.a.kind}/${d.a.id}/${d.b.kind}/${d.b.id}/${d.relationshipKind}`;
+        return $http
+            .delete(url)
+            .then(r => r.data);
+    };
 
-    const save = (d) => $http
-        .post(`${BASE}/${d.measurableA}/${d.measurableB}/${d.relationshipKind}`, d.description)
-        .then(r => r.data);
+    const create = (d) => {
+        checkIsEntityRef(d.a);
+        checkIsEntityRef(d.b);
+        const url = `${BASE}/${d.a.kind}/${d.a.id}/${d.b.kind}/${d.b.id}/${d.relationshipKind}`;
+        return $http
+            .post(url , d.description)
+            .then(r => r.data);
+    };
+
+    const update = (key, changes) => {
+        // changes -> { description, relationshipKind }
+        checkIsEntityRef(key.a);
+        checkIsEntityRef(key.b);
+        const url = `${BASE}/${key.a.kind}/${key.a.id}/${key.b.kind}/${key.b.id}/${key.relationshipKind}`;
+        return $http
+            .put(url, changes)
+            .then(r => r.data);
+    };
 
     return {
-        findForMeasurable,
+        findByMeasurable,
         remove,
-        save
+        create,
+        update
     };
 }
 
@@ -45,26 +68,28 @@ store.$inject = [
 ];
 
 
-
-
-
 export const serviceName = 'MeasurableRelationshipStore';
 
 
 export const MeasurableRelationshipStore_API = {
     findByMeasurable: {
         serviceName,
-        serviceFnName: 'findForMeasurable',
+        serviceFnName: 'findByMeasurable',
         description: 'finds relationships by given measurable id'
     },
-    save: {
+    create: {
         serviceName,
-        serviceFnName: 'save',
-        description: 'saves an entity named note'
+        serviceFnName: 'create',
+        description: 'creates a relationship'
+    },
+    update: {
+        serviceName,
+        serviceFnName: 'update',
+        description: 'updates a relationship (key, changes)'
     },
     remove: {
         serviceName,
         serviceFnName: 'remove',
-        description: 'removes an entity named note'
+        description: 'removes a relationship'
     }
 };

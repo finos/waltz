@@ -18,31 +18,63 @@
 
 package com.khartec.waltz.service.measurable_relationship;
 
+import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.entity_relationship.EntityRelationship;
+import com.khartec.waltz.model.entity_relationship.EntityRelationshipKey;
+import com.khartec.waltz.model.entity_relationship.UpdateEntityRelationshipParams;
 import com.khartec.waltz.model.measurable_relationship.MeasurableRelationship;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
+
+import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 
 @Service
 public class MeasurableRelationshipService {
 
+    private final EntityRelationshipDao entityRelationshipDao;
 
 
-    public MeasurableRelationshipService() {
+    @Autowired
+    public MeasurableRelationshipService(EntityRelationshipDao entityRelationshipDao) {
+        checkNotNull(entityRelationshipDao, "entityRelationshipDao cannot be null");
+        this.entityRelationshipDao = entityRelationshipDao;
     }
 
 
-    public List<MeasurableRelationship> findForMeasurable(long measurableId) {
-        return Collections.emptyList();
+    public Collection<EntityRelationship> findForMeasurable(long measurableId) {
+        return entityRelationshipDao
+                .findRelationshipsInvolving(mkRef(
+                        EntityKind.MEASURABLE,
+                        measurableId));
     }
 
 
-    public int remove(long measurable1, long measurable2) {
-        return 0;
+    public boolean remove(EntityRelationshipKey command) {
+        return entityRelationshipDao.remove(command);
     }
+
 
     public boolean save(MeasurableRelationship measurableRelationship) {
         return false;
+    }
+
+
+    @Deprecated
+    public int save(EntityRelationship relationship) {
+        return entityRelationshipDao.save(relationship);
+    }
+
+
+    public boolean create(EntityRelationship relationship) {
+        return entityRelationshipDao.create(relationship);
+    }
+
+
+    public boolean update(EntityRelationshipKey key, UpdateEntityRelationshipParams params, String username) {
+        return entityRelationshipDao.update(key, params, username);
     }
 }

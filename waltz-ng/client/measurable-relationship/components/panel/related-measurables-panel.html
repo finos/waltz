@@ -25,9 +25,7 @@
      ng-if="$ctrl.relationships.length > 0 || $ctrl.showAnyway">
     <div class="col-sm-5">
         <!-- VISUALISATION -->
-        <waltz-related-measurables-viz categories="$ctrl.categories"
-                                       measurables="$ctrl.measurables"
-                                       related-by-category="$ctrl.relatedByCategory"
+        <waltz-related-measurables-viz relationships="$ctrl.relationships"
                                        on-category-select="$ctrl.selectCategory"
                                        on-category-clear="$ctrl.clearCategory"
                                        measurable="$ctrl.measurable">
@@ -35,24 +33,10 @@
     </div>
 
     <div class="col-sm-7">
-        <!-- SELECTED CATEGORY -->
-        <div ng-if="$ctrl.selectedCategory"
-             class="waltz-fade-if">
-            <h5>
-                Selected Category:
-                <span ng-bind="$ctrl.selectedCategory.name"></span>
-                <a class='clickable pull-right'
-                   ng-click="$ctrl.clearCategory()">
-                    (x)
-                </a>
-            </h5>
-            <br>
-        </div>
-
         <!-- TABLE -->
         <div ng-if="$ctrl.gridData.length > 0"
              class="waltz-fade-if small">
-            <div ng-class="{ 'waltz-scroll-region-300' : $ctrl.gridData.length > 10 }">
+            <div ng-class="{ 'waltz-scroll-region-350' : $ctrl.gridData.length > 10 }">
                 <table class="table table-condensed table-hover">
                     <colgroup>
                         <col width="33%">
@@ -75,38 +59,25 @@
                         ng-class="{ 'waltz-highlighted-row' : $ctrl.isSelected(row) }"
                         ng-click="$ctrl.selectRow(row)">
                         <td>
-                            <span ng-if='row.outbound'>This</span>
-                            <span ng-if='!row.outbound'>
-                                <span ng-bind="row.measurableA.name"></span>
-                                ( <small class='text-muted' ng-bind="row.categoryA.name"></small> )
+                            <span ng-class="{ 'text-muted' : row.outbound }">
+                                <span ng-bind="row.a.name"></span>
+                                ( <small class='text-muted' ng-bind="row.a.type"></small> )
                             </span>
                         </td>
                         <td>
-                            <span ng-bind="row.relationship.relationshipKind | toDisplayName:'measurableRelationshipKind'"></span>
+                            <span ng-bind="row.relationship.relationship | toDisplayName:'relationshipKind'"></span>
                         </td>
                         <td>
-                            <span ng-if='!row.outbound'>This</span>
-                            <span ng-if='row.outbound'>
-                                <span ng-bind="row.measurableB.name"></span>
-                                ( <small class='text-muted' ng-bind="row.categoryB.name"></small> )
+                            <span ng-class="{ 'text-muted' : !row.outbound }">
+                                <span ng-bind="row.b.name"></span>
+                                ( <small class='text-muted' ng-bind="row.b.type"></small> )
                             </span>
                         </td>
                         <td>
-                        <span ng-if="row.relationship.description.length > 0"
-                              title="Additional description available">
-                            <waltz-icon name="file-text-o"></waltz-icon>
-                        </span>
-                        </td>
-                    </tr>
-                    <!-- ADD -->
-                    <tr ng-if="! $ctrl.relationshipForm">
-                        <td colspan="4">
-                            <div waltz-has-role="CAPABILITY_EDITOR">
-                                <a class="clickable"
-                                   ng-click="$ctrl.beginNewRelationship()">
-                                    Add new relationship...
-                                </a>
-                            </div>
+                            <span ng-if="row.relationship.description.length > 0"
+                                  title="Additional description available">
+                                <waltz-icon name="file-text-o"></waltz-icon>
+                            </span>
                         </td>
                     </tr>
                     </tbody>
@@ -119,39 +90,65 @@
              class="waltz-fade-if">
             <waltz-no-data>
                 <message>
-                    No relationships have been defined.
-                    <div waltz-has-role="CAPABILITY_EDITOR">
-                        <span ng-if="! $ctrl.relationshipForm">
-                            <br>
-                            <a class="clickable"
-                               ng-click="$ctrl.beginNewRelationship()">
-                                Add new relationship...
-                            </a>
-                        </span>
-                    </div>
+                    <strong>No relationships</strong>
+                    have been defined.
                 </message>
             </waltz-no-data>
         </div>
 
+        <div ng-if="$ctrl.selectedCategory && !$ctrl.visibility.editor && !$ctrl.selectedRow"
+             class="waltz-fade-if">
+            Select a category or relationship to make changes.
+        </div>
+        <!-- SELECTED CATEGORY -->
+        <div ng-if="$ctrl.selectedCategory && !$ctrl.visibility.editor && !$ctrl.selectedRow"
+             class="waltz-fade-if">
+            <hr>
+            <h4>
+                Selected Category:
+                <span ng-bind="$ctrl.selectedCategory.name"></span>
+                <a class='clickable pull-right'
+                   ng-click="$ctrl.clearCategory()">
+                    (x)
+                </a>
+            </h4>
+            <br>
+            <!-- ADD -->
+            <div waltz-has-role="CAPABILITY_EDITOR">
+                <a class="clickable"
+                   ng-click="$ctrl.beginNewRelationship()">
+                    Add new relationship...
+                </a>
+            </div>
+        </div>
+
         <!-- SELECTED RELATIONSHIP -->
-        <div ng-if="$ctrl.selectedRow && ! $ctrl.relationshipForm"
+        <div ng-if="$ctrl.selectedRow && ! $ctrl.visibility.editor"
              class="waltz-fade-if">
             <hr>
 
-            <h5 ng-if="!$ctrl.selectedRow.outbound">
-                <waltz-entity-link entity-ref="$ctrl.selectedRow.counterpart"></waltz-entity-link>
+            <h4 ng-if="!$ctrl.selectedRow.outbound">
+                <waltz-entity-link entity-ref="$ctrl.selectedRow.a"></waltz-entity-link>
                 &raquo;
-                <span ng-bind="$ctrl.selectedRow.relationship.relationshipKind | toDisplayName:'measurableRelationshipKind'"></span>
+                <span ng-bind="$ctrl.selectedRow.relationship.relationship | toDisplayName:'relationshipKind'"></span>
                 &raquo;
                 to this
-            </h5>
-            <h5 ng-if="$ctrl.selectedRow.outbound">
+                <a class='clickable pull-right'
+                   ng-click="$ctrl.clearRowSelection()">
+                    (x)
+                </a>
+            </h4>
+            <h4 ng-if="$ctrl.selectedRow.outbound">
                 This
                 &raquo;
-                <span ng-bind="$ctrl.selectedRow.relationship.relationshipKind | toDisplayName:'measurableRelationshipKind'"></span>
+                <span ng-bind="$ctrl.selectedRow.relationship.relationship | toDisplayName:'relationshipKind'"></span>
                 &raquo;
-                <waltz-entity-link entity-ref="$ctrl.selectedRow.counterpart"></waltz-entity-link>
-            </h5>
+                <waltz-entity-link entity-ref="$ctrl.selectedRow.b"></waltz-entity-link>
+                <a class='clickable pull-right'
+                   ng-click="$ctrl.clearRowSelection()">
+                    (x)
+                </a>
+            </h4>
 
             <div ng-if="$ctrl.selectedRow.relationship.description">
                 <waltz-markdown text="$ctrl.selectedRow.relationship.description"></waltz-markdown>
@@ -162,17 +159,18 @@
             </div>
 
             <hr>
+
             <!-- ACTIONS -->
             <div waltz-has-role="CAPABILITY_EDITOR">
                 <button class="btn btn-xs btn-primary"
-                        ng-click="$ctrl.editRow()">
+                        ng-click="$ctrl.updateExistingRelationship()">
                     Edit
                 </button>
                 <button class="btn btn-xs btn-danger"
-                        ng-click="$ctrl.removeRow()">
+                        ng-click="$ctrl.removeRelationship($ctrl.selectedRow.relationship)">
                     Delete
                 </button>
-                <a ng-click="$ctrl.clearRow()"
+                <a ng-click="$ctrl.clearRowSelection()"
                    class="clickable">
                     Dismiss
                 </a>
@@ -183,72 +181,27 @@
                 <waltz-last-updated entity="$ctrl.selectedRow.relationship">
                 </waltz-last-updated>
             </div>
-
         </div>
 
-        <!-- NEW RELATIONSHIP FORM -->
-        <div ng-if="$ctrl.relationshipForm">
+        <div ng-if="$ctrl.visibility.createEditor"
+             class="waltz-fade-if">
             <hr>
-            <div class="small">
-
-                <form>
-
-                    <!-- KIND -->
-                    <div class="form-group">
-                        <label>Relationship Kind</label>
-                        <select ng-options="kind.code as kind.name for kind in $ctrl.relationshipKinds track by kind.code"
-                                ng-model="$ctrl.relationshipForm.relationshipKind"
-                                class="form-control">
-                        </select>
-                    </div>
-
-
-                    <!-- MEASURABLE -->
-                    <div class="form-group"
-                         ng-if="$ctrl.relationshipForm.mode == 'CREATE'">
-                        <label class="control-label">Related viewpoint item</label>
-                        <waltz-entity-selector entity-kinds="['MEASURABLE']"
-                                               on-select="$ctrl.onMeasurableSelection"
-                                               required='true'
-                                               selection-filter="$ctrl.selectionFilterFn">
-                        </waltz-entity-selector>
-                        <div class="help-block">
-                            <span ng-if="$ctrl.selectedCategory">
-                                Limiting results to type:
-                                <span ng-bind="$ctrl.selectedCategory.name"></span>
-                            </span>
-                            <span ng-if="!$ctrl.selectedCategory">
-                                Search across all viewpoints, to restrict search select a category from the diagram
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- DESCRIPTION -->
-                    <div class="form-group">
-                        <label class="control-label">Description</label>
-                        <textarea class='form-control'
-                                  ng-model="$ctrl.relationshipForm.description"
-                                  placeholder="Please provide any additional details here"
-                                  rows="6">
-                        </textarea>
-                    </div>
-
-                    <hr>
-
-                    <!-- ACTION BUTTONS -->
-                    <button class="btn btn-xs btn-success"
-                            ng-click="$ctrl.submit()"
-                            ng-disabled="! $ctrl.isFormValid()">
-                        Save
-                    </button>
-                    <a class="clickable" ng-click="$ctrl.cancelEditor()">
-                        Cancel
-                    </a>
-
-                </form>
-            </div>
+            <waltz-create-related-measurable-editor relationship="$ctrl.relationshipToEdit"
+                                                    measurable="$ctrl.measurable"
+                                                    type="$ctrl.selectedCategory"
+                                                    on-cancel="$ctrl.cancelEditor"
+                                                    on-refresh="$ctrl.refresh">
+            </waltz-create-related-measurable-editor>
         </div>
 
+        <div ng-if="$ctrl.visibility.updateEditor"
+             class="waltz-fade-if">
+            <hr>
+            <waltz-update-related-measurable-editor relationship="$ctrl.selectedRow.relationship"
+                                                    on-cancel="$ctrl.cancelEditor"
+                                                    on-refresh="$ctrl.refresh">
+            </waltz-update-related-measurable-editor>
+        </div>
 
     </div>
 </div>

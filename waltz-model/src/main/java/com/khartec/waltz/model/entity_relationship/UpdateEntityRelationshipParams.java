@@ -18,38 +18,18 @@
 
 package com.khartec.waltz.model.entity_relationship;
 
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdatedProvider;
-import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
-import static com.khartec.waltz.model.entity_relationship.RelationshipKind.HAS;
-
 @Value.Immutable
-@JsonSerialize(as = ImmutableEntityRelationship.class)
-@JsonDeserialize(as = ImmutableEntityRelationship.class)
-public abstract class EntityRelationship implements ProvenanceProvider, LastUpdatedProvider, DescriptionProvider {
+@JsonSerialize(as = ImmutableUpdateEntityRelationshipParams.class)
+@JsonDeserialize(as = ImmutableUpdateEntityRelationshipParams.class)
 
-    public abstract EntityReference a();
-    public abstract EntityReference b();
-
-
-    @Value.Default
-    public RelationshipKind relationship() {
-        return HAS;
-    }
-
-
-    public EntityRelationshipKey toKey() {
-        return ImmutableEntityRelationshipKey.builder()
-                .a(a())
-                .b(b())
-                .relationshipKind(relationship())
-                .build();
-    }
-
+/**
+ * Use in conjunction with EntityRelationshipKey
+ */
+public abstract class UpdateEntityRelationshipParams implements DescriptionProvider {
+    public abstract RelationshipKind relationshipKind();
 }

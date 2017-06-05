@@ -174,16 +174,3 @@ export function invokeFunction(fn) {
 }
 
 
-export function toEntityRef(obj, kind = obj.kind) {
-    const ref = {
-        id: obj.id,
-        kind,
-        name: obj.name,
-        description: obj.description
-    };
-
-    checkIsEntityRef(ref);
-
-    return ref;
-}
-

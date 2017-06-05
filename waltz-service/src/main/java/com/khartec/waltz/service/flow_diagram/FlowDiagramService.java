@@ -98,11 +98,11 @@ public class FlowDiagramService {
         Long diagramId;
 
         if (diagram.id().isPresent()) {
-            // update
+            // save
             diagramId = diagram.id().get();
 
             if(!flowDiagramDao.update(diagram)) {
-                throw new InvalidResultException("Could not update diagram with Id: " + diagramId);
+                throw new InvalidResultException("Could not save diagram with Id: " + diagramId);
             }
 
             flowDiagramEntityDao.deleteForDiagram(diagramId);

@@ -155,7 +155,7 @@ public class SurveyRunGenerator {
 
                     surveyCompletedCount.incrementAndGet();
 
-                    // update instances to COMPLETED
+                    // save instances to COMPLETED
                     if (surveyInstanceStatusMap.containsKey(SurveyInstanceStatus.COMPLETED)) {
                         Set<Long> completedInstanceIds = surveyInstanceStatusMap.get(SurveyInstanceStatus.COMPLETED);
                         dsl.update(SURVEY_INSTANCE)
@@ -165,7 +165,7 @@ public class SurveyRunGenerator {
                         LOG.debug(" --- {} instances: {}", SurveyInstanceStatus.COMPLETED, completedInstanceIds);
                     }
 
-                    // update instances to EXPIRED
+                    // save instances to EXPIRED
                     if (surveyInstanceStatusMap.containsKey(SurveyInstanceStatus.NOT_STARTED)
                             || surveyInstanceStatusMap.containsKey(SurveyInstanceStatus.IN_PROGRESS)) {
                         Set<Long> expiredInstanceIds = surveyInstanceStatusMap.entrySet()
