@@ -127,10 +127,11 @@
         </table>
     </div>
 
-    <a class="clickable"
-       waltz-has-role-for-entity-kind="{{ $ctrl.parentEntityRef.kind }}"
-       ng-if="$ctrl.creatableNoteTypes.length > 0 && ! $ctrl.creatingNote && ($ctrl.notes.length === 0 || $ctrl.visibility.notes)"
-       ng-click="$ctrl.startNewNote()">
-        +Add Note
-    </a>
+    <span waltz-has-role-for-entity-kind="{{ $ctrl.parentEntityRef.kind }}">
+        <a class="clickable"
+           ng-if="$ctrl.creatableNoteTypes.length > 0 && ! $ctrl.creatingNote && ($ctrl.notes.length === 0 || $ctrl.visibility.notes)"
+           ng-click="$ctrl.startNewNote()">
+            +Add Note
+        </a>
+    </span>
 </div>

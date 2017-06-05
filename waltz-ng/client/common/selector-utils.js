@@ -21,6 +21,7 @@
 
 export function getDefaultScopeForEntityKind(kind) {
     switch (kind) {
+        case 'ACTOR':
         case 'APPLICATION':
         case 'APP_GROUP':
         case 'FLOW_DIAGRAM':

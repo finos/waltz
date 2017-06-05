@@ -11,10 +11,9 @@
                         on-initialise="$ctrl.onProducesGridInitialise"
                         class="small">
             </waltz-grid-with-search>
+            <hr>
         </div>
     </div>
-
-    <hr>
 
     <div class="row"
          ng-if="$ctrl.consumes.length > 0">
@@ -34,7 +33,9 @@
 
     <waltz-no-data ng-if="$ctrl.produces.length == 0 && $ctrl.consumes.length == 0">
         <message>
-            <strong>No Physical Flow</strong> detail available for this application
+            <strong>No Physical Flow</strong> detail available for this
+            <span ng-bind="$ctrl.primaryRef.kind | toDisplayName:'entity'">
+            </span>
         </message>
     </waltz-no-data>
 

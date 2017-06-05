@@ -18,11 +18,12 @@
 
 import {initialiseData} from "../common";
 
-import template from './actor-view.html';
+import template from "./actor-view.html";
 
 
 const initialState = {
     logs: [],
+    logicalFlows: [],
     physicalFlows: [],
     physicalSpecifications: [],
     physicalFlowsUnusedSpecificationsCount: 0,
@@ -81,6 +82,7 @@ function controller($q,
                     flowDiagramStore,
                     flowDiagramEntityStore,
                     historyStore,
+                    logicalFlowStore,
                     physicalFlowStore,
                     physicalSpecificationStore,
                     sourceDataRatingStore) {
@@ -96,6 +98,10 @@ function controller($q,
         .then(a => vm.actor = a)
         .then(() => vm.entityRef = Object.assign({}, vm.entityRef, { name: vm.actor.name }))
         .then(() => addToHistory(historyStore, vm.actor));
+
+    logicalFlowStore
+        .findByEntityReference(vm.entityRef)
+        .then(flows => vm.logicalFlows = flows);
 
     physicalFlowStore
         .findByEntityReference(vm.entityRef)
@@ -171,6 +177,7 @@ controller.$inject = [
     'FlowDiagramStore',
     'FlowDiagramEntityStore',
     'HistoryStore',
+    'LogicalFlowStore',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore',
     'SourceDataRatingStore'

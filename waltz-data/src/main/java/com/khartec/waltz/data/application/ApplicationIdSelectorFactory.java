@@ -45,6 +45,7 @@ import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 
 @Service
 public class ApplicationIdSelectorFactory implements IdSelectorFactory {
@@ -59,11 +60,13 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     private final Application app = APPLICATION.as("app");
     private final ApplicationGroupEntry appGroup = APPLICATION_GROUP_ENTRY.as("appgrp");
     private final EntityRelationship relationship = ENTITY_RELATIONSHIP.as("relationship");
+    private final FlowDiagramEntity flowDiagram = FLOW_DIAGRAM_ENTITY.as("flowdiag");
     private final Involvement involvement = INVOLVEMENT.as("involvement");
+    private final LogicalFlow logicalFlow = LOGICAL_FLOW.as("log_flow");
     private final MeasurableRating measurableRating = MEASURABLE_RATING.as("m_rating");
     private final Person person = PERSON.as("per");
     private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("phier");
-    private final FlowDiagramEntity flowDiagram = FLOW_DIAGRAM_ENTITY.as("flowdiag");
+    private final PhysicalFlow physicalFlow = PHYSICAL_FLOW.as("phy_flow");
 
 
     @Autowired
@@ -88,6 +91,8 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
         checkNotNull(options, "options cannot be null");
         EntityReference ref = options.entityReference();
         switch (ref.kind()) {
+            case ACTOR:
+                return mkForActor(options);
             case APP_GROUP:
                 return mkForAppGroup(ref, options.scope());
             case APPLICATION:
@@ -108,6 +113,28 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
     }
+
+
+    private Select<Record1<Long>> mkForActor(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        long actorId = options.entityReference().id();
+
+        Select<Record1<Long>> sourceAppIds = DSL.select(logicalFlow.SOURCE_ENTITY_ID)
+                .from(logicalFlow)
+                .where(logicalFlow.TARGET_ENTITY_ID.eq(actorId)
+                        .and(logicalFlow.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
+                        .and(logicalFlow.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+
+        Select<Record1<Long>> targetAppIds = DSL.select(logicalFlow.TARGET_ENTITY_ID)
+                .from(logicalFlow)
+                .where(logicalFlow.SOURCE_ENTITY_ID.eq(actorId)
+                        .and(logicalFlow.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
+                        .and(logicalFlow.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+
+        return sourceAppIds
+                .union(targetAppIds);
+    }
+
 
     private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
         ensureScopeIsExact(options);
