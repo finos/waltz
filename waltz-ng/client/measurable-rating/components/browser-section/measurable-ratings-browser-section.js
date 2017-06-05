@@ -19,6 +19,7 @@
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
 import {mkLinkGridCell} from '../../../common/link-utils';
+import {CORE_API} from '../../../common/services/core-api-utils';
 
 /**
  * @name waltz-measurable-ratings-browser
@@ -27,13 +28,12 @@ import {mkLinkGridCell} from '../../../common/link-utils';
  * This component ...
  */
 
+import template from './measurable-ratings-browser-section.html';
+
 
 const bindings = {
-    applications: '<',
-    measurables: '<',
-    measurableCategories: '<',
-    ratingTallies: '<',
-    onLoadDetail: '<'
+    parentEntityRef: '<',
+    scope: '@',
 };
 
 
@@ -41,6 +41,7 @@ const initialState = {
     applications: [],
     measurables: [],
     measurableCategories: [],
+    measurableRatingsDetail: null,
     ratingTallies: [],
     detail: null,
     visibility: {
@@ -49,9 +50,6 @@ const initialState = {
     selectedMeasurable: null,
     onLoadDetail: () => log('onLoadDetail')
 };
-
-
-const template = require('./measurable-ratings-browser-section.html');
 
 
 function prepareColumnDefs(measurableCategory) {
@@ -64,7 +62,7 @@ function prepareColumnDefs(measurableCategory) {
         {
             field: 'ratingName',
             name: 'Rating',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-rating-indicator-cell rating="row.entity.rating.rating" label="COL_FIELD"></waltz-rating-indicator-cell></div>'
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-rating-indicator-cell rating="row.entity.rating.rating" label="COL_FIELD.name"></waltz-rating-indicator-cell></div>'
         },
         {
             field: 'measurable.name',
@@ -120,8 +118,59 @@ function log() {
 }
 
 
-function controller() {
+function loadMeasurableRatings(serviceBroker, selector, holder) {
+    return serviceBroker
+        .loadViewData(CORE_API.MeasurableRatingStore.statsByAppSelector, [selector])
+        .then(r => holder.ratingTallies = r.data);
+}
+
+
+function loadMeasurables(serviceBroker, selector, holder) {
+    return serviceBroker
+        .loadViewData(CORE_API.MeasurableStore.findMeasurablesBySelector, [selector])
+        .then(r => holder.measurables = r.data);
+}
+
+
+function loadMeasurableCategories(serviceBroker, holder) {
+    return serviceBroker
+        .loadAppData(CORE_API.MeasurableCategoryStore.findAll, [])
+        .then(r => holder.measurableCategories = r.data);
+}
+
+
+function loadApps(serviceBroker, selector, holder) {
+    return serviceBroker
+        .loadViewData(CORE_API.ApplicationStore.findBySelector, [selector])
+        .then(r => holder.applications = r.data);
+}
+
+
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    const loadRatingsDetail = () => {
+        return vm.measurableRatingsDetail
+            ? $q.resolve(vm.measurableRatingsDetail)
+            : serviceBroker
+                .execute(CORE_API.MeasurableRatingStore.findByAppSelector, [vm.selector])
+                .then(r => vm.measurableRatingsDetail = r.data);
+    };
+
+
+    vm.$onInit = () => {
+        vm.selector = {
+            entityReference: vm.parentEntityRef,
+            scope: vm.scope
+        };
+
+        return $q.all([
+            loadMeasurableRatings(serviceBroker, vm.selector, vm),
+            loadMeasurables(serviceBroker, vm.selector, vm),
+            loadMeasurableCategories(serviceBroker, vm),
+            loadApps(serviceBroker, vm.selector, vm),
+        ]);
+    };
 
 
     vm.$onChanges = (c) => {
@@ -130,11 +179,12 @@ function controller() {
         }
     };
 
+
     vm.onSelect = (measurable) => {
         vm.visibility.loading = true;
         vm.tableData = null;
         vm.selectedMeasurable = measurable;
-        const promise = vm.onLoadDetail(measurable);
+        const promise = loadRatingsDetail();
         const category = _.find(vm.measurableCategories, ({ id: measurable.categoryId }));
 
         vm.columnDefs = prepareColumnDefs(category);
@@ -152,11 +202,13 @@ function controller() {
             vm.visibility.loading = false;
         }
     };
+
 }
 
 
 controller.$inject = [
-    '$q'
+    '$q',
+    'ServiceBroker'
 ];
 
 
@@ -167,4 +219,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: 'waltzMeasurableRatingsBrowserSection'
+};
