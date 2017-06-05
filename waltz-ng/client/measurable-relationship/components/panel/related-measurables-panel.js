@@ -176,7 +176,6 @@ function controller($q, $timeout, serviceBroker, notification) {
     };
 
     vm.removeRelationship = (rel) => {
-        console.log('remove', rel)
         if (confirm('Are you sure you want to delete this relationship ?')) {
             remove(rel)
                 .then(() => {
@@ -189,8 +188,6 @@ function controller($q, $timeout, serviceBroker, notification) {
                 });
         }
     };
-
-
 
     vm.beginNewRelationship = () => {
         vm.visibility.editor = true;
