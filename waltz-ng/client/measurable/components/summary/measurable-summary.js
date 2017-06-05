@@ -19,13 +19,15 @@ import _ from "lodash";
 import {enrichServerStats} from "../../../server-info/services/server-utilities";
 import {calcPortfolioCost} from "../../../asset-cost/services/asset-cost-utilities";
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
+import {CORE_API} from '../../../common/services/core-api-utils';
+import {refToString, sameRef} from '../../../common/entity-utils';
+import {entityNames} from '../../../common/services/display-names';
 
 
 const bindings = {
     applications: '<',
     children: '<',
     complexity: '<',
-    logicalFlows: '<',
     measurable: '<',
     parents: '<',
     serverStats: '<',
@@ -61,7 +63,20 @@ function prepareParentRefs(parents = [], measurable = {}) {
 }
 
 
-function controller() {
+function prepareRelationshipStats(stats = [], entityReference) {
+    return _
+        .chain(stats)
+        .flatMap(r => { return [r.a, r.b]; })
+        .uniqBy(refToString)
+        .reject(r => sameRef(r, entityReference))
+        .countBy(r => r.kind)
+        .map((v,k) => { return { kind: k, name: entityNames[k], count: v }})
+        .orderBy('name')
+        .value();
+}
+
+
+function controller(serviceBroker) {
     const vm = this;
 
     vm.$onChanges = (c) => {
@@ -76,9 +91,19 @@ function controller() {
                 kind: 'MEASURABLE',
                 id: vm.measurable.id
             };
+
+            serviceBroker
+                .loadViewData(CORE_API.MeasurableRelationshipStore.findByMeasurable, [vm.measurable.id])
+                .then(r => vm.relationshipStats = prepareRelationshipStats(r.data, vm.entityRef));
         }
     };
 }
+
+
+controller.$inject = [
+    'ServiceBroker'
+];
+
 
 const component = {
     template,

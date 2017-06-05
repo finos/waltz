@@ -92,6 +92,9 @@ function controller($q,
             serviceBroker
                 .loadViewData(CORE_API.ApplicationStore.findBySelector, [childrenSelector])
                 .then(r => vm.applications = r.data),
+            serviceBroker
+                .loadViewData(CORE_API.TechnologyStatisticsService.findBySelector, [childrenSelector])
+                .then(r => vm.techStats = r.data),
             logicalFlowViewService
                 .initialise(childrenSelector)
                 .then(flowView => vm.logicalFlowView = flowView),
@@ -111,7 +114,8 @@ function controller($q,
 
     const loadWave4 = () =>
         $q.all([
-            serviceBroker.loadAppData(CORE_API.SourceDataRatingStore.findAll, [])
+            serviceBroker
+                .loadAppData(CORE_API.SourceDataRatingStore.findAll, [])
                 .then(r => vm.sourceDataRatings = r.data),
             logHistory(vm.measurable, historyStore)
         ]);
