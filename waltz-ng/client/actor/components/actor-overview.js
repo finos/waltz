@@ -16,18 +16,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {initialiseData} from "../../common/index";
+import template from "./actor-overview.html";
+
+
 const bindings = {
     actor: '<'
 };
 
 
-const template = require('./actor-overview.html');
+const initialState = {};
 
 
-const component = {
-    template,
-    bindings
+function controller() {
+    const vm = initialiseData(this, initialState);
+
+    vm.$onChanges = (changes) => {
+        if (vm.actor) {
+            vm.entityRef = {
+                kind: 'ACTOR',
+                id: vm.actor.id
+            }
+        }
+    };
+}
+
+
+controller.$inject = [];
+
+
+export default {
+    component: {
+        template,
+        bindings,
+        controller
+    },
+    id: 'waltzActorOverview'
 };
-
-
-export default component;

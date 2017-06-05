@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import {registerComponents} from "../common/module-utils";
+import actorOverview from "./components/actor-overview";
+
 
 export default () => {
 
@@ -25,8 +28,11 @@ export default () => {
         .service('ActorStore', require('./services/actor-store'))
         .service('ActorService', require('./services/actor-service'));
 
+    registerComponents(module, [
+        actorOverview
+    ]);
+
     module
-        .component('waltzActorOverview', require('./components/actor-overview'))
         .component('waltzActorSelector', require('./components/actor-selector'))
         .component('waltzBasicActorSelector', require('./components/basic-actor-selector'));
 

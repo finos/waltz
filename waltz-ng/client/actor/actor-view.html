@@ -13,39 +13,41 @@
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-actor-overview actor="ctrl.actor"></waltz-actor-overview>
+        <waltz-actor-overview actor="ctrl.actor">
+        </waltz-actor-overview>
     </div>
 
 
     <br>
 
+    <!-- APPS -->
+    <waltz-apps-section parent-entity-ref="ctrl.entityRef"
+                        scope="EXACT">
+    </waltz-apps-section>
 
+    <!-- PHYSICAL FLOWW -->
     <waltz-section name="Physical Flows"
                    id="physical-flows-section">
 
         <waltz-section-actions>
             <a class="btn btn-xs btn-primary"
-               ui-sref="main.physical-flow.registration ({ kind: 'ACTOR', id: ctrl.actor.id })"
+               ui-sref="main.physical-flow.registration (ctrl.entityRef)"
                waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
                 Register
             </a>
-
-            <waltz-physical-flow-export-buttons unused-count="ctrl.physicalFlowsUnusedCount"
-                                                consumes-count="ctrl.physicalFlowsConsumesCount"
-                                                produces-count="ctrl.physicalFlowsProducesCount"
-                                                export-consumes="ctrl.exportPhysicalFlowConsumes"
+            <waltz-physical-flow-export-buttons export-consumes="ctrl.exportPhysicalFlowConsumes"
                                                 export-produces="ctrl.exportPhysicalFlowProduces"
                                                 export-unused="exportPhysicalFlowUnused">
             </waltz-physical-flow-export-buttons>
-
         </waltz-section-actions>
 
         <waltz-physical-data-section specifications="ctrl.physicalSpecifications"
+                                     logical-flows="ctrl.logicalFlows"
                                      on-initialise="ctrl.onPhysicalFlowsInitialise"
                                      on-change="ctrl.onPhysicalFlowsChange"
+                                     primary-ref="ctrl.entityRef"
                                      physical-flows="ctrl.physicalFlows">
         </waltz-physical-data-section>
-
     </waltz-section>
 
 
@@ -55,6 +57,12 @@
                                  create-diagram-commands="ctrl.createFlowDiagramCommands"
                                  reload="ctrl.loadFlowDiagrams">
     </waltz-flow-diagrams-section>
+
+
+    <!-- TECHNOLOGIES -->
+    <waltz-technology-summary-section parent-entity-ref='ctrl.entityRef'
+                                      scope="EXACT">
+    </waltz-technology-summary-section>
 
 
     <!-- BOOKMARKS -->
