@@ -56,9 +56,6 @@ function controller($scope,
                     complexityStore,
                     historyStore,
                     logicalFlowViewService,
-                    measurableStore,
-                    measurableCategoryStore,
-                    measurableRatingStore,
                     sourceDataRatingStore,
                     userService) {
 
@@ -78,18 +75,6 @@ function controller($scope,
 
 
     // -- LOAD ---
-
-    measurableStore
-        .findMeasurablesBySelector(idSelector)
-        .then(measurables => vm.measurables = measurables);
-
-    measurableCategoryStore
-        .findAll()
-        .then(cs => vm.measurableCategories = cs);
-
-    measurableRatingStore
-        .statsByAppSelector(idSelector)
-        .then(ratings => vm.measurableRatings = ratings);
 
     logicalFlowViewService
         .initialise(id, 'APP_GROUP', 'EXACT')
@@ -146,14 +131,6 @@ function controller($scope,
         .loadDetail()
         .then(flowData => vm.dataFlows = flowData);
 
-    vm.loadRatingsDetail = () => {
-        return vm.measurableRatingsDetail
-            ? $q.resolve(vm.measurableRatingsDetail)
-            : measurableRatingStore
-                .findByAppSelector(idSelector)
-                .then(rs => vm.measurableRatingsDetail = rs);
-    };
-
 
     // -- HELPER ---
 
@@ -173,9 +150,6 @@ controller.$inject = [
     'ComplexityStore',
     'HistoryStore',
     'LogicalFlowViewService',
-    'MeasurableStore',
-    'MeasurableCategoryStore',
-    'MeasurableRatingStore',
     'SourceDataRatingStore',
     'UserService'
 ];

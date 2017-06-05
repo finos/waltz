@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
@@ -59,6 +60,8 @@ public class MeasurableIdSelectorFactory extends AbstractIdSelectorFactory {
                 return mkForApplication(options);
             case APP_GROUP:
                 return mkForAppGroup(options);
+            case FLOW_DIAGRAM:
+                return mkForFlowDiagram(options);
             case ORG_UNIT:
                 return mkForOrgUnit(options);
             default:
@@ -93,6 +96,16 @@ public class MeasurableIdSelectorFactory extends AbstractIdSelectorFactory {
         return mkBaseRatingBasedSelector()
                 .where(MEASURABLE_RATING.ENTITY_ID.in(options.entityReference().id()))
                 .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+    }
+
+
+    private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
+        checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate flow diagram based selectors with exact scopes");
+        return mkBaseRatingBasedSelector()
+                .innerJoin(FLOW_DIAGRAM_ENTITY)
+                .on(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(MEASURABLE_RATING.ENTITY_ID)
+                        .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(MEASURABLE_RATING.ENTITY_KIND)))
+                .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id()));
     }
 
 

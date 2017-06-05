@@ -109,27 +109,6 @@ function loadSourceDataRatings(serviceBroker, holder) {
 }
 
 
-function loadMeasurables(store, selector, holder) {
-    return store
-        .findMeasurablesBySelector(selector)
-        .then(measurables => holder.measurables = measurables);
-}
-
-
-function loadMeasurableCategories(store, holder) {
-    store
-        .findAll()
-        .then(cs => holder.measurableCategories = cs);
-}
-
-
-function loadMeasurableRatings(store, selector, holder) {
-    store
-        .statsByAppSelector(selector)
-        .then(ratings => holder.measurableRatings = ratings);
-}
-
-
 function service($q,
                  serviceBroker,
                  assetCostViewService,
@@ -137,9 +116,6 @@ function service($q,
                  complexityStore,
                  involvementStore,
                  logicalFlowViewService,
-                 measurableStore,
-                 measurableCategoryStore,
-                 measurableRatingStore,
                  orgUnitStore) {
 
     const rawData = {};
@@ -169,9 +145,6 @@ function service($q,
             loadOrgUnit(orgUnitStore, orgUnitId, rawData),
             loadImmediateHierarchy(orgUnitStore, orgUnitId, rawData),
             loadApps(serviceBroker, selector, rawData),
-            loadMeasurables(measurableStore, selector, rawData),
-            loadMeasurableCategories(measurableCategoryStore, rawData),
-            loadMeasurableRatings(measurableRatingStore, selector, rawData),
             initialiseAssetCosts(assetCostViewService, selector, rawData)
         ]);
     }
@@ -214,15 +187,6 @@ function service($q,
     }
 
 
-    function loadRatingsDetail(orgUnitId) {
-        return rawData.measurableRatingsDetail
-            ? $q.resolve(rawData.measurableRatingsDetail)
-            : measurableRatingStore
-                .findByAppSelector(mkSelector(orgUnitId))
-                .then(rs => rawData.measurableRatingsDetail = rs);
-    };
-
-
     function loadInvolvements(orgUnitId) {
         return loadInvolvement(involvementStore, orgUnitId, rawData);
     }
@@ -233,7 +197,6 @@ function service($q,
         loadAllCosts,
         loadFlowDetail,
         loadOrgUnitDescendants,
-        loadRatingsDetail,
         loadInvolvements
     };
 
@@ -248,9 +211,6 @@ service.$inject = [
     'ComplexityStore',
     'InvolvementStore',
     'LogicalFlowViewService',
-    'MeasurableStore',
-    'MeasurableCategoryStore',
-    'MeasurableRatingStore',
     'OrgUnitStore'
 ];
 

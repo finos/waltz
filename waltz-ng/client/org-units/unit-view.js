@@ -70,10 +70,6 @@ function controller($stateParams,
         .loadOrgUnitDescendants(id)
         .then(descendants => vm.viewData.orgUnitDescendants = descendants);
 
-    vm.loadRatingsDetail = () => {
-        return viewDataService.loadRatingsDetail(id);
-    };
-
     vm.onAddInvolvement = (entityInvolvement) => {
 
         involvedSectionService.addInvolvement(vm.entityRef, entityInvolvement)

@@ -28,13 +28,9 @@
 
 
     <!-- RATINGS -->
-    <waltz-measurable-ratings-browser-section rating-tallies="ctrl.viewData.measurableRatings"
-                                              measurables="ctrl.viewData.measurables"
-                                              measurable-categories="ctrl.viewData.measurableCategories"
-                                              applications="ctrl.viewData.apps"
-                                              on-load-detail="ctrl.loadRatingsDetail"
-                                              source-data-ratings="ctrl.viewData.sourceDataRatings"
-                                              id="ratings-explorer-section">
+    <waltz-measurable-ratings-browser-section id="ratings-explorer-section"
+                                               parent-entity-ref="ctrl.entityRef"
+                                               scope="CHILDREN">
     </waltz-measurable-ratings-browser-section>
 
 
