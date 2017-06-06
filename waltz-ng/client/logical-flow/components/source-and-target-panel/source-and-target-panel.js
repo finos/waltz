@@ -20,6 +20,8 @@ import {event} from "d3-selection";
 import {initialiseData} from "../../../common";
 import {mkTweakers} from '../source-and-target-graph/source-and-target-utilities';
 
+import template from './source-and-target-panel.html';
+
 
 const bindings = {
     entityRef: '<',
@@ -37,9 +39,6 @@ const initialState = {
         decorators: []
     }
 };
-
-
-const template = require('./source-and-target-panel.html');
 
 
 function calcPhysicalFlows(physicalFlows = [], specifications = [], logicalFlowId) {
@@ -141,6 +140,7 @@ function controller($element, $timeout, $window) {
                     vm.physicalSpecifications,
                     logicalFlowId),
                 entity,
+                logicalFlowId,
                 y: evt.layerY
             };
         }
