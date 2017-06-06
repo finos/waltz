@@ -94,7 +94,7 @@ public class ChangeInitiativeEndpoint implements Endpoint {
         EntityRelationshipChangeCommand command = readBody(request, EntityRelationshipChangeCommand.class);
         switch (command.operation()) {
             case ADD:
-                return service.addEntityRelationship(getId(request), command);
+                return service.addEntityRelationship(getId(request), command, getUsername(request));
             case REMOVE:
                 return service.removeEntityRelationship(getId(request), command);
             default:

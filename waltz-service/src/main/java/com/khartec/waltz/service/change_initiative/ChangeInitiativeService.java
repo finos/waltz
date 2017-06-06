@@ -18,14 +18,13 @@
 
 package com.khartec.waltz.service.change_initiative;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.data.change_initiative.search.ChangeInitiativeSearchDao;
 import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
-import com.khartec.waltz.model.entity_relationship.EntityRelationship;
-import com.khartec.waltz.model.entity_relationship.EntityRelationshipChangeCommand;
-import com.khartec.waltz.model.entity_relationship.RelationshipKind;
+import com.khartec.waltz.model.entity_relationship.*;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.service.entity_relationship.EntityRelationshipUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,34 +86,45 @@ public class ChangeInitiativeService {
 
 
     public boolean addEntityRelationship(long changeInitiativeId,
-                                         EntityRelationshipChangeCommand command) {
+                                         EntityRelationshipChangeCommand command,
+                                         String username) {
         checkNotNull(command, "command cannot be null");
+        EntityRelationshipKey key = mkEntityRelationshipKey(changeInitiativeId, command);
 
-        return relationshipDao.save(mkEntityRelationship(changeInitiativeId, command)) == 1;
+        EntityRelationship entityRelationship = ImmutableEntityRelationship.builder()
+                .a(key.a())
+                .b(key.b())
+                .relationship(key.relationshipKind())
+                .lastUpdatedBy(username)
+                .lastUpdatedAt(DateTimeUtilities.nowUtc())
+                .build();
+
+        return relationshipDao.save(entityRelationship) == 1;
     }
 
 
     public boolean removeEntityRelationship(long changeInitiativeId,
                                             EntityRelationshipChangeCommand command) {
         checkNotNull(command, "command cannot be null");
-        return relationshipDao.remove(mkEntityRelationship(changeInitiativeId, command));
+        EntityRelationshipKey key = mkEntityRelationshipKey(changeInitiativeId, command);
+        return relationshipDao.remove(key);
     }
 
 
-    private EntityRelationship mkEntityRelationship(long changeInitiativeId, EntityRelationshipChangeCommand command) {
+    private EntityRelationshipKey mkEntityRelationshipKey(long changeInitiativeId, EntityRelationshipChangeCommand command) {
         EntityReference entityReference = command.entityReference();
         RelationshipKind relationship = command.relationship();
 
-        return EntityRelationshipUtilities.mkEntityRelationship(
-                mkRef(CHANGE_INITIATIVE, changeInitiativeId),
-                entityReference,
-                relationship)
-                .orElseThrow(() -> new RuntimeException(String.format(
-                        "Could not build a valid relationship for kind: %s between %s and %s",
-                        relationship,
-                        CHANGE_INITIATIVE,
-                        entityReference.kind()
-                )));
+        return EntityRelationshipUtilities.mkEntityRelationshipKey(
+            mkRef(CHANGE_INITIATIVE, changeInitiativeId),
+            entityReference,
+            relationship)
+            .orElseThrow(() -> new RuntimeException(String.format(
+                    "Could not build a valid relationship for kind: %s between %s and %s",
+                    relationship,
+                    CHANGE_INITIATIVE,
+                    entityReference.kind()
+            )));
     }
 
 }

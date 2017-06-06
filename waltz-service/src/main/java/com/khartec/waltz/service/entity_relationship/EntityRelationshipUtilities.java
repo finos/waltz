@@ -2,8 +2,8 @@ package com.khartec.waltz.service.entity_relationship;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_relationship.EntityRelationship;
-import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
+import com.khartec.waltz.model.entity_relationship.EntityRelationshipKey;
+import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationshipKey;
 import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
@@ -16,9 +16,9 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 
 public class EntityRelationshipUtilities {
 
-    public static Optional<EntityRelationship> mkEntityRelationship(EntityReference entityA,
-                                                                    EntityReference entityB,
-                                                                    RelationshipKind relationshipKind) {
+    public static Optional<EntityRelationshipKey> mkEntityRelationshipKey(EntityReference entityA,
+                                                                       EntityReference entityB,
+                                                                       RelationshipKind relationshipKind) {
         checkNotNull(relationshipKind, "relationshipKind cannot be null");
         checkNotNull(entityA, "entityA cannot be null");
         checkNotNull(entityB, "entityB cannot be null");
@@ -30,16 +30,16 @@ public class EntityRelationshipUtilities {
         Tuple2<EntityKind, EntityKind> opposite = Tuple.tuple(entityB.kind(), entityA.kind());
 
         if (allowedEntityKinds.contains(exact)) {
-            return Optional.of(ImmutableEntityRelationship.builder()
+            return Optional.of(ImmutableEntityRelationshipKey.builder()
                     .a(entityA)
                     .b(entityB)
-                    .relationship(relationshipKind)
+                    .relationshipKind(relationshipKind)
                     .build());
         } else if (allowedEntityKinds.contains(opposite)){
-            return Optional.of(ImmutableEntityRelationship.builder()
+            return Optional.of(ImmutableEntityRelationshipKey.builder()
                     .a(entityB)
                     .b(entityA)
-                    .relationship(relationshipKind)
+                    .relationshipKind(relationshipKind)
                     .build());
         } else {
             return Optional.empty();
