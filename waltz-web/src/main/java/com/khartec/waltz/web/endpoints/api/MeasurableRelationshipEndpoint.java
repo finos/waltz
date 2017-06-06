@@ -73,8 +73,8 @@ public class MeasurableRelationshipEndpoint implements Endpoint {
 
         DatumRoute<Boolean> removeRelationshipRoute = (request, response) ->{
             requireRole(userRoleService, request, Role.CAPABILITY_EDITOR);
-            EntityRelationshipKey command = readRelationshipKeyFromRequest(request);
-            return measurableRelationshipService.remove(command);
+            EntityRelationshipKey key = readRelationshipKeyFromRequest(request);
+            return measurableRelationshipService.remove(key, getUsername(request));
         };
 
         DatumRoute<Boolean> createRelationshipRoute = (request, response) -> {

@@ -45,14 +45,22 @@ function controller(serviceBroker) {
 
         if (vm.parentEntityRef) {
             serviceBroker
-                .loadViewData(CORE_API.ChangeLogStore.findByEntityReference, [vm.parentEntityRef])
+                .loadViewData(
+                    CORE_API.ChangeLogStore.findByEntityReference,
+                    [vm.parentEntityRef],
+                    { force: true })
                 .then(dataLoadHandler);
         } else if (vm.userName) {
             serviceBroker
-                .loadViewData(CORE_API.ChangeLogStore.findForUserName, [vm.userName])
+                .loadViewData(
+                    CORE_API.ChangeLogStore.findForUserName,
+                    [vm.userName],
+                    { force: true })
                 .then(dataLoadHandler);
         }
     };
+
+    vm.refresh = () => vm.loadEntries();
 
     vm.changeLogTableInitialised = (api) => {
         vm.exportChangeLog = () => api.exportFn("change-log.csv");
