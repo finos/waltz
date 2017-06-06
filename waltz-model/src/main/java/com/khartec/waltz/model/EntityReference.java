@@ -45,14 +45,6 @@ public abstract class EntityReference {
     public abstract Optional<String> description();
 
 
-    public String safeName() {
-        String idStr = "[" + id() +"]";
-        return name()
-                .map(n -> n + " " + idStr)
-                .orElse(idStr);
-    }
-
-
     public static <T extends NameProvider & IdProvider & DescriptionProvider> EntityReference fromEntity(T entity, EntityKind kind) {
         Long id = entity.id()
                 .orElseThrow(() -> new IllegalArgumentException("Cannot create a reference from an entity with an empty id"));

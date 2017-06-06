@@ -22,10 +22,7 @@ import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowSearchDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.command.CommandOutcome;
@@ -51,6 +48,7 @@ import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.EntityReferenceUtilities.safeName;
 
 
 @Service
@@ -159,7 +157,6 @@ public class PhysicalFlowService {
             }
         }
 
-
         // log changes against source and target entities
         if (commandOutcome == CommandOutcome.SUCCESS) {
             PhysicalSpecification specification = physicalSpecificationDao.getById(physicalFlow.specificationId());
@@ -168,22 +165,22 @@ public class PhysicalFlowService {
                     logicalFlow.source(),
                     String.format("Physical flow: %s, from: %s, to: %s removed.",
                             specification.name(),
-                            logicalFlow.source().safeName(),
-                            logicalFlow.target().safeName()),
+                            safeName(logicalFlow.source()),
+                            safeName(logicalFlow.target())),
                     Operation.REMOVE);
 
             logChange(username,
                     logicalFlow.target(),
                     String.format("Physical flow: %s, from: %s removed.",
                             specification.name(),
-                            logicalFlow.source().safeName()),
+                            safeName(logicalFlow.source())),
                     Operation.REMOVE);
 
             logChange(username,
                     logicalFlow.source(),
                     String.format("Physical flow: %s, to: %s removed.",
                             specification.name(),
-                            logicalFlow.target().safeName()),
+                            safeName(logicalFlow.target())),
                     Operation.REMOVE);
         }
 
@@ -241,22 +238,22 @@ public class PhysicalFlowService {
                 logicalFlow.source(),
                 String.format("Added physical flow (%s) to: %s",
                         command.specification().name(),
-                        logicalFlow.target().safeName()),
+                        safeName(logicalFlow.target())),
                 Operation.ADD);
 
         logChange(username,
                 logicalFlow.target(),
                 String.format("Added physical flow (%s) from: %s",
                         command.specification().name(),
-                        logicalFlow.source().safeName()),
+                        safeName(logicalFlow.source())),
                 Operation.ADD);
 
         logChange(username,
                 mkRef(PHYSICAL_SPECIFICATION, specId),
                 String.format("Added physical flow (%s) from: %s, to %s",
                         command.specification().name(),
-                        logicalFlow.source().safeName(),
-                        logicalFlow.target().safeName()),
+                        safeName(logicalFlow.source()),
+                        safeName(logicalFlow.target())),
                 Operation.ADD);
 
         return ImmutablePhysicalFlowCreateCommandResponse.builder()

@@ -24,9 +24,7 @@ import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM;
@@ -126,7 +124,7 @@ public class EntityNameUtilities {
      */
     public static Field<String> mkEntityNameField(Field<Long> idCompareField,
                                                   Field<String> kindCompareField,
-                                                  List<EntityKind> searchEntityKinds) {
+                                                  Collection<EntityKind> searchEntityKinds) {
         checkNotNull(idCompareField, "idCompareField cannot be null");
         checkNotNull(kindCompareField, "kindCompareField cannot be null");
         checkNotNull(searchEntityKinds, "searchEntityKinds cannot be null");
@@ -154,6 +152,19 @@ public class EntityNameUtilities {
     }
 
 
+    /**
+     * Similar to the three arg version except this one tries all supported entities.
+     * As such there is a minor performance penalty - but gives maximum flexibility.
+     * @param idCompareField
+     * @param kindCompareField
+     * @return
+     */
+    public static Field<String> mkEntityNameField(Field<Long> idCompareField,
+                                                  Field<String> kindCompareField) {
+        return mkEntityNameField(idCompareField, kindCompareField, getSupportedEntityKinds());
+    }
+
+
     private static Select<Record1<String>> mkNameSelect(Tuple3<Table, Field<Long>, Field<String>> mapping,
                                                         Field<Long> idCompareField) {
         // form the query to fetch entity names
@@ -167,5 +178,10 @@ public class EntityNameUtilities {
         return DSL.select(mapping.v3())
                 .from(mapping.v1())
                 .where(mapping.v2().eq(idCompareField));
+    }
+
+
+    private static Set<EntityKind> getSupportedEntityKinds() {
+        return MAPPINGS.keySet();
     }
 }
