@@ -18,9 +18,24 @@
 
 
 export const baseRagNames = {
-    'R': 'Poor',
-    'A': 'Adequate',
-    'G': 'Good',
-    'Z': 'Unknown',
-    'X': 'Not Applicable'
+    'R': {
+        rating: 'R',
+        name: 'Poor',
+    },
+    'A': {
+        rating: 'A',
+        name: 'Adequate'
+    },
+    'G': {
+        rating: 'G',
+        name: 'Good'
+    },
+    'Z': {
+        rating: 'Z',
+        name: 'Unknown'
+    },
+    'X': {
+        rating: 'X',
+        name: 'Not Applicable'
+    }
 };
