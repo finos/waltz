@@ -18,6 +18,7 @@
 
 import {initialiseData} from '../../../common';
 
+
 /**
  * @name waltz-flow-diagram-editor
  *
@@ -25,9 +26,12 @@ import {initialiseData} from '../../../common';
  * This component ...
  */
 
+import template from './flow-diagram-editor.html';
+
 
 const bindings = {
-    onCancel: '<'
+    onCancel: '<',
+    onBackToList: '<'
 };
 
 
@@ -43,10 +47,6 @@ const initialState = {
         description: '',
     }
 };
-
-
-const template = require('./flow-diagram-editor.html');
-
 
 
 function prepareAddLogicalFlowPopup(graphNode, isUpstream = true, logicalFlowStore, flowDiagramStateService) {
