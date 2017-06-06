@@ -20,6 +20,8 @@
 import angular from "angular";
 import {kindToViewState} from "../common/link-utils";
 
+import template from './bookmark-editor.html';
+
 
 function controller($state,
                     $stateParams,
@@ -85,6 +87,11 @@ function controller($state,
     vm.goToParent = () => {
         try {
             const nextState = kindToViewState(parentRef.kind);
+            if(nextState == 'main.entity-statistic.view') {
+                // note: this is poor, but a necessary evil, fix as part of #2298
+                // reason: main.entity-statistic.view take two id parameters and they get mixed up
+                $window.history.back();
+            }
             $state.go(nextState, parentRef);
         } catch (e) {
             $window.history.back();
@@ -112,7 +119,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./bookmark-editor.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };
