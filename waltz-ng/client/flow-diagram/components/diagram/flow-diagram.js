@@ -463,8 +463,8 @@ function drawAnnotations(state, group, commandProcessor) {
  * Toggles layers by setting their css display style
  */
 function enableLayers(visibility, groups) {
-    groups.flowBuckets.style('display', visibility.flowBuckets ? 'initial' : 'none');
-    groups.annotations.style('display', visibility.annotations ? 'initial' : 'none');
+    if (groups.flowBuckets) { groups.flowBuckets.style('display', visibility.flowBuckets ? 'initial' : 'none'); }
+    if (groups.annotations) { groups.annotations.style('display', visibility.annotations ? 'initial' : 'none'); }
 }
 
 
