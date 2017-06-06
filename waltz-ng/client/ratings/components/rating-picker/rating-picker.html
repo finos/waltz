@@ -13,7 +13,11 @@
                id="wrp-inp-{{ option.value }}-{{ $id }}">
         <label for="wrp-inp-{{ option.value }}-{{ $id }}"
                ng-class="option.clazz"
-               ng-bind="option.label">
+               ng-bind="option.label.name">
         </label>
+        <small class="text-muted"
+               ng-if="option.label.description"
+               ng-bind="option.label.description">
+        </small>
     </div>
 </div>
