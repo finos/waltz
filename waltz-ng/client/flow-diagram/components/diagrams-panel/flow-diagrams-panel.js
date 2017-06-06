@@ -22,15 +22,15 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 
 
+import template from './flow-diagrams-panel.html';
+
+
 const bindings = {
     flowDiagrams: '<',
     flowDiagramEntities: '<',
     createDiagramCommands: '<',
     reload: '<',
 };
-
-
-const template = require('./flow-diagrams-panel.html');
 
 
 const initialState = {
@@ -210,12 +210,7 @@ function controller(
     };
 
     vm.dismissDiagramEditor = () => {
-        hideDiagram();
-        clearSelections();
-
-        flowDiagramStateService
-            .reset();
-        vm.reload();
+        vm.onDiagramSelect(vm.selected.diagram);
     };
 
     vm.clickHandlers = {

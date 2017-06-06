@@ -191,7 +191,7 @@
                          class="waltz-fade-if">
                         <br>
                         <a class='clickable'
-                           ng-click="$ctrl.selected.diagram = null">
+                           ng-click="$ctrl.onDiagramDismiss()">
                             &laquo; Back to list
                         </a>
                     </div>
@@ -247,7 +247,8 @@
          ng-if="$ctrl.visibility.editor">
         <div ng-if="$ctrl.visibility.editor"
              class="waltz-fade-if col-md-12">
-            <waltz-flow-diagram-editor on-cancel="$ctrl.dismissDiagramEditor">
+            <waltz-flow-diagram-editor on-cancel="$ctrl.dismissDiagramEditor"
+                                       on-back-to-list="$ctrl.onDiagramDismiss">
             </waltz-flow-diagram-editor>
         </div>
 
