@@ -94,31 +94,31 @@
                         <tr>
                             <td>Rating 'R'</td>
                             <td>
-                                <div ng-bind="ctrl.selectedPerspective.ragNames.R"></div>
+                                <div ng-bind="ctrl.selectedPerspective.ragNames.R.name"></div>
                             </td>
                         </tr>
                         <tr>
                             <td>Rating 'A'</td>
                             <td>
-                                <div ng-bind="ctrl.selectedPerspective.ragNames.A"></div>
+                                <div ng-bind="ctrl.selectedPerspective.ragNames.A.name"></div>
                             </td>
                         </tr>
                         <tr>
                             <td>Rating 'G'</td>
                             <td>
-                                <div ng-bind="ctrl.selectedPerspective.ragNames.G"></div>
+                                <div ng-bind="ctrl.selectedPerspective.ragNames.G.name"></div>
                             </td>
                         </tr>
                         <tr>
                             <td>Rating 'X'</td>
                             <td>
-                                <div ng-bind="ctrl.selectedPerspective.ragNames.X"></div>
+                                <div ng-bind="ctrl.selectedPerspective.ragNames.X.name"></div>
                             </td>
                         </tr>
                         <tr>
                             <td>Rating 'Z'</td>
                             <td>
-                                <div ng-bind="ctrl.selectedPerspective.ragNames.Z"></div>
+                                <div ng-bind="ctrl.selectedPerspective.ragNames.Z.name"></div>
                             </td>
                         </tr>
                     </table>
@@ -218,7 +218,7 @@
                                        name="red"
                                        id="form.red"
                                        ng-required="true"
-                                       ng-model="ctrl.model.ragNames.R">
+                                       ng-model="ctrl.model.ragNames.R.name">
                             </div>
 
                             <div class="form-group">
@@ -232,7 +232,7 @@
                                        name="amber"
                                        id="form.amber"
                                        ng-required="true"
-                                       ng-model="ctrl.model.ragNames.A">
+                                       ng-model="ctrl.model.ragNames.A.name">
                             </div>
 
                             <div class="form-group">
@@ -246,7 +246,7 @@
                                        name="green"
                                        id="form.green"
                                        ng-required="true"
-                                       ng-model="ctrl.model.ragNames.G">
+                                       ng-model="ctrl.model.ragNames.G.name">
                             </div>
 
                             <div class="form-group">
@@ -260,7 +260,7 @@
                                        name="amber"
                                        id="form.unknown"
                                        ng-required="true"
-                                       ng-model="ctrl.model.ragNames.Z">
+                                       ng-model="ctrl.model.ragNames.Z.name">
                             </div>
 
                             <div class="form-group">
@@ -274,7 +274,7 @@
                                        name="x"
                                        id="form.na"
                                        ng-required="true"
-                                       ng-model="ctrl.model.ragNames.X">
+                                       ng-model="ctrl.model.ragNames.X.name">
                             </div>
                         </div>
                     </div>
