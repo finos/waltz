@@ -102,7 +102,7 @@ function mkGridData(id,
             };
         })
         .filter(r => r !== null)
-        .sortBy('measurableA.name')
+        .sortBy(['a.name', 'b.name'])
         .value()
 }
 
