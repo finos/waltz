@@ -18,7 +18,7 @@
  *
  */
 
-import {getEditRoleForEntityKind} from '../../common/role-utils';
+import {getEditRoleForEntityKind} from "../../common/role-utils";
 
 
 const BINDINGS = {
@@ -26,18 +26,25 @@ const BINDINGS = {
 };
 
 
-function controller(UserService) {
+function controller($scope, UserService) {
     const vm = this;
-    const role = getEditRoleForEntityKind(vm.entityKind);
-    UserService
-        .whoami()
-        .then(user => vm.show = UserService.hasRole(user, role));
-
     vm.show = false;
+
+    $scope.$watch('ctrl.entityKind', (nv) => {
+        if (! nv) return;
+
+        const role = getEditRoleForEntityKind(nv);
+        UserService
+            .whoami()
+            .then(user => vm.show = UserService.hasRole(user, role));
+    });
 }
 
 
-controller.$inject = ['UserService'];
+controller.$inject = [
+    '$scope',
+    'UserService'
+];
 
 
 export default () => ({
