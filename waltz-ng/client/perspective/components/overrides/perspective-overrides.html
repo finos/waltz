@@ -12,7 +12,7 @@
     </p>
     <ul class="list-unstyled">
         <li ng-repeat="r in $ctrl.overrideNest">
-            <waltz-rating-indicator-cell label="$ctrl.ragNames[r.key]"
+            <waltz-rating-indicator-cell label="$ctrl.ragNames[r.key].name"
                                          rating="r.key">
             </waltz-rating-indicator-cell>
             <ul class="list-unstyled">
