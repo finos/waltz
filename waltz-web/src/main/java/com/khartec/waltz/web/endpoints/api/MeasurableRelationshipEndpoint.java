@@ -62,14 +62,14 @@ public class MeasurableRelationshipEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String findForMeasurablePath = mkPath(BASE_URL, "measurable", ":id");
+        String findForEntityReferencePath = mkPath(BASE_URL, ":kind", ":id");
         String removeRelationshipPath = mkPath(BASE_URL, ":kindA", ":idA", ":kindB", ":idB", ":relationshipKind");
         String updateRelationshipPath = mkPath(BASE_URL, ":kindA", ":idA", ":kindB", ":idB", ":relationshipKind");
         String createRelationshipPath = mkPath(BASE_URL, ":kindA", ":idA", ":kindB", ":idB", ":relationshipKind");
 
 
-        ListRoute<EntityRelationship> findForMeasurableRoute = (request, response)
-                -> measurableRelationshipService.findForMeasurable(getId(request));
+        ListRoute<EntityRelationship> findForEntityReferenceRoute = (request, response)
+                -> measurableRelationshipService.findForEntityReference(getEntityReference(request));
 
         DatumRoute<Boolean> removeRelationshipRoute = (request, response) ->{
             requireRole(userRoleService, request, Role.CAPABILITY_EDITOR);
@@ -97,7 +97,7 @@ public class MeasurableRelationshipEndpoint implements Endpoint {
         };
 
 
-        getForList(findForMeasurablePath, findForMeasurableRoute);
+        getForList(findForEntityReferencePath, findForEntityReferenceRoute);
         deleteForDatum(removeRelationshipPath, removeRelationshipRoute);
         putForDatum(updateRelationshipPath, updateRelationshipRoute);
         postForDatum(createRelationshipPath, createRelationshipRoute);

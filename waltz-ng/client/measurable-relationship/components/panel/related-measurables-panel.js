@@ -42,7 +42,6 @@ const bindings = {
 
 const initialState = {
     categories: [],
-    measurable: null,
     measurables: [],
     relationships: [],
     visibility: {
@@ -56,14 +55,7 @@ const initialState = {
 const DEFAULT_SELECTION_FILTER_FN = (m) => true;
 
 
-const DEFAULT_RELATIONSHIP_FORM = {
-    description: '',
-    relationshipKind: { code: "STRONGLY_RELATES_TO" },
-    measurable: null
-};
-
-
-function mkGridData(id,
+function mkGridData(ref,
                     relationships = [],
                     measurables = [],
                     categories = [],
@@ -85,7 +77,7 @@ function mkGridData(id,
         .chain(relationships)
         .filter(rowFilterFn)
         .map(r => {
-            const outbound = r.a.id === id && r.a.kind === 'MEASURABLE';
+            const outbound = sameRef(r.a, ref);
             const a = r.a.kind === 'MEASURABLE'
                 ? toMeasurableCell(r.a)
                 : toGenericCell(r.a);
@@ -112,7 +104,7 @@ function controller($q, $timeout, serviceBroker, notification) {
 
     const calcGridData = () => {
         return mkGridData(
-            vm.measurable.id,
+            vm.parentEntityRef,
             vm.relationships,
             vm.measurables,
             vm.categories,
@@ -215,7 +207,7 @@ function controller($q, $timeout, serviceBroker, notification) {
 
     const loadRelationships = () => {
         return serviceBroker
-            .loadViewData(CORE_API.MeasurableRelationshipStore.findByMeasurable, [vm.measurable.id], { force: true })
+            .loadViewData(CORE_API.MeasurableRelationshipStore.findByEntityReference, [vm.parentEntityRef], { force: true })
             .then(r => {
                 vm.relationships = r.data;
                 vm.gridData = calcGridData();
@@ -232,7 +224,6 @@ function controller($q, $timeout, serviceBroker, notification) {
             .then(([categories, measurables]) => {
                 vm.categories = categories;
                 vm.measurables = measurables;
-                vm.measurable = _.find(measurables, { id: vm.parentEntityRef.id });
             })
             .then(loadRelationships)
 

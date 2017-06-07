@@ -20,7 +20,10 @@ package com.khartec.waltz.service.measurable_relationship;
 
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.EntityReferenceUtilities;
+import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.entity_relationship.EntityRelationship;
 import com.khartec.waltz.model.entity_relationship.EntityRelationshipKey;
@@ -35,7 +38,6 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 
 @Service
 public class MeasurableRelationshipService {
@@ -58,11 +60,10 @@ public class MeasurableRelationshipService {
     }
 
 
-    public Collection<EntityRelationship> findForMeasurable(long measurableId) {
+    public Collection<EntityRelationship> findForEntityReference(EntityReference entityReference) {
+        checkNotNull(entityReference, "entityReference cannot be null");
         return entityRelationshipDao
-                .findRelationshipsInvolving(mkRef(
-                        EntityKind.MEASURABLE,
-                        measurableId));
+                .findRelationshipsInvolving(entityReference);
     }
 
 

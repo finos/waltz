@@ -18,12 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash';
+import {checkIsEntityRef} from '../common/checks';
+import {sameRef} from '../common/entity-utils';
 
 
-export function determineCounterpart(measurableId, rel) {
-    return rel.a.kind === 'MEASURABLE' && rel.a.id === measurableId
-        ? rel.b
-        : rel.a;
+export function determineCounterpart(reference, relationship) {
+    checkIsEntityRef(reference);
+    return sameRef(reference, relationship.a)
+        ? relationship.b
+        : relationship.a;
 }
 
 

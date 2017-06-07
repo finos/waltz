@@ -26,7 +26,7 @@ import template from './create-related-measurable-editor.html';
 
 
 const bindings = {
-    measurable: '<',
+    parentEntityRef: '<',
     type: '<',
     onCancel: '<',
     onRefresh: '<'
@@ -90,8 +90,8 @@ function controller(notification, serviceBroker) {
 
             serviceBroker
                 .loadViewData(
-                    CORE_API.MeasurableRelationshipStore.findByMeasurable,
-                    [vm.measurable.id],
+                    CORE_API.MeasurableRelationshipStore.findByEntityReference,
+                    [vm.parentEntityRef],
                     { force: true })
                 .then(r => {
                     const usedIds = _
@@ -136,7 +136,7 @@ function controller(notification, serviceBroker) {
         if (vm.isFormValid()) {
             const form = vm.form;
             const submission = {
-                a: toEntityRef(vm.measurable, 'MEASURABLE'),
+                a: vm.parentEntityRef,
                 b: form.counterpart,
                 relationshipKind: form.relationshipKind,
                 description: form.description

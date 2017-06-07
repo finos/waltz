@@ -37,7 +37,7 @@ import template from './related-measurables-viz.html';
  */
 
 const bindings = {
-    measurable: '<',
+    parentEntityRef: '<',
     relationships: '<',
     onCategorySelect: '<',
     onCategoryClear: '<'
@@ -47,7 +47,7 @@ const bindings = {
 const initialState = {
     categories: [],
     measurables: [],
-    measurable: null,
+    parentEntityRef: null,
     relationships: {},
     onCategorySelect: (c) => console.log('wrmv: default on-category-select', c),
     onCategoryClear: (c) => console.log('wrmv: default on-category-clear')
@@ -120,11 +120,11 @@ function calculatePositionOfOuterNode(angle) {
 }
 
 
-function drawCenterGroup(group, measurable, category) {
+function drawCenterGroup(group, primaryEntity) {
     if (!group) return;
     const centerGroup = group
         .selectAll(`.${styles.centerNode}`)
-        .data([measurable], d => d.id)
+        .data([primaryEntity], d => d.id)
         .enter()
         .append('g')
         .classed(styles.centerNode, true);
@@ -148,7 +148,7 @@ function drawCenterGroup(group, measurable, category) {
 
     centerGroup
         .append('text')
-        .text((d, i) => category.name)
+        .text((d, i) => d.category.name)
         .classed(styles.nodeDetail, true)
         .attr('text-anchor', 'middle')
         .attr('x', dimensions.width / 2)
@@ -246,14 +246,14 @@ function drawBridges(group, categories = [], deltaAngle) {
 }
 
 
-function mkBuckets(categories = [], measurables = [], measurable, relationships = []) {
+function mkBuckets(categories = [], measurables = [], primaryEntity, relationships = []) {
 
-    if (! measurable) return [];
+    if (! primaryEntity) return [];
 
     const measurablesByCategory = _.groupBy(measurables, m => m.categoryId);
     const measurablesById = _.keyBy(measurables, m => m.id);
 
-    const counterparts = _.map(relationships, r => determineCounterpart(measurable.id, r));
+    const counterparts = _.map(relationships, r => determineCounterpart(primaryEntity, r));
 
     const countsById = _.countBy(counterparts, c =>  {
         if (c.kind === 'MEASURABLE') {
@@ -269,7 +269,7 @@ function mkBuckets(categories = [], measurables = [], measurable, relationships 
         .map(c => {
             const relatedMeasurableIds = _.map(measurablesByCategory[c.id] || [], m => m.id);
             const filter = er => {
-                const counterpart = determineCounterpart(measurable.id, er);
+                const counterpart = determineCounterpart(primaryEntity, er);
                 return counterpart.kind === 'MEASURABLE' && _.includes(relatedMeasurableIds, counterpart.id);
             };
 
@@ -288,7 +288,7 @@ function mkBuckets(categories = [], measurables = [], measurable, relationships 
     buckets.push({
         id: 'CHANGE_INITIATIVE',
         name: 'Change Initiatives',
-        relationshipFilter: er => 'CHANGE_INITIATIVE' === determineCounterpart(measurable.id, er).kind,
+        relationshipFilter: er => 'CHANGE_INITIATIVE' === determineCounterpart(primaryEntity, er).kind,
         count: countsById['CHANGE_INITIATIVE'],
     });
 
@@ -298,14 +298,14 @@ function mkBuckets(categories = [], measurables = [], measurable, relationships 
 
 function draw(groups, data, handlers) {
     if (! groups) return;
-    if (! data.category) return;
+    if (! data.primaryEntity) return;
     if (! data.categories) return;
 
-    const buckets = mkBuckets(data.categories, data.measurables, data.measurable, data.relationships);
+    const buckets = mkBuckets(data.categories, data.measurables, data.primaryEntity, data.relationships);
 
     const deltaAngle = i => i * (Math.PI * 2) / buckets.length + angleOffset;
 
-    drawCenterGroup(groups.centerNodes, data.measurable, data.category);
+    drawCenterGroup(groups.centerNodes, data.primaryEntity);
     drawOuterNodes(groups.outerNodes, buckets, deltaAngle, handlers);
     drawBridges(groups.bridges, buckets, deltaAngle);
 }
@@ -319,15 +319,44 @@ function mkHandlers(vm) {
 }
 
 
+function mkPrimaryEntity(ref, measurables = [], categories = [], serviceBroker) {
+
+    const kind = ref.kind;
+
+    if (kind === 'MEASURABLE') {
+        const measurable = _.find(measurables, { id: ref.id });
+        const category = _.find(categories, { id: measurable.categoryId });
+        return Promise.resolve({
+            id: ref.id,
+            kind: ref.kind,
+            name: measurable.name,
+            category
+        });
+    } else if (kind === 'CHANGE_INITIATIVE') {
+        return serviceBroker
+            .loadViewData(CORE_API.ChangeInitiativeStore.getById, [ref.id])
+            .then(r => {
+                return {
+                    id: ref.id,
+                    kind: ref.kind,
+                    name: r.data.name,
+                    category: {
+                        name: 'Change Initiative'
+                    }
+                };
+            })
+    } else {
+        Promise.reject('Cannot handle kind: ' + kind);
+    }
+}
+
+
 function mkData(vm) {
     const data = {};
     data.categories = vm.categories || [];
     data.measurables = vm.measurables || [];
     data.relationships = sanitizeRelationships(vm.relationships || [], data.measurables, data.categories);
-    if (vm.measurable) {
-        data.measurable = vm.measurable;
-        data.category = _.find(vm.categories || [], {id: vm.measurable.categoryId});
-    }
+    data.primaryEntity = vm.primaryEntity || { name: 'Loading', category: { name: '...' }};
     return data;
 }
 
@@ -344,7 +373,13 @@ function controller($element, $q, serviceBroker) {
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
             .then(r => vm.categories = r.data);
 
-        return $q.all([p1, p2]);
+        return $q.all([p1, p2])
+            .then(() => mkPrimaryEntity(
+                    vm.parentEntityRef,
+                    vm.measurables,
+                    vm.categories,
+                    serviceBroker))
+            .then(primaryEntity => vm.primaryEntity = primaryEntity);
     };
 
     let destroyResizeListener = () => {};
@@ -355,7 +390,6 @@ function controller($element, $q, serviceBroker) {
         const holder = $element.find('svg')[0];
         groups = prepareGroups(holder, vm.onCategoryClear);
         destroyResizeListener = responsivefy(groups.svg);
-
         loadData()
             .then(() => draw(groups, mkData(vm), mkHandlers(vm)));
     };
