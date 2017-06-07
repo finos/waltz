@@ -86,23 +86,23 @@ function mkGridData(id,
         .filter(rowFilterFn)
         .map(r => {
             const outbound = r.a.id === id && r.a.kind === 'MEASURABLE';
-            const src = r.a.kind === 'MEASURABLE'
+            const a = r.a.kind === 'MEASURABLE'
                 ? toMeasurableCell(r.a)
                 : toGenericCell(r.a);
 
-            const targ = r.b.kind === 'MEASURABLE'
+            const b = r.b.kind === 'MEASURABLE'
                 ? toMeasurableCell(r.b)
                 : toGenericCell(r.b);
 
             return {
                 outbound,
-                a: src,
-                b: targ,
+                a,
+                b,
                 relationship: r
             };
         })
         .filter(r => r !== null)
-        .sortBy('measurableA.name')
+        .sortBy(['a.name', 'b.name'])
         .value()
 }
 
