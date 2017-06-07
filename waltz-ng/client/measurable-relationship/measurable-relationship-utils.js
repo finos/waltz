@@ -35,7 +35,17 @@ export function sanitizeRelationships(relationships, measurables, categories) {
     const measurablesById = _.keyBy(measurables, m => m.id);
 
     const isValid = (mId) => measurablesById[mId] && categoriesById[measurablesById[mId].categoryId];
+
     const isValidRel = (rel) => {
+        const validCombos = [
+            { a: 'MEASURABLE', b: 'MEASURABLE' },
+            { a: 'MEASURABLE', b: 'CHANGE_INITIATIVE' },
+            { a: 'CHANGE_INITIATIVE', b: 'MEASURABLE' },
+            { a: 'CHANGE_INITIATIVE', b: 'CHANGE_INITIATIVE' }
+        ];
+
+        const validCombo = _.some(validCombos, c => c.a === rel.a.kind && c.b === rel.b.kind);
+
         const aValid = rel.a.kind === 'MEASURABLE'
             ? isValid(rel.a.id)
             : true;
@@ -43,7 +53,7 @@ export function sanitizeRelationships(relationships, measurables, categories) {
             ? isValid(rel.b.id)
             : true;
 
-        return aValid && bValid;
+        return validCombo && aValid && bValid;
     };
 
     return _.filter(relationships, isValidRel);

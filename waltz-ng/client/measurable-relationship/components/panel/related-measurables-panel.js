@@ -21,6 +21,7 @@ import {initialiseData} from '../../../common';
 import {sameRef} from '../../../common/entity-utils';
 import {CORE_API} from '../../../common/services/core-api-utils';
 import {entityNames} from '../../../common/services/display-names';
+import {sanitizeRelationships} from '../../measurable-relationship-utils';
 
 import template from './related-measurables-panel.html';
 
@@ -209,7 +210,7 @@ function controller($q, $timeout, serviceBroker, notification) {
         return serviceBroker
             .loadViewData(CORE_API.MeasurableRelationshipStore.findByEntityReference, [vm.parentEntityRef], { force: true })
             .then(r => {
-                vm.relationships = r.data;
+                vm.relationships = sanitizeRelationships(r.data, vm.measurables, vm.categories);
                 vm.gridData = calcGridData();
             });
     };
