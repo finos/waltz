@@ -21,7 +21,7 @@ import {initialiseData} from '../common';
 import {kindToViewState} from '../common/link-utils';
 
 
-const template = require('./physical-flow-registration.html');
+import template from './physical-flow-registration.html';
 
 
 const initialState = {
