@@ -22,8 +22,15 @@ export function store($http, base) {
     const BASE = `${base}/measurable-relationship`;
 
     const findByMeasurable = (id) => $http
-        .get(`${BASE}/measurable/${id}`)
+        .get(`${BASE}/MEASURABLE/${id}`)
         .then(r => r.data);
+
+    const findByEntityReference = (ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${BASE}/${ref.kind}/${ref.id}`)
+            .then(r => r.data);
+    };
 
     const remove = (d) => {
         checkIsEntityRef(d.a);
@@ -55,6 +62,7 @@ export function store($http, base) {
 
     return {
         findByMeasurable,
+        findByEntityReference,
         remove,
         create,
         update
@@ -76,6 +84,11 @@ export const MeasurableRelationshipStore_API = {
         serviceName,
         serviceFnName: 'findByMeasurable',
         description: 'finds relationships by given measurable id'
+    },
+    findByEntityReference: {
+        serviceName,
+        serviceFnName: 'findByEntityReference',
+        description: 'finds relationships by given entity reference'
     },
     create: {
         serviceName,

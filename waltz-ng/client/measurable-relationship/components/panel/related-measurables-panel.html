@@ -28,7 +28,7 @@
         <waltz-related-measurables-viz relationships="$ctrl.relationships"
                                        on-category-select="$ctrl.selectCategory"
                                        on-category-clear="$ctrl.clearCategory"
-                                       measurable="$ctrl.measurable">
+                                       parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-related-measurables-viz>
     </div>
 
@@ -187,7 +187,7 @@
              class="waltz-fade-if">
             <hr>
             <waltz-create-related-measurable-editor relationship="$ctrl.relationshipToEdit"
-                                                    measurable="$ctrl.measurable"
+                                                    parent-entity-ref="$ctrl.parentEntityRef"
                                                     type="$ctrl.selectedCategory"
                                                     on-cancel="$ctrl.cancelEditor"
                                                     on-refresh="$ctrl.refresh">

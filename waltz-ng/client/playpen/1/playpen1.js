@@ -27,9 +27,14 @@ function controller()
 {
     const vm = Object.assign(this, initData);
 
-    vm.parentEntityRef = {
-        id: vm.id,
+    vm.measurableRef = {
+        id: 134,
         kind: 'MEASURABLE'
+    };
+
+    vm.changeInitiativeRef = {
+        id: 17,
+        kind: 'CHANGE_INITIATIVE'
     };
 }
 

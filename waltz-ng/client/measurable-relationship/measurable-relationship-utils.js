@@ -18,12 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash';
+import {checkIsEntityRef} from '../common/checks';
+import {sameRef} from '../common/entity-utils';
 
 
-export function determineCounterpart(measurableId, rel) {
-    return rel.a.kind === 'MEASURABLE' && rel.a.id === measurableId
-        ? rel.b
-        : rel.a;
+export function determineCounterpart(reference, relationship) {
+    checkIsEntityRef(reference);
+    return sameRef(reference, relationship.a)
+        ? relationship.b
+        : relationship.a;
 }
 
 
@@ -32,7 +35,17 @@ export function sanitizeRelationships(relationships, measurables, categories) {
     const measurablesById = _.keyBy(measurables, m => m.id);
 
     const isValid = (mId) => measurablesById[mId] && categoriesById[measurablesById[mId].categoryId];
+
     const isValidRel = (rel) => {
+        const validCombos = [
+            { a: 'MEASURABLE', b: 'MEASURABLE' },
+            { a: 'MEASURABLE', b: 'CHANGE_INITIATIVE' },
+            { a: 'CHANGE_INITIATIVE', b: 'MEASURABLE' },
+            { a: 'CHANGE_INITIATIVE', b: 'CHANGE_INITIATIVE' }
+        ];
+
+        const validCombo = _.some(validCombos, c => c.a === rel.a.kind && c.b === rel.b.kind);
+
         const aValid = rel.a.kind === 'MEASURABLE'
             ? isValid(rel.a.id)
             : true;
@@ -40,7 +53,7 @@ export function sanitizeRelationships(relationships, measurables, categories) {
             ? isValid(rel.b.id)
             : true;
 
-        return aValid && bValid;
+        return validCombo && aValid && bValid;
     };
 
     return _.filter(relationships, isValidRel);
