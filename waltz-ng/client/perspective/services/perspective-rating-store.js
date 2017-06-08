@@ -87,4 +87,29 @@ store.$inject = [
 ];
 
 
-export default store;
+const serviceName = 'PerspectiveRatingStore';
+
+
+export const PerspectiveRatingStore_API = {
+    findForEntity: {
+        serviceName,
+        serviceFnName: 'findForEntity',
+        description: 'find perspective ratings for an entity'
+    },
+    findForEntityAxis: {
+        serviceName,
+        serviceFnName: 'findForEntityAxis',
+        description: 'find ratings for a pair of categories'
+    },
+    updateForEntityAxis: {
+        serviceName,
+        serviceFnName: 'updateForEntityAxis',
+        description: 'update ratings for a pair of categories'
+    }
+};
+
+
+export default {
+    serviceName,
+    store
+};

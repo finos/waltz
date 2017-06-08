@@ -16,28 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import perspectiveRatingEdit from './perspective-rating-edit';
+
+
 const baseState = {
     url: 'perspective',
 };
 
 
-const ratingViewState = {
-    url: '/entity/{entityKind:string}/{entityId:int}',
-    views: {'content@': require('./perspective-rating-view') },
-};
-
-
 const ratingEditState = {
-    url: '/{perspectiveId:int}/edit',
-    views: {'content@': require('./perspective-rating-edit') },
+    url: '/entity/{entityKind:string}/{entityId:int}/{perspectiveId:int}/edit',
+    views: {'content@': perspectiveRatingEdit },
 };
 
 
 function setup($stateProvider) {
     $stateProvider
         .state('main.perspective', baseState)
-        .state('main.perspective.rating', ratingViewState)
-        .state('main.perspective.rating.edit', ratingEditState);
+        .state('main.perspective.rating-edit', ratingEditState);
 }
 
 

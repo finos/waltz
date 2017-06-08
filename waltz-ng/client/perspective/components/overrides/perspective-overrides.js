@@ -58,7 +58,7 @@ function controller() {
 
         return rating === 'X'
                 ? `${vm.baseMeasurable.name} is not applicable when combined with ${override.name} `
-                : `When ${vm.baseMeasurable.name} combines with ${override.name} the rating is ${vm.ragNames[rating]}`;
+                : `When ${vm.baseMeasurable.name} combines with ${override.name} the rating is ${vm.ragNames[rating].name}`;
     };
 }
 

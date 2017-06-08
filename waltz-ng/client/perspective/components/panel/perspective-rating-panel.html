@@ -1,0 +1,129 @@
+<div class="waltz-perspective-rating-panel">
+
+    <style>
+        .side-scroller {
+            overflow-y: hidden;
+            overflow-x: auto;
+        }
+    </style>
+
+
+    <div class="row"
+         ng-if="$ctrl.hasNoPerspectiveRatings() && ! $ctrl.showAnyway">
+        <div class="col-sm-12">
+            <waltz-no-data>
+                <message>
+                    <div>
+                        No perspective ratings defined.
+                    </div>
+                    <div waltz-has-role="RATING_EDITOR">
+                        <div>
+                            <waltz-icon name="warning"></waltz-icon>
+                            <strong>You</strong> have permission to edit perspective ratings.
+                            <a ng-click="$ctrl.showAnyway = true"
+                               class="clickable">
+                                Show this
+                            </a>
+                            section view perspective ratings.
+                        </div>
+                    </div>
+                </message>
+            </waltz-no-data>
+        </div>
+    </div>
+
+    <div class="row"
+         ng-if="!$ctrl.hasNoPerspectiveRatings() > 0 || $ctrl.showAnyway">
+
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h4>Perspectives</h4>
+                    <div class="text-muted">
+                        Perspective ratings are overrides show how a particular rating may change when viewed in conjunction with another aspect of this application.
+                    </div>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="row">
+                <div class="col-sm-3">
+
+                    <div>
+                        <div ng-repeat="pb in $ctrl.perspectiveBlocks | orderBy:'name'"
+                             class="wprp-perspective-desc"
+                             ng-class="{
+                                'wprp-no-measurable': !$ctrl.hasMeasurables(pb),
+                                'wprp-perspective-selected': $ctrl.selectedPerspectiveBlock === pb
+                             }">
+                            <a class="clickable"
+                               ng-bind="pb.definition.name"
+                               ng-click="$ctrl.selectedPerspectiveBlock = pb">
+                            </a>
+                            <p class="small text-muted"
+                               ng-bind="pb.definition.description"></p>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <div ng-if="$ctrl.selectedPerspectiveBlock">
+                        <div>
+                            <h6>Layers</h6>
+                            <div class="small">
+                                <waltz-toggle label-on='Hide implied ratings'
+                                              label-off='Hide implied ratings'
+                                              icon-on='toggle-on'
+                                              icon-off='toggle-off'
+                                              on-toggle='$ctrl.selectedPerspectiveBlock.hideImplied = !$ctrl.selectedPerspectiveBlock.hideImplied'
+                                              state='$ctrl.selectedPerspectiveBlock.hideImplied'>
+                                </waltz-toggle>
+                            </div>
+                            <div class="help-block small small">
+                                Toggle visibility of implied ratings.
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div>
+                            <a ng-if="$ctrl.hasMeasurables($ctrl.selectedPerspectiveBlock)"
+                               waltz-has-role="RATING_EDITOR"
+                               class="btn btn-xs btn-primary"
+                               ui-sref="main.perspective.rating-edit ({
+                                    entityKind: $ctrl.parentEntityRef.kind,
+                                    entityId: $ctrl.parentEntityRef.id,
+                                    perspectiveId: $ctrl.selectedPerspectiveBlock.definition.id
+                               })">
+                                Edit
+                            </a>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-sm-9">
+                <div class="side-scroller"
+                     ng-repeat="pb in $ctrl.perspectiveBlocks">
+                    <div ng-if="$ctrl.selectedPerspectiveBlock === pb">
+                        <waltz-perspective-grid ng-if="$ctrl.hasMeasurables(pb)"
+                                                existing-overrides="pb.overrides"
+                                                hide-implied="pb.hideImplied"
+                                                pending-overrides="[]"
+                                                perspective-definition="pb.definition"
+                                                measurables="$ctrl.measurables"
+                                                measurable-ratings="$ctrl.measurableRatings">
+                        </waltz-perspective-grid>
+                        <div ng-if="!$ctrl.hasMeasurables(pb)"
+                             class="wprp-no-data">
+                            Ratings are not supplied for this perspective
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+</div>
