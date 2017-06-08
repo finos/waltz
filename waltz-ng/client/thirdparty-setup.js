@@ -61,9 +61,10 @@ function showdownSetup($showdownProvider) {
 
     $showdownProvider.loadExtension(customExtensions);
 
+    $showdownProvider.setOption('excludeTrailingPunctuationFromURLs', true);
     $showdownProvider.setOption('sanitize', true);
     $showdownProvider.setOption('simplifiedAutoLink', true);
-    $showdownProvider.setOption('excludeTrailingPunctuationFromURLs', true);
+    $showdownProvider.setOption('simpleLineBreaks', true);
     $showdownProvider.setOption('strikethrough', true);
     $showdownProvider.setOption('tables', true);
     $showdownProvider.setOption('tasklists', true);
