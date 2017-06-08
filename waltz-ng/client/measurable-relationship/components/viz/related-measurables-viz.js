@@ -82,8 +82,8 @@ const angleOffset = -0.7;
 const styles = {
     centerNodes: 'wrmv-center-nodes',
     centerNode: 'wrmv-center-node',
-    nodeName: 'name',
-    nodeDetail: 'detail',
+    nodeName: 'wrmv-name',
+    nodeDetail: 'wrmv-detail',
     outerNodes: 'wrmv-outer-nodes',
     outerNode: 'wrmv-outer-node',
     bridges: 'wrmv-bridges',
@@ -164,6 +164,9 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
         .selectAll(`.${styles.outerNode}`)
         .data(buckets, d => d.id);
 
+
+    // -- ENTER --
+
     const newOuterNodes = outerNodes
         .enter()
         .append('g')
@@ -193,14 +196,18 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
         .append('text')
         .classed(styles.nodeDetail, true);
 
-    outerNodes
-        .merge(newOuterNodes)
+
+    // -- UPDATE --
+
+    const allOuterNodes = newOuterNodes
+        .merge(outerNodes);
+
+    allOuterNodes
         .classed(styles.hasRelationships, d => d.count > 0)
         .classed(styles.noRelationships, d => d.count === 0);
 
-    outerNodes
-        .merge(newOuterNodes)
-        .selectAll(`circle`)
+    allOuterNodes
+        .select(`circle`)
         .attr('r', d => {
             const hasRelationships = d.count > 0;
             const scaleFactor = hasRelationships
@@ -209,14 +216,14 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
             return dimensions.outerNode.r * scaleFactor;
         });
 
-    outerNodes
-        .merge(newOuterNodes)
-        .selectAll(`.${styles.nodeDetail}`)
-        .text(d => {
-            return d.count ? d.count : '-'
-        })
+    allOuterNodes
+        .select(`.${styles.nodeDetail}`)
+        .text(d => d.count ? d.count : '-')
         .attr('text-anchor', 'middle')
         .attr('dy', dimensions.nodeDescription.dy);
+
+
+    // -- EXIT --
 
     outerNodes
         .exit()
@@ -289,7 +296,7 @@ function mkBuckets(categories = [], measurables = [], primaryEntity, relationshi
         id: 'CHANGE_INITIATIVE',
         name: 'Change Initiative',
         relationshipFilter: er => 'CHANGE_INITIATIVE' === determineCounterpart(primaryEntity, er).kind,
-        count: countsById['CHANGE_INITIATIVE'],
+        count: countsById['CHANGE_INITIATIVE'] || 0,
     });
 
     return buckets;

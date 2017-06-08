@@ -35,7 +35,7 @@ export function store($http, base) {
     const remove = (d) => {
         checkIsEntityRef(d.a);
         checkIsEntityRef(d.b);
-        const url = `${BASE}/${d.a.kind}/${d.a.id}/${d.b.kind}/${d.b.id}/${d.relationshipKind}`;
+        const url = `${BASE}/${d.a.kind}/${d.a.id}/${d.b.kind}/${d.b.id}/${d.relationship}`;
         return $http
             .delete(url)
             .then(r => r.data);

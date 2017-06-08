@@ -85,13 +85,12 @@ public class MeasurableRelationshipService {
     }
 
 
-
     // --- helpers ---
 
     private void logUpdate(EntityRelationshipKey key, UpdateEntityRelationshipParams params, String username) {
-        List<String> niceNames = map(
-                entityReferenceNameResolver.resolve(newArrayList(key.a(), key.b())),
-                EntityReferenceUtilities::pretty);
+        List<String> niceNames = resolveNames(
+                key.a(),
+                key.b());
 
         String paramStr = "";
         paramStr += params.relationshipKind() != null
@@ -116,9 +115,9 @@ public class MeasurableRelationshipService {
 
 
     private void logRemoval(EntityRelationshipKey key, String username) {
-        List<String> niceNames = map(
-                entityReferenceNameResolver.resolve(newArrayList(key.a(), key.b())),
-                EntityReferenceUtilities::pretty);
+        List<String> niceNames = resolveNames(
+                key.a(),
+                key.b());
 
         writeLog(
                 Operation.REMOVE,
@@ -134,9 +133,9 @@ public class MeasurableRelationshipService {
 
 
     private void logAddition(EntityRelationship relationship) {
-        List<String> niceNames = map(
-                entityReferenceNameResolver.resolve(newArrayList(relationship.a(), relationship.b())),
-                EntityReferenceUtilities::pretty);
+        List<String> niceNames = resolveNames(
+                relationship.a(),
+                relationship.b());
 
         writeLog(
                 Operation.ADD,
@@ -160,6 +159,13 @@ public class MeasurableRelationshipService {
                 .message(message)
                 .build();
         changeLogService.write(logEntry);
+    }
+
+
+    private List<String> resolveNames(EntityReference... refs) {
+        return map(
+                entityReferenceNameResolver.resolve(newArrayList(refs)),
+                EntityReferenceUtilities::pretty);
     }
 
 }
