@@ -17,6 +17,7 @@
  */
 
 import _ from "lodash";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initModel = {
@@ -77,6 +78,7 @@ function buildAppInvolvementSummary(apps = [], involvements = [], involvementKin
 
 
 function service($q,
+                 serviceBroker,
                  assetCostViewService,
                  complexityStore,
                  involvementStore,
@@ -202,6 +204,15 @@ function service($q,
     }
 
 
+    function loadTechStats(personId) {
+        const selector = toSelector(personId);
+
+        return serviceBroker
+            .loadViewData(CORE_API.TechnologyStatisticsService.findBySelector, [selector])
+            .then(r => state.model.techStats = r.data);
+    }
+
+
     function loadSourceDataRatings()
     {
         return sourceDataRatingStore
@@ -237,6 +248,7 @@ function service($q,
         const personId = state.model.person.id;
         return $q
             .all([
+                loadTechStats(personId),
                 loadComplexity(personId),
             ]);
     }
@@ -286,6 +298,7 @@ function service($q,
 
 service.$inject = [
     '$q',
+    'ServiceBroker',
     'AssetCostViewService',
     'ComplexityStore',
     'InvolvementStore',

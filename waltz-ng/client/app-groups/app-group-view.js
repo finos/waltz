@@ -95,13 +95,16 @@ function controller($scope,
         .then(appIds => $q.all([
             serviceBroker.loadViewData(CORE_API.ApplicationStore.findBySelector, [ idSelector ]),
             complexityStore.findBySelector(id, 'APP_GROUP', 'EXACT'),
+            serviceBroker.loadViewData(CORE_API.TechnologyStatisticsService.findBySelector, [ idSelector ])
         ]))
         .then(([
             appsResponse,
-            complexity
+            complexity,
+            techStatsResponse
         ]) => {
             vm.applications = _.map(appsResponse.data, a => _.assign(a, {management: 'IT'}));
             vm.complexity = complexity;
+            vm.techStats = techStatsResponse.data
         })
         .then(result => Object.assign(vm, result))
         .then(() => sourceDataRatingStore.findAll())
