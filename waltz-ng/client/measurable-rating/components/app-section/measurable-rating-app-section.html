@@ -43,7 +43,7 @@
                      class="wt-tab">
                     <br>
                     <waltz-measurable-rating-panel ratings="tab.ratings"
-                                                   entity-reference="$ctrl.entityReference"
+                                                   entity-reference="$ctrl.parentEntityRef"
                                                    overrides="$ctrl.overridesByMeasurableId"
                                                    category="tab.category"
                                                    perspective-definitions="tab.perspectiveDefinitions"
@@ -57,6 +57,15 @@
             </div>
         </div>
     </div>
+
+    <br>
+    <hr>
+
+
+    <!--PERSPECTIVE RATINGS-->
+    <waltz-perspective-rating-panel parent-entity-ref="$ctrl.parentEntityRef">
+    </waltz-perspective-rating-panel>
+
 
     <!-- NO DATA -->
     <div class="row"

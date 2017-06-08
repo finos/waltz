@@ -45,4 +45,24 @@ store.$inject = [
 ];
 
 
-export default store;
+const serviceName = 'PerspectiveDefinitionStore';
+
+
+export const PerspectiveDefinitionStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'find all perspectives'
+    },
+    create: {
+        serviceName,
+        serviceFnName: 'create',
+        description: 'create a perspective definition'
+    }
+};
+
+
+export default {
+    serviceName,
+    store
+};

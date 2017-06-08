@@ -19,6 +19,9 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {mergeKeyedLists, toGroupedMap} from "../../../common/map-utils";
 
+import template from './measurable-rating-app-section.html';
+
+
 /**
  * @name waltz-measurable-rating-panel
  *
@@ -29,8 +32,8 @@ import {mergeKeyedLists, toGroupedMap} from "../../../common/map-utils";
  * It is intended to be used to show measurables and ratings for a single application.
  */
 
-
 const bindings = {
+    parentEntityRef: '<',
     application: '<',
     categories: '<',
     measurables: '<',
@@ -40,8 +43,6 @@ const bindings = {
     sourceDataRatings: '<'
 };
 
-
-const template = require('./measurable-rating-app-section.html');
 
 
 const initialState = {
@@ -56,7 +57,6 @@ const initialState = {
     },
     byCategory: {}
 };
-
 
 
 
@@ -119,12 +119,6 @@ function controller() {
     };
 
     vm.$onChanges = () => {
-        if (vm.application) {
-            vm.entityReference = {
-                kind: 'APPLICATION',
-                id: vm.application.id
-            };
-        }
         if (vm.perspectiveRatings && vm.measurables) {
             vm.overridesByMeasurableId = mkOverridesMap(vm.perspectiveRatings, vm.measurables);
         }

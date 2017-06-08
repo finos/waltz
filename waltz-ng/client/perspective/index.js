@@ -17,6 +17,17 @@
  */
 import angular from "angular";
 
+import {registerComponents, registerStores} from '../common/module-utils';
+
+import perspectiveDefinitionStore from './services/perspective-definition-store';
+import perspectiveRatingStore from './services/perspective-rating-store';
+
+
+import perspectiveEditor from './components/editor/perspective-editor';
+import perspectiveGrid from './components/grid/perspective-grid';
+import perspectiveOverrides from './components/overrides/perspective-overrides';
+import perspectRatingPanel from './components/panel/perspective-rating-panel';
+
 
 function setup() {
     const module = angular.module('waltz.perspective', []);
@@ -24,13 +35,18 @@ function setup() {
     module
         .config(require('./routes'));
 
+    registerStores(module, [
+        perspectiveDefinitionStore,
+        perspectiveRatingStore
+    ]);
+
+
     module
-        .service('PerspectiveDefinitionStore', require('./serivces/perspective-definition-store'))
-        .service('PerspectiveRatingStore', require('./serivces/perspective-rating-store'));
-    module
-        .component('waltzPerspectiveEditor', require('./components/editor/perspective-editor'))
-        .component('waltzPerspectiveGrid', require('./components/grid/perspective-grid'))
-        .component('waltzPerspectiveOverrides', require('./components/overrides/perspective-overrides'));
+        .component('waltzPerspectiveEditor', perspectiveEditor)
+        .component('waltzPerspectiveGrid', perspectiveGrid)
+        .component('waltzPerspectiveOverrides', perspectiveOverrides);
+
+    registerComponents(module, [perspectRatingPanel]);
 
     return module.name;
 }

@@ -33,6 +33,8 @@ import {MeasurableRatingStore_API as MeasurableRatingStore} from "../../measurab
 import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from "../../measurable-relationship/services/measurable-relationship-store";
 import {MeasurableStore_API as MeasurableStore} from "../../measurable/services/measurable-store";
 import {PersonStore_API as PersonStore} from "../../person/services/person-store";
+import {PerspectiveDefinitionStore_API as PerspectiveDefinitionStore} from "../../perspective/services/perspective-definition-store";
+import {PerspectiveRatingStore_API as PerspectiveRatingStore} from "../../perspective/services/perspective-rating-store";
 import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
 import {SourceDataRatingStore_API as SourceDataRatingStore} from "../../source-data-rating/services/source-data-rating-store";
 import {TechnologyStatisticsService_API as TechnologyStatisticsService} from "../../technology/services/technology-statistics-service";
@@ -54,6 +56,8 @@ export const CORE_API = {
     MeasurableRelationshipStore,
     MeasurableStore,
     PersonStore,
+    PerspectiveDefinitionStore,
+    PerspectiveRatingStore,
     PhysicalSpecDataTypeStore,
     SourceDataRatingStore,
     TechnologyStatisticsService
