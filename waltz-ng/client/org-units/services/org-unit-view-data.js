@@ -109,6 +109,15 @@ function loadSourceDataRatings(serviceBroker, holder) {
 }
 
 
+function loadTechStats(serviceBroker, id, holder) {
+    const selector = mkSelector(id);
+
+    return serviceBroker
+        .loadViewData(CORE_API.TechnologyStatisticsService.findBySelector, [selector])
+        .then(r => holder.techStats = r.data);
+}
+
+
 function service($q,
                  serviceBroker,
                  assetCostViewService,
@@ -162,7 +171,8 @@ function service($q,
 
     function loadThirdWave(orgUnitId) {
         return $q.all([
-            loadSourceDataRatings(serviceBroker, rawData)
+            loadSourceDataRatings(serviceBroker, rawData),
+            loadTechStats(serviceBroker, orgUnitId, rawData)
         ]);
     }
 
