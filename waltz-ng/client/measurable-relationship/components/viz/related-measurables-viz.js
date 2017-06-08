@@ -287,7 +287,7 @@ function mkBuckets(categories = [], measurables = [], primaryEntity, relationshi
 
     buckets.push({
         id: 'CHANGE_INITIATIVE',
-        name: 'Change Initiatives',
+        name: 'Change Initiative',
         relationshipFilter: er => 'CHANGE_INITIATIVE' === determineCounterpart(primaryEntity, er).kind,
         count: countsById['CHANGE_INITIATIVE'],
     });
