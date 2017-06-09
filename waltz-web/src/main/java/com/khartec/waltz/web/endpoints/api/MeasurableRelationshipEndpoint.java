@@ -79,14 +79,19 @@ public class MeasurableRelationshipEndpoint implements Endpoint {
 
         DatumRoute<Boolean> createRelationshipRoute = (request, response) -> {
             requireRole(userRoleService, request, Role.CAPABILITY_EDITOR);
-            EntityRelationship relationship = ImmutableEntityRelationship.builder()
-                    .a(getEntityReferenceA(request))
-                    .b(getEntityReferenceB(request))
-                    .relationship(getRelationshipKind(request))
-                    .description(request.body())
-                    .lastUpdatedBy(getUsername(request))
-                    .build();
-            return measurableRelationshipService.create(relationship);
+
+            String userName = getUsername(request);
+            EntityReference entityRefA = getEntityReferenceA(request);
+            EntityReference entityRefB = getEntityReferenceB(request);
+            RelationshipKind relationshipKind = getRelationshipKind(request);
+            String description = request.body();
+
+            return measurableRelationshipService.create(
+                    userName,
+                    entityRefA,
+                    entityRefB,
+                    relationshipKind,
+                    description);
         };
 
         DatumRoute<Boolean> updateRelationshipRoute = (request, response) -> {
