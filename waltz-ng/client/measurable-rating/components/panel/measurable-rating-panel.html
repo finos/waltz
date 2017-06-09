@@ -8,6 +8,16 @@
     </div>
     <div class="col-sm-6"
          style="border-left: 1px solid #eee">
+
+        <div ng-if="$ctrl.selected == null"
+             class="waltz-fade-if text-muted">
+            Please select an item on the tree to see more detail.
+            <br>
+            <br>
+            Items flagged with an asterisk indicate that the rating is subject to additional
+            refinement when combined with other viewpoints.
+        </div>
+
         <div ng-if="$ctrl.selected != null"
              class="waltz-fade-if">
             <div>
