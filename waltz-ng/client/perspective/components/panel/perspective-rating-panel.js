@@ -87,7 +87,7 @@ function controller($q,
                     .map(p => {
                         return {
                             definition: p,
-                            hideImplied: false,
+                            showImplied: false,
                             measurablesX: _.filter(vm.measurables, { categoryId: p.categoryX }),
                             measurablesY: _.filter(vm.measurables, { categoryId: p.categoryY })
                         };
@@ -109,17 +109,18 @@ function controller($q,
             });
     };
 
-
-
     vm.hasMeasurables = (perspectiveBlock) => {
         return perspectiveBlock.measurablesX.length > 0
             && perspectiveBlock.measurablesY.length > 0;
     };
 
-    vm.hasNoPerspectiveRatings = () => {
-        return _.every(vm.perspectiveBlocks, (pb) => !vm.hasMeasurables(pb));
+    vm.hasPerspectiveOverrides = (perspectiveBlock) => {
+        return _.keys(perspectiveBlock.overrides).length > 0;
     };
 
+    vm.hasNoPerspectiveRatings = () => {
+        return _.every(vm.perspectiveBlocks, (pb) => !(vm.hasMeasurables(pb) && vm.hasPerspectiveOverrides(pb)));
+    };
 }
 
 

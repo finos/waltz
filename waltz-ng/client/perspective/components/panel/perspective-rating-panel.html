@@ -24,7 +24,7 @@
                                class="clickable">
                                 Show this
                             </a>
-                            section view perspective ratings.
+                            section to view perspective ratings.
                         </div>
                     </div>
                 </message>
@@ -40,7 +40,8 @@
                 <div class="col-sm-12">
                     <h4>Perspectives</h4>
                     <div class="text-muted">
-                        Perspective ratings are overrides show how a particular rating may change when viewed in conjunction with another aspect of this application.
+                        Perspective ratings are overrides that show how a particular application's rating on a viewpoint
+                        may change when viewed in conjunction with a secondary viewpoint.
                     </div>
                 </div>
             </div>
@@ -71,12 +72,12 @@
                         <div>
                             <h6>Layers</h6>
                             <div class="small">
-                                <waltz-toggle label-on='Hide implied ratings'
-                                              label-off='Hide implied ratings'
+                                <waltz-toggle label-on='Show implied ratings'
+                                              label-off='Show implied ratings'
                                               icon-on='toggle-on'
                                               icon-off='toggle-off'
-                                              on-toggle='$ctrl.selectedPerspectiveBlock.hideImplied = !$ctrl.selectedPerspectiveBlock.hideImplied'
-                                              state='$ctrl.selectedPerspectiveBlock.hideImplied'>
+                                              on-toggle='$ctrl.selectedPerspectiveBlock.showImplied = !$ctrl.selectedPerspectiveBlock.showImplied'
+                                              state='$ctrl.selectedPerspectiveBlock.showImplied'>
                                 </waltz-toggle>
                             </div>
                             <div class="help-block small small">
@@ -107,18 +108,29 @@
                 <div class="side-scroller"
                      ng-repeat="pb in $ctrl.perspectiveBlocks">
                     <div ng-if="$ctrl.selectedPerspectiveBlock === pb">
-                        <waltz-perspective-grid ng-if="$ctrl.hasMeasurables(pb)"
+                        <waltz-perspective-grid ng-if="$ctrl.hasMeasurables(pb) &&
+                                                        $ctrl.hasPerspectiveOverrides($ctrl.selectedPerspectiveBlock)"
                                                 existing-overrides="pb.overrides"
-                                                hide-implied="pb.hideImplied"
+                                                hide-implied="!pb.showImplied"
                                                 pending-overrides="[]"
                                                 perspective-definition="pb.definition"
                                                 measurables="$ctrl.measurables"
                                                 measurable-ratings="$ctrl.measurableRatings">
                         </waltz-perspective-grid>
-                        <div ng-if="!$ctrl.hasMeasurables(pb)"
-                             class="wprp-no-data">
-                            Ratings are not supplied for this perspective
-                        </div>
+                        <waltz-no-data ng-if="!$ctrl.hasMeasurables(pb)">
+                            <message>
+                                <div>
+                                    Ratings are not supplied for this perspective
+                                </div>
+                            </message>
+                        </waltz-no-data>
+                        <waltz-no-data ng-if="$ctrl.hasMeasurables(pb) && !$ctrl.hasPerspectiveOverrides($ctrl.selectedPerspectiveBlock)">
+                            <message>
+                                <div>
+                                    No rating overrides exist for this perspective
+                                </div>
+                            </message>
+                        </waltz-no-data>
                     </div>
                 </div>
             </div>
