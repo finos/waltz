@@ -13,14 +13,13 @@
 
 
     <!-- APP SUMMARY STATS -->
-    <div ng-if="$ctrl.applications.length > 0">
+    <div ng-if="$ctrl.applications.length > 0 || $ctrl.relationshipStats.length > 0">
         <hr>
-        <div class="row" ng-if="$ctrl.applications.length > 0">
-            <div class="col-sm-4">
+        <div class="row">
+            <div class="col-sm-4"
+                 ng-if="$ctrl.applications.length > 0">
                 <waltz-basic-info-tile name="App Stats"
-
                                        icon="rocket">
-
                     <div style="font-size: large;"
                          waltz-jump-to="costs-section">
                         Cost: <span ng-bind="$ctrl.portfolioCostStr"></span>
@@ -39,13 +38,15 @@
                 </waltz-basic-info-tile>
             </div>
 
-            <div class="col-sm-4">
+            <div class="col-sm-4"
+                 ng-if="$ctrl.applications.length > 0">
                 <waltz-apps-by-investment-pie applications="$ctrl.applications"
                                               size="70">
                 </waltz-apps-by-investment-pie>
             </div>
 
-            <div class="col-sm-4">
+            <div class="col-sm-4"
+                 ng-if="$ctrl.relationshipStats.length > 0">
                 <waltz-basic-info-tile name="Relationships"
                                        waltz-jump-to="related-measurables"
                                        icon="link">
