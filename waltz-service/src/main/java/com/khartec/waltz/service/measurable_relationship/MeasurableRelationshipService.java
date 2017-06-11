@@ -25,15 +25,15 @@ import com.khartec.waltz.model.EntityReferenceUtilities;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.entity_relationship.EntityRelationship;
-import com.khartec.waltz.model.entity_relationship.EntityRelationshipKey;
-import com.khartec.waltz.model.entity_relationship.UpdateEntityRelationshipParams;
+import com.khartec.waltz.model.entity_relationship.*;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.entity_relationship.EntityRelationshipUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.map;
@@ -73,7 +73,27 @@ public class MeasurableRelationshipService {
     }
 
 
-    public boolean create(EntityRelationship relationship) {
+    public boolean create(String userName,
+                          EntityReference entityRefA,
+                          EntityReference entityRefB,
+                          RelationshipKind relationshipKind,
+                          String description) {
+
+        Optional<EntityRelationshipKey> entityRelationshipKey =
+                EntityRelationshipUtilities.mkEntityRelationshipKey(entityRefA, entityRefB, relationshipKind);
+
+        EntityRelationship relationship = entityRelationshipKey
+                .map(erKey -> ImmutableEntityRelationship.builder()
+                        .a(erKey.a())
+                        .b(erKey.b())
+                        .relationship(relationshipKind)
+                        .description(description)
+                        .lastUpdatedBy(userName)
+                        .build())
+                .orElseThrow(() -> new IllegalArgumentException("Entity relationship type " + relationshipKind
+                        + " cannot be created between " + entityRefA
+                        + " and " + entityRefB));
+
         logAddition(relationship);
         return entityRelationshipDao.create(relationship);
     }
