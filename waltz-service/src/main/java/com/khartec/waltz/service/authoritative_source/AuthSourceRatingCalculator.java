@@ -78,7 +78,7 @@ public class AuthSourceRatingCalculator {
         DataType dataType = dataTypeDao.getByCode(dataTypeCode);
 
         if (dataType == null) {
-            LOG.error("Cannot save ratings for data type code: {} for vantage point: {} as cannot find corresponding data type",
+            LOG.error("Cannot update ratings for data type code: {} for vantage point: {} as cannot find corresponding data type",
                     dataTypeCode,
                     vantageRef);
             return new int[0];
@@ -106,7 +106,7 @@ public class AuthSourceRatingCalculator {
                 fromCollection(reRatedDecorators),
                 fromCollection(impactedDecorators));
 
-        LOG.info("Need to save {} ratings due to auth source change - dataType: {}, parent: {}",
+        LOG.info("Need to update {} ratings due to auth source change - dataType: {}, parent: {}",
                 modifiedDecorators.size(),
                 dataType,
                 vantageRef);
