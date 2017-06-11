@@ -45,6 +45,7 @@ const bindings = {
 
 
 const initialState = {
+    selectedCategoryId: null,
     categories: [],
     measurables: [],
     parentEntityRef: null,
@@ -89,7 +90,8 @@ const styles = {
     bridges: 'wrmv-bridges',
     bridge: 'wrmv-bridge',
     hasRelationships: 'has-relationships',
-    noRelationships: 'no-relationships'
+    noRelationships: 'no-relationships',
+    selected: 'wrmv-selected'
 };
 
 
@@ -203,6 +205,7 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
         .merge(outerNodes);
 
     allOuterNodes
+        .classed(styles.selected, d => d.isSelected)
         .classed(styles.hasRelationships, d => d.count > 0)
         .classed(styles.noRelationships, d => d.count === 0);
 
@@ -253,7 +256,7 @@ function drawBridges(group, categories = [], deltaAngle) {
 }
 
 
-function mkBuckets(categories = [], measurables = [], primaryEntity, relationships = []) {
+function mkBuckets(categories = [], measurables = [], primaryEntity, relationships = [], selectedCategoryId) {
 
     if (! primaryEntity) return [];
 
@@ -286,20 +289,28 @@ function mkBuckets(categories = [], measurables = [], primaryEntity, relationshi
                 id,
                 name: c.name,
                 relationshipFilter: filter,
-                count: countsById[id] || 0
+                count: countsById[id] || 0,
+                isSelected: selectedCategoryId === id
             };
         })
         .orderBy('name')
         .value();
 
-    buckets.push({
-        id: 'CHANGE_INITIATIVE',
-        name: 'Change Initiative',
-        relationshipFilter: er => 'CHANGE_INITIATIVE' === determineCounterpart(primaryEntity, er).kind,
-        count: countsById['CHANGE_INITIATIVE'] || 0,
-    });
+    buckets.push(mkChangeInitiativeBucket(primaryEntity, countsById, selectedCategoryId));
 
     return buckets;
+}
+
+
+function mkChangeInitiativeBucket(primaryEntity, countsById, selectedCategoryId) {
+    const id = 'CHANGE_INITIATIVE';
+    return {
+        id,
+        name: 'Change Initiative',
+        relationshipFilter: er => id === determineCounterpart(primaryEntity, er).kind,
+        count: countsById[id] || 0,
+        isSelected: selectedCategoryId === id
+    };
 }
 
 
@@ -308,7 +319,12 @@ function draw(groups, data, handlers) {
     if (! data.primaryEntity) return;
     if (! data.categories) return;
 
-    const buckets = mkBuckets(data.categories, data.measurables, data.primaryEntity, data.relationships);
+    const buckets = mkBuckets(
+        data.categories,
+        data.measurables,
+        data.primaryEntity,
+        data.relationships,
+        data.selectedCategoryId);
 
     const deltaAngle = i => i * (Math.PI * 2) / buckets.length + angleOffset;
 
@@ -318,10 +334,18 @@ function draw(groups, data, handlers) {
 }
 
 
-function mkHandlers(vm) {
+function mkHandlers(vm, $timeout) {
     return {
-        onCategoryClear: vm.onCategoryClear,
-        onCategorySelect: vm.onCategorySelect
+        onCategoryClear: () => {
+            vm.selectedCategoryId = null;
+            vm.onCategoryClear();
+            $timeout(() => vm.$onChanges(), 0);
+        },
+        onCategorySelect: c => {
+            vm.selectedCategoryId = c.id;
+            vm.onCategorySelect(c);
+            $timeout(() => vm.$onChanges(), 0);
+        }
     };
 }
 
@@ -363,12 +387,13 @@ function mkData(vm) {
     data.categories = vm.categories || [];
     data.measurables = vm.measurables || [];
     data.relationships = sanitizeRelationships(vm.relationships || [], data.measurables, data.categories);
-    data.primaryEntity = vm.primaryEntity || { name: 'Loading', category: { name: '...' }};
+    data.primaryEntity = vm.primaryEntity || { name: 'Loading', category: { name: '...' }, id: -1, kind: 'ZZZ'};
+    data.selectedCategoryId = vm.selectedCategoryId;
     return data;
 }
 
 
-function controller($element, $q, serviceBroker) {
+function controller($element, $q, $timeout, serviceBroker) {
     const vm = this;
 
     const loadData = () => {
@@ -395,14 +420,15 @@ function controller($element, $q, serviceBroker) {
     vm.$onInit = () => {
         initialiseData(vm, initialState);
         const holder = $element.find('svg')[0];
-        groups = prepareGroups(holder, vm.onCategoryClear);
+        const handlers = mkHandlers(vm, $timeout);
+        groups = prepareGroups(holder, handlers.onCategoryClear);
         destroyResizeListener = responsivefy(groups.svg);
         loadData()
-            .then(() => draw(groups, mkData(vm), mkHandlers(vm)));
+            .then(() => draw(groups, mkData(vm), handlers));
     };
 
     vm.$onChanges = (c) => {
-        draw(groups, mkData(vm), mkHandlers(vm));
+        draw(groups, mkData(vm), mkHandlers(vm, $timeout));
     };
 
     vm.$onDestroy = () => {
@@ -414,6 +440,7 @@ function controller($element, $q, serviceBroker) {
 controller.$inject = [
     '$element',
     '$q',
+    '$timeout',
     'ServiceBroker'
 ];
 

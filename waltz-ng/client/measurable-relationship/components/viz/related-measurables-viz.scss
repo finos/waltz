@@ -9,12 +9,20 @@ $outer-node-fill: #f0fff1;
         stroke-width: 1.4;
     }
     .wrmv-outer-node {
-        &:hover {
+
+        &.wrmv-selected {
+            circle {
+                stroke-width: 8;
+            }
+        }
+
+        &:hover:not(.wrmv-selected) {
             cursor: pointer;
             circle {
                 stroke-width: 2;
             }
         }
+
         &.has-relationships {
             circle {
                 stroke: #9ed18f;
@@ -24,6 +32,7 @@ $outer-node-fill: #f0fff1;
                 }
             }
         }
+
         &.no-relationships {
             circle {
                 stroke: #999;
@@ -35,9 +44,6 @@ $outer-node-fill: #f0fff1;
         }
         .detail {
             font-size: small;
-        }
-        .name {
-            //font-size:;
         }
     }
 
@@ -56,4 +62,5 @@ $outer-node-fill: #f0fff1;
             cursor: pointer;
         }
     }
+
 }
