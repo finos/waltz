@@ -68,10 +68,10 @@ public class InvolvementKindEndpoint implements Endpoint {
         getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute );
 
         // create
-        postForDatum(mkPath(BASE_URL, "save"), this::createInvolvementKindRoute );
+        postForDatum(mkPath(BASE_URL, "update"), this::createInvolvementKindRoute );
 
         // save
-        putForDatum(mkPath(BASE_URL, "save"), this::updateInvolvementKindRoute );
+        putForDatum(mkPath(BASE_URL, "update"), this::updateInvolvementKindRoute );
 
         // delete
         deleteForDatum(mkPath(BASE_URL, ":id"), this::deleteInvolvementKindRoute);
