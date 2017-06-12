@@ -23,7 +23,7 @@ import {zoom} from 'd3-zoom';
 import {initialiseData, perhaps} from '../../../common';
 import {mkLineWithArrowPath, responsivefy, wrapText} from '../../../common/d3-utils';
 import {d3ContextMenu} from '../../../common/d3-context-menu';
-import {toGraphId, toNodeShape, shapeFor, positionFor} from '../../flow-diagram-utils';
+import {toGraphId, toNodeShape, drawNodeShape, shapeFor, positionFor} from '../../flow-diagram-utils';
 
 
 /**
@@ -109,16 +109,6 @@ const contextMenus = Object.assign({}, DEFAULT_CONTEXT_MENUS);
 const clickHandlers = Object.assign({}, DEFAULT_CLICK_HANDLERS);
 
 
-function drawNodeShape(selection, state) {
-    return selection
-        .attr('d', d => {
-            const path = shapeFor(state, d).path
-            return path;
-        })
-        .attr('stroke', '#ccc')
-        .attr('fill', '#eee');
-}
-
 
 function dragStarted(d) {
     select(this)
@@ -193,7 +183,6 @@ function drawNodes(state, group, commandProcessor) {
 
     nodeElems
         .merge(newNodeElems)
-        .selectAll('path')
         .call(drawNodeShape, state);
 
     // icon
@@ -206,7 +195,7 @@ function drawNodes(state, group, commandProcessor) {
 
     nodeElems
         .merge(newNodeElems)
-        .selectAll(`.${styles.TITLE_ICON}`)
+        .select(`.${styles.TITLE_ICON}`)
         .attr('dx', d => shapeFor(state, d).title.dx)
         .attr('dy', d => shapeFor(state, d).title.dy);
 
@@ -220,7 +209,7 @@ function drawNodes(state, group, commandProcessor) {
 
     nodeElems
         .merge(newNodeElems)
-        .selectAll(`.${styles.TITLE}`)
+        .select(`.${styles.TITLE}`)
         .text(d => d.data.name)
         .each(function(d) {
             const self = this;
@@ -254,7 +243,7 @@ function drawFlows(state, group) {
 
     newLinkElems
         .merge(linkElems)
-        .selectAll(`.${styles.FLOW_ARROW}`)
+        .select(`.${styles.FLOW_ARROW}`)
         .attr('d', d => {
             const sourcePos = positionFor(state, d.source);
             const targetPos = positionFor(state, d.target);
@@ -313,7 +302,7 @@ function drawFlowBuckets(state, group) {
             const p = determineBucketPosition(state, d);
             return `translate(${p.x},${p.y})`;
         })
-        .selectAll('circle')
+        .select('circle')
         .attr('r', d => _.size(state.model.decorations[d.id]) > 0
             ? dimensions.flowBucket.r * 1.5
             : dimensions.flowBucket.r );
@@ -384,7 +373,7 @@ function drawAnnotations(state, group, commandProcessor) {
 
     const allLines = annotationElems
         .merge(newAnnotationElems)
-        .selectAll('path');
+        .select('path');
 
     const determineAnnotationGeometry = (state, d) => {
         const ref = d.data.entityReference;
@@ -428,7 +417,7 @@ function drawAnnotations(state, group, commandProcessor) {
 
     annotationElems
         .merge(newAnnotationElems)
-        .selectAll('circle')
+        .select('circle')
         .attr('r', dimensions.annotation.circle.r)
         .each(function(d) {
             const p = determineAnnotationGeometry(state, d);
@@ -445,7 +434,7 @@ function drawAnnotations(state, group, commandProcessor) {
 
     annotationElems
         .merge(newAnnotationElems)
-        .selectAll('text')
+        .select('text')
         .each(function(d) {
             const p = determineAnnotationGeometry(state, d);
             const bar = p.annotationPosition.x > 0 ? 10 : dimensions.annotation.text.w * -1;

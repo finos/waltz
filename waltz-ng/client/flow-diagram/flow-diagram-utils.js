@@ -42,12 +42,26 @@ export function toGraphFlow(flow) {
 }
 
 
-export function mkModel(nodes = [], flows = []) {
-    return {
-        nodes: _.map(nodes, toGraphNode),
-        flows: _.map(flows, toGraphFlow),
-        decorations: {}
-    };
+export function drawNodeShape(selection, state) {
+    selection
+        .select('path')
+        .attr('d', d => shapeFor(state, d).path)
+        .attr('stroke', '#ccc')
+        .attr('fill', d => {
+            switch (d.data.kind) {
+                case "ACTOR":
+                    return '#dfd7ee';
+                case "APPLICATION":
+                    const application = state.detail.applicationsById[d.data.id];
+                    if (application) {
+                        return application.kind === 'EUC' ? '#f1d0d0' : '#dff1d2';
+                    } else {
+                        return '#dff1d2';
+                    }
+                default:
+                    return '#dff1d2';
+            };
+        });
 }
 
 
@@ -83,18 +97,8 @@ export function shapeFor(state, graphNode) {
     return state.layout.shapes[id] || initialiseShape(state, graphNode);
 }
 
+
 // -- shapes
-
-const paperShape = {
-    path: 'M0,0 L90,0 L100,10 L100,20 L0,20 z',
-    cx: 50,
-    cy: 10,
-    title: {
-        dx: 6,
-        dy: 13
-    }
-};
-
 
 function mkTrapezoidShape(widthHint) {
     return {
@@ -124,8 +128,9 @@ function mkRectShape(widthHint) {
 
 
 const shapes = {
-    ACTOR: (widthHint = 100) => Object.assign({}, mkTrapezoidShape(widthHint), { icon: '\uf2be'}),
-    APPLICATION: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: '\uf108' }),
+    ACTOR: (widthHint = 100) => Object.assign({}, mkTrapezoidShape(widthHint), { icon: '\uf2be'}), // user-circle-o
+    APPLICATION: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: '\uf108' }),  // desktop
+    EUC: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: '\uf109' }), // laptop
     DEFAULT: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: '\uf096' })
 };
 

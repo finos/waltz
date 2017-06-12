@@ -39,6 +39,9 @@ const initialState = {
             flowBuckets: true,
             annotations: true
         }
+    },
+    detail: {
+        applicationsById: {}
     }
 };
 
@@ -228,7 +231,9 @@ function removeDecoration(payload, model) {
     const currentDecorations = model.decorations[refOfRemovedDecoration] || [];
     const existingIds = _.map(currentDecorations, "id");
     if (_.includes(existingIds, decorationNodeToRemove.id)) {
-        model.decorations[refOfRemovedDecoration] = _.reject(currentDecorations, d => d.id === decorationNodeToRemove.id);
+        model.decorations[refOfRemovedDecoration] = _.reject(
+            currentDecorations,
+            d => d.id === decorationNodeToRemove.id);
     } else {
         console.log('Ignoring request to removed unknown decoration');
     }
@@ -237,6 +242,7 @@ function removeDecoration(payload, model) {
 
 function service(
     $q,
+    applicationStore,
     flowDiagramStore,
     flowDiagramAnnotationStore,
     flowDiagramEntityStore,
@@ -265,15 +271,19 @@ function service(
         reset();
         state.diagramId = id;
 
-        const diagramPromise = flowDiagramStore.getById(id);
-        const annotationPromise =flowDiagramAnnotationStore.findByDiagramId(id);
-        const entityPromise = flowDiagramEntityStore.findByDiagramId(id);
-        const logicalFlowPromise = logicalFlowStore.findBySelector(diagramSelector);
-        const physicalFlowPromise = physicalFlowStore.findBySelector(diagramSelector);
+        const promises = [
+            applicationStore.findBySelector(diagramSelector),
+            flowDiagramStore.getById(id),
+            flowDiagramAnnotationStore.findByDiagramId(id),
+            flowDiagramEntityStore.findByDiagramId(id),
+            logicalFlowStore.findBySelector(diagramSelector),
+            physicalFlowStore.findBySelector(diagramSelector)
+        ];
 
         return $q
-            .all([diagramPromise, annotationPromise, entityPromise, logicalFlowPromise, physicalFlowPromise])
-            .then(([diagram, annotations, entityNodes, logicalFlows, physicalFlows]) => {
+            .all(promises)
+            .then(([applications, diagram, annotations, entityNodes, logicalFlows, physicalFlows]) => {
+                state.detail.applicationsById = _.keyBy(applications, 'id');
                 restoreDiagram(processCommands, diagram, annotations, entityNodes, logicalFlows, physicalFlows);
                 state.dirty = false;
             })
@@ -351,6 +361,13 @@ function service(
                 } else {
                     model.nodes = _.concat(model.nodes || [], [ graphNode ]);
                     listener(state)
+                }
+                if (graphNode.data.kind === 'APPLICATION' && !state.detail.applicationsById[graphNode.data.id]) {
+                    // load full app detail
+                    applicationStore
+                        .getById(graphNode.data.id)
+                        .then(app => state.detail.applicationsById[graphNode.data.id] = app)
+                        .then(() => listener(state));
                 }
                 break;
 
@@ -468,6 +485,7 @@ function service(
 
 service.$inject = [
     '$q',
+    'ApplicationStore',
     'FlowDiagramStore',
     'FlowDiagramAnnotationStore',
     'FlowDiagramEntityStore',
