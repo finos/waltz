@@ -67,7 +67,6 @@ public class MeasurableRelationshipsGenerator {
                             .mapToObj(i -> ListUtilities.randomPick(regions))
                             .distinct()
                             .map(region -> creatRelationshipRecord(function, region, ArrayUtilities.randomPick(
-                                    RelationshipKind.LOOSELY_RELATES_TO,
                                     RelationshipKind.RELATES_TO)));
                 })
                 .collect(toList());
