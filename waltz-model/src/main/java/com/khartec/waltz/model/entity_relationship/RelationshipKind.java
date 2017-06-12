@@ -34,12 +34,7 @@ public enum RelationshipKind {
     HAS(Collections.emptySet()),
 
     DEPRECATES(fromArray(
-            tuple(CHANGE_INITIATIVE, APPLICATION)
-    )),
-
-    LOOSELY_RELATES_TO(fromArray(
-            tuple(MEASURABLE, MEASURABLE),
-            tuple(MEASURABLE, CHANGE_INITIATIVE),
+            tuple(CHANGE_INITIATIVE, APPLICATION),
             tuple(CHANGE_INITIATIVE, MEASURABLE)
     )),
 
@@ -51,6 +46,7 @@ public enum RelationshipKind {
             tuple(APP_GROUP, CHANGE_INITIATIVE),
             tuple(MEASURABLE, MEASURABLE),
             tuple(MEASURABLE, CHANGE_INITIATIVE),
+            tuple(CHANGE_INITIATIVE, CHANGE_INITIATIVE),
             tuple(CHANGE_INITIATIVE, MEASURABLE)
     )),
 

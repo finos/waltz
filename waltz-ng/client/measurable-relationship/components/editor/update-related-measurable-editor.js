@@ -15,12 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {availableRelationshipKinds} from './related-measurable-editor-utils';
+import {CORE_API} from "../../../common/services/core-api-utils";
 
-import template from './update-related-measurable-editor.html';
+import template from "./update-related-measurable-editor.html";
 
 
 const bindings = {
@@ -34,9 +32,8 @@ const initialState = {
     form: {
         description: null
     },
-    availableRelationshipKinds,
     onCancel: () => console.log('wurme: onCancel - default impl'),
-    onRefresh: () => console.log('wurme: onRefresh - default impl'),
+    onRefresh: () => console.log('wurme: onRefresh - default impl')
 };
 
 
@@ -65,7 +62,7 @@ function controller(notification, serviceBroker) {
                 relationshipKind: vm.relationship.relationship
             };
             const changes = {
-                relationshipKind: form.relationshipKind,
+                relationshipKind: vm.relationship.relationship,
                 description: form.description
             };
             return save(key, changes)
