@@ -16,8 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const RELATES_TO = { code: 'RELATES_TO', label: 'Relates To' };
+const IS_DEPRECATED_BY = { code: 'DEPRECATES', label: 'Is Deprecated By' };
+const DEPRECATES = { code: 'DEPRECATES', label: 'Deprecates' };
 
-export const availableRelationshipKinds = [
-    { code: 'RELATES_TO', label: 'Relates To' },
-    { code: 'LOOSELY_RELATES_TO', label: 'Loosely Relates To' },
-];
+export const availableRelationshipKinds = {
+    'MEASURABLE-MEASURABLE': [RELATES_TO],
+    'MEASURABLE-CHANGE_INITIATIVE': [RELATES_TO, IS_DEPRECATED_BY],
+    'CHANGE_INITIATIVE-MEASURABLE': [RELATES_TO, DEPRECATES],
+    'CHANGE_INITIATIVE-CHANGE_INITIATIVE': [RELATES_TO]
+};

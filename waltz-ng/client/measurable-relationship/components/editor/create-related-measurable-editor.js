@@ -17,12 +17,12 @@
  */
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {availableRelationshipKinds} from './related-measurable-editor-utils';
-import {buildHierarchies, switchToParentIds} from '../../../common/hierarchy-utils';
-import {toEntityRef} from '../../../common/entity-utils';
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {availableRelationshipKinds} from "./related-measurable-editor-utils";
+import {buildHierarchies, switchToParentIds} from "../../../common/hierarchy-utils";
+import {toEntityRef} from "../../../common/entity-utils";
 
-import template from './create-related-measurable-editor.html';
+import template from "./create-related-measurable-editor.html";
 
 
 const bindings = {
@@ -43,6 +43,7 @@ const initialState = {
     measurables: [],
     categories: [],
     availableRelationshipKinds,
+    relationshipKindsKey: '',
     onCancel: () => console.log('wcrme: onCancel - default impl'),
     onRefresh: () => console.log('wcrme: onRefresh - default impl'),
     treeOptions: {
@@ -113,6 +114,8 @@ function controller(notification, serviceBroker) {
             vm.visibility.changeInitiativeSelector = true;
             vm.counterpartType = 'Change Initiative';
         }
+
+        vm.relationshipKindsKey = vm.parentEntityRef.kind + '-' + (isMeasurable ? 'MEASURABLE' : 'CHANGE_INITIATIVE');
     };
 
 
