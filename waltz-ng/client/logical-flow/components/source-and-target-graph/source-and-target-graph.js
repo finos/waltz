@@ -386,12 +386,13 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
     if (tweakers.icon) {
         labels
             .merge(newLabels)
-            .selectAll('.wsat-icon')
+            .select('.wsat-icon')
             .attr("fill", d => tweakers.icon(d).color)
             .text((d) => tweakers.icon(d).code || '');
 
-        labels.merge(newLabels)
-            .selectAll('title')
+        labels
+            .merge(newLabels)
+            .select('title')
             .text((d) => tweakers.icon(d).description || '');
     }
 
