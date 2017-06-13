@@ -29,6 +29,7 @@ import template from "./perspective-rating-panel.html";
 
 const bindings = {
     parentEntityRef: '<',
+    measurableCategory: '<', // measurable to filter perspectives to only those that have this measurable
 };
 
 
@@ -66,7 +67,11 @@ function controller($q,
 
         const defnPromise = serviceBroker
             .loadViewData(CORE_API.PerspectiveDefinitionStore.findAll)
-            .then(r => vm.perspectives = r.data);
+            .then(r => {
+                vm.perspectives = _.filter(
+                    r.data,
+                    pd => pd.categoryX === vm.measurableCategory.id || pd.categoryY === vm.measurableCategory.id);
+            });
 
         const ratingPromise = serviceBroker
             .loadViewData(CORE_API.PerspectiveRatingStore.findForEntity, [vm.parentEntityRef])
