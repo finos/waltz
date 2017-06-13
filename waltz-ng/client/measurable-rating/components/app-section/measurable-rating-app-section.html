@@ -53,18 +53,19 @@
                     <br>
                     <p class="text-muted small"
                        ng-bind="tab.category.description"></p>
+
+                    <br>
+                    <hr>
+
+                    <!--PERSPECTIVE RATINGS-->
+                    <waltz-perspective-rating-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                                    measurable-category="tab.category">
+                    </waltz-perspective-rating-panel>
                 </div>
+
             </div>
         </div>
     </div>
-
-    <br>
-    <hr>
-
-
-    <!--PERSPECTIVE RATINGS-->
-    <waltz-perspective-rating-panel parent-entity-ref="$ctrl.parentEntityRef">
-    </waltz-perspective-rating-panel>
 
 
     <!-- NO DATA -->
