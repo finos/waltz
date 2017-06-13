@@ -17,11 +17,13 @@
  */
 
 import angular from 'angular';
+import {registerComponents} from '../common/module-utils';
 
 import * as entityNamedNoteStore from './services/entity-named-note-store';
 import * as entityNamedNoteTypeStore from './services/entity-named-note-type-store';
 
-import entityNamedNotesPanel from './components/entity-named-notes-panel';
+import entityNamedNotesPanel from './components/panel/entity-named-notes-panel';
+import entityNamedNotesSection from './components/section/entity-named-notes-section';
 
 
 export default () => {
@@ -32,8 +34,10 @@ export default () => {
         .service(entityNamedNoteStore.serviceName, entityNamedNoteStore.store)
         .service(entityNamedNoteTypeStore.serviceName, entityNamedNoteTypeStore.store);
 
-    module
-        .component('waltzEntityNamedNotesPanel', entityNamedNotesPanel);
+    registerComponents(module, [
+        entityNamedNotesPanel,
+        entityNamedNotesSection
+    ]);
 
     return module.name;
 };
