@@ -147,13 +147,4 @@ public class CollectionUtilities {
         return xs == null || xs.isEmpty();
     }
 
-
-    public static <X> List<X> flatten(Collection<? extends Collection<X>> xss) {
-        checkNotNull(xss, "xss cannot be null");
-        return xss
-                .stream()
-                .flatMap(xs -> xs.stream())
-                .collect(Collectors.toList());
-    }
-
 }

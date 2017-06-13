@@ -19,10 +19,8 @@
 package com.khartec.waltz.common;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -51,19 +49,6 @@ public class ArrayUtilities {
         }
         return true;
 
-    }
-
-
-    public static <X, Y> List<Y> mapToList(X[] xs, Function<X, Y> transformer) {
-        checkNotNull(xs, "array must not be null");
-        checkNotNull(transformer, "transformer must not be null");
-
-        LinkedList<Y> ys = new LinkedList<>();
-
-        for (X x : xs) {
-            ys.add(transformer.apply(x));
-        }
-        return ys;
     }
 
 
