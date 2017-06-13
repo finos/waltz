@@ -1,0 +1,26 @@
+.waltz-related-measurables-panel {
+    .wrmp-pill {
+
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        padding: 0 4px 0 4px;
+        margin: 0 4px 0 4px;
+
+        &.wrmp-counterpart {
+            border-color: #9ed18f;
+            background-color: #f0fff1;
+        }
+        &.wrmp-self {
+            background-color: #f9f9f9;
+        }
+        &.wrmp-rel {
+            background-color: #e9ecf9;
+        }
+    }
+
+    .wrmp-relationship-heading {
+        padding: 4px;
+        border: 1px solid #eee;
+        border-radius: 3px;
+    }
+}
