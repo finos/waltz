@@ -18,6 +18,8 @@
 import _ from "lodash";
 import {event} from "d3-selection";
 import {initialiseData} from "../../../common";
+import {downloadTextFile} from '../../../common/file-utils';
+import {CORE_API} from '../../../common/services/core-api-utils';
 import {mkTweakers} from '../source-and-target-graph/source-and-target-utilities';
 
 import template from './source-and-target-panel.html';
@@ -117,7 +119,7 @@ function scrollIntoView(element, $window) {
 }
 
 
-function controller($element, $timeout, $window) {
+function controller($element, $timeout, $window, displayNameService, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.showAll = () => vm.filteredFlowData = filterByType(0, vm.logicalFlows, vm.decorators);
@@ -189,13 +191,80 @@ function controller($element, $timeout, $window) {
             vm.physicalFlows,
             vm.logicalFlows);
     };
+
+
+    vm.exportLogicalFlowData = () => {
+        const header = [
+            "Source",
+            "Source code",
+            "Target",
+            "Target code",
+            "Data Types"
+        ];
+
+        const dataTypesByFlowId = _
+            .chain(vm.decorators)
+            .filter(d => d.decoratorEntity.kind === 'DATA_TYPE')
+            .map(d => ( { id: d.dataFlowId, code: d.decoratorEntity.id }))
+            .groupBy('id')
+            .value();
+
+        const calcDataTypes = (fId) => {
+            const dts = dataTypesByFlowId[fId] || [];
+
+            return _.chain(dts)
+                .map(dt => dt.code)
+                .map(code => displayNameService.lookup('dataType', code))
+                .value()
+                .join('; ');
+        };
+
+        const appIds = _
+            .chain(vm.logicalFlows)
+            .flatMap(f => ([ f.source, f.target ]))
+            .filter(r => r.kind === 'APPLICATION')
+            .map(r => r.id)
+            .uniq()
+            .value();
+
+        serviceBroker
+            .loadViewData(CORE_API.ApplicationStore.findByIds, [appIds])
+            .then(r => {
+                const appsById = _.keyBy(r.data, 'id');
+
+                const resolveCode = (ref) => {
+                    const pathToNameAttr = [ref.id, 'assetCode'];
+                    return ref.kind === 'APPLICATION'
+                        ? _.get(appsById, pathToNameAttr, '-')
+                        : ref.kind;
+                };
+
+                const dataRows = _.map(vm.logicalFlows, f => {
+                    return [
+                        f.source.name,
+                        resolveCode(f.source),
+                        f.target.name,
+                        resolveCode(f.target),
+                        calcDataTypes(f.id)
+                    ]
+                });
+
+                const rows = _.concat(
+                    [header],
+                    dataRows);
+
+                downloadTextFile(rows, ',', 'logical_flows.csv');
+            })
+    };
 }
 
 
 controller.$inject = [
     '$element',
     '$timeout',
-    '$window'
+    '$window',
+    'DisplayNameService',
+    'ServiceBroker'
 ];
 
 

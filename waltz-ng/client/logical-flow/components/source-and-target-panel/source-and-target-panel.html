@@ -1,5 +1,5 @@
 <div class="row waltz-source-and-target-panel">
-    <div class="col-sm-12">
+    <div class="col-sm-12 waltz-visibility-parent">
         <waltz-source-and-target-graph entity-ref="$ctrl.entityRef"
                                        logical-flows="$ctrl.filteredFlowData.flows"
                                        decorators="$ctrl.filteredFlowData.decorators"
@@ -18,6 +18,14 @@
                 Show All
             </a>
             <hr>
+        </div>
+
+        <div class="pull-right" style="margin-right: 30px; margin-bottom: 4px">
+            <a class="clickable waltz-visibility-child-30"
+               ng-click="$ctrl.exportLogicalFlowData()">
+                <waltz-icon name="download"></waltz-icon>
+                Export logical flows
+            </a>
         </div>
     </div>
 
