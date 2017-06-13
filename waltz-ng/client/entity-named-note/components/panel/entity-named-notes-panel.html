@@ -1,12 +1,5 @@
 <div class="waltz-entity-named-notes">
-    <a class="clickable"
-       ng-if="! $ctrl.visibility.notes && $ctrl.notes.length > 0"
-       ng-click="$ctrl.showNotes()">
-        &raquo;
-        <span ng-bind="$ctrl.labelText"></span>
-    </a>
-
-    <div ng-if="$ctrl.visibility.notes || $ctrl.creatingNote">
+    <div>
         <table class="wenn-table small table table-condensed table-striped">
             <colgroup>
                 <col width="30%">
@@ -22,17 +15,17 @@
             </thead>
             <tbody>
             <tr ng-repeat="note in $ctrl.notes"
-                class="waltz-visibility-parent">
+                class="waltz-visibility-parent"
+                ng-if="$ctrl.creatingNote === false">
                 <td>
                     <div ng-bind="note.namedNoteTypeId | toDisplayName:'entityNamedNoteType'">
                     </div>
                     <waltz-markdown class="small text-muted"
                                     text="note.namedNoteTypeId | toDescription:'entityNamedNoteType'">
                     </waltz-markdown>
-                    <br>
                     <div ng-if="! $ctrl.noteTypesById[note.namedNoteTypeId].isReadOnly"
+                         class="waltz-visibility-child-30"
                          waltz-has-role-for-entity-kind="{{ $ctrl.parentEntityRef.kind }}">
-                        <br>
                         <a class="clickable"
                            ng-click="$ctrl.startEditNote(note)">
                             <waltz-icon name="pencil"></waltz-icon>
@@ -126,12 +119,4 @@
             </tbody>
         </table>
     </div>
-
-    <span waltz-has-role-for-entity-kind="{{ $ctrl.parentEntityRef.kind }}">
-        <a class="clickable"
-           ng-if="$ctrl.creatableNoteTypes.length > 0 && ! $ctrl.creatingNote && ($ctrl.notes.length === 0 || $ctrl.visibility.notes)"
-           ng-click="$ctrl.startNewNote()">
-            +Add Note
-        </a>
-    </span>
 </div>
