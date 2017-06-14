@@ -171,7 +171,8 @@
             <div ng-if="$ctrl.selectedRow.relationship.description">
                 <waltz-markdown text="$ctrl.selectedRow.relationship.description"></waltz-markdown>
             </div>
-            <div ng-if="!$ctrl.selectedRow.relationship.description" class="small">
+            <div ng-if="!$ctrl.selectedRow.relationship.description"
+                 class="text-muted">
                 <strong>No description provided</strong>
             </div>
 
