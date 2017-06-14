@@ -52,5 +52,8 @@ public enum EntityKind {
     SURVEY_INSTANCE,
     SURVEY_RUN,
     SURVEY_TEMPLATE,
-    SYSTEM
+    SYSTEM,
+
+    @Deprecated
+    CAPABILITY  // TO BE REMOVED IN 1.5
 }
