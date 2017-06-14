@@ -325,4 +325,17 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 2348 -->
+    <changeSet id="20170614-2348-1"
+               author="davidwatkins73">
+        <comment>2348: cleanup dead relationships</comment>
+        <sql>
+            DELETE er
+            FROM entity_relationship er
+            WHERE er.kind_a = 'APP_GROUP'
+            AND er.id_a NOT IN (SELECT id FROM application_group);
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

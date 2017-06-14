@@ -170,6 +170,19 @@ public class EntityRelationshipDao {
     }
 
 
+    public int removeAnyInvolving(EntityReference entityReference) {
+        Condition matchesA = ENTITY_RELATIONSHIP.KIND_A.eq(entityReference.kind().name())
+                .and(ENTITY_RELATIONSHIP.ID_A.eq(entityReference.id()));
+
+        Condition matchesB = ENTITY_RELATIONSHIP.KIND_B.eq(entityReference.kind().name())
+                .and(ENTITY_RELATIONSHIP.ID_B.eq(entityReference.id()));
+
+        return dsl.deleteFrom(ENTITY_RELATIONSHIP)
+                .where(matchesA.or(matchesB))
+                .execute();
+    }
+
+
     // --- HELPERS ---
 
     private boolean exists(EntityRelationshipKey key) {
@@ -190,6 +203,5 @@ public class EntityRelationshipDao {
                         .and(ENTITY_RELATIONSHIP.KIND_B.eq(key.b().kind().name())))
                 .and(ENTITY_RELATIONSHIP.RELATIONSHIP.eq(key.relationshipKind().name()));
     }
-
 
 }

@@ -150,6 +150,7 @@ public class AppGroupService {
     public List<AppGroupSubscription> deleteGroup(String userId, long groupId) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
         appGroupDao.deleteGroup(groupId);
+        entityRelationshipDao.removeAnyInvolving(EntityReference.mkRef(EntityKind.APP_GROUP, groupId));
         audit(groupId, userId, String.format("Removed group %d", groupId), null, Operation.REMOVE);
         return findGroupSubscriptionsForUser(userId);
     }
