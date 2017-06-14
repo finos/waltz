@@ -1,9 +1,11 @@
 <div class="waltz-entity-named-notes">
+
     <waltz-no-data ng-if="$ctrl.notes.length == 0">
         <message>
             <strong>No notes</strong> have been added
         </message>
     </waltz-no-data>
+
     <div ng-if="$ctrl.notes.length > 0">
         <table class="wenn-table small table table-condensed table-striped">
             <colgroup>
