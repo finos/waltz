@@ -31,7 +31,7 @@ const initialState = {
     surveyInstances: [],
     surveyRuns: [],
     related: {
-        appGroups: []
+        appGroupRelationships: []
     }
 };
 
