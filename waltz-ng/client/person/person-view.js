@@ -16,7 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import {notEmpty} from '../common';
+import {downloadTextFile} from '../common/file-utils';
 
 
 function hasInvolvements(involvements) {
@@ -61,6 +63,39 @@ function controller($scope,
 
 
     vm.loadFlowDetail = () => viewService.loadFlowDetail();
+
+    vm.exportApps = () => {
+
+        const header = [
+            "Application",
+            "Asset Code",
+            "Kind",
+            "Overall Rating",
+            "Risk Rating",
+            "Business Criticality",
+            "Lifecycle Phase"
+        ];
+
+        const dataRows = _
+            .chain(vm.combinedAppInvolvements.all || [])
+            .map(app => {
+                return [
+                    app.name,
+                    app.assetCode || '',
+                    app.kind || '',
+                    app.overallRating || '',
+                    app.riskRating || '',
+                    app.businessCriticality || '',
+                    app.lifecyclePhase || ''
+                ];
+            })
+            .value();
+
+        const rows = [header]
+            .concat(dataRows);
+
+        downloadTextFile(rows, ",", "apps_"+employeeId+".csv");
+    };
 
 }
 
