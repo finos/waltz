@@ -112,7 +112,6 @@ function controller($q, notification, serviceBroker, userService) {
     };
 
     vm.showSection = () => {
-
         return (vm.hasRole && vm.hasCreatableNoteTypes)
             || (vm.notes && vm.notes.length > 0);
     };
