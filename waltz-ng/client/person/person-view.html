@@ -60,6 +60,17 @@
                                              entities="['APPLICATION', 'END_USER_APPLICATION', 'INVOLVEMENT']">
             </waltz-source-data-section-addon>
 
+
+            <waltz-section-actions>
+                <a class="btn btn-xs btn-primary"
+                   ng-click="ctrl.exportApps()"
+                   ng-if="ctrl.combinedAppInvolvements.all.length > 0">
+                    <waltz-icon name="cloud-download"></waltz-icon>
+                    Export
+                </a>
+            </waltz-section-actions>
+
+
             <uib-tabset>
 
                 <uib-tab heading="Summary">
