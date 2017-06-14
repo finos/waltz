@@ -19,7 +19,7 @@
 import _ from 'lodash';
 import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks'
 
-function service($http, BaseApiUrl) {
+export function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/logical-flow`;
 
     // --- FINDERS ---
@@ -68,6 +68,10 @@ function service($http, BaseApiUrl) {
         .post(`${BASE}`, addFlowCmd)
         .then(r => r.data);
 
+    const cleanupOrphans = () => $http
+        .post(`${BASE}/cleanup-orphans`, null)
+        .then(r => r.data);
+
     return {
         findBySelector,
         findByEntityReference,
@@ -75,15 +79,62 @@ function service($http, BaseApiUrl) {
         countByDataType,
         removeFlow,
         getById,
-        addFlow
+        addFlow,
+        cleanupOrphans
     };
 }
 
 
-service.$inject = [
+store.$inject = [
     '$http',
     'BaseApiUrl'
 ];
 
 
-export default service;
+export const serviceName = 'LogicalFlowStore';
+
+
+export const LogicalFlowStore_API = {
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'find logical flows for a selector'
+    },
+    findByEntityReference: {
+        serviceName,
+        serviceFnName: 'findByEntityReference',
+        description: 'find logical flows involving a given entity'
+    },
+    calculateStats: {
+        serviceName,
+        serviceFnName: 'calculateStats',
+        description: 'calculate statistics for flows'
+    },
+    countByDataType: {
+        serviceName,
+        serviceFnName: 'countByDataType',
+        description: 'summarizes flows by their data types'
+    },
+    removeFlow: {
+        serviceName,
+        serviceFnName: 'removeFlow',
+        description: 'removes a single logical flow'
+    },
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'retrieve a single logical flow (or null) given an id'
+    },
+    addFlow: {
+        serviceName,
+        serviceFnName: 'addFlow',
+        description: 'adds a single logical flow'
+    },
+    cleanupOrphans: {
+        serviceName,
+        serviceFnName: 'cleanupOrphans',
+        description: 'mark flows as removed if either endpoint is missing'
+    },
+};
+
+

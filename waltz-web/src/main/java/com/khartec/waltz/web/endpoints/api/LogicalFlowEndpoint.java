@@ -69,6 +69,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         String findStatsPath = mkPath(BASE_URL, "stats");
         String getByIdPath = mkPath(BASE_URL, ":id");
         String removeFlowPath = mkPath(BASE_URL, ":id");
+        String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
         String addFlowPath = mkPath(BASE_URL);
 
         ListRoute<LogicalFlow> getByEntityRef = (request, response)
@@ -89,6 +90,17 @@ public class LogicalFlowEndpoint implements Endpoint {
         postForDatum(findStatsPath, findStatsRoute);
         deleteForDatum(removeFlowPath, this::removeFlowRoute);
         postForDatum(addFlowPath, this::addFlowRoute);
+        postForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
+    }
+
+
+    private Integer cleanupOrphansRoute(Request request, Response response) throws IOException {
+        ensureUserHasAdminRights(request);
+
+        String username = getUsername(request);
+
+        LOG.info("User: {}, requested logical flow cleanup", username);
+        return logicalFlowService.cleanupOrphans();
     }
 
 
@@ -120,6 +132,11 @@ public class LogicalFlowEndpoint implements Endpoint {
 
     private void ensureUserHasEditRights(Request request) {
         requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+    }
+
+
+    private void ensureUserHasAdminRights(Request request) {
+        requireRole(userRoleService, request, Role.ADMIN);
     }
 
 }

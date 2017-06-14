@@ -18,7 +18,8 @@
  */
 
 import angular from 'angular';
-
+import * as logicalFlowStore from './services/logical-flow-store';
+import {registerStore} from '../common/module-utils';
 
 export default () => {
 
@@ -30,8 +31,9 @@ export default () => {
     require('./directives')(module);
     require('./components')(module);
 
+    registerStore(module, logicalFlowStore);
+
     module
-        .service('LogicalFlowStore', require('./services/logical-flow-store'))
         .service('LogicalFlowViewService', require('./services/logical-flow-view-service'))
         .service('LogicalFlowUtilityService', require('./services/logical-flow-utility'));
 
