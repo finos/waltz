@@ -28,6 +28,7 @@ import {EntityNamedNoteStore_API as EntityNamedNoteStore} from "../../entity-nam
 import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../entity-named-note/services/entity-named-note-type-store";
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
 import {InvolvementStore_API as InvolvementStore} from "../../involvement/services/involvement-store";
+import {LogicalFlowStore_API as LogicalFlowStore} from "../../logical-flow/services/logical-flow-store";
 import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../measurable-category/services/measurable-category-store";
 import {MeasurableRatingStore_API as MeasurableRatingStore} from "../../measurable-rating/services/measurable-rating-store";
 import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from "../../measurable-relationship/services/measurable-relationship-store";
@@ -51,6 +52,7 @@ export const CORE_API = {
     EntityNamedNoteTypeStore,
     EntityStatisticStore,
     InvolvementStore,
+    LogicalFlowStore,
     MeasurableCategoryStore,
     MeasurableRatingStore,
     MeasurableRelationshipStore,

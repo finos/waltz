@@ -17,6 +17,7 @@
  */
 
 import {initialiseData} from "../common";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
@@ -25,7 +26,9 @@ const initialState = {
 
 
 function controller($q,
-                    orphanStore) {
+                    notification,
+                    orphanStore,
+                    serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
@@ -68,12 +71,20 @@ function controller($q,
     };
 
     loadOrphans();
+
+    vm.cleanupLogicalFlows = () => {
+        serviceBroker
+            .execute(CORE_API.LogicalFlowStore.cleanupOrphans, [])
+            .then(r => notification.success(`Cleaned up ${r.data} flow/s`));
+    };
 }
 
 
 controller.$inject = [
     '$q',
-    'OrphanStore'
+    'Notification',
+    'OrphanStore',
+    'ServiceBroker'
 ];
 
 

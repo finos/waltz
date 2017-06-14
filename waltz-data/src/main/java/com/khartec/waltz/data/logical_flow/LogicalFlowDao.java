@@ -26,6 +26,9 @@ import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -37,12 +40,15 @@ import java.util.function.BiFunction;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.Optional.ofNullable;
 
 
 @Repository
 public class LogicalFlowDao {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowDao.class);
 
     private static final Field<String> SOURCE_NAME_FIELD = EntityNameUtilities.mkEntityNameField(
             LOGICAL_FLOW.SOURCE_ENTITY_ID,
@@ -201,6 +207,37 @@ public class LogicalFlowDao {
     }
 
 
+    public Integer cleanupOrphans() {
+        Select<Record1<Long>> appIds = DSL
+                .select(APPLICATION.ID)
+                .from(APPLICATION);
+
+        Condition sourceAppNotFound = LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.notIn(appIds));
+
+        Condition targetAppNotFound = LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.notIn(appIds));
+
+        Condition notRemoved = LOGICAL_FLOW.IS_REMOVED.eq(false);
+
+        Condition requiringCleanup = notRemoved
+                .and(sourceAppNotFound.or(targetAppNotFound));
+
+        List<Long> flowIds = dsl.select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .where(requiringCleanup)
+                .fetch(LOGICAL_FLOW.ID);
+
+        LOG.info("Logical flow cleanupOrphans. The following flows will be marked as removed as one or both endpoints no longer exist: {}", flowIds);
+
+        return dsl
+                .update(LOGICAL_FLOW)
+                .set(LOGICAL_FLOW.IS_REMOVED, true)
+                .where(requiringCleanup)
+                .execute();
+    }
+
+
     // -- HELPERS ---
 
     private Condition isSourceOrTargetCondition(EntityReference ref) {
@@ -217,7 +254,6 @@ public class LogicalFlowDao {
         return LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(ref.id())
                     .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name()));
     }
-
 
     private SelectJoinStep<Record> baseQuery() {
         return dsl

@@ -187,6 +187,7 @@ public class OrphanDao {
                         .where(idField.notIn(
                                 select(APPLICATION.ID)
                                         .from(APPLICATION)))
+                        .and(LOGICAL_FLOW.IS_REMOVED.eq(false))
                         .and(kindField.eq(EntityKind.APPLICATION.name()));
 
         return dsl.selectFrom(queryFactory.apply(LOGICAL_FLOW.SOURCE_ENTITY_KIND, LOGICAL_FLOW.SOURCE_ENTITY_ID).asTable())

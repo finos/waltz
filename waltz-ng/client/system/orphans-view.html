@@ -10,7 +10,7 @@
 
 
     <!-- Orphans -->
-    <waltz-section name="Orphans">
+    <div class="waltz-page-summary waltz-page-summary-attach">
         <div class="row">
             <div class="col-md-8">
                 <table class="table table-condensed table-striped">
@@ -74,8 +74,29 @@
                     </table>
                 </div>
             </div>
-
         </div>
-    </waltz-section>
+
+        <hr>
+
+        <h3>
+            <waltz-icon name="life-ring"></waltz-icon>
+            Actions
+        </h3>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Cleanup Logical Flows</h4>
+                <p class="small text-muted">
+                    Marks flows as removed if either their source or target applications no longer exist
+                </p>
+
+                <button class="btn btn-primary"
+                        ng-click="ctrl.cleanupLogicalFlows()">
+                    Cleanup Logical Flows
+                </button>
+            </div>
+        </div>
+    </div>
+
 
 </div>
