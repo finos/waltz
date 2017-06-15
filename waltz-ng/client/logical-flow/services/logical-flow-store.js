@@ -69,7 +69,7 @@ export function store($http, BaseApiUrl) {
         .then(r => r.data);
 
     const cleanupOrphans = () => $http
-        .post(`${BASE}/cleanup-orphans`, null)
+        .get(`${BASE}/cleanup-orphans`)
         .then(r => r.data);
 
     return {
