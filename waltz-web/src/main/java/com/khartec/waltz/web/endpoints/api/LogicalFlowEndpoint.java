@@ -84,13 +84,13 @@ public class LogicalFlowEndpoint implements Endpoint {
         DatumRoute<LogicalFlow> getByIdRoute = (request, response)
                 -> logicalFlowService.getById(getId(request));
 
+        getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         getForList(findByEntityPath, getByEntityRef);
         getForDatum(getByIdPath, getByIdRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         postForDatum(findStatsPath, findStatsRoute);
         deleteForDatum(removeFlowPath, this::removeFlowRoute);
         postForDatum(addFlowPath, this::addFlowRoute);
-        postForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
     }
 
 
