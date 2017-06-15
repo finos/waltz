@@ -18,6 +18,8 @@
  */
 
 import angular from 'angular';
+import * as authSourcesStore from './services/auth-sources-store';
+import {registerStore} from '../common/module-utils';
 
 
 export default () => {
@@ -27,9 +29,6 @@ export default () => {
     require('./directives')(module);
 
     module
-        .service('AuthSourcesStore', require('./services/auth-sources-store'));
-
-    module
         .component('waltzAuthSourcesList', require('./components/auth-sources-list'))
         .component('waltzNonAuthSourcesList', require('./components/non-auth-sources-list'))
         .component('waltzAuthSourcesTable', require('./components/auth-sources-table'));
@@ -37,6 +36,7 @@ export default () => {
     module
         .config(require('./routes'));
 
+    registerStore(module, authSourcesStore);
 
 
     return module.name;

@@ -88,6 +88,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         String deletePath = mkPath(BASE_URL, "id", ":id");
         String insertPath = mkPath(BASE_URL, "kind", ":kind", ":id", ":dataType", ":appId");
         String determineAuthSourcesForOrgUnitPath = mkPath(BASE_URL, "org-unit", ":id");
+        String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
 
 
         // -- ROUTES
@@ -105,6 +106,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
                 -> authoritativeSourceService.determineAuthSourcesForOrgUnit(getId(request));
 
         getForDatum(recalculateFlowRatingsPath, this::recalculateFlowRatingsRoute);
+        getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         postForList(calculateConsumersForDataTypeIdSelectorPath, this::calculateConsumersForDataTypeIdSelectorRoute);
         postForList(findByDataTypeIdSelectPath, findByDataTypeIdSelectorRoute);
         getForList(findByEntityReferencePath, findByEntityReferenceRoute);
@@ -115,6 +117,16 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
 
 
         getForDatum(determineAuthSourcesForOrgUnitPath, determineAuthSourcesForOrgUnitRoute);
+    }
+
+
+    private Integer cleanupOrphansRoute(Request request, Response response) throws IOException {
+        requireRole(userRoleService, request, Role.ADMIN);
+
+        String username = getUsername(request);
+
+        LOG.info("User: {}, requested auth source cleanup", username);
+        return authoritativeSourceService.cleanupOrphans(username);
     }
 
 

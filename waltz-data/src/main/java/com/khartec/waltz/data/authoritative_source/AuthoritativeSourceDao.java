@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.authoritative_source;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
@@ -40,6 +41,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
@@ -288,5 +290,51 @@ public class AuthoritativeSourceDao {
                         r.getValue(applicationIdField),
                         r.getValue(applicationNameField)),
                 records);
+    }
+
+
+    public List<EntityReference> cleanupOrphans() {
+        Select<Record1<Long>> orgUnitIds = DSL
+                .select(ORGANISATIONAL_UNIT.ID)
+                .from(ORGANISATIONAL_UNIT);
+        Select<Record1<Long>> appIds = DSL
+                .select(APPLICATION.ID)
+                .from(APPLICATION);
+
+        Condition unknownOrgUnit = AUTHORITATIVE_SOURCE.PARENT_ID.notIn(orgUnitIds)
+                .and(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()));
+
+        Condition unknownApp = AUTHORITATIVE_SOURCE.APPLICATION_ID.notIn(appIds);
+
+        List<EntityReference> authSourceAppsWithoutOrgUnit = dsl
+                .select(AUTHORITATIVE_SOURCE.APPLICATION_ID)
+                .from(AUTHORITATIVE_SOURCE)
+                .where(unknownOrgUnit)
+                .fetch(AUTHORITATIVE_SOURCE.APPLICATION_ID)
+                .stream()
+                .map(id -> mkRef(EntityKind.APPLICATION, id))
+                .collect(Collectors.toList());
+
+        List<EntityReference> authSourceOrgUnitsWithoutApp = dsl
+                .select(AUTHORITATIVE_SOURCE.PARENT_ID, AUTHORITATIVE_SOURCE.PARENT_KIND)
+                .from(AUTHORITATIVE_SOURCE)
+                .where(unknownApp)
+                .fetch()
+                .stream()
+                .map(r -> mkRef(
+                        EntityKind.valueOf(r.get(AUTHORITATIVE_SOURCE.PARENT_KIND)),
+                        r.get(AUTHORITATIVE_SOURCE.PARENT_ID)))
+                .collect(Collectors.toList());
+
+        List<EntityReference> bereaved = ListUtilities.concat(
+                authSourceAppsWithoutOrgUnit,
+                authSourceOrgUnitsWithoutApp);
+
+        dsl.deleteFrom(AUTHORITATIVE_SOURCE)
+                .where(unknownOrgUnit)
+                .or(unknownApp)
+                .execute();
+
+        return bereaved;
     }
 }

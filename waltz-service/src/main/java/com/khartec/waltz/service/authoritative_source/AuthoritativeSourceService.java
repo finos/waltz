@@ -21,12 +21,13 @@ package com.khartec.waltz.service.authoritative_source;
 import com.khartec.waltz.common.hierarchy.Node;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
+import com.khartec.waltz.model.changelog.ChangeLog;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -55,22 +56,26 @@ public class AuthoritativeSourceService {
     private final AuthSourceRatingCalculator ratingCalculator;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
     private final OrganisationalUnitService organisationalUnitService;
+    private final ChangeLogService changeLogService;
 
 
     @Autowired
     public AuthoritativeSourceService(AuthoritativeSourceDao authoritativeSourceDao,
                                       AuthSourceRatingCalculator ratingCalculator,
                                       DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
-                                      OrganisationalUnitService organisationalUnitService) {
+                                      OrganisationalUnitService organisationalUnitService, 
+                                      ChangeLogService changeLogService) {
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao must not be null");
         checkNotNull(ratingCalculator, "ratingCalculator cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
         checkNotNull(organisationalUnitService, "organisationalUnitService cannot be null");
+        checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.authoritativeSourceDao = authoritativeSourceDao;
         this.ratingCalculator = ratingCalculator;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
         this.organisationalUnitService = organisationalUnitService;
+        this.changeLogService = changeLogService;
     }
 
 
@@ -145,6 +150,30 @@ public class AuthoritativeSourceService {
     }
 
 
+    public Integer cleanupOrphans(String userId) {
+        List<EntityReference> entityReferences = authoritativeSourceDao.cleanupOrphans();
+
+        entityReferences
+                .forEach(ref -> {
+                    String message = ref.kind() == EntityKind.APPLICATION
+                            ? "Removed as an authoritative source as declaring Org Unit no longer exists"
+                            : "Application removed as an authoritative source as it no longer exists";
+
+                    ChangeLog logEntry = ImmutableChangeLog.builder()
+                            .parentReference(ref)
+                            .message(message)
+                            .severity(Severity.INFORMATION)
+                            .operation(Operation.UPDATE)
+                            .userId(userId)
+                            .build();
+
+                    changeLogService.write(logEntry);
+                });
+
+        return entityReferences.size();
+    }
+
+
     /** (ouId) -> dataType -> appId -> rating
      * @param orgUnitId */
     public Map<String, Map<Long, AuthoritativeSource>> determineAuthSourcesForOrgUnit(long orgUnitId) {
@@ -178,7 +207,5 @@ public class AuthoritativeSourceService {
         return cumulativeRules;
 
     }
-
-
 
 }

@@ -20,7 +20,7 @@
 import {checkIsIdSelector} from "../../common/checks";
 
 
-const service = ($http, root) => {
+export function store($http, root) {
 
     const BASE = `${root}/authoritative-source`;
 
@@ -81,6 +81,11 @@ const service = ($http, root) => {
             .get(`${BASE}/org-unit/${orgUnitId}`)
             .then(r => r.data);
 
+    const cleanupOrphans = () =>
+        $http
+            .get(`${BASE}/cleanup-orphans`)
+            .then(r => r.data);
+
     return {
         calculateConsumersForDataTypeIdSelector,
         findByReference,
@@ -90,11 +95,70 @@ const service = ($http, root) => {
         insert,
         recalculateAll,
         remove,
-        determineAuthSourcesForOrgUnit
+        determineAuthSourcesForOrgUnit,
+        cleanupOrphans
     };
 
-};
+}
 
-service.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
 
-export default service;
+
+export const serviceName = 'AuthSourcesStore';
+
+
+export const AuthSourcesStore_API = {
+    calculateConsumersForDataTypeIdSelector: {
+        serviceName,
+        serviceFnName: 'calculateConsumersForDataTypeIdSelector',
+        description: 'calculateConsumersForDataTypeIdSelector'
+    },
+    findByReference: {
+        serviceName,
+        serviceFnName: 'findByReference',
+        description: 'findByReference'
+    },
+    findByApp: {
+        serviceName,
+        serviceFnName: 'findByApp',
+        description: 'findByApp'
+    },
+    findByDataTypeIdSelector: {
+        serviceName,
+        serviceFnName: 'findByDataTypeIdSelector',
+        description: 'findByDataTypeIdSelector'
+    },
+    update: {
+        serviceName,
+        serviceFnName: 'update',
+        description: 'update'
+    },
+    insert: {
+        serviceName,
+        serviceFnName: 'insert',
+        description: 'insert'
+    },
+    recalculateAll: {
+        serviceName,
+        serviceFnName: 'recalculateAll',
+        description: 'recalculateAll'
+    },
+    remove: {
+        serviceName,
+        serviceFnName: 'remove',
+        description: 'remove'
+    },
+    determineAuthSourcesForOrgUnit: {
+        serviceName,
+        serviceFnName: 'determineAuthSourcesForOrgUnit',
+        description: 'determineAuthSourcesForOrgUnit'
+    },
+    cleanupOrphans: {
+        serviceName,
+        serviceFnName: 'cleanupOrphans',
+        description: 'cleanupOrphans'
+    },
+}
