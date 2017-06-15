@@ -18,20 +18,18 @@
   ~  */
   -->
 
-<div ng-show="$ctrl.showSection()">
+<div ng-show="($ctrl.hasRole && $ctrl.availableTypes.length > 0) || $ctrl.notes.length > 0">
     <waltz-section name="Additional Notes"
                    icon="sticky-note-o"
                    id="entity-notes-section">
 
         <waltz-section-actions>
-            <div waltz-has-role-for-entity-kind="{{ $ctrl.parentEntityRef.kind }}">
-                <button type="button"
-                        class="btn btn-xs btn-primary"
-                        ng-if="$ctrl.hasCreatableNoteTypes && ! $ctrl.creatingNote"
-                        ng-click="$ctrl.showEditor()">
-                    Add Note
-                </button>
-            </div>
+            <button type="button"
+                    class="btn btn-xs btn-primary"
+                    ng-if="($ctrl.hasRole && $ctrl.availableTypes.length > 0)"
+                    ng-click="$ctrl.showEditor()">
+                Add Note
+            </button>
         </waltz-section-actions>
 
 
