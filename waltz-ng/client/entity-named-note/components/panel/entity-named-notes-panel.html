@@ -1,11 +1,19 @@
 <div class="waltz-entity-named-notes">
-    <div>
+
+    <waltz-no-data ng-if="$ctrl.notes.length == 0">
+        <message>
+            <strong>No notes</strong> have been added
+        </message>
+    </waltz-no-data>
+
+    <div ng-if="$ctrl.notes.length > 0">
         <table class="wenn-table small table table-condensed table-striped">
             <colgroup>
                 <col width="30%">
                 <col width="70%">
                 <col width="20%">
             </colgroup>
+
             <thead>
             <tr>
                 <th>Note Type</th>
@@ -13,6 +21,7 @@
                 <th></th>
             </tr>
             </thead>
+
             <tbody>
             <tr ng-repeat="note in $ctrl.notes"
                 class="waltz-visibility-parent"
@@ -118,5 +127,6 @@
             </tr>
             </tbody>
         </table>
+
     </div>
 </div>
