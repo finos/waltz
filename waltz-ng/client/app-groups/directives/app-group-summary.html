@@ -92,5 +92,10 @@
             </div>
         </div>
     </div>
+    <div class="pull-right small text-muted"
+         ng-if="ctrl.owners.length > 0">
+        <strong>Group Owner/s:</strong>
+        <span ng-repeat="owner in ctrl.owners" ng-bind="owner.userId"></span>
+    </div>
 </div>
 
