@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import {enrichServerStats} from "../../server-info/services/server-utilities";
 import {calcPortfolioCost} from "../../asset-cost/services/asset-cost-utilities";
 import {calcComplexitySummary} from "../../complexity/services/complexity-utilities";
@@ -28,7 +29,8 @@ const BINDINGS = {
     complexity: '=',
     serverStats: '=',
     editable: '=',
-    flows: '='
+    flows: '=',
+    members: '<'
 };
 
 
@@ -39,6 +41,7 @@ function controller($scope) {
     $scope.$watch('ctrl.totalCost', cs => vm.portfolioCostStr = calcPortfolioCost(cs));
     $scope.$watch('ctrl.complexity', cs => vm.complexitySummary = calcComplexitySummary(cs));
     $scope.$watch('ctrl.serverStats', stats => vm.enrichedServerStats = enrichServerStats(stats));
+    $scope.$watch('ctrl.members', ms => vm.owners = _.filter(ms, { role: 'OWNER' }));
 
 }
 
