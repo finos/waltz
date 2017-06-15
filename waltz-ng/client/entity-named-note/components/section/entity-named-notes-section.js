@@ -12,26 +12,41 @@ const bindings = {
 
 
 const initialState = {
+    availableTypes: [],
     notes: [],
     allNoteTypes: [],
     hasRole: false,
-    creatingNote: false
+    creatingNote: false,
 };
+
+
+function calcAvailableTypes(parentRef, noteTypes, notes) {
+    const usedTypes = _.map(notes, 'namedNoteTypeId');
+
+    return _
+        .chain(noteTypes)
+        .filter(nt => !nt.isReadOnly)
+        .filter(nt => nt.applicableEntityKinds.indexOf(parentRef.kind) !== -1)
+        .filter(nt => !_.includes(usedTypes, nt.id))
+        .value();
+}
 
 
 function controller($q, notification, serviceBroker, userService) {
     const vm = initialiseData(this, initialState);
     const componentId = 'entity-named-notes-section';
 
+    const recalcAvailableTypes = () => {
+        vm.availableTypes = calcAvailableTypes(
+            vm.parentEntityRef,
+            vm.allNoteTypes,
+            vm.notes);
+    };
+
     vm.$onInit = () => {
         if (vm.parentEntityRef) {
             loadAll()
-                .then(() => {
-                    vm.hasCreatableNoteTypes = _.chain(vm.allNoteTypes)
-                        .filter(nt => !nt.isReadOnly)
-                        .filter(nt => nt.applicableEntityKinds.indexOf(vm.parentEntityRef.kind) !== -1)
-                        .value().length > 0;
-                });
+                .then(recalcAvailableTypes);
         }
 
         const role = getEditRoleForEntityKind(vm.parentEntityRef.kind);
@@ -90,11 +105,12 @@ function controller($q, notification, serviceBroker, userService) {
             .then(rc => {
                 if (rc) {
                     notification.success('Note saved successfully');
-                    loadNamedNotes(true);
                 } else {
                     notification.error('Failed to save note');
                 }
-            });
+            })
+            .then(() => loadNamedNotes(true))
+            .then(recalcAvailableTypes);
     };
 
     vm.deleteNote = (note) => {
@@ -104,16 +120,12 @@ function controller($q, notification, serviceBroker, userService) {
             .then(rc => {
                 if (rc) {
                     notification.success('Note deleted successfully');
-                    loadNamedNotes(true);
                 } else {
                     notification.error('Failed to delete note');
                 }
             })
-    };
-
-    vm.showSection = () => {
-        return (vm.hasRole && vm.hasCreatableNoteTypes)
-            || (vm.notes && vm.notes.length > 0);
+            .then(() => loadNamedNotes(true))
+            .then(recalcAvailableTypes);
     };
 
     vm.editorDismiss = () => {
