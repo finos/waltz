@@ -77,6 +77,12 @@ function controller($q,
             .execute(CORE_API.LogicalFlowStore.cleanupOrphans, [])
             .then(r => notification.success(`Cleaned up ${r.data} flow/s`));
     };
+
+    vm.cleanupAuthSources = () => {
+        serviceBroker
+            .execute(CORE_API.AuthSourcesStore.cleanupOrphans, [])
+            .then(r => notification.success(`Cleaned up ${r.data} auth sources/s`));
+    };
 }
 
 
