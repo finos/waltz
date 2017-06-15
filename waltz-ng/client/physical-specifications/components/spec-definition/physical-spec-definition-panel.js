@@ -48,7 +48,10 @@ function controller() {
 const component = {
     controller,
     template,
-    bindings
+    bindings,
+    transclude: {
+        noDataMessage: 'noDataMessage'
+    }
 };
 
 

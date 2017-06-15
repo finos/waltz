@@ -155,7 +155,7 @@
 
     <waltz-no-data ng-if="! $ctrl.specDefinition.def">
         <message>
-            <strong>No definitions</strong> for this physical specification.
+            <div ng-transclude="noDataMessage"></div>
         </message>
     </waltz-no-data>
 </div>

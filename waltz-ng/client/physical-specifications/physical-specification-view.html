@@ -116,6 +116,9 @@
                      ng-if="ctrl.selectedSpecDefinition.def">
                     <waltz-physical-spec-definition-panel spec-definition="ctrl.selectedSpecDefinition"
                                                           default-active-tab-index="0">
+                        <no-data-message>
+                            <strong>No definitions</strong> for this physical specification.
+                        </no-data-message>
                     </waltz-physical-spec-definition-panel>
                 </div>
             </div>
