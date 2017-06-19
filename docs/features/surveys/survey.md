@@ -18,7 +18,7 @@ a specific function etc.).
 ## Model
 
 ![Schema Diagram](survey_schema.png)
-[Source](https://app.quickdatabasediagrams.com/#/schema/-Ix5XDNAT0GKLh4hx2n6Mg)
+[Source](https://app.quickdatabasediagrams.com/#/schema/YLytE3nJy0OVTId-YZkXew)
 
 ## Templates
 
