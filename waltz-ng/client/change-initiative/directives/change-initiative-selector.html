@@ -1,11 +1,15 @@
-<div>
+<div class="waltz-change-initiative-selector">
     <ui-select ng-model="ctrl.model"
                theme="bootstrap">
 
         <ui-select-match placeholder="Search for change initiative...">
-            <span ng-bind="$select.selected.externalId"></span>
-            -
-            <span ng-bind="$select.selected.name"></span>
+            <span ng-bind="$select.selected.externalId"
+                  class="wcis-selected-text"></span>
+            <span class="wcis-selected-text">
+                -
+            </span>
+            <span ng-bind="$select.selected.name"
+                  class="wcis-selected-text"></span>
         </ui-select-match>
 
         <ui-select-choices repeat="result in ctrl.results"
