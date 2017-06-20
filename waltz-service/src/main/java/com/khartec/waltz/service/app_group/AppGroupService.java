@@ -34,10 +34,10 @@ import com.khartec.waltz.model.app_group.*;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.entity_relationship.EntityRelationship;
 import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
 import com.khartec.waltz.model.entity_relationship.RelationshipKind;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -234,7 +234,7 @@ public class AppGroupService {
             long changeInitiativeId) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(username, groupId);
 
-        EntityRelationship entityRelationship = buildChangeInitiativeRelationship(groupId, changeInitiativeId);
+        EntityRelationship entityRelationship = buildChangeInitiativeRelationship(username, groupId, changeInitiativeId);
         entityRelationshipDao.save(entityRelationship);
 
         audit(groupId,
@@ -253,7 +253,7 @@ public class AppGroupService {
             long changeInitiativeId) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(username, groupId);
 
-        EntityRelationship entityRelationship = buildChangeInitiativeRelationship(groupId, changeInitiativeId);
+        EntityRelationship entityRelationship = buildChangeInitiativeRelationship(username, groupId, changeInitiativeId);
         entityRelationshipDao.remove(entityRelationship);
 
         audit(groupId,
@@ -273,7 +273,7 @@ public class AppGroupService {
     }
 
 
-    private EntityRelationship buildChangeInitiativeRelationship(long groupId, long changeInitiativeId) {
+    private EntityRelationship buildChangeInitiativeRelationship(String username, long groupId, long changeInitiativeId) {
         EntityReference appGroupRef = ImmutableEntityReference.builder()
                 .kind(EntityKind.APP_GROUP)
                 .id(groupId)
@@ -288,6 +288,7 @@ public class AppGroupService {
                 .a(appGroupRef)
                 .b(changeInitiativeRef)
                 .relationship(RelationshipKind.RELATES_TO)
+                .lastUpdatedBy(username)
                 .provenance("waltz")
                 .build();
     }
