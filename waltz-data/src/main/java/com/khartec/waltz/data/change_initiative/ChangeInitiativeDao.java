@@ -76,6 +76,7 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
+
     public Collection<ChangeInitiative> findForEntityReference(EntityReference ref) {
 
         Select<Record> refSideA = dsl.select(CHANGE_INITIATIVE.fields())
@@ -97,6 +98,14 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
         return refSideA.union(refSideB)
                 .fetch(TO_DOMAIN_MAPPER);
 
+    }
+
+
+    public Collection<ChangeInitiative> findByParentId(long parentId) {
+        return dsl.select(CHANGE_INITIATIVE.fields())
+                .from(CHANGE_INITIATIVE)
+                .where(CHANGE_INITIATIVE.PARENT_ID.eq(parentId))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 

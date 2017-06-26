@@ -27,6 +27,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.change_initiative.ChangeInitiativeKind;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.involvement.ImmutableInvolvement;
 import com.khartec.waltz.model.involvement.Involvement;
@@ -204,6 +205,18 @@ public class InvolvementDao {
                 .on(INVOLVEMENT.ENTITY_ID.eq(CHANGE_INITIATIVE.ID))
                 .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
+                .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
+    }
+
+
+    public Collection<ChangeInitiative> findDirectChangeInitiativesByEmployeeIdAndKind(String employeeId, ChangeInitiativeKind kind) {
+        return dsl.selectDistinct()
+                .from(CHANGE_INITIATIVE)
+                .innerJoin(INVOLVEMENT)
+                .on(INVOLVEMENT.ENTITY_ID.eq(CHANGE_INITIATIVE.ID))
+                .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
+                .and(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
+                .and(CHANGE_INITIATIVE.KIND.eq(kind.name()))
                 .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
     }
 

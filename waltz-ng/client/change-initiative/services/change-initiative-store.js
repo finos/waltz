@@ -28,6 +28,11 @@ function store($http, BaseApiUrl) {
             .then(r => r.data);
 
 
+    const findByParentId = (id) => $http
+        .get(`${BASE}/children/${id}`)
+        .then(r => r.data);
+
+
     const getById = (id) => $http
             .get(`${BASE}/id/${id}`)
             .then(r => r.data);
@@ -52,6 +57,7 @@ function store($http, BaseApiUrl) {
 
 
     return {
+        findByParentId,
         findByRef,
         findRelatedForId,
         getById,
@@ -67,6 +73,11 @@ const serviceName = 'ChangeInitiativeStore';
 
 
 export const ChangeInitiativeStore_API = {
+    findByParentId: {
+        serviceName,
+        serviceFnName: 'findByParentId',
+        description: 'finds change initiatives by parent id'
+    },
     findByRef: {
         serviceName,
         serviceFnName: 'findByRef',

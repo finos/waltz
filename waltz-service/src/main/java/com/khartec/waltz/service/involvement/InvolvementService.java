@@ -25,6 +25,7 @@ import com.khartec.waltz.model.EntityIdSelectionOptions;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.change_initiative.ChangeInitiativeKind;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.involvement.EntityInvolvementChangeCommand;
 import com.khartec.waltz.model.involvement.Involvement;
@@ -102,6 +103,14 @@ public class InvolvementService {
     public Collection<ChangeInitiative> findDirectChangeInitiativesByEmployeeId(String employeeId) {
         checkNotEmpty(employeeId, "employeeId cannot be empty");
         return time("IS.findDirectChangeInitiativesByEmployeeId", () -> dao.findDirectChangeInitiativesByEmployeeId(employeeId));
+    }
+
+
+    public Collection<ChangeInitiative> findDirectChangeInitiativesByEmployeeIdAndKind(
+            String employeeId,
+            ChangeInitiativeKind kind) {
+        checkNotEmpty(employeeId, "employeeId cannot be empty");
+        return dao.findDirectChangeInitiativesByEmployeeIdAndKind(employeeId, kind);
     }
 
 

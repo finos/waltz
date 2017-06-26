@@ -21,6 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.change_initiative.ChangeInitiativeKind;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.involvement.EntityInvolvementChangeCommand;
 import com.khartec.waltz.model.involvement.Involvement;
@@ -60,6 +61,7 @@ public class InvolvementEndpoint implements Endpoint {
         String findByEmployeePath = mkPath(BASE_URL, "employee", ":employeeId");
         String findDirectAppsByEmployeePath = mkPath(findByEmployeePath, "applications", "direct");
         String findDirectChangeInitiativesByEmployeePath = mkPath(findByEmployeePath, "change-initiative", "direct");
+        String findDirectChangeInitiativesByEmployeeAndKindPath = mkPath(findByEmployeePath, "change-initiative", "kind", ":kind", "direct");
         String findAllAppsByEmployeePath = mkPath(findByEmployeePath, "applications");
         String findAllEndUserAppsBySelectorPath = mkPath(BASE_URL, "end-user-application");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
@@ -80,6 +82,12 @@ public class InvolvementEndpoint implements Endpoint {
         ListRoute<ChangeInitiative>  findDirectChangeInitiativesByEmployeeRoute = (request, response) -> {
             String employeeId = request.params("employeeId");
             return service.findDirectChangeInitiativesByEmployeeId(employeeId);
+        };
+
+        ListRoute<ChangeInitiative>  findDirectChangeInitiativesByEmployeeAndKindRoute = (request, response) -> {
+            String employeeId = request.params("employeeId");
+            ChangeInitiativeKind kind = ChangeInitiativeKind.valueOf(request.params("kind"));
+            return service.findDirectChangeInitiativesByEmployeeIdAndKind(employeeId, kind);
         };
 
         ListRoute<Application>  findAllAppsByEmployeeRoute = (request, response) -> {
@@ -106,6 +114,7 @@ public class InvolvementEndpoint implements Endpoint {
         getForList(findByEmployeePath, findByEmployeeRoute);
         getForList(findDirectAppsByEmployeePath, findDirectAppsByEmployeeRoute);
         getForList(findDirectChangeInitiativesByEmployeePath, findDirectChangeInitiativesByEmployeeRoute);
+        getForList(findDirectChangeInitiativesByEmployeeAndKindPath, findDirectChangeInitiativesByEmployeeAndKindRoute);
         getForList(findAllAppsByEmployeePath, findAllAppsByEmployeeRoute);
         postForList(findAllEndUserAppsBySelectorPath, findAllEndUserAppsBySelectorRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);

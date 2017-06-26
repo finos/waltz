@@ -164,6 +164,13 @@
     </waltz-section>
 
 
+    <!-- CHANGE INITIATIVES -->
+    <waltz-change-initiative-section name="Projects"
+                                     parent-entity-ref="ctrl.entityRef"
+                                     ng-if="ctrl.changeInitiative.kind !== 'PROJECT'">
+    </waltz-change-initiative-section>
+
+
     <!-- surveys -->
     <waltz-survey-section survey-runs="ctrl.surveyRuns"
                           survey-instances="ctrl.surveyInstances">
