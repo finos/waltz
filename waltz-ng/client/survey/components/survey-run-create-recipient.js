@@ -44,24 +44,24 @@ function controller(surveyRunStore) {
         .then(r => {
             vm.surveyRunRecipients = r.data;
             vm.includedRecipients = [].concat(vm.surveyRunRecipients);
-            vm.excludeRecipients = [];
+            vm.excludedRecipients = [];
         });
 
     vm.excludeRecipient = (recipient) => {
         _.pull(vm.includedRecipients, recipient);
-        vm.excludeRecipients.push(recipient);
+        vm.excludedRecipients.push(recipient);
     };
 
     vm.includeRecipient = (recipient) => {
         vm.includedRecipients.push(recipient);
-        _.pull(vm.excludeRecipients, recipient);
+        _.pull(vm.excludedRecipients, recipient);
     };
 
     vm.isRecipientIncluded = (recipient) =>
         vm.includedRecipients.indexOf(recipient) >= 0;
 
     vm.onSubmit = () =>
-        vm.onSave(this.surveyRun, this.includedRecipients, this.excludedRecipients);
+        vm.onSave(vm.surveyRun, vm.includedRecipients, vm.excludedRecipients);
 
     vm.goBack = () => {
         vm.onGoBack();
