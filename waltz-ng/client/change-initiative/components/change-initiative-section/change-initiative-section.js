@@ -43,11 +43,12 @@ function controller(serviceBroker) {
 
             promise
                 .then(result => {
-                    // console.log(result.data);
                     vm.changeInitiatives = result.data;
             });
         }
-    }
+    };
+
+    vm.onSelect = ci => vm.selectedChangeInitiative = ci;
 
 }
 

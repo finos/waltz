@@ -33,6 +33,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
@@ -47,6 +48,7 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
         ChangeInitiativeRecord record = r.into(CHANGE_INITIATIVE);
         return ImmutableChangeInitiative.builder()
                 .id(record.getId())
+                .parentId(Optional.ofNullable(record.getParentId()))
                 .name(record.getName())
                 .description(ofNullable(record.getDescription()).orElse(""))
                 .externalId(ofNullable(record.getExternalId()))
