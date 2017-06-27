@@ -106,14 +106,6 @@ public class InvolvementService {
     }
 
 
-    public Collection<ChangeInitiative> findDirectChangeInitiativesByEmployeeIdAndKind(
-            String employeeId,
-            ChangeInitiativeKind kind) {
-        checkNotEmpty(employeeId, "employeeId cannot be empty");
-        return dao.findDirectChangeInitiativesByEmployeeIdAndKind(employeeId, kind);
-    }
-
-
     public boolean addEntityInvolvement(EntityReference entityReference,
                                         EntityInvolvementChangeCommand command) {
         Involvement involvement = mkInvolvement(entityReference, command);

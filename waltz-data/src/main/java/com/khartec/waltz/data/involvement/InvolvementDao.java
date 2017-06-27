@@ -209,18 +209,6 @@ public class InvolvementDao {
     }
 
 
-    public Collection<ChangeInitiative> findDirectChangeInitiativesByEmployeeIdAndKind(String employeeId, ChangeInitiativeKind kind) {
-        return dsl.selectDistinct()
-                .from(CHANGE_INITIATIVE)
-                .innerJoin(INVOLVEMENT)
-                .on(INVOLVEMENT.ENTITY_ID.eq(CHANGE_INITIATIVE.ID))
-                .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
-                .and(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
-                .and(CHANGE_INITIATIVE.KIND.eq(kind.name()))
-                .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
-    }
-
-
     public int save(Involvement involvement) {
         return ! exists(involvement)
                 ? dsl.executeInsert(TO_RECORD_MAPPER.apply(involvement))

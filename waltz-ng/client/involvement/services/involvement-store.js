@@ -39,11 +39,6 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
 
 
-    const findChangeInitiativesForEmployeeIdAndCIKind = (employeeId, kind) =>
-        $http.get(`${BASE}/employee/${employeeId}/change-initiative/kind/${kind}/direct`)
-            .then(result => result.data);
-
-
     const findByEmployeeId = (employeeId) =>
         $http.get(`${BASE}/employee/${employeeId}`)
             .then(result => result.data);
@@ -73,7 +68,6 @@ function store($http, BaseApiUrl) {
         findByEmployeeId,
         findByEntityReference,
         findChangeInitiativesForEmployeeId,
-        findChangeInitiativesForEmployeeIdAndCIKind,
         findPeopleByEntityReference,
         changeInvolvement
     };
@@ -110,11 +104,6 @@ export const InvolvementStore_API = {
     findChangeInitiativesForEmployeeId: {
         serviceName,
         serviceFnName: 'findChangeInitiativesForEmployeeId',
-        description: 'find change initiatives by employee id'
-    },
-    findChangeInitiativesForEmployeeIdAndCIKind: {
-        serviceName,
-        serviceFnName: 'findChangeInitiativesForEmployeeIdAndCIKind',
         description: 'find change initiatives by employee id'
     },
     findPeopleByEntityReference: {

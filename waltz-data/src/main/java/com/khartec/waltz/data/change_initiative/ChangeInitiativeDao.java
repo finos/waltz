@@ -104,8 +104,7 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
 
 
     public Collection<ChangeInitiative> findByParentId(long parentId) {
-        return dsl.select(CHANGE_INITIATIVE.fields())
-                .from(CHANGE_INITIATIVE)
+        return dsl.selectFrom(CHANGE_INITIATIVE)
                 .where(CHANGE_INITIATIVE.PARENT_ID.eq(parentId))
                 .fetch(TO_DOMAIN_MAPPER);
     }

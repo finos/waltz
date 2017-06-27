@@ -29,8 +29,8 @@ function controller(serviceBroker) {
                 promise = serviceBroker
                     .loadViewData(CORE_API.PersonStore.getById, [vm.parentEntityRef.id])
                     .then(person => serviceBroker.loadViewData(
-                        CORE_API.InvolvementStore.findChangeInitiativesForEmployeeIdAndCIKind,
-                        [person.data.employeeId, 'PROGRAMME']));
+                        CORE_API.InvolvementStore.findChangeInitiativesForEmployeeId,
+                        [person.data.employeeId]));
             } else if (vm.parentEntityRef.kind === 'CHANGE_INITIATIVE') {
                 promise = serviceBroker.loadViewData(
                     CORE_API.ChangeInitiativeStore.findByParentId,
