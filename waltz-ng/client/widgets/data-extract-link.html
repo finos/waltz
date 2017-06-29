@@ -1,6 +1,6 @@
 <a class='btn btn-xs btn-primary'
-   ng-href="{{$ctrl.url}}">
+   ng-click="$ctrl.export()">
     <waltz-icon name="cloud-download"></waltz-icon>
-    Export
+    <span ng-bind="$ctrl.name"></span>
 </a>
 

@@ -48,6 +48,10 @@ function controller($stateParams,
 
     vm.entityRef = { kind: 'ORG_UNIT', id };
     vm.viewData = viewDataService.data;
+    vm.selector =  {
+        entityReference: vm.entityRef,
+        scope: 'CHILDREN'
+    };
 
     viewDataService
         .loadAll(id)

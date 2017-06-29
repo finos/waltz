@@ -23,12 +23,12 @@ const bindings = {
     ratings: '<',
     flowData: '<',
     applications: '<',
-    onLoadDetail: '<'
+    onLoadDetail: '<',
+    selector: '<'
 };
 
 
 const initialState = {
-    export: () => console.log('lfts: default do-nothing export function'),
     ratings: [],
     flowData: null,
     applications: [],
@@ -55,9 +55,6 @@ function controller() {
         vm.visibility.exportButton = index == 2;
         if(index === 0) vm.visibility.flowConfigOverlay = false;
     };
-
-    vm.tableInitialised = (cfg) =>
-        vm.export = () => cfg.exportFn('logical-flows.csv');
 
     vm.$onChanges = c => {
         vm.hasFlows = calcHasFlows(vm.flowData);
