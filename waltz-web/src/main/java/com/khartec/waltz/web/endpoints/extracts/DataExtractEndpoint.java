@@ -22,7 +22,10 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
@@ -34,25 +37,22 @@ public class DataExtractEndpoint implements Endpoint {
     private static final Logger LOG = LoggerFactory.getLogger(DataExtractEndpoint.class);
     private static final String BASE_URL = mkPath("data-extract");
 
-    private final LogicalFlowExtractor logicalFlowExtractor;
-    private final OrgUnitExtractor orgUnitExtractor;
-
+    private static AnnotationConfigApplicationContext ctx;
 
     @Autowired
-    public DataExtractEndpoint(LogicalFlowExtractor logicalFlowExtractor,
-                               OrgUnitExtractor orgUnitExtractor) {
-        checkNotNull(logicalFlowExtractor, "logicalFlowExtractor cannot be null");
-        checkNotNull(orgUnitExtractor, "orgUnitExtractor cannot be null");
-
-        this.logicalFlowExtractor = logicalFlowExtractor;
-        this.orgUnitExtractor = orgUnitExtractor;
+    public DataExtractEndpoint(AnnotationConfigApplicationContext ctx) {
+        checkNotNull(ctx, "ctx cannot be null");
+        this.ctx = ctx;
     }
 
 
     @Override
     public void register() {
-        orgUnitExtractor.register(BASE_URL);
-        logicalFlowExtractor.register(BASE_URL);
+        Map<String, BaseDataExtractor> dataExtractors = ctx.getBeansOfType(BaseDataExtractor.class);
+        dataExtractors.forEach((name, extractor) -> {
+            LOG.info("Registering Data extractor: {}", name);
+            extractor.register(BASE_URL);
+        });
     }
 
 }
