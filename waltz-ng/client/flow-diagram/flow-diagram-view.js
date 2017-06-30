@@ -157,8 +157,6 @@ function controller(
                     physicalFlows: enhancedPhysicalFlowsByLogicalId[f.id] || [],
                 }
             });
-
-            prepareDataForExport(vm.flows);
         });
 
 

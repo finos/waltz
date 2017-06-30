@@ -18,95 +18,40 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import org.eclipse.jetty.http.MimeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
-import org.supercsv.io.CsvListWriter;
-import org.supercsv.prefs.CsvPreference;
 
-import java.io.IOException;
-import java.io.StringWriter;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static spark.Spark.get;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
+
 
 @Service
 public class DataExtractEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("data-extract");
     private static final Logger LOG = LoggerFactory.getLogger(DataExtractEndpoint.class);
+    private static final String BASE_URL = mkPath("data-extract");
 
-
-    private final OrganisationalUnitService orgUnitService;
-
+    private static AnnotationConfigApplicationContext ctx;
 
     @Autowired
-    public DataExtractEndpoint(OrganisationalUnitService orgUnitService) {
-        checkNotNull(orgUnitService, "orgUnitService must not be null");
-
-        this.orgUnitService = orgUnitService;
+    public DataExtractEndpoint(AnnotationConfigApplicationContext ctx) {
+        checkNotNull(ctx, "ctx cannot be null");
+        this.ctx = ctx;
     }
 
 
     @Override
     public void register() {
-        registerOrgUnitsExtract();
-        registerCapabilitiesExtract();
-    }
-
-
-    private void registerCapabilitiesExtract() {
-        registerExtractor("capabilities", "capabilities.csv", (csvWriter) -> {
-            csvWriter.writeHeader(
-                    "id",
-                    "parentId",
-                    "name",
-                    "description");
-        });
-    }
-
-
-    private void registerOrgUnitsExtract() {
-        registerExtractor("org-units", "organisational-units.csv", csvWriter -> {
-            csvWriter.writeHeader(
-                    "id",
-                    "parentId",
-                    "name",
-                    "description");
-
-            orgUnitService.findAll()
-                    .forEach(ou -> {
-                        try {
-                            csvWriter.write(
-                                    ou.id().orElse(null),
-                                    ou.parentId().orElse(null),
-                                    ou.name(),
-                                    ou.description());
-                        } catch (IOException ioe) {
-                            LOG.warn("Failed to write ou: " + ou, ioe);
-                        }
-                    });
-        });
-    }
-
-
-    public void registerExtractor(String endpoint, String suggestedFilename, Extractor extractor) {
-        get(WebUtilities.mkPath(BASE_URL, endpoint), (request, response) -> {
-            response.type(MimeTypes.Type.TEXT_PLAIN.name());
-            response.header("Content-disposition", "attachment; filename="+suggestedFilename);
-
-            StringWriter bodyWriter = new StringWriter();
-            CsvListWriter csvWriter = new CsvListWriter(bodyWriter, CsvPreference.EXCEL_PREFERENCE);
-
-            extractor.accept(csvWriter);
-
-            csvWriter.flush();
-            return bodyWriter.toString();
+        Map<String, BaseDataExtractor> dataExtractors = ctx.getBeansOfType(BaseDataExtractor.class);
+        dataExtractors.forEach((name, extractor) -> {
+            LOG.info("Registering Data extractor: {}", name);
+            extractor.register(BASE_URL);
         });
     }
 
