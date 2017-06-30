@@ -2,30 +2,40 @@
     svg {
         border: 1px solid #eee;
         overflow: hidden;
-    }
-    svg text {
-        font-family: Arial;
-        font-size: 10px;
-    }
 
-    [data-wesd-node-entity-link] path {
-        transition: 300ms linear all;
-        stroke: blue;
-        stroke-width: 2;
-        stroke-opacity: 0.5;
-        cursor: pointer;
-    }
+        text {
+            font-family: Arial;
+            font-size: 10px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
 
-    [data-wesd-node-entity-link] path:hover {
-        stroke-width: 4;
-        stroke-opacity: 0.8;
+        text::selection {
+            background: none;
+        }
     }
 
 
-    [data-wesd-node-entity-link] text {
-        pointer-events: none;
-    }
+    [data-wesd-node-entity-link] {
+        path {
+            transition: 300ms linear all;
+            stroke: blue;
+            stroke-width: 2;
+            stroke-opacity: 0.5;
+            cursor: pointer;
+        }
 
+        path:hover {
+            stroke-width: 4;
+            stroke-opacity: 0.8;
+        }
+
+        text {
+            pointer-events: none;
+        }
+    }
 }
 
 .wesd-popup {

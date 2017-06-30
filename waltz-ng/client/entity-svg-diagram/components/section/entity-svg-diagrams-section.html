@@ -18,14 +18,15 @@
   ~  */
   -->
 
-<div>
-    <waltz-section name="Diagrams"
+<div ng-if="$ctrl.diagrams.length > 0">
+    <waltz-section name="{{ $ctrl.diagrams.length == 1 ? 'Diagram' : 'Diagrams' }}"
                    icon="sticky-note-o"
                    id="entity-notes-section">
 
         <div class="row">
             <div class="col-sm-12">
-                <div class="waltz-tabs">
+                <div class="waltz-tabs"
+                     ng-if="$ctrl.diagrams.length > 1">
                     <!-- TAB HEADERS -->
                     <input type="radio"
                            ng-repeat-start="diagram in $ctrl.diagrams track by diagram.id"
@@ -48,6 +49,12 @@
                         <waltz-markdown text="diagram.description">
                         </waltz-markdown>
                     </div>
+                </div>
+                <div ng-if="$ctrl.diagrams.length == 1">
+                    <waltz-entity-svg-diagram-viewer svg="$ctrl.diagrams[0].svg">
+                    </waltz-entity-svg-diagram-viewer>
+                    <waltz-markdown text="$ctrl.diagrams[0].description">
+                    </waltz-markdown>
                 </div>
             </div>
         </div>
