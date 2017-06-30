@@ -23,7 +23,6 @@ import {registerComponents, registerStore} from '../common/module-utils';
 import changeInitiativeStore from './services/change-initiative-store';
 import changeInitiativeSelector from './directives/change-initiative-selector';
 import changeInitiativeBrowser from './components/change-initiative-browser/change-initiative-browser';
-import changeInitiativeTable from './components/change-initiative-table/change-initiative-table';
 import changeInitiativeSection from './components/change-initiative-section/change-initiative-section';
 
 
@@ -39,7 +38,6 @@ function setup() {
 
     registerComponents(module, [
         changeInitiativeBrowser,
-        changeInitiativeTable,
         changeInitiativeSection
     ]);
 
