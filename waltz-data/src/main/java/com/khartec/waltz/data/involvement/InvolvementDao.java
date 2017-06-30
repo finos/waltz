@@ -27,6 +27,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.change_initiative.ChangeInitiativeKind;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.involvement.ImmutableInvolvement;
 import com.khartec.waltz.model.involvement.Involvement;

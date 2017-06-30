@@ -21,6 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.change_initiative.ChangeInitiativeKind;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.involvement.EntityInvolvementChangeCommand;
 import com.khartec.waltz.model.involvement.Involvement;
@@ -81,6 +82,7 @@ public class InvolvementEndpoint implements Endpoint {
             String employeeId = request.params("employeeId");
             return service.findDirectChangeInitiativesByEmployeeId(employeeId);
         };
+
 
         ListRoute<Application>  findAllAppsByEmployeeRoute = (request, response) -> {
             String employeeId = request.params("employeeId");

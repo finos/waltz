@@ -5,11 +5,13 @@ import template from './change-initiative-section.html';
 
 
 const bindings = {
-    parentEntityRef: '<',
+    name: '@',
+    parentEntityRef: '<'
 };
 
 
 const initialState = {
+    name: 'Change Initiatives',
     changeInitiatives: [],
     visibility: {
         sourcesOverlay: false
@@ -29,16 +31,24 @@ function controller(serviceBroker) {
                     .then(person => serviceBroker.loadViewData(
                         CORE_API.InvolvementStore.findChangeInitiativesForEmployeeId,
                         [person.data.employeeId]));
+            } else if (vm.parentEntityRef.kind === 'CHANGE_INITIATIVE') {
+                promise = serviceBroker.loadViewData(
+                    CORE_API.ChangeInitiativeStore.findByParentId,
+                    [vm.parentEntityRef.id]);
             } else {
                 promise = serviceBroker.loadViewData(
                     CORE_API.ChangeInitiativeStore.findByRef,
-                    [vm.parentEntityRef.kind, vm.parentEntityRef.id])
+                    [vm.parentEntityRef.kind, vm.parentEntityRef.id]);
             }
 
             promise
-                .then(result => vm.changeInitiatives = result.data);
+                .then(result => {
+                    vm.changeInitiatives = result.data;
+            });
         }
-    }
+    };
+
+    vm.onSelect = ci => vm.selectedChangeInitiative = ci;
 
 }
 

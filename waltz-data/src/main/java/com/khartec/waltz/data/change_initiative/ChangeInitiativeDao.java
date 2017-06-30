@@ -33,6 +33,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
@@ -47,6 +48,7 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
         ChangeInitiativeRecord record = r.into(CHANGE_INITIATIVE);
         return ImmutableChangeInitiative.builder()
                 .id(record.getId())
+                .parentId(Optional.ofNullable(record.getParentId()))
                 .name(record.getName())
                 .description(ofNullable(record.getDescription()).orElse(""))
                 .externalId(ofNullable(record.getExternalId()))
@@ -76,6 +78,7 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
+
     public Collection<ChangeInitiative> findForEntityReference(EntityReference ref) {
 
         Select<Record> refSideA = dsl.select(CHANGE_INITIATIVE.fields())
@@ -97,6 +100,13 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
         return refSideA.union(refSideB)
                 .fetch(TO_DOMAIN_MAPPER);
 
+    }
+
+
+    public Collection<ChangeInitiative> findByParentId(long parentId) {
+        return dsl.selectFrom(CHANGE_INITIATIVE)
+                .where(CHANGE_INITIATIVE.PARENT_ID.eq(parentId))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
