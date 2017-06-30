@@ -73,6 +73,7 @@ const dependencies = [
     require('./entity')(),
     require('./entity-named-note')(),
     require('./entity-statistics')(),
+    require('./entity-svg-diagram')(),
     require('./entity-tags')(),
     require('./examples')(),
     require('./flow-diagram')(),

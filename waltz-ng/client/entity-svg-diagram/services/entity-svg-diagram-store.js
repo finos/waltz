@@ -1,3 +1,4 @@
+
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,39 +17,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsEntityRef} from './checks';
+import {checkIsEntityRef} from "../../common/checks";
 
-export function sameRef(r1, r2) {
-    checkIsEntityRef(r1);
-    checkIsEntityRef(r2);
-    return r1.kind === r2.kind && r1.id === r2.id;
-}
+export function store($http, BaseApiUrl) {
 
+    const BASE = `${BaseApiUrl}/entity-svg-diagram`;
 
-export function refToString(r) {
-    return `${r.kind}/${r.id}`;
-}
+    const findByEntityReference = (ref) => {
+        checkIsEntityRef(ref);
+        return $http.get(`${BASE}/entity-ref/${ref.kind}/${ref.id}`)
+            .then(result => result.data);
+    };
 
-
-export function stringToRef(s) {
-    const bits = s.split('/');
     return {
-        kind: bits[0],
-        id: bits[1]
+        findByEntityReference,
     };
 }
 
 
-export function toEntityRef(obj, kind = obj.kind) {
-    const ref = {
-        id: obj.id,
-        kind,
-        name: obj.name,
-        description: obj.description
-    };
+store.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
 
-    checkIsEntityRef(ref);
 
-    return ref;
-}
+export const serviceName = 'EntitySvgDiagramStore';
 
+
+export const EntitySvgDiagramStore_API = {
+    findByEntityReference: {
+        serviceName,
+        serviceFnName: 'findByEntityReference',
+        description: 'finds entity svg diagrams by entity reference'
+    }
+};

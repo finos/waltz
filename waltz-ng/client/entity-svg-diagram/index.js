@@ -16,39 +16,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsEntityRef} from './checks';
+import angular from 'angular';
+import {registerComponents, registerStores} from '../common/module-utils';
 
-export function sameRef(r1, r2) {
-    checkIsEntityRef(r1);
-    checkIsEntityRef(r2);
-    return r1.kind === r2.kind && r1.id === r2.id;
-}
+import * as entitySvgDiagramStore from './services/entity-svg-diagram-store';
 
-
-export function refToString(r) {
-    return `${r.kind}/${r.id}`;
-}
+import entitySvgDiagramsSection from './components/section/entity-svg-diagrams-section';
+import entitySvgDiagramsViewer from './components/viewer/entity-svg-diagram-viewer';
 
 
-export function stringToRef(s) {
-    const bits = s.split('/');
-    return {
-        kind: bits[0],
-        id: bits[1]
-    };
-}
+export default () => {
 
+    const module = angular.module('waltz.entity.svg-diagram', []);
 
-export function toEntityRef(obj, kind = obj.kind) {
-    const ref = {
-        id: obj.id,
-        kind,
-        name: obj.name,
-        description: obj.description
-    };
+    registerStores(module, [
+        entitySvgDiagramStore
+    ]);
 
-    checkIsEntityRef(ref);
+    registerComponents(module, [
+        entitySvgDiagramsSection,
+        entitySvgDiagramsViewer
+    ]);
 
-    return ref;
-}
-
+    return module.name;
+};
