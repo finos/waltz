@@ -26,7 +26,7 @@ public abstract class BaseDataExtractor {
     public abstract void register(String baseUrl);
 
 
-    protected Object writeFile(String suggestedFilename, CSVSerializer extractor, Response response) throws Exception {
+    protected String writeFile(String suggestedFilename, CSVSerializer extractor, Response response) throws Exception {
         response.type(MimeTypes.Type.TEXT_PLAIN.name());
         response.header("Content-disposition", "attachment; filename="+suggestedFilename);
 
