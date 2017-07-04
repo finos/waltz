@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
 
+import template from './related-measurables-section.html';
+
 
 /**
  * @name waltz-related-measurables-explorer
@@ -19,9 +21,6 @@ const bindings = {
 
 
 const initialState = {};
-
-
-const template = require('./related-measurables-section.html');
 
 
 function calcRelatedMeasurables(ratingTallies = [], allMeasurables = []) {
@@ -57,6 +56,11 @@ function controller() {
 
     vm.onSelect = m => vm.selectedMeasurable = m;
 
+    vm.relatedMeasurablePanelInitialise = (api) => {
+        vm.export = () => {
+            api.exportFn();
+        };
+    };
 }
 
 

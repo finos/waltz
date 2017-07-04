@@ -18,9 +18,10 @@
 
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
+import {downloadTextFile} from "../../../common/file-utils";
 import {sameRef} from '../../../common/entity-utils';
 import {CORE_API} from '../../../common/services/core-api-utils';
-import {entityNames} from '../../../common/services/display-names';
+import {entityNames, relationshipKindNames} from '../../../common/services/display-names';
 import {sanitizeRelationships} from '../../measurable-relationship-utils';
 
 import template from './related-measurables-panel.html';
@@ -35,9 +36,9 @@ import template from './related-measurables-panel.html';
  * are provided.
  */
 
-
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: '<',
+    onInitialise: '<'
 };
 
 
@@ -49,7 +50,8 @@ const initialState = {
         editor: false,
         createEditor: false,
         updateEditor: false,
-    }
+    },
+    onInitialise: (e) => console.log('default onInitialise handler for related measurables panel')
 };
 
 
@@ -97,6 +99,48 @@ function mkGridData(ref,
         .filter(r => r !== null)
         .sortBy(['a.name', 'b.name'])
         .value()
+}
+
+
+function mkExportData(relationships = [], categories = [], measurables = []) {
+    const categoriesById = _.keyBy(categories, 'id');
+    const categoriesByMeasurableId = _.chain(measurables)
+        .map(m => ({
+            measurableId: m.id,
+            category: categoriesById[m.categoryId]
+        }))
+        .keyBy('measurableId')
+        .value();
+
+    const getType = (id, kind) => {
+        return kind === 'MEASURABLE'
+            ? categoriesByMeasurableId[id].category.name
+            : entityNames[kind];
+    };
+
+    const columnNames = [[
+        "From",
+        "From type",
+        "To",
+        "To type",
+        "Relationship",
+        "Description",
+        "Last Updated At",
+        "Last Updated By"
+    ]];
+
+    const exportData = _.map(relationships, r => [
+            r.a.name,
+            getType(r.a.id, r.a.kind),
+            r.b.name,
+            getType(r.b.id, r.b.kind),
+            relationshipKindNames[r.relationship],
+            r.description,
+            r.lastUpdatedAt,
+            r.lastUpdatedBy
+    ]);
+
+    return columnNames.concat(exportData);
 }
 
 
@@ -235,11 +279,17 @@ function controller($q, $timeout, serviceBroker, notification) {
             .execute(CORE_API.MeasurableRelationshipStore.remove, [rel])
     };
 
+    const exportData = () => {
+        const data = mkExportData(vm.relationships, vm.categories, vm.measurables);
+        downloadTextFile(data, ",", "related_viewpoints.csv");
+    };
+
     // -- BOOT --
 
     vm.$onInit = () => {
         initialiseData(vm, initialState);
         loadAll();
+        vm.onInitialise({exportFn: exportData});
     };
 }
 
