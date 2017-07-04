@@ -105,7 +105,6 @@
                     <username>${database.user}</username>
                     <password>${database.password}</password>
                     <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
-                    <contexts>exclude-ft</contexts>
                 </configuration>
 
                 <executions>
