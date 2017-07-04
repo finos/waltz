@@ -37,7 +37,7 @@ import template from './related-measurables-panel.html';
  */
 
 const bindings = {
-    parentEntityRef: '<',
+    parentEntityRef: '<'
 };
 
 
