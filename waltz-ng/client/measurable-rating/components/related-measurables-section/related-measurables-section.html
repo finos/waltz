@@ -2,17 +2,8 @@
                icon="link"
                id="related-measurables">
 
-    <waltz-section-actions>
-        <button ng-click="$ctrl.export()"
-                class="btn btn-xs btn-primary">
-            <waltz-icon name="cloud-download"></waltz-icon>
-            Export
-        </button>
-    </waltz-section-actions>
-
     <h4>Explicit Relationships</h4>
-    <waltz-related-measurables-panel parent-entity-ref="$ctrl.parentEntityRef"
-                                     on-initialise="$ctrl.relatedMeasurablePanelInitialise">
+    <waltz-related-measurables-panel parent-entity-ref="$ctrl.parentEntityRef">
     </waltz-related-measurables-panel>
 
     <h4>Implicit Relationships</h4>

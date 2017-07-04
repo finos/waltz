@@ -38,7 +38,6 @@ import template from './related-measurables-panel.html';
 
 const bindings = {
     parentEntityRef: '<',
-    onInitialise: '<'
 };
 
 
@@ -50,8 +49,7 @@ const initialState = {
         editor: false,
         createEditor: false,
         updateEditor: false,
-    },
-    onInitialise: (e) => console.log('default onInitialise handler for related measurables panel')
+    }
 };
 
 
@@ -244,8 +242,12 @@ function controller($q, $timeout, serviceBroker, notification) {
         vm.visibility.updateEditor = true;
     };
 
-
     vm.selectionFilterFn = DEFAULT_SELECTION_FILTER_FN;
+
+    vm.export = () => {
+        const data = mkExportData(vm.relationships, vm.categories, vm.measurables);
+        downloadTextFile(data, ",", "related_viewpoints.csv");
+    };
 
 
     // -- API --
@@ -279,17 +281,11 @@ function controller($q, $timeout, serviceBroker, notification) {
             .execute(CORE_API.MeasurableRelationshipStore.remove, [rel])
     };
 
-    const exportData = () => {
-        const data = mkExportData(vm.relationships, vm.categories, vm.measurables);
-        downloadTextFile(data, ",", "related_viewpoints.csv");
-    };
 
     // -- BOOT --
-
     vm.$onInit = () => {
         initialiseData(vm, initialState);
         loadAll();
-        vm.onInitialise({exportFn: exportData});
     };
 }
 

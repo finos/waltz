@@ -55,12 +55,6 @@ function controller() {
     };
 
     vm.onSelect = m => vm.selectedMeasurable = m;
-
-    vm.relatedMeasurablePanelInitialise = (api) => {
-        vm.export = () => {
-            api.exportFn();
-        };
-    };
 }
 
 
