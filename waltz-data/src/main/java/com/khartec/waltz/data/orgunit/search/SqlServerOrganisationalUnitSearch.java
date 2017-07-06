@@ -52,19 +52,19 @@ public class SqlServerOrganisationalUnitSearch implements FullTextSearch<Organis
                         DSL.trueCondition(),
                         (acc, frag) -> acc.and(frag)));
 
-        List<OrganisationalUnit> orgUnitViaName = dsl.selectDistinct(ORGANISATIONAL_UNIT.fields())
+        List<OrganisationalUnit> orgUnitsViaName = dsl.selectDistinct(ORGANISATIONAL_UNIT.fields())
                 .from(ORGANISATIONAL_UNIT)
                 .where(nameCondition)
                 .orderBy(ORGANISATIONAL_UNIT.NAME)
                 .limit(options.limit())
                 .fetch(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
 
-        List<OrganisationalUnit> orgUnitViaFullText =  dsl.select(ORGANISATIONAL_UNIT.fields())
+        List<OrganisationalUnit> orgUnitsViaFullText =  dsl.select(ORGANISATIONAL_UNIT.fields())
                 .from(ORGANISATIONAL_UNIT)
                 .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
                 .limit(options.limit())
                 .fetch(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
 
-        return new ArrayList<>(union(orgUnitViaName, orgUnitViaFullText));
+        return new ArrayList<>(union(orgUnitsViaName, orgUnitsViaFullText));
     }
 }
