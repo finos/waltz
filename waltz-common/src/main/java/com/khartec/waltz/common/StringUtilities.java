@@ -95,6 +95,8 @@ public class StringUtilities {
 
 
     public static List<String> mkTerms(String query) {
+        if(query.length() < 3) return new ArrayList<>();
+
         String safeQuery = query
                 .replace("[", " ")
                 .replace("]", " ")
@@ -108,9 +110,13 @@ public class StringUtilities {
                 .replace(",", " ")
                 .replace("~", " ");
 
-        return Stream.of(safeQuery.split(" "))
+        String[] terms = safeQuery.split(" ");
+
+        // ensure the first term is at least 3 characters
+        if(terms[0].length() < 3) return new ArrayList<>();
+
+        return Stream.of(terms)
                 .filter(StringUtilities::notEmpty)
-                .filter(s -> s.length() > 2)
                 .collect(toList());
     }
 

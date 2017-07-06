@@ -19,14 +19,15 @@
 package com.khartec.waltz.data.application.search;
 
 import com.khartec.waltz.data.DatabaseVendorSpecific;
-import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.JooqUtilities;
+import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,13 +64,26 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
                 .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
 
-        List<Application> appsViaFullText = dsl.select(APPLICATION.fields())
+        Condition nameCondition = terms.stream()
+                .map(term -> APPLICATION.NAME.like("%" + term + "%"))
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        List<Application> appsViaName = dsl.selectDistinct(APPLICATION.fields())
                 .from(APPLICATION)
-                .where(JooqUtilities.MSSQL.mkContains(terms))
+                .where(nameCondition)
+                .orderBy(APPLICATION.NAME)
                 .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
 
-        return new ArrayList<>(union(appsViaAlias, appsViaFullText));
+        List<Application> appsViaFullText = dsl.select(APPLICATION.fields())
+                .from(APPLICATION)
+                .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
+                .limit(options.limit())
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
+
+        return new ArrayList<>(union(appsViaName, appsViaAlias, appsViaFullText));
     }
 
 }
