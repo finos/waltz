@@ -47,6 +47,19 @@ public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, Da
             return emptyList();
         }
 
+        Condition externalIdCondition = terms.stream()
+                .map(term -> MEASURABLE.EXTERNAL_ID.like("%" + term + "%"))
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        List<Measurable> measurablesViaExternalId = dsl.selectDistinct(MEASURABLE.fields())
+                .from(MEASURABLE)
+                .where(externalIdCondition)
+                .orderBy(MEASURABLE.EXTERNAL_ID)
+                .limit(options.limit())
+                .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
+
         Condition nameCondition = terms.stream()
                 .map(term -> MEASURABLE.NAME.like("%" + term + "%"))
                 .collect(Collectors.reducing(
@@ -60,14 +73,13 @@ public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, Da
                 .limit(options.limit())
                 .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
 
-
         List<Measurable> measurablesViaFullText = dsl
                 .selectFrom(MEASURABLE)
                 .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
                 .limit(options.limit())
                 .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
 
-        return new ArrayList<>(union(measurablesViaName, measurablesViaFullText));
+        return new ArrayList<>(union(measurablesViaExternalId, measurablesViaName, measurablesViaFullText));
     }
 
 }
