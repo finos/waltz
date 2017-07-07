@@ -100,7 +100,7 @@ public class AssetCostStatsDao {
                 .fetchOne(r -> ImmutableCost.builder()
                         .amount(r.value1())
                         .currencyCode("EUR")
-                        .kind(CostKind.CUMLATIVE)
+                        .kind(CostKind.CUMULATIVE)
                         .year(year)
                         .build());
     }
