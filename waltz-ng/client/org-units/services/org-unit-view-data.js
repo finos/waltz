@@ -102,13 +102,6 @@ function loadComplexity(store, id, holder) {
 }
 
 
-function loadSourceDataRatings(serviceBroker, holder) {
-    return serviceBroker
-        .loadViewData(CORE_API.SourceDataRatingStore.findAll, [])
-        .then(r => holder.sourceDataRatings = r.data);
-}
-
-
 function loadTechStats(serviceBroker, id, holder) {
     const selector = mkSelector(id);
 
@@ -171,7 +164,6 @@ function service($q,
 
     function loadThirdWave(orgUnitId) {
         return $q.all([
-            loadSourceDataRatings(serviceBroker, rawData),
             loadTechStats(serviceBroker, orgUnitId, rawData)
         ]);
     }

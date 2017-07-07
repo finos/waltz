@@ -84,8 +84,7 @@ function service($q,
                  involvementStore,
                  involvementKindService,
                  logicalFlowViewService,
-                 personStore,
-                 sourceDataRatingStore) {
+                 personStore) {
 
     const state = { model: initModel };
 
@@ -213,14 +212,6 @@ function service($q,
     }
 
 
-    function loadSourceDataRatings()
-    {
-        return sourceDataRatingStore
-            .findAll()
-            .then(ratings => state.model.sourceDataRatings = ratings);
-    }
-
-
     // --- MAIN LOADERS
 
     function loadFirstWave(empId) {
@@ -254,20 +245,12 @@ function service($q,
     }
 
 
-    function loadFourthWave() {
-        return $q.all([
-            loadSourceDataRatings()
-        ]);
-    }
-
-
     function load(employeeId) {
         reset();
 
         return loadFirstWave(employeeId)
             .then(() => loadSecondWave(employeeId))
-            .then(() => loadThirdWave(employeeId))
-            .then(() => loadFourthWave(employeeId));
+            .then(() => loadThirdWave(employeeId));
     }
 
 
@@ -304,8 +287,7 @@ service.$inject = [
     'InvolvementStore',
     'InvolvementKindService',
     'LogicalFlowViewService',
-    'PersonStore',
-    'SourceDataRatingStore'
+    'PersonStore'
 ];
 
 export default service;

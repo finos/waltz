@@ -40,8 +40,7 @@
 
 
     <!-- FLOWS -->
-    <waltz-logical-flows-tabgroup-section ratings="ctrl.viewData.sourceDataRatings"
-                                          flow-data="ctrl.viewData.dataFlows"
+    <waltz-logical-flows-tabgroup-section flow-data="ctrl.viewData.dataFlows"
                                           on-load-detail="ctrl.loadFlowDetail"
                                           applications="ctrl.viewData.apps">
     </waltz-logical-flows-tabgroup-section>
@@ -66,7 +65,6 @@
         </waltz-section-actions>
 
         <waltz-source-data-overlay visible="ctrl.visibility.authOverlay"
-                                   ratings="ctrl.viewData.sourceDataRatings"
                                    entities="['AUTHORITATIVE_SOURCE']">
         </waltz-source-data-overlay>
 
@@ -132,8 +130,7 @@
         entity-ref="ctrl.entityRef"
         involvements="ctrl.viewData.involvements"
         on-add="ctrl.onAddInvolvement"
-        on-remove="ctrl.onRemoveInvolvement"
-        source-data-ratings="ctrl.viewData.sourceDataRatings">
+        on-remove="ctrl.onRemoveInvolvement">
     </waltz-involved-people-section>
 
 
@@ -159,14 +156,12 @@
     <waltz-asset-costs-section cost-view="ctrl.viewData.assetCostData"
                                id="costs-section"
                                load-all="ctrl.loadAllCosts"
-                               csv-name="{{ ctrl.viewData.orgUnit.name }}_asset_costs.csv"
-                               source-data-ratings="ctrl.sourceDataRatings">
+                               csv-name="{{ ctrl.viewData.orgUnit.name }}_asset_costs.csv">
     </waltz-asset-costs-section>
 
 
     <!-- BOOKMARKS -->
-    <waltz-bookmarks-section parent-entity-ref="ctrl.entityRef"
-                             source-data-ratings="ctrl.viewData.sourceDataRatings">
+    <waltz-bookmarks-section parent-entity-ref="ctrl.entityRef">
     </waltz-bookmarks-section>
 
 

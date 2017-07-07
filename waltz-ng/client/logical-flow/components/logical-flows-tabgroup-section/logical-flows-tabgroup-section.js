@@ -20,7 +20,6 @@ import _ from 'lodash';
 
 
 const bindings = {
-    ratings: '<',
     flowData: '<',
     applications: '<',
     onLoadDetail: '<'
@@ -29,7 +28,6 @@ const bindings = {
 
 const initialState = {
     export: () => console.log('lfts: default do-nothing export function'),
-    ratings: [],
     flowData: null,
     applications: [],
     onLoadDetail: () => console.log('onLoadDetail not provided to logical flows tabgroup section'),

@@ -24,8 +24,7 @@ import {
     loadInvolvements,
     loadLogicalFlowDecorators,
     loadServers,
-    loadSoftwareCatalog,
-    loadSourceDataRatings
+    loadSoftwareCatalog
 } from "./data-load";
 
 import template from "./app-view.html";
@@ -46,7 +45,6 @@ const initialState = {
     peopleInvolvements: [],
     servers: [],
     softwareCatalog: [],
-    sourceDataRatings: [],
     surveyInstances: [],
     surveyRuns: [],
     tags: [],
@@ -121,7 +119,6 @@ function controller($q,
                     physicalFlowStore,
                     serverInfoStore,
                     softwareCatalogStore,
-                    sourceDataRatingStore,
                     surveyInstanceStore,
                     surveyRunStore)
 {
@@ -254,8 +251,7 @@ function controller($q,
 
         ];
 
-        return $q.all(promises)
-            .then(() => loadSourceDataRatings(sourceDataRatingStore, vm));
+        return $q.all(promises);
     }
 
     function loadFourthWave() {
@@ -352,7 +348,6 @@ controller.$inject = [
     'PhysicalFlowStore',
     'ServerInfoStore',
     'SoftwareCatalogStore',
-    'SourceDataRatingStore',
     'SurveyInstanceStore',
     'SurveyRunStore'
 ];

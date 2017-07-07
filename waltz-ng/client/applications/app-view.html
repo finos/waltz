@@ -36,15 +36,13 @@
                                          categories="ctrl.measurableCategories"
                                          ratings="ctrl.ratings"
                                          perspective-definitions="ctrl.perspectiveDefinitions"
-                                         perspective-ratings="ctrl.perspectiveRatings"
-                                         source-data-ratings="ctrl.sourceDataRatings">
+                                         perspective-ratings="ctrl.perspectiveRatings">
     </waltz-measurable-rating-app-section>
 
 
     <!-- BOOKMARKS -->
     <waltz-bookmarks-section parent-entity-ref="ctrl.entityRef"
-                             show-filter="true"
-                             source-data-ratings="ctrl.sourceDataRatings">
+                             show-filter="true">
     </waltz-bookmarks-section>
 
 
@@ -53,8 +51,7 @@
                                    entity-ref="ctrl.entityRef"
                                    involvements="ctrl.peopleInvolvements"
                                    on-add="ctrl.onAddInvolvement"
-                                   on-remove="ctrl.onRemoveInvolvement"
-                                   source-data-ratings="ctrl.sourceDataRatings">
+                                   on-remove="ctrl.onRemoveInvolvement">
     </waltz-involved-people-section>
 
 
@@ -107,7 +104,6 @@
         </waltz-section-actions>
 
         <waltz-source-data-overlay visible="ctrl.visibility.logicalFlows"
-                                   ratings="ctrl.sourceDataRatings"
                                    entities="['LOGICAL_DATA_FLOW', 'PHYSICAL_SPECIFICATION', 'PHYSICAL_FLOW']">
         </waltz-source-data-overlay>
 
@@ -283,15 +279,13 @@
     <div waltz-has-setting="feature.software-catalog.enabled=true">
         <waltz-technology-section software-catalog="ctrl.softwareCatalog"
                                   databases="ctrl.databases"
-                                  servers="ctrl.servers"
-                                  source-data-ratings="ctrl.sourceDataRatings">
+                                  servers="ctrl.servers">
         </waltz-technology-section>
     </div>
 
 
     <!-- COSTS -->
-    <waltz-app-costs-section costs="ctrl.costs"
-                             source-data-ratings="ctrl.sourceDataRatings">
+    <waltz-app-costs-section costs="ctrl.costs">
     </waltz-app-costs-section>
 
 

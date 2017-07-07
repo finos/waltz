@@ -1,0 +1,34 @@
+<!--
+  ~ /*
+  ~  * Waltz - Enterprise Architecture
+  ~  * Copyright (C) 2017  Khartec Ltd.
+  ~  *
+  ~  * This program is free software: you can redistribute it and/or modify
+  ~  * it under the terms of the GNU Lesser General Public License as published by
+  ~  * the Free Software Foundation, either version 3 of the License, or
+  ~  * (at your option) any later version.
+  ~  *
+  ~  * This program is distributed in the hope that it will be useful,
+  ~  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  * GNU Lesser General Public License for more details.
+  ~  *
+  ~  * You should have received a copy of the GNU Lesser General Public License
+  ~  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~  */
+  -->
+
+<div ng-init="$ctrl.visible = false">
+    <waltz-section-actions>
+        <ng-transclude></ng-transclude>
+        <button class="btn btn-xs waltz-btn-transparent"
+                ng-click="$ctrl.visible = ! $ctrl.visible">
+            <waltz-icon name="map-signs"></waltz-icon>
+        </button>
+    </waltz-section-actions>
+
+    <waltz-source-data-overlay visible="$ctrl.visible"
+                               entities="$ctrl.entities">
+    </waltz-source-data-overlay>
+
+</div>
