@@ -16,7 +16,7 @@
 
         <div class="col-md-6">
             <!-- APPS -->
-            <h5>
+            <h5 ng-class="{'wns-has-results': $ctrl.results.apps.length > 0}">
                 <waltz-icon name="desktop"></waltz-icon>
                 Applications
             </h5>
@@ -41,7 +41,7 @@
             <hr>
 
             <!-- CHANGE INITIATIVE -->
-            <h5>
+            <h5 ng-class="{'wns-has-results': $ctrl.results.changeInitiatives.length > 0}">
                 <waltz-icon name="paper-plane-o"></waltz-icon>
                 Change Initiatives
             </h5>
@@ -66,7 +66,7 @@
             <hr>
 
             <!-- CHARACTERISTICS -->
-            <h5>
+            <h5 ng-class="{'wns-has-results': $ctrl.results.measurables.length > 0}">
                 <waltz-icon name="puzzle-piece"></waltz-icon>
                 Characteristics
             </h5>
@@ -95,7 +95,7 @@
             <hr>
 
             <!-- ACTORS -->
-            <h5>
+            <h5 ng-class="{'wns-has-results': $ctrl.results.actors.length > 0}">
                 <waltz-icon name="user-circle"></waltz-icon>
                 Actors
             </h5>
@@ -124,7 +124,7 @@
 
         <div class="col-md-6">
             <!-- PEOPLE -->
-            <h5>
+            <h5 ng-class="{'wns-has-results': $ctrl.results.people.length > 0}">
                 <waltz-icon name="users"></waltz-icon>
                 People
             </h5>
@@ -144,7 +144,7 @@
             <hr>
 
             <!-- ORG UNITS -->
-            <h5>
+            <h5 ng-class="{'wns-has-results': $ctrl.results.orgUnits.length > 0}">
                 <waltz-icon name="sitemap"></waltz-icon>
                 Organisational Units
             </h5>
@@ -171,7 +171,7 @@
             <hr>
 
             <!-- SPECIFICATIONS -->
-            <h5>
+            <h5 ng-class="{'wns-has-results': $ctrl.results.specifications.length > 0}">
                 <waltz-icon name="qrcode"></waltz-icon>
                 Specifications
             </h5>
