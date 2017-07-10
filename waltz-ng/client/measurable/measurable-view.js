@@ -112,13 +112,7 @@ function controller($q,
                 .then(costs => vm.assetCostData = costs),
         ]);
 
-    const loadWave4 = () =>
-        $q.all([
-            serviceBroker
-                .loadAppData(CORE_API.SourceDataRatingStore.findAll, [])
-                .then(r => vm.sourceDataRatings = r.data),
-            logHistory(vm.measurable, historyStore)
-        ]);
+    const loadWave4 = () => logHistory(vm.measurable, historyStore);
 
     const loadInvolvements = () => {
         return $q.all([

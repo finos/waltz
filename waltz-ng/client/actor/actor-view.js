@@ -84,8 +84,7 @@ function controller($q,
                     historyStore,
                     logicalFlowStore,
                     physicalFlowStore,
-                    physicalSpecificationStore,
-                    sourceDataRatingStore) {
+                    physicalSpecificationStore) {
 
     const vm = initialiseData(this, initialState);
 
@@ -110,10 +109,6 @@ function controller($q,
     physicalSpecificationStore
         .findByEntityReference(vm.entityRef)
         .then(specs => vm.physicalSpecifications = specs);
-
-    sourceDataRatingStore
-        .findAll()
-        .then(sdrs => vm.sourceDataRatings = sdrs);
 
     loadFlowDiagrams(id, $q, flowDiagramStore, flowDiagramEntityStore)
         .then(r => Object.assign(vm, r));
@@ -180,7 +175,6 @@ controller.$inject = [
     'LogicalFlowStore',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore',
-    'SourceDataRatingStore'
 ];
 
 

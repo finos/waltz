@@ -25,7 +25,6 @@ import template from './bookmarks-section.html';
 
 const bindings = {
     parentEntityRef: '<',
-    sourceDataRatings: '<',
     showFilter: '@'
 };
 

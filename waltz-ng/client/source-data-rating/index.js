@@ -18,7 +18,10 @@
 
 import angular from 'angular';
 import * as sourceDataRatingStore from './services/source-data-rating-store';
-import {registerStore} from '../common/module-utils';
+import {registerComponents, registerStore} from '../common/module-utils';
+
+import sourceDataOverlay from './components/overlay/source-data-overlay';
+import sourceDataSectionAddon from './components/section-addon/source-data-section-addon';
 
 
 export default () => {
@@ -30,9 +33,12 @@ export default () => {
     registerStore(module, sourceDataRatingStore);
 
     module
-        .directive('waltzSourceDataInfo', require('./directives/source-data-info'))
-        .directive('waltzSourceDataOverlay', require('./directives/source-data-overlay'))
-        .directive('waltzSourceDataSectionAddon', require('./directives/source-data-section-addon'));
+        .directive('waltzSourceDataInfo', require('./directives/source-data-info'));
+
+    registerComponents(module, [
+        sourceDataOverlay,
+        sourceDataSectionAddon
+    ]);
 
     return module.name;
 };

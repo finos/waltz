@@ -19,6 +19,8 @@ import _ from "lodash";
 import {initialiseData} from "../../common";
 import {CORE_API} from '../../common/services/core-api-utils';
 
+import template from  './technology-summary-section.html';
+
 
 const bindings = {
     parentEntityRef: '<',
@@ -32,9 +34,6 @@ const initialState = {
 };
 
 
-const template = require('./technology-summary-section.html');
-
-
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -43,10 +42,6 @@ function controller(serviceBroker) {
             entityReference: vm.parentEntityRef,
             scope: vm.scope
         };
-
-        serviceBroker
-            .loadAppData(CORE_API.SourceDataRatingStore.findAll)
-            .then(r => vm.sourceDataRatings = r.data);
 
         serviceBroker
             .loadViewData(CORE_API.TechnologyStatisticsService.findBySelector, [selector])
