@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.SetUtilities.union;
+import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.common.StringUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
@@ -65,6 +65,6 @@ public class SqlServerOrganisationalUnitSearch implements FullTextSearch<Organis
                 .limit(options.limit())
                 .fetch(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
 
-        return new ArrayList<>(union(orgUnitsViaName, orgUnitsViaFullText));
+        return new ArrayList<>(orderedUnion(orgUnitsViaName, orgUnitsViaFullText));
     }
 }

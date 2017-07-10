@@ -19,8 +19,8 @@
 package com.khartec.waltz.data.application.search;
 
 import com.khartec.waltz.data.DatabaseVendorSpecific;
-import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.FullTextSearch;
+import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.Application;
@@ -34,7 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.SetUtilities.union;
+import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.common.StringUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
@@ -83,7 +83,7 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
                 .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
 
-        return new ArrayList<>(union(appsViaName, appsViaAlias, appsViaFullText));
+        return new ArrayList<>(orderedUnion(appsViaName, appsViaAlias, appsViaFullText));
     }
 
 }

@@ -47,11 +47,25 @@ public class SetUtilities {
     }
 
     public static <T> Set<T> union(Collection<T>... xss) {
+        Set<T> result = new HashSet<>();
+        for (Collection xs : xss) {
+            result.addAll(xs);
+        }
+
+        Arrays.stream(xss)
+                .collect(Collectors.toSet());
+        return result;
+    }
+
+    public static <T> Set<T> orderedUnion(Collection<T>... xss) {
         // LinkedHashSet preserves iteration ordering, source: https://stackoverflow.com/a/16480560
         Set<T> result = new LinkedHashSet<>();
         for (Collection xs : xss) {
             result.addAll(xs);
         }
+
+        Arrays.stream(xss)
+                .collect(Collectors.toSet());
         return result;
     }
 

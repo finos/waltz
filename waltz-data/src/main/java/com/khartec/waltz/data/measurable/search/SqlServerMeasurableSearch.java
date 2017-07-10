@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.SetUtilities.union;
+import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.common.StringUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static java.util.Collections.emptyList;
@@ -79,7 +79,7 @@ public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, Da
                 .limit(options.limit())
                 .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
 
-        return new ArrayList<>(union(measurablesViaExternalId, measurablesViaName, measurablesViaFullText));
+        return new ArrayList<>(orderedUnion(measurablesViaExternalId, measurablesViaName, measurablesViaFullText));
     }
 
 }

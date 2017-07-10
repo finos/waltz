@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.SetUtilities.union;
+import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.common.StringUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 
@@ -65,7 +65,7 @@ public class SqlServerChangeInitiativeSearch implements FullTextSearch<ChangeIni
                 .limit(options.limit())
                 .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
 
-        return new ArrayList<>(union(ciViaName, ciViaFullText));
+        return new ArrayList<>(orderedUnion(ciViaName, ciViaFullText));
     }
 
 }
