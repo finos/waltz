@@ -160,6 +160,18 @@ public class JooqUtilities {
             return DSL.sql(joiner.toString());
         }
 
+        public static SQL mkContainsPrefix(Collection<String> terms) {
+            checkNotNull(terms, "terms cannot be null");
+
+            // this is based on: https://stackoverflow.com/a/4321828
+            List<String> wildcardTerms = terms
+                    .stream()
+                    .map(s -> "\"" + s + "*\"")
+                    .collect(Collectors.toList());
+
+            return mkContains(wildcardTerms);
+        }
+
         private static String wrapSpecialInQuotes(String t) {
             return t.contains("&") ? "\"" + t + "\"" : t;
         }

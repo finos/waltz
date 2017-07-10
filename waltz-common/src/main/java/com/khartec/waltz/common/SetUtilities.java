@@ -18,10 +18,7 @@
 
 package com.khartec.waltz.common;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -54,6 +51,21 @@ public class SetUtilities {
         for (Collection xs : xss) {
             result.addAll(xs);
         }
+
+        Arrays.stream(xss)
+                .collect(Collectors.toSet());
+        return result;
+    }
+
+    public static <T> Set<T> orderedUnion(Collection<T>... xss) {
+        // LinkedHashSet preserves iteration ordering, source: https://stackoverflow.com/a/16480560
+        Set<T> result = new LinkedHashSet<>();
+        for (Collection xs : xss) {
+            result.addAll(xs);
+        }
+
+        Arrays.stream(xss)
+                .collect(Collectors.toSet());
         return result;
     }
 

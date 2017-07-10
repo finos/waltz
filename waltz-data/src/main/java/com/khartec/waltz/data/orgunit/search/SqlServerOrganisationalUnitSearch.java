@@ -24,11 +24,16 @@ import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.common.StringUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
@@ -40,10 +45,26 @@ public class SqlServerOrganisationalUnitSearch implements FullTextSearch<Organis
         if (terms.isEmpty()) {
             return Collections.emptyList();
         }
-        return dsl.select(ORGANISATIONAL_UNIT.fields())
+
+        Condition nameCondition = terms.stream()
+                .map(term -> ORGANISATIONAL_UNIT.NAME.like("%" + term + "%"))
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        List<OrganisationalUnit> orgUnitsViaName = dsl.selectDistinct(ORGANISATIONAL_UNIT.fields())
                 .from(ORGANISATIONAL_UNIT)
-                .where(JooqUtilities.MSSQL.mkContains(terms))
+                .where(nameCondition)
+                .orderBy(ORGANISATIONAL_UNIT.NAME)
                 .limit(options.limit())
                 .fetch(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
+
+        List<OrganisationalUnit> orgUnitsViaFullText =  dsl.select(ORGANISATIONAL_UNIT.fields())
+                .from(ORGANISATIONAL_UNIT)
+                .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
+                .limit(options.limit())
+                .fetch(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
+
+        return new ArrayList<>(orderedUnion(orgUnitsViaName, orgUnitsViaFullText));
     }
 }

@@ -74,4 +74,46 @@
         </createTable>
     </changeSet>
 
+
+    <!-- 2400 - remove title and department_name from person full text index -->
+    <changeSet id="20170706-2400-1a"
+               author="kamransaleem"
+               dbms="mssql"
+               context="!exclude-ft">
+        <comment>2400: remove title and department_name from person full text index</comment>
+        <sql>
+            DROP FULLTEXT INDEX ON person
+        </sql>
+    </changeSet>
+    <changeSet id="20170706-2400-1b"
+               author="kamransaleem"
+               dbms="mssql"
+               context="!exclude-ft">
+        <comment>2400: remove title and department_name from person full text index</comment>
+        <sql>
+            CREATE FULLTEXT INDEX ON person
+            (display_name, email, user_principal_name)
+            KEY INDEX person_pkey
+            ON WaltzFTS
+            WITH STOPLIST = SYSTEM;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20170706-2400-2a"
+               author="kamransaleem"
+               dbms="mysql">
+        <comment>2400: remove title and department_name from person full text index</comment>
+        <dropIndex indexName="people_content_ft_idx"
+                   tableName="person"/>
+    </changeSet>
+
+    <changeSet id="20170706-2400-2b"
+               author="kamransaleem"
+               dbms="mysql">
+        <comment>2400: remove title and department_name from person full text index</comment>
+        <sql>
+            CREATE FULLTEXT INDEX people_content_ft_idx ON person (display_name, email, user_principal_name)
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
