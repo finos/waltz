@@ -348,12 +348,7 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
         .classed('clickable', true)
         .classed('wsat-label', true)
         .attr('transform',  (d, i) => `translate(0, ${ scale(d.id) })`)
-        .attr('opacity', 0)
-        .on('mouseenter.highlight', d => { highlighted = d.id; redraw(); })
-        .on('mouseleave.highlight', d => { highlighted = null; redraw(); })
-        .on('click.tweaker', (d) => tweakers.onSelect(d, event))
-        .on('mouseenter.tweaker', tweakers.onEnter)
-        .on('mouseleave.tweaker', tweakers.onLeave);
+        .attr('opacity', 0);
 
     const textAdjustment = determineLabelTextAdjustment(anchor);
     const iconAdjustment = determineLabelIconAdjustment(anchor);
@@ -378,6 +373,11 @@ function drawLabels(section, items = [], scale, anchor = 'start', tweakers) {
     labels
         .merge(newLabels)
         .classed('wsat-hover', (d) => highlighted === d.id)
+        .on('mouseenter.highlight', d => { highlighted = d.id; redraw(); })
+        .on('mouseleave.highlight', d => { highlighted = null; redraw(); })
+        .on('click.tweaker', (d) => tweakers.onSelect(d, event))
+        .on('mouseenter.tweaker', tweakers.onEnter)
+        .on('mouseleave.tweaker', tweakers.onLeave)
         .transition()
         .duration(animationDuration)
         .attr('transform',  (d, i) => `translate(0, ${ scale(d.id) })`)
@@ -547,11 +547,11 @@ function update(sections,
 
     const scales = setupScales(model, dimensions);
 
-    drawLabels(sections.sources, model.sources, scales.source, 'end', tweakers.source, redraw);
-    drawLabels(sections.targets, model.targets, scales.target, 'start', tweakers.target, redraw);
+    drawLabels(sections.sources, model.sources, scales.source, 'end', tweakers.source);
+    drawLabels(sections.targets, model.targets, scales.target, 'start', tweakers.target);
 
     drawTypeBoxes(sections.types, model, scales.type, dimensions.label, tweakers.typeBlock);
-    drawLabels(sections.types, model.types, scales.type, 'middle', tweakers.type, redraw);
+    drawLabels(sections.types, model.types, scales.type, 'middle', tweakers.type);
 
     drawInbound(sections.inbound, model.sourceToType, scales, dimensions);
     drawOutbound(sections.outbound, model.typeToTarget, scales, dimensions);
