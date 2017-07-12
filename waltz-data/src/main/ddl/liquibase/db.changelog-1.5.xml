@@ -116,4 +116,16 @@
         </sql>
     </changeSet>
 
+
+    <!-- 2397 -->
+    <changeSet id="20170707-2397-1"
+               author="rovats">
+        <comment>2397: Type in CostKind enum</comment>
+        <sql>
+            UPDATE asset_cost SET
+            kind = 'CUMULATIVE'
+            WHERE kind = 'CUMLATIVE'
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

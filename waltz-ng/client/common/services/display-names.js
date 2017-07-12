@@ -133,7 +133,9 @@ export const changeInitiativeNames = {
 export const assetCostKindNames = {
     APPLICATION_DEVELOPMENT: 'Application Development',
     INFRASTRUCTURE: 'Infrastructure',
-    PEOPLE: 'People Costs'
+    PEOPLE: 'People Costs',
+    CUMULATIVE: 'Cumulative',
+    OTHER: 'Other'
 };
 
 

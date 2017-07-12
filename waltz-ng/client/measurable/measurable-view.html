@@ -42,8 +42,7 @@
     <waltz-measurable-rating-explorer-section parent-entity-ref="ctrl.entityReference"
                                               scope="ctrl.scope"
                                               measurable-category="ctrl.measurableCategory"
-                                              applications="ctrl.applications"
-                                              source-data-ratings="ctrl.sourceDataRatings">
+                                              applications="ctrl.applications">
     </waltz-measurable-rating-explorer-section>
 
     <!-- RELATED -->
@@ -55,8 +54,7 @@
 
 
     <!-- BOOKMARKS -->
-    <waltz-bookmarks-section parent-entity-ref="ctrl.entityReference"
-                             source-data-ratings="ctrl.sourceDataRatings">
+    <waltz-bookmarks-section parent-entity-ref="ctrl.entityReference">
     </waltz-bookmarks-section>
 
 
@@ -65,14 +63,12 @@
                                    entity-ref="ctrl.entityReference"
                                    involvements="ctrl.peopleInvolvements"
                                    on-add="ctrl.onAddInvolvement"
-                                   on-remove="ctrl.onRemoveInvolvement"
-                                   source-data-ratings="ctrl.sourceDataRatings">
+                                   on-remove="ctrl.onRemoveInvolvement">
     </waltz-involved-people-section>
 
 
     <!-- FLOWS -->
-    <waltz-logical-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
-                                          flow-data="ctrl.logicalFlowView"
+    <waltz-logical-flows-tabgroup-section flow-data="ctrl.logicalFlowView"
                                           on-load-detail="ctrl.loadFlowDetail"
                                           applications="ctrl.applications">
     </waltz-logical-flows-tabgroup-section>
@@ -111,8 +107,7 @@
     <!-- COSTS -->
     <waltz-asset-costs-section cost-view="ctrl.assetCostData"
                                load-all="ctrl.loadAllCosts"
-                               csv-name="{{ ctrl.measurable.name }}_asset_costs.csv"
-                               source-data-ratings="ctrl.sourceDataRatings">
+                               csv-name="{{ ctrl.measurable.name }}_asset_costs.csv">
     </waltz-asset-costs-section>
 
 
