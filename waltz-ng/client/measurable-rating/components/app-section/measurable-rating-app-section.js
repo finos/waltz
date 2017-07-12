@@ -40,7 +40,6 @@ const bindings = {
     ratings: '<',
     perspectiveDefinitions: '<',
     perspectiveRatings: '<',
-    sourceDataRatings: '<'
 };
 
 

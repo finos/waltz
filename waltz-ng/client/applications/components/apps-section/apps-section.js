@@ -30,7 +30,6 @@ const bindings = {
 const initialState = {
     apps: [],
     endUserApps: [],
-    sourceDataRatings: [],
 };
 
 
@@ -61,10 +60,6 @@ function controller(serviceBroker) {
             entityReference: vm.parentEntityRef,
             scope: vm.scope
         };
-
-        serviceBroker
-            .loadAppData(CORE_API.SourceDataRatingStore.findAll, [])
-            .then(r => vm.sourceDataRatings = r.data);
 
         serviceBroker
             .loadViewData(CORE_API.ApplicationStore.findBySelector, [selectorOptions])

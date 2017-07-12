@@ -26,7 +26,6 @@ const bindings = {
     entityRef: '<',
     involvements: '<',
     involvementKinds: '<',
-    sourceDataRatings: '<',
 
     onAdd: '<',
     onRemove: '<'

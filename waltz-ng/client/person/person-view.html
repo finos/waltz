@@ -56,19 +56,14 @@
                        id="app-portfolio-section"
                        name="Application Portfolio">
 
-            <waltz-source-data-section-addon ratings="ctrl.sourceDataRatings"
-                                             entities="['APPLICATION', 'END_USER_APPLICATION', 'INVOLVEMENT']">
-            </waltz-source-data-section-addon>
-
-
-            <waltz-section-actions>
+            <waltz-source-data-section-addon entities="['APPLICATION', 'END_USER_APPLICATION', 'INVOLVEMENT']">
                 <a class="btn btn-xs btn-primary"
                    ng-click="ctrl.exportApps()"
                    ng-if="ctrl.combinedAppInvolvements.all.length > 0">
                     <waltz-icon name="cloud-download"></waltz-icon>
                     Export
                 </a>
-            </waltz-section-actions>
+            </waltz-source-data-section-addon>
 
 
             <uib-tabset>
@@ -120,8 +115,7 @@
 
 
     <!-- FLOWS -->
-    <waltz-logical-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
-                                          ng-if="ctrl.hasInvolvements"
+    <waltz-logical-flows-tabgroup-section ng-if="ctrl.hasInvolvements"
                                           flow-data="ctrl.dataFlows"
                                           on-load-detail="ctrl.loadFlowDetail"
                                           applications="ctrl.apps">
@@ -158,8 +152,7 @@
     <!-- COSTS -->
     <waltz-asset-costs-section cost-view="ctrl.assetCostData"
                                ng-if="ctrl.hasInvolvements"
-                               load-all="ctrl.loadAllCosts"
-                               source-data-ratings="ctrl.sourceDataRatings">
+                               load-all="ctrl.loadAllCosts">
     </waltz-asset-costs-section>
 
 

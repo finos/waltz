@@ -24,7 +24,6 @@ const bindings = {
     costView: '<',
     loadAll: '<',
     csvName: '@?',
-    sourceDataRatings: '<'
 };
 
 
