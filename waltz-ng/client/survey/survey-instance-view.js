@@ -147,6 +147,33 @@ function controller($stateParams,
         }
     };
 
+    vm.markAsWithdrawn = () => {
+        if (confirm('Are you sure you want to withdraw this survey instance? ')) {
+            surveyInstanceStore.updateStatus(
+                vm.surveyInstance.id,
+                {newStatus: 'WITHDRAWN'}
+            )
+                .then(result => {
+                    notification.success('Survey instance withdrawn');
+                    loadInstanceAndRun();
+                });
+        }
+    };
+
+    vm.markAsInProgress = () => {
+        if (confirm('Are you sure you want this survey to be marked as In Progress? ' +
+                'This will enable participants to edit and re-submit their responses.')) {
+            surveyInstanceStore.updateStatus(
+                vm.surveyInstance.id,
+                {newStatus: 'IN_PROGRESS'}
+            )
+                .then(result => {
+                    notification.success('Survey response marked as In Progress');
+                    loadInstanceAndRun();
+                });
+        }
+    };
+
     loadInstanceAndRun();
     loadRecipients();
 }

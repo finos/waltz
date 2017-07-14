@@ -264,7 +264,8 @@ export const surveyInstanceStatusNames = {
     'COMPLETED': 'Completed',
     'EXPIRED': 'Expired',
     'IN_PROGRESS': 'In Progress',
-    'NOT_STARTED': 'Not Started'
+    'NOT_STARTED': 'Not Started',
+    'WITHDRAWN': 'Withdrawn'
 };
 
 
