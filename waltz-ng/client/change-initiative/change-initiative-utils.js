@@ -15,8 +15,11 @@ export function groupRelationships(ciId, rels = []) {
 export function enrichRelationships(rels = [], entities = []) {
     const entitiesById = _.keyBy(entities, 'id');
 
-    return _.map(rels, rel => Object.assign({}, {
-        relationship: rel.relationship,
-        entity: entitiesById[rel.entity.id]
-    }));
+    return _.chain(rels)
+        .map(rel => Object.assign({}, {
+            relationship: rel.relationship,
+            entity: entitiesById[rel.entity.id]
+        }))
+        .filter(rel => rel.entity)
+        .value();
 }
