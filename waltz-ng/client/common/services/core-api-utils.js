@@ -39,6 +39,7 @@ import {PerspectiveDefinitionStore_API as PerspectiveDefinitionStore} from "../.
 import {PerspectiveRatingStore_API as PerspectiveRatingStore} from "../../perspective/services/perspective-rating-store";
 import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
 import {SourceDataRatingStore_API as SourceDataRatingStore} from "../../source-data-rating/services/source-data-rating-store";
+import {StaticPanelStore_API as StaticPanelStore} from "../../static-panel/services/static-panel-store";
 import {TechnologyStatisticsService_API as TechnologyStatisticsService} from "../../technology/services/technology-statistics-service";
 
 
@@ -64,6 +65,7 @@ export const CORE_API = {
     PerspectiveRatingStore,
     PhysicalSpecDataTypeStore,
     SourceDataRatingStore,
+    StaticPanelStore,
     TechnologyStatisticsService
 };
 

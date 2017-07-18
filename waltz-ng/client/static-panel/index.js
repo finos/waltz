@@ -18,18 +18,17 @@
  */
 
 import angular from 'angular';
+import * as staticPanelStore from './services/static-panel-store';
 
+import {registerStore} from '../common/module-utils'
 
 export default () => {
-
     const module = angular.module('waltz.static.panel', []);
 
-    module
-        .service('StaticPanelStore', require('./services/static-panel-store'));
+    registerStore(module, staticPanelStore);
 
     module
         .component('waltzStaticPanels', require('./components/static-panels'))
         .component('waltzStaticPanel', require('./components/static-panel'));
-
     return module.name;
 };

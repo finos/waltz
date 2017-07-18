@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function service($http, base) {
+export function store($http, base) {
     const baseUrl = `${base}/static-panel`;
 
     const findByGroups = (groups = []) => {
@@ -46,10 +46,35 @@ function service($http, base) {
 }
 
 
-service.$inject = [
+store.$inject = [
     '$http',
     'BaseApiUrl'
 ];
 
 
-export default service;
+
+export const serviceName = 'StaticPanelStore';
+
+
+export const StaticPanelStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'findAll'
+    },
+    findByGroup: {
+        serviceName,
+        serviceFnName: 'findByGroup',
+        description: 'findByGroup'
+    },
+    findByGroups: {
+        serviceName,
+        serviceFnName: 'findByGroups',
+        description: 'findByGroups'
+    },
+    save: {
+        serviceName,
+        serviceFnName: 'save',
+        description: 'save'
+    }
+};
