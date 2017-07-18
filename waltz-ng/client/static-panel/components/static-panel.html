@@ -16,8 +16,7 @@
             <span ng-bind="$ctrl.panel.title">
             </span>
         </h3>
-        <div ng-bind-html="$ctrl.panel.content">
-        </div>
+        <waltz-markdown content="$ctrl.panel.content"></waltz-markdown>
     </div>
 
 
@@ -29,7 +28,6 @@
             <span ng-bind="$ctrl.panel.title">
             </span>
         </h3>
-        <div ng-bind-html="$ctrl.panel.content">
-        </div>
+        <waltz-markdown text="$ctrl.panel.content"></waltz-markdown>
     </div>
 </div>
