@@ -18,6 +18,7 @@
 
 import {assetCostKindNames} from '../../common/services/display-names';
 import {initialiseData} from '../../common';
+import {CORE_API} from '../../common/services/core-api-utils';
 
 
 const bindings = {
@@ -43,7 +44,7 @@ function processSelection(d) {
 }
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.onSummarySelect = (d) => vm.summarySelection = processSelection(d);
@@ -58,10 +59,19 @@ function controller() {
         vm.visibility.detail = true;
         vm.loadAll();
     };
+
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(
+                CORE_API.StaticPanelStore.findByGroup,
+                ['SECTION.ASSET_COSTS.ABOUT'])
+            .then(rs => vm.staticPanels = rs.data);
+    };
 }
 
 
 controller.$inject = [
+    'ServiceBroker'
 ];
 
 
