@@ -13,7 +13,9 @@
         </message>
     </waltz-no-data>
 
-    <div ng-if="$ctrl.costs.length > 0">
+    <div ng-if="$ctrl.costs.length > 0"
+         class="row">
+        <div class="col-sm-8">
             <uib-tabset>
                 <uib-tab>
                     <uib-tab-heading>
@@ -74,6 +76,13 @@
                 </uib-tab>
             </uib-tabset>
         </div>
+        <div class="col-sm-4">
+            <waltz-static-panels panels="$ctrl.staticPanels"
+                                 class="small"
+                                 render-mode="minimal-border">
+            </waltz-static-panels>
+        </div>
+
     </div>
 
 </waltz-section>

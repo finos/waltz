@@ -17,6 +17,7 @@
  */
 
 import _ from 'lodash';
+import {CORE_API} from '../../../common/services/core-api-utils';
 
 
 const bindings = {
@@ -48,13 +49,22 @@ function filterCostsForYear(year, costs = []) {
 }
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = this;
     vm.$onChanges = () => {
         vm.currentYear = getCurrentYear(vm.costs);
         vm.currentCosts = filterCostsForYear(vm.currentYear, vm.costs);
         vm.currentTotal = calcTotalCost(vm.currentCosts);
     };
+
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(
+                CORE_API.StaticPanelStore.findByGroup,
+                ['SECTION.ASSET_COSTS.ABOUT'])
+            .then(rs => vm.staticPanels = rs.data);
+    };
+
 }
 
 
@@ -64,5 +74,9 @@ const component = {
     controller
 };
 
+
+component.$inject = [
+    'ServiceBroker'
+];
 
 export default component;
