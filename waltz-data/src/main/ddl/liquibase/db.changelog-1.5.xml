@@ -128,4 +128,17 @@
         </sql>
     </changeSet>
 
+
+    <!-- 2413 -->
+    <changeSet id="20170718-2413-1"
+               author="rovats">
+        <comment>2413: Support versioning of survey responses</comment>
+        <addColumn tableName="survey_instance">
+            <column name="original_instance_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

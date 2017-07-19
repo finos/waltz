@@ -112,6 +112,21 @@ public class SurveyQuestionResponseDao {
     }
 
 
+    public int[] cloneResponses(long sourceSurveyInstanceId, long targetSurveyInstanceId) {
+        Result<SurveyQuestionResponseRecord> records = dsl.select(SURVEY_QUESTION_RESPONSE.fields())
+                .select(entityNameField)
+                .from(SURVEY_QUESTION_RESPONSE)
+                .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(sourceSurveyInstanceId))
+                .fetchInto(SURVEY_QUESTION_RESPONSE);
+
+        records.stream()
+                .forEach(r -> r.setSurveyInstanceId(targetSurveyInstanceId));
+
+        return dsl.batchInsert(records)
+                .execute();
+    }
+
+
     private SurveyQuestionResponseRecord mkRecord(SurveyInstanceQuestionResponse response) {
         SurveyQuestionResponse questionResponse = response.questionResponse();
         Optional<EntityReference> entityResponse = questionResponse.entityResponse();
