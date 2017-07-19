@@ -25,5 +25,6 @@ export default (module) => {
         .filter('toDomain', require('./to-domain-filter'))
         .filter('toDescription', require('./description-filter'))
         .filter('toFixed', require('./fixed-filter'))
-        .filter('toIconName', require('./icon-name-filter'));
+        .filter('toIconName', require('./icon-name-filter'))
+        .filter('truncateMiddle', require('./truncate-middle-filter'));
 };
