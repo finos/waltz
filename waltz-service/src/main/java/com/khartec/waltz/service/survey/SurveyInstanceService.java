@@ -122,6 +122,15 @@ public class SurveyInstanceService {
     public int updateStatus(String userName, long instanceId, SurveyInstanceStatusChangeCommand command) {
         checkNotNull(command, "command cannot be null");
 
+        SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
+
+        // if survey is being sent back, store current responses as a version
+        if (surveyInstance.status() == SurveyInstanceStatus.COMPLETED
+                && command.newStatus() == SurveyInstanceStatus.IN_PROGRESS) {
+            long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
+            surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
+        }
+
         int result = surveyInstanceDao.updateStatus(instanceId, command.newStatus());
 
         if (result > 0) {
@@ -170,6 +179,11 @@ public class SurveyInstanceService {
         Select<Record1<Long>> selector = surveyInstanceIdSelectorFactory.apply(idSelectionOptions);
 
         return surveyInstanceDao.findBySurveyInstanceIdSelector(selector);
+    }
+
+
+    public List<SurveyInstance> findPreviousVersionsForInstance(long instanceId) {
+        return surveyInstanceDao.findPreviousVersionsForInstance(instanceId);
     }
 
 

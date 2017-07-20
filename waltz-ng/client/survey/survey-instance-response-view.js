@@ -57,7 +57,32 @@ function controller($state,
             return surveyRunStore
                 .getById(surveyInstance.surveyRunId)
         })
-        .then(sr => vm.surveyRun = sr);
+        .then(sr => vm.surveyRun = sr)
+        .then(() => surveyInstanceStore.findPreviousVersions(vm.surveyInstance.originalInstanceId || id))
+        .then(prevVersionInstances => {
+            const prevVersions = _.chain(prevVersionInstances)
+                .sortBy('submittedAt')
+                .map((pv, i) => ({
+                    versionNum: `${i + 1}.0`,
+                    instanceId: pv.id,
+                    isLatest: false
+                }))
+                .reverse()
+                .value();
+
+            const latestInstanceId = vm.surveyInstance.originalInstanceId || id;
+            const latestResponseVersion = {
+                versionNum: `${prevVersions.length + 1}.0`,
+                instanceId: latestInstanceId,
+                isLatest: true
+            };
+
+            const allResponseVersions = [latestResponseVersion].concat(prevVersions);
+            vm.currentResponseVersion = _.keyBy(allResponseVersions, 'instanceId')[id];
+            vm.otherResponseVersions = _.filter(
+                allResponseVersions,
+                rv => rv.instanceId !== vm.currentResponseVersion.instanceId);
+        });
 
 
     const loadParticipants = responses => {
@@ -94,6 +119,10 @@ function controller($state,
                 $state.reload();
             });
         }
+    };
+
+    vm.viewOtherResponseVersion = (otherVer) => {
+        $state.go('main.survey.instance.response.view', {id: otherVer.instanceId});
     };
 }
 

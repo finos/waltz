@@ -26,4 +26,7 @@ public abstract class SurveyInstance implements IdProvider {
 
     @Nullable
     public abstract String submittedBy();
+
+    @Nullable
+    public abstract Long originalInstanceId();
 }
