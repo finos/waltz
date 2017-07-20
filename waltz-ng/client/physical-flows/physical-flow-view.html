@@ -10,7 +10,7 @@
             <li>
                 <waltz-entity-link entity-ref="ctrl.logicalFlow.source"></waltz-entity-link>
             </li>
-            <li ng-bind="ctrl.specification.name"></li>
+            <li ng-bind="ctrl.specification.name | truncateMiddle:50"></li>
         </ol>
     </waltz-page-header>
 
