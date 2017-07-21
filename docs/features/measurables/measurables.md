@@ -13,3 +13,8 @@ __ratings__ with optional comments.
 
 ![Schema Diagram](measurables_schema.png)
 [Source](https://app.quickdatabasediagrams.com/#/schema/rpoddJhDW0WTKzJiBz80Kw)
+
+
+## Updating
+
+If the measuables are changed then remember to rebuild the hierarchy  (Profile > System Admin > Hierarchy Maintenance)
