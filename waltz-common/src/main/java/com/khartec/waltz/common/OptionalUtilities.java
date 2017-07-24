@@ -24,6 +24,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
+
 
 public class OptionalUtilities {
 
@@ -54,5 +56,15 @@ public class OptionalUtilities {
                 .map(opt -> opt.get())
                 .collect(Collectors.toList());
 
+    }
+
+
+    /**
+        Returns true iff, `a` is empty and b `is` null, or, `a.get` equals `b`
+     */
+    public static <T> boolean contentsEqual(Optional<T> a, T b) {
+        checkNotNull(a, "'a' cannot be null");
+        return a.map(aVal -> aVal.equals(b))
+                .orElse(b == null);
     }
 }

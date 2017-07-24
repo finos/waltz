@@ -295,7 +295,9 @@ function controller($q,
     };
 
     vm.$onChanges = (c) => {
-        vm.title = flowDiagramStateService.getState().model.title
+        const state = flowDiagramStateService.getState();
+        vm.title = state.model.title;
+        vm.id = state.diagramId;
     };
 
     vm.onTitleChange = (t) => {

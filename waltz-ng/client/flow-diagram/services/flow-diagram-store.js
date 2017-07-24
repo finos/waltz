@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function store($http, base) {
+export function store($http, base) {
     const BASE = `${base}/flow-diagram`;
 
     const getById = (id) => $http
@@ -56,4 +56,35 @@ store.$inject = [
 ];
 
 
-export default store;
+
+
+export const serviceName = 'FlowDiagramStore';
+
+
+export const FlowDiagramStore_API = {
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'getById'
+    },
+    deleteForId: {
+        serviceName,
+        serviceFnName: 'deleteForId',
+        description: 'deleteForId'
+    },
+    findByEntityReference: {
+        serviceName,
+        serviceFnName: 'findByEntityReference',
+        description: 'findByEntityReference'
+    },
+    findForSelector: {
+        serviceName,
+        serviceFnName: 'findForSelector',
+        description: 'findForSelector'
+    },
+    save: {
+        serviceName,
+        serviceFnName: 'save',
+        description: 'save'
+    }
+};

@@ -200,6 +200,12 @@
 
                 <hr>
 
+                <waltz-flow-diagram-associations read-only="true"
+                                                 diagram-id="$ctrl.selected.diagram.id">
+                </waltz-flow-diagram-associations>
+
+                <hr>
+
                 <!-- HELP -->
                 <div>
                     <h6>Help</h6>
@@ -245,6 +251,7 @@
         </div>
     </div>
 
+    <!-- EDITOR -->
     <div class="row waltz-fade-if"
          ng-if="$ctrl.visibility.editor">
         <div ng-if="$ctrl.visibility.editor"
