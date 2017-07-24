@@ -261,6 +261,7 @@ function service(
             .then(id => {
                 state.diagramId = id;
                 state.dirty = false;
+                return id;
             });
     };
 
@@ -291,7 +292,7 @@ function service(
     };
 
     const processCommand = (state, commandObject) => {
-        console.log("wFD - processing command: ", commandObject, state);
+        // console.log("wFD - processing command: ", commandObject, state);
         const payload = commandObject.payload;
         const model = state.model;
         switch (commandObject.command) {

@@ -20,16 +20,16 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 import template from './flow-diagrams-panel.html';
 
 
 const bindings = {
-    flowDiagrams: '<',
-    flowDiagramEntities: '<',
+    parentEntityRef: '<',
     createDiagramCommands: '<',
-    reload: '<',
+    canCreate: '<'
 };
 
 
@@ -37,8 +37,6 @@ const initialState = {
     flowDiagrams: [],
     flowDiagramEntities: [],
     diagrams: [],
-    createDiagramCommands: () => ([]),
-    reload: () => console.log('wfdp:reload - default (do nothing) handler'),
     visibility: {
         diagram: false,
         editor: false
@@ -60,9 +58,10 @@ function toRef(d) {
 }
 
 function controller(
+    $q,
     $timeout,
+    serviceBroker,
     flowDiagramStateService,
-    flowDiagramStore,
     notification,
     physicalFlowStore,
     physicalSpecificationStore)
@@ -150,17 +149,44 @@ function controller(
         }, 0);
     };
 
-    vm.$onChanges = () => {
-        if(vm.flowDiagrams && vm.flowDiagramEntities) {
-            const flowEntitiesDiagramId = _.keyBy(vm.flowDiagramEntities, 'diagramId');
-            vm.diagrams = _.map(
-                vm.flowDiagrams,
-                d => Object.assign(
-                    {},
-                    d,
-                    { notable: flowEntitiesDiagramId[d.id].isNotable || false }));
-        }
+    const reload = () => {
+        const selector = {
+            entityReference: vm.parentEntityRef,
+            scope: 'EXACT'
+        };
+
+        const diagramPromise = serviceBroker
+            .loadViewData(
+                CORE_API.FlowDiagramStore.findForSelector,
+                [selector],
+                { force: true})
+            .then(r => vm.flowDiagrams = r.data);
+
+        const diagramEntityPromise = serviceBroker
+            .loadViewData(
+                CORE_API.FlowDiagramEntityStore.findForSelector,
+                [selector],
+                { force: true})
+            .then(r => vm.flowDiagramEntities = r.data);
+
+        $q.all([diagramPromise, diagramEntityPromise])
+            .then(() => {
+                const flowEntitiesDiagramId = _.keyBy(vm.flowDiagramEntities, 'diagramId');
+                vm.diagrams = _.map(
+                    vm.flowDiagrams,
+                    d => Object.assign(
+                        {},
+                        d,
+                        { notable: flowEntitiesDiagramId[d.id].isNotable || false }));
+            });
     };
+
+
+    vm.$onInit = () => {
+        reload();
+        console.log(vm)
+    };
+
 
     vm.onDiagramSelect = (diagram) => {
         showReadOnlyDiagram();
@@ -174,6 +200,7 @@ function controller(
 
     vm.onDiagramDismiss = () => {
         hideDiagram();
+        reload();
         clearSelections();
         flowDiagramStateService.reset();
     };
@@ -210,7 +237,13 @@ function controller(
     };
 
     vm.dismissDiagramEditor = () => {
-        vm.onDiagramSelect(vm.selected.diagram);
+        if (vm.selected.diagram) {
+            vm.onDiagramSelect(vm.selected.diagram);
+        } else {
+            hideDiagram();
+            clearSelections();
+            flowDiagramStateService.reset();
+        }
     };
 
     vm.clickHandlers = {
@@ -219,10 +252,12 @@ function controller(
     };
 
     vm.deleteDiagram = (id) => {
-        flowDiagramStore
-            .deleteForId(id)
+        serviceBroker
+            .execute(
+                CORE_API.FlowDiagramStore.deleteForId,
+                [id])
             .then(() => {
-                vm.reload();
+                reload();
                 clearSelections();
                 flowDiagramStateService.reset();
                 notification.warning('Diagram deleted');
@@ -242,9 +277,10 @@ function controller(
 
 
 controller.$inject = [
+    '$q',
     '$timeout',
+    'ServiceBroker',
     'FlowDiagramStateService',
-    'FlowDiagramStore',
     'Notification',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore'

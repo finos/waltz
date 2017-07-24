@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function store($http, base) {
+export function store($http, base) {
     const BASE = `${base}/flow-diagram-annotation`;
 
     const findByDiagramId = (id) => $http
@@ -35,4 +35,13 @@ store.$inject = [
 ];
 
 
-export default store;
+export const serviceName = 'FlowDiagramAnnotationStore';
+
+
+export const FlowDiagramAnnotationStore_API = {
+    findByDiagramId: {
+        serviceName,
+        serviceFnName: 'findByDiagramId',
+        description: 'findByDiagramId'
+    }
+};

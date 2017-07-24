@@ -25,7 +25,7 @@ const bindings = {
     minCharacters: '<',
     delay: '<',
     placeholderText: '@'
-}
+};
 
 
 const template = require('./search-control.html');
@@ -36,7 +36,7 @@ const initialState = {
     delay: 250,
     placeholderText: 'Search...',
     onQuery: query => console.log('default onQuery handler in search-control: ', query),
-}
+};
 
 
 function controller($scope) {

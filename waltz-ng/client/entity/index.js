@@ -17,8 +17,8 @@
  */
 import angular from "angular";
 
-import entitySearchStore from './services/entity-search-store';
-
+import {registerStore} from '../common/module-utils'
+import * as entitySearchStore from './services/entity-search-store';
 import entityHierarchyNavigator from './components/entity-hierarchy-navigator/entity-hierarchy-navigator';
 import entityInvolvementEditor from './components/entity-involvement-editor/entity-involvement-editor';
 import entitySelector from './components/entity-selector/entity-selector';
@@ -29,8 +29,7 @@ import relatedEntityEditor from './components/related-entity-editor/related-enti
 export default () => {
     const module = angular.module('waltz.entity', []);
 
-    module
-        .service('EntitySearchStore', entitySearchStore);
+    registerStore(module, entitySearchStore);
 
     module
         .component('waltzEntityHierarchyNavigator', entityHierarchyNavigator)

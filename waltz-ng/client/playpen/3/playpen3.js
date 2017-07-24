@@ -25,26 +25,16 @@ const initialState = {
     }
 };
 
-
-function toNode(d, kind = 'APPLICATION') {
-    return {
-        name: d.name,
-        id: d.id,
-        description: d.description || '',
-        kind
-    };
-}
-
 function controller($stateParams,
                     flowDiagramStateService) {
     const vm = Object.assign(this, initialState);
 
-    // flowDiagramStateService.reset();
 
-    flowDiagramStateService
-        .load($stateParams.id)
-
-
+    vm.createDiagramCommands = () => {
+        return [
+            { command: 'SET_TITLE', payload: "Test title" }
+        ];
+    };
 }
 
 

@@ -17,7 +17,7 @@
  */
 
 
-function service($http, BaseApiUrl) {
+export function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/entity-search`;
 
 
@@ -31,10 +31,19 @@ function service($http, BaseApiUrl) {
 }
 
 
-service.$inject = [
+store.$inject = [
     '$http',
-    'BaseApiUrl',
+    'BaseApiUrl'
 ];
 
 
-export default service;
+export const serviceName = 'EntitySearchStore';
+
+
+export const EntitySearchStore_API = {
+    search: {
+        serviceName,
+        serviceFnName: 'search',
+        description: 'search for entities, params should be the query and a list of entity kinds'
+    }
+};
