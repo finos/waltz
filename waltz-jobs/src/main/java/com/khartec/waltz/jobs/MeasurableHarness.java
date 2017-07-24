@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.common.OptionalUtilities;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -46,8 +47,8 @@ public class MeasurableHarness {
         MeasurableService measurableService = ctx.getBean(MeasurableService.class);
 
         EntityReference ref = mkRef(
-                EntityKind.APP_GROUP,
-                3);
+                EntityKind.FLOW_DIAGRAM,
+                2);
 
         IdSelectionOptions options = mkOpts(
                 ref,
@@ -60,9 +61,17 @@ public class MeasurableHarness {
         System.out.println("---");
 
         List<Measurable> measurables = measurableService.findByMeasurableIdSelector(options);
+
         measurables.forEach(System.out::println);
 
+        System.out.println("-----");
 
+        measurables
+                .stream()
+                .filter(m -> OptionalUtilities.contentsEqual(m.id(), 486L))
+                .forEach(System.out::println);
+
+        System.out.println("-----");
     }
 
 }

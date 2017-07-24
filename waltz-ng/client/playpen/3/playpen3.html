@@ -5,23 +5,9 @@
 
     </style>
 
-
-    <waltz-section name="Diagram Editor">
-
-
-        <div class="row">
-            <div class="col-sm-12">
-                <waltz-flow-diagram-editor nodes="ctrl.nodes"
-                                           initial-model="ctrl.initialModel">
-                </waltz-flow-diagram-editor>
-            </div>
-        </div>
-
-    </waltz-section>
+     <waltz-flow-diagrams-section parent-entity-ref="{ id: 59, kind: 'APPLICATION' }"
+                                create-diagram-commands="$ctrl.createDiagramCommands()">
+    </waltz-flow-diagrams-section>
 
 
-    <waltz-section name="Hello1"></waltz-section>
-    <waltz-section name="Hello2"></waltz-section>
-    <waltz-section name="Hello3"></waltz-section>
-    <waltz-section name="Hello4"></waltz-section>
 </div>

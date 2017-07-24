@@ -290,12 +290,14 @@ function controller($q,
 
     vm.doSave = () => {
         flowDiagramStateService.save()
-            .then(r => vm.saveResp = r)
+            .then(r => vm.id = r)
             .then(() => notification.success('Saved'))
     };
 
     vm.$onChanges = (c) => {
-        vm.title = flowDiagramStateService.getState().model.title
+        const state = flowDiagramStateService.getState();
+        vm.title = state.model.title;
+        vm.id = state.diagramId;
     };
 
     vm.onTitleChange = (t) => {

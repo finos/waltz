@@ -25,12 +25,16 @@
                               total-cost="ctrl.assetCostData.total">
     </waltz-measurable-summary>
 
-
     <br>
 
-    <!--Diagrams-->
+    <!-- ENTITY DIAGRAMS -->
     <waltz-entity-svg-diagrams-section parent-entity-ref="ctrl.entityReference">
     </waltz-entity-svg-diagrams-section>
+
+    <!-- FLOW DIAGRAMS -->
+    <waltz-flow-diagrams-section parent-entity-ref="ctrl.entityReference"
+                                 can-create="false">
+    </waltz-flow-diagrams-section>
 
 
     <!--Entity Named Notes-->

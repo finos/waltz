@@ -1,17 +1,11 @@
 <waltz-section name="Flow Diagrams"
-               small="( {{ $ctrl.flowDiagrams.length }} )"
                icon="picture-o"
                id="specification-flow-diagram-section">
 
-    <div class="waltz-fade-if">
-        <div>
-            <waltz-flow-diagrams-panel flow-diagrams="$ctrl.flowDiagrams"
-                                       flow-diagram-entities="$ctrl.flowDiagramEntities"
-                                       create-diagram-commands="$ctrl.createDiagramCommands"
-                                       reload="$ctrl.reload">
-            </waltz-flow-diagrams-panel>
-        </div>
-
-    </div>
+    <waltz-flow-diagrams-panel parent-entity-ref="$ctrl.parentEntityRef"
+                               can-create="$ctrl.canCreate"
+                               create-diagram-commands="$ctrl.createDiagramCommands"
+                               allow-creation="$ctrl.allowCreation">
+    </waltz-flow-diagrams-panel>
 
 </waltz-section>

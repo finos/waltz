@@ -48,7 +48,7 @@
 
     <!-- EDITOR -->
     <div class="col-md-2">
-        <h5>Flow Diagram Editor</h5>
+        <h4>Flow Diagram Editor</h4>
 
         <form>
             <label>Title</label>
@@ -57,6 +57,19 @@
                    ng-model="$ctrl.title"
                    ng-change="$ctrl.onTitleChange($ctrl.title)">
         </form>
+
+        <hr>
+
+        <waltz-flow-diagram-associations ng-if="$ctrl.id"
+                                         read-only="false"
+                                         diagram-id="$ctrl.id">
+        </waltz-flow-diagram-associations>
+
+        <strong ng-if="!$ctrl.id">
+            Cannot add additional viewpoints until
+            the diagram has been saved
+        </strong>
+
         <hr>
 
         <div class="small">

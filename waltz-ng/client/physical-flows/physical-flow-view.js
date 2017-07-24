@@ -108,23 +108,9 @@ function getSelectableSpecDefinitions(specDefinitions = [], selectedSpecDef) {
 }
 
 
-function loadFlowDiagrams(flowRef, $q, flowDiagramStore, flowDiagramEntityStore) {
-
-    const promises = [
-        flowDiagramStore.findByEntityReference(flowRef),
-        flowDiagramEntityStore.findByEntityReference(flowRef)
-    ];
-    return $q
-        .all(promises)
-        .then(([flowDiagrams, flowDiagramEntities]) => ({ flowDiagrams, flowDiagramEntities }));
-}
-
-
 function controller($q,
                     $state,
                     $stateParams,
-                    flowDiagramStore,
-                    flowDiagramEntityStore,
                     historyStore,
                     logicalFlowStore,
                     notification,
@@ -158,13 +144,6 @@ function controller($q,
         .then(physicalFlow => physicalSpecificationStore.getById(physicalFlow.specificationId))
         .then(spec => vm.specification = spec);
 
-
-    vm.loadFlowDiagrams = () => {
-        loadFlowDiagrams(vm.entityReference, $q, flowDiagramStore, flowDiagramEntityStore)
-            .then(r => Object.assign(vm, r));
-    };
-
-    vm.loadFlowDiagrams();
 
     // spec definitions
     const loadSpecDefinitions = () => physicalSpecDefinitionStore
@@ -279,7 +258,6 @@ function controller($q,
 
         return _.concat(modelCommands, moveCommands);
     };
-
 }
 
 
@@ -287,8 +265,6 @@ controller.$inject = [
     '$q',
     '$state',
     '$stateParams',
-    'FlowDiagramStore',
-    'FlowDiagramEntityStore',
     'HistoryStore',
     'LogicalFlowStore',
     'Notification',
