@@ -19,9 +19,10 @@
 import angular from "angular";
 
 
-import flowDiagramStore from './services/flow-diagram-store';
-import flowDiagramAnnotationStore from './services/flow-diagram-annotation-store';
-import flowDiagramEntityStore from './services/flow-diagram-entity-store';
+import * as flowDiagramStore from './services/flow-diagram-store';
+import * as flowDiagramAnnotationStore from './services/flow-diagram-annotation-store';
+import * as flowDiagramEntityStore from './services/flow-diagram-entity-store';
+
 import flowDiagramStateService from './services/flow-diagram-state-service';
 
 import flowDiagram from './components/diagram/flow-diagram';
@@ -32,6 +33,9 @@ import flowDiagramAnnotationPopup from './components/editor/flow-diagram-annotat
 import flowDiagramEditor from './components/editor/flow-diagram-editor';
 import flowDiagramsPanel from './components/diagrams-panel/flow-diagrams-panel';
 import flowDiagramsSection from './components/section/flow-diagrams-section';
+import * as flowDiagramAssociations from './components/associations/flow-diagram-associations';
+
+import {registerComponents, registerStores} from '../common/module-utils'
 
 import routes from './routes';
 
@@ -41,9 +45,6 @@ export default () => {
     const module = angular.module('waltz.flow-diagram', []);
 
     module
-        .service('FlowDiagramStore', flowDiagramStore)
-        .service('FlowDiagramAnnotationStore', flowDiagramAnnotationStore)
-        .service('FlowDiagramEntityStore', flowDiagramEntityStore)
         .service('FlowDiagramStateService', flowDiagramStateService)
         ;
 
@@ -61,6 +62,18 @@ export default () => {
     module
         .config(routes)
         ;
+
+    registerComponents(module, [
+        flowDiagramAssociations
+    ]);
+
+
+    registerStores(module, [
+        flowDiagramStore,
+        flowDiagramAnnotationStore,
+        flowDiagramEntityStore
+    ]);
+
 
     return module.name;
 };

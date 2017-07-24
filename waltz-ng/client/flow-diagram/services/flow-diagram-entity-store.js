@@ -17,7 +17,7 @@
  */
 
 
-function store($http, base) {
+export function store($http, base) {
     const BASE = `${base}/flow-diagram-entity`;
 
     const findByDiagramId = (id) => $http
@@ -32,10 +32,22 @@ function store($http, base) {
         .post(`${BASE}/selector`, options)
         .then(r => r.data);
 
+    const addMeasurable = (diagramId, measurableId) => $http
+        .post(`${BASE}/id/${diagramId}/MEASURABLE/${measurableId}`, {})
+        .then(r => r.data);
+
+    const removeMeasurable = (diagramId, measurableId) => $http
+        .delete(`${BASE}/id/${diagramId}/MEASURABLE/${measurableId}`)
+        .then(r => r.data);
+
+
+
     return {
         findByDiagramId,
         findByEntityReference,
-        findForSelector
+        findForSelector,
+        addMeasurable,
+        removeMeasurable
     };
 }
 
@@ -46,4 +58,34 @@ store.$inject = [
 ];
 
 
-export default store;
+
+export const serviceName = 'FlowDiagramEntityStore';
+
+
+export const FlowDiagramEntityStore_API = {
+    findByDiagramId: {
+        serviceName,
+        serviceFnName: 'findByDiagramId',
+        description: 'findByDiagramId'
+    },
+    findByEntityReference: {
+        serviceName,
+        serviceFnName: 'findByEntityReference',
+        description: 'findByEntityReference'
+    },
+    findForSelector: {
+        serviceName,
+        serviceFnName: 'findForSelector',
+        description: 'findForSelector'
+    },
+    addMeasurable: {
+        serviceName,
+        serviceFnName: 'addMeasurable',
+        description: 'addMeasurable (by id)'
+    },
+    removeMeasurable: {
+        serviceName,
+        serviceFnName: 'removeMeasurable',
+        description: 'removeMeasurable (by Id'
+    }
+};

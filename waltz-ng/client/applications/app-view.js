@@ -206,8 +206,6 @@ function controller($q,
             measurableStore
                 .findMeasurablesRelatedToPath(entityReference)
                 .then(ms => vm.measurables = ms),
-
-            vm.loadFlowDiagrams()
         ];
 
         return $q.all(promises);

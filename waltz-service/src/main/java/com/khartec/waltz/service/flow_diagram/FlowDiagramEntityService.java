@@ -20,17 +20,22 @@ package com.khartec.waltz.service.flow_diagram;
 
 import com.khartec.waltz.data.flow_diagram.FlowDiagramEntityDao;
 import com.khartec.waltz.data.flow_diagram.FlowDiagramIdSelectorFactory;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.flow_diagram.FlowDiagramEntity;
+import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagramEntity;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 
 
 @Service
@@ -68,4 +73,22 @@ public class FlowDiagramEntityService {
         return flowDiagramEntityDao.findForSelector(selector);
     }
 
+
+    public boolean addMeasurable(long diagramId, long measurableId) {
+        ArrayList<FlowDiagramEntity> entities = newArrayList(
+                ImmutableFlowDiagramEntity.builder()
+                        .diagramId(diagramId)
+                        .entityReference(mkRef(EntityKind.MEASURABLE, measurableId))
+                        .isNotable(false)
+                        .build());
+        int[] rc = flowDiagramEntityDao.createEntities(entities);
+        return rc[0] == 1;
+    }
+
+
+    public boolean removeMeasurable(long diagramId, long measurableId) {
+        return flowDiagramEntityDao.deleteEntityForDiagram(
+                diagramId,
+                mkRef(EntityKind.MEASURABLE, measurableId));
+    }
 }

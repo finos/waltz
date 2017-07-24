@@ -99,13 +99,29 @@ public class MeasurableIdSelectorFactory extends AbstractIdSelectorFactory {
     }
 
 
+    /**
+     * Returns all measurables liked to entities listed in the diagram
+     *
+     * @param options
+     * @return
+     */
     private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate flow diagram based selectors with exact scopes");
-        return mkBaseRatingBasedSelector()
+        long diagramId = options.entityReference().id();
+        Select<Record1<Long>> viaAppRatings = mkBaseRatingBasedSelector()
                 .innerJoin(FLOW_DIAGRAM_ENTITY)
                 .on(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(MEASURABLE_RATING.ENTITY_ID)
                         .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(MEASURABLE_RATING.ENTITY_KIND)))
-                .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id()));
+                .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId));
+
+        Select<Record1<Long>> viaDirectRelationship = DSL
+                .select(FLOW_DIAGRAM_ENTITY.ENTITY_ID)
+                .from(FLOW_DIAGRAM_ENTITY)
+                .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.MEASURABLE.name()))
+                .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId));
+
+        return viaAppRatings.union(viaDirectRelationship);
+
     }
 
 
