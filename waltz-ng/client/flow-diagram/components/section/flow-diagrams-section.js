@@ -16,10 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from '../../../common';
-
-
 /**
  * @name waltz-flow-diagrams-section
  *
@@ -29,27 +25,16 @@ import {initialiseData} from '../../../common';
 
 
 const bindings = {
-    flowDiagrams: '<',
-    flowDiagramEntities: '<',
+    parentEntityRef: '<',
     createDiagramCommands: '<',
-    reload: '<'
-};
-
-
-const initialState = {
+    canCreate: '<'
 };
 
 
 const template = require('./flow-diagrams-section.html');
 
 
-function controller() {
-    const vm = this;
-
-    vm.$onInit = () => initialiseData(vm, initialState);
-
-    vm.$onChanges = (c) => {
-    };
+function controller($q, serviceBroker) {
 }
 
 

@@ -60,9 +60,15 @@
 
         <hr>
 
-        <waltz-flow-diagram-associations read-only="false"
+        <waltz-flow-diagram-associations ng-if="$ctrl.id"
+                                         read-only="false"
                                          diagram-id="$ctrl.id">
         </waltz-flow-diagram-associations>
+
+        <strong ng-if="!$ctrl.id">
+            Cannot add additional viewpoints until
+            the diagram has been saved
+        </strong>
 
         <hr>
 

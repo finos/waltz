@@ -30,6 +30,11 @@ function controller($stateParams,
     const vm = Object.assign(this, initialState);
 
 
+    vm.createDiagramCommands = () => {
+        return [
+            { command: 'SET_TITLE', payload: "Test title" }
+        ];
+    };
 }
 
 

@@ -290,7 +290,7 @@ function controller($q,
 
     vm.doSave = () => {
         flowDiagramStateService.save()
-            .then(r => vm.saveResp = r)
+            .then(r => vm.id = r)
             .then(() => notification.success('Saved'))
     };
 

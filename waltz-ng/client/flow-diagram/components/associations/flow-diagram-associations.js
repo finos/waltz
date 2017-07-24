@@ -50,7 +50,8 @@ const initialState = {
     associations: [],
     visibility: {
         suggestions: false,
-        search: false
+        search: false,
+        inactive: false
     },
     readOnly: true
 };
@@ -114,16 +115,21 @@ function controller($q, serviceBroker) {
     };
 
 
-    vm.$onInit = () => {
-        vm.diagramRef = {
-            entityReference: {
-                kind: 'FLOW_DIAGRAM',
-                id: vm.diagramId
-            }
-            ,
-            scope: 'EXACT'
-        };
-        loadMappings();
+    vm.$onChanges = () => {
+        if (vm.diagramId) {
+            vm.diagramRef = {
+                entityReference: {
+                    kind: 'FLOW_DIAGRAM',
+                    id: vm.diagramId
+                }
+                ,
+                scope: 'EXACT'
+            };
+            loadMappings();
+            vm.visibility.inactive = false;
+        } else {
+            vm.visibility.inactive = true;
+        }
     };
 
 
@@ -166,7 +172,7 @@ function controller($q, serviceBroker) {
                     qry,
                     ['name']);
             });
-    }
+    };
 
 
     // -- CRUD --

@@ -43,6 +43,7 @@ public class FlowDiagramIdSelectorFactory implements IdSelectorFactory {
             case APPLICATION:
             case LOGICAL_DATA_FLOW:
             case PHYSICAL_FLOW:
+            case MEASURABLE:
                 return mkForDirectEntity(options);
             case PHYSICAL_SPECIFICATION:
                 return mkForPhysicalSpecification(options);
