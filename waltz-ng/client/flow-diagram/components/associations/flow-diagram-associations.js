@@ -80,7 +80,8 @@ function controller($q, serviceBroker) {
         const likelyMeasurablePromise = serviceBroker
             .loadViewData(
                 CORE_API.MeasurableStore.findMeasurablesBySelector,
-                [vm.diagramRef])
+                [vm.diagramRef],
+                { force: true })
             .then(r => {
                 return r.data;
             });
@@ -164,7 +165,7 @@ function controller($q, serviceBroker) {
                 const measurables = _.filter(
                     r.data,
                     m => category
-                        ? m.categoryId == category.id
+                        ? m.categoryId === category.id
                         : true);
 
                 vm.searchResults = termSearch(
@@ -178,7 +179,6 @@ function controller($q, serviceBroker) {
     // -- CRUD --
 
     vm.onRemove = (m) => {
-        vm.message="remove"
         serviceBroker
             .execute(
                 CORE_API.FlowDiagramEntityStore.removeMeasurable,
@@ -188,8 +188,7 @@ function controller($q, serviceBroker) {
 
 
     vm.onAdd = (m) => {
-        vm.message="Add"
-        hideAll()
+        hideAll();
         serviceBroker
             .execute(
                 CORE_API.FlowDiagramEntityStore.addMeasurable,
