@@ -90,7 +90,10 @@ function controller() {
         nodeChildren: "children",
         dirSelectable: true,
         equality: (a, b) => a && b && a.id === b.id,
-        multiSelection: false
+        multiSelection: false,
+        isSelectable: (node) => {
+            return _.get(node, 'concrete', true);
+        }
     };
 
     vm.onNodeClick = (node) => {
