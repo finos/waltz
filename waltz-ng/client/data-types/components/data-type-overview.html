@@ -55,7 +55,11 @@
                     <h4>Parent dataTypes: </h4>
                     <ul>
                         <li ng-repeat="parent in $ctrl.parents">
-                            <a ui-sref="main.data-type.view ({id: parent.id })"
+                            <i ng-if="!parent.concrete"
+                               ng-bind="parent.name">
+                            </i>
+                            <a ng-if='parent.concrete'
+                               ui-sref="main.data-type.view ({id: parent.id })"
                                ng-bind="parent.name">
                             </a>
                             <span ng-if="!$last">&raquo;</span>
