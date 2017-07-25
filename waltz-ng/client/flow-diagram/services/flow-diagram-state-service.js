@@ -126,12 +126,13 @@ function restoreDiagram(
     const flowCommands = _
         .chain(entityNodes)
         .filter(node => node.entityReference.kind === 'LOGICAL_DATA_FLOW')
-        .map(node => {
-            const logicalFlow = logicalFlowsById[node.entityReference.id];
+        .map(node => logicalFlowsById[node.entityReference.id])
+        .filter(logicalFlow => logicalFlow != null)
+        .map(logicalFlow => {
             return {
                 command: 'ADD_FLOW',
                 payload: Object.assign({}, logicalFlow, {kind: 'LOGICAL_DATA_FLOW'} )
-            }
+            };
         })
         .value();
 
@@ -151,17 +152,33 @@ function restoreDiagram(
         })
         .value();
 
-    const annotationCommands = _.map(annotations, ann => {
-        return {
-            command: 'ADD_ANNOTATION',
-            payload: {
-                kind: 'ANNOTATION',
-                id: ann.annotationId,
-                entityReference: ann.entityReference,
-                note: ann.note,
+
+    const entityRefs = _.map(entityNodes, n => toGraphId(n.entityReference));
+
+    const annotationCommands = _
+        .chain(annotations)
+        .filter(ann => {
+            const annotatedEntityExists = ann.entityReference.kind === 'LOGICAL_DATA_FLOW'
+                ? logicalFlowsById[ann.entityReference.id] != null
+                : _.includes(entityRefs, toGraphId(ann.entityReference));
+
+            if (! annotatedEntityExists) {
+                console.warn('wfdss: WARN - cannot attach annotation to missing element: ', ann)
             }
-        }
-    });
+            return annotatedEntityExists;
+        })
+        .map(ann => {
+            return {
+                command: 'ADD_ANNOTATION',
+                payload: {
+                    kind: 'ANNOTATION',
+                    id: ann.annotationId,
+                    entityReference: ann.entityReference,
+                    note: ann.note,
+                }
+            };
+        })
+        .value();
 
     const decorationCommands = _.map(physicalFlows, pf => {
         return {
