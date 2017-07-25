@@ -26,13 +26,13 @@
                         <div class="col-md-offset-1 col-md-4">
                             <br>
                             <h3>
-                                Total Cost:
+                                Application TCO:
                                 <span style='font-weight: bolder'
                                       ng-bind="$ctrl.currentTotal | currency:'€'">
                                 </span>
                             </h3>
                             <h4>
-                                <span ng-bind="$ctrl.currentYear"></span>
+                                <span ng-bind="$ctrl.currentYear"></span> YTD
                             </h4>
                         </div>
                         <div class="col-md-7">
@@ -66,9 +66,6 @@
                     <uib-tab-heading>
                         Detail
                     </uib-tab-heading>
-                    <p class="small">
-                        The table shows historic cost entries for this application
-                    </p>
                     <div ng-if="showTableTab">
                         <waltz-asset-cost-table costs="$ctrl.costs">
                         </waltz-asset-cost-table>
