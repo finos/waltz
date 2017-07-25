@@ -37,4 +37,9 @@ public abstract class DataType implements
     @Value.Default
     public boolean selectable() { return true; }
 
+
+    @Value.Default
+    public boolean concrete() {
+        return true;
+    }
 }

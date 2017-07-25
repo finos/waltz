@@ -33,4 +33,18 @@
         </sql>
     </changeSet>
 
+
+    <!-- 2421 -->
+    <changeSet id="20170725-2421-1"
+               author="davidwatkins73">
+        <comment>2421: Add concrete flag to data types</comment>
+        <addColumn tableName="data_type">
+            <column name="concrete"
+                    type="boolean"
+                    defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
