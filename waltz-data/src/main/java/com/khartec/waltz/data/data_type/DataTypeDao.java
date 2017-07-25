@@ -42,8 +42,7 @@ import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 @Repository
 public class DataTypeDao implements FindEntityReferencesByIdSelector {
 
-    private final DSLContext dsl;
-    private RecordMapper<? super Record, DataType> mapper = r -> {
+    private final static RecordMapper<Record, DataType> TO_DOMAIN = r -> {
         DataTypeRecord record = r.into(DataTypeRecord.class);
         return ImmutableDataType.builder()
                 .code(record.getCode())
@@ -51,8 +50,12 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
                 .name(record.getName())
                 .id(Optional.ofNullable(record.getId()))
                 .parentId(Optional.ofNullable(record.getParentId()))
+                .concrete(record.getConcrete())
                 .build();
     };
+
+
+    private final DSLContext dsl;
 
 
     @Autowired
@@ -63,10 +66,9 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
 
 
     public List<DataType> getAll() {
-        return dsl.select()
-                .from(DATA_TYPE)
-                .fetch(mapper);
-
+        return dsl
+                .selectFrom(DATA_TYPE)
+                .fetch(TO_DOMAIN);
     }
 
 
@@ -83,9 +85,10 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
 
     public DataType getByCode(String code) {
         checkNotEmpty(code, "Code cannot be null/empty");
-        return dsl.select(DATA_TYPE.fields())
-                .from(DATA_TYPE)
+        return dsl
+                .selectFrom(DATA_TYPE)
                 .where(DATA_TYPE.CODE.eq(code))
-                .fetchOne(mapper);
+                .fetchOne(TO_DOMAIN);
     }
+
 }
