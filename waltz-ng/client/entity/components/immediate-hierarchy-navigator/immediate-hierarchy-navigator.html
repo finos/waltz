@@ -2,7 +2,8 @@
     <div class="col-md-6">
         <strong>Parents: </strong>
         <div class="wihn-list"
-             ng-class="{'waltz-scroll-region-200': $ctrl.parentLinks.length > 10}">
+             ng-class="{'waltz-scroll-region-200': $ctrl.parentLinks.length > 10}"
+             ng-style="{'width': $ctrl.parentLinks.length > 10 ? '85%' : '100%'}">
             <ul class="list-unstyled"
                 ng-if="$ctrl.parentLinks.length > 0">
                 <li ng-repeat="parent in $ctrl.parentLinks">
@@ -20,7 +21,8 @@
     <div class="col-md-6">
         <strong>Children: </strong>
         <div class="wihn-list"
-             ng-class="{'waltz-scroll-region-200': $ctrl.childLinks.length > 10}">
+             ng-class="{'waltz-scroll-region-200': $ctrl.childLinks.length > 10}"
+             ng-style="{'width': $ctrl.childLinks.length > 10 ? '85%' : '100%'}">
             <ul class="list-unstyled"
                 ng-if="$ctrl.childLinks.length > 0">
                 <li ng-repeat="child in $ctrl.childLinks">
