@@ -58,10 +58,9 @@
 
 
     <!-- FLOW DIAGRAMS -->
-    <waltz-flow-diagrams-section flow-diagrams="ctrl.flowDiagrams"
-                                 flow-diagram-entities="ctrl.flowDiagramEntities"
-                                 create-diagram-commands="ctrl.createFlowDiagramCommands"
-                                 reload="ctrl.loadFlowDiagrams">
+    <waltz-flow-diagrams-section parent-entity-ref="ctrl.entityRef"
+                                 can-create="true"
+                                 create-diagram-commands="ctrl.createFlowDiagramCommands">
     </waltz-flow-diagrams-section>
 
 
