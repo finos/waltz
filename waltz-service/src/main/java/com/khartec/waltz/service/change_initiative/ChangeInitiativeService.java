@@ -74,6 +74,11 @@ public class ChangeInitiativeService {
     }
 
 
+    public Collection<ChangeInitiative> findParentsById(long id) {
+        return baseDao.findParentsById(id);
+    }
+
+
     public Collection<ChangeInitiative> search(String query) {
         return search(query, EntitySearchOptions.mkForEntity(CHANGE_INITIATIVE));
     }

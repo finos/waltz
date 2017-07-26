@@ -37,6 +37,7 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
+import static com.khartec.waltz.schema.Tables.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static java.util.Optional.ofNullable;
@@ -106,6 +107,16 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
     public Collection<ChangeInitiative> findByParentId(long parentId) {
         return dsl.selectFrom(CHANGE_INITIATIVE)
                 .where(CHANGE_INITIATIVE.PARENT_ID.eq(parentId))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Collection<ChangeInitiative> findParentsById(long id) {
+        return dsl.select(CHANGE_INITIATIVE.fields())
+                .from(CHANGE_INITIATIVE)
+                .innerJoin(ENTITY_HIERARCHY).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(CHANGE_INITIATIVE.ID))
+                .where(ENTITY_HIERARCHY.ID.eq(id))
+                .and(ENTITY_HIERARCHY.ANCESTOR_ID.notEqual(id))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

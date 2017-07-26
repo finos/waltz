@@ -26,6 +26,8 @@ import template from './change-initiative-view.html';
 
 const initialState = {
     changeInitiative: {},
+    childrenRefs: [],
+    parentRefs: [],
     involvements: [],
     sourceDataRatings: [],
     surveyInstances: [],
@@ -34,6 +36,16 @@ const initialState = {
         appGroupRelationships: []
     }
 };
+
+
+function enrichWithRefs(changeInitiatives = []) {
+    return _.map(
+        changeInitiatives,
+        d => Object.assign(
+            {},
+            d,
+            { entityReference: {kind: 'CHANGE_INITIATIVE', id: d.id, name: d.name, description: d.description }}));
+}
 
 
 function controller($q,
@@ -118,6 +130,24 @@ function controller($q,
     surveyInstanceStore
         .findByEntityReference(vm.entityRef)
         .then(surveyInstances => vm.surveyInstances = _.filter(surveyInstances, {'status': 'COMPLETED'}));
+
+    serviceBroker
+        .loadViewData(CORE_API.ChangeInitiativeStore.findByParentId, [vm.entityRef.id])
+        .then(r => {
+            const children = _.chain(r.data)
+                .sortBy('name')
+                .value();
+            vm.childRefs = enrichWithRefs(children);
+        });
+
+    serviceBroker
+        .loadViewData(CORE_API.ChangeInitiativeStore.findParentsById, [vm.entityRef.id])
+        .then(r => {
+            const parents = _.chain(r.data)
+                .sortBy('name')
+                .value();
+            vm.parentRefs = enrichWithRefs(parents);
+        });
 
     const loadInvolvements = () => {
         const involvementPromises = [

@@ -64,6 +64,7 @@ public class ChangeInitiativeEndpoint implements Endpoint {
         String getRelationshipsForIdPath = mkPath(getByIdPath, "related");
         String findForRefPath = mkPath(BASE_URL, "ref", ":kind", ":id");
         String findByParentIdPath = mkPath(BASE_URL, "children", ":id");
+        String findParentByIdPath = mkPath(BASE_URL, "parents", ":id");
         String searchPath = mkPath(BASE_URL, "search", ":query");
         String changeEntityRelationshipPath = mkPath(BASE_URL, "id", ":id", "entity-relationship");
 
@@ -79,6 +80,9 @@ public class ChangeInitiativeEndpoint implements Endpoint {
         ListRoute<ChangeInitiative> findByParentIdRoute = (request, response) ->
                 service.findByParentId(getId(request));
 
+        ListRoute<ChangeInitiative> findParentByIdRoute = (request, response) ->
+                service.findParentsById(getId(request));
+
         ListRoute<ChangeInitiative> searchRoute = (request, response) ->
                 service.search(request.params("query"));
 
@@ -89,6 +93,7 @@ public class ChangeInitiativeEndpoint implements Endpoint {
         getForList(getRelationshipsForIdPath, getRelationshipsForIdRoute);
         getForList(findForRefPath, findForRefRoute);
         getForList(findByParentIdPath, findByParentIdRoute);
+        getForList(findParentByIdPath, findParentByIdRoute);
         getForList(searchPath, searchRoute);
         postForDatum(changeEntityRelationshipPath, changeEntityRelationshipRoute);
     }
