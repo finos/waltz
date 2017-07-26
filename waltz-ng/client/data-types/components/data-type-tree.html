@@ -4,15 +4,10 @@
                  order-by="'-name'"
                  options="$ctrl.treeOptions">
             <span class="waltz-visibility-parent">
-
-                <a ng-if='node.concrete'
-                   ui-sref="main.data-type.view ({id: node.id })">
+                <a ui-sref="main.data-type.view ({id: node.id })">
                     <strong ng-bind="node.name">
                     </strong>
                 </a>
-
-                <i ng-if="!node.concrete"
-                   ng-bind="node.name"></i>
             </span>
     </treecontrol>
 </div>
