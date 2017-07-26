@@ -6,15 +6,15 @@
                  on-selection="$ctrl.onNodeClick(node)"
                  options="$ctrl.treeOptions">
 
-            <span ng-style="{opacity : (node.selectable ? 1 : 0.3)}">
+            <span ng-style="{opacity : (node.concrete ? 1 : 0.7)}">
                 <input type="checkbox"
                        checked
                        ng-if="$ctrl.checkedMap[node.id]"
-                       ng-disabled="!node.selectable"
+                       ng-disabled="!node.concrete"
                        ng-click="$ctrl.onNodeUncheck(node.id)">
                 <input type="checkbox"
                        ng-if="!$ctrl.checkedMap[node.id]"
-                       ng-disabled="!node.selectable"
+                       ng-disabled="!node.concrete"
                        ng-click="$ctrl.onNodeCheck(node.id)">
                 <ng-transclude>
                     <span ng-bind="node.name"></span>
