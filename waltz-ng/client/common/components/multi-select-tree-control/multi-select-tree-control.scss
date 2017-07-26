@@ -2,4 +2,8 @@
     treecontrol {
         font-family: 'Oxygen', sans-serif;
     }
+
+    treecontrol.tree-light li .tree-unselectable {
+        color: #999;
+    }
 }
