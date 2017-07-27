@@ -49,6 +49,10 @@ function controller($scope,
         if (model.person) {
             historyStore.put(model.person.displayName, 'PERSON', 'main.person.view', { empId: model.person.employeeId });
             vm.entityRef = { kind: 'PERSON', id: model.person.id };
+            vm.selector =  {
+                entityReference: vm.entityRef,
+                scope: 'CHILDREN'
+            };
         }
 
         vm.hasInvolvements = hasInvolvements(viewService.state.model.combinedAppInvolvements);
