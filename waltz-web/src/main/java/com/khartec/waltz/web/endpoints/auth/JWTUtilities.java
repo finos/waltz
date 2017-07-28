@@ -25,4 +25,5 @@ public class JWTUtilities {
 
     public static final String SECRET = "secret";
 
+    public static final String ISSUER = "Waltz";
 }
