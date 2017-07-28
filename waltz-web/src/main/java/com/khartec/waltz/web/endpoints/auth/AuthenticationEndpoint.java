@@ -94,9 +94,6 @@ public class AuthenticationEndpoint implements Endpoint {
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println();
-    }
 
     @Override
     public void register() {
