@@ -98,13 +98,13 @@ public class PersonDataGenerator {
 
             ImmutablePerson p = ImmutablePerson.builder()
                     .managerEmployeeId(parent.employeeId())
-                    .employeeId(person.passportNumber())
+                    .employeeId(person.getPassportNumber())
                     .kind(PersonKind.EMPLOYEE)
-                    .userPrincipalName(person.username())
+                    .userPrincipalName(person.getUsername())
                     .title(jobTitle)
                     .departmentName(randomPick(departmentNames))
-                    .displayName(person.fullName())
-                    .email((counter++) + person.email())
+                    .displayName(person.getFullName())
+                    .email((counter++) + person.getEmail())
                     .build();
 
             peeps.add(p);
