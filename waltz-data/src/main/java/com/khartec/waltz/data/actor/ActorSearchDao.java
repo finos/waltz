@@ -18,9 +18,7 @@
 
 package com.khartec.waltz.data.actor;
 
-import com.khartec.waltz.common.StringUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.data.SearchUtilities;
 import com.khartec.waltz.model.actor.Actor;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.DSLContext;
@@ -61,7 +59,7 @@ public class ActorSearchDao {
             return emptyList();
         }
 
-        List<String> terms = StringUtilities.mkTerms(query.toLowerCase());
+        List<String> terms = SearchUtilities.mkTerms(query.toLowerCase());
         return actorDao.findAll()
                 .stream()
                 .filter(actor -> {
