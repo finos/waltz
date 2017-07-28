@@ -54,13 +54,13 @@ public class PersonDataGenerator {
         Person person = fairy.person();
 
         ImmutablePerson root = ImmutablePerson.builder()
-                .employeeId(person.passportNumber())
+                .employeeId(person.getPassportNumber())
                 .kind(PersonKind.EMPLOYEE)
-                .userPrincipalName(person.username())
+                .userPrincipalName(person.getUsername())
                 .title(randomPick(jobTitles[0]))
                 .departmentName("CEO")
-                .displayName(person.fullName())
-                .email(person.email())
+                .displayName(person.getFullName())
+                .email(person.getEmail())
                 .build();
 
 
