@@ -54,7 +54,7 @@
                        ng-model="$ctrl.selectedPerspectiveBlock"
                        ng-value="pb"
                        ng-disabled="!$ctrl.hasMeasurables(pb)"
-                       name="tab"
+                       name="{{ $ctrl.measurableCategory.id + '_perspective_rating' }}"
                        id="{{ pb.definition.id + '_' +$id}}">
 
                 <label for="{{ pb.definition.id + '_' +$id}}"
