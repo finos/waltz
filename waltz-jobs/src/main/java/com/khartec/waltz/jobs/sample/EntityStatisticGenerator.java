@@ -98,7 +98,7 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
     private static final EntityStatisticDefinition SERVER_COUNT = ImmutableEntityStatisticDefinition.builder()
             .active(true)
             .id(20010L)
-            .category(StatisticCategory.SECURITY)
+            .category(StatisticCategory.TECHNICAL)
             .name("Server Type Count")
             .description("Server Types")
             .type(StatisticType.NUMERIC)

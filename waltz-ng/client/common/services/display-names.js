@@ -141,10 +141,11 @@ export const assetCostKindNames = {
 
 export const entityStatisticCategoryDisplayNames = {
     COMPLIANCE: 'Compliance',
+    DATA_QUALITY: 'Data Quality',
     GOVERNANCE: 'Governance',
-    SECURITY: 'Security',
     REGULATORY: 'Regulatory',
-    DATA_QUALITY: 'Data Quality'
+    SECURITY: 'Security',
+    TECHNICAL: 'Technical'
 };
 
 
