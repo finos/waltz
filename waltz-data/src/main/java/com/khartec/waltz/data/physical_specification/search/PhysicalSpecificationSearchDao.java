@@ -33,9 +33,9 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.StringUtilities.mkTerms;
 import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 

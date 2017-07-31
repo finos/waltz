@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.SetUtilities.orderedUnion;
-import static com.khartec.waltz.common.StringUtilities.mkTerms;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 
@@ -48,6 +48,19 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
         if (terms.isEmpty()) {
             return Collections.emptyList();
         }
+
+        Condition assetCodeCondition = terms.stream()
+                .map(term -> APPLICATION.ASSET_CODE.like(term + "%"))
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        List<Application> appsViaAssetCode = dsl.selectDistinct(APPLICATION.fields())
+                .from(APPLICATION)
+                .where(assetCodeCondition)
+                .orderBy(APPLICATION.NAME)
+                .limit(options.limit())
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
 
         Condition aliasCondition = terms.stream()
                 .map(term -> ENTITY_ALIAS.ALIAS.like("%" + term + "%"))
@@ -83,7 +96,7 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
                 .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
 
-        return new ArrayList<>(orderedUnion(appsViaName, appsViaAlias, appsViaFullText));
+        return new ArrayList<>(orderedUnion(appsViaAssetCode, appsViaName, appsViaAlias, appsViaFullText));
     }
 
 }
