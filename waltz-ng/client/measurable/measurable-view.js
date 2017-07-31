@@ -56,6 +56,7 @@ function controller($q,
 
     const vm = initialiseData(this, initialState);
     vm.entityReference = ref;
+    vm.selector = childrenSelector;
     vm.scope = childrenSelector.scope;
 
 

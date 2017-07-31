@@ -72,7 +72,7 @@ function controller($scope,
     };
 
     vm.entityRef = idSelector.entityReference;
-
+    vm.selector =  idSelector;
 
     // -- LOAD ---
 
