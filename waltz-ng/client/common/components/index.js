@@ -21,7 +21,7 @@ export default (module) => {
         .component('waltzBooleanRenderer', require('./boolean-renderer'))
         .component('waltzBucketChart', require('./bucket-chart'))
         .component('waltzLastUpdated', require('./last-updated/last-updated'))
-        .component('waltzMultiSelectTreeControl', require('./multi-select-tree-control/multi-select-treecontrol'))
+        .component('waltzMultiSelectTreeControl', require('./multi-select-tree-control/multi-select-tree-control'))
         .component('waltzSearchControl', require('./search-control/search-control'))
         .component('waltzEntityIconLabel', require('./entity-link/entity-icon-label'))
         .component('waltzEntityLink', require('./entity-link/entity-link'))

@@ -18,8 +18,6 @@
 
 import angular from "angular";
 import {initialiseData} from "../common";
-import {buildHierarchies} from "../common/hierarchy-utils";
-
 
 
 const initialState = {
@@ -28,33 +26,28 @@ const initialState = {
 };
 
 
+
 function controller($state,
-                    dataTypes,
                     staticPanelStore,
                     svgStore) {
 
     const vm = initialiseData(this, initialState);
 
-    vm.trees = buildHierarchies(dataTypes);
+    vm.$onInit = () => {
+        svgStore
+            .findByGroup('DATA_TYPE')
+            .then(xs => vm.diagrams = xs);
+
+        staticPanelStore
+            .findByGroup("HOME.DATA-TYPE")
+            .then(panels => vm.panels = panels);
+    };
 
     vm.nodeSelected = (node) => vm.selectedNode = node;
-
-    svgStore
-        .findByGroup('DATA_TYPE')
-        .then(xs => vm.diagrams = xs);
-
-    staticPanelStore
-        .findByGroup("HOME.DATA-TYPE")
-        .then(panels => vm.panels = panels);
 
     vm.blockProcessor = b => {
         b.block.onclick = () => $state.go('main.data-type.code', { code: b.value });
         angular.element(b.block).addClass('clickable');
-    };
-
-
-    vm.flowTableInitialised = (api) => {
-        vm.exportLineageReports = api.export;
     };
 
 }
@@ -62,7 +55,6 @@ function controller($state,
 
 controller.$inject = [
     '$state',
-    'dataTypes',
     'StaticPanelStore',
     'SvgDiagramStore'
 ];
