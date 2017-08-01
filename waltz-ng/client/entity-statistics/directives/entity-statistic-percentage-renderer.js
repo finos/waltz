@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from "lodash";
+
 
 const BINDINGS = {
     statistic: '<',
@@ -25,7 +27,7 @@ const BINDINGS = {
 function controller() {
     const vm = this;
 
-    vm.isNumber = (v) => !isNaN(parseFloat((v)));
+    vm.isNumber = (v) => _.isNumber(v);
 }
 
 
