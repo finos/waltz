@@ -18,12 +18,17 @@
 
 package com.khartec.waltz.web.endpoints.auth;
 
+import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.khartec.waltz.service.settings.SettingsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 
-import java.util.Map;
+import java.io.UnsupportedEncodingException;
 
 
 /**
@@ -31,23 +36,34 @@ import java.util.Map;
  * about the bearer name.
  */
 public class JWTAuthenticationFilter extends WaltzFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
+
+    private final JWTVerifier verifier;
 
     public JWTAuthenticationFilter(SettingsService settingsService) {
         super(settingsService);
+        try {
+            Algorithm algorithm = Algorithm.HMAC512(JWTUtilities.SECRET);
+            verifier = JWT.require(algorithm)
+                    .withIssuer(JWTUtilities.ISSUER)
+                    .build(); //Reusable verifier instance
+        } catch (UnsupportedEncodingException uee) {
+            LOG.error("Cannot create JWT Verifier, this is bad", uee);
+            throw new UnsupportedOperationException(uee);
+        }
     }
 
 
     @Override
     public void handle(Request request, Response response) throws Exception {
-        JWTVerifier verifier = new JWTVerifier(JWTUtilities.SECRET);
         String authorizationHeader = request.headers("Authorization");
 
         if (authorizationHeader == null) {
             AuthenticationUtilities.setUserAsAnonymous(request);
         } else {
             String token = authorizationHeader.replaceFirst("Bearer ", "");
-            Map<String, Object> claims = verifier.verify(token);
-            AuthenticationUtilities.setUser(request, (String) claims.get("sub"));
+            DecodedJWT decodedJWT = verifier.verify(token);
+            AuthenticationUtilities.setUser(request, decodedJWT.getSubject());
         }
     }
 

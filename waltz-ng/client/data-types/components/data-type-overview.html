@@ -70,9 +70,15 @@
                 <div ng-if="$ctrl.dataType.children.length > 0"
                      class="col-sm-8">
 
-                    <h4>Sub dataTypes</h4>
-                    <waltz-data-type-tree trees="$ctrl.dataType.children">
-                    </waltz-data-type-tree>
+                    <h4>Child dataTypes</h4>
+                    <ul>
+                        <li ng-repeat="child in $ctrl.dataType.children | orderBy:'name'">
+                            <a ui-sref="main.data-type.view ({id: child.id})"
+                               class="clickable"
+                               ng-bind="child.name">
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
 

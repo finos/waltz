@@ -15,22 +15,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from 'lodash';
+import {CORE_API} from '../common/services/core-api-utils';
 
-export function loadDataTypes(dataTypeService) {
-    return dataTypeService.loadDataTypes();
+
+export function loadDataTypes(serviceBroker) {
+    return serviceBroker
+        .loadAppData(CORE_API.DataTypeStore.findAll, [])
+        .then(r => r.data);
 }
 
-loadDataTypes.$inject = ['DataTypeService'];
+loadDataTypes.$inject = [
+    'ServiceBroker'
+];
 
 
-export function dataTypeByIdResolver($stateParams, dataTypeService) {
+export function dataTypeByIdResolver($stateParams, serviceBroker) {
     if(!$stateParams.id)
         throw "'id' not found in stateParams";
 
-    return dataTypeService
-        .loadDataTypes()
-        .then(dataTypes => {
-            const dataType = _.find(dataTypes, { id: $stateParams.id});
+    return serviceBroker
+        .loadAppData(CORE_API.DataTypeStore.findAll, [])
+        .then(r => {
+            const dataType = _.find(r.data, { id: $stateParams.id});
             if (dataType) {
                 return dataType;
             } else {
@@ -39,17 +46,20 @@ export function dataTypeByIdResolver($stateParams, dataTypeService) {
         });
 }
 
-dataTypeByIdResolver.$inject = ['$stateParams', 'DataTypeService'];
+dataTypeByIdResolver.$inject = [
+    '$stateParams',
+    'ServiceBroker'
+];
 
 
-export function dataTypeByCodeResolver($stateParams, dataTypeService) {
+export function dataTypeByCodeResolver($stateParams, serviceBroker) {
     if(!$stateParams.code)
         throw "'code' not found in stateParams";
 
-    return dataTypeService
-        .loadDataTypes()
-        .then(dataTypes => {
-            const dataType = _.find(dataTypes, { code: $stateParams.code});
+    return serviceBroker
+        .loadAppData(CORE_API.DataTypeStore.findAll, [])
+        .then(r => {
+            const dataType = _.find(r.data, { code: $stateParams.code});
             if (dataType) {
                 return dataType;
             } else {
@@ -58,4 +68,7 @@ export function dataTypeByCodeResolver($stateParams, dataTypeService) {
         });
 }
 
-dataTypeByCodeResolver.$inject = ['$stateParams', 'DataTypeService'];
+dataTypeByCodeResolver.$inject = [
+    '$stateParams',
+    'ServiceBroker'
+];

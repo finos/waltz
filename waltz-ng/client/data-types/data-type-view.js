@@ -42,7 +42,6 @@ function controller($scope,
         name: dataType.name
     };
 
-
     const selector = {
         entityReference,
         scope: 'CHILDREN'

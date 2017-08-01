@@ -184,7 +184,6 @@ function controller(
 
     vm.$onInit = () => {
         reload();
-        console.log(vm)
     };
 
 

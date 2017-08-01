@@ -54,13 +54,13 @@ public class PersonDataGenerator {
         Person person = fairy.person();
 
         ImmutablePerson root = ImmutablePerson.builder()
-                .employeeId(person.passportNumber())
+                .employeeId(person.getPassportNumber())
                 .kind(PersonKind.EMPLOYEE)
-                .userPrincipalName(person.username())
+                .userPrincipalName(person.getUsername())
                 .title(randomPick(jobTitles[0]))
                 .departmentName("CEO")
-                .displayName(person.fullName())
-                .email(person.email())
+                .displayName(person.getFullName())
+                .email(person.getEmail())
                 .build();
 
 
@@ -98,13 +98,13 @@ public class PersonDataGenerator {
 
             ImmutablePerson p = ImmutablePerson.builder()
                     .managerEmployeeId(parent.employeeId())
-                    .employeeId(person.passportNumber())
+                    .employeeId(person.getPassportNumber())
                     .kind(PersonKind.EMPLOYEE)
-                    .userPrincipalName(person.username())
+                    .userPrincipalName(person.getUsername())
                     .title(jobTitle)
                     .departmentName(randomPick(departmentNames))
-                    .displayName(person.fullName())
-                    .email((counter++) + person.email())
+                    .displayName(person.getFullName())
+                    .email((counter++) + person.getEmail())
                     .build();
 
             peeps.add(p);
