@@ -31,7 +31,7 @@ Nav aids are currently declared in the `svg_diagram` table which looks like this
 The group is used to determine where an svg diagram/s is rendered.  These groups are hard-coded into client side code and therefore all diagrams should align to one of the following:
 
 |Group|Expected key value|Description|
-|---|---|
+|---|---|---|
 |`ORG_TREE`|person, employee_id |Shown on the the person index page|
 |`ORG_UNIT`|org unit, id|Shown on the organisational unit index page|
 |`DATA_TYPE`|data type, code|Shown on the data type page|
