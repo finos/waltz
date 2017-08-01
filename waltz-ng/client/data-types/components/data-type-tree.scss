@@ -1,0 +1,18 @@
+.wdtt-search-active {
+    color: #32a226;
+}
+.wdtt-search-inactive {
+    color: #858c85;
+}
+
+
+.wdtt-search-region {
+    margin-left: 24px;
+    padding-bottom: 12px;
+
+    input {
+        display: inline-block;
+        width: 60%;
+        margin-left: 4px;
+    }
+}

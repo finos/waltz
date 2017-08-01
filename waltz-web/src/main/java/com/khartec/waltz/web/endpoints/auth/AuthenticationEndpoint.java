@@ -19,11 +19,10 @@
 package com.khartec.waltz.web.endpoints.auth;
 
 
-import com.auth0.jwt.JWTSigner;
-import com.khartec.waltz.common.MapBuilder;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.khartec.waltz.model.settings.NamedSettings;
 import com.khartec.waltz.model.user.LoginRequest;
-import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.settings.SettingsService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.service.user.UserService;
@@ -34,8 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Filter;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -105,22 +102,24 @@ public class AuthenticationEndpoint implements Endpoint {
 
             LoginRequest login = readBody(request, LoginRequest.class);
             if (userService.authenticate(login)) {
+                Algorithm algorithmHS = Algorithm.HMAC512(JWTUtilities.SECRET);
 
-                List<Role> roles = userRoleService.getUserRoles(login.userName());
-                Map<String, Object> claims = new MapBuilder()
-                        .add("iss", "Waltz")
-                        .add("sub", login.userName())
-                        .add("roles", roles)
-                        .add("displayName", login.userName())
-                        .add("employeeId", login.userName())
-                        .build();
-                JWTSigner signer = new JWTSigner(JWTUtilities.SECRET);
-                String token = signer.sign(claims);
+                String[] roles = userRoleService
+                        .getUserRoles(login.userName()).stream()
+                        .map(r -> r.name())
+                        .toArray(size -> new String[size]);
+
+                String token = JWT.create()
+                        .withIssuer(JWTUtilities.ISSUER)
+                        .withSubject(login.userName())
+                        .withArrayClaim("roles", roles)
+                        .withClaim("displayName", login.userName())
+                        .withClaim("employeeId", login.userName())
+                        .sign(algorithmHS);
 
                 return newHashMap("token", token);
             } else {
                 response.status(401);
-
                 return "Unknown user/password";
             }
         }, transformer);

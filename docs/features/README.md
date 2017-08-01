@@ -16,6 +16,7 @@
     - [Properties](configuration/properties.md) 
     - [Settings](configuration/settings.md) 
     - [Static Panels](configuration/static-panels.md) 
+    - [Nav Aids](configuration/svg_diagrams.html)
 
 
 ## Notes 

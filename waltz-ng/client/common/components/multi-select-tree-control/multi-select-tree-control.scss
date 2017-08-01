@@ -6,4 +6,23 @@
     treecontrol.tree-light li .tree-unselectable {
         color: #999;
     }
+
+    .wmstc-search-active {
+        color: #32a226;
+    }
+    .wmstc-search-inactive {
+        color: #858c85;
+    }
+
+    .wmstc-search-region {
+        margin-left: 24px;
+        padding-bottom: 12px;
+
+        input {
+            display: inline-block;
+            width: 60%;
+            margin-left: 4px;
+        }
+    }
 }
+
