@@ -50,7 +50,10 @@
                            icon="qrcode"
                            small="Types"
                            id="data-types-tree-section">
-                <waltz-data-type-tree trees="ctrl.trees"
+
+
+                <waltz-data-type-tree trees="ctrl.hierarchy"
+                                      expanded-nodes="$ctrl.expandedNodes"
                                       on-selection="ctrl.nodeSelected">
                 </waltz-data-type-tree>
             </waltz-section>

@@ -51,9 +51,7 @@ function service($q,
                 dataTypes,
                 apps,
             ]) => {
-
                 const appsWithManagement = _.map(apps, a => _.assign(a, {management: 'IT'}));
-
                 const r = {
                     dataTypes,
                     apps: appsWithManagement

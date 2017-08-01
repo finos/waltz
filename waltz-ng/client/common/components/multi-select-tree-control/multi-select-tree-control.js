@@ -18,8 +18,8 @@
 
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
-import {buildHierarchies, switchToParentIds} from "../../../common/hierarchy-utils";
 import {preventDefault, stopPropagation} from "../../browser-utils"
+import {prepareSearchNodes, doSearch, buildHierarchies, switchToParentIds} from '../../../common/hierarchy-utils';
 
 
 const bindings = {
@@ -38,21 +38,26 @@ const initialState = {
     expandedNodes: [],
     checkedItemIds: [],
     checkedMap: {},
-    trees: [],
+    hierarchy: [],
     onCheck: id => console.log('default handler in multi-select-treecontrol for node id check: ', id),
     onUncheck: id => console.log('default handler in multi-select-treecontrol for node id uncheck: ', id),
     onClick: node => console.log('default handler in multi-select-treecontrol for node click: ', node),
 };
 
 
-const template = require('./multi-select-treecontrol.html');
+const template = require('./multi-select-tree-control.html');
 
 
+function prepareTree(dataTypes = []) {
+    const hierarchy = switchToParentIds(buildHierarchies(dataTypes));
+    return hierarchy;
+}
 
 
-
-function buildTrees(nodes) {
-    return switchToParentIds(buildHierarchies(nodes));
+function expandSearchNotes(hierarchy = []) {
+    return hierarchy.length < 6  // pre-expand small trees
+        ? _.clone(hierarchy)
+        : [];
 }
 
 
@@ -64,7 +69,7 @@ function mkCheckedMap(nodes = [], checked = []) {
 }
 
 
-function mkExpandedNodes(nodes = [], expandedIds = []) {
+function expandSelectedNodes(nodes = [], expandedIds = []) {
     function recurse(nodes, ids) {
         const filteredNodes = _.filter(nodes, n => ids.includes(n.id));
         const newParentIds = _.chain(filteredNodes)
@@ -122,19 +127,34 @@ function controller() {
 
     vm.$onChanges = changes => {
         if(changes.items) {
-            vm.trees = buildTrees(vm.items);
+            vm.hierarchy = prepareTree(vm.items);
+            vm.searchNodes = prepareSearchNodes(vm.items);
         }
 
         if(changes.items || changes.expandedItemIds) {
             if (vm.expandedItemIds && vm.items) {
-                vm.expandedNodes = mkExpandedNodes(vm.items, vm.expandedItemIds);
+                vm.expandedNodes = expandSelectedNodes(vm.items, vm.expandedItemIds);
             }
         }
 
         vm.checkedMap = mkCheckedMap(vm.items, vm.checkedItemIds);
     };
 
-};
+    vm.searchTermsChanged = (termStr = '') => {
+        const matchingNodes = doSearch(termStr, vm.searchNodes);
+        vm.hierarchy = prepareTree(matchingNodes);
+
+        vm.expandedNodes = termStr.length == 0
+            ? expandSelectedNodes(vm.items, vm.expandedItemIds)
+            : expandSearchNotes(vm.hierarchy);
+    };
+
+    vm.clearSearch = () => {
+        vm.searchTermsChanged('');
+        vm.searchTerms = '';
+        vm.expandedNodes = expandSelectedNodes(vm.items, vm.expandedItemIds);
+    };
+}
 
 
 controller.$inject = [];
