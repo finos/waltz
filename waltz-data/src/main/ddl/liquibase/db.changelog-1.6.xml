@@ -43,4 +43,20 @@
         <dropTable tableName="perspective_rating_1_1"/>
     </changeSet>
 
+
+    <!-- 1265 - deprecate app_capability table -->
+    <changeSet author="kamransaleem"
+               id="20170801-1265-1">
+        <comment>1265 - deprecate app_capability table</comment>
+        <renameTable newTableName="app_capability_1_6"
+                     oldTableName="app_capability"/>
+
+        <dropPrimaryKey constraintName="app_capability_pkey"
+                        tableName="app_capability_1_6"/>
+
+        <addPrimaryKey columnNames="application_id, capability_id"
+                       constraintName="app_capability_1_6_pkey"
+                       tableName="app_capability_1_6"/>
+    </changeSet>
+
 </databaseChangeLog>
