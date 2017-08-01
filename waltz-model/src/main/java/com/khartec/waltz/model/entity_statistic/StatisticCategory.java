@@ -23,5 +23,6 @@ public enum StatisticCategory {
     DATA_QUALITY,
     GOVERNANCE,
     REGULATORY,
-    SECURITY
+    SECURITY,
+    TECHNICAL
 }
