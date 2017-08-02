@@ -18,7 +18,7 @@
  */
 
 import angular from 'angular';
-
+import {registerStore} from '../common/module-utils';
 
 import userAgentInfoStore from './services/user-agent-info-store';
 import userService from './services/user-service';
@@ -38,10 +38,11 @@ export default () => {
     module
         .config(require('./routes'));
 
+    registerStore(module, userStore);
+
     module
         .service('UserAgentInfoStore', userAgentInfoStore)
         .service('UserService', userService)
-        .service('UserStore', userStore)
         .service('UserPreferenceStore', userPreferenceStore)
         .service('UserPreferenceService', userPreferenceService);
 

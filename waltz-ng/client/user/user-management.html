@@ -47,6 +47,7 @@
                 <tr>
                     <th>User Name</th>
                     <th>Admin</th>
+                    <th>User Admin</th>
                     <th>Application</th>
                     <th>Rating</th>
                     <th>Org Unit</th>
@@ -71,6 +72,11 @@
                     </td>
                     <td align="left">
                         <span ng-if='ctrl.hasRole(user, "ADMIN")'>
+                            <waltz-icon name='check'></waltz-icon>
+                        </span>
+                    </td>
+                    <td align="left">
+                        <span ng-if='ctrl.hasRole(user, "USER_ADMIN")'>
                             <waltz-icon name='check'></waltz-icon>
                         </span>
                     </td>
@@ -154,6 +160,12 @@
                                 <td>ADMIN</td>
                                 <td>
                                     <input type="checkbox" ng-model="ctrl.roleSelections.ADMIN">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>USER_ADMIN</td>
+                                <td>
+                                    <input type="checkbox" ng-model="ctrl.roleSelections.USER_ADMIN">
                                 </td>
                             </tr>
                             <tr>
