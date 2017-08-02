@@ -36,9 +36,9 @@ function controller() {
             vm.treeData = prepareTreeData(vm.changeInitiatives);
         }
 
-        if (c.scrollHeight) {
+        if (vm.scrollHeight && vm.treeData && vm.treeData.length > 10) {
             vm.containerClass = [
-                `waltz-scroll-region-${vm.scrollHeight}`
+                 `waltz-scroll-region-${vm.scrollHeight}`
             ];
         }
     }
