@@ -89,7 +89,7 @@
             <li style="margin: 4px"
                 ui-sref-active="side-active"
                 class="no-overflow">
-                <span waltz-has-role="ADMIN">
+                <span ng-show="ctrl.showSysAdminMenuItem">
                     <a ui-sref="main.system.list">
                         <waltz-icon class='text-muted small'
                                     fixed-width="true"
