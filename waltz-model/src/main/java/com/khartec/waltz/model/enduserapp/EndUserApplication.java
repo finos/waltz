@@ -30,6 +30,7 @@ import org.immutables.value.Value;
 public abstract class EndUserApplication implements
         IdProvider,
         DescriptionProvider,
+        ExternalIdProvider,
         NameProvider,
         ProvenanceProvider {
 
