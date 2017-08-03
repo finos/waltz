@@ -58,7 +58,6 @@ function controller(serviceBroker) {
                 .then(r => {
                     vm.ratings = r.data;
                     vm.filteredRatings = filterRatings(vm.ratings, vm.entities);
-                    console.log('loaded SDR');
                 });
         }
 

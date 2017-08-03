@@ -46,6 +46,7 @@ import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../
 import {SourceDataRatingStore_API as SourceDataRatingStore} from "../../source-data-rating/services/source-data-rating-store";
 import {StaticPanelStore_API as StaticPanelStore} from "../../static-panel/services/static-panel-store";
 import {TechnologyStatisticsService_API as TechnologyStatisticsService} from "../../technology/services/technology-statistics-service";
+import {UserStore_API as UserStore} from "../../user/services/user-store";
 
 
 export const CORE_API = {
@@ -76,7 +77,8 @@ export const CORE_API = {
     PhysicalSpecDataTypeStore,
     SourceDataRatingStore,
     StaticPanelStore,
-    TechnologyStatisticsService
+    TechnologyStatisticsService,
+    UserStore
 };
 
 
