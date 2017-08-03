@@ -39,4 +39,44 @@ function store($http, BaseApiUrl) {
 store.$inject = ['$http', 'BaseApiUrl'];
 
 
-export default store;
+const serviceName = 'UserStore';
+
+
+export const UserStore_API = {
+    deleteUser: {
+        serviceName,
+        serviceFnName: 'deleteUser',
+        description: 'delete a user'
+    },
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'find all users'
+    },
+    findForUserId: {
+        serviceName,
+        serviceFnName: 'findForUserId',
+        description: 'find a user by id'
+    },
+    register: {
+        serviceName,
+        serviceFnName: 'register',
+        description: 'register a new user'
+    },
+    resetPassword: {
+        serviceName,
+        serviceFnName: 'resetPassword',
+        description: "reset a user's password"
+    },
+    updateRoles: {
+        serviceName,
+        serviceFnName: 'updateRoles',
+        description: "update a user's permissions"
+    }
+};
+
+
+export default {
+    serviceName,
+    store
+};

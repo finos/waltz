@@ -28,9 +28,9 @@
                         (more &raquo;)
                     </a>
                 </h4>
-                <div class="small"
-                     ng-bind="$ctrl.selected.measurable.description">
-                </div>
+                <waltz-markdown class="small"
+                                text="$ctrl.selected.measurable.description">
+                </waltz-markdown>
                 <br>
                 <div>
                     Rating: <waltz-rating-indicator-cell rating="$ctrl.selected.rating.rating"
