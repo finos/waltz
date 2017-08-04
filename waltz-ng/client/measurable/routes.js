@@ -20,6 +20,8 @@ import _ from 'lodash';
 import UnitView from "./measurable-view";
 import ListView from "./measurable-list";
 
+import {CORE_API} from '../common/services/core-api-utils';
+
 
 const baseState = {};
 
@@ -40,29 +42,42 @@ const listState = {
 };
 
 
-function bouncer($state, $stateParams, measurableStore) {
-    measurableStore
-        .findByExternalId($stateParams.id)
-        .then(ms => {
-            const m = _.find(ms, {kind: 'CAPABILITY'});
-            if (m) {
-                $state.go('main.measurable.view', {id: m.id});
+function bouncer($q, $state, $stateParams, serviceBroker) {
+    const categoryExternalId = $stateParams.category;
+    const externalId = $stateParams.externalId;
+
+    $q.all([serviceBroker.loadAppData(CORE_API.MeasurableCategoryStore.findAll),
+            serviceBroker.loadViewData(CORE_API.MeasurableStore.findByExternalId, [externalId])])
+        .then(([categoriesResult, measurablesResult]) => {
+
+            const categories = categoriesResult.data;
+            const measurables = measurablesResult.data;
+            const category = _.find(categories, {externalId: categoryExternalId});
+
+            if(category) {
+                const m = _.find(measurables, {categoryId: category.id});
+                if (m) {
+                    $state.go('main.measurable.view', {id: m.id});
+                } else {
+                    console.log(`Cannot find measure corresponding category: ${categoryExternalId}, external id: ${externalId}`);
+                }
             } else {
-                console.log(`Cannot find measure corresponding to old capability: ${$stateParams.id}`);
+                console.log(`Cannot find measure corresponding category: ${categoryExternalId}, external id: ${externalId}`);
             }
-        });
+    });
 }
 
 
 bouncer.$inject = [
+    '$q',
     '$state',
     '$stateParams',
-    'MeasurableStore'
+    'ServiceBroker'
 ];
 
 
 const bouncerState = {
-    url: 'capabilities/{id:int}',
+    url: 'measurable/external-id/{category:string}/{externalId:string}',
     resolve: {
         bouncer
     }
