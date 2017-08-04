@@ -46,6 +46,7 @@ import java.util.function.Function;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
+import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
@@ -117,6 +118,7 @@ public class InvolvementDao {
                 .on(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
                 .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .where(APPLICATION.ID.eq(INVOLVEMENT.ENTITY_ID))
+                .and(IS_ACTIVE)
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
     }
 
@@ -139,7 +141,8 @@ public class InvolvementDao {
         SelectConditionStep<Record> query = dsl
                 .select(APPLICATION.fields())
                 .from(APPLICATION)
-                .where(APPLICATION.ID.in(applicationIds));
+                .where(APPLICATION.ID.in(applicationIds))
+                .and(IS_ACTIVE);
 
         return query
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);

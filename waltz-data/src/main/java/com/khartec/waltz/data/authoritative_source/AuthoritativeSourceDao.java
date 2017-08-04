@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
+import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
@@ -299,7 +300,8 @@ public class AuthoritativeSourceDao {
                 .from(ORGANISATIONAL_UNIT);
         Select<Record1<Long>> appIds = DSL
                 .select(APPLICATION.ID)
-                .from(APPLICATION);
+                .from(APPLICATION)
+                .where(IS_ACTIVE);
 
         Condition unknownOrgUnit = AUTHORITATIVE_SOURCE.PARENT_ID.notIn(orgUnitIds)
                 .and(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()));

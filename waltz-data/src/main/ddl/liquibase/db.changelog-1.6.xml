@@ -75,4 +75,18 @@
                        tableName="capability_1_6"/>
     </changeSet>
 
+
+    <!-- 2467 -->
+    <changeSet id="20170831-2467-1"
+               author="rovats">
+        <comment>2467: Add EntityLifecycleStatus on apps</comment>
+        <addColumn tableName="application">
+            <column name="entity_lifecycle_status"
+                    type="${enum.type}"
+                    defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

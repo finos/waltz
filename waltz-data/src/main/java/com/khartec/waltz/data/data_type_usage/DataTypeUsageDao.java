@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.limit;
+import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
@@ -238,7 +239,7 @@ public class DataTypeUsageDao {
 
 
     public boolean recalculateForAllApplications() {
-        return recalculateForAppIdSelector(DSL.select(APPLICATION.ID).from(APPLICATION));
+        return recalculateForAppIdSelector(DSL.select(APPLICATION.ID).from(APPLICATION).where(IS_ACTIVE));
     }
 
 

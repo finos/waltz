@@ -37,6 +37,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.data.JooqUtilities.mkEndOfLifeStatusDerivedField;
+import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 import static java.util.stream.Collectors.counting;
@@ -149,7 +150,8 @@ public class ServerInformationDao {
         Condition condition = SERVER_INFORMATION.ASSET_CODE
                 .in(select(APPLICATION.ASSET_CODE)
                         .from(APPLICATION)
-                        .where(APPLICATION.ID.in(appIdSelector)));
+                        .where(APPLICATION.ID.in(appIdSelector))
+                        .and(IS_ACTIVE));
 
         // de-duplicate host names, as one server can host multiple apps
         Result<? extends Record> serverInfo = dsl.select(
