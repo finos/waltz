@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.limit;
+import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
@@ -59,15 +60,14 @@ public class DataTypeUsageDao {
     private final com.khartec.waltz.schema.tables.LogicalFlow lf = LOGICAL_FLOW.as("lf");
     private final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
     private final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
+    private final com.khartec.waltz.schema.tables.Actor actor = ACTOR.as("actor");
     private final Condition NOT_REMOVED = lf.IS_REMOVED.isFalse();
 
     private final Field<String> originatorUsageKindField = val(UsageKind.ORIGINATOR.name());
-    private final Field<String> consumerDistributorCaseField = DSL
-            .when(lf.SOURCE_ENTITY_ID.eq(app.ID),
-                    UsageKind.DISTRIBUTOR.name())
-            .otherwise(UsageKind.CONSUMER.name());
 
-    private final Field<Long> appIdInner = DSL.field("app_id_inner", Long.class);
+
+
+    private final Field<Long> nodeIdInner = DSL.field("node_id_inner", Long.class);
     private final Field<String> dataTypeCodeInner = DSL.field("dt_code_inner", String.class);
     private final Field<String> usageKindInner = DSL.field("usage_kind_inner", String.class);
 
@@ -148,7 +148,8 @@ public class DataTypeUsageDao {
     public List<DataTypeUsage> findForDataTypeSelector(Select<Record1<Long>> dataTypeIdSelector) {
         checkNotNull(dataTypeIdSelector, "dataTypeIdSelector cannot be null");
 
-        SelectConditionStep<Record1<String>> codeSelector = DSL.select(DATA_TYPE.CODE)
+        SelectConditionStep<Record1<String>> codeSelector = DSL
+                .select(DATA_TYPE.CODE)
                 .from(DATA_TYPE)
                 .where(DATA_TYPE.ID.in(dataTypeIdSelector));
 
@@ -171,7 +172,8 @@ public class DataTypeUsageDao {
 
     private List<DataTypeUsage> findByCondition(Condition condition) {
         checkNotNull(condition, "condition cannot be null");
-        return dsl.select(DATA_TYPE_USAGE.fields())
+        return dsl
+                .select(DATA_TYPE_USAGE.fields())
                 .from(DATA_TYPE_USAGE)
                 .where(dsl.renderInlined(condition))
                 .fetch(TO_USAGE_MAPPER);
@@ -238,11 +240,27 @@ public class DataTypeUsageDao {
 
 
     public boolean recalculateForAllApplications() {
-        return recalculateForAppIdSelector(DSL.select(APPLICATION.ID).from(APPLICATION));
+        recalculateForIdSelector(
+                EntityKind.APPLICATION,
+                DSL.select(APPLICATION.ID)
+                    .from(APPLICATION));
+
+        recalculateForIdSelector(
+                EntityKind.ACTOR,
+                DSL.select(ACTOR.ID)
+                    .from(ACTOR));
+
+        return true;
     }
 
 
+    @Deprecated
     public boolean recalculateForAppIdSelector(Select<Record1<Long>> appIdSelector) {
+        return recalculateForIdSelector(EntityKind.APPLICATION, appIdSelector);
+    }
+
+
+    public boolean recalculateForIdSelector(EntityKind kind, Select<Record1<Long>> idSelector) {
 
         dsl.transaction(configuration -> {
             DSLContext tx = DSL.using(configuration);
@@ -256,8 +274,8 @@ public class DataTypeUsageDao {
             tx.deleteFrom(DATA_TYPE_USAGE)
                     .where(isCalculatedUsageKind)
                     .and(DATA_TYPE_USAGE.DESCRIPTION.eq(""))
-                    .and(DATA_TYPE_USAGE.ENTITY_ID.in(appIdSelector))
-                    .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                    .and(DATA_TYPE_USAGE.ENTITY_ID.in(idSelector))
+                    .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(kind.name()))
                     .execute();
 
             // mark commented usages inactive
@@ -265,23 +283,23 @@ public class DataTypeUsageDao {
                     .set(DATA_TYPE_USAGE.IS_SELECTED, false)
                     .where(isCalculatedUsageKind)
                     .and(DATA_TYPE_USAGE.DESCRIPTION.ne(""))
-                    .and(DATA_TYPE_USAGE.ENTITY_ID.in(appIdSelector))
-                    .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                    .and(DATA_TYPE_USAGE.ENTITY_ID.in(idSelector))
+                    .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(kind.name()))
                     .execute();
 
             insertUsages(
                     tx,
-                    mkConsumerDistributorUsagesToInsertSelector(appIdSelector));
+                    mkConsumerDistributorUsagesToInsertSelector(kind, idSelector));
             updateUsageKinds(
                     tx,
-                    mkFlowWithTypesForConsumerDistributors(appIdSelector));
+                    mkFlowWithTypesForConsumerDistributors(kind, idSelector));
 
             insertUsages(
                     tx,
-                    mkOriginatorUsagesToInsertSelector(appIdSelector));
+                    mkOriginatorUsagesToInsertSelector(kind, idSelector));
             updateUsageKinds(
                     tx,
-                    mkFlowWithTypesForOriginators(appIdSelector));
+                    mkFlowWithTypesForOriginators(kind, idSelector));
         });
 
         return true;
@@ -311,7 +329,7 @@ public class DataTypeUsageDao {
                 .where(DATA_TYPE_USAGE.IS_SELECTED.eq(false))
                 .and(exists(
                         selectFrom(flowTable)
-                            .where(DATA_TYPE_USAGE.ENTITY_ID.eq(appIdInner))
+                            .where(DATA_TYPE_USAGE.ENTITY_ID.eq(nodeIdInner))
                             .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                             .and(DATA_TYPE_USAGE.DATA_TYPE_CODE.eq(dataTypeCodeInner))
                             .and(DATA_TYPE_USAGE.USAGE_KIND.eq(usageKindInner))))
@@ -320,28 +338,35 @@ public class DataTypeUsageDao {
 
 
     private Select<Record7<Long, String, String, String, String, String, Boolean>> mkOriginatorUsagesToInsertSelector(
-            Select<Record1<Long>> appIdSelector)
+            EntityKind nodeKind,
+            Select<Record1<Long>> nodeIdSelector)
     {
         return mkUsagesToInsertSelector(
+                nodeKind,
                 mkFlowWithTypesForOriginators(
-                        appIdSelector));
+                        nodeKind,
+                        nodeIdSelector));
     }
 
     private Select<Record7<Long, String, String, String, String, String, Boolean>> mkConsumerDistributorUsagesToInsertSelector(
-            Select<Record1<Long>> appIdSelector)
+            EntityKind kind,
+            Select<Record1<Long>> idSelector)
     {
         return mkUsagesToInsertSelector(
+                kind,
                 mkFlowWithTypesForConsumerDistributors(
-                        appIdSelector));
+                        kind,
+                        idSelector));
     }
 
 
     private Select<Record7<Long, String, String, String, String, String, Boolean>> mkUsagesToInsertSelector(
+            EntityKind nodeKind,
             Table<Record3<Long, String, String>> flowsWithTypesTable)
     {
         return selectDistinct(
-                appIdInner,
-                val(EntityKind.APPLICATION.name()),
+                nodeIdInner,
+                val(nodeKind.name()),
                 dataTypeCodeInner,
                 usageKindInner,
                 val(""),
@@ -355,38 +380,71 @@ public class DataTypeUsageDao {
 
 
     private Table<Record3<Long, String, String>> mkFlowWithTypesForConsumerDistributors(
-            Select<Record1<Long>> appIdSelector)
+            EntityKind nodeKind,
+            Select<Record1<Long>> nodeIdSelector)
     {
-        return DSL.select(
-                    app.ID.as(appIdInner),
+
+        switch (nodeKind) {
+            case ACTOR:
+                return mkFlowWithTypesForConsumerDistributors(nodeKind, actor, actor.ID, nodeIdSelector);
+            case APPLICATION:
+                return mkFlowWithTypesForConsumerDistributors(nodeKind, app, app.ID, nodeIdSelector);
+            default:
+                throw new UnsupportedOperationException("Cannot create dt usage records for node kind: "+nodeKind);
+        }
+    }
+
+
+    private Table<Record3<Long, String, String>> mkFlowWithTypesForConsumerDistributors(EntityKind nodeKind,
+                                                                                        Table nodeTable,
+                                                                                        TableField<? extends Record, Long> nodeIdField,
+                                                                                        Select<Record1<Long>> nodeIdSelector) {
+        return DSL
+                .select(
+                    nodeIdField.as(nodeIdInner),
                     dt.CODE.as(dataTypeCodeInner),
-                    consumerDistributorCaseField.as(usageKindInner))
+                    mkConsumerDistributorCaseField(nodeIdField).as(usageKindInner))
                 .from(lf)
-                .innerJoin(app)
-                .on(app.ID.eq(lf.SOURCE_ENTITY_ID)
-                        .or(app.ID.eq(lf.TARGET_ENTITY_ID)))
+                .innerJoin(nodeTable)
+                .on(mkMatchingFlowCondition(nodeKind, nodeIdField))
                 .innerJoin(lfd)
                 .on(lfd.LOGICAL_FLOW_ID.eq(lf.ID))
                 .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
                 .innerJoin(dt)
                 .on(dt.ID.eq(lfd.DECORATOR_ENTITY_ID))
-                .where(app.ID.in(appIdSelector))
+                .where(nodeIdField.in(nodeIdSelector))
                 .and(NOT_REMOVED)
                 .asTable("cons_dist");
     }
 
 
-    private Table<Record3<Long, String, String>> mkFlowWithTypesForOriginators(Select<Record1<Long>> appIdSelector) {
+    private Condition mkMatchingFlowCondition(EntityKind nodeKind, TableField<? extends Record, Long> nodeIdField) {
+        Condition matchingSourceCondition = nodeIdField.eq(lf.SOURCE_ENTITY_ID).and(lf.SOURCE_ENTITY_KIND.eq(nodeKind.name()));
+        Condition matchingTargetCondition = nodeIdField.eq(lf.TARGET_ENTITY_ID).and(lf.TARGET_ENTITY_KIND.eq(nodeKind.name()));
+        return matchingSourceCondition.or(matchingTargetCondition);
+    }
+
+
+    private Field<String> mkConsumerDistributorCaseField(TableField<? extends Record, Long> nodeIdTableField) {
+        return DSL
+                .when(lf.SOURCE_ENTITY_ID.eq(nodeIdTableField),
+                        UsageKind.DISTRIBUTOR.name())
+                .otherwise(UsageKind.CONSUMER.name());
+    }
+
+
+    private Table<Record3<Long, String, String>> mkFlowWithTypesForOriginators(EntityKind nodeKind,
+                                                                               Select<Record1<Long>> nodeIdSelector) {
 
         com.khartec.waltz.schema.tables.DataTypeUsage dtuConsumer = DATA_TYPE_USAGE.as("dtu_consumer");
 
         return DSL.select(
-                    dtu.ENTITY_ID.as(appIdInner),
+                    dtu.ENTITY_ID.as(nodeIdInner),
                     dtu.DATA_TYPE_CODE.as(dataTypeCodeInner),
                     originatorUsageKindField.as(usageKindInner))
                 .from(dtu)
-                .where(dtu.ENTITY_ID.in(appIdSelector))
-                .and(dtu.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .where(dtu.ENTITY_ID.in(nodeIdSelector))
+                .and(dtu.ENTITY_KIND.eq(nodeKind.name()))
                 .and(dtu.USAGE_KIND.eq(UsageKind.DISTRIBUTOR.name()))
                 .and(dtu.IS_SELECTED.eq(true))
                 .and(DSL.notExists(DSL.selectFrom(dtuConsumer)
@@ -401,7 +459,7 @@ public class DataTypeUsageDao {
 
 
     private Condition mkDataTypeUsageJoin(Field<String> usageKindField) {
-        return dtu.ENTITY_ID.eq(appIdInner)
+        return dtu.ENTITY_ID.eq(nodeIdInner)
                         .and(dtu.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                         .and(dtu.DATA_TYPE_CODE.eq(dataTypeCodeInner))
                         .and(dtu.USAGE_KIND.eq(usageKindField))
@@ -409,7 +467,8 @@ public class DataTypeUsageDao {
     }
 
 
-    public Map<Long, Collection<EntityReference>> findForUsageKindByDataTypeIdSelector(UsageKind kind, Select<Record1<Long>> dataTypeIdSelector) {
+    public Map<Long, Collection<EntityReference>> findForUsageKindByDataTypeIdSelector(UsageKind kind,
+                                                                                       Select<Record1<Long>> dataTypeIdSelector) {
         Result<Record3<Long, Long, String>> records = dsl
                 .select(dt.ID, dtu.ENTITY_ID, app.NAME)
                 .from(dtu)

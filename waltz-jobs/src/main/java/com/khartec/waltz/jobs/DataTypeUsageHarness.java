@@ -46,9 +46,11 @@ public class DataTypeUsageHarness {
         long st = System.currentTimeMillis();
 
         dao.recalculateForAllApplications();
-        List<DataTypeUsage> usages = svc.findForDataTypeSelector(mkOpts(mkRef(EntityKind.DATA_TYPE, 1000), HierarchyQueryScope.CHILDREN));
-        System.out.println(usages);
+        List<DataTypeUsage> dtUsages = svc.findForDataTypeSelector(mkOpts(mkRef(EntityKind.DATA_TYPE, 3000), HierarchyQueryScope.CHILDREN));
+        System.out.println("Data Type usages: " + dtUsages.size());
 
+        List<DataTypeUsage> actorUsages = svc.findForEntity(mkRef(EntityKind.ACTOR, 16L));
+        System.out.println("Actor usages: " + actorUsages.size());
         System.out.println("Took "+ (System.currentTimeMillis() - st));
     }
 

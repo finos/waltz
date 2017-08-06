@@ -1,12 +1,10 @@
 <div>
     <waltz-page-header name="Register Logical Data Flows"
-                       small="{{ ctrl.app.name }}">
+                       small="{{ ctrl.primaryRef.name }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>
-                <a ui-sref="main.app.view ({id: ctrl.app.id})">
-                    <span ng-bind="ctrl.app.name"></span>
-                </a>
+                <waltz-entity-link entity-ref="ctrl.primaryRef"></waltz-entity-link>
             </li>
             <li>Register Logical Data Flows</li>
         </ol>
@@ -19,8 +17,8 @@
             <div class="col-md-12">
                 <!-- SLOPE DIAGRAM -->
                 <waltz-source-and-target-graph entity-ref="ctrl.primaryRef"
-                                               logical-flows="ctrl.flows"
-                                               decorators="ctrl.dataFlowDecorators"
+                                               logical-flows="ctrl.logicalFlows"
+                                               decorators="ctrl.logicalFlowDecorators"
                                                tweakers="ctrl.flowTweakers">
                 </waltz-source-and-target-graph>
             </div>
@@ -76,7 +74,7 @@
 
                         <p class="waltz-paragraph small" style="margin-left: 26px" >
                             Go back to
-                            <a ng-bind='ctrl.app.name' ui-sref="main.app.view ({ id: ctrl.app.id })"></a>
+                            <waltz-entity-link entity-ref="ctrl.primaryRef"></waltz-entity-link>
                         </p>
                     </div>
                 </div>

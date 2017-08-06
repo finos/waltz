@@ -19,7 +19,7 @@
 import {checkIsEntityRef, checkIsIdSelector, checkIsCreatePhysicalFlowCommand} from "../../common/checks";
 
 
-function store($http, baseApiUrl) {
+export function store($http, baseApiUrl) {
 
     const base = `${baseApiUrl}/physical-flow`;
 
@@ -126,4 +126,64 @@ store.$inject = [
 ];
 
 
-export default store;
+export const serviceName = 'PhysicalFlowStore';
+
+
+
+export const PhysicalFlowStore_API = {
+    findBySpecificationId: {
+        serviceName,
+        serviceFnName: 'findBySpecificationId',
+        description: 'executes findBySpecificationId'
+    },
+    findByLogicalFlowId: {
+        serviceName,
+        serviceFnName: 'findByLogicalFlowId',
+        description: 'executes findByLogicalFlowId'
+    },
+    findByEntityReference: {
+        serviceName,
+        serviceFnName: 'findByEntityReference',
+        description: 'executes findByEntityReference'
+    },
+    findByProducerEntityReference: {
+        serviceName,
+        serviceFnName: 'findByProducerEntityReference',
+        description: 'executes findByProducerEntityReference'
+    },
+    findByConsumerEntityReference: {
+        serviceName,
+        serviceFnName: 'findByConsumerEntityReference',
+        description: 'executes findByConsumerEntityReference'
+    },
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'executes findBySelector'
+    },
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'executes getById'
+    },
+    searchReports: {
+        serviceName,
+        serviceFnName: 'searchReports',
+        description: 'executes searchReports'
+    },
+    create: {
+        serviceName,
+        serviceFnName: 'create',
+        description: 'executes create'
+    },
+    deleteById: {
+        serviceName,
+        serviceFnName: 'deleteById',
+        description: 'executes deleteById'
+    },
+    updateSpecDefinitionId: {
+        serviceName,
+        serviceFnName: 'updateSpecDefinitionId',
+        description: 'executes updateSpecDefinitionId'
+    }
+};

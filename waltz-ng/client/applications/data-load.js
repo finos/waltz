@@ -17,48 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {nest} from "d3-collection";
-import _ from "lodash";
 import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
-
-
-const CHANGE_LOG_LIMIT = 20;
-
-
-function addDataTypes(extras, vm) {
-    const existing = vm.dataTypes ? vm.dataTypes : [];
-    vm.dataTypes = _.union(existing, extras);
-    return vm.dataTypes;
-}
-
-
-function addOrgUnits(extras, vm) {
-    const existing = vm.orgUnits ? vm.orgUnits : [];
-    vm.orgUnits = _.union(existing, extras);
-    vm.orgUnitsById = _.keyBy(vm.orgUnits, 'id');
-    return vm.orgUnits;
-}
-
-
-export function loadDataFlows(dataFlowStore, id, vm) {
-    return dataFlowStore
-        .findByEntityReference('APPLICATION', id)
-        .then(flows => vm.flows = flows);
-}
-
-
-export function loadPhysicalFlows(physicalFlowStore, entityReference, vm) {
-    return physicalFlowStore
-        .findByEntityReference(entityReference)
-        .then(xs => vm.physicalFlows = xs);
-}
-
-
-export function loadSourceDataRatings(sourceDataRatingStore, vm) {
-    sourceDataRatingStore
-        .findAll()
-        .then(sdrs => vm.sourceDataRatings = sdrs);
-}
 
 
 export function loadServers(serverInfoStore, appId, vm) {
@@ -90,49 +49,3 @@ export function loadInvolvements($q, involvementStore, id, vm) {
 }
 
 
-export function loadAuthSources(authSourceStore, orgUnitStore, appId, ouId, vm) {
-    const appAuthSourcePromise = authSourceStore.findByApp(appId);
-
-    appAuthSourcePromise
-        .then(authSources => nest()
-            .key(a => a.dataType)
-            .key(a => a.rating)
-            .object(authSources))
-        .then(nested => vm.authSources = nested)
-        .then(nested => addDataTypes(_.keys(nested), vm));
-
-    const loadDeclaringOUs = (authSources) => {
-        const orgUnitIds = _
-            .chain(authSources)
-            .filter(a => a.parentReference.kind === 'ORG_UNIT')
-            .map(a => a.parentReference.id)
-            .uniq()
-            .value();
-
-        orgUnitStore
-            .findByIds(orgUnitIds)
-            .then(orgUnits => addOrgUnits(orgUnits, vm))
-    };
-
-    return appAuthSourcePromise
-        .then(loadDeclaringOUs);
-}
-
-
-export function loadDataTypeUsages(dataTypeUsageStore, appId, vm) {
-    return dataTypeUsageStore
-        .findForEntity('APPLICATION', appId)
-        .then(usages => vm.dataTypeUsages = usages);
-}
-
-
-export function loadLogicalFlowDecorators(store, appId, vm) {
-    const selector = {
-        entityReference: { id: appId, kind: 'APPLICATION'},
-        scope: 'EXACT'
-    };
-
-    return store
-        .findBySelectorAndKind(selector, 'DATA_TYPE')
-        .then(r => vm.dataFlowDecorators = r);
-}

@@ -26,37 +26,6 @@
     </waltz-entity-named-notes-section>
 
 
-    <!-- APPS -->
-    <waltz-apps-section parent-entity-ref="ctrl.entityRef"
-                        scope="EXACT">
-    </waltz-apps-section>
-
-    <!-- PHYSICAL FLOWW -->
-    <waltz-section name="Physical Flows"
-                   id="physical-flows-section">
-
-        <waltz-section-actions>
-            <a class="btn btn-xs btn-primary"
-               ui-sref="main.physical-flow.registration (ctrl.entityRef)"
-               waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                Register
-            </a>
-            <waltz-physical-flow-export-buttons export-consumes="ctrl.exportPhysicalFlowConsumes"
-                                                export-produces="ctrl.exportPhysicalFlowProduces"
-                                                export-unused="exportPhysicalFlowUnused">
-            </waltz-physical-flow-export-buttons>
-        </waltz-section-actions>
-
-        <waltz-physical-data-section specifications="ctrl.physicalSpecifications"
-                                     logical-flows="ctrl.logicalFlows"
-                                     on-initialise="ctrl.onPhysicalFlowsInitialise"
-                                     on-change="ctrl.onPhysicalFlowsChange"
-                                     primary-ref="ctrl.entityRef"
-                                     physical-flows="ctrl.physicalFlows">
-        </waltz-physical-data-section>
-    </waltz-section>
-
-
     <!-- FLOW DIAGRAMS -->
     <waltz-flow-diagrams-section parent-entity-ref="ctrl.entityRef"
                                  can-create="true"
@@ -64,15 +33,27 @@
     </waltz-flow-diagrams-section>
 
 
-    <!-- TECHNOLOGIES -->
-    <waltz-technology-summary-section parent-entity-ref='ctrl.entityRef'
-                                      scope="EXACT">
-    </waltz-technology-summary-section>
+    <!-- DATA TYPES & FLOWS -->
+    <waltz-data-flow-section parent-entity-ref="ctrl.entityRef">
+    </waltz-data-flow-section>
 
 
     <!-- BOOKMARKS -->
     <waltz-bookmarks-section parent-entity-ref="ctrl.entityRef">
     </waltz-bookmarks-section>
+
+
+    <!-- APPS -->
+    <waltz-apps-section parent-entity-ref="ctrl.entityRef"
+                        scope="EXACT">
+    </waltz-apps-section>
+
+
+    <!-- TECHNOLOGIES -->
+    <waltz-technology-summary-section parent-entity-ref='ctrl.entityRef'
+                                      scope="EXACT">
+    </waltz-technology-summary-section>
+
 
 
     <!-- CHANGE LOG -->

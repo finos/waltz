@@ -17,8 +17,9 @@
  */
 
 import angular from "angular";
-import {registerComponent, registerStore} from "../common/module-utils";
-import physicalSpecDataTypeStore from "./services/physical-spec-data-type-store";
+import {registerComponents, registerStores} from "../common/module-utils";
+import * as physicalSpecDataTypeStore from "./services/physical-spec-data-type-store";
+import * as physicalSpecificationStore from "./services/physical-specification-store";
 import dataTypeList from "./components/data-type/physical-spec-data-type-list";
 import dataTypeSection from "./components/data-type/physical-spec-data-type-section";
 
@@ -30,8 +31,10 @@ function setup() {
     module
         .config(require('./routes'));
 
-    registerComponent(module, dataTypeList);
-    registerComponent(module, dataTypeSection);
+    registerComponents(
+        module,
+        [dataTypeList, dataTypeSection]);
+
 
     module
         .component('waltzPhysicalDataSection', require('./components/physical-data-section/physical-data-section'))
@@ -41,10 +44,11 @@ function setup() {
         .component('waltzPhysicalSpecificationMentions', require('./components/mentions/physical-specification-mentions'))
         .component('waltzPhysicalSpecDefinitionPanel', require('./components/spec-definition/physical-spec-definition-panel'));
 
-    registerStore(module, physicalSpecDataTypeStore);
+    registerStores(
+        module,
+        [physicalSpecDataTypeStore, physicalSpecificationStore]);
 
     module
-        .service('PhysicalSpecificationStore', require('./services/physical-specification-store'))
         .service('PhysicalSpecDefinitionStore', require('./services/physical-spec-definition-store'))
         .service('PhysicalSpecDefinitionFieldStore', require('./services/physical-spec-definition-field-store'))
         .service('PhysicalSpecDefinitionSampleFileStore', require('./services/physical-spec-definition-sample-file-store'));

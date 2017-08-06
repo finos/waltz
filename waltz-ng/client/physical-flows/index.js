@@ -17,6 +17,8 @@
  */
 
 import angular from 'angular';
+import {registerStore} from '../common/module-utils';
+import * as PhysicalFlowStore from './service/physical-flow-store';
 
 
 function setup() {
@@ -25,8 +27,7 @@ function setup() {
     module
         .config(require('./routes'));
 
-    module
-        .service('PhysicalFlowStore', require('./service/physical-flow-store'));
+    registerStore(module, PhysicalFlowStore);
 
     module
         .component('waltzPhysicalFlowOverview', require('./components/overview/physical-flow-overview'))

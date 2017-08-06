@@ -17,6 +17,8 @@
  */
 
 import angular from 'angular';
+import {registerStores} from '../common/module-utils';
+import * as OrgUnitStore from './services/org-unit-store';
 
 export default () => {
 
@@ -28,8 +30,9 @@ export default () => {
     require('./directives')(module);
 
     module
-        .service('OrgUnitStore', require('./services/org-unit-store'))
         .service('OrgUnitViewDataService', require('./services/org-unit-view-data'));
+
+    registerStores(module, [OrgUnitStore]);
 
     module
         .component('waltzOrgUnitOverview', require('./components/overview/org-unit-overview'))
