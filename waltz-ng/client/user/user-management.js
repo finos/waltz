@@ -19,6 +19,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../common";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
@@ -26,11 +27,12 @@ const initialState = {
 };
 
 
-function controller(userStore) {
+function controller(serviceBroker) {
 
     const vm =  initialiseData(this, initialState);
 
-    userStore.findAll().then(users => vm.users = users);
+    serviceBroker.loadViewData(CORE_API.UserStore.findAll, [])
+        .then(result => vm.users = result.data);
 
     vm.dismiss = () => {
         vm.newUser = null;
@@ -58,7 +60,8 @@ function controller(userStore) {
     };
 
     vm.registerUser = (user) => {
-        userStore.register(user)
+        serviceBroker
+            .execute(CORE_API.UserStore.register, [user])
             .then(
                 () => {
                     vm.userSelected(user);
@@ -84,8 +87,8 @@ function controller(userStore) {
             .compact() // remove non selected names
             .value();
 
-        userStore
-            .updateRoles(user.userName, roles)
+        serviceBroker
+            .execute(CORE_API.UserStore.updateRoles, [user.userName, roles])
             .then(
                 () => {
                     user.roles = roles;
@@ -97,7 +100,8 @@ function controller(userStore) {
             );
 
         if (password1) {
-            userStore.resetPassword(user.userName, password1);
+            serviceBroker
+                .execute(CORE_API.UserStore.resetPassword, [user.userName, password1]);
         }
     };
 
@@ -107,8 +111,8 @@ function controller(userStore) {
     };
 
     vm.deleteUser = (user) => {
-        userStore
-            .deleteUser(user.userName)
+        serviceBroker
+            .execute(CORE_API.UserStore.deleteUser, [user.userName])
             .then(
                 () => {
                     vm.users = _.reject(vm.users, u => u === user);
@@ -123,7 +127,7 @@ function controller(userStore) {
 
 
 
-controller.$inject = [ 'UserStore' ];
+controller.$inject = [ 'ServiceBroker' ];
 
 
 // ---

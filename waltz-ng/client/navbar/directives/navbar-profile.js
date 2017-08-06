@@ -28,7 +28,8 @@ const template = require('./navbar-profile.html');
 
 const initialState = {
     logoOverlayText: '',
-    user: null
+    user: null,
+    showSysAdminMenuItem: false
 };
 
 
@@ -70,7 +71,9 @@ function controller($state,
 
     userService
         .whoami(true) // force
-        .then(user => vm.user = user);
+        .then(user => vm.user = user)
+        .then(() => vm.showSysAdminMenuItem = userService.hasRole(vm.user, 'ADMIN')
+                                                || userService.hasRole(vm.user, 'USER_ADMIN'));
 
 
 
