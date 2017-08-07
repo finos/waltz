@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.SetUtilities.fromArray;
 
 /**
  * Created by dwatkins on 30/03/2016.
@@ -55,17 +54,16 @@ public class UserRoleService {
 
 
     public boolean hasRole(String userName, Role... requiredRoles) {
-        List<Role> userRoles = userRoleDao.getUserRoles(userName);
-        return userRoles.containsAll(fromArray(requiredRoles));
+        Set<Role> userRoles = userRoleDao.getUserRoles(userName);
+        return userRoles.containsAll(SetUtilities.fromArray(requiredRoles));
     }
 
 
     public boolean hasAnyRole(String userName, Role... requiredRoles) {
-        List<Role> userRoles = userRoleDao.getUserRoles(userName);
-        Set<Role> userRolesSet = SetUtilities.fromCollection(userRoles);
+        Set<Role> userRoles = userRoleDao.getUserRoles(userName);
         Set<Role> requiredRolesSet = SetUtilities.fromArray(requiredRoles);
 
-        return ! SetUtilities.intersection(userRolesSet, requiredRolesSet)
+        return ! SetUtilities.intersection(userRoles, requiredRolesSet)
                     .isEmpty();
     }
 
@@ -89,7 +87,7 @@ public class UserRoleService {
     }
 
 
-    public List<Role> getUserRoles(String userName) {
+    public Set<Role> getUserRoles(String userName) {
         return userRoleDao.getUserRoles(userName);
     }
 

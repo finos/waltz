@@ -26,11 +26,13 @@ const initialState = {
 function controller(userService) {
     const vm = initialiseData(this, initialState);
 
-    userService
-        .whoami(true) // force
-        .then(user => vm.user = user)
-        .then(() => vm.showUserAdminItems = userService.hasRole(vm.user, 'ADMIN')
-            || userService.hasRole(vm.user, 'USER_ADMIN'));
+    vm.$onInit = () => {
+        userService
+            .whoami(true) // force
+            .then(user => vm.user = user)
+            .then(() => vm.showUserAdminItems = userService.hasRole(vm.user, 'ADMIN')
+                || userService.hasRole(vm.user, 'USER_ADMIN'));
+    };
 
 }
 

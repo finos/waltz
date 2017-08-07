@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.user;
 
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.user.ImmutableUser;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.model.user.User;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -59,13 +61,13 @@ public class UserRoleDao {
     }
 
 
-    public List<Role> getUserRoles(String userName) {
+    public Set<Role> getUserRoles(String userName) {
         List<String> roles = dsl.select(USER_ROLE.ROLE)
                 .from(USER_ROLE)
                 .where(USER_ROLE.USER_NAME.equalIgnoreCase(userName))
                 .fetch(USER_ROLE.ROLE);
 
-        return map(roles, r -> Role.valueOf(r));
+        return SetUtilities.map(roles, r -> Role.valueOf(r));
     }
 
 
