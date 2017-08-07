@@ -40,6 +40,7 @@ import java.util.function.BiFunction;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.Optional.ofNullable;
@@ -210,7 +211,8 @@ public class LogicalFlowDao {
     public Integer cleanupOrphans() {
         Select<Record1<Long>> appIds = DSL
                 .select(APPLICATION.ID)
-                .from(APPLICATION);
+                .from(APPLICATION)
+                .where(IS_ACTIVE);
 
         Condition sourceAppNotFound = LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.notIn(appIds));

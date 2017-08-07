@@ -37,6 +37,7 @@ import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.RangeBandUtilities.toPrettyString;
+import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AssetCost.ASSET_COST;
 
@@ -111,7 +112,8 @@ public class AssetCostStatsDao {
         SelectConditionStep<Record1<String>> relevantAssetCodes =
                 DSL.selectDistinct(APPLICATION.ASSET_CODE)
                         .from(APPLICATION)
-                        .where(APPLICATION.ID.in(appIdSelector));
+                        .where(APPLICATION.ID.in(appIdSelector))
+                        .and(IS_ACTIVE);
         return ASSET_COST.ASSET_CODE.in(relevantAssetCodes);
     }
 

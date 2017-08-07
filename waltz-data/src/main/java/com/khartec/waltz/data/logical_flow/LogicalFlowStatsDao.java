@@ -43,6 +43,7 @@ import java.util.function.Supplier;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.safeGet;
+import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -98,7 +99,8 @@ public class LogicalFlowStatsDao {
         Select<Record1<Integer>> intraAppCounter = dsl
                     .select(count())
                     .from(APPLICATION)
-                    .where(dsl.renderInlined(APPLICATION.ID.in(appIdSelector)));
+                    .where(dsl.renderInlined(APPLICATION.ID.in(appIdSelector)))
+                    .and(dsl.renderInlined(IS_ACTIVE));
 
         Future<Integer> inAppCount = dbExecutorPool.submit(() -> inAppCounter.fetchOne().value1());
         Future<Integer> outAppCount = dbExecutorPool.submit(() -> outAppCounter.fetchOne().value1());
