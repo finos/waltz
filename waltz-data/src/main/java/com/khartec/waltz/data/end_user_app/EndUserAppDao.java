@@ -34,6 +34,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
+import static java.util.Optional.ofNullable;
 
 @Repository
 public class EndUserAppDao {
@@ -46,6 +47,7 @@ public class EndUserAppDao {
         return ImmutableEndUserApplication.builder()
                 .name(record.getName())
                 .description(mkSafe(record.getDescription()))
+                .externalId(ofNullable(record.getExternalId()))
                 .kind(record.getKind())
                 .id(record.getId())
                 .organisationalUnitId(record.getOrganisationalUnitId())
