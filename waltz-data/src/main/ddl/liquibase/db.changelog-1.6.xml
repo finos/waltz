@@ -75,4 +75,17 @@
                        tableName="capability_1_6"/>
     </changeSet>
 
+
+    <!-- 2205 - end_user_application add external_id -->
+    <changeSet author="kamransaleem"
+               id="20170802-2205-1">
+        <comment>2205 - end_user_application add external_id</comment>
+        <addColumn tableName="end_user_application">
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
