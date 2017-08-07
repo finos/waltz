@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function service($http, BaseApiUrl) {
+export function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/org-unit`;
 
@@ -67,11 +67,44 @@ function service($http, BaseApiUrl) {
 }
 
 
-service.$inject = [
+store.$inject = [
     '$http',
     'BaseApiUrl'
 ];
 
 
-export default service;
+export const serviceName = "OrgUnitStore";
+
+export const OrgUnitStore_API = {
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'executes getById'
+    },
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'executes findAll'
+    },
+    findByIds: {
+        serviceName,
+        serviceFnName: 'findByIds',
+        description: 'executes findByIds'
+    },
+    findDescendants: {
+        serviceName,
+        serviceFnName: 'findDescendants',
+        description: 'executes findDescendants'
+    },
+    findImmediateHierarchy: {
+        serviceName,
+        serviceFnName: 'findImmediateHierarchy',
+        description: 'executes findImmediateHierarchy'
+    },
+    search: {
+        serviceName,
+        serviceFnName: 'search',
+        description: 'executes search'
+    },
+}
 

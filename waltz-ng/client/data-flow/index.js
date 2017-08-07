@@ -1,3 +1,4 @@
+
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,35 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import angular from 'angular';
+
+import {registerComponent} from '../common/module-utils';
+import * as dataFlowSection from './components/data-flow-section/data-flow-section';
 
 
-const initialState = {
-    parentEntityRef: {
-        id: 73,
-        kind: 'APPLICATION'
-    }
-};
+function setup() {
+    const module = angular.module('waltz.data-flow', []);
 
-function controller($stateParams) {
-    const vm = Object.assign(this, initialState);
+    registerComponent(module, dataFlowSection);
 
-
+    return module.name;
 }
 
 
-controller.$inject = [
-    '$stateParams'
-];
-
-
-const view = {
-    template: require('./playpen3.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;
+export default setup;

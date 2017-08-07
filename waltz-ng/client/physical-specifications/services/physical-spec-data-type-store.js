@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function store($http, BaseApiUrl) {
+export function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/physical-spec-data-type`;
 
@@ -50,7 +50,7 @@ store.$inject = [
 ];
 
 
-const serviceName = 'PhysicalSpecDataTypeStore';
+export const serviceName = 'PhysicalSpecDataTypeStore';
 
 
 export const PhysicalSpecDataTypeStore_API = {
@@ -71,8 +71,3 @@ export const PhysicalSpecDataTypeStore_API = {
     }
 };
 
-
-export default {
-    store,
-    serviceName
-};
