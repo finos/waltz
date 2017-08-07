@@ -155,6 +155,21 @@ public class WebUtilities {
     }
 
 
+    public static void requireAnyRole(UserRoleService userRoleService,
+                                      Request request,
+                                      Role... requiredRoles) {
+        String user = getUsername(request);
+        if (StringUtilities.isEmpty(user)) {
+            LOG.warn("Required role check failed as no user, roles needed: " + Arrays.toString(requiredRoles));
+            throw new IllegalArgumentException("Not logged in");
+        }
+        if (!userRoleService.hasAnyRole(user, requiredRoles)) {
+            LOG.warn("Required role check failed as user: " + user + ", did not have any of required roles: " + Arrays.toString(requiredRoles));
+            throw new NotAuthorizedException();
+        }
+    }
+
+
     public static String getUsername(Request request) {
         return AuthenticationUtilities.getUsername(request);
     }

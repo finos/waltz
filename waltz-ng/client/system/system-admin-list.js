@@ -15,13 +15,32 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import {initialiseData} from "../common";
 
 const template = require('./system-admin-list.html');
 
-
-const page = {
-    template,
+const initialState = {
+    showUserAdminItems: false
 };
 
+function controller(userService) {
+    const vm = initialiseData(this, initialState);
 
-export default page;
+    userService
+        .whoami(true) // force
+        .then(user => vm.user = user)
+        .then(() => vm.showUserAdminItems = userService.hasRole(vm.user, 'ADMIN')
+            || userService.hasRole(vm.user, 'USER_ADMIN'));
+
+}
+
+controller.$inject = [ 'UserService' ];
+
+
+export default {
+    template,
+    controller,
+    controllerAs: 'ctrl',
+    bindToController: true,
+    scope: {}
+};
