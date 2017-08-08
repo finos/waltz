@@ -21,11 +21,12 @@ package com.khartec.waltz.jobs;
 import com.khartec.waltz.data.attestation.AttestationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.attestation.AttestationType;
-import com.khartec.waltz.model.attestation.ImmutableAttestation;
+import com.khartec.waltz.model.attestation.Attestation;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.List;
 
 
 public class AttestationHarness {
@@ -36,15 +37,10 @@ public class AttestationHarness {
 
         AttestationDao attestationDao = ctx.getBean(AttestationDao.class);
 
-        ImmutableAttestation attestation = ImmutableAttestation.builder()
-                .entityReference(EntityReference.mkRef(EntityKind.APPLICATION, 1))
-                .attestationType(AttestationType.EXPLICIT)
-                .attestedBy("kamran")
-                .comments("test")
-                .build();
+        List<Attestation> attestations = attestationDao
+                .findForEntity(EntityReference.mkRef(EntityKind.APPLICATION, 1));
 
-        attestationDao.create(attestation);
-
+        System.out.println(attestations);
     }
 
 }
