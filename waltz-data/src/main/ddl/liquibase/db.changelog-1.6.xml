@@ -102,4 +102,83 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 2474 -->
+    <changeSet id="20170808-2474-1"
+               author="rovats">
+        <comment>2474: Deprecate existing Attestation table</comment>
+        <renameTable newTableName="attestation_1_6"
+                     oldTableName="attestation"/>
+    </changeSet>
+
+    <changeSet id="20170808-2474-2"
+               author="rovats">
+        <comment>2474: Recreate Attestation table</comment>
+        <createTable tableName="attestation"
+                     remarks="Store attestation records">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="attestation_pkey"/>
+            </column>
+            <column name="parent_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="child_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attested_at"
+                    type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attested_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comments"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20170808-2474-3"
+               author="rovats">
+        <comment>2474: Add attestation columns</comment>
+        <addColumn tableName="logical_flow">
+            <column name="last_attested_at"
+                    type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_attested_by"
+                    type="${name.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20170808-2474-4"
+               author="rovats">
+        <comment>2474: Add attestation columns</comment>
+        <addColumn tableName="physical_flow">
+            <column name="last_attested_at"
+                    type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_attested_by"
+                    type="${name.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
 </databaseChangeLog>
