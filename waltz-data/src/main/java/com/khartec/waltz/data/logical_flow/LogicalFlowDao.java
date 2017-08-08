@@ -35,6 +35,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -81,6 +82,8 @@ public class LogicalFlowDao {
                 .isRemoved(record.getIsRemoved())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
+                .lastAttestedBy(Optional.ofNullable(record.getLastAttestedBy()))
+                .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(ts -> ts.toLocalDateTime()))
                 .provenance(record.getProvenance())
                 .build();
     };
@@ -94,6 +97,8 @@ public class LogicalFlowDao {
         record.setTargetEntityKind(flow.target().kind().name());
         record.setLastUpdatedBy(flow.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(flow.lastUpdatedAt()));
+        record.setLastAttestedBy(flow.lastAttestedBy().orElse(null));
+        record.setLastAttestedAt(flow.lastAttestedAt().map(ldt -> Timestamp.valueOf(ldt)).orElse(null));
         record.setProvenance(flow.provenance());
         record.setIsRemoved(flow.isRemoved());
         return record;

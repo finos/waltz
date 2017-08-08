@@ -30,25 +30,8 @@ export default [
                 .then(result => result.data);
         };
 
-
-        const recalculateForFlowDiagrams = () => {
-            return $http
-                .get(`${BASE}/calculate-all/flow-diagram`)
-                .then(result => result.data);
-        };
-
-
-        const recalculateForLogicalFlowDecorators = () => {
-            return $http
-                .get(`${BASE}/calculate-all/logical-flow-decorator`)
-                .then(result => result.data);
-        };
-
-
         return {
-            findForEntity,
-            recalculateForFlowDiagrams,
-            recalculateForLogicalFlowDecorators
+            findForEntity
         };
     }
 ];

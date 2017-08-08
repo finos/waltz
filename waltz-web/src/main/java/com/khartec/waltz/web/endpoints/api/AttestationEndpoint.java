@@ -20,18 +20,15 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.attestation.AttestationService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import spark.Request;
-import spark.Response;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static com.khartec.waltz.web.WebUtilities.getEntityReference;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
 @Service
@@ -57,28 +54,9 @@ public class AttestationEndpoint implements Endpoint {
     @Override
     public void register() {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
-        String calculateForFlowDiagramsPath = mkPath(BASE_URL, "calculate-all", "flow-diagram");
-        String calculateForLogicalDecorators = mkPath(BASE_URL, "calculate-all", "logical-flow-decorator");
-
 
         getForList(
                 findForEntityPath,
                 (request, response) -> attestationService.findForEntity(getEntityReference(request)));
-
-        getForDatum(calculateForFlowDiagramsPath, this::calculateForFlowDiagramsRoute);
-        getForDatum(calculateForLogicalDecorators, this::calculateForLogicalFlowDecoratorsRoute);
     }
-
-
-    private boolean calculateForFlowDiagramsRoute(Request request, Response response) {
-        requireRole(userRoleService, request, Role.ADMIN);
-        return attestationService.recalculateForFlowDiagrams();
-    }
-
-
-    private boolean calculateForLogicalFlowDecoratorsRoute(Request request, Response response) {
-        requireRole(userRoleService, request, Role.ADMIN);
-        return attestationService.recalculateForLogicalFlowDecorators();
-    }
-
 }
