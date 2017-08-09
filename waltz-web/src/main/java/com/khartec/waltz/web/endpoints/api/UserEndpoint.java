@@ -71,20 +71,20 @@ public class UserEndpoint implements Endpoint {
         // -- routes
 
         DatumRoute<Boolean> newUserRoute = (request, response) -> {
-            requireRole(userRoleService, request, Role.USER_ADMIN);
+            requireAnyRole(userRoleService, request, Role.USER_ADMIN, Role.ADMIN);
 
             UserRegistrationRequest userRegRequest = readBody(request, UserRegistrationRequest.class);
             return userService.registerNewUser(userRegRequest) == 1;
         };
         DatumRoute<Boolean> updateRolesRoute = (request, response) -> {
-            requireRole(userRoleService, request, Role.USER_ADMIN);
+            requireAnyRole(userRoleService, request, Role.USER_ADMIN, Role.ADMIN);
 
             String userName = request.params("userName");
             List<String> roles = (List<String>) readBody(request, List.class);
             return userRoleService.updateRoles(userName, map(roles, r -> Role.valueOf(r)));
         };
         DatumRoute<Boolean> resetPasswordRoute = (request, response) -> {
-            requireRole(userRoleService, request, Role.USER_ADMIN);
+            requireAnyRole(userRoleService, request, Role.USER_ADMIN, Role.ADMIN);
 
             String userName = request.params("userName");
             String password = request.body().trim();
@@ -92,7 +92,7 @@ public class UserEndpoint implements Endpoint {
         };
 
         DatumRoute<Boolean> deleteUserRoute = (request, response) -> {
-            requireRole(userRoleService, request, Role.USER_ADMIN);
+            requireAnyRole(userRoleService, request, Role.USER_ADMIN, Role.ADMIN);
 
             String userName = request.params("userName");
             return userService.deleteUser(userName);
