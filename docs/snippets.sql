@@ -70,11 +70,7 @@ where
 	and cl.operation = 'REMOVE'
 order by cl.created_at desc
 
-
---[LOGICAL_FLOWS]---
-
 -- Example recursive query (mssql) to show data flow lineage
-
 WITH flow_cte (id, source_entity_kind, source_entity_id, target_entity_kind, target_entity_id, lvl)
 AS (
   SELECT
