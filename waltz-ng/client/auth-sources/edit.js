@@ -126,10 +126,12 @@ function editController($state,
 
 
     function remove(authSource) {
-        authSourceStore
-            .remove(authSource.id)
-            .then(refresh)
-            .then(() => notification.warning('Authoritative Source removed'));
+        if (confirm('Are you sure you want to delete this Authoritative Source ?')) {
+            authSourceStore
+                .remove(authSource.id)
+                .then(refresh)
+                .then(() => notification.warning('Authoritative Source removed'));
+        }
     }
 
 
