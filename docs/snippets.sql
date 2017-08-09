@@ -69,3 +69,41 @@ where
 	and cl.message like 'Flow removed between:%'
 	and cl.operation = 'REMOVE'
 order by cl.created_at desc
+
+
+--[LOGICAL_FLOWS]---
+
+-- Example recursive query (mssql) to show data flow lineage
+
+WITH flow_cte (id, source_entity_kind, source_entity_id, target_entity_kind, target_entity_id, lvl)
+AS (
+  SELECT
+    lf.id,
+    lf.source_entity_kind,
+    lf.source_entity_id,
+    lf.target_entity_kind,
+    lf.target_entity_id,
+    0 AS lvl
+  FROM logical_flow lf
+  WHERE target_entity_id = 20506
+  UNION ALL
+  SELECT
+    up.id,
+    up.source_entity_kind,
+    up.source_entity_id,
+    up.target_entity_kind,
+    up.target_entity_id,
+    ds.lvl + 1
+  FROM logical_flow up
+    INNER JOIN flow_cte ds
+      ON up.target_entity_kind = ds.source_entity_kind AND up.target_entity_id = ds.source_entity_id
+  WHERE ds.lvl + 1 < 3
+)
+SELECT
+    id
+    source_entity_kind,
+    source_entity_id,
+    target_entity_kind,
+    target_entity_id,
+    lvl
+FROM flow_cte;
