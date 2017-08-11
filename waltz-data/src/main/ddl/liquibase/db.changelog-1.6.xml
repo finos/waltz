@@ -222,6 +222,10 @@
                     type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="issued_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
             <column name="issued_on"
                     type="DATE">
                 <constraints nullable="false"/>
