@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import {initialiseData} from "../common";
 
 import template from "./actor-view.html";
@@ -23,12 +24,6 @@ import template from "./actor-view.html";
 
 const initialState = {
     logs: [],
-    logicalFlows: [],
-    physicalFlows: [],
-    physicalSpecifications: [],
-    physicalFlowsUnusedSpecificationsCount: 0,
-    physicalFlowsProducesCount: 0,
-    physicalFlowsConsumesCount: 0
 };
 
 
@@ -55,36 +50,10 @@ function addToHistory(historyStore, actor) {
 }
 
 
-function loadFlowDiagrams(id, $q, flowDiagramStore, flowDiagramEntityStore) {
-    const ref = {
-        id: id,
-        kind: 'ACTOR'
-    };
 
-    const selector = {
-        entityReference: ref,
-        scope: 'EXACT'
-    };
-
-    const promises = [
-        flowDiagramStore.findForSelector(selector),
-        flowDiagramEntityStore.findForSelector(selector)
-    ];
-    return $q
-        .all(promises)
-        .then(([flowDiagrams, flowDiagramEntities]) => ({ flowDiagrams, flowDiagramEntities }));
-}
-
-
-function controller($q,
-                    $stateParams,
+function controller($stateParams,
                     actorStore,
-                    flowDiagramStore,
-                    flowDiagramEntityStore,
-                    historyStore,
-                    logicalFlowStore,
-                    physicalFlowStore,
-                    physicalSpecificationStore) {
+                    historyStore) {
 
     const vm = initialiseData(this, initialState);
 
@@ -98,45 +67,6 @@ function controller($q,
         .then(() => vm.entityRef = Object.assign({}, vm.entityRef, { name: vm.actor.name }))
         .then(() => addToHistory(historyStore, vm.actor));
 
-    logicalFlowStore
-        .findByEntityReference(vm.entityRef)
-        .then(flows => vm.logicalFlows = flows);
-
-    physicalFlowStore
-        .findByEntityReference(vm.entityRef)
-        .then(flows => vm.physicalFlows = flows);
-
-    physicalSpecificationStore
-        .findByEntityReference(vm.entityRef)
-        .then(specs => vm.physicalSpecifications = specs);
-
-    loadFlowDiagrams(id, $q, flowDiagramStore, flowDiagramEntityStore)
-        .then(r => Object.assign(vm, r));
-
-
-    vm.onPhysicalFlowsInitialise = (e) => {
-        vm.physicalFlowProducesExportFn = e.exportProducesFn;
-        vm.physicalFlowConsumesExportFn = e.exportConsumesFn;
-        vm.physicalFlowUnusedExportFn = e.exportUnusedSpecificationsFn;
-    };
-
-    vm.onPhysicalFlowsChange = (e) => {
-        vm.physicalFlowsProducesCount = e.producesCount;
-        vm.physicalFlowsConsumesCount = e.consumesCount;
-        vm.physicalFlowsUnusedCount = e.unusedSpecificationsCount;
-    };
-
-    vm.exportPhysicalFlowProduces = () => {
-        vm.physicalFlowProducesExportFn();
-    };
-
-    vm.exportPhysicalFlowConsumes = () => {
-        vm.physicalFlowConsumesExportFn();
-    };
-
-    vm.exportPhysicalFlowUnused = () => {
-        vm.physicalFlowUnusedSpecificationsExportFn();
-    };
 
     vm.createFlowDiagramCommands = () => {
         const actor = Object.assign({}, vm.actor, { kind: 'ACTOR' });
@@ -166,15 +96,9 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
     '$stateParams',
     'ActorStore',
-    'FlowDiagramStore',
-    'FlowDiagramEntityStore',
     'HistoryStore',
-    'LogicalFlowStore',
-    'PhysicalFlowStore',
-    'PhysicalSpecificationStore',
 ];
 
 

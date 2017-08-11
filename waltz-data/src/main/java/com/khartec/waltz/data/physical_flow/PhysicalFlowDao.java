@@ -60,6 +60,8 @@ public class PhysicalFlowDao {
                 .specificationDefinitionId(Optional.ofNullable(record.getSpecificationDefinitionId()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
+                .lastAttestedBy(Optional.ofNullable(record.getLastAttestedBy()))
+                .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(ts -> ts.toLocalDateTime()))
                 .isRemoved(record.getIsRemoved())
                 .build();
     };
@@ -172,6 +174,8 @@ public class PhysicalFlowDao {
         record.setDescription(flow.description());
         record.setLastUpdatedBy(flow.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(flow.lastUpdatedAt()));
+        record.setLastAttestedBy(flow.lastAttestedBy().orElse(null));
+        record.setLastAttestedAt(flow.lastAttestedAt().map(ldt -> Timestamp.valueOf(ldt)).orElse(null));
         record.setIsRemoved(flow.isRemoved());
         record.setProvenance("waltz");
 

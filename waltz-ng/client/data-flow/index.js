@@ -1,3 +1,4 @@
+
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,28 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AttestationView from "./view";
+import angular from 'angular';
+
+import {registerComponent} from '../common/module-utils';
+import * as dataFlowSection from './components/data-flow-section/data-flow-section';
 
 
-const baseState = {
-    url: 'attestation'
-};
+function setup() {
+    const module = angular.module('waltz.data-flow', []);
 
+    registerComponent(module, dataFlowSection);
 
-const entityViewState = {
-    url: '/view/entity/:kind/:id?name',
-    views: { 'content@': AttestationView }
-};
-
-
-function setup($stateProvider) {
-    $stateProvider
-        .state('main.attestation', baseState)
-        .state('main.attestation.view', entityViewState);
+    return module.name;
 }
-
-
-setup.$inject = ['$stateProvider'];
 
 
 export default setup;

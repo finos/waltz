@@ -37,7 +37,8 @@ public abstract class Application implements
         NameProvider,
         DescriptionProvider,
         ProvenanceProvider,
-        WaltzEntity {
+        WaltzEntity,
+        EntityLifecycleStatusProvider {
 
     public abstract Optional<String> assetCode();
     public abstract Optional<String> parentAssetCode();

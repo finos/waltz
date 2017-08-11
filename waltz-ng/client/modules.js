@@ -66,6 +66,7 @@ const dependencies = [
     require('./complexity')(),
     require('./common/module')(),
     require('./change-log')(),
+    require('./data-flow')(),
     require('./data-type-usage')(),
     require('./data-types')(),
     require('./databases')(),

@@ -20,27 +20,21 @@ import _ from 'lodash';
 
 
 const initialState = {
-    initialModel: {
-        annotations: []
+    parentEntityRef: {
+        id: 73,
+        kind: 'APPLICATION'
     }
 };
 
-function controller($stateParams,
-                    flowDiagramStateService) {
+function controller($stateParams) {
     const vm = Object.assign(this, initialState);
 
 
-    vm.createDiagramCommands = () => {
-        return [
-            { command: 'SET_TITLE', payload: "Test title" }
-        ];
-    };
 }
 
 
 controller.$inject = [
-    '$stateParams',
-    'FlowDiagramStateService'
+    '$stateParams'
 ];
 
 

@@ -18,16 +18,25 @@
 
 import {checkIsIdSelector, checkIsEntityRef} from "../../common/checks";
 import {isEmpty} from "../../common";
+import _ from 'lodash';
 
 
-function service($http,
-                 baseUrl) {
+export function store($http,
+                      baseUrl) {
 
     const BASE = `${baseUrl}/data-type-usage`;
 
-    const findForEntity = (kind, id) => $http
-        .get(`${BASE}/entity/${kind}/${id}`)
-        .then(result => result.data);
+    const findForEntity = (kind, id) => {
+        const entityReference = _.isObject(kind)
+            ? kind
+            : { kind, id };
+
+        checkIsEntityRef(entityReference);
+
+        return $http
+            .get(`${BASE}/entity/${entityReference.kind}/${entityReference.id}`)
+            .then(result => result.data);
+    };
 
     const findForDataTypeSelector = (selector) => {
         checkIsIdSelector(selector);
@@ -91,10 +100,49 @@ function service($http,
     };
 }
 
-service.$inject = [
+store.$inject = [
     '$http',
     'BaseApiUrl'
 ];
 
 
-export default service;
+export const serviceName = 'DataTypeUsageStore';
+
+
+export const DataTypeUsageStore_API = {
+    findForEntity: {
+        serviceName,
+        serviceFnName: 'findForEntity',
+        description: 'findForEntity'
+    },
+    findForDataTypeSelector: {
+        serviceName,
+        serviceFnName: 'findForDataTypeSelector',
+        description: 'findForDataTypeSelector'
+    },
+    findForUsageKindByDataTypeIdSelector: {
+        serviceName,
+        serviceFnName: 'findForUsageKindByDataTypeIdSelector',
+        description: 'executes findForUsageKindByDataTypeIdSelector'
+    },
+    calculateStats: {
+        serviceName,
+        serviceFnName: 'calculateStats',
+        description: 'executes calculateStats'
+    },
+    findForSelector: {
+        serviceName,
+        serviceFnName: 'findForSelector',
+        description: 'executes findForSelector'
+    },
+    recalculateAll: {
+        serviceName,
+        serviceFnName: 'recalculateAll',
+        description: 'executes recalculateAll'
+    },
+    save: {
+        serviceName,
+        serviceFnName: 'save',
+        description: 'executes save'
+    }
+};

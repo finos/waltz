@@ -22,13 +22,7 @@ export default () => {
     const module = angular.module('waltz.attestation', []);
 
     module
-        .config(require('./routes'));
-
-    module
         .service('AttestationStore', require('./services/attestation-store'));
-
-    module
-        .component('waltzAttestationTable', require('./components/attestation-table'));
 
     return module.name;
 };

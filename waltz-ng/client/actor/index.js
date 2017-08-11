@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {registerComponents} from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
 import actorOverview from "./components/actor-overview";
-
+import * as actorStore from './services/actor-store';
 
 export default () => {
 
@@ -25,12 +25,15 @@ export default () => {
 
     module
         .config(require('./routes'))
-        .service('ActorStore', require('./services/actor-store'))
         .service('ActorService', require('./services/actor-service'));
 
-    registerComponents(module, [
-        actorOverview
-    ]);
+    registerComponents(
+        module,
+        [ actorOverview ]);
+
+    registerStores(
+        module,
+        [ actorStore ]);
 
     module
         .component('waltzActorSelector', require('./components/actor-selector'))

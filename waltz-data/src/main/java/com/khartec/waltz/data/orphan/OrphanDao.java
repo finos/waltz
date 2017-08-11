@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -57,6 +58,7 @@ public class OrphanDao {
                 .where(APPLICATION.ORGANISATIONAL_UNIT_ID
                         .notIn(select(ORGANISATIONAL_UNIT.ID)
                                 .from(ORGANISATIONAL_UNIT)))
+                .and(IS_ACTIVE)
                 .fetch(r -> ImmutableOrphanRelationship.builder()
                         .entityA(mkRef(EntityKind.APPLICATION, r.value1(), r.value2()))
                         .entityB(EntityReference.mkRef(EntityKind.ORG_UNIT, r.value3()))
@@ -72,7 +74,7 @@ public class OrphanDao {
 
         Condition missingApplication = MEASURABLE_RATING.ENTITY_ID
                 .notIn(select(APPLICATION.ID)
-                        .from(APPLICATION));
+                        .from(APPLICATION).where(IS_ACTIVE));
 
         Condition isApplicationCondition = MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name());
 
@@ -126,7 +128,8 @@ public class OrphanDao {
     public List<OrphanRelationship> findOrphanAuthoritativeSourceByApp() {
         Condition missingApplication = AUTHORITATIVE_SOURCE.APPLICATION_ID
                 .notIn(select(APPLICATION.ID)
-                        .from(APPLICATION));
+                        .from(APPLICATION)
+                        .where(IS_ACTIVE));
 
 
         return dsl.select(AUTHORITATIVE_SOURCE.ID,
@@ -186,7 +189,8 @@ public class OrphanDao {
                         .from(LOGICAL_FLOW)
                         .where(idField.notIn(
                                 select(APPLICATION.ID)
-                                        .from(APPLICATION)))
+                                        .from(APPLICATION)
+                                        .where(IS_ACTIVE)))
                         .and(LOGICAL_FLOW.IS_REMOVED.eq(false))
                         .and(kindField.eq(EntityKind.APPLICATION.name()));
 

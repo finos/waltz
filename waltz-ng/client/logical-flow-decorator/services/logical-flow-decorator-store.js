@@ -19,8 +19,8 @@
 import {checkIsApplicationIdSelector, checkIsIdSelector} from "../../common/checks";
 
 
-function service($http,
-                 baseUrl) {
+export function store($http,
+                      baseUrl) {
 
     const BASE = `${baseUrl}/logical-flow-decorator`;
 
@@ -84,10 +84,34 @@ function service($http,
     };
 }
 
-service.$inject = [
+store.$inject = [
     '$http',
     'BaseApiUrl'
 ];
 
 
-export default service;
+export const serviceName = "LogicalFlowDecoratorStore";
+
+
+export const LogicalFlowDecoratorStore_API = {
+    findBySelectorAndKind: {
+        serviceName,
+        serviceFnName: 'findBySelectorAndKind',
+        description: 'executes findBySelectorAndKind'
+    },
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'executes findBySelector'
+    },
+    updateDecorators: {
+        serviceName,
+        serviceFnName: 'updateDecorators',
+        description: 'executes updateDecorators'
+    },
+    summarizeBySelector: {
+        serviceName,
+        serviceFnName: 'summarizeBySelector',
+        description: 'executes summarizeBySelector'
+    }
+};

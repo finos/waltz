@@ -34,6 +34,7 @@ import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +46,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.model.EntityKind.ACTOR;
 import static com.khartec.waltz.model.EntityKind.APPLICATION;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 
@@ -106,7 +108,17 @@ public class LogicalFlowDecoratorService {
             case ORG_UNIT:
             case PERSON:
                 Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
-                return logicalFlowDecoratorDao.findByEntityIdSelectorAndKind(APPLICATION, selector, decoratorEntityKind);
+                return logicalFlowDecoratorDao.findByEntityIdSelectorAndKind(
+                        APPLICATION,
+                        selector,
+                        decoratorEntityKind);
+            case ACTOR:
+                long actorId = options.entityReference().id();
+                Select<Record1<Long>> actorIdSelector = DSL.select(DSL.val(actorId));
+                return logicalFlowDecoratorDao.findByEntityIdSelectorAndKind(
+                        ACTOR,
+                        actorIdSelector,
+                        decoratorEntityKind);
             default:
                 throw new UnsupportedOperationException("Cannot find decorators for selector kind: " + options.entityReference().kind());
         }

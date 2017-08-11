@@ -35,11 +35,13 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.Optional.ofNullable;
@@ -80,6 +82,8 @@ public class LogicalFlowDao {
                 .isRemoved(record.getIsRemoved())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
+                .lastAttestedBy(Optional.ofNullable(record.getLastAttestedBy()))
+                .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(ts -> ts.toLocalDateTime()))
                 .provenance(record.getProvenance())
                 .build();
     };
@@ -93,6 +97,8 @@ public class LogicalFlowDao {
         record.setTargetEntityKind(flow.target().kind().name());
         record.setLastUpdatedBy(flow.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(flow.lastUpdatedAt()));
+        record.setLastAttestedBy(flow.lastAttestedBy().orElse(null));
+        record.setLastAttestedAt(flow.lastAttestedAt().map(ldt -> Timestamp.valueOf(ldt)).orElse(null));
         record.setProvenance(flow.provenance());
         record.setIsRemoved(flow.isRemoved());
         return record;
@@ -210,7 +216,8 @@ public class LogicalFlowDao {
     public Integer cleanupOrphans() {
         Select<Record1<Long>> appIds = DSL
                 .select(APPLICATION.ID)
-                .from(APPLICATION);
+                .from(APPLICATION)
+                .where(IS_ACTIVE);
 
         Condition sourceAppNotFound = LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.notIn(appIds));

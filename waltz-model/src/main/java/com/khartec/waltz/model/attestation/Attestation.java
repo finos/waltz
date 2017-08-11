@@ -21,35 +21,24 @@ package com.khartec.waltz.model.attestation;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdProvider;
-import com.khartec.waltz.model.Nullable;
-import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
-
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableAttestation.class)
 @JsonDeserialize(as = ImmutableAttestation.class)
-public abstract class Attestation implements IdProvider, ProvenanceProvider
-{
-    public abstract EntityReference entityReference();
-    public abstract AttestationType attestationType();
+public abstract class Attestation implements IdProvider {
+
+    public abstract EntityReference parentEntityReference();
+    public abstract EntityKind childKind();
     public abstract String attestedBy();
+    public abstract LocalDateTime attestedAt();
 
-    @Value.Default
-    public LocalDateTime attestedAt() {
-        return nowUtc();
-    }
-
-    @Nullable
-    public abstract String comments();
-
-    public abstract Optional<EntityReference> attestingEntityReference();
-
+    public abstract Optional<String> comments();
 }
