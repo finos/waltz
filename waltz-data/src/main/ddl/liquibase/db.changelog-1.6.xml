@@ -181,4 +181,122 @@
     </changeSet>
 
 
+    <!-- 2483 -->
+    <changeSet id="20170808-2483-1"
+               author="rovats">
+        <comment>2474: Attestation_Run table</comment>
+        <createTable tableName="attestation_run"
+                     remarks="Store attestation run records">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="attestation_run_pkey"/>
+            </column>
+            <column name="target_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="selector_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="selector_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="selector_hierarchy_scope"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="involvement_kind_ids"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="issued_on"
+                    type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="due_date"
+                    type="DATE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20170808-2483-2"
+               author="rovats">
+        <comment>2474: Attestation_Instance table</comment>
+        <createTable tableName="attestation_instance"
+                     remarks="Store attestation instance records">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="attestation_instance_pkey"/>
+            </column>
+            <column name="attestation_run_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="child_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attested_at"
+                    type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="attested_by"
+                    type="${name.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="comments"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20170808-2483-3"
+               author="rovats">
+        <comment>2474: Attestation_Instance_Recipient table</comment>
+        <createTable tableName="attestation_instance_recipient"
+                     remarks="Store attestation instance recipient records">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="attestation_instance_recipient_pkey"/>
+            </column>
+            <column name="attestation_instance_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
