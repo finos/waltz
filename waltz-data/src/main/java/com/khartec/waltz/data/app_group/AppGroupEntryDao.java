@@ -30,6 +30,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 
@@ -59,6 +60,7 @@ public class AppGroupEntryDao {
                 .where(APPLICATION.ID.in(DSL.select(APPLICATION_GROUP_ENTRY.APPLICATION_ID)
                         .from(APPLICATION_GROUP_ENTRY)
                         .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(groupId))))
+                .and(IS_ACTIVE)
                 .fetch(appRefMapper);
     }
 

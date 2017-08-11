@@ -40,7 +40,8 @@ public abstract class PhysicalFlow implements
         IsRemovedProvider,
         DescriptionProvider,
         ProvenanceProvider,
-        LastUpdatedProvider {
+        LastUpdatedProvider,
+        LastAttestedProvider {
 
     public abstract long logicalFlowId();
 

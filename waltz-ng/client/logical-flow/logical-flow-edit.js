@@ -17,18 +17,9 @@
  */
 
 import _ from "lodash";
-import {
-    loadActors,
-    loadDataTypes
-} from "./registration-utils";
-
-import {
-    loadDataFlows,
-    loadLogicalFlowDecorators,
-    loadPhysicalFlows
-} from "../applications/data-load";
-
 import { mkTweakers } from './components/source-and-target-graph/source-and-target-utilities';
+import { CORE_API } from '../common/services/core-api-utils';
+import { toEntityRef } from '../common/entity-utils';
 
 
 function vetoMove(isDirty) {
@@ -37,13 +28,6 @@ function vetoMove(isDirty) {
         return true;
     }
     return false;
-}
-
-
-function loadDataTypeUsages(dataTypeUsageStore, appId, vm) {
-    return dataTypeUsageStore
-        .findForEntity('APPLICATION', appId)
-        .then(usages => vm.dataTypeUsages = usages);
 }
 
 
@@ -57,6 +41,7 @@ function notifyIllegalFlow(notification, primaryApp, counterpartRef) {
 
 
 const initialState = {
+    allActors: [],
     app: null,
     appsById: {},
     dataTypes: [],
@@ -80,7 +65,6 @@ function mkNewFlow(source, target) {
 }
 
 
-
 function mkAddFlowCommand(flow) {
     return {
         source: flow.source,
@@ -91,64 +75,133 @@ function mkAddFlowCommand(flow) {
 
 function controller($q,
                     $scope,
-                    application,
-                    actorStore,
-                    dataTypeService,
-                    dataTypeUsageStore,
-                    logicalFlowDecoratorStore,
-                    logicalFlowStore,
-                    notification,
-                    physicalFlowStore) {
-    const primaryAppId = application.id;
-
+                    $stateParams,
+                    serviceBroker,
+                    notification) {
     const vm = _.defaultsDeep(this, initialState);
-    vm.app = application;
 
-    vm.primaryRef = {
-        kind: 'APPLICATION',
-        id: application.id,
-        name: application.name
+    vm.$onInit = () => {
+        const primaryEntityFetchMethod = $stateParams.kind === 'APPLICATION'
+            ? CORE_API.ApplicationStore.getById
+            : CORE_API.ActorStore.getById;
+
+        serviceBroker
+            .loadViewData(
+                primaryEntityFetchMethod,
+                [$stateParams.id])
+            .then(r => {
+                vm.primaryEntity = r.data;
+                vm.primaryRef = toEntityRef(vm.primaryEntity, $stateParams.kind);
+                reload()
+                    .then(() => {
+                        const baseTweakers = {
+                            source: { onSelect: a => $scope.$applyAsync(() => selectSource(a)) },
+                            target: { onSelect: a => $scope.$applyAsync(() => selectTarget(a)) },
+                            type: { onSelect: a => $scope.$applyAsync(() => selectType(a)) }
+                        };
+
+                        vm.flowTweakers = mkTweakers(
+                            baseTweakers,
+                            vm.physicalFlows,
+                            vm.flows);
+                    });
+            });
+
+        serviceBroker
+            .loadAppData(
+                CORE_API.DataTypeStore.findAll,
+                [])
+            .then(r => vm.dataTypes = r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.ActorStore.findAll,
+                [])
+            .then(r => vm.allActors = r.data);
     };
 
-    const addFlow = (flows, flow) => {
+
+    const addFlow = (flow) => {
         const alreadyRegistered = _.some(
-            flows,
-            f => f.source.id === flow.source.id && f.target.id === flow.targetId);
+            vm.logicalFlows,
+            f => f.source.id === flow.source.id && f.target.id === flow.target.id);
 
         if (! alreadyRegistered) {
-            return logicalFlowStore.addFlow(mkAddFlowCommand(flow))
-                .then(savedFlow => flows.push(savedFlow))
+            return serviceBroker
+                .execute(
+                    CORE_API.LogicalFlowStore.addFlow,
+                    [mkAddFlowCommand(flow)])
+                .then(savedFlow => vm.logicalFlows.push(savedFlow))
                 .then(reload);
         } else {
             return Promise.resolve();
         }
     };
 
+    function loadLogicalFlows() {
+        return serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowStore.findByEntityReference,
+                [vm.primaryRef],
+                {force: true})
+            .then(r => vm.logicalFlows = r.data);
+    }
+
+    function loadPhysicalFlows() {
+        return serviceBroker
+            .loadViewData(
+                CORE_API.PhysicalFlowStore.findByEntityReference,
+                [ vm.primaryRef ],
+                { force: true })
+            .then(r => vm.physicalFlows = r.data);
+    }
+
+
+    function loadLogicalFlowDecorators() {
+        return serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
+                [ { entityReference: vm.primaryRef, scope: 'EXACT' }, 'DATA_TYPE' ],
+                { force: true })
+            .then(r => vm.logicalFlowDecorators = r.data);
+    }
+
+
+    function loadDataTypeUsages() {
+        return serviceBroker
+            .loadViewData(
+                CORE_API.DataTypeUsageStore.findForEntity,
+                [ vm.primaryRef ],
+                { force: true })
+            .then(r => vm.dataTypeUsages = r.data);
+    }
+
+
     const reload = () => {
         vm.cancel();
         return $q.all([
-            loadDataFlows(logicalFlowStore, primaryAppId, vm),
-            loadLogicalFlowDecorators(logicalFlowDecoratorStore, primaryAppId, vm),
-            loadDataTypeUsages(dataTypeUsageStore, primaryAppId, vm),
-            loadPhysicalFlows(physicalFlowStore, vm.primaryRef, vm)
+            loadLogicalFlows(),
+            loadLogicalFlowDecorators(),
+            loadDataTypeUsages(),
+            loadPhysicalFlows()
         ]);
     };
 
     const selectSource = (selection) => {
-        selectCounterpart(selection, { source: { id: selection.id }});
+        selectCounterpart(selection, { source: { id: selection.id, kind: selection.kind }});
     };
 
     const selectTarget = (selection) => {
-        selectCounterpart(selection, { target: { id: selection.id }});
+        selectCounterpart(selection, { target: { id: selection.id, kind: selection.kind }});
     };
 
     const selectCounterpart = (selection, flowSelectionPredicate) => {
         if (vetoMove(vm.isDirty)) { return; }
         vm.setMode('editCounterpart');
         vm.selectedCounterpart = selection;
-        vm.selectedFlow = _.find(vm.flows, flowSelectionPredicate);
+        vm.selectedFlow = _.find(vm.logicalFlows, flowSelectionPredicate);
         vm.selectedDecorators = vm.selectedFlow
-            ? _.filter(vm.dataFlowDecorators, { dataFlowId: vm.selectedFlow.id })
+            ? _.filter(vm.logicalFlowDecorators, { dataFlowId: vm.selectedFlow.id })
             : [];
     };
 
@@ -162,8 +215,10 @@ function controller($q,
     };
 
     const updateDecorators = (command) => {
-        return logicalFlowDecoratorStore
-            .updateDecorators(command)
+        return serviceBroker
+            .execute(
+                CORE_API.LogicalFlowDecoratorStore.updateDecorators,
+                [command])
             .then(reload)
             .then(() => notification.success('Data flow updated'));
     };
@@ -178,7 +233,10 @@ function controller($q,
 
     vm.updateFlow = (command) => {
         if (! command.flowId) {
-            return logicalFlowStore.addFlow(mkAddFlowCommand(vm.selectedFlow))
+            return serviceBroker
+                .execute(
+                    CORE_API.LogicalFlowStore.addFlow,
+                    [mkAddFlowCommand(vm.selectedFlow)])
                 .then(flow => Object.assign(command, { flowId: flow.id }))
                 .then(updateDecorators);
 
@@ -190,8 +248,10 @@ function controller($q,
     vm.deleteFlow = (flow) => {
         const hasPhysicalFlow = _.some(vm.physicalFlows, { logicalFlowId: flow.id });
         if (!hasPhysicalFlow) {
-            logicalFlowStore
-                .removeFlow(flow.id)
+            serviceBroker
+                .execute(
+                    CORE_API.LogicalFlowStore.removeFlow,
+                    [flow.id])
                 .then(reload)
                 .then(() => notification.warning('Data flow removed'))
                 .catch(e => notification.error(_.split(e.data.message, '/')[0] || "System error, please contact support"));
@@ -202,8 +262,10 @@ function controller($q,
 
     vm.saveUsages = (usages = []) => {
         const dataTypeCode = vm.selectedDataType.code;
-        dataTypeUsageStore
-            .save(vm.primaryRef, dataTypeCode, usages)
+        serviceBroker
+            .execute(
+                CORE_API.DataTypeUsageStore.save,
+                [vm.primaryRef, dataTypeCode, usages])
             .then(() => reload())
             .then(() => notification.success('Data usage updated'));
     };
@@ -211,15 +273,15 @@ function controller($q,
     const addSource = (kind, entity) => {
         const counterpartRef = { id: entity.id, kind, name: entity.name };
         if (notifyIllegalFlow(notification, vm.primaryRef, counterpartRef)) return;
-        addFlow(vm.flows, mkNewFlow(counterpartRef, vm.primaryRef))
-            .then(() => selectSource(entity));
+        addFlow(mkNewFlow(counterpartRef, vm.primaryRef))
+            .then(() => selectSource(counterpartRef));
     };
 
     const addTarget = (kind, entity) => {
         const counterpartRef = { id: entity.id, kind, name: entity.name };
         if (notifyIllegalFlow(notification, vm.primaryRef, counterpartRef)) return;
-        addFlow(vm.flows, mkNewFlow(vm.primaryRef, counterpartRef))
-            .then(() => selectTarget(entity));
+        addFlow(mkNewFlow(vm.primaryRef, counterpartRef))
+            .then(() => selectTarget(counterpartRef));
     };
 
     vm.addSourceApplication = (srcApp) => {
@@ -246,37 +308,15 @@ function controller($q,
         }
         vm.mode = mode;
     };
-
-    // -- BOOT
-    loadDataTypes(dataTypeService, vm);
-    loadActors(actorStore, vm);
-    reload().then(data => {
-        const baseTweakers = {
-            source: { onSelect: a => $scope.$applyAsync(() => selectSource(a)) },
-            target: { onSelect: a => $scope.$applyAsync(() => selectTarget(a)) },
-            type: { onSelect: a => $scope.$applyAsync(() => selectType(a)) }
-        };
-
-        vm.flowTweakers = mkTweakers(
-            baseTweakers,
-            vm.physicalFlows,
-            vm.flows);
-    });
-
 }
 
 
 controller.$inject = [
     '$q',
     '$scope',
-    'application',
-    'ActorStore',
-    'DataTypeService',
-    'DataTypeUsageStore',
-    'LogicalFlowDecoratorStore',
-    'LogicalFlowStore',
-    'Notification',
-    'PhysicalFlowStore'
+    '$stateParams',
+    'ServiceBroker',
+    'Notification'
 ];
 
 

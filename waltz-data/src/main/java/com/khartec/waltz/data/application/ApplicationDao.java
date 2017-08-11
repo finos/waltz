@@ -21,13 +21,13 @@ package com.khartec.waltz.data.application;
 
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.Criticality;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ApplicationRecord;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
-import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,11 +64,17 @@ public class ApplicationDao {
                 .lifecyclePhase(readEnum(appRecord.getLifecyclePhase(), LifecyclePhase.class, (s) -> LifecyclePhase.DEVELOPMENT))
                 .overallRating(readEnum(appRecord.getOverallRating(), RagRating.class, (s) -> RagRating.Z))
                 .businessCriticality(readEnum(appRecord.getBusinessCriticality(), Criticality.class, c -> Criticality.UNKNOWN))
+                .entityLifecycleStatus(readEnum(appRecord.getEntityLifecycleStatus(), EntityLifecycleStatus.class, s -> EntityLifecycleStatus.ACTIVE))
                 .provenance(appRecord.getProvenance())
                 .build();
 
         return app;
     };
+
+
+    public static final Condition IS_ACTIVE = APPLICATION.ENTITY_LIFECYCLE_STATUS
+                                                          .eq(EntityLifecycleStatus.ACTIVE.name());
+
 
     private final DSLContext dsl;
 
@@ -83,6 +89,7 @@ public class ApplicationDao {
         return dsl.select()
                 .from(APPLICATION)
                 .where(APPLICATION.ID.eq(id))
+                .and(IS_ACTIVE)
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
@@ -91,6 +98,7 @@ public class ApplicationDao {
         return dsl.select(APPLICATION.fields())
                 .from(APPLICATION)
                 .where(APPLICATION.ORGANISATIONAL_UNIT_ID.in(ids))
+                .and(IS_ACTIVE)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -98,6 +106,7 @@ public class ApplicationDao {
     public List<Application> getAll() {
         return dsl.select()
                 .from(APPLICATION)
+                .where(IS_ACTIVE)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -105,6 +114,7 @@ public class ApplicationDao {
         return dsl.select()
                 .from(APPLICATION)
                 .where(APPLICATION.ID.in(ids))
+                .and(IS_ACTIVE)
                 .fetch(TO_DOMAIN_MAPPER);
 
     }
@@ -115,7 +125,7 @@ public class ApplicationDao {
                 dsl,
                 APPLICATION,
                 APPLICATION.ORGANISATIONAL_UNIT_ID,
-                DSL.trueCondition());
+                IS_ACTIVE);
     }
 
     /**
@@ -142,6 +152,7 @@ public class ApplicationDao {
                 .or(rel.PARENT_ASSET_CODE.eq(self.ASSET_CODE)) //  parent
                 .or(rel.ASSET_CODE.eq(self.PARENT_ASSET_CODE).and(self.PARENT_ASSET_CODE.ne(""))) // child
                 .where(self.ID.eq(appId))
+                .and(IS_ACTIVE)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -219,6 +230,7 @@ public class ApplicationDao {
     public List<Application> findByAppIdSelector(Select<Record1<Long>> selector) {
         return dsl.selectFrom(APPLICATION)
                 .where(APPLICATION.ID.in(selector))
+                .and(IS_ACTIVE)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -229,6 +241,7 @@ public class ApplicationDao {
         return dsl.select()
                 .from(APPLICATION)
                 .where(APPLICATION.ASSET_CODE.eq(assetCode))
+                .and(IS_ACTIVE)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

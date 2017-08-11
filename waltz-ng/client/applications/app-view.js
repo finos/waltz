@@ -17,12 +17,8 @@
  */
 import _ from "lodash";
 import {
-    loadAuthSources,
     loadDatabases,
-    loadDataFlows,
-    loadDataTypeUsages,
     loadInvolvements,
-    loadLogicalFlowDecorators,
     loadServers,
     loadSoftwareCatalog
 } from "./data-load";
@@ -97,9 +93,7 @@ function controller($q,
                     appViewStore,
                     assetCostStore,
                     aliasStore,
-                    authSourcesStore,
                     databaseStore,
-                    dataTypeUsageStore,
                     entityStatisticStore,
                     entityTagStore,
                     flowDiagramStore,
@@ -107,16 +101,11 @@ function controller($q,
                     historyStore,
                     involvedSectionService,
                     involvementStore,
-                    logicalFlowDecoratorStore,
-                    logicalFlowStore,
                     measurableStore,
                     measurableCategoryStore,
                     measurableRatingStore,
-                    orgUnitStore,
                     perspectiveDefinitionStore,
                     perspectiveRatingStore,
-                    physicalSpecificationStore,
-                    physicalFlowStore,
                     serverInfoStore,
                     softwareCatalogStore,
                     surveyInstanceStore,
@@ -193,6 +182,7 @@ function controller($q,
             .then(r => Object.assign(vm, r));
     };
 
+
     function loadSecondWave() {
         const promises = [
             measurableCategoryStore
@@ -214,22 +204,10 @@ function controller($q,
 
     function loadThirdWave() {
         const promises = [
-            loadDataFlows(logicalFlowStore, id, vm),
             loadInvolvements($q, involvementStore, id, vm),
-            loadAuthSources(authSourcesStore, orgUnitStore, id, vm.organisationalUnit.id, vm),
             loadServers(serverInfoStore, id, vm),
             loadSoftwareCatalog(softwareCatalogStore, id, vm),
             loadDatabases(databaseStore, id, vm),
-            loadDataTypeUsages(dataTypeUsageStore, id, vm),
-            loadLogicalFlowDecorators(logicalFlowDecoratorStore, id, vm),
-
-            physicalSpecificationStore
-                .findByEntityReference(entityReference)
-                .then(xs => vm.physicalSpecifications = xs),
-
-            physicalFlowStore
-                .findByEntityReference(entityReference)
-                .then(xs => vm.physicalFlows = xs),
 
             entityStatisticStore
                 .findStatsForEntity(entityReference)
@@ -324,9 +302,7 @@ controller.$inject = [
     'ApplicationViewStore',
     'AssetCostStore',
     'AliasStore',
-    'AuthSourcesStore',
     'DatabaseStore',
-    'DataTypeUsageStore',
     'EntityStatisticStore',
     'EntityTagStore',
     'FlowDiagramStore',
@@ -334,16 +310,11 @@ controller.$inject = [
     'HistoryStore',
     'InvolvedSectionService',
     'InvolvementStore',
-    'LogicalFlowDecoratorStore',
-    'LogicalFlowStore',
     'MeasurableStore',
     'MeasurableCategoryStore',
     'MeasurableRatingStore',
-    'OrgUnitStore',
     'PerspectiveDefinitionStore',
     'PerspectiveRatingStore',
-    'PhysicalSpecificationStore',
-    'PhysicalFlowStore',
     'ServerInfoStore',
     'SoftwareCatalogStore',
     'SurveyInstanceStore',

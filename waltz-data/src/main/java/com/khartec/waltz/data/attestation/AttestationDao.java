@@ -19,32 +19,24 @@
 
 package com.khartec.waltz.data.attestation;
 
-import com.khartec.waltz.data.EntityNameUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.attestation.Attestation;
-import com.khartec.waltz.model.attestation.AttestationType;
 import com.khartec.waltz.model.attestation.ImmutableAttestation;
 import com.khartec.waltz.schema.tables.records.AttestationRecord;
-import org.jooq.*;
-import org.jooq.impl.DSL;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.model.EntityKind.valueOf;
 import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM;
-import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.Attestation.ATTESTATION;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 
 
 @Repository
@@ -52,36 +44,16 @@ public class AttestationDao {
 
     private final DSLContext dsl;
 
-    private static final Field<String> ATTESTING_ENTITY_NAME_FIELD = EntityNameUtilities.mkEntityNameField(
-            ATTESTATION.ATTESTING_ENTITY_ID,
-            ATTESTATION.ATTESTING_ENTITY_KIND,
-            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR, EntityKind.DATA_TYPE, EntityKind.FLOW_DIAGRAM));
-
     public static final RecordMapper<Record, Attestation> TO_ATTESTATION_MAPPER = r -> {
         AttestationRecord record = r.into(AttestationRecord.class);
-        EntityKind entityKind = Enum.valueOf(EntityKind.class, record.getEntityKind());
-
-        EntityReference attestingEntityRef = null;
-        Long attestingEntityId = record.getAttestingEntityId();
-        String attestingEntityKindStr = record.getAttestingEntityKind();
-
-        if (attestingEntityId != null
-                && attestingEntityKindStr != null) {
-            attestingEntityRef = mkRef(
-                    valueOf(attestingEntityKindStr),
-                    attestingEntityId,
-                    r.getValue(ATTESTING_ENTITY_NAME_FIELD));
-        }
 
         return ImmutableAttestation.builder()
                 .id(record.getId())
-                .entityReference(mkRef(entityKind, record.getEntityId()))
-                .attestationType(Enum.valueOf(AttestationType.class, record.getAttestationType()))
+                .parentEntityReference(mkRef(EntityKind.valueOf(record.getParentEntityKind()), record.getParentEntityId()))
+                .childKind(EntityKind.valueOf(record.getChildEntityKind()))
                 .attestedBy(record.getAttestedBy())
                 .attestedAt(record.getAttestedAt().toLocalDateTime())
-                .attestingEntityReference(Optional.ofNullable(attestingEntityRef))
                 .comments(record.getComments())
-                .provenance(record.getProvenance())
                 .build();
     };
 
@@ -89,16 +61,13 @@ public class AttestationDao {
     public static final Function<Attestation, AttestationRecord> TO_RECORD_MAPPER = at -> {
 
         AttestationRecord record = new AttestationRecord();
-        record.setEntityKind(at.entityReference().kind().name());
-        record.setEntityId(at.entityReference().id());
-        record.setAttestationType(at.attestationType().name());
+        record.setParentEntityKind(at.parentEntityReference().kind().name());
+        record.setParentEntityId(at.parentEntityReference().id());
+        record.setChildEntityKind(at.childKind().name());
         record.setAttestedBy(at.attestedBy());
         record.setAttestedAt(Timestamp.valueOf(at.attestedAt()));
-        record.setComments(at.comments());
-        record.setProvenance(at.provenance());
+        record.setComments(at.comments().orElse(null));
         at.id().ifPresent(record::setId);
-        at.attestingEntityReference().ifPresent(e -> record.setAttestingEntityId(e.id()));
-        at.attestingEntityReference().ifPresent(e -> record.setAttestingEntityKind(e.kind().name()));
 
         return record;
     };
@@ -116,10 +85,9 @@ public class AttestationDao {
 
         return dsl
                 .select(ATTESTATION.fields())
-                .select(ATTESTING_ENTITY_NAME_FIELD)
                 .from(ATTESTATION)
-                .where(ATTESTATION.ENTITY_KIND.eq(reference.kind().name())
-                        .and(ATTESTATION.ENTITY_ID.eq(reference.id())))
+                .where(ATTESTATION.PARENT_ENTITY_KIND.eq(reference.kind().name())
+                        .and(ATTESTATION.PARENT_ENTITY_ID.eq(reference.id())))
                 .fetch(TO_ATTESTATION_MAPPER);
     }
 
@@ -130,109 +98,4 @@ public class AttestationDao {
         AttestationRecord attestationRecord = TO_RECORD_MAPPER.apply(attestation);
         return dsl.executeInsert(attestationRecord) == 1;
     }
-
-
-    public boolean deleteForEntity(EntityReference reference) {
-        checkNotNull(reference, "reference cannot be null");
-
-        return dsl.deleteFrom(ATTESTATION)
-                .where(ATTESTATION.ENTITY_KIND.eq(reference.kind().name())
-                        .and(ATTESTATION.ENTITY_ID.eq(reference.id())))
-                .execute() > 0;
-    }
-
-
-    public boolean recalculateForFlowDiagrams() {
-        final String provenance = "flow diagram";
-
-        dsl.transaction(configuration -> {
-            DSLContext tx = DSL.using(configuration);
-
-            Condition isImpliedFlowDiagramAttestation = ATTESTATION.ATTESTATION_TYPE.eq(AttestationType.IMPLICIT.name())
-                    .and(ATTESTATION.PROVENANCE.eq(provenance));
-
-            // clear existing attestations
-            tx.deleteFrom(ATTESTATION)
-                    .where(isImpliedFlowDiagramAttestation)
-                    .execute();
-
-            Select<Record9<String, Long, String, String, Timestamp, String, String, Long, String>> entities = DSL.select(
-                    FLOW_DIAGRAM_ENTITY.ENTITY_KIND,
-                    FLOW_DIAGRAM_ENTITY.ENTITY_ID,
-                    DSL.val(AttestationType.IMPLICIT.name()).as("attestation_type"),
-                    FLOW_DIAGRAM.LAST_UPDATED_BY.as("attested_by"),
-                    FLOW_DIAGRAM.LAST_UPDATED_AT.as("attested_at"),
-                    DSL.val("Attested by flow diagram inclusion").as("comments"),
-                    DSL.val(provenance).as("provenance"),
-                    FLOW_DIAGRAM.ID.as("attesting_entity_id"),
-                    DSL.val(EntityKind.FLOW_DIAGRAM.name()).as("attesting_entity_kind"))
-                    .from(FLOW_DIAGRAM_ENTITY)
-                    .innerJoin(FLOW_DIAGRAM)
-                    .on(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(FLOW_DIAGRAM.ID))
-                    .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.in(
-                            EntityKind.LOGICAL_DATA_FLOW.name(),
-                            EntityKind.PHYSICAL_FLOW.name()));
-
-            insertAttestations(tx, entities);
-        });
-
-        return true;
-    }
-
-
-    public boolean recalculateForLogicalFlowDecorators() {
-        final String provenance = "logical flow decoration";
-
-        dsl.transaction(configuration -> {
-            DSLContext tx = DSL.using(configuration);
-
-            Condition isImpliedDecoratorAttestation = ATTESTATION.ENTITY_KIND.eq(EntityKind.LOGICAL_DATA_FLOW.name())
-                    .and(ATTESTATION.ATTESTATION_TYPE.eq(AttestationType.IMPLICIT.name()))
-                    .and(ATTESTATION.ATTESTING_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
-                    .and(ATTESTATION.PROVENANCE.eq(provenance));
-
-            // clear existing attestations
-            tx.deleteFrom(ATTESTATION)
-                    .where(isImpliedDecoratorAttestation)
-                    .execute();
-
-            Select<Record9<String, Long, String, String, Timestamp, String, String, Long, String>> select = DSL.select(
-                    DSL.val(EntityKind.LOGICAL_DATA_FLOW.name()).as("entity_kind"),
-                    LOGICAL_FLOW.ID.as("entity_id"),
-                    DSL.val("IMPLICIT").as("attestation_type"),
-                    LOGICAL_FLOW_DECORATOR.LAST_UPDATED_BY,
-                    LOGICAL_FLOW_DECORATOR.LAST_UPDATED_AT,
-                    DSL.val("Attestation by logical flow decoration").as("comments"),
-                    DSL.val(provenance).as("provenance"),
-                    LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.as("attesting_entity_id"),
-                    LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.as("attesting_entity_kind"))
-                    .from(LOGICAL_FLOW_DECORATOR)
-                    .innerJoin(LOGICAL_FLOW)
-                    .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID));
-
-            insertAttestations(tx, select);
-        });
-
-        return true;
-    }
-
-
-    private void insertAttestations(DSLContext tx,
-                                    Select<Record9<String, Long, String, String, Timestamp, String, String, Long, String>> attesationsSelector) {
-
-        //insert into attestation(entity_kind, entity_id, attestation_type, attested_by, attested_at, comments, provenance, attesting_entity_id, attesting_entity_kind)
-        tx.insertInto(ATTESTATION)
-                .columns(ATTESTATION.ENTITY_KIND,
-                        ATTESTATION.ENTITY_ID,
-                        ATTESTATION.ATTESTATION_TYPE,
-                        ATTESTATION.ATTESTED_BY,
-                        ATTESTATION.ATTESTED_AT,
-                        ATTESTATION.COMMENTS,
-                        ATTESTATION.PROVENANCE,
-                        ATTESTATION.ATTESTING_ENTITY_ID,
-                        ATTESTATION.ATTESTING_ENTITY_KIND)
-                .select(attesationsSelector)
-                .execute();
-    }
-
 }

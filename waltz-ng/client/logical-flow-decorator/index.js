@@ -17,13 +17,17 @@
  */
 
 import angular from 'angular';
+import {registerStores} from '../common/module-utils';
+import * as logicalFlowDecoratorStore from './services/logical-flow-decorator-store';
 
 
-export default () => {
+function setup() {
     const module = angular.module('waltz.logical.flow.decorator', []);
 
-    module
-        .service('LogicalFlowDecoratorStore', require('./services/logical-flow-decorator-store'));
+    registerStores(module, [logicalFlowDecoratorStore]);
 
     return module.name;
-};
+}
+
+
+export default setup;

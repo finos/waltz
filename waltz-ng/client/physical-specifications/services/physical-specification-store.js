@@ -18,7 +18,7 @@
 
 import {checkIsIdSelector, checkIsEntityRef} from "../../common/checks";
 
-function store($http, baseApiUrl) {
+export function store($http, baseApiUrl) {
 
     const base = `${baseApiUrl}/physical-specification`;
 
@@ -70,4 +70,33 @@ store.$inject = [
 ];
 
 
-export default store;
+export const serviceName = 'PhysicalSpecificationStore';
+
+
+export const PhysicalSpecificationStore_API = {
+    findByEntityReference: {
+        serviceName,
+        serviceFnName: 'findByEntityReference',
+        description: 'executes findByEntityReference'
+    },
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'executes findBySelector'
+    },
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'executes getById'
+    },
+    deleteById: {
+        serviceName,
+        serviceFnName: 'deleteById',
+        description: 'executes deleteById'
+    },
+    search: {
+        serviceName,
+        serviceFnName: 'search',
+        description: 'executes search'
+    },
+}

@@ -17,6 +17,8 @@
  */
 
 import angular from 'angular';
+import * as DataTypeUsageStore from './services/data-type-usage-store';
+import {registerStore} from '../common/module-utils'
 
 export default () => {
     const module = angular.module('waltz.data.type.usage', []);
@@ -28,8 +30,7 @@ export default () => {
         .component('waltzDataTypeUsageStatTable', require('./components/stat-table/data-type-usage-stat-table'))
         .component('waltzAppDataTypeUsageEditor', require("./components/editor/app-data-type-usage-editor"));
 
-    module
-        .service('DataTypeUsageStore', require('./services/data-type-usage-store'));
+    registerStore(module, DataTypeUsageStore);
 
     return module.name;
 };
