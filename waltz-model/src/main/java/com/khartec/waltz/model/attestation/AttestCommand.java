@@ -11,7 +11,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableAttestCommand.class)
 public abstract class AttestCommand {
 
-    public abstract Long id();
+    public abstract Long attestationInstanceid();
 
     @Value
     @Nullable
