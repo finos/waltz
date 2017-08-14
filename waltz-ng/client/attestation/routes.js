@@ -16,17 +16,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import {registerStore} from '../common/module-utils';
-import attestationRunStore from './services/attestation-run-store';
-
-export default () => {
-    const module = angular.module('waltz.attestation', []);
-
-    module
-        .config(require('./routes'));
-
-    registerStore(module, attestationRunStore);
-
-    return module.name;
+const baseState = {
+    url: 'attestation'
 };
+
+
+const runBaseState = {
+    url: '/run'
+};
+
+
+const runCreateState = {
+    url: '/create',
+    views: {'content@': require('./attestation-run-create')}
+};
+
+
+// const runViewState = {
+//     url: '/{id:int}',
+//     views: {'content@': require('./attestation-run-view')}
+// };
+
+function setup($stateProvider) {
+    $stateProvider
+        .state('main.attestation', baseState)
+        .state('main.attestation.run', runBaseState)
+        .state('main.attestation.run.create', runCreateState);
+        // .state('main.survey.run.view', runViewState)
+
+
+}
+
+
+setup.$inject = ['$stateProvider'];
+
+
+export default setup;

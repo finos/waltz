@@ -20,6 +20,7 @@
 
 import {ActorStore_API as ActorStore} from "../../actor/services/actor-store";
 import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
+import {AttestationRunStore_API as AttestationRunStore} from "../../attestation/services/attestation-run-store";
 import {AuthSourcesStore_API as AuthSourcesStore} from "../../auth-sources/services/auth-sources-store";
 import {BookmarkStore_API as BookmarkStore} from "../../bookmarks/services/bookmark-store";
 import {ChangeInitiativeStore_API as ChangeInitiativeStore} from "../../change-initiative/services/change-initiative-store";
@@ -58,6 +59,7 @@ import {UserStore_API as UserStore} from "../../user/services/user-store";
 export const CORE_API = {
     ActorStore,
     ApplicationStore,
+    AttestationRunStore,
     AuthSourcesStore,
     BookmarkStore,
     ChangeInitiativeStore,
