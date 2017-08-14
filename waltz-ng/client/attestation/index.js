@@ -18,11 +18,22 @@
 
 import angular from 'angular';
 
+import {registerStores} from "../common/module-utils";
+
+import * as attestationInstanceStore from './services/attestation-instance-store';
+import routes from './routes';
+
+
 export default () => {
     const module = angular.module('waltz.attestation', []);
 
     module
+        .config(routes);
+
+    module
         .service('AttestationStore', require('./services/attestation-store'));
+
+    registerStores(module, [attestationInstanceStore]);
 
     return module.name;
 };
