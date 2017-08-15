@@ -14,10 +14,14 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.common.StringUtilities.join;
 import static com.khartec.waltz.common.StringUtilities.splitThenMap;
+import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
+import static com.khartec.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static com.khartec.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
 
 @Repository
@@ -30,6 +34,7 @@ public class AttestationRunDao {
 
         return ImmutableAttestationRun.builder()
                 .id(record.getId())
+                .targetEntityKind(EntityKind.valueOf(record.getTargetEntityKind()))
                 .name(record.getName())
                 .description(record.getDescription())
                 .selectionOptions(IdSelectionOptions.mkOpts(
@@ -41,6 +46,7 @@ public class AttestationRunDao {
                         record.getInvolvementKindIds(),
                         ID_SEPARATOR,
                         Long::valueOf))
+                .issuedBy(record.getIssuedBy())
                 .issuedOn(record.getIssuedOn().toLocalDate())
                 .dueDate(record.getDueDate().toLocalDate())
                 .build();
@@ -60,6 +66,18 @@ public class AttestationRunDao {
         return dsl.selectFrom(ATTESTATION_RUN)
                 .where(ATTESTATION_RUN.ID.eq(attestationRunId))
                 .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<AttestationRun> findByRecipient(String userId) {
+        return dsl.select(ATTESTATION_RUN.fields())
+                .from(ATTESTATION_RUN)
+                .innerJoin(ATTESTATION_INSTANCE)
+                    .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
+                .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
+                    .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
+                .where(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(userId))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 

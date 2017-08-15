@@ -58,6 +58,21 @@ public class AttestationInstanceDao {
     }
 
 
+    public long create(AttestationInstance attestationInstance) {
+        checkNotNull(attestationInstance, "attestationInstance cannot be null");
+
+        AttestationInstanceRecord record = dsl.newRecord(ATTESTATION_INSTANCE);
+        record.setAttestationRunId(attestationInstance.attestationRunId());
+        record.setParentEntityKind(attestationInstance.parentEntity().kind().name());
+        record.setParentEntityId(attestationInstance.parentEntity().id());
+        record.setChildEntityKind(attestationInstance.childEntityKind().name());
+
+        record.store();
+
+        return record.getId();
+    }
+
+
     public List<AttestationInstance> findByRecipient(String userId) {
         return dsl.select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
