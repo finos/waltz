@@ -316,4 +316,13 @@
         </createTable>
     </changeSet>
 
+
+    <!-- 2485 -->
+    <changeSet id="20170815-2485-1"
+               author="kamransaleem">
+        <comment>2485: Attestation_Instance - remove comments column</comment>
+        <dropColumn tableName="attestation_instance"
+                    columnName="comments" />
+    </changeSet>
+
 </databaseChangeLog>

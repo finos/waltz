@@ -47,7 +47,6 @@ public class AttestationInstanceDao {
                 .childEntityKind(EntityKind.valueOf(record.getChildEntityKind()))
                 .attestedAt(Optional.ofNullable(record.getAttestedAt()).map(ts -> ts.toLocalDateTime()))
                 .attestedBy(Optional.ofNullable(record.getAttestedBy()))
-                .comments(record.getComments())
                 .build();
     };
 
@@ -70,11 +69,10 @@ public class AttestationInstanceDao {
     }
 
 
-    public boolean attestInstance(long instanceId, String attestedBy, LocalDateTime dateTime, String comments) {
+    public boolean attestInstance(long instanceId, String attestedBy, LocalDateTime dateTime) {
         return dsl.update(ATTESTATION_INSTANCE)
             .set(ATTESTATION_INSTANCE.ATTESTED_BY, attestedBy)
             .set(ATTESTATION_INSTANCE.ATTESTED_AT, Timestamp.valueOf(dateTime) )
-            .set(ATTESTATION_INSTANCE.COMMENTS, comments)
             .where(ATTESTATION_INSTANCE.ID.eq(instanceId).and(ATTESTATION_INSTANCE.ATTESTED_AT.isNull()))
             .execute() == 1;
     }

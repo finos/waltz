@@ -29,7 +29,7 @@ public class AttestationInstanceService {
     }
 
 
-    public boolean attestInstance(long instanceId, String attestedBy, String comments) {
-        return attestationInstanceDao.attestInstance(instanceId, attestedBy, nowUtc(), comments);
+    public boolean attestInstance(long instanceId, String attestedBy) {
+        return attestationInstanceDao.attestInstance(instanceId, attestedBy, nowUtc());
     }
 }

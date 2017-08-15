@@ -18,10 +18,12 @@
 
 import angular from 'angular';
 
-import {registerStores} from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
+
+import routes from './routes';
 
 import * as attestationInstanceStore from './services/attestation-instance-store';
-import routes from './routes';
+import attestationConfirmation from './components/attestation-confirmation';
 
 
 export default () => {
@@ -34,6 +36,7 @@ export default () => {
         .service('AttestationStore', require('./services/attestation-store'));
 
     registerStores(module, [attestationInstanceStore]);
+    registerComponents(module, [attestationConfirmation]);
 
     return module.name;
 };

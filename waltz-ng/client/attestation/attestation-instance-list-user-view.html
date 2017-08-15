@@ -21,10 +21,11 @@
                     <th>Issued</th>
                     <th>Due</th>
                     <th>Target</th>
+                    <th width="10%"></th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr ng-repeat="incompleteAttestation in ctrl.attestations.incomplete">
+                <tbody ng-repeat="incompleteAttestation in ctrl.attestations.incomplete" style="border-top: none">
+                <tr>
                     <td ng-bind="incompleteAttestation.run.name">
                     </td>
                     <td ng-bind="incompleteAttestation.run.description">
@@ -47,14 +48,26 @@
                     </td>
                     <td>
                         <a class="btn btn-primary btn-xs"
-                           ng-click="ctrl.attestEntity(incompleteAttestation)">
+                           ng-click="ctrl.selectedAttestation = incompleteAttestation"
+                           ng-if="ctrl.selectedAttestation !== incompleteAttestation">
                             Attest
                         </a>
                     </td>
                 </tr>
+                <tr ng-if="ctrl.selectedAttestation === incompleteAttestation">
+                    <td colspan="7" style="padding-right: 3em">
+                        <waltz-attestation-confirmation attestation="ctrl.selectedAttestation"
+                                                        on-confirm="ctrl.attestEntity"
+                                                        on-cancel="ctrl.cancelAttestation">
+                        </waltz-attestation-confirmation>
+                    </td>
+                </tr>
                 </tbody>
+
             </table>
         </div>
+
+        <!-- No pending -->
         <div ng-if="ctrl.attestations.incomplete.length == 0">
             <span class="text-muted">
                 No pending attestations
@@ -70,12 +83,9 @@
                     <th>Attestation</th>
                     <th>Description</th>
                     <th>Subject</th>
-                    <th>Issued</th>
-                    <th>Due</th>
                     <th>Target</th>
-                    <th>Attested at</th>
                     <th>Attested by</th>
-                    <th>Comments</th>
+                    <th>Attested at</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -89,24 +99,14 @@
                         </waltz-entity-link>
                     </td>
                     <td>
-                        <waltz-from-now timestamp="completeAttestation.run.issuedOn">
-                        </waltz-from-now>
-                    </td>
-                    <td>
-                        <waltz-from-now timestamp="completeAttestation.run.dueDate">
-                        </waltz-from-now>
-                    </td>
-                    <td>
                         <span ng-bind="completeAttestation.instance.childEntityKind | toDisplayName:'entity'">
                         </span>s
+                    </td>
+                    <td ng-bind="completeAttestation.instance.attestedBy">
                     </td>
                     <td>
                         <waltz-from-now timestamp="completeAttestation.instance.attestedAt">
                         </waltz-from-now>
-                    </td>
-                    <td ng-bind="completeAttestation.instance.attestedBy">
-                    </td>
-                    <td ng-bind="completeAttestation.instance.comments">
                     </td>
                 </tr>
                 </tbody>
