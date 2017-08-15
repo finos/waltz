@@ -113,7 +113,8 @@
 
     <!-- 2474 - rename attestation_pkey to attestation_1_6_pkey -->
     <changeSet author="kamransaleem"
-               id="20170801-2474-1a">
+               id="20170801-2474-1a"
+               dbms="mssql">
         <comment>2488 - rename attestation_pkey to attestation_1_6_pkey</comment>
 
         <dropPrimaryKey constraintName="attestation_pkey"
