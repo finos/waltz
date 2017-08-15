@@ -17,6 +17,7 @@
  */
 
 import angular from 'angular';
+import {registerStores} from "../common/module-utils";
 import * as attestationInstanceStore from './services/attestation-instance-store';
 import attestationRunStore from './services/attestation-run-store';
 import routes from './routes';
