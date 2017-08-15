@@ -1,6 +1,5 @@
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.attestation.AttestCommand;
 import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.service.attestation.AttestationInstanceService;
 import com.khartec.waltz.web.DatumRoute;
@@ -38,14 +37,9 @@ public class AttestationInstanceEndpoint implements Endpoint {
                 (req, res) -> attestationInstanceService.findByRecipient(getUsername(req));
 
         DatumRoute<Boolean> attestInstanceRoute =
-                (req, res) -> {
-                    AttestCommand command = readBody(req, AttestCommand.class);
-                    return attestationInstanceService.attestInstance(
+                (req, res) -> attestationInstanceService.attestInstance(
                             getId(req),
-                            getUsername(req),
-                            command.comments());
-                };
-
+                            getUsername(req));
 
         getForList(findByUserPath, findByUserRoute);
         postForDatum(attestInstancePath, attestInstanceRoute);

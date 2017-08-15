@@ -6,7 +6,8 @@ import template from './attestation-instance-list-user-view.html';
 
 
 const initialState = {
-    attestationInstancesAndRuns: []
+    attestationInstancesAndRuns: [],
+    selectedAttestation: null
 };
 
 
@@ -66,8 +67,13 @@ function controller(serviceBroker,
     vm.attestEntity = (attestation) => {
         serviceBroker
             .execute(CORE_API.AttestationInstanceStore.attestInstance, [attestation.instance.id])
-            .then(() => loadData());
+            .then(() => loadData())
+            .then(() => vm.selectedAttestation = null);
     };
+
+    vm.cancelAttestation = () => {
+        vm.selectedAttestation = null;
+    }
 }
 
 

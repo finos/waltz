@@ -22,8 +22,5 @@ public abstract class AttestationInstance implements IdProvider {
 
     public abstract Optional<LocalDateTime> attestedAt();
     public abstract Optional<String> attestedBy();
-
-    @Nullable
-    public abstract String comments();
 }
 
