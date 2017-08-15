@@ -23,6 +23,10 @@ import playpenView2 from "./2/playpen2";
 import playpenView3 from "./3/playpen3";
 import playpenView4 from "./4/playpen4";
 
+import {registerComponents} from '../common/module-utils';
+import * as EntityDataSourcingPanel from './4/entity-data-sourcing-panel/entity-data-sourcing-panel';
+import * as FlowExplorer from './4/flow-explorer/flow-explorer';
+import * as FooWidget from './4/foo-widget/foo-widget';
 
 export default () => {
 
@@ -54,12 +58,13 @@ export default () => {
                     views: { 'content@': playpenView3 }
                 })
                 .state('main.playpen.4', {
-                    url: '/4',
+                    url: '/4?kind&{id:int}',
                     views: { 'content@': playpenView4 }
                 })
         }
     ]);
 
+    registerComponents(module, [FlowExplorer, FooWidget, EntityDataSourcingPanel]);
     return module.name;
 
 };
