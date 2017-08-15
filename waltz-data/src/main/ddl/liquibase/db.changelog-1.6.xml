@@ -111,6 +111,21 @@
                      oldTableName="attestation"/>
     </changeSet>
 
+
+    <changeSet id="20170808-2474-1a"
+               author="kamransaleem"
+               dbms="mssql">
+        <comment>2488: rename attestation_pkey to attestation_1_6_pkey</comment>
+
+        <dropPrimaryKey constraintName="attestation_pkey"
+                        tableName="attestation_1_6" />
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="attestation_1_6_pkey"
+                       tableName="attestation_1_6" />
+    </changeSet>
+
+
     <changeSet id="20170808-2474-2"
                author="rovats">
         <comment>2474: Recreate Attestation table</comment>
