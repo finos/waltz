@@ -7,12 +7,9 @@ export function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
-    const attestInstance = (id, comments) => {
+    const attestInstance = (id) => {
         return $http
-            .post(`${base}/attest/${id}`, {
-                attestationInstanceid: id,
-                comments
-            });
+            .post(`${base}/attest/${id}`);
     };
 
     return {

@@ -17,11 +17,11 @@
  */
 
 import angular from 'angular';
-import {registerStores} from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
 import * as attestationInstanceStore from './services/attestation-instance-store';
 import attestationRunStore from './services/attestation-run-store';
+import attestationConfirmation from './components/attestation-confirmation';
 import routes from './routes';
-
 
 export default () => {
     const module = angular.module('waltz.attestation', []);
@@ -29,10 +29,15 @@ export default () => {
     module
         .config(routes);
 
+    module
+        .service('AttestationStore', require('./services/attestation-store'));
+
     registerStores(module, [
         attestationInstanceStore,
         attestationRunStore
     ]);
 
+    registerComponents(module, [attestationConfirmation]);
+    
     return module.name;
 };
