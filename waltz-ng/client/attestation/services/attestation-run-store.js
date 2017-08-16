@@ -32,10 +32,17 @@ function store($http, baseApiUrl) {
             .get(`${base}/id/${id}`)
             .then(r => r.data);
     };
+    
+    const findByRecipient = () => {
+        return $http
+            .get(`${base}/user`)
+            .then(r => r.data);
+    };
 
     return {
         create,
-        getById
+        getById,
+        findByRecipient
     };
 }
 
@@ -59,6 +66,11 @@ export const AttestationRunStore_API = {
         serviceName,
         serviceFnName: 'getById',
         description: 'attestation run by id'
+    },
+    findByRecipient: {
+        serviceName,
+        serviceFnName: 'findByRecipient',
+        description: 'attestation runs for recipient'
     }
 };
 

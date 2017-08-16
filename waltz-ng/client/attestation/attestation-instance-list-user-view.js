@@ -28,12 +28,11 @@ function mkAttestationData(attestationRuns = [], attestationInstances = []){
         'incomplete': incomplete,
         'complete': complete
     };
-
-
 }
 
 
-function controller(serviceBroker,
+function controller($q,
+                    serviceBroker,
                     userService) {
     const vm = initialiseData(this, initialState);
 
@@ -41,24 +40,18 @@ function controller(serviceBroker,
         .whoami()
         .then(user => vm.user = user);
 
-    const sampleRun = [{
-        id: 1,
-        targetEntityKind: 'APPLICATION',
-        name: 'test run',
-        description: 'test',
-        selectorEntityKind: 'ORG_UNIT',
-        selectorEntityId: 4326,
-        selectorHierarchyScope: 'CHILDREN',
-        involvementKindIds: 'ITAO',
-        issuedBy: 'david.watkins@db.com',
-        issuedOn: '2017-08-14',
-        dueDate: '2017-08-24',
-    }];
-
     const loadData = () => {
-        serviceBroker
-            .loadViewData(CORE_API.AttestationInstanceStore.findByUser, [], { force: true })
-            .then(r => vm.attestations = mkAttestationData(sampleRun, r.data));
+
+        const runsPromise = serviceBroker
+            .loadViewData(CORE_API.AttestationRunStore.findByRecipient)
+            .then(r => r.data);
+
+        const instancesPromise = serviceBroker
+            .loadViewData(CORE_API.AttestationInstanceStore.findByUser, [], {force: true})
+            .then(r => r.data);
+
+        $q.all([runsPromise, instancesPromise])
+            .then(([runs, instances]) => vm.attestations = mkAttestationData(runs, instances));
     };
 
     loadData();
@@ -78,6 +71,7 @@ function controller(serviceBroker,
 
 
 controller.$inject = [
+    '$q',
     'ServiceBroker',
     'UserService'
 ];

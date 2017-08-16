@@ -10,6 +10,7 @@ import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.attestation.AttestationRunService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
+import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import spark.Request;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 @Service
@@ -43,9 +45,13 @@ public class AttestationRunEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String findByRecipientPath = mkPath(BASE_URL, "user");
 
         DatumRoute<AttestationRun> getByIdRoute = (req, res) ->
                 attestationRunService.getById(getId(req));
+
+        ListRoute<AttestationRun> findByRecipientRoute = (req, res) ->
+                attestationRunService.findByRecipient(WebUtilities.getUsername(req));
 
         DatumRoute<IdCommandResponse> attestationRunCreateRoute = (req, res) -> {
             ensureUserHasAdminRights(req);
@@ -58,6 +64,7 @@ public class AttestationRunEndpoint implements Endpoint {
         };
 
         getForDatum(getByIdPath, getByIdRoute);
+        getForList(findByRecipientPath, findByRecipientRoute);
         postForDatum(BASE_URL, attestationRunCreateRoute);
     }
 
