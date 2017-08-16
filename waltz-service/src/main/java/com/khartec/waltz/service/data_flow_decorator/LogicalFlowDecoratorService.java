@@ -39,10 +39,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
@@ -221,6 +223,15 @@ public class LogicalFlowDecoratorService {
     }
 
 
+
+    public Collection<LogicalFlowDecorator> findByFlowIdsAndKind(List<Long> ids, EntityKind decorationKind) {
+        checkNotNull(decorationKind, "decorationKind cannot be null");
+        if (isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return logicalFlowDecoratorDao.findByFlowIdsAndKind(ids, decorationKind);
+    }
+
     private void audit(String verb,
                        Collection<EntityReference> decorators,
                        LogicalFlow flow,
@@ -245,4 +256,5 @@ public class LogicalFlowDecoratorService {
 
     }
 
+    
 }

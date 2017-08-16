@@ -1,0 +1,31 @@
+@import "flow-explorer/flow-explorer";
+@import '../../../style/variables';
+
+.waltz-foo-widget {
+    width: 100%;
+    height: 1.5em;
+    svg {
+        border: 1px solid #eee;
+    }
+
+    .wfw-layer {
+        &[data-key='SECONDARY'] rect {
+            fill: $waltz-amber;
+        }
+        &[data-key='PRIMARY'] rect {
+            fill: $waltz-green;
+        }
+        &[data-key='DISCOURAGED'] rect {
+            fill: $waltz-red;
+        }
+        &[data-key='NO_OPINION'] rect {
+            fill: #aaa;
+        }
+    }
+
+
+}
+
+div[data-key='a'] {
+    background-color: #2ca02c;
+}
