@@ -15,32 +15,36 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
-import {CORE_API} from '../../common/services/core-api-utils';
 
-const initData = {
-    id: 134,
-};
+export function store($http, BaseApiUrl) {
+    const BASE = `${BaseApiUrl}/enum-value`;
 
+    // --- FINDERS ---
+    const findAll = () => $http
+        .get(BASE)
+        .then(r => r.data);
 
-function controller(serviceBroker)
-{
-    const vm = Object.assign(this, initData);
-
-    serviceBroker.loadViewData(CORE_API.EnumValueStore.findAll).then(r => console.log(r.data));
+    return {
+        findAll,
+    };
 }
 
 
-controller.$inject = ['ServiceBroker'];
+store.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
 
 
-const view = {
-    template: require('./playpen1.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
+export const serviceName = 'EnumValueStore';
+
+
+export const EnumValueStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'find all enum values'
+    }
 };
 
 
-export default view;

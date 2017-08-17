@@ -15,32 +15,33 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
-import {CORE_API} from '../../common/services/core-api-utils';
 
-const initData = {
-    id: 134,
-};
+package com.khartec.waltz.service.enum_value;
 
 
-function controller(serviceBroker)
-{
-    const vm = Object.assign(this, initData);
+import com.khartec.waltz.data.enum_value.EnumValueDao;
+import com.khartec.waltz.model.EnumValue;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-    serviceBroker.loadViewData(CORE_API.EnumValueStore.findAll).then(r => console.log(r.data));
+import java.util.List;
+
+import static com.khartec.waltz.common.Checks.checkNotNull;
+
+@Service
+public class EnumValueService {
+
+    private final EnumValueDao enumValueDao;
+
+
+    @Autowired
+    public EnumValueService(EnumValueDao enumValueDao) {
+        checkNotNull(enumValueDao, "enumValueDao cannot be null");
+        this.enumValueDao = enumValueDao;
+    }
+
+
+    public List<EnumValue> findAll() {
+        return enumValueDao.findAll();
+    }
 }
-
-
-controller.$inject = ['ServiceBroker'];
-
-
-const view = {
-    template: require('./playpen1.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;
