@@ -20,7 +20,6 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.bookmark.Bookmark;
-import com.khartec.waltz.model.bookmark.BookmarkKind;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.bookmark.BookmarkService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -69,13 +68,6 @@ public class BookmarksEndpoint implements Endpoint {
                     EntityReference ref = getEntityReference(request);
                     return bookmarkService.findByReference(ref);
 
-                },
-                transformer);
-
-        get(mkPath(BASE_URL, "types"),
-                (request, response) -> {
-                    response.type(TYPE_JSON);
-                    return BookmarkKind.values();
                 },
                 transformer);
 

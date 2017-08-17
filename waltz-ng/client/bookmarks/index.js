@@ -18,10 +18,12 @@
 
 import angular from 'angular';
 
-import {registerComponent, registerStore} from '../common/module-utils';
+import {registerComponents, registerStores} from '../common/module-utils';
 
 import bookmarkStore from './services/bookmark-store';
+import bookmarkKindSelect from './components/bookmark-kind-select/bookmark-kind-select';
 import bookmarksSection from './components/bookmarks-section/bookmarks-section';
+import bookmarkKinds from './components/bookmark-kinds/bookmark-kinds';
 
 export default () => {
 
@@ -32,12 +34,12 @@ export default () => {
     module
         .config(require('./routes'));
 
-    registerStore(module, bookmarkStore);
+    registerStores(module, [bookmarkStore]);
 
-    module
-        .component('waltzBookmarkKinds', require('./components/bookmark-kinds/bookmark-kinds'));
-
-    registerComponent(module, bookmarksSection)
+    registerComponents(module, [
+        bookmarkKinds,
+        bookmarkKindSelect,
+        bookmarksSection]);
 
     return module.name;
 };

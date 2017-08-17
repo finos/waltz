@@ -231,7 +231,8 @@
                        tableName="enum_value"/>
     </changeSet>
     
-    
+
+    <!-- 2493: Auth source rating names etc -->
     <changeSet id="20170817-2493-1"
                author="davidwatkins73">
         <comment>2493: Adding auth source rating names to enum values</comment>
@@ -277,5 +278,119 @@
         </insert>
     </changeSet>
 
+
+    <!-- 2494: system defined bookmarks -->
+    <changeSet id="20170817-2494-1"
+               author="davidwatkins73">
+        <comment>2494: Adding bookmark kinds to enum-value table</comment>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="APPLICATION_INSTANCE"/>
+            <column name="display_name"
+                    value="Application Instance"/>
+            <column name="description"
+                    value="Application Instance"/>
+            <column name="icon_name"
+                    value="desktop"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="BUILD_SYSTEM"/>
+            <column name="display_name"
+                    value="Automated Build / Deployment System"/>
+            <column name="description"
+                    value="Automated Build and Deployment Systems, e.g. Teamcity, Jenkins, Hudson"/>
+            <column name="icon_name"
+                    value="simplybuilt"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="BUSINESS_SPECIFICATION"/>
+            <column name="display_name"
+                    value="Business Specification"/>
+            <column name="description"
+                    value="Business Specification"/>
+            <column name="icon_name"
+                    value="briefcase"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="DOCUMENTATION"/>
+            <column name="display_name"
+                    value="Documentation"/>
+            <column name="description"
+                    value="Documentation, e.g. Wiki, Sharepoint"/>
+            <column name="icon_name"
+                    value="book"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="ISSUE_TRACKER"/>
+            <column name="display_name"
+                    value="Issue Tracker"/>
+            <column name="description"
+                    value="Issue Tracker, e.g. Jira, Bugzilla"/>
+            <column name="icon_name"
+                    value="tasks"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="MONITORING"/>
+            <column name="display_name"
+                    value="Monitoring"/>
+            <column name="description"
+                    value="Monitoring Systems"/>
+            <column name="icon_name"
+                    value="bar-chart"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="QUALITY_CONTROL"/>
+            <column name="display_name"
+                    value="Quality Control"/>
+            <column name="description"
+                    value="Quality Control Systems"/>
+            <column name="icon_name"
+                    value="sliders"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="SOURCE_CODE_CONTROL"/>
+            <column name="display_name"
+                    value="Source Code Control"/>
+            <column name="description"
+                    value="Source Code Control / Management"/>
+            <column name="icon_name"
+                    value="code"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="TECHNICAL_SPECIFICATION"/>
+            <column name="display_name"
+                    value="Technical Specification"/>
+            <column name="description"
+                    value="Technical Specification"/>
+            <column name="icon_name"
+                    value="tty"/>
+        </insert>
+    </changeSet>
 
 </databaseChangeLog>

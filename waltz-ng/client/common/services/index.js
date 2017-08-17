@@ -22,7 +22,6 @@ import {
     applicationRatingNames,
     assetCostKindNames,
     attestationTypeDisplayNames,
-    bookmarkNames,
     capabilityRatingNames,
     changeInitiativeNames,
     criticalityDisplayNames,
@@ -49,7 +48,6 @@ import {
     dataFormatKindNames
 } from "./display-names";
 import {
-    bookmarkIconNames,
     booleanTypeIconNames,
     entityIconNames,
     entityStatisticCategoryIconNames,
@@ -144,7 +142,6 @@ export default (module) => {
         .register('applicationRating', applicationRatingNames)
         .register('assetCost', assetCostKindNames)
         .register('attestationType', attestationTypeDisplayNames)
-        .register('bookmark', bookmarkNames)
         .register('capabilityRating', capabilityRatingNames)
         .register('changeInitiative', changeInitiativeNames)
         .register('criticality', criticalityDisplayNames)
@@ -171,7 +168,6 @@ export default (module) => {
         .register('transportKind', transportKindNames);
 
     iconNameService
-        .register('bookmark', bookmarkIconNames)
         .register('BOOLEAN', booleanTypeIconNames)
         .register('entity', entityIconNames)
         .register('entityStatistic', entityStatisticCategoryIconNames)
