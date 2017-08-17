@@ -18,8 +18,7 @@
 
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
-import {bookmarkNames} from "../../../common/services/display-names";
-import {bookmarkIconNames} from "../../../common/services/icon-names";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -36,51 +35,61 @@ const initialState = {
 };
 
 
-function createKinds(bookmarks = []) {
+function createKinds(serviceBroker, bookmarks = []) {
     const bookmarksByKind = _.groupBy(bookmarks, 'kind');
 
-    return _.chain(_.keys(bookmarkNames))
-        .union(_.keys(bookmarkIconNames))
-        .sortBy()
-        .map(k => ({
-            code: k,
-            name: bookmarkNames[k] || '?',
-            icon: bookmarkIconNames[k] || 'square-o',
-            count: bookmarksByKind[k] ? bookmarksByKind[k].length : 0,
-            selected: false
-        }))
-        .value();
+    return serviceBroker
+        .loadAppData(CORE_API.EnumValueStore.findAll)
+        .then(r => {
+            const enumValues = r.data;
+            return _
+                .chain(enumValues)
+                .filter({ type: 'BookmarkKind' })
+                .sortBy('name')
+                .map(k => ({
+                    code: k.key,
+                    name: k.name,
+                    icon: k.icon,
+                    count: (bookmarksByKind[k.key] || []).length,
+                    selected: false
+                }))
+                .value();
+        });
 }
 
 
 const template = require('./bookmark-kinds.html');
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
-        vm.kinds = createKinds(vm.bookmarks);
+    vm.$onInit = () => {
+        createKinds(serviceBroker, vm.bookmarks)
+            .then(kinds => vm.kinds = kinds);
     };
 
-
     const resetCurrentSelection = () => {
-        if(vm.currentSelection) vm.currentSelection.selected = false;
+        if(vm.currentSelection) {
+            vm.currentSelection.selected = false;
+        }
         vm.currentSelection = null;
     };
 
-
     vm.select = (kind) => {
-        if(!kind.count) return;
+        if (!kind.count) {
+            return;
+        }
 
-        if(vm.currentSelection != kind) resetCurrentSelection();
+        if (vm.currentSelection != kind) {
+            resetCurrentSelection();
+        }
 
         kind.selected = !kind.selected;
         invokeFunction(vm.onSelect, kind.selected ? kind.code : null);
 
         vm.currentSelection = kind;
     };
-
 
     vm.clearSelection = () => {
         invokeFunction(vm.onSelect, null);
@@ -89,7 +98,7 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = ['ServiceBroker'];
 
 
 const component = {
@@ -99,4 +108,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: 'waltzBookmarkKinds'
+};

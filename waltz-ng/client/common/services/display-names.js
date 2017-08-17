@@ -35,19 +35,6 @@ export const attestationTypeDisplayNames = {
 };
 
 
-export const bookmarkNames = {
-    APPLICATION_INSTANCE: 'Application Instance',
-    BUILD_SYSTEM: 'Automated Build / Deployment System',
-    BUSINESS_SPECIFICATION: 'Business Specification',
-    DOCUMENTATION: 'Documentation',
-    ISSUE_TRACKER: 'Issue Tracking',
-    MONITORING: 'Monitoring Systems',
-    QUALITY_CONTROL: 'Quality Control',
-    SOURCE_CODE_CONTROL: 'Source Code Control',
-    TECHNICAL_SPECIFICATION: 'Technical Specification',
-};
-
-
 export const investmentRatingNames = {
     R: 'Disinvest',
     A: 'Maintain',
