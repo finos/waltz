@@ -230,6 +230,52 @@
                        constraintName="enum_value_pkey"
                        tableName="enum_value"/>
     </changeSet>
+    
+    
+    <changeSet id="20170817-2493-1"
+               author="davidwatkins73">
+        <comment>2493: Adding auth source rating names to enum values</comment>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="AuthoritativenessRating"/>
+            <column name="key"
+                    value="PRIMARY"/>
+            <column name="display_name"
+                    value="Primary Source"/>
+            <column name="description"
+                    value="Primary Sources should be the golden master"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="AuthoritativenessRating"/>
+            <column name="key"
+                    value="SECONDARY"/>
+            <column name="display_name"
+                    value="Secondary Source"/>
+            <column name="description"
+                    value="Secondary Sources should be authorised redistributors of data"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="AuthoritativenessRating"/>
+            <column name="key"
+                    value="DISCOURAGED"/>
+            <column name="display_name"
+                    value="Discouraged Source"/>
+            <column name="description"
+                    value="A discouraged source is one where an alternative primary or secondary source is available"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="AuthoritativenessRating"/>
+            <column name="key"
+                    value="NO_OPINION"/>
+            <column name="display_name"
+                    value="No "/>
+            <column name="description"
+                    value="A source's rating is 'no opinion' when no primary or secondary sources have been declared for the associated data type"/>
+        </insert>
+    </changeSet>
 
 
 </databaseChangeLog>

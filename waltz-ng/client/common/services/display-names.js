@@ -35,15 +35,6 @@ export const attestationTypeDisplayNames = {
 };
 
 
-export const authSourceRatingNames = {
-    PRIMARY: 'Primary Source',
-    SECONDARY: 'Secondary Source',
-    NO_OPINION: 'No Opinion',
-    DISCOURAGED: 'Discouraged Source',
-    NOT_APPLICABLE: 'N/A'
-};
-
-
 export const bookmarkNames = {
     APPLICATION_INSTANCE: 'Application Instance',
     BUILD_SYSTEM: 'Automated Build / Deployment System',

@@ -23,6 +23,7 @@ import _ from "lodash";
 import {scalePoint} from "d3-scale";
 import {event, select} from "d3-selection";
 import "d3-selection-multi";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const template = require('./source-and-target-graph.html');
@@ -561,12 +562,12 @@ function update(sections,
 /**
  * Note: it is v. important the $element is an element with some width,
  * simply placing this in a element like a waltz-section will cause it
- * to render with 0x0....
+ * to render with 0x0...
  * @param $element
  * @param $window
- * @param dataTypeService
+ * @param serviceBroker
  */
-function controller($element, $window, dataTypeService) {
+function controller($element, $window, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
     const svg = select($element.find('svg')[0]);
@@ -582,9 +583,10 @@ function controller($element, $window, dataTypeService) {
 
         const tweakers = _.defaultsDeep(vm.tweakers, dfltTweakers);
 
-        dataTypeService
-            .loadDataTypes()
-            .then(types => {
+        serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .then(r => {
+                const types = r.data;
                 const data = {
                     logicalFlows: vm.logicalFlows || [],
                     decorators: vm.decorators || [],
@@ -613,7 +615,7 @@ function controller($element, $window, dataTypeService) {
 controller.$inject = [
     '$element',
     '$window',
-    'DataTypeService'
+    'ServiceBroker'
 ];
 
 

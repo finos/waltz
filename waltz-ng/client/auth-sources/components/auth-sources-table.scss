@@ -10,7 +10,11 @@
  *
  */
 
-.waltz-auth-sources-table .indirect {
-  font-style: italic;
-  color: #999;;
+.waltz-auth-sources-table {
+    padding-top: 4px;
+
+    .indirect {
+        font-style: italic;
+        color: #999;;
+    }
 }

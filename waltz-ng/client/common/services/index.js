@@ -22,7 +22,6 @@ import {
     applicationRatingNames,
     assetCostKindNames,
     attestationTypeDisplayNames,
-    authSourceRatingNames,
     bookmarkNames,
     capabilityRatingNames,
     changeInitiativeNames,
@@ -161,7 +160,6 @@ export default (module) => {
         .register('orgUnitKind', orgUnitKindNames)
         .register('physicalSpecDefinitionFieldType', physicalSpecDefinitionFieldTypeNames)
         .register('physicalSpecDefinitionType', physicalSpecDefinitionTypeNames)
-        .register('rating', authSourceRatingNames)
         .register('relationshipKind', relationshipKindNames)
         .register('rollupKind', rollupKindNames)
         .register('severity', severityNames)

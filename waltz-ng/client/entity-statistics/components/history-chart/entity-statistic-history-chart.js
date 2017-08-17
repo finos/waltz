@@ -315,7 +315,6 @@ function draw(sections,
  * to render with 0x0....
  * @param $element
  * @param $window
- * @param dataTypeService
  */
 function controller($element, $window) {
 

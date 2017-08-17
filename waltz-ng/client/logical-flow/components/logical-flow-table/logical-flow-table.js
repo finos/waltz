@@ -41,8 +41,12 @@ const ratingColumn = {
     displayName: 'Source Rating',
     cellTemplate: `<span>
                      <waltz-rating-indicator-cell rating="row.entity.ragRating"></waltz-rating-indicator-cell>
-                     <span class="ui-grid-cell-contents" 
-                           ng-bind="COL_FIELD | toDisplayName:'rating'"></span>
+                     <span class="ui-grid-cell-contents">
+                       <waltz-enum-value type="'AuthoritativenessRating'"
+                                         show-icon="false"
+                                         key="COL_FIELD">
+                       </waltz-enum-value>
+                     </span>
                    </span>`,
 };
 

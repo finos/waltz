@@ -2,7 +2,7 @@
                name="Data Flows"
                id="rated-flows-boingy-section">
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-sm-4">
             <div>
                 <div class="waltz-paragraph text-muted small">
                     Use this panel to configure this view:
@@ -14,7 +14,7 @@
                 </h5>
 
                 <div class="waltz-flow-filter-options-overlay waltz-paragraph small"
-                     style="padding-bottom: 4px;">
+                     style="padding-bottom: 4px; margin-left: 1em;">
                     Select one of the following ratings:
 
                     <div class="wffoo-scopes">
@@ -23,8 +23,10 @@
                                 <input type="checkbox"
                                        ng-model='$ctrl.filterOptions.showPrimary'
                                        ng-change="$ctrl.filterChanged()">
-                                Primary -
-                                <span class="text-muted">Only show flows with a Primary rating</span>
+                                <waltz-enum-value type="'AuthoritativenessRating'"
+                                                  show-icon="false"
+                                                  key="'PRIMARY'">
+                                </waltz-enum-value>
                             </label>
                         </div>
 
@@ -33,8 +35,10 @@
                                 <input type="checkbox"
                                        ng-model='$ctrl.filterOptions.showSecondary'
                                        ng-change="$ctrl.filterChanged()">
-                                Secondary -
-                                <span class="text-muted">Only show flows with a Secondary rating</span>
+                                <waltz-enum-value type="'AuthoritativenessRating'"
+                                                  show-icon="false"
+                                                  key="'SECONDARY'">
+                                </waltz-enum-value>
                             </label>
                         </div>
 
@@ -43,8 +47,10 @@
                                 <input type="checkbox"
                                        ng-model='$ctrl.filterOptions.showDiscouraged'
                                        ng-change="$ctrl.filterChanged()">
-                                Discouraged -
-                                <span class="text-muted">Only show flows with a Discouraged rating</span>
+                                <waltz-enum-value type="'AuthoritativenessRating'"
+                                                  show-icon="false"
+                                                  key="'DISCOURAGED'">
+                                </waltz-enum-value>
                             </label>
                         </div>
 
@@ -53,8 +59,10 @@
                                 <input type="checkbox"
                                        ng-model='$ctrl.filterOptions.showNoOpinion'
                                        ng-change="$ctrl.filterChanged()">
-                                No opinion -
-                                <span class="text-muted">Only show flows with an unknown rating</span>
+                                <waltz-enum-value type="'AuthoritativenessRating'"
+                                                  show-icon="false"
+                                                  key="'NO_OPINION'">
+                                </waltz-enum-value>
                             </label>
                         </div>
 
@@ -83,7 +91,7 @@
             </div>
 
         </div>
-        <div class="col-md-8">
+        <div class="col-sm-8">
             <div ng-if="$ctrl.flowData.entities.length == 0">
                 <div class="alert alert-warning">
                     <strong>No data to show</strong> given the current filter options.

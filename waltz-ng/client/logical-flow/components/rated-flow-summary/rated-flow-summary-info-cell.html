@@ -19,8 +19,10 @@
             <strong>Rating</strong>
         </td>
         <td>
-            <span ng-bind="$ctrl.rating | toDisplayName:'rating'">
-            </span>
+            <waltz-enum-value type="'AuthoritativenessRating'"
+                              show-icon="false"
+                              key="$ctrl.rating">
+            </waltz-enum-value>
         </td>
     </tr>
     <tr>
