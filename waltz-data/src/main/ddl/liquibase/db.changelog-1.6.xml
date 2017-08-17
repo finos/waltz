@@ -196,4 +196,40 @@
     </changeSet>
 
 
+    <!-- 2492: enum value table -->
+    <changeSet id="20170816-2492-1"
+               author="davidwatkins73">
+        <comment>2492: Create enum value table</comment>
+        <createTable tableName="enum_value"
+                     remarks="Store enum values - display names, descriptions and icon names">
+            <column name="type"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="key"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="icon_name"
+                    type="${enum.type}"
+                    remarks="The default value 'fw', stands for fixed-width which acts like a spacer icon"
+                    defaultValue="fw">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="type,key"
+                       constraintName="enum_value_pkey"
+                       tableName="enum_value"/>
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -15,32 +15,23 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
-import {CORE_API} from '../../common/services/core-api-utils';
 
-const initData = {
-    id: 134,
-};
+package com.khartec.waltz.model;
 
 
-function controller(serviceBroker)
-{
-    const vm = Object.assign(this, initData);
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
-    serviceBroker.loadViewData(CORE_API.EnumValueStore.findAll).then(r => console.log(r.data));
+@Value.Immutable
+@JsonSerialize(as = ImmutableEnumValue.class)
+@JsonDeserialize(as = ImmutableEnumValue.class)
+public abstract class EnumValue implements
+        IconProvider,
+        DescriptionProvider,
+        NameProvider {
+
+    public abstract String type();
+    public abstract String key();
+
 }
-
-
-controller.$inject = ['ServiceBroker'];
-
-
-const view = {
-    template: require('./playpen1.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;

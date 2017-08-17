@@ -31,6 +31,7 @@ import {EntityNamedNoteStore_API as EntityNamedNoteStore} from "../../entity-nam
 import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../entity-named-note/services/entity-named-note-type-store";
 import {EntitySearchStore_API as EntitySearchStore} from "../../entity/services/entity-search-store";
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
+import {EnumValueStore_API as EnumValueStore} from "../../enum-value/services/enum-value-store";
 import {FlowDiagramStore_API as FlowDiagramStore} from "../../flow-diagram/services/flow-diagram-store";
 import {FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore} from "../../flow-diagram/services/flow-diagram-annotation-store";
 import {FlowDiagramEntityStore_API as FlowDiagramEntityStore} from "../../flow-diagram/services/flow-diagram-entity-store";
@@ -68,6 +69,7 @@ export const CORE_API = {
     EntityNamedNoteTypeStore,
     EntitySearchStore,
     EntityStatisticStore,
+    EnumValueStore,
     FlowDiagramStore,
     FlowDiagramAnnotationStore,
     FlowDiagramEntityStore,

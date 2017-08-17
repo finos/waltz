@@ -23,6 +23,7 @@ let dataTypes = [];
 function service(dataTypeStore) {
 
     const loadDataTypes = (force = false) => {
+        console.log('DEPRECATED - data-type-service:loadDataTypes - use sevice broker')
         if (force || (dataTypesPromise == null)) {
             dataTypesPromise = dataTypeStore.findAll()
                 .then(d => dataTypes = d);
