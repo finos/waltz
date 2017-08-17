@@ -16,67 +16,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from '../../common'
-import {CORE_API} from "../../common/services/core-api-utils";
+import {initialiseData} from '../../../common/index';
+
+import template from './enum-value.html';
 
 
 const bindings = {
-    flowOriginators: '<'
+    type: '<',
+    key: '<',
+    showIcon: '<?'
 };
-
-
-const template = require('./data-type-originators.html');
 
 
 const initialState = {
-    dataTypes: [],
-    flowOriginators: {}
+    showIcon: true
 };
 
 
-function prepareData(dataTypes = [], flowOriginators = {}) {
-    const typesById = _.keyBy(dataTypes, 'id');
-
-    // TODO: enrich with dtu flow info
-    return _.map(flowOriginators, (apps, typeId) => {
-        return {
-            dataType: typesById[typeId],
-            appReferences: _.sortBy(apps, 'name')
-        };
-    });
-
-
-}
-
-
-function controller(serviceBroker) {
-
+function controller(displayNameService, descriptionService, iconNameService) {
     const vm = initialiseData(this, initialState);
 
-    serviceBroker
-        .loadAppData(CORE_API.DataTypeStore.findAll)
-        .then(r => vm.dataTypes = r.data);
-
-    vm.$onChanges = () => {
-        vm.originators = prepareData(vm.dataTypes, vm.flowOriginators);
+    const refresh = () => {
+        vm.name = displayNameService.lookup(vm.type, vm.key);
+        vm.description = descriptionService.lookup(vm.type, vm.key);
+        vm.icon = iconNameService.lookup(vm.type, vm.key);
     };
 
+    vm.$onInit = () => refresh();
+    vm.$onChanges = () => refresh();
 }
 
 
 controller.$inject = [
-    'ServiceBroker'
+    'DisplayNameService',
+    'DescriptionService',
+    'IconNameService'
 ];
 
 
 const component = {
-    bindings,
     template,
+    bindings,
     controller
 };
 
 
-
-
-export default component;
+export default {
+    component,
+    id: 'waltzEnumValue'
+};

@@ -19,13 +19,15 @@
 
 import angular from 'angular';
 import * as EnumValueStore from './services/enum-value-store';
-import {registerStore} from '../common/module-utils';
+import {registerStores, registerComponents} from '../common/module-utils';
+import EnumValue from './components/enum-value/enum-value'
 
 export default () => {
 
     const module = angular.module('waltz.enum-value', []);
 
-    registerStore(module, EnumValueStore);
+    registerStores(module, [ EnumValueStore ]);
+    registerComponents(module, [ EnumValue ])
 
     return module.name;
 };

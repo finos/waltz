@@ -17,9 +17,10 @@
             <td>
                 <span>
                     <waltz-rating-indicator value="{{source.rating}}"></waltz-rating-indicator>
-                    <span>
-                        {{source.rating|toDisplayName:'rating'}}
-                    </span>
+                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                       show-icon="false"
+                                       key="source.rating">
+                    </waltz-enum-value>
                     <span ng-if="source.parentReference.id != $ctrl.orgUnitId" class="small">
                         (Declared by: {{$ctrl.lookupOrgUnitName(source.parentReference.id)}})
                     </span>

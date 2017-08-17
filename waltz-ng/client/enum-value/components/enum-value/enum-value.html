@@ -1,0 +1,10 @@
+<span class="waltz-enum-value">
+    <waltz-icon name="{{ $ctrl.icon }}"
+                ng-if="$ctrl.showIcon">
+    </waltz-icon>
+    <span ng-bind="$ctrl.name"
+          uib-popover="{{ $ctrl.description }}"
+          popover-append-to-body="true"
+          popover-trigger="mouseenter">
+    </span>
+</span>

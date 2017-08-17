@@ -29,7 +29,6 @@ export default () => {
     registerStore(module, dataTypeStore);
 
     module
-        .service('DataTypeService', require('./services/data-type-service'))
         .service('DataTypeViewDataService', require('./services/data-type-view-data'));
 
     module

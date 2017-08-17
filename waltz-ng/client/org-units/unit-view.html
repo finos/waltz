@@ -109,7 +109,16 @@
                     This section shows the authoritative sources for data types.  A source can be declared locally to this
                     organisational unit or declared by a <i>parent</i> organisational unit.  An authoritative source
                     consists of the data type, the source application (it's owning unit is shown in parenthesis) and a rating
-                    of either primary or secondary.
+                    of either '
+                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                      show-icon="false"
+                                      key="'PRIMARY'">
+                    </waltz-enum-value>
+                    ' or '
+                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                      show-icon="false"
+                                      key="'SECONDARY'">
+                    </waltz-enum-value>'.
                 </div>
 
             </uib-tab>

@@ -30,7 +30,10 @@
                 </td>
                 <td>
                     <waltz-rating-indicator value="{{authSource.rating}}"></waltz-rating-indicator>
-                    <span ng-bind="authSource.rating | toDisplayName:'rating'"></span>
+                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                      show-icon="false"
+                                      key="authSource.rating">
+                    </waltz-enum-value>
                 </td>
                 <td>
                     <a ng-click="$ctrl.showDetail(authSource)" class="clickable">
@@ -55,7 +58,12 @@
                 Application
                 <mark ng-bind="$ctrl.selected.applicationReference.name"></mark>
                 has been declared as a
-                <mark ng-bind="$ctrl.selected.rating | toDisplayName:'rating'"></mark>
+                <mark>
+                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                      show-icon="false"
+                                      key="$ctrl.selected.rating">
+                    </waltz-enum-value>
+                </mark>
                 of
                 <mark ng-bind="$ctrl.selected.dataType | toDisplayName:'dataType'"></mark>
                 data by the organisational unit -

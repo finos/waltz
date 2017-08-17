@@ -32,7 +32,7 @@
             </td>
 
             <td>
-                <div uib-tooltip="Rating: {{flow.decorator.rating | toDisplayName:'rating'}}"
+                <div uib-tooltip="{{flow.decorator.rating | toDescription:'AuthoritativenessRating'}}"
                      tooltip-append-to-body="true"
                      tooltip-placement="top">
                     <waltz-rating-indicator-cell rating="flow.decorator.rating">
