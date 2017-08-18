@@ -17,13 +17,16 @@
  */
 
 import angular from 'angular';
+import {registerStores} from '../common/module-utils';
+import * as AssetCostStore from './services/asset-cost-store';
 
 export default () => {
 
     const module = angular.module('waltz.asset.cost', []);
 
+    registerStores(module, [ AssetCostStore ]);
+
     module
-        .service('AssetCostStore', require('./services/asset-cost-store'))
         .service('AssetCostViewService', require('./services/asset-cost-view-service'));
 
     module

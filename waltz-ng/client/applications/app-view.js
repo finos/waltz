@@ -91,7 +91,6 @@ function controller($q,
                     $state,
                     $stateParams,
                     appViewStore,
-                    assetCostStore,
                     aliasStore,
                     databaseStore,
                     entityStatisticStore,
@@ -213,10 +212,6 @@ function controller($q,
                 .findStatsForEntity(entityReference)
                 .then(stats => vm.entityStatistics = stats),
 
-            assetCostStore
-                .findByAppId(id)
-                .then(costs => vm.costs = costs),
-
             perspectiveDefinitionStore
                 .findAll()
                 .then(pds => vm.perspectiveDefinitions = pds),
@@ -300,7 +295,6 @@ controller.$inject = [
     '$state',
     '$stateParams',
     'ApplicationViewStore',
-    'AssetCostStore',
     'AliasStore',
     'DatabaseStore',
     'EntityStatisticStore',

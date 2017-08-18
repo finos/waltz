@@ -21,7 +21,7 @@ import _ from 'lodash';
 
 const initialState = {
     parentEntityRef: {
-        id: 73,
+        id: 25821,
         kind: 'APPLICATION'
     }
 };

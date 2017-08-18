@@ -19,7 +19,7 @@
 import {checkIsIdSelector} from "../../common/checks";
 
 
-const service = ($http, root) => {
+export function store($http, root) {
 
     const BASE = `${root}/asset-cost`;
 
@@ -80,9 +80,46 @@ const service = ($http, root) => {
         findTotalCostForAppSelector,
         calculateCombinedAmountsForSelector
     };
+}
+
+store.$inject = ['$http', 'BaseApiUrl'];
+
+
+
+export const serviceName = 'AssetCostStore';
+
+
+export const AssetCostStore_API = {
+    findByCode: {
+        serviceName,
+        serviceFnName: 'findByCode',
+        description: 'executes findByCode'
+    },
+    findByAppId: {
+        serviceName,
+        serviceFnName: 'findByAppId',
+        description: 'executes findByAppId'
+    },
+    findAppCostsByAppIdSelector: {
+        serviceName,
+        serviceFnName: 'findAppCostsByAppIdSelector',
+        description: 'executes findAppCostsByAppIdSelector'
+    },
+    findTopAppCostsByAppIdSelector: {
+        serviceName,
+        serviceFnName: 'findTopAppCostsByAppIdSelector',
+        description: 'executes findTopAppCostsByAppIdSelector'
+    },
+    findTotalCostForAppSelector: {
+        serviceName,
+        serviceFnName: 'findTotalCostForAppSelector',
+        description: 'executes findTotalCostForAppSelector'
+    },
+    calculateCombinedAmountsForSelector: {
+        serviceName,
+        serviceFnName: 'calculateCombinedAmountsForSelector',
+        description: 'executes calculateCombinedAmountsForSelector'
+    }
 };
 
-service.$inject = ['$http', 'BaseApiUrl'];
 
-
-export default service;
