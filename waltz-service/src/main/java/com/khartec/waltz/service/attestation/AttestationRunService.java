@@ -7,10 +7,7 @@ import com.khartec.waltz.data.attestation.AttestationInstanceDao;
 import com.khartec.waltz.data.attestation.AttestationInstanceRecipientDao;
 import com.khartec.waltz.data.attestation.AttestationRunDao;
 import com.khartec.waltz.data.involvement.InvolvementDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdCommandResponse;
-import com.khartec.waltz.model.ImmutableIdCommandResponse;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.model.person.Person;
 import org.jooq.Record1;
@@ -18,9 +15,7 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -69,6 +64,36 @@ public class AttestationRunService {
     }
 
 
+    public AttestationCreateSummary getCreateSummary(AttestationRunCreateCommand command){
+
+        Select<Record1<Long>> idSelector = mkIdSelector(command.targetEntityKind(), command.selectionOptions());
+
+        Map<EntityReference, List<Person>> entityReferenceToPeople = getEntityReferenceToPeople(
+                command.targetEntityKind(),
+                command.selectionOptions(),
+                command.involvementKindIds());
+
+        int entityCount = attestationRunDao.getEntityCount(idSelector);
+
+        int instanceCount = entityReferenceToPeople
+                .keySet()
+                .size();
+
+        long recipientCount = entityReferenceToPeople.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .distinct()
+                .count();
+
+        return ImmutableAttestationCreateSummary.builder()
+                .entityCount(entityCount)
+                .instanceCount(instanceCount)
+                .recipientCount(recipientCount)
+                .build();
+
+    }
+
+    
     public IdCommandResponse create(String userId, AttestationRunCreateCommand command) {
         // create run
         Long runId = attestationRunDao.create(userId, command);
@@ -89,12 +114,9 @@ public class AttestationRunService {
         AttestationRun attestationRun = attestationRunDao.getById(attestationRunId);
         checkNotNull(attestationRun, "attestationRun " + attestationRunId + " not found");
 
-        IdSelectorFactory idSelectorFactory = idSelectorFactoryProvider.getForKind(attestationRun.targetEntityKind());
-
-        Select<Record1<Long>> idSelector = idSelectorFactory.apply(attestationRun.selectionOptions());
-        Map<EntityReference, List<Person>> entityRefToPeople = involvementDao.findPeopleByEntitySelectorAndInvolvement(
+        Map<EntityReference, List<Person>> entityRefToPeople = getEntityReferenceToPeople(
                 attestationRun.targetEntityKind(),
-                idSelector,
+                attestationRun.selectionOptions(),
                 attestationRun.involvementKindIds());
 
         return entityRefToPeople.entrySet()
@@ -103,6 +125,23 @@ public class AttestationRunService {
                                 .flatMap(p -> mkInstanceRecipients(attestationRunId, e.getKey(), p.email())))
                 .distinct()
                 .collect(toList());
+    }
+
+
+    private Map<EntityReference, List<Person>> getEntityReferenceToPeople(EntityKind targetEntityKind,
+                                                                          IdSelectionOptions selectionOptions,
+                                                                          Set<Long> involvementKindIds) {
+        Select<Record1<Long>> idSelector = mkIdSelector(targetEntityKind, selectionOptions);
+        return involvementDao.findPeopleByEntitySelectorAndInvolvement(
+                targetEntityKind,
+                idSelector,
+                involvementKindIds);
+    }
+
+
+    private Select<Record1<Long>> mkIdSelector(EntityKind targetEntityKind, IdSelectionOptions selectionOptions) {
+        IdSelectorFactory idSelectorFactory = idSelectorFactoryProvider.getForKind(targetEntityKind);
+        return idSelectorFactory.apply(selectionOptions);
     }
 
 

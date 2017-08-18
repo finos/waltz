@@ -139,11 +139,52 @@
                 <div class="form-group" style="padding-top: 10px">
                     <div class="col-sm-offset-2 col-sm-10">
                         <button type="button"
-                                ng-if="!(attestationRunForm.$invalid)"
-                                ng-click="ctrl.onSubmit()"
-                                class="btn btn-success">
-                            Create
+                                ng-if="!(attestationRunForm.$invalid) && !ctrl.loadingSummary && !ctrl.displaySummary"
+                                ng-click="ctrl.loadCreateSummary()"
+                                class="btn btn-warning">
+                            Next
                         </button>
+                        <div ng-if="ctrl.displaySummary">
+                            <h3>Summary</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-condensed">
+                                        <tbody>
+                                        <tr>
+                                            <td>
+                                                #
+                                                <span ng-bind="ctrl.attestationRun.targetEntityKind | toDisplayName:'entity'"></span>s
+                                                matching selector
+                                            </td>
+                                            <td ng-bind="ctrl.summary.entityCount"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                #
+                                                <span ng-bind="ctrl.attestationRun.targetEntityKind | toDisplayName:'entity'"></span>s
+                                                to be attested
+                                            </td>
+                                            <td ng-bind="ctrl.summary.instanceCount"></td>
+                                        </tr>
+                                        <tr>
+                                            <td># Recipients</td>
+                                            <td ng-bind="ctrl.summary.recipientCount"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <br>
+                            <button type="button"
+                                    ng-click="ctrl.create()"
+                                    class="btn btn-success">
+                                Create
+                            </button>
+                            <a class="clickable"
+                               ng-click="ctrl.cancel()">
+                                Cancel
+                            </a>
+                        </div>
                 <span ng-if="attestationRunForm.$invalid"
                       class="alert alert-warning"
                       style="padding-bottom: 10px;">
