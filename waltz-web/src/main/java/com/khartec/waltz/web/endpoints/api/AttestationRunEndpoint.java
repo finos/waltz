@@ -2,6 +2,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 
 import com.khartec.waltz.model.IdCommandResponse;
+import com.khartec.waltz.model.attestation.AttestationCreateSummary;
 import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.attestation.AttestationRunCreateCommand;
 import com.khartec.waltz.model.survey.SurveyRun;
@@ -19,9 +20,7 @@ import spark.Request;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class AttestationRunEndpoint implements Endpoint {
@@ -46,12 +45,20 @@ public class AttestationRunEndpoint implements Endpoint {
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findByRecipientPath = mkPath(BASE_URL, "user");
+        String getCreateSummaryPath = mkPath(BASE_URL, "create-summary");
+
 
         DatumRoute<AttestationRun> getByIdRoute = (req, res) ->
                 attestationRunService.getById(getId(req));
 
         ListRoute<AttestationRun> findByRecipientRoute = (req, res) ->
                 attestationRunService.findByRecipient(WebUtilities.getUsername(req));
+
+        DatumRoute<AttestationCreateSummary> getCreateSummaryRoute = (req, res) -> {
+            AttestationRunCreateCommand createCommand = readBody(req, AttestationRunCreateCommand.class);
+            return attestationRunService
+                    .getCreateSummary(createCommand);
+        };
 
         DatumRoute<IdCommandResponse> attestationRunCreateRoute = (req, res) -> {
             ensureUserHasAdminRights(req);
@@ -66,6 +73,7 @@ public class AttestationRunEndpoint implements Endpoint {
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByRecipientPath, findByRecipientRoute);
         postForDatum(BASE_URL, attestationRunCreateRoute);
+        postForDatum(getCreateSummaryPath, getCreateSummaryRoute);
     }
 
 

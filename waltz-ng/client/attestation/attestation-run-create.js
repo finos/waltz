@@ -56,19 +56,40 @@ const initialState = {
         'CHANGE_INITIATIVE': [exactScope],
         'ORG_UNIT': [exactScope, childrenScope],
         'MEASURABLE': [exactScope, childrenScope]
-    }
-
+    },
+    displaySummary: false,
+    loadingSummary: false
 };
 
 
 const template = require('./attestation-run-create.html');
 
 
+function mkCreateCommand(attestationRun){
+    const involvementKindIds = _.map(attestationRun.involvementKinds, ik => ik.id);
+    return {
+        name: attestationRun.name,
+        description: attestationRun.description,
+        selectionOptions: {
+            entityReference: {
+                kind: attestationRun.selectorEntityKind,
+                id: attestationRun.selectorEntity.id
+            },
+            scope: attestationRun.selectorScope
+        },
+        targetEntityKind: attestationRun.targetEntityKind,
+        involvementKindIds: involvementKindIds,
+        dueDate: attestationRun.dueDate
+    };
+}
+
+
 function controller(notification, serviceBroker, involvementKindStore) {
 
     const vm = initialiseData(this, initialState);
 
-    involvementKindStore.findAll().then(
+    involvementKindStore.findAll()
+        .then(
         involvementKinds => {
             vm.availableInvolvementKinds = involvementKinds;
         }
@@ -82,30 +103,33 @@ function controller(notification, serviceBroker, involvementKindStore) {
         vm.attestationRun.selectorEntity = entity;
     };
 
-    vm.onSubmit = () => {
-        const involvementKindIds = _.map(vm.attestationRun.involvementKinds, ik => ik.id);
-        const command = {
-            name: vm.attestationRun.name,
-            description: vm.attestationRun.description,
-            selectionOptions: {
-                entityReference: {
-                    kind: vm.attestationRun.selectorEntityKind,
-                    id: vm.attestationRun.selectorEntity.id
-                },
-                scope: vm.attestationRun.selectorScope
-            },
-            targetEntityKind: vm.attestationRun.targetEntityKind,
-            involvementKindIds: involvementKindIds,
-            dueDate: vm.attestationRun.dueDate
-        };
+    vm.loadCreateSummary = () => {
+        const command = mkCreateCommand(vm.attestationRun);
+        vm.loadingSummary = true;
+        serviceBroker
+            .execute(CORE_API.AttestationRunStore.getCreateSummary, [command])
+            .then(res => {
+                vm.summary = res.data;
+                vm.loadingSummary = false;
+                vm.displaySummary = true;
+            });
+    };
+
+    vm.create = () => {
+        const command = mkCreateCommand(vm.attestationRun);
+
         serviceBroker
             .execute(CORE_API.AttestationRunStore.create, [command])
             .then(res => {
                 // todo redirect to attestation run page
-                notification.success('Attestation run created successfully');                
+                notification.success('Attestation run created successfully');
             }, () => notification.error('Failed to create attestation run'))
     };
 
+    vm.cancel = () => {
+        vm.displaySummary = false;
+        vm.summary = null;
+    };
 }
 
 

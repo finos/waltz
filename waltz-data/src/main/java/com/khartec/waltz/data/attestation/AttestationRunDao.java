@@ -8,9 +8,8 @@ import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.attestation.AttestationRunCreateCommand;
 import com.khartec.waltz.model.attestation.ImmutableAttestationRun;
 import com.khartec.waltz.schema.tables.records.AttestationRunRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -99,5 +98,13 @@ public class AttestationRunDao {
         record.insert();
 
         return record.getId();
+    }
+
+
+    public int getEntityCount(Select<Record1<Long>> idSelector) {
+        Field<Integer> entityCount = DSL.count().as("entity_count");
+        return dsl.select(entityCount)
+                .from(idSelector)
+                .fetchOne(r -> r.get(entityCount));
     }
 }

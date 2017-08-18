@@ -21,6 +21,12 @@ function store($http, baseApiUrl) {
 
     const base = `${baseApiUrl}/attestation-run`;
 
+    const getCreateSummary = (cmd) => {
+        return $http
+            .post(`${base}/create-summary`, cmd)
+            .then(r => r.data);
+    };
+
     const create = (cmd) => {
         return $http
             .post(base, cmd)
@@ -32,7 +38,7 @@ function store($http, baseApiUrl) {
             .get(`${base}/id/${id}`)
             .then(r => r.data);
     };
-    
+
     const findByRecipient = () => {
         return $http
             .get(`${base}/user`)
@@ -40,6 +46,7 @@ function store($http, baseApiUrl) {
     };
 
     return {
+        getCreateSummary,
         create,
         getById,
         findByRecipient
@@ -57,6 +64,11 @@ const serviceName = 'AttestationRunStore';
 
 
 export const AttestationRunStore_API = {
+    getCreateSummary: {
+        serviceName,
+        serviceFnName: 'getCreateSummary',
+        description: 'get create summary when creating an attestation run'
+    },
     create: {
         serviceName,
         serviceFnName: 'create',
